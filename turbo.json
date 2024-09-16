@@ -1,61 +1,19 @@
 {
   "$schema": "https://turborepo.org/schema.json",
-  "globalDependencies": [
-    "**/.env"
-  ],
+  "globalDependencies": ["**/.env"],
   "ui": "stream",
   "tasks": {
-    "topo": {
-      "dependsOn": [
-        "^topo"
-      ]
-    },
     "build": {
-      "env": [],
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        ".env"
-      ],
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**",
-        "next-env.d.ts",
-        ".expo/**"
-      ]
-    },
-    "start": {
-      "cache": false
-    },
-    "test": {
-      "cache": false
-    },
-    "dev": {
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        ".env"
-      ],
-      "persistent": true,
-      "cache": false
-    },
-    "jobs": {
-      "persistent": true,
-      "cache": false
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
     },
     "lint": {
-      "dependsOn": [
-        "^topo"
-      ]
+      "outputs": []
     },
-    "typecheck": {
-      "dependsOn": [
-        "^topo"
-      ],
-      "outputs": [
-        "node_modules/.cache/tsbuildinfo.json"
-      ]
+    "dev": {
+      "inputs": ["$TURBO_DEFAULT$", ".env"],
+      "persistent": true,
+      "cache": false
     }
   }
 }

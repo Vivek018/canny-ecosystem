@@ -1,0 +1,10 @@
+{
+  "name": "@canny_ecosystem/types",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./index.d.ts"
+  }
+}

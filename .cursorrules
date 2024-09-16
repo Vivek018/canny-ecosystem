@@ -42,7 +42,7 @@ UI and Styling:
 
 Performance Optimization:
 
-- Minimize 'useEffect', and 'setState'; favor React Remix Components (RSC)
+- Minimize 'useEffect', and 'setState'; favor React Remix Design Pattern Components
 - Wrap client components in Suspense with fallback
 - Use dynamic loading for non-critical components
 - Optimize images: use WebP format, include size data, implement lazy loading

@@ -1,0 +1,59 @@
+{
+  "name": "@canny_ecosystem/ui",
+  "version": "1.0.0",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "files": ["tailwind.config.ts", "postcss.config.js", "globals.css"],
+  "scripts": {
+    "build:icons": "tsx ./src/other/build-icons.ts",
+    "clean": "rm -rf .turbo node_modules",
+    "lint": "biome lint",
+    "format": "biome --write .",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/react": "^18.3.5",
+    "autoprefixer": "^10.4.20",
+    "node-html-parser": "^6.1.13",
+    "postcss": "^8.4.43",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwindcss": "^3.4.10",
+    "tsx": "^4.19.1",
+    "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "@radix-ui/react-avatar": "^1.1.0",
+    "@radix-ui/react-dropdown-menu": "^2.1.1",
+    "@radix-ui/react-popover": "^1.1.1",
+    "@radix-ui/react-select": "^2.1.1",
+    "@radix-ui/react-slot": "^1.1.0",
+    "@radix-ui/react-tooltip": "^1.1.2",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "execa": "^8.0.1",
+    "tailwind-merge": "^1.11.0",
+    "tailwindcss-animate": "^1.0.7"
+  },
+  "exports": {
+    "./globals.css": "./src/globals.css",
+    "./utils/cn": "./src/utils/cn.ts",
+    "./button": "./src/components/button.tsx",
+    "./icon": "./src/components/icon.tsx",
+    "./tooltip": "./src/components/tooltip.tsx",
+    "./popover": "./src/components/popover.tsx",
+    "./textarea": "./src/components/textarea.tsx",
+    "./loader": "./src/components/loader.tsx",
+    "./skeleton": "./src/components/skeleton.tsx",
+    "./avatar": "./src/components/avatar.tsx",
+    "./select": "./src/components/select.tsx",
+    "./dropdown-menu": "./src/components/dropdown-menu.tsx",
+    "./common-sidebar": "./src/components/common-sidebar.tsx",
+    "./tailwind.config": "./tailwind.config.ts",
+    "./postcss": "./postcss.config.js",
+    "./hooks/isomorphic-layout-effect": "./src/hooks/isomorphic-layout-effect.ts",
+    "./hooks/is-document": "./src/hooks/is-document.ts"
+  }
+}

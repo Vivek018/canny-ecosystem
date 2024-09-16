@@ -1,29 +1,27 @@
 {
-  "name": "canny-eco",
+  "name": "canny_ecosystem",
   "private": true,
+  "workspaces": ["tooling/*", "packages/*", "apps/*"],
   "scripts": {
     "build": "turbo build",
+    "clean": "git clean -xdf node_modules",
     "clean:workspaces": "turbo clean",
     "dev": "turbo dev --parallel",
-    "dev:app": "turbo dev --filter=@v1/app",
-    "start:app": "turbo start --filter=@v1/app",
+    "dev:payroll": "turbo dev --filter=@canny_ecosystem/payroll",
+    "start:payroll": "turbo start --filter=@canny_ecosystem/payroll",
     "test": "turbo test --parallel",
     "format": "biome format --write .",
-    "lint": "turbo lint",
+    "lint": "turbo lint && manypkg check",
     "typecheck": "turbo typecheck"
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
+    "@manypkg/cli": "^0.21.4",
     "turbo": "^2.1.1",
-    "typescript": "^5.4.5"
+    "typescript": "^5.5.4"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20.0.0"
   },
-  "packageManager": "npm@10.8.3",
-  "workspaces": [
-    "apps/*",
-    "packages/*",
-    "tooling/*"
-  ]
+  "packageManager": "npm@10.8.3"
 }

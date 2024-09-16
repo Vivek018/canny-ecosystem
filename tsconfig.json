@@ -1,0 +1,3 @@
+{
+  "extends": "@canny_ecosystem/typescript/base.json"
+}
