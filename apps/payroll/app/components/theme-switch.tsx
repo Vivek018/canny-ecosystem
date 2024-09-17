@@ -40,7 +40,7 @@ export const ThemeSwitch = ({ theme = "system" }: { theme?: Theme }) => {
             { theme: value, returnTo: location.pathname + location.search },
             {
               method: "POST",
-              action: "cookie",
+              action: "/cookie",
             },
           )
         }
@@ -55,7 +55,7 @@ export const ThemeSwitch = ({ theme = "system" }: { theme?: Theme }) => {
                 <ThemeIcon
                   currentTheme={theme as Theme}
                   size="font"
-                  className="mr-2.5 mb-0.5"
+                  className="mr-2 mb-[2.5px]"
                 />
                 {theme}
               </SelectItem>

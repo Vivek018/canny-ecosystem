@@ -1,0 +1,27 @@
+{
+  "name": "@canny_ecosystem/supabase",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "clean": "rm -rf .turbo node_modules",
+    "lint": "biome lint",
+    "format": "biome format --write .",
+    "typecheck": "tsc --noEmit",
+    "db:generate": "supabase gen types --lang=typescript --project-id oghojvhpbxanipiuxwbu --schema public > src/types/db.ts"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.5.1",
+    "react": "^18.3.1",
+    "supabase": "^1.192.5"
+  },
+  "devDependencies": {
+    "@supabase/supabase-js": "^2.45.4",
+    "typescript": "^5.5.4"
+  },
+  "exports": {
+    "./server": "./src/clients/server.ts",
+    "./client": "./src/clients/client.ts",
+    "./types": "./src/types/index.ts"
+  }
+}

@@ -1,0 +1,40 @@
+import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
+import { redirect, type LoaderFunctionArgs, json } from "@remix-run/node";
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const requestUrl = new URL(request.url);
+  const code = requestUrl.searchParams.get("code");
+  const next = requestUrl.searchParams.get("next") || "/";
+  const headers = new Headers();
+
+  if (code) {
+    const { supabase, headers: supabaseHeaders } = getSupabaseWithHeaders({
+      request,
+    });
+
+    try {
+      const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+
+      if (error) {
+        console.error(
+          "Auth Callback - Error exchanging code for session:",
+          error,
+        );
+        return json({ error: error.message }, { status: 500 });
+      }
+
+      if (data.session) {
+        headers.append("Set-Cookie", supabaseHeaders.get("Set-Cookie") || "");
+        return redirect(next, { headers });
+      }
+    } catch (error) {
+      console.error("Auth Callback - Unexpected error:", error);
+      return json({ error: "An unexpected error occurred" }, { status: 500 });
+    }
+  } else {
+    console.error("Auth Callback - No code provided in URL");
+  }
+
+  // If we reach here, something went wrong
+  return redirect("/sign-in?error=auth_callback_failed", { headers });
+}

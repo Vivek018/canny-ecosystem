@@ -8,6 +8,7 @@ import {
   TooltipTrigger,
 } from "./tooltip";
 import type { NavList } from "@canny_ecosystem/types";
+import { Logo } from "./logo";
 
 type SidebarProps = {
   className?: string;
@@ -32,10 +33,8 @@ export function CommonSidebar({
       )}
     >
       <div className={cn("mt-6 flex w-min items-center gap-2 mx-auto")}>
-        <Link to="/" className={cn("flex w-min cursor-pointer gap-3")}>
-          <h1 className="w-max text-3xl font-extrabold uppercase tracking-wider">
-            💰
-          </h1>
+        <Link to="/">
+          <Logo />
         </Link>
       </div>
       <div
@@ -55,10 +54,10 @@ export function CommonSidebar({
                         cn(
                           "flex cursor-pointer rounded-md w-min px-4 py-3.5 text-sm tracking-wide hover:bg-accent justify-center",
                           isActive
-                            ? "bg-primary/0 border border-primary text-primary shadow-sm hover:bg-primary/20"
+                            ? "bg-primary/15 text-primary shadow-sm hover:bg-primary/20"
                             : "",
                           link === path
-                            ? "cursor-auto bg-primary/20 border border-primary text-primary shadow-sm hover:bg-primary/20"
+                            ? "cursor-auto bg-primary/25  text-primary shadow-sm hover:bg-primary/25"
                             : "",
                         )
                       }

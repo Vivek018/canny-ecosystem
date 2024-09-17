@@ -3,14 +3,17 @@ import {
   type LoaderFunctionArgs,
   type LinksFunction,
   type HeadersFunction,
+  redirect,
 } from "@remix-run/node";
 import {
+  Link,
   Links,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useLocation,
 } from "@remix-run/react";
 
 import tailwindStyleSheetUrl from "@/styles/tailwind.css?url";
@@ -20,6 +23,15 @@ import { getTheme } from "./utils/server/theme.server";
 import { useTheme } from "./utils/theme";
 // import { href as iconsHref } from './components/ui/icon'
 import { ClientHintCheck, getHints } from "./utils/client-hints";
+import { useNonce } from "./utils/providers/nonce-provider";
+import {
+  getSupabaseEnv,
+  getSupabaseWithHeaders,
+  getSupabaseWithSessionAndHeaders,
+} from "@canny_ecosystem/supabase/server";
+import { useSupabase } from "@canny_ecosystem/supabase/client";
+import { Logo } from "@canny_ecosystem/ui/logo";
+import { ThemeSwitch } from "./components/theme-switch";
 // import { getDomainUrl } from './utils/misx'
 // import { useNonce } from './utils/providers/nonce-provider'
 
@@ -28,9 +40,17 @@ export const links: LinksFunction = () => {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  const { supabase } = getSupabaseWithHeaders({ request });
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return json({
+    user,
     requestInfo: {
       hints: getHints(request),
+
       // origin: getDomainUrl(request),
       path: new URL(request.url).pathname,
       userPrefs: {
@@ -75,20 +95,41 @@ function Document({
 
 function App() {
   const {
+    user,
     requestInfo: {
       userPrefs: { theme: initialTheme },
     },
   } = useLoaderData<typeof loader>();
 
+  const nonce = useNonce();
   const theme = useTheme();
+
   return (
-    <Document nonce={"nonce"} theme={theme}>
+    <Document nonce={nonce} theme={theme}>
       <main className="flex h-full w-full bg-background text-foreground ">
-        <Sidebar className="flex-none" />
-        <div className="flex max-h-screen flex-grow flex-col overflow-scroll px-4">
-          <Header theme={initialTheme || "system"} />
-          <Outlet />
-        </div>
+        {!user ? (
+          <div className="w-full h-full">
+            <header className="flex justify-between items-center mx-5 mt-4 md:mx-10 md:mt-10">
+              <div>
+                <Link to="/">
+                  <Logo />
+                </Link>
+              </div>
+              <div>
+                <ThemeSwitch />
+              </div>
+            </header>
+            <Outlet />
+          </div>
+        ) : (
+          <>
+            <Sidebar className="flex-none" />
+            <div className="flex max-h-screen flex-grow flex-col overflow-scroll px-4">
+              <Header theme={initialTheme || "system"} />
+              <Outlet />
+            </div>
+          </>
+        )}
       </main>
     </Document>
   );

@@ -42,6 +42,7 @@
     "./utils/cn": "./src/utils/cn.ts",
     "./button": "./src/components/button.tsx",
     "./icon": "./src/components/icon.tsx",
+    "./logo": "./src/components/logo.tsx",
     "./tooltip": "./src/components/tooltip.tsx",
     "./popover": "./src/components/popover.tsx",
     "./textarea": "./src/components/textarea.tsx",
