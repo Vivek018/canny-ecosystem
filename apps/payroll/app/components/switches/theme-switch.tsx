@@ -1,4 +1,4 @@
-import { Icon } from "@canny_ecosystem/ui/icon";
+import { Icon, type Size } from "@canny_ecosystem/ui/icon";
 
 import {
   Select,
@@ -13,7 +13,7 @@ import { themes } from "@/utils/theme";
 
 type Props = {
   currentTheme?: Theme;
-  size?: "md" | "font" | "xs" | "sm" | "lg" | "xl";
+  size?: Size;
   className?: string;
 };
 

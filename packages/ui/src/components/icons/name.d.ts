@@ -10,6 +10,7 @@ export type IconName =
   | "dashboard"
   | "dot-filled"
   | "employee"
+  | "feedback"
   | "input"
   | "lab-timer"
   | "laptop"

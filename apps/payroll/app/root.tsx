@@ -3,7 +3,6 @@ import {
   type LoaderFunctionArgs,
   type LinksFunction,
   type HeadersFunction,
-  redirect,
 } from "@remix-run/node";
 import {
   Link,
@@ -13,7 +12,6 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
-  useLocation,
 } from "@remix-run/react";
 
 import tailwindStyleSheetUrl from "@/styles/tailwind.css?url";
@@ -24,27 +22,25 @@ import { useTheme } from "./utils/theme";
 // import { href as iconsHref } from './components/ui/icon'
 import { ClientHintCheck, getHints } from "./utils/client-hints";
 import { useNonce } from "./utils/providers/nonce-provider";
-import {
-  getSupabaseEnv,
-  getSupabaseWithHeaders,
-  getSupabaseWithSessionAndHeaders,
-} from "@canny_ecosystem/supabase/server";
-import { useSupabase } from "@canny_ecosystem/supabase/client";
+import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Logo } from "@canny_ecosystem/ui/logo";
-import { ThemeSwitch } from "./components/theme-switch";
+import { ThemeSwitch } from "./components/switches/theme-switch";
+import { getAuthUser } from "@canny_ecosystem/supabase/cached-queries";
+import { getUserQuery } from "@canny_ecosystem/supabase/queries";
 // import { getDomainUrl } from './utils/misx'
-// import { useNonce } from './utils/providers/nonce-provider'
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: tailwindStyleSheetUrl }].filter(Boolean);
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  const { user: authUser } = await getAuthUser({ request });
   const { supabase } = getSupabaseWithHeaders({ request });
+  let user = null;
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (authUser?.email) {
+    user = await getUserQuery({ supabase, email: authUser.email });
+  }
 
   return json({
     user,
@@ -116,7 +112,7 @@ function App() {
                 </Link>
               </div>
               <div>
-                <ThemeSwitch />
+                <ThemeSwitch theme={initialTheme || "system"} />
               </div>
             </header>
             <Outlet />
@@ -125,7 +121,7 @@ function App() {
           <>
             <Sidebar className="flex-none" />
             <div className="flex max-h-screen flex-grow flex-col overflow-scroll px-4">
-              <Header theme={initialTheme || "system"} />
+              <Header theme={initialTheme || "system"} user={user} />
               <Outlet />
             </div>
           </>

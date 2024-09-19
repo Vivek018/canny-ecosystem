@@ -1,5 +1,5 @@
-// import { sendFeebackAction } from "@/actions/send-feedback-action";
 import { Button } from "@canny_ecosystem/ui/button";
+import { Icon } from "@canny_ecosystem/ui/icon";
 import { Loader } from "@canny_ecosystem/ui/loader";
 import {
   Popover,
@@ -7,6 +7,7 @@ import {
   PopoverTrigger,
 } from "@canny_ecosystem/ui/popover";
 import { Textarea } from "@canny_ecosystem/ui/textarea";
+
 import { useState } from "react";
 
 export function FeedbackForm() {
@@ -18,11 +19,12 @@ export function FeedbackForm() {
       <PopoverTrigger asChild className="md:flex-inline">
         <Button
           variant="outline"
-          className="rounded-full font-normal h-8 p-0 px-3 text-xs text-[#878787]"
+          className="rounded-full font-normal h-10 p-0 px-3 text-xs text-[#878787]"
         >
-          Feedback
+          <Icon name="feedback" size="md" />
         </Button>
       </PopoverTrigger>
+
       <PopoverContent
         className="w-[320px] h-[200px]"
         sideOffset={10}

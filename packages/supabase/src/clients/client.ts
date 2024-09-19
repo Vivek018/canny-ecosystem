@@ -1,9 +1,7 @@
 import { createBrowserClient } from "@supabase/ssr";
-import type { Database, SupabaseEnv } from "../types";
+import type { Database, SupabaseEnv, TypedSupabaseClient } from "../types";
 import { useEffect, useState } from "react";
-import type { Session, SupabaseClient } from "@supabase/supabase-js";
-
-export type TypedSupabaseClient = SupabaseClient<Database>;
+import type { Session } from "@supabase/supabase-js";
 
 export type SupabaseOutletContext = {
   supabase: TypedSupabaseClient;

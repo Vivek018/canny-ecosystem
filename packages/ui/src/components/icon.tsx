@@ -15,7 +15,7 @@ const sizeClassName = {
   xl: "w-7 h-7",
 } as const;
 
-type Size = keyof typeof sizeClassName;
+export type Size = keyof typeof sizeClassName;
 
 const childrenSizeClassName = {
   font: "gap-2",

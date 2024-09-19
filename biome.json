@@ -4,7 +4,10 @@
     "enabled": true
   },
   "linter": {
-    "ignore": ["node_modules", "packages/tsconfig"],
+    "ignore": [
+      "node_modules",
+      "packages/tsconfig"
+    ],
     "enabled": true,
     "rules": {
       "suspicious": {
@@ -19,6 +22,8 @@
         "noParameterAssign": "off"
       },
       "correctness": {
+        "noUnusedVariables": "warn",
+        "noUnusedImports": "warn",
         "useExhaustiveDependencies": "off"
       }
     }

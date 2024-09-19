@@ -1,5 +1,6 @@
+import { safeRedirect } from "@/utils/server/http.server";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { redirect, type LoaderFunctionArgs, json } from "@remix-run/node";
+import { type LoaderFunctionArgs, json } from "@remix-run/node";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const requestUrl = new URL(request.url);
@@ -25,7 +26,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
       if (data.session) {
         headers.append("Set-Cookie", supabaseHeaders.get("Set-Cookie") || "");
-        return redirect(next, { headers });
+        return safeRedirect(next, { headers });
       }
     } catch (error) {
       console.error("Auth Callback - Unexpected error:", error);
@@ -36,5 +37,5 @@ export async function loader({ request }: LoaderFunctionArgs) {
   }
 
   // If we reach here, something went wrong
-  return redirect("/sign-in?error=auth_callback_failed", { headers });
+  return safeRedirect("/sign-in?error=auth_callback_failed", { headers });
 }

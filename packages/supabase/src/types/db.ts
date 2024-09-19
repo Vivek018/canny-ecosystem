@@ -9,7 +9,7 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      Company: {
+      company: {
         Row: {
           created_at: string
           email_suffix: string | null
@@ -33,6 +33,36 @@ export type Database = {
           logo?: string | null
           main_address?: string | null
           name?: string
+        }
+        Relationships: []
+      }
+      user: {
+        Row: {
+          avatar: string | null
+          created_at: string
+          email: string
+          first_name: string
+          id: string
+          last_checked_in: string
+          last_name: string | null
+        }
+        Insert: {
+          avatar?: string | null
+          created_at?: string
+          email?: string
+          first_name: string
+          id?: string
+          last_checked_in: string
+          last_name?: string | null
+        }
+        Update: {
+          avatar?: string | null
+          created_at?: string
+          email?: string
+          first_name?: string
+          id?: string
+          last_checked_in?: string
+          last_name?: string | null
         }
         Relationships: []
       }

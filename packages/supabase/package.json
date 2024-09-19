@@ -11,6 +11,7 @@
     "db:generate": "supabase gen types --lang=typescript --project-id oghojvhpbxanipiuxwbu --schema public > src/types/db.ts"
   },
   "dependencies": {
+    "@canny_ecosystem/utils": "*",
     "@supabase/ssr": "^0.5.1",
     "react": "^18.3.1",
     "supabase": "^1.192.5"
@@ -22,6 +23,9 @@
   "exports": {
     "./server": "./src/clients/server.ts",
     "./client": "./src/clients/client.ts",
+    "./queries": "./src/queries/index.ts",
+    "./cached-queries": "./src/queries/cached-queries.ts",
+    "./mutations": "./src/mutations/index.ts",
     "./types": "./src/types/index.ts"
   }
 }

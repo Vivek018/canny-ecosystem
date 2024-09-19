@@ -11,27 +11,32 @@ import {
   DropdownMenuTrigger,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { SignOut } from "./sign-out";
+import type { Database } from "@canny_ecosystem/supabase/types";
 
 export function UserMenu({
   onlySignOut = false,
   userData,
   Link,
-}: { onlySignOut?: boolean; userData: any; Link: React.ElementType }) {
+}: {
+  onlySignOut?: boolean;
+  userData: Database["public"]["Tables"]["user"]["Row"];
+  Link: React.ElementType;
+}) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Avatar className="rounded-full w-10 h-10 cursor-pointer">
-          {userData?.avatar_url && (
+        <Avatar className="rounded-full w-[44px] h-[44px] cursor-pointer">
+          {userData?.avatar && (
             <img
-              src={userData?.avatar_url}
-              alt={userData?.full_name}
+              src={userData?.avatar}
+              alt={userData?.first_name + userData?.last_name}
               width={32}
               height={32}
             />
           )}
           <AvatarFallback>
             <span className="text-xs">
-              {userData?.full_name?.charAt(0)?.toUpperCase()}
+              {userData?.first_name?.charAt(0)?.toUpperCase()}
             </span>
           </AvatarFallback>
         </Avatar>
@@ -42,7 +47,9 @@ export function UserMenu({
             <DropdownMenuLabel>
               <div className="flex justify-between items-center">
                 <div className="flex flex-col">
-                  <span className="truncate">{userData.full_name}</span>
+                  <span className="truncate">
+                    {`${userData.first_name} ${userData.last_name}`}
+                  </span>
                   <span className="truncate text-xs text-[#606060] font-normal">
                     {userData.email}
                   </span>

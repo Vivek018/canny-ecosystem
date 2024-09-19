@@ -11,7 +11,6 @@ export const getSupabaseEnv = (): SupabaseEnv => ({
 });
 
 export function getSupabaseWithHeaders({ request }: { request: Request }) {
-  const cookies = parseCookieHeader(request.headers.get("Cookie") ?? "");
   const headers = new Headers();
 
   const supabase = createServerClient<Database>(

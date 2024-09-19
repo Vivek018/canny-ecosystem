@@ -52,7 +52,7 @@ export function CommonSidebar({
                       to={link ?? ""}
                       className={({ isActive }: { isActive: boolean }) =>
                         cn(
-                          "flex cursor-pointer rounded-md w-min px-4 py-3.5 text-sm tracking-wide hover:bg-accent justify-center",
+                          "flex cursor-pointer rounded w-min px-4 py-3.5 text-sm tracking-wide hover:bg-accent justify-center",
                           isActive
                             ? "bg-primary/15 text-primary shadow-sm hover:bg-primary/20"
                             : "",

@@ -3,7 +3,9 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
+      "@/*": [
+        "./src/*"
+      ],
       "@/icon-name": [
         "./src/components/icons/name.d.ts",
         "./types/icon-name.d.ts"
@@ -13,8 +15,10 @@
   "include": [
     "src",
     "../../apps/payroll/app/components/assistant",
-    "../../apps/payroll/app/components/theme-switch.tsx",
+    "../../apps/payroll/app/components/switches/theme-switch.tsx",
     "../../apps/payroll/app/components/sign-out.tsx"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

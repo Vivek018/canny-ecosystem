@@ -1,5 +1,6 @@
+import { safeRedirect } from "@/utils/server/http.server";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { json, redirect } from "@remix-run/node";
+import { json } from "@remix-run/node";
 
 export const action = async ({ request }: { request: Request }) => {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
@@ -10,5 +11,5 @@ export const action = async ({ request }: { request: Request }) => {
     return json({ error: error.message }, { status: 500 });
   }
 
-  return redirect("/sign-in", { headers });
+  return safeRedirect("/sign-in", { headers });
 };
