@@ -1,4 +1,5 @@
-import { Button, buttonVariants } from "@canny_ecosystem/ui/button";
+import { CREATE_COMPANY } from "@/constant";
+import { buttonVariants } from "@canny_ecosystem/ui/button";
 import {
   Select,
   SelectContent,
@@ -8,9 +9,8 @@ import {
   SelectTrigger,
 } from "@canny_ecosystem/ui/select";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { useSubmit } from "@remix-run/react";
-
-const CREATE_COMPANY = "create company";
+import { replaceDash } from "@canny_ecosystem/utils";
+import { useNavigate, useSubmit } from "@remix-run/react";
 
 const companies = [
   {
@@ -26,8 +26,13 @@ const companies = [
 
 export const CompanySwitch = ({ className }: { className?: string }) => {
   const submit = useSubmit();
+  const navigate = useNavigate();
 
-  const onValueChange = (value: string) => {};
+  const onValueChange = (value: string) => {
+    if (value === CREATE_COMPANY) {
+      navigate("/create-company");
+    }
+  };
 
   return (
     <div className={cn("flex items-center relative", className)}>
@@ -51,10 +56,11 @@ export const CompanySwitch = ({ className }: { className?: string }) => {
               value={CREATE_COMPANY}
               className={cn(
                 buttonVariants({ variant: "ghost" }),
-                "w-full text-primary hover:text-primary focus:text-primary capitalize",
+                "w-full text-primary hover:text-primary focus:text-primary cursor-pointer capitalize",
               )}
+              noIcon={true}
             >
-              {CREATE_COMPANY}
+              {replaceDash(CREATE_COMPANY)}
             </SelectItem>
           </SelectGroup>
         </SelectContent>

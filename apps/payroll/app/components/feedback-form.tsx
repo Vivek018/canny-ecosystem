@@ -19,14 +19,14 @@ export function FeedbackForm() {
       <PopoverTrigger asChild className="md:flex-inline">
         <Button
           variant="outline"
-          className="rounded-full font-normal h-10 p-0 px-3 text-xs text-[#878787]"
+          className="rounded-full font-normal h-10 text-xs text-[#878787]"
         >
           <Icon name="feedback" size="md" />
         </Button>
       </PopoverTrigger>
 
       <PopoverContent
-        className="w-[320px] h-[200px]"
+        className="w-[320px]"
         sideOffset={10}
         align="end"
       >
@@ -38,7 +38,7 @@ export function FeedbackForm() {
             </p>
           </div>
         ) : (
-          <form className="space-y-4">
+          <form>
             <Textarea
               name="feedback"
               value={value}
@@ -49,7 +49,7 @@ export function FeedbackForm() {
               onChange={(evt: any) => setValue(evt.target.value)}
             />
 
-            <div className="mt-1 flex items-center justify-end">
+            <div className="mt-4 flex items-center justify-end">
               <Button
                 type="button"
                 // onClick={() => action.execute({ feedback: value })}

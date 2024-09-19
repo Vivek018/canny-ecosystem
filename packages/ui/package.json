@@ -4,7 +4,11 @@
   "private": true,
   "sideEffects": false,
   "type": "module",
-  "files": ["tailwind.config.ts", "postcss.config.js", "globals.css"],
+  "files": [
+    "tailwind.config.ts",
+    "postcss.config.js",
+    "globals.css"
+  ],
   "scripts": {
     "build:icons": "tsx ./src/other/build-icons.ts",
     "clean": "rm -rf .turbo node_modules",
@@ -25,8 +29,11 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
+    "@conform-to/react": "^1.2.1",
     "@radix-ui/react-avatar": "^1.1.0",
+    "@radix-ui/react-checkbox": "^1.1.1",
     "@radix-ui/react-dropdown-menu": "^2.1.1",
+    "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-popover": "^1.1.1",
     "@radix-ui/react-select": "^2.1.1",
     "@radix-ui/react-slot": "^1.1.0",
@@ -40,11 +47,13 @@
   "exports": {
     "./globals.css": "./src/globals.css",
     "./utils/cn": "./src/utils/cn.ts",
+    "./label": "./src/components/label.tsx",
     "./button": "./src/components/button.tsx",
     "./icon": "./src/components/icon.tsx",
     "./logo": "./src/components/logo.tsx",
     "./tooltip": "./src/components/tooltip.tsx",
     "./popover": "./src/components/popover.tsx",
+    "./input": "./src/components/input.tsx",
     "./textarea": "./src/components/textarea.tsx",
     "./loader": "./src/components/loader.tsx",
     "./skeleton": "./src/components/skeleton.tsx",
@@ -52,6 +61,7 @@
     "./select": "./src/components/select.tsx",
     "./dropdown-menu": "./src/components/dropdown-menu.tsx",
     "./common-sidebar": "./src/components/common-sidebar.tsx",
+    "./forms": "./src/components/forms.tsx",
     "./tailwind.config": "./tailwind.config.ts",
     "./postcss": "./postcss.config.js",
     "./hooks/isomorphic-layout-effect": "./src/hooks/isomorphic-layout-effect.ts",
