@@ -1,4 +1,4 @@
-import { CREATE_COMPANY } from "@/constant";
+import { CREATE_COMPANY } from "@/routes/_company+/create-company";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import {
   Select,
@@ -10,58 +10,59 @@ import {
 } from "@canny_ecosystem/ui/select";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { replaceDash } from "@canny_ecosystem/utils";
-import { useNavigate, useSubmit } from "@remix-run/react";
+import { Link, useLocation, useSubmit } from "@remix-run/react";
+import { useRef } from "react";
+import type { CompaniesDatabaseRow } from "types";
 
-const companies = [
-  {
-    value: "company-1",
-  },
-  {
-    value: "company-2",
-  },
-  {
-    value: "company-3",
-  },
-];
-
-export const CompanySwitch = ({ className }: { className?: string }) => {
+export const CompanySwitch = ({
+  companies,
+  className,
+}: { companies: CompaniesDatabaseRow; className?: string }) => {
   const submit = useSubmit();
-  const navigate = useNavigate();
+  const linkRef = useRef<HTMLAnchorElement | null>(null);
+  const location = useLocation();
 
   const onValueChange = (value: string) => {
-    if (value === CREATE_COMPANY) {
-      navigate("/create-company");
-    }
+
   };
 
   return (
     <div className={cn("flex items-center relative", className)}>
-      <Select defaultValue={companies[0].value} onValueChange={onValueChange}>
+      <Select
+        key={location.key}
+        defaultValue={companies[0].name}
+        onValueChange={onValueChange}
+      >
         <SelectTrigger className="w-full py-1.5 px-4 gap-2 rounded-full bg-transparent capitalize h-10 text-sm tracking-wide">
-          {"select Company"}
+          {companies[0].name}
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
             {companies.map((company) => (
               <SelectItem
-                key={company.value}
-                value={company.value}
+                key={company.id}
+                value={company.name}
                 className="py-2"
+                onKeyDown={() => {
+                  if (companies[companies.length - 1].id === company.id) {
+                    linkRef.current?.focus();
+                  }
+                }}
               >
-                {company.value}
+                {company.name}
               </SelectItem>
             ))}
             <SelectSeparator />
-            <SelectItem
-              value={CREATE_COMPANY}
+            <Link
+              ref={linkRef}
+              to={`/${CREATE_COMPANY}`}
               className={cn(
                 buttonVariants({ variant: "ghost" }),
-                "w-full text-primary hover:text-primary focus:text-primary cursor-pointer capitalize",
+                "text-primary hover:text-primary focus:text-primary cursor-pointer capitalize",
               )}
-              noIcon={true}
             >
               {replaceDash(CREATE_COMPANY)}
-            </SelectItem>
+            </Link>
           </SelectGroup>
         </SelectContent>
       </Select>

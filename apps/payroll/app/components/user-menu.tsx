@@ -25,7 +25,7 @@ export function UserMenu({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="rounded-full focus:outline-none focus:dark:brightness-150 hover:dark:brightness-150 focus:brightness-90 hover:brightness-90">
-        <Avatar className="rounded-full w-[44px] h-[44px] cursor-pointer">
+        <Avatar className="rounded-full w-10 h-10 cursor-pointer">
           {userData?.avatar && (
             <img
               src={userData?.avatar}

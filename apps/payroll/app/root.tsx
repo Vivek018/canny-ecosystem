@@ -19,35 +19,47 @@ import { Sidebar } from "@/components/sidebar";
 import { Header } from "@/components/header";
 import { getTheme } from "./utils/server/theme.server";
 import { useTheme } from "./utils/theme";
-// import { href as iconsHref } from './components/ui/icon'
+import { href as iconsHref } from "@canny_ecosystem/ui/icon";
 import { ClientHintCheck, getHints } from "./utils/client-hints";
 import { useNonce } from "./utils/providers/nonce-provider";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Logo } from "@canny_ecosystem/ui/logo";
 import { ThemeSwitch } from "./components/switches/theme-switch";
 import { getAuthUser } from "@canny_ecosystem/supabase/cached-queries";
-import { getUserQuery } from "@canny_ecosystem/supabase/queries";
-// import { getDomainUrl } from './utils/misx'
+import {
+  getCompaniesQuery,
+  getUserQuery,
+} from "@canny_ecosystem/supabase/queries";
 
 export const links: LinksFunction = () => {
-  return [{ rel: "stylesheet", href: tailwindStyleSheetUrl }].filter(Boolean);
+  return [
+    { rel: "preload", href: iconsHref, as: "image" },
+    { rel: "stylesheet", href: tailwindStyleSheetUrl },
+  ].filter(Boolean);
+};
+
+export const headers: HeadersFunction = ({ loaderHeaders }) => {
+  return {
+    "Server-Timing": loaderHeaders.get("Server-Timing") ?? "",
+  };
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { user: authUser } = await getAuthUser({ request });
   const { supabase } = getSupabaseWithHeaders({ request });
   let user = null;
+  let companies = null;
 
   if (authUser?.email) {
-    user = await getUserQuery({ supabase, email: authUser.email });
+    user = (await getUserQuery({ supabase, email: authUser.email })).data;
+    companies = (await getCompaniesQuery({ supabase })).data;
   }
 
   return json({
     user,
+    companies,
     requestInfo: {
       hints: getHints(request),
-
-      // origin: getDomainUrl(request),
       path: new URL(request.url).pathname,
       userPrefs: {
         theme: getTheme(request),
@@ -55,12 +67,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
     },
   });
 }
-
-export const headers: HeadersFunction = ({ loaderHeaders }) => {
-  return {
-    "Server-Timing": loaderHeaders.get("Server-Timing") ?? "",
-  };
-};
 
 function Document({
   children,
@@ -92,6 +98,7 @@ function Document({
 function App() {
   const {
     user,
+    companies,
     requestInfo: {
       userPrefs: { theme: initialTheme },
     },
@@ -121,7 +128,11 @@ function App() {
           <>
             <Sidebar className="flex-none" />
             <div className="flex max-h-screen flex-grow flex-col overflow-scroll px-4">
-              <Header theme={initialTheme || "system"} user={user} />
+              <Header
+                theme={initialTheme || "system"}
+                user={user}
+                companies={companies ?? []}
+              />
               <Outlet />
             </div>
           </>

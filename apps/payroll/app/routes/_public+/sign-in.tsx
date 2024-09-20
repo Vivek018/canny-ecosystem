@@ -8,7 +8,7 @@ import {
   type ActionFunctionArgs,
   type LoaderFunctionArgs,
 } from "@remix-run/node";
-import { Form, useActionData, useLoaderData } from "@remix-run/react";
+import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
@@ -22,7 +22,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   return json({ error });
 };
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export async function action ({ request }: ActionFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({
     request,
   });
@@ -80,13 +80,13 @@ export default function SignIn() {
           <p className="text-xs text-[#878787]">
             By clicking continue, you acknowledge that you have read and agree
             to Canny's{" "}
-            <a href="/public/terms" className="underline">
+            <Link to="/terms" className="underline">
               Terms of Service
-            </a>{" "}
+            </Link>{" "}
             and{" "}
-            <a href="/public/policy" className="underline">
+            <Link to="/policy" className="underline">
               Privacy Policy
-            </a>
+            </Link>
             .
           </p>
         </div>

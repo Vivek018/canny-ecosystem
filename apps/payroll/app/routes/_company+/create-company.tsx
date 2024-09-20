@@ -1,14 +1,20 @@
 import {
-  CREATE_COMPANY,
+  MAX_FILE_SIZE,
   zEmailSuffix,
   zImage,
   zNumberString,
   zTextArea,
-} from "@/constant";
+} from "@canny_ecosystem/utils";
+import { createCompany } from "@canny_ecosystem/supabase/mutations";
+import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Field, TextareaField } from "@canny_ecosystem/ui/forms";
 import { Label } from "@canny_ecosystem/ui/label";
-import { replaceDash, replaceUnderscore } from "@canny_ecosystem/utils";
+import {
+  getInitialValueFromZod,
+  replaceDash,
+  replaceUnderscore,
+} from "@canny_ecosystem/utils";
 import {
   FormProvider,
   getFormProps,
@@ -17,29 +23,69 @@ import {
   useForm,
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
+import type { ActionFunctionArgs } from "@remix-run/node";
 import { Form } from "@remix-run/react";
+import {
+  json,
+  unstable_parseMultipartFormData as parseMultipartFormData,
+  unstable_createMemoryUploadHandler as createMemoryUploadHandler,
+} from "@remix-run/node";
 import { z } from "zod";
+import { safeRedirect } from "@/utils/server/http.server";
+
+export const CREATE_COMPANY = "create-company";
 
 const CompanySchema = z.object({
   id: z.string().optional(),
-  name: zNumberString.min(4),
+  name: zNumberString.min(3),
   logo: zImage,
-  email_suffix: zEmailSuffix,
+  email_suffix: zEmailSuffix.optional(),
   service_charge: z.number().min(2).max(20),
-  reimbursement_charge: z.number().min(0.1).max(20).optional(),
+  reimbursement_charge: z.number().min(0.5).max(20).optional(),
   main_address: zTextArea,
 });
 
+export async function action({ request }: ActionFunctionArgs) {
+  const { supabase } = getSupabaseWithHeaders({ request });
+  const formData = await parseMultipartFormData(
+    request,
+    createMemoryUploadHandler({ maxPartSize: MAX_FILE_SIZE }),
+  );
+
+  const submission = parseWithZod(formData, {
+    schema: CompanySchema,
+  });
+
+  if (submission.status !== "success") {
+    return json(
+      { result: submission.reply() },
+      { status: submission.status === "error" ? 400 : 200 },
+    );
+  }
+
+  const { status, error } = await createCompany({
+    supabase,
+    data: submission.value,
+  });
+
+  if (status === 201) {
+    return safeRedirect("/");
+  }
+  return json({ status, error });
+}
+
 export default function CreateCompany() {
+  const initialValues = getInitialValueFromZod(CompanySchema);
+
   const [form, fields] = useForm({
     id: CREATE_COMPANY,
     constraint: getZodConstraint(CompanySchema),
-    // lastResult: actionData?.result,
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: CompanySchema });
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
+    defaultValue: initialValues,
   });
 
   return (
@@ -63,7 +109,7 @@ export default function CreateCompany() {
             labelProps={{ children: fields.name.name }}
             errors={fields.name.errors}
           />
-          <div className="flex justify-between gap-16">
+          <div className="grid grid-cols-2 grid-rows-1 place-items-center justify-between gap-16">
             <Field
               inputProps={{
                 ...getInputProps(fields.logo, { type: "file" }),
@@ -83,7 +129,7 @@ export default function CreateCompany() {
               errors={fields.email_suffix.errors}
             />
           </div>
-          <div className="flex justify-between gap-16">
+          <div className="grid grid-cols-2 grid-rows-1 place-items-center justify-between gap-16">
             <Field
               inputProps={{
                 ...getInputProps(fields.service_charge, { type: "number" }),

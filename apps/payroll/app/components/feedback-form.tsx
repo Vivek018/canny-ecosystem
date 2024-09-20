@@ -12,24 +12,21 @@ import { useState } from "react";
 
 export function FeedbackForm() {
   const [value, setValue] = useState("");
+  const [key, setKey] = useState("initial-key");
 
   const action = { status: "idle" };
   return (
-    <Popover>
+    <Popover key={key}>
       <PopoverTrigger asChild className="md:flex-inline">
         <Button
-          variant="outline"
-          className="rounded-full font-normal h-10 text-xs text-[#878787]"
+          variant="ghost"
+          className="rounded-full px-2.5 border border-input font-normal h-10 text-xs text-[#878787]"
         >
           <Icon name="feedback" size="md" />
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent
-        className="w-[320px]"
-        sideOffset={10}
-        align="end"
-      >
+      <PopoverContent className="w-[320px]" sideOffset={10} align="end">
         {action.status === "hasSucceeded" ? (
           <div className="flex items-center justify-center flex-col space-y-1 mt-10 text-center">
             <p className="font-medium text-sm">Thank you for your feedback!</p>
@@ -49,9 +46,17 @@ export function FeedbackForm() {
               onChange={(evt: any) => setValue(evt.target.value)}
             />
 
-            <div className="mt-4 flex items-center justify-end">
+            <div className="mt-4 flex items-center justify-end gap-3">
               <Button
-                type="button"
+                variant="secondary"
+                onClick={() => {
+                  setKey("cancel-key");
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
                 // onClick={() => action.execute({ feedback: value })}
                 disabled={value.length === 0 || action.status === "executing"}
               >

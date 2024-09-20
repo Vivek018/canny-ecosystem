@@ -17,6 +17,8 @@ export type Database = {
           logo: string | null
           main_address: string | null
           name: string
+          reimbursement_charge: number | null
+          service_charge: number
         }
         Insert: {
           created_at?: string
@@ -25,6 +27,8 @@ export type Database = {
           logo?: string | null
           main_address?: string | null
           name: string
+          reimbursement_charge?: number | null
+          service_charge?: number
         }
         Update: {
           created_at?: string
@@ -33,6 +37,8 @@ export type Database = {
           logo?: string | null
           main_address?: string | null
           name?: string
+          reimbursement_charge?: number | null
+          service_charge?: number
         }
         Relationships: []
       }

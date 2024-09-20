@@ -37,7 +37,7 @@ export function CommonSidebar({
           <Logo />
         </Link>
       </div>
-      <div
+      <nav
         className={cn(
           "no-scrollbar -mt-2.5 flex h-full flex-col gap-4 overflow-scroll items-center px-2.5",
         )}
@@ -77,7 +77,7 @@ export function CommonSidebar({
             );
           })}
         </ul>
-      </div>
+      </nav>
     </aside>
   );
 }

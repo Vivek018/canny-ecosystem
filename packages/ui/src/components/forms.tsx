@@ -6,6 +6,7 @@ import { Input } from "./input";
 import { Label } from "./label";
 import { Textarea } from "./textarea";
 import { cn } from "@/utils";
+import { SearchableSelect, type SearchableSelectOption } from "./combobox";
 
 export type ListOfErrors = Array<string | null | undefined> | null | undefined;
 
@@ -156,6 +157,58 @@ export function CheckboxField({
         />
       </div>
       <div className="px-4 pb-4 pt-1">
+        {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
+      </div>
+    </div>
+  );
+}
+
+type SearchableSelectFieldProps = {
+  options: SearchableSelectOption[];
+  labelProps: React.LabelHTMLAttributes<HTMLLabelElement>;
+  inputProps: React.InputHTMLAttributes<HTMLInputElement>;
+  errors?: ListOfErrors;
+  className?: string;
+  placeholder?: string;
+};
+
+export function SearchableSelectField({
+  options,
+  labelProps,
+  inputProps,
+  errors,
+  className,
+  placeholder,
+}: SearchableSelectFieldProps) {
+  const fallbackId = useId();
+  const id = inputProps.id ?? fallbackId;
+  const errorId = errors?.length ? `${id}-error` : undefined;
+
+  const input = useInputControl({
+    name: inputProps.name!,
+    formId: inputProps.form!,
+    initialValue: inputProps.defaultValue as string,
+  });
+
+  return (
+    <div className={cn("w-full flex flex-col gap-1.5", className)}>
+      <Label {...labelProps} />
+      <input
+        type="hidden"
+        id={id}
+        name={inputProps.name}
+        value={input.value ?? ""}
+        onChange={input.change as any}
+        onBlur={input.blur}
+      />
+      <SearchableSelect
+        key={input.value}
+        options={options}
+        value={input.value ?? ""}
+        onChange={input.change}
+        placeholder={placeholder}
+      />
+      <div className="min-h-[32px] px-4 pb-3 pt-1">
         {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
       </div>
     </div>

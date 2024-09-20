@@ -26,6 +26,7 @@
     "./queries": "./src/queries/index.ts",
     "./cached-queries": "./src/queries/cached-queries.ts",
     "./mutations": "./src/mutations/index.ts",
-    "./types": "./src/types/index.ts"
+    "./types": "./src/types/index.ts",
+    "./constant": "./src/constant.ts"
   }
 }

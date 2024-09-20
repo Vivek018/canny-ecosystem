@@ -45,7 +45,10 @@ export const ThemeSwitch = ({ theme = "system" }: { theme?: Theme }) => {
           )
         }
       >
-        <SelectTrigger className="w-full py-1.5 gap-2 rounded-full bg-transparent capitalize h-10 text-xs">
+        <SelectTrigger
+          noIcon={true}
+          className="w-full py-1.5 px-2.5 gap-2 rounded-full bg-transparent capitalize h-10 text-xs"
+        >
           <ThemeIcon currentTheme={theme as Theme} />
         </SelectTrigger>
         <SelectContent>

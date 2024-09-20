@@ -1,4 +1,4 @@
-import type { TypedSupabaseClient } from "../types";
+import type { Database, TypedSupabaseClient } from "../types";
 
 export async function createUserOrUpdateLastCheckedIn({
   supabase,
@@ -60,7 +60,13 @@ export async function updateUserLastCheckedIn({
   return { status };
 }
 
-export async function updateUser(supabase: TypedSupabaseClient, data: any) {
+export async function updateUser({
+  supabase,
+  data,
+}: {
+  supabase: TypedSupabaseClient;
+  data: Database["public"]["Tables"]["user"]["Insert"];
+}) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -81,4 +87,32 @@ export async function updateUser(supabase: TypedSupabaseClient, data: any) {
   }
 
   return status;
+}
+
+export async function createCompany({
+  supabase,
+  data,
+}: {
+  supabase: TypedSupabaseClient;
+  data: Database["public"]["Tables"]["company"]["Insert"];
+}) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.email) {
+    return {status: 400, error: 'Unauthorized User'};
+  }
+
+  const { error, status } = await supabase
+    .from("company")
+    .insert(data)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { status, error };
 }
