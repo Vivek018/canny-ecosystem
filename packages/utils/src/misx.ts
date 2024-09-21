@@ -8,6 +8,11 @@ export function replaceUnderscore(str: string) {
   return str.replaceAll("_", " ");
 }
 
+export const pipe =
+  (...fns: any[]) =>
+  (val: any) =>
+    fns.reduce((prev, fn) => fn(prev), val);
+
 export function getInitialValueFromZod<T extends z.ZodObject<any, any>>(
   schema: T,
 ): z.infer<T> {

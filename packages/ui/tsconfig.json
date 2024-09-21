@@ -1,5 +1,5 @@
 {
-  "extends": "@canny_ecosystem/typescript/react-library.json",
+  "extends": "@canny_ecosystem/typescript/base.json",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
@@ -14,9 +14,7 @@
   },
   "include": [
     "src",
-    "../../apps/payroll/app/components/assistant",
-    "../../apps/payroll/app/components/switches/theme-switch.tsx",
-    "../../apps/payroll/app/components/sign-out.tsx"
+    "."
   ],
   "exclude": [
     "node_modules"

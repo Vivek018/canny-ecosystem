@@ -116,3 +116,31 @@ export async function createCompany({
 
   return { status, error };
 }
+
+export async function createLocation({
+  supabase,
+  data,
+}: {
+  supabase: TypedSupabaseClient;
+  data: Database["public"]["Tables"]["location"]["Insert"];
+}) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.email) {
+    return {status: 400, error: 'Unauthorized User'};
+  }
+
+  const { error, status } = await supabase
+    .from("location")
+    .insert(data)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { status, error };
+}

@@ -3,12 +3,11 @@ import {
   zEmailSuffix,
   zImage,
   zNumberString,
-  zTextArea,
 } from "@canny_ecosystem/utils";
 import { createCompany } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Button } from "@canny_ecosystem/ui/button";
-import { Field, TextareaField } from "@canny_ecosystem/ui/forms";
+import { Field } from "@canny_ecosystem/ui/forms";
 import { Label } from "@canny_ecosystem/ui/label";
 import {
   getInitialValueFromZod,
@@ -19,7 +18,6 @@ import {
   FormProvider,
   getFormProps,
   getInputProps,
-  getTextareaProps,
   useForm,
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
@@ -42,7 +40,6 @@ const CompanySchema = z.object({
   email_suffix: zEmailSuffix.optional(),
   service_charge: z.number().min(2).max(20),
   reimbursement_charge: z.number().min(0.5).max(20).optional(),
-  main_address: zTextArea,
 });
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -109,27 +106,25 @@ export default function CreateCompany() {
             labelProps={{ children: fields.name.name }}
             errors={fields.name.errors}
           />
-          <div className="grid grid-cols-2 grid-rows-1 place-items-center justify-between gap-16">
-            <Field
-              inputProps={{
-                ...getInputProps(fields.logo, { type: "file" }),
-                placeholder: `Enter ${fields.logo.name}`,
-              }}
-              labelProps={{ children: fields.logo.name }}
-              errors={fields.logo.errors}
-            />
-            <Field
-              inputProps={{
-                ...getInputProps(fields.email_suffix, { type: "text" }),
-                placeholder: `Enter ${replaceUnderscore(fields.email_suffix.name)}`,
-              }}
-              labelProps={{
-                children: replaceUnderscore(fields.email_suffix.name),
-              }}
-              errors={fields.email_suffix.errors}
-            />
-          </div>
-          <div className="grid grid-cols-2 grid-rows-1 place-items-center justify-between gap-16">
+          <Field
+            inputProps={{
+              ...getInputProps(fields.logo, { type: "file" }),
+              placeholder: `Enter ${fields.logo.name}`,
+            }}
+            labelProps={{ children: fields.logo.name }}
+            errors={fields.logo.errors}
+          />
+          <Field
+            inputProps={{
+              ...getInputProps(fields.email_suffix, { type: "text" }),
+              placeholder: `Enter ${replaceUnderscore(fields.email_suffix.name)}`,
+            }}
+            labelProps={{
+              children: replaceUnderscore(fields.email_suffix.name),
+            }}
+            errors={fields.email_suffix.errors}
+          />
+          <div className="grid grid-cols-2 grid-rows-1 place-content-center justify-between gap-16">
             <Field
               inputProps={{
                 ...getInputProps(fields.service_charge, { type: "number" }),
@@ -153,16 +148,6 @@ export default function CreateCompany() {
               errors={fields.reimbursement_charge.errors}
             />
           </div>
-          <TextareaField
-            textareaProps={{
-              ...getTextareaProps(fields.main_address),
-              placeholder: `Enter ${replaceUnderscore(fields.main_address.name)}`,
-            }}
-            labelProps={{
-              children: replaceUnderscore(fields.main_address.name),
-            }}
-            errors={fields.main_address.errors}
-          />
           <div className="ml-auto w-2/5 flex flex-row items-center justify-center gap-4">
             <Button
               variant="secondary"

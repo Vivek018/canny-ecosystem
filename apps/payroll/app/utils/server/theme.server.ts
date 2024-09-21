@@ -1,4 +1,5 @@
 import type { Theme } from "@canny_ecosystem/types";
+import { SECONDS_IN_A_MONTH } from "@canny_ecosystem/utils/constant";
 import * as cookie from "cookie";
 const cookieName = "en_theme";
 
@@ -15,5 +16,8 @@ export function setTheme(theme: Theme | "system") {
   if (theme === "system") {
     return cookie.serialize(cookieName, "", { path: "/", maxAge: -1 });
   }
-  return cookie.serialize(cookieName, theme, { path: "/", maxAge: 31536000 });
+  return cookie.serialize(cookieName, theme, {
+    path: "/",
+    maxAge: SECONDS_IN_A_MONTH * 12,
+  });
 }

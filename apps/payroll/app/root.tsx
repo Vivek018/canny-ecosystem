@@ -25,11 +25,12 @@ import { useNonce } from "./utils/providers/nonce-provider";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Logo } from "@canny_ecosystem/ui/logo";
 import { ThemeSwitch } from "./components/switches/theme-switch";
-import { getAuthUser } from "@canny_ecosystem/supabase/cached-queries";
+import { getSessionUser } from "@canny_ecosystem/supabase/cached-queries";
 import {
   getCompaniesQuery,
   getUserQuery,
 } from "@canny_ecosystem/supabase/queries";
+import { getCompanyIdOrFirstCompany } from "./utils/server/company.server";
 
 export const links: LinksFunction = () => {
   return [
@@ -45,15 +46,17 @@ export const headers: HeadersFunction = ({ loaderHeaders }) => {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { user: authUser } = await getAuthUser({ request });
+  const { user: sessionUser } = await getSessionUser({ request });
   const { supabase } = getSupabaseWithHeaders({ request });
   let user = null;
   let companies = null;
 
-  if (authUser?.email) {
-    user = (await getUserQuery({ supabase, email: authUser.email })).data;
+  if (sessionUser?.email) {
+    user = (await getUserQuery({ supabase, email: sessionUser.email })).data;
     companies = (await getCompaniesQuery({ supabase })).data;
   }
+
+  const companyId = await getCompanyIdOrFirstCompany(request, supabase);
 
   return json({
     user,
@@ -63,6 +66,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       path: new URL(request.url).pathname,
       userPrefs: {
         theme: getTheme(request),
+        companyId: companyId,
       },
     },
   });

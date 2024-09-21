@@ -10,6 +10,8 @@ export type IconName =
   | "cross"
   | "dashboard"
   | "dot-filled"
+  | "dots"
+  | "edit"
   | "employee"
   | "feedback"
   | "input"

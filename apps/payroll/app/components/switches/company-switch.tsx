@@ -1,4 +1,5 @@
 import { CREATE_COMPANY } from "@/routes/_company+/create-company";
+import { useCompanyId } from "@/utils/company";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import {
   Select,
@@ -21,35 +22,45 @@ export const CompanySwitch = ({
   const submit = useSubmit();
   const linkRef = useRef<HTMLAnchorElement | null>(null);
   const location = useLocation();
+  const companyId = useCompanyId();
+  const companyName = companies.find(
+    (company) => company.id === companyId,
+  )?.name;
 
   const onValueChange = (value: string) => {
-
+    submit(
+      { companyId: value, returnTo: location.pathname + location.search },
+      {
+        method: "POST",
+        action: "/cookie",
+      },
+    );
   };
 
   return (
     <div className={cn("flex items-center relative", className)}>
       <Select
         key={location.key}
-        defaultValue={companies[0].name}
+        defaultValue={companyId ?? ""}
         onValueChange={onValueChange}
       >
-        <SelectTrigger className="w-full py-1.5 px-4 gap-2 rounded-full bg-transparent capitalize h-10 text-sm tracking-wide">
-          {companies[0].name}
+        <SelectTrigger className="w-44 py-1.5 px-4 gap-2 rounded-full bg-transparent capitalize h-10 text-sm tracking-wide">
+          <p className="truncate">{companyName}</p>
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
             {companies.map((company) => (
               <SelectItem
                 key={company.id}
-                value={company.name}
-                className="py-2"
+                value={company.id}
+                className="py-2 w-44"
                 onKeyDown={() => {
                   if (companies[companies.length - 1].id === company.id) {
                     linkRef.current?.focus();
                   }
                 }}
               >
-                {company.name}
+                <p className="w-44 truncate">{company.name}</p>
               </SelectItem>
             ))}
             <SelectSeparator />
@@ -58,7 +69,7 @@ export const CompanySwitch = ({
               to={`/${CREATE_COMPANY}`}
               className={cn(
                 buttonVariants({ variant: "ghost" }),
-                "text-primary hover:text-primary focus:text-primary cursor-pointer capitalize",
+                "text-primary w-full hover:text-primary focus:text-primary cursor-pointer capitalize",
               )}
             >
               {replaceDash(CREATE_COMPANY)}

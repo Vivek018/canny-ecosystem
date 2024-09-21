@@ -42,7 +42,7 @@ export function SearchableSelect({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className={cn("max-w-96 truncate justify-between", className)}
+          className={cn("truncate justify-between capitalize", className)}
         >
           {selectedOption ? selectedOption.label : placeholder}
           <Icon
@@ -52,10 +52,10 @@ export function SearchableSelect({
           />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0">
+      <PopoverContent align="start" className="p-0">
         <Command>
           <CommandInput placeholder="Search options..." />
-          <CommandEmpty className="max-w-96 py-6 text-center">
+          <CommandEmpty className="w-full py-6 text-center">
             No option found.
           </CommandEmpty>
           <CommandList className="no-scrollbar">

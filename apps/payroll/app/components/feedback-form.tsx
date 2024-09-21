@@ -20,7 +20,7 @@ export function FeedbackForm() {
       <PopoverTrigger asChild className="md:flex-inline">
         <Button
           variant="ghost"
-          className="rounded-full px-2.5 border border-input font-normal h-10 text-xs text-[#878787]"
+          className="rounded-full px-2.5 border border-input font-normal h-10 text-xs"
         >
           <Icon name="feedback" size="md" />
         </Button>

@@ -1,5 +1,5 @@
 import { safeRedirect } from "@/utils/server/http.server";
-import { getAuthUser } from "@canny_ecosystem/supabase/cached-queries";
+import { getSessionUser } from "@canny_ecosystem/supabase/cached-queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Button } from "@canny_ecosystem/ui/button";
 import {
@@ -13,7 +13,7 @@ import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const error = url.searchParams.get("error");
-  const { user } = await getAuthUser({ request });
+  const { user } = await getSessionUser({ request });
 
   if (user) {
     return safeRedirect("/");

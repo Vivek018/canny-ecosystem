@@ -22,7 +22,7 @@ export function Header({
       <AssistantButton />
       <div className="flex gap-4 items-center no-drag">
         <CompanySwitch companies={companies} />
-        <div className="bg-muted w-[1px] py-1.5 mx-2 h-full">
+        <div className="bg-secondary w-[1.5px] py-1.5 mx-2 h-full">
           &nbsp;
         </div>
         <ThemeSwitch theme={theme} />

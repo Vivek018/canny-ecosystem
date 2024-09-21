@@ -15,7 +15,6 @@ export type Database = {
           email_suffix: string | null
           id: string
           logo: string | null
-          main_address: string | null
           name: string
           reimbursement_charge: number | null
           service_charge: number
@@ -25,7 +24,6 @@ export type Database = {
           email_suffix?: string | null
           id?: string
           logo?: string | null
-          main_address?: string | null
           name: string
           reimbursement_charge?: number | null
           service_charge?: number
@@ -35,12 +33,58 @@ export type Database = {
           email_suffix?: string | null
           id?: string
           logo?: string | null
-          main_address?: string | null
           name?: string
           reimbursement_charge?: number | null
           service_charge?: number
         }
         Relationships: []
+      }
+      location: {
+        Row: {
+          address: string
+          city: string
+          company_id: string | null
+          created_at: string
+          esic_code: string
+          id: string
+          is_main: boolean | null
+          name: string
+          pin_code: string
+          state: string
+        }
+        Insert: {
+          address: string
+          city: string
+          company_id?: string | null
+          created_at?: string
+          esic_code: string
+          id?: string
+          is_main?: boolean | null
+          name: string
+          pin_code: string
+          state: string
+        }
+        Update: {
+          address?: string
+          city?: string
+          company_id?: string | null
+          created_at?: string
+          esic_code?: string
+          id?: string
+          is_main?: boolean | null
+          name?: string
+          pin_code?: string
+          state?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "location_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user: {
         Row: {

@@ -11,3 +11,13 @@ export const getAuthUser = async ({ request }: { request: Request }) => {
 
   return { session, user };
 };
+
+export const getSessionUser = async ({ request }: { request: Request }) => {
+  const { session } = await getSupabaseWithSessionAndHeaders({
+    request,
+  });
+
+  const user = session?.user;
+
+  return { session, user };
+};

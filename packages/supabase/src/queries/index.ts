@@ -38,3 +38,34 @@ export async function getCompaniesQuery({
 
   return { data };
 }
+
+export async function getFirstCompanyQuery({
+  supabase,
+}: { supabase: TypedSupabaseClient }) {
+  const { data, error } = await supabase
+    .from("company")
+    .select("id, name")
+    .limit(SINGLE_QUERY_LIMIT)
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return { data };
+}
+
+export async function getLocationsQuery({
+  supabase,
+}: { supabase: TypedSupabaseClient }) {
+  const { data, error } = await supabase
+    .from("location")
+    .select("id, name, city, state, pin_code, esic_code, is_main, address")
+    .limit(HARD_QUERY_LIMIT);
+
+  if (error) {
+    throw error;
+  }
+
+  return { data };
+}

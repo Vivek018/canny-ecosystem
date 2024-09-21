@@ -128,8 +128,8 @@ export function CheckboxField({
   const errorId = errors?.length ? `${id}-error` : undefined;
 
   return (
-    <div className={cn("w-full", className)}>
-      <div className="flex gap-2">
+    <div className={className}>
+      <div className="flex items-center gap-2">
         <Checkbox
           {...checkboxProps}
           id={id}
@@ -150,13 +150,13 @@ export function CheckboxField({
           }}
           type="button"
         />
-        <label
+        <Label
           htmlFor={id}
           {...labelProps}
-          className="self-center text-body-xs text-muted-foreground"
+          className="self-center text-foreground"
         />
       </div>
-      <div className="px-4 pb-4 pt-1">
+      <div className="px-4 pb-6 pt-1">
         {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
       </div>
     </div>

@@ -1,5 +1,5 @@
 import { safeRedirect } from "@/utils/server/http.server";
-import { getAuthUser } from "@canny_ecosystem/supabase/cached-queries";
+import { getSessionUser } from "@canny_ecosystem/supabase/cached-queries";
 import {
   json,
   type LoaderFunctionArgs,
@@ -14,7 +14,7 @@ export const meta: MetaFunction = () => {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { user } = await getAuthUser({ request });
+  const { user } = await getSessionUser({ request });
 
   if (!user) {
     return safeRedirect("/sign-in");

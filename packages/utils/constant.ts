@@ -1,3 +1,5 @@
+export const SECONDS_IN_A_MONTH = 60 * 60 * 24 * 30;
+
 export const statesAndUTs = [
   { value: "andhra_pradesh", label: "Andhra Pradesh" },
   { value: "arunachal_pradesh", label: "Arunachal Pradesh" },
