@@ -1,4 +1,10 @@
-import type { Database, TypedSupabaseClient } from "../types";
+import type {
+  CompanyDatabaseInsert,
+  LocationDatabaseInsert,
+  LocationDatabaseUpdate,
+  TypedSupabaseClient,
+  UserDatabaseInsert,
+} from "../types";
 
 export async function createUserOrUpdateLastCheckedIn({
   supabase,
@@ -65,7 +71,7 @@ export async function updateUser({
   data,
 }: {
   supabase: TypedSupabaseClient;
-  data: Database["public"]["Tables"]["user"]["Insert"];
+  data: UserDatabaseInsert;
 }) {
   const {
     data: { user },
@@ -94,14 +100,14 @@ export async function createCompany({
   data,
 }: {
   supabase: TypedSupabaseClient;
-  data: Database["public"]["Tables"]["company"]["Insert"];
+  data: CompanyDatabaseInsert;
 }) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user?.email) {
-    return {status: 400, error: 'Unauthorized User'};
+    return { status: 400, error: "Unauthorized User" };
   }
 
   const { error, status } = await supabase
@@ -122,19 +128,48 @@ export async function createLocation({
   data,
 }: {
   supabase: TypedSupabaseClient;
-  data: Database["public"]["Tables"]["location"]["Insert"];
+  data: LocationDatabaseInsert;
 }) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user?.email) {
-    return {status: 400, error: 'Unauthorized User'};
+    return { status: 400, error: "Unauthorized User" };
   }
 
   const { error, status } = await supabase
     .from("location")
     .insert(data)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { status, error };
+}
+
+export async function updateLocation({
+  supabase,
+  data,
+}: {
+  supabase: TypedSupabaseClient;
+  data: LocationDatabaseUpdate;
+}) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.email) {
+    return { status: 400, error: "Unauthorized User" };
+  }
+
+  const { error, status } = await supabase
+    .from("location")
+    .update(data)
+    .eq("id", data.id!)
     .select()
     .single();
 

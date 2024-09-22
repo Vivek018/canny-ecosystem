@@ -6,7 +6,7 @@ import { Input } from "./input";
 import { Label } from "./label";
 import { Textarea } from "./textarea";
 import { cn } from "@/utils";
-import { SearchableSelect, type SearchableSelectOption } from "./combobox";
+import { Combobox, type ComboboxSelectOption } from "./combobox";
 
 export type ListOfErrors = Array<string | null | undefined> | null | undefined;
 
@@ -164,7 +164,7 @@ export function CheckboxField({
 }
 
 type SearchableSelectFieldProps = {
-  options: SearchableSelectOption[];
+  options: ComboboxSelectOption[];
   labelProps: React.LabelHTMLAttributes<HTMLLabelElement>;
   inputProps: React.InputHTMLAttributes<HTMLInputElement>;
   errors?: ListOfErrors;
@@ -201,7 +201,7 @@ export function SearchableSelectField({
         onChange={input.change as any}
         onBlur={input.blur}
       />
-      <SearchableSelect
+      <Combobox
         key={input.value}
         options={options}
         value={input.value ?? ""}

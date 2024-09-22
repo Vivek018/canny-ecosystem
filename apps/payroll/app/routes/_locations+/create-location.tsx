@@ -1,4 +1,5 @@
 import {
+  isGoodStatus,
   replaceUnderscore,
   zNumber,
   zString,
@@ -30,10 +31,12 @@ import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { createLocation } from "@canny_ecosystem/supabase/mutations";
+import type { LocationDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import { UPDATE_LOCATION } from "./$locationId.update-location";
 
 export const CREATE_LOCATION = "create-location";
 
-const LocationSchema = z.object({
+export const LocationSchema = z.object({
   id: z.string().optional(),
   name: zString.min(3),
   esic_code: zNumber.min(10).max(17),
@@ -71,20 +74,23 @@ export async function action({ request }: ActionFunctionArgs) {
     data: submission.value,
   });
 
-  if (status === 201) {
+  if (isGoodStatus(status)) {
     return safeRedirect("/locations", { status: 303 });
   }
   return json({ status, error });
 }
 
-export default function CreateLocation() {
+export default function CreateLocation({
+  updateValues,
+}: { updateValues?: LocationDatabaseUpdate | null }) {
   const { companyId } = useLoaderData<typeof loader>();
+  const LOCATION_TAG = updateValues ? UPDATE_LOCATION : CREATE_LOCATION;
 
-  const initialValues = getInitialValueFromZod(LocationSchema);
+  const initialValues = updateValues ?? getInitialValueFromZod(LocationSchema);
   const [resetKey, setResetKey] = useState(Date.now());
 
   const [form, fields] = useForm({
-    id: CREATE_LOCATION,
+    id: LOCATION_TAG,
     constraint: getZodConstraint(LocationSchema),
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: LocationSchema });
@@ -99,8 +105,13 @@ export default function CreateLocation() {
       <FormProvider context={form.context}>
         <Form method="POST" {...getFormProps(form)} className="flex flex-col">
           <Label className="text-3xl mb-10">
-            {replaceDash(CREATE_LOCATION)}
+            {replaceDash(LOCATION_TAG)}
           </Label>
+          <input
+            type="hidden"
+            name={fields.id.name}
+            value={fields.id.value ?? fields.id.initialValue}
+          />
           <input
             type="hidden"
             name={fields.company_id.name}
@@ -152,10 +163,10 @@ export default function CreateLocation() {
                 ...getInputProps(fields.city, { type: "text" }),
                 autoFocus: true,
                 className: "capitalize",
-                placeholder: `${fields.city.name}`,
+                placeholder: `Enter ${fields.city.name}`,
               }}
               labelProps={{
-                children: "",
+                children: "City",
               }}
               errors={fields.city.errors}
             />
@@ -166,9 +177,9 @@ export default function CreateLocation() {
               inputProps={{
                 ...getInputProps(fields.state, { type: "text" }),
               }}
-              placeholder={`${fields.state.name}`}
+              placeholder={`Select ${fields.state.name}`}
               labelProps={{
-                children: "",
+                children: "State",
               }}
               errors={fields.state.errors}
             />
@@ -176,10 +187,10 @@ export default function CreateLocation() {
               inputProps={{
                 ...getInputProps(fields.pin_code, { type: "text" }),
                 className: "capitalize",
-                placeholder: `${replaceUnderscore(fields.pin_code.name)}`,
+                placeholder: `Enter ${replaceUnderscore(fields.pin_code.name)}`,
               }}
               labelProps={{
-                children: "",
+                children: "Pin Code",
               }}
               errors={fields.pin_code.errors}
             />

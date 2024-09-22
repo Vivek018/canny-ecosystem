@@ -1,4 +1,5 @@
 import {
+  isGoodStatus,
   MAX_FILE_SIZE,
   zEmailSuffix,
   zImage,
@@ -65,7 +66,7 @@ export async function action({ request }: ActionFunctionArgs) {
     data: submission.value,
   });
 
-  if (status === 201) {
+  if (isGoodStatus(status)) {
     return safeRedirect("/");
   }
   return json({ status, error });

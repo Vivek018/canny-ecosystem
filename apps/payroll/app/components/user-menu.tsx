@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { SignOut } from "./sign-out";
-import type { Database } from "@canny_ecosystem/supabase/types";
+import type { UserDatabaseRow } from "@canny_ecosystem/supabase/types";
 
 export function UserMenu({
   onlySignOut = false,
@@ -19,7 +19,7 @@ export function UserMenu({
   Link,
 }: {
   onlySignOut?: boolean;
-  userData: Database["public"]["Tables"]["user"]["Row"];
+  userData: UserDatabaseRow;
   Link: React.ElementType;
 }) {
   return (

@@ -1,5 +1,10 @@
 import { z } from "zod";
 
+export function isGoodStatus(status: number | string) {
+  const statusString = status.toString();
+  return statusString.startsWith("2");
+}
+
 export function replaceDash(str: string) {
   return str.replaceAll("-", " ");
 }

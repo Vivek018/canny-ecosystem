@@ -55,13 +55,32 @@ export async function getFirstCompanyQuery({
   return { data };
 }
 
-export async function getLocationsQuery({
+export async function getLocationsInCompanyQuery({
   supabase,
-}: { supabase: TypedSupabaseClient }) {
+  companyId,
+}: { supabase: TypedSupabaseClient; companyId: string }) {
   const { data, error } = await supabase
     .from("location")
     .select("id, name, city, state, pin_code, esic_code, is_main, address")
+    .eq("company_id", companyId)
     .limit(HARD_QUERY_LIMIT);
+
+  if (error) {
+    throw error;
+  }
+
+  return { data };
+}
+
+export async function getLocationQuery({
+  supabase,
+  id,
+}: { supabase: TypedSupabaseClient; id: string }) {
+  const { data, error } = await supabase
+    .from("location")
+    .select("id, name, city, state, pin_code, esic_code, is_main, address, company_id")
+    .eq("id", id)
+    .single();
 
   if (error) {
     throw error;

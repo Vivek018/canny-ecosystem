@@ -12,26 +12,26 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { Icon } from "./icon";
 
-export interface SearchableSelectOption {
+export interface ComboboxSelectOption {
   value: string;
   label: string;
 }
 
-interface SearchableSelectProps {
-  options: SearchableSelectOption[];
+interface ComboboxProps {
+  options: ComboboxSelectOption[];
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
 }
 
-export function SearchableSelect({
+export function Combobox({
   options,
   value,
   onChange,
   placeholder = "Select an option...",
   className,
-}: SearchableSelectProps) {
+}: ComboboxProps) {
   const [open, setOpen] = useState(false);
   const selectedOption = options?.find((option) => option.value === value);
 
