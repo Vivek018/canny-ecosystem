@@ -1,5 +1,6 @@
 import { CREATE_COMPANY } from "@/routes/_company+/create-company";
 import { useCompanyId } from "@/utils/company";
+import type { CompaniesDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import {
   Select,
@@ -13,7 +14,6 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { replaceDash } from "@canny_ecosystem/utils";
 import { Link, useLocation, useSubmit } from "@remix-run/react";
 import { useRef } from "react";
-import type { CompaniesDatabaseRow } from "types";
 
 export const CompanySwitch = ({
   companies,
@@ -44,7 +44,7 @@ export const CompanySwitch = ({
         defaultValue={companyId ?? ""}
         onValueChange={onValueChange}
       >
-        <SelectTrigger className="w-44 py-1.5 px-4 gap-2 rounded-full bg-transparent capitalize h-10 text-sm tracking-wide">
+        <SelectTrigger className="w-44 py-1.5 px-4 gap-2 rounded-full bg-secondary hover:bg-secondary/75 focus:bg-secondary/75 border-none capitalize h-10 text-sm tracking-wide">
           <p className="truncate">{companyName}</p>
         </SelectTrigger>
         <SelectContent>
@@ -68,8 +68,8 @@ export const CompanySwitch = ({
               ref={linkRef}
               to={`/${CREATE_COMPANY}`}
               className={cn(
-                buttonVariants({ variant: "ghost" }),
-                "text-primary w-full hover:text-primary focus:text-primary cursor-pointer capitalize",
+                buttonVariants({ variant: "primary-ghost" }),
+                "w-full cursor-pointer capitalize",
               )}
             >
               {replaceDash(CREATE_COMPANY)}

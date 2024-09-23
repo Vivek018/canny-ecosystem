@@ -24,7 +24,7 @@ import { ClientHintCheck, getHints } from "./utils/client-hints";
 import { useNonce } from "./utils/providers/nonce-provider";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Logo } from "@canny_ecosystem/ui/logo";
-import { ThemeSwitch } from "./components/switches/theme-switch";
+import { ThemeSwitch } from "./components/header/theme-switch";
 import { getSessionUser } from "@canny_ecosystem/supabase/cached-queries";
 import {
   getCompaniesQuery,

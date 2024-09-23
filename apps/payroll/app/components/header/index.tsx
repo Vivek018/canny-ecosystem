@@ -1,11 +1,14 @@
 import { Link } from "@remix-run/react";
-import { AssistantButton } from "./assistant/assistant-button";
+import { AssistantButton } from "../assistant/assistant-button";
 import { FeedbackForm } from "./feedback-form";
-import { ThemeSwitch } from "./switches/theme-switch";
+import { ThemeSwitch } from "./theme-switch";
 import { UserMenu } from "./user-menu";
 import type { Theme } from "@canny_ecosystem/types";
-import { CompanySwitch } from "./switches/company-switch";
-import type { CompaniesDatabaseRow, UserDatabaseRow } from "types";
+import { CompanySwitch } from "./company-switch";
+import type {
+  CompaniesDatabaseRow,
+  UserDatabaseRow,
+} from "@canny_ecosystem/supabase/types";
 
 export function Header({
   theme,
@@ -22,9 +25,7 @@ export function Header({
       <AssistantButton />
       <div className="flex gap-4 items-center no-drag">
         <CompanySwitch companies={companies} />
-        <div className="bg-secondary w-[1.5px] py-1.5 mx-2 h-full">
-          &nbsp;
-        </div>
+        <div className="bg-secondary w-[1.5px] py-1.5 mx-2 h-full">&nbsp;</div>
         <ThemeSwitch theme={theme} />
         <FeedbackForm />
         <UserMenu userData={user} Link={Link} />

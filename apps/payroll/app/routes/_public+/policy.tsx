@@ -1,3 +1,3 @@
 export default function Policy() {
-  return <div>Policy</div>;
+  return <section>Policy</section>;
 }

@@ -101,7 +101,7 @@ export default function CreateLocation({
   });
 
   return (
-    <div className="px-60 py-12">
+    <section className="px-60 py-12">
       <FormProvider context={form.context}>
         <Form method="POST" {...getFormProps(form)} className="flex flex-col">
           <Label className="text-3xl mb-10">
@@ -218,6 +218,6 @@ export default function CreateLocation({
           </div>
         </Form>
       </FormProvider>
-    </div>
+    </section>
   );
 }

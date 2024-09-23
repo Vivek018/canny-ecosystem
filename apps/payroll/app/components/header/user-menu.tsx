@@ -10,7 +10,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@canny_ecosystem/ui/dropdown-menu";
-import { SignOut } from "./sign-out";
+import { SignOut } from "../auth/sign-out";
 import type { UserDatabaseRow } from "@canny_ecosystem/supabase/types";
 
 export function UserMenu({

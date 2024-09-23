@@ -1,8 +1,8 @@
 import { safeRedirect } from "@/utils/server/http.server";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { json } from "@remix-run/node";
+import { type ActionFunctionArgs, json } from "@remix-run/node";
 
-export async function action({ request }: { request: Request }) {
+export async function action({ request }: ActionFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
 
   const { error } = await supabase.auth.signOut();

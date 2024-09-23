@@ -1,4 +1,4 @@
-import { LocationCard } from "@/components/location-card";
+import { LocationCard } from "@/components/locations/location-card";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getLocationsInCompanyQuery } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -11,6 +11,7 @@ import {
   CommandItem,
   CommandList,
 } from "@canny_ecosystem/ui/command";
+import { useIsDocument } from "@canny_ecosystem/ui/hooks/is-document";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
@@ -25,9 +26,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function Locations() {
   const { data } = useLoaderData<typeof loader>();
+  const { isDocument } = useIsDocument();
 
   return (
-    <section className="py-3.5">
+    <section className="py-[22px]">
       <div className="w-full flex items-end justify-between">
         <Command className="overflow-visible">
           <div className="w-full md:w-3/4 lg:w-1/2 2xl:w-1/3 flex items-center gap-4">
@@ -38,12 +40,17 @@ export default function Locations() {
             />
             <Link
               to="/create-location"
-              className={cn(buttonVariants({ variant: "default" }))}
+              className={cn(buttonVariants({ variant: "primary-outline" }))}
             >
               Add Location
             </Link>
           </div>
-          <CommandEmpty className="w-full py-40 capitalize text-lg tracking-wide text-center">
+          <CommandEmpty
+            className={cn(
+              "w-full py-40 capitalize text-lg tracking-wide text-center",
+              !isDocument && "hidden",
+            )}
+          >
             No location found.
           </CommandEmpty>
           <CommandList className="max-h-full py-6 overflow-x-visible overflow-y-visible">

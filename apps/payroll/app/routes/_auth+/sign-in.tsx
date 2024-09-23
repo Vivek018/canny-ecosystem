@@ -53,7 +53,7 @@ export default function SignIn() {
   const error = actionData?.error || loaderData.error;
 
   return (
-    <div className="flex min-h-screen justify-center items-center overflow-hidden p-6 -mt-20 md:p-0">
+    <section className="flex min-h-screen justify-center items-center overflow-hidden p-6 -mt-20 md:p-0">
       <div className="relative z-20 m-auto flex w-full max-w-[380px] flex-col py-8">
         <div className="flex w-full flex-col relative">
           <div className="pb-4 bg-gradient-to-r from-primary dark:via-primary dark:to-[#848484] to-[#000] inline-block text-transparent bg-clip-text mx-auto">
@@ -91,6 +91,6 @@ export default function SignIn() {
           </p>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

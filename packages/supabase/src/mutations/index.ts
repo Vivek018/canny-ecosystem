@@ -179,3 +179,32 @@ export async function updateLocation({
 
   return { status, error };
 }
+
+export async function deleteLocation({
+  supabase,
+  id,
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+}) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.email) {
+    return { status: 400, error: "Unauthorized User" };
+  }
+
+  const { error, status } = await supabase
+    .from("location")
+    .delete()
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { status, error };
+}

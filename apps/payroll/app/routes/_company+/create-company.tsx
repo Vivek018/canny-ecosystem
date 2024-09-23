@@ -87,7 +87,7 @@ export default function CreateCompany() {
   });
 
   return (
-    <div className="px-60 py-12">
+    <section className="px-60 py-12">
       <FormProvider context={form.context}>
         <Form
           method="POST"
@@ -170,6 +170,6 @@ export default function CreateCompany() {
           </div>
         </Form>
       </FormProvider>
-    </div>
+    </section>
   );
 }

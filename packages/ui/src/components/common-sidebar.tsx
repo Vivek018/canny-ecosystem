@@ -46,7 +46,7 @@ export function CommonSidebar({
           {list.map(({ icon, name, link }) => {
             return (
               <TooltipProvider key={name}>
-                <Tooltip delayDuration={70}>
+                <Tooltip delayDuration={100}>
                   <TooltipTrigger tabIndex={-1}>
                     <NavLink
                       to={link ?? ""}
