@@ -1,7 +1,7 @@
 import { HARD_QUERY_LIMIT, SINGLE_QUERY_LIMIT } from "../constant";
 import type { TypedSupabaseClient } from "../types";
 
-export async function getUserQuery({
+export async function getUserByEmailQuery({
   supabase,
   email,
 }: {
@@ -17,11 +17,7 @@ export async function getUserQuery({
     .limit(SINGLE_QUERY_LIMIT)
     .single();
 
-  if (error) {
-    throw error;
-  }
-
-  return { data };
+  return { data, error };
 }
 
 export async function getCompaniesQuery({
@@ -32,11 +28,7 @@ export async function getCompaniesQuery({
     .select("id, name")
     .limit(HARD_QUERY_LIMIT);
 
-  if (error) {
-    throw error;
-  }
-
-  return { data };
+  return { data, error };
 }
 
 export async function getFirstCompanyQuery({
@@ -48,11 +40,22 @@ export async function getFirstCompanyQuery({
     .limit(SINGLE_QUERY_LIMIT)
     .single();
 
-  if (error) {
-    throw error;
-  }
+  return { data, error };
+}
 
-  return { data };
+export async function getCompanyByIdQuery({
+  supabase,
+  id,
+}: { supabase: TypedSupabaseClient; id: string }) {
+  const { data, error } = await supabase
+    .from("company")
+    .select(
+      "id, name, email_suffix, logo, service_charge, reimbursement_charge",
+    )
+    .eq("id", id)
+    .single();
+
+  return { data, error };
 }
 
 export async function getLocationsInCompanyQuery({
@@ -65,26 +68,20 @@ export async function getLocationsInCompanyQuery({
     .eq("company_id", companyId)
     .limit(HARD_QUERY_LIMIT);
 
-  if (error) {
-    throw error;
-  }
-
-  return { data };
+  return { data, error };
 }
 
-export async function getLocationQuery({
+export async function getLocationByIdQuery({
   supabase,
   id,
 }: { supabase: TypedSupabaseClient; id: string }) {
   const { data, error } = await supabase
     .from("location")
-    .select("id, name, city, state, pin_code, esic_code, is_main, address, company_id")
+    .select(
+      "id, name, city, state, pin_code, esic_code, is_main, address, company_id",
+    )
     .eq("id", id)
     .single();
 
-  if (error) {
-    throw error;
-  }
-
-  return { data };
+  return { data, error };
 }

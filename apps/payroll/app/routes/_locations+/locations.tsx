@@ -19,8 +19,20 @@ import { json } from "@remix-run/react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
-  const companyId = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data } = await getLocationsInCompanyQuery({ supabase, companyId });
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+  const { data, error } = await getLocationsInCompanyQuery({
+    supabase,
+    companyId,
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data) {
+    throw new Error("No data found");
+  }
+
   return json({ data });
 }
 

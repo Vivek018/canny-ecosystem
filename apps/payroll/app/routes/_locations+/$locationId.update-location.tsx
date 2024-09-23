@@ -1,7 +1,7 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import CreateLocation, { LocationSchema } from "./create-location";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { getLocationQuery } from "@canny_ecosystem/supabase/queries";
+import { getLocationByIdQuery } from "@canny_ecosystem/supabase/queries";
 import { json, useLoaderData } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
 import { safeRedirect } from "@/utils/server/http.server";
@@ -16,7 +16,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   let data = null;
 
   if (locationId) {
-    data = (await getLocationQuery({ supabase, id: locationId })).data;
+    data = (await getLocationByIdQuery({ supabase, id: locationId })).data;
   }
 
   return json({ data });

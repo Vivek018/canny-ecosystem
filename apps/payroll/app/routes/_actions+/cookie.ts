@@ -9,18 +9,19 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+  try {
   const formData = await request.formData();
   const theme = formData.get("theme");
-  const companyId = formData.get("companyId");
+  const companyId = formData.get("companyId")?.toString();
 
-  let setCookieValue: string | undefined;
+  let cookieValue: string | undefined;
 
   switch (true) {
     case !!companyId:
-      setCookieValue = setCompanyId(companyId as string);
+      cookieValue = setCompanyId(companyId);
       break;
     case !!theme:
-      setCookieValue = setTheme(theme as Theme);
+      cookieValue = setTheme(theme as Theme);
       break;
     default:
       break;
@@ -28,12 +29,16 @@ export async function action({ request }: ActionFunctionArgs) {
 
   return safeRedirect(
     formData.get("returnTo"),
-    setCookieValue
+    cookieValue
       ? {
           headers: {
-            "set-cookie": setCookieValue,
+            "set-cookie": cookieValue,
           },
         }
       : {},
   );
+} catch (error) {
+  console.error(error);
+  return safeRedirect("/", { status: 500 });
+}
 }

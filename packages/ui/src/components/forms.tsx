@@ -36,7 +36,7 @@ export function Field({
   errors,
   className,
 }: {
-  labelProps: React.LabelHTMLAttributes<HTMLLabelElement>;
+  labelProps?: React.LabelHTMLAttributes<HTMLLabelElement>;
   inputProps: React.InputHTMLAttributes<HTMLInputElement>;
   errors?: ListOfErrors;
   className?: string;
@@ -50,7 +50,9 @@ export function Field({
     <div className={cn("w-full flex flex-col gap-1.5", className)}>
       <div className="flex flex-row gap-[1px]">
         <Label htmlFor={id} {...labelProps} />
-        <sub className="text-primary">{isRequired ? "*" : ""}</sub>
+        <sub className="text-primary">
+          {isRequired && labelProps ? "*" : ""}
+        </sub>
       </div>
       <Input
         id={id}
@@ -126,6 +128,7 @@ export function CheckboxField({
   });
   const id = buttonProps.id ?? fallbackId;
   const errorId = errors?.length ? `${id}-error` : undefined;
+  const isRequired = buttonProps.required;
 
   return (
     <div className={className}>
@@ -155,6 +158,7 @@ export function CheckboxField({
           {...labelProps}
           className="self-center text-foreground"
         />
+        <sub className="text-primary">{isRequired ? "*" : ""}</sub>
       </div>
       <div className="px-4 pb-6 pt-1">
         {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
@@ -183,6 +187,7 @@ export function SearchableSelectField({
   const fallbackId = useId();
   const id = inputProps.id ?? fallbackId;
   const errorId = errors?.length ? `${id}-error` : undefined;
+  const isRequired = inputProps.required;
 
   const input = useInputControl({
     name: inputProps.name!,
@@ -192,7 +197,10 @@ export function SearchableSelectField({
 
   return (
     <div className={cn("w-full flex flex-col gap-1.5", className)}>
-      <Label {...labelProps} />
+      <div className="flex">
+        <Label {...labelProps} />
+        <sub className="text-primary">{isRequired ? "*" : ""}</sub>
+      </div>
       <input
         type="hidden"
         id={id}

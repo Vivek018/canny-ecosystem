@@ -9,7 +9,6 @@ import { createCompany } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Field } from "@canny_ecosystem/ui/forms";
-import { Label } from "@canny_ecosystem/ui/label";
 import {
   getInitialValueFromZod,
   replaceDash,
@@ -31,6 +30,14 @@ import {
 } from "@remix-run/node";
 import { z } from "zod";
 import { safeRedirect } from "@/utils/server/http.server";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@canny_ecosystem/ui/card";
 
 export const CREATE_COMPANY = "create-company";
 
@@ -87,7 +94,7 @@ export default function CreateCompany() {
   });
 
   return (
-    <section className="px-60 py-12">
+    <section className="px-60 py-6">
       <FormProvider context={form.context}>
         <Form
           method="POST"
@@ -95,79 +102,92 @@ export default function CreateCompany() {
           {...getFormProps(form)}
           className="flex flex-col"
         >
-          <Label className="text-3xl mb-10">
-            {replaceDash(CREATE_COMPANY)}
-          </Label>
-          <Field
-            inputProps={{
-              ...getInputProps(fields.name, { type: "text" }),
-              autoFocus: true,
-              placeholder: `Enter ${fields.name.name}`,
-            }}
-            labelProps={{ children: fields.name.name }}
-            errors={fields.name.errors}
-          />
-          <Field
-            inputProps={{
-              ...getInputProps(fields.logo, { type: "file" }),
-              placeholder: `Enter ${fields.logo.name}`,
-            }}
-            labelProps={{ children: fields.logo.name }}
-            errors={fields.logo.errors}
-          />
-          <Field
-            inputProps={{
-              ...getInputProps(fields.email_suffix, { type: "text" }),
-              placeholder: `Enter ${replaceUnderscore(fields.email_suffix.name)}`,
-            }}
-            labelProps={{
-              children: replaceUnderscore(fields.email_suffix.name),
-            }}
-            errors={fields.email_suffix.errors}
-          />
-          <div className="grid grid-cols-2 grid-rows-1 place-content-center justify-between gap-16">
-            <Field
-              inputProps={{
-                ...getInputProps(fields.service_charge, { type: "number" }),
-                placeholder: `Enter ${replaceUnderscore(fields.service_charge.name)}`,
-              }}
-              labelProps={{
-                children: replaceUnderscore(fields.service_charge.name),
-              }}
-              errors={fields.service_charge.errors}
-            />
-            <Field
-              inputProps={{
-                ...getInputProps(fields.reimbursement_charge, {
-                  type: "number",
-                }),
-                placeholder: `Enter ${replaceUnderscore(fields.reimbursement_charge.name)}`,
-              }}
-              labelProps={{
-                children: replaceUnderscore(fields.reimbursement_charge.name),
-              }}
-              errors={fields.reimbursement_charge.errors}
-            />
-          </div>
-          <div className="ml-auto w-2/5 flex flex-row items-center justify-center gap-4">
-            <Button
-              variant="secondary"
-              size="full"
-              type="reset"
-              {...form.reset.getButtonProps()}
-            >
-              Reset
-            </Button>
-            <Button
-              form={form.id}
-              disabled={!form.valid}
-              variant="default"
-              size="full"
-              type="submit"
-            >
-              Submit
-            </Button>
-          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-3xl">
+                {replaceDash(CREATE_COMPANY)}
+              </CardTitle>
+              <CardDescription>
+                Create a new company that will be central in all of canny apps
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Field
+                inputProps={{
+                  ...getInputProps(fields.name, { type: "text" }),
+                  autoFocus: true,
+                  placeholder: `Enter ${fields.name.name}`,
+                }}
+                labelProps={{ children: fields.name.name }}
+                errors={fields.name.errors}
+              />
+              <Field
+                inputProps={{
+                  ...getInputProps(fields.logo, { type: "file" }),
+                  placeholder: `Enter ${fields.logo.name}`,
+                }}
+                labelProps={{ children: fields.logo.name }}
+                errors={fields.logo.errors}
+              />
+              <Field
+                inputProps={{
+                  ...getInputProps(fields.email_suffix, { type: "text" }),
+                  placeholder: `Enter ${replaceUnderscore(fields.email_suffix.name)}`,
+                }}
+                labelProps={{
+                  children: replaceUnderscore(fields.email_suffix.name),
+                }}
+                errors={fields.email_suffix.errors}
+              />
+              <div className="grid grid-cols-2 grid-rows-1 place-content-center justify-between gap-16">
+                <Field
+                  inputProps={{
+                    ...getInputProps(fields.service_charge, { type: "number" }),
+                    placeholder: `Enter ${replaceUnderscore(fields.service_charge.name)}`,
+                  }}
+                  labelProps={{
+                    children: replaceUnderscore(fields.service_charge.name),
+                  }}
+                  errors={fields.service_charge.errors}
+                />
+                <Field
+                  inputProps={{
+                    ...getInputProps(fields.reimbursement_charge, {
+                      type: "number",
+                    }),
+                    placeholder: `Enter ${replaceUnderscore(fields.reimbursement_charge.name)}`,
+                  }}
+                  labelProps={{
+                    children: replaceUnderscore(
+                      fields.reimbursement_charge.name,
+                    ),
+                  }}
+                  errors={fields.reimbursement_charge.errors}
+                />
+              </div>
+            </CardContent>
+            <CardFooter>
+              <div className="ml-auto w-2/5 flex flex-row items-center justify-center gap-4">
+                <Button
+                  variant="secondary"
+                  size="full"
+                  type="reset"
+                  {...form.reset.getButtonProps()}
+                >
+                  Reset
+                </Button>
+                <Button
+                  form={form.id}
+                  disabled={!form.valid}
+                  variant="default"
+                  size="full"
+                  type="submit"
+                >
+                  Submit
+                </Button>
+              </div>
+            </CardFooter>
+          </Card>
         </Form>
       </FormProvider>
     </section>

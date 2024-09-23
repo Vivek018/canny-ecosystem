@@ -1,5 +1,6 @@
 import type {
   CompanyDatabaseInsert,
+  CompanyDatabaseUpdate,
   LocationDatabaseInsert,
   LocationDatabaseUpdate,
   TypedSupabaseClient,
@@ -113,6 +114,64 @@ export async function createCompany({
   const { error, status } = await supabase
     .from("company")
     .insert(data)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { status, error };
+}
+
+export async function updateCompany({
+  supabase,
+  data,
+}: {
+  supabase: TypedSupabaseClient;
+  data: CompanyDatabaseUpdate;
+}) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.email) {
+    return { status: 400, error: "Unauthorized User" };
+  }
+
+  const { error, status } = await supabase
+    .from("company")
+    .update(data)
+    .eq("id", data.id!)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { status, error };
+}
+
+export async function deleteCompany({
+  supabase,
+  id,
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+}) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.email) {
+    return { status: 400, error: "Unauthorized User" };
+  }
+
+  const { error, status } = await supabase
+    .from("company")
+    .delete()
+    .eq("id", id)
     .select()
     .single();
 

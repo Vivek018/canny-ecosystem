@@ -24,13 +24,14 @@ import { ClientHintCheck, getHints } from "./utils/client-hints";
 import { useNonce } from "./utils/providers/nonce-provider";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Logo } from "@canny_ecosystem/ui/logo";
-import { ThemeSwitch } from "./components/header/theme-switch";
+import { ThemeSwitch } from "./components/theme-switch";
 import { getSessionUser } from "@canny_ecosystem/supabase/cached-queries";
 import {
   getCompaniesQuery,
-  getUserQuery,
+  getUserByEmailQuery,
 } from "@canny_ecosystem/supabase/queries";
-import { getCompanyIdOrFirstCompany } from "./utils/server/company.server";
+import { getCompanyIdOrFirstCompany, setCompanyId } from "./utils/server/company.server";
+import { safeRedirect } from "./utils/server/http.server";
 
 export const links: LinksFunction = () => {
   return [
@@ -52,11 +53,21 @@ export async function loader({ request }: LoaderFunctionArgs) {
   let companies = null;
 
   if (sessionUser?.email) {
-    user = (await getUserQuery({ supabase, email: sessionUser.email })).data;
+    user = (await getUserByEmailQuery({ supabase, email: sessionUser.email }))
+      .data;
     companies = (await getCompaniesQuery({ supabase })).data;
   }
 
-  const companyId = await getCompanyIdOrFirstCompany(request, supabase);
+  const { companyId, setCookie } = await getCompanyIdOrFirstCompany(
+    request,
+    supabase,
+  );
+
+  if (setCookie) {
+    const headers = new Headers();
+    headers.append("Set-Cookie", setCompanyId(companyId));
+    return safeRedirect("/", { headers });
+  }
 
   return json({
     user,
