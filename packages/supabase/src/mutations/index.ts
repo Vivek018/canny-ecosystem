@@ -4,6 +4,7 @@ import type {
   LocationDatabaseInsert,
   LocationDatabaseUpdate,
   ProjectDatabaseInsert,
+  ProjectDatabaseUpdate,
   TypedSupabaseClient,
   UserDatabaseInsert,
 } from "../types";
@@ -204,6 +205,64 @@ export async function createProject({
   const { error, status } = await supabase
     .from("project")
     .insert(data)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { status, error };
+}
+
+export async function updateProject({
+  supabase,
+  data,
+}: {
+  supabase: TypedSupabaseClient;
+  data: ProjectDatabaseUpdate;
+}) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.email) {
+    return { status: 400, error: "Unauthorized User" };
+  }
+
+  const { error, status } = await supabase
+    .from("project")
+    .update(data)
+    .eq("id", data.id!)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { status, error };
+}
+
+export async function deleteProject({
+  supabase,
+  id,
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+}) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.email) {
+    return { status: 400, error: "Unauthorized User" };
+  }
+
+  const { error, status } = await supabase
+    .from("project")
+    .delete()
+    .eq("id", id)
     .select()
     .single();
 

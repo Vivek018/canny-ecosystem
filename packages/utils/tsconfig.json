@@ -3,6 +3,6 @@
   "compilerOptions": {
     "noImplicitAny": false
   },
-  "include": [".", "../ui/src/hooks"],
+  "include": [".", "../ui/src/hooks", "../../apps/payroll/app/hooks/toggle-search-params.ts"],
   "exclude": ["node_modules"]
 }

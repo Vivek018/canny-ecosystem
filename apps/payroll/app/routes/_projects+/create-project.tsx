@@ -38,6 +38,8 @@ import {
 } from "@canny_ecosystem/ui/card";
 import { createProject } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import type { ProjectDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import { UPDATE_PROJECT } from "./$projectId.update-project";
 
 export const CREATE_PROJECT = "create-project";
 
@@ -76,12 +78,16 @@ export async function action({ request }: ActionFunctionArgs) {
   return json({ status, error });
 }
 
-export default function CreateProject() {
+export default function CreateProject({
+  updateValues,
+}: { updateValues?: ProjectDatabaseUpdate | null }) {
   const { companyId } = useLoaderData<typeof loader>();
-  const initialValues = getInitialValueFromZod(ProjectSchema);
+  const PROJECT_TAG = updateValues ? UPDATE_PROJECT : CREATE_PROJECT;
+
+  const initialValues = updateValues ?? getInitialValueFromZod(ProjectSchema);
 
   const [form, fields] = useForm({
-    id: CREATE_PROJECT,
+    id: PROJECT_TAG,
     constraint: getZodConstraint(ProjectSchema),
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: ProjectSchema });
@@ -103,13 +109,18 @@ export default function CreateProject() {
           <Card>
             <CardHeader>
               <CardTitle className="text-3xl">
-                {replaceDash(CREATE_PROJECT)}
+                {replaceDash(PROJECT_TAG)}
               </CardTitle>
               <CardDescription>
                 Create a new company that will be central in all of canny apps
               </CardDescription>
             </CardHeader>
             <CardContent>
+              <input
+                type="hidden"
+                name={fields.id.name}
+                value={fields.id.value ?? fields.id.initialValue}
+              />
               <input
                 type="hidden"
                 name={fields.company_id.name}

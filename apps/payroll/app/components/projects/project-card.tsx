@@ -3,6 +3,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
@@ -32,7 +33,7 @@ export function ProjectCard({
 }) {
   const avatarName = project?.name
     ?.split(" ")
-    .map((name, index) => (index < 3 ? name.charAt(0).toUpperCase() : ""))
+    .map((name, index) => (index < 2 ? name.charAt(0).toUpperCase() : ""))
     .join("");
 
   return (
@@ -51,7 +52,7 @@ export function ProjectCard({
             />
           )}
           <AvatarFallback className="rounded-md">
-            <span className="tracking-wide text-[17px] font-me">
+            <span className="tracking-widest text-[17px] font-medium">
               {avatarName}
             </span>
           </AvatarFallback>
@@ -76,6 +77,8 @@ export function ProjectCard({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
               <DropdownMenuGroup>
+                
+                <DropdownMenuSeparator />
                 <DeleteProject projectId={project.id} />
               </DropdownMenuGroup>
             </DropdownMenuContent>
@@ -95,10 +98,10 @@ export function ProjectCard({
       >
         <p
           className={cn(
-            "text-green bg-green/30 rounded-md p-1 flex items-center gap-1 capitalize",
+            "text-green bg-green/25 rounded-md p-1 flex items-center gap-1 capitalize",
           )}
         >
-          <Icon name="clock" size="sm" className="rotate-180" />
+          <Icon name="clock" size="sm" className=" scale-x-[-1]" />
           {getAutoTimeDifference(
             project.starting_date,
             new Date().toISOString(),
@@ -107,7 +110,7 @@ export function ProjectCard({
         </p>
         <p
           className={cn(
-            "text-destructive bg-destructive/30 rounded-md flex items-center gap-1 p-1 capitalize",
+            "text-destructive bg-destructive/25 rounded-md flex items-center gap-1 p-1 capitalize",
             !getAutoTimeDifference(
               new Date().toISOString(),
               project.ending_date,

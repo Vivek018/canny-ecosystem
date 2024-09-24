@@ -45,7 +45,7 @@ export default function Projects() {
     <section className="py-[22px]">
       <div className="w-full flex items-end justify-between">
         <Command className="overflow-visible">
-          <div className="w-full md:w-3/4 lg:w-3/5 2xl:w-1/3 flex items-center gap-4">
+          <div className="w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4">
             <CommandInput
               divClassName="border border-input rounded-md h-10 flex-1"
               placeholder="Search Projects"
@@ -72,7 +72,7 @@ export default function Projects() {
           </CommandEmpty>
           <CommandList className="max-h-full py-6 overflow-x-visible overflow-y-visible">
             <CommandGroup className="p-0 overflow-visible">
-              <div className="w-full grid gap-8 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
+              <div className="w-full grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
                 {data.map((project) => (
                   <CommandItem
                     key={project.id}
