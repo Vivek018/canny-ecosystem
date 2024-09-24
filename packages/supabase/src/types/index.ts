@@ -25,6 +25,15 @@ export type CompanyDatabaseInsert =
 export type CompanyDatabaseUpdate =
   Database["public"]["Tables"]["company"]["Update"];
 
+export type ProjectDatabaseRow =
+  Database["public"]["Tables"]["project"]["Row"];
+
+export type ProjectDatabaseInsert =
+  Database["public"]["Tables"]["project"]["Insert"];
+
+export type ProjectDatabaseUpdate =
+  Database["public"]["Tables"]["project"]["Update"];
+
 export type LocationDatabaseRow =
   Database["public"]["Tables"]["location"]["Row"];
 

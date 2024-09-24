@@ -9,7 +9,7 @@ import {
 } from "@canny_ecosystem/ui/select";
 import type { Theme } from "@canny_ecosystem/types";
 import { useLocation, useSubmit } from "@remix-run/react";
-import { themes } from "@/utils/theme";
+import { themes } from "@canny_ecosystem/utils";
 
 type Props = {
   currentTheme?: Theme;

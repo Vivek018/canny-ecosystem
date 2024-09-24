@@ -1,9 +1,7 @@
 import {
   isGoodStatus,
+  LocationSchema,
   replaceUnderscore,
-  zNumber,
-  zString,
-  zTextArea,
 } from "@canny_ecosystem/utils";
 import {
   CheckboxField,
@@ -21,7 +19,6 @@ import {
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { Form, json, useLoaderData } from "@remix-run/react";
-import { z } from "zod";
 import { statesAndUTs } from "@canny_ecosystem/utils/constant";
 import { Button } from "@canny_ecosystem/ui/button";
 import { useState } from "react";
@@ -42,18 +39,6 @@ import {
 } from "@canny_ecosystem/ui/card";
 
 export const CREATE_LOCATION = "create-location";
-
-export const LocationSchema = z.object({
-  id: z.string().optional(),
-  name: zString.min(3),
-  esic_code: zNumber.min(10).max(17),
-  is_main: z.boolean().default(false),
-  address: zTextArea,
-  state: zString,
-  city: zString.min(3),
-  pin_code: zNumber.min(6).max(6),
-  company_id: z.string().optional(),
-});
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -108,7 +93,7 @@ export default function CreateLocation({
   });
 
   return (
-    <section className="px-60 py-6">
+    <section className="md:px-20 lg:px-52 2xl:px-80 py-6">
       <FormProvider context={form.context}>
         <Form method="POST" {...getFormProps(form)} className="flex flex-col">
           <Card>
@@ -165,10 +150,10 @@ export default function CreateLocation({
               <TextareaField
                 textareaProps={{
                   ...getTextareaProps(fields.address),
-                  placeholder: `Enter ${replaceUnderscore(fields.address.name)}`,
+                  placeholder: `Enter ${fields.address.name}`,
                 }}
                 labelProps={{
-                  children: replaceUnderscore(fields.address.name),
+                  children: fields.address.name,
                 }}
                 errors={fields.address.errors}
               />
@@ -176,12 +161,11 @@ export default function CreateLocation({
                 <Field
                   inputProps={{
                     ...getInputProps(fields.city, { type: "text" }),
-                    autoFocus: true,
                     className: "capitalize",
                     placeholder: `Enter ${fields.city.name}`,
                   }}
                   labelProps={{
-                    children: "City",
+                    children: fields.city.name,
                   }}
                   errors={fields.city.errors}
                 />
@@ -205,7 +189,7 @@ export default function CreateLocation({
                     placeholder: `Enter ${replaceUnderscore(fields.pin_code.name)}`,
                   }}
                   labelProps={{
-                    children: "Pin Code",
+                    children: replaceUnderscore(fields.pin_code.name),
                   }}
                   errors={fields.pin_code.errors}
                 />

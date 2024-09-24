@@ -17,25 +17,44 @@ import {
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
+import { ErrorList } from "@canny_ecosystem/ui/forms";
+import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
-export const DeleteCompany = ({companyId}: {companyId: string}) => {
+export const DeleteCompany = ({ companyId }: { companyId: string }) => {
   const [isLoading, setLoading] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+  const [inputError, setInputError] = useState<string[]>([]);
   const submit = useSubmit();
 
-  const handleDeleteCompany = () => {
-    setLoading(true);
-    submit(
-      {},
-      {
-        method: "post",
-        action: `/${companyId}/delete-company`,
-        replace: true,
-      },
-    );
+  const handleCancelCompany = () => {
+    setInputError([]);
+    setInputValue("");
+    setLoading(false);
   };
+
+  const handleDeleteCompany = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
+    if (inputValue === DELETE_TEXT) {
+      setLoading(true);
+      submit(
+        {},
+        {
+          method: "post",
+          action: `/${companyId}/delete-company`,
+          replace: true,
+        },
+      );
+    } else {
+      e.preventDefault();
+      setInputError(["Please type the correct text to confirm."]);
+    }
+  };
+
   return (
     <Card className="border-destructive">
       <CardHeader>
@@ -59,8 +78,28 @@ export const DeleteCompany = ({companyId}: {companyId: string}) => {
                 company and remove it's data from our servers.
               </AlertDialogDescription>
             </AlertDialogHeader>
+            <div className="py-4">
+              <p className="text-sm text-foreground/80">
+                Please type{" "}
+                <i className="text-foreground font-medium">{DELETE_TEXT}</i> to
+                confirm.
+              </p>
+              <Input
+                type="text"
+                value={inputValue}
+                onChange={(e) => {
+                  setInputValue(e.target.value);
+                  setInputError([]);
+                }}
+                className="border border-input rounded-md h-10 w-full"
+                placeholder="Confirm your action"
+              />
+              <ErrorList errors={inputError} />
+            </div>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogCancel onClick={handleCancelCompany}>
+                Cancel
+              </AlertDialogCancel>
               <AlertDialogAction
                 className={cn(buttonVariants({ variant: "destructive" }))}
                 onClick={handleDeleteCompany}

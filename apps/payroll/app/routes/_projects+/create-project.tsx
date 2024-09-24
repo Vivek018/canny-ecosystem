@@ -1,8 +1,12 @@
-import { CompanySchema, isGoodStatus, SIZE_1MB } from "@canny_ecosystem/utils";
-import { createCompany } from "@canny_ecosystem/supabase/mutations";
+import {
+  getValidDateForInput,
+  isGoodStatus,
+  ProjectSchema,
+  SIZE_1MB,
+} from "@canny_ecosystem/utils";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Button } from "@canny_ecosystem/ui/button";
-import { Field } from "@canny_ecosystem/ui/forms";
+import { Field, TextareaField } from "@canny_ecosystem/ui/forms";
 import {
   getInitialValueFromZod,
   replaceDash,
@@ -12,11 +16,12 @@ import {
   FormProvider,
   getFormProps,
   getInputProps,
+  getTextareaProps,
   useForm,
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import type { ActionFunctionArgs } from "@remix-run/node";
-import { Form } from "@remix-run/react";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { Form, useLoaderData } from "@remix-run/react";
 import {
   json,
   unstable_parseMultipartFormData as parseMultipartFormData,
@@ -31,9 +36,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
-import { setCompanyId } from "@/utils/server/company.server";
+import { createProject } from "@canny_ecosystem/supabase/mutations";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
-export const CREATE_COMPANY = "create-company";
+export const CREATE_PROJECT = "create-project";
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const { supabase } = getSupabaseWithHeaders({ request });
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+  return json({ companyId: companyId });
+}
 
 export async function action({ request }: ActionFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -43,7 +55,7 @@ export async function action({ request }: ActionFunctionArgs) {
   );
 
   const submission = parseWithZod(formData, {
-    schema: CompanySchema,
+    schema: ProjectSchema,
   });
 
   if (submission.status !== "success") {
@@ -53,27 +65,26 @@ export async function action({ request }: ActionFunctionArgs) {
     );
   }
 
-  const { status, error, id } = await createCompany({
+  const { status, error } = await createProject({
     supabase,
     data: submission.value,
   });
 
   if (isGoodStatus(status)) {
-    const headers = new Headers();
-    headers.append("Set-Cookie", setCompanyId(id));
-    return safeRedirect("/", { headers });
+    return safeRedirect("/projects");
   }
   return json({ status, error });
 }
 
-export default function CreateCompany() {
-  const initialValues = getInitialValueFromZod(CompanySchema);
+export default function CreateProject() {
+  const { companyId } = useLoaderData<typeof loader>();
+  const initialValues = getInitialValueFromZod(ProjectSchema);
 
   const [form, fields] = useForm({
-    id: CREATE_COMPANY,
-    constraint: getZodConstraint(CompanySchema),
+    id: CREATE_PROJECT,
+    constraint: getZodConstraint(ProjectSchema),
     onValidate({ formData }) {
-      return parseWithZod(formData, { schema: CompanySchema });
+      return parseWithZod(formData, { schema: ProjectSchema });
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
@@ -92,13 +103,18 @@ export default function CreateCompany() {
           <Card>
             <CardHeader>
               <CardTitle className="text-3xl">
-                {replaceDash(CREATE_COMPANY)}
+                {replaceDash(CREATE_PROJECT)}
               </CardTitle>
               <CardDescription>
                 Create a new company that will be central in all of canny apps
               </CardDescription>
             </CardHeader>
             <CardContent>
+              <input
+                type="hidden"
+                name={fields.company_id.name}
+                value={companyId}
+              />
               <Field
                 inputProps={{
                   ...getInputProps(fields.name, { type: "text" }),
@@ -108,48 +124,52 @@ export default function CreateCompany() {
                 labelProps={{ children: fields.name.name }}
                 errors={fields.name.errors}
               />
-              <Field
-                inputProps={{
-                  ...getInputProps(fields.logo, { type: "file" }),
-                  placeholder: `Enter ${fields.logo.name}`,
+              <TextareaField
+                textareaProps={{
+                  ...getTextareaProps(fields.description),
+                  placeholder: `Enter ${fields.description.name}`,
                 }}
-                labelProps={{ children: fields.logo.name }}
-                errors={fields.logo.errors}
+                labelProps={{ children: fields.description.name }}
+                errors={fields.description.errors}
               />
               <Field
                 inputProps={{
-                  ...getInputProps(fields.email_suffix, { type: "text" }),
-                  placeholder: `Enter ${replaceUnderscore(fields.email_suffix.name)}`,
+                  ...getInputProps(fields.image, { type: "file" }),
+                  placeholder: `Enter ${fields.image.name}`,
                 }}
                 labelProps={{
-                  children: replaceUnderscore(fields.email_suffix.name),
+                  children: fields.image.name,
                 }}
-                errors={fields.email_suffix.errors}
+                errors={fields.image.errors}
               />
               <div className="grid grid-cols-2 grid-rows-1 place-content-center justify-between gap-16">
                 <Field
                   inputProps={{
-                    ...getInputProps(fields.service_charge, { type: "number" }),
-                    placeholder: `Enter ${replaceUnderscore(fields.service_charge.name)}`,
+                    ...getInputProps(fields.starting_date, { type: "date" }),
+                    placeholder: `Enter ${replaceUnderscore(fields.starting_date.name)}`,
+                    max: getValidDateForInput(new Date().toISOString()),
+                    defaultValue: getValidDateForInput(
+                      fields.starting_date.initialValue,
+                    ),
                   }}
                   labelProps={{
-                    children: replaceUnderscore(fields.service_charge.name),
+                    children: replaceUnderscore(fields.starting_date.name),
                   }}
-                  errors={fields.service_charge.errors}
+                  errors={fields.starting_date.errors}
                 />
                 <Field
                   inputProps={{
-                    ...getInputProps(fields.reimbursement_charge, {
-                      type: "number",
-                    }),
-                    placeholder: `Enter ${replaceUnderscore(fields.reimbursement_charge.name)}`,
-                  }}
-                  labelProps={{
-                    children: replaceUnderscore(
-                      fields.reimbursement_charge.name,
+                    ...getInputProps(fields.ending_date, { type: "date" }),
+                    placeholder: `Enter ${replaceUnderscore(fields.ending_date.name)}`,
+                    min: getValidDateForInput(fields.starting_date.value),
+                    defaultValue: getValidDateForInput(
+                      fields.ending_date.initialValue,
                     ),
                   }}
-                  errors={fields.reimbursement_charge.errors}
+                  labelProps={{
+                    children: replaceUnderscore(fields.ending_date.name),
+                  }}
+                  errors={fields.ending_date.errors}
                 />
               </div>
             </CardContent>

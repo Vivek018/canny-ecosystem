@@ -33,7 +33,7 @@ export function LocationCard({
   return (
     <Card
       key={location.id}
-      className="w-full dark:border-[1.5px] h-full flex flex-col justify-between"
+      className="w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-between"
     >
       <CardHeader className="flex flex-row space-y-0 items-center justify-between p-4">
         <CardTitle className="text-lg tracking-wide">{location.name}</CardTitle>
@@ -43,7 +43,7 @@ export function LocationCard({
               <TooltipTrigger asChild>
                 <Link
                   to={`/${location.id}/update-location`}
-                  className="p-2 rounded-full bg-secondary grid place-items-center border-foreground"
+                  className="p-2 rounded-md bg-secondary grid place-items-center border-foreground"
                 >
                   <Icon name="edit" size="xs" />
                 </Link>
@@ -52,7 +52,7 @@ export function LocationCard({
             </Tooltip>
           </TooltipProvider>
           <DropdownMenu>
-            <DropdownMenuTrigger className="p-2 py-2 rounded-full bg-secondary grid place-items-center border-foreground">
+            <DropdownMenuTrigger className="p-2 py-2 rounded-md bg-secondary grid place-items-center border-foreground">
               <Icon name="dots" size="xs" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">

@@ -3,10 +3,12 @@ import type {
   CompanyDatabaseUpdate,
   LocationDatabaseInsert,
   LocationDatabaseUpdate,
+  ProjectDatabaseInsert,
   TypedSupabaseClient,
   UserDatabaseInsert,
 } from "../types";
 
+// Users
 export async function createUserOrUpdateLastCheckedIn({
   supabase,
 }: { supabase: TypedSupabaseClient }) {
@@ -96,6 +98,7 @@ export async function updateUser({
   return status;
 }
 
+// Companies
 export async function createCompany({
   supabase,
   data,
@@ -111,17 +114,17 @@ export async function createCompany({
     return { status: 400, error: "Unauthorized User" };
   }
 
-  const { error, status } = await supabase
+  const { error, status, data: companyData } = await supabase
     .from("company")
     .insert(data)
-    .select()
+    .select("id")
     .single();
 
   if (error) {
     console.error(error);
   }
 
-  return { status, error };
+  return { status, error, id: companyData?.id };
 }
 
 export async function updateCompany({
@@ -182,6 +185,36 @@ export async function deleteCompany({
   return { status, error };
 }
 
+// Projects
+export async function createProject({
+  supabase,
+  data,
+}: {
+  supabase: TypedSupabaseClient;
+  data: ProjectDatabaseInsert;
+}) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.email) {
+    return { status: 400, error: "Unauthorized User" };
+  }
+
+  const { error, status } = await supabase
+    .from("project")
+    .insert(data)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { status, error };
+}
+
+// Locations
 export async function createLocation({
   supabase,
   data,

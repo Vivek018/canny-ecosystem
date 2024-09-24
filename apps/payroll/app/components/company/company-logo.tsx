@@ -19,7 +19,7 @@ export const CompanyLogo = ({
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleUpload = async (evt: React.ChangeEvent<HTMLInputElement>) => {
-
+    console.log(evt.target.files);
   };
 
   return (
@@ -34,12 +34,12 @@ export const CompanyLogo = ({
         </CardHeader>
 
         <Avatar
-          className="rounded-full w-16 h-16 flex items-center justify-center bg-accent cursor-pointer"
+          className="rounded-md w-16 h-16 flex items-center justify-center bg-accent cursor-pointer"
           onClick={() => inputRef?.current?.click()}
         >
           <>
             <AvatarImage src={logo} />
-            <AvatarFallback>
+            <AvatarFallback className="rounded-md">
               <span className="text-md">{name?.charAt(0)}</span>
             </AvatarFallback>
           </>

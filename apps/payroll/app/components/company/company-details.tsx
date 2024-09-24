@@ -10,9 +10,8 @@ import {
 } from "@canny_ecosystem/ui/card";
 import { Field } from "@canny_ecosystem/ui/forms";
 import {
+  CompanyDetailsSchema,
   replaceUnderscore,
-  zEmailSuffix,
-  zNumberString,
 } from "@canny_ecosystem/utils";
 import {
   FormProvider,
@@ -22,15 +21,8 @@ import {
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { Form } from "@remix-run/react";
-import { z } from "zod";
 
 export const COMPANY_DETAILS = "company-details";
-
-export const CompanyDetailsSchema = z.object({
-  id: z.string(),
-  name: zNumberString.min(3),
-  email_suffix: zEmailSuffix,
-});
 
 export const CompanyDetails = ({
   updateValues,
@@ -61,7 +53,7 @@ export const CompanyDetails = ({
             </CardDescription>
           </CardHeader>
           <CardContent className="pb-2">
-            <div className="flex flex-col md:flex-row items-center gap-2 md:gap-8">
+            <div className="flex flex-col md:flex-row items-center justify-center md:gap-8">
               <input
                 type="hidden"
                 name={fields.id.name}

@@ -32,7 +32,7 @@ export default function SettingGeneral() {
   const companyId = data.id;
 
   return (
-    <section className="flex flex-col gap-6 w-full lg:w-4/6 mt-6">
+    <section className="flex flex-col gap-6 w-full lg:w-4/6 mt-4">
       <CompanyLogo name={data.name} logo={data.logo ?? undefined} />
       <CompanyDetails
         key={companyId}

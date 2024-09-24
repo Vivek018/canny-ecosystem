@@ -1,6 +1,7 @@
 import { HARD_QUERY_LIMIT, SINGLE_QUERY_LIMIT } from "../constant";
 import type { TypedSupabaseClient } from "../types";
 
+// Users
 export async function getUserByEmailQuery({
   supabase,
   email,
@@ -20,6 +21,7 @@ export async function getUserByEmailQuery({
   return { data, error };
 }
 
+// Companies
 export async function getCompaniesQuery({
   supabase,
 }: { supabase: TypedSupabaseClient }) {
@@ -58,6 +60,35 @@ export async function getCompanyByIdQuery({
   return { data, error };
 }
 
+// Projects
+export async function getProjectsInCompanyQuery({
+  supabase,
+  companyId,
+}: { supabase: TypedSupabaseClient; companyId: string }) {
+  const { data, error } = await supabase
+    .from("project")
+    .select("id, name, description, starting_date, ending_date, image")
+    .eq("company_id", companyId)
+    .limit(HARD_QUERY_LIMIT);
+
+  return { data, error };
+}
+
+export async function getProjectByIdQuery({
+  supabase,
+  id,
+}: { supabase: TypedSupabaseClient; id: string }) {
+  const { data, error } = await supabase
+    .from("project")
+    .select("id, name, image, description, starting_date, ending_date, company_id")
+    .eq("id", id)
+    .single();
+
+  return { data, error };
+}
+
+
+// Locations
 export async function getLocationsInCompanyQuery({
   supabase,
   companyId,

@@ -86,6 +86,82 @@ export type Database = {
           },
         ]
       }
+      pay_sequence: {
+        Row: {
+          created_at: string
+          id: number
+          pay_day: number
+          pay_frequency: string
+          project_id: string | null
+          working_days: string[]
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          pay_day?: number
+          pay_frequency?: string
+          project_id?: string | null
+          working_days: string[]
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          pay_day?: number
+          pay_frequency?: string
+          project_id?: string | null
+          working_days?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pay_sequence_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "project"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project: {
+        Row: {
+          company_id: string | null
+          created_at: string
+          description: string | null
+          ending_date: string | null
+          id: string
+          image: string | null
+          name: string
+          starting_date: string
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string
+          description?: string | null
+          ending_date?: string | null
+          id?: string
+          image?: string | null
+          name: string
+          starting_date: string
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string
+          description?: string | null
+          ending_date?: string | null
+          id?: string
+          image?: string | null
+          name?: string
+          starting_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user: {
         Row: {
           avatar: string | null

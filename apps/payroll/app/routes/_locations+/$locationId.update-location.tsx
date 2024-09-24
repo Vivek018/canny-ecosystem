@@ -1,12 +1,12 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import CreateLocation, { LocationSchema } from "./create-location";
+import CreateLocation from "./create-location";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { getLocationByIdQuery } from "@canny_ecosystem/supabase/queries";
 import { json, useLoaderData } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
 import { safeRedirect } from "@/utils/server/http.server";
 import { updateLocation } from "@canny_ecosystem/supabase/mutations";
-import { isGoodStatus } from "@canny_ecosystem/utils";
+import { isGoodStatus, LocationSchema } from "@canny_ecosystem/utils";
 
 export const UPDATE_LOCATION = "update-location";
 
