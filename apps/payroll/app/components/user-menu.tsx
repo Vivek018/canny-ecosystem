@@ -63,27 +63,15 @@ export function UserMenu({
             <DropdownMenuSeparator />
 
             <DropdownMenuGroup>
-              <Link prefetch="render" to="/account">
+              <Link prefetch="render" to="/settings/account">
                 <DropdownMenuItem>
                   Account
                   <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
                 </DropdownMenuItem>
               </Link>
-
-              <Link prefetch="render" to="/account/support">
-                <DropdownMenuItem>Support</DropdownMenuItem>
-              </Link>
-
-              <Link prefetch="render" to="/account/teams">
-                <DropdownMenuItem>
-                  Teams
-                  <DropdownMenuShortcut>⌘E</DropdownMenuShortcut>
-                </DropdownMenuItem>
-              </Link>
             </DropdownMenuGroup>
           </>
         )}
-        <DropdownMenuSeparator />
         <SignOut />
       </DropdownMenuContent>
     </DropdownMenu>

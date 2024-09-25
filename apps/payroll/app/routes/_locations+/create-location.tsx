@@ -102,8 +102,8 @@ export default function CreateLocation({
                 {replaceDash(LOCATION_TAG)}
               </CardTitle>
               <CardDescription>
-                {LOCATION_TAG.split("-")[0]} a new location that will be central
-                in all of canny apps
+                {LOCATION_TAG.split("-")[0]} a location that will be central in
+                all of canny apps
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -178,7 +178,7 @@ export default function CreateLocation({
                   }}
                   placeholder={`Select ${fields.state.name}`}
                   labelProps={{
-                    children: "State",
+                    children: fields.state.name,
                   }}
                   errors={fields.state.errors}
                 />

@@ -10,10 +10,14 @@ export type SupabaseEnv = {
   SUPABASE_ANON_KEY: string;
 };
 
+
+// Users
 export type UserDatabaseRow = Database["public"]["Tables"]["user"]["Row"];
 
 export type UserDatabaseInsert = Database["public"]["Tables"]["user"]["Insert"];
 
+
+// Companies
 export type CompaniesDatabaseRow = {
   id: Database["public"]["Tables"]["company"]["Row"]["id"];
   name: Database["public"]["Tables"]["company"]["Row"]["name"];
@@ -25,8 +29,8 @@ export type CompanyDatabaseInsert =
 export type CompanyDatabaseUpdate =
   Database["public"]["Tables"]["company"]["Update"];
 
-export type ProjectDatabaseRow =
-  Database["public"]["Tables"]["project"]["Row"];
+// Projects
+export type ProjectDatabaseRow = Database["public"]["Tables"]["project"]["Row"];
 
 export type ProjectDatabaseInsert =
   Database["public"]["Tables"]["project"]["Insert"];
@@ -34,6 +38,15 @@ export type ProjectDatabaseInsert =
 export type ProjectDatabaseUpdate =
   Database["public"]["Tables"]["project"]["Update"];
 
+// Pay Sequences
+export type PaySequenceDatabaseRow =
+  Database["public"]["Tables"]["pay_sequence"]["Row"];
+
+export type PaySequenceDatabaseUpdate =
+  Database["public"]["Tables"]["pay_sequence"]["Update"];
+
+
+// Locations
 export type LocationDatabaseRow =
   Database["public"]["Tables"]["location"]["Row"];
 

@@ -95,7 +95,7 @@ export default function CreateCompany() {
                 {replaceDash(CREATE_COMPANY)}
               </CardTitle>
               <CardDescription>
-                Create a new company that will be central in all of canny apps
+                Create a company that will be central in all of canny apps
               </CardDescription>
             </CardHeader>
             <CardContent>

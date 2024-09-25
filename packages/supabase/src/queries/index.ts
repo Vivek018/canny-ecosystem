@@ -80,13 +80,28 @@ export async function getProjectByIdQuery({
 }: { supabase: TypedSupabaseClient; id: string }) {
   const { data, error } = await supabase
     .from("project")
-    .select("id, name, image, description, starting_date, ending_date, company_id")
+    .select(
+      "id, name, image, description, starting_date, ending_date, company_id",
+    )
     .eq("id", id)
     .single();
 
   return { data, error };
 }
 
+// Pay Sequences
+export async function getPaySequenceInProjectQuery({
+  supabase,
+  projectId,
+}: { supabase: TypedSupabaseClient; projectId: string }) {
+  const { data, error } = await supabase
+    .from("pay_sequence")
+    .select("id, pay_frequency, working_days, pay_day, project_id")
+    .eq("project_id", projectId)
+    .single();
+
+  return { data, error };
+}
 
 // Locations
 export async function getLocationsInCompanyQuery({

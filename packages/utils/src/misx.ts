@@ -30,3 +30,12 @@ export function getInitialValueFromZod<T extends z.ZodObject<any, any>>(
     }),
   ) as z.infer<T>;
 }
+
+export function transformStringArrayIntoOptions(
+  arr: string[],
+): { value: string; label: string }[] {
+  return arr.map((str) => ({
+    value: str,
+    label: str,
+  }));
+}

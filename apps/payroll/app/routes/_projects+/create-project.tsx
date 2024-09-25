@@ -112,7 +112,8 @@ export default function CreateProject({
                 {replaceDash(PROJECT_TAG)}
               </CardTitle>
               <CardDescription>
-                Create a new company that will be central in all of canny apps
+                {PROJECT_TAG.split("-")[0]} a project that will be central in
+                all of canny apps
               </CardDescription>
             </CardHeader>
             <CardContent>

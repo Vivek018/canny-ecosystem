@@ -18,9 +18,10 @@ export function SecondaryMenu({
             key={item.path}
             to={item.path}
             className={cn(
-              "text-muted-foreground",
+              "text-muted-foreground underline-offset-4",
+              "hover:underline focus:underline focus:outline-none",
               pathname === item.path &&
-                "text-primary font-medium underline underline-offset-8",
+                "text-primary font-medium hover:no-underline",
             )}
           >
             <span className="capitalize">{item.label}</span>

@@ -89,33 +89,33 @@ export type Database = {
       pay_sequence: {
         Row: {
           created_at: string
-          id: number
+          id: string
           pay_day: number
           pay_frequency: string
-          project_id: string | null
-          working_days: string[]
+          project_id: string
+          working_days: number[]
         }
         Insert: {
           created_at?: string
-          id?: number
+          id?: string
           pay_day?: number
           pay_frequency?: string
-          project_id?: string | null
-          working_days: string[]
+          project_id: string
+          working_days?: number[]
         }
         Update: {
           created_at?: string
-          id?: number
+          id?: string
           pay_day?: number
           pay_frequency?: string
-          project_id?: string | null
-          working_days?: string[]
+          project_id?: string
+          working_days?: number[]
         }
         Relationships: [
           {
             foreignKeyName: "pay_sequence_project_id_fkey"
             columns: ["project_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "project"
             referencedColumns: ["id"]
           },

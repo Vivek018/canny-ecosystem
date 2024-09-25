@@ -13,7 +13,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { Icon } from "./icon";
 
 export interface ComboboxSelectOption {
-  value: string;
+  value: string | number;
   label: string;
 }
 
@@ -63,7 +63,7 @@ export function Combobox({
               {options?.map((option) => (
                 <CommandItem
                   key={option.value}
-                  value={option.value}
+                  value={String(option.value)}
                   onSelect={(currentValue) => {
                     onChange(currentValue === value ? "" : currentValue);
                     setOpen(false);

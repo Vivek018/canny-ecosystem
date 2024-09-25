@@ -1,6 +1,8 @@
 import { ProjectCard } from "@/components/projects/project-card";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { getProjectsInCompanyQuery } from "@canny_ecosystem/supabase/queries";
+import {
+  getProjectsInCompanyQuery,
+} from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import {
@@ -14,7 +16,7 @@ import {
 import { useIsDocument } from "@canny_ecosystem/ui/hooks/is-document";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json, Link, useLoaderData } from "@remix-run/react";
+import { json, Link, Outlet, useLoaderData } from "@remix-run/react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -36,7 +38,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function Projects() {
-
   const { data } = useLoaderData<typeof loader>();
 
   const { isDocument } = useIsDocument();
@@ -76,9 +77,7 @@ export default function Projects() {
                 {data.map((project) => (
                   <CommandItem
                     key={project.id}
-                    value={
-                      project.name + project.description
-                    }
+                    value={project.name + project.description}
                     className="data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0"
                   >
                     <ProjectCard project={project} />
@@ -89,6 +88,7 @@ export default function Projects() {
           </CommandList>
         </Command>
       </div>
+      <Outlet />
     </section>
   );
 }

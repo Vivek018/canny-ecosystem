@@ -92,7 +92,6 @@ export const ThemeFormSchema = z.object({
   theme: z.enum(themes),
 });
 
-
 // Company
 export const CompanySchema = z.object({
   id: z.string().optional(),
@@ -109,20 +108,28 @@ export const CompanyDetailsSchema = z.object({
   email_suffix: zEmailSuffix,
 });
 
-
 // Project
 export const ProjectSchema = z.object({
   id: z.string().optional(),
   name: zNumberString.min(3),
   description: zTextArea.optional(),
   image: zImage,
-  starting_date: z
-    .string()
-    .default(new Date().toISOString().split("T")[0]),
+  starting_date: z.string().default(new Date().toISOString().split("T")[0]),
   ending_date: z.string().optional(),
   company_id: z.string().optional(),
 });
 
+// Pay Sequence
+const daySchema = z.number().int().min(0).max(6);
+export const payFrequencyArray = ["monthly"];
+
+export const PaySequenceSchema = z.object({
+  id: z.string(),
+  pay_frequency: z.enum(payFrequencyArray as [string, ...string[]]),
+  working_days: z.array(daySchema),
+  pay_day: z.number().int().min(1).max(15),
+  project_id: z.string(),
+});
 
 // Location
 export const LocationSchema = z.object({

@@ -52,8 +52,8 @@ export const DeleteLocation = ({ locationId }: { locationId: string }) => {
     <AlertDialog>
       <AlertDialogTrigger
         className={cn(
-          buttonVariants({ variant: "destructive-ghost" }),
-          "text-[13px]",
+          buttonVariants({ variant: "destructive-ghost", size: "full" }),
+          "text-[13px] h-9",
         )}
       >
         Delete Location
@@ -85,7 +85,9 @@ export const DeleteLocation = ({ locationId }: { locationId: string }) => {
           <ErrorList errors={inputError} />
         </div>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={handleCancelLocation}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel onClick={handleCancelLocation}>
+            Cancel
+          </AlertDialogCancel>
           <AlertDialogAction
             className={cn(buttonVariants({ variant: "destructive" }))}
             onClick={handleDeleteLocation}

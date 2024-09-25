@@ -3,6 +3,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
+  DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@canny_ecosystem/ui/dropdown-menu";
@@ -14,7 +15,7 @@ import {
   TooltipTrigger,
 } from "@canny_ecosystem/ui/tooltip";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { Link } from "@remix-run/react";
+import { Link, useNavigate } from "@remix-run/react";
 import {
   Card,
   CardContent,
@@ -25,16 +26,21 @@ import {
 import { Avatar, AvatarFallback } from "@canny_ecosystem/ui/avatar";
 import { getAutoTimeDifference } from "@canny_ecosystem/utils";
 import { DeleteProject } from "./delete-project";
+import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
 
 export function ProjectCard({
   project,
 }: {
   project: Omit<ProjectDatabaseRow, "created_at" | "company_id">;
 }) {
+  const navigate = useNavigate();
+
   const avatarName = project?.name
     ?.split(" ")
     .map((name, index) => (index < 2 ? name.charAt(0).toUpperCase() : ""))
     .join("");
+
+  const editPaySequenceSearchParam = `${modalSearchParamNames.edit_pay_sequence}=true`;
 
   return (
     <Card
@@ -77,7 +83,24 @@ export function ProjectCard({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
               <DropdownMenuGroup>
-                
+                <DropdownMenuItem
+                  onClick={() => {
+                    navigate(
+                      `/projects/${project.id}?${editPaySequenceSearchParam}`,
+                    );
+                  }}
+                >
+                  View Pay Sequence
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    navigate(
+                      `/projects/${project.id}?${editPaySequenceSearchParam}`,
+                    );
+                  }}
+                >
+                  Edit Pay Sequence
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DeleteProject projectId={project.id} />
               </DropdownMenuGroup>
@@ -93,7 +116,7 @@ export function ProjectCard({
       </CardContent>
       <CardFooter
         className={cn(
-          "mx-4 mb-1.5 p-0 py-1.5 text-foreground text-sm flex gap-1 justify-between font-semibold",
+          "mx-4 mb-1.5 p-0 py-1.5 text-foreground text-xs flex gap-1 justify-between font-semibold",
         )}
       >
         <p
@@ -101,7 +124,7 @@ export function ProjectCard({
             "text-green bg-green/25 rounded-md p-1 flex items-center gap-1 capitalize",
           )}
         >
-          <Icon name="clock" size="sm" className=" scale-x-[-1]" />
+          <Icon name="clock" size="xs" className=" scale-x-[-1]" />
           {getAutoTimeDifference(
             project.starting_date,
             new Date().toISOString(),
@@ -117,7 +140,7 @@ export function ProjectCard({
             ) && "hidden",
           )}
         >
-          <Icon name="clock" size="sm" />
+          <Icon name="clock" size="xs" />
           {getAutoTimeDifference(
             new Date().toISOString(),
             project.ending_date,

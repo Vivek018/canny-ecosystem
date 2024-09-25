@@ -3,6 +3,7 @@ import type {
   CompanyDatabaseUpdate,
   LocationDatabaseInsert,
   LocationDatabaseUpdate,
+  PaySequenceDatabaseUpdate,
   ProjectDatabaseInsert,
   ProjectDatabaseUpdate,
   TypedSupabaseClient,
@@ -115,11 +116,11 @@ export async function createCompany({
     return { status: 400, error: "Unauthorized User" };
   }
 
-  const { error, status, data: companyData } = await supabase
-    .from("company")
-    .insert(data)
-    .select("id")
-    .single();
+  const {
+    error,
+    status,
+    data: companyData,
+  } = await supabase.from("company").insert(data).select("id").single();
 
   if (error) {
     console.error(error);
@@ -186,6 +187,7 @@ export async function deleteCompany({
   return { status, error };
 }
 
+
 // Projects
 export async function createProject({
   supabase,
@@ -202,11 +204,22 @@ export async function createProject({
     return { status: 400, error: "Unauthorized User" };
   }
 
-  const { error, status } = await supabase
-    .from("project")
-    .insert(data)
-    .select()
-    .single();
+  const {
+    error,
+    status,
+    data: projectData,
+  } = await supabase.from("project").insert(data).select().single();
+
+  if (projectData?.id) {
+    const { error: paySequenceError } = await supabase
+      .from("pay_sequence")
+      .insert({ project_id: projectData.id })
+      .single();
+
+    if (paySequenceError) {
+      console.error(paySequenceError);
+    }
+  }
 
   if (error) {
     console.error(error);
@@ -272,6 +285,37 @@ export async function deleteProject({
 
   return { status, error };
 }
+
+// Pay Sequences
+export async function updatePaySequence({
+  supabase,
+  data,
+}: {
+  supabase: TypedSupabaseClient;
+  data: PaySequenceDatabaseUpdate;
+}) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.email) {
+    return { status: 400, error: "Unauthorized User" };
+  }
+
+  const { error, status } = await supabase
+    .from("pay_sequence")
+    .update(data)
+    .eq("id", data.id!)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { status, error };
+}
+
 
 // Locations
 export async function createLocation({
