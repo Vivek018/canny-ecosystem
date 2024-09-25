@@ -39,3 +39,12 @@ export function transformStringArrayIntoOptions(
     label: str,
   }));
 }
+
+export function getOrdinalSuffix(n: number): string {
+  const suffixes = ["th", "st", "nd", "rd"];
+  const remainder = n % 100;
+
+  return (
+    n + (suffixes[(remainder - 20) % 10] || suffixes[remainder] || suffixes[0])
+  );
+}

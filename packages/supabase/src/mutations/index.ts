@@ -304,7 +304,7 @@ export async function updatePaySequence({
 
   const { error, status } = await supabase
     .from("pay_sequence")
-    .update(data)
+    .update({...data, working_days: data.working_days?.sort()})
     .eq("id", data.id!)
     .select()
     .single();

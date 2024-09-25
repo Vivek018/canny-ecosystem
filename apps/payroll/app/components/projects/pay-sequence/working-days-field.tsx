@@ -4,16 +4,7 @@ import { Label } from "@canny_ecosystem/ui/label";
 import { ToggleGroup, ToggleGroupItem } from "@canny_ecosystem/ui/toggle-group";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useId } from "react";
-
-const WORKING_DAYS = [
-  { value: "0", label: "Sun" },
-  { value: "1", label: "Mon" },
-  { value: "2", label: "Tue" },
-  { value: "3", label: "Wed" },
-  { value: "4", label: "Thu" },
-  { value: "5", label: "Fri" },
-  { value: "6", label: "Sat" },
-];
+import { workingDaysOptions } from "@/constant";
 
 export function WorkingDaysField({
   labelProps,
@@ -53,7 +44,7 @@ export function WorkingDaysField({
         onValueChange={selectInput.change as any}
         onBlur={selectInput.blur}
       >
-        {WORKING_DAYS.map((day) => (
+        {workingDaysOptions.map((day) => (
           <ToggleGroupItem
             key={day.value}
             value={day.value}
@@ -71,7 +62,7 @@ export function WorkingDaysField({
         onBlur={selectInput.blur}
         className="hidden"
       >
-        {WORKING_DAYS.map((day) => (
+        {workingDaysOptions.map((day) => (
           <option key={day.value} value={day.value}>
             {day.label}
           </option>

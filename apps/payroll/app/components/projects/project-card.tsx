@@ -40,12 +40,13 @@ export function ProjectCard({
     .map((name, index) => (index < 2 ? name.charAt(0).toUpperCase() : ""))
     .join("");
 
+  const viewPaySequenceSearchParam = `${modalSearchParamNames.view_pay_sequence}=true`;
   const editPaySequenceSearchParam = `${modalSearchParamNames.edit_pay_sequence}=true`;
 
   return (
     <Card
       key={project.id}
-      className="w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-between"
+      className="w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start"
     >
       <CardHeader className="flex flex-row space-y-0 items-start justify-between p-4">
         <Avatar className="rounded-md w-16 h-16">
@@ -85,9 +86,7 @@ export function ProjectCard({
               <DropdownMenuGroup>
                 <DropdownMenuItem
                   onClick={() => {
-                    navigate(
-                      `/projects/${project.id}?${editPaySequenceSearchParam}`,
-                    );
+                    navigate(`/projects/${project.id}?${viewPaySequenceSearchParam}`);
                   }}
                 >
                   View Pay Sequence
@@ -112,11 +111,11 @@ export function ProjectCard({
         <CardTitle className="text-lg tracking-wide -mt-1.5">
           {project.name}
         </CardTitle>
-        <p className="mt-2">{project.description}</p>
+        <p className="mt-2 line-clamp-3">{project.description}</p>
       </CardContent>
       <CardFooter
         className={cn(
-          "mx-4 mb-1.5 p-0 py-1.5 text-foreground text-xs flex gap-1 justify-between font-semibold",
+          "mx-4 mb-1.5 mt-auto p-0 py-1.5 text-foreground text-xs flex gap-1 justify-between font-semibold",
         )}
       >
         <p

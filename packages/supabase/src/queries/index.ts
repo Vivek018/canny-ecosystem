@@ -112,7 +112,7 @@ export async function getLocationsInCompanyQuery({
     .from("location")
     .select("id, name, city, state, pin_code, esic_code, is_main, address")
     .eq("company_id", companyId)
-    .limit(HARD_QUERY_LIMIT);
+    .limit(HARD_QUERY_LIMIT).order("is_main", { ascending: false });
 
   return { data, error };
 }

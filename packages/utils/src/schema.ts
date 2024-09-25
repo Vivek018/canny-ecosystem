@@ -24,7 +24,7 @@ export const zNumber = z
 export const zTextArea = z
   .string()
   .min(20)
-  .max(textMaxLength * 10)
+  .max(textMaxLength * 3)
   .regex(
     /^[A-Z_a-z./ ,0-9 \s]+$/,
     "Only alphabets, numbers, dot, slash and comma are allowed",

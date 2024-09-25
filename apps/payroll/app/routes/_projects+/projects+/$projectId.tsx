@@ -1,4 +1,5 @@
 import { EditPaySequenceSheet } from "@/components/projects/pay-sequence/edit-pay-sequence-sheet";
+import { ViewPaySequenceDialog } from "@/components/projects/pay-sequence/view-pay-sequence-dialog";
 import { getPaySequenceInProjectQuery } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
@@ -30,6 +31,10 @@ export default function EditPaySequence() {
   const { data } = useLoaderData<typeof loader>();
 
   const [searchParams] = useSearchParams();
+
+  if (searchParams.get(modalSearchParamNames.view_pay_sequence) === "true") {
+    return <ViewPaySequenceDialog values={data} />;
+  }
 
   if (searchParams.get(modalSearchParamNames.edit_pay_sequence) === "true") {
     return <EditPaySequenceSheet updateValues={data} />;

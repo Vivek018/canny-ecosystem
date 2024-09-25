@@ -33,7 +33,7 @@ export function LocationCard({
   return (
     <Card
       key={location.id}
-      className="w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-between"
+      className="w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start"
     >
       <CardHeader className="flex flex-row space-y-0 items-center justify-between p-4">
         <CardTitle className="text-lg tracking-wide">{location.name}</CardTitle>
@@ -73,7 +73,9 @@ export function LocationCard({
         </div>
       </CardHeader>
       <CardContent className="flex flex-col gap-0.5 px-4">
-        <address className="not-italic">{location.address}</address>
+        <address className="not-italic line-clamp-2">
+          {location.address}
+        </address>
         <div className="flex items-center capitalize gap-2">
           <p>{`${location.city},`}</p>
           <p>{`${location.state}`}</p>

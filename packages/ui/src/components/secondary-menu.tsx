@@ -21,7 +21,7 @@ export function SecondaryMenu({
               "text-muted-foreground underline-offset-4",
               "hover:underline focus:underline focus:outline-none",
               pathname === item.path &&
-                "text-primary font-medium hover:no-underline",
+                "text-primary font-medium hover:no-underline focus:no-underline",
             )}
           >
             <span className="capitalize">{item.label}</span>
