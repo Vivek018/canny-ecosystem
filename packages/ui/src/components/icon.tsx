@@ -1,10 +1,10 @@
 import type { SVGProps } from "react";
 import { cn } from "@/utils/cn";
-import type { IconName } from "@/icon-name";
+import type { IconName as NameOfIcons } from "./icons/name";
 import href from "./icons/sprite.svg";
 
 export { href };
-export type { IconName };
+export type IconName = NameOfIcons;
 
 const sizeClassName = {
   font: "w-[1em] h-[1em]",
@@ -15,7 +15,7 @@ const sizeClassName = {
   xl: "w-7 h-7",
 } as const;
 
-type Size = keyof typeof sizeClassName;
+export type Size = keyof typeof sizeClassName;
 
 const childrenSizeClassName = {
   font: "gap-2",

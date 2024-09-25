@@ -12,6 +12,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@canny_ecosystem/supabase": "*",
+    "@canny_ecosystem/types": "*",
+    "@canny_ecosystem/ui": "*",
+    "@canny_ecosystem/utils": "*",
+    "@conform-to/react": "^1.2.1",
     "@conform-to/zod": "^1.2.1",
     "@remix-run/node": "^2.12.0",
     "@remix-run/react": "^2.12.0",
@@ -19,13 +24,9 @@
     "isbot": "^4.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "zod": "^3.23.8",
     "zustand": "^5.0.0-rc.2"
   },
   "devDependencies": {
-    "@canny_ecosystem/types": "*",
-    "@canny_ecosystem/ui": "*",
-    "@canny_ecosystem/utils": "*",
     "@remix-run/dev": "^2.12.0",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.2.7",

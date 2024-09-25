@@ -1,15 +1,9 @@
 import { parseWithZod } from "@conform-to/zod";
 import { useFetchers } from "@remix-run/react";
-import { z } from "zod";
 import { useRequestInfo } from "./request-info";
 import { useHints } from "./client-hints";
 import type { Theme } from "@canny_ecosystem/types";
-
-export const themes = ["light", "dark", "system"] as const;
-
-export const ThemeFormSchema = z.object({
-  theme: z.enum(themes),
-});
+import { ThemeFormSchema } from "@canny_ecosystem/utils";
 
 export function useTheme(): Theme {
   const hints = useHints();

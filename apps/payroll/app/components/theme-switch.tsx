@@ -1,4 +1,4 @@
-import { Icon } from "@canny_ecosystem/ui/icon";
+import { Icon, type Size } from "@canny_ecosystem/ui/icon";
 
 import {
   Select,
@@ -9,11 +9,11 @@ import {
 } from "@canny_ecosystem/ui/select";
 import type { Theme } from "@canny_ecosystem/types";
 import { useLocation, useSubmit } from "@remix-run/react";
-import { themes } from "@/utils/theme";
+import { themes } from "@canny_ecosystem/utils";
 
 type Props = {
   currentTheme?: Theme;
-  size?: "md" | "font" | "xs" | "sm" | "lg" | "xl";
+  size?: Size;
   className?: string;
 };
 
@@ -40,12 +40,15 @@ export const ThemeSwitch = ({ theme = "system" }: { theme?: Theme }) => {
             { theme: value, returnTo: location.pathname + location.search },
             {
               method: "POST",
-              action: "cookie",
+              action: "/cookie",
             },
           )
         }
       >
-        <SelectTrigger className="w-full py-1.5 gap-2 rounded-full bg-transparent capitalize h-10 text-xs">
+        <SelectTrigger
+          noIcon={true}
+          className="w-full py-1.5 px-2.5 gap-2 rounded-full bg-transparent capitalize h-10 text-xs"
+        >
           <ThemeIcon currentTheme={theme as Theme} />
         </SelectTrigger>
         <SelectContent>
@@ -55,7 +58,7 @@ export const ThemeSwitch = ({ theme = "system" }: { theme?: Theme }) => {
                 <ThemeIcon
                   currentTheme={theme as Theme}
                   size="font"
-                  className="mr-2.5 mb-0.5"
+                  className="mr-2 mb-[2.5px]"
                 />
                 {theme}
               </SelectItem>

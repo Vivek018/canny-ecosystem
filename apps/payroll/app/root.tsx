@@ -5,6 +5,7 @@ import {
   type HeadersFunction,
 } from "@remix-run/node";
 import {
+  Link,
   Links,
   Meta,
   Outlet,
@@ -18,33 +19,69 @@ import { Sidebar } from "@/components/sidebar";
 import { Header } from "@/components/header";
 import { getTheme } from "./utils/server/theme.server";
 import { useTheme } from "./utils/theme";
-// import { href as iconsHref } from './components/ui/icon'
+import { href as iconsHref } from "@canny_ecosystem/ui/icon";
 import { ClientHintCheck, getHints } from "./utils/client-hints";
-// import { getDomainUrl } from './utils/misx'
-// import { useNonce } from './utils/providers/nonce-provider'
+import { useNonce } from "./utils/providers/nonce-provider";
+import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
+import { Logo } from "@canny_ecosystem/ui/logo";
+import { ThemeSwitch } from "./components/theme-switch";
+import { getSessionUser } from "@canny_ecosystem/supabase/cached-queries";
+import {
+  getCompaniesQuery,
+  getUserByEmailQuery,
+} from "@canny_ecosystem/supabase/queries";
+import { getCompanyIdOrFirstCompany, setCompanyId } from "./utils/server/company.server";
+import { safeRedirect } from "./utils/server/http.server";
 
 export const links: LinksFunction = () => {
-  return [{ rel: "stylesheet", href: tailwindStyleSheetUrl }].filter(Boolean);
+  return [
+    { rel: "preload", href: iconsHref, as: "image" },
+    { rel: "stylesheet", href: tailwindStyleSheetUrl },
+  ].filter(Boolean);
 };
-
-export async function loader({ request }: LoaderFunctionArgs) {
-  return json({
-    requestInfo: {
-      hints: getHints(request),
-      // origin: getDomainUrl(request),
-      path: new URL(request.url).pathname,
-      userPrefs: {
-        theme: getTheme(request),
-      },
-    },
-  });
-}
 
 export const headers: HeadersFunction = ({ loaderHeaders }) => {
   return {
     "Server-Timing": loaderHeaders.get("Server-Timing") ?? "",
   };
 };
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const { user: sessionUser } = await getSessionUser({ request });
+  const { supabase } = getSupabaseWithHeaders({ request });
+  let user = null;
+  let companies = null;
+
+  if (sessionUser?.email) {
+    user = (await getUserByEmailQuery({ supabase, email: sessionUser.email }))
+      .data;
+    companies = (await getCompaniesQuery({ supabase })).data;
+  }
+
+  const { companyId, setCookie } = await getCompanyIdOrFirstCompany(
+    request,
+    supabase,
+  );
+
+  if (setCookie) {
+    const headers = new Headers();
+    headers.append("Set-Cookie", setCompanyId(companyId));
+    return safeRedirect("/", { headers });
+  }
+
+  return json({
+    user,
+    companies,
+    requestInfo: {
+      hints: getHints(request),
+      path: new URL(request.url).pathname,
+      userPrefs: {
+        theme: getTheme(request),
+        companyId: companyId,
+      },
+    },
+  });
+}
 
 function Document({
   children,
@@ -75,20 +112,46 @@ function Document({
 
 function App() {
   const {
+    user,
+    companies,
     requestInfo: {
       userPrefs: { theme: initialTheme },
     },
   } = useLoaderData<typeof loader>();
 
+  const nonce = useNonce();
   const theme = useTheme();
+
   return (
-    <Document nonce={"nonce"} theme={theme}>
+    <Document nonce={nonce} theme={theme}>
       <main className="flex h-full w-full bg-background text-foreground ">
-        <Sidebar className="flex-none" />
-        <div className="flex max-h-screen flex-grow flex-col overflow-scroll px-4">
-          <Header theme={initialTheme || "system"} />
-          <Outlet />
-        </div>
+        {!user ? (
+          <div className="w-full h-full">
+            <header className="flex justify-between items-center mx-5 mt-4 md:mx-10 md:mt-10">
+              <div>
+                <Link to="/">
+                  <Logo />
+                </Link>
+              </div>
+              <div>
+                <ThemeSwitch theme={initialTheme || "system"} />
+              </div>
+            </header>
+            <Outlet />
+          </div>
+        ) : (
+          <>
+            <Sidebar className="flex-none" />
+            <div className="flex max-h-screen flex-grow flex-col overflow-scroll px-4">
+              <Header
+                theme={initialTheme || "system"}
+                user={user}
+                companies={companies ?? []}
+              />
+              <Outlet />
+            </div>
+          </>
+        )}
       </main>
     </Document>
   );

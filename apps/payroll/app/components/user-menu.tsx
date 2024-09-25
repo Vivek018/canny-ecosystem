@@ -10,28 +10,33 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@canny_ecosystem/ui/dropdown-menu";
-import { SignOut } from "./sign-out";
+import { SignOut } from "./auth/sign-out";
+import type { UserDatabaseRow } from "@canny_ecosystem/supabase/types";
 
 export function UserMenu({
   onlySignOut = false,
   userData,
   Link,
-}: { onlySignOut?: boolean; userData: any; Link: React.ElementType }) {
+}: {
+  onlySignOut?: boolean;
+  userData: UserDatabaseRow;
+  Link: React.ElementType;
+}) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger className="rounded-full focus:outline-none focus:dark:brightness-150 hover:dark:brightness-150 focus:brightness-90 hover:brightness-90">
         <Avatar className="rounded-full w-10 h-10 cursor-pointer">
-          {userData?.avatar_url && (
+          {userData?.avatar && (
             <img
-              src={userData?.avatar_url}
-              alt={userData?.full_name}
+              src={userData?.avatar}
+              alt={userData?.first_name + userData?.last_name}
               width={32}
               height={32}
             />
           )}
           <AvatarFallback>
             <span className="text-xs">
-              {userData?.full_name?.charAt(0)?.toUpperCase()}
+              {userData?.first_name?.charAt(0)?.toUpperCase()}
             </span>
           </AvatarFallback>
         </Avatar>
@@ -42,7 +47,9 @@ export function UserMenu({
             <DropdownMenuLabel>
               <div className="flex justify-between items-center">
                 <div className="flex flex-col">
-                  <span className="truncate">{userData.full_name}</span>
+                  <span className="truncate">
+                    {`${userData.first_name} ${userData.last_name}`}
+                  </span>
                   <span className="truncate text-xs text-[#606060] font-normal">
                     {userData.email}
                   </span>
@@ -56,27 +63,15 @@ export function UserMenu({
             <DropdownMenuSeparator />
 
             <DropdownMenuGroup>
-              <Link prefetch="render" to="/account">
+              <Link prefetch="render" to="/settings/account">
                 <DropdownMenuItem>
                   Account
                   <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
                 </DropdownMenuItem>
               </Link>
-
-              <Link prefetch="render" to="/account/support">
-                <DropdownMenuItem>Support</DropdownMenuItem>
-              </Link>
-
-              <Link prefetch="render" to="/account/teams">
-                <DropdownMenuItem>
-                  Teams
-                  <DropdownMenuShortcut>⌘E</DropdownMenuShortcut>
-                </DropdownMenuItem>
-              </Link>
             </DropdownMenuGroup>
           </>
         )}
-        <DropdownMenuSeparator />
         <SignOut />
       </DropdownMenuContent>
     </DropdownMenu>
