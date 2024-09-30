@@ -11,6 +11,7 @@ import {
 } from "./command";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { Icon } from "./icon";
+import { replaceUnderscore } from "@canny_ecosystem/utils";
 
 export interface ComboboxSelectOption {
   value: string | number;
@@ -44,7 +45,9 @@ export function Combobox({
           aria-expanded={open}
           className={cn("truncate justify-between capitalize", className)}
         >
-          {selectedOption ? selectedOption.label : placeholder}
+          {replaceUnderscore(
+            selectedOption ? selectedOption.label : placeholder,
+          )}
           <Icon
             name="caret-sort"
             size="sm"
@@ -78,7 +81,9 @@ export function Combobox({
                       value === option.value ? "opacity-100" : "opacity-0",
                     )}
                   />
-                  <p className="truncate">{option.label}</p>
+                  <p className="truncate capitalize">
+                    {replaceUnderscore(option.label)}
+                  </p>
                 </CommandItem>
               ))}
             </CommandGroup>

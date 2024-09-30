@@ -12,46 +12,55 @@ export type SupabaseEnv = {
 
 
 // Users
-export type UserDatabaseRow = Database["public"]["Tables"]["user"]["Row"];
+export type UserDatabaseRow = Database["public"]["Tables"]["users"]["Row"];
 
-export type UserDatabaseInsert = Database["public"]["Tables"]["user"]["Insert"];
+export type UserDatabaseInsert = Database["public"]["Tables"]["users"]["Insert"];
+
+export type UserDatabaseUpdate = Database["public"]["Tables"]["users"]["Update"];
 
 
 // Companies
 export type CompaniesDatabaseRow = {
-  id: Database["public"]["Tables"]["company"]["Row"]["id"];
-  name: Database["public"]["Tables"]["company"]["Row"]["name"];
+  id: Database["public"]["Tables"]["companies"]["Row"]["id"];
+  name: Database["public"]["Tables"]["companies"]["Row"]["name"];
 }[];
 
 export type CompanyDatabaseInsert =
-  Database["public"]["Tables"]["company"]["Insert"];
+  Database["public"]["Tables"]["companies"]["Insert"];
 
 export type CompanyDatabaseUpdate =
-  Database["public"]["Tables"]["company"]["Update"];
+  Database["public"]["Tables"]["companies"]["Update"];
+
+  // Company Registration Details
+export type CompanyRegistrationDetailsInsert =
+  Database["public"]["Tables"]["company_registration_details"]["Insert"];
+
+export type CompanyRegistrationDetailsUpdate =
+  Database["public"]["Tables"]["company_registration_details"]["Update"];
 
 // Projects
-export type ProjectDatabaseRow = Database["public"]["Tables"]["project"]["Row"];
+export type ProjectDatabaseRow = Database["public"]["Tables"]["projects"]["Row"];
 
 export type ProjectDatabaseInsert =
-  Database["public"]["Tables"]["project"]["Insert"];
+  Database["public"]["Tables"]["projects"]["Insert"];
 
 export type ProjectDatabaseUpdate =
-  Database["public"]["Tables"]["project"]["Update"];
+  Database["public"]["Tables"]["projects"]["Update"];
 
 // Pay Sequences
-export type PaySequenceDatabaseRow =
-  Database["public"]["Tables"]["pay_sequence"]["Row"];
+export type SitePaySequenceDatabaseRow =
+  Database["public"]["Tables"]["site_pay_sequence"]["Row"];
 
-export type PaySequenceDatabaseUpdate =
-  Database["public"]["Tables"]["pay_sequence"]["Update"];
+export type SitePaySequenceDatabaseUpdate =
+  Database["public"]["Tables"]["site_pay_sequence"]["Update"];
 
 
 // Locations
-export type LocationDatabaseRow =
-  Database["public"]["Tables"]["location"]["Row"];
+export type ProjectSitesDatabaseRow =
+  Database["public"]["Tables"]["project_sites"]["Row"];
 
-export type LocationDatabaseInsert =
-  Database["public"]["Tables"]["location"]["Insert"];
+export type ProjectSitesDatabaseInsert =
+  Database["public"]["Tables"]["project_sites"]["Insert"];
 
-export type LocationDatabaseUpdate =
-  Database["public"]["Tables"]["location"]["Update"];
+export type ProjectSitesDatabaseUpdate =
+  Database["public"]["Tables"]["project_sites"]["Update"];

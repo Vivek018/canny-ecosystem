@@ -1,5 +1,7 @@
+import { DEFAULT_ROUTE } from "@/constant";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getSessionUser } from "@canny_ecosystem/supabase/cached-queries";
+import { updateUserLastLogin } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Button } from "@canny_ecosystem/ui/button";
 import {
@@ -16,13 +18,13 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { user } = await getSessionUser({ request });
 
   if (user) {
-    return safeRedirect("/");
+    return safeRedirect(DEFAULT_ROUTE, { status: 303 });
   }
 
   return json({ error });
 };
 
-export async function action ({ request }: ActionFunctionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({
     request,
   });
@@ -35,18 +37,19 @@ export async function action ({ request }: ActionFunctionArgs) {
   });
 
   if (error) {
-    console.error("Signin - OAuth error:", error);
+    console.error("Login - OAuth error:", error);
     return json({ error: error.message }, { status: 500 });
   }
 
   if (data.url) {
+    updateUserLastLogin({ supabase });
     return redirect(data.url, { headers });
   }
 
-  return json({ error: "Failed to get signin URL" }, { status: 500 });
-};
+  return json({ error: "Failed to get login URL" }, { status: 500 });
+}
 
-export default function SignIn() {
+export default function Login() {
   const actionData = useActionData<typeof action>();
   const loaderData = useLoaderData<typeof loader>();
 

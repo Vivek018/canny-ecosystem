@@ -54,10 +54,10 @@ export function CommonSidebar({
                         cn(
                           "flex cursor-pointer rounded w-min px-4 py-3.5 text-sm tracking-wide hover:bg-accent justify-center",
                           isActive
-                            ? "bg-primary/15 text-primary shadow-sm hover:bg-primary/20"
+                            ? "bg-primary/15 text-primary hover:bg-primary/20"
                             : "",
                           link === path
-                            ? "cursor-auto bg-primary/25  text-primary shadow-sm hover:bg-primary/25"
+                            ? "cursor-auto bg-primary/25  text-primary hover:bg-primary/25"
                             : "",
                         )
                       }

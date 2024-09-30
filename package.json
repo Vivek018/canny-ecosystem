@@ -4,9 +4,11 @@
   "workspaces": ["tooling/*", "packages/*", "apps/*"],
   "scripts": {
     "build": "turbo build",
-    "clean": "git clean -xdf node_modules",
+    "clean": "git clean -xdf .turbo node_modules",
     "clean:workspaces": "turbo clean",
     "dev": "turbo dev --parallel",
+    "start": "turbo start",
+    "build:payroll": "turbo build --filter=@canny_ecosystem/payroll",
     "dev:payroll": "turbo dev --filter=@canny_ecosystem/payroll",
     "start:payroll": "turbo start --filter=@canny_ecosystem/payroll",
     "test": "turbo test --parallel",

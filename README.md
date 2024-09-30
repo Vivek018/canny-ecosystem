@@ -1,4 +1,6 @@
-# Turborepo starter
+# There is dotenv/config import in entry.server.ts - thend only build is getting envs, check it out later
+
+Turborepo starter
 
 This is an official starter Turborepo.
 

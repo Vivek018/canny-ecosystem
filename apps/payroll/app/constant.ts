@@ -1,5 +1,7 @@
 import type { NavList } from "@canny_ecosystem/types";
 
+export const DEFAULT_ROUTE = "/";
+
 export const workingDaysOptions = [
   { value: "0", label: "Sun" },
   { value: "1", label: "Mon" },

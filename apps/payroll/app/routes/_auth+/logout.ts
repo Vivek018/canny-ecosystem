@@ -8,8 +8,9 @@ export async function action({ request }: ActionFunctionArgs) {
   const { error } = await supabase.auth.signOut();
 
   if (error) {
+    console.error("Error logging out:", error);
     return json({ error: error.message }, { status: 500 });
   }
 
-  return safeRedirect("/sign-in", { headers });
+  return safeRedirect("/login", {headers});
 }

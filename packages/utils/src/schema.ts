@@ -92,20 +92,33 @@ export const ThemeFormSchema = z.object({
   theme: z.enum(themes),
 });
 
+export const company_type = [
+  "project_client",
+  "sub_contractor",
+  "app_creator",
+  "end_client",
+] as const;
+
+export const company_size = ["small", "medium", "large", "enterprise"] as const;
+
 // Company
 export const CompanySchema = z.object({
   id: z.string().optional(),
   name: zNumberString.min(3),
   logo: zImage,
   email_suffix: zEmailSuffix.optional(),
-  service_charge: z.number().min(2).max(20),
-  reimbursement_charge: z.number().min(0.5).max(20).optional(),
+  company_type: z.enum(company_type).default("project_client"),
+  company_size: z.enum(company_size).default("enterprise"),
 });
 
-export const CompanyDetailsSchema = z.object({
-  id: z.string(),
-  name: zNumberString.min(3),
-  email_suffix: zEmailSuffix,
+export const CompanyRegistrationDetailsSchema = z.object({
+  registration_number: zNumberString.min(3).optional(),
+  pan_number: zNumberString.min(3).optional(),
+  gst_number: zNumberString.min(3).optional(),
+  pf_number: zNumberString.min(3).optional(),
+  esi_number: zNumberString.min(3).optional(),
+  pt_number: zNumberString.min(3).optional(),
+  lwf_number: zNumberString.min(3).optional(),
 });
 
 // Project
@@ -121,11 +134,11 @@ export const ProjectSchema = z.object({
 
 // Pay Sequence
 const daySchema = z.number().int().min(0).max(6);
-export const payFrequencyArray = ["monthly"];
+export const payFrequencyArray = ["monthly"] as const;
 
 export const PaySequenceSchema = z.object({
   id: z.string(),
-  pay_frequency: z.enum(payFrequencyArray as [string, ...string[]]),
+  pay_frequency: z.enum(payFrequencyArray),
   working_days: z.array(daySchema),
   pay_day: z.number().int().min(1).max(15),
   project_id: z.string(),

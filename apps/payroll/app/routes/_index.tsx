@@ -17,7 +17,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { user } = await getSessionUser({ request });
 
   if (!user) {
-    return safeRedirect("/sign-in");
+    return safeRedirect("/login", { status: 303 });
   }
 
   return json({});

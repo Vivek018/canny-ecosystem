@@ -12,6 +12,7 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useNavigate,
 } from "@remix-run/react";
 
 import tailwindStyleSheetUrl from "@/styles/tailwind.css?url";
@@ -30,8 +31,13 @@ import {
   getCompaniesQuery,
   getUserByEmailQuery,
 } from "@canny_ecosystem/supabase/queries";
-import { getCompanyIdOrFirstCompany, setCompanyId } from "./utils/server/company.server";
+import {
+  getCompanyIdOrFirstCompany,
+  setCompanyId,
+} from "./utils/server/company.server";
 import { safeRedirect } from "./utils/server/http.server";
+import { useEffect } from "react";
+import { DEFAULT_ROUTE } from "./constant";
 
 export const links: LinksFunction = () => {
   return [
@@ -53,9 +59,26 @@ export async function loader({ request }: LoaderFunctionArgs) {
   let companies = null;
 
   if (sessionUser?.email) {
-    user = (await getUserByEmailQuery({ supabase, email: sessionUser.email }))
-      .data;
-    companies = (await getCompaniesQuery({ supabase })).data;
+    const { data: userData, error: userError } = await getUserByEmailQuery({
+      supabase,
+      email: sessionUser.email,
+    });
+    const { data: companiesData, error: companiesError } =
+      await getCompaniesQuery({ supabase });
+
+    if (userError || !userData) {
+      console.error("userError", userError);
+    } else {
+      user = userData;
+    }
+
+    if (companiesError) {
+      console.error("companiesError", companiesError);
+
+      companies = null;
+    } else {
+      companies = companiesData;
+    }
   }
 
   const { companyId, setCookie } = await getCompanyIdOrFirstCompany(
@@ -66,10 +89,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
   if (setCookie) {
     const headers = new Headers();
     headers.append("Set-Cookie", setCompanyId(companyId));
-    return safeRedirect("/", { headers });
+    return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
   return json({
+    isLoggedIn: !!sessionUser,
     user,
     companies,
     requestInfo: {
@@ -112,6 +136,7 @@ function Document({
 
 function App() {
   const {
+    isLoggedIn,
     user,
     companies,
     requestInfo: {
@@ -121,6 +146,13 @@ function App() {
 
   const nonce = useNonce();
   const theme = useTheme();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isLoggedIn && !user) {
+      navigate("/no-user-found");
+    }
+  }, []);
 
   return (
     <Document nonce={nonce} theme={theme}>
@@ -129,7 +161,7 @@ function App() {
           <div className="w-full h-full">
             <header className="flex justify-between items-center mx-5 mt-4 md:mx-10 md:mt-10">
               <div>
-                <Link to="/">
+                <Link to={"/"}>
                   <Logo />
                 </Link>
               </div>
@@ -145,7 +177,7 @@ function App() {
             <div className="flex max-h-screen flex-grow flex-col overflow-scroll px-4">
               <Header
                 theme={initialTheme || "system"}
-                user={user}
+                user={user ?? []}
                 companies={companies ?? []}
               />
               <Outlet />

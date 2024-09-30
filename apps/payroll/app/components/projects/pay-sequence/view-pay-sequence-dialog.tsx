@@ -1,5 +1,5 @@
 import { workingDaysOptions } from "@/constant";
-import type { PaySequenceDatabaseRow } from "@canny_ecosystem/supabase/types";
+import type { SitePaySequenceDatabaseRow } from "@canny_ecosystem/supabase/types";
 import {
   Dialog,
   DialogContent,
@@ -8,12 +8,13 @@ import {
 } from "@canny_ecosystem/ui/dialog";
 import { Label } from "@canny_ecosystem/ui/label";
 import { ToggleGroup, ToggleGroupItem } from "@canny_ecosystem/ui/toggle-group";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { getOrdinalSuffix } from "@canny_ecosystem/utils";
 import { useNavigate } from "@remix-run/react";
 
 export const ViewPaySequenceDialog = ({
   values,
-}: { values: Omit<PaySequenceDatabaseRow, "created_at"> }) => {
+}: { values: Omit<SitePaySequenceDatabaseRow, "created_at" | "updated_at"> }) => {
   const navigate = useNavigate();
 
   const handleOpenChange = () => {
@@ -28,33 +29,33 @@ export const ViewPaySequenceDialog = ({
         </DialogHeader>
         <div className="flex flex-col gap-6">
           <div className="flex items-center gap-2">
-            <Label>Pay Day:</Label>
-            <p>
+            <Label className="font-bold">Pay Day:</Label>
+            <p className="text-base">
               {getOrdinalSuffix(values.pay_day)} of every month
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Label>Pay Frequency:</Label>
+            <Label className="font-bold">Pay Frequency:</Label>
             <p className="capitalize">{values.pay_frequency}</p>
           </div>
           <div className="flex items-center gap-2">
-            <Label className="w-max">Working Days:</Label>
+            <Label className="w-max font-bold">Working Days:</Label>
             <ToggleGroup
               type="multiple"
               variant="outline"
-              disabled
               className="flex gap-2"
+              disabled={true}
             >
-              {values.working_days.map((day) => (
+              {workingDaysOptions.map(({ label, value }) => (
                 <ToggleGroupItem
-                  key={day}
-                  className="flex items-center bg-secondary space-x-2"
+                  key={value}
+                  className={cn(
+                    "flex items-center space-x-2 disabled:opacity-100",
+                    values.working_days.includes(Number.parseInt(value)) &&
+                      "bg-secondary",
+                  )}
                 >
-                  {
-                    workingDaysOptions.find(
-                      (workingDay) => workingDay.value === String(day),
-                    )?.label
-                  }
+                  {label}
                 </ToggleGroupItem>
               ))}
             </ToggleGroup>

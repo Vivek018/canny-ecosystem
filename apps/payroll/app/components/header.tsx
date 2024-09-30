@@ -1,6 +1,5 @@
 import { Link } from "@remix-run/react";
 import { AssistantButton } from "./assistant/assistant-button";
-import { FeedbackForm } from "./feedback-form";
 import { ThemeSwitch } from "./theme-switch";
 import { UserMenu } from "./user-menu";
 import type { Theme } from "@canny_ecosystem/types";
@@ -16,7 +15,7 @@ export function Header({
   companies,
 }: {
   theme: Theme;
-  user: UserDatabaseRow;
+  user: Omit<UserDatabaseRow, "created_at" | "updated_at">;
   companies: CompaniesDatabaseRow;
 }) {
   return (
@@ -27,7 +26,6 @@ export function Header({
         <CompanySwitch companies={companies} />
         <div className="bg-secondary w-[1.5px] py-1.5 mx-2 h-full">&nbsp;</div>
         <ThemeSwitch theme={theme} />
-        <FeedbackForm />
         <UserMenu userData={user} Link={Link} />
       </div>
     </header>

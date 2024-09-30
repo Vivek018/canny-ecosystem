@@ -1,4 +1,3 @@
-import { CREATE_COMPANY } from "@/routes/_company+/create-company";
 import { useCompanyId } from "@/utils/company";
 import type { CompaniesDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
@@ -11,7 +10,6 @@ import {
   SelectTrigger,
 } from "@canny_ecosystem/ui/select";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { replaceDash } from "@canny_ecosystem/utils";
 import { Link, useLocation, useSubmit } from "@remix-run/react";
 import { useRef } from "react";
 
@@ -66,13 +64,13 @@ export const CompanySwitch = ({
             <SelectSeparator />
             <Link
               ref={linkRef}
-              to={`/${CREATE_COMPANY}`}
+              to="/create-company"
               className={cn(
                 buttonVariants({ variant: "primary-ghost" }),
                 "w-full cursor-pointer capitalize",
               )}
             >
-              {replaceDash(CREATE_COMPANY)}
+              Create Company
             </Link>
           </SelectGroup>
         </SelectContent>

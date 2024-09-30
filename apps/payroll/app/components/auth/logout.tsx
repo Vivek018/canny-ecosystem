@@ -3,21 +3,21 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
-export function SignOut() {
+export function Logout() {
   const [isLoading, setLoading] = useState(false);
   const submit = useSubmit();
 
-  const handleSignOut = () => {
+  const handleLogout = () => {
     setLoading(true);
-    submit({}, { method: "post", action: "/sign-out", replace: true });
+    submit({}, { method: "post", action: "/logout", replace: true });
   };
 
   return (
     <DropdownMenuItem
       className={cn(!isLoading && "text-destructive focus:text-destructive")}
-      onClick={handleSignOut}
+      onClick={handleLogout}
     >
-      {isLoading ? "Loading..." : "Sign out"}
+      {isLoading ? "Loading..." : "Logout"}
     </DropdownMenuItem>
   );
 }

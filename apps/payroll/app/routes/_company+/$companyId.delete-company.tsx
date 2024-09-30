@@ -1,3 +1,4 @@
+import { DEFAULT_ROUTE } from "@/constant";
 import { setCompanyId } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { deleteCompany } from "@canny_ecosystem/supabase/mutations";
@@ -18,7 +19,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   if (isGoodStatus(status)) {
     setCompanyId(undefined, true);
     headers.append("Set-Cookie", "company_id=; Path=/; Max-Age=0");
-    return safeRedirect("/", { headers });
+    return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
   return json({ error: error?.toString() }, { status: 500 });

@@ -6,11 +6,11 @@ export function isGoodStatus(status: number | string) {
 }
 
 export function replaceDash(str: string) {
-  return str.replaceAll("-", " ");
+  return str?.replaceAll("-", " ");
 }
 
 export function replaceUnderscore(str: string) {
-  return str.replaceAll("_", " ");
+  return str?.replaceAll("_", " ");
 }
 
 export const pipe =
