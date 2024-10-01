@@ -45,7 +45,7 @@ export type Database = {
         }
         Relationships: []
       }
-      company_addresses: {
+      company_locations: {
         Row: {
           address_line1: string
           address_line2: string | null
@@ -105,36 +105,36 @@ export type Database = {
         Row: {
           company_id: string
           created_at: string | null
-          esi_registration_number: string | null
+          esi_number: string | null
           gst_number: string | null
-          lwf_registration_number: string | null
+          lwf_number: string | null
           pan_number: string | null
-          pf_registration_number: string | null
-          pt_registration_number: string | null
+          pf_number: string | null
+          pt_number: string | null
           registration_number: string | null
           updated_at: string | null
         }
         Insert: {
           company_id: string
           created_at?: string | null
-          esi_registration_number?: string | null
+          esi_number?: string | null
           gst_number?: string | null
-          lwf_registration_number?: string | null
+          lwf_number?: string | null
           pan_number?: string | null
-          pf_registration_number?: string | null
-          pt_registration_number?: string | null
+          pf_number?: string | null
+          pt_number?: string | null
           registration_number?: string | null
           updated_at?: string | null
         }
         Update: {
           company_id?: string
           created_at?: string | null
-          esi_registration_number?: string | null
+          esi_number?: string | null
           gst_number?: string | null
-          lwf_registration_number?: string | null
+          lwf_number?: string | null
           pan_number?: string | null
-          pf_registration_number?: string | null
-          pt_registration_number?: string | null
+          pf_number?: string | null
+          pt_number?: string | null
           registration_number?: string | null
           updated_at?: string | null
         }
@@ -686,7 +686,7 @@ export type Database = {
             foreignKeyName: "project_site_company_address_id_fkey"
             columns: ["company_address_id"]
             isOneToOne: false
-            referencedRelation: "company_addresses"
+            referencedRelation: "company_locations"
             referencedColumns: ["id"]
           },
           {

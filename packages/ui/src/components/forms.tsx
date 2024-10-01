@@ -169,7 +169,7 @@ export function CheckboxField({
 
 type SearchableSelectFieldProps = {
   options: ComboboxSelectOption[];
-  labelProps: React.LabelHTMLAttributes<HTMLLabelElement>;
+  labelProps?: React.LabelHTMLAttributes<HTMLLabelElement>;
   inputProps: React.InputHTMLAttributes<HTMLInputElement>;
   errors?: ListOfErrors;
   className?: string;

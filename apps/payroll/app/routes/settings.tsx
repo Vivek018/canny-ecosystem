@@ -9,7 +9,7 @@ export default function Settings() {
       <SecondaryMenu
         items={[
           { label: "General", path: "/settings" },
-          { label: "Addresses", path: "/addresses" },
+          { label: "Locations", path: "/settings/locations" },
           { label: "Relationships", path: "/settings/relationships" },
           { label: "Users", path: "/settings/users" },
         ]}

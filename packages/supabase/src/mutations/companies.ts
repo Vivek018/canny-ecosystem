@@ -1,3 +1,4 @@
+import { getCompanyRegistrationDetailsByCompanyIdQuery } from "../queries";
 import type {
   CompanyDatabaseInsert,
   CompanyDatabaseUpdate,
@@ -33,23 +34,39 @@ export async function createCompany({
     .single();
 
   if (error) {
-    console.error(error);
+    console.error("company ", error);
+    return {
+      status,
+      companyError: error,
+      registrationDetailsError: null,
+      id: null,
+    };
   }
 
   if (data?.id) {
-    const { error: registrationDetailsError } = await supabase
-      .from("company_registration_details")
-      .insert({
-        company_id: data.id,
-        ...companyRegistrationDetails,
+    const { error: registrationDetailsError, status } =
+      await createCompanyRegistrationDetails({
+        supabase,
+        data: { company_id: data.id, ...companyRegistrationDetails },
       });
 
     if (registrationDetailsError) {
-      console.error(registrationDetailsError);
+      console.error("registrationDetails ", registrationDetailsError);
+      return {
+        status,
+        companyError: null,
+        registrationDetailsError,
+        id: data?.id,
+      };
     }
   }
 
-  return { status, error, id: companyData?.id };
+  return {
+    status,
+    companyError: null,
+    registrationDetailsError: null,
+    id: data?.id,
+  };
 }
 
 export async function updateCompany({
@@ -111,7 +128,35 @@ export async function deleteCompany({
 }
 
 // Company Registration Details
-export async function updateCompanyRegistrationDetails({
+export async function createCompanyRegistrationDetails({
+  supabase,
+  data,
+}: {
+  supabase: TypedSupabaseClient;
+  data: CompanyRegistrationDetailsInsert;
+}) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.email) {
+    return { status: 400, error: "Unauthorized User" };
+  }
+
+  const { error, status } = await supabase
+    .from("company_registration_details")
+    .insert(data)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { status, error };
+}
+
+export async function updateOrCreateCompanyRegistrationDetails({
   supabase,
   data,
 }: {
@@ -124,6 +169,23 @@ export async function updateCompanyRegistrationDetails({
 
   if (!user?.email) {
     return { status: 400, error: "Unauthorized User" };
+  }
+
+  if (!data.company_id) {
+    return { status: 400, error: "Company ID is required" };
+  }
+
+  const { data: dataExist } =
+    await getCompanyRegistrationDetailsByCompanyIdQuery({
+      supabase,
+      companyId: data.company_id,
+    });
+
+  if (!dataExist) {
+    return await createCompanyRegistrationDetails({
+      supabase,
+      data: data as any,
+    });
   }
 
   const { error, status } = await supabase

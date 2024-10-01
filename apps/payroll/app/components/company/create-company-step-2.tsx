@@ -11,11 +11,12 @@ import {
 } from "@canny_ecosystem/utils";
 import { Field } from "@canny_ecosystem/ui/forms";
 import { type FieldMetadata, getInputProps } from "@conform-to/react";
+import type { CompanyRegistrationDetailsInsert } from "@canny_ecosystem/supabase/types";
 
 type FieldsType = {
   [K in keyof typeof CompanyRegistrationDetailsSchema.shape]: FieldMetadata<
-    typeof CompanyRegistrationDetailsSchema,
-    typeof CompanyRegistrationDetailsSchema,
+    CompanyRegistrationDetailsInsert,
+    CompanyRegistrationDetailsInsert,
     string[]
   >;
 };
@@ -39,15 +40,6 @@ export function CreateCompanyStep2({
         <Field
           className="col-span-2"
           inputProps={{
-            ...getInputProps(fields.gst_number, { type: "text" }),
-            autoFocus: true,
-            placeholder: `Enter ${replaceUnderscore(fields.gst_number.name)}`,
-          }}
-          labelProps={{ children: replaceUnderscore(fields.gst_number.name) }}
-          errors={fields.gst_number.errors}
-        />
-        <Field
-          inputProps={{
             ...getInputProps(fields.registration_number, { type: "text" }),
             placeholder: `Enter ${replaceUnderscore(fields.registration_number.name)}`,
           }}
@@ -58,8 +50,16 @@ export function CreateCompanyStep2({
         />
         <Field
           inputProps={{
-            ...getInputProps(fields.pan_number, { type: "text" }),
+            ...getInputProps(fields.gst_number, { type: "text" }),
             autoFocus: true,
+            placeholder: `Enter ${replaceUnderscore(fields.gst_number.name)}`,
+          }}
+          labelProps={{ children: replaceUnderscore(fields.gst_number.name) }}
+          errors={fields.gst_number.errors}
+        />
+        <Field
+          inputProps={{
+            ...getInputProps(fields.pan_number, { type: "text" }),
             placeholder: `Enter ${replaceUnderscore(fields.pan_number.name)}`,
           }}
           labelProps={{ children: replaceUnderscore(fields.pan_number.name) }}

@@ -112,13 +112,22 @@ export const CompanySchema = z.object({
 });
 
 export const CompanyRegistrationDetailsSchema = z.object({
-  registration_number: zNumberString.min(3).optional(),
-  pan_number: zNumberString.min(3).optional(),
-  gst_number: zNumberString.min(3).optional(),
-  pf_number: zNumberString.min(3).optional(),
-  esi_number: zNumberString.min(3).optional(),
-  pt_number: zNumberString.min(3).optional(),
-  lwf_number: zNumberString.min(3).optional(),
+  company_id: z.string().optional(),
+  registration_number: zNumberString.max(15).optional(),
+  gst_number: zNumberString.max(15).optional(),
+  pan_number: zNumberString.max(15).optional(),
+  pf_number: zNumberString.max(15).optional(),
+  esi_number: zNumberString.max(15).optional(),
+  pt_number: zNumberString.max(15).optional(),
+  lwf_number: zNumberString.max(15).optional(),
+});
+
+export const CompanyDetailsSchema = z.object({
+  id: z.string().optional(),
+  name: zNumberString.min(3).max(32),
+  email_suffix: zEmailSuffix.max(32).optional(),
+  company_type: z.enum(company_type).optional(),
+  company_size: z.enum(company_size).optional(),
 });
 
 // Project

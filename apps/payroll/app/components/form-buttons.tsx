@@ -1,9 +1,8 @@
-import { DEFAULT_ROUTE } from "@/constant";
 import { Button } from "@canny_ecosystem/ui/button";
 import { CardFooter } from "@canny_ecosystem/ui/card";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import type { FormMetadata } from "@conform-to/react";
-import { useNavigate, useSearchParams } from "@remix-run/react";
+import { useSearchParams } from "@remix-run/react";
 
 export const FormButtons = ({
   form,
@@ -18,28 +17,17 @@ export const FormButtons = ({
   totalSteps: number;
   isSingle?: boolean;
 }) => {
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
   return (
     <CardFooter className="flex items-center justify-between">
       <div className={cn("flex flex-row items-center justify-center gap-4")}>
         <Button
-          type="button"
-          variant="destructive"
-          size="full"
-          onClick={() => {
-            navigate(DEFAULT_ROUTE);
-          }}
-        >
-          Cancel
-        </Button>
-        <Button
           variant="outline"
           size="full"
           onClick={() => {
             if (step !== totalSteps) {
-              searchParams.set("step", String(step + 1));
+              searchParams.set("step", String(Math.min(step + 1, totalSteps)));
               setSearchParams(searchParams);
             }
           }}

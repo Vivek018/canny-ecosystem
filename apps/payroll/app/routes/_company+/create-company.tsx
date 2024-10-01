@@ -27,11 +27,14 @@ import { CreateCompanyStep1 } from "@/components/company/create-company-step-1";
 import { FormButtons } from "@/components/form-buttons";
 import { CreateCompanyStep2 } from "@/components/company/create-company-step-2";
 import type { CompanyDatabaseInsert } from "@canny_ecosystem/supabase/types";
+import { useIsomorphicLayoutEffect } from "@canny_ecosystem/ui/hooks/isomorphic-layout-effect";
 
 export const CREATE_COMPANY = [
   "create-company",
   "create-company-registration-details",
 ];
+
+export const STEP = "step";
 
 const SESSION_KEY_PREFIX = "multiStepForm_step_";
 
@@ -39,14 +42,14 @@ const schemas = [CompanySchema, CompanyRegistrationDetailsSchema];
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
-  const step = Number.parseInt(url.searchParams.get("step") || "1");
+  const step = Number.parseInt(url.searchParams.get(STEP) || "1");
   const totalSteps = schemas.length;
 
   const session = await getSession(request.headers.get("Cookie"));
   const stepData = await session.get(`${SESSION_KEY_PREFIX}${step}`);
 
   if (step < 1 || step > totalSteps) {
-    url.searchParams.set("step", "1");
+    url.searchParams.set(STEP, "1");
     return redirect(url.toString(), { status: 302 });
   }
 
@@ -57,7 +60,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const url = new URL(request.url);
   const session = await getSession(request.headers.get("Cookie"));
 
-  const step = Number.parseInt(url.searchParams.get("step") || "1");
+  const step = Number.parseInt(url.searchParams.get(STEP) || "1");
   const currentSchema = schemas[step - 1];
   const totalSteps = schemas.length;
 
@@ -73,42 +76,53 @@ export async function action({ request }: ActionFunctionArgs) {
   });
 
   if (action === "submit") {
-    try {
-      if (submission.status === "success") {
-        const companyData = session.get(`${SESSION_KEY_PREFIX}1`);
-        const companyRegistrationDetails = submission.value as Omit<
-          CompanyDatabaseInsert,
-          "company_id"
-        >;
+    if (submission.status === "success") {
+      const companyData = session.get(`${SESSION_KEY_PREFIX}1`);
+      const companyRegistrationDetails = submission.value as Omit<
+        CompanyDatabaseInsert,
+        "company_id"
+      >;
 
-        const { status, error, id } = await createCompany({
+      const { status, companyError, registrationDetailsError, id } =
+        await createCompany({
           supabase,
           companyData,
           companyRegistrationDetails,
         });
 
-        if (error) {
-          return json({ status, error }, { status: 500 });
+      if (companyError) {
+        for (let i = 1; i <= totalSteps; i++) {
+          session.unset(`${SESSION_KEY_PREFIX}${i}`);
         }
-
-        if (isGoodStatus(status)) {
-          for (let i = 1; i <= totalSteps; i++) {
-            session.unset(`${SESSION_KEY_PREFIX}${i}`);
-          }
-          const headers = new Headers();
-          headers.append("Set-Cookie", setCompanyId(id));
-          headers.append("Set-Cookie", await commitSession(session));
-          return redirect(DEFAULT_ROUTE, { headers });
-        }
+        const headers = new Headers();
+        headers.append("Set-Cookie", await commitSession(session));
+        url.searchParams.delete(STEP);
+        return redirect(url.toString(), { headers });
       }
-    } catch (error) {
-      console.error("Form submission error:", error);
-      return json(
-        {
-          errors: "An error occurred during form submission. Please try again.",
-        },
-        { status: 500 },
-      );
+
+      if (registrationDetailsError) {
+        for (let i = 1; i <= totalSteps; i++) {
+          session.unset(`${SESSION_KEY_PREFIX}${i}`);
+        }
+        const headers = new Headers();
+        headers.append("Set-Cookie", setCompanyId(id));
+        headers.append("Set-Cookie", await commitSession(session));
+        return redirect(DEFAULT_ROUTE, {
+          headers,
+        });
+      }
+
+      if (isGoodStatus(status)) {
+        for (let i = 1; i <= totalSteps; i++) {
+          session.unset(`${SESSION_KEY_PREFIX}${i}`);
+        }
+        const headers = new Headers();
+        headers.append("Set-Cookie", setCompanyId(id));
+        headers.append("Set-Cookie", await commitSession(session));
+        return redirect(DEFAULT_ROUTE, {
+          headers,
+        });
+      }
     }
   } else if (action === "next" || action === "back" || action === "skip") {
     if (action === "next") {
@@ -130,7 +144,7 @@ export async function action({ request }: ActionFunctionArgs) {
       nextStep = Math.max(step - 1, 1);
     }
 
-    url.searchParams.set("step", String(nextStep));
+    url.searchParams.set(STEP, String(nextStep));
     return redirect(url.toString(), {
       headers: {
         "Set-Cookie": await commitSession(session),
@@ -148,6 +162,10 @@ export default function CreateCompany() {
   const COMPANY_TAG = CREATE_COMPANY[step - 1];
   const currentSchema = schemas[step - 1];
   const initialValues = getInitialValueFromZod(currentSchema);
+
+  useIsomorphicLayoutEffect(() => {
+    setResetKey(Date.now());
+  }, [step]);
 
   const [form, fields] = useForm({
     id: COMPANY_TAG,
@@ -197,10 +215,13 @@ export default function CreateCompany() {
           className="flex flex-col"
         >
           <Card>
-            {step === 1 && (
-              <CreateCompanyStep1 fields={fields as any} resetKey={resetKey} />
-            )}
-            {step === 2 && <CreateCompanyStep2 fields={fields as any} />}
+            {step === 1 ? (
+              <CreateCompanyStep1
+                key={resetKey}
+                fields={fields as any}
+              />
+            ) : null}
+            {step === 2 ? <CreateCompanyStep2 fields={fields as any} /> : null}
             <FormButtons
               form={form}
               setResetKey={setResetKey}

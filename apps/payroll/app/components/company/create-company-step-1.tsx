@@ -13,10 +13,7 @@ import {
   type CompanySchema,
 } from "@canny_ecosystem/utils";
 import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
-import {
-  type FieldMetadata,
-  getInputProps,
-} from "@conform-to/react";
+import { type FieldMetadata, getInputProps } from "@conform-to/react";
 
 type FieldsType = {
   [K in keyof typeof CompanySchema.shape]: FieldMetadata<
@@ -28,10 +25,8 @@ type FieldsType = {
 
 export function CreateCompanyStep1({
   fields,
-  resetKey,
 }: {
   fields: FieldsType;
-  resetKey: any;
 }) {
   return (
     <Fragment>
@@ -71,7 +66,6 @@ export function CreateCompanyStep1({
         />
         <div className="grid grid-cols-2 grid-rows-1 place-content-center justify-between gap-16">
           <SearchableSelectField
-            key={resetKey}
             className="w-full capitalize flex-1"
             options={transformStringArrayIntoOptions(
               company_type as unknown as string[],
@@ -86,7 +80,6 @@ export function CreateCompanyStep1({
             errors={fields.company_type.errors}
           />
           <SearchableSelectField
-            key={resetKey + 1}
             className="w-full capitalize flex-1"
             options={transformStringArrayIntoOptions(
               company_size as unknown as string[],

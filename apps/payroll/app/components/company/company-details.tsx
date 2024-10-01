@@ -8,10 +8,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
-import { Field } from "@canny_ecosystem/ui/forms";
+import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import {
+  company_size,
+  company_type,
   CompanyDetailsSchema,
+  deepEqualCheck,
   replaceUnderscore,
+  transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
 import {
   FormProvider,
@@ -47,13 +51,13 @@ export const CompanyDetails = ({
       >
         <Card>
           <CardHeader>
-            <CardTitle>Company Name & Suffix</CardTitle>
+            <CardTitle>Company Details</CardTitle>
             <CardDescription>
-              This is your team's visible name and suffix within canny.
+              This is your company's visible details within canny.
             </CardDescription>
           </CardHeader>
           <CardContent className="pb-2">
-            <div className="flex flex-col md:flex-row items-center justify-center md:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 items-center justify-center md:gap-x-8">
               <input
                 type="hidden"
                 name={fields.id.name}
@@ -73,6 +77,28 @@ export const CompanyDetails = ({
                 }}
                 errors={fields.email_suffix.errors}
               />
+              <SearchableSelectField
+                className="w-full capitalize flex-1"
+                options={transformStringArrayIntoOptions(
+                  company_type as unknown as string[],
+                )}
+                inputProps={{
+                  ...getInputProps(fields.company_type, { type: "text" }),
+                }}
+                placeholder={`Select ${replaceUnderscore(fields.company_type.name)}`}
+                errors={fields.company_type.errors}
+              />
+              <SearchableSelectField
+                className="w-full capitalize flex-1"
+                options={transformStringArrayIntoOptions(
+                  company_size as unknown as string[],
+                )}
+                inputProps={{
+                  ...getInputProps(fields.company_size, { type: "text" }),
+                }}
+                placeholder={`Select ${replaceUnderscore(fields.company_size.name)}`}
+                errors={fields.company_size.errors}
+              />
             </div>
           </CardContent>
 
@@ -80,7 +106,7 @@ export const CompanyDetails = ({
             <div>Please use 32 characters at maximum.</div>
             <Button
               form={form.id}
-              disabled={!form.valid}
+              disabled={!form.valid || deepEqualCheck(form.initialValue, form.value)}
               variant="default"
               type="submit"
             >
