@@ -62,9 +62,13 @@ export function UserMenu({
             <DropdownMenuSeparator />
 
             <DropdownMenuGroup>
-              <Link prefetch="render" to="/settings/account">
+              <Link prefetch="render" to="/account">
                 <DropdownMenuItem>Account</DropdownMenuItem>
+              </Link>
+              <Link prefetch="render" to="/account/help">
                 <DropdownMenuItem>Help</DropdownMenuItem>
+              </Link>
+              <Link prefetch="render" to="/account/feedback">
                 <DropdownMenuItem>Feedback</DropdownMenuItem>
               </Link>
             </DropdownMenuGroup>

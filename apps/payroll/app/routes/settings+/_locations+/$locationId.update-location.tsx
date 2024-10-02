@@ -1,25 +1,34 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import CreateLocation from "./create-location";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { getLocationByIdQuery } from "@canny_ecosystem/supabase/queries";
 import { json, useLoaderData } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
 import { safeRedirect } from "@/utils/server/http.server";
-import { updateLocation } from "@canny_ecosystem/supabase/mutations";
 import { isGoodStatus, LocationSchema } from "@canny_ecosystem/utils";
+import {
+  getLocationById,
+} from "@canny_ecosystem/supabase/queries";
+import { updateLocation } from "@canny_ecosystem/supabase/mutations";
 
 export const UPDATE_LOCATION = "update-location";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const locationId = params.locationId;
   const { supabase } = getSupabaseWithHeaders({ request });
-  let data = null;
+  let locationData = null;
 
   if (locationId) {
-    data = (await getLocationByIdQuery({ supabase, id: locationId })).data;
+    locationData = await getLocationById({
+      supabase,
+      id: locationId,
+    });
   }
 
-  return json({ data });
+  if (locationData?.error) {
+    throw locationData.error;
+  }
+
+  return json({ data: locationData?.data });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -43,7 +52,7 @@ export async function action({ request }: ActionFunctionArgs) {
   });
 
   if (isGoodStatus(status)) {
-    return safeRedirect("/locations", { status: 303 });
+    return safeRedirect("/settings/locations", { status: 303 });
   }
   return json({ status, error });
 }

@@ -30,6 +30,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   if (error) {
     console.error(error);
+    return safeRedirect("/settings", { status: 303 });
   }
 
   if (isGoodStatus(status)) {

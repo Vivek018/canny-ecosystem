@@ -28,11 +28,6 @@ export const sideNavList = [
   },
   { name: "Projects", link: "/projects", icon: "project" },
   {
-    name: "Locations",
-    link: "/locations",
-    icon: "pin",
-  },
-  {
     name: "Settings",
     link: "/settings",
     icon: "setting",

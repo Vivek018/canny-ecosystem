@@ -28,8 +28,8 @@ import { Logo } from "@canny_ecosystem/ui/logo";
 import { ThemeSwitch } from "./components/theme-switch";
 import { getSessionUser } from "@canny_ecosystem/supabase/cached-queries";
 import {
-  getCompaniesQuery,
-  getUserByEmailQuery,
+  getCompanies,
+  getUserByEmail,
 } from "@canny_ecosystem/supabase/queries";
 import {
   getCompanyIdOrFirstCompany,
@@ -59,12 +59,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
   let companies = null;
 
   if (sessionUser?.email) {
-    const { data: userData, error: userError } = await getUserByEmailQuery({
+    const { data: userData, error: userError } = await getUserByEmail({
       supabase,
       email: sessionUser.email,
     });
     const { data: companiesData, error: companiesError } =
-      await getCompaniesQuery({ supabase });
+      await getCompanies({ supabase });
 
     if (userError || !userData) {
       console.error("userError", userError);

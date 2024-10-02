@@ -1,6 +1,6 @@
 import type { TypedSupabaseClient } from "../types";
 
-export async function getUserByEmailQuery({
+export async function getUserByEmail({
   supabase,
   email,
 }: {

@@ -1,6 +1,6 @@
 import { LocationCard } from "@/components/locations/location-card";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { getLocationsInCompanyQuery } from "@canny_ecosystem/supabase/queries";
+import { getLocationsByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import {
@@ -20,7 +20,7 @@ import { json } from "@remix-run/react";
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data, error } = await getLocationsInCompanyQuery({
+  const { data, error } = await getLocationsByCompanyId({
     supabase,
     companyId,
   });
@@ -41,7 +41,7 @@ export default function Locations() {
   const { isDocument } = useIsDocument();
 
   return (
-    <section className="py-[22px]">
+    <section className="py-4">
       <div className="w-full flex items-end justify-between">
         <Command className="overflow-visible">
           <div className="w-full md:w-3/4 lg:w-1/2 2xl:w-1/3 flex items-center gap-4">
@@ -51,7 +51,7 @@ export default function Locations() {
               autoFocus={true}
             />
             <Link
-              to="/create-location"
+              to="/settings/create-location"
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
                 "flex items-center gap-1",
@@ -72,16 +72,16 @@ export default function Locations() {
           <CommandList className="max-h-full py-6 overflow-x-visible overflow-y-visible">
             <CommandGroup className="p-0 overflow-visible">
               <div className="w-full grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-                {data.map((location) => (
+                {data?.map((location) => (
                   <CommandItem
                     key={location.id}
                     value={
                       location.name +
-                      location.address +
+                      location.address_line_1 +
+                      location.address_line_2 +
                       location.city +
                       location.state +
-                      location.pin_code +
-                      location.esic_code
+                      location.pincode
                     }
                     className="data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0"
                   >

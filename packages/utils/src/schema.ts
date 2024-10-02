@@ -111,6 +111,15 @@ export const CompanySchema = z.object({
   company_size: z.enum(company_size).default("enterprise"),
 });
 
+export const CompanyDetailsSchema = z.object({
+  id: z.string().optional(),
+  name: zNumberString.min(3).max(32),
+  email_suffix: zEmailSuffix.max(32).optional(),
+  company_type: z.enum(company_type).optional(),
+  company_size: z.enum(company_size).optional(),
+});
+
+// Company Registration Details
 export const CompanyRegistrationDetailsSchema = z.object({
   company_id: z.string().optional(),
   registration_number: zNumberString.max(15).optional(),
@@ -122,12 +131,38 @@ export const CompanyRegistrationDetailsSchema = z.object({
   lwf_number: zNumberString.max(15).optional(),
 });
 
-export const CompanyDetailsSchema = z.object({
+// Company Locations
+export const LocationSchema = z.object({
   id: z.string().optional(),
-  name: zNumberString.min(3).max(32),
-  email_suffix: zEmailSuffix.max(32).optional(),
-  company_type: z.enum(company_type).optional(),
-  company_size: z.enum(company_size).optional(),
+  name: zString.min(3),
+  is_primary: z.boolean().default(false),
+  address_line_1: z.string().min(3),
+  address_line_2: z.string().optional(),
+  state: zString,
+  city: zString.min(3),
+  pincode: zNumber.min(6).max(6),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
+  company_id: z.string().optional(),
+});
+
+// Company Relationships
+export const RelationshipSchema = z.object({
+  id: z.string().optional(),
+  relationship_type: zString.min(3),
+  parent_company_id: z.string().optional(),
+  child_company_id: z.string().optional(),
+  is_active: z.boolean().default(false),
+  terms: z.string().transform((str, ctx) => {
+    try {
+      return JSON.parse(str);
+    } catch (_e) {
+      ctx.addIssue({ code: "custom", message: "Invalid JSON string" });
+      return z.NEVER;
+    }
+  }),
+  start_date: z.string().default(new Date().toISOString().split("T")[0]),
+  end_date: z.string().optional(),
 });
 
 // Project
@@ -151,17 +186,4 @@ export const PaySequenceSchema = z.object({
   working_days: z.array(daySchema),
   pay_day: z.number().int().min(1).max(15),
   project_id: z.string(),
-});
-
-// Location
-export const LocationSchema = z.object({
-  id: z.string().optional(),
-  name: zString.min(3),
-  esic_code: zNumber.min(10).max(17),
-  is_main: z.boolean().default(false),
-  address: zTextArea,
-  state: zString,
-  city: zString.min(3),
-  pin_code: zNumber.min(6).max(6),
-  company_id: z.string().optional(),
 });

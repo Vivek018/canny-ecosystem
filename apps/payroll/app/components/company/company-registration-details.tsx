@@ -63,14 +63,10 @@ export const CompanyRegistrationDetails = ({
           <CardContent className="pb-2">
             <div className="grid grid-cols-1 md:grid-cols-2 items-center justify-center md:gap-x-8">
               <input
-                type="hidden"
-                name={fields?.company_id.name}
-                value={
-                  fields?.company_id.value ?? fields?.company_id.initialValue
-                }
+                {...getInputProps(fields.company_id, { type: "hidden" })}
               />
               <Field
-                className="col-span-2"
+                className="md:col-span-2"
                 inputProps={{
                   ...getInputProps(fields.registration_number, {
                     type: "text",
@@ -126,16 +122,25 @@ export const CompanyRegistrationDetails = ({
 
           <CardFooter className="border-t pt-6 flex justify-between">
             <div>Please use 15 characters at maximum.</div>
-            <Button
-              form={form.id}
-              disabled={
-                !form.valid || deepEqualCheck(form.initialValue, form.value)
-              }
-              variant="default"
-              type="submit"
-            >
-              Save
-            </Button>
+            <div className="flex gap-4">
+              <Button
+                variant="secondary"
+                type="reset"
+                {...form.reset.getButtonProps()}
+              >
+                Reset
+              </Button>
+              <Button
+                form={form.id}
+                disabled={
+                  !form.valid || deepEqualCheck(form.initialValue, form.value)
+                }
+                variant="default"
+                type="submit"
+              >
+                Save
+              </Button>
+            </div>
           </CardFooter>
         </Card>
       </Form>

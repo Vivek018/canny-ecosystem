@@ -27,7 +27,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   return json({ data });
 }
 
-export default function EditPaySequence() {
+export default function Project() {
   const { data } = useLoaderData<typeof loader>();
 
   const [searchParams] = useSearchParams();

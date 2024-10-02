@@ -17,19 +17,19 @@ import { DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
-export const DeleteLocation = ({ locationId }: { locationId: string }) => {
+export const DeleteRelationship = ({ relationshipId }: { relationshipId: string }) => {
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [inputError, setInputError] = useState<string[]>([]);
   const submit = useSubmit();
 
-  const handleCancelLocation = () => {
+  const handleCancelRelationship = () => {
     setInputError([]);
     setInputValue("");
     setLoading(false);
   };
 
-  const handleDeleteLocation = (
+  const handleDeleteRelationship = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
@@ -38,7 +38,7 @@ export const DeleteLocation = ({ locationId }: { locationId: string }) => {
         {},
         {
           method: "post",
-          action: `/settings/${locationId}/delete-location`,
+          action: `/settings/${relationshipId}/delete-relationship`,
           replace: true,
         },
       );
@@ -56,14 +56,14 @@ export const DeleteLocation = ({ locationId }: { locationId: string }) => {
           "text-[13px] h-9",
         )}
       >
-        Delete Location
+        Delete Relationship
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
             This action cannot be undone. This will permanently delete your
-            location and remove it's data from our servers.
+            company relationship and remove it's data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="py-4">
@@ -85,13 +85,13 @@ export const DeleteLocation = ({ locationId }: { locationId: string }) => {
           <ErrorList errors={inputError} />
         </div>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={handleCancelLocation}>
+          <AlertDialogCancel onClick={handleCancelRelationship}>
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
             className={cn(buttonVariants({ variant: "destructive" }))}
-            onClick={handleDeleteLocation}
-            onSelect={handleDeleteLocation}
+            onClick={handleDeleteRelationship}
+            onSelect={handleDeleteRelationship}
           >
             {isLoading ? "Deleting..." : "Delete"}
           </AlertDialogAction>

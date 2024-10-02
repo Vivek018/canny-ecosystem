@@ -4,8 +4,8 @@ import { CompanyRegistrationDetails } from "@/components/company/company-registr
 import { DeleteCompany } from "@/components/company/delete-company";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
-  getCompanyByIdQuery,
-  getCompanyRegistrationDetailsByCompanyIdQuery,
+  getCompanyById,
+  getCompanyRegistrationDetailsByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { LoaderFunctionArgs } from "@remix-run/node";
@@ -16,7 +16,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-  const { data: companyData, error: companyError } = await getCompanyByIdQuery({
+  const { data: companyData, error: companyError } = await getCompanyById({
     supabase,
     id: companyId!,
   });
@@ -24,7 +24,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const {
     data: companyRegistrationDetailsData,
     error: companyRegistrationDetailsError,
-  } = await getCompanyRegistrationDetailsByCompanyIdQuery({
+  } = await getCompanyRegistrationDetailsByCompanyId({
     supabase,
     companyId,
   });

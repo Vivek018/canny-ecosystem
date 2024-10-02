@@ -7,27 +7,23 @@ import {
   CheckboxField,
   Field,
   SearchableSelectField,
-  TextareaField,
 } from "@canny_ecosystem/ui/forms";
 import { getInitialValueFromZod, replaceDash } from "@canny_ecosystem/utils";
 import {
   FormProvider,
   getFormProps,
   getInputProps,
-  getTextareaProps,
   useForm,
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { Form, json, useLoaderData } from "@remix-run/react";
-import { statesAndUTs } from "@canny_ecosystem/utils/constant";
 import { Button } from "@canny_ecosystem/ui/button";
 import { useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { createLocation } from "@canny_ecosystem/supabase/mutations";
-import type { LocationDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+
 import { UPDATE_LOCATION } from "./$locationId.update-location";
 import {
   Card,
@@ -38,12 +34,17 @@ import {
   CardTitle,
 } from "@canny_ecosystem/ui/card";
 
+import { createLocation } from "@canny_ecosystem/supabase/mutations";
+import type { LocationDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import { statesAndUTs } from "@canny_ecosystem/utils/constant";
+
 export const CREATE_LOCATION = "create-location";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  return json({ companyId: companyId });
+
+  return json({ companyId });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -63,18 +64,20 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const { status, error } = await createLocation({
     supabase,
-    data: submission.value,
+    data: submission.value as any,
   });
 
   if (isGoodStatus(status)) {
-    return safeRedirect("/locations", { status: 303 });
+    return safeRedirect("/settings/locations", { status: 303 });
   }
   return json({ status, error });
 }
 
 export default function CreateLocation({
   updateValues,
-}: { updateValues?: LocationDatabaseUpdate | null }) {
+}: {
+  updateValues?: LocationDatabaseUpdate | null;
+}) {
   const { companyId } = useLoaderData<typeof loader>();
   const LOCATION_TAG = updateValues ? UPDATE_LOCATION : CREATE_LOCATION;
 
@@ -89,7 +92,10 @@ export default function CreateLocation({
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
-    defaultValue: initialValues,
+    defaultValue: {
+      ...initialValues,
+      company_id: initialValues.company_id ?? companyId,
+    },
   });
 
   return (
@@ -102,62 +108,57 @@ export default function CreateLocation({
                 {replaceDash(LOCATION_TAG)}
               </CardTitle>
               <CardDescription>
-                {LOCATION_TAG.split("-")[0]} a location that will be central in
-                all of canny apps
+                {LOCATION_TAG.split("-")[0]} location of a company that will be
+                central in all of canny apps
               </CardDescription>
             </CardHeader>
             <CardContent>
+              <input {...getInputProps(fields.id, { type: "hidden" })} />
               <input
-                type="hidden"
-                name={fields.id.name}
-                value={fields.id.value ?? fields.id.initialValue}
-              />
-              <input
-                type="hidden"
-                name={fields.company_id.name}
-                value={companyId}
+                {...getInputProps(fields.company_id, { type: "hidden" })}
               />
               <Field
                 inputProps={{
                   ...getInputProps(fields.name, { type: "text" }),
                   autoFocus: true,
-                  placeholder: `Enter ${fields.name.name}`,
+                  placeholder: `Enter ${replaceUnderscore(fields.name.name)}`,
+                  className: "capitalize",
                 }}
-                labelProps={{ children: fields.name.name }}
+                labelProps={{
+                  children: replaceUnderscore(fields.name.name),
+                }}
                 errors={fields.name.errors}
               />
-              <div className="flex justify-between gap-16">
-                <Field
-                  inputProps={{
-                    ...getInputProps(fields.esic_code, { type: "number" }),
-                    placeholder: `Enter ${replaceUnderscore(fields.esic_code.name)}`,
-                  }}
-                  labelProps={{
-                    children: replaceUnderscore(fields.esic_code.name),
-                  }}
-                  errors={fields.esic_code.errors}
-                />
-              </div>
               <CheckboxField
-                buttonProps={getInputProps(fields.is_main, {
+                buttonProps={getInputProps(fields.is_primary, {
                   type: "checkbox",
                 })}
                 labelProps={{
-                  htmlFor: fields.is_main.id,
-                  children: "Is this your main address?",
+                  htmlFor: fields.is_primary.id,
+                  children: "Is this your primary address?",
                 }}
               />
-              <TextareaField
-                textareaProps={{
-                  ...getTextareaProps(fields.address),
-                  placeholder: `Enter ${fields.address.name}`,
+              <Field
+                inputProps={{
+                  ...getInputProps(fields.address_line_1, { type: "text" }),
+                  placeholder: replaceUnderscore(fields.address_line_1.name),
+                  className: "placeholder:capitalize",
                 }}
                 labelProps={{
-                  children: fields.address.name,
+                  children: "Address",
                 }}
-                errors={fields.address.errors}
+                errors={fields.address_line_1.errors}
               />
-              <div className="-mt-4 grid grid-cols-3 grid-rows-1 place-content-center justify-between gap-6">
+              <Field
+                className="-mt-6"
+                inputProps={{
+                  ...getInputProps(fields.address_line_2, { type: "text" }),
+                  placeholder: replaceUnderscore(fields.address_line_2.name),
+                  className: "placeholder:capitalize",
+                }}
+                errors={fields.address_line_2.errors}
+              />
+              <div className="grid grid-cols-3 place-content-center justify-between gap-6">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.city, { type: "text" }),
@@ -171,7 +172,7 @@ export default function CreateLocation({
                 />
                 <SearchableSelectField
                   key={resetKey}
-                  className="w-full capitalize flex-1"
+                  className="capitalize"
                   options={statesAndUTs}
                   inputProps={{
                     ...getInputProps(fields.state, { type: "text" }),
@@ -184,14 +185,38 @@ export default function CreateLocation({
                 />
                 <Field
                   inputProps={{
-                    ...getInputProps(fields.pin_code, { type: "text" }),
+                    ...getInputProps(fields.pincode, { type: "text" }),
                     className: "capitalize",
-                    placeholder: `Enter ${replaceUnderscore(fields.pin_code.name)}`,
+                    placeholder: `Enter ${replaceUnderscore(fields.pincode.name)}`,
                   }}
                   labelProps={{
-                    children: replaceUnderscore(fields.pin_code.name),
+                    children: replaceUnderscore(fields.pincode.name),
                   }}
-                  errors={fields.pin_code.errors}
+                  errors={fields.pincode.errors}
+                />
+              </div>
+              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+                <Field
+                  inputProps={{
+                    ...getInputProps(fields.latitude, { type: "number" }),
+                    className: "capitalize",
+                    placeholder: `Enter ${fields.latitude.name}`,
+                  }}
+                  labelProps={{
+                    children: fields.latitude.name,
+                  }}
+                  errors={fields.latitude.errors}
+                />
+                <Field
+                  inputProps={{
+                    ...getInputProps(fields.longitude, { type: "number" }),
+                    className: "capitalize",
+                    placeholder: `Enter ${replaceUnderscore(fields.longitude.name)}`,
+                  }}
+                  labelProps={{
+                    children: replaceUnderscore(fields.longitude.name),
+                  }}
+                  errors={fields.longitude.errors}
                 />
               </div>
             </CardContent>

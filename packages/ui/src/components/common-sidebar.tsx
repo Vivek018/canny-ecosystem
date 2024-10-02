@@ -33,7 +33,7 @@ export function CommonSidebar({
       )}
     >
       <div className={cn("mt-6 flex w-min items-center gap-2 mx-auto")}>
-        <Link to="/">
+        <Link prefetch="intent" to="/">
           <Logo />
         </Link>
       </div>
@@ -50,6 +50,7 @@ export function CommonSidebar({
                   <TooltipTrigger tabIndex={-1}>
                     <NavLink
                       to={link ?? ""}
+                      prefetch="intent"
                       className={({ isActive }: { isActive: boolean }) =>
                         cn(
                           "flex cursor-pointer rounded w-min px-4 py-3.5 text-sm tracking-wide hover:bg-accent justify-center",

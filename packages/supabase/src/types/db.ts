@@ -47,46 +47,46 @@ export type Database = {
       }
       company_locations: {
         Row: {
-          address_line1: string
-          address_line2: string | null
-          address_type: string
+          address_line_1: string
+          address_line_2: string | null
           city: string
-          company_id: string
+          company_id: string | null
           created_at: string | null
           id: string
           is_primary: boolean | null
           latitude: number | null
           longitude: number | null
+          name: string
           pincode: string
           state: string
           updated_at: string | null
         }
         Insert: {
-          address_line1: string
-          address_line2?: string | null
-          address_type: string
+          address_line_1: string
+          address_line_2?: string | null
           city: string
-          company_id: string
+          company_id?: string | null
           created_at?: string | null
           id?: string
           is_primary?: boolean | null
           latitude?: number | null
           longitude?: number | null
+          name: string
           pincode: string
           state: string
           updated_at?: string | null
         }
         Update: {
-          address_line1?: string
-          address_line2?: string | null
-          address_type?: string
+          address_line_1?: string
+          address_line_2?: string | null
           city?: string
-          company_id?: string
+          company_id?: string | null
           created_at?: string | null
           id?: string
           is_primary?: boolean | null
           latitude?: number | null
           longitude?: number | null
+          name?: string
           pincode?: string
           state?: string
           updated_at?: string | null

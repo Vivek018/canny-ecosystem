@@ -81,3 +81,24 @@ export function deepEqualCheck(
 
   return true;
 }
+
+export function convertUndefinedToNull(obj: { [x: string]: any }) {
+  for (const key in obj) {
+    if (obj[key] === undefined) {
+      obj[key] = null;
+    }
+  }
+  return obj;
+}
+
+export const parseStringValue = (value: string) => {
+  if (value === "") return "";
+  if (value === "true") return true;
+  if (value === "false") return false;
+  if (!Number.isNaN(Number(value))) return Number(value);
+  try {
+    return JSON.parse(value);
+  } catch {
+    return value;
+  }
+};

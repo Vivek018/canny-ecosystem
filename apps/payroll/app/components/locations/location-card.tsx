@@ -28,7 +28,7 @@ import {
 export function LocationCard({
   location,
 }: {
-  location: Omit<LocationDatabaseRow, "created_at" | "company_id">;
+  location: Omit<LocationDatabaseRow, "created_at" | "updated_at">;
 }) {
   return (
     <Card
@@ -42,7 +42,8 @@ export function LocationCard({
             <Tooltip delayDuration={100}>
               <TooltipTrigger asChild>
                 <Link
-                  to={`/${location.id}/update-location`}
+                  prefetch="intent"
+                  to={`/settings/${location.id}/update-location`}
                   className="p-2 rounded-md bg-secondary grid place-items-center border-foreground"
                 >
                   <Icon name="edit" size="xs" />
@@ -58,14 +59,32 @@ export function LocationCard({
             <DropdownMenuContent align="start">
               <DropdownMenuGroup>
                 <DropdownMenuItem
-                  className="py-2 text-[13px]"
+                  className={cn(
+                    "py-2 text-[13px]",
+                    !location.latitude && "hidden",
+                  )}
                   onClick={() => {
-                    navigator.clipboard.writeText(location.esic_code);
+                    navigator.clipboard.writeText(String(location.latitude));
                   }}
                 >
-                  Copy ESIC Code
+                  Copy Latitude
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className={cn(
+                    "py-2 text-[13px]",
+                    !location.longitude && "hidden",
+                  )}
+                  onClick={() => {
+                    navigator.clipboard.writeText(String(location.longitude));
+                  }}
+                >
+                  Copy Longitude
+                </DropdownMenuItem>
+                <DropdownMenuSeparator
+                  className={cn(
+                    !location.latitude && !location.longitude && "hidden",
+                  )}
+                />
                 <DeleteLocation locationId={location.id} />
               </DropdownMenuGroup>
             </DropdownMenuContent>
@@ -73,23 +92,23 @@ export function LocationCard({
         </div>
       </CardHeader>
       <CardContent className="flex flex-col gap-0.5 px-4">
-        <address className="not-italic line-clamp-2">
-          {location.address}
+        <address className="not-italic line-clamp-3">
+          {`${location.address_line_1} ${location.address_line_2}`}
         </address>
         <div className="flex items-center capitalize gap-2">
           <p>{`${location.city},`}</p>
           <p>{`${location.state}`}</p>
-          <p>{`- ${location.pin_code}`}</p>
+          <p>{`- ${location.pincode}`}</p>
         </div>
       </CardContent>
       <CardFooter
         className={cn(
           "px-2.5 ml-auto bg-secondary text-foreground py-1.5 text-sm tracking-wide font-sem rounded-tl-md border-foreground flex gap-1 justify-center",
-          !location.is_main && "opacity-0",
+          !location.is_primary && "opacity-0",
         )}
       >
         <Icon name="dot-filled" size="xs" />
-        Main
+        Primary
       </CardFooter>
     </Card>
   );
