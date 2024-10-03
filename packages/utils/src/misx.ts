@@ -82,9 +82,12 @@ export function deepEqualCheck(
   return true;
 }
 
-export function convertUndefinedToNull(obj: { [x: string]: any }) {
+export function convertToNull(obj: { [x: string]: any }) {
   for (const key in obj) {
     if (obj[key] === undefined) {
+      obj[key] = null;
+    }
+    if (obj[key] === "null") {
       obj[key] = null;
     }
   }

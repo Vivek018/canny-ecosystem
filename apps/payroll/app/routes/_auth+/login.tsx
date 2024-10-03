@@ -67,13 +67,13 @@ export default function Login() {
 
           <p className="font-medium text-center pb-2 text-[#878787]">
             Managing your workforce effortlessly, from fully transparent
-            operations to most detailed insights insights, all in one end to end
+            operations to most detailed insights, all in one end to end
             ecosystem.
           </p>
 
-          <div className="pointer-events-auto mt-6 flex flex-col mb-6">
+          <div className="pointer-events-auto my-6 flex flex-col">
             <Form method="POST">
-              <Button type="submit" variant="normal" className="w-full">
+              <Button type="submit" variant="default" className="w-full">
                 Continue with Google
               </Button>
             </Form>

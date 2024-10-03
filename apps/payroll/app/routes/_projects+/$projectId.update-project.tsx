@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { getProjectByIdQuery } from "@canny_ecosystem/supabase/queries";
+import { getProjectById } from "@canny_ecosystem/supabase/queries";
 import { json, useLoaderData } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
 import { safeRedirect } from "@/utils/server/http.server";
@@ -16,7 +16,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   let data = null;
 
   if (projectId) {
-    data = (await getProjectByIdQuery({ supabase, id: projectId })).data;
+    data = (await getProjectById({ supabase, id: projectId })).data;
   }
 
   return json({ data });

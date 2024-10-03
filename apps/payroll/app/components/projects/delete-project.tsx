@@ -91,6 +91,7 @@ export const DeleteProject = ({ projectId }: { projectId: string }) => {
           <AlertDialogAction
             className={cn(buttonVariants({ variant: "destructive" }))}
             onClick={handleDeleteProject}
+            onSelect={handleDeleteProject}
           >
             {isLoading ? "Deleting..." : "Delete"}
           </AlertDialogAction>

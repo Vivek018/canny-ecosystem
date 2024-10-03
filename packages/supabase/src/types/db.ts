@@ -156,7 +156,7 @@ export type Database = {
           id: string
           is_active: boolean | null
           parent_company_id: string
-          relationship_type: string
+          relationship_type: string | null
           start_date: string
           terms: Json | null
           updated_at: string | null
@@ -168,7 +168,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           parent_company_id: string
-          relationship_type?: string
+          relationship_type?: string | null
           start_date?: string
           terms?: Json | null
           updated_at?: string | null
@@ -180,7 +180,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           parent_company_id?: string
-          relationship_type?: string
+          relationship_type?: string | null
           start_date?: string
           terms?: Json | null
           updated_at?: string | null
@@ -703,16 +703,16 @@ export type Database = {
           actual_end_date: string | null
           created_at: string | null
           description: string | null
-          end_client_id: string
+          end_client_id: string | null
           environmental_considerations: string | null
           estimated_end_date: string | null
           health_safety_requirements: string | null
           id: string
           name: string
-          primary_contractor_id: string
+          primary_contractor_id: string | null
           project_client_id: string
           project_code: string
-          project_type: string
+          project_type: string | null
           quality_standards: string | null
           risk_assessment: string | null
           start_date: string
@@ -723,16 +723,16 @@ export type Database = {
           actual_end_date?: string | null
           created_at?: string | null
           description?: string | null
-          end_client_id: string
+          end_client_id?: string | null
           environmental_considerations?: string | null
           estimated_end_date?: string | null
           health_safety_requirements?: string | null
           id?: string
           name: string
-          primary_contractor_id: string
+          primary_contractor_id?: string | null
           project_client_id: string
           project_code: string
-          project_type: string
+          project_type?: string | null
           quality_standards?: string | null
           risk_assessment?: string | null
           start_date: string
@@ -743,16 +743,16 @@ export type Database = {
           actual_end_date?: string | null
           created_at?: string | null
           description?: string | null
-          end_client_id?: string
+          end_client_id?: string | null
           environmental_considerations?: string | null
           estimated_end_date?: string | null
           health_safety_requirements?: string | null
           id?: string
           name?: string
-          primary_contractor_id?: string
+          primary_contractor_id?: string | null
           project_client_id?: string
           project_code?: string
-          project_type?: string
+          project_type?: string | null
           quality_standards?: string | null
           risk_assessment?: string | null
           start_date?: string

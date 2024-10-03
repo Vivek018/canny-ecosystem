@@ -54,7 +54,7 @@ export default function SettingGeneral() {
   }, [companyData]);
 
   return (
-    <section className="flex flex-col gap-6 w-full lg:w-2/3 mt-4">
+    <section className="flex flex-col gap-6 w-full lg:w-2/3 my-4">
       <CompanyLogo
         name={companyData.name}
         logo={companyData.logo ?? undefined}

@@ -8,7 +8,7 @@ import {
 
 export function getValidDateForInput(
   date: string | Date | undefined,
-): string | undefined {
+): string {
   let dateObject: Date | null = null;
 
   if (date instanceof Date && isValid(date)) {
@@ -25,7 +25,7 @@ export function getValidDateForInput(
     return format(dateObject, "yyyy-MM-dd");
   }
 
-  return undefined;
+  return "";
 }
 
 export function getAutoTimeDifference(

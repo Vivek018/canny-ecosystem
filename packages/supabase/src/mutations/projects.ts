@@ -1,3 +1,4 @@
+import { convertToNull } from "@canny_ecosystem/utils";
 import type {
   ProjectDatabaseInsert,
   ProjectDatabaseUpdate,
@@ -46,15 +47,17 @@ export async function updateProject({
     return { status: 400, error: "Unauthorized User" };
   }
 
+  const updateData = convertToNull(data);
+
   const { error, status } = await supabase
     .from("projects")
-    .update(data)
+    .update(updateData)
     .eq("id", data.id!)
     .select()
     .single();
 
   if (error) {
-    console.error(error);
+    console.error("error",error);
   }
 
   return { status, error };

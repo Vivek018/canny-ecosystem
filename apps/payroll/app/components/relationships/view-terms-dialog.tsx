@@ -5,6 +5,7 @@ import {
   DialogTitle,
 } from "@canny_ecosystem/ui/dialog";
 import { Label } from "@canny_ecosystem/ui/label";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { replaceUnderscore } from "@canny_ecosystem/utils";
 import { useNavigate } from "@remix-run/react";
 
@@ -24,11 +25,11 @@ export const ViewRelationshipTermsDialog = ({
 
   return (
     <Dialog defaultOpen={true} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-max pl-5 pr-40">
+      <DialogContent className={cn("max-w-max pl-5 pr-40", !objectKeys.length && "pr-4 pl-4")}>
         <DialogHeader className="mb-4">
           <DialogTitle>Term Details</DialogTitle>
         </DialogHeader>
-        <div className="flex flex-col gap-6">
+        <div className={cn("flex flex-col gap-6", !objectKeys.length && "hidden")}>
           {objectKeys.map((key, index) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
             <div key={key + index} className="flex items-center gap-2">
@@ -37,6 +38,10 @@ export const ViewRelationshipTermsDialog = ({
             </div>
           ))}
         </div>
+        <p className={cn("hidden text-sm w-96",!objectKeys.length && "flex")}>
+          There are no terms for this relationship. Please contact your
+          administrator.
+        </p>
       </DialogContent>
     </Dialog>
   );

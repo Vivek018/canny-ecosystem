@@ -1,4 +1,4 @@
-import { convertUndefinedToNull } from "@canny_ecosystem/utils";
+import { convertToNull } from "@canny_ecosystem/utils";
 import { getCompanyRegistrationDetailsByCompanyId } from "../queries";
 import type {
   CompanyDatabaseInsert,
@@ -89,7 +89,7 @@ export async function updateCompany({
     return { status: 400, error: "Unauthorized User" };
   }
 
-  const updateData = convertUndefinedToNull(data);
+  const updateData = convertToNull(data);
 
   const { error, status } = await supabase
     .from("companies")
@@ -194,7 +194,7 @@ export async function updateOrCreateCompanyRegistrationDetails({
     });
   }
 
-  const updateData = convertUndefinedToNull(data);
+  const updateData = convertToNull(data);
 
   const { error, status } = await supabase
     .from("company_registration_details")
@@ -258,7 +258,7 @@ export async function updateLocation({
     return { status: 400, error: "Company ID is required" };
   }
 
-  const updateData = convertUndefinedToNull(data);
+  const updateData = convertToNull(data);
 
   const { error, status } = await supabase
     .from("company_locations")
@@ -348,7 +348,7 @@ export async function updateRelationship({
     return { status: 400, error: "Unauthorized User" };
   }
 
-  const updateData = convertUndefinedToNull(data);
+  const updateData = convertToNull(data);
 
   const { error, status } = await supabase
     .from("company_relationships")

@@ -44,7 +44,7 @@ export function LocationCard({
                 <Link
                   prefetch="intent"
                   to={`/settings/${location.id}/update-location`}
-                  className="p-2 rounded-md bg-secondary grid place-items-center border-foreground"
+                  className="p-2 rounded-md bg-secondary grid place-items-center"
                 >
                   <Icon name="edit" size="xs" />
                 </Link>
@@ -53,7 +53,7 @@ export function LocationCard({
             </Tooltip>
           </TooltipProvider>
           <DropdownMenu>
-            <DropdownMenuTrigger className="p-2 py-2 rounded-md bg-secondary grid place-items-center border-foreground">
+            <DropdownMenuTrigger className="p-2 py-2 rounded-md bg-secondary grid place-items-center">
               <Icon name="dots" size="xs" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">

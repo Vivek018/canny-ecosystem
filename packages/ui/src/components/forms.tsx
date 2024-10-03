@@ -10,6 +10,7 @@ import { Combobox, type ComboboxSelectOption } from "./combobox";
 import { Button } from "./button";
 import { parseStringValue } from "@canny_ecosystem/utils";
 import { useIsomorphicLayoutEffect } from "@/hooks/isomorphic-layout-effect";
+import { Icon } from "./icon";
 
 export type ListOfErrors = Array<string | null | undefined> | null | undefined;
 
@@ -219,7 +220,7 @@ export function SearchableSelectField({
         options={options}
         value={input.value ?? ""}
         onChange={input.change}
-        placeholder={placeholder}
+        placeholder={placeholder ?? inputProps.placeholder}
       />
       <div className="min-h-[32px] px-4 pb-3 pt-1">
         {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
@@ -341,7 +342,7 @@ export function JSONBField({
             onClick={() => removePair(index)}
             variant="destructive-outline"
           >
-            Remove
+            <Icon name="cross" size="md" />
           </Button>
         </div>
       ))}

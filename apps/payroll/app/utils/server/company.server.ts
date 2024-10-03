@@ -1,4 +1,4 @@
-import { getFirstCompanyQuery } from "@canny_ecosystem/supabase/queries";
+import { getFirstCompany } from "@canny_ecosystem/supabase/queries";
 import type { TypedSupabaseClient } from "@canny_ecosystem/supabase/types";
 import { SECONDS_IN_A_MONTH } from "@canny_ecosystem/utils/constant";
 import * as cookie from "cookie";
@@ -14,7 +14,7 @@ export async function getCompanyIdOrFirstCompany(
   if (parsed?.length) {
     return { companyId: parsed, setCookie: false };
   }
-  const companyId = (await getFirstCompanyQuery({ supabase })).data?.id;
+  const companyId = (await getFirstCompany({ supabase })).data?.id;
   if (companyId) {
     return { companyId: companyId, setCookie: true };
   }

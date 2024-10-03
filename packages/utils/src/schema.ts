@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+export { z };
+
 export const textMinLength = 1;
 export const textMaxLength = 100;
 
@@ -166,14 +168,30 @@ export const RelationshipSchema = z.object({
 });
 
 // Project
+export const statusArray = [
+  "active",
+  "inactive",
+  "pending",
+  "completed",
+  "cancelled",
+] as const;
+
 export const ProjectSchema = z.object({
   id: z.string().optional(),
   name: zNumberString.min(3),
+  project_code: zNumberString.min(3),
+  project_type: zNumberString.min(3),
   description: zTextArea.optional(),
-  image: zImage,
-  starting_date: z.string().default(new Date().toISOString().split("T")[0]),
-  ending_date: z.string().optional(),
-  company_id: z.string().optional(),
+  project_client_id: z.string(),
+  end_client_id: z.string().optional(),
+  primary_contractor_id: z.string().optional(),
+  start_date: z.string().default(new Date().toISOString().split("T")[0]),
+  estimated_end_date: z.string().optional(),
+  status: z.enum(statusArray).default("active"),
+  risk_assessment: zTextArea.optional(),
+  quality_standards: zTextArea.optional(),
+  health_safety_requirements: zTextArea.optional(),
+  environmental_considerations: zTextArea.optional(),
 });
 
 // Pay Sequence

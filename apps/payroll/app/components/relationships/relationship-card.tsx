@@ -35,7 +35,6 @@ export function RelationshipCard({
 }: {
   relationship: Omit<RelationshipWithCompany, "created_at" | "updated_at">;
 }) {
-
   const navigate = useNavigate();
   const viewRelationshipTermsParam = `${modalSearchParamNames.view_relationship_terms}=true`;
 
@@ -46,7 +45,7 @@ export function RelationshipCard({
     >
       <CardHeader className="flex flex-row space-y-0 items-center justify-between p-4">
         <CardTitle className="text-lg tracking-wide">
-          {replaceUnderscore(relationship.relationship_type)}
+          {replaceUnderscore(relationship.relationship_type ?? "")}
         </CardTitle>
         <div className="flex items-center gap-3">
           <TooltipProvider>
@@ -55,7 +54,7 @@ export function RelationshipCard({
                 <Link
                   prefetch="intent"
                   to={`/settings/${relationship.id}/update-relationship`}
-                  className="p-2 rounded-md bg-secondary grid place-items-center border-foreground"
+                  className="p-2 rounded-md bg-secondary grid place-items-center"
                 >
                   <Icon name="edit" size="xs" />
                 </Link>
@@ -64,7 +63,7 @@ export function RelationshipCard({
             </Tooltip>
           </TooltipProvider>
           <DropdownMenu>
-            <DropdownMenuTrigger className="p-2 py-2 rounded-md bg-secondary grid place-items-center border-foreground">
+            <DropdownMenuTrigger className="p-2 py-2 rounded-md bg-secondary grid place-items-center">
               <Icon name="dots" size="xs" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
@@ -98,7 +97,7 @@ export function RelationshipCard({
           </h2>
           <div
             className={cn(
-              "bg-input flex-1 h-[0.5px]",
+              "bg-input flex-1 h-[1px]",
               relationship.is_active && "bg-primary",
             )}
           >
@@ -121,7 +120,7 @@ export function RelationshipCard({
           </TooltipProvider>
           <div
             className={cn(
-              "bg-input flex-1 h-[0.5px]",
+              "bg-input flex-1 h-[1px]",
               relationship.is_active && "bg-primary",
             )}
           >

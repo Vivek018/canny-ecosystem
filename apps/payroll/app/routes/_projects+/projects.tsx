@@ -1,8 +1,6 @@
 import { ProjectCard } from "@/components/projects/project-card";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import {
-  getProjectsInCompanyQuery,
-} from "@canny_ecosystem/supabase/queries";
+import { getProjectsInCompany } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import {
@@ -21,17 +19,13 @@ import { json, Link, Outlet, useLoaderData } from "@remix-run/react";
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data, error } = await getProjectsInCompanyQuery({
+  const { data, error } = await getProjectsInCompany({
     supabase,
     companyId,
   });
 
   if (error) {
     throw error;
-  }
-
-  if (!data) {
-    throw new Error("No data found");
   }
 
   return json({ data });
@@ -73,11 +67,19 @@ export default function Projects() {
           </CommandEmpty>
           <CommandList className="max-h-full py-6 overflow-x-visible overflow-y-visible">
             <CommandGroup className="p-0 overflow-visible">
-              <div className="w-full grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-                {data.map((project) => (
+              <div className="w-full grid gap-8 grid-cols-1">
+                {data?.map((project) => (
                   <CommandItem
                     key={project.id}
-                    value={project.name + project.description}
+                    value={
+                      project?.name +
+                      project?.status +
+                      project?.project_type +
+                      project?.project_code +
+                      project?.primary_contractor?.name +
+                      project?.project_client?.name +
+                      project?.end_client?.name
+                    }
                     className="data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0"
                   >
                     <ProjectCard project={project} />
