@@ -1,4 +1,3 @@
-import type { LocationDatabaseRow } from "@canny_ecosystem/supabase/types";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,7 +15,7 @@ import {
 } from "@canny_ecosystem/ui/tooltip";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Link } from "@remix-run/react";
-import { DeleteLocation } from "./delete-location";
+import { DeleteSite } from "./delete-site";
 import {
   Card,
   CardContent,
@@ -24,26 +23,32 @@ import {
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
+import type { SitesWithLocation } from "@canny_ecosystem/supabase/queries";
 
-export function LocationCard({
-  location,
+export function SiteCard({
+  site,
 }: {
-  location: Omit<LocationDatabaseRow, "created_at" | "updated_at">;
+  site: Omit<SitesWithLocation, "created_at" | "updated_at">;
 }) {
   return (
     <Card
-      key={location.id}
+      key={site.id}
       className="w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start"
     >
-      <CardHeader className="flex flex-row space-y-0 items-center justify-between p-4">
-        <CardTitle className="text-lg tracking-wide">{location.name}</CardTitle>
+      <CardHeader className="flex flex-row space-y-0 items-start justify-between p-4">
+        <div className="flex flex-col items-start">
+          <CardTitle className="text-lg tracking-wide">{site.name}</CardTitle>
+          <p className="text-[12px] w-max text-muted-foreground -mt-1 rounded-md">
+            {site.site_code}
+          </p>
+        </div>
         <div className="flex items-center gap-3">
           <TooltipProvider>
             <Tooltip delayDuration={100}>
               <TooltipTrigger asChild>
                 <Link
                   prefetch="intent"
-                  to={`/settings/${location.id}/update-location`}
+                  to={`/projects/${site.project_id}/${site.id}/update-site`}
                   className="p-2 rounded-md bg-secondary grid place-items-center"
                 >
                   <Icon name="edit" size="xs" />
@@ -59,12 +64,9 @@ export function LocationCard({
             <DropdownMenuContent align="start">
               <DropdownMenuGroup>
                 <DropdownMenuItem
-                  className={cn(
-                    "py-2 text-[13px]",
-                    !location.latitude && "hidden",
-                  )}
+                  className={cn("py-2 text-[13px]", !site.latitude && "hidden")}
                   onClick={() => {
-                    navigator.clipboard.writeText(String(location.latitude));
+                    navigator.clipboard.writeText(String(site.latitude));
                   }}
                 >
                   Copy Latitude
@@ -72,20 +74,18 @@ export function LocationCard({
                 <DropdownMenuItem
                   className={cn(
                     "py-2 text-[13px]",
-                    !location.longitude && "hidden",
+                    !site.longitude && "hidden",
                   )}
                   onClick={() => {
-                    navigator.clipboard.writeText(String(location.longitude));
+                    navigator.clipboard.writeText(String(site.longitude));
                   }}
                 >
                   Copy Longitude
                 </DropdownMenuItem>
                 <DropdownMenuSeparator
-                  className={cn(
-                    !location.latitude && !location.longitude && "hidden",
-                  )}
+                  className={cn(!site.latitude && !site.longitude && "hidden")}
                 />
-                <DeleteLocation locationId={location.id} />
+                <DeleteSite projectId={site.project_id} siteId={site.id} />
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -93,22 +93,27 @@ export function LocationCard({
       </CardHeader>
       <CardContent className="flex flex-col gap-0.5 px-4">
         <address className="not-italic line-clamp-3">
-          {`${location.address_line_1} ${location.address_line_2 ? location.address_line_2 : ""}`}
+          {`${site.address_line_1} ${site.address_line_2 ? site.address_line_2 : ""}`}
         </address>
         <div className="flex items-center capitalize gap-2">
-          <p>{`${location.city},`}</p>
-          <p>{`${location.state}`}</p>
-          <p>{`- ${location.pincode}`}</p>
+          <p>{`${site.city},`}</p>
+          <p>{`${site.state}`}</p>
+          <p>{`- ${site.pincode}`}</p>
         </div>
       </CardContent>
-      <CardFooter
-        className={cn(
-          "px-2.5 ml-auto bg-secondary text-foreground py-1.5 text-sm tracking-wide font-sem rounded-tl-md border-foreground flex gap-1 justify-center",
-          !location.is_primary && "opacity-0",
-        )}
-      >
-        <Icon name="dot-filled" size="xs" />
-        Primary
+      <CardFooter className={cn("p-0")}>
+        <div className="border-t border-r bg-secondary rounded-tr-md text-foreground px-2.5 py-1.5">
+          {site.company_location?.name}
+        </div>
+        <div
+          className={cn(
+            "px-2.5 ml-auto bg-secondary text-foreground py-1.5 text-sm tracking-wide font-sem rounded-tl-md border-foreground flex gap-1 justify-center",
+            !site.is_active && "opacity-0",
+          )}
+        >
+          <Icon name="dot-filled" size="xs" />
+          Active
+        </div>
       </CardFooter>
     </Card>
   );

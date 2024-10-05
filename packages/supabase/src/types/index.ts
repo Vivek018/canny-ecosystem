@@ -69,6 +69,14 @@ export type ProjectDatabaseInsert =
 export type ProjectDatabaseUpdate =
   Database["public"]["Tables"]["projects"]["Update"];
 
+// Project Sites
+export type SiteDatabaseRow =
+  Database["public"]["Tables"]["project_sites"]["Row"];
+export type SiteDatabaseInsert =
+  Database["public"]["Tables"]["project_sites"]["Insert"];
+export type SiteDatabaseUpdate =
+  Database["public"]["Tables"]["project_sites"]["Update"];
+
 // Pay Sequences
 export type SitePaySequenceDatabaseRow =
   Database["public"]["Tables"]["site_pay_sequence"]["Row"];
@@ -76,12 +84,3 @@ export type SitePaySequenceDatabaseRow =
 export type SitePaySequenceDatabaseUpdate =
   Database["public"]["Tables"]["site_pay_sequence"]["Update"];
 
-// Locations
-export type ProjectSitesDatabaseRow =
-  Database["public"]["Tables"]["project_sites"]["Row"];
-
-export type ProjectSitesDatabaseInsert =
-  Database["public"]["Tables"]["project_sites"]["Insert"];
-
-export type ProjectSitesDatabaseUpdate =
-  Database["public"]["Tables"]["project_sites"]["Update"];

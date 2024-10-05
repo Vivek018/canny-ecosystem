@@ -1,6 +1,6 @@
 import {
   isGoodStatus,
-  LocationSchema,
+  SiteSchema,
   replaceUnderscore,
 } from "@canny_ecosystem/utils";
 import {
@@ -22,9 +22,7 @@ import { useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
-import { UPDATE_LOCATION } from "./$locationId.update-location";
 import {
   Card,
   CardContent,
@@ -34,25 +32,50 @@ import {
   CardTitle,
 } from "@canny_ecosystem/ui/card";
 
-import { createLocation } from "@canny_ecosystem/supabase/mutations";
-import type { LocationDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import { createSite } from "@canny_ecosystem/supabase/mutations";
+import type { SiteDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { statesAndUTs } from "@canny_ecosystem/utils/constant";
+import { UPDATE_SITE } from "./$siteId.update-site";
+import { getLocationsForSelectByCompanyId } from "@canny_ecosystem/supabase/queries";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 
-export const CREATE_LOCATION = "create-location";
+export const CREATE_SITE = "create-site";
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  const projectId = params.projectId;
+
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+  const { data: locations, error } = await getLocationsForSelectByCompanyId({
+    supabase,
+    companyId,
+  });
 
-  return json({ companyId });
+  if (error) {
+    throw error;
+  }
+
+  if (!locations) {
+    throw new Error("No Locations Found");
+  }
+
+  const locationOptions = locations.map((location) => ({
+    label: location.name,
+    value: location.id,
+  }));
+
+  return json({ projectId, locationOptions });
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request, params }: ActionFunctionArgs) {
+  const projectId = params.projectId;
+
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
 
   const submission = parseWithZod(formData, {
-    schema: LocationSchema,
+    schema: SiteSchema,
   });
 
   if (submission.status !== "success") {
@@ -62,39 +85,41 @@ export async function action({ request }: ActionFunctionArgs) {
     );
   }
 
-  const { status, error } = await createLocation({
+  const { status, error } = await createSite({
     supabase,
     data: submission.value as any,
   });
 
   if (isGoodStatus(status)) {
-    return safeRedirect("/settings/locations", { status: 303 });
+    return safeRedirect(`/projects/${projectId}/sites`, { status: 303 });
   }
   return json({ status, error });
 }
 
-export default function CreateLocation({
+export default function CreateSite({
   updateValues,
+  locationOptionsFromUpdate,
 }: {
-  updateValues?: LocationDatabaseUpdate | null;
+  updateValues?: SiteDatabaseUpdate | null;
+  locationOptionsFromUpdate: ComboboxSelectOption[];
 }) {
-  const { companyId } = useLoaderData<typeof loader>();
-  const LOCATION_TAG = updateValues ? UPDATE_LOCATION : CREATE_LOCATION;
+  const { projectId, locationOptions } = useLoaderData<typeof loader>();
+  const SITE_TAG = updateValues ? UPDATE_SITE : CREATE_SITE;
 
-  const initialValues = updateValues ?? getInitialValueFromZod(LocationSchema);
+  const initialValues = updateValues ?? getInitialValueFromZod(SiteSchema);
   const [resetKey, setResetKey] = useState(Date.now());
 
   const [form, fields] = useForm({
-    id: LOCATION_TAG,
-    constraint: getZodConstraint(LocationSchema),
+    id: SITE_TAG,
+    constraint: getZodConstraint(SiteSchema),
     onValidate({ formData }) {
-      return parseWithZod(formData, { schema: LocationSchema });
+      return parseWithZod(formData, { schema: SiteSchema });
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
     defaultValue: {
       ...initialValues,
-      company_id: initialValues.company_id ?? companyId,
+      project_id: initialValues.project_id ?? projectId,
     },
   });
 
@@ -105,17 +130,17 @@ export default function CreateLocation({
           <Card>
             <CardHeader>
               <CardTitle className="text-3xl">
-                {replaceDash(LOCATION_TAG)}
+                {replaceDash(SITE_TAG)}
               </CardTitle>
               <CardDescription>
-                {LOCATION_TAG.split("-")[0]} location of a company that will be
-                central in all of canny apps
+                {SITE_TAG.split("-")[0]} site of a project that will be central
+                in all of canny apps
               </CardDescription>
             </CardHeader>
             <CardContent>
               <input {...getInputProps(fields.id, { type: "hidden" })} />
               <input
-                {...getInputProps(fields.company_id, { type: "hidden" })}
+                {...getInputProps(fields.project_id, { type: "hidden" })}
               />
               <Field
                 inputProps={{
@@ -129,13 +154,41 @@ export default function CreateLocation({
                 }}
                 errors={fields.name.errors}
               />
+              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+                <Field
+                  inputProps={{
+                    ...getInputProps(fields.site_code, { type: "text" }),
+                    placeholder: `Enter ${replaceUnderscore(fields.site_code.name)}`,
+                    className: "capitalize",
+                  }}
+                  labelProps={{
+                    children: replaceUnderscore(fields.site_code.name),
+                  }}
+                  errors={fields.site_code.errors}
+                />
+                <SearchableSelectField
+                  key={resetKey}
+                  className="capitalize"
+                  options={locationOptionsFromUpdate ?? locationOptions}
+                  inputProps={{
+                    ...getInputProps(fields.company_location_id, {
+                      type: "text",
+                    }),
+                  }}
+                  placeholder={"Select Company Location"}
+                  labelProps={{
+                    children: "Company Location",
+                  }}
+                  errors={fields.company_location_id.errors}
+                />
+              </div>
               <CheckboxField
-                buttonProps={getInputProps(fields.is_primary, {
+                buttonProps={getInputProps(fields.is_active, {
                   type: "checkbox",
                 })}
                 labelProps={{
-                  htmlFor: fields.is_primary.id,
-                  children: "Is this your primary address?",
+                  htmlFor: fields.is_active.id,
+                  children: "Is this site active?",
                 }}
               />
               <Field

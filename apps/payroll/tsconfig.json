@@ -12,6 +12,6 @@
     "**/*.tsx",
     "tailwind.config.ts",
     "../../packages/ui/src/components/user-menu.tsx"
-, "types/index.d.ts", "app/routes/_projects+/projects_+/$projectId.tsx"  ],
+, "types/index.d.ts", "app/routes/_projects+/projects_+/$projectId.tsx", "app/routes/_projects+/projects_+/$projectId+"  ],
   "exclude": ["node_modules"]
 }

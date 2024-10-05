@@ -26,11 +26,7 @@ export const zNumber = z
 export const zTextArea = z
   .string()
   .min(20)
-  .max(textMaxLength * 3)
-  .regex(
-    /^[A-Z_a-z./ ,0-9 \s]+$/,
-    "Only alphabets, numbers, dot, slash and comma are allowed",
-  );
+  .max(textMaxLength * 5);
 
 export const zEmail = z.string().email();
 export const zEmailSuffix = z
@@ -192,6 +188,23 @@ export const ProjectSchema = z.object({
   quality_standards: zTextArea.optional(),
   health_safety_requirements: zTextArea.optional(),
   environmental_considerations: zTextArea.optional(),
+});
+
+// Project Sites
+export const SiteSchema = z.object({
+  id: z.string().optional(),
+  name: zString.min(3),
+  site_code: zNumberString.min(3),
+  company_location_id: z.string(),
+  is_active: z.boolean().default(false),
+  address_line_1: z.string().min(3),
+  address_line_2: z.string().optional(),
+  state: zString,
+  city: zString.min(3),
+  pincode: zNumber.min(6).max(6),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
+  project_id: z.string().optional(),
 });
 
 // Pay Sequence

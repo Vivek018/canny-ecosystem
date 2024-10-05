@@ -1,9 +1,4 @@
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
@@ -13,55 +8,26 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@canny_ecosystem/ui/tooltip";
-import { Link, useSubmit } from "@remix-run/react";
+import { Link } from "@remix-run/react";
 import { Card, CardContent, CardTitle } from "@canny_ecosystem/ui/card";
-import { DeleteProject } from "./delete-project";
 import type { ProjectsWithCompany } from "@canny_ecosystem/supabase/queries";
 import { Avatar, AvatarFallback } from "@canny_ecosystem/ui/avatar";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Progress } from "@canny_ecosystem/ui/progress";
 import {
   getAutoTimeDifference,
-  getValidDateForInput,
+
 } from "@canny_ecosystem/utils";
+import { ProjectOptionsDropdown } from "./project-options-dropdown";
 
 export function ProjectCard({
   project,
 }: {
   project: Omit<
     ProjectsWithCompany,
-    "created_at" | "updated_at" | "company_id"
+    "created_at" | "updated_at"
   >;
 }) {
-  const submit = useSubmit();
-
-  const handleMarkAsCompleted = () => {
-    submit(
-      {
-        id: project.id,
-        actual_end_date: getValidDateForInput(new Date())!,
-        status: "completed",
-      },
-      {
-        method: "POST",
-        action: `/${project.id}/update-completed`,
-      },
-    );
-  };
-
-  const handleMarkAsInComplete = () => {
-    submit(
-      {
-        id: project.id,
-        actual_end_date: null,
-        status: "active",
-      },
-      {
-        method: "POST",
-        action: `/${project.id}/update-completed`,
-      },
-    );
-  };
 
   const companies = [
     project?.project_client,
@@ -80,7 +46,7 @@ export function ProjectCard({
             <Link
               prefetch="intent"
               to={`${project?.id}`}
-              className="truncate max-w-96 font-extrabold text-wrap line-clamp-2 hover:text-primary"
+              className="truncate max-w-96 font-bold text-wrap line-clamp-2 hover:text-primary"
             >
               {project.name}
             </Link>
@@ -90,9 +56,6 @@ export function ProjectCard({
               </p>
               <p className="text-[11px] bg-muted w-max text-muted-foreground px-1.5 mt-1.5 rounded-md">
                 {project.project_type}
-              </p>
-              <p className="text-[11px] bg-muted w-max text-muted-foreground px-1.5 mt-1.5 rounded-md">
-                {project.project_code}
               </p>
             </div>
           </CardTitle>
@@ -134,39 +97,24 @@ export function ProjectCard({
           >
             <Progress
               value={
-                project.estimated_end_date
-                  ? getAutoTimeDifference(
-                      project.start_date,
-                      new Date(),
-                      "months",
-                    )
-                  : 0
-              }
-              max={
-                getAutoTimeDifference(
-                  project.start_date,
-                  project.estimated_end_date,
-                  "months",
-                )!
+                (getAutoTimeDifference(project.start_date, new Date())! /
+                  getAutoTimeDifference(
+                    project.start_date,
+                    project.estimated_end_date,
+                  )!) *
+                100
               }
               className="w-80"
             />
             <p
               className={cn(
                 "text-xs text-muted-foreground ml-auto mt-1",
-                getAutoTimeDifference(
-                  new Date(),
-                  project.estimated_end_date,
-                  "months",
-                )! < 0 && "hidden",
+                getAutoTimeDifference(new Date(), project.estimated_end_date)! <
+                  0 && "hidden",
               )}
             >
-              {getAutoTimeDifference(
-                new Date(),
-                project.estimated_end_date,
-                "months",
-              )}{" "}
-              months remaining
+              {getAutoTimeDifference(new Date(), project.estimated_end_date)}{" "}
+              days remaining
             </p>
           </div>
           <div
@@ -175,7 +123,7 @@ export function ProjectCard({
               !project.actual_end_date && "hidden",
             )}
           >
-            <Progress value={100} max={100} className="w-80 bg-destructive" />
+            <Progress value={100} className="w-80" />
             <p
               className={cn(
                 "text-xs text-muted-foreground ml-auto mt-1",
@@ -186,9 +134,8 @@ export function ProjectCard({
               {getAutoTimeDifference(
                 project.start_date,
                 project.actual_end_date,
-                "months",
               )}{" "}
-              months
+              days
             </p>
           </div>
         </div>
@@ -206,29 +153,17 @@ export function ProjectCard({
               <TooltipContent>Edit</TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          <DropdownMenu>
-            <DropdownMenuTrigger className="p-2 py-2 rounded-md bg-secondary grid place-items-center border-foreground">
-              <Icon name="dots" size="xs" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
-              <DropdownMenuGroup>
-                <DropdownMenuItem
-                  className={cn(project.actual_end_date && "hidden")}
-                  onClick={handleMarkAsCompleted}
-                >
-                  Make as Completed
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className={cn(!project.actual_end_date && "hidden")}
-                  onClick={handleMarkAsInComplete}
-                >
-                  Make as Incomplete
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DeleteProject projectId={project.id} />
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <ProjectOptionsDropdown
+            project={{
+              id: project.id,
+              actual_end_date: project.actual_end_date,
+            }}
+            triggerChild={
+              <DropdownMenuTrigger className="p-2 py-2 rounded-md bg-secondary grid place-items-center border-foreground">
+                <Icon name="dots" size="xs" />
+              </DropdownMenuTrigger>
+            }
+          />
         </div>
       </CardContent>
     </Card>

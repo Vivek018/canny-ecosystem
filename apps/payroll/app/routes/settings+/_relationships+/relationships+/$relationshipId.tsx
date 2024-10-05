@@ -1,4 +1,5 @@
 import { ViewRelationshipTermsDialog } from "@/components/relationships/view-terms-dialog";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getRelationshipTermsById } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
@@ -9,10 +10,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const relationshipId = params.relationshipId;
 
   const { supabase } = getSupabaseWithHeaders({ request });
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
   const { data, error } = await getRelationshipTermsById({
     supabase,
     id: relationshipId ?? "",
+    companyId,
   });
 
   if (error) {

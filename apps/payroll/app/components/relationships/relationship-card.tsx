@@ -82,7 +82,7 @@ export function RelationshipCard({
                   View Terms
                 </DropdownMenuItem>
                 <DropdownMenuSeparator
-                  className={cn(!relationship.terms && "hidden")}
+                  className={cn(!relationship?.terms && "hidden")}
                 />
                 <DeleteRelationship relationshipId={relationship.id} />
               </DropdownMenuGroup>
@@ -93,12 +93,12 @@ export function RelationshipCard({
       <CardContent className="flex flex-col gap-0.5 px-4 mt-4">
         <div className="flex flex-row w-full items-center justify-between">
           <h2 className="capitalize w-max p-2 border border-input rounded-md bg-muted/75">
-            {relationship.parent_company.name}
+            {relationship?.parent_company?.name}
           </h2>
           <div
             className={cn(
               "bg-input flex-1 h-[1px]",
-              relationship.is_active && "bg-primary",
+              relationship?.is_active && "bg-primary",
             )}
           >
             &nbsp;
@@ -109,7 +109,7 @@ export function RelationshipCard({
                 <div
                   className={cn(
                     "w-2 h-2 rounded-full bg-primary/75",
-                    !relationship.is_active && "hidden",
+                    !relationship?.is_active && "hidden",
                   )}
                 >
                   &nbsp;
@@ -121,13 +121,18 @@ export function RelationshipCard({
           <div
             className={cn(
               "bg-input flex-1 h-[1px]",
-              relationship.is_active && "bg-primary",
+              relationship?.is_active && "bg-primary",
             )}
           >
             &nbsp;
           </div>
-          <h2 className="capitalize p-2 border border-input rounded-md bg-muted/75">
-            {relationship.child_company.name}
+          <h2
+            className={cn(
+              "capitalize p-2 border border-input rounded-md bg-muted/75",
+              !relationship?.child_company?.name && "bg-background",
+            )}
+          >
+            {relationship?.child_company?.name ?? "Add Company"}
           </h2>
         </div>
       </CardContent>

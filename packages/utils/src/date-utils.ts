@@ -6,9 +6,7 @@ import {
   differenceInDays,
 } from "date-fns";
 
-export function getValidDateForInput(
-  date: string | Date | undefined,
-): string {
+export function getValidDateForInput(date: string | Date | undefined): string {
   let dateObject: Date | null = null;
 
   if (date instanceof Date && isValid(date)) {
@@ -58,4 +56,8 @@ export function getAutoTimeDifference(
     default:
       return differenceInDays(end, start);
   }
+}
+
+export function formatDate(date: Date | string) {
+  return format(new Date(date), "dd MMM yyyy");
 }

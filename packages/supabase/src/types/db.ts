@@ -93,7 +93,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "company_addresses_company_id_fkey"
+            foreignKeyName: "company_locations_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
@@ -150,7 +150,7 @@ export type Database = {
       }
       company_relationships: {
         Row: {
-          child_company_id: string
+          child_company_id: string | null
           created_at: string | null
           end_date: string | null
           id: string
@@ -162,7 +162,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
-          child_company_id: string
+          child_company_id?: string | null
           created_at?: string | null
           end_date?: string | null
           id?: string
@@ -174,7 +174,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
-          child_company_id?: string
+          child_company_id?: string | null
           created_at?: string | null
           end_date?: string | null
           id?: string
@@ -263,9 +263,7 @@ export type Database = {
           branch_name: string | null
           created_at: string | null
           employee_id: string
-          id: string
           ifsc_code: string
-          is_primary: boolean | null
           updated_at: string | null
         }
         Insert: {
@@ -275,9 +273,7 @@ export type Database = {
           branch_name?: string | null
           created_at?: string | null
           employee_id: string
-          id?: string
           ifsc_code: string
-          is_primary?: boolean | null
           updated_at?: string | null
         }
         Update: {
@@ -287,16 +283,14 @@ export type Database = {
           branch_name?: string | null
           created_at?: string | null
           employee_id?: string
-          id?: string
           ifsc_code?: string
-          is_primary?: boolean | null
           updated_at?: string | null
         }
         Relationships: [
           {
             foreignKeyName: "employee_bank_details_employee_id_fkey"
             columns: ["employee_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "employees"
             referencedColumns: ["id"]
           },
@@ -634,66 +628,72 @@ export type Database = {
       }
       project_sites: {
         Row: {
-          address: string
+          address_line_1: string
+          address_line_2: string | null
           capacity: number | null
-          company_address_id: string
+          city: string
+          company_location_id: string | null
           created_at: string | null
-          end_date: string | null
           id: string
           is_active: boolean | null
           latitude: number | null
           longitude: number | null
           name: string
+          pincode: string
           project_id: string
           site_code: string
-          start_date: string
+          state: string
           updated_at: string | null
         }
         Insert: {
-          address: string
+          address_line_1: string
+          address_line_2?: string | null
           capacity?: number | null
-          company_address_id: string
+          city: string
+          company_location_id?: string | null
           created_at?: string | null
-          end_date?: string | null
           id?: string
           is_active?: boolean | null
           latitude?: number | null
           longitude?: number | null
           name: string
+          pincode: string
           project_id: string
           site_code: string
-          start_date: string
+          state: string
           updated_at?: string | null
         }
         Update: {
-          address?: string
+          address_line_1?: string
+          address_line_2?: string | null
           capacity?: number | null
-          company_address_id?: string
+          city?: string
+          company_location_id?: string | null
           created_at?: string | null
-          end_date?: string | null
           id?: string
           is_active?: boolean | null
           latitude?: number | null
           longitude?: number | null
           name?: string
+          pincode?: string
           project_id?: string
           site_code?: string
-          start_date?: string
+          state?: string
           updated_at?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "project_site_company_address_id_fkey"
-            columns: ["company_address_id"]
-            isOneToOne: false
-            referencedRelation: "company_locations"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "project_site_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_sites_company_address_id_fkey"
+            columns: ["company_location_id"]
+            isOneToOne: false
+            referencedRelation: "company_locations"
             referencedColumns: ["id"]
           },
         ]
@@ -761,21 +761,21 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "project_end_client_id_fkey"
+            foreignKeyName: "projects_end_client_id_fkey"
             columns: ["end_client_id"]
             isOneToOne: false
             referencedRelation: "companies"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "project_primary_contractor_id_fkey"
+            foreignKeyName: "projects_primary_contractor_id_fkey"
             columns: ["primary_contractor_id"]
             isOneToOne: false
             referencedRelation: "companies"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "project_project_client_id_fkey"
+            foreignKeyName: "projects_project_client_id_fkey"
             columns: ["project_client_id"]
             isOneToOne: false
             referencedRelation: "companies"

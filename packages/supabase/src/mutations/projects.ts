@@ -2,8 +2,8 @@ import { convertToNull } from "@canny_ecosystem/utils";
 import type {
   ProjectDatabaseInsert,
   ProjectDatabaseUpdate,
-  ProjectSitesDatabaseInsert,
-  ProjectSitesDatabaseUpdate,
+  SiteDatabaseInsert,
+  SiteDatabaseUpdate,
   SitePaySequenceDatabaseUpdate,
   TypedSupabaseClient,
 } from "../types";
@@ -93,12 +93,12 @@ export async function deleteProject({
 }
 
 // Project Sites
-export async function createProjectSite({
+export async function createSite({
   supabase,
   data,
 }: {
   supabase: TypedSupabaseClient;
-  data: ProjectSitesDatabaseInsert;
+  data: SiteDatabaseInsert;
 }) {
   const {
     data: { user },
@@ -130,12 +130,12 @@ export async function createProjectSite({
   return { status, error };
 }
 
-export async function updateProjectSite({
+export async function updateSite({
   supabase,
   data,
 }: {
   supabase: TypedSupabaseClient;
-  data: ProjectSitesDatabaseUpdate;
+  data: SiteDatabaseUpdate;
 }) {
   const {
     data: { user },
@@ -159,7 +159,7 @@ export async function updateProjectSite({
   return { status, error };
 }
 
-export async function deleteProjectSite({
+export async function deleteSite({
   supabase,
   id,
 }: {

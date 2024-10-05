@@ -54,6 +54,19 @@ export async function getCompanyRegistrationDetailsByCompanyId({
 }
 
 // Company Locations
+export async function getLocationsForSelectByCompanyId({
+  supabase,
+  companyId,
+}: { supabase: TypedSupabaseClient; companyId: string }) {
+  const { data, error } = await supabase
+    .from("company_locations")
+    .select("id, name")
+    .eq("company_id", companyId)
+    .limit(HARD_QUERY_LIMIT);
+
+  return { data, error };
+}
+
 export async function getLocationsByCompanyId({
   supabase,
   companyId,
@@ -72,13 +85,15 @@ export async function getLocationsByCompanyId({
 export async function getLocationById({
   supabase,
   id,
-}: { supabase: TypedSupabaseClient; id: string }) {
+  companyId,
+}: { supabase: TypedSupabaseClient; id: string; companyId: string }) {
   const { data, error } = await supabase
     .from("company_locations")
     .select(
       "id, company_id, name, address_line_1, address_line_2, city, state, pincode, latitude, longitude, is_primary",
     )
     .eq("id", id)
+    .eq("company_id", companyId)
     .single();
 
   return { data, error };
@@ -110,7 +125,8 @@ export async function getRelationshipsByCompanyId({
 export async function getRelationshipById({
   supabase,
   id,
-}: { supabase: TypedSupabaseClient; id: string }) {
+  companyId,
+}: { supabase: TypedSupabaseClient; id: string; companyId: string }) {
   const { data, error } = await supabase
     .from("company_relationships")
     .select(
@@ -118,6 +134,7 @@ export async function getRelationshipById({
       child_company:companies!child_company_id (id, name)`,
     )
     .eq("id", id)
+    .or(`parent_company_id.eq.${companyId},child_company_id.eq.${companyId}`)
     .single<Omit<RelationshipWithCompany, "created_at" | "updated_at">>();
 
   return { data, error };
@@ -126,11 +143,13 @@ export async function getRelationshipById({
 export async function getRelationshipTermsById({
   supabase,
   id,
-}: { supabase: TypedSupabaseClient; id: string }) {
+  companyId,
+}: { supabase: TypedSupabaseClient; id: string; companyId: string }) {
   const { data, error } = await supabase
     .from("company_relationships")
     .select("terms")
     .eq("id", id)
+    .or(`parent_company_id.eq.${companyId},child_company_id.eq.${companyId}`)
     .single();
 
   return { data, error };

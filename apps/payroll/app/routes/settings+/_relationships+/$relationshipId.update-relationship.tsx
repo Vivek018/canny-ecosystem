@@ -10,18 +10,21 @@ import {
   getRelationshipById,
 } from "@canny_ecosystem/supabase/queries";
 import { updateRelationship } from "@canny_ecosystem/supabase/mutations";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
 export const UPDATE_RELATIONSHIP = "update-relationship";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const relationshipId = params.relationshipId;
   const { supabase } = getSupabaseWithHeaders({ request });
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   let relationshipData = null;
 
   if (relationshipId) {
     relationshipData = await getRelationshipById({
       supabase,
       id: relationshipId,
+      companyId
     });
   }
 
@@ -29,7 +32,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     throw relationshipData.error;
   }
 
-  const companyId = relationshipData?.data?.parent_company_id;
+  const parentCompanyId = relationshipData?.data?.parent_company_id;
   const { data: companies, error } = await getCompanies({ supabase });
 
   if (error) {
@@ -41,7 +44,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   const companyOptions = companies
-    .filter((company) => company.id !== companyId)
+    .filter((company) => company.id !== parentCompanyId)
     .map((company) => ({ label: company.name, value: company.id }));
 
   return json({ data: relationshipData?.data, companyOptions });

@@ -1,31 +1,28 @@
-import { getProjectById } from "@canny_ecosystem/supabase/queries";
-import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
+import { SecondaryMenu } from "@canny_ecosystem/ui/secondary-menu";
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { Link, Outlet, useLoaderData, useLocation } from "@remix-run/react";
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ params }: LoaderFunctionArgs) {
   const projectId = params.projectId;
 
-  const { supabase } = getSupabaseWithHeaders({ request });
 
-  const { data, error } = await getProjectById({
-    supabase,
-    id: projectId ?? "",
-  });
-
-  if (error) {
-    throw error;
-  }
-
-  if (!data) {
-    throw new Error("No data found");
-  }
-
-  return json({ data });
+  return json({ projectId });
 }
 
 export default function Project() {
-  const { data } = useLoaderData<typeof loader>();
-
-  return JSON.stringify(data);
+  const { projectId } = useLoaderData<typeof loader>();
+  const { pathname } = useLocation();
+  return (
+    <section>
+      <SecondaryMenu
+        items={[
+          { label: "Overview", path: `/projects/${projectId}` },
+          { label: "Sites", path: `/projects/${projectId}/sites` },
+        ]}
+        pathname={pathname}
+        Link={Link}
+      />
+      <Outlet />
+    </section>
+  );
 }
