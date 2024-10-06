@@ -42,7 +42,6 @@ export const ProjectDetailedPage = ({
                 to={`/${project.id}/update-project`}
                 className={cn(
                   buttonVariants({ variant: "muted" }),
-                  "bg-card shadow border hover:shadow-none",
                 )}
               >
                 <Icon name="edit" size="xs" className="mr-1.5" />
@@ -57,7 +56,7 @@ export const ProjectDetailedPage = ({
                   <DropdownMenuTrigger
                     className={cn(
                       buttonVariants({ variant: "muted" }),
-                      "bg-card shadow border hover:shadow-none",
+                      
                     )}
                   >
                     <Icon name="dots" size="xs" className="mr-1.5" />

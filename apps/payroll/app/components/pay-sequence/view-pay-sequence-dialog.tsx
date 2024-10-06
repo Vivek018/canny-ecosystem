@@ -18,7 +18,7 @@ export const ViewPaySequenceDialog = ({
   const navigate = useNavigate();
 
   const handleOpenChange = () => {
-    navigate("/projects");
+    navigate(-1);
   };
 
   return (

@@ -13,7 +13,7 @@ import {
 import { useIsDocument } from "@canny_ecosystem/ui/hooks/is-document";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/react";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
@@ -100,6 +100,7 @@ export default function Sites() {
           </CommandList>
         </Command>
       </div>
+      <Outlet />
     </section>
   );
 }

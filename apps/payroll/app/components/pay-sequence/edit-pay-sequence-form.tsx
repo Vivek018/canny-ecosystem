@@ -1,12 +1,12 @@
-import type { PaySequenceDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import type { SitePaySequenceDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import {
   getInitialValueFromZod,
   payFrequencyArray,
-  PaySequenceSchema,
   replaceUnderscore,
   transformStringArrayIntoOptions,
+  SitePaySequenceSchema,
 } from "@canny_ecosystem/utils";
 import {
   FormProvider,
@@ -24,18 +24,22 @@ export const EDIT_PAY_SEQUENCE = "edit-pay-sequence";
 
 export function EditPaySequenceForm({
   updateValues,
-}: { updateValues: PaySequenceDatabaseUpdate }) {
+  projectId,
+}: {
+  updateValues: SitePaySequenceDatabaseUpdate;
+  projectId: string;
+}) {
   const PAY_SEQUENCE_TAG = EDIT_PAY_SEQUENCE;
 
   const initialValues =
-    updateValues ?? getInitialValueFromZod(PaySequenceSchema);
+    updateValues ?? getInitialValueFromZod(SitePaySequenceSchema);
   const [resetKey, setResetKey] = useState(Date.now());
 
   const [form, fields] = useForm({
     id: PAY_SEQUENCE_TAG,
-    constraint: getZodConstraint(PaySequenceSchema),
+    constraint: getZodConstraint(SitePaySequenceSchema),
     onValidate({ formData }) {
-      return parseWithZod(formData, { schema: PaySequenceSchema });
+      return parseWithZod(formData, { schema: SitePaySequenceSchema });
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
@@ -48,19 +52,11 @@ export function EditPaySequenceForm({
         <Form
           method="POST"
           {...getFormProps(form)}
-          action={`/projects/${fields.id.value}/edit-pay-sequence`}
+          action={`/projects/${projectId}/sites/${fields.id.value ?? fields.id.initialValue}/edit-pay-sequence`}
           className="flex flex-col h-full"
         >
-          <input
-            type="hidden"
-            name={fields.id.name}
-            value={fields.id.value ?? fields.id.initialValue}
-          />
-          <input
-            type="hidden"
-            name={fields.project_id.name}
-            value={fields.project_id.value ?? fields.project_id.initialValue}
-          />
+          <input {...getInputProps(fields.id, { type: "hidden" })} />
+          <input {...getInputProps(fields.site_id, { type: "hidden" })} />
           <Field
             inputProps={{
               ...getInputProps(fields.pay_day, { type: "text" }),
@@ -79,7 +75,9 @@ export function EditPaySequenceForm({
             labelProps={{
               children: replaceUnderscore(fields.pay_frequency.name),
             }}
-            options={transformStringArrayIntoOptions(payFrequencyArray)}
+            options={transformStringArrayIntoOptions(
+              payFrequencyArray as unknown as string[],
+            )}
             errors={fields.pay_frequency.errors}
           />
           <WorkingDaysField

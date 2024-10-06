@@ -211,10 +211,10 @@ export const SiteSchema = z.object({
 const daySchema = z.number().int().min(0).max(6);
 export const payFrequencyArray = ["monthly"] as const;
 
-export const PaySequenceSchema = z.object({
+export const SitePaySequenceSchema = z.object({
   id: z.string(),
   pay_frequency: z.enum(payFrequencyArray),
   working_days: z.array(daySchema),
   pay_day: z.number().int().min(1).max(15),
-  project_id: z.string(),
+  site_id: z.string(),
 });

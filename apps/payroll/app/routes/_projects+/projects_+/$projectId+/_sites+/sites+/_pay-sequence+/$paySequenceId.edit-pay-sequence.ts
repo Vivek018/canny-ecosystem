@@ -1,16 +1,18 @@
 import { safeRedirect } from "@/utils/server/http.server";
-import { updatePaySequence } from "@canny_ecosystem/supabase/mutations";
+import { updateSitePaySequence } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { isGoodStatus, PaySequenceSchema } from "@canny_ecosystem/utils";
+import { isGoodStatus, SitePaySequenceSchema } from "@canny_ecosystem/utils";
 import { parseWithZod } from "@conform-to/zod";
 import { json, type ActionFunctionArgs } from "@remix-run/node";
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request, params }: ActionFunctionArgs) {
+  const projectId = params.projectId;
+
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
 
   const submission = parseWithZod(formData, {
-    schema: PaySequenceSchema,
+    schema: SitePaySequenceSchema,
   });
 
   if (submission.status !== "success") {
@@ -20,13 +22,13 @@ export async function action({ request }: ActionFunctionArgs) {
     );
   }
 
-  const { status, error } = await updatePaySequence({
+  const { status, error } = await updateSitePaySequence({
     supabase,
     data: submission.value,
   });
 
   if (isGoodStatus(status)) {
-    return safeRedirect("/projects", { status: 303 });
+    return safeRedirect(`/projects/${projectId}/sites`, { status: 303 });
   }
   return json({ status, error });
 }

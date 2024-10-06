@@ -14,7 +14,7 @@ import {
   TooltipTrigger,
 } from "@canny_ecosystem/ui/tooltip";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { Link } from "@remix-run/react";
+import { Link, useNavigate } from "@remix-run/react";
 import { DeleteSite } from "./delete-site";
 import {
   Card,
@@ -24,12 +24,18 @@ import {
   CardTitle,
 } from "@canny_ecosystem/ui/card";
 import type { SitesWithLocation } from "@canny_ecosystem/supabase/queries";
+import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
 
 export function SiteCard({
   site,
 }: {
   site: Omit<SitesWithLocation, "created_at" | "updated_at">;
 }) {
+  const navigate = useNavigate();
+
+  const viewPaySequenceSearchParam = `${modalSearchParamNames.view_pay_sequence}=true`;
+  const editPaySequenceSearchParam = `${modalSearchParamNames.edit_pay_sequence}=true`;
+
   return (
     <Card
       key={site.id}
@@ -63,6 +69,24 @@ export function SiteCard({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
               <DropdownMenuGroup>
+                <DropdownMenuItem
+                  onClick={() => {
+                    navigate(
+                      `/projects/${site.project_id}/sites/${site.id}?${viewPaySequenceSearchParam}`,
+                    );
+                  }}
+                >
+                  View Pay Sequence
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    navigate(
+                      `/projects/${site.project_id}/sites/${site.id}?${editPaySequenceSearchParam}`,
+                    );
+                  }}
+                >
+                  Edit Pay Sequence
+                </DropdownMenuItem>
                 <DropdownMenuItem
                   className={cn("py-2 text-[13px]", !site.latitude && "hidden")}
                   onClick={() => {
