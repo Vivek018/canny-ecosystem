@@ -105,7 +105,7 @@ export type Database = {
         Row: {
           company_id: string
           created_at: string | null
-          esi_number: string | null
+          esic_number: string | null
           gst_number: string | null
           lwf_number: string | null
           pan_number: string | null
@@ -117,7 +117,7 @@ export type Database = {
         Insert: {
           company_id: string
           created_at?: string | null
-          esi_number?: string | null
+          esic_number?: string | null
           gst_number?: string | null
           lwf_number?: string | null
           pan_number?: string | null
@@ -129,7 +129,7 @@ export type Database = {
         Update: {
           company_id?: string
           created_at?: string | null
-          esi_number?: string | null
+          esic_number?: string | null
           gst_number?: string | null
           lwf_number?: string | null
           pan_number?: string | null
@@ -204,45 +204,51 @@ export type Database = {
       }
       employee_addresses: {
         Row: {
-          address_line1: string
-          address_line2: string | null
+          address_line_1: string | null
+          address_line_2: string | null
           address_type: string | null
-          city: string
+          city: string | null
           country: string | null
           created_at: string | null
           employee_id: string
           id: string
           is_primary: boolean | null
-          pincode: string
-          state: string
+          latitude: number | null
+          longitude: number | null
+          pincode: string | null
+          state: string | null
           updated_at: string | null
         }
         Insert: {
-          address_line1: string
-          address_line2?: string | null
+          address_line_1?: string | null
+          address_line_2?: string | null
           address_type?: string | null
-          city: string
+          city?: string | null
           country?: string | null
           created_at?: string | null
           employee_id: string
           id?: string
           is_primary?: boolean | null
-          pincode: string
-          state: string
+          latitude?: number | null
+          longitude?: number | null
+          pincode?: string | null
+          state?: string | null
           updated_at?: string | null
         }
         Update: {
-          address_line1?: string
-          address_line2?: string | null
+          address_line_1?: string | null
+          address_line_2?: string | null
           address_type?: string | null
-          city?: string
+          city?: string | null
           country?: string | null
           created_at?: string | null
           employee_id?: string
           id?: string
           is_primary?: boolean | null
-          pincode?: string
-          state?: string
+          latitude?: number | null
+          longitude?: number | null
+          pincode?: string | null
+          state?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -257,33 +263,36 @@ export type Database = {
       }
       employee_bank_details: {
         Row: {
-          account_holder_name: string
-          account_number: string
-          bank_name: string
+          account_holder_name: string | null
+          account_number: string | null
+          account_type: string
+          bank_name: string | null
           branch_name: string | null
           created_at: string | null
           employee_id: string
-          ifsc_code: string
+          ifsc_code: string | null
           updated_at: string | null
         }
         Insert: {
-          account_holder_name: string
-          account_number: string
-          bank_name: string
+          account_holder_name?: string | null
+          account_number?: string | null
+          account_type?: string
+          bank_name?: string | null
           branch_name?: string | null
           created_at?: string | null
           employee_id: string
-          ifsc_code: string
+          ifsc_code?: string | null
           updated_at?: string | null
         }
         Update: {
-          account_holder_name?: string
-          account_number?: string
-          bank_name?: string
+          account_holder_name?: string | null
+          account_number?: string | null
+          account_type?: string
+          bank_name?: string | null
           branch_name?: string | null
           created_at?: string | null
           employee_id?: string
-          ifsc_code?: string
+          ifsc_code?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -304,15 +313,14 @@ export type Database = {
           date_of_birth: string | null
           email: string | null
           employee_id: string
-          first_name: string
+          first_name: string | null
           gender: string | null
           id: string
           is_emergency_contact: boolean | null
-          last_name: string
+          last_name: string | null
           middle_name: string | null
           mobile_number: string | null
-          occupation: string | null
-          relationship: string
+          relationship: string | null
           updated_at: string | null
         }
         Insert: {
@@ -322,15 +330,14 @@ export type Database = {
           date_of_birth?: string | null
           email?: string | null
           employee_id: string
-          first_name: string
+          first_name?: string | null
           gender?: string | null
           id?: string
           is_emergency_contact?: boolean | null
-          last_name: string
+          last_name?: string | null
           middle_name?: string | null
           mobile_number?: string | null
-          occupation?: string | null
-          relationship: string
+          relationship?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -340,15 +347,14 @@ export type Database = {
           date_of_birth?: string | null
           email?: string | null
           employee_id?: string
-          first_name?: string
+          first_name?: string | null
           gender?: string | null
           id?: string
           is_emergency_contact?: boolean | null
-          last_name?: string
+          last_name?: string | null
           middle_name?: string | null
           mobile_number?: string | null
-          occupation?: string | null
-          relationship?: string
+          relationship?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -364,42 +370,48 @@ export type Database = {
       employee_project_assignments: {
         Row: {
           assignment_type: string | null
-          billable_rate: number | null
           created_at: string | null
           employee_id: string
           end_date: string | null
           id: string
           is_current: boolean | null
           position: string
+          probation_end_date: string | null
+          probation_period: boolean | null
           project_site_id: string
+          skill_level: string | null
           start_date: string
           supervisor_id: string | null
           updated_at: string | null
         }
         Insert: {
           assignment_type?: string | null
-          billable_rate?: number | null
           created_at?: string | null
           employee_id: string
           end_date?: string | null
           id?: string
           is_current?: boolean | null
           position: string
+          probation_end_date?: string | null
+          probation_period?: boolean | null
           project_site_id: string
+          skill_level?: string | null
           start_date: string
           supervisor_id?: string | null
           updated_at?: string | null
         }
         Update: {
           assignment_type?: string | null
-          billable_rate?: number | null
           created_at?: string | null
           employee_id?: string
           end_date?: string | null
           id?: string
           is_current?: boolean | null
           position?: string
+          probation_end_date?: string | null
+          probation_period?: boolean | null
           project_site_id?: string
+          skill_level?: string | null
           start_date?: string
           supervisor_id?: string | null
           updated_at?: string | null
@@ -433,8 +445,7 @@ export type Database = {
           created_at: string | null
           employee_id: string
           id: string
-          is_primary: boolean | null
-          skill_level: string | null
+          proficiency: string
           skill_name: string
           updated_at: string | null
           years_of_experience: number | null
@@ -443,8 +454,7 @@ export type Database = {
           created_at?: string | null
           employee_id: string
           id?: string
-          is_primary?: boolean | null
-          skill_level?: string | null
+          proficiency?: string
           skill_name: string
           updated_at?: string | null
           years_of_experience?: number | null
@@ -453,8 +463,7 @@ export type Database = {
           created_at?: string | null
           employee_id?: string
           id?: string
-          is_primary?: boolean | null
-          skill_level?: string | null
+          proficiency?: string
           skill_name?: string
           updated_at?: string | null
           years_of_experience?: number | null
@@ -477,7 +486,6 @@ export type Database = {
           driving_license_number: string | null
           employee_id: string
           esic_number: string | null
-          id: string
           pan_number: string | null
           passport_expiry: string | null
           passport_number: string | null
@@ -492,7 +500,6 @@ export type Database = {
           driving_license_number?: string | null
           employee_id: string
           esic_number?: string | null
-          id?: string
           pan_number?: string | null
           passport_expiry?: string | null
           passport_number?: string | null
@@ -507,7 +514,6 @@ export type Database = {
           driving_license_number?: string | null
           employee_id?: string
           esic_number?: string | null
-          id?: string
           pan_number?: string | null
           passport_expiry?: string | null
           passport_number?: string | null
@@ -519,7 +525,7 @@ export type Database = {
           {
             foreignKeyName: "employee_statutory_details_employee_id_fkey"
             columns: ["employee_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "employees"
             referencedColumns: ["id"]
           },
@@ -571,12 +577,13 @@ export type Database = {
       }
       employees: {
         Row: {
+          company_id: string
           created_at: string | null
           date_of_birth: string
           education: string | null
           employee_code: string
           first_name: string
-          gender: string | null
+          gender: string
           id: string
           is_active: boolean | null
           last_name: string
@@ -584,17 +591,19 @@ export type Database = {
           middle_name: string | null
           nationality: string | null
           personal_email: string | null
+          photo: string | null
           primary_mobile_number: string
           secondary_mobile_number: string | null
           updated_at: string | null
         }
         Insert: {
+          company_id: string
           created_at?: string | null
           date_of_birth: string
           education?: string | null
           employee_code: string
           first_name: string
-          gender?: string | null
+          gender?: string
           id?: string
           is_active?: boolean | null
           last_name: string
@@ -602,17 +611,19 @@ export type Database = {
           middle_name?: string | null
           nationality?: string | null
           personal_email?: string | null
+          photo?: string | null
           primary_mobile_number: string
           secondary_mobile_number?: string | null
           updated_at?: string | null
         }
         Update: {
+          company_id?: string
           created_at?: string | null
           date_of_birth?: string
           education?: string | null
           employee_code?: string
           first_name?: string
-          gender?: string | null
+          gender?: string
           id?: string
           is_active?: boolean | null
           last_name?: string
@@ -620,11 +631,20 @@ export type Database = {
           middle_name?: string | null
           nationality?: string | null
           personal_email?: string | null
+          photo?: string | null
           primary_mobile_number?: string
           secondary_mobile_number?: string | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "employees_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       project_sites: {
         Row: {

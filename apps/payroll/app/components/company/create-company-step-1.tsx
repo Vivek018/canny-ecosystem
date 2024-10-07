@@ -64,7 +64,7 @@ export function CreateCompanyStep1({
           }}
           errors={fields.email_suffix.errors}
         />
-        <div className="grid grid-cols-2 grid-rows-1 place-content-center justify-between gap-16">
+        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
           <SearchableSelectField
             className="w-full capitalize flex-1"
             options={transformStringArrayIntoOptions(

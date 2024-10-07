@@ -199,7 +199,7 @@ export default function CreateProject({
                 labelProps={{ children: fields.description.name }}
                 errors={fields.description.errors}
               />
-              <div className="grid grid-cols-2 place-content-center justify-between gap-16">
+              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
                 <SearchableSelectField
                   key={resetKey + 1}
                   inputProps={{
@@ -229,7 +229,7 @@ export default function CreateProject({
                   errors={fields.end_client_id.errors}
                 />
               </div>
-              <div className="grid grid-cols-2 grid-rows-1 place-content-center justify-between gap-16">
+              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.start_date, { type: "date" }),

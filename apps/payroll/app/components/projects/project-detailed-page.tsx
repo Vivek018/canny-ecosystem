@@ -23,7 +23,7 @@ export const ProjectDetailedPage = ({
   return (
     <div className="w-full mb-4">
       <Card className="my-4 rounded w-full h-full p-4 flex flex-col lg:flex-row gap-4">
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-6">
           <div className="flex flex-row items-center justify-between">
             <Link
               prefetch="intent"
@@ -33,16 +33,14 @@ export const ProjectDetailedPage = ({
                 "bg-card shadow border hover:shadow-none",
               )}
             >
-              <Icon name="chevron-left" size="sm" className="mr-1" />
-              Back to Projects
+              <Icon name="chevron-left" size="sm" className="md:mr-1" />
+              <p className="hidden md:flex">Back to Projects</p>
             </Link>
             <div className="flex items-center gap-2">
               <Link
                 prefetch="intent"
                 to={`/${project.id}/update-project`}
-                className={cn(
-                  buttonVariants({ variant: "muted" }),
-                )}
+                className={cn(buttonVariants({ variant: "outline" }), "text-muted-foreground hover:text-muted-foreground")}
               >
                 <Icon name="edit" size="xs" className="mr-1.5" />
                 <p>Edit</p>
@@ -54,10 +52,7 @@ export const ProjectDetailedPage = ({
                 }}
                 triggerChild={
                   <DropdownMenuTrigger
-                    className={cn(
-                      buttonVariants({ variant: "muted" }),
-                      
-                    )}
+                    className={cn(buttonVariants({ variant: "muted" }))}
                   >
                     <Icon name="dots" size="xs" className="mr-1.5" />
                     <p>More Options</p>
@@ -66,7 +61,7 @@ export const ProjectDetailedPage = ({
               />
             </div>
           </div>
-          <div className="flex flex-col lg:flex-row gap-5">
+          <div className="flex flex-col lg:flex-row gap-6">
             <div>
               <div
                 className={cn(
@@ -165,7 +160,7 @@ export const ProjectDetailedPage = ({
                   ) : null}
                 </div>
               </div>
-              <div className="mt-6">
+              <div className="mt-10">
                 <h3 className="font-bold capitalize">Risk Assessment</h3>
                 <p className="text-sm">{project.risk_assessment}</p>
               </div>

@@ -84,3 +84,28 @@ export type SitePaySequenceDatabaseRow =
 export type SitePaySequenceDatabaseUpdate =
   Database["public"]["Tables"]["site_pay_sequence"]["Update"];
 
+
+// Employees
+export type EmployeeDatabaseRow = Database["public"]["Tables"]["employees"]["Row"];
+export type EmployeeDatabaseInsert = Database["public"]["Tables"]["employees"]["Insert"];
+export type EmployeeDatabaseUpdate = Database["public"]["Tables"]["employees"]["Update"];
+
+// Employee Statutory Details
+export type EmployeeStatutoryDetailsDatabaseRow = Database["public"]["Tables"]["employee_statutory_details"]["Row"];
+export type EmployeeStatutoryDetailsDatabaseInsert = Database["public"]["Tables"]["employee_statutory_details"]["Insert"];
+export type EmployeeStatutoryDetailsDatabaseUpdate = Database["public"]["Tables"]["employee_statutory_details"]["Update"];
+
+// Employee Bank Details
+export type EmployeeBankDetailsDatabaseRow = Database["public"]["Tables"]["employee_bank_details"]["Row"];
+export type EmployeeBankDetailsDatabaseInsert = Database["public"]["Tables"]["employee_bank_details"]["Insert"];
+export type EmployeeBankDetailsDatabaseUpdate = Database["public"]["Tables"]["employee_bank_details"]["Update"];
+
+// Employee Addresses
+export type EmployeeAddressDatabaseRow = Database["public"]["Tables"]["employee_addresses"]["Row"];
+export type EmployeeAddressDatabaseInsert = Database["public"]["Tables"]["employee_addresses"]["Insert"];
+export type EmployeeAddressDatabaseUpdate = Database["public"]["Tables"]["employee_addresses"]["Update"];
+
+// Employee Guardians
+export type EmployeeGuardianDatabaseRow = Database["public"]["Tables"]["employee_guardians"]["Row"];
+export type EmployeeGuardianDatabaseInsert = Database["public"]["Tables"]["employee_guardians"]["Insert"];
+export type EmployeeGuardianDatabaseUpdate = Database["public"]["Tables"]["employee_guardians"]["Update"];

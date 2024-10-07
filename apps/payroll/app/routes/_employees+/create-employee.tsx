@@ -1,10 +1,13 @@
 import {
-  CompanyRegistrationDetailsSchema,
-  CompanySchema,
+  EmployeeAddressesSchema,
+  EmployeeBankDetailsSchema,
+  EmployeeGuardiansSchema,
+  EmployeeSchema,
+  EmployeeStatutorySchema,
   isGoodStatus,
   SIZE_1MB,
 } from "@canny_ecosystem/utils";
-import { createCompany } from "@canny_ecosystem/supabase/mutations";
+import { createEmployee } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { getInitialValueFromZod } from "@canny_ecosystem/utils";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
@@ -18,27 +21,39 @@ import {
   redirect,
 } from "@remix-run/node";
 import { Card } from "@canny_ecosystem/ui/card";
-import { setCompanyId } from "@/utils/server/company.server";
 import { Fragment, useState } from "react";
 import { commitSession, getSession } from "@/utils/sessions";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { DEFAULT_ROUTE } from "@/constant";
-import { CreateCompanyStep1 } from "@/components/company/create-company-step-1";
 import { FormButtons } from "@/components/form-buttons";
-import { CreateCompanyStep2 } from "@/components/company/create-company-step-2";
-import type {  CompanyRegistrationDetailsInsert } from "@canny_ecosystem/supabase/types";
 import { useIsomorphicLayoutEffect } from "@canny_ecosystem/ui/hooks/isomorphic-layout-effect";
+import { CreateEmployeeStep1 } from "@/components/employees/create-employee-step-1";
+import { CreateEmployeeStep2 } from "@/components/employees/create-employee-step-2";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import { CreateEmployeeStep3 } from "@/components/employees/create-employee-step-3";
+import { CreateEmployeeStep4 } from "@/components/employees/create-employee-step-4";
+import type { EmployeeGuardianDatabaseInsert } from "@canny_ecosystem/supabase/types";
+import { CreateEmployeeStep5 } from "@/components/employees/create-employee-step-5";
 
-export const CREATE_COMPANY = [
-  "create-company",
-  "create-company-registration-details",
+export const CREATE_EMPLOYEE = [
+  "create-employee",
+  "create-employee-statutory-details",
+  "create-employee-bank-details",
+  "create-employee-addresses",
+  "create-employee-guardians",
 ];
 
 export const STEP = "step";
 
-const SESSION_KEY_PREFIX = "multiStepCompanyForm_step_";
+const SESSION_KEY_PREFIX = "multiStepEmployeeForm_step_";
 
-const schemas = [CompanySchema, CompanyRegistrationDetailsSchema];
+const schemas = [
+  EmployeeSchema,
+  EmployeeStatutorySchema,
+  EmployeeBankDetailsSchema,
+  EmployeeAddressesSchema,
+  EmployeeGuardiansSchema,
+];
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -48,12 +63,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const session = await getSession(request.headers.get("Cookie"));
   const stepData = await session.get(`${SESSION_KEY_PREFIX}${step}`);
 
+  const { supabase } = getSupabaseWithHeaders({ request });
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+
   if (step < 1 || step > totalSteps) {
     url.searchParams.set(STEP, "1");
     return redirect(url.toString(), { status: 302 });
   }
 
-  return json({ step, totalSteps, stepData });
+  return json({ step, totalSteps, stepData, companyId });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -77,20 +95,34 @@ export async function action({ request }: ActionFunctionArgs) {
 
   if (action === "submit") {
     if (submission.status === "success") {
-      const companyData = session.get(`${SESSION_KEY_PREFIX}1`);
-      const companyRegistrationDetails = submission.value as Omit<
-        CompanyRegistrationDetailsInsert,
-        "company_id"
+      const employeeData = session.get(`${SESSION_KEY_PREFIX}1`);
+      const employeeStatutoryDetailsData = session.get(
+        `${SESSION_KEY_PREFIX}2`,
+      );
+      const employeeBankDetailsData = session.get(`${SESSION_KEY_PREFIX}3`);
+      const employeeAddressesData = session.get(`${SESSION_KEY_PREFIX}4`);
+      const employeeGuardiansData = submission.value as Omit<
+        EmployeeGuardianDatabaseInsert,
+        "employee_id"
       >;
 
-      const { status, companyError, registrationDetailsError, id } =
-        await createCompany({
-          supabase,
-          companyData,
-          companyRegistrationDetails,
-        });
+      const {
+        status,
+        employeeError,
+        employeeStatutoryDetailsError,
+        employeeBankDetailsError,
+        employeeAddressesError,
+        employeeGuardiansError,
+      } = await createEmployee({
+        supabase,
+        employeeData,
+        employeeStatutoryDetailsData,
+        employeeBankDetailsData,
+        employeeAddressesData,
+        employeeGuardiansData,
+      });
 
-      if (companyError) {
+      if (employeeError) {
         for (let i = 1; i <= totalSteps; i++) {
           session.unset(`${SESSION_KEY_PREFIX}${i}`);
         }
@@ -100,12 +132,16 @@ export async function action({ request }: ActionFunctionArgs) {
         return redirect(url.toString(), { headers });
       }
 
-      if (registrationDetailsError) {
+      if (
+        employeeStatutoryDetailsError ||
+        employeeBankDetailsError ||
+        employeeAddressesError ||
+        employeeGuardiansError
+      ) {
         for (let i = 1; i <= totalSteps; i++) {
           session.unset(`${SESSION_KEY_PREFIX}${i}`);
         }
         const headers = new Headers();
-        headers.append("Set-Cookie", setCompanyId(id));
         headers.append("Set-Cookie", await commitSession(session));
         return redirect(DEFAULT_ROUTE, {
           headers,
@@ -117,7 +153,6 @@ export async function action({ request }: ActionFunctionArgs) {
           session.unset(`${SESSION_KEY_PREFIX}${i}`);
         }
         const headers = new Headers();
-        headers.append("Set-Cookie", setCompanyId(id));
         headers.append("Set-Cookie", await commitSession(session));
         return redirect(DEFAULT_ROUTE, {
           headers,
@@ -155,11 +190,12 @@ export async function action({ request }: ActionFunctionArgs) {
   return json({});
 }
 
-export default function CreateCompany() {
-  const { step, totalSteps, stepData } = useLoaderData<typeof loader>();
+export default function CreateEmployee() {
+  const { step, totalSteps, stepData, companyId } =
+    useLoaderData<typeof loader>();
   const [resetKey, setResetKey] = useState(Date.now());
 
-  const COMPANY_TAG = CREATE_COMPANY[step - 1];
+  const EMPLOYEE_TAG = CREATE_EMPLOYEE[step - 1];
   const currentSchema = schemas[step - 1];
   const initialValues = getInitialValueFromZod(currentSchema);
 
@@ -168,14 +204,17 @@ export default function CreateCompany() {
   }, [step]);
 
   const [form, fields] = useForm({
-    id: COMPANY_TAG,
+    id: EMPLOYEE_TAG,
     constraint: getZodConstraint(currentSchema),
     onValidate: ({ formData }: { formData: FormData }) => {
       return parseWithZod(formData, { schema: currentSchema });
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
-    defaultValue: stepData ?? initialValues,
+    defaultValue: stepData ?? {
+      ...initialValues,
+      company_id: step === 1 ? companyId : null,
+    },
   });
 
   return (
@@ -216,12 +255,27 @@ export default function CreateCompany() {
         >
           <Card>
             {step === 1 ? (
-              <CreateCompanyStep1
-                key={resetKey}
+              <CreateEmployeeStep1 key={resetKey} fields={fields as any} />
+            ) : null}
+            {step === 2 ? (
+              <CreateEmployeeStep2 key={resetKey + 1} fields={fields as any} />
+            ) : null}
+            {step === 3 ? (
+              <CreateEmployeeStep3 key={resetKey + 2} fields={fields as any} />
+            ) : null}
+            {step === 4 ? (
+              <CreateEmployeeStep4
+                key={resetKey + 3}
+                fields={fields as any}
+                resetKey={resetKey * resetKey}
+              />
+            ) : null}
+            {step === 5 ? (
+              <CreateEmployeeStep5
+                key={resetKey + 4}
                 fields={fields as any}
               />
             ) : null}
-            {step === 2 ? <CreateCompanyStep2 fields={fields as any} /> : null}
             <FormButtons
               form={form}
               setResetKey={setResetKey}

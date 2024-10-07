@@ -45,7 +45,7 @@ export async function getCompanyRegistrationDetailsByCompanyId({
   const { data, error } = await supabase
     .from("company_registration_details")
     .select(
-      "company_id, gst_number, registration_number, pan_number, pf_number, esi_number, pt_number, lwf_number",
+      "company_id, gst_number, registration_number, pan_number, pf_number, esic_number, pt_number, lwf_number",
     )
     .eq("company_id", companyId)
     .single();

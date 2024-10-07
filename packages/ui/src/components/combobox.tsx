@@ -43,7 +43,7 @@ export function Combobox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className={cn("truncate justify-between capitalize", className)}
+          className={cn("truncate justify-between capitalize", !selectedOption && "text-muted-foreground", className)}
         >
           {replaceUnderscore(
             selectedOption ? selectedOption.label : placeholder,

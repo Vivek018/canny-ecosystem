@@ -98,10 +98,10 @@ export const CompanyRegistrationDetails = ({
               />
               <Field
                 inputProps={{
-                  ...getInputProps(fields.esi_number, { type: "text" }),
-                  placeholder: `Enter ${replaceUnderscore(fields.esi_number.name)}`,
+                  ...getInputProps(fields.esic_number, { type: "text" }),
+                  placeholder: `Enter ${replaceUnderscore(fields.esic_number.name)}`,
                 }}
-                errors={fields.esi_number.errors}
+                errors={fields.esic_number.errors}
               />
               <Field
                 inputProps={{

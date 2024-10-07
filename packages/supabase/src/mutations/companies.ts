@@ -49,21 +49,18 @@ export async function createCompany({
   }
 
   if (data?.id) {
-    const { error: registrationDetailsError, status } =
+    const { error: registrationDetailsError } =
       await createCompanyRegistrationDetails({
         supabase,
         data: { company_id: data.id, ...companyRegistrationDetails },
       });
 
-    if (registrationDetailsError) {
-      console.error("registrationDetails ", registrationDetailsError);
-      return {
-        status,
-        companyError: null,
-        registrationDetailsError,
-        id: data?.id,
-      };
-    }
+    return {
+      status,
+      companyError: null,
+      registrationDetailsError,
+      id: data?.id,
+    };
   }
 
   return {
