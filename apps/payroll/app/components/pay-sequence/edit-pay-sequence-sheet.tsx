@@ -6,12 +6,12 @@ import {
   SheetTitle,
 } from "@canny_ecosystem/ui/sheet";
 import { useNavigate } from "@remix-run/react";
-import { EditPaySequenceForm } from "./edit-pay-sequence-form";
+import { EditPaySequenceForm } from "./form/edit-pay-sequence-form";
 
 export const EditPaySequenceSheet = ({
   updateValues,
-  projectId
-}: { updateValues: SitePaySequenceDatabaseUpdate, projectId: string }) => {
+  projectId,
+}: { updateValues: SitePaySequenceDatabaseUpdate; projectId: string }) => {
   const navigate = useNavigate();
 
   const handleOpenChange = () => {
@@ -24,7 +24,10 @@ export const EditPaySequenceSheet = ({
           <SheetTitle>Edit Pay Sequence</SheetTitle>
         </SheetHeader>
 
-        <EditPaySequenceForm updateValues={updateValues} projectId={projectId} />
+        <EditPaySequenceForm
+          updateValues={updateValues}
+          projectId={projectId}
+        />
       </SheetContent>
     </Sheet>
   );

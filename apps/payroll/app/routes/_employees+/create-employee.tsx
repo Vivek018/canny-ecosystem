@@ -21,19 +21,19 @@ import {
   redirect,
 } from "@remix-run/node";
 import { Card } from "@canny_ecosystem/ui/card";
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import { commitSession, getSession } from "@/utils/sessions";
-import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { DEFAULT_ROUTE } from "@/constant";
-import { FormButtons } from "@/components/form-buttons";
+import { FormButtons } from "@/components/multi-step-form/form-buttons";
 import { useIsomorphicLayoutEffect } from "@canny_ecosystem/ui/hooks/isomorphic-layout-effect";
-import { CreateEmployeeStep1 } from "@/components/employees/create-employee-step-1";
-import { CreateEmployeeStep2 } from "@/components/employees/create-employee-step-2";
+import { CreateEmployeeStep1 } from "@/components/employees/form/create-employee-step-1";
+import { CreateEmployeeStep2 } from "@/components/employees/form/create-employee-step-2";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { CreateEmployeeStep3 } from "@/components/employees/create-employee-step-3";
-import { CreateEmployeeStep4 } from "@/components/employees/create-employee-step-4";
+import { CreateEmployeeStep3 } from "@/components/employees/form/create-employee-step-3";
+import { CreateEmployeeStep4 } from "@/components/employees/form/create-employee-step-4";
 import type { EmployeeGuardianDatabaseInsert } from "@canny_ecosystem/supabase/types";
-import { CreateEmployeeStep5 } from "@/components/employees/create-employee-step-5";
+import { CreateEmployeeStep5 } from "@/components/employees/form/create-employee-step-5";
+import { FormStepHeader } from "@/components/multi-step-form/form-step-header";
 
 export const CREATE_EMPLOYEE = [
   "create-employee",
@@ -61,10 +61,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const totalSteps = schemas.length;
 
   const session = await getSession(request.headers.get("Cookie"));
-  const stepData = await session.get(`${SESSION_KEY_PREFIX}${step}`);
+  const stepData: any[] = [];
 
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+
+  for (let i = 1; i <= totalSteps; i++) {
+    stepData.push(await session.get(`${SESSION_KEY_PREFIX}${i}`));
+  }
 
   if (step < 1 || step > totalSteps) {
     url.searchParams.set(STEP, "1");
@@ -211,7 +215,7 @@ export default function CreateEmployee() {
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
-    defaultValue: stepData ?? {
+    defaultValue: stepData[step - 1] ?? {
       ...initialValues,
       company_id: step === 1 ? companyId : null,
     },
@@ -220,31 +224,11 @@ export default function CreateEmployee() {
   return (
     <section className="md:px-20 lg:px-52 2xl:px-80 py-6">
       <div className="w-full mx-auto mb-8">
-        <div className="flex items-center justify-center">
-          {[...Array(totalSteps).keys()].map((stepNumber) => (
-            <Fragment key={stepNumber}>
-              <div
-                className={cn(
-                  "grid place-items-center px-4 rounded-md",
-                  step - 1 === stepNumber
-                    ? "h-9 bg-primary text-primary-foreground"
-                    : "h-10 border border-input bg-background",
-                )}
-              >
-                <p>{stepNumber + 1}</p>
-              </div>
-
-              <div
-                className={cn(
-                  "bg-foreground/75 h-[0.5px] mx-4 w-20",
-                  stepNumber + 1 === totalSteps && "hidden",
-                )}
-              >
-                &nbsp;
-              </div>
-            </Fragment>
-          ))}
-        </div>
+        <FormStepHeader
+          totalSteps={totalSteps}
+          step={step}
+          stepData={stepData}
+        />
       </div>
       <FormProvider context={form.context}>
         <Form
@@ -271,10 +255,7 @@ export default function CreateEmployee() {
               />
             ) : null}
             {step === 5 ? (
-              <CreateEmployeeStep5
-                key={resetKey + 4}
-                fields={fields as any}
-              />
+              <CreateEmployeeStep5 key={resetKey + 4} fields={fields as any} />
             ) : null}
             <FormButtons
               form={form}

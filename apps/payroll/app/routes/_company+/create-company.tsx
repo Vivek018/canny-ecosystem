@@ -19,15 +19,15 @@ import {
 } from "@remix-run/node";
 import { Card } from "@canny_ecosystem/ui/card";
 import { setCompanyId } from "@/utils/server/company.server";
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import { commitSession, getSession } from "@/utils/sessions";
-import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { DEFAULT_ROUTE } from "@/constant";
-import { CreateCompanyStep1 } from "@/components/company/create-company-step-1";
-import { FormButtons } from "@/components/form-buttons";
-import { CreateCompanyStep2 } from "@/components/company/create-company-step-2";
-import type {  CompanyRegistrationDetailsInsert } from "@canny_ecosystem/supabase/types";
+import { CreateCompanyStep1 } from "@/components/company/form/create-company-step-1";
+import { FormButtons } from "@/components/multi-step-form/form-buttons";
+import { CreateCompanyStep2 } from "@/components/company/form/create-company-step-2";
+import type { CompanyRegistrationDetailsInsert } from "@canny_ecosystem/supabase/types";
 import { useIsomorphicLayoutEffect } from "@canny_ecosystem/ui/hooks/isomorphic-layout-effect";
+import { FormStepHeader } from "@/components/multi-step-form/form-step-header";
 
 export const CREATE_COMPANY = [
   "create-company",
@@ -46,7 +46,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const totalSteps = schemas.length;
 
   const session = await getSession(request.headers.get("Cookie"));
-  const stepData = await session.get(`${SESSION_KEY_PREFIX}${step}`);
+  const stepData: any[] = [];
+
+  for (let i = 1; i <= totalSteps; i++) {
+    stepData.push(await session.get(`${SESSION_KEY_PREFIX}${i}`));
+  }
 
   if (step < 1 || step > totalSteps) {
     url.searchParams.set(STEP, "1");
@@ -175,37 +179,17 @@ export default function CreateCompany() {
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
-    defaultValue: stepData ?? initialValues,
+    defaultValue: stepData[step - 1] ?? initialValues,
   });
 
   return (
     <section className="md:px-20 lg:px-52 2xl:px-80 py-6">
       <div className="w-full mx-auto mb-8">
-        <div className="flex items-center justify-center">
-          {[...Array(totalSteps).keys()].map((stepNumber) => (
-            <Fragment key={stepNumber}>
-              <div
-                className={cn(
-                  "grid place-items-center px-4 rounded-md",
-                  step - 1 === stepNumber
-                    ? "h-9 bg-primary text-primary-foreground"
-                    : "h-10 border border-input bg-background",
-                )}
-              >
-                <p>{stepNumber + 1}</p>
-              </div>
-
-              <div
-                className={cn(
-                  "bg-foreground/75 h-[0.5px] mx-4 w-20",
-                  stepNumber + 1 === totalSteps && "hidden",
-                )}
-              >
-                &nbsp;
-              </div>
-            </Fragment>
-          ))}
-        </div>
+        <FormStepHeader
+          totalSteps={totalSteps}
+          step={step}
+          stepData={stepData}
+        />
       </div>
       <FormProvider context={form.context}>
         <Form
@@ -216,10 +200,7 @@ export default function CreateCompany() {
         >
           <Card>
             {step === 1 ? (
-              <CreateCompanyStep1
-                key={resetKey}
-                fields={fields as any}
-              />
+              <CreateCompanyStep1 key={resetKey} fields={fields as any} />
             ) : null}
             {step === 2 ? <CreateCompanyStep2 fields={fields as any} /> : null}
             <FormButtons

@@ -21,7 +21,7 @@ export default function NoUserFound () {
           <div className="pointer-events-auto mt-6 flex flex-col mb-6">
             <Form method="POST" action="/logout">
               <Button type="submit" variant="destructive" className="w-full">
-                Sign out
+                Logout
               </Button>
             </Form>
           </div>

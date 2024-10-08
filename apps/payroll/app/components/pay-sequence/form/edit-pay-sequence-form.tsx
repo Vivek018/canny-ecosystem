@@ -18,7 +18,7 @@ import {
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { Form } from "@remix-run/react";
 import { useState } from "react";
-import { WorkingDaysField } from "./working-days-field";
+import { WorkingDaysField } from "../working-days-field";
 
 export const EDIT_PAY_SEQUENCE = "edit-pay-sequence";
 
