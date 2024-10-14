@@ -99,7 +99,7 @@ export default function CreateLocation({
   });
 
   return (
-    <section className="md:px-20 lg:px-52 2xl:px-80 py-6">
+    <section className="md:px-20 lg:px-52 2xl:px-80 py-3">
       <FormProvider context={form.context}>
         <Form method="POST" {...getFormProps(form)} className="flex flex-col">
           <Card>

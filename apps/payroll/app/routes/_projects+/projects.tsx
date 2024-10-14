@@ -1,6 +1,6 @@
 import { ProjectCard } from "@/components/projects/project-card";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { getProjectsInCompany } from "@canny_ecosystem/supabase/queries";
+import { getProjectsByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import {
@@ -19,7 +19,7 @@ import { json, Link, Outlet, useLoaderData } from "@remix-run/react";
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data, error } = await getProjectsInCompany({
+  const { data, error } = await getProjectsByCompanyId({
     supabase,
     companyId,
   });

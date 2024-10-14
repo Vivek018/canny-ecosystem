@@ -70,6 +70,7 @@
     "./avatar": "./src/components/avatar.tsx",
     "./select": "./src/components/select.tsx",
     "./progress": "./src/components/progress.tsx",
+    "./table": "./src/components/table.tsx",
     "./toggle-group": "./src/components/toggle-group.tsx",
     "./toggle": "./src/components/toggle.tsx",
     "./checkbox": "./src/components/checkbox.tsx",

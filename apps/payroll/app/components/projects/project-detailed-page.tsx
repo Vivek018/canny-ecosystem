@@ -40,7 +40,7 @@ export const ProjectDetailedPage = ({
               <Link
                 prefetch="intent"
                 to={`/${project.id}/update-project`}
-                className={cn(buttonVariants({ variant: "outline" }), "text-muted-foreground hover:text-muted-foreground")}
+                className={cn(buttonVariants({ variant: "outline" }))}
               >
                 <Icon name="edit" size="xs" className="mr-1.5" />
                 <p>Edit</p>
@@ -52,7 +52,7 @@ export const ProjectDetailedPage = ({
                 }}
                 triggerChild={
                   <DropdownMenuTrigger
-                    className={cn(buttonVariants({ variant: "muted" }))}
+                    className={cn(buttonVariants({ variant: "outline" }))}
                   >
                     <Icon name="dots" size="xs" className="mr-1.5" />
                     <p>More Options</p>

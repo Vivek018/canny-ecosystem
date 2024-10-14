@@ -1,13 +1,23 @@
-import type { RelationshipDatabaseRow, TypedSupabaseClient } from "../types";
+import type {
+  CompanyDatabaseRow,
+  CompanyRegistrationDetailsRow,
+  InferredType,
+  LocationDatabaseRow,
+  RelationshipDatabaseRow,
+  TypedSupabaseClient,
+} from "../types";
 import { HARD_QUERY_LIMIT, SINGLE_QUERY_LIMIT } from "../constant";
 
 export async function getCompanies({
   supabase,
 }: { supabase: TypedSupabaseClient }) {
+  const columns = ["id", "name"] as const;
+
   const { data, error } = await supabase
     .from("companies")
-    .select("id, name")
-    .limit(HARD_QUERY_LIMIT);
+    .select(columns.join(","))
+    .limit(HARD_QUERY_LIMIT)
+    .returns<InferredType<CompanyDatabaseRow, (typeof columns)[number]>[]>();
 
   return { data, error };
 }
@@ -15,11 +25,13 @@ export async function getCompanies({
 export async function getFirstCompany({
   supabase,
 }: { supabase: TypedSupabaseClient }) {
+  const columns = ["id", "name"] as const;
+
   const { data, error } = await supabase
     .from("companies")
-    .select("id, name")
+    .select(columns.join(","))
     .limit(SINGLE_QUERY_LIMIT)
-    .single();
+    .single<InferredType<CompanyDatabaseRow, (typeof columns)[number]>>();
 
   return { data, error };
 }
@@ -28,11 +40,20 @@ export async function getCompanyById({
   supabase,
   id,
 }: { supabase: TypedSupabaseClient; id: string }) {
+  const columns = [
+    "id",
+    "name",
+    "email_suffix",
+    "logo",
+    "company_size",
+    "company_type",
+  ] as const;
+
   const { data, error } = await supabase
     .from("companies")
-    .select("id, name, email_suffix, logo, company_size, company_type")
+    .select(columns.join(","))
     .eq("id", id)
-    .single();
+    .single<InferredType<CompanyDatabaseRow, (typeof columns)[number]>>();
 
   return { data, error };
 }
@@ -42,13 +63,24 @@ export async function getCompanyRegistrationDetailsByCompanyId({
   supabase,
   companyId,
 }: { supabase: TypedSupabaseClient; companyId: string }) {
+  const columns = [
+    "company_id",
+    "gst_number",
+    "registration_number",
+    "pan_number",
+    "pf_number",
+    "esic_number",
+    "pt_number",
+    "lwf_number",
+  ] as const;
+
   const { data, error } = await supabase
     .from("company_registration_details")
-    .select(
-      "company_id, gst_number, registration_number, pan_number, pf_number, esic_number, pt_number, lwf_number",
-    )
+    .select(columns.join(","))
     .eq("company_id", companyId)
-    .single();
+    .single<
+      InferredType<CompanyRegistrationDetailsRow, (typeof columns)[number]>
+    >();
 
   return { data, error };
 }
@@ -58,11 +90,14 @@ export async function getLocationsForSelectByCompanyId({
   supabase,
   companyId,
 }: { supabase: TypedSupabaseClient; companyId: string }) {
+  const columns = ["id", "name"] as const;
+
   const { data, error } = await supabase
     .from("company_locations")
-    .select("id, name")
+    .select(columns.join(","))
     .eq("company_id", companyId)
-    .limit(HARD_QUERY_LIMIT);
+    .limit(HARD_QUERY_LIMIT)
+    .returns<InferredType<LocationDatabaseRow, (typeof columns)[number]>[]>();
 
   return { data, error };
 }
@@ -71,13 +106,26 @@ export async function getLocationsByCompanyId({
   supabase,
   companyId,
 }: { supabase: TypedSupabaseClient; companyId: string }) {
+  const columns = [
+    "id",
+    "company_id",
+    "name",
+    "address_line_1",
+    "address_line_2",
+    "city",
+    "state",
+    "pincode",
+    "latitude",
+    "longitude",
+    "is_primary",
+  ] as const;
+
   const { data, error } = await supabase
     .from("company_locations")
-    .select(
-      "id, company_id, name, address_line_1, address_line_2, city, state, pincode, latitude, longitude, is_primary",
-    )
+    .select(columns.join(","))
     .eq("company_id", companyId)
-    .limit(HARD_QUERY_LIMIT);
+    .limit(HARD_QUERY_LIMIT)
+    .returns<InferredType<LocationDatabaseRow, (typeof columns)[number]>[]>();
 
   return { data, error };
 }
@@ -87,14 +135,26 @@ export async function getLocationById({
   id,
   companyId,
 }: { supabase: TypedSupabaseClient; id: string; companyId: string }) {
+  const columns = [
+    "id",
+    "company_id",
+    "name",
+    "address_line_1",
+    "address_line_2",
+    "city",
+    "state",
+    "pincode",
+    "latitude",
+    "longitude",
+    "is_primary",
+  ] as const;
+
   const { data, error } = await supabase
     .from("company_locations")
-    .select(
-      "id, company_id, name, address_line_1, address_line_2, city, state, pincode, latitude, longitude, is_primary",
-    )
+    .select(columns.join(","))
     .eq("id", id)
     .eq("company_id", companyId)
-    .single();
+    .single<InferredType<LocationDatabaseRow, (typeof columns)[number]>>();
 
   return { data, error };
 }
@@ -109,15 +169,25 @@ export async function getRelationshipsByCompanyId({
   supabase,
   companyId,
 }: { supabase: TypedSupabaseClient; companyId: string }) {
+  const columns = [
+    "id",
+    "parent_company_id",
+    "child_company_id",
+    "relationship_type",
+    "start_date",
+    "end_date",
+    "terms",
+    "is_active",
+    "parent_company:companies!parent_company_id (id, name)",
+    "child_company:companies!child_company_id (id, name)",
+  ] as const;
+
   const { data, error } = await supabase
     .from("company_relationships")
-    .select(
-      `id, parent_company_id, child_company_id, relationship_type, start_date, end_date, terms, is_active, parent_company:companies!parent_company_id (id, name),
-      child_company:companies!child_company_id (id, name)`,
-    )
+    .select(columns.join(","))
     .or(`parent_company_id.eq.${companyId},child_company_id.eq.${companyId}`)
-    .returns<Omit<RelationshipWithCompany, "created_at" | "updated_at">[]>()
-    .limit(HARD_QUERY_LIMIT);
+    .limit(HARD_QUERY_LIMIT)
+    .returns<Omit<RelationshipWithCompany, "created_at" | "updated_at">[]>();
 
   return { data, error };
 }
@@ -127,12 +197,22 @@ export async function getRelationshipById({
   id,
   companyId,
 }: { supabase: TypedSupabaseClient; id: string; companyId: string }) {
+  const columns = [
+    "id",
+    "parent_company_id",
+    "child_company_id",
+    "relationship_type",
+    "start_date",
+    "end_date",
+    "terms",
+    "is_active",
+    "parent_company:companies!parent_company_id (id, name)",
+    "child_company:companies!child_company_id (id, name)",
+  ] as const;
+
   const { data, error } = await supabase
     .from("company_relationships")
-    .select(
-      `id, parent_company_id, child_company_id, relationship_type, start_date, end_date, terms, is_active, parent_company:companies!parent_company_id (id, name),
-      child_company:companies!child_company_id (id, name)`,
-    )
+    .select(columns.join(","))
     .eq("id", id)
     .or(`parent_company_id.eq.${companyId},child_company_id.eq.${companyId}`)
     .single<Omit<RelationshipWithCompany, "created_at" | "updated_at">>();
@@ -145,12 +225,13 @@ export async function getRelationshipTermsById({
   id,
   companyId,
 }: { supabase: TypedSupabaseClient; id: string; companyId: string }) {
+  const columns = ["terms"] as const;
   const { data, error } = await supabase
     .from("company_relationships")
-    .select("terms")
+    .select(columns.join(","))
     .eq("id", id)
     .or(`parent_company_id.eq.${companyId},child_company_id.eq.${companyId}`)
-    .single();
+    .single<InferredType<RelationshipDatabaseRow, (typeof columns)[number]>>();
 
   return { data, error };
 }

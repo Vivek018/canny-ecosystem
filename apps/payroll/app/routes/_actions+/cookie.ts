@@ -3,6 +3,7 @@ import { safeRedirect } from "@/utils/server/http.server";
 import { setTheme } from "@/utils/server/theme.server";
 import type { Theme } from "@canny_ecosystem/types";
 import { setCompanyId } from "@/utils/server/company.server";
+import { DEFAULT_ROUTE } from "@/constant";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   return safeRedirect(request.headers.get("Referer") ?? "/", { status: 303 });
@@ -35,6 +36,6 @@ export async function action({ request }: ActionFunctionArgs) {
     return safeRedirect(formData.get("returnTo"), { headers });
   } catch (error) {
     console.error(error);
-    return safeRedirect("/", { status: 500 });
+    return safeRedirect(DEFAULT_ROUTE, { status: 500 });
   }
 }

@@ -341,6 +341,7 @@ export function JSONBField({
             type="button"
             onClick={() => removePair(index)}
             variant="destructive-outline"
+            className="px-3"
           >
             <Icon name="cross" size="md" />
           </Button>

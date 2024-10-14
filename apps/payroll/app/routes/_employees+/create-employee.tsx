@@ -158,7 +158,7 @@ export async function action({ request }: ActionFunctionArgs) {
         }
         const headers = new Headers();
         headers.append("Set-Cookie", await commitSession(session));
-        return redirect(DEFAULT_ROUTE, {
+        return redirect("/employees", {
           headers,
         });
       }

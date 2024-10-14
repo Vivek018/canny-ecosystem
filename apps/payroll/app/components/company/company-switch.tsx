@@ -1,3 +1,4 @@
+import { DEFAULT_ROUTE } from "@/constant";
 import { useCompanyId } from "@/utils/company";
 import type { CompaniesDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
@@ -27,7 +28,7 @@ export const CompanySwitch = ({
 
   const onValueChange = (value: string) => {
     submit(
-      { companyId: value, returnTo: location.pathname + location.search },
+      { companyId: value, returnTo: DEFAULT_ROUTE },
       {
         method: "POST",
         action: "/cookie",

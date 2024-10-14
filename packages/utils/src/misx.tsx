@@ -13,6 +13,7 @@ export function replaceUnderscore(str: string) {
   return str?.replaceAll("_", " ");
 }
 
+
 export const pipe =
   (...fns: any[]) =>
   (val: any) =>
@@ -105,4 +106,3 @@ export const parseStringValue = (value: string) => {
     return value;
   }
 };
-
