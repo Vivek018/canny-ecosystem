@@ -67,7 +67,7 @@ export function SiteCard({
             <DropdownMenuTrigger className="p-2 py-2 rounded-md bg-secondary grid place-items-center">
               <Icon name="dots" size="xs" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
+            <DropdownMenuContent sideOffset={10} align="end">
               <DropdownMenuGroup>
                 <DropdownMenuItem
                   onClick={() => {
@@ -131,7 +131,7 @@ export function SiteCard({
         </div>
         <div
           className={cn(
-            "px-2.5 ml-auto bg-secondary text-foreground py-1.5 text-sm tracking-wide font-sem rounded-tl-md border-foreground flex gap-1 justify-center",
+            "px-2.5 ml-auto bg-secondary text-foreground py-1.5 h-full items-center text-sm tracking-wide font-sem rounded-tl-md border-foreground flex gap-1 justify-center",
             !site.is_active && "opacity-0",
           )}
         >

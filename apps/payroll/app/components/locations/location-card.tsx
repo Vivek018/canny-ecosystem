@@ -56,7 +56,7 @@ export function LocationCard({
             <DropdownMenuTrigger className="p-2 py-2 rounded-md bg-secondary grid place-items-center">
               <Icon name="dots" size="xs" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
+            <DropdownMenuContent sideOffset={10} align="end">
               <DropdownMenuGroup>
                 <DropdownMenuItem
                   className={cn(

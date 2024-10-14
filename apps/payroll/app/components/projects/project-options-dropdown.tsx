@@ -42,7 +42,7 @@ export const ProjectOptionsDropdown = ({project, triggerChild}: {project: {
   return (
     <DropdownMenu>
       {triggerChild}
-      <DropdownMenuContent align="start">
+      <DropdownMenuContent sideOffset={10} align="end">
         <DropdownMenuGroup>
           <DropdownMenuItem
             className={cn(project.actual_end_date && "hidden")}
