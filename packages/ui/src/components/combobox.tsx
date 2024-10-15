@@ -43,7 +43,11 @@ export function Combobox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className={cn("truncate justify-between capitalize", !selectedOption && "text-muted-foreground", className)}
+          className={cn(
+            "truncate justify-between capitalize",
+            !selectedOption && "text-muted-foreground",
+            className,
+          )}
         >
           {replaceUnderscore(
             selectedOption ? selectedOption.label : placeholder,
@@ -66,9 +70,13 @@ export function Combobox({
               {options?.map((option) => (
                 <CommandItem
                   key={option.value}
-                  value={String(option.value)}
-                  onSelect={(currentValue) => {
-                    onChange(currentValue === value ? "" : currentValue);
+                  value={String(option.value + option.label)}
+                  onSelect={() => {
+                    onChange(
+                      String(option.value) === value
+                        ? ""
+                        : String(option.value),
+                    );
                     setOpen(false);
                   }}
                   className="max-w-96"

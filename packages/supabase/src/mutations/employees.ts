@@ -14,6 +14,7 @@ export async function createEmployee({
   employeeBankDetailsData,
   employeeAddressesData,
   employeeGuardiansData,
+  bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
   employeeData: EmployeeDatabaseInsert;
@@ -27,13 +28,16 @@ export async function createEmployee({
   >;
   employeeAddressesData: Omit<EmployeeAddressDatabaseInsert, "employee_id">;
   employeeGuardiansData: Omit<EmployeeGuardianDatabaseInsert, "employee_id">;
+  bypassAuth?: boolean;
 }) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user?.email) {
-    return { status: 400, error: "Unauthorized User" };
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
   }
 
   const { error, status, data } = await supabase
@@ -59,6 +63,7 @@ export async function createEmployee({
       await createEmployeeStatutoryDetails({
         supabase,
         data: { employee_id: data.id, ...employeeStatutoryDetailsData },
+        bypassAuth,
       });
 
     if (employeeStatutoryDetailsError) {
@@ -76,17 +81,20 @@ export async function createEmployee({
       {
         supabase,
         data: { employee_id: data.id, ...employeeBankDetailsData },
+        bypassAuth,
       },
     );
 
     const { error: employeeAddressesError } = await createEmployeeAddresses({
       supabase,
       data: { employee_id: data.id, ...employeeAddressesData },
+      bypassAuth,
     });
 
     const { error: employeeGuardiansError } = await createEmployeeGuardians({
       supabase,
       data: { employee_id: data.id, ...employeeGuardiansData },
+      bypassAuth,
     });
 
     return {
@@ -112,10 +120,22 @@ export async function createEmployee({
 export async function createEmployeeStatutoryDetails({
   supabase,
   data,
+  bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
   data: EmployeeStatutoryDetailsDatabaseInsert;
+  bypassAuth?: boolean;
 }) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
   const { error, status } = await supabase
     .from("employee_statutory_details")
     .insert(data)
@@ -131,10 +151,22 @@ export async function createEmployeeStatutoryDetails({
 export async function createEmployeeBankDetails({
   supabase,
   data,
+  bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
   data: EmployeeBankDetailsDatabaseInsert;
+  bypassAuth?: boolean;
 }) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
   const { error, status } = await supabase
     .from("employee_bank_details")
     .insert(data)
@@ -150,10 +182,22 @@ export async function createEmployeeBankDetails({
 export async function createEmployeeAddresses({
   supabase,
   data,
+  bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
   data: EmployeeAddressDatabaseInsert;
+  bypassAuth?: boolean;
 }) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
   const { error, status } = await supabase
     .from("employee_addresses")
     .insert(data)
@@ -169,10 +213,22 @@ export async function createEmployeeAddresses({
 export async function createEmployeeGuardians({
   supabase,
   data,
+  bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
   data: EmployeeGuardianDatabaseInsert;
+  bypassAuth?: boolean;
 }) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
   const { error, status } = await supabase
     .from("employee_guardians")
     .insert(data)

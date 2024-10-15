@@ -11,40 +11,52 @@ import type {
 export async function createProject({
   supabase,
   data,
+  bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
   data: ProjectDatabaseInsert;
+  bypassAuth?: boolean;
 }) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user?.email) {
-    return { status: 400, error: "Unauthorized User" };
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
   }
 
-  const { error, status } = await supabase.from("projects").insert(data);
+  const {
+    error,
+    status,
+    data: projectData,
+  } = await supabase.from("projects").insert(data).select().single();
 
   if (error) {
     console.error(error);
   }
 
-  return { status, error };
+  return { status, error, id: projectData?.id };
 }
 
 export async function updateProject({
   supabase,
   data,
+  bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
   data: ProjectDatabaseUpdate;
+  bypassAuth?: boolean;
 }) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user?.email) {
-    return { status: 400, error: "Unauthorized User" };
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
   }
 
   const updateData = convertToNull(data);
@@ -57,7 +69,7 @@ export async function updateProject({
     .single();
 
   if (error) {
-    console.error("error",error);
+    console.error("error", error);
   }
 
   return { status, error };
@@ -66,16 +78,20 @@ export async function updateProject({
 export async function deleteProject({
   supabase,
   id,
+  bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
   id: string;
+  bypassAuth?: boolean;
 }) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user?.email) {
-    return { status: 400, error: "Unauthorized User" };
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
   }
 
   const { error, status } = await supabase
@@ -96,16 +112,20 @@ export async function deleteProject({
 export async function createSite({
   supabase,
   data,
+  bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
   data: SiteDatabaseInsert;
+  bypassAuth?: boolean;
 }) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user?.email) {
-    return { status: 400, error: "Unauthorized User" };
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
   }
 
   const {
@@ -133,16 +153,20 @@ export async function createSite({
 export async function updateSite({
   supabase,
   data,
+  bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
   data: SiteDatabaseUpdate;
+  bypassAuth?: boolean;
 }) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user?.email) {
-    return { status: 400, error: "Unauthorized User" };
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
   }
 
   const { error, status } = await supabase
@@ -162,16 +186,20 @@ export async function updateSite({
 export async function deleteSite({
   supabase,
   id,
+  bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
   id: string;
+  bypassAuth?: boolean;
 }) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user?.email) {
-    return { status: 400, error: "Unauthorized User" };
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
   }
 
   const { error, status } = await supabase
@@ -192,16 +220,20 @@ export async function deleteSite({
 export async function updateSitePaySequence({
   supabase,
   data,
+  bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
   data: SitePaySequenceDatabaseUpdate;
+  bypassAuth?: boolean;
 }) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user?.email) {
-    return { status: 400, error: "Unauthorized User" };
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
   }
 
   const { error, status } = await supabase

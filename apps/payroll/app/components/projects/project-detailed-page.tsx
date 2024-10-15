@@ -97,10 +97,10 @@ export const ProjectDetailedPage = ({
                 <div className="flex items-center justify-between gap-4 mt-1">
                   {companies.map((company, index) => (
                     <div
-                      // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-                      key={company.id + index}
+                      key={company?.id + index.toString()}
                       className={cn(
                         "flex w-full bg-card shadow border px-2 py-2 rounded items-center gap-1.5",
+                        !company?.id && "hidden",
                       )}
                     >
                       <Avatar
@@ -125,7 +125,7 @@ export const ProjectDetailedPage = ({
                 </div>
               </div>
             </div>
-            <Card className="py-5 px-5 lg:my-0 w-full lg:w-[220%] xl:w-[160%] rounded">
+            <Card className="py-5 px-5 lg:my-0 w-full rounded">
               <h2 className="text-2xl tracking-wide font-bold pb-1.5 border-b">
                 Project Information
               </h2>

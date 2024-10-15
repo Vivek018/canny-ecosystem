@@ -16,20 +16,24 @@ export async function createCompany({
   supabase,
   companyData,
   companyRegistrationDetails,
+  bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
   companyData: CompanyDatabaseInsert;
-  companyRegistrationDetails: Omit<
+  companyRegistrationDetails?: Omit<
     CompanyRegistrationDetailsInsert,
     "company_id"
   >;
+  bypassAuth?: boolean;
 }) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user?.email) {
-    return { status: 400, error: "Unauthorized User" };
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
   }
 
   const { error, status, data } = await supabase
@@ -53,6 +57,7 @@ export async function createCompany({
       await createCompanyRegistrationDetails({
         supabase,
         data: { company_id: data.id, ...companyRegistrationDetails },
+        bypassAuth,
       });
 
     return {
@@ -74,16 +79,20 @@ export async function createCompany({
 export async function updateCompany({
   supabase,
   data,
+  bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
   data: CompanyDatabaseUpdate;
+  bypassAuth?: boolean;
 }) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user?.email) {
-    return { status: 400, error: "Unauthorized User" };
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
   }
 
   const updateData = convertToNull(data);
@@ -105,16 +114,20 @@ export async function updateCompany({
 export async function deleteCompany({
   supabase,
   id,
+  bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
   id: string;
+  bypassAuth?: boolean;
 }) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user?.email) {
-    return { status: 400, error: "Unauthorized User" };
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
   }
 
   const { error, status } = await supabase
@@ -131,20 +144,23 @@ export async function deleteCompany({
   return { status, error };
 }
 
-// Company Registration Details
 export async function createCompanyRegistrationDetails({
   supabase,
   data,
+  bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
   data: CompanyRegistrationDetailsInsert;
+  bypassAuth?: boolean;
 }) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user?.email) {
-    return { status: 400, error: "Unauthorized User" };
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
   }
 
   const { error, status } = await supabase
@@ -163,16 +179,20 @@ export async function createCompanyRegistrationDetails({
 export async function updateOrCreateCompanyRegistrationDetails({
   supabase,
   data,
+  bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
   data: CompanyRegistrationDetailsUpdate;
+  bypassAuth?: boolean;
 }) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user?.email) {
-    return { status: 400, error: "Unauthorized User" };
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
   }
 
   if (!data.company_id) {
@@ -188,6 +208,7 @@ export async function updateOrCreateCompanyRegistrationDetails({
     return await createCompanyRegistrationDetails({
       supabase,
       data: data as any,
+      bypassAuth,
     });
   }
 
@@ -207,20 +228,23 @@ export async function updateOrCreateCompanyRegistrationDetails({
   return { status, error };
 }
 
-// Company Locations
 export async function createLocation({
   supabase,
   data,
+  bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
   data: LocationDatabaseInsert;
+  bypassAuth?: boolean;
 }) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user?.email) {
-    return { status: 400, error: "Unauthorized User" };
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
   }
 
   const { error, status } = await supabase
@@ -239,16 +263,20 @@ export async function createLocation({
 export async function updateLocation({
   supabase,
   data,
+  bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
   data: LocationDatabaseUpdate;
+  bypassAuth?: boolean;
 }) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user?.email) {
-    return { status: 400, error: "Unauthorized User" };
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
   }
 
   if (!data.company_id) {
@@ -274,16 +302,20 @@ export async function updateLocation({
 export async function deleteLocation({
   supabase,
   id,
+  bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
   id: string;
+  bypassAuth?: boolean;
 }) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user?.email) {
-    return { status: 400, error: "Unauthorized User" };
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
   }
 
   const { error, status } = await supabase
@@ -300,20 +332,23 @@ export async function deleteLocation({
   return { status, error };
 }
 
-// Company Relationships
 export async function createRelationship({
   supabase,
   data,
+  bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
   data: RelationshipDatabaseInsert;
+  bypassAuth?: boolean;
 }) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user?.email) {
-    return { status: 400, error: "Unauthorized User" };
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
   }
 
   const { error, status } = await supabase
@@ -333,16 +368,20 @@ export async function createRelationship({
 export async function updateRelationship({
   supabase,
   data,
+  bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
   data: RelationshipDatabaseUpdate;
+  bypassAuth?: boolean;
 }) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user?.email) {
-    return { status: 400, error: "Unauthorized User" };
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
   }
 
   const updateData = convertToNull(data);
@@ -364,16 +403,20 @@ export async function updateRelationship({
 export async function deleteRelationship({
   supabase,
   id,
+  bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
   id: string;
+  bypassAuth?: boolean;
 }) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user?.email) {
-    return { status: 400, error: "Unauthorized User" };
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
   }
 
   const { error, status } = await supabase

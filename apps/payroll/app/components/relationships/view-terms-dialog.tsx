@@ -31,8 +31,7 @@ export const ViewRelationshipTermsDialog = ({
         </DialogHeader>
         <div className={cn("flex flex-col gap-6", !objectKeys.length && "hidden")}>
           {objectKeys.map((key, index) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-            <div key={key + index} className="flex items-center gap-2">
+            <div key={key.toString() + index.toString()} className="flex items-center gap-2">
               <Label className="font-bold">{replaceUnderscore(key)}:</Label>
               <p className="text-base">{objectValues[index]}</p>
             </div>

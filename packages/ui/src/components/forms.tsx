@@ -323,8 +323,7 @@ export function JSONBField({
         <sub className="text-primary">{isRequired ? "*" : ""}</sub>
       </div>
       {pairs.map((pair, index) => (
-        // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-        <div key={index} className="flex gap-2 mb-2">
+        <div key={index.toString()} className="flex gap-2 mb-2">
           <Input
             placeholder="Key"
             value={pair.key}

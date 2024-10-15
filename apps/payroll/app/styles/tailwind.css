@@ -5,7 +5,7 @@
 @layer base {
   :root {
     --background: 0 0% 98.5%;
-		--foreground: 0 0% 15%;
+    --foreground: 0 0% 15%;
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
@@ -30,11 +30,15 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
+
+    /* Custom scrollbar colors for light mode */
+    --scrollbar-bg: 210 40% 96.1%;
+    --scrollbar-thumb: 221.2 83.2% 53.3%;
   }
 
   .dark {
     --background: 0 0% 4%;
-		--foreground: 0 0% 85%;
+    --foreground: 0 0% 85%;
     --card: 0 0% 0%;
     --card-foreground: 210 40% 98%;
     --popover: 222.2 84% 4.9%;
@@ -58,6 +62,10 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+
+    /* Custom scrollbar colors for dark mode */
+    --scrollbar-bg: 217.2 32.6% 17.5%;
+    --scrollbar-thumb: 217.2 91.2% 59.8%;
   }
 }
 
@@ -67,26 +75,47 @@
   }
 
   input[type='date']::-webkit-calendar-picker-indicator {
-		padding: 8px;
-	}
+    padding: 8px;
+  }
 
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Custom scrollbar styles */
+  ::-webkit-scrollbar {
+    width: 30px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 2px;
+    border: 3px solid hsl(var(--scrollbar-bg));
+  }
+
+  /* For Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--scrollbar-thumb)) hsl(var(--scrollbar-bg));
+  }
 }
 
 @layer utilities {
-	/* Hide scrollbar for Chrome, Safari and Opera */
-	.no-scrollbar::-webkit-scrollbar {
-		display: none;
-	}
-	/* Hide scrollbar for IE, Edge and Firefox */
-	.no-scrollbar {
-		-ms-overflow-style: none; /* IE and Edge */
-		scrollbar-width: none; /* Firefox */
-	}
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
 
-	.input-dark {
-		color-scheme: dark;
-	}
+  .input-dark {
+    color-scheme: dark;
+  }
 }
