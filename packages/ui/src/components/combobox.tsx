@@ -65,7 +65,7 @@ export function Combobox({
           <CommandEmpty className="w-full py-6 text-center">
             No option found.
           </CommandEmpty>
-          <CommandList className="no-scrollbar">
+          <CommandList>
             <CommandGroup>
               {options?.map((option) => (
                 <CommandItem

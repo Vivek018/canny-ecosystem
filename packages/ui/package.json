@@ -67,6 +67,7 @@
     "./textarea": "./src/components/textarea.tsx",
     "./loader": "./src/components/loader.tsx",
     "./skeleton": "./src/components/skeleton.tsx",
+    "./spinner": "./src/components/spinner.tsx",
     "./avatar": "./src/components/avatar.tsx",
     "./select": "./src/components/select.tsx",
     "./progress": "./src/components/progress.tsx",

@@ -1,4 +1,4 @@
-import { formatDate } from "@canny_ecosystem/utils";
+import { formatDate, replaceDash } from "@canny_ecosystem/utils";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -76,7 +76,11 @@ export const columns: ColumnDef<EmployeeDataType>[] = [
     accessorKey: "education",
     header: "Education",
     cell: ({ row }) => {
-      return <p className="truncate w-20">{row.original?.education}</p>;
+      return (
+        <p className="truncate w-20 capitalize">
+          {replaceDash(row.original?.education ?? "")}
+        </p>
+      );
     },
   },
   {

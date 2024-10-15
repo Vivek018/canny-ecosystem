@@ -126,7 +126,12 @@ export function SiteCard({
         </div>
       </CardContent>
       <CardFooter className={cn("p-0")}>
-        <div className="border-t border-r bg-secondary rounded-tr-md text-foreground px-2.5 py-1.5">
+        <div
+          className={cn(
+            "border-t border-r bg-secondary rounded-tr-md text-foreground px-2.5 py-1.5",
+            !site.company_location?.name && "opacity-0",
+          )}
+        >
           {site.company_location?.name}
         </div>
         <div

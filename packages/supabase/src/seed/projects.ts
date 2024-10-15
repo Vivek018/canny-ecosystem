@@ -12,7 +12,7 @@ export function seedProject(): Omit<
     status: ["active", "pending", "cancelled", "completed"][
       faker.number.int({ min: 0, max: 3 })
     ],
-    start_date: faker.date.recent().toISOString(),
+    start_date: faker.date.past().toISOString(),
     estimated_end_date: faker.date.future().toISOString(),
     description: faker.lorem.paragraph(5),
     environmental_considerations: faker.lorem.paragraph(5),

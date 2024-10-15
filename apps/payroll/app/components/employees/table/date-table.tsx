@@ -5,6 +5,7 @@ import {
   TableCell,
   TableRow,
 } from "@canny_ecosystem/ui/table";
+import { Spinner } from "@canny_ecosystem/ui/spinner";
 import {
   type ColumnDef,
   type VisibilityState,
@@ -16,38 +17,73 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { DataTableHeader } from "./data-table-header";
 import { useEmployeesStore } from "@/store/employees";
+import { useInView } from "react-intersection-observer";
+import { useSearchParams } from "@remix-run/react";
+import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
+import { useSupabase } from "@canny_ecosystem/supabase/client";
+import { getEmployeesByCompanyId } from "@canny_ecosystem/supabase/queries";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  hasNextPage?: boolean;
+  count: number;
+  hasNextPage: boolean;
   hasFilters?: boolean;
-  loadMore?: () => void;
   query?: string;
-  pageSize?: number;
-  meta?: Record<string, string>;
+  pageSize: number;
   initialColumnVisibility?: VisibilityState;
+  companyId: string;
+  env: SupabaseEnv;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   query,
   data: initialData,
+  count,
   pageSize,
-  loadMore,
-  meta: pageMeta,
   hasFilters,
   hasNextPage: initialHasNextPage,
   initialColumnVisibility,
+  companyId,
+  env,
 }: DataTableProps<TData, TValue>) {
   const [data, setData] = useState(initialData);
   const [from, setFrom] = useState(pageSize);
   const [hasNextPage, setHasNextPage] = useState(initialHasNextPage);
+  const [searchParams] = useSearchParams();
+  const { supabase } = useSupabase({ env });
+
+  const { ref, inView } = useInView();
   const { rowSelection, setRowSelection, setColumns } = useEmployeesStore();
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
     initialColumnVisibility ?? {},
   );
+
+  const loadMoreEmployees = async () => {
+    const formattedFrom = from;
+    const to = formattedFrom + pageSize;
+    const sortParam = searchParams.get("sort");
+    try {
+      const { data } = await getEmployeesByCompanyId({
+        supabase,
+        companyId,
+        params: {
+          from: from,
+          to: to,
+          sort: sortParam?.split(":") as [string, "asc" | "desc"],
+        },
+      });
+      if (data) {
+        setData((prevData) => [...prevData, ...data] as TData[]);
+      }
+      setFrom(to + 1);
+      setHasNextPage(count > to);
+    } catch {
+      setHasNextPage(false);
+    }
+  };
 
   const table = useReactTable({
     data,
@@ -66,7 +102,15 @@ export function DataTable<TData, TValue>({
   }, [columnVisibility]);
 
   useEffect(() => {
+    if (inView) {
+      loadMoreEmployees();
+    }
+  }, [inView]);
+
+  useEffect(() => {
     setData(initialData);
+    setFrom(pageSize);
+    setHasNextPage(initialHasNextPage);
   }, [initialData]);
 
   return (
@@ -117,6 +161,14 @@ export function DataTable<TData, TValue>({
           )}
         </TableBody>
       </Table>
+      {hasNextPage && (
+        <div className="flex items-center justify-center mt-6" ref={ref}>
+          <div className="flex items-center space-x-2 px-6 py-5">
+            <Spinner />
+            <span className="text-sm text-[#606060]">Loading more...</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -9,7 +9,7 @@ export type SupabaseOutletContext = {
 
 type useSupabase = {
   env: SupabaseEnv;
-  session: Session | null;
+  session?: Session | null;
 };
 
 export const useSupabase = ({ env, session }: useSupabase) => {

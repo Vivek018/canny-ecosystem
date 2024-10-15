@@ -1,12 +1,8 @@
-import { MAX_QUERY_LIMIT } from "../constant";
-import type {
-  EmployeeDatabaseRow,
-  TypedSupabaseClient,
-} from "../types";
+import type { EmployeeDatabaseRow, TypedSupabaseClient } from "../types";
 
 export type GetEmployeesByCompanyIdParams = {
-  to?: number;
-  from?: number;
+  to: number;
+  from: number;
   sort?: [string, "asc" | "desc"];
   searchQuery?: string;
   filter?: {
@@ -38,7 +34,7 @@ export async function getEmployeesByCompanyId({
   companyId: string;
   params: GetEmployeesByCompanyIdParams;
 }) {
-  const { sort } = params;
+  const { sort, from, to } = params;
 
   const columns = [
     "id",
@@ -83,13 +79,19 @@ export async function getEmployeesByCompanyId({
     query.order("created_at", { ascending: false });
   }
 
-  const { data, error } = await query
-    .limit(MAX_QUERY_LIMIT)
+  const { data, count, error } = await query
+    .range(from, to)
     .returns<EmployeeDataType[]>();
 
   if (error) {
     console.error(error);
   }
 
-  return { data, error };
+  return {
+    data,
+    meta: {
+      count: count ?? data?.length,
+    },
+    error,
+  };
 }
