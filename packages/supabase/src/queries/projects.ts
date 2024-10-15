@@ -39,6 +39,7 @@ export async function getProjectsByCompanyId({
       `project_client_id.eq.${companyId},end_client_id.eq.${companyId},primary_contractor_id.eq.${companyId}`,
     )
     .limit(HARD_QUERY_LIMIT)
+    .order("created_at", { ascending: false })
     .returns<Omit<ProjectsWithCompany, "created_at" | "updated_at">[]>();
 
   return { data, error };
@@ -114,7 +115,7 @@ export async function getSitesByProjectId({
     .select(columns.join(","))
     .eq("project_id", projectId)
     .limit(HARD_QUERY_LIMIT)
-    .order("is_active", { ascending: false })
+    .order("created_at", { ascending: false })
     .returns<Omit<SitesWithLocation, "created_at" | "updated_at">[]>();
 
   return { data, error };

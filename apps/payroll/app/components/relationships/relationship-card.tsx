@@ -129,7 +129,7 @@ export function RelationshipCard({
           <h2
             className={cn(
               "capitalize p-2 border border-input rounded-md bg-muted/75",
-              !relationship?.child_company?.name && "bg-background",
+              !relationship?.child_company?.name && "bg-background text-muted-foreground",
             )}
           >
             {relationship?.child_company?.name ?? "Add Company"}

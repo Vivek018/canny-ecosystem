@@ -17,6 +17,7 @@ export async function getCompanies({
     .from("companies")
     .select(columns.join(","))
     .limit(HARD_QUERY_LIMIT)
+    .order("created_at", { ascending: false })
     .returns<InferredType<CompanyDatabaseRow, (typeof columns)[number]>[]>();
 
   return { data, error };
@@ -31,6 +32,7 @@ export async function getFirstCompany({
     .from("companies")
     .select(columns.join(","))
     .limit(SINGLE_QUERY_LIMIT)
+    .order("created_at", { ascending: false })
     .single<InferredType<CompanyDatabaseRow, (typeof columns)[number]>>();
 
   return { data, error };
@@ -97,6 +99,7 @@ export async function getLocationsForSelectByCompanyId({
     .select(columns.join(","))
     .eq("company_id", companyId)
     .limit(HARD_QUERY_LIMIT)
+    .order("created_at", { ascending: false })
     .returns<InferredType<LocationDatabaseRow, (typeof columns)[number]>[]>();
 
   return { data, error };
@@ -125,6 +128,7 @@ export async function getLocationsByCompanyId({
     .select(columns.join(","))
     .eq("company_id", companyId)
     .limit(HARD_QUERY_LIMIT)
+    .order("created_at", { ascending: false })
     .returns<InferredType<LocationDatabaseRow, (typeof columns)[number]>[]>();
 
   return { data, error };
@@ -187,6 +191,7 @@ export async function getRelationshipsByCompanyId({
     .select(columns.join(","))
     .or(`parent_company_id.eq.${companyId},child_company_id.eq.${companyId}`)
     .limit(HARD_QUERY_LIMIT)
+    .order("created_at", { ascending: false })
     .returns<Omit<RelationshipWithCompany, "created_at" | "updated_at">[]>();
 
   return { data, error };
