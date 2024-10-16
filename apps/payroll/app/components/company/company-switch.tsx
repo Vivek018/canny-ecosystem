@@ -1,82 +1,118 @@
-import { CREATE_COMPANY } from "@/routes/_company+/create-company";
+import { DEFAULT_ROUTE } from "@/constant";
 import { useCompanyId } from "@/utils/company";
 import type { CompaniesDatabaseRow } from "@canny_ecosystem/supabase/types";
+import { Avatar, AvatarFallback } from "@canny_ecosystem/ui/avatar";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectSeparator,
-  SelectTrigger,
-} from "@canny_ecosystem/ui/select";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { replaceDash } from "@canny_ecosystem/utils";
 import { Link, useLocation, useSubmit } from "@remix-run/react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@canny_ecosystem/ui/popover";
+import { Button } from "@canny_ecosystem/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@canny_ecosystem/ui/command";
+import { Icon } from "@canny_ecosystem/ui/icon";
+import { replaceUnderscore } from "@canny_ecosystem/utils";
 
 export const CompanySwitch = ({
   companies,
-  className,
-}: { companies: CompaniesDatabaseRow; className?: string }) => {
+}: {
+  companies: CompaniesDatabaseRow;
+}) => {
   const submit = useSubmit();
   const linkRef = useRef<HTMLAnchorElement | null>(null);
   const location = useLocation();
   const companyId = useCompanyId();
-  const companyName = companies.find(
-    (company) => company.id === companyId,
-  )?.name;
+  const [open, setOpen] = useState(false);
+
+  const currentCompany = companies.find((company) => company.id === companyId);
 
   const onValueChange = (value: string) => {
     submit(
-      { companyId: value, returnTo: location.pathname + location.search },
+      { companyId: value, returnTo: DEFAULT_ROUTE },
       {
         method: "POST",
         action: "/cookie",
       },
     );
+    setOpen(false);
   };
 
   return (
-    <div className={cn("flex items-center relative", className)}>
-      <Select
-        key={location.key}
-        defaultValue={companyId ?? ""}
-        onValueChange={onValueChange}
-      >
-        <SelectTrigger className="w-44 py-1.5 px-4 gap-2 rounded-full bg-secondary hover:bg-secondary/75 focus:bg-secondary/75 border-none capitalize h-10 text-sm tracking-wide">
-          <p className="truncate">{companyName}</p>
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            {companies.map((company) => (
-              <SelectItem
-                key={company.id}
-                value={company.id}
-                className="py-2 w-44"
-                onKeyDown={() => {
-                  if (companies[companies.length - 1].id === company.id) {
-                    linkRef.current?.focus();
-                  }
-                }}
-              >
-                <p className="w-44 truncate">{company.name}</p>
-              </SelectItem>
-            ))}
-            <SelectSeparator />
-            <Link
-              ref={linkRef}
-              to={`/${CREATE_COMPANY}`}
-              className={cn(
-                buttonVariants({ variant: "primary-ghost" }),
-                "w-full cursor-pointer capitalize",
-              )}
-            >
-              {replaceDash(CREATE_COMPANY)}
-            </Link>
-          </SelectGroup>
-        </SelectContent>
-      </Select>
-    </div>
+    <Popover key={location.key} open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className={cn(
+            "truncate justify-between capitalize rounded-full pl-3 pr-3 w-60 h-10 bg-secondary hover:bg-secondary/75 focus:bg-secondary/75",
+            !currentCompany && "text-muted-foreground",
+          )}
+        >
+          {currentCompany ? currentCompany.name : "Select a company"}
+          <Icon
+            name="caret-sort"
+            size="sm"
+            className="ml-2 shrink-0 opacity-50"
+          />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent sideOffset={10} align="start" className="p-0 w-64">
+        <Command>
+          <CommandInput placeholder="Search companies..." />
+          <CommandEmpty className="w-full py-6 text-center">
+            No company found.
+          </CommandEmpty>
+          <CommandList>
+            <CommandGroup>
+              {companies.map((company) => (
+                <CommandItem
+                  key={company.id}
+                  value={company.id + company.name}
+                  onSelect={() => onValueChange(company.id)}
+                  className="py-2 px-2"
+                >
+                  <div className="flex items-center gap-1.5">
+                    <Avatar className="w-8 h-8 border border-muted-foreground/30 shadow-sm">
+                      <AvatarFallback>
+                        <span className="tracking-widest capitalize text-xs ml-[1.5px]">
+                          {company.name.charAt(0)}
+                        </span>
+                      </AvatarFallback>
+                    </Avatar>
+                    <p className="font-medium tracking-wide ml-1 truncate w-40">
+                      {replaceUnderscore(company.name)}
+                    </p>
+                  </div>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+        <div className="p-2 border-t">
+          <Link
+            ref={linkRef}
+            to="/create-company"
+            className={cn(
+              buttonVariants({ variant: "primary-ghost" }),
+              "w-full cursor-pointer capitalize",
+            )}
+            onClick={() => setOpen(false)}
+          >
+            Create Company
+          </Link>
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 };

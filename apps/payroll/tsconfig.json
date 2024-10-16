@@ -3,7 +3,9 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./app/*"]
+      "@/*": [
+        "./app/*"
+      ]
     },
     "strict": true
   },
@@ -11,7 +13,9 @@
     "**/*.ts",
     "**/*.tsx",
     "tailwind.config.ts",
-    "../../packages/ui/src/components/user-menu.tsx"
-, "types/index.d.ts", "app/routes/_projects+/projects+/$projectId.tsx"  ],
-  "exclude": ["node_modules"]
+    "types/index.d.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

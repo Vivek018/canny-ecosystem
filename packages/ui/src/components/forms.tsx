@@ -1,12 +1,16 @@
 import { useInputControl } from "@conform-to/react";
 import type React from "react";
-import { useId } from "react";
+import { useId, useState } from "react";
 import { Checkbox, type CheckboxProps } from "./checkbox";
 import { Input } from "./input";
 import { Label } from "./label";
 import { Textarea } from "./textarea";
 import { cn } from "@/utils";
 import { Combobox, type ComboboxSelectOption } from "./combobox";
+import { Button } from "./button";
+import { parseStringValue } from "@canny_ecosystem/utils";
+import { useIsomorphicLayoutEffect } from "@/hooks/isomorphic-layout-effect";
+import { Icon } from "./icon";
 
 export type ListOfErrors = Array<string | null | undefined> | null | undefined;
 
@@ -102,6 +106,8 @@ export function TextareaField({
   );
 }
 
+// BUG: when default value is true in schema, it is not changing back to false when unchecked, if the default is false, its working properly
+// BUG UPDATE: it only works when the default value is false, it is not working in any other case
 export function CheckboxField({
   labelProps,
   buttonProps,
@@ -169,7 +175,7 @@ export function CheckboxField({
 
 type SearchableSelectFieldProps = {
   options: ComboboxSelectOption[];
-  labelProps: React.LabelHTMLAttributes<HTMLLabelElement>;
+  labelProps?: React.LabelHTMLAttributes<HTMLLabelElement>;
   inputProps: React.InputHTMLAttributes<HTMLInputElement>;
   errors?: ListOfErrors;
   className?: string;
@@ -214,10 +220,157 @@ export function SearchableSelectField({
         options={options}
         value={input.value ?? ""}
         onChange={input.change}
-        placeholder={placeholder}
+        placeholder={placeholder ?? inputProps.placeholder}
       />
       <div className="min-h-[32px] px-4 pb-3 pt-1">
         {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
+      </div>
+    </div>
+  );
+}
+
+type JSONBFieldProps = {
+  labelProps: React.LabelHTMLAttributes<HTMLLabelElement>;
+  inputProps: React.InputHTMLAttributes<HTMLInputElement>;
+  errors?: string[];
+  className?: string;
+};
+
+export function JSONBField({
+  labelProps,
+  inputProps,
+  errors,
+  className,
+}: JSONBFieldProps) {
+  const fallbackId = useId();
+  const id = inputProps.id ?? fallbackId;
+  const isRequired = inputProps.required;
+
+  const [pairs, setPairs] = useState<{ key: string; value: string }[]>([
+    { key: "", value: "" },
+  ]);
+
+  useIsomorphicLayoutEffect(() => {
+    try {
+      const parsedValue = JSON.parse(
+        inputProps.defaultValue?.toString() || "{}",
+      );
+      const initialPairs = Object.entries(parsedValue).map(([key, value]) => ({
+        key,
+        value: String(value),
+      }));
+      setPairs(
+        initialPairs.length > 0 ? initialPairs : [{ key: "", value: "" }],
+      );
+    } catch (error) {
+      console.error("Failed to parse JSONB value:", error);
+    }
+  }, [inputProps.defaultValue]);
+
+  const updateJSONBValue = (newPairs: { key: string; value: string }[]) => {
+    const jsonbValue = newPairs.reduce(
+      (acc, { key, value }) => {
+        if (key) {
+          try {
+            acc[key] = parseStringValue(value);
+          } catch {
+            acc[key] = value;
+          }
+        }
+        return acc;
+      },
+      {} as Record<string, any>,
+    );
+    const event = {
+      target: {
+        name: inputProps.name,
+        value: JSON.stringify(jsonbValue),
+      },
+    } as React.ChangeEvent<HTMLInputElement>;
+    inputProps?.onChange?.(event);
+  };
+
+  const handleKeyChange = (index: number, newKey: string) => {
+    const newPairs = [...pairs];
+    newPairs[index].key = newKey;
+    setPairs(newPairs);
+    updateJSONBValue(newPairs);
+  };
+
+  const handleValueChange = (index: number, newValue: string) => {
+    const newPairs = [...pairs];
+    newPairs[index].value = newValue;
+    setPairs(newPairs);
+    updateJSONBValue(newPairs);
+  };
+
+  const addPair = () => {
+    const newPairs = [...pairs, { key: "", value: "" }];
+    setPairs(newPairs);
+    updateJSONBValue(newPairs);
+  };
+
+  const removePair = (index: number) => {
+    const newPairs = pairs.filter((_, i) => i !== index);
+    setPairs(newPairs);
+    updateJSONBValue(newPairs);
+  };
+
+  return (
+    <div className={cn("w-full flex flex-col gap-1.5", className)}>
+      <div className="flex">
+        <Label htmlFor={inputProps.id} {...labelProps} />
+        <sub className="text-primary">{isRequired ? "*" : ""}</sub>
+      </div>
+      {pairs.map((pair, index) => (
+        <div key={index.toString()} className="flex gap-2 mb-2">
+          <Input
+            placeholder="Key"
+            value={pair.key}
+            onChange={(e) => handleKeyChange(index, e.target.value)}
+            className="flex-1"
+          />
+          <Input
+            placeholder="Value"
+            value={pair.value}
+            onChange={(e) => handleValueChange(index, e.target.value)}
+            className="flex-1"
+          />
+          <Button
+            type="button"
+            onClick={() => removePair(index)}
+            variant="destructive-outline"
+            className="px-3"
+          >
+            <Icon name="cross" size="md" />
+          </Button>
+        </div>
+      ))}
+      <Button
+        type="button"
+        onClick={addPair}
+        variant="primary-outline"
+        className="mt-2"
+      >
+        Add Key-Value Pair
+      </Button>
+      <input
+        {...inputProps}
+        type="hidden"
+        id={id}
+        defaultValue={undefined}
+        value={JSON.stringify(
+          pairs.reduce(
+            (acc, { key, value }) => {
+              if (key) acc[key] = parseStringValue(value);
+              return acc;
+            },
+            {} as Record<string, string>,
+          ),
+        )}
+      />
+      <div className="min-h-[28px] px-4 pb-4 pt-1">
+        {errors && errors.length > 0 ? <ErrorList errors={errors} /> : null}
       </div>
     </div>
   );

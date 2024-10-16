@@ -7,10 +7,9 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@canny_ecosystem/ui/dropdown-menu";
-import { SignOut } from "./auth/sign-out";
+import { Logout } from "./auth/logout";
 import type { UserDatabaseRow } from "@canny_ecosystem/supabase/types";
 
 export function UserMenu({
@@ -19,7 +18,7 @@ export function UserMenu({
   Link,
 }: {
   onlySignOut?: boolean;
-  userData: UserDatabaseRow;
+  userData: Omit<UserDatabaseRow, "created_at" | "updated_at">;
   Link: React.ElementType;
 }) {
   return (
@@ -63,16 +62,22 @@ export function UserMenu({
             <DropdownMenuSeparator />
 
             <DropdownMenuGroup>
-              <Link prefetch="render" to="/settings/account">
-                <DropdownMenuItem>
-                  Account
-                  <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-                </DropdownMenuItem>
+              <Link prefetch="render" to="/account">
+                <DropdownMenuItem>Account</DropdownMenuItem>
+              </Link>
+              <Link prefetch="render" to="/account/help">
+                <DropdownMenuItem>Help</DropdownMenuItem>
+              </Link>
+              <Link prefetch="render" to="/account/feedback">
+                <DropdownMenuItem>Feedback</DropdownMenuItem>
               </Link>
             </DropdownMenuGroup>
           </>
         )}
-        <SignOut />
+
+        <DropdownMenuSeparator />
+
+        <Logout />
       </DropdownMenuContent>
     </DropdownMenu>
   );

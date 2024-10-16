@@ -1,25 +1,46 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { getProjectByIdQuery } from "@canny_ecosystem/supabase/queries";
+import {
+  getCompanies,
+  getProjectById,
+} from "@canny_ecosystem/supabase/queries";
 import { json, useLoaderData } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
 import { safeRedirect } from "@/utils/server/http.server";
 import { updateProject } from "@canny_ecosystem/supabase/mutations";
 import { isGoodStatus, ProjectSchema } from "@canny_ecosystem/utils";
 import CreateProject from "./create-project";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
 export const UPDATE_PROJECT = "update-project";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const projectId = params.projectId;
   const { supabase } = getSupabaseWithHeaders({ request });
+
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+
   let data = null;
 
   if (projectId) {
-    data = (await getProjectByIdQuery({ supabase, id: projectId })).data;
+    data = (await getProjectById({ supabase, id: projectId, companyId })).data;
   }
 
-  return json({ data });
+  const { data: companies, error } = await getCompanies({ supabase });
+
+  if (error) {
+    throw error;
+  }
+
+  if (!companies) {
+    throw new Error("No companies found");
+  }
+
+  const companyOptions = companies
+    .filter((company) => company.id !== companyId)
+    .map((company) => ({ label: company.name, value: company.id }));
+
+  return json({ data, companyOptions });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -49,6 +70,11 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function UpdateProject() {
-  const { data } = useLoaderData<typeof loader>();
-  return <CreateProject updateValues={data} />;
+  const { data, companyOptions } = useLoaderData<typeof loader>();
+  return (
+    <CreateProject
+      updateValues={data}
+      companyOptionsFromUpdate={companyOptions}
+    />
+  );
 }

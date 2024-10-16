@@ -11,6 +11,7 @@ import {
 } from "./command";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { Icon } from "./icon";
+import { replaceUnderscore } from "@canny_ecosystem/utils";
 
 export interface ComboboxSelectOption {
   value: string | number;
@@ -42,9 +43,15 @@ export function Combobox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className={cn("truncate justify-between capitalize", className)}
+          className={cn(
+            "truncate justify-between capitalize",
+            !selectedOption && "text-muted-foreground",
+            className,
+          )}
         >
-          {selectedOption ? selectedOption.label : placeholder}
+          {replaceUnderscore(
+            selectedOption ? selectedOption.label : placeholder,
+          )}
           <Icon
             name="caret-sort"
             size="sm"
@@ -58,14 +65,18 @@ export function Combobox({
           <CommandEmpty className="w-full py-6 text-center">
             No option found.
           </CommandEmpty>
-          <CommandList className="no-scrollbar">
+          <CommandList>
             <CommandGroup>
               {options?.map((option) => (
                 <CommandItem
                   key={option.value}
-                  value={String(option.value)}
-                  onSelect={(currentValue) => {
-                    onChange(currentValue === value ? "" : currentValue);
+                  value={String(option.value + option.label)}
+                  onSelect={() => {
+                    onChange(
+                      String(option.value) === value
+                        ? ""
+                        : String(option.value),
+                    );
                     setOpen(false);
                   }}
                   className="max-w-96"
@@ -78,7 +89,9 @@ export function Combobox({
                       value === option.value ? "opacity-100" : "opacity-0",
                     )}
                   />
-                  <p className="truncate">{option.label}</p>
+                  <p className="truncate capitalize">
+                    {replaceUnderscore(option.label)}
+                  </p>
                 </CommandItem>
               ))}
             </CommandGroup>

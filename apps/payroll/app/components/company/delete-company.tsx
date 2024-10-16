@@ -64,7 +64,7 @@ export const DeleteCompany = ({ companyId }: { companyId: string }) => {
           platform.
         </CardDescription>
       </CardHeader>
-      <CardFooter className="flex justify-between">
+      <CardFooter className="border-t pt-6 flex justify-between">
         <div>This action is not reversible — please continue with caution.</div>
         <AlertDialog>
           <AlertDialogTrigger asChild>

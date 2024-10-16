@@ -37,5 +37,5 @@ export async function loader({ request }: LoaderFunctionArgs) {
   }
 
   // If we reach here, something went wrong
-  return safeRedirect("/sign-in?error=auth_callback_failed", { headers });
+  return safeRedirect("/login?error=auth_callback_failed", { headers });
 }

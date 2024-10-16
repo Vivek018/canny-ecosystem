@@ -1,10 +1,4 @@
-import type { ProjectDatabaseRow } from "@canny_ecosystem/supabase/types";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
@@ -14,56 +8,138 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@canny_ecosystem/ui/tooltip";
-import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { Link, useNavigate } from "@remix-run/react";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@canny_ecosystem/ui/card";
+import { Link } from "@remix-run/react";
+import { Card, CardContent, CardTitle } from "@canny_ecosystem/ui/card";
+import type { ProjectsWithCompany } from "@canny_ecosystem/supabase/queries";
 import { Avatar, AvatarFallback } from "@canny_ecosystem/ui/avatar";
-import { getAutoTimeDifference } from "@canny_ecosystem/utils";
-import { DeleteProject } from "./delete-project";
-import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { Progress } from "@canny_ecosystem/ui/progress";
+import {
+  getAutoTimeDifference,
+
+} from "@canny_ecosystem/utils";
+import { ProjectOptionsDropdown } from "./project-options-dropdown";
 
 export function ProjectCard({
   project,
 }: {
-  project: Omit<ProjectDatabaseRow, "created_at" | "company_id">;
+  project: Omit<
+    ProjectsWithCompany,
+    "created_at" | "updated_at"
+  >;
 }) {
-  const navigate = useNavigate();
 
-  const avatarName = project?.name
-    ?.split(" ")
-    .map((name, index) => (index < 2 ? name.charAt(0).toUpperCase() : ""))
-    .join("");
-
-  const editPaySequenceSearchParam = `${modalSearchParamNames.edit_pay_sequence}=true`;
+  const companies = [
+    project?.project_client,
+    project?.primary_contractor,
+    project?.end_client,
+  ];
 
   return (
     <Card
       key={project.id}
-      className="w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-between"
+      className="w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start"
     >
-      <CardHeader className="flex flex-row space-y-0 items-start justify-between p-4">
-        <Avatar className="rounded-md w-16 h-16">
-          {project?.image && (
-            <img
-              src={project?.image}
-              alt={project?.name}
-              width={32}
-              height={32}
+      <CardContent className="flex flex-row gap-0.5 justify-between items-center p-4">
+        <div className="flex items-center flex-1 gap-10 justify-between pr-12">
+          <CardTitle className="text-xl tracking-wide">
+            <Link
+              prefetch="intent"
+              to={`${project?.id}`}
+              className="truncate max-w-96 font-bold text-wrap line-clamp-2 hover:text-primary"
+            >
+              {project.name}
+            </Link>
+            <div className="flex items-center gap-1.5">
+              <p className="text-[11px] bg-muted-foreground w-max text-muted px-1.5 mt-1.5 rounded-md">
+                {project.status}
+              </p>
+              <p className="text-[11px] bg-muted w-max text-muted-foreground px-1.5 mt-1.5 rounded-md">
+                {project.project_type}
+              </p>
+            </div>
+          </CardTitle>
+          <div className="flex flex-col items-center gap-1">
+            <TooltipProvider>
+              <div className="flex items-center">
+                {companies.map((company, index) =>
+                  company?.id ? (
+                    <Tooltip key={company?.id} delayDuration={100}>
+                      <TooltipTrigger asChild>
+                        <Avatar
+                          className={cn(
+                            "w-12 h-12 border border-muted-foreground/30 shadow-sm hover:z-40",
+                            index !== 0 && "-ml-[18px]",
+                          )}
+                        >
+                          {company?.logo && (
+                            <img src={company?.logo} alt={company?.name} />
+                          )}
+                          <AvatarFallback>
+                            <span className="tracking-widest text-sm">
+                              {company?.name.charAt(0)}
+                            </span>
+                          </AvatarFallback>
+                        </Avatar>
+                      </TooltipTrigger>
+                      <TooltipContent>{company?.name}</TooltipContent>
+                    </Tooltip>
+                  ) : null,
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Companies Involved
+              </p>
+            </TooltipProvider>
+          </div>
+          <div
+            className={cn("flex flex-col", project.actual_end_date && "hidden")}
+          >
+            <Progress
+              value={
+                (getAutoTimeDifference(project.start_date, new Date())! /
+                  getAutoTimeDifference(
+                    project.start_date,
+                    project.estimated_end_date,
+                  )!) *
+                100
+              }
+              className="w-80"
             />
-          )}
-          <AvatarFallback className="rounded-md">
-            <span className="tracking-widest text-[17px] font-medium">
-              {avatarName}
-            </span>
-          </AvatarFallback>
-        </Avatar>
-        <div className="flex items-center gap-3">
+            <p
+              className={cn(
+                "text-xs text-muted-foreground ml-auto mt-1",
+                getAutoTimeDifference(new Date(), project.estimated_end_date)! <
+                  0 && "hidden",
+              )}
+            >
+              {getAutoTimeDifference(new Date(), project.estimated_end_date)}{" "}
+              days remaining
+            </p>
+          </div>
+          <div
+            className={cn(
+              "flex flex-col",
+              !project.actual_end_date && "hidden",
+            )}
+          >
+            <Progress value={100} className="w-80" />
+            <p
+              className={cn(
+                "text-xs text-muted-foreground ml-auto mt-1",
+                !project.actual_end_date && "hidden",
+              )}
+            >
+              Took{" "}
+              {getAutoTimeDifference(
+                project.start_date,
+                project.actual_end_date,
+              )}{" "}
+              days
+            </p>
+          </div>
+        </div>
+        <div className="flex flex-col items-center gap-4">
           <TooltipProvider>
             <Tooltip delayDuration={100}>
               <TooltipTrigger asChild>
@@ -77,81 +153,19 @@ export function ProjectCard({
               <TooltipContent>Edit</TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          <DropdownMenu>
-            <DropdownMenuTrigger className="p-2 py-2 rounded-md bg-secondary grid place-items-center border-foreground">
-              <Icon name="dots" size="xs" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
-              <DropdownMenuGroup>
-                <DropdownMenuItem
-                  onClick={() => {
-                    navigate(
-                      `/projects/${project.id}?${editPaySequenceSearchParam}`,
-                    );
-                  }}
-                >
-                  View Pay Sequence
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => {
-                    navigate(
-                      `/projects/${project.id}?${editPaySequenceSearchParam}`,
-                    );
-                  }}
-                >
-                  Edit Pay Sequence
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DeleteProject projectId={project.id} />
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <ProjectOptionsDropdown
+            project={{
+              id: project.id,
+              actual_end_date: project.actual_end_date,
+            }}
+            triggerChild={
+              <DropdownMenuTrigger className="p-2 py-2 rounded-md bg-secondary grid place-items-center border-foreground">
+                <Icon name="dots" size="xs" />
+              </DropdownMenuTrigger>
+            }
+          />
         </div>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-0.5 px-4">
-        <CardTitle className="text-lg tracking-wide -mt-1.5">
-          {project.name}
-        </CardTitle>
-        <p className="mt-2">{project.description}</p>
       </CardContent>
-      <CardFooter
-        className={cn(
-          "mx-4 mb-1.5 p-0 py-1.5 text-foreground text-xs flex gap-1 justify-between font-semibold",
-        )}
-      >
-        <p
-          className={cn(
-            "text-green bg-green/25 rounded-md p-1 flex items-center gap-1 capitalize",
-          )}
-        >
-          <Icon name="clock" size="xs" className=" scale-x-[-1]" />
-          {getAutoTimeDifference(
-            project.starting_date,
-            new Date().toISOString(),
-          )}{" "}
-          days ago
-        </p>
-        <p
-          className={cn(
-            "text-destructive bg-destructive/25 rounded-md flex items-center gap-1 p-1 capitalize",
-            !getAutoTimeDifference(
-              new Date().toISOString(),
-              project.ending_date,
-            ) && "hidden",
-          )}
-        >
-          <Icon name="clock" size="xs" />
-          {getAutoTimeDifference(
-            new Date().toISOString(),
-            project.ending_date,
-          )! > 0
-            ? ` In ${getAutoTimeDifference(new Date().toISOString(), project.ending_date)} Days`
-            : `${getAutoTimeDifference(
-                project.starting_date,
-                new Date().toISOString(),
-              )} days ago`}
-        </p>
-      </CardFooter>
     </Card>
   );
 }

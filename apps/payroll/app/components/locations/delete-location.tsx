@@ -38,7 +38,7 @@ export const DeleteLocation = ({ locationId }: { locationId: string }) => {
         {},
         {
           method: "post",
-          action: `/${locationId}/delete-location`,
+          action: `/settings/${locationId}/delete-location`,
           replace: true,
         },
       );
@@ -91,6 +91,7 @@ export const DeleteLocation = ({ locationId }: { locationId: string }) => {
           <AlertDialogAction
             className={cn(buttonVariants({ variant: "destructive" }))}
             onClick={handleDeleteLocation}
+            onSelect={handleDeleteLocation}
           >
             {isLoading ? "Deleting..." : "Delete"}
           </AlertDialogAction>
