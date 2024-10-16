@@ -243,7 +243,7 @@ export const educationArray = [
   "12th",
   "diploma",
   "graduate",
-  "postgraduate",
+  "post-graduate",
 ] as const;
 
 export const EmployeeSchema = z.object({

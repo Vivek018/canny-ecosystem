@@ -13,11 +13,15 @@ import {
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
 import { formatISO } from "date-fns";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useSearchParams, useSubmit } from "@remix-run/react";
 import { Calendar } from "@canny_ecosystem/ui/calendar";
-import { educationArray, genderArray } from "@canny_ecosystem/utils";
+import {
+  educationArray,
+  genderArray,
+  replaceDash,
+} from "@canny_ecosystem/utils";
 import type { EmployeeFilters } from "@canny_ecosystem/supabase/queries";
 import { useIsDocument } from "@canny_ecosystem/ui/hooks/is-document";
 
@@ -35,10 +39,7 @@ export function EmployeesSearchFilter() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
 
-  const { isDocument } = useIsDocument();
   const [searchParams, setSearchParams] = useSearchParams();
-  const submit = useSubmit();
-
   const filters: EmployeeFilters = {
     start: searchParams.get("start") ?? undefined,
     end: searchParams.get("end") ?? undefined,
@@ -46,6 +47,19 @@ export function EmployeesSearchFilter() {
     gender: searchParams.get("gender") ?? undefined,
     status: searchParams.get("status") ?? undefined,
   };
+  const [filterParams, setFilterParams] = useState(filters);
+
+  const { isDocument } = useIsDocument();
+  const submit = useSubmit();
+
+  useEffect(() => {
+    for (const [key, value] of Object.entries(filterParams)) {
+      if (value !== null && value !== undefined && String(value)?.length) {
+        searchParams.set(key, value);
+        setSearchParams(searchParams);
+      }
+    }
+  }, [filterParams]);
 
   useHotkeys(
     "esc",
@@ -183,10 +197,9 @@ export function EmployeesSearchFilter() {
                         : String(filters.start),
                       end: range.to
                         ? formatISO(range.to, { representation: "date" })
-                        : '',
+                        : "",
                     };
-
-                    setSearchParams(newRange);
+                    setFilterParams((prev) => ({ ...prev, ...newRange }));
                   }}
                 />
               </DropdownMenuSubContent>
@@ -209,14 +222,15 @@ export function EmployeesSearchFilter() {
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
                     className="capitalize"
-                    checked={filters?.education?.includes(name)}
+                    checked={filters?.education === name}
                     onCheckedChange={() => {
-                      setSearchParams({
+                      setFilterParams((prev) => ({
+                        ...prev,
                         education: name,
-                      });
+                      }));
                     }}
                   >
-                    {name}
+                    {replaceDash(name)}
                   </DropdownMenuCheckboxItem>
                 ))}
               </DropdownMenuSubContent>
@@ -241,9 +255,10 @@ export function EmployeesSearchFilter() {
                     className="capitalize"
                     checked={filters?.gender?.includes(name)}
                     onCheckedChange={() => {
-                      setSearchParams({
+                      setFilterParams((prev) => ({
+                        ...prev,
                         gender: name,
-                      });
+                      }));
                     }}
                   >
                     {name}
@@ -271,9 +286,10 @@ export function EmployeesSearchFilter() {
                     className="capitalize"
                     checked={filters?.status?.includes(name)}
                     onCheckedChange={() => {
-                      setSearchParams({
+                      setFilterParams((prev) => ({
+                        ...prev,
                         status: name,
-                      });
+                      }));
                     }}
                   >
                     {name}

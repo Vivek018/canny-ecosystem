@@ -1,7 +1,11 @@
 import type { EmployeeFilters } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import { formatDate, formatDateRange, replaceDash } from "@canny_ecosystem/utils";
+import {
+  formatDate,
+  formatDateRange,
+  replaceDash,
+} from "@canny_ecosystem/utils";
 import { useSearchParams } from "@remix-run/react";
 
 export type EmployeeFilterList = EmployeeFilters & {
@@ -45,6 +49,9 @@ export function FilterList({ filterList }: Props) {
   };
 
   const handleOnRemove = (key: string) => {
+    if (key === "start" && filterList?.end) {
+      searchParams.delete("end");
+    }
     searchParams.delete(key);
     setSearchParams(searchParams);
   };
@@ -66,9 +73,9 @@ export function FilterList({ filterList }: Props) {
                 >
                   <Icon
                     name="cross"
-                    className="scale-0 group-hover:scale-100 transition-all w-0 capitalize group-hover:w-4"
+                    className="scale-0 group-hover:scale-100 transition-all w-0 group-hover:w-4"
                   />
-                  <span>
+                  <span className="capitalize">
                     {renderFilter({
                       key,
                       value,
