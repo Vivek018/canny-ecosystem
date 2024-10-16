@@ -123,7 +123,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const searchParams = new URLSearchParams();
   for (const [key, value] of Object.entries(validatedContent) as any) {
-    if (String(value)?.length) {
+    if (value !== null && value !== undefined && String(value)?.length) {
       searchParams.append(key, value.toString());
     }
   }
