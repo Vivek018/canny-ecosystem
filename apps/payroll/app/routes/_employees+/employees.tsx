@@ -101,8 +101,8 @@ export async function action({ request }: ActionFunctionArgs) {
                     Rules:
                     - Use only the valid filter names provided
                     - Interpret the input intelligently to map to appropriate filters
-                    - For education, map terms like "graduate", "undergraduate", etc. to appropriate values
-                    - For status, interpret terms like "active", "inactive", "on leave", etc.
+                    - For gender, education, map terms like "graduate", "under graduate" to "graduate","under-graduate", etc.(add - inplace of space) to appropriate values
+                    - For status, interpret terms like "active" and "inactive".
                     - Use date ranges for 'start' and 'end' when appropriate
                     - Return a single JSON object with string key-value pairs
                     - Omit filters with empty or unclear values`,
