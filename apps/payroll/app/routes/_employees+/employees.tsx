@@ -56,7 +56,7 @@ export default function Employees() {
   return (
     <section className="py-[22px]">
       <div className="flex items-center justify-between pb-4">
-        <p>Search</p>
+        <p>Search Employees</p>
         <EmployeesActions isEmpty={!data?.length} />
       </div>
       <DataTable
