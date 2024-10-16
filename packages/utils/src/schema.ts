@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { isValid, z } from "zod";
 
 export { z };
 
@@ -81,6 +81,12 @@ export const zFile = z
         : true,
     "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .docx formats are supported.",
   );
+
+export const parseDateSchema = z
+  .date()
+  .transform((value) => new Date(value))
+  .transform((v: any) => isValid(v))
+  .refine((v) => !!v, { message: "Invalid date" });
 
 // Theme
 export const themes = ["light", "dark", "system"] as const;
@@ -247,9 +253,9 @@ export const EmployeeSchema = z.object({
   last_name: zString.min(3),
   employee_code: zNumberString.min(3),
   photo: zImage.optional(),
+  marital_status: zString.min(3).optional(),
   date_of_birth: z.string(),
   gender: z.enum(genderArray).default("male"),
-  marital_status: zString.min(3).optional(),
   education: z.enum(educationArray).optional(),
   is_active: z.boolean().default(false),
   primary_mobile_number: zNumber.min(10).max(10),

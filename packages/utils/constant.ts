@@ -7,7 +7,7 @@ export const modalSearchParamNames = {
   // Pay Sequence
   view_pay_sequence: "view-pay-sequence",
   edit_pay_sequence: "edit-pay-sequence",
-}
+};
 
 export const statesAndUTs = [
   { value: "andhra_pradesh", label: "Andhra Pradesh" },

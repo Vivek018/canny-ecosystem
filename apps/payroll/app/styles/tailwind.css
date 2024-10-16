@@ -84,17 +84,21 @@
 
   /* Custom scrollbar styles */
   ::-webkit-scrollbar {
-    width: 30px;
+    width: 6px;
+    opacity: 70%;
   }
+  
+  ::-webkit-scrollbar-corner {
+    background: transparent; /* Or match it with your app's background */
+}
 
   ::-webkit-scrollbar-track {
     background: transparent;
   }
 
   ::-webkit-scrollbar-thumb {
-    background-color: transparent;
-    border-radius: 2px;
-    border: 3px solid hsl(var(--scrollbar-bg));
+    background-color: hsl(var(--scrollbar-thumb));
+    border-radius: 10px;
   }
 
   /* For Firefox */

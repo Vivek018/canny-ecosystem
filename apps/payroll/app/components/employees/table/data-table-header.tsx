@@ -1,5 +1,3 @@
-"use client";
-
 import { Button } from "@canny_ecosystem/ui/button";
 import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 import { Icon } from "@canny_ecosystem/ui/icon";
@@ -103,6 +101,7 @@ export function DataTableHeader({ table, loading }: Props) {
             )
           );
         })}
+        <TableHead className="px-3 md:px-4 py-2" />
       </TableRow>
     </TableHeader>
   );

@@ -1,14 +1,20 @@
+import { UTCDate } from "@canny_ecosystem/utils";
 import type { EmployeeDatabaseRow, TypedSupabaseClient } from "../types";
+
+export type EmployeeFilters = {
+  start?: string | undefined;
+  end?: string | undefined;
+  education?: string | undefined;
+  gender?: string | undefined;
+  status?: string | undefined;
+};
 
 export type GetEmployeesByCompanyIdParams = {
   to: number;
   from: number;
   sort?: [string, "asc" | "desc"];
   searchQuery?: string;
-  filter?: {
-    start?: string;
-    end?: string;
-  };
+  filters?: EmployeeFilters;
 };
 
 export type EmployeeDataType = Pick<
@@ -34,7 +40,7 @@ export async function getEmployeesByCompanyId({
   companyId: string;
   params: GetEmployeesByCompanyIdParams;
 }) {
-  const { sort, from, to } = params;
+  const { sort, from, to, filters, searchQuery } = params;
 
   const columns = [
     "id",
@@ -77,6 +83,36 @@ export async function getEmployeesByCompanyId({
     }
   } else {
     query.order("created_at", { ascending: false });
+  }
+
+  if (searchQuery) {
+    query.textSearch("fts_vector", `'${searchQuery}'`);
+  }
+
+  if (filters) {
+    const { start, end, gender, education, status } = filters;
+
+    if (start) {
+      const fromDate = new UTCDate(start);
+      query.gte("date_of_birth", fromDate.toISOString());
+    }
+    if (end) {
+      const toDate = new UTCDate(end);
+      query.lte("date_of_birth", toDate?.toISOString());
+    }
+
+    if (gender) {
+      query.eq("gender", gender.toLowerCase());
+    }
+
+    if (education) {
+      query.eq("education", education.toLowerCase());
+    }
+
+    if (status) {
+      const statusBoolean = status.toLowerCase() === "active";
+      query.eq("is_active", statusBoolean);
+    }
   }
 
   const { data, count, error } = await query

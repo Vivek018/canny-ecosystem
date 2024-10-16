@@ -77,6 +77,7 @@
     "./checkbox": "./src/components/checkbox.tsx",
     "./combobox": "./src/components/combobox.tsx",
     "./command": "./src/components/command.tsx",
+    "./calendar": "./src/components/calendar.tsx",
     "./card": "./src/components/card.tsx",
     "./dropdown-menu": "./src/components/dropdown-menu.tsx",
     "./dialog": "./src/components/dialog.tsx",

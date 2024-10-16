@@ -1,5 +1,3 @@
-"use client";
-
 import { Button } from "@canny_ecosystem/ui/button";
 import {
   DropdownMenu,

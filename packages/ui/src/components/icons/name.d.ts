@@ -16,6 +16,7 @@ export type IconName =
   | "edit"
   | "employee"
   | "feedback"
+  | "filter"
   | "import"
   | "input"
   | "lab-timer"
@@ -27,6 +28,7 @@ export type IconName =
   | "plus-circled"
   | "plus"
   | "project"
+  | "search"
   | "setting"
   | "sun"
   | "table";
