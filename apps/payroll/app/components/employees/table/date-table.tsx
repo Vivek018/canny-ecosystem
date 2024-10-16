@@ -21,15 +21,15 @@ import { useInView } from "react-intersection-observer";
 import { useSearchParams } from "@remix-run/react";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
-import { getEmployeesByCompanyId } from "@canny_ecosystem/supabase/queries";
+import { type EmployeeFilters, getEmployeesByCompanyId } from "@canny_ecosystem/supabase/queries";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   count: number;
   hasNextPage: boolean;
-  hasFilters?: boolean;
-  query?: string;
+  query?: string | null;
+  filters?: EmployeeFilters;
   pageSize: number;
   initialColumnVisibility?: VisibilityState;
   companyId: string;
@@ -38,16 +38,17 @@ interface DataTableProps<TData, TValue> {
 
 export function DataTable<TData, TValue>({
   columns,
-  query,
   data: initialData,
   count,
+  query,
+  filters,
   pageSize,
-  hasFilters,
   hasNextPage: initialHasNextPage,
   initialColumnVisibility,
   companyId,
   env,
 }: DataTableProps<TData, TValue>) {
+
   const [data, setData] = useState(initialData);
   const [from, setFrom] = useState(pageSize);
   const [hasNextPage, setHasNextPage] = useState(initialHasNextPage);
@@ -71,7 +72,9 @@ export function DataTable<TData, TValue>({
         companyId,
         params: {
           from: from,
-          to: to,
+          to:  to,
+          filters,
+          searchQuery: query ?? undefined,
           sort: sortParam?.split(":") as [string, "asc" | "desc"],
         },
       });
