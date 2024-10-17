@@ -5,7 +5,6 @@ import { Link, Outlet, useLoaderData, useLocation } from "@remix-run/react";
 export async function loader({ params }: LoaderFunctionArgs) {
   const projectId = params.projectId;
 
-
   return json({ projectId });
 }
 

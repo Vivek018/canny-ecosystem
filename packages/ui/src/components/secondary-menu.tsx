@@ -11,7 +11,7 @@ export function SecondaryMenu({
 }) {
   return (
     <nav className="py-4">
-      <ul className="flex space-x-6 text-sm overflow-auto scrollbar-hide">
+      <ul className="flex space-x-6 text-sm overflow-auto no-scrollbar">
         {items.map((item) => (
           <Link
             prefetch="intent"

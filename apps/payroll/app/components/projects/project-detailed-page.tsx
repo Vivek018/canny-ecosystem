@@ -29,8 +29,8 @@ export const ProjectDetailedPage = ({
               prefetch="intent"
               to="/projects"
               className={cn(
-                buttonVariants({ variant: "muted" }),
-                "bg-card shadow border hover:shadow-none",
+                buttonVariants({ variant: "outline" }),
+                "bg-card",
               )}
             >
               <Icon name="chevron-left" size="sm" className="md:mr-1" />

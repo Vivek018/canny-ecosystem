@@ -95,24 +95,35 @@ export async function action({ request }: ActionFunctionArgs) {
     messages: [
       {
         role: "system",
-        content: `Generate filters based on the prompt. Current date: ${new Date().toISOString().split("T")[0]}. 
-                    Context: ${context || "None"}
-                    Valid filters: ${VALID_FILTERS.join(", ")}
-                    Rules:
-                    - Use only the valid filter names provided
-                    - Interpret the input intelligently to map to appropriate filters
-                    - For gender, education, map terms like "graduate", "under graduate" to "graduate","under-graduate", etc.(add - inplace of space) to appropriate values
-                    - For status, interpret terms like "active" and "inactive".
-                    - Use date ranges for 'start' and 'end' when appropriate
-                    - Return a single JSON object with string key-value pairs
-                    - Omit filters with empty or unclear values`,
+        content: `Generate filters based on the prompt. Current date: ${new Date().toISOString().split("T")[0]}. Context: ${context || "None"}Valid filters: ${VALID_FILTERS.join(", ")} Rules for parsing user input and generating filter object: 
+        1. Use only the valid filter names provided in VALID_FILTERS.
+        2. Interpret the input intelligently to map to appropriate filters.
+        3. For gender and education filters:
+        - Map terms like "graduate" to "graduate", "under graduate" to "under-graduate", "10th pass and all" to just "10th" , etc.
+        - Replace spaces with hyphens in multi-word education levels.
+        4. For status filter:
+        - Interpret terms like "active" and "inactive".
+        5. Date handling:
+        - Always pair 'end' with 'start' to give a date range.
+        - Never provide an 'end' filter alone.
+        - Use date ranges for 'start' when appropriate.
+        6. Output format:
+        - Return a single JSON object with string key-value pairs.
+        - Omit filters with empty or unclear values.
+        Example input: "Find active graduate employees born after 1990
+        Example output: {
+          "status": "active",
+          "education": "graduate",
+          "start": "1990-01-01",
+          "end": "2024-01-01"
+        }`,
       },
       {
         role: "user",
         content: prompt,
       },
     ],
-    temperature: 0.7,
+    temperature: 0.1,
   });
   const content = completion.choices[0]?.message?.content;
   if (!content) {
@@ -124,6 +135,9 @@ export async function action({ request }: ActionFunctionArgs) {
   const searchParams = new URLSearchParams();
   for (const [key, value] of Object.entries(validatedContent) as any) {
     if (value !== null && value !== undefined && String(value)?.length) {
+      if (key === "end" && !validatedContent?.start) {
+        searchParams.append("start", "1947-08-15");
+      }
       searchParams.append(key, value.toString());
     }
   }
@@ -140,7 +154,7 @@ export default function Employees() {
   return (
     <section className="py-[22px]">
       <div className="flex items-center justify-between pb-4">
-        <div className="flex items-center gap-6">
+        <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
           <EmployeesSearchFilter />
           <FilterList filterList={{ ...filters, name: query }} />
         </div>

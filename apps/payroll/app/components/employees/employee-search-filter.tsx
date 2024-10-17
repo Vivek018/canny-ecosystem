@@ -22,17 +22,13 @@ import {
   genderArray,
   replaceDash,
 } from "@canny_ecosystem/utils";
-import type { EmployeeFilters } from "@canny_ecosystem/supabase/queries";
-import { useIsDocument } from "@canny_ecosystem/ui/hooks/is-document";
 
 const PLACEHOLDERS = [
-  "Employees born before 1980",
-  "Active Employees",
-  "Graduate Employees",
   "Search Employees",
+  "Active Employees",
+  "Employees born before 1980",
+  "Graduate Employees",
 ];
-const placeholder =
-  PLACEHOLDERS[Math.floor(Math.random() * PLACEHOLDERS.length)];
 
 export function EmployeesSearchFilter() {
   const [prompt, setPrompt] = useState("");
@@ -40,24 +36,47 @@ export function EmployeesSearchFilter() {
   const [isOpen, setIsOpen] = useState(false);
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const filters: EmployeeFilters = {
-    start: searchParams.get("start") ?? undefined,
-    end: searchParams.get("end") ?? undefined,
-    education: searchParams.get("education") ?? undefined,
-    gender: searchParams.get("gender") ?? undefined,
-    status: searchParams.get("status") ?? undefined,
-  };
-  const [filterParams, setFilterParams] = useState(filters);
 
-  const { isDocument } = useIsDocument();
+  const initialFilterParams = {
+    start: "",
+    end: "",
+    education: "",
+    gender: "",
+    status: "",
+  };
+
+  const [filterParams, setFilterParams] = useState(initialFilterParams);
+
   const submit = useSubmit();
+
+  const [currentPlaceholder, setCurrentPlaceholder] = useState(PLACEHOLDERS[0]);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setCurrentPlaceholder((prevPlaceholder) => {
+        const currentIndex = PLACEHOLDERS.indexOf(prevPlaceholder);
+        const nextIndex = (currentIndex + 1) % PLACEHOLDERS.length;
+        return PLACEHOLDERS[nextIndex];
+      });
+    }, 10 * 1000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  const deleteAllSearchParams = () => {
+    for (const [key, _val] of Object.entries(filterParams)) {
+      searchParams.delete(key);
+    }
+    searchParams.delete("name");
+    setSearchParams(searchParams);
+  };
 
   useEffect(() => {
     for (const [key, value] of Object.entries(filterParams)) {
       if (value !== null && value !== undefined && String(value)?.length) {
         searchParams.set(key, value);
-        setSearchParams(searchParams);
       }
+      setSearchParams(searchParams);
     }
   }, [filterParams]);
 
@@ -65,8 +84,10 @@ export function EmployeesSearchFilter() {
     "esc",
     () => {
       setPrompt("");
-      setSearchParams("");
+      deleteAllSearchParams();
+      setFilterParams(initialFilterParams);
       setIsOpen(false);
+      inputRef.current?.focus();
     },
     {
       enableOnFormTags: true,
@@ -89,7 +110,8 @@ export function EmployeesSearchFilter() {
     if (value) {
       setPrompt(value);
     } else {
-      setSearchParams();
+      deleteAllSearchParams();
+      setFilterParams(initialFilterParams);
       setPrompt("");
     }
   };
@@ -112,15 +134,15 @@ export function EmployeesSearchFilter() {
   };
 
   const hasValidFilters =
-    Object.entries(filters).filter(
-      ([key, value]) => value !== null && key !== "q",
+    Object.entries(filterParams).filter(
+      ([key, value]) => value !== null && key !== "name",
     ).length > 0;
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-      <div className="flex space-x-4 items-center">
+      <div className="flex space-x-4 w-full md:w-auto items-center">
         <form
-          className="relative"
+          className="relative w-full md:w-auto"
           onSubmit={(e) => {
             e.preventDefault();
             handleSubmit();
@@ -128,12 +150,12 @@ export function EmployeesSearchFilter() {
         >
           <Icon
             name="search"
-            className="absolute pointer-events-none left-3 top-2.5"
+            className="absolute pointer-events-none left-3 top-[13px]"
           />
           <Input
             ref={inputRef}
-            placeholder={isDocument ? placeholder : "Search Employees"}
-            className="pl-9 w-full md:w-[350px] pr-8 focus-visible:ring-0 "
+            placeholder={currentPlaceholder}
+            className="pl-9 w-full h-10 md:w-[420px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70"
             value={prompt}
             onChange={handleSearch}
             autoComplete="off"
@@ -147,19 +169,19 @@ export function EmployeesSearchFilter() {
               onClick={() => setIsOpen((prev) => !prev)}
               type="button"
               className={cn(
-                "absolute z-10 right-3 top-1 opacity-50 transition-opacity duration-300 hover:opacity-100",
+                "absolute z-10 right-3 top-1.5 opacity-50 transition-opacity duration-300 hover:opacity-100 focus:outline-none focus:opacity-100",
                 hasValidFilters && "opacity-100",
                 isOpen && "opacity-100",
               )}
             >
-              <Icon name="filter" />
+              <Icon name="mixer" />
             </button>
           </DropdownMenuTrigger>
         </form>
       </div>
 
       <DropdownMenuContent
-        className="w-[350px]"
+        className="w-full md:w-[420px]"
         align="end"
         sideOffset={19}
         alignOffset={-11}
@@ -179,13 +201,18 @@ export function EmployeesSearchFilter() {
                 <Calendar
                   mode="range"
                   initialFocus
-                  today={filters.start ? new Date(filters.start) : new Date()}
+                  today={
+                    filterParams.start
+                      ? new Date(filterParams.start)
+                      : new Date()
+                  }
                   toDate={new Date()}
                   selected={
                     {
                       from:
-                        filters.start && new Date(filters.start).toISOString(),
-                      to: filters.end && new Date(filters.end),
+                        filterParams.start &&
+                        new Date(filterParams.start).toISOString(),
+                      to: filterParams.end && new Date(filterParams.end),
                     } as any
                   }
                   onSelect={(range) => {
@@ -194,7 +221,7 @@ export function EmployeesSearchFilter() {
                     const newRange = {
                       start: range.from
                         ? formatISO(range.from, { representation: "date" })
-                        : String(filters.start),
+                        : String(filterParams.start),
                       end: range.to
                         ? formatISO(range.to, { representation: "date" })
                         : "",
@@ -222,7 +249,7 @@ export function EmployeesSearchFilter() {
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
                     className="capitalize"
-                    checked={filters?.education === name}
+                    checked={filterParams?.education === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
                         ...prev,
@@ -253,7 +280,7 @@ export function EmployeesSearchFilter() {
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
                     className="capitalize"
-                    checked={filters?.gender?.includes(name)}
+                    checked={filterParams?.gender === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
                         ...prev,
@@ -284,7 +311,7 @@ export function EmployeesSearchFilter() {
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
                     className="capitalize"
-                    checked={filters?.status?.includes(name)}
+                    checked={filterParams?.status === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
                         ...prev,
