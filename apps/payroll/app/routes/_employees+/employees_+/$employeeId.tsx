@@ -6,20 +6,20 @@ import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useLocation } from "@remix-run/react";
 
 export async function loader({ params }: LoaderFunctionArgs) {
-  const projectId = params.projectId;
+  const employeeId = params.employeeId;
 
-  return json({ projectId });
+  return json({ employeeId });
 }
 
-export default function Project() {
-  const { projectId } = useLoaderData<typeof loader>();
+export default function Employee() {
+  const { employeeId } = useLoaderData<typeof loader>();
   const { pathname } = useLocation();
   return (
     <section>
       <div className="flex items-center gap-4">
         <Link
           prefetch="intent"
-          to="/projects"
+          to="/employees"
           className={cn(
             buttonVariants({ variant: "outline" }),
             "bg-card w-9 h-9 px-0 rounded-full",
@@ -27,11 +27,10 @@ export default function Project() {
         >
           <Icon name="chevron-left" size="sm" />
         </Link>
-
         <SecondaryMenu
           items={[
-            { label: "Overview", path: `/projects/${projectId}` },
-            { label: "Sites", path: `/projects/${projectId}/sites` },
+            { label: "Overview", path: `/employees/${employeeId}` },
+            { label: "Sites", path: `/employees/${employeeId}/sites` },
           ]}
           pathname={pathname}
           Link={Link}

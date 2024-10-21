@@ -57,7 +57,7 @@ export function FilterList({ filterList }: Props) {
   };
 
   return (
-    <ul className="flex flex-0 space-x-2 md:max-w-full lg:max-w-[60%] overflow-x-scroll no-scrollbar">
+    <ul className="flex flex-0 space-x-2 w-full overflow-scroll no-scrollbar">
       {filterList &&
         Object.entries(filterList)
           .filter(

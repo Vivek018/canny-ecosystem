@@ -144,7 +144,7 @@ export function ProjectCard({
             <Tooltip delayDuration={100}>
               <TooltipTrigger asChild>
                 <Link
-                  to={`/${project.id}/update-project`}
+                  to={`/projects/${project.id}/update-project`}
                   className="p-2 rounded-md bg-secondary grid place-items-center border-foreground"
                 >
                   <Icon name="edit" size="xs" />

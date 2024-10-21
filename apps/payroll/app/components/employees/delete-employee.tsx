@@ -17,19 +17,23 @@ import { DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
-export const DeleteProject = ({ projectId }: { projectId: string }) => {
+export const DeleteEmployee = ({
+  employeeId,
+}: {
+  employeeId: string;
+}) => {
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [inputError, setInputError] = useState<string[]>([]);
   const submit = useSubmit();
 
-  const handleCancelProject = () => {
+  const handleCancelEmployee = () => {
     setInputError([]);
     setInputValue("");
     setLoading(false);
   };
 
-  const handleDeleteProject = (
+  const handleDeleteEmployee = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
@@ -38,7 +42,7 @@ export const DeleteProject = ({ projectId }: { projectId: string }) => {
         {},
         {
           method: "post",
-          action: `/projects/${projectId}/delete-project`,
+          action: `/${employeeId}/delete-employee`,
           replace: true,
         },
       );
@@ -52,18 +56,18 @@ export const DeleteProject = ({ projectId }: { projectId: string }) => {
     <AlertDialog>
       <AlertDialogTrigger
         className={cn(
-          buttonVariants({ variant: "destructive-ghost", size:"full" }),
+          buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "text-[13px] h-9",
         )}
       >
-        Delete Project
+        Delete Employee
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
             This action cannot be undone. This will permanently delete your
-            project and remove it's data from our servers.
+            employee and remove it's data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="py-4">
@@ -85,13 +89,13 @@ export const DeleteProject = ({ projectId }: { projectId: string }) => {
           <ErrorList errors={inputError} />
         </div>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={handleCancelProject}>
+          <AlertDialogCancel onClick={handleCancelEmployee}>
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
             className={cn(buttonVariants({ variant: "destructive" }))}
-            onClick={handleDeleteProject}
-            onSelect={handleDeleteProject}
+            onClick={handleDeleteEmployee}
+            onSelect={handleDeleteEmployee}
           >
             {isLoading ? "Deleting..." : "Delete"}
           </AlertDialogAction>

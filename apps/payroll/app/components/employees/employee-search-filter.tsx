@@ -25,9 +25,9 @@ import {
 
 const PLACEHOLDERS = [
   "Search Employees",
-  "Active Employees",
+  "Active Male Employees",
   "Employees born before 1980",
-  "Graduate Employees",
+  "Graduated Employees",
 ];
 
 export function EmployeesSearchFilter() {
@@ -87,7 +87,6 @@ export function EmployeesSearchFilter() {
       deleteAllSearchParams();
       setFilterParams(initialFilterParams);
       setIsOpen(false);
-      inputRef.current?.focus();
     },
     {
       enableOnFormTags: true,
@@ -135,7 +134,7 @@ export function EmployeesSearchFilter() {
 
   const hasValidFilters =
     Object.entries(filterParams).filter(
-      ([key, value]) => value !== null && key !== "name",
+      ([key, value]) => value?.length && key !== "name",
     ).length > 0;
 
   return (
@@ -150,7 +149,7 @@ export function EmployeesSearchFilter() {
         >
           <Icon
             name="search"
-            className="absolute pointer-events-none left-3 top-[13px]"
+            className="absolute pointer-events-none left-3 top-[12.5px]"
           />
           <Input
             ref={inputRef}
@@ -169,7 +168,7 @@ export function EmployeesSearchFilter() {
               onClick={() => setIsOpen((prev) => !prev)}
               type="button"
               className={cn(
-                "absolute z-10 right-3 top-1.5 opacity-50 transition-opacity duration-300 hover:opacity-100 focus:outline-none focus:opacity-100",
+                "absolute z-10 right-3 top-[6px] opacity-70 transition-opacity duration-300 hover:opacity-100 focus:outline-none focus:opacity-100",
                 hasValidFilters && "opacity-100",
                 isOpen && "opacity-100",
               )}

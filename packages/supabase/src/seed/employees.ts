@@ -15,6 +15,9 @@ export function seedEmployees(): Omit<EmployeeDatabaseInsert, "company_id"> {
     employee_code: faker.string.sample(5),
     date_of_birth: faker.date.past().toISOString(),
     is_active: [true, false][faker.number.int({ min: 0, max: 1 })],
+    marital_status: ["married", "unmarried"][
+      faker.number.int({ min: 0, max: 1 })
+    ],
     gender: ["male", "female"][faker.number.int({ min: 0, max: 1 })],
     primary_mobile_number: faker.string.numeric(10),
     secondary_mobile_number: faker.string.numeric(10),

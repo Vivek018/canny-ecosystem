@@ -63,8 +63,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
       supabase,
       email: sessionUser.email,
     });
-    const { data: companiesData, error: companiesError } =
-      await getCompanies({ supabase });
+    const { data: companiesData, error: companiesError } = await getCompanies({
+      supabase,
+    });
 
     if (userError || !userData) {
       console.error("userError", userError);
@@ -79,6 +80,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
     } else {
       companies = companiesData;
     }
+  } else {
+    safeRedirect("/login");
   }
 
   const { companyId, setCookie } = await getCompanyIdOrFirstCompany(

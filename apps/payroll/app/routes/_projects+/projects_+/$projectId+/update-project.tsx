@@ -9,7 +9,7 @@ import { parseWithZod } from "@conform-to/zod";
 import { safeRedirect } from "@/utils/server/http.server";
 import { updateProject } from "@canny_ecosystem/supabase/mutations";
 import { isGoodStatus, ProjectSchema } from "@canny_ecosystem/utils";
-import CreateProject from "./create-project";
+import CreateProject from "../create-project";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
 export const UPDATE_PROJECT = "update-project";

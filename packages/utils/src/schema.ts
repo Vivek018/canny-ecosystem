@@ -245,6 +245,10 @@ export const educationArray = [
   "graduate",
   "post-graduate",
 ] as const;
+export const maritalStatusArray = [
+  "married",
+  "unmarried",
+] as const
 
 export const EmployeeSchema = z.object({
   id: z.string().optional(),
@@ -253,7 +257,7 @@ export const EmployeeSchema = z.object({
   last_name: zString.min(3),
   employee_code: zNumberString.min(3),
   photo: zImage.optional(),
-  marital_status: zString.min(3).optional(),
+  marital_status: z.enum(maritalStatusArray).default("unmarried"),
   date_of_birth: z.string(),
   gender: z.enum(genderArray).default("male"),
   education: z.enum(educationArray).optional(),

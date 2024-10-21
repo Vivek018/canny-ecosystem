@@ -1,7 +1,9 @@
+import { convertToNull } from "@canny_ecosystem/utils";
 import type {
   EmployeeAddressDatabaseInsert,
   EmployeeBankDetailsDatabaseInsert,
   EmployeeDatabaseInsert,
+  EmployeeDatabaseUpdate,
   EmployeeGuardianDatabaseInsert,
   EmployeeStatutoryDetailsDatabaseInsert,
   TypedSupabaseClient,
@@ -239,4 +241,72 @@ export async function createEmployeeGuardians({
   }
 
   return { error, status };
+}
+
+export async function updateEmployee({
+  supabase,
+  data,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  data: EmployeeDatabaseUpdate;
+  bypassAuth?: boolean;
+}) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
+  const updateData = convertToNull(data);
+
+  const { error, status } = await supabase
+    .from("employees")
+    .update(updateData)
+    .eq("id", data.id!)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("error", error);
+  }
+
+  return { status, error };
+}
+
+export async function deleteEmployee({
+  supabase,
+  id,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+  bypassAuth?: boolean;
+}) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
+  const { error, status } = await supabase
+    .from("employees")
+    .delete()
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { status, error };
 }

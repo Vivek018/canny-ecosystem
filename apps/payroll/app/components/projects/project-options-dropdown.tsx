@@ -20,7 +20,7 @@ export const ProjectOptionsDropdown = ({project, triggerChild}: {project: {
       },
       {
         method: "POST",
-        action: `/${project.id}/update-completed`,
+        action: `/projects/${project.id}/update-completed`,
       },
     );
   };
@@ -34,7 +34,7 @@ export const ProjectOptionsDropdown = ({project, triggerChild}: {project: {
       },
       {
         method: "POST",
-        action: `/${project.id}/update-completed`,
+        action: `/projects/${project.id}/update-completed`,
       },
     );
   };

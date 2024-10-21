@@ -40,7 +40,7 @@ import {
 import { createProject } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import type { ProjectDatabaseUpdate } from "@canny_ecosystem/supabase/types";
-import { UPDATE_PROJECT } from "./$projectId.update-project";
+import { UPDATE_PROJECT } from "./$projectId+/update-project";
 import { getCompanies } from "@canny_ecosystem/supabase/queries";
 import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 import { useState } from "react";

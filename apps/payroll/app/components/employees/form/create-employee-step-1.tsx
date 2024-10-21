@@ -9,6 +9,7 @@ import {
   educationArray,
   genderArray,
   getValidDateForInput,
+  maritalStatusArray,
   replaceUnderscore,
   transformStringArrayIntoOptions,
   type EmployeeSchema,
@@ -72,13 +73,15 @@ export function CreateEmployeeStep1({
             errors={fields.last_name.errors}
           />
         </div>
-        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+        <div className="grid grid-cols-3 place-content-center justify-between gap-6">
           <Field
             inputProps={{
               ...getInputProps(fields.employee_code, { type: "text" }),
               placeholder: `Enter ${replaceUnderscore(fields.employee_code.name)}`,
             }}
-            labelProps={{ children: replaceUnderscore(fields.employee_code.name) }}
+            labelProps={{
+              children: replaceUnderscore(fields.employee_code.name),
+            }}
             errors={fields.employee_code.errors}
           />
           <Field
@@ -89,8 +92,6 @@ export function CreateEmployeeStep1({
             labelProps={{ children: fields.photo.name }}
             errors={fields.photo.errors}
           />
-        </div>
-        <div className="grid grid-cols-3 place-content-center justify-between gap-6">
           <Field
             inputProps={{
               ...getInputProps(fields.date_of_birth, { type: "date" }),
@@ -102,6 +103,8 @@ export function CreateEmployeeStep1({
             }}
             errors={fields.date_of_birth.errors}
           />
+        </div>
+        <div className="grid grid-cols-3 place-content-center justify-between gap-6">
           <SearchableSelectField
             className="w-full capitalize flex-1"
             options={transformStringArrayIntoOptions(
@@ -129,6 +132,20 @@ export function CreateEmployeeStep1({
               children: fields.education.name,
             }}
             errors={fields.education.errors}
+          />
+          <SearchableSelectField
+            className="w-full capitalize flex-1"
+            options={transformStringArrayIntoOptions(
+              maritalStatusArray as unknown as string[],
+            )}
+            inputProps={{
+              ...getInputProps(fields.marital_status, { type: "text" }),
+            }}
+            placeholder={`Select ${replaceUnderscore(fields.marital_status.name)}`}
+            labelProps={{
+              children: replaceUnderscore(fields.marital_status.name),
+            }}
+            errors={fields.marital_status.errors}
           />
         </div>
         <CheckboxField
