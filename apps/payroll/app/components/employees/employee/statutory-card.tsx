@@ -36,17 +36,18 @@ export const EmployeeStatutoryCard: React.FC<{
   return (
     <Card className="rounded w-full h-full p-4 flex flex-col gap-6">
       <div className="w-full flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Employee Statutory Details</h2>
+        <h2 className="text-xl font-semibold">Statutory Details</h2>
         <Link
           prefetch="intent"
           to={`/${employeeStatutory?.employee_id}/update-employee-statutory`}
           className={cn(
-            buttonVariants({ variant: "ghost" }),
+            buttonVariants({ variant: "outline" }),
             "bg-card",
             !employeeStatutory && "hidden",
           )}
         >
-          <Icon name="edit" className="sm" />
+          <Icon name="edit" className="mr-2" />
+          Edit
         </Link>
       </div>
 

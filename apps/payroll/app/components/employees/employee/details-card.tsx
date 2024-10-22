@@ -1,6 +1,5 @@
 import type { EmployeeDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { Card } from "@canny_ecosystem/ui/card";
-import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { formatDate, replaceDash } from "@canny_ecosystem/utils";
 
 type DetailItemProps = {
@@ -8,9 +7,6 @@ type DetailItemProps = {
   value: string | null | undefined;
   formatter?: (value: string) => string;
 };
-
-const subHeadingClassName =
-  "text-muted-foreground text-[13px] tracking-wide capitalize";
 
 export const DetailItem: React.FC<DetailItemProps> = ({
   label,
@@ -21,8 +17,10 @@ export const DetailItem: React.FC<DetailItemProps> = ({
 
   return (
     <div className="flex flex-col items-start">
-      <h3 className={cn(subHeadingClassName)}>{label}</h3>
-      <p className="capitalize">{formattedValue}</p>
+      <h3 className="text-muted-foreground text-[13px] tracking-wide capitalize">
+        {label}
+      </h3>
+      <p>{formattedValue}</p>
     </div>
   );
 };

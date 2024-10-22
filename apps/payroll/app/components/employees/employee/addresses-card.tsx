@@ -34,7 +34,7 @@ export const AddressItem = ({ address }: { address: EmployeeAddress }) => {
   return (
     <Card
       key={address.id}
-      className="w-[420px] bg-background shadow-inner select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start"
+      className="w-[420px] shadow-none select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start"
     >
       <CardHeader className="flex flex-row space-y-0 items-center justify-between p-4">
         <CardTitle className="text-lg tracking-wide">
@@ -60,7 +60,10 @@ export const AddressItem = ({ address }: { address: EmployeeAddress }) => {
           </TooltipProvider>
           <DropdownMenu>
             <DropdownMenuTrigger
-              className={cn(buttonVariants({ variant: "muted" }), "px-2.5 h-min")}
+              className={cn(
+                buttonVariants({ variant: "muted" }),
+                "px-2.5 h-min",
+              )}
             >
               <Icon name="dots" size="xs" />
             </DropdownMenuTrigger>
@@ -128,9 +131,18 @@ export const EmployeeAddressesCard = ({
   employeeAddresses: EmployeeAddress[] | null;
 }) => {
   return (
-    <Card className="rounded w-full h-full p-6">
+    <Card className="rounded w-full h-full p-4">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold">Employee Addresses</h2>
+        <div>
+          <Link
+            to="/add-address"
+            className={cn(buttonVariants({ variant: "outline" }), "bg-card")}
+          >
+            <Icon name="plus-circled" className="mr-2" />
+            Add
+          </Link>
+        </div>
       </div>
 
       <div className="w-full overflow-scroll no-scrollbar">

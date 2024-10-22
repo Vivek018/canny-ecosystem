@@ -325,7 +325,6 @@ export const EmployeeGuardiansSchema = z.object({
   employee_id: z.string().optional(),
   relationship: z.enum(relationshipArray).default("father"),
   first_name: zString.min(3).max(50).optional(),
-  middle_name: zString.min(3).max(50).optional(),
   last_name: zString.min(3).max(50).optional(),
   date_of_birth: z.string().optional(),
   gender: z.enum(genderArray).default("male"),

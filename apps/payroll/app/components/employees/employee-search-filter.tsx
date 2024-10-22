@@ -80,6 +80,22 @@ export function EmployeesSearchFilter() {
     }
   }, [filterParams]);
 
+  const searchParamsList = {
+    start: searchParams.get("start"),
+    end: searchParams.get("end"),
+    education: searchParams.get("education"),
+    gender: searchParams.get("gender"),
+    status: searchParams.get("status"),
+  };
+
+  useEffect(() => {
+    for (const [key, value] of Object.entries(searchParamsList)) {
+      if (value === null || value === undefined || !String(value)?.length) {
+        setFilterParams((prev) => ({ ...prev, [key]: "" }));
+      }
+    }
+  }, [searchParams]);
+
   useHotkeys(
     "esc",
     () => {
@@ -168,7 +184,7 @@ export function EmployeesSearchFilter() {
               onClick={() => setIsOpen((prev) => !prev)}
               type="button"
               className={cn(
-                "absolute z-10 right-3 top-[6px] opacity-70 transition-opacity duration-300 hover:opacity-100 focus:outline-none focus:opacity-100",
+                "absolute z-10 right-3 top-[6px] opacity-70 transition-opacity duration-300 hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 hasValidFilters && "opacity-100",
                 isOpen && "opacity-100",
               )}

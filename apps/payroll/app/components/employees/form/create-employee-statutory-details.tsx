@@ -22,7 +22,7 @@ type FieldsType = {
   >;
 };
 
-export function CreateEmployeeStep2({
+export function CreateEmployeeStatutoryDetails({
   fields,
 }: {
   fields: FieldsType;

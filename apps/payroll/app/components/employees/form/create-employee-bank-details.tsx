@@ -22,7 +22,7 @@ type FieldsType = {
   >;
 };
 
-export function CreateEmployeeStep3({
+export function CreateEmployeeBankDetails({
   fields,
 }: {
   fields: FieldsType;

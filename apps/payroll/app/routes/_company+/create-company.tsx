@@ -22,9 +22,9 @@ import { setCompanyId } from "@/utils/server/company.server";
 import { useState } from "react";
 import { commitSession, getSession } from "@/utils/sessions";
 import { DEFAULT_ROUTE } from "@/constant";
-import { CreateCompanyStep1 } from "@/components/company/form/create-company-step-1";
+import { CreateCompanyDetails } from "@/components/company/form/create-company-details";
 import { FormButtons } from "@/components/multi-step-form/form-buttons";
-import { CreateCompanyStep2 } from "@/components/company/form/create-company-step-2";
+import { CreateCompanyRegistrationDetails } from "@/components/company/form/create-company-registration-details";
 import type { CompanyRegistrationDetailsInsert } from "@canny_ecosystem/supabase/types";
 import { useIsomorphicLayoutEffect } from "@canny_ecosystem/ui/hooks/isomorphic-layout-effect";
 import { FormStepHeader } from "@/components/multi-step-form/form-step-header";
@@ -199,10 +199,14 @@ export default function CreateCompany() {
           className="flex flex-col"
         >
           <Card>
-            {step === 1 ? (
-              <CreateCompanyStep1 key={resetKey} fields={fields as any} />
-            ) : null}
-            {step === 2 ? <CreateCompanyStep2 fields={fields as any} /> : null}
+            <div className="h-[500px] overflow-scroll">
+              {step === 1 ? (
+                <CreateCompanyDetails key={resetKey} fields={fields as any} />
+              ) : null}
+              {step === 2 ? (
+                <CreateCompanyRegistrationDetails fields={fields as any} />
+              ) : null}
+            </div>
             <FormButtons
               form={form}
               setResetKey={setResetKey}

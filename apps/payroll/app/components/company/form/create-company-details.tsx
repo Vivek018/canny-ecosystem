@@ -23,7 +23,7 @@ type FieldsType = {
   >;
 };
 
-export function CreateCompanyStep1({
+export function CreateCompanyDetails({
   fields,
 }: {
   fields: FieldsType;

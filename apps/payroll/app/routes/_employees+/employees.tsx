@@ -149,13 +149,7 @@ export default function Employees() {
     <section className="py-[22px]">
       <div className="w-full flex items-center justify-between pb-4">
         <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-6">
-          <EmployeesSearchFilter
-            key={
-              Object.entries(filters)
-                .filter(([key]) => key !== "start")
-                .toString() + query?.toString()
-            }
-          />
+          <EmployeesSearchFilter />
           <FilterList filterList={{ ...filters, name: query }} />
         </div>
         <EmployeesActions isEmpty={!data?.length} />

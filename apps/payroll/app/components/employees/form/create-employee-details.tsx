@@ -6,12 +6,13 @@ import {
 } from "@canny_ecosystem/ui/card";
 import { Fragment } from "react";
 import {
+  educationArray,
   genderArray,
   getValidDateForInput,
-  relationshipArray,
+  maritalStatusArray,
   replaceUnderscore,
   transformStringArrayIntoOptions,
-  type EmployeeGuardiansSchema,
+  type EmployeeSchema,
 } from "@canny_ecosystem/utils";
 import {
   CheckboxField,
@@ -21,14 +22,14 @@ import {
 import { type FieldMetadata, getInputProps } from "@conform-to/react";
 
 type FieldsType = {
-  [K in keyof typeof EmployeeGuardiansSchema.shape]: FieldMetadata<
-    typeof EmployeeGuardiansSchema,
-    typeof EmployeeGuardiansSchema,
+  [K in keyof typeof EmployeeSchema.shape]: FieldMetadata<
+    typeof EmployeeSchema,
+    typeof EmployeeSchema,
     string[]
   >;
 };
 
-export function CreateEmployeeStep5({
+export function CreateEmployeeDetails({
   fields,
 }: {
   fields: FieldsType;
@@ -36,24 +37,13 @@ export function CreateEmployeeStep5({
   return (
     <Fragment>
       <CardHeader>
-        <CardTitle className="text-3xl">Add Employee Guardian</CardTitle>
-        <CardDescription>Add guardian of the employee</CardDescription>
+        <CardTitle className="text-3xl">Create Employee</CardTitle>
+        <CardDescription>
+          Create a employee that will be central in all of canny apps
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        <SearchableSelectField
-          className="w-full capitalize flex-1"
-          options={transformStringArrayIntoOptions(
-            relationshipArray as unknown as string[],
-          )}
-          inputProps={{
-            ...getInputProps(fields.relationship, { type: "text" }),
-          }}
-          placeholder={`Select ${fields.relationship.name}`}
-          labelProps={{
-            children: fields.relationship.name,
-          }}
-          errors={fields.relationship.errors}
-        />
+        <input {...getInputProps(fields.company_id, { type: "hidden" })} />
         <div className="grid grid-cols-3 place-content-center justify-between gap-6">
           <Field
             inputProps={{
@@ -86,6 +76,24 @@ export function CreateEmployeeStep5({
         <div className="grid grid-cols-3 place-content-center justify-between gap-6">
           <Field
             inputProps={{
+              ...getInputProps(fields.employee_code, { type: "text" }),
+              placeholder: `Enter ${replaceUnderscore(fields.employee_code.name)}`,
+            }}
+            labelProps={{
+              children: replaceUnderscore(fields.employee_code.name),
+            }}
+            errors={fields.employee_code.errors}
+          />
+          <Field
+            inputProps={{
+              ...getInputProps(fields.photo, { type: "file" }),
+              placeholder: `Enter ${fields.photo.name}`,
+            }}
+            labelProps={{ children: fields.photo.name }}
+            errors={fields.photo.errors}
+          />
+          <Field
+            inputProps={{
               ...getInputProps(fields.date_of_birth, { type: "date" }),
               placeholder: `Enter ${replaceUnderscore(fields.date_of_birth.name)}`,
               max: getValidDateForInput(new Date().toISOString()),
@@ -95,6 +103,8 @@ export function CreateEmployeeStep5({
             }}
             errors={fields.date_of_birth.errors}
           />
+        </div>
+        <div className="grid grid-cols-3 place-content-center justify-between gap-6">
           <SearchableSelectField
             className="w-full capitalize flex-1"
             options={transformStringArrayIntoOptions(
@@ -109,59 +119,79 @@ export function CreateEmployeeStep5({
             }}
             errors={fields.gender.errors}
           />
+          <SearchableSelectField
+            className="w-full capitalize flex-1"
+            options={transformStringArrayIntoOptions(
+              educationArray as unknown as string[],
+            )}
+            inputProps={{
+              ...getInputProps(fields.education, { type: "text" }),
+            }}
+            placeholder={`Select ${fields.education.name}`}
+            labelProps={{
+              children: fields.education.name,
+            }}
+            errors={fields.education.errors}
+          />
+          <SearchableSelectField
+            className="w-full capitalize flex-1"
+            options={transformStringArrayIntoOptions(
+              maritalStatusArray as unknown as string[],
+            )}
+            inputProps={{
+              ...getInputProps(fields.marital_status, { type: "text" }),
+            }}
+            placeholder={`Select ${replaceUnderscore(fields.marital_status.name)}`}
+            labelProps={{
+              children: replaceUnderscore(fields.marital_status.name),
+            }}
+            errors={fields.marital_status.errors}
+          />
         </div>
         <CheckboxField
-          buttonProps={getInputProps(fields.is_emergency_contact, {
+          className="mt-0.5 mb-3"
+          buttonProps={getInputProps(fields.is_active, {
             type: "checkbox",
           })}
           labelProps={{
-            htmlFor: fields.is_emergency_contact.id,
-            children: "Is it an emergency contact of the employee?",
-          }}
-        />
-        <CheckboxField
-          buttonProps={getInputProps(fields.address_same_as_employee, {
-            type: "checkbox",
-          })}
-          labelProps={{
-            htmlFor: fields.address_same_as_employee.id,
-            children: "Is the address same as employee?",
+            htmlFor: fields.is_active.id,
+            children: "Is this employee active?",
           }}
         />
         <div className="grid grid-cols-3 place-content-center justify-between gap-6">
           <Field
             inputProps={{
-              ...getInputProps(fields.mobile_number, { type: "text" }),
-              placeholder: `Enter ${replaceUnderscore(fields.mobile_number.name)}`,
+              ...getInputProps(fields.primary_mobile_number, { type: "text" }),
+              placeholder: `Enter ${replaceUnderscore(fields.primary_mobile_number.name)}`,
             }}
             labelProps={{
-              children: replaceUnderscore(fields.mobile_number.name),
+              children: replaceUnderscore(fields.primary_mobile_number.name),
             }}
-            errors={fields.mobile_number.errors}
+            errors={fields.primary_mobile_number.errors}
           />
           <Field
             inputProps={{
-              ...getInputProps(fields.alternate_mobile_number, {
+              ...getInputProps(fields.secondary_mobile_number, {
                 type: "text",
               }),
-              placeholder: `Enter ${replaceUnderscore(fields.alternate_mobile_number.name)}`,
+              placeholder: `Enter ${replaceUnderscore(fields.secondary_mobile_number.name)}`,
             }}
             labelProps={{
-              children: replaceUnderscore(fields.alternate_mobile_number.name),
+              children: replaceUnderscore(fields.secondary_mobile_number.name),
             }}
-            errors={fields.alternate_mobile_number.errors}
+            errors={fields.secondary_mobile_number.errors}
           />
           <Field
             inputProps={{
-              ...getInputProps(fields.email, {
+              ...getInputProps(fields.personal_email, {
                 type: "text",
               }),
-              placeholder: `Enter ${replaceUnderscore(fields.email.name)}`,
+              placeholder: `Enter ${replaceUnderscore(fields.personal_email.name)}`,
             }}
             labelProps={{
-              children: replaceUnderscore(fields.email.name),
+              children: replaceUnderscore(fields.personal_email.name),
             }}
-            errors={fields.email.errors}
+            errors={fields.personal_email.errors}
           />
         </div>
       </CardContent>

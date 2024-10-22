@@ -49,7 +49,7 @@ export default function Sites() {
     <section className="pb-4">
       <div className="w-full flex items-end justify-between">
         <Command className="overflow-visible">
-          <div className="w-full md:w-3/4 lg:w-1/2 2xl:w-1/3 flex items-center gap-4">
+          <div className="w-full md:w-3/4 lg:w-1/2 2xl:w-1/3 py-4 flex items-center gap-4">
             <CommandInput
               divClassName="border border-input rounded-md h-10 flex-1"
               placeholder="Search Sites"
@@ -74,7 +74,7 @@ export default function Sites() {
           >
             No site found.
           </CommandEmpty>
-          <CommandList className="max-h-full py-6 overflow-x-visible overflow-y-visible">
+          <CommandList className="max-h-full py-2 overflow-x-visible overflow-y-visible">
             <CommandGroup className="p-0 overflow-visible">
               <div className="w-full grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
                 {data?.map((site) => (

@@ -16,9 +16,6 @@ type EmployeeBankDetails = Omit<
   "created_at" | "updated_at"
 >;
 
-const subHeadingClassName =
-  "text-muted-foreground text-[13px] tracking-wide capitalize";
-
 export const DetailItem: React.FC<DetailItemProps> = ({
   label,
   value,
@@ -28,8 +25,10 @@ export const DetailItem: React.FC<DetailItemProps> = ({
 
   return (
     <div className="flex flex-col items-start">
-      <h3 className={cn(subHeadingClassName)}>{label}</h3>
-      <p className="capitalize">{formattedValue}</p>
+      <h3 className="text-muted-foreground text-[13px] tracking-wide capitalize">
+        {label}
+      </h3>
+      <p>{formattedValue}</p>
     </div>
   );
 };
@@ -47,12 +46,13 @@ export const EmployeeBankDetailsCard = ({
           prefetch="intent"
           to={`/${bankDetails?.employee_id}/update-bank-details`}
           className={cn(
-            buttonVariants({ variant: "ghost" }),
+            buttonVariants({ variant: "outline" }),
             "bg-card",
             !bankDetails && "hidden",
           )}
         >
-          <Icon name="edit" className="sm" />
+          <Icon name="edit" className="mr-2" />
+          Edit
         </Link>
       </div>
 

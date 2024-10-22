@@ -87,6 +87,7 @@ export function SiteCard({
                 >
                   Edit Pay Sequence
                 </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className={cn("py-2 text-[13px]", !site.latitude && "hidden")}
                   onClick={() => {

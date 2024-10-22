@@ -3,6 +3,7 @@ import type {
   EmployeeAddressDatabaseRow,
   EmployeeBankDetailsDatabaseRow,
   EmployeeDatabaseRow,
+  EmployeeGuardianDatabaseRow,
   EmployeeStatutoryDetailsDatabaseRow,
   InferredType,
   TypedSupabaseClient,
@@ -266,6 +267,41 @@ export async function getEmployeeAddressesById({
     .limit(HARD_QUERY_LIMIT)
     .returns<
       InferredType<EmployeeAddressDatabaseRow, (typeof columns)[number]>[]
+    >();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { data, error };
+}
+
+export async function getEmployeeGuardiansById({
+  supabase,
+  id,
+}: { supabase: TypedSupabaseClient; id: string }) {
+  const columns = [
+    "id",
+    "relationship",
+    "first_name",
+    "last_name",
+    "date_of_birth",
+    "gender",
+    "mobile_number",
+    "alternate_mobile_number",
+    "email",
+    "is_emergency_contact",
+    "address_same_as_employee",
+    "employee_id",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("employee_guardians")
+    .select(columns.join(","))
+    .eq("employee_id", id)
+    .limit(HARD_QUERY_LIMIT)
+    .returns<
+      InferredType<EmployeeGuardianDatabaseRow, (typeof columns)[number]>[]
     >();
 
   if (error) {

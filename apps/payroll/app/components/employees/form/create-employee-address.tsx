@@ -25,7 +25,7 @@ type FieldsType = {
   >;
 };
 
-export function CreateEmployeeStep4({
+export function CreateEmployeeAddress({
   fields,
   resetKey,
 }: {
