@@ -26,14 +26,14 @@ export async function action({ request }: ActionFunctionArgs) {
     );
   }
 
-
   const { status, error } = await updateProject({
     supabase,
     data: submission.value,
   });
 
+  const returnTo = formData.get("returnTo");
   if (isGoodStatus(status)) {
-    return safeRedirect("/projects", { status: 303 });
+    return safeRedirect(returnTo ?? "/projects", { status: 303 });
   }
   return json({ status, error });
 }

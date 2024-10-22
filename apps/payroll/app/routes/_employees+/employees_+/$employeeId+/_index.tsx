@@ -7,10 +7,10 @@ import { EmployeeStatutoryCard } from "@/components/employees/employee/statutory
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import {
-  getEmployeeAddressesById,
+  getEmployeeAddressesByEmployeeId,
   getEmployeeBankDetailsById,
   getEmployeeById,
-  getEmployeeGuardiansById,
+  getEmployeeGuardiansByEmployeeId,
   getEmployeeStatutoryDetailsById,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -49,14 +49,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     id: employeeId ?? "",
   });
 
-  const { data: employeeAddresses } = await getEmployeeAddressesById({
+  const { data: employeeAddresses } = await getEmployeeAddressesByEmployeeId({
     supabase,
-    id: employeeId ?? "",
+    employeeId: employeeId ?? "",
   });
 
-  const { data: employeeGuardians } = await getEmployeeGuardiansById({
+  const { data: employeeGuardians } = await getEmployeeGuardiansByEmployeeId({
     supabase,
-    id: employeeId ?? "",
+    employeeId: employeeId ?? "",
   });
 
   return json({

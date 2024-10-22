@@ -183,7 +183,7 @@ export default function CreateCompany() {
   });
 
   return (
-    <section className="md:px-20 lg:px-52 2xl:px-80 py-6">
+    <section className="lg:px-40 2xl:px-80 py-2">
       <div className="w-full mx-auto mb-8">
         <FormStepHeader
           totalSteps={totalSteps}

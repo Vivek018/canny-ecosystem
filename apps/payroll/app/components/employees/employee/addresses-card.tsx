@@ -24,6 +24,7 @@ import {
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
+import { DeleteAddress } from "./delete-address";
 
 type EmployeeAddress = Omit<
   EmployeeAddressDatabaseRow,
@@ -46,7 +47,7 @@ export const AddressItem = ({ address }: { address: EmployeeAddress }) => {
               <TooltipTrigger asChild>
                 <Link
                   prefetch="intent"
-                  to={`/settings/${address.id}/update-address`}
+                  to={`/employees/${address.employee_id}/${address.id}/update-employee-address`}
                   className={cn(
                     buttonVariants({ variant: "muted" }),
                     "px-2.5 h-min",
@@ -96,7 +97,7 @@ export const AddressItem = ({ address }: { address: EmployeeAddress }) => {
                     !address.latitude && !address.longitude && "hidden",
                   )}
                 />
-                abc
+                <DeleteAddress employeeId={address.employee_id} addressId={address.id} />
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -136,7 +137,7 @@ export const EmployeeAddressesCard = ({
         <h2 className="text-xl font-semibold">Employee Addresses</h2>
         <div>
           <Link
-            to="/add-address"
+            to="add-employee-address"
             className={cn(buttonVariants({ variant: "outline" }), "bg-card")}
           >
             <Icon name="plus-circled" className="mr-2" />

@@ -30,8 +30,9 @@ export async function action({ request }: ActionFunctionArgs) {
     data: submission.value,
   });
 
+  const returnTo = formData.get("returnTo");
   if (isGoodStatus(status)) {
-    return safeRedirect("/employees", { status: 303 });
+    return safeRedirect(returnTo ?? "/employees", { status: 303 });
   }
   return json({ status, error });
 }

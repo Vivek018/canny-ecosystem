@@ -39,7 +39,7 @@ export const EmployeeStatutoryCard: React.FC<{
         <h2 className="text-xl font-semibold">Statutory Details</h2>
         <Link
           prefetch="intent"
-          to={`/${employeeStatutory?.employee_id}/update-employee-statutory`}
+          to={`/employees/${employeeStatutory?.employee_id}/update-statutory-details`}
           className={cn(
             buttonVariants({ variant: "outline" }),
             "bg-card",

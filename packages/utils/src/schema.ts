@@ -9,7 +9,7 @@ export const zString = z
   .string()
   .min(textMinLength)
   .max(textMaxLength)
-  .regex(/^[A-Z._a-z \s]+$/, "Only alphabets are allowed");
+  .regex(/^[A-Z._a-z, \s]+$/, "Only alphabets are allowed");
 
 export const zNumberString = z
   .string()
@@ -323,11 +323,11 @@ export const relationshipArray = [
 export const EmployeeGuardiansSchema = z.object({
   id: z.string().optional(),
   employee_id: z.string().optional(),
-  relationship: z.enum(relationshipArray).default("father"),
+  relationship: z.enum(relationshipArray).optional(),
   first_name: zString.min(3).max(50).optional(),
   last_name: zString.min(3).max(50).optional(),
   date_of_birth: z.string().optional(),
-  gender: z.enum(genderArray).default("male"),
+  gender: z.enum(genderArray).optional(),
   is_emergency_contact: z.boolean().default(false),
   address_same_as_employee: z.boolean().default(false),
   mobile_number: zNumber.min(10).max(10).optional(),

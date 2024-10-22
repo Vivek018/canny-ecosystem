@@ -242,7 +242,76 @@ export async function getEmployeeBankDetailsById({
   return { data, error };
 }
 
-export async function getEmployeeAddressesById({
+export async function getEmployeeAddressesByEmployeeId({
+  supabase,
+  employeeId,
+}: { supabase: TypedSupabaseClient; employeeId: string }) {
+  const columns = [
+    "id",
+    "address_type",
+    "address_line_1",
+    "address_line_2",
+    "city",
+    "state",
+    "pincode",
+    "is_primary",
+    "latitude",
+    "longitude",
+    "employee_id",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("employee_addresses")
+    .select(columns.join(","))
+    .eq("employee_id", employeeId)
+    .limit(HARD_QUERY_LIMIT)
+    .returns<
+      InferredType<EmployeeAddressDatabaseRow, (typeof columns)[number]>[]
+    >();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { data, error };
+}
+
+export async function getEmployeeGuardiansByEmployeeId({
+  supabase,
+  employeeId,
+}: { supabase: TypedSupabaseClient; employeeId: string }) {
+  const columns = [
+    "id",
+    "relationship",
+    "first_name",
+    "last_name",
+    "date_of_birth",
+    "gender",
+    "mobile_number",
+    "alternate_mobile_number",
+    "email",
+    "is_emergency_contact",
+    "address_same_as_employee",
+    "employee_id",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("employee_guardians")
+    .select(columns.join(","))
+    .eq("employee_id", employeeId)
+    .limit(HARD_QUERY_LIMIT)
+    .returns<
+      InferredType<EmployeeGuardianDatabaseRow, (typeof columns)[number]>[]
+    >();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { data, error };
+}
+
+export async function getEmployeeAddressById({
   supabase,
   id,
 }: { supabase: TypedSupabaseClient; id: string }) {
@@ -263,10 +332,9 @@ export async function getEmployeeAddressesById({
   const { data, error } = await supabase
     .from("employee_addresses")
     .select(columns.join(","))
-    .eq("employee_id", id)
-    .limit(HARD_QUERY_LIMIT)
-    .returns<
-      InferredType<EmployeeAddressDatabaseRow, (typeof columns)[number]>[]
+    .eq("id", id)
+    .single<
+      InferredType<EmployeeAddressDatabaseRow, (typeof columns)[number]>
     >();
 
   if (error) {
@@ -276,7 +344,7 @@ export async function getEmployeeAddressesById({
   return { data, error };
 }
 
-export async function getEmployeeGuardiansById({
+export async function getEmployeeGuardianById({
   supabase,
   id,
 }: { supabase: TypedSupabaseClient; id: string }) {
@@ -298,10 +366,9 @@ export async function getEmployeeGuardiansById({
   const { data, error } = await supabase
     .from("employee_guardians")
     .select(columns.join(","))
-    .eq("employee_id", id)
-    .limit(HARD_QUERY_LIMIT)
-    .returns<
-      InferredType<EmployeeGuardianDatabaseRow, (typeof columns)[number]>[]
+    .eq("id", id)
+    .single<
+      InferredType<EmployeeGuardianDatabaseRow, (typeof columns)[number]>
     >();
 
   if (error) {

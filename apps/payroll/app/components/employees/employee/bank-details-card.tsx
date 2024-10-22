@@ -44,7 +44,7 @@ export const EmployeeBankDetailsCard = ({
         <h2 className="text-xl font-semibold">Bank Account Details</h2>
         <Link
           prefetch="intent"
-          to={`/${bankDetails?.employee_id}/update-bank-details`}
+          to={`/employees/${bankDetails?.employee_id}/update-bank-details`}
           className={cn(
             buttonVariants({ variant: "outline" }),
             "bg-card",

@@ -66,7 +66,7 @@ export function EmployeePageHeader({
         <div className="flex flex-row items-start gap-3">
           <Link
             prefetch="intent"
-            to={`/${employee.id}/update-employee`}
+            to={`/employees/${employee.id}/update-employee-details`}
             className={cn(
               buttonVariants({ variant: "outline" }),
               "w-full bg-card",
@@ -79,6 +79,7 @@ export function EmployeePageHeader({
             employee={{
               id: employee.id,
               is_active: employee.is_active ?? false,
+              returnTo: `/employees/${employee.id}`
             }}
             triggerChild={
               <DropdownMenuTrigger

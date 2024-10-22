@@ -1,9 +1,7 @@
 import { formatDate, replaceDash } from "@canny_ecosystem/utils";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Checkbox } from "@canny_ecosystem/ui/checkbox";
-import {
-  DropdownMenuTrigger,
-} from "@canny_ecosystem/ui/dropdown-menu";
+import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
 
 import type { ColumnDef } from "@tanstack/react-table";
@@ -97,6 +95,7 @@ export const columns: ColumnDef<EmployeeDataType>[] = [
     cell: ({ row }) => {
       return (
         <EmployeeOptionsDropdown
+          key={row.original.id}
           employee={{
             id: row.original.id,
             is_active: row.original.is_active ?? false,

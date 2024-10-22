@@ -1,11 +1,15 @@
 import { convertToNull } from "@canny_ecosystem/utils";
 import type {
   EmployeeAddressDatabaseInsert,
+  EmployeeAddressDatabaseUpdate,
   EmployeeBankDetailsDatabaseInsert,
+  EmployeeBankDetailsDatabaseUpdate,
   EmployeeDatabaseInsert,
   EmployeeDatabaseUpdate,
   EmployeeGuardianDatabaseInsert,
+  EmployeeGuardianDatabaseUpdate,
   EmployeeStatutoryDetailsDatabaseInsert,
+  EmployeeStatutoryDetailsDatabaseUpdate,
   TypedSupabaseClient,
 } from "../types";
 
@@ -299,6 +303,212 @@ export async function deleteEmployee({
 
   const { error, status } = await supabase
     .from("employees")
+    .delete()
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { status, error };
+}
+
+export async function updateEmployeeStatutoryDetails({
+  supabase,
+  data,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  data: EmployeeStatutoryDetailsDatabaseUpdate;
+  bypassAuth?: boolean;
+}) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
+  const updateData = convertToNull(data);
+
+  const { error, status } = await supabase
+    .from("employee_statutory_details")
+    .update(updateData)
+    .eq("employee_id", data.employee_id!)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("error", error);
+  }
+
+  return { status, error };
+}
+
+export async function updateEmployeeBankDetails({
+  supabase,
+  data,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  data: EmployeeBankDetailsDatabaseUpdate;
+  bypassAuth?: boolean;
+}) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
+  const updateData = convertToNull(data);
+
+  const { error, status } = await supabase
+    .from("employee_bank_details")
+    .update(updateData)
+    .eq("employee_id", data.employee_id!)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("error", error);
+  }
+
+  return { status, error };
+}
+
+export async function updateEmployeeAddress({
+  supabase,
+  data,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  data: EmployeeAddressDatabaseUpdate;
+  bypassAuth?: boolean;
+}) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
+  const updateData = convertToNull(data);
+
+  const { error, status } = await supabase
+    .from("employee_addresses")
+    .update(updateData)
+    .eq("id", data.id!)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("error", error);
+  }
+
+  return { status, error };
+}
+
+export async function deleteEmployeeAddress({
+  supabase,
+  id,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+  bypassAuth?: boolean;
+}) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
+  const { error, status } = await supabase
+    .from("employee_addresses")
+    .delete()
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { status, error };
+}
+
+export async function updateEmployeeGuardian({
+  supabase,
+  data,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  data: EmployeeGuardianDatabaseUpdate;
+  bypassAuth?: boolean;
+}) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
+  const updateData = convertToNull(data);
+
+  const { error, status } = await supabase
+    .from("employee_guardians")
+    .update(updateData)
+    .eq("id", data.id!)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("error", error);
+  }
+
+  return { status, error };
+}
+
+export async function deleteEmployeeGuardian({
+  supabase,
+  id,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+  bypassAuth?: boolean;
+}) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
+  const { error, status } = await supabase
+    .from("employee_guardians")
     .delete()
     .eq("id", id)
     .select()

@@ -40,6 +40,7 @@ export const ProjectHeader = ({
           project={{
             id: project.id,
             actual_end_date: project.actual_end_date,
+            returnTo: `/projects/${project.id}`,
           }}
           triggerChild={
             <DropdownMenuTrigger

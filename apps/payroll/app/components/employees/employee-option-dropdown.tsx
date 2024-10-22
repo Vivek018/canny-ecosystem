@@ -16,6 +16,7 @@ export const EmployeeOptionsDropdown = ({
   employee: {
     id: string;
     is_active: boolean;
+    returnTo?: string;
   };
   triggerChild: React.ReactElement;
 }) => {
@@ -26,6 +27,7 @@ export const EmployeeOptionsDropdown = ({
       {
         id: employee.id,
         is_active: true,
+        returnTo: employee.returnTo ?? '/employees',
       },
       {
         method: "POST",
@@ -39,6 +41,7 @@ export const EmployeeOptionsDropdown = ({
       {
         id: employee.id,
         is_active: false,
+        returnTo: employee.returnTo ?? "/employees",
       },
       {
         method: "POST",

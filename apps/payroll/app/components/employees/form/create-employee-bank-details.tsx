@@ -24,16 +24,23 @@ type FieldsType = {
 
 export function CreateEmployeeBankDetails({
   fields,
+  isUpdate = false,
 }: {
   fields: FieldsType;
+  isUpdate?: boolean;
 }) {
   return (
     <Fragment>
       <CardHeader>
-        <CardTitle className="text-3xl">Add Employee Bank Details</CardTitle>
-        <CardDescription>Add bank details of the employee</CardDescription>
+        <CardTitle className="text-3xl">
+          {isUpdate ? "Update" : "Add"} Employee Bank Details
+        </CardTitle>
+        <CardDescription>
+          {isUpdate ? "Update" : "Add"} bank details of the employee
+        </CardDescription>
       </CardHeader>
       <CardContent>
+        <input {...getInputProps(fields.employee_id, { type: "hidden" })} />
         <div className="grid grid-cols-2 place-content-center justify-between gap-6">
           <Field
             inputProps={{

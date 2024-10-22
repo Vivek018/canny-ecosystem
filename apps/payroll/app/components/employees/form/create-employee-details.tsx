@@ -31,18 +31,24 @@ type FieldsType = {
 
 export function CreateEmployeeDetails({
   fields,
+  isUpdate = false,
 }: {
   fields: FieldsType;
+  isUpdate?: boolean;
 }) {
   return (
     <Fragment>
       <CardHeader>
-        <CardTitle className="text-3xl">Create Employee</CardTitle>
+        <CardTitle className="text-3xl">
+          {isUpdate ? "Update" : "Create"} Employee
+        </CardTitle>
         <CardDescription>
-          Create a employee that will be central in all of canny apps
+          {isUpdate ? "Update" : "Create"} an employee that will be central in
+          all of canny apps
         </CardDescription>
       </CardHeader>
       <CardContent>
+        <input {...getInputProps(fields.id, { type: "hidden" })} />
         <input {...getInputProps(fields.company_id, { type: "hidden" })} />
         <div className="grid grid-cols-3 place-content-center justify-between gap-6">
           <Field

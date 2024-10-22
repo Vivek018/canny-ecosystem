@@ -17,23 +17,25 @@ import { DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
-export const DeleteEmployee = ({
+export const DeleteGuardian = ({
   employeeId,
+  guardianId,
 }: {
   employeeId: string;
+  guardianId: string;
 }) => {
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [inputError, setInputError] = useState<string[]>([]);
   const submit = useSubmit();
 
-  const handleCancelEmployee = () => {
+  const handleCancelGuardian = () => {
     setInputError([]);
     setInputValue("");
     setLoading(false);
   };
 
-  const handleDeleteEmployee = (
+  const handleDeleteGuardian = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
@@ -42,7 +44,7 @@ export const DeleteEmployee = ({
         {},
         {
           method: "post",
-          action: `/employees/${employeeId}/delete-employee`,
+          action: `/employees/${employeeId}/${guardianId}/delete-employee-guardian`,
           replace: true,
         },
       );
@@ -60,14 +62,14 @@ export const DeleteEmployee = ({
           "text-[13px] h-9",
         )}
       >
-        Delete Employee
+        Delete Guardian
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
             This action cannot be undone. This will permanently delete your
-            employee and remove it's data from our servers.
+            guardian and remove it's data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="py-4">
@@ -89,13 +91,13 @@ export const DeleteEmployee = ({
           <ErrorList errors={inputError} />
         </div>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={handleCancelEmployee}>
+          <AlertDialogCancel onClick={handleCancelGuardian}>
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
             className={cn(buttonVariants({ variant: "destructive" }))}
-            onClick={handleDeleteEmployee}
-            onSelect={handleDeleteEmployee}
+            onClick={handleDeleteGuardian}
+            onSelect={handleDeleteGuardian}
           >
             {isLoading ? "Deleting..." : "Delete"}
           </AlertDialogAction>

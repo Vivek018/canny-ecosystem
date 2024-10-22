@@ -18,9 +18,9 @@ export const ProjectDetails = ({
   >;
 }) => {
   const companies = [
-    project?.project_client,
-    project?.primary_contractor,
-    project?.end_client,
+    {company: project?.project_client, tag: "Project Client"},
+    {company: project?.primary_contractor, tag: "Primary Contractor"},
+    {company: project?.end_client, tag: "End Client"},
   ];
 
   return (
@@ -40,7 +40,7 @@ export const ProjectDetails = ({
       <div className="mt-6">
         <h3 className="font-bold text-lg">Companies Involved</h3>
         <div className="flex items-center justify-between gap-4 mt-1">
-          {companies.map((company, index) => (
+          {companies.map(({ company, tag }, index) => (
             <div
               key={company?.id + index.toString()}
               className={cn(
@@ -62,7 +62,11 @@ export const ProjectDetails = ({
                   </span>
                 </AvatarFallback>
               </Avatar>
-              <p className="font-medium tracking-wide ml-1">{company?.name}</p>
+
+              <div className="flex flex-col items-start ml-1">
+                <p className="font-medium tracking-wide truncate w-40">{company?.name}</p>
+                <p className="text-muted-foreground text-sm -mt-0.5">{tag}</p>
+              </div>
             </div>
           ))}
         </div>

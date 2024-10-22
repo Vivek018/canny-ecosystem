@@ -27,18 +27,24 @@ type FieldsType = {
 
 export function CreateEmployeeAddress({
   fields,
-  resetKey,
+  isUpdate = false,
 }: {
   fields: FieldsType;
-  resetKey: number;
+  isUpdate?: boolean;
 }) {
   return (
     <Fragment>
       <CardHeader>
-        <CardTitle className="text-3xl">Add Employee Address</CardTitle>
-        <CardDescription>Add address of the employee</CardDescription>
+        <CardTitle className="text-3xl">
+          {isUpdate ? "Update" : "Add"} Employee Address
+        </CardTitle>
+        <CardDescription>
+          {isUpdate ? "Update" : "Add"} address of the employee
+        </CardDescription>
       </CardHeader>
       <CardContent>
+        <input {...getInputProps(fields.id, { type: "hidden" })} />
+        <input {...getInputProps(fields.employee_id, { type: "hidden" })} />
         <Field
           inputProps={{
             ...getInputProps(fields.address_type, { type: "text" }),
@@ -93,7 +99,6 @@ export function CreateEmployeeAddress({
             errors={fields.city.errors}
           />
           <SearchableSelectField
-            key={resetKey}
             className="capitalize"
             options={statesAndUTs}
             inputProps={{

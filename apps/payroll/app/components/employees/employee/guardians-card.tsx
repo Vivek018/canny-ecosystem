@@ -21,6 +21,7 @@ import {
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import type { EmployeeGuardianDatabaseRow } from "@canny_ecosystem/supabase/types";
+import { DeleteGuardian } from "./delete-guardian";
 
 type DetailItemProps = {
   label: string;
@@ -62,7 +63,7 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
               <TooltipTrigger asChild>
                 <Link
                   prefetch="intent"
-                  to={`/employees/${guardian.id}/update-guardian`}
+                  to={`/employees/${guardian.employee_id}/${guardian.id}/update-employee-guardian`}
                   className={cn(
                     buttonVariants({ variant: "muted" }),
                     "px-2.5 h-min",
@@ -84,7 +85,12 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
               <Icon name="dots" size="xs" />
             </DropdownMenuTrigger>
             <DropdownMenuContent sideOffset={10} align="end">
-              <DropdownMenuGroup>asc</DropdownMenuGroup>
+              <DropdownMenuGroup>
+                <DeleteGuardian
+                  employeeId={guardian.employee_id}
+                  guardianId={guardian.id}
+                />
+              </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -149,7 +155,7 @@ export const EmployeeGuardiansCard = ({
         <h2 className="text-xl font-semibold">Guardians Details</h2>
         <div>
           <Link
-            to="/employees/add-guardian"
+            to="add-employee-guardian"
             className={cn(buttonVariants({ variant: "outline" }), "bg-card")}
           >
             <Icon name="plus-circled" className="mr-2" />

@@ -121,7 +121,7 @@ export default function CreateProject({
   });
 
   return (
-    <section className="md:px-20 lg:px-52 2xl:px-80 py-6">
+    <section className="lg:px-40 2xl:px-80 py-2">
       <FormProvider context={form.context}>
         <Form
           method="POST"

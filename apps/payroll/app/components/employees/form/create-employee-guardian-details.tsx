@@ -30,16 +30,24 @@ type FieldsType = {
 
 export function CreateEmployeeGuardianDetails({
   fields,
+  isUpdate = false,
 }: {
   fields: FieldsType;
+  isUpdate?: boolean;
 }) {
   return (
     <Fragment>
       <CardHeader>
-        <CardTitle className="text-3xl">Add Employee Guardian</CardTitle>
-        <CardDescription>Add guardian of the employee</CardDescription>
+        <CardTitle className="text-3xl">
+          {isUpdate ? "Update" : "Add"} Employee Guardian
+        </CardTitle>
+        <CardDescription>
+          {isUpdate ? "Update" : "Add"} guardian of the employee
+        </CardDescription>
       </CardHeader>
       <CardContent>
+        <input {...getInputProps(fields.id, { type: "hidden" })} />
+        <input {...getInputProps(fields.employee_id, { type: "hidden" })} />
         <SearchableSelectField
           className="w-full capitalize flex-1"
           options={transformStringArrayIntoOptions(
