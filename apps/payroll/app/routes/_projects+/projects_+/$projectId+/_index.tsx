@@ -1,8 +1,11 @@
-import { ProjectDetailedPage } from "@/components/projects/project-detailed-page";
+import { ProjectDetails } from "@/components/projects/project/project-details";
+import { ProjectHeader } from "@/components/projects/project/project-header";
+import { ProjectInformationCard } from "@/components/projects/project/project-information-card";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getProjectById } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
+import { Card } from "@canny_ecosystem/ui/card";
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
@@ -33,8 +36,16 @@ export default function ProjectIndex() {
   const { data } = useLoaderData<typeof loader>();
 
   return (
-    <div className="-mt-4">
-      <ProjectDetailedPage project={data} />
+    <div className="w-full my-4">
+      <Card className="my-4 rounded w-full h-full p-4 flex flex-col lg:flex-row gap-4">
+        <div className="flex flex-col w-full gap-6">
+          <ProjectHeader project={data} />
+          <div className="flex flex-col w-full justify-between lg:flex-row gap-6">
+            <ProjectDetails project={data} />
+            <ProjectInformationCard project={data} />
+          </div>
+        </div>
+      </Card>
     </div>
   );
 }

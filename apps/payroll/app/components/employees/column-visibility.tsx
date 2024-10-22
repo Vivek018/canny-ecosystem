@@ -20,7 +20,7 @@ export function ColumnVisibility({ disabled }: { disabled?: boolean }) {
           className="h-10 w-10"
           disabled={disabled}
         >
-          <Icon name="mixer" className="h-[18px] w-[18px]" />
+          <Icon name="column" className="h-[18px] w-[18px]" />
         </Button>
       </PopoverTrigger>
 

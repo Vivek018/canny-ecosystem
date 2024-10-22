@@ -4,11 +4,17 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useSubmit } from "@remix-run/react";
 import { getValidDateForInput } from "@canny_ecosystem/utils";
 
-export const ProjectOptionsDropdown = ({project, triggerChild}: {project: {
-  id: string;
-  actual_end_date: string | null;
-}, triggerChild: React.ReactElement}) => {
-
+export const ProjectOptionsDropdown = ({
+  project,
+  triggerChild,
+}: {
+  project: {
+    id: string;
+    actual_end_date: string | null;
+    returnTo?: string;
+  };
+  triggerChild: React.ReactElement;
+}) => {
   const submit = useSubmit();
 
   const handleMarkAsCompleted = () => {
@@ -17,24 +23,26 @@ export const ProjectOptionsDropdown = ({project, triggerChild}: {project: {
         id: project.id,
         actual_end_date: getValidDateForInput(new Date())!,
         status: "completed",
+        returnTo: project.returnTo ?? "/projects",
       },
       {
         method: "POST",
-        action: `/${project.id}/update-completed`,
+        action: `/projects/${project.id}/update-completed`,
       },
     );
   };
 
-  const handleMarkAsInComplete = () => {
+  const handleMarkAsActive = () => {
     submit(
       {
         id: project.id,
         actual_end_date: null,
         status: "active",
+        returnTo: project.returnTo ?? "/projects",
       },
       {
         method: "POST",
-        action: `/${project.id}/update-completed`,
+        action: `/projects/${project.id}/update-completed`,
       },
     );
   };
@@ -52,9 +60,9 @@ export const ProjectOptionsDropdown = ({project, triggerChild}: {project: {
           </DropdownMenuItem>
           <DropdownMenuItem
             className={cn(!project.actual_end_date && "hidden")}
-            onClick={handleMarkAsInComplete}
+            onClick={handleMarkAsActive}
           >
-            Make as Incomplete
+            Make as Active
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DeleteProject projectId={project.id} />
@@ -62,4 +70,4 @@ export const ProjectOptionsDropdown = ({project, triggerChild}: {project: {
       </DropdownMenuContent>
     </DropdownMenu>
   );
-}
+};

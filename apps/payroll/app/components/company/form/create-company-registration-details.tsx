@@ -21,7 +21,7 @@ type FieldsType = {
   >;
 };
 
-export function CreateCompanyStep2({
+export function CreateCompanyRegistrationDetails({
   fields,
 }: {
   fields: FieldsType;
@@ -41,6 +41,7 @@ export function CreateCompanyStep2({
           className="col-span-2"
           inputProps={{
             ...getInputProps(fields.registration_number, { type: "text" }),
+            autoFocus: true,
             placeholder: `Enter ${replaceUnderscore(fields.registration_number.name)}`,
           }}
           labelProps={{
@@ -51,7 +52,6 @@ export function CreateCompanyStep2({
         <Field
           inputProps={{
             ...getInputProps(fields.gst_number, { type: "text" }),
-            autoFocus: true,
             placeholder: `Enter ${replaceUnderscore(fields.gst_number.name)}`,
           }}
           labelProps={{ children: replaceUnderscore(fields.gst_number.name) }}

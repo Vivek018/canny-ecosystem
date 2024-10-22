@@ -22,22 +22,25 @@ type FieldsType = {
   >;
 };
 
-export function CreateEmployeeStep2({
+export function CreateEmployeeStatutoryDetails({
   fields,
+  isUpdate = false,
 }: {
   fields: FieldsType;
+  isUpdate?: boolean;
 }) {
   return (
     <Fragment>
       <CardHeader>
         <CardTitle className="text-3xl">
-          Add Employee Statutory Details
+          {isUpdate ? "Update" : "Add"} Employee Statutory Details
         </CardTitle>
         <CardDescription>
-          Add all statutory details of the employee
+          {isUpdate ? "Update" : "Add"} all statutory details of the employee
         </CardDescription>
       </CardHeader>
       <CardContent>
+        <input {...getInputProps(fields.employee_id, { type: "hidden" })} />
         <div className="grid grid-cols-3 place-content-center justify-between gap-6">
           <Field
             inputProps={{

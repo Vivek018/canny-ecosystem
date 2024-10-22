@@ -9,6 +9,7 @@ import {
   educationArray,
   genderArray,
   getValidDateForInput,
+  maritalStatusArray,
   replaceUnderscore,
   transformStringArrayIntoOptions,
   type EmployeeSchema,
@@ -28,20 +29,26 @@ type FieldsType = {
   >;
 };
 
-export function CreateEmployeeStep1({
+export function CreateEmployeeDetails({
   fields,
+  isUpdate = false,
 }: {
   fields: FieldsType;
+  isUpdate?: boolean;
 }) {
   return (
     <Fragment>
       <CardHeader>
-        <CardTitle className="text-3xl">Create Employee</CardTitle>
+        <CardTitle className="text-3xl">
+          {isUpdate ? "Update" : "Create"} Employee
+        </CardTitle>
         <CardDescription>
-          Create a employee that will be central in all of canny apps
+          {isUpdate ? "Update" : "Create"} an employee that will be central in
+          all of canny apps
         </CardDescription>
       </CardHeader>
       <CardContent>
+        <input {...getInputProps(fields.id, { type: "hidden" })} />
         <input {...getInputProps(fields.company_id, { type: "hidden" })} />
         <div className="grid grid-cols-3 place-content-center justify-between gap-6">
           <Field
@@ -72,13 +79,15 @@ export function CreateEmployeeStep1({
             errors={fields.last_name.errors}
           />
         </div>
-        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+        <div className="grid grid-cols-3 place-content-center justify-between gap-6">
           <Field
             inputProps={{
               ...getInputProps(fields.employee_code, { type: "text" }),
               placeholder: `Enter ${replaceUnderscore(fields.employee_code.name)}`,
             }}
-            labelProps={{ children: replaceUnderscore(fields.employee_code.name) }}
+            labelProps={{
+              children: replaceUnderscore(fields.employee_code.name),
+            }}
             errors={fields.employee_code.errors}
           />
           <Field
@@ -89,8 +98,6 @@ export function CreateEmployeeStep1({
             labelProps={{ children: fields.photo.name }}
             errors={fields.photo.errors}
           />
-        </div>
-        <div className="grid grid-cols-3 place-content-center justify-between gap-6">
           <Field
             inputProps={{
               ...getInputProps(fields.date_of_birth, { type: "date" }),
@@ -102,6 +109,8 @@ export function CreateEmployeeStep1({
             }}
             errors={fields.date_of_birth.errors}
           />
+        </div>
+        <div className="grid grid-cols-3 place-content-center justify-between gap-6">
           <SearchableSelectField
             className="w-full capitalize flex-1"
             options={transformStringArrayIntoOptions(
@@ -130,8 +139,23 @@ export function CreateEmployeeStep1({
             }}
             errors={fields.education.errors}
           />
+          <SearchableSelectField
+            className="w-full capitalize flex-1"
+            options={transformStringArrayIntoOptions(
+              maritalStatusArray as unknown as string[],
+            )}
+            inputProps={{
+              ...getInputProps(fields.marital_status, { type: "text" }),
+            }}
+            placeholder={`Select ${replaceUnderscore(fields.marital_status.name)}`}
+            labelProps={{
+              children: replaceUnderscore(fields.marital_status.name),
+            }}
+            errors={fields.marital_status.errors}
+          />
         </div>
         <CheckboxField
+          className="mt-0.5 mb-3"
           buttonProps={getInputProps(fields.is_active, {
             type: "checkbox",
           })}

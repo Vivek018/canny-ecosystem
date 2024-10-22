@@ -99,7 +99,7 @@ export const CompanySwitch = ({
             </CommandGroup>
           </CommandList>
         </Command>
-        <div className="p-2 border-t">
+        <div className="p-1.5 border-t">
           <Link
             ref={linkRef}
             to="/create-company"

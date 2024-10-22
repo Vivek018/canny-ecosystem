@@ -318,7 +318,6 @@ export type Database = {
           id: string
           is_emergency_contact: boolean | null
           last_name: string | null
-          middle_name: string | null
           mobile_number: string | null
           relationship: string | null
           updated_at: string | null
@@ -335,7 +334,6 @@ export type Database = {
           id?: string
           is_emergency_contact?: boolean | null
           last_name?: string | null
-          middle_name?: string | null
           mobile_number?: string | null
           relationship?: string | null
           updated_at?: string | null
@@ -352,7 +350,6 @@ export type Database = {
           id?: string
           is_emergency_contact?: boolean | null
           last_name?: string | null
-          middle_name?: string | null
           mobile_number?: string | null
           relationship?: string | null
           updated_at?: string | null

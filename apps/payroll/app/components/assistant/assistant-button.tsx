@@ -12,7 +12,7 @@ export function AssistantButton() {
     >
       <span className="ml-4 md:ml-0">Ask Canny A Question...</span>
       <kbd className="pointer-events-none absolute right-1.5 top-1.5 hidden h-5 select-none items-center gap-1 border bg-accent px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
-        <span className="text-xs">⌘</span>K
+        <span className="text-sm mt-[1px]">⌘</span>K
       </kbd>
     </Button>
   );

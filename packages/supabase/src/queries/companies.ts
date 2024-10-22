@@ -20,6 +20,10 @@ export async function getCompanies({
     .order("created_at", { ascending: false })
     .returns<InferredType<CompanyDatabaseRow, (typeof columns)[number]>[]>();
 
+  if (error) {
+    console.error(error);
+  }
+
   return { data, error };
 }
 
@@ -34,6 +38,10 @@ export async function getFirstCompany({
     .limit(SINGLE_QUERY_LIMIT)
     .order("created_at", { ascending: false })
     .single<InferredType<CompanyDatabaseRow, (typeof columns)[number]>>();
+
+  if (error) {
+    console.error(error);
+  }
 
   return { data, error };
 }
@@ -56,6 +64,10 @@ export async function getCompanyById({
     .select(columns.join(","))
     .eq("id", id)
     .single<InferredType<CompanyDatabaseRow, (typeof columns)[number]>>();
+
+  if (error) {
+    console.error(error);
+  }
 
   return { data, error };
 }
@@ -84,6 +96,10 @@ export async function getCompanyRegistrationDetailsByCompanyId({
       InferredType<CompanyRegistrationDetailsRow, (typeof columns)[number]>
     >();
 
+  if (error) {
+    console.error(error);
+  }
+
   return { data, error };
 }
 
@@ -101,6 +117,10 @@ export async function getLocationsForSelectByCompanyId({
     .limit(HARD_QUERY_LIMIT)
     .order("created_at", { ascending: false })
     .returns<InferredType<LocationDatabaseRow, (typeof columns)[number]>[]>();
+
+  if (error) {
+    console.error(error);
+  }
 
   return { data, error };
 }
@@ -131,6 +151,10 @@ export async function getLocationsByCompanyId({
     .order("created_at", { ascending: false })
     .returns<InferredType<LocationDatabaseRow, (typeof columns)[number]>[]>();
 
+  if (error) {
+    console.error(error);
+  }
+
   return { data, error };
 }
 
@@ -159,6 +183,10 @@ export async function getLocationById({
     .eq("id", id)
     .eq("company_id", companyId)
     .single<InferredType<LocationDatabaseRow, (typeof columns)[number]>>();
+
+  if (error) {
+    console.error(error);
+  }
 
   return { data, error };
 }
@@ -194,6 +222,10 @@ export async function getRelationshipsByCompanyId({
     .order("created_at", { ascending: false })
     .returns<Omit<RelationshipWithCompany, "created_at" | "updated_at">[]>();
 
+  if (error) {
+    console.error(error);
+  }
+
   return { data, error };
 }
 
@@ -222,6 +254,10 @@ export async function getRelationshipById({
     .or(`parent_company_id.eq.${companyId},child_company_id.eq.${companyId}`)
     .single<Omit<RelationshipWithCompany, "created_at" | "updated_at">>();
 
+  if (error) {
+    console.error(error);
+  }
+
   return { data, error };
 }
 
@@ -237,6 +273,10 @@ export async function getRelationshipTermsById({
     .eq("id", id)
     .or(`parent_company_id.eq.${companyId},child_company_id.eq.${companyId}`)
     .single<InferredType<RelationshipDatabaseRow, (typeof columns)[number]>>();
+
+  if (error) {
+    console.error(error);
+  }
 
   return { data, error };
 }

@@ -28,18 +28,26 @@ type FieldsType = {
   >;
 };
 
-export function CreateEmployeeStep5({
+export function CreateEmployeeGuardianDetails({
   fields,
+  isUpdate = false,
 }: {
   fields: FieldsType;
+  isUpdate?: boolean;
 }) {
   return (
     <Fragment>
       <CardHeader>
-        <CardTitle className="text-3xl">Add Employee Guardian</CardTitle>
-        <CardDescription>Add guardian of the employee</CardDescription>
+        <CardTitle className="text-3xl">
+          {isUpdate ? "Update" : "Add"} Employee Guardian
+        </CardTitle>
+        <CardDescription>
+          {isUpdate ? "Update" : "Add"} guardian of the employee
+        </CardDescription>
       </CardHeader>
       <CardContent>
+        <input {...getInputProps(fields.id, { type: "hidden" })} />
+        <input {...getInputProps(fields.employee_id, { type: "hidden" })} />
         <SearchableSelectField
           className="w-full capitalize flex-1"
           options={transformStringArrayIntoOptions(
@@ -54,7 +62,7 @@ export function CreateEmployeeStep5({
           }}
           errors={fields.relationship.errors}
         />
-        <div className="grid grid-cols-3 place-content-center justify-between gap-6">
+        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
           <Field
             inputProps={{
               ...getInputProps(fields.first_name, { type: "text" }),
@@ -66,16 +74,6 @@ export function CreateEmployeeStep5({
           />
           <Field
             inputProps={{
-              ...getInputProps(fields.middle_name, { type: "text" }),
-              placeholder: `Enter ${replaceUnderscore(fields.middle_name.name)}`,
-            }}
-            labelProps={{
-              children: replaceUnderscore(fields.middle_name.name),
-            }}
-            errors={fields.middle_name.errors}
-          />
-          <Field
-            inputProps={{
               ...getInputProps(fields.last_name, { type: "text" }),
               placeholder: `Enter ${replaceUnderscore(fields.last_name.name)}`,
             }}
@@ -83,7 +81,7 @@ export function CreateEmployeeStep5({
             errors={fields.last_name.errors}
           />
         </div>
-        <div className="grid grid-cols-3 place-content-center justify-between gap-6">
+        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
           <Field
             inputProps={{
               ...getInputProps(fields.date_of_birth, { type: "date" }),

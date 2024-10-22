@@ -26,13 +26,13 @@ import { commitSession, getSession } from "@/utils/sessions";
 import { DEFAULT_ROUTE } from "@/constant";
 import { FormButtons } from "@/components/multi-step-form/form-buttons";
 import { useIsomorphicLayoutEffect } from "@canny_ecosystem/ui/hooks/isomorphic-layout-effect";
-import { CreateEmployeeStep1 } from "@/components/employees/form/create-employee-step-1";
-import { CreateEmployeeStep2 } from "@/components/employees/form/create-employee-step-2";
+import { CreateEmployeeDetails } from "@/components/employees/form/create-employee-details";
+import { CreateEmployeeStatutoryDetails } from "@/components/employees/form/create-employee-statutory-details";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { CreateEmployeeStep3 } from "@/components/employees/form/create-employee-step-3";
-import { CreateEmployeeStep4 } from "@/components/employees/form/create-employee-step-4";
+import { CreateEmployeeBankDetails } from "@/components/employees/form/create-employee-bank-details";
+import { CreateEmployeeAddress } from "@/components/employees/form/create-employee-address";
 import type { EmployeeGuardianDatabaseInsert } from "@canny_ecosystem/supabase/types";
-import { CreateEmployeeStep5 } from "@/components/employees/form/create-employee-step-5";
+import { CreateEmployeeGuardianDetails } from "@/components/employees/form/create-employee-guardian-details";
 import { FormStepHeader } from "@/components/multi-step-form/form-step-header";
 
 export const CREATE_EMPLOYEE = [
@@ -222,8 +222,8 @@ export default function CreateEmployee() {
   });
 
   return (
-    <section className="md:px-20 lg:px-52 2xl:px-80 py-6">
-      <div className="w-full mx-auto mb-8">
+    <section className="lg:px-40 2xl:px-80 py-2">
+      <div className="w-full overflow-scroll mx-auto mb-8">
         <FormStepHeader
           totalSteps={totalSteps}
           step={step}
@@ -238,25 +238,35 @@ export default function CreateEmployee() {
           className="flex flex-col"
         >
           <Card>
-            {step === 1 ? (
-              <CreateEmployeeStep1 key={resetKey} fields={fields as any} />
-            ) : null}
-            {step === 2 ? (
-              <CreateEmployeeStep2 key={resetKey + 1} fields={fields as any} />
-            ) : null}
-            {step === 3 ? (
-              <CreateEmployeeStep3 key={resetKey + 2} fields={fields as any} />
-            ) : null}
-            {step === 4 ? (
-              <CreateEmployeeStep4
-                key={resetKey + 3}
-                fields={fields as any}
-                resetKey={resetKey * resetKey}
-              />
-            ) : null}
-            {step === 5 ? (
-              <CreateEmployeeStep5 key={resetKey + 4} fields={fields as any} />
-            ) : null}
+            <div className="h-[560px] overflow-scroll">
+              {step === 1 ? (
+                <CreateEmployeeDetails key={resetKey} fields={fields as any} />
+              ) : null}
+              {step === 2 ? (
+                <CreateEmployeeStatutoryDetails
+                  key={resetKey + 1}
+                  fields={fields as any}
+                />
+              ) : null}
+              {step === 3 ? (
+                <CreateEmployeeBankDetails
+                  key={resetKey + 2}
+                  fields={fields as any}
+                />
+              ) : null}
+              {step === 4 ? (
+                <CreateEmployeeAddress
+                  key={resetKey + 3}
+                  fields={fields as any}
+                />
+              ) : null}
+              {step === 5 ? (
+                <CreateEmployeeGuardianDetails
+                  key={resetKey + 4}
+                  fields={fields as any}
+                />
+              ) : null}
+            </div>
             <FormButtons
               form={form}
               setResetKey={setResetKey}

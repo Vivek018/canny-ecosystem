@@ -32,7 +32,7 @@ export function AddEmployeeDialog() {
           <span>Import/backfill</span>
         </DropdownMenuItem>
         <DropdownMenuItem
-          onClick={() => navigate("/create-employee")}
+          onClick={() => navigate("/employees/create-employee")}
           className="space-x-2"
         >
           <Icon name="plus-circled" size="sm" />

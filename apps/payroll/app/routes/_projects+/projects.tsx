@@ -47,7 +47,7 @@ export default function Projects() {
               autoFocus={true}
             />
             <Link
-              to="/create-project"
+              to="/projects/create-project"
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
                 "flex items-center gap-1",

@@ -40,7 +40,7 @@ import {
 import { createProject } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import type { ProjectDatabaseUpdate } from "@canny_ecosystem/supabase/types";
-import { UPDATE_PROJECT } from "./$projectId.update-project";
+import { UPDATE_PROJECT } from "./$projectId+/update-project";
 import { getCompanies } from "@canny_ecosystem/supabase/queries";
 import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 import { useState } from "react";
@@ -121,7 +121,7 @@ export default function CreateProject({
   });
 
   return (
-    <section className="md:px-20 lg:px-52 2xl:px-80 py-6">
+    <section className="lg:px-40 2xl:px-80 py-2">
       <FormProvider context={form.context}>
         <Form
           method="POST"

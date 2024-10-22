@@ -57,7 +57,7 @@ export function FilterList({ filterList }: Props) {
   };
 
   return (
-    <ul className="flex space-x-2">
+    <ul className="flex flex-0 space-x-2 w-full overflow-scroll no-scrollbar">
       {filterList &&
         Object.entries(filterList)
           .filter(
@@ -68,7 +68,7 @@ export function FilterList({ filterList }: Props) {
             return (
               <li key={key}>
                 <Button
-                  className="rounded-full h-8 px-3 bg-secondary hover:bg-secondary font-normal text-[#878787] flex space-x-1 items-center group"
+                  className="rounded-full h-9 px-3 bg-secondary hover:bg-secondary font-normal text-[#878787] flex space-x-1 items-center group"
                   onClick={() => handleOnRemove(key)}
                 >
                   <Icon

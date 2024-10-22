@@ -42,6 +42,10 @@ export async function getProjectsByCompanyId({
     .order("created_at", { ascending: false })
     .returns<Omit<ProjectsWithCompany, "created_at" | "updated_at">[]>();
 
+  if (error) {
+    console.error(error);
+  }
+
   return { data, error };
 }
 
@@ -81,6 +85,10 @@ export async function getProjectById({
     )
     .single<Omit<ProjectsWithCompany, "created_at" | "updated_at">>();
 
+  if (error) {
+    console.error(error);
+  }
+
   return { data, error };
 }
 
@@ -118,6 +126,10 @@ export async function getSitesByProjectId({
     .order("created_at", { ascending: false })
     .returns<Omit<SitesWithLocation, "created_at" | "updated_at">[]>();
 
+  if (error) {
+    console.error(error);
+  }
+
   return { data, error };
 }
 
@@ -148,6 +160,10 @@ export async function getSiteById({
     .eq("id", id)
     .single<Omit<SitesWithLocation, "created_at" | "updated_at">>();
 
+  if (error) {
+    console.error(error);
+  }
+
   return { data, error };
 }
 
@@ -156,13 +172,25 @@ export async function getSitePaySequenceInSite({
   supabase,
   siteId,
 }: { supabase: TypedSupabaseClient; siteId: string }) {
-  const columns = ["id", "pay_frequency", "working_days", "pay_day", "site_id"] as const;
+  const columns = [
+    "id",
+    "pay_frequency",
+    "working_days",
+    "pay_day",
+    "site_id",
+  ] as const;
 
   const { data, error } = await supabase
     .from("site_pay_sequence")
     .select(columns.join(","))
     .eq("site_id", siteId)
-    .single<InferredType<SitePaySequenceDatabaseRow, (typeof columns)[number]>>();
+    .single<
+      InferredType<SitePaySequenceDatabaseRow, (typeof columns)[number]>
+    >();
+
+  if (error) {
+    console.error(error);
+  }
 
   return { data, error };
 }

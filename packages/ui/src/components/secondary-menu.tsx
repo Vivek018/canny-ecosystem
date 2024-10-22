@@ -4,14 +4,16 @@ export function SecondaryMenu({
   items,
   pathname,
   Link,
+  className,
 }: {
   items: { path: string; label: string }[];
   pathname: string;
   Link: React.ElementType;
+  className?: string;
 }) {
   return (
-    <nav className="py-4">
-      <ul className="flex space-x-6 text-sm overflow-auto scrollbar-hide">
+    <nav className={cn("py-4", className)}>
+      <ul className="flex space-x-6 text-sm overflow-auto no-scrollbar">
         {items.map((item) => (
           <Link
             prefetch="intent"
