@@ -128,3 +128,19 @@ export type EmployeeProjectAssignmentDatabaseInsert =
   Database["public"]["Tables"]["employee_project_assignments"]["Insert"];
 export type EmployeeProjectAssignmentDatabaseUpdate =
   Database["public"]["Tables"]["employee_project_assignments"]["Update"];
+
+// Employee Skills
+export type EmployeeSkillDatabaseRow =
+  Database["public"]["Tables"]["employee_skills"]["Row"];
+export type EmployeeSkillDatabaseInsert =
+  Database["public"]["Tables"]["employee_skills"]["Insert"];
+export type EmployeeSkillDatabaseUpdate =
+  Database["public"]["Tables"]["employee_skills"]["Update"];
+
+// Employee Work History
+export type EmployeeWorkHistoryDatabaseRow =
+  Database["public"]["Tables"]["employee_work_history"]["Row"];
+export type EmployeeWorkHistoryDatabaseInsert =
+  Database["public"]["Tables"]["employee_work_history"]["Insert"];
+export type EmployeeWorkHistoryDatabaseUpdate =
+  Database["public"]["Tables"]["employee_work_history"]["Update"];

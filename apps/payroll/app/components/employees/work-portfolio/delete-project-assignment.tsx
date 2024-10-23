@@ -17,25 +17,25 @@ import { DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
-export const DeleteAddress = ({
+export const DeleteProjectAssignment = ({
   employeeId,
-  addressId,
+  projectAssignmentId,
 }: {
-  employeeId: string,
-  addressId: string;
+  employeeId: string;
+  projectAssignmentId: string;
 }) => {
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [inputError, setInputError] = useState<string[]>([]);
   const submit = useSubmit();
 
-  const handleCancelAddress = () => {
+  const handleCancelProjectAssignment = () => {
     setInputError([]);
     setInputValue("");
     setLoading(false);
   };
 
-  const handleDeleteAddress = (
+  const handleDeleteProjectAssignment = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
@@ -44,7 +44,7 @@ export const DeleteAddress = ({
         {},
         {
           method: "post",
-          action: `/employees/${employeeId}/${addressId}/delete-employee-address`,
+          action: `/employees/${employeeId}/work-portfolio/${projectAssignmentId}/delete-project-assignment`,
           replace: true,
         },
       );
@@ -62,14 +62,13 @@ export const DeleteAddress = ({
           "text-[13px] h-9",
         )}
       >
-        Delete Address
+        Delete Project Assignment
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your
-            address and remove it's data from our servers.
+            This action cannot be undone. This will permanently delete this project assignment and remove it's data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="py-4">
@@ -91,13 +90,13 @@ export const DeleteAddress = ({
           <ErrorList errors={inputError} />
         </div>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={handleCancelAddress}>
+          <AlertDialogCancel onClick={handleCancelProjectAssignment}>
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
             className={cn(buttonVariants({ variant: "destructive" }))}
-            onClick={handleDeleteAddress}
-            onSelect={handleDeleteAddress}
+            onClick={handleDeleteProjectAssignment}
+            onSelect={handleDeleteProjectAssignment}
           >
             {isLoading ? "Deleting..." : "Delete"}
           </AlertDialogAction>

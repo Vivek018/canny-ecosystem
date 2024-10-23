@@ -78,15 +78,13 @@ export default function EmployeeIndex() {
   } = useLoaderData<typeof loader>();
 
   return (
-    <div className="-mt-4">
-      <div className="w-full mb-10 mt-5 flex flex-col gap-7">
-        <EmployeePageHeader employee={data} />
-        <EmployeeDetailsCard employee={data} />
-        <EmployeeStatutoryCard employeeStatutory={employeeStatutoryData} />
-        <EmployeeBankDetailsCard bankDetails={employeeBankData} />
-        <EmployeeAddressesCard employeeAddresses={employeeAddresses} />
-        <EmployeeGuardiansCard employeeGuardians={employeeGuardians} />
-      </div>
+    <div className="w-full my-8 flex flex-col gap-8">
+      <EmployeePageHeader employee={data} />
+      <EmployeeDetailsCard employee={data} />
+      <EmployeeStatutoryCard employeeStatutory={employeeStatutoryData} />
+      <EmployeeBankDetailsCard bankDetails={employeeBankData} />
+      <EmployeeAddressesCard employeeAddresses={employeeAddresses} />
+      <EmployeeGuardiansCard employeeGuardians={employeeGuardians} />
     </div>
   );
 }

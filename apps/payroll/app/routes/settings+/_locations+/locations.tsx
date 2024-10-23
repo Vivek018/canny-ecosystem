@@ -13,6 +13,7 @@ import {
 } from "@canny_ecosystem/ui/command";
 import { useIsDocument } from "@canny_ecosystem/ui/hooks/is-document";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { replaceUnderscore } from "@canny_ecosystem/utils";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/react";
@@ -80,7 +81,7 @@ export default function Locations() {
                       location.address_line_1 +
                       location.address_line_2 +
                       location.city +
-                      location.state +
+                      replaceUnderscore(location.state) +
                       location.pincode
                     }
                     className="data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0"

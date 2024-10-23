@@ -4,11 +4,14 @@ import type {
   EmployeeBankDetailsDatabaseRow,
   EmployeeDatabaseRow,
   EmployeeGuardianDatabaseRow,
+  EmployeeProjectAssignmentDatabaseRow,
+  EmployeeSkillDatabaseRow,
   EmployeeStatutoryDetailsDatabaseRow,
+  EmployeeWorkHistoryDatabaseRow,
   InferredType,
   TypedSupabaseClient,
 } from "../types";
-import { HARD_QUERY_LIMIT } from "../constant";
+import { HARD_QUERY_LIMIT, MID_QUERY_LIMIT } from "../constant";
 
 export type EmployeeFilters = {
   start?: string | undefined;
@@ -141,11 +144,45 @@ export async function getEmployeesByCompanyId({
   };
 }
 
+export async function getEmployeesByProjectSiteId({
+  supabase,
+  projectSiteId,
+}: {
+  supabase: TypedSupabaseClient;
+  projectSiteId: string;
+}) {
+  const columns = ["id", "employee_code"] as const;
+
+  const { data, error } = await supabase
+    .from("employees")
+    .select(
+      `${columns.join(
+        ","
+      )},employee_project_assignments!employee_project_assignments_employee_id_fkey!inner(*)`
+    )
+    .eq("employee_project_assignments.project_site_id", projectSiteId)
+    .limit(MID_QUERY_LIMIT)
+    .returns<InferredType<EmployeeDatabaseRow, (typeof columns)[number]>[]>();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return {
+    data,
+    error,
+  };
+}
+
 export async function getEmployeeById({
   supabase,
   id,
   companyId,
-}: { supabase: TypedSupabaseClient; id: string; companyId: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+  companyId: string;
+}) {
   const columns = [
     "id",
     "employee_code",
@@ -181,7 +218,10 @@ export async function getEmployeeById({
 export async function getEmployeeStatutoryDetailsById({
   supabase,
   id,
-}: { supabase: TypedSupabaseClient; id: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+}) {
   const columns = [
     "aadhaar_number",
     "pan_number",
@@ -216,7 +256,10 @@ export async function getEmployeeStatutoryDetailsById({
 export async function getEmployeeBankDetailsById({
   supabase,
   id,
-}: { supabase: TypedSupabaseClient; id: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+}) {
   const columns = [
     "account_holder_name",
     "bank_name",
@@ -245,7 +288,10 @@ export async function getEmployeeBankDetailsById({
 export async function getEmployeeAddressesByEmployeeId({
   supabase,
   employeeId,
-}: { supabase: TypedSupabaseClient; employeeId: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  employeeId: string;
+}) {
   const columns = [
     "id",
     "address_type",
@@ -279,7 +325,10 @@ export async function getEmployeeAddressesByEmployeeId({
 export async function getEmployeeGuardiansByEmployeeId({
   supabase,
   employeeId,
-}: { supabase: TypedSupabaseClient; employeeId: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  employeeId: string;
+}) {
   const columns = [
     "id",
     "relationship",
@@ -314,7 +363,10 @@ export async function getEmployeeGuardiansByEmployeeId({
 export async function getEmployeeAddressById({
   supabase,
   id,
-}: { supabase: TypedSupabaseClient; id: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+}) {
   const columns = [
     "id",
     "address_type",
@@ -347,7 +399,10 @@ export async function getEmployeeAddressById({
 export async function getEmployeeGuardianById({
   supabase,
   id,
-}: { supabase: TypedSupabaseClient; id: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+}) {
   const columns = [
     "id",
     "relationship",
@@ -369,6 +424,214 @@ export async function getEmployeeGuardianById({
     .eq("id", id)
     .single<
       InferredType<EmployeeGuardianDatabaseRow, (typeof columns)[number]>
+    >();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { data, error };
+}
+
+export async function getEmployeeSkillsByEmployeeId({
+  supabase,
+  employeeId,
+}: {
+  supabase: TypedSupabaseClient;
+  employeeId: string;
+}) {
+  const columns = [
+    "id",
+    "skill_name",
+    "proficiency",
+    "years_of_experience",
+    "employee_id",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("employee_skills")
+    .select(columns.join(","))
+    .eq("employee_id", employeeId)
+    .limit(HARD_QUERY_LIMIT)
+    .returns<
+      InferredType<EmployeeSkillDatabaseRow, (typeof columns)[number]>[]
+    >();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { data, error };
+}
+
+export async function getEmployeeSkillById({
+  supabase,
+  id,
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+}) {
+  const columns = [
+    "id",
+    "skill_name",
+    "proficiency",
+    "years_of_experience",
+    "employee_id",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("employee_skills")
+    .select(columns.join(","))
+    .eq("id", id)
+    .single<InferredType<EmployeeSkillDatabaseRow, (typeof columns)[number]>>();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { data, error };
+}
+
+export async function getEmployeeWorkHistoriesByEmployeeId({
+  supabase,
+  employeeId,
+}: {
+  supabase: TypedSupabaseClient;
+  employeeId: string;
+}) {
+  const columns = [
+    "id",
+    "company_name",
+    "position",
+    "responsibilities",
+    "start_date",
+    "end_date",
+    "employee_id",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("employee_work_history")
+    .select(columns.join(","))
+    .eq("employee_id", employeeId)
+    .limit(HARD_QUERY_LIMIT)
+    .returns<
+      InferredType<EmployeeWorkHistoryDatabaseRow, (typeof columns)[number]>[]
+    >();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { data, error };
+}
+
+export async function getEmployeeWorkHistoryById({
+  supabase,
+  id,
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+}) {
+  const columns = [
+    "id",
+    "company_name",
+    "position",
+    "responsibilities",
+    "start_date",
+    "end_date",
+    "employee_id",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("employee_work_history")
+    .select(columns.join(","))
+    .eq("id", id)
+    .single<
+      InferredType<EmployeeWorkHistoryDatabaseRow, (typeof columns)[number]>
+    >();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { data, error };
+}
+
+export type EmployeeProjectAssignmentDataType = Omit<
+  EmployeeProjectAssignmentDatabaseRow,
+  "created_at" | "updated_at"
+> & {
+  project_site: { id: string; name: string };
+  supervisor: { id: string; employee_code: string };
+};
+
+export async function getEmployeeProjectAssignmentsByEmployeeId({
+  supabase,
+  employeeId,
+}: {
+  supabase: TypedSupabaseClient;
+  employeeId: string;
+}) {
+  const columns = [
+    "id",
+    "project_site:project_sites!project_site_id (id, name)",
+    "position",
+    "start_date",
+    "end_date",
+    "is_current",
+    "supervisor:employees!supervisor_id (id, employee_code)",
+    "assignment_type",
+    "skill_level",
+    "probation_period",
+    "probation_end_date",
+    "employee_id",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("employee_project_assignments")
+    .select(columns.join(","))
+    .eq("employee_id", employeeId)
+    .limit(HARD_QUERY_LIMIT)
+    .returns<EmployeeProjectAssignmentDataType[]>();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { data, error };
+}
+
+export async function getEmployeeProjectAssignmentById({
+  supabase,
+  id,
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+}) {
+  const columns = [
+    "id",
+    "project_site_id",
+    "position",
+    "start_date",
+    "end_date",
+    "is_current",
+    "supervisor_id",
+    "assignment_type",
+    "skill_level",
+    "probation_period",
+    "probation_end_date",
+    "employee_id",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("employee_project_assignments")
+    .select(columns.join(","))
+    .eq("id", id)
+    .single<
+      InferredType<
+        EmployeeProjectAssignmentDatabaseRow,
+        (typeof columns)[number]
+      >
     >();
 
   if (error) {

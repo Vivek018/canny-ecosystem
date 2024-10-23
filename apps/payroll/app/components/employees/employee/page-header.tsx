@@ -22,7 +22,7 @@ export function EmployeePageHeader({
   >;
 }) {
   return (
-    <div className="mt-6 flex w-full flex-col gap-6">
+    <div className="flex w-full flex-col gap-6">
       <div className="w-full flex flex-row gap-6 justify-between">
         <div className="flex flex-row gap-6 items-center">
           <div>

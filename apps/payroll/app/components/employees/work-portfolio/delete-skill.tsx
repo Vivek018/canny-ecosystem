@@ -17,25 +17,25 @@ import { DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
-export const DeleteAddress = ({
+export const DeleteSkill = ({
   employeeId,
-  addressId,
+  skillId,
 }: {
-  employeeId: string,
-  addressId: string;
+  employeeId: string;
+  skillId: string;
 }) => {
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [inputError, setInputError] = useState<string[]>([]);
   const submit = useSubmit();
 
-  const handleCancelAddress = () => {
+  const handleCancelSkill = () => {
     setInputError([]);
     setInputValue("");
     setLoading(false);
   };
 
-  const handleDeleteAddress = (
+  const handleDeleteSkill = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
@@ -44,7 +44,7 @@ export const DeleteAddress = ({
         {},
         {
           method: "post",
-          action: `/employees/${employeeId}/${addressId}/delete-employee-address`,
+          action: `/employees/${employeeId}/work-portfolio/${skillId}/delete-employee-skill`,
           replace: true,
         },
       );
@@ -62,14 +62,13 @@ export const DeleteAddress = ({
           "text-[13px] h-9",
         )}
       >
-        Delete Address
+        Delete Skill
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your
-            address and remove it's data from our servers.
+            This action cannot be undone. This will permanently delete this employee's skill and remove it's data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="py-4">
@@ -91,13 +90,13 @@ export const DeleteAddress = ({
           <ErrorList errors={inputError} />
         </div>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={handleCancelAddress}>
+          <AlertDialogCancel onClick={handleCancelSkill}>
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
             className={cn(buttonVariants({ variant: "destructive" }))}
-            onClick={handleDeleteAddress}
-            onSelect={handleDeleteAddress}
+            onClick={handleDeleteSkill}
+            onSelect={handleDeleteSkill}
           >
             {isLoading ? "Deleting..." : "Delete"}
           </AlertDialogAction>

@@ -30,7 +30,7 @@ export default function Employee() {
         <SecondaryMenu
           items={[
             { label: "Overview", path: `/employees/${employeeId}` },
-            { label: "Sites", path: `/employees/${employeeId}/sites` },
+            { label: "Work Portfolio", path: `/employees/${employeeId}/work-portfolio` },
           ]}
           pathname={pathname}
           Link={Link}

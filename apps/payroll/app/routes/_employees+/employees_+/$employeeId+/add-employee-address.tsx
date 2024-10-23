@@ -1,36 +1,17 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { getEmployeeAddressesByEmployeeId } from "@canny_ecosystem/supabase/queries";
-import { Form, json, useLoaderData } from "@remix-run/react";
+import { Form, json } from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { safeRedirect } from "@/utils/server/http.server";
 import { createEmployeeAddresses } from "@canny_ecosystem/supabase/mutations";
-import { isGoodStatus, EmployeeAddressesSchema } from "@canny_ecosystem/utils";
+import { isGoodStatus, EmployeeAddressesSchema, getInitialValueFromZod } from "@canny_ecosystem/utils";
 import { CreateEmployeeAddress } from "@/components/employees/form/create-employee-address";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
 import { Card, CardFooter } from "@canny_ecosystem/ui/card";
 import { Button } from "@canny_ecosystem/ui/button";
 import { useState } from "react";
 
-export const ADD_EMPLOYEE_ADDRESS = "update-employee-address";
-
-export async function loader({ request, params }: LoaderFunctionArgs) {
-  const employeeId = params.employeeId;
-  const { supabase } = getSupabaseWithHeaders({ request });
-
-  let data = null;
-
-  if (employeeId) {
-    data = (
-      await getEmployeeAddressesByEmployeeId({
-        supabase,
-        employeeId: employeeId,
-      })
-    ).data;
-  }
-
-  return json({ data });
-}
+export const ADD_EMPLOYEE_ADDRESS = "add-employee-address";
 
 export async function action({ request, params }: ActionFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -66,9 +47,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export default function AddEmployeeAddress() {
-  const { data } = useLoaderData<typeof loader>();
   const [resetKey, setResetKey] = useState(Date.now());
   const currentSchema = EmployeeAddressesSchema;
+
+  const initialValues = getInitialValueFromZod(currentSchema);
 
   const [form, fields] = useForm({
     id: ADD_EMPLOYEE_ADDRESS,
@@ -78,7 +60,7 @@ export default function AddEmployeeAddress() {
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
-    defaultValue: data,
+    defaultValue: initialValues,
   });
 
   return (
