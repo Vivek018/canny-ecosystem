@@ -25,6 +25,7 @@ import {
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { DeleteAddress } from "./delete-address";
+import { replaceUnderscore } from "@canny_ecosystem/utils";
 
 type EmployeeAddress = Omit<
   EmployeeAddressDatabaseRow,
@@ -109,7 +110,7 @@ export const AddressItem = ({ address }: { address: EmployeeAddress }) => {
         </address>
         <div className="flex items-center capitalize gap-2">
           <p>{`${address.city ?? "--"},`}</p>
-          <p>{`${address.state ?? "--"}`}</p>
+          <p>{`${replaceUnderscore(address.state ?? "--")}`}</p>
           <p>{`- ${address.pincode ?? "--"}`}</p>
         </div>
       </CardContent>
@@ -147,7 +148,7 @@ export const EmployeeAddressesCard = ({
       </div>
 
       <div className="w-full overflow-scroll no-scrollbar">
-        {employeeAddresses ? (
+        {employeeAddresses?.length ? (
           <div className="flex items-center gap-4 min-w-max">
             {employeeAddresses.map((address, index) => (
               <AddressItem

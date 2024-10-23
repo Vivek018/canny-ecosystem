@@ -26,24 +26,24 @@ export async function getUserByEmail({
     "is_active",
   ] as const;
 
-  // const { data, error } = await supabase
-  //   .from("users")
-  //   .select(columns.join(","))
-  //   .eq("email", email)
-  //   .single<InferredType<UserDatabaseRow, (typeof columns)[number]>>();
+  const { data, error } = await supabase
+    .from("users")
+    .select(columns.join(","))
+    .eq("email", email)
+    .single<InferredType<UserDatabaseRow, (typeof columns)[number]>>();
 
-  // if (error) {
-  //     console.error(error)
-  //   }
+  if (error) {
+      console.error(error)
+    }
 
-  // return { data, error };
-  return {
-    data: {
-      id: "1",
-      email: "demo@gmail.com",
-      first_name: "Demo",
-      last_name: "User",
-    },
-    error: null,
-  };
+  return { data, error };
+  // return {
+  //   data: {
+  //     id: "1",
+  //     email: "demo@gmail.com",
+  //     first_name: "Demo",
+  //     last_name: "User",
+  //   },
+  //   error: null,
+  // };
 }

@@ -25,6 +25,7 @@ import {
 } from "@canny_ecosystem/ui/card";
 import type { SitesWithLocation } from "@canny_ecosystem/supabase/queries";
 import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
+import { replaceUnderscore } from "@canny_ecosystem/utils";
 
 export function SiteCard({
   site,
@@ -122,7 +123,7 @@ export function SiteCard({
         </address>
         <div className="flex items-center capitalize gap-2">
           <p>{`${site.city},`}</p>
-          <p>{`${site.state}`}</p>
+          <p>{`${replaceUnderscore(site.state)}`}</p>
           <p>{`- ${site.pincode}`}</p>
         </div>
       </CardContent>

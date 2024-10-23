@@ -222,7 +222,7 @@ export default function CreateEmployee() {
   });
 
   return (
-    <section className="lg:px-40 2xl:px-80 py-2">
+    <section className="lg:px-40 2xl:px-80 py-4">
       <div className="w-full overflow-scroll mx-auto mb-8">
         <FormStepHeader
           totalSteps={totalSteps}

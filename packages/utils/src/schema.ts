@@ -370,7 +370,7 @@ export const skillLevelArray = [
 export const EmployeeProjectAssignmentSchema = z.object({
   id: z.string().optional(),
   employee_id: z.string().optional(),
-  project_site_id: z.string().optional(),
+  project_site_id: z.string(),
   position: z.enum(positionArray).default("sampler"),
   skill_level: z.enum(skillLevelArray).default("unskilled"),
   assignment_type: z.enum(assignmentTypeArray).default("full_time"),
@@ -395,9 +395,9 @@ export const EmployeeSkillsSchema = z.object({
 export const EmployeeWorkHistorySchema = z.object({
   id: z.string().optional(),
   employee_id: z.string().optional(),
-  company_name: zString.min(3),
   position: z.enum(positionArray),
-  start_date: z.string().optional(),
-  end_date: z.string().optional(),
+  company_name: zString.min(3),
   responsibilities: zTextArea.optional(),
+  start_date: z.string(),
+  end_date: z.string(),
 });

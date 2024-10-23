@@ -24,6 +24,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
+import { replaceUnderscore } from "@canny_ecosystem/utils";
 
 export function LocationCard({
   location,
@@ -97,7 +98,7 @@ export function LocationCard({
         </address>
         <div className="flex items-center capitalize gap-2">
           <p>{`${location.city},`}</p>
-          <p>{`${location.state}`}</p>
+          <p>{`${replaceUnderscore(location.state)}`}</p>
           <p>{`- ${location.pincode}`}</p>
         </div>
       </CardContent>

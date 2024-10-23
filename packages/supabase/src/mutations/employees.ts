@@ -8,8 +8,14 @@ import type {
   EmployeeDatabaseUpdate,
   EmployeeGuardianDatabaseInsert,
   EmployeeGuardianDatabaseUpdate,
+  EmployeeProjectAssignmentDatabaseInsert,
+  EmployeeProjectAssignmentDatabaseUpdate,
+  EmployeeSkillDatabaseInsert,
+  EmployeeSkillDatabaseUpdate,
   EmployeeStatutoryDetailsDatabaseInsert,
   EmployeeStatutoryDetailsDatabaseUpdate,
+  EmployeeWorkHistoryDatabaseInsert,
+  EmployeeWorkHistoryDatabaseUpdate,
   TypedSupabaseClient,
 } from "../types";
 
@@ -121,6 +127,74 @@ export async function createEmployee({
     employeeAddressesError: null,
     employeeGuardiansError: null,
   };
+}
+
+export async function updateEmployee({
+  supabase,
+  data,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  data: EmployeeDatabaseUpdate;
+  bypassAuth?: boolean;
+}) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
+  const updateData = convertToNull(data);
+
+  const { error, status } = await supabase
+    .from("employees")
+    .update(updateData)
+    .eq("id", data.id!)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("error", error);
+  }
+
+  return { status, error };
+}
+
+export async function deleteEmployee({
+  supabase,
+  id,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+  bypassAuth?: boolean;
+}) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
+  const { error, status } = await supabase
+    .from("employees")
+    .delete()
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { status, error };
 }
 
 export async function createEmployeeStatutoryDetails({
@@ -245,74 +319,6 @@ export async function createEmployeeGuardians({
   }
 
   return { error, status };
-}
-
-export async function updateEmployee({
-  supabase,
-  data,
-  bypassAuth = false,
-}: {
-  supabase: TypedSupabaseClient;
-  data: EmployeeDatabaseUpdate;
-  bypassAuth?: boolean;
-}) {
-  if (!bypassAuth) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user?.email) {
-      return { status: 400, error: "Unauthorized User" };
-    }
-  }
-
-  const updateData = convertToNull(data);
-
-  const { error, status } = await supabase
-    .from("employees")
-    .update(updateData)
-    .eq("id", data.id!)
-    .select()
-    .single();
-
-  if (error) {
-    console.error("error", error);
-  }
-
-  return { status, error };
-}
-
-export async function deleteEmployee({
-  supabase,
-  id,
-  bypassAuth = false,
-}: {
-  supabase: TypedSupabaseClient;
-  id: string;
-  bypassAuth?: boolean;
-}) {
-  if (!bypassAuth) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user?.email) {
-      return { status: 400, error: "Unauthorized User" };
-    }
-  }
-
-  const { error, status } = await supabase
-    .from("employees")
-    .delete()
-    .eq("id", id)
-    .select()
-    .single();
-
-  if (error) {
-    console.error(error);
-  }
-
-  return { status, error };
 }
 
 export async function updateEmployeeStatutoryDetails({
@@ -509,6 +515,303 @@ export async function deleteEmployeeGuardian({
 
   const { error, status } = await supabase
     .from("employee_guardians")
+    .delete()
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { status, error };
+}
+
+export async function createEmployeeSkill({
+  supabase,
+  data,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  data: EmployeeSkillDatabaseInsert;
+  bypassAuth?: boolean;
+}) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
+  const { error, status } = await supabase
+    .from("employee_skills")
+    .insert(data)
+    .single();
+
+  if (error) {
+    console.error("employee_skills_error", error);
+  }
+
+  return { error, status };
+}
+
+export async function updateEmployeeSkill({
+  supabase,
+  data,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  data: EmployeeSkillDatabaseUpdate;
+  bypassAuth?: boolean;
+}) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
+  const updateData = convertToNull(data);
+
+  const { error, status } = await supabase
+    .from("employee_skills")
+    .update(updateData)
+    .eq("id", data.id!)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("error", error);
+  }
+
+  return { status, error };
+}
+
+export async function deleteEmployeeSkill({
+  supabase,
+  id,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+  bypassAuth?: boolean;
+}) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
+  const { error, status } = await supabase
+    .from("employee_skills")
+    .delete()
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { status, error };
+}
+
+export async function createEmployeeWorkHistory({
+  supabase,
+  data,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  data: EmployeeWorkHistoryDatabaseInsert;
+  bypassAuth?: boolean;
+}) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
+  const { error, status } = await supabase
+    .from("employee_work_history")
+    .insert(data)
+    .single();
+
+  if (error) {
+    console.error("employee_works_history_error", error);
+  }
+
+  return { error, status };
+}
+
+export async function updateEmployeeWorkHistory({
+  supabase,
+  data,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  data: EmployeeWorkHistoryDatabaseUpdate;
+  bypassAuth?: boolean;
+}) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
+  const updateData = convertToNull(data);
+
+  const { error, status } = await supabase
+    .from("employee_work_history")
+    .update(updateData)
+    .eq("id", data.id!)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("error", error);
+  }
+
+  return { status, error };
+}
+
+export async function deleteEmployeeWorkHistory({
+  supabase,
+  id,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+  bypassAuth?: boolean;
+}) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
+  const { error, status } = await supabase
+    .from("employee_work_history")
+    .delete()
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { status, error };
+}
+
+export async function createEmployeeProjectAssignment({
+  supabase,
+  data,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  data: EmployeeProjectAssignmentDatabaseInsert;
+  bypassAuth?: boolean;
+}) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
+  const { error, status } = await supabase
+    .from("employee_project_assignments")
+    .insert(data)
+    .single();
+
+  if (error) {
+    console.error("employee_project_assignments_error", error);
+  }
+
+  return { error, status };
+}
+
+export async function updateEmployeeProjectAssignment({
+  supabase,
+  data,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  data: EmployeeProjectAssignmentDatabaseUpdate;
+  bypassAuth?: boolean;
+}) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
+  const updateData = convertToNull(data);
+
+  const { error, status } = await supabase
+    .from("employee_project_assignments")
+    .update(updateData)
+    .eq("id", data.id!)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("error", error);
+  }
+
+  return { status, error };
+}
+
+export async function deleteEmployeeProjectAssignment({
+  supabase,
+  id,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+  bypassAuth?: boolean;
+}) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
+  const { error, status } = await supabase
+    .from("employee_project_assignments")
     .delete()
     .eq("id", id)
     .select()

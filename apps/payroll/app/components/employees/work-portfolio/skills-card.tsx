@@ -20,13 +20,13 @@ import {
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
-import type { EmployeeGuardianDatabaseRow } from "@canny_ecosystem/supabase/types";
-import { DeleteGuardian } from "./delete-guardian";
+import type { EmployeeSkillDatabaseRow } from "@canny_ecosystem/supabase/types";
+import { DeleteSkill } from "./delete-skill";
 
 type DetailItemProps = {
   label: string;
-  value: string | null | undefined;
-  formatter?: (value: string) => string;
+  value: string | number | null | undefined;
+  formatter?: (value: string | number) => string;
 };
 
 const DetailItem: React.FC<DetailItemProps> = ({ label, value, formatter }) => {
@@ -42,20 +42,20 @@ const DetailItem: React.FC<DetailItemProps> = ({ label, value, formatter }) => {
   );
 };
 
-type EmployeeGuardian = Omit<
-  EmployeeGuardianDatabaseRow,
+type EmployeeSkill = Omit<
+  EmployeeSkillDatabaseRow,
   "created_at" | "updated_at"
 >;
 
-export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
+export const SkillItem = ({ skill }: { skill: EmployeeSkill }) => {
   return (
     <Card
-      key={guardian.id}
+      key={skill.id}
       className="w-[420px] shadow-none select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start"
     >
       <CardHeader className="flex flex-row space-y-0 items-center justify-between p-4">
         <CardTitle className="text-lg tracking-wide">
-          {guardian.relationship ?? "--"}
+          {skill.skill_name ?? "--"}
         </CardTitle>
         <div className="flex items-center gap-3">
           <TooltipProvider>
@@ -63,7 +63,7 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
               <TooltipTrigger asChild>
                 <Link
                   prefetch="intent"
-                  to={`/employees/${guardian.employee_id}/${guardian.id}/update-employee-guardian`}
+                  to={`/employees/${skill.employee_id}/work-portfolio/${skill.id}/update-employee-skill`}
                   className={cn(
                     buttonVariants({ variant: "muted" }),
                     "px-2.5 h-min",
@@ -86,76 +86,38 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent sideOffset={10} align="end">
               <DropdownMenuGroup>
-                <DeleteGuardian
-                  employeeId={guardian.employee_id}
-                  guardianId={guardian.id}
+                <DeleteSkill
+                  employeeId={skill.employee_id}
+                  skillId={skill.id}
                 />
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </CardHeader>
-      <CardContent className="flex flex-col px-4 pt-1 pb-4 gap-3">
-        <div className="flex flex-row items-center justify-between">
-          <DetailItem
-            label="Name"
-            value={`${guardian.first_name ?? "--"} ${guardian.last_name ?? "--"}`}
-          />
-          <DetailItem label="Date of Birth" value={guardian.date_of_birth} />
-          <DetailItem label="Gender" value={guardian.gender} />
-        </div>
-        <div className="flex flex-row items-center justify-between">
-          <DetailItem label="Mobile Number" value={guardian.mobile_number} />
-          <DetailItem
-            label="Alternate Number"
-            value={guardian.alternate_mobile_number}
-          />
-        </div>
-        <div className="mt-1.5 flex flex-row items-center justify-between">
-          <div className="flex items-center gap-1 text-muted-foreground text-sm">
-            <Icon
-              name={guardian.is_emergency_contact ? "check" : "cross"}
-              size="sm"
-              className={cn(
-                "dark:mt-[1px]",
-                guardian.is_emergency_contact
-                  ? "text-green"
-                  : "text-destructive",
-              )}
-            />
-            <p>Is emergency contact</p>
-          </div>
-          <div className="flex items-center gap-1 text-muted-foreground text-sm">
-            <Icon
-              name={guardian.address_same_as_employee ? "check" : "cross"}
-              size="sm"
-              className={cn(
-                "dark:mt-[1px]",
-                guardian.address_same_as_employee
-                  ? "text-green"
-                  : "text-destructive",
-              )}
-            />
-            <p>Address same as employee</p>
-          </div>
-        </div>
+      <CardContent className="flex flex-row justify-between gap-0.5 px-4">
+        <DetailItem label="Proficiency" value={skill.proficiency} />
+        <DetailItem
+          label="Years of experience"
+          value={skill.years_of_experience}
+        />
       </CardContent>
     </Card>
   );
 };
 
-export const EmployeeGuardiansCard = ({
-  employeeGuardians,
+export const EmployeeSkillsCard = ({
+  employeeSkills,
 }: {
-  employeeGuardians: EmployeeGuardian[] | null;
+  employeeSkills: EmployeeSkill[] | null;
 }) => {
   return (
     <Card className="rounded w-full h-full p-4">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold">Guardians Details</h2>
+        <h2 className="text-xl font-semibold">Employee Skills</h2>
         <div>
           <Link
-            to="add-employee-guardian"
+            to="add-employee-skill"
             className={cn(buttonVariants({ variant: "outline" }), "bg-card")}
           >
             <Icon name="plus-circled" className="mr-2" />
@@ -165,18 +127,15 @@ export const EmployeeGuardiansCard = ({
       </div>
 
       <div className="w-full overflow-scroll no-scrollbar">
-        {employeeGuardians?.length ? (
+        {employeeSkills?.length ? (
           <div className="flex items-center gap-4 min-w-max">
-            {employeeGuardians.map((guardian, index) => (
-              <GuardianItem
-                key={guardian?.id + index.toString()}
-                guardian={guardian}
-              />
+            {employeeSkills.map((skill, index) => (
+              <SkillItem key={skill?.id + index.toString()} skill={skill} />
             ))}
           </div>
         ) : (
           <div className="text-center py-8">
-            <p>No guardians details available.</p>
+            <p>No employee skills available.</p>
           </div>
         )}
       </div>

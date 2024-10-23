@@ -1,11 +1,14 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { getEmployeeGuardiansByEmployeeId } from "@canny_ecosystem/supabase/queries";
-import { Form, json, useLoaderData } from "@remix-run/react";
+import { Form, json } from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { safeRedirect } from "@/utils/server/http.server";
 import { createEmployeeGuardians } from "@canny_ecosystem/supabase/mutations";
-import { isGoodStatus, EmployeeGuardiansSchema } from "@canny_ecosystem/utils";
+import {
+  isGoodStatus,
+  EmployeeGuardiansSchema,
+  getInitialValueFromZod,
+} from "@canny_ecosystem/utils";
 import { CreateEmployeeGuardianDetails } from "@/components/employees/form/create-employee-guardian-details";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
 import { Card, CardFooter } from "@canny_ecosystem/ui/card";
@@ -13,24 +16,6 @@ import { Button } from "@canny_ecosystem/ui/button";
 import { useState } from "react";
 
 export const ADD_EMPLOYEE_GUARDIAN = "update-employee-guardian";
-
-export async function loader({ request, params }: LoaderFunctionArgs) {
-  const employeeId = params.employeeId;
-  const { supabase } = getSupabaseWithHeaders({ request });
-
-  let data = null;
-
-  if (employeeId) {
-    data = (
-      await getEmployeeGuardiansByEmployeeId({
-        supabase,
-        employeeId: employeeId,
-      })
-    ).data;
-  }
-
-  return json({ data });
-}
 
 export async function action({ request, params }: ActionFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -66,9 +51,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export default function AddEmployeeGuardian() {
-  const { data } = useLoaderData<typeof loader>();
   const [resetKey, setResetKey] = useState(Date.now());
   const currentSchema = EmployeeGuardiansSchema;
+
+  const initialValues = getInitialValueFromZod(currentSchema);
 
   const [form, fields] = useForm({
     id: ADD_EMPLOYEE_GUARDIAN,
@@ -78,7 +64,7 @@ export default function AddEmployeeGuardian() {
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
-    defaultValue: data,
+    defaultValue: initialValues,
   });
 
   return (
@@ -91,7 +77,10 @@ export default function AddEmployeeGuardian() {
           className="flex flex-col"
         >
           <Card>
-            <CreateEmployeeGuardianDetails key={resetKey} fields={fields as any} />
+            <CreateEmployeeGuardianDetails
+              key={resetKey}
+              fields={fields as any}
+            />
             <CardFooter>
               <div className="ml-auto w-2/5 flex flex-row items-center justify-center gap-4">
                 <Button
