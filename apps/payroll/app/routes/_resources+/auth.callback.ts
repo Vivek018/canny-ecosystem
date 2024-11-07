@@ -5,21 +5,24 @@ import { type LoaderFunctionArgs, json } from "@remix-run/node";
 export async function loader({ request }: LoaderFunctionArgs) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
-  const next = requestUrl.searchParams.get("next") || "/";
+  const next = requestUrl.searchParams.get("next") ?? "/";
   const headers = new Headers();
+
+  // Checking for production
+  headers.append("Access-Control-Allow-Origin", "*");
 
   if (code) {
     const { supabase, headers: supabaseHeaders } = getSupabaseWithHeaders({
       request,
     });
-
+    
     try {
       const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
       if (error) {
         console.error(
           "Auth Callback - Error exchanging code for session:",
-          error,
+          error
         );
         return json({ error: error.message }, { status: 500 });
       }
