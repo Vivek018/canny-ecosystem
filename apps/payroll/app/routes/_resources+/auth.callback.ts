@@ -8,6 +8,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const next = requestUrl.searchParams.get("next") ?? "/";
   const headers = new Headers();
 
+  console.log(code);
+  console.log(next);
+
   if (code) {
     const { supabase, headers: supabaseHeaders } = getSupabaseWithHeaders({
       request,
@@ -15,6 +18,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     
     try {
       const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+      console.log(data, error);
 
       if (error) {
         console.error(
