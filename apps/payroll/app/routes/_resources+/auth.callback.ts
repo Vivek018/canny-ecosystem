@@ -8,9 +8,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const next = requestUrl.searchParams.get("next") ?? "/";
   const headers = new Headers();
 
-  // Checking for production
-  headers.append("Access-Control-Allow-Origin", "*");
-
   if (code) {
     const { supabase, headers: supabaseHeaders } = getSupabaseWithHeaders({
       request,
