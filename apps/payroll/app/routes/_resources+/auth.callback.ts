@@ -30,6 +30,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
       if (data.session) {
         headers.append("Set-Cookie", supabaseHeaders.get("Set-Cookie") || "");
+        console.log(headers)
+        console.log(Object.keys(supabase).length)
+        console.log(supabaseHeaders)
         return safeRedirect(next, { headers });
       }
     } catch (error) {
