@@ -26,7 +26,7 @@ import { useNonce } from "./utils/providers/nonce-provider";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Logo } from "@canny_ecosystem/ui/logo";
 import { ThemeSwitch } from "./components/theme-switch";
-import { getSessionUser } from "@canny_ecosystem/supabase/cached-queries";
+import { getAuthUser, getSessionUser } from "@canny_ecosystem/supabase/cached-queries";
 import {
   getCompanies,
   getUserByEmail,
@@ -53,15 +53,15 @@ export const headers: HeadersFunction = ({ loaderHeaders }) => {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { user: sessionUser } = await getSessionUser({ request });
+  const { user: authUser } = await getAuthUser({ request });
   const { supabase } = getSupabaseWithHeaders({ request });
   let user = null;
   let companies = null;
 
-  if (sessionUser?.email) {
+  if (authUser?.email) {
     const { data: userData, error: userError } = await getUserByEmail({
       supabase,
-      email: sessionUser.email,
+      email: authUser.email,
     });
     const { data: companiesData, error: companiesError } = await getCompanies({
       supabase,
@@ -96,7 +96,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   }
 
   return json({
-    isLoggedIn: !!sessionUser,
+    isLoggedIn: !!authUser,
     user,
     companies,
     requestInfo: {

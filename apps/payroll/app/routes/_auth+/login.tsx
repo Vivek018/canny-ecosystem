@@ -33,12 +33,10 @@ export async function action({ request }: ActionFunctionArgs) {
     provider: "google",
     options: {
       redirectTo: `${new URL(request.url).origin}/auth/callback`,
-      queryParams: {
-        access_type: "offline",
-        prompt: "consent",
-      },
     },
   });
+
+  console.log("Sign in response:", { data, error });
 
   if (error) {
     console.error("Login - OAuth error:", error);
