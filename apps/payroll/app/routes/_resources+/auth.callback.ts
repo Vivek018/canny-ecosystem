@@ -1,41 +1,33 @@
+import { type LoaderFunctionArgs, json } from "@remix-run/node";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { type LoaderFunctionArgs, json } from "@remix-run/node";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
   const next = requestUrl.searchParams.get("next") ?? "/";
-  const headers = new Headers();
 
-  if (code) {
-    const { supabase, headers: supabaseHeaders } = getSupabaseWithHeaders({
-      request,
-    });
-    
-    try {
-      const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-
-      if (error) {
-        console.error(
-          "Auth Callback - Error exchanging code for session:",
-          error
-        );
-        return json({ error: error.message }, { status: 500 });
-      }
-
-      if (data.session) {
-        headers.append("Set-Cookie", supabaseHeaders.get("Set-Cookie") || "");
-        return safeRedirect(next, { headers });
-      }
-    } catch (error) {
-      console.error("Auth Callback - Unexpected error:", error);
-      return json({ error: "An unexpected error occurred" }, { status: 500 });
-    }
-  } else {
-    console.error("Auth Callback - No code provided in URL");
+  if (!code) {
+    console.error("No code provided");
+    return safeRedirect("/login?error=no_code");
   }
 
-  // If we reach here, something went wrong
-  return safeRedirect("/login?error=auth_callback_failed", { headers });
+  try {
+    const { supabase, headers } = getSupabaseWithHeaders({ request });
+
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+
+    if (error) throw error;
+
+    if (!data.session) {
+      throw new Error("No session in response");
+    }
+
+    return safeRedirect(next, {
+      headers: headers,
+    });
+  } catch (error: any) {
+    console.error("Auth callback error:", error);
+    return safeRedirect(`/login?error=${encodeURIComponent(error?.message)}`);
+  }
 }

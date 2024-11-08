@@ -36,8 +36,6 @@ export async function action({ request }: ActionFunctionArgs) {
     },
   });
 
-  console.log("Sign in response:", { data, error });
-
   if (error) {
     console.error("Login - OAuth error:", error);
     return json({ error: error.message }, { status: 500 });

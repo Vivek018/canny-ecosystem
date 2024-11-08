@@ -12,6 +12,7 @@ export const getSupabaseEnv = (): SupabaseEnv => ({
 
 export function getSupabaseWithHeaders({ request }: { request: Request }) {
   const headers = new Headers();
+  const cookieHeader = request.headers.get("Cookie");
 
   const supabase = createServerClient<Database>(
     getSupabaseEnv().SUPABASE_URL,
@@ -19,18 +20,56 @@ export function getSupabaseWithHeaders({ request }: { request: Request }) {
     {
       cookies: {
         getAll() {
-          return parseCookieHeader(request.headers.get("Cookie") ?? "");
+          const cookies = parseCookieHeader(cookieHeader ?? "");
+          return cookies;
         },
-        setAll(cookiesToSet: any) {
-          for (const { name, value, options } of cookiesToSet) {
-            headers.append(
-              "Set-Cookie",
-              serializeCookieHeader(name, value, options),
-            );
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach((cookie: any) => {
+              const { name, value, options } = cookie;
+
+              // Check if we need to split the cookie
+              if (value && value.length > 4000) {
+                // Split into chunks and set multiple cookies
+                const chunks = [];
+                let i = 0;
+                while (i < value.length) {
+                  chunks.push(value.slice(i, i + 4000));
+                  i += 4000;
+                }
+
+                chunks.forEach((chunk, index) => {
+                  const chunkName = `${name}.${index}`;
+                  const cookieStr = serializeCookieHeader(chunkName, chunk, {
+                    ...options,
+                    path: "/",
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === "production",
+                    sameSite: "lax",
+                    maxAge: 34560000, // 400 days
+                  });
+                  headers.append("Set-Cookie", cookieStr);
+                });
+              } else {
+                // Set as single cookie
+                const cookieStr = serializeCookieHeader(name, value, {
+                  ...options,
+                  path: "/",
+                  httpOnly: true,
+                  secure: process.env.NODE_ENV === "production",
+                  sameSite: "lax",
+                  maxAge: 34560000,
+                });
+                headers.append("Set-Cookie", cookieStr);
+              }
+            });
+          } catch (error) {
+            console.error("Error setting cookies:", error);
+            throw error;
           }
         },
       },
-    },
+    }
   );
 
   return { supabase, headers };
@@ -38,10 +77,24 @@ export function getSupabaseWithHeaders({ request }: { request: Request }) {
 
 export async function getSupabaseWithSessionAndHeaders({
   request,
-}: { request: Request }) {
+}: {
+  request: Request;
+}) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  return { supabase, headers, session };
+
+  try {
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.getSession();
+
+    if (error) {
+      console.error("Session error:", error);
+    }
+
+    return { supabase, headers, session };
+  } catch (error) {
+    console.error("Error getting session:", error);
+    throw error;
+  }
 }
