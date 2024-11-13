@@ -85,7 +85,7 @@
   /* Custom scrollbar styles */
   ::-webkit-scrollbar {
     width: 6px;
-    opacity: 70%;
+    opacity: 0%;
   }
   
   ::-webkit-scrollbar-corner {
@@ -100,6 +100,10 @@
     background-color: hsl(var(--scrollbar-thumb));
     border-radius: 10px;
   }
+
+  ::-webkit-scrollbar-corner {
+  background-color: hsl(var(--scrollbar-bg)); /* Match your app background */
+}
 
   /* For Firefox */
   * {

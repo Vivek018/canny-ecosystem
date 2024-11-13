@@ -61,7 +61,7 @@ export default function Login() {
         <div className='flex w-full flex-col relative'>
           <div className='pb-4 bg-gradient-to-r from-primary dark:via-primary dark:to-[#848484] to-[#000] inline-block text-transparent bg-clip-text mx-auto'>
             <h1 className='font-extrabold uppercase pb-1 tracking-widest text-4xl'>
-              CANNY CMS
+              CANNY ECOSYSTEM
             </h1>
           </div>
 
