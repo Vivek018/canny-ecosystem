@@ -19,7 +19,7 @@ export const pipe =
     fns.reduce((prev, fn) => fn(prev), val);
 
 export function getInitialValueFromZod<T extends z.ZodObject<any, any>>(
-  schema: T
+  schema: T,
 ): z.infer<T> {
   return Object.fromEntries(
     Object.entries(schema.shape).map(([key, value]) => {
@@ -27,12 +27,12 @@ export function getInitialValueFromZod<T extends z.ZodObject<any, any>>(
         return [key, value._def.defaultValue()];
       }
       return [key, undefined];
-    })
+    }),
   ) as z.infer<T>;
 }
 
 export function transformStringArrayIntoOptions(
-  arr: string[]
+  arr: string[],
 ): { value: string; label: string }[] {
   return arr.map((str) => ({
     value: str,
@@ -51,7 +51,7 @@ export function getOrdinalSuffix(n: number): string {
 
 export function deepEqualCheck(
   obj1: { [x: string]: any } | null | undefined,
-  obj2: { [x: string]: any } | null | undefined
+  obj2: { [x: string]: any } | null | undefined,
 ) {
   if (obj1 === obj2) {
     return true;

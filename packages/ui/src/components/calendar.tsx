@@ -1,11 +1,11 @@
-import type * as React from "react"
-import { DayPicker } from "react-day-picker"
+import type * as React from "react";
+import { DayPicker } from "react-day-picker";
 
-import { cn } from "@/utils"
-import { buttonVariants } from "@/components/button"
-import { Icon } from "./icon"
+import { cn } from "@/utils";
+import { buttonVariants } from "@/components/button";
+import { Icon } from "./icon";
 
-export type CalendarProps = React.ComponentProps<typeof DayPicker>
+export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
 function Calendar({
   className,
@@ -65,6 +65,6 @@ function Calendar({
     />
   );
 }
-Calendar.displayName = "Calendar"
+Calendar.displayName = "Calendar";
 
-export { Calendar }
+export { Calendar };

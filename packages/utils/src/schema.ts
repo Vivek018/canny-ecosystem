@@ -245,10 +245,7 @@ export const educationArray = [
   "graduate",
   "post-graduate",
 ] as const;
-export const maritalStatusArray = [
-  "married",
-  "unmarried",
-] as const
+export const maritalStatusArray = ["married", "unmarried"] as const;
 
 export const EmployeeSchema = z.object({
   id: z.string().optional(),

@@ -27,7 +27,7 @@ export const EmployeeOptionsDropdown = ({
       {
         id: employee.id,
         is_active: true,
-        returnTo: employee.returnTo ?? '/employees',
+        returnTo: employee.returnTo ?? "/employees",
       },
       {
         method: "POST",

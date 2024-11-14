@@ -5,9 +5,7 @@ import { json, useLoaderData } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
 import { safeRedirect } from "@/utils/server/http.server";
 import { isGoodStatus, LocationSchema } from "@canny_ecosystem/utils";
-import {
-  getLocationById,
-} from "@canny_ecosystem/supabase/queries";
+import { getLocationById } from "@canny_ecosystem/supabase/queries";
 import { updateLocation } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 

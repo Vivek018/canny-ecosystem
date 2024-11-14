@@ -129,7 +129,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 
@@ -188,17 +188,17 @@ export default function AddEmployeeProjectAssignment({
   });
 
   return (
-    <section className='lg:px-40 2xl:px-80 py-2'>
+    <section className="lg:px-40 2xl:px-80 py-2">
       <FormProvider context={form.context}>
         <Form
-          method='POST'
-          encType='multipart/form-data'
+          method="POST"
+          encType="multipart/form-data"
           {...getFormProps(form)}
-          className='flex flex-col'
+          className="flex flex-col"
         >
           <Card>
             <CardHeader>
-              <CardTitle className='text-3xl'>
+              <CardTitle className="text-3xl">
                 {replaceDash(EMPLOYEE_PROJECT_ASSIGNMENT_TAG)}
               </CardTitle>
               <CardDescription>
@@ -211,11 +211,11 @@ export default function AddEmployeeProjectAssignment({
               <input
                 {...getInputProps(fields.employee_id, { type: "hidden" })}
               />
-              <div className='grid grid-cols-3 place-content-center justify-between gap-6'>
-                <div className='w-full flex flex-col gap-1.5'>
-                  <div className='flex'>
+              <div className="grid grid-cols-3 place-content-center justify-between gap-6">
+                <div className="w-full flex flex-col gap-1.5">
+                  <div className="flex">
                     <Label>Projects</Label>
-                    <sub className='text-primary'>*</sub>
+                    <sub className="text-primary">*</sub>
                   </div>
                   <Combobox
                     key={resetKey}
@@ -234,7 +234,7 @@ export default function AddEmployeeProjectAssignment({
                 </div>
                 <SearchableSelectField
                   key={resetKey + 1}
-                  className='capitalize'
+                  className="capitalize"
                   options={updateProjectSiteOptions ?? projectSiteOptions ?? []}
                   inputProps={{
                     ...getInputProps(fields.project_site_id, { type: "text" }),
@@ -258,7 +258,7 @@ export default function AddEmployeeProjectAssignment({
                 />
                 <SearchableSelectField
                   key={resetKey + 2}
-                  className='capitalize'
+                  className="capitalize"
                   options={
                     updateSiteEmployeeOptions ?? siteEmployeeOptions ?? []
                   }
@@ -272,12 +272,12 @@ export default function AddEmployeeProjectAssignment({
                   errors={fields.supervisor_id.errors}
                 />
               </div>
-              <div className='grid grid-cols-3 place-content-center justify-between gap-6'>
+              <div className="grid grid-cols-3 place-content-center justify-between gap-6">
                 <SearchableSelectField
                   key={resetKey + 3}
-                  className='capitalize'
+                  className="capitalize"
                   options={transformStringArrayIntoOptions(
-                    positionArray as unknown as string[]
+                    positionArray as unknown as string[],
                   )}
                   inputProps={{
                     ...getInputProps(fields.position, { type: "text" }),
@@ -290,15 +290,15 @@ export default function AddEmployeeProjectAssignment({
                 />
                 <SearchableSelectField
                   key={resetKey + 4}
-                  className='capitalize'
+                  className="capitalize"
                   options={transformStringArrayIntoOptions(
-                    skillLevelArray as unknown as string[]
+                    skillLevelArray as unknown as string[],
                   )}
                   inputProps={{
                     ...getInputProps(fields.skill_level, { type: "text" }),
                   }}
                   placeholder={`Select ${replaceUnderscore(
-                    fields.skill_level.name
+                    fields.skill_level.name,
                   )}`}
                   labelProps={{
                     children: replaceUnderscore(fields.skill_level.name),
@@ -307,15 +307,15 @@ export default function AddEmployeeProjectAssignment({
                 />
                 <SearchableSelectField
                   key={resetKey + 5}
-                  className='capitalize'
+                  className="capitalize"
                   options={transformStringArrayIntoOptions(
-                    assignmentTypeArray as unknown as string[]
+                    assignmentTypeArray as unknown as string[],
                   )}
                   inputProps={{
                     ...getInputProps(fields.assignment_type, { type: "text" }),
                   }}
                   placeholder={`Select ${replaceUnderscore(
-                    fields.assignment_type.name
+                    fields.assignment_type.name,
                   )}`}
                   labelProps={{
                     children: replaceUnderscore(fields.assignment_type.name),
@@ -323,16 +323,16 @@ export default function AddEmployeeProjectAssignment({
                   errors={fields.assignment_type.errors}
                 />
               </div>
-              <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
+              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.start_date, { type: "date" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.start_date.name
+                      fields.start_date.name,
                     )}`,
                     max: getValidDateForInput(new Date().toISOString()),
                     defaultValue: getValidDateForInput(
-                      fields.start_date.initialValue
+                      fields.start_date.initialValue,
                     ),
                   }}
                   labelProps={{
@@ -346,11 +346,11 @@ export default function AddEmployeeProjectAssignment({
                       type: "date",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.end_date.name
+                      fields.end_date.name,
                     )}`,
                     min: getValidDateForInput(fields.start_date.value),
                     defaultValue: getValidDateForInput(
-                      fields.end_date.initialValue
+                      fields.end_date.initialValue,
                     ),
                   }}
                   labelProps={{
@@ -383,10 +383,10 @@ export default function AddEmployeeProjectAssignment({
                     type: "date",
                   }),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.probation_end_date.name
+                    fields.probation_end_date.name,
                   )}`,
                   defaultValue: getValidDateForInput(
-                    fields.probation_end_date.initialValue
+                    fields.probation_end_date.initialValue,
                   ),
                 }}
                 labelProps={{
@@ -396,11 +396,11 @@ export default function AddEmployeeProjectAssignment({
               />
             </CardContent>
             <CardFooter>
-              <div className='ml-auto w-2/5 flex flex-row items-center justify-center gap-4'>
+              <div className="ml-auto w-2/5 flex flex-row items-center justify-center gap-4">
                 <Button
-                  variant='secondary'
-                  size='full'
-                  type='reset'
+                  variant="secondary"
+                  size="full"
+                  type="reset"
                   onClick={() => setResetKey(Date.now())}
                   {...form.reset.getButtonProps()}
                 >
@@ -409,9 +409,9 @@ export default function AddEmployeeProjectAssignment({
                 <Button
                   form={form.id}
                   disabled={!form.valid}
-                  variant='default'
-                  size='full'
-                  type='submit'
+                  variant="default"
+                  size="full"
+                  type="submit"
                 >
                   Submit
                 </Button>

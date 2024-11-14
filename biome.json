@@ -4,10 +4,7 @@
     "enabled": true
   },
   "linter": {
-    "ignore": [
-      "node_modules",
-      "packages/tsconfig"
-    ],
+    "ignore": ["node_modules", "packages/tsconfig"],
     "enabled": true,
     "rules": {
       "suspicious": {

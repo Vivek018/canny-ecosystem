@@ -34,6 +34,7 @@ const childrenSizeClassName = {
  * you need to wrap the icon and text in a common parent and set the parent to
  * display "flex" (or "inline-flex") with "items-center" and a reasonable gap.
  */
+
 export function Icon({
   name,
   size = "font",

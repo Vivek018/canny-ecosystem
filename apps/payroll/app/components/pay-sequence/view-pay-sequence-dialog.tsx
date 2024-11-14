@@ -14,7 +14,9 @@ import { useNavigate } from "@remix-run/react";
 
 export const ViewPaySequenceDialog = ({
   values,
-}: { values: Omit<SitePaySequenceDatabaseRow, "created_at" | "updated_at"> }) => {
+}: {
+  values: Omit<SitePaySequenceDatabaseRow, "created_at" | "updated_at">;
+}) => {
   const navigate = useNavigate();
 
   const handleOpenChange = () => {

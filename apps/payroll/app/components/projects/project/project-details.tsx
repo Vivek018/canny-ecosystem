@@ -18,9 +18,9 @@ export const ProjectDetails = ({
   >;
 }) => {
   const companies = [
-    {company: project?.project_client, tag: "Project Client"},
-    {company: project?.primary_contractor, tag: "Primary Contractor"},
-    {company: project?.end_client, tag: "End Client"},
+    { company: project?.project_client, tag: "Project Client" },
+    { company: project?.primary_contractor, tag: "Primary Contractor" },
+    { company: project?.end_client, tag: "End Client" },
   ];
 
   return (
@@ -64,7 +64,9 @@ export const ProjectDetails = ({
               </Avatar>
 
               <div className="flex flex-col items-start ml-1">
-                <p className="font-medium tracking-wide truncate w-40">{company?.name}</p>
+                <p className="font-medium tracking-wide truncate w-40">
+                  {company?.name}
+                </p>
                 <p className="text-muted-foreground text-sm -mt-0.5">{tag}</p>
               </div>
             </div>

@@ -17,7 +17,9 @@ import { DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
-export const DeleteRelationship = ({ relationshipId }: { relationshipId: string }) => {
+export const DeleteRelationship = ({
+  relationshipId,
+}: { relationshipId: string }) => {
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [inputError, setInputError] = useState<string[]>([]);

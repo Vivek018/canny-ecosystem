@@ -157,8 +157,8 @@ export async function getEmployeesByProjectSiteId({
     .from("employees")
     .select(
       `${columns.join(
-        ","
-      )},employee_project_assignments!employee_project_assignments_employee_id_fkey!inner(*)`
+        ",",
+      )},employee_project_assignments!employee_project_assignments_employee_id_fkey!inner(*)`,
     )
     .eq("employee_project_assignments.project_site_id", projectSiteId)
     .limit(MID_QUERY_LIMIT)

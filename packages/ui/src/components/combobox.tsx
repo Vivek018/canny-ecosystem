@@ -40,29 +40,29 @@ export function Combobox({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          variant='outline'
-          role='combobox'
+          variant="outline"
+          role="combobox"
           aria-expanded={open}
           className={cn(
             "truncate justify-between capitalize",
             !selectedOption && "text-muted-foreground",
-            className
+            className,
           )}
         >
           {replaceUnderscore(
-            selectedOption ? selectedOption?.label : placeholder
+            selectedOption ? selectedOption?.label : placeholder,
           )}
           <Icon
-            name='caret-sort'
-            size='sm'
-            className='ml-2 shrink-0 opacity-50'
+            name="caret-sort"
+            size="sm"
+            className="ml-2 shrink-0 opacity-50"
           />
         </Button>
       </PopoverTrigger>
-      <PopoverContent align='start' className='p-0'>
+      <PopoverContent align="start" className="p-0">
         <Command>
-          <CommandInput placeholder='Search options...' />
-          <CommandEmpty className='w-full py-6 text-center'>
+          <CommandInput placeholder="Search options..." />
+          <CommandEmpty className="w-full py-6 text-center">
             No option found.
           </CommandEmpty>
           <CommandList>
@@ -73,21 +73,23 @@ export function Combobox({
                   value={String(option.value + option.label)}
                   onSelect={() => {
                     onChange(
-                      String(option.value) === value ? "" : String(option.value)
+                      String(option.value) === value
+                        ? ""
+                        : String(option.value),
                     );
                     setOpen(false);
                   }}
-                  className='max-w-96'
+                  className="max-w-96"
                 >
                   <Icon
-                    name='check'
-                    size='sm'
+                    name="check"
+                    size="sm"
                     className={cn(
                       "mr-2 shrink-0",
-                      value === option.value ? "opacity-100" : "opacity-0"
+                      value === option.value ? "opacity-100" : "opacity-0",
                     )}
                   />
-                  <p className='truncate capitalize'>
+                  <p className="truncate capitalize">
                     {replaceUnderscore(option?.label)}
                   </p>
                 </CommandItem>

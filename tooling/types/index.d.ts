@@ -5,4 +5,3 @@ export type NavList = {
   link?: string;
   icon?: IconName;
 };
-

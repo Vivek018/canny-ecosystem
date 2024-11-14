@@ -1,6 +1,3 @@
-
 export default function Users() {
-  return (
-    <section>users</section>
-  )
+  return <section>users</section>;
 }

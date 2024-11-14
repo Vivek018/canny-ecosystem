@@ -3,7 +3,10 @@ import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { json, useLoaderData } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
 import { safeRedirect } from "@/utils/server/http.server";
-import { EmployeeWorkHistorySchema, isGoodStatus } from "@canny_ecosystem/utils";
+import {
+  EmployeeWorkHistorySchema,
+  isGoodStatus,
+} from "@canny_ecosystem/utils";
 import { getEmployeeWorkHistoryById } from "@canny_ecosystem/supabase/queries";
 import { updateEmployeeWorkHistory } from "@canny_ecosystem/supabase/mutations";
 import AddEmployeeWorkHistory from "./add-work-history";

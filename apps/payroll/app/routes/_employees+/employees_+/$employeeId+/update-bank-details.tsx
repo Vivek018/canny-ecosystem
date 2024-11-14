@@ -5,7 +5,10 @@ import { Form, json, useLoaderData } from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { safeRedirect } from "@/utils/server/http.server";
 import { updateEmployeeBankDetails } from "@canny_ecosystem/supabase/mutations";
-import { isGoodStatus, EmployeeBankDetailsSchema } from "@canny_ecosystem/utils";
+import {
+  isGoodStatus,
+  EmployeeBankDetailsSchema,
+} from "@canny_ecosystem/utils";
 import { CreateEmployeeBankDetails } from "@/components/employees/form/create-employee-bank-details";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
 import { Card, CardFooter } from "@canny_ecosystem/ui/card";
