@@ -42,7 +42,7 @@ export const CompanySwitch = ({
       {
         method: "POST",
         action: "/cookie",
-      },
+      }
     );
     setOpen(false);
   };
@@ -51,26 +51,26 @@ export const CompanySwitch = ({
     <Popover key={location.key} open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          variant="outline"
-          role="combobox"
+          variant='outline'
+          role='combobox'
           aria-expanded={open}
           className={cn(
             "truncate justify-between capitalize rounded-full pl-3 pr-3 w-60 h-10 bg-secondary hover:bg-secondary/75 focus:bg-secondary/75",
-            !currentCompany && "text-muted-foreground",
+            !currentCompany && "text-muted-foreground"
           )}
         >
           {currentCompany ? currentCompany.name : "Select a company"}
           <Icon
-            name="caret-sort"
-            size="sm"
-            className="ml-2 shrink-0 opacity-50"
+            name='caret-sort'
+            size='sm'
+            className='ml-2 shrink-0 opacity-50'
           />
         </Button>
       </PopoverTrigger>
-      <PopoverContent sideOffset={10} align="start" className="p-0 w-64">
+      <PopoverContent sideOffset={10} align='start' className='p-0 w-64'>
         <Command>
-          <CommandInput placeholder="Search companies..." />
-          <CommandEmpty className="w-full py-6 text-center">
+          <CommandInput placeholder='Search companies...' />
+          <CommandEmpty className='w-full py-6 text-center'>
             No company found.
           </CommandEmpty>
           <CommandList>
@@ -80,17 +80,18 @@ export const CompanySwitch = ({
                   key={company.id}
                   value={company.id + company.name}
                   onSelect={() => onValueChange(company.id)}
-                  className="py-2 px-2"
+                  disabled={currentCompany?.id === company.id}
+                  className={cn("py-2 px-2")}
                 >
-                  <div className="flex items-center gap-1.5">
-                    <Avatar className="w-8 h-8 border border-muted-foreground/30 shadow-sm">
+                  <div className='flex items-center gap-1.5'>
+                    <Avatar className='w-8 h-8 border border-muted-foreground/30 shadow-sm'>
                       <AvatarFallback>
-                        <span className="tracking-widest capitalize text-xs ml-[1.5px]">
+                        <span className='tracking-widest capitalize text-xs ml-[1.5px]'>
                           {company.name.charAt(0)}
                         </span>
                       </AvatarFallback>
                     </Avatar>
-                    <p className="font-medium tracking-wide ml-1 truncate w-40">
+                    <p className='font-medium tracking-wide ml-1 truncate w-40'>
                       {replaceUnderscore(company.name)}
                     </p>
                   </div>
@@ -99,13 +100,13 @@ export const CompanySwitch = ({
             </CommandGroup>
           </CommandList>
         </Command>
-        <div className="p-1.5 border-t">
+        <div className='p-1.5 border-t'>
           <Link
             ref={linkRef}
-            to="/create-company"
+            to='/create-company'
             className={cn(
               buttonVariants({ variant: "primary-ghost" }),
-              "w-full cursor-pointer capitalize",
+              "w-full cursor-pointer capitalize"
             )}
             onClick={() => setOpen(false)}
           >

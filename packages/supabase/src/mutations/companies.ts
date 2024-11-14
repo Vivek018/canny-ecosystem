@@ -56,7 +56,7 @@ export async function createCompany({
     const { error: registrationDetailsError } =
       await createCompanyRegistrationDetails({
         supabase,
-        data: { company_id: data.id, ...companyRegistrationDetails },
+        data: { ...companyRegistrationDetails, company_id: data.id },
         bypassAuth,
       });
 
