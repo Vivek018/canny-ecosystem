@@ -68,7 +68,8 @@ export const DeleteWorkHistory = ({
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete this work history and remove it's data from our servers.
+            This action cannot be undone. This will permanently delete this work
+            history and remove it's data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="py-4">

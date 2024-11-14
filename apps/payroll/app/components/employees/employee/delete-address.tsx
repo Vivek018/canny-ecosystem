@@ -21,7 +21,7 @@ export const DeleteAddress = ({
   employeeId,
   addressId,
 }: {
-  employeeId: string,
+  employeeId: string;
   addressId: string;
 }) => {
   const [isLoading, setLoading] = useState(false);

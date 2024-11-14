@@ -3,19 +3,10 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./app/*"
-      ]
+      "@/*": ["./app/*"]
     },
     "strict": true
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "tailwind.config.ts",
-    "types/index.d.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["**/*.ts", "**/*.tsx", "tailwind.config.ts", "types/index.d.ts"],
+  "exclude": ["node_modules"]
 }

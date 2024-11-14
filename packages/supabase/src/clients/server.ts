@@ -25,7 +25,7 @@ export function getSupabaseWithHeaders({ request }: { request: Request }) {
         },
         setAll(cookiesToSet) {
           try {
-            cookiesToSet.forEach((cookie: any) => {
+            for (const cookie of cookiesToSet) {
               const { name, value, options } = cookie;
 
               // Check if we need to split the cookie
@@ -37,8 +37,7 @@ export function getSupabaseWithHeaders({ request }: { request: Request }) {
                   chunks.push(value.slice(i, i + 4000));
                   i += 4000;
                 }
-
-                chunks.forEach((chunk, index) => {
+                for (const [index, chunk] of chunks.entries()) {
                   const chunkName = `${name}.${index}`;
                   const cookieStr = serializeCookieHeader(chunkName, chunk, {
                     ...options,
@@ -49,7 +48,7 @@ export function getSupabaseWithHeaders({ request }: { request: Request }) {
                     maxAge: 34560000, // 400 days
                   });
                   headers.append("Set-Cookie", cookieStr);
-                });
+                }
               } else {
                 // Set as single cookie
                 const cookieStr = serializeCookieHeader(name, value, {
@@ -62,14 +61,14 @@ export function getSupabaseWithHeaders({ request }: { request: Request }) {
                 });
                 headers.append("Set-Cookie", cookieStr);
               }
-            });
+            }
           } catch (error) {
             console.error("Error setting cookies:", error);
             throw error;
           }
         },
       },
-    }
+    },
   );
 
   return { supabase, headers };

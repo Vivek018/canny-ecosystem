@@ -24,7 +24,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     relationshipData = await getRelationshipById({
       supabase,
       id: relationshipId,
-      companyId
+      companyId,
     });
   }
 
@@ -78,5 +78,10 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function UpdateRelationship() {
   const { data, companyOptions } = useLoaderData<typeof loader>();
-  return <CreateRelationship updateValues={data} companyOptionsFromUpdate={companyOptions} />;
+  return (
+    <CreateRelationship
+      updateValues={data}
+      companyOptionsFromUpdate={companyOptions}
+    />
+  );
 }

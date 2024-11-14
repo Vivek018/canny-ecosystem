@@ -12,5 +12,5 @@ export async function action({ request }: ActionFunctionArgs) {
     return json({ error: error.message }, { status: 500 });
   }
 
-  return safeRedirect("/login", {headers});
+  return safeRedirect("/login", { headers });
 }

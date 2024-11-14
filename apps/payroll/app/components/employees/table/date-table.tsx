@@ -21,7 +21,10 @@ import { useInView } from "react-intersection-observer";
 import { useSearchParams } from "@remix-run/react";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
-import { type EmployeeFilters, getEmployeesByCompanyId } from "@canny_ecosystem/supabase/queries";
+import {
+  type EmployeeFilters,
+  getEmployeesByCompanyId,
+} from "@canny_ecosystem/supabase/queries";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -48,7 +51,6 @@ export function DataTable<TData, TValue>({
   companyId,
   env,
 }: DataTableProps<TData, TValue>) {
-
   const [data, setData] = useState(initialData);
   const [from, setFrom] = useState(pageSize);
   const [hasNextPage, setHasNextPage] = useState(initialHasNextPage);
@@ -72,7 +74,7 @@ export function DataTable<TData, TValue>({
         companyId,
         params: {
           from: from,
-          to:  to,
+          to: to,
           filters,
           searchQuery: query ?? undefined,
           sort: sortParam?.split(":") as [string, "asc" | "desc"],

@@ -25,19 +25,29 @@ export const ViewRelationshipTermsDialog = ({
 
   return (
     <Dialog defaultOpen={true} onOpenChange={handleOpenChange}>
-      <DialogContent className={cn("max-w-max pl-5 pr-40", !objectKeys.length && "pr-4 pl-4")}>
+      <DialogContent
+        className={cn(
+          "max-w-max pl-5 pr-40",
+          !objectKeys.length && "pr-4 pl-4",
+        )}
+      >
         <DialogHeader className="mb-4">
           <DialogTitle>Term Details</DialogTitle>
         </DialogHeader>
-        <div className={cn("flex flex-col gap-6", !objectKeys.length && "hidden")}>
+        <div
+          className={cn("flex flex-col gap-6", !objectKeys.length && "hidden")}
+        >
           {objectKeys.map((key, index) => (
-            <div key={key.toString() + index.toString()} className="flex items-center gap-2">
+            <div
+              key={key.toString() + index.toString()}
+              className="flex items-center gap-2"
+            >
               <Label className="font-bold">{replaceUnderscore(key)}:</Label>
               <p className="text-base">{objectValues[index]}</p>
             </div>
           ))}
         </div>
-        <p className={cn("hidden text-sm w-96",!objectKeys.length && "flex")}>
+        <p className={cn("hidden text-sm w-96", !objectKeys.length && "flex")}>
           There are no terms for this relationship. Please contact your
           administrator.
         </p>

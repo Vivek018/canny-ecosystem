@@ -26,7 +26,7 @@ import { useNonce } from "./utils/providers/nonce-provider";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Logo } from "@canny_ecosystem/ui/logo";
 import { ThemeSwitch } from "./components/theme-switch";
-import { getAuthUser, getSessionUser } from "@canny_ecosystem/supabase/cached-queries";
+import { getSessionUser } from "@canny_ecosystem/supabase/cached-queries";
 import {
   getCompanies,
   getUserByEmail,
@@ -53,15 +53,15 @@ export const headers: HeadersFunction = ({ loaderHeaders }) => {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { user: authUser } = await getAuthUser({ request });
+  const { user: sessionUser } = await getSessionUser({ request });
   const { supabase } = getSupabaseWithHeaders({ request });
   let user = null;
   let companies = null;
 
-  if (authUser?.email) {
+  if (sessionUser?.email) {
     const { data: userData, error: userError } = await getUserByEmail({
       supabase,
-      email: authUser.email,
+      email: sessionUser.email,
     });
     const { data: companiesData, error: companiesError } = await getCompanies({
       supabase,
@@ -86,7 +86,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const { companyId, setCookie } = await getCompanyIdOrFirstCompany(
     request,
-    supabase
+    supabase,
   );
 
   if (setCookie) {
@@ -96,7 +96,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   }
 
   return json({
-    isLoggedIn: !!authUser,
+    isLoggedIn: !!sessionUser,
     user,
     companies,
     requestInfo: {
@@ -120,15 +120,15 @@ function Document({
   theme?: string;
 }) {
   return (
-    <html lang='en' className={`${theme} h-full overflow-x-hidden`}>
+    <html lang="en" className={`${theme} h-full overflow-x-hidden`}>
       <head>
         <ClientHintCheck nonce={nonce} />
         <Meta />
-        <meta charSet='utf-8' />
-        <meta name='viewport' content='width=device-width,initial-scale=1' />
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
         <Links />
       </head>
-      <body className='h-full w-full bg-background text-foreground'>
+      <body className="h-full w-full bg-background text-foreground">
         {children}
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />
@@ -159,10 +159,10 @@ function App() {
 
   return (
     <Document nonce={nonce} theme={theme}>
-      <main className='flex h-full w-full bg-background text-foreground '>
+      <main className="flex h-full w-full bg-background text-foreground ">
         {!user ? (
-          <div className='w-full h-full'>
-            <header className='flex justify-between items-center mx-5 mt-4 md:mx-10 md:mt-10'>
+          <div className="w-full h-full">
+            <header className="flex justify-between items-center mx-5 mt-4 md:mx-10 md:mt-10">
               <div>
                 <Link to={"/"}>
                   <Logo />
@@ -176,8 +176,8 @@ function App() {
           </div>
         ) : (
           <>
-            <Sidebar className='flex-none' />
-            <div className='flex max-h-screen flex-grow flex-col overflow-scroll px-4'>
+            <Sidebar className="flex-none" />
+            <div className="flex max-h-screen flex-grow flex-col overflow-scroll px-4">
               <Header
                 theme={initialTheme || "system"}
                 user={user ?? []}

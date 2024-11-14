@@ -7,12 +7,21 @@ import {
   EmployeeProjectAssignmentSchema,
   isGoodStatus,
 } from "@canny_ecosystem/utils";
-import { getEmployeeProjectAssignmentById, getEmployeesByProjectSiteId, getProjectsByCompanyId, getSitesByProjectId } from "@canny_ecosystem/supabase/queries";
+import {
+  getEmployeeProjectAssignmentById,
+  getEmployeesByProjectSiteId,
+  getProjectsByCompanyId,
+  getSitesByProjectId,
+} from "@canny_ecosystem/supabase/queries";
 import { updateEmployeeProjectAssignment } from "@canny_ecosystem/supabase/mutations";
-import AddEmployeeProjectAssignment, { PROJECT_PARAM, PROJECT_SITE_PARAM } from "./add-project-assignment";
+import AddEmployeeProjectAssignment, {
+  PROJECT_PARAM,
+  PROJECT_SITE_PARAM,
+} from "./add-project-assignment";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
-export const UPDATE_EMPLOYEE_PROJECT_ASSIGNMENT = "update-employee-project-assignment";
+export const UPDATE_EMPLOYEE_PROJECT_ASSIGNMENT =
+  "update-employee-project-assignment";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -33,7 +42,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   if (projectAssignmentData?.error) {
     throw projectAssignmentData.error;
   }
-
 
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   const { data: projects } = await getProjectsByCompanyId({
@@ -118,6 +126,14 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export default function UpdateEmployeeProjectAssignment() {
-  const { data, projectOptions, projectSiteOptions, siteEmployeeOptions } = useLoaderData<typeof loader>();
-  return <AddEmployeeProjectAssignment updateValues={data} updateProjectOptions={projectOptions} updateProjectSiteOptions={projectSiteOptions} updateSiteEmployeeOptions={siteEmployeeOptions} />;
+  const { data, projectOptions, projectSiteOptions, siteEmployeeOptions } =
+    useLoaderData<typeof loader>();
+  return (
+    <AddEmployeeProjectAssignment
+      updateValues={data}
+      updateProjectOptions={projectOptions}
+      updateProjectSiteOptions={projectSiteOptions}
+      updateSiteEmployeeOptions={siteEmployeeOptions}
+    />
+  );
 }

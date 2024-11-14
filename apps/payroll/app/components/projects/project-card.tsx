@@ -1,6 +1,4 @@
-import {
-  DropdownMenuTrigger,
-} from "@canny_ecosystem/ui/dropdown-menu";
+import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import {
   Tooltip,
@@ -14,21 +12,14 @@ import type { ProjectsWithCompany } from "@canny_ecosystem/supabase/queries";
 import { Avatar, AvatarFallback } from "@canny_ecosystem/ui/avatar";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Progress } from "@canny_ecosystem/ui/progress";
-import {
-  getAutoTimeDifference,
-
-} from "@canny_ecosystem/utils";
+import { getAutoTimeDifference } from "@canny_ecosystem/utils";
 import { ProjectOptionsDropdown } from "./project-options-dropdown";
 
 export function ProjectCard({
   project,
 }: {
-  project: Omit<
-    ProjectsWithCompany,
-    "created_at" | "updated_at"
-  >;
+  project: Omit<ProjectsWithCompany, "created_at" | "updated_at">;
 }) {
-
   const companies = [
     project?.project_client,
     project?.primary_contractor,

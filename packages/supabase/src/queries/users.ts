@@ -33,8 +33,8 @@ export async function getUserByEmail({
     .single<InferredType<UserDatabaseRow, (typeof columns)[number]>>();
 
   if (error) {
-      console.error(error)
-    }
+    console.error(error);
+  }
 
   return { data, error };
   // return {

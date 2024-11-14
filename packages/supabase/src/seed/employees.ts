@@ -82,7 +82,6 @@ export function seedEmployeeGuardianDetails(): Omit<
 > {
   return {
     first_name: faker.person.firstName(),
-    middle_name: faker.person.middleName(),
     last_name: faker.person.lastName(),
     date_of_birth: faker.date.past().toISOString(),
     is_emergency_contact: [true, false][faker.number.int({ min: 0, max: 1 })],

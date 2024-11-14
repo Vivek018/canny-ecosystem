@@ -9,9 +9,7 @@ import {
   replaceUnderscore,
   type EmployeeStatutorySchema,
 } from "@canny_ecosystem/utils";
-import {
-  Field,
-} from "@canny_ecosystem/ui/forms";
+import { Field } from "@canny_ecosystem/ui/forms";
 import { type FieldMetadata, getInputProps } from "@conform-to/react";
 
 type FieldsType = {

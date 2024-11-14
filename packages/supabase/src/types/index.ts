@@ -3,10 +3,8 @@ import type { Database } from "./db";
 
 export * from "./db";
 
-
 export type Keys<T> = keyof T;
 export type InferredType<T, K extends Keys<T>> = Pick<T, K>;
-
 
 export type TypedSupabaseClient = SupabaseClient<Database>;
 

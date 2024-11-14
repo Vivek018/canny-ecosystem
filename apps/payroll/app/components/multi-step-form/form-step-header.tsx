@@ -21,7 +21,8 @@ export const FormStepHeader = ({
               step - 1 === stepNumber
                 ? "border-primary text-primary"
                 : "border-input",
-              stepData[stepNumber] && "border-primary bg-primary text-primary-foreground",
+              stepData[stepNumber] &&
+                "border-primary bg-primary text-primary-foreground",
             )}
           >
             <p className={cn(stepData[stepNumber] && "hidden")}>

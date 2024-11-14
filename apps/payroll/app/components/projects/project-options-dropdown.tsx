@@ -1,4 +1,10 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuSeparator } from "@canny_ecosystem/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@canny_ecosystem/ui/dropdown-menu";
 import { DeleteProject } from "./delete-project";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useSubmit } from "@remix-run/react";

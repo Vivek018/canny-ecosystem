@@ -52,7 +52,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
   });
 
   if (isGoodStatus(status)) {
-    return safeRedirect(`/employees/${employeeId}/work-portfolio`, { status: 303 });
+    return safeRedirect(`/employees/${employeeId}/work-portfolio`, {
+      status: 303,
+    });
   }
   return json({ status, error });
 }

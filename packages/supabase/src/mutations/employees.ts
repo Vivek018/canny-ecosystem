@@ -74,38 +74,27 @@ export async function createEmployee({
     const { error: employeeStatutoryDetailsError, status } =
       await createEmployeeStatutoryDetails({
         supabase,
-        data: { employee_id: data.id, ...employeeStatutoryDetailsData },
+        data: { ...employeeStatutoryDetailsData, employee_id: data.id },
         bypassAuth,
       });
-
-    if (employeeStatutoryDetailsError) {
-      return {
-        status,
-        employeeError: null,
-        employeeStatutoryDetailsError,
-        employeeBankDetailsError: null,
-        employeeAddressesError: null,
-        employeeGuardiansError: null,
-      };
-    }
 
     const { error: employeeBankDetailsError } = await createEmployeeBankDetails(
       {
         supabase,
-        data: { employee_id: data.id, ...employeeBankDetailsData },
+        data: { ...employeeBankDetailsData, employee_id: data.id },
         bypassAuth,
-      },
+      }
     );
 
     const { error: employeeAddressesError } = await createEmployeeAddresses({
       supabase,
-      data: { employee_id: data.id, ...employeeAddressesData },
+      data: { ...employeeAddressesData, employee_id: data.id },
       bypassAuth,
     });
 
     const { error: employeeGuardiansError } = await createEmployeeGuardians({
       supabase,
-      data: { employee_id: data.id, ...employeeGuardiansData },
+      data: { ...employeeGuardiansData, employee_id: data.id },
       bypassAuth,
     });
 

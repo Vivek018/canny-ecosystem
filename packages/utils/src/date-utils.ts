@@ -6,7 +6,7 @@ import {
   differenceInDays,
 } from "date-fns";
 
-export { UTCDate } from '@date-fns/utc';
+export { UTCDate } from "@date-fns/utc";
 export { formatDateRange } from "little-date";
 
 export function getValidDateForInput(date: string | Date | undefined): string {

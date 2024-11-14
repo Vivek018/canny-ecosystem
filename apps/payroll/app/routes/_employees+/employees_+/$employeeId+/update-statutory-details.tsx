@@ -53,7 +53,9 @@ export async function action({ request }: ActionFunctionArgs) {
   });
 
   if (isGoodStatus(status)) {
-    return safeRedirect(`/employees/${submission.value?.employee_id}`, { status: 303 });
+    return safeRedirect(`/employees/${submission.value?.employee_id}`, {
+      status: 303,
+    });
   }
   return json({ status, error });
 }
@@ -84,7 +86,11 @@ export default function UpdateStatutoryDetails() {
           className="flex flex-col"
         >
           <Card>
-            <CreateEmployeeStatutoryDetails key={resetKey} fields={fields as any} isUpdate={true} />
+            <CreateEmployeeStatutoryDetails
+              key={resetKey}
+              fields={fields as any}
+              isUpdate={true}
+            />
             <CardFooter>
               <div className="ml-auto w-2/5 flex flex-row items-center justify-center gap-4">
                 <Button

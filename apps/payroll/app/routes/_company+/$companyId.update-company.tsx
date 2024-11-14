@@ -1,4 +1,3 @@
-
 import { safeRedirect } from "@/utils/server/http.server";
 import { updateCompany } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";

@@ -52,7 +52,7 @@ export const DeleteProject = ({ projectId }: { projectId: string }) => {
     <AlertDialog>
       <AlertDialogTrigger
         className={cn(
-          buttonVariants({ variant: "destructive-ghost", size:"full" }),
+          buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "text-[13px] h-9",
         )}
       >

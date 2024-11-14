@@ -1,7 +1,6 @@
 import { getSupabaseWithSessionAndHeaders } from "../clients/server";
 
 export const getAuthUser = async ({ request }: { request: Request }) => {
-  
   const { session, supabase } = await getSupabaseWithSessionAndHeaders({
     request,
   });

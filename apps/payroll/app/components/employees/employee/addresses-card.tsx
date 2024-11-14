@@ -98,7 +98,10 @@ export const AddressItem = ({ address }: { address: EmployeeAddress }) => {
                     !address.latitude && !address.longitude && "hidden",
                   )}
                 />
-                <DeleteAddress employeeId={address.employee_id} addressId={address.id} />
+                <DeleteAddress
+                  employeeId={address.employee_id}
+                  addressId={address.id}
+                />
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
