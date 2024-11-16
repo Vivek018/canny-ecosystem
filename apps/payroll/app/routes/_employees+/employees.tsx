@@ -146,7 +146,7 @@ export default function Employees() {
     useLoaderData<typeof loader>();
 
   return (
-    <section className="py-[22px]">
+    <section className="py-4">
       <div className="w-full flex items-center justify-between pb-4">
         <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-6">
           <EmployeesSearchFilter />

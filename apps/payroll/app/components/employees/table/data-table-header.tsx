@@ -55,8 +55,8 @@ export function DataTableHeader({ table, loading }: Props) {
 
   return (
     <TableHeader>
-      <TableRow className="h-[45px] hover:bg-transparent">
-        <TableHead className="w-[50px] hidden md:table-cell px-3 md:px-4 py-2">
+      <TableRow className='h-[45px] hover:bg-transparent'>
+        <TableHead className='w-[50px] hidden md:table-cell px-3 md:px-4 py-2'>
           <Checkbox
             checked={
               table?.getIsAllPageRowsSelected() ||
@@ -71,29 +71,29 @@ export function DataTableHeader({ table, loading }: Props) {
         {employeeColumnIdArray.map((id) => {
           return (
             isVisible(id) && (
-              <TableHead key={id} className="px-3 md:px-4 py-2">
+              <TableHead key={id} className='px-3 md:px-4 py-2'>
                 <Button
-                  className="p-0 hover:bg-transparent space-x-2"
-                  variant="ghost"
+                  className='p-0 hover:bg-transparent space-x-2'
+                  variant='ghost'
                   onClick={(e) => {
                     e.preventDefault();
                     createSortQuery(id);
                   }}
                 >
-                  <span className="capitalize">{columnName(id)}</span>
+                  <span className='capitalize'>{columnName(id)}</span>
 
                   <Icon
-                    name="chevron-up"
+                    name='chevron-up'
                     className={cn(
                       "hidden",
-                      id === column && value === "desc" && "flex",
+                      id === column && value === "desc" && "flex"
                     )}
                   />
                   <Icon
-                    name="chevron-down"
+                    name='chevron-down'
                     className={cn(
                       "hidden",
-                      id === column && value === "asc" && "flex",
+                      id === column && value === "asc" && "flex"
                     )}
                   />
                 </Button>
@@ -101,7 +101,7 @@ export function DataTableHeader({ table, loading }: Props) {
             )
           );
         })}
-        <TableHead className="px-3 md:px-4 py-2" />
+        <TableHead className='px-3 md:px-4 py-2' />
       </TableRow>
     </TableHeader>
   );

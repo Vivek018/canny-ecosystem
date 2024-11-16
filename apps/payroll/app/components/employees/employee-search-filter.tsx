@@ -58,7 +58,7 @@ export function EmployeesSearchFilter() {
         const nextIndex = (currentIndex + 1) % PLACEHOLDERS.length;
         return PLACEHOLDERS[nextIndex];
       });
-    }, 10 * 1000);
+    }, 5 * 1000);
 
     return () => clearInterval(intervalId);
   }, []);
@@ -170,7 +170,7 @@ export function EmployeesSearchFilter() {
           <Input
             ref={inputRef}
             placeholder={currentPlaceholder}
-            className="pl-9 w-full h-10 md:w-[420px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70"
+            className="pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70"
             value={prompt}
             onChange={handleSearch}
             autoComplete="off"
@@ -196,7 +196,7 @@ export function EmployeesSearchFilter() {
       </div>
 
       <DropdownMenuContent
-        className="w-full md:w-[420px]"
+        className="w-full md:w-[480px]"
         align="end"
         sideOffset={19}
         alignOffset={-11}

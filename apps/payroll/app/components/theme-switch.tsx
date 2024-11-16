@@ -10,6 +10,7 @@ import {
 import type { Theme } from "@canny_ecosystem/types";
 import { useLocation, useSubmit } from "@remix-run/react";
 import { themes } from "@canny_ecosystem/utils";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
 
 type Props = {
   currentTheme?: Theme;
@@ -20,19 +21,28 @@ type Props = {
 const ThemeIcon = ({ currentTheme, size = "md", className }: Props) => {
   switch (currentTheme) {
     case "dark":
-      return <Icon name="moon" size={size} className={className} />;
+      return <Icon name='moon' size={size} className={className} />;
     case "system":
-      return <Icon name="laptop" size={size} className={className} />;
+      return <Icon name='laptop' size={size} className={className} />;
     default:
-      return <Icon name="sun" size={size} className={className} />;
+      return <Icon name='sun' size={size} className={className} />;
   }
 };
 
-export const ThemeSwitch = ({ theme = "system" }: { theme?: Theme }) => {
+export const ThemeSwitch = ({
+  theme = "system",
+  isExpanded,
+  selectContentRef,
+}: {
+  theme?: Theme;
+  isExpanded?: boolean;
+  selectContentRef?: React.RefObject<HTMLDivElement>;
+}) => {
   const location = useLocation();
   const submit = useSubmit();
+
   return (
-    <div className="flex items-center relative">
+    <div className='flex w-full items-center relative'>
       <Select
         defaultValue={theme}
         onValueChange={(value) =>
@@ -41,24 +51,32 @@ export const ThemeSwitch = ({ theme = "system" }: { theme?: Theme }) => {
             {
               method: "POST",
               action: "/cookie",
-            },
+            }
           )
         }
       >
         <SelectTrigger
-          noIcon={true}
-          className="w-full py-1.5 px-2.5 gap-2 rounded-full bg-transparent capitalize h-10 text-xs"
+          noIcon={!isExpanded}
+          className={cn(
+            "py-5 px-[12.5px] gap-2.5 h-12 w-12 rounded-full capitalize text-sm tracking-wide flex items-center justify-start transition-[width]",
+            isExpanded && "w-full"
+          )}
         >
-          <ThemeIcon currentTheme={theme as Theme} />
+          <ThemeIcon
+            currentTheme={theme as Theme}
+            className='shrink-0'
+            size='md'
+          />
+          <p className={cn(!isExpanded && "hidden")}>{theme}</p>
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent ref={selectContentRef}>
           <SelectGroup>
             {themes.map((theme) => (
-              <SelectItem key={theme} value={theme} className="capitalize">
+              <SelectItem key={theme} value={theme} className='capitalize'>
                 <ThemeIcon
                   currentTheme={theme as Theme}
-                  size="font"
-                  className="mr-2 mb-[2.5px]"
+                  size='font'
+                  className='mr-2 mb-[2.5px]'
                 />
                 {theme}
               </SelectItem>

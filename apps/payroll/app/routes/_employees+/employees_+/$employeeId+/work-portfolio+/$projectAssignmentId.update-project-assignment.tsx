@@ -9,7 +9,7 @@ import {
 } from "@canny_ecosystem/utils";
 import {
   getEmployeeProjectAssignmentById,
-  getEmployeesByProjectSiteId,
+  getEmployeesByPositionAndProjectSiteId,
   getProjectsByCompanyId,
   getSitesByProjectId,
 } from "@canny_ecosystem/supabase/queries";
@@ -75,8 +75,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const projectSiteParamId = urlSearchParams.get(PROJECT_SITE_PARAM);
 
   if (projectSiteParamId?.length) {
-    const { data: siteEmployees } = await getEmployeesByProjectSiteId({
+    const { data: siteEmployees } = await getEmployeesByPositionAndProjectSiteId({
       supabase,
+      position: "supervisor",
       projectSiteId: projectSiteParamId,
     });
 

@@ -41,11 +41,11 @@ import { useState } from "react";
 import { UPDATE_EMPLOYEE_PROJECT_ASSIGNMENT } from "./$projectAssignmentId.update-project-assignment";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
-  getEmployeesByProjectSiteId,
+  getEmployeesByPositionAndProjectSiteId,
   getProjectsByCompanyId,
   getSitesByProjectId,
 } from "@canny_ecosystem/supabase/queries";
-import { Combobox, ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
+import { Combobox, type ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 import { Label } from "@canny_ecosystem/ui/label";
 
 export const ADD_EMPLOYEE_PROJECT_ASSIGNMENT =
@@ -92,14 +92,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const projectSiteParamId = urlSearchParams.get(PROJECT_SITE_PARAM);
 
   if (projectSiteParamId?.length) {
-    const { data: siteEmployees } = await getEmployeesByProjectSiteId({
-      supabase,
-      projectSiteId: projectSiteParamId,
-    });
+    const { data: siteEmployees } =
+      await getEmployeesByPositionAndProjectSiteId({
+        supabase,
+        position: "supervisor",
+        projectSiteId: projectSiteParamId,
+      });
 
     siteEmployeeOptions = siteEmployees
-      ?.filter((siteEmployee) => siteEmployee.id !== employeeId)
-      .map((siteEmployee) => ({
+      ?.filter((siteEmployee) => siteEmployee.id !==  employeeId)
+      ?.map((siteEmployee) => ({
         label: siteEmployee?.employee_code,
         value: siteEmployee?.id,
       }));
@@ -242,7 +244,7 @@ export default function AddEmployeeProjectAssignment({
                       searchParams.get(PROJECT_SITE_PARAM) ??
                       fields.project_site_id.initialValue,
                   }}
-                  placeholder={`Select Project Site`}
+                  placeholder={"Select Project Site"}
                   labelProps={{
                     children: "Project Site",
                   }}
@@ -265,7 +267,7 @@ export default function AddEmployeeProjectAssignment({
                   inputProps={{
                     ...getInputProps(fields.supervisor_id, { type: "text" }),
                   }}
-                  placeholder={`Select Supervisor`}
+                  placeholder={"Select Supervisor"}
                   labelProps={{
                     children: "Supervisor",
                   }}

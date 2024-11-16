@@ -144,11 +144,13 @@ export async function getEmployeesByCompanyId({
   };
 }
 
-export async function getEmployeesByProjectSiteId({
+export async function getEmployeesByPositionAndProjectSiteId({
   supabase,
+  position,
   projectSiteId,
 }: {
   supabase: TypedSupabaseClient;
+  position?: string;
   projectSiteId: string;
 }) {
   const columns = ["id", "employee_code"] as const;
@@ -157,10 +159,12 @@ export async function getEmployeesByProjectSiteId({
     .from("employees")
     .select(
       `${columns.join(
-        ",",
-      )},employee_project_assignments!employee_project_assignments_employee_id_fkey!inner(*)`,
+        ","
+      )},employee_project_assignments!employee_project_assignments_employee_id_fkey!inner(*)`
     )
+    .eq("employee_project_assignments.is_current", true)
     .eq("employee_project_assignments.project_site_id", projectSiteId)
+    .eq("employee_project_assignments.position", position ?? "")
     .limit(MID_QUERY_LIMIT)
     .returns<InferredType<EmployeeDatabaseRow, (typeof columns)[number]>[]>();
 

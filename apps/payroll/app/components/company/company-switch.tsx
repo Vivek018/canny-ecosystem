@@ -55,19 +55,30 @@ export const CompanySwitch = ({
           role='combobox'
           aria-expanded={open}
           className={cn(
-            "truncate justify-between capitalize rounded-full pl-3 pr-3 w-60 h-10 bg-secondary hover:bg-secondary/75 focus:bg-secondary/75",
+            "bg-card truncate justify-between capitalize rounded pl-2 pr-3 w-64 h-12",
             !currentCompany && "text-muted-foreground"
           )}
         >
-          {currentCompany ? currentCompany.name : "Select a company"}
+          <div className="flex items-center gap-2">
+            <Avatar className='w-8 h-8 border border-muted-foreground/30 shadow-sm'>
+              <AvatarFallback>
+                <span className='tracking-widest capitalize text-xs ml-[1.5px]'>
+                  {currentCompany?.name.charAt(0)}
+                </span>
+              </AvatarFallback>
+            </Avatar>
+            {currentCompany ? currentCompany.name : "Select a company"}
+          </div>
           <Icon
             name='caret-sort'
             size='sm'
-            className='ml-2 shrink-0 opacity-50'
+            className={cn(
+              "ml-2 shrink-0 opacity-50",
+            )}
           />
         </Button>
       </PopoverTrigger>
-      <PopoverContent sideOffset={10} align='start' className='p-0 w-64'>
+      <PopoverContent sideOffset={10} align='end' className='p-0 w-64'>
         <Command>
           <CommandInput placeholder='Search companies...' />
           <CommandEmpty className='w-full py-6 text-center'>
