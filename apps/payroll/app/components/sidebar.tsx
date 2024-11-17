@@ -20,18 +20,14 @@ export function Sidebar({
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { pathname } = useLocation();
-  const themeSelectContentRef = useRef<HTMLDivElement>(null);
-  const userDropdownContentRef = useRef<HTMLDivElement>(null);
+  const selectContentRef = useRef<HTMLDivElement>(null);
 
   const openSidebar = () => {
     setIsExpanded(true);
   };
 
   const closeSidebar = () => {
-    if (
-      userDropdownContentRef?.current?.getAttribute("data-state") === "open" ||
-      themeSelectContentRef?.current?.getAttribute("data-state") === "open"
-    ) {
+    if (selectContentRef?.current?.getAttribute("data-state") === "open") {
       return;
     }
     setIsExpanded(false);
@@ -40,8 +36,8 @@ export function Sidebar({
   return (
     <aside
       className={cn(
-        "fixed flex h-full flex-col overflow-hidden w-20 z-20 bg-background transition-[width]",
-        isExpanded && "w-52 shadow-2xl dark:shadow-foreground/15 border-r",
+        "fixed flex h-full flex-col overflow-hidden w-20 z-20 bg-background border-r transition-[width]",
+        isExpanded && "w-52 shadow-2xl dark:shadow-foreground/10",
         className
       )}
       onMouseEnter={openSidebar}
@@ -58,22 +54,14 @@ export function Sidebar({
       </div>
       <nav
         className={cn(
-          "no-scrollbar flex h-full flex-col gap-4 overflow-y-scroll overflow-x-hidden items-center border-r",
-          isExpanded && "border-r-0"
+          "no-scrollbar flex h-full flex-col gap-4 overflow-y-scroll overflow-x-hidden items-center"
         )}
       >
-        <ul className='flex w-full h-full flex-col py-2.5 gap-2 items-start'>
+        <ul className='flex w-full h-full flex-col py-2.5 gap-1.5 items-start'>
           {sideNavList?.map(({ icon, name, link }) => {
             if (!icon && !link && !name) return null;
             if (!icon || !link) {
-              return (
-                <li
-                  key={name}
-                  className={cn(
-                    "my-0.5 w-full border-t",
-                  )}
-                />
-              );
+              return <li key={name} className={cn("my-0.5 w-full border-t")} />;
             }
             return (
               <NavLink
@@ -104,19 +92,18 @@ export function Sidebar({
       </nav>
       <div
         className={cn(
-          "w-full flex flex-col items-start justify-start px-4 gap-4 pt-6 pb-12 border-t border-r",
-          isExpanded && "border-r-0"
+          "w-full flex flex-col items-start justify-start px-4 gap-4 pt-6 pb-12 border-t"
         )}
       >
         <ThemeSwitch
           theme={theme}
           isExpanded={isExpanded}
-          selectContentRef={themeSelectContentRef}
+          selectContentRef={selectContentRef}
         />
         <UserMenu
           userData={user}
           isExpanded={isExpanded}
-          dropdownContentRef={userDropdownContentRef}
+          dropdownContentRef={selectContentRef}
           Link={Link}
         />
       </div>

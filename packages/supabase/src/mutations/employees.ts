@@ -61,6 +61,7 @@ export async function createEmployee({
   if (error) {
     console.error("employee ", error);
     return {
+      data,
       status,
       employeeError: error,
       employeeStatutoryDetailsError: null,
@@ -99,6 +100,7 @@ export async function createEmployee({
     });
 
     return {
+      data,
       status,
       employeeError: null,
       employeeStatutoryDetailsError,
@@ -109,6 +111,7 @@ export async function createEmployee({
   }
 
   return {
+    data,
     status,
     employeeError: null,
     employeeStatutoryDetailsError: null,

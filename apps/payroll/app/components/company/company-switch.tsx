@@ -55,12 +55,12 @@ export const CompanySwitch = ({
           role='combobox'
           aria-expanded={open}
           className={cn(
-            "bg-card truncate justify-between capitalize rounded pl-2 pr-3 w-64 h-12",
+            "bg-card truncate justify-between capitalize rounded pl-1.5 pr-3 w-64 h-12",
             !currentCompany && "text-muted-foreground"
           )}
         >
           <div className="flex items-center gap-2">
-            <Avatar className='w-8 h-8 border border-muted-foreground/30 shadow-sm'>
+            <Avatar className='w-[34px] h-[34px] border border-muted-foreground/30 shadow-sm'>
               <AvatarFallback>
                 <span className='tracking-widest capitalize text-xs ml-[1.5px]'>
                   {currentCompany?.name.charAt(0)}
@@ -71,9 +71,9 @@ export const CompanySwitch = ({
           </div>
           <Icon
             name='caret-sort'
-            size='sm'
+            size='md'
             className={cn(
-              "ml-2 shrink-0 opacity-50",
+              "ml-2 shrink-0 opacity-75",
             )}
           />
         </Button>

@@ -19,6 +19,13 @@ export const employeeColumnIdArray = [
   "education",
   "gender",
   "is_active",
+  "employee_project_assignment_project_site_project_name",
+  "employee_project_assignment_project_site_name",
+  "employee_project_assignment_assignment_type",
+  "employee_project_assignment_position",
+  "employee_project_assignment_skill_level",
+  "employee_project_assignment_start_date",
+  "employee_project_assignment_end_date",
 ];
 
 export function DataTableHeader({ table, loading }: Props) {
@@ -47,6 +54,14 @@ export function DataTableHeader({ table, loading }: Props) {
       })
       ?.getIsVisible();
 
+  const isEnableSorting = (id: string) =>
+    (
+      loading ||
+      table?.getAllLeafColumns()?.find((col: any) => {
+        return col.id === id;
+      })
+    )?.getCanSort();
+
   const columnName = (id: string) =>
     loading ||
     table?.getAllLeafColumns()?.find((col: any) => {
@@ -56,7 +71,7 @@ export function DataTableHeader({ table, loading }: Props) {
   return (
     <TableHeader>
       <TableRow className='h-[45px] hover:bg-transparent'>
-        <TableHead className='w-[50px] hidden md:table-cell px-3 md:px-4 py-2'>
+        <TableHead className='hidden md:table-cell px-3 md:px-4 py-2 sticky left-0 min-w-12 max-w-12 bg-card z-10'>
           <Checkbox
             checked={
               table?.getIsAllPageRowsSelected() ||
@@ -68,13 +83,21 @@ export function DataTableHeader({ table, loading }: Props) {
           />
         </TableHead>
 
-        {employeeColumnIdArray.map((id) => {
+        {employeeColumnIdArray?.map((id) => {
           return (
             isVisible(id) && (
-              <TableHead key={id} className='px-3 md:px-4 py-2'>
+              <TableHead
+                key={id}
+                className={cn(
+                  "px-3 md:px-4 py-2",
+                  id === "employee_code" && "sticky left-12 bg-card z-10",
+                  id === "full_name" && "sticky left-48 bg-card z-10"
+                )}
+              >
                 <Button
-                  className='p-0 hover:bg-transparent space-x-2'
+                  className='p-0 hover:bg-transparent space-x-2 disabled:opacity-100'
                   variant='ghost'
+                  disabled={!isEnableSorting(id)}
                   onClick={(e) => {
                     e.preventDefault();
                     createSortQuery(id);
@@ -101,7 +124,7 @@ export function DataTableHeader({ table, loading }: Props) {
             )
           );
         })}
-        <TableHead className='px-3 md:px-4 py-2' />
+        <TableHead className='sticky right-0 min-w-20 max-w-20 bg-card z-10' />
       </TableRow>
     </TableHeader>
   );

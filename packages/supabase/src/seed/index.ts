@@ -3,6 +3,9 @@ import dotenv from "dotenv";
 import {
   createCompany,
   createEmployee,
+  createEmployeeProjectAssignment,
+  createEmployeeSkill,
+  createEmployeeWorkHistory,
   createLocation,
   createProject,
   createRelationship,
@@ -19,19 +22,23 @@ import {
   seedEmployeeAddresses,
   seedEmployeeBankDetails,
   seedEmployeeGuardianDetails,
+  seedEmployeeProjectAssignmentDetails,
   seedEmployees,
+  seedEmployeeSkills,
   seedEmployeeStatutoryDetails,
+  seedEmployeeWorkHistory,
 } from "./employees";
 
 dotenv.config();
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
-  process.env.SUPABASE_ANON_KEY!,
+  process.env.SUPABASE_ANON_KEY!
 );
 
 async function seed() {
   console.log("Seeding database...");
+  const site_ids: string[] = [];
 
   console.time("Database has been seeded");
 
@@ -45,7 +52,7 @@ async function seed() {
     });
 
     console.time("Created Locations and Relationships...");
-    for (let index = 0; index < Math.floor((Math.random() + 1) * 40); index++) {
+    for (let index = 0; index < Math.floor((Math.random() + 1) * 20); index++) {
       await createLocation({
         supabase,
         data: { ...seedCompanyLocations(), company_id: companyId },
@@ -64,7 +71,7 @@ async function seed() {
     console.timeEnd("Created Locations and Relationships...");
 
     console.time("Created Project and Sites...");
-    for (let index = 0; index < Math.floor((Math.random() + 1) * 20); index++) {
+    for (let index = 0; index < Math.floor((Math.random() + 1) * 5); index++) {
       const { id: projectId } = await createProject({
         supabase,
         data: { ...seedProject(), project_client_id: companyId! },
@@ -73,10 +80,10 @@ async function seed() {
 
       for (
         let index = 0;
-        index < Math.floor((Math.random() + 1) * 15);
+        index < Math.floor((Math.random() + 1) * 10);
         index++
       ) {
-        await createSite({
+        const { data } = await createSite({
           supabase,
           data: {
             ...seedProjectSite(),
@@ -84,6 +91,9 @@ async function seed() {
           },
           bypassAuth: true,
         });
+        if (data?.id) {
+          site_ids.push(data?.id);
+        }
       }
     }
     console.timeEnd("Created Project and Sites...");
@@ -91,10 +101,10 @@ async function seed() {
     console.time("Created Employees...");
     for (
       let index = 0;
-      index < Math.floor((Math.random() + 1) * 100);
+      index < Math.floor((Math.random() + 1) * 30);
       index++
     ) {
-      await createEmployee({
+      const { data } = await createEmployee({
         supabase,
         employeeData: { ...seedEmployees(), company_id: companyId! },
         employeeStatutoryDetailsData: seedEmployeeStatutoryDetails(),
@@ -103,6 +113,54 @@ async function seed() {
         employeeGuardiansData: seedEmployeeGuardianDetails(),
         bypassAuth: true,
       });
+
+      if (data?.id) {
+        for (
+          let index = 0;
+          index < Math.floor((Math.random() + 1) * 3);
+          index++
+        ) {
+          await createEmployeeProjectAssignment({
+            supabase,
+            data: {
+              employee_id: data.id,
+              project_site_id:
+                site_ids[Math.floor(Math.random() * site_ids.length)],
+              ...seedEmployeeProjectAssignmentDetails(),
+            },
+            bypassAuth: true,
+          });
+        }
+
+        for (
+          let index = 0;
+          index < Math.floor((Math.random() + 1) * 3);
+          index++
+        ) {
+          await createEmployeeWorkHistory({
+            supabase,
+            data: {
+              employee_id: data.id,
+              ...seedEmployeeWorkHistory(),
+            },
+            bypassAuth: true,
+          });
+        }
+        for (
+          let index = 0;
+          index < Math.floor((Math.random() + 1) * 2);
+          index++
+        ) {
+          await createEmployeeSkill({
+            supabase,
+            data: {
+              employee_id: data.id,
+              ...seedEmployeeSkills(),
+            },
+            bypassAuth: true,
+          });
+        }
+      }
     }
     console.timeEnd("Created Employees...");
   }

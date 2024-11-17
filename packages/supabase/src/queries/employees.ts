@@ -9,6 +9,8 @@ import type {
   EmployeeStatutoryDetailsDatabaseRow,
   EmployeeWorkHistoryDatabaseRow,
   InferredType,
+  ProjectDatabaseRow,
+  SiteDatabaseRow,
   TypedSupabaseClient,
 } from "../types";
 import { HARD_QUERY_LIMIT, MID_QUERY_LIMIT } from "../constant";
@@ -41,7 +43,29 @@ export type EmployeeDataType = Pick<
   | "education"
   | "is_active"
   | "gender"
->;
+> & {
+  employee_project_assignments:
+    | (Pick<
+        EmployeeProjectAssignmentDatabaseRow,
+        | "id"
+        | "is_current"
+        | "assignment_type"
+        | "position"
+        | "skill_level"
+        | "start_date"
+        | "end_date"
+      > & {
+        project_sites: {
+          id: SiteDatabaseRow["id"];
+          name: SiteDatabaseRow["name"];
+          projects: {
+            id: ProjectDatabaseRow["id"];
+            name: ProjectDatabaseRow["name"];
+          };
+        };
+      })[]
+    | [];
+};
 
 export async function getEmployeesByCompanyId({
   supabase,
@@ -69,8 +93,17 @@ export async function getEmployeesByCompanyId({
 
   const query = supabase
     .from("employees")
-    .select(columns.join(","), { count: "exact" })
-    .eq("company_id", companyId);
+    .select(
+      `${columns.join(",")},
+      employee_project_assignments!employee_project_assignments_employee_id_fkey(
+      id, assignment_type, is_current, skill_level, position, start_date, end_date,
+      project_sites(id, name, projects(id, name))
+    )`,
+      { count: "exact" }
+    )
+    .eq("company_id", companyId)
+    .eq("employee_project_assignments.is_current", true)
+    .limit(1, { foreignTable: "employee_project_assignments" });
 
   if (sort) {
     const [column, value] = sort;

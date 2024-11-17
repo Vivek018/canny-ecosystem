@@ -126,7 +126,6 @@ export const ProjectAssignmentItem = ({
           value={projectAssignment?.probation_end_date}
           formatter={formatDate}
         />
-        <DetailItem label='Position' value={projectAssignment?.position} />
         <DetailItem
           label='Start Date'
           value={projectAssignment?.start_date}

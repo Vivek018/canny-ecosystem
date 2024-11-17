@@ -4,8 +4,12 @@ import type {
   EmployeeBankDetailsDatabaseInsert,
   EmployeeDatabaseInsert,
   EmployeeGuardianDatabaseInsert,
+  EmployeeProjectAssignmentDatabaseInsert,
+  EmployeeSkillDatabaseInsert,
   EmployeeStatutoryDetailsDatabaseInsert,
+  EmployeeWorkHistoryDatabaseInsert,
 } from "../types";
+import { proficiencyArray, skillLevelArray } from "@canny_ecosystem/utils";
 
 export function seedEmployees(): Omit<EmployeeDatabaseInsert, "company_id"> {
   return {
@@ -13,7 +17,7 @@ export function seedEmployees(): Omit<EmployeeDatabaseInsert, "company_id"> {
     middle_name: faker.person.middleName(),
     last_name: faker.person.lastName(),
     employee_code: faker.string.sample(5),
-    date_of_birth: faker.date.past().toISOString(),
+    date_of_birth: faker.date.past({ years: 50 }).toISOString(),
     is_active: [true, false][faker.number.int({ min: 0, max: 1 })],
     marital_status: ["married", "unmarried"][
       faker.number.int({ min: 0, max: 1 })
@@ -95,5 +99,47 @@ export function seedEmployeeGuardianDetails(): Omit<
     alternate_mobile_number: faker.string.numeric(10),
     email: faker.internet.email(),
     gender: ["male", "female"][faker.number.int({ min: 0, max: 1 })],
+  };
+}
+
+export function seedEmployeeProjectAssignmentDetails(): Omit<
+  EmployeeProjectAssignmentDatabaseInsert,
+  "employee_id" | "project_site_id" | "supervisor_id"
+> {
+  return {
+    assignment_type: ["permanent", "temporary"][
+      faker.number.int({ min: 0, max: 1 })
+    ],
+    position: faker.person.jobTitle(),
+    skill_level: skillLevelArray[faker.number.int({ min: 0, max: 2 })],
+    is_current: [true, false][faker.number.int({ min: 0, max: 1 })],
+    probation_period: [true, false][faker.number.int({ min: 0, max: 1 })],
+    probation_end_date: faker.date.future().toISOString(),
+    start_date: faker.date.past({ years: 10 }).toISOString(),
+    end_date: faker.date.future().toISOString(),
+  };
+}
+
+export function seedEmployeeWorkHistory(): Omit<
+  EmployeeWorkHistoryDatabaseInsert,
+  "employee_id"
+> {
+  return {
+    position: faker.person.jobTitle(),
+    company_name: faker.company.name(),
+    responsibilities: faker.person.jobTitle(),
+    start_date: faker.date.past().toISOString(),
+    end_date: faker.date.future().toISOString(),
+  };
+}
+
+export function seedEmployeeSkills(): Omit<
+  EmployeeSkillDatabaseInsert,
+  "employee_id"
+> {
+  return {
+    skill_name: faker.person.jobTitle(),
+    proficiency: proficiencyArray[faker.number.int({ min: 0, max: 2 })],
+    years_of_experience: faker.number.int({ min: 0, max: 10 }),
   };
 }

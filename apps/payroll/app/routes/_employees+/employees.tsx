@@ -39,7 +39,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const hasFilters =
     filters &&
     Object.values(filters).some(
-      (value) => value !== null && value !== undefined,
+      (value) => value !== null && value !== undefined
     );
 
   const { data, meta, error } = await getEmployeesByCompanyId({
@@ -55,7 +55,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   });
 
   const hasNextPage = Boolean(
-    meta?.count && meta.count / (page + 1) > pageSize,
+    meta?.count && meta.count / (page + 1) > pageSize
   );
 
   if (error) {
@@ -90,7 +90,11 @@ export async function action({ request }: ActionFunctionArgs) {
     messages: [
       {
         role: "system",
-        content: `Generate filters based on the prompt. Current date: ${new Date().toISOString().split("T")[0]}. Context: ${context || "None"}Valid filters: ${VALID_FILTERS.join(", ")} Rules for parsing user input and generating filter object: 
+        content: `Generate filters based on the prompt. Current date: ${
+          new Date().toISOString().split("T")[0]
+        }. Context: ${context || "None"}Valid filters: ${VALID_FILTERS.join(
+          ", "
+        )} Rules for parsing user input and generating filter object: 
           1. Use only the valid filter names provided in VALID_FILTERS.
           2. Interpret the input intelligently to map to appropriate filters.
           3. For gender and education filters:
@@ -146,9 +150,9 @@ export default function Employees() {
     useLoaderData<typeof loader>();
 
   return (
-    <section className="py-4">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-6">
+    <section className='py-4'>
+      <div className='w-full flex items-center justify-between pb-4'>
+        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-6'>
           <EmployeesSearchFilter />
           <FilterList filterList={{ ...filters, name: query }} />
         </div>
