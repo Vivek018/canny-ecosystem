@@ -142,3 +142,11 @@ export type EmployeeWorkHistoryDatabaseInsert =
   Database["public"]["Tables"]["employee_work_history"]["Insert"];
 export type EmployeeWorkHistoryDatabaseUpdate =
   Database["public"]["Tables"]["employee_work_history"]["Update"];
+
+// Feedback
+export type FeedbackDatabaseRow =
+  Database["public"]["Tables"]["feedback"]["Row"];
+export type FeedbackDatabaseInsert =
+  Database["public"]["Tables"]["feedback"]["Insert"];
+export type FeedbackDatabaseUpdate =
+  Database["public"]["Tables"]["feedback"]["Update"];
