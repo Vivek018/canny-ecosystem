@@ -737,6 +737,57 @@ export type Database = {
           },
         ]
       }
+      feedback: {
+        Row: {
+          category: Database["public"]["Enums"]["feedback_category"] | null
+          company_id: string
+          created_at: string
+          id: string
+          message: string
+          severity: Database["public"]["Enums"]["feedback_severity"] | null
+          subject: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: Database["public"]["Enums"]["feedback_category"] | null
+          company_id: string
+          created_at?: string
+          id?: string
+          message: string
+          severity?: Database["public"]["Enums"]["feedback_severity"] | null
+          subject: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["feedback_category"] | null
+          company_id?: string
+          created_at?: string
+          id?: string
+          message?: string
+          severity?: Database["public"]["Enums"]["feedback_severity"] | null
+          subject?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feedback_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       labour_welfare_fund: {
         Row: {
           company_id: string
@@ -1179,6 +1230,8 @@ export type Database = {
     }
     Enums: {
       calculation_type: "fixed" | "basic"
+      feedback_category: "suggestion" | "bug" | "complain"
+      feedback_severity: "low" | "normal" | "urgent"
       payment_type: "fixed" | "variable"
     }
     CompositeTypes: {

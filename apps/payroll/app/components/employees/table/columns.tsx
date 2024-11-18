@@ -51,7 +51,7 @@ export const columns: ColumnDef<EmployeeDataType>[] = [
     },
   },
   {
-    accessorKey: "mobile_number",
+    accessorKey: "primary_mobile_number",
     header: "Mobile Number",
     cell: ({ row }) => {
       return row.original?.primary_mobile_number;
