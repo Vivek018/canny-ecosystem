@@ -182,7 +182,7 @@ function App() {
               user={user ?? []}
             />
             <div className='flex max-h-screen flex-grow flex-col overflow-scroll ml-20'>
-              <Header className='px-5'  companies={companies ?? []} />
+              <Header className='px-5' companies={companies ?? []} />
               <div className='px-5'>
                 <Outlet />
               </div>

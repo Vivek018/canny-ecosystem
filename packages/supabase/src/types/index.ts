@@ -142,3 +142,27 @@ export type EmployeeWorkHistoryDatabaseInsert =
   Database["public"]["Tables"]["employee_work_history"]["Insert"];
 export type EmployeeWorkHistoryDatabaseUpdate =
   Database["public"]["Tables"]["employee_work_history"]["Update"];
+
+// Payment Fields
+export type PaymentFieldDatabaseRow =
+  Database["public"]["Tables"]["payment_fields"]["Row"];
+export type PaymentFieldDatabaseInsert =
+  Database["public"]["Tables"]["payment_fields"]["Insert"];
+export type PaymentFieldDatabaseUpdate =
+  Database["public"]["Tables"]["payment_fields"]["Update"];
+
+// Professional Tax
+export type ProfessionalTaxDatabaseRow =
+  Database["public"]["Tables"]["professional_tax"]["Row"];
+export type ProfessionalTaxDatabaseInsert =
+  Database["public"]["Tables"]["professional_tax"]["Insert"];
+export type ProfessionalTaxDatabaseUpdate =
+  Database["public"]["Tables"]["professional_tax"]["Update"];
+
+// Labour Welfare Fund
+export type LabourWelfareFundDatabaseRow =
+  Database["public"]["Tables"]["labour_welfare_fund"]["Row"];
+export type LabourWelfareFundDatabaseInsert =
+  Database["public"]["Tables"]["labour_welfare_fund"]["Insert"];
+export type LabourWelfareFundDatabaseUpdate =
+  Database["public"]["Tables"]["labour_welfare_fund"]["Update"];
