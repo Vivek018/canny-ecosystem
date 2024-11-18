@@ -12,7 +12,7 @@ export function SecondaryMenu({
   className?: string;
 }) {
   return (
-    <nav className={cn("py-4", className)}>
+    <nav className={cn("pt-4 pb-2", className)}>
       <ul className="flex space-x-6 text-sm overflow-auto no-scrollbar">
         {items.map((item) => (
           <Link

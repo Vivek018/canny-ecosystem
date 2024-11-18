@@ -167,7 +167,6 @@ export default function AddEmployeeWorkHistory({
                   ...getTextareaProps(fields.responsibilities),
                   autoFocus: true,
                   placeholder: `Enter ${fields.responsibilities.name}`,
-                  className: "capitalize",
                 }}
                 labelProps={{
                   children: fields.responsibilities.name,

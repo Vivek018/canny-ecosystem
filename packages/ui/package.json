@@ -80,12 +80,12 @@
     "./alert-dialog": "./src/components/alert-dialog.tsx",
     "./sheet": "./src/components/sheet.tsx",
     "./scroll-area": "./src/components/scroll-area.tsx",
-    "./common-sidebar": "./src/components/common-sidebar.tsx",
     "./secondary-menu": "./src/components/secondary-menu.tsx",
     "./forms": "./src/components/forms.tsx",
     "./tailwind.config": "./tailwind.config.ts",
     "./postcss": "./postcss.config.js",
     "./hooks/isomorphic-layout-effect": "./src/hooks/isomorphic-layout-effect.ts",
+    "./hooks/typing-animation": "./src/hooks/typing-animation.ts",
     "./hooks/is-document": "./src/hooks/is-document.ts",
     "./hooks/local-storage": "./src/hooks/local-storage.ts"
   }

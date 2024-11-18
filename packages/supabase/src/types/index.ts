@@ -121,11 +121,11 @@ export type EmployeeGuardianDatabaseUpdate =
 
 // Employee Project Assignments
 export type EmployeeProjectAssignmentDatabaseRow =
-  Database["public"]["Tables"]["employee_project_assignments"]["Row"];
+  Database["public"]["Tables"]["employee_project_assignment"]["Row"];
 export type EmployeeProjectAssignmentDatabaseInsert =
-  Database["public"]["Tables"]["employee_project_assignments"]["Insert"];
+  Database["public"]["Tables"]["employee_project_assignment"]["Insert"];
 export type EmployeeProjectAssignmentDatabaseUpdate =
-  Database["public"]["Tables"]["employee_project_assignments"]["Update"];
+  Database["public"]["Tables"]["employee_project_assignment"]["Update"];
 
 // Employee Skills
 export type EmployeeSkillDatabaseRow =

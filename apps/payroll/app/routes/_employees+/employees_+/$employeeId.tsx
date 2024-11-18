@@ -16,7 +16,7 @@ export default function Employee() {
   const { pathname } = useLocation();
   return (
     <section>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 pt-4 pb-2">
         <Link
           prefetch="intent"
           to="/employees"
@@ -28,6 +28,7 @@ export default function Employee() {
           <Icon name="chevron-left" size="sm" />
         </Link>
         <SecondaryMenu
+          className="pt-0 pb-0"
           items={[
             { label: "Overview", path: `/employees/${employeeId}` },
             {

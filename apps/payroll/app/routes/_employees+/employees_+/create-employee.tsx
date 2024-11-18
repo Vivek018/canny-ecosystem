@@ -2,6 +2,7 @@ import {
   EmployeeAddressesSchema,
   EmployeeBankDetailsSchema,
   EmployeeGuardiansSchema,
+  EmployeeProjectAssignmentSchema,
   EmployeeSchema,
   EmployeeStatutorySchema,
   isGoodStatus,
@@ -34,11 +35,22 @@ import { CreateEmployeeAddress } from "@/components/employees/form/create-employ
 import type { EmployeeGuardianDatabaseInsert } from "@canny_ecosystem/supabase/types";
 import { CreateEmployeeGuardianDetails } from "@/components/employees/form/create-employee-guardian-details";
 import { FormStepHeader } from "@/components/multi-step-form/form-step-header";
+import {
+  getEmployeesByPositionAndProjectSiteId,
+  getProjectsByCompanyId,
+  getSitesByProjectId,
+} from "@canny_ecosystem/supabase/queries";
+import {
+  CreateEmployeeProjectAssignment,
+  PROJECT_PARAM,
+  PROJECT_SITE_PARAM,
+} from "@/components/employees/form/create-employee-project-assignment";
 
 export const CREATE_EMPLOYEE = [
   "create-employee",
   "create-employee-statutory-details",
   "create-employee-bank-details",
+  "create-employee-project-assignment",
   "create-employee-addresses",
   "create-employee-guardians",
 ];
@@ -51,12 +63,14 @@ const schemas = [
   EmployeeSchema,
   EmployeeStatutorySchema,
   EmployeeBankDetailsSchema,
+  EmployeeProjectAssignmentSchema,
   EmployeeAddressesSchema,
   EmployeeGuardiansSchema,
 ];
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
+  const urlSearchParams = new URLSearchParams(url.searchParams);
   const step = Number.parseInt(url.searchParams.get(STEP) || "1");
   const totalSteps = schemas.length;
 
@@ -75,7 +89,60 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return redirect(url.toString(), { status: 302 });
   }
 
-  return json({ step, totalSteps, stepData, companyId });
+  let projectOptions: any = [];
+  let projectSiteOptions: any = [];
+  let siteEmployeeOptions: any = [];
+  if (step === 4) {
+    const { data: projects } = await getProjectsByCompanyId({
+      supabase,
+      companyId,
+    });
+
+    projectOptions = projects?.map((project) => ({
+      label: project?.name,
+      value: project?.id,
+    }));
+
+    const projectParamId = urlSearchParams.get(PROJECT_PARAM);
+
+    if (projectParamId?.length) {
+      const { data: projectSites } = await getSitesByProjectId({
+        supabase,
+        projectId: projectParamId,
+      });
+
+      projectSiteOptions = projectSites?.map((projectSite) => ({
+        label: projectSite?.name,
+        value: projectSite?.id,
+      }));
+    }
+
+    const projectSiteParamId = urlSearchParams.get(PROJECT_SITE_PARAM);
+
+    if (projectSiteParamId?.length) {
+      const { data: siteEmployees } =
+        await getEmployeesByPositionAndProjectSiteId({
+          supabase,
+          position: "supervisor",
+          projectSiteId: projectSiteParamId,
+        });
+
+      siteEmployeeOptions = siteEmployees?.map((siteEmployee) => ({
+        label: siteEmployee?.employee_code,
+        value: siteEmployee?.id,
+      }));
+    }
+  }
+
+  return json({
+    step,
+    totalSteps,
+    stepData,
+    companyId,
+    projectOptions,
+    projectSiteOptions,
+    siteEmployeeOptions,
+  });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -89,7 +156,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await parseMultipartFormData(
     request,
-    createMemoryUploadHandler({ maxPartSize: SIZE_1MB }),
+    createMemoryUploadHandler({ maxPartSize: SIZE_1MB })
   );
   const action = formData.get("_action") as string;
 
@@ -101,10 +168,13 @@ export async function action({ request }: ActionFunctionArgs) {
     if (submission.status === "success") {
       const employeeData = session.get(`${SESSION_KEY_PREFIX}1`);
       const employeeStatutoryDetailsData = session.get(
-        `${SESSION_KEY_PREFIX}2`,
+        `${SESSION_KEY_PREFIX}2`
       );
       const employeeBankDetailsData = session.get(`${SESSION_KEY_PREFIX}3`);
-      const employeeAddressesData = session.get(`${SESSION_KEY_PREFIX}4`);
+      const employeeProjectAssignmentData = session.get(
+        `${SESSION_KEY_PREFIX}4`
+      );
+      const employeeAddressesData = session.get(`${SESSION_KEY_PREFIX}5`);
       const employeeGuardiansData = submission.value as Omit<
         EmployeeGuardianDatabaseInsert,
         "employee_id"
@@ -115,6 +185,7 @@ export async function action({ request }: ActionFunctionArgs) {
         employeeError,
         employeeStatutoryDetailsError,
         employeeBankDetailsError,
+        employeeProjectAssignmentError,
         employeeAddressesError,
         employeeGuardiansError,
       } = await createEmployee({
@@ -122,6 +193,7 @@ export async function action({ request }: ActionFunctionArgs) {
         employeeData,
         employeeStatutoryDetailsData,
         employeeBankDetailsData,
+        employeeProjectAssignmentData,
         employeeAddressesData,
         employeeGuardiansData,
       });
@@ -139,6 +211,7 @@ export async function action({ request }: ActionFunctionArgs) {
       if (
         employeeStatutoryDetailsError ||
         employeeBankDetailsError ||
+        employeeProjectAssignmentError ||
         employeeAddressesError ||
         employeeGuardiansError
       ) {
@@ -171,7 +244,7 @@ export async function action({ request }: ActionFunctionArgs) {
       if (submission.status === "error") {
         return json(
           { result: submission.reply() },
-          { status: submission.status === "error" ? 400 : 200 },
+          { status: submission.status === "error" ? 400 : 200 }
         );
       }
     }
@@ -195,7 +268,7 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function CreateEmployee() {
-  const { step, totalSteps, stepData, companyId } =
+  const { step, totalSteps, stepData, companyId, projectOptions, projectSiteOptions, siteEmployeeOptions } =
     useLoaderData<typeof loader>();
   const [resetKey, setResetKey] = useState(Date.now());
 
@@ -222,8 +295,8 @@ export default function CreateEmployee() {
   });
 
   return (
-    <section className="lg:px-40 2xl:px-80 py-4">
-      <div className="w-full overflow-scroll mx-auto mb-8">
+    <section className='lg:px-40 2xl:px-80 py-4'>
+      <div className='w-full overflow-scroll mx-auto mb-8'>
         <FormStepHeader
           totalSteps={totalSteps}
           step={step}
@@ -232,13 +305,13 @@ export default function CreateEmployee() {
       </div>
       <FormProvider context={form.context}>
         <Form
-          method="POST"
-          encType="multipart/form-data"
+          method='POST'
+          encType='multipart/form-data'
           {...getFormProps(form)}
-          className="flex flex-col"
+          className='flex flex-col'
         >
           <Card>
-            <div className="h-[560px] overflow-scroll">
+            <div className='h-[560px] overflow-scroll'>
               {step === 1 ? (
                 <CreateEmployeeDetails key={resetKey} fields={fields as any} />
               ) : null}
@@ -255,14 +328,23 @@ export default function CreateEmployee() {
                 />
               ) : null}
               {step === 4 ? (
-                <CreateEmployeeAddress
+                <CreateEmployeeProjectAssignment
                   key={resetKey + 3}
                   fields={fields as any}
+                  projectOptions={projectOptions}
+                  projectSiteOptions={projectSiteOptions}
+                  siteEmployeeOptions={siteEmployeeOptions}
                 />
               ) : null}
               {step === 5 ? (
-                <CreateEmployeeGuardianDetails
+                <CreateEmployeeAddress
                   key={resetKey + 4}
+                  fields={fields as any}
+                />
+              ) : null}
+              {step === 6 ? (
+                <CreateEmployeeGuardianDetails
+                  key={resetKey + 5}
                   fields={fields as any}
                 />
               ) : null}

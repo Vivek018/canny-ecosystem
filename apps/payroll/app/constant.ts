@@ -14,7 +14,9 @@ export const workingDaysOptions = [
 
 export const sideNavList = [
   { name: "Dashboard", link: "/dashboard", icon: "dashboard" },
+  {name: "management"},
   { name: "Employees", link: "/employees", icon: "employee" },
+  { name: "Finance" },
   { name: "Advances", link: "/advances", icon: "lab-timer" },
   {
     name: "Payment Fields",
@@ -26,6 +28,7 @@ export const sideNavList = [
     link: "/payment_data",
     icon: "table",
   },
+  { name: "General" },
   { name: "Projects", link: "/projects", icon: "project" },
   {
     name: "Settings",

@@ -147,7 +147,7 @@ export async function createSite({
 
   console.error(error);
 
-  return { status, error };
+  return { data: projectSiteData, status, error };
 }
 
 export async function updateSite({

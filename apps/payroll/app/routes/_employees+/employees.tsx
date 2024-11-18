@@ -9,6 +9,8 @@ import { MAX_QUERY_LIMIT } from "@canny_ecosystem/supabase/constant";
 import {
   type EmployeeFilters,
   getEmployeesByCompanyId,
+  getProjectNamesByCompanyId,
+  getSiteNamesByProjectNameAndCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { extractJsonFromString } from "@canny_ecosystem/utils";
@@ -29,17 +31,26 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const query = searchParams.get("name") ?? undefined;
 
   const filters: EmployeeFilters = {
-    start: searchParams.get("start") ?? undefined,
-    end: searchParams.get("end") ?? undefined,
+    dob_start: searchParams.get("dob_start") ?? undefined,
+    dob_end: searchParams.get("dob_end") ?? undefined,
     education: searchParams.get("education") ?? undefined,
     gender: searchParams.get("gender") ?? undefined,
     status: searchParams.get("status") ?? undefined,
+    project: searchParams.get("project") ?? undefined,
+    project_site: searchParams.get("project_site") ?? undefined,
+    assignment_type: searchParams.get("assignment_type") ?? undefined,
+    position: searchParams.get("position") ?? undefined,
+    skill_level: searchParams.get("skill_level") ?? undefined,
+    doj_start: searchParams.get("doj_start") ?? undefined,
+    doj_end: searchParams.get("doj_end") ?? undefined,
+    dol_start: searchParams.get("dol_start") ?? undefined,
+    dol_end: searchParams.get("dol_end") ?? undefined,
   };
 
   const hasFilters =
     filters &&
     Object.values(filters).some(
-      (value) => value !== null && value !== undefined,
+      (value) => value !== null && value !== undefined
     );
 
   const { data, meta, error } = await getEmployeesByCompanyId({
@@ -55,11 +66,23 @@ export async function loader({ request }: LoaderFunctionArgs) {
   });
 
   const hasNextPage = Boolean(
-    meta?.count && meta.count / (page + 1) > pageSize,
+    meta?.count && meta.count / (page + 1) > pageSize
   );
 
   if (error) {
     throw error;
+  }
+
+  const {data: projectData} = await getProjectNamesByCompanyId({ supabase, companyId });
+
+  let projectSiteData = null;
+  if (filters.project) {
+    const { data } = await getSiteNamesByProjectNameAndCompanyId({
+      supabase,
+      projectName: filters.project,
+      companyId
+    });
+    projectSiteData = data;
   }
 
   const env = {
@@ -68,17 +91,19 @@ export async function loader({ request }: LoaderFunctionArgs) {
   };
 
   return json({
-    data,
+    data: data as any,
     count: meta?.count,
     query,
     filters,
     hasNextPage,
     companyId,
+    projectArray: projectData?.map((project) => project.name) ?? [],
+    projectSiteArray: projectSiteData?.map((site) => site.name) ?? [],
     env,
   });
 }
 
-const VALID_FILTERS = ["name", "start", "end", "gender", "education", "status"];
+const VALID_FILTERS = ["name", "dob_start", "dob_end", "gender", "education", "status", "project", "project_site", "assignment_type", "position", "skill_level", "doj_start", "doj_end", "dol_start", "dol_end"];
 
 export async function action({ request }: ActionFunctionArgs) {
   const url = new URL(request.url);
@@ -90,7 +115,11 @@ export async function action({ request }: ActionFunctionArgs) {
     messages: [
       {
         role: "system",
-        content: `Generate filters based on the prompt. Current date: ${new Date().toISOString().split("T")[0]}. Context: ${context || "None"}Valid filters: ${VALID_FILTERS.join(", ")} Rules for parsing user input and generating filter object: 
+        content: `Generate filters based on the prompt. Current date: ${
+          new Date().toISOString().split("T")[0]
+        }. Context: ${context || "None"}Valid filters: ${VALID_FILTERS.join(
+          ", "
+        )} Rules for parsing user input and generating filter object: 
           1. Use only the valid filter names provided in VALID_FILTERS.
           2. Interpret the input intelligently to map to appropriate filters.
           3. For gender and education filters:
@@ -142,14 +171,14 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function Employees() {
-  const { data, count, query, filters, hasNextPage, companyId, env } =
+  const { data, count, query, filters, hasNextPage, companyId, projectArray, projectSiteArray, env } =
     useLoaderData<typeof loader>();
 
   return (
-    <section className="py-[22px]">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-6">
-          <EmployeesSearchFilter />
+    <section className='py-4'>
+      <div className='w-full flex items-center justify-between pb-4'>
+        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-6'>
+          <EmployeesSearchFilter projectArray={projectArray} projectSiteArray={projectSiteArray} />
           <FilterList filterList={{ ...filters, name: query }} />
         </div>
         <EmployeesActions isEmpty={!data?.length} />

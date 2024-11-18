@@ -243,7 +243,7 @@ export const educationArray = [
   "12th",
   "diploma",
   "graduate",
-  "post-graduate",
+  "post_graduate",
 ] as const;
 export const maritalStatusArray = ["married", "unmarried"] as const;
 
@@ -365,14 +365,12 @@ export const skillLevelArray = [
 ] as const;
 
 export const EmployeeProjectAssignmentSchema = z.object({
-  id: z.string().optional(),
   employee_id: z.string().optional(),
   project_site_id: z.string(),
   position: z.enum(positionArray).default("sampler"),
   skill_level: z.enum(skillLevelArray).default("unskilled"),
   assignment_type: z.enum(assignmentTypeArray).default("full_time"),
   supervisor_id: z.string().optional(),
-  is_current: z.boolean().default(false),
   start_date: z.string().default(new Date().toISOString().split("T")[0]),
   end_date: z.string().optional(),
   probation_period: z.boolean().default(false),
