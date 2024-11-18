@@ -89,7 +89,7 @@ export function DataTableHeader({ table, loading }: Props) {
               <TableHead
                 key={id}
                 className={cn(
-                  "px-3 md:px-4 py-2",
+                  "px-4 py-2",
                   id === "employee_code" && "sticky left-12 bg-card z-10",
                   id === "full_name" && "sticky left-48 bg-card z-10"
                 )}

@@ -123,9 +123,9 @@ export function DataTable<TData, TValue>({
       {/* Wrapper for horizontal scroll with fixed action column */}
       <div className='relative border overflow-x-auto'>
         <div className='relative'>
-          <Table className=''>
+          <Table>
             <DataTableHeader table={table} />
-            <TableBody className='overflow-x-auto'>
+            <TableBody>
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow

@@ -1,4 +1,4 @@
-import { UTCDate } from "@canny_ecosystem/utils";
+import { formatUTCDate } from "@canny_ecosystem/utils";
 import type {
   EmployeeAddressDatabaseRow,
   EmployeeBankDetailsDatabaseRow,
@@ -16,11 +16,20 @@ import type {
 import { HARD_QUERY_LIMIT, MID_QUERY_LIMIT } from "../constant";
 
 export type EmployeeFilters = {
-  start?: string | undefined;
-  end?: string | undefined;
-  education?: string | undefined;
-  gender?: string | undefined;
-  status?: string | undefined;
+  dob_start?: string | undefined | null;
+  dob_end?: string | undefined | null;
+  education?: string | undefined | null;
+  gender?: string | undefined | null;
+  status?: string | undefined | null;
+  project?: string | undefined | null;
+  project_site?: string | undefined | null;
+  assignment_type?: string | undefined | null;
+  position?: string | undefined | null;
+  skill_level?: string | undefined | null;
+  doj_start?: string | undefined | null;
+  doj_end?: string | undefined | null;
+  dol_start?: string | undefined | null;
+  dol_end?: string | undefined | null;
 };
 
 export type GetEmployeesByCompanyIdParams = {
@@ -44,27 +53,24 @@ export type EmployeeDataType = Pick<
   | "is_active"
   | "gender"
 > & {
-  employee_project_assignments:
-    | (Pick<
-        EmployeeProjectAssignmentDatabaseRow,
-        | "id"
-        | "is_current"
-        | "assignment_type"
-        | "position"
-        | "skill_level"
-        | "start_date"
-        | "end_date"
-      > & {
-        project_sites: {
-          id: SiteDatabaseRow["id"];
-          name: SiteDatabaseRow["name"];
-          projects: {
-            id: ProjectDatabaseRow["id"];
-            name: ProjectDatabaseRow["name"];
-          };
-        };
-      })[]
-    | [];
+  employee_project_assignment: Pick<
+    EmployeeProjectAssignmentDatabaseRow,
+    | "employee_id"
+    | "assignment_type"
+    | "position"
+    | "skill_level"
+    | "start_date"
+    | "end_date"
+  > & {
+    project_sites: {
+      id: SiteDatabaseRow["id"];
+      name: SiteDatabaseRow["name"];
+      projects: {
+        id: ProjectDatabaseRow["id"];
+        name: ProjectDatabaseRow["name"];
+      };
+    };
+  };
 };
 
 export async function getEmployeesByCompanyId({
@@ -95,85 +101,103 @@ export async function getEmployeesByCompanyId({
     .from("employees")
     .select(
       `${columns.join(",")},
-      employee_project_assignments!employee_project_assignments_employee_id_fkey(
-      id, assignment_type, is_current, skill_level, position, start_date, end_date,
-      project_sites(id, name, projects(id, name))
-    )`,
+      employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(
+        employee_id, assignment_type, skill_level, position, start_date, end_date,
+        project_sites!inner(id, name, projects!inner(id, name))
+      )`,
       { count: "exact" }
     )
-    .eq("company_id", companyId)
-    .eq("employee_project_assignments.is_current", true)
-    .limit(1, { foreignTable: "employee_project_assignments" });
+    .eq("company_id", companyId);
 
+  // Sorting
   if (sort) {
-    const [column, value] = sort;
-    const ascending = value === "asc";
-
-    if (column === "employee_code") {
-      query.order("employee_code", { ascending });
-    } else if (column === "full_name") {
-      query.order("first_name", { ascending });
-    } else if (column === "mobile_number") {
-      query.order("primary_mobile_number", { ascending });
-    } else if (column === "date_of_birth") {
-      query.order("date_of_birth", { ascending });
-    } else if (column === "education") {
-      query.order("education", { ascending });
-    } else if (column === "gender") {
-      query.order("gender", { ascending });
-    } else if (column === "status") {
-      query.order("status", { ascending });
-    } else {
-      query.order(column, { ascending });
-    }
+    const [column, direction] = sort;
+    query.order(column, { ascending: direction === "asc" });
   } else {
     query.order("created_at", { ascending: false });
   }
 
+  // Full-text search
   if (searchQuery) {
-    query.textSearch("fts_vector", `'${searchQuery}'`);
+    query.textSearch("fts_vector", `'${searchQuery}'`, { type: "plain" });
   }
 
+  // Filters
   if (filters) {
-    const { start, end, gender, education, status } = filters;
+    const {
+      dob_start,
+      dob_end,
+      education,
+      gender,
+      status,
+      project,
+      project_site,
+      assignment_type,
+      position,
+      skill_level,
+      doj_start,
+      doj_end,
+      dol_start,
+      dol_end,
+    } = filters;
 
-    if (start) {
-      const fromDate = new UTCDate(start);
-      query.gte("date_of_birth", fromDate.toISOString());
-    }
-    if (end) {
-      const toDate = new UTCDate(end);
-      query.lte("date_of_birth", toDate?.toISOString());
-    }
+    const dateFilters = [
+      { field: "date_of_birth", start: dob_start, end: dob_end },
+      {
+        field: "employee_project_assignment.start_date",
+        start: doj_start,
+        end: doj_end,
+      },
+      {
+        field: "employee_project_assignment.end_date",
+        start: dol_start,
+        end: dol_end,
+      },
+    ];
 
-    if (gender) {
-      query.eq("gender", gender.toLowerCase());
-    }
-
-    if (education) {
-      query.eq("education", education.toLowerCase());
+    for (const { field, start, end } of dateFilters) {
+      if (start) query.gte(field, formatUTCDate(start));
+      if (end) query.lte(field, formatUTCDate(end));
     }
 
     if (status) {
-      const statusBoolean = status.toLowerCase() === "active";
-      query.eq("is_active", statusBoolean);
+      query.eq("is_active", !!status);
+    }
+    if (gender) {
+      query.eq("gender", gender.toLowerCase());
+    }
+    if (education) {
+      query.eq("education", education.toLowerCase());
+    }
+    if (project) {
+      query.eq("employee_project_assignment.project_sites.projects.name", project);
+    }
+    if (project_site) {
+      query.eq("employee_project_assignment.project_sites.name", project_site);
+    }
+    if (assignment_type) {
+      query.eq("employee_project_assignment.assignment_type", assignment_type);
+    }
+    if (position) {
+      query.eq("employee_project_assignment.position", position);
+    }
+    if (skill_level) {
+      query.eq("employee_project_assignment.skill_level", skill_level);
     }
   }
 
-  const { data, count, error } = await query
-    .range(from, to)
-    .returns<EmployeeDataType[]>();
+  // Fetch Data
+  const { data, count, error } = await query.range(from, to);
 
   if (error) {
-    console.error(error);
+    console.error("Error fetching employees:", error);
+    return { data: null, error };
   }
 
   return {
     data,
-    meta: {
-      count: count ?? data?.length,
-    },
-    error,
+    meta: { count: count ?? data?.length },
+    error: null,
   };
 }
 
@@ -193,11 +217,11 @@ export async function getEmployeesByPositionAndProjectSiteId({
     .select(
       `${columns.join(
         ","
-      )},employee_project_assignments!employee_project_assignments_employee_id_fkey!inner(*)`
+      )},employee_project_assignment!employee_project_assignment_employee_id_fkey!inner(*)`
     )
-    .eq("employee_project_assignments.is_current", true)
-    .eq("employee_project_assignments.project_site_id", projectSiteId)
-    .eq("employee_project_assignments.position", position ?? "")
+    .eq("employee_project_assignment.is_current", true)
+    .eq("employee_project_assignment.project_site_id", projectSiteId)
+    .eq("employee_project_assignment.position", position ?? "")
     .limit(MID_QUERY_LIMIT)
     .returns<InferredType<EmployeeDatabaseRow, (typeof columns)[number]>[]>();
 
@@ -598,11 +622,11 @@ export type EmployeeProjectAssignmentDataType = Omit<
   EmployeeProjectAssignmentDatabaseRow,
   "created_at" | "updated_at"
 > & {
-  project_site: { id: string; name: string };
+  project_sites: { id: string; name: string; projects: { name: string } };
   supervisor: { id: string; employee_code: string };
 };
 
-export async function getEmployeeProjectAssignmentsByEmployeeId({
+export async function getEmployeeProjectAssignmentByEmployeeId({
   supabase,
   employeeId,
 }: {
@@ -610,66 +634,27 @@ export async function getEmployeeProjectAssignmentsByEmployeeId({
   employeeId: string;
 }) {
   const columns = [
-    "id",
-    "project_site:project_sites!project_site_id (id, name)",
-    "position",
-    "start_date",
-    "end_date",
-    "is_current",
-    "supervisor:employees!supervisor_id (id, employee_code)",
-    "assignment_type",
-    "skill_level",
-    "probation_period",
-    "probation_end_date",
     "employee_id",
-  ] as const;
-
-  const { data, error } = await supabase
-    .from("employee_project_assignments")
-    .select(columns.join(","))
-    .eq("employee_id", employeeId)
-    .limit(HARD_QUERY_LIMIT)
-    .returns<EmployeeProjectAssignmentDataType[]>();
-
-  if (error) {
-    console.error(error);
-  }
-
-  return { data, error };
-}
-
-export async function getEmployeeProjectAssignmentById({
-  supabase,
-  id,
-}: {
-  supabase: TypedSupabaseClient;
-  id: string;
-}) {
-  const columns = [
-    "id",
     "project_site_id",
     "position",
     "start_date",
     "end_date",
-    "is_current",
     "supervisor_id",
     "assignment_type",
     "skill_level",
     "probation_period",
     "probation_end_date",
-    "employee_id",
   ] as const;
 
   const { data, error } = await supabase
-    .from("employee_project_assignments")
-    .select(columns.join(","))
-    .eq("id", id)
-    .single<
-      InferredType<
-        EmployeeProjectAssignmentDatabaseRow,
-        (typeof columns)[number]
-      >
-    >();
+    .from("employee_project_assignment")
+    .select(
+      `${columns.join(
+        ","
+      )}, project_sites(id, name, projects(name)), supervisor:employees!employee_project_assignments_supervisor_id_fkey(id, employee_code)`
+    )
+    .eq("employee_id", employeeId)
+    .single<EmployeeProjectAssignmentDataType>();
 
   if (error) {
     console.error(error);

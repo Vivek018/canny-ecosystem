@@ -9,7 +9,15 @@ import type {
   EmployeeStatutoryDetailsDatabaseInsert,
   EmployeeWorkHistoryDatabaseInsert,
 } from "../types";
-import { proficiencyArray, skillLevelArray } from "@canny_ecosystem/utils";
+import {
+  accountTypeArray,
+  assignmentTypeArray,
+  genderArray,
+  positionArray,
+  proficiencyArray,
+  relationshipArray,
+  skillLevelArray,
+} from "@canny_ecosystem/utils";
 
 export function seedEmployees(): Omit<EmployeeDatabaseInsert, "company_id"> {
   return {
@@ -25,7 +33,7 @@ export function seedEmployees(): Omit<EmployeeDatabaseInsert, "company_id"> {
     gender: ["male", "female"][faker.number.int({ min: 0, max: 1 })],
     primary_mobile_number: faker.string.numeric(10),
     secondary_mobile_number: faker.string.numeric(10),
-    education: ["10th", "12th", "graduate", "post-graduate"][
+    education: ["10th", "12th", "graduate", "post_graduate"][
       faker.number.int({ min: 0, max: 3 })
     ],
     personal_email: faker.internet.email(),
@@ -56,7 +64,7 @@ export function seedEmployeeBankDetails(): Omit<
   return {
     account_holder_name: faker.person.fullName(),
     account_number: faker.string.numeric(10),
-    account_type: ["savings", "current"][faker.number.int({ min: 0, max: 1 })],
+    account_type: accountTypeArray[Math.floor(Math.random() * accountTypeArray.length)],
     ifsc_code: faker.string.alphanumeric(10),
     bank_name: faker.company.name(),
     branch_name: faker.company.buzzPhrase(),
@@ -89,8 +97,8 @@ export function seedEmployeeGuardianDetails(): Omit<
     last_name: faker.person.lastName(),
     date_of_birth: faker.date.past().toISOString(),
     is_emergency_contact: [true, false][faker.number.int({ min: 0, max: 1 })],
-    relationship: ["father", "mother", "spouse", "other"][
-      faker.number.int({ min: 0, max: 3 })
+    relationship: relationshipArray[
+      Math.floor(Math.random() * relationshipArray.length)
     ],
     address_same_as_employee: [true, false][
       faker.number.int({ min: 0, max: 1 })
@@ -98,7 +106,7 @@ export function seedEmployeeGuardianDetails(): Omit<
     mobile_number: faker.string.numeric(10),
     alternate_mobile_number: faker.string.numeric(10),
     email: faker.internet.email(),
-    gender: ["male", "female"][faker.number.int({ min: 0, max: 1 })],
+    gender: genderArray[Math.floor(Math.random() * genderArray.length)],
   };
 }
 
@@ -107,16 +115,17 @@ export function seedEmployeeProjectAssignmentDetails(): Omit<
   "employee_id" | "project_site_id" | "supervisor_id"
 > {
   return {
-    assignment_type: ["permanent", "temporary"][
-      faker.number.int({ min: 0, max: 1 })
-    ],
-    position: faker.person.jobTitle(),
-    skill_level: skillLevelArray[faker.number.int({ min: 0, max: 2 })],
-    is_current: [true, false][faker.number.int({ min: 0, max: 1 })],
+    assignment_type:
+      assignmentTypeArray[
+        Math.floor(Math.random() * assignmentTypeArray.length)
+      ],
+    position: positionArray[Math.floor(Math.random() * positionArray.length)],
+    skill_level:
+      skillLevelArray[Math.floor(Math.random() * skillLevelArray.length)],
     probation_period: [true, false][faker.number.int({ min: 0, max: 1 })],
     probation_end_date: faker.date.future().toISOString(),
     start_date: faker.date.past({ years: 10 }).toISOString(),
-    end_date: faker.date.future().toISOString(),
+    end_date: faker.date.future({ years: 10 }).toISOString(),
   };
 }
 
@@ -139,7 +148,8 @@ export function seedEmployeeSkills(): Omit<
 > {
   return {
     skill_name: faker.person.jobTitle(),
-    proficiency: proficiencyArray[faker.number.int({ min: 0, max: 2 })],
+    proficiency:
+      proficiencyArray[Math.floor(Math.random() * proficiencyArray.length)],
     years_of_experience: faker.number.int({ min: 0, max: 10 }),
   };
 }

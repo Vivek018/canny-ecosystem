@@ -1,3 +1,4 @@
+import { UTCDate } from "@date-fns/utc";
 import {
   isValid,
   format,
@@ -8,6 +9,10 @@ import {
 
 export { UTCDate } from "@date-fns/utc";
 export { formatDateRange } from "little-date";
+
+export function formatUTCDate(date?: string): string | undefined {
+  return date ? new UTCDate(date).toISOString() : undefined;
+}
 
 export function getValidDateForInput(date: string | Date | undefined): string {
   let dateObject: Date | null = null;

@@ -1,8 +1,4 @@
-import {
-  formatDate,
-  replaceDash,
-  replaceUnderscore,
-} from "@canny_ecosystem/utils";
+import { formatDate, replaceUnderscore } from "@canny_ecosystem/utils";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
@@ -74,7 +70,7 @@ export const columns: ColumnDef<EmployeeDataType>[] = [
     cell: ({ row }) => {
       return (
         <p className='truncate w-20 capitalize'>
-          {replaceDash(row.original?.education ?? "")}
+          {replaceUnderscore(row.original?.education ?? "")}
         </p>
       );
     },
@@ -105,8 +101,8 @@ export const columns: ColumnDef<EmployeeDataType>[] = [
       return (
         <p className='truncate w-28 capitalize'>
           {
-            row.original?.employee_project_assignments[0]?.project_sites
-              ?.projects?.name
+            row.original?.employee_project_assignment?.project_sites?.projects
+              ?.name
           }
         </p>
       );
@@ -119,7 +115,7 @@ export const columns: ColumnDef<EmployeeDataType>[] = [
     cell: ({ row }) => {
       return (
         <p className='truncate w-28 capitalize'>
-          {row.original?.employee_project_assignments[0]?.project_sites.name}
+          {row.original?.employee_project_assignment?.project_sites?.name}
         </p>
       );
     },
@@ -132,7 +128,7 @@ export const columns: ColumnDef<EmployeeDataType>[] = [
       return (
         <p className='capitalize'>
           {replaceUnderscore(
-            row.original?.employee_project_assignments[0]?.assignment_type ?? ""
+            row.original?.employee_project_assignment?.assignment_type ?? ""
           )}
         </p>
       );
@@ -145,7 +141,9 @@ export const columns: ColumnDef<EmployeeDataType>[] = [
     cell: ({ row }) => {
       return (
         <p className='w-40 truncate capitalize'>
-          {row.original?.employee_project_assignments[0]?.position}
+          {replaceUnderscore(
+            row.original?.employee_project_assignment?.position
+          )}
         </p>
       );
     },
@@ -158,7 +156,7 @@ export const columns: ColumnDef<EmployeeDataType>[] = [
       return (
         <p className='w-max capitalize'>
           {replaceUnderscore(
-            row.original?.employee_project_assignments[0]?.skill_level ?? ""
+            row.original?.employee_project_assignment?.skill_level ?? ""
           )}
         </p>
       );
@@ -171,10 +169,8 @@ export const columns: ColumnDef<EmployeeDataType>[] = [
     cell: ({ row }) => {
       return (
         <p className='w-max capitalize'>
-          {row.original?.employee_project_assignments[0]?.start_date &&
-            formatDate(
-              row.original?.employee_project_assignments[0]?.start_date
-            )}
+          {row.original?.employee_project_assignment?.start_date &&
+            formatDate(row.original?.employee_project_assignment?.start_date)}
         </p>
       );
     },
@@ -186,8 +182,8 @@ export const columns: ColumnDef<EmployeeDataType>[] = [
     cell: ({ row }) => {
       return (
         <p className='w-max capitalize'>
-          {row.original?.employee_project_assignments[0]?.end_date &&
-            formatDate(row.original?.employee_project_assignments[0]?.end_date)}
+          {row.original?.employee_project_assignment?.end_date &&
+            formatDate(row.original?.employee_project_assignment?.end_date)}
         </p>
       );
     },

@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 import {
   createCompany,
   createEmployee,
-  createEmployeeProjectAssignment,
   createEmployeeSkill,
   createEmployeeWorkHistory,
   createLocation,
@@ -99,39 +98,23 @@ async function seed() {
     console.timeEnd("Created Project and Sites...");
 
     console.time("Created Employees...");
-    for (
-      let index = 0;
-      index < Math.floor((Math.random() + 1) * 30);
-      index++
-    ) {
+    for (let index = 0; index < Math.floor((Math.random() + 1) * 30); index++) {
       const { data } = await createEmployee({
         supabase,
         employeeData: { ...seedEmployees(), company_id: companyId! },
         employeeStatutoryDetailsData: seedEmployeeStatutoryDetails(),
         employeeBankDetailsData: seedEmployeeBankDetails(),
+        employeeProjectAssignmentData: {
+          project_site_id:
+            site_ids[Math.floor(Math.random() * site_ids.length)],
+          ...seedEmployeeProjectAssignmentDetails(),
+        },
         employeeAddressesData: seedEmployeeAddresses(),
         employeeGuardiansData: seedEmployeeGuardianDetails(),
         bypassAuth: true,
       });
 
       if (data?.id) {
-        for (
-          let index = 0;
-          index < Math.floor((Math.random() + 1) * 3);
-          index++
-        ) {
-          await createEmployeeProjectAssignment({
-            supabase,
-            data: {
-              employee_id: data.id,
-              project_site_id:
-                site_ids[Math.floor(Math.random() * site_ids.length)],
-              ...seedEmployeeProjectAssignmentDetails(),
-            },
-            bypassAuth: true,
-          });
-        }
-
         for (
           let index = 0;
           index < Math.floor((Math.random() + 1) * 3);
