@@ -35,7 +35,7 @@ export const zEmailSuffix = z
   .max(20)
   .regex(
     /^[A-Za-z0-9]+\.[A-Za-z]{2,}$/,
-    "Must contain a dot with at least one character before and two after.",
+    "Must contain a dot with at least one character before and two after."
   );
 
 export const SIZE_1MB = 1 * 1024 * 1024; // 1MB
@@ -50,21 +50,21 @@ export const zImage = z
   .any()
   .refine(
     (file) => (typeof file !== "string" ? file.size < SIZE_1MB : true),
-    "File size must be less than 1MB",
+    "File size must be less than 1MB"
   )
   .refine(
     (file) =>
       typeof file !== "string"
         ? ACCEPTED_IMAGE_TYPES.includes(file?.type)
         : true,
-    "Only .jpg, .jpeg, .png and .webp formats are supported.",
+    "Only .jpg, .jpeg, .png and .webp formats are supported."
   );
 
 export const zFile = z
   .any()
   .refine(
     (file) => (typeof file !== "string" ? file.size < SIZE_1MB * 5 : true),
-    "File size must be less than 5MB",
+    "File size must be less than 5MB"
   )
   .refine(
     (file) =>
@@ -79,7 +79,7 @@ export const zFile = z
             "application/docx",
           ].includes(file?.type)
         : true,
-    "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .docx formats are supported.",
+    "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .docx formats are supported."
   );
 
 export const parseDateSchema = z
@@ -396,3 +396,33 @@ export const EmployeeWorkHistorySchema = z.object({
   start_date: z.string(),
   end_date: z.string(),
 });
+
+const statutoryBonusPayFrequencyArray = ["monthly", "yearly"] as const;
+
+export const StatutoryBonusSchema = z
+  .object({
+    id: z.string().optional(),
+    payment_frequency: z
+      .enum(statutoryBonusPayFrequencyArray)
+      .default("monthly"),
+    percentage: z.number().min(0).max(1),
+    payout_month: z.string().nullable().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.payment_frequency === "yearly" && !data.payout_month) {
+      ctx.addIssue({
+        path: ["payout_month"], // The field where the error occurred
+        message: "payout_month is required when payment_freq is 'yearly'",
+        code: z.ZodIssueCode.custom,
+      });
+    }
+
+    // If payment_freq is "monthly", payout_month must be null
+    if (data.payment_frequency === "monthly" && data.payout_month !== null) {
+      ctx.addIssue({
+        path: ["payout_month"], // The field where the error occurred
+        message: "payout_month must be null when payment_freq is 'monthly'",
+        code: z.ZodIssueCode.custom,
+      });
+    }
+  });
