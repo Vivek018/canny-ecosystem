@@ -1,8 +1,8 @@
-import { EmployeeProjectAssignmentsCard } from "@/components/employees/work-portfolio/project-assignment-card";
+import { EmployeeProjectAssignmentCard } from "@/components/employees/work-portfolio/project-assignment-card";
 import { EmployeeSkillsCard } from "@/components/employees/work-portfolio/skills-card";
 import { EmployeeWorkHistoriesCard } from "@/components/employees/work-portfolio/work-history-card";
 import {
-  getEmployeeProjectAssignmentsByEmployeeId,
+  getEmployeeProjectAssignmentByEmployeeId,
   getEmployeeSkillsByEmployeeId,
   getEmployeeWorkHistoriesByEmployeeId,
 } from "@canny_ecosystem/supabase/queries";
@@ -15,8 +15,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   const { supabase } = getSupabaseWithHeaders({ request });
 
-  const { data: employeeProjectAssignments } =
-    await getEmployeeProjectAssignmentsByEmployeeId({
+  const { data: employeeProjectAssignment } =
+    await getEmployeeProjectAssignmentByEmployeeId({
       supabase,
       employeeId: employeeId ?? "",
     });
@@ -33,19 +33,19 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   });
 
   return json({
-    employeeProjectAssignments,
+    employeeProjectAssignment,
     employeeWorkHistories,
     employeeSkills,
   });
 }
 
 export default function WorkPortfolio() {
-  const { employeeProjectAssignments, employeeWorkHistories, employeeSkills } =
+  const { employeeProjectAssignment, employeeWorkHistories, employeeSkills } =
     useLoaderData<typeof loader>();
   return (
     <div className="w-full my-8 flex flex-col gap-8">
-      <EmployeeProjectAssignmentsCard
-        employeeProjectAssignments={employeeProjectAssignments}
+      <EmployeeProjectAssignmentCard
+        projectAssignment={employeeProjectAssignment}
       />
       <EmployeeWorkHistoriesCard
         employeeWorkHistories={employeeWorkHistories}

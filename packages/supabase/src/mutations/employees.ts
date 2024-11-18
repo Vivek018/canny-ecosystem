@@ -24,6 +24,7 @@ export async function createEmployee({
   employeeData,
   employeeStatutoryDetailsData,
   employeeBankDetailsData,
+  employeeProjectAssignmentData,
   employeeAddressesData,
   employeeGuardiansData,
   bypassAuth = false,
@@ -36,6 +37,10 @@ export async function createEmployee({
   >;
   employeeBankDetailsData: Omit<
     EmployeeBankDetailsDatabaseInsert,
+    "employee_id"
+  >;
+  employeeProjectAssignmentData: Omit<
+    EmployeeProjectAssignmentDatabaseInsert,
     "employee_id"
   >;
   employeeAddressesData: Omit<EmployeeAddressDatabaseInsert, "employee_id">;
@@ -61,10 +66,12 @@ export async function createEmployee({
   if (error) {
     console.error("employee ", error);
     return {
+      data,
       status,
       employeeError: error,
       employeeStatutoryDetailsError: null,
       employeeBankDetailsError: null,
+      employeeProjectAssignmentError: null,
       employeeAddressesError: null,
       employeeGuardiansError: null,
     };
@@ -86,6 +93,13 @@ export async function createEmployee({
       }
     );
 
+    const { error: employeeProjectAssignmentError } =
+      await createEmployeeProjectAssignment({
+        supabase,
+        data: { ...employeeProjectAssignmentData, employee_id: data.id },
+        bypassAuth,
+      });
+
     const { error: employeeAddressesError } = await createEmployeeAddresses({
       supabase,
       data: { ...employeeAddressesData, employee_id: data.id },
@@ -99,20 +113,24 @@ export async function createEmployee({
     });
 
     return {
+      data,
       status,
       employeeError: null,
       employeeStatutoryDetailsError,
       employeeBankDetailsError,
+      employeeProjectAssignmentError,
       employeeAddressesError,
       employeeGuardiansError,
     };
   }
 
   return {
+    data,
     status,
     employeeError: null,
     employeeStatutoryDetailsError: null,
     employeeBankDetailsError: null,
+    employeeProjectAssignmentError: null,
     employeeAddressesError: null,
     employeeGuardiansError: null,
   };
@@ -734,7 +752,7 @@ export async function createEmployeeProjectAssignment({
   }
 
   const { error, status } = await supabase
-    .from("employee_project_assignments")
+    .from("employee_project_assignment")
     .insert(data)
     .single();
 
@@ -767,47 +785,14 @@ export async function updateEmployeeProjectAssignment({
   const updateData = convertToNull(data);
 
   const { error, status } = await supabase
-    .from("employee_project_assignments")
+    .from("employee_project_assignment")
     .update(updateData)
-    .eq("id", data.id!)
+    .eq("employee_id", data.employee_id!)
     .select()
     .single();
 
   if (error) {
     console.error("error", error);
-  }
-
-  return { status, error };
-}
-
-export async function deleteEmployeeProjectAssignment({
-  supabase,
-  id,
-  bypassAuth = false,
-}: {
-  supabase: TypedSupabaseClient;
-  id: string;
-  bypassAuth?: boolean;
-}) {
-  if (!bypassAuth) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user?.email) {
-      return { status: 400, error: "Unauthorized User" };
-    }
-  }
-
-  const { error, status } = await supabase
-    .from("employee_project_assignments")
-    .delete()
-    .eq("id", id)
-    .select()
-    .single();
-
-  if (error) {
-    console.error(error);
   }
 
   return { status, error };

@@ -61,7 +61,7 @@ export function DataTable<TData, TValue>({
   const { rowSelection, setRowSelection, setColumns } = useEmployeesStore();
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    initialColumnVisibility ?? {},
+    initialColumnVisibility ?? {}
   );
 
   const loadMoreEmployees = async () => {
@@ -119,58 +119,74 @@ export function DataTable<TData, TValue>({
   }, [initialData]);
 
   return (
-    <div className="mb-8 relative">
-      <Table>
-        <DataTableHeader table={table} />
-
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-                className="h-[40px] md:h-[45px] cursor-default select-text"
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell
-                    key={cell.id}
-                    className={cn(
-                      "px-3 md:px-4 py-2",
-                      (cell.column.id === "select" ||
-                        cell.column.id === "employee_code" ||
-                        cell.column.id === "full_name" ||
-                        cell.column.id === "mobile_number" ||
-                        cell.column.id === "date_of_birth" ||
-                        cell.column.id === "education" ||
-                        cell.column.id === "gender" ||
-                        cell.column.id === "is_active" ||
-                        cell.column.id === "actions") &&
-                        "hidden md:table-cell",
-                    )}
-                    onClick={() => {}}
+    <div className='relative mb-8'>
+      {/* Wrapper for horizontal scroll with fixed action column */}
+      <div className='relative border overflow-x-auto'>
+        <div className='relative'>
+          <Table>
+            <DataTableHeader table={table} />
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                    className='relative h-[40px] md:h-[45px] cursor-default select-text'
                   >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    {row.getVisibleCells().map((cell) => {
+                      return (
+                        <TableCell
+                          key={cell.id}
+                          className={cn(
+                            "px-3 md:px-4 py-2",
+                            (cell.column.id === "select" ||
+                              cell.column.id === "employee_code" ||
+                              cell.column.id === "full_name" ||
+                              cell.column.id === "mobile_number" ||
+                              cell.column.id === "date_of_birth" ||
+                              cell.column.id === "education" ||
+                              cell.column.id === "gender" ||
+                              cell.column.id === "is_active") &&
+                              "hidden md:table-cell",
+                            cell.column.id === "select" &&
+                              "sticky left-0 min-w-12 max-w-12 bg-card z-10",
+                            cell.column.id === "employee_code" &&
+                              "sticky left-12 bg-card z-10",
+                            cell.column.id === "full_name" &&
+                              "sticky left-48 bg-card z-10",
+                            cell.column.id === "actions" &&
+                              "sticky right-0 min-w-20 max-w-20 bg-card z-10"
+                          )}
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className='h-24 text-center text-lg tracking-wide'
+                  >
+                    No results.
                   </TableCell>
-                ))}
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell
-                colSpan={columns.length}
-                className="h-24 text-center text-lg tracking-wide"
-              >
-                No results.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+
       {hasNextPage && (
-        <div className="flex items-center justify-center mt-6" ref={ref}>
-          <div className="flex items-center space-x-2 px-6 py-5">
+        <div className='flex items-center justify-center mt-6' ref={ref}>
+          <div className='flex items-center space-x-2 px-6 py-5'>
             <Spinner />
-            <span className="text-sm text-[#606060]">Loading more...</span>
+            <span className='text-sm text-[#606060]'>Loading more...</span>
           </div>
         </div>
       )}

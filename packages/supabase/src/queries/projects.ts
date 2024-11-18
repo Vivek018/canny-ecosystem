@@ -17,7 +17,10 @@ export type ProjectsWithCompany = ProjectDatabaseRow & {
 export async function getProjectsByCompanyId({
   supabase,
   companyId,
-}: { supabase: TypedSupabaseClient; companyId: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+}) {
   const columns = [
     "id",
     "name",
@@ -36,7 +39,7 @@ export async function getProjectsByCompanyId({
     .from("projects")
     .select(columns.join(","))
     .or(
-      `project_client_id.eq.${companyId},end_client_id.eq.${companyId},primary_contractor_id.eq.${companyId}`,
+      `project_client_id.eq.${companyId},end_client_id.eq.${companyId},primary_contractor_id.eq.${companyId}`
     )
     .limit(HARD_QUERY_LIMIT)
     .order("created_at", { ascending: false })
@@ -49,11 +52,39 @@ export async function getProjectsByCompanyId({
   return { data, error };
 }
 
+export async function getProjectNamesByCompanyId({
+  supabase,
+  companyId,
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+}) {
+  const { data, error } = await supabase
+    .from("projects")
+    .select("name")
+    .or(
+      `project_client_id.eq.${companyId},end_client_id.eq.${companyId},primary_contractor_id.eq.${companyId}`
+    )
+    .limit(HARD_QUERY_LIMIT)
+    .order("created_at", { ascending: false })
+    .returns<{ name: string }[]>();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { data, error };
+}
+
 export async function getProjectById({
   supabase,
   id,
   companyId,
-}: { supabase: TypedSupabaseClient; id: string; companyId: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+  companyId: string;
+}) {
   const columns = [
     "id",
     "name",
@@ -81,7 +112,7 @@ export async function getProjectById({
     .select(columns.join(","))
     .eq("id", id)
     .or(
-      `project_client_id.eq.${companyId},end_client_id.eq.${companyId},primary_contractor_id.eq.${companyId}`,
+      `project_client_id.eq.${companyId},end_client_id.eq.${companyId},primary_contractor_id.eq.${companyId}`
     )
     .single<Omit<ProjectsWithCompany, "created_at" | "updated_at">>();
 
@@ -100,7 +131,10 @@ export type SitesWithLocation = SiteDatabaseRow & {
 export async function getSitesByProjectId({
   supabase,
   projectId,
-}: { supabase: TypedSupabaseClient; projectId: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  projectId: string;
+}) {
   const columns = [
     "id",
     "name",
@@ -133,10 +167,44 @@ export async function getSitesByProjectId({
   return { data, error };
 }
 
+export async function getSiteNamesByProjectNameAndCompanyId({
+  supabase,
+  projectName,
+  companyId,
+}: {
+  supabase: TypedSupabaseClient;
+  projectName: string;
+  companyId: string;
+}) {
+  const { data, error } = await supabase
+    .from("project_sites")
+    .select(
+      "name, projects(name, project_client_id, end_client_id, primary_contractor_id)"
+    )
+    .eq("projects.name", projectName)
+    .match({
+      "projects.project_client_id": companyId,
+      "projects.end_client_id": companyId,
+      "projects.primary_contractor_id": companyId,
+    })
+    .limit(HARD_QUERY_LIMIT)
+    .order("created_at", { ascending: false })
+    .returns<{ name: string }[]>();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { data, error };
+}
+
 export async function getSiteById({
   supabase,
   id,
-}: { supabase: TypedSupabaseClient; id: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+}) {
   const columns = [
     "id",
     "name",
@@ -171,7 +239,10 @@ export async function getSiteById({
 export async function getSitePaySequenceInSite({
   supabase,
   siteId,
-}: { supabase: TypedSupabaseClient; siteId: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  siteId: string;
+}) {
   const columns = [
     "id",
     "pay_frequency",

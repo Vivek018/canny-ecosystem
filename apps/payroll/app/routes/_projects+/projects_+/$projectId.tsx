@@ -16,7 +16,7 @@ export default function Project() {
   const { pathname } = useLocation();
   return (
     <section>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 pt-4 pb-2">
         <Link
           prefetch="intent"
           to="/projects"
@@ -33,6 +33,7 @@ export default function Project() {
             { label: "Overview", path: `/projects/${projectId}` },
             { label: "Sites", path: `/projects/${projectId}/sites` },
           ]}
+          className="pt-0 pb-0"
           pathname={pathname}
           Link={Link}
         />

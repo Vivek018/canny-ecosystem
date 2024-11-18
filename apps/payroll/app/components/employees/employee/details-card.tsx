@@ -1,6 +1,6 @@
 import type { EmployeeDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { Card } from "@canny_ecosystem/ui/card";
-import { formatDate, replaceDash } from "@canny_ecosystem/utils";
+import { formatDate, replaceUnderscore } from "@canny_ecosystem/utils";
 
 type DetailItemProps = {
   label: string;
@@ -43,7 +43,7 @@ export const EmployeeDetailsCard: React.FC<{
           <DetailItem
             label="Education"
             value={employee.education}
-            formatter={replaceDash}
+            formatter={replaceUnderscore}
           />
           <DetailItem label="Marital Status" value={employee.marital_status} />
           <DetailItem
