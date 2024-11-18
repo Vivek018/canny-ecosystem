@@ -1,4 +1,4 @@
-import { FeedbackDatabaseInsert, TypedSupabaseClient } from "../types";
+import type { FeedbackDatabaseInsert, TypedSupabaseClient } from "../types";
 
 export async function createFeedback({
     supabase,

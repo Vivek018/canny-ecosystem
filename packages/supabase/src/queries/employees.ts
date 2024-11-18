@@ -161,7 +161,7 @@ export async function getEmployeesByCompanyId({
     }
 
     if (status) {
-      query.eq("is_active", !!status);
+      query.eq("is_active", status === "active");
     }
     if (gender) {
       query.eq("gender", gender.toLowerCase());
@@ -170,7 +170,10 @@ export async function getEmployeesByCompanyId({
       query.eq("education", education.toLowerCase());
     }
     if (project) {
-      query.eq("employee_project_assignment.project_sites.projects.name", project);
+      query.eq(
+        "employee_project_assignment.project_sites.projects.name",
+        project
+      );
     }
     if (project_site) {
       query.eq("employee_project_assignment.project_sites.name", project_site);

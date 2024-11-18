@@ -142,7 +142,7 @@ export function DataTable<TData, TValue>({
                             (cell.column.id === "select" ||
                               cell.column.id === "employee_code" ||
                               cell.column.id === "full_name" ||
-                              cell.column.id === "mobile_number" ||
+                              cell.column.id === "primary_mobile_number" ||
                               cell.column.id === "date_of_birth" ||
                               cell.column.id === "education" ||
                               cell.column.id === "gender" ||

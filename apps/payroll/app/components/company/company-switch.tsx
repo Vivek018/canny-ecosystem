@@ -59,7 +59,7 @@ export const CompanySwitch = ({
             !currentCompany && "text-muted-foreground"
           )}
         >
-          <div className="flex items-center gap-2">
+          <div className='flex items-center gap-2'>
             <Avatar className='w-[34px] h-[34px] border border-muted-foreground/30 shadow-sm'>
               <AvatarFallback>
                 <span className='tracking-widest capitalize text-xs ml-[1.5px]'>
@@ -67,14 +67,14 @@ export const CompanySwitch = ({
                 </span>
               </AvatarFallback>
             </Avatar>
-            {currentCompany ? currentCompany.name : "Select a company"}
+            <p className='w-40 truncate'>
+              {currentCompany ? currentCompany.name : "Select a company"}
+            </p>
           </div>
           <Icon
             name='caret-sort'
             size='md'
-            className={cn(
-              "ml-2 shrink-0 opacity-75",
-            )}
+            className={cn("ml-2 shrink-0 opacity-75")}
           />
         </Button>
       </PopoverTrigger>

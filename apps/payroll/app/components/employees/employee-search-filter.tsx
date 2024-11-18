@@ -29,12 +29,23 @@ import { useTypingAnimation } from "@canny_ecosystem/ui/hooks/typing-animation";
 import type { EmployeeFilters } from "@canny_ecosystem/supabase/queries";
 
 const PLACEHOLDERS = [
-  "Search Employees",
-  "Active Male Employees",
-  "Female Employees",
-  "Employees born before 1980",
-  "Male Graduated Employees",
+  "Employees joined after Jan 2020 with a supervisor position",
+  "Active employees with a bachelor's degree at Site B",
+  "Employees left between 2022-2024 in full time roles",
+  "Male employees born after 1990 in Welder positions",
+  "Inactive employees in Project A who left before 2023",
+  "Employees born 1990-2000 in full time roles",
+  "Employees joined before 2015",
+  "Active employees in part time roles at Site C",
+  "Employees left after 2022 with semi skilled skills",
+  "Employees in 'Project X' born before 1985",
+  "Employees joined before 2018 in Sampler roles",
+  "Employees born before 1995 who worked at Site B",
+  "Employees joined in 2019 in sampler roles",
+  "Junior employees in Supervisor roles",
+  "Full-time employees at Project Site B",
 ];
+
 
 export function EmployeesSearchFilter({
   projectArray,
@@ -72,9 +83,8 @@ export function EmployeesSearchFilter({
   const submit = useSubmit();
 
   const animatedPlaceholder = useTypingAnimation(PLACEHOLDERS, isFocused, {
-    typingSpeed: 60,
-    deletingSpeed: 30,
-    pauseDuration: 3000,
+    typingSpeed: 35,
+    pauseDuration: 3500,
   });
 
   const deleteAllSearchParams = () => {
@@ -132,12 +142,12 @@ export function EmployeesSearchFilter({
     }
   );
 
-  useHotkeys("meta+s", (evt) => {
+  useHotkeys(["meta+s", "ctrl+s"], (evt) => {
     evt.preventDefault();
     inputRef.current?.focus();
   });
 
-  useHotkeys("meta+f", (evt) => {
+  useHotkeys(["meta+f", "ctrl+f"], (evt) => {
     evt.preventDefault();
     setIsOpen((prev) => !prev);
   });
@@ -410,21 +420,27 @@ export function EmployeesSearchFilter({
                 alignOffset={-4}
                 className='p-0'
               >
-                {projectSiteArray?.map((name, index) => (
-                  <DropdownMenuCheckboxItem
-                    key={name + index.toString()}
-                    className='capitalize'
-                    checked={filterParams?.project_site === name}
-                    onCheckedChange={() => {
-                      setFilterParams((prev) => ({
-                        ...prev,
-                        project_site: name,
-                      }));
-                    }}
-                  >
-                    {name}
+                {!searchParamsList.project ? (
+                  <DropdownMenuCheckboxItem disabled={true} className="p-8 items-center justify-center">
+                    Select Project First
                   </DropdownMenuCheckboxItem>
-                ))}
+                ) : (
+                  projectSiteArray?.map((name, index) => (
+                    <DropdownMenuCheckboxItem
+                      key={name + index.toString()}
+                      className='capitalize'
+                      checked={filterParams?.project_site === name}
+                      onCheckedChange={() => {
+                        setFilterParams((prev) => ({
+                          ...prev,
+                          project_site: name,
+                        }));
+                      }}
+                    >
+                      {name}
+                    </DropdownMenuCheckboxItem>
+                  ))
+                )}
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>
