@@ -125,6 +125,22 @@ export const CreateEmployeeProjectAssignment = ({
           <SearchableSelectField
             className='capitalize'
             options={transformStringArrayIntoOptions(
+              assignmentTypeArray as unknown as string[]
+            )}
+            inputProps={{
+              ...getInputProps(fields.assignment_type, { type: "text" }),
+            }}
+            placeholder={`Select ${replaceUnderscore(
+              fields.assignment_type.name
+            )}`}
+            labelProps={{
+              children: replaceUnderscore(fields.assignment_type.name),
+            }}
+            errors={fields.assignment_type.errors}
+          />
+          <SearchableSelectField
+            className='capitalize'
+            options={transformStringArrayIntoOptions(
               positionArray as unknown as string[]
             )}
             inputProps={{
@@ -149,22 +165,6 @@ export const CreateEmployeeProjectAssignment = ({
               children: replaceUnderscore(fields.skill_level.name),
             }}
             errors={fields.skill_level.errors}
-          />
-          <SearchableSelectField
-            className='capitalize'
-            options={transformStringArrayIntoOptions(
-              assignmentTypeArray as unknown as string[]
-            )}
-            inputProps={{
-              ...getInputProps(fields.assignment_type, { type: "text" }),
-            }}
-            placeholder={`Select ${replaceUnderscore(
-              fields.assignment_type.name
-            )}`}
-            labelProps={{
-              children: replaceUnderscore(fields.assignment_type.name),
-            }}
-            errors={fields.assignment_type.errors}
           />
         </div>
         <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
