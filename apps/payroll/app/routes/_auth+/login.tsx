@@ -12,7 +12,7 @@ import {
 } from "@remix-run/node";
 import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export async function loader ({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const error = url.searchParams.get("error");
   const { user } = await getSessionUser({ request });
