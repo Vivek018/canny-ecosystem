@@ -1,11 +1,13 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
+import { updateUserLastLoginAndSetAvatar } from "@canny_ecosystem/supabase/mutations";
+import { DEFAULT_ROUTE } from "@/constant";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
-  const next = requestUrl.searchParams.get("next") ?? "/";
+  const next = requestUrl.searchParams.get("next") ?? DEFAULT_ROUTE;
 
   if (!code) {
     console.error("No code provided");
@@ -22,6 +24,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
     if (!data.session) {
       throw new Error("No session in response");
     }
+
+    await updateUserLastLoginAndSetAvatar({ supabase });
 
     return safeRedirect(next, {
       headers: headers,
