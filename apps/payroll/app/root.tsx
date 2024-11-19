@@ -46,7 +46,6 @@ export const headers: HeadersFunction = ({ loaderHeaders }) => {
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { user: sessionUser } = await getSessionUser({ request });
-
   const { supabase } = getSupabaseWithHeaders({ request });
 
   const { companyId, setCookie } = await getCompanyIdOrFirstCompany(
