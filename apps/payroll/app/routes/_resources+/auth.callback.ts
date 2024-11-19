@@ -1,4 +1,4 @@
-import { type LoaderFunctionArgs, json } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 
