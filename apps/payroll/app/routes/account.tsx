@@ -9,7 +9,8 @@ export default function Account() {
         items={[
           { label: "Account", path: "/account" },
           { label: "Help", path: "/account/help" },
-          { label: "Feedback", path: "/account/feedback" },
+          { label: "Feedback", path: "/account/feedback-list" },
+          { label: "Feedback", path: "/account/feedback-form" },
         ]}
         pathname={pathname}
         Link={Link}

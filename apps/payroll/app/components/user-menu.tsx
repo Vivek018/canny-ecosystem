@@ -87,7 +87,7 @@ export function UserMenu({
             <Link prefetch='render' to='/account/help'>
               <DropdownMenuItem>Help</DropdownMenuItem>
             </Link>
-            <Link prefetch='render' to='/account/feedback'>
+            <Link prefetch='render' to='/account/feedback-list'>
               <DropdownMenuItem>Feedback</DropdownMenuItem>
             </Link>
           </DropdownMenuGroup>
