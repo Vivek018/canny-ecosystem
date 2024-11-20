@@ -68,6 +68,24 @@ export default function FeedbackList() {
     setSearchParams(searchParams);
   };
 
+  const getPaginationRange = (currentPage: number, totalPages: number) => {
+    const range = [];
+    const maxVisiblePages = 3;
+    const startPage = Math.max(2, currentPage - 1); 
+    const endPage = Math.min(totalPages - 1, currentPage + 1); 
+
+    if (totalPages <= maxVisiblePages + 2) {
+   
+      for (let i = 1; i <= totalPages; i++) range.push(i);
+    } else {
+      if (startPage > 2) range.push("...");
+      for (let i = startPage; i <= endPage; i++) range.push(i);
+      if (endPage < totalPages - 1) range.push("...");
+    }
+
+    return [1, ...range, totalPages];
+  };
+
   const handleNext = () => {
     if (currentPage < totalPages) {
       searchParams.set("page", `${currentPage + 1}`);
@@ -157,27 +175,31 @@ export default function FeedbackList() {
                 onClick={handlePrevious}
               />
             </PaginationItem>
-            {Array.from(
-              { length: Math.min(totalPages, 3) },
-              (_, i) => i + 1
-            ).map((pageNum) => (
-              <PaginationItem key={pageNum} className="mx-0.5">
-                <PaginationLink
-                  size=""
-                  onClick={() => goToPage(pageNum)}
-                  isActive={currentPage === pageNum}
-                  
-                  
-                >
-                  {pageNum}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-
-            {totalPages > 3 && (
-              <PaginationItem>
-                <PaginationEllipsis className="rotate-90" />
-              </PaginationItem>
+            {getPaginationRange(currentPage, totalPages).map(
+              (pageNum, index) => {
+                if (pageNum === "...") {
+                  return (
+                    <PaginationItem key={`ellipsis-${index}`}>
+                      <PaginationEllipsis className="rotate-90" />
+                    </PaginationItem>
+                  );
+                }
+                return (
+                  <PaginationItem key={pageNum} className="mx-0.5">
+                    <PaginationLink
+                      size=""
+                      onClick={() => {
+                        if (typeof pageNum === "number") {
+                          goToPage(pageNum);
+                        }
+                      }}
+                      isActive={currentPage === pageNum}
+                    >
+                      {pageNum}
+                    </PaginationLink>
+                  </PaginationItem>
+                );
+              }
             )}
 
             <PaginationItem className="mx-2">
