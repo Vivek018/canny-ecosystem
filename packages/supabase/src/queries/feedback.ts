@@ -1,7 +1,5 @@
-import { HARD_QUERY_LIMIT } from "../constant";
 import {
   FeedbackDatabaseRow,
-  InferredType,
   TypedSupabaseClient,
   UserDatabaseRow,
 } from "../types";
@@ -29,9 +27,13 @@ export type FeedbackDatabaseType = Pick<
 export async function getFeedbacksByCompanyId({
   supabase,
   companyId,
+  page = 1,
+  limit = 9,
 }: {
   supabase: TypedSupabaseClient;
   companyId: string;
+  page?: number;
+  limit?: number;
 }) {
   const columns = [
     "id",
@@ -39,18 +41,21 @@ export async function getFeedbacksByCompanyId({
     "category",
     "severity",
     "message",
-
     "company_id",
     "created_at",
   ] as const;
 
-  const { data, error } = await supabase
+  const start = (page - 1) * limit;
+  const end = start + limit - 1;
+
+  const { data, error, count } = await supabase
     .from("feedback")
     .select(
-      `${columns.join(",")}, users(id, first_name, last_name, email, avatar)`
+      `${columns.join(",")}, users(id, first_name, last_name, email, avatar)`,
+      { count: "exact" }
     )
     .eq("company_id", companyId)
-    .limit(HARD_QUERY_LIMIT)
+    .range(start, end)
     .order("created_at", { ascending: false })
     .returns<FeedbackDatabaseType[]>();
 
@@ -58,5 +63,5 @@ export async function getFeedbacksByCompanyId({
     console.error(error);
   }
 
-  return { data, error };
+  return { data, error, totalCount: count??0 };
 }
