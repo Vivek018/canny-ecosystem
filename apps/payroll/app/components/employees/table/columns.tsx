@@ -204,7 +204,7 @@ export const columns: ColumnDef<EmployeeDataType>[] = [
             <DropdownMenuTrigger asChild>
               <Button variant='ghost' className='h-8 w-8 p-0'>
                 <span className='sr-only'>Open menu</span>
-                <Icon name='dots' />
+                <Icon name='dots-vertical' />
               </Button>
             </DropdownMenuTrigger>
           }

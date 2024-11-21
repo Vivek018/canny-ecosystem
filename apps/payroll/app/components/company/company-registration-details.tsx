@@ -49,7 +49,7 @@ export const CompanyRegistrationDetails = ({
   return (
     <FormProvider context={form.context}>
       <Form
-        method="POST"
+        method='POST'
         {...getFormProps(form)}
         action={`/${updateValues?.company_id}/update-company-registration-details`}
       >
@@ -60,72 +60,86 @@ export const CompanyRegistrationDetails = ({
               This is your company's registration details within canny.
             </CardDescription>
           </CardHeader>
-          <CardContent className="pb-2">
-            <div className="grid grid-cols-1 md:grid-cols-2 items-center justify-center md:gap-x-8">
+          <CardContent className='pb-2'>
+            <div className='grid grid-cols-1 md:grid-cols-2 items-center justify-center md:gap-x-8'>
               <input
                 {...getInputProps(fields.company_id, { type: "hidden" })}
               />
               <Field
-                className="md:col-span-2"
+                className='md:col-span-2'
                 inputProps={{
                   ...getInputProps(fields.registration_number, {
                     type: "text",
                   }),
-                  placeholder: `Enter ${replaceUnderscore(fields.registration_number.name)}`,
+                  placeholder: `Enter ${replaceUnderscore(
+                    fields.registration_number.name
+                  )}`,
                 }}
                 errors={fields.registration_number.errors}
               />
               <Field
                 inputProps={{
                   ...getInputProps(fields.gst_number, { type: "text" }),
-                  placeholder: `Enter ${replaceUnderscore(fields.gst_number.name)}`,
+                  placeholder: `Enter ${replaceUnderscore(
+                    fields.gst_number.name
+                  )}`,
                 }}
                 errors={fields.gst_number.errors}
               />
               <Field
                 inputProps={{
                   ...getInputProps(fields.pan_number, { type: "text" }),
-                  placeholder: `Enter ${replaceUnderscore(fields.pan_number.name)}`,
+                  placeholder: `Enter ${replaceUnderscore(
+                    fields.pan_number.name
+                  )}`,
                 }}
                 errors={fields.pan_number.errors}
               />
               <Field
                 inputProps={{
                   ...getInputProps(fields.pf_number, { type: "text" }),
-                  placeholder: `Enter ${replaceUnderscore(fields.pf_number.name)}`,
+                  placeholder: `Enter ${replaceUnderscore(
+                    fields.pf_number.name
+                  )}`,
                 }}
                 errors={fields.pf_number.errors}
               />
               <Field
                 inputProps={{
                   ...getInputProps(fields.esic_number, { type: "text" }),
-                  placeholder: `Enter ${replaceUnderscore(fields.esic_number.name)}`,
+                  placeholder: `Enter ${replaceUnderscore(
+                    fields.esic_number.name
+                  )}`,
                 }}
                 errors={fields.esic_number.errors}
               />
               <Field
                 inputProps={{
                   ...getInputProps(fields.lwf_number, { type: "text" }),
-                  placeholder: `Enter ${replaceUnderscore(fields.lwf_number.name)}`,
+                  placeholder: `Enter ${replaceUnderscore(
+                    fields.lwf_number.name
+                  )}`,
                 }}
                 errors={fields.lwf_number.errors}
               />
               <Field
                 inputProps={{
                   ...getInputProps(fields.pt_number, { type: "text" }),
-                  placeholder: `Enter ${replaceUnderscore(fields.pt_number.name)}`,
+                  placeholder: `Enter ${replaceUnderscore(
+                    fields.pt_number.name
+                  )}`,
                 }}
                 errors={fields.pt_number.errors}
               />
             </div>
           </CardContent>
 
-          <CardFooter className="border-t pt-6 flex justify-between">
+          <CardFooter className='border-t pt-6 flex justify-between'>
             <div>Please use 15 characters at maximum.</div>
-            <div className="flex gap-4">
+            <div className='flex gap-4'>
               <Button
-                variant="secondary"
-                type="reset"
+                variant='secondary'
+                type='reset'
                 {...form.reset.getButtonProps()}
               >
                 Reset
@@ -135,8 +149,8 @@ export const CompanyRegistrationDetails = ({
                 disabled={
                   !form.valid || deepEqualCheck(form.initialValue, form.value)
                 }
-                variant="default"
-                type="submit"
+                variant='default'
+                type='submit'
               >
                 Save
               </Button>

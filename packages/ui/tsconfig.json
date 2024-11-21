@@ -3,13 +3,21 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
+      "@/*": [
+        "./src/*"
+      ],
       "@/icon-name": [
         "./src/components/icons/name.d.ts",
         "./types/icon-name.d.ts"
       ]
     }
   },
-  "include": ["src", "."],
-  "exclude": ["node_modules"]
+  "include": [
+    "src",
+    ".",
+    "../utils/src/hooks"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

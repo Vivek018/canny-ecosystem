@@ -51,25 +51,25 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
   return (
     <Card
       key={guardian.id}
-      className="w-[420px] shadow-none select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start"
+      className='w-[420px] shadow-none select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start'
     >
-      <CardHeader className="flex flex-row space-y-0 items-center justify-between p-4">
-        <CardTitle className="text-lg tracking-wide">
+      <CardHeader className='flex flex-row space-y-0 items-center justify-between p-4'>
+        <CardTitle className='text-lg tracking-wide'>
           {guardian.relationship ?? "--"}
         </CardTitle>
-        <div className="flex items-center gap-3">
+        <div className='flex items-center gap-3'>
           <TooltipProvider>
             <Tooltip delayDuration={100}>
               <TooltipTrigger asChild>
                 <Link
-                  prefetch="intent"
+                  prefetch='intent'
                   to={`/employees/${guardian.employee_id}/${guardian.id}/update-employee-guardian`}
                   className={cn(
                     buttonVariants({ variant: "muted" }),
-                    "px-2.5 h-min",
+                    "px-2.5 h-min"
                   )}
                 >
-                  <Icon name="edit" size="xs" />
+                  <Icon name='edit' size='xs' />
                 </Link>
               </TooltipTrigger>
               <TooltipContent>Edit</TooltipContent>
@@ -79,12 +79,12 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
             <DropdownMenuTrigger
               className={cn(
                 buttonVariants({ variant: "muted" }),
-                "px-2.5 h-min",
+                "px-2.5 h-min"
               )}
             >
-              <Icon name="dots" size="xs" />
+              <Icon name='dots-vertical' size='xs' />
             </DropdownMenuTrigger>
-            <DropdownMenuContent sideOffset={10} align="end">
+            <DropdownMenuContent sideOffset={10} align='end'>
               <DropdownMenuGroup>
                 <DeleteGuardian
                   employeeId={guardian.employee_id}
@@ -95,45 +95,47 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
           </DropdownMenu>
         </div>
       </CardHeader>
-      <CardContent className="flex flex-col px-4 pt-1 pb-4 gap-3">
-        <div className="flex flex-row items-center justify-between">
+      <CardContent className='flex flex-col px-4 pt-1 pb-4 gap-3'>
+        <div className='flex flex-row items-center justify-between'>
           <DetailItem
-            label="Name"
-            value={`${guardian.first_name ?? "--"} ${guardian.last_name ?? "--"}`}
+            label='Name'
+            value={`${guardian.first_name ?? "--"} ${
+              guardian.last_name ?? "--"
+            }`}
           />
-          <DetailItem label="Date of Birth" value={guardian.date_of_birth} />
-          <DetailItem label="Gender" value={guardian.gender} />
+          <DetailItem label='Date of Birth' value={guardian.date_of_birth} />
+          <DetailItem label='Gender' value={guardian.gender} />
         </div>
-        <div className="flex flex-row items-center justify-between">
-          <DetailItem label="Mobile Number" value={guardian.mobile_number} />
+        <div className='flex flex-row items-center justify-between'>
+          <DetailItem label='Mobile Number' value={guardian.mobile_number} />
           <DetailItem
-            label="Alternate Number"
+            label='Alternate Number'
             value={guardian.alternate_mobile_number}
           />
         </div>
-        <div className="mt-1.5 flex flex-row items-center justify-between">
-          <div className="flex items-center gap-1 text-muted-foreground text-sm">
+        <div className='mt-1.5 flex flex-row items-center justify-between'>
+          <div className='flex items-center gap-1 text-muted-foreground text-sm'>
             <Icon
               name={guardian.is_emergency_contact ? "check" : "cross"}
-              size="sm"
+              size='sm'
               className={cn(
                 "dark:mt-[1px]",
                 guardian.is_emergency_contact
                   ? "text-green"
-                  : "text-destructive",
+                  : "text-destructive"
               )}
             />
             <p>Is emergency contact</p>
           </div>
-          <div className="flex items-center gap-1 text-muted-foreground text-sm">
+          <div className='flex items-center gap-1 text-muted-foreground text-sm'>
             <Icon
               name={guardian.address_same_as_employee ? "check" : "cross"}
-              size="sm"
+              size='sm'
               className={cn(
                 "dark:mt-[1px]",
                 guardian.address_same_as_employee
                   ? "text-green"
-                  : "text-destructive",
+                  : "text-destructive"
               )}
             />
             <p>Address same as employee</p>

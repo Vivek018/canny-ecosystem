@@ -8,9 +8,9 @@ import { updateEmployeeStatutoryDetails } from "@canny_ecosystem/supabase/mutati
 import { isGoodStatus, EmployeeStatutorySchema } from "@canny_ecosystem/utils";
 import { CreateEmployeeStatutoryDetails } from "@/components/employees/form/create-employee-statutory-details";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
-import { Card, CardFooter } from "@canny_ecosystem/ui/card";
-import { Button } from "@canny_ecosystem/ui/button";
+import { Card } from "@canny_ecosystem/ui/card";
 import { useState } from "react";
+import { FormButtons } from "@/components/form/form-buttons";
 
 export const UPDATE_EMPLOYEE_STATUTORY = "update-employee-statutory";
 
@@ -43,7 +43,7 @@ export async function action({ request }: ActionFunctionArgs) {
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: submission.status === "error" ? 400 : 200 }
     );
   }
 
@@ -77,13 +77,13 @@ export default function UpdateStatutoryDetails() {
   });
 
   return (
-    <section className="lg:px-40 2xl:px-80 py-2">
+    <section className='md:px-20 lg:px-28 2xl:px-40 py-4'>
       <FormProvider context={form.context}>
         <Form
-          method="POST"
-          encType="multipart/form-data"
+          method='POST'
+          encType='multipart/form-data'
           {...getFormProps(form)}
-          className="flex flex-col"
+          className='flex flex-col'
         >
           <Card>
             <CreateEmployeeStatutoryDetails
@@ -91,28 +91,11 @@ export default function UpdateStatutoryDetails() {
               fields={fields as any}
               isUpdate={true}
             />
-            <CardFooter>
-              <div className="ml-auto w-2/5 flex flex-row items-center justify-center gap-4">
-                <Button
-                  variant="secondary"
-                  size="full"
-                  type="reset"
-                  onClick={() => setResetKey(Date.now())}
-                  {...form.reset.getButtonProps()}
-                >
-                  Reset
-                </Button>
-                <Button
-                  form={form.id}
-                  disabled={!form.valid}
-                  variant="default"
-                  size="full"
-                  type="submit"
-                >
-                  Submit
-                </Button>
-              </div>
-            </CardFooter>
+            <FormButtons
+              form={form}
+              setResetKey={setResetKey}
+              isSingle={true}
+            />
           </Card>
         </Form>
       </FormProvider>

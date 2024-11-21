@@ -18,11 +18,11 @@ export const FormStepHeader = ({
           <div
             className={cn(
               "h-10 border grid place-items-center px-4 rounded-md",
-              step - 1 === stepNumber
-                ? "border-primary text-primary"
-                : "border-input",
               stepData[stepNumber] &&
-                "border-primary bg-primary text-primary-foreground",
+              "border-primary bg-primary text-primary-foreground",
+              step - 1 === stepNumber
+                ? "border-primary bg-background text-primary"
+                : "border-input",
             )}
           >
             <p className={cn(stepData[stepNumber] && "hidden")}>

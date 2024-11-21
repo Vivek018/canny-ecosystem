@@ -9,7 +9,7 @@ import { cn } from "@/utils";
 import { Combobox, type ComboboxSelectOption } from "./combobox";
 import { Button } from "./button";
 import { parseStringValue } from "@canny_ecosystem/utils";
-import { useIsomorphicLayoutEffect } from "@/hooks/isomorphic-layout-effect";
+import { useIsomorphicLayoutEffect } from "@canny_ecosystem/utils/hooks/isomorphic-layout-effect";
 import { Icon } from "./icon";
 
 export type ListOfErrors = Array<string | null | undefined> | null | undefined;
@@ -24,9 +24,9 @@ export function ErrorList({
   const errorsToRender = errors?.filter(Boolean);
   if (!errorsToRender?.length) return null;
   return (
-    <ul id={id} className="flex flex-col gap-1">
+    <ul id={id} className='flex flex-col gap-1'>
       {errorsToRender.map((e) => (
-        <li key={e} className="text-[10px] text-destructive">
+        <li key={e} className='text-[10px] text-destructive'>
           {e}
         </li>
       ))}
@@ -52,9 +52,9 @@ export function Field({
 
   return (
     <div className={cn("w-full flex flex-col gap-1.5", className)}>
-      <div className="flex flex-row gap-[1px]">
+      <div className='flex flex-row gap-[1px]'>
         <Label htmlFor={id} {...labelProps} />
-        <sub className="text-primary">
+        <sub className='text-primary'>
           {isRequired && labelProps ? "*" : ""}
         </sub>
       </div>
@@ -64,7 +64,7 @@ export function Field({
         aria-describedby={errorId}
         {...inputProps}
       />
-      <div className="min-h-[28px] px-4 pb-4 pt-1">
+      <div className='min-h-[28px] px-4 pb-4 pt-1'>
         {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
       </div>
     </div>
@@ -89,9 +89,9 @@ export function TextareaField({
 
   return (
     <div className={cn("w-full flex flex-col gap-1.5", className)}>
-      <div className="flex flex-row gap-[1px]">
+      <div className='flex flex-row gap-[1px]'>
         <Label htmlFor={id} {...labelProps} />
-        <sub className="text-primary">{isRequired ? "*" : ""}</sub>
+        <sub className='text-primary'>{isRequired ? "*" : ""}</sub>
       </div>
       <Textarea
         id={id}
@@ -99,7 +99,7 @@ export function TextareaField({
         aria-describedby={errorId}
         {...textareaProps}
       />
-      <div className="min-h-[28px] px-4 pb-4 pt-1">
+      <div className='min-h-[28px] px-4 pb-4 pt-1'>
         {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
       </div>
     </div>
@@ -138,7 +138,7 @@ export function CheckboxField({
 
   return (
     <div className={className}>
-      <div className="flex items-center gap-2">
+      <div className='flex items-center gap-2'>
         <Checkbox
           {...checkboxProps}
           id={id}
@@ -157,16 +157,16 @@ export function CheckboxField({
             input.blur();
             buttonProps.onBlur?.(event);
           }}
-          type="button"
+          type='button'
         />
         <Label
           htmlFor={id}
           {...labelProps}
-          className="self-center text-foreground"
+          className='self-center text-foreground'
         />
-        <sub className="text-primary">{isRequired ? "*" : ""}</sub>
+        <sub className='text-primary'>{isRequired ? "*" : ""}</sub>
       </div>
-      <div className="px-4 pb-6 pt-1">
+      <div className='px-4 pb-6 pt-1'>
         {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
       </div>
     </div>
@@ -205,12 +205,12 @@ export function SearchableSelectField({
 
   return (
     <div className={cn("w-full flex flex-col gap-1.5", className)}>
-      <div className="flex">
+      <div className='flex'>
         <Label {...labelProps} />
-        <sub className="text-primary">{isRequired ? "*" : ""}</sub>
+        <sub className='text-primary'>{isRequired ? "*" : ""}</sub>
       </div>
       <input
-        type="hidden"
+        type='hidden'
         id={id}
         name={inputProps.name}
         value={input.value ?? ""}
@@ -227,7 +227,7 @@ export function SearchableSelectField({
         }}
         placeholder={placeholder ?? inputProps.placeholder}
       />
-      <div className="min-h-[32px] px-4 pb-3 pt-1">
+      <div className='min-h-[32px] px-4 pb-3 pt-1'>
         {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
       </div>
     </div>
@@ -258,14 +258,14 @@ export function JSONBField({
   useIsomorphicLayoutEffect(() => {
     try {
       const parsedValue = JSON.parse(
-        inputProps.defaultValue?.toString() || "{}",
+        inputProps.defaultValue?.toString() || "{}"
       );
       const initialPairs = Object.entries(parsedValue).map(([key, value]) => ({
         key,
         value: String(value),
       }));
       setPairs(
-        initialPairs.length > 0 ? initialPairs : [{ key: "", value: "" }],
+        initialPairs.length > 0 ? initialPairs : [{ key: "", value: "" }]
       );
     } catch (error) {
       console.error("Failed to parse JSONB value:", error);
@@ -273,19 +273,16 @@ export function JSONBField({
   }, [inputProps.defaultValue]);
 
   const updateJSONBValue = (newPairs: { key: string; value: string }[]) => {
-    const jsonbValue = newPairs.reduce(
-      (acc, { key, value }) => {
-        if (key) {
-          try {
-            acc[key] = parseStringValue(value);
-          } catch {
-            acc[key] = value;
-          }
+    const jsonbValue = newPairs.reduce((acc, { key, value }) => {
+      if (key) {
+        try {
+          acc[key] = parseStringValue(value);
+        } catch {
+          acc[key] = value;
         }
-        return acc;
-      },
-      {} as Record<string, any>,
-    );
+      }
+      return acc;
+    }, {} as Record<string, any>);
     const event = {
       target: {
         name: inputProps.name,
@@ -323,58 +320,55 @@ export function JSONBField({
 
   return (
     <div className={cn("w-full flex flex-col gap-1.5", className)}>
-      <div className="flex">
+      <div className='flex'>
         <Label htmlFor={inputProps.id} {...labelProps} />
-        <sub className="text-primary">{isRequired ? "*" : ""}</sub>
+        <sub className='text-primary'>{isRequired ? "*" : ""}</sub>
       </div>
       {pairs.map((pair, index) => (
-        <div key={index.toString()} className="flex gap-2 mb-2">
+        <div key={index.toString()} className='flex gap-2 mb-2'>
           <Input
-            placeholder="Key"
+            placeholder='Key'
             value={pair.key}
             onChange={(e) => handleKeyChange(index, e.target.value)}
-            className="flex-1"
+            className='flex-1'
           />
           <Input
-            placeholder="Value"
+            placeholder='Value'
             value={pair.value}
             onChange={(e) => handleValueChange(index, e.target.value)}
-            className="flex-1"
+            className='flex-1'
           />
           <Button
-            type="button"
+            type='button'
             onClick={() => removePair(index)}
-            variant="destructive-outline"
-            className="px-3"
+            variant='destructive-outline'
+            className='px-3'
           >
-            <Icon name="cross" size="md" />
+            <Icon name='cross' size='md' />
           </Button>
         </div>
       ))}
       <Button
-        type="button"
+        type='button'
         onClick={addPair}
-        variant="primary-outline"
-        className="mt-2"
+        variant='primary-outline'
+        className='mt-2'
       >
         Add Key-Value Pair
       </Button>
       <input
         {...inputProps}
-        type="hidden"
+        type='hidden'
         id={id}
         defaultValue={undefined}
         value={JSON.stringify(
-          pairs.reduce(
-            (acc, { key, value }) => {
-              if (key) acc[key] = parseStringValue(value);
-              return acc;
-            },
-            {} as Record<string, string>,
-          ),
+          pairs.reduce((acc, { key, value }) => {
+            if (key) acc[key] = parseStringValue(value);
+            return acc;
+          }, {} as Record<string, string>)
         )}
       />
-      <div className="min-h-[28px] px-4 pb-4 pt-1">
+      <div className='min-h-[28px] px-4 pb-4 pt-1'>
         {errors && errors.length > 0 ? <ErrorList errors={errors} /> : null}
       </div>
     </div>

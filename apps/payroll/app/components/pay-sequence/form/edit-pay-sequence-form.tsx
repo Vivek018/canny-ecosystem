@@ -47,13 +47,15 @@ export function EditPaySequenceForm({
   });
 
   return (
-    <section className="p-2 h-full">
+    <section className='p-2 h-full'>
       <FormProvider context={form.context}>
         <Form
-          method="POST"
+          method='POST'
           {...getFormProps(form)}
-          action={`/projects/${projectId}/sites/${fields.id.value ?? fields.id.initialValue}/edit-pay-sequence`}
-          className="flex flex-col h-full"
+          action={`/projects/${projectId}/sites/${
+            fields.id.value ?? fields.id.initialValue
+          }/edit-pay-sequence`}
+          className='flex flex-col h-full'
         >
           <input {...getInputProps(fields.id, { type: "hidden" })} />
           <input {...getInputProps(fields.site_id, { type: "hidden" })} />
@@ -71,12 +73,14 @@ export function EditPaySequenceForm({
             inputProps={{
               ...getInputProps(fields.pay_frequency, { type: "text" }),
             }}
-            placeholder={`Select ${replaceUnderscore(fields.pay_frequency.name)}`}
+            placeholder={`Select ${replaceUnderscore(
+              fields.pay_frequency.name
+            )}`}
             labelProps={{
               children: replaceUnderscore(fields.pay_frequency.name),
             }}
             options={transformStringArrayIntoOptions(
-              payFrequencyArray as unknown as string[],
+              payFrequencyArray as unknown as string[]
             )}
             errors={fields.pay_frequency.errors}
           />
@@ -86,11 +90,11 @@ export function EditPaySequenceForm({
             errors={fields.working_days.errors}
             selectProps={getSelectProps(fields.working_days) as any}
           />
-          <div className="mt-auto mb-14 w-full flex gap-4">
+          <div className='mt-auto mb-14 w-full flex gap-4'>
             <Button
-              variant="secondary"
-              size="full"
-              type="reset"
+              variant='secondary'
+              size='full'
+              type='reset'
               onClick={() => setResetKey(Date.now())}
               {...form.reset.getButtonProps()}
             >
@@ -99,9 +103,9 @@ export function EditPaySequenceForm({
             <Button
               form={form.id}
               disabled={!form.valid}
-              variant="default"
-              size="full"
-              type="submit"
+              variant='default'
+              size='full'
+              type='submit'
             >
               Submit
             </Button>

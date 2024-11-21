@@ -133,8 +133,9 @@ ${VALID_FILTERS.map(
 2. Each filter must strictly match the name and type defined above.
 3. **Date filters** (e.g., 'dob_start', 'doj_start'):
    - Always use date ranges with both 'start' and 'end'.
-   - If 'end' is provided without a 'start', use the date of independance of India as 'start'.
+   - If 'end' is provided without a 'start', use the date of '1947-08-15' as 'start'.
    - If 'start' is provided without an 'end', use today's date as the end.
+   - 'end' date can never be before 'start', and never give 'end' filter without 'start' if that is the case, remove 'end' filter.
 4. **Output**:
    - Return a single JSON object with key-value pairs.
    - Omit filters with missing, unclear, or invalid values.
@@ -145,8 +146,15 @@ ${VALID_FILTERS.map(
 Input: "Find active employees with Bachelor's degree who joined after 2021"
 Output: {
   "status": "active",
-  "education": "Bachelor's",
+  "education": "graduate",
   "doj_start": "2021-01-01"
+}
+  Input: "Find iactive employees with Master's degree who joined before 2021"
+  Output: {
+  "status": "inactive",
+  "education": "post_graduate",
+  "doj_start": "1947-08-15"
+  "doj_end": "2021-01-01"
 }
 `,
       },
@@ -191,15 +199,19 @@ export default function Employees() {
     env,
   } = useLoaderData<typeof loader>();
 
+  const filterList = { ...filters, name: query };
+  const noFilters = Object.values(filterList).every((value) => !value);
+
   return (
-    <section className='py-4'>
+    <section className='py-4 px-4'>
       <div className='w-full flex items-center justify-between pb-4'>
-        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-6'>
+        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4'>
           <EmployeesSearchFilter
+            disabled={!data?.length && noFilters}
             projectArray={projectArray}
             projectSiteArray={projectSiteArray}
           />
-          <FilterList filterList={{ ...filters, name: query }} />
+          <FilterList filterList={filterList} />
         </div>
         <EmployeesActions isEmpty={!data?.length} />
       </div>
@@ -209,6 +221,7 @@ export default function Employees() {
         count={count ?? data?.length ?? 0}
         query={query}
         filters={filters}
+        noFilters={noFilters}
         hasNextPage={hasNextPage}
         pageSize={pageSize}
         companyId={companyId}

@@ -16,16 +16,16 @@ export default function Project() {
   const { pathname } = useLocation();
   return (
     <section>
-      <div className="flex items-center gap-4 pt-4 pb-2">
+      <div className='flex items-center gap-4 py-2.5 px-4 border-b'>
         <Link
-          prefetch="intent"
-          to="/projects"
+          prefetch='intent'
+          to='/projects'
           className={cn(
             buttonVariants({ variant: "outline" }),
-            "bg-card w-9 h-9 px-0 rounded-full",
+            "bg-card w-9 h-9 px-0 rounded-full"
           )}
         >
-          <Icon name="chevron-left" size="sm" />
+          <Icon name='chevron-left' size='sm' />
         </Link>
 
         <SecondaryMenu
@@ -33,12 +33,14 @@ export default function Project() {
             { label: "Overview", path: `/projects/${projectId}` },
             { label: "Sites", path: `/projects/${projectId}/sites` },
           ]}
-          className="pt-0 pb-0"
+          className='pt-0 pb-0'
           pathname={pathname}
           Link={Link}
         />
       </div>
-      <Outlet />
+      <div className='px-4'>
+        <Outlet />
+      </div>
     </section>
   );
 }

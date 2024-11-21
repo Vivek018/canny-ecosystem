@@ -17,9 +17,13 @@ import { updateEmployeeProjectAssignment } from "@canny_ecosystem/supabase/mutat
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { useState } from "react";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
-import { Card, CardFooter } from "@canny_ecosystem/ui/card";
-import { CreateEmployeeProjectAssignment, PROJECT_PARAM, PROJECT_SITE_PARAM } from "@/components/employees/form/create-employee-project-assignment";
-import { Button } from "@canny_ecosystem/ui/button";
+import { Card } from "@canny_ecosystem/ui/card";
+import {
+  CreateEmployeeProjectAssignment,
+  PROJECT_PARAM,
+  PROJECT_SITE_PARAM,
+} from "@/components/employees/form/create-employee-project-assignment";
+import { FormButtons } from "@/components/form/form-buttons";
 
 export const UPDATE_EMPLOYEE_PROJECT_ASSIGNMENT =
   "update-employee-project-assignment";
@@ -75,11 +79,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const projectSiteParamId = urlSearchParams.get(PROJECT_SITE_PARAM);
 
   if (projectSiteParamId?.length) {
-    const { data: siteEmployees } = await getEmployeesByPositionAndProjectSiteId({
-      supabase,
-      position: "supervisor",
-      projectSiteId: projectSiteParamId,
-    });
+    const { data: siteEmployees } =
+      await getEmployeesByPositionAndProjectSiteId({
+        supabase,
+        position: "supervisor",
+        projectSiteId: projectSiteParamId,
+      });
 
     siteEmployeeOptions = siteEmployees
       ?.filter((siteEmployee) => siteEmployee.id !== employeeId)
@@ -109,7 +114,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: submission.status === "error" ? 400 : 200 }
     );
   }
 
@@ -143,9 +148,8 @@ export default function UpdateEmployeeProjectAssignment() {
     defaultValue: data,
   });
 
-
   return (
-    <section className='lg:px-40 2xl:px-80 py-2'>
+    <section className='md:px-20 lg:px-28 2xl:px-40 py-4'>
       <FormProvider context={form.context}>
         <Form
           method='POST'
@@ -162,28 +166,11 @@ export default function UpdateEmployeeProjectAssignment() {
               projectSiteOptions={projectSiteOptions}
               siteEmployeeOptions={siteEmployeeOptions}
             />
-            <CardFooter>
-              <div className='ml-auto w-2/5 flex flex-row items-center justify-center gap-4'>
-                <Button
-                  variant='secondary'
-                  size='full'
-                  type='reset'
-                  onClick={() => setResetKey(Date.now())}
-                  {...form.reset.getButtonProps()}
-                >
-                  Reset
-                </Button>
-                <Button
-                  form={form.id}
-                  disabled={!form.valid}
-                  variant='default'
-                  size='full'
-                  type='submit'
-                >
-                  Submit
-                </Button>
-              </div>
-            </CardFooter>
+            <FormButtons
+              form={form}
+              setResetKey={setResetKey}
+              isSingle={true}
+            />
           </Card>
         </Form>
       </FormProvider>

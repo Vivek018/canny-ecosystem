@@ -8,6 +8,7 @@ import { useSearchParams } from "@remix-run/react";
 type Props = {
   table?: any;
   loading?: boolean;
+  className?: string;
 };
 
 // make sure the order is same as header order
@@ -28,7 +29,7 @@ export const employeeColumnIdArray = [
   "employee_project_assignment_end_date",
 ];
 
-export function DataTableHeader({ table, loading }: Props) {
+export function DataTableHeader({ table, loading, className }: Props) {
   const [searchParams, setSearchParams] = useSearchParams();
   const sortParam = searchParams.get("sort");
   const [column, value] = sortParam ? sortParam.split(":") : [];
@@ -68,7 +69,7 @@ export function DataTableHeader({ table, loading }: Props) {
     })?.columnDef?.header;
 
   return (
-    <TableHeader>
+    <TableHeader className={className}>
       <TableRow className='h-[45px] hover:bg-transparent'>
         <TableHead className='hidden md:table-cell px-3 md:px-4 py-2 sticky left-0 min-w-12 max-w-12 bg-card z-10'>
           <Checkbox
@@ -90,7 +91,7 @@ export function DataTableHeader({ table, loading }: Props) {
                 className={cn(
                   "px-4 py-2",
                   id === "employee_code" && "sticky left-12 bg-card z-10",
-                  id === "full_name" && "sticky left-48 bg-card z-10"
+                  id === "full_name" && "sticky w-full left-48 bg-card z-10"
                 )}
               >
                 <Button
