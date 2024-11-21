@@ -5,16 +5,20 @@ export default function Account() {
   const { pathname } = useLocation();
   return (
     <section>
-      <SecondaryMenu
-        items={[
-          { label: "Account", path: "/account" },
-          { label: "Help", path: "/account/help" },
-          { label: "Feedback", path: "/account/feedback" },
-        ]}
-        pathname={pathname}
-        Link={Link}
-      />
-      <Outlet />
+      <div className='py-[18px] px-4 border-b'>
+        <SecondaryMenu
+          items={[
+            { label: "Account", path: "/account" },
+            { label: "Help", path: "/account/help" },
+            { label: "Feedback", path: "/account/feedback" },
+          ]}
+          pathname={pathname}
+          Link={Link}
+        />
+      </div>
+      <div className='px-4'>
+        <Outlet />
+      </div>
     </section>
   );
 }

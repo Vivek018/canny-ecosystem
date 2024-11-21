@@ -21,7 +21,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
@@ -36,8 +35,8 @@ import {
   SearchableSelectField,
   TextareaField,
 } from "@canny_ecosystem/ui/forms";
-import { Button } from "@canny_ecosystem/ui/button";
 import { createFeedback } from "@canny_ecosystem/supabase/mutations";
+import { FormButtons } from "@/components/form/form-buttons";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -102,9 +101,9 @@ export default function Feedback() {
   });
 
   return (
-    <section className="flex flex-col gap-6 w-full lg:w-2/3 my-4">
+    <section className='flex flex-col gap-6 w-full lg:w-2/3 my-4'>
       <FormProvider context={form.context}>
-        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
+        <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
           <Card>
             <CardHeader>
               <CardTitle>Feedback</CardTitle>
@@ -129,10 +128,10 @@ export default function Feedback() {
                 }}
                 errors={fields.subject.errors}
               />
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+              <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
                 <SearchableSelectField
                   key={resetKey}
-                  className="capitalize"
+                  className='capitalize'
                   options={transformStringArrayIntoOptions(
                     categoryArray as unknown as string[]
                   )}
@@ -147,7 +146,7 @@ export default function Feedback() {
                 />
                 <SearchableSelectField
                   key={resetKey + 1}
-                  className="capitalize"
+                  className='capitalize'
                   options={transformStringArrayIntoOptions(
                     severityArray as unknown as string[]
                   )}
@@ -170,28 +169,11 @@ export default function Feedback() {
                 errors={fields.message.errors}
               />
             </CardContent>
-            <CardFooter>
-              <div className="ml-auto w-2/5 flex flex-row items-center justify-center gap-4">
-                <Button
-                  variant="secondary"
-                  size="full"
-                  type="reset"
-                  onClick={() => setResetKey(Date.now())}
-                  {...form.reset.getButtonProps()}
-                >
-                  Reset
-                </Button>
-                <Button
-                  form={form.id}
-                  disabled={!form.valid}
-                  variant="default"
-                  size="full"
-                  type="submit"
-                >
-                  Submit
-                </Button>
-              </div>
-            </CardFooter>
+            <FormButtons
+              form={form}
+              setResetKey={setResetKey}
+              isSingle={true}
+            />
           </Card>
         </Form>
       </FormProvider>

@@ -6,17 +6,21 @@ export default function Settings() {
 
   return (
     <section>
-      <SecondaryMenu
-        items={[
-          { label: "General", path: "/settings" },
-          { label: "Locations", path: "/settings/locations" },
-          { label: "Relationships", path: "/settings/relationships" },
-          { label: "Users", path: "/settings/users" },
-        ]}
-        pathname={pathname}
-        Link={Link}
-      />
-      <Outlet />
+      <div className='py-[18px] px-4 border-b'>
+        <SecondaryMenu
+          items={[
+            { label: "General", path: "/settings" },
+            { label: "Locations", path: "/settings/locations" },
+            { label: "Relationships", path: "/settings/relationships" },
+            { label: "Users", path: "/settings/users" },
+          ]}
+          pathname={pathname}
+          Link={Link}
+        />
+      </div>
+      <div className='px-4'>
+        <Outlet />
+      </div>
     </section>
   );
 }

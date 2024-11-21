@@ -6,7 +6,6 @@ import {
   transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { Button } from "@canny_ecosystem/ui/button";
 import {
   Field,
   SearchableSelectField,
@@ -33,7 +32,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
@@ -44,6 +42,7 @@ import { UPDATE_PROJECT } from "./$projectId+/update-project";
 import { getCompanies } from "@canny_ecosystem/supabase/queries";
 import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 import { useState } from "react";
+import { FormButtons } from "@/components/form/form-buttons";
 
 export const CREATE_PROJECT = "create-project";
 
@@ -78,7 +77,7 @@ export async function action({ request }: ActionFunctionArgs) {
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: submission.status === "error" ? 400 : 200 }
     );
   }
 
@@ -121,17 +120,17 @@ export default function CreateProject({
   });
 
   return (
-    <section className="lg:px-40 2xl:px-80 py-2">
+    <section className='md:px-20 lg:px-28 2xl:px-40 py-4'>
       <FormProvider context={form.context}>
         <Form
-          method="POST"
-          encType="multipart/form-data"
+          method='POST'
+          encType='multipart/form-data'
           {...getFormProps(form)}
-          className="flex flex-col"
+          className='flex flex-col'
         >
           <Card>
             <CardHeader>
-              <CardTitle className="text-3xl">
+              <CardTitle className='text-3xl'>
                 {replaceDash(PROJECT_TAG)}
               </CardTitle>
               <CardDescription>
@@ -153,11 +152,13 @@ export default function CreateProject({
                 labelProps={{ children: fields.name.name }}
                 errors={fields.name.errors}
               />
-              <div className="grid grid-cols-3 place-content-center justify-between gap-6">
+              <div className='grid grid-cols-3 place-content-center justify-between gap-6'>
                 <Field
                   inputProps={{
                     ...getInputProps(fields.project_code, { type: "text" }),
-                    placeholder: `Enter ${replaceUnderscore(fields.project_code.name)}`,
+                    placeholder: `Enter ${replaceUnderscore(
+                      fields.project_code.name
+                    )}`,
                   }}
                   labelProps={{
                     children: replaceUnderscore(fields.project_code.name),
@@ -167,7 +168,9 @@ export default function CreateProject({
                 <Field
                   inputProps={{
                     ...getInputProps(fields.project_type, { type: "text" }),
-                    placeholder: `Enter ${replaceUnderscore(fields.project_type.name)}`,
+                    placeholder: `Enter ${replaceUnderscore(
+                      fields.project_type.name
+                    )}`,
                   }}
                   labelProps={{
                     children: replaceUnderscore(fields.project_type.name),
@@ -183,7 +186,7 @@ export default function CreateProject({
                     placeholder: `Select ${fields.status.name}`,
                   }}
                   options={transformStringArrayIntoOptions(
-                    statusArray as unknown as string[],
+                    statusArray as unknown as string[]
                   )}
                   labelProps={{
                     children: fields.status.name,
@@ -199,7 +202,7 @@ export default function CreateProject({
                 labelProps={{ children: fields.description.name }}
                 errors={fields.description.errors}
               />
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+              <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
                 <SearchableSelectField
                   key={resetKey + 1}
                   inputProps={{
@@ -229,14 +232,16 @@ export default function CreateProject({
                   errors={fields.end_client_id.errors}
                 />
               </div>
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+              <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
                 <Field
                   inputProps={{
                     ...getInputProps(fields.start_date, { type: "date" }),
-                    placeholder: `Enter ${replaceUnderscore(fields.start_date.name)}`,
+                    placeholder: `Enter ${replaceUnderscore(
+                      fields.start_date.name
+                    )}`,
                     max: getValidDateForInput(new Date().toISOString()),
                     defaultValue: getValidDateForInput(
-                      fields.start_date.initialValue,
+                      fields.start_date.initialValue
                     ),
                   }}
                   labelProps={{
@@ -249,10 +254,12 @@ export default function CreateProject({
                     ...getInputProps(fields.estimated_end_date, {
                       type: "date",
                     }),
-                    placeholder: `Enter ${replaceUnderscore(fields.estimated_end_date.name)}`,
+                    placeholder: `Enter ${replaceUnderscore(
+                      fields.estimated_end_date.name
+                    )}`,
                     min: getValidDateForInput(fields.start_date.value),
                     defaultValue: getValidDateForInput(
-                      fields.estimated_end_date.initialValue,
+                      fields.estimated_end_date.initialValue
                     ),
                   }}
                   labelProps={{
@@ -264,7 +271,9 @@ export default function CreateProject({
               <TextareaField
                 textareaProps={{
                   ...getTextareaProps(fields.risk_assessment),
-                  placeholder: `Enter ${replaceUnderscore(fields.risk_assessment.name)}`,
+                  placeholder: `Enter ${replaceUnderscore(
+                    fields.risk_assessment.name
+                  )}`,
                 }}
                 labelProps={{
                   children: replaceUnderscore(fields.risk_assessment.name),
@@ -274,7 +283,9 @@ export default function CreateProject({
               <TextareaField
                 textareaProps={{
                   ...getTextareaProps(fields.quality_standards),
-                  placeholder: `Enter ${replaceUnderscore(fields.quality_standards.name)}`,
+                  placeholder: `Enter ${replaceUnderscore(
+                    fields.quality_standards.name
+                  )}`,
                 }}
                 labelProps={{
                   children: replaceUnderscore(fields.quality_standards.name),
@@ -284,11 +295,13 @@ export default function CreateProject({
               <TextareaField
                 textareaProps={{
                   ...getTextareaProps(fields.health_safety_requirements),
-                  placeholder: `Enter ${replaceUnderscore(fields.health_safety_requirements.name)}`,
+                  placeholder: `Enter ${replaceUnderscore(
+                    fields.health_safety_requirements.name
+                  )}`,
                 }}
                 labelProps={{
                   children: replaceUnderscore(
-                    fields.health_safety_requirements.name,
+                    fields.health_safety_requirements.name
                   ),
                 }}
                 errors={fields.health_safety_requirements.errors}
@@ -296,38 +309,23 @@ export default function CreateProject({
               <TextareaField
                 textareaProps={{
                   ...getTextareaProps(fields.environmental_considerations),
-                  placeholder: `Enter ${replaceUnderscore(fields.environmental_considerations.name)}`,
+                  placeholder: `Enter ${replaceUnderscore(
+                    fields.environmental_considerations.name
+                  )}`,
                 }}
                 labelProps={{
                   children: replaceUnderscore(
-                    fields.environmental_considerations.name,
+                    fields.environmental_considerations.name
                   ),
                 }}
                 errors={fields.environmental_considerations.errors}
               />
             </CardContent>
-            <CardFooter>
-              <div className="ml-auto w-2/5 flex flex-row items-center justify-center gap-4">
-                <Button
-                  variant="secondary"
-                  size="full"
-                  type="reset"
-                  onClick={() => setResetKey(Date.now())}
-                  {...form.reset.getButtonProps()}
-                >
-                  Reset
-                </Button>
-                <Button
-                  form={form.id}
-                  disabled={!form.valid}
-                  variant="default"
-                  size="full"
-                  type="submit"
-                >
-                  Submit
-                </Button>
-              </div>
-            </CardFooter>
+            <FormButtons
+              form={form}
+              setResetKey={setResetKey}
+              isSingle={true}
+            />
           </Card>
         </Form>
       </FormProvider>

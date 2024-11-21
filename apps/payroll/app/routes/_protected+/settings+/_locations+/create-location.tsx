@@ -17,7 +17,6 @@ import {
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { Form, json, useLoaderData } from "@remix-run/react";
-import { Button } from "@canny_ecosystem/ui/button";
 import { useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -29,7 +28,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
@@ -37,6 +35,7 @@ import {
 import { createLocation } from "@canny_ecosystem/supabase/mutations";
 import type { LocationDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { statesAndUTs } from "@canny_ecosystem/utils/constant";
+import { FormButtons } from "@/components/form/form-buttons";
 
 export const CREATE_LOCATION = "create-location";
 
@@ -58,7 +57,7 @@ export async function action({ request }: ActionFunctionArgs) {
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: submission.status === "error" ? 400 : 200 }
     );
   }
 
@@ -99,12 +98,12 @@ export default function CreateLocation({
   });
 
   return (
-    <section className="md:px-20 lg:px-52 2xl:px-80 py-3">
+    <section className='md:px-20 lg:px-52 2xl:px-80 py-3'>
       <FormProvider context={form.context}>
-        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
+        <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
           <Card>
             <CardHeader>
-              <CardTitle className="text-3xl">
+              <CardTitle className='text-3xl'>
                 {replaceDash(LOCATION_TAG)}
               </CardTitle>
               <CardDescription>
@@ -150,7 +149,7 @@ export default function CreateLocation({
                 errors={fields.address_line_1.errors}
               />
               <Field
-                className="-mt-4"
+                className='-mt-4'
                 inputProps={{
                   ...getInputProps(fields.address_line_2, { type: "text" }),
                   placeholder: replaceUnderscore(fields.address_line_2.name),
@@ -158,7 +157,7 @@ export default function CreateLocation({
                 }}
                 errors={fields.address_line_2.errors}
               />
-              <div className="grid grid-cols-3 place-content-center justify-between gap-6">
+              <div className='grid grid-cols-3 place-content-center justify-between gap-6'>
                 <Field
                   inputProps={{
                     ...getInputProps(fields.city, { type: "text" }),
@@ -172,7 +171,7 @@ export default function CreateLocation({
                 />
                 <SearchableSelectField
                   key={resetKey}
-                  className="capitalize"
+                  className='capitalize'
                   options={statesAndUTs}
                   inputProps={{
                     ...getInputProps(fields.state, { type: "text" }),
@@ -187,7 +186,9 @@ export default function CreateLocation({
                   inputProps={{
                     ...getInputProps(fields.pincode, { type: "text" }),
                     className: "capitalize",
-                    placeholder: `Enter ${replaceUnderscore(fields.pincode.name)}`,
+                    placeholder: `Enter ${replaceUnderscore(
+                      fields.pincode.name
+                    )}`,
                   }}
                   labelProps={{
                     children: replaceUnderscore(fields.pincode.name),
@@ -195,7 +196,7 @@ export default function CreateLocation({
                   errors={fields.pincode.errors}
                 />
               </div>
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+              <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
                 <Field
                   inputProps={{
                     ...getInputProps(fields.latitude, { type: "number" }),
@@ -211,7 +212,9 @@ export default function CreateLocation({
                   inputProps={{
                     ...getInputProps(fields.longitude, { type: "number" }),
                     className: "capitalize",
-                    placeholder: `Enter ${replaceUnderscore(fields.longitude.name)}`,
+                    placeholder: `Enter ${replaceUnderscore(
+                      fields.longitude.name
+                    )}`,
                   }}
                   labelProps={{
                     children: replaceUnderscore(fields.longitude.name),
@@ -220,28 +223,11 @@ export default function CreateLocation({
                 />
               </div>
             </CardContent>
-            <CardFooter>
-              <div className="ml-auto w-2/5 flex flex-row items-center justify-center gap-4">
-                <Button
-                  variant="secondary"
-                  size="full"
-                  type="reset"
-                  onClick={() => setResetKey(Date.now())}
-                  {...form.reset.getButtonProps()}
-                >
-                  Reset
-                </Button>
-                <Button
-                  form={form.id}
-                  disabled={!form.valid}
-                  variant="default"
-                  size="full"
-                  type="submit"
-                >
-                  Submit
-                </Button>
-              </div>
-            </CardFooter>
+            <FormButtons
+              form={form}
+              setResetKey={setResetKey}
+              isSingle={true}
+            />
           </Card>
         </Form>
       </FormProvider>
