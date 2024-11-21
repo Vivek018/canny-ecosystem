@@ -1,7 +1,6 @@
 import { DEFAULT_ROUTE } from "@/constant";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getSessionUser } from "@canny_ecosystem/supabase/cached-queries";
-import { updateUserLastLogin } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Button } from "@canny_ecosystem/ui/button";
 import {
@@ -12,7 +11,7 @@ import {
 } from "@remix-run/node";
 import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export async function loader ({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const error = url.searchParams.get("error");
   const { user } = await getSessionUser({ request });
@@ -42,7 +41,6 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   if (data.url) {
-    await updateUserLastLogin({ supabase });
     return redirect(data.url, { headers });
   }
 

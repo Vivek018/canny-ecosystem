@@ -59,22 +59,22 @@ export const CompanySwitch = ({
             !currentCompany && "text-muted-foreground"
           )}
         >
-          <div className="flex items-center gap-2">
-            <Avatar className='w-[34px] h-[34px] border border-muted-foreground/30 shadow-sm'>
-              <AvatarFallback>
+          <div className='flex items-center gap-2'>
+            <Avatar className='w-[34px] h-[34px] border border-muted-foreground/30 shadow-sm rounded-sm'>
+              <AvatarFallback className="rounded-sm">
                 <span className='tracking-widest capitalize text-xs ml-[1.5px]'>
                   {currentCompany?.name.charAt(0)}
                 </span>
               </AvatarFallback>
             </Avatar>
-            {currentCompany ? currentCompany.name : "Select a company"}
+            <p className='w-40 text-start truncate'>
+              {currentCompany ? currentCompany.name : "Select a company"}
+            </p>
           </div>
           <Icon
             name='caret-sort'
             size='md'
-            className={cn(
-              "ml-2 shrink-0 opacity-75",
-            )}
+            className={cn("ml-2 shrink-0 opacity-75")}
           />
         </Button>
       </PopoverTrigger>
@@ -95,8 +95,8 @@ export const CompanySwitch = ({
                   className={cn("py-2 px-2")}
                 >
                   <div className='flex items-center gap-1.5'>
-                    <Avatar className='w-8 h-8 border border-muted-foreground/30 shadow-sm'>
-                      <AvatarFallback>
+                    <Avatar className='w-8 h-8 border border-muted-foreground/30 shadow-sm rounded-sm'>
+                      <AvatarFallback className='rounded-sm'>
                         <span className='tracking-widest capitalize text-xs ml-[1.5px]'>
                           {company.name.charAt(0)}
                         </span>

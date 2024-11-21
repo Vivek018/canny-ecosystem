@@ -13,7 +13,8 @@ export type IconName =
   | "cross"
   | "dashboard"
   | "dot-filled"
-  | "dots"
+  | "dots-horizontal"
+  | "dots-vertical"
   | "edit"
   | "employee"
   | "feedback"
@@ -31,4 +32,5 @@ export type IconName =
   | "search"
   | "setting"
   | "sun"
-  | "table";
+  | "table"
+  | "update";

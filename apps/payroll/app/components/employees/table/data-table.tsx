@@ -25,6 +25,7 @@ import {
   type EmployeeFilters,
   getEmployeesByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
+import { Button } from "@canny_ecosystem/ui/button";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -33,6 +34,7 @@ interface DataTableProps<TData, TValue> {
   hasNextPage: boolean;
   query?: string | null;
   filters?: EmployeeFilters;
+  noFilters?: boolean;
   pageSize: number;
   initialColumnVisibility?: VisibilityState;
   companyId: string;
@@ -45,6 +47,7 @@ export function DataTable<TData, TValue>({
   count,
   query,
   filters,
+  noFilters,
   pageSize,
   hasNextPage: initialHasNextPage,
   initialColumnVisibility,
@@ -54,7 +57,7 @@ export function DataTable<TData, TValue>({
   const [data, setData] = useState(initialData);
   const [from, setFrom] = useState(pageSize);
   const [hasNextPage, setHasNextPage] = useState(initialHasNextPage);
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { supabase } = useSupabase({ env });
 
   const { ref, inView } = useInView();
@@ -118,15 +121,24 @@ export function DataTable<TData, TValue>({
     setHasNextPage(initialHasNextPage);
   }, [initialData]);
 
+  const tableLength = table.getRowModel().rows?.length;
+
   return (
     <div className='relative mb-8'>
-      {/* Wrapper for horizontal scroll with fixed action column */}
-      <div className='relative border overflow-x-auto'>
+      <div
+        className={cn(
+          "relative border overflow-x-auto rounded",
+          !tableLength && "border-none"
+        )}
+      >
         <div className='relative'>
           <Table>
-            <DataTableHeader table={table} />
+            <DataTableHeader
+              table={table}
+              className={!tableLength ? "hidden" : ""}
+            />
             <TableBody>
-              {table.getRowModel().rows?.length ? (
+              {tableLength ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
@@ -142,7 +154,7 @@ export function DataTable<TData, TValue>({
                             (cell.column.id === "select" ||
                               cell.column.id === "employee_code" ||
                               cell.column.id === "full_name" ||
-                              cell.column.id === "mobile_number" ||
+                              cell.column.id === "primary_mobile_number" ||
                               cell.column.id === "date_of_birth" ||
                               cell.column.id === "education" ||
                               cell.column.id === "gender" ||
@@ -168,12 +180,38 @@ export function DataTable<TData, TValue>({
                   </TableRow>
                 ))
               ) : (
-                <TableRow>
+                <TableRow
+                  className={cn("flex flex-col", !tableLength && "border-none")}
+                >
                   <TableCell
                     colSpan={columns.length}
-                    className='h-24 text-center text-lg tracking-wide'
+                    className={cn(
+                      "h-96 bg-background grid place-items-center text-center tracking-wide"
+                    )}
                   >
-                    No results.
+                    <div className='flex flex-col items-center gap-1'>
+                      <h2 className='text-xl font-medium'>No results.</h2>
+                      <p
+                        className={cn(
+                          "text-muted-foreground",
+                          !data?.length && noFilters && "hidden"
+                        )}
+                      >
+                        Try another search, or adjusting the filters
+                      </p>
+                      <Button
+                        variant='outline'
+                        className={cn(
+                          "mt-4",
+                          !data?.length && noFilters && "hidden"
+                        )}
+                        onClick={() => {
+                          setSearchParams();
+                        }}
+                      >
+                        Clear Filters
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               )}

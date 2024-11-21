@@ -2,7 +2,6 @@ import type { RowSelectionState, Updater } from "@tanstack/react-table";
 import { create } from "zustand";
 
 interface EmployeesState {
-  canDelete?: boolean;
   columns: string[];
   setColumns: (columns?: any[]) => void;
   setRowSelection: (updater: Updater<RowSelectionState>) => void;

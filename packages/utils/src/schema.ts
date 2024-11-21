@@ -397,6 +397,19 @@ export const EmployeeWorkHistorySchema = z.object({
   end_date: z.string(),
 });
 
+
+export const categoryArray = ["suggestion", "bug", "complain"] as const;
+export const severityArray = ["low", "normal", "urgent"] as const;
+
+export const FeedbackSchema = z.object({
+  id: z.string().optional(),
+  subject: zString.min(3).max(30),
+  message: zTextArea.max(500),
+  category: z.enum(categoryArray).optional(),
+  severity: z.enum(severityArray).default("normal"),
+  user_id: z.string(),
+  company_id : z.string(),
+});
 // Payment Fields
 export const PaymentTypeEnum = ["fixed", "variable"] as const;
 export const CalculationTypeEnum = ["fixed", "basic"] as const;
