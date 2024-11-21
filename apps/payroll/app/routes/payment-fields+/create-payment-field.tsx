@@ -139,7 +139,7 @@ export default function CreatePaymentField({ updateValues }: { updateValues?: Pa
                   children: replaceUnderscore(fields.calculation_type.value === "fixed" ? fields.amount.name : "percentage"),
                 }}
                 errors={fields.amount.errors}
-                prefix={fields.calculation_type.value === "fixed" ? "Rs" : undefined}
+                prefix={(fields.calculation_type.value === "fixed" || fields.calculation_type.value === undefined) ? "Rs" : undefined}
                 suffix={fields.calculation_type.value === "basic" ? "%" : undefined}
               />
 
