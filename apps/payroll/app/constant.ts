@@ -92,3 +92,31 @@ export const navList = [
     icon: "plus-circled",
   },
 ] as NavList[];
+
+export const statutorySideNavList = [
+  {
+    name: "EPF",
+    link: "/payment_fields/statutory-fields/employee-provident-fund",
+    icon: ""
+  },
+  {
+    name: "ESI",
+    link: "/payment_fields/statutory-fields/employee-state-insurance",
+    icon: ""
+  },
+  {
+    name: "Professional Tax",
+    link: "/payment_fields/statutory-fields/professional-tax",
+    icon: ""
+  },
+  {
+    name: "Labour welfare fund",
+    link: "/payment_fields/statutory-fields/labour-welfare-fund",
+    icon: ""
+  },
+  {
+    name: "Statutory Bonus",
+    link: "/payment_fields/statutory-fields/statutory-bonus",
+    icon: ""
+  }
+]

@@ -397,6 +397,57 @@ export const EmployeeWorkHistorySchema = z.object({
   end_date: z.string(),
 });
 
+const deductionCycleArray = ["monthly", "yearly", "half_yearly"] as const;
+const contributionRateArray = [20, 0] as number[];
+
+export const EmployeeProvidentFundSchema = z.object({
+  id: z.string().optional(),
+  company_id: z.string(),
+  epf_number: zNumberString.max(20),
+  deduction_cycle: z.enum(deductionCycleArray).default(deductionCycleArray[0]),
+  employee_contribution: z.number().default(contributionRateArray[0]),
+  employer_contribution: z.number().default(contributionRateArray[0]),
+  employee_restrict_value: z.number().min(0).optional(),
+  restrict_employer_contribution: z.boolean().default(false),
+  include_employer_esi_contribution: z.boolean().default(false),
+  include_admin_charges: z.boolean().default(false),
+});
+
+export const EmployeeStateInsuranceSchema = z.object({
+  id: z.string().optional(),
+  company_id: z.string(),
+  esi_number: zNumberString.max(20),
+  deduction_cycle: z.enum(deductionCycleArray).default(deductionCycleArray[0]),
+  employees_contribution: z.number().default(0.0075),
+  employers_contribution: z.number().default(0.0325),
+  include_employer_contribution: z.boolean().default(true),
+});
+
+export const ProfessionalTaxSchema = z.object({
+  id: z.string().optional(),
+  company_id: z.string(),
+  pt_number: zNumberString.max(20),
+  deduction_cycle: z.enum(deductionCycleArray).default(deductionCycleArray[0]),
+  state: z.string(),
+  gross_salary_range: z.array(
+    z.object({
+      start: z.number(),
+      end: z.number(),
+      tax_amount: z.number(),
+    })
+  ),
+});
+
+export const LabourWelfareFundSchema = z.object({
+  id: z.string().optional(),
+  company_id: z.string(),
+  state: z.string(),
+  employee_contribution: z.number().default(6),
+  employer_contribution: z.number().default(12),
+  deduction_cycle: z.enum(deductionCycleArray).default(deductionCycleArray[2]),
+  status: z.boolean().default(false),
+});
+
 const statutoryBonusPayFrequencyArray = ["monthly", "yearly"] as const;
 
 export const StatutoryBonusSchema = z
@@ -411,16 +462,15 @@ export const StatutoryBonusSchema = z
   .superRefine((data, ctx) => {
     if (data.payment_frequency === "yearly" && !data.payout_month) {
       ctx.addIssue({
-        path: ["payout_month"], // The field where the error occurred
+        path: ["payout_month"],
         message: "payout_month is required when payment_freq is 'yearly'",
         code: z.ZodIssueCode.custom,
       });
     }
 
-    // If payment_freq is "monthly", payout_month must be null
     if (data.payment_frequency === "monthly" && data.payout_month !== null) {
       ctx.addIssue({
-        path: ["payout_month"], // The field where the error occurred
+        path: ["payout_month"],
         message: "payout_month must be null when payment_freq is 'monthly'",
         code: z.ZodIssueCode.custom,
       });

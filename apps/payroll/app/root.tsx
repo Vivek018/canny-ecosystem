@@ -177,7 +177,7 @@ function App() {
         ) : (
           <>
             <Sidebar
-              className='flex-none'
+              className='flex-none z-30'
               theme={initialTheme || "system"}
               user={user ?? []}
             />

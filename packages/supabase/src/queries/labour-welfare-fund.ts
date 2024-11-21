@@ -1,89 +1,66 @@
 import { convertToNull } from "@canny_ecosystem/utils";
-import {
-  EmployeeProvidentFundDatabaseInsert,
-  EmployeeProvidentFundDatabaseUpdate,
+import type {
+  LabourWelfareFundDatabaseInsert,
+  LabourWelfareFundDatabaseUpdate,
   TypedSupabaseClient,
 } from "../types";
-
-export const createEmployeeProvidentFund = async ({
+export async function createLabourWelfareFund({
   supabase,
   data,
   bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
-  data: EmployeeProvidentFundDatabaseInsert;
+  data: LabourWelfareFundDatabaseInsert;
   bypassAuth?: boolean;
-}) => {
+}) {
   if (!bypassAuth) {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-
-    if (!user?.email) {
-      throw new Error("User is not logged in");
-    }
-  }
-
-  const {
-    error,
-    status,
-    data: employeeProvidentFundData,
-  } = await supabase
-    .from("employee_provident_fund")
-    .insert(data)
-    .select()
-    .single();
-
-  if (error) {
-    console.error("error", error);
-  }
-
-  return {
-    employeeProvidentFundData,
-    status,
-    error,
-  };
-};
-
-export const updateEmployeeProvidentFund = async ({
-  supabase,
-  data,
-  bypassAuth = false,
-}: {
-  supabase: TypedSupabaseClient;
-  data: EmployeeProvidentFundDatabaseUpdate;
-  bypassAuth?: boolean;
-}) => {
-  if (!bypassAuth) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
     if (!user?.email) {
       return { status: 400, error: "Unauthorized User" };
     }
   }
-
+  const {
+    error,
+    status,
+    data: professionalTax,
+  } = await supabase.from("labour_welfare_fund").insert(data).select().single();
+  if (error) {
+    console.error(error);
+  }
+  return { status, error, id: professionalTax?.id };
+}
+export async function updateLabourWelfareFund({
+  supabase,
+  data,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  data: LabourWelfareFundDatabaseUpdate;
+  bypassAuth?: boolean;
+}) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
   const updateData = convertToNull(data);
-
   const { error, status } = await supabase
-    .from("employee_provident_fund")
+    .from("labour_welfare_fund")
     .update(updateData)
     .eq("id", data.id!)
     .select()
     .single();
-
   if (error) {
     console.error("error", error);
   }
-
-  return {
-    status,
-    error,
-  };
-};
-
-export const deleteEmployeeProvidentFund = async ({
+  return { status, error };
+}
+export async function deleteLabourWelfareFund({
   supabase,
   id,
   bypassAuth = false,
@@ -91,32 +68,23 @@ export const deleteEmployeeProvidentFund = async ({
   supabase: TypedSupabaseClient;
   id: string;
   bypassAuth?: boolean;
-}) => {
+}) {
   if (!bypassAuth) {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-
     if (!user?.email) {
       return { status: 400, error: "Unauthorized User" };
     }
   }
-
   const { error, status } = await supabase
-    .from("statutory_bonus")
+    .from("labour_welfare_fund")
     .delete()
     .eq("id", id)
     .select()
     .single();
-
   if (error) {
     console.error(error);
   }
-
-  console.log("-------------------", status, error)
-
-  return {
-    status,
-    error,
-  };
-};
+  return { status, error };
+}
