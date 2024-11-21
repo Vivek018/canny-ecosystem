@@ -186,7 +186,7 @@ Output: {
   return redirect(url.toString());
 }
 
-export default function Employees() {
+export default function EmployeesIndex() {
   const {
     data,
     count,

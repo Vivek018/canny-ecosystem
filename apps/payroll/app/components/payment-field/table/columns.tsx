@@ -22,17 +22,6 @@ export const columns: ColumnDef<PaymentFieldDataType>[] = [
     },
   },
   {
-    accessorKey: "calculation_type",
-    header: "Calculation Type",
-    cell: ({ row }) => {
-      return (
-        <p className="truncate w-20 capitalize">
-          {replaceUnderscore(row.original?.calculation_type)}
-        </p>
-      );
-    },
-  },
-  {
     accessorKey: "payment_type",
     header: "Payment Type",
     cell: ({ row }) => {
@@ -43,6 +32,17 @@ export const columns: ColumnDef<PaymentFieldDataType>[] = [
       );
     },
   },
+  {
+    accessorKey: "calculation_type",
+    header: "Calculation Type",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate w-32 capitalize">
+          {replaceUnderscore(row.original?.calculation_type)}
+        </p>
+      );
+    },
+  }, 
   {
     accessorKey: "is_active",
     header: "Status",

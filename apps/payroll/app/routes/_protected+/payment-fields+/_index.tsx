@@ -27,7 +27,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return json({ data: data as any });
 }
 
-export default function PaymentField() {
+export default function PaymentFieldsIndex() {
   const { data } = useLoaderData<typeof loader>();
 
   const [searchString, setSearchString] = useState("");
@@ -59,7 +59,7 @@ export default function PaymentField() {
                 placeholder="Search Payment Fields"
                 value={searchString}
                 onChange={(e) => setSearchString(e.target.value)}
-                className="pl-8 w-full focus-visible:ring-0"
+                className="pl-8 h-10 w-full focus-visible:ring-0"
               />
             </div>
             <Link

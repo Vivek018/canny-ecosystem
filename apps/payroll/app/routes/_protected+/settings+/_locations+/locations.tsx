@@ -45,7 +45,7 @@ export default function Locations() {
     <section className="py-4">
       <div className="w-full flex items-end justify-between">
         <Command className="overflow-visible">
-          <div className="w-full md:w-3/4 lg:w-1/2 2xl:w-1/3 flex items-center gap-4">
+          <div className="w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4">
             <CommandInput
               divClassName="border border-input rounded-md h-10 flex-1"
               placeholder="Search Locations"

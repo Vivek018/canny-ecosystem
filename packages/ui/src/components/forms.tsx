@@ -58,7 +58,7 @@ export function Field({
     <div className={cn("w-full flex flex-col gap-1.5", className)}>
       <div className="flex flex-row gap-[1px]">
         <Label htmlFor={id} {...labelProps} />
-        <sub className="text-primary">{isRequired ? "*" : ""}</sub>
+        <sub className={cn("hidden text-primary", labelProps?.children && isRequired && "inline")}>*</sub>
       </div>
       <div className="relative flex items-center">
         {prefix && <span className="absolute left-2 text-muted">{prefix}</span>}
@@ -104,7 +104,7 @@ export function TextareaField({
     <div className={cn("w-full flex flex-col gap-1.5", className)}>
       <div className="flex flex-row gap-[1px]">
         <Label htmlFor={id} {...labelProps} />
-        <sub className="text-primary">{isRequired ? "*" : ""}</sub>
+        <sub className={cn("hidden text-primary", labelProps?.children && isRequired && "inline")}>*</sub>
       </div>
       <Textarea
         id={id}
@@ -177,7 +177,7 @@ export function CheckboxField({
           {...labelProps}
           className="self-center text-foreground"
         />
-        <sub className="text-primary">{isRequired ? "*" : ""}</sub>
+        <sub className={cn("hidden text-primary", labelProps?.children && isRequired && "inline")}>*</sub>
       </div>
       <div className="px-4 pb-6 pt-1">
         {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
@@ -220,7 +220,7 @@ export function SearchableSelectField({
     <div className={cn("w-full flex flex-col gap-1.5", className)}>
       <div className="flex">
         <Label {...labelProps} />
-        <sub className="text-primary">{isRequired ? "*" : ""}</sub>
+        <sub className={cn("hidden text-primary", labelProps?.children && isRequired && "inline")}>*</sub>
       </div>
       <input
         type="hidden"
@@ -338,7 +338,7 @@ export function JSONBField({
     <div className={cn("w-full flex flex-col gap-1.5", className)}>
       <div className="flex">
         <Label htmlFor={inputProps.id} {...labelProps} />
-        <sub className="text-primary">{isRequired ? "*" : ""}</sub>
+        <sub className={cn("hidden text-primary", labelProps?.children && isRequired && "inline")}>*</sub>
       </div>
       {pairs.map((pair, index) => (
         <div key={index.toString()} className="flex gap-2 mb-2">

@@ -11,8 +11,8 @@ type Props = {
 export const paymentFieldsColumnIdArray = [
   "name",
   "amount",
-  "calculation_type",
   "payment_type",
+  "calculation_type",
   "is_active",
   "consider_for_epf",
   "consider_for_esic",

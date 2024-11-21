@@ -82,7 +82,7 @@ export default function CreatePaymentField({
     : CREATE_PAYMENT_FIELD;
 
   const initialValues =
-    updateValues ?? getInitialValueFromZod(PaymentFieldSchema as any);
+    updateValues ?? getInitialValueFromZod(PaymentFieldSchema);
 
   const [resetKey, setResetKey] = useState(Date.now());
 

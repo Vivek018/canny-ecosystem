@@ -18,21 +18,30 @@ export const pipe =
   (val: any) =>
     fns.reduce((prev, fn) => fn(prev), val);
 
-export function getInitialValueFromZod<T extends z.ZodObject<any, any>>(
-  schema: T,
+export function getInitialValueFromZod<T extends z.ZodTypeAny>(
+  schema: T
 ): z.infer<T> {
+  let unwrappedSchema = schema;
+  while (unwrappedSchema instanceof z.ZodEffects) {
+    unwrappedSchema = unwrappedSchema._def.schema;
+  }
+
+  if (!(unwrappedSchema instanceof z.ZodObject)) {
+    throw new Error("Schema must be a ZodObject or wrapped ZodObject");
+  }
+
   return Object.fromEntries(
-    Object.entries(schema.shape).map(([key, value]) => {
+    Object.entries(unwrappedSchema.shape).map(([key, value]) => {
       if (value instanceof z.ZodDefault) {
         return [key, value._def.defaultValue()];
       }
       return [key, undefined];
-    }),
+    })
   ) as z.infer<T>;
 }
 
 export function transformStringArrayIntoOptions(
-  arr: string[],
+  arr: string[]
 ): { value: string; label: string }[] {
   return arr.map((str) => ({
     value: str,
@@ -51,7 +60,7 @@ export function getOrdinalSuffix(n: number): string {
 
 export function deepEqualCheck(
   obj1: { [x: string]: any } | null | undefined,
-  obj2: { [x: string]: any } | null | undefined,
+  obj2: { [x: string]: any } | null | undefined
 ) {
   if (obj1 === obj2) {
     return true;
@@ -147,7 +156,7 @@ export function extractJsonFromString(str: string): any | null {
 }
 
 export function debounce<
-  Callback extends (...args: Parameters<Callback>) => void,
+  Callback extends (...args: Parameters<Callback>) => void
 >(fn: Callback, delay: number) {
   let timer: ReturnType<typeof setTimeout> | null = null;
   return (...args: Parameters<Callback>) => {

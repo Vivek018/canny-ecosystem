@@ -1,5 +1,5 @@
 import { Outlet } from "@remix-run/react";
 
-export default function PaymentFields() {
+export default function Projects() {
   return <Outlet />;
 };

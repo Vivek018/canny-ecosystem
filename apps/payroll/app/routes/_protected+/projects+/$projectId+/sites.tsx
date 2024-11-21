@@ -42,7 +42,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   return json({ data, projectId });
 }
 
-export default function Sites() {
+export default function SitesIndex() {
   const { data, projectId } = useLoaderData<typeof loader>();
   const { isDocument } = useIsDocument();
 
