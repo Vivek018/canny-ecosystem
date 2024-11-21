@@ -39,11 +39,15 @@ export function Field({
   inputProps,
   errors,
   className,
+  prefix,
+  suffix,
 }: {
   labelProps?: React.LabelHTMLAttributes<HTMLLabelElement>;
   inputProps: React.InputHTMLAttributes<HTMLInputElement>;
   errors?: ListOfErrors;
   className?: string;
+  prefix?: React.ReactNode;
+  suffix?: React.ReactNode;
 }) {
   const fallbackId = useId();
   const id = inputProps.id ?? fallbackId;
@@ -54,19 +58,24 @@ export function Field({
     <div className={cn("w-full flex flex-col gap-1.5", className)}>
       <div className="flex flex-row gap-[1px]">
         <Label htmlFor={id} {...labelProps} />
-        <sub className="text-primary">
-          {isRequired && labelProps ? "*" : ""}
-        </sub>
+        <sub className="text-primary">{isRequired ? "*" : ""}</sub>
       </div>
-      <Input
-        id={id}
-        aria-invalid={errorId ? true : undefined}
-        aria-describedby={errorId}
-        {...inputProps}
-      />
-      <div className="min-h-[28px] px-4 pb-4 pt-1">
-        {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
+      <div className="relative flex items-center">
+        {prefix && <span className="absolute left-2 text-muted">{prefix}</span>}
+        <Input
+          id={id}
+          aria-invalid={errorId ? true : undefined}
+          aria-describedby={errorId}
+          {...inputProps}
+          className={cn(
+            prefix && "pl-8",
+            suffix && "pr-8",
+            inputProps.className
+          )}
+        />
+        {suffix && <span className="absolute right-2 text-muted">{suffix}</span>}
       </div>
+      <div className="min-h-[28px] px-4 pb-4 pt-1">{errorId ? <ErrorList id={errorId} errors={errors} /> : null}</div>
     </div>
   );
 }

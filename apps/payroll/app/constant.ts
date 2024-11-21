@@ -20,7 +20,7 @@ export const sideNavList = [
   { name: "Advances", link: "/advances", icon: "lab-timer" },
   {
     name: "Payment Fields",
-    link: "/payment_fields",
+    link: "/payment-fields",
     icon: "input",
   },
   {
@@ -73,7 +73,7 @@ export const navList = [
   },
   {
     name: "Add Payment Field",
-    link: "/payment_fields/upsert",
+    link: "/payment-fields/upsert",
     icon: "plus-circled",
   },
   {

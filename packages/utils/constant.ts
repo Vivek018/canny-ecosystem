@@ -53,3 +53,13 @@ export const statesAndUTs = [
   { value: "ladakh", label: "Ladakh" },
   { value: "jammu_and_kashmir", label: "Jammu and Kashmir" },
 ];
+
+export const paymentType = [
+  { value: "fixed", label: "Fixed" },
+  { value: "variable", label: "Variable" },
+];
+
+export const calculationType = [
+  { value: "fixed", label: "Fixed" },
+  { value: "basic", label: "Basic" },
+];

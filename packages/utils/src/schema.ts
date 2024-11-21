@@ -400,18 +400,16 @@ export const EmployeeWorkHistorySchema = z.object({
 // Payment Fields
 export const PaymentTypeEnum = ["fixed", "variable"] as const;
 export const CalculationTypeEnum = ["fixed", "basic"] as const;
+
 export const PaymentFieldSchema = z.object({
-  id: z.string().uuid(),
-  name: z.string().min(1, "Name is required"),
+  id: z.string().uuid().optional(),
+  name: zString,
   payment_type: z.enum(PaymentTypeEnum).default("fixed"),
-  calculation_type: z.enum(CalculationTypeEnum).default("basic"),
+  calculation_type: z.enum(CalculationTypeEnum).default("fixed"),
   amount: z.number(),
-  is_active: z.boolean(),
-  is_pro_rata: z.boolean(),
-  consider_for_epf: z.boolean(),
-  consider_for_esic: z.boolean(),
-  created_at: z.string().datetime({ offset: true }),
-  updated_at: z.string().datetime({ offset: true }),
+  is_active: z.boolean().default(false),
+  is_pro_rata: z.boolean().default(false),
+  consider_for_epf: z.boolean().default(false),
+  consider_for_esic: z.boolean().default(false),
   company_id: z.string().uuid(),
 });
-

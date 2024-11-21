@@ -2,7 +2,7 @@ import { EmployeesActions } from "@/components/employees/employee-actions";
 import { EmployeesSearchFilter } from "@/components/employees/employee-search-filter";
 import { FilterList } from "@/components/employees/filter-list";
 import { columns } from "@/components/employees/table/columns";
-import { DataTable } from "@/components/employees/table/date-table";
+import { DataTable } from "@/components/employees/table/data-table";
 import { AIChat4o } from "@/utils/ai";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { MAX_QUERY_LIMIT } from "@canny_ecosystem/supabase/constant";
