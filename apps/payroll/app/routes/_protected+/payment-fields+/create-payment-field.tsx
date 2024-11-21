@@ -1,19 +1,43 @@
-import { isGoodStatus, PaymentFieldSchema, replaceUnderscore, getInitialValueFromZod, replaceDash } from "@canny_ecosystem/utils";
-import { CheckboxField, Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
-import { FormProvider, getFormProps, getInputProps, useForm } from "@conform-to/react";
+import {
+  isGoodStatus,
+  PaymentFieldSchema,
+  replaceUnderscore,
+  getInitialValueFromZod,
+  replaceDash,
+  paymentTypeArray,
+  transformStringArrayIntoOptions,
+  calculationTypeArray,
+} from "@canny_ecosystem/utils";
+import {
+  CheckboxField,
+  Field,
+  SearchableSelectField,
+} from "@canny_ecosystem/ui/forms";
+import {
+  FormProvider,
+  getFormProps,
+  getInputProps,
+  useForm,
+} from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { Form, json, useLoaderData } from "@remix-run/react";
-import { Button } from "@canny_ecosystem/ui/button";
 import { useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { UPDATE_PAYMENT_FIELD } from "./$paymentFieldId.update-payment-field";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@canny_ecosystem/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@canny_ecosystem/ui/card";
 import { createPaymentField } from "@canny_ecosystem/supabase/mutations";
 import type { PaymentFieldDatabaseUpdate } from "@canny_ecosystem/supabase/types";
-import { calculationType, paymentType } from "@canny_ecosystem/utils/constant";
+import { FormButtons } from "@/components/form/form-buttons";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
 
 export const CREATE_PAYMENT_FIELD = "create-payment-field";
 
@@ -43,16 +67,22 @@ export async function action({ request }: ActionFunctionArgs) {
     data: submission.value as any,
   });
 
-  if (isGoodStatus(status)) return safeRedirect("/payment-fields", { status: 303 });
+  if (isGoodStatus(status))
+    return safeRedirect("/payment-fields", { status: 303 });
 
   return json({ status, error });
 }
 
-export default function CreatePaymentField({ updateValues }: { updateValues?: PaymentFieldDatabaseUpdate | null }) {
+export default function CreatePaymentField({
+  updateValues,
+}: { updateValues?: PaymentFieldDatabaseUpdate | null }) {
   const { companyId } = useLoaderData<typeof loader>();
-  const PAYMENT_FIELD_TAG = updateValues ? UPDATE_PAYMENT_FIELD : CREATE_PAYMENT_FIELD;
+  const PAYMENT_FIELD_TAG = updateValues
+    ? UPDATE_PAYMENT_FIELD
+    : CREATE_PAYMENT_FIELD;
 
-  const initialValues = updateValues ?? getInitialValueFromZod(PaymentFieldSchema);
+  const initialValues =
+    updateValues ?? getInitialValueFromZod(PaymentFieldSchema as any);
 
   const [resetKey, setResetKey] = useState(Date.now());
 
@@ -80,8 +110,8 @@ export default function CreatePaymentField({ updateValues }: { updateValues?: Pa
                 {replaceDash(PAYMENT_FIELD_TAG)}
               </CardTitle>
               <CardDescription>
-                {PAYMENT_FIELD_TAG.split("-")[0]} payment field of a company that will be
-                central in all of canny apps
+                {PAYMENT_FIELD_TAG.split("-")[0]} payment field of a company
+                that will be central in all of canny apps
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -104,7 +134,9 @@ export default function CreatePaymentField({ updateValues }: { updateValues?: Pa
               <SearchableSelectField
                 key={resetKey}
                 className="capitalize"
-                options={paymentType}
+                options={transformStringArrayIntoOptions(
+                  paymentTypeArray as unknown as string[],
+                )}
                 inputProps={{
                   ...getInputProps(fields.payment_type, { type: "text" }),
                 }}
@@ -118,7 +150,9 @@ export default function CreatePaymentField({ updateValues }: { updateValues?: Pa
               <SearchableSelectField
                 key={resetKey + 1}
                 className="capitalize"
-                options={calculationType}
+                options={transformStringArrayIntoOptions(
+                  calculationTypeArray as unknown as string[],
+                )}
                 inputProps={{
                   ...getInputProps(fields.calculation_type, { type: "text" }),
                 }}
@@ -133,14 +167,31 @@ export default function CreatePaymentField({ updateValues }: { updateValues?: Pa
                 inputProps={{
                   ...getInputProps(fields.amount, { type: "number" }),
                   className: "capitalize",
-                  placeholder: `Enter ${replaceUnderscore(fields.calculation_type.value === "fixed" ? fields.amount.name : "percentage")}`,
+                  placeholder: `Enter ${replaceUnderscore(fields.calculation_type.value === calculationTypeArray[0] ? fields.amount.name : "Percentage")}`,
+                  disabled: fields.payment_type.value === paymentTypeArray[1],
                 }}
                 labelProps={{
-                  children: replaceUnderscore(fields.calculation_type.value === "fixed" ? fields.amount.name : "percentage"),
+                  children: replaceUnderscore(
+                    fields.calculation_type.value === calculationTypeArray[0]
+                      ? fields.amount.name
+                      : "percentage",
+                  ),
                 }}
                 errors={fields.amount.errors}
-                prefix={(fields.calculation_type.value === "fixed" || fields.calculation_type.value === undefined) ? "Rs" : undefined}
-                suffix={fields.calculation_type.value === "basic" ? "%" : undefined}
+                prefix={
+                  fields.calculation_type.value === calculationTypeArray[0] ||
+                  fields.calculation_type.value === undefined
+                    ? "Rs"
+                    : undefined
+                }
+                suffix={
+                  fields.calculation_type.value === calculationTypeArray[1]
+                    ? "%"
+                    : undefined
+                }
+                className={cn(
+                  fields.payment_type.value === paymentTypeArray[1] && "hidden",
+                )}
               />
 
               <div className="grid grid-cols-2 place-content-center justify-between gap-x-4">
@@ -180,28 +231,11 @@ export default function CreatePaymentField({ updateValues }: { updateValues?: Pa
                 />
               </div>
             </CardContent>
-            <CardFooter>
-              <div className="ml-auto w-2/5 flex flex-row items-center justify-center gap-4">
-                <Button
-                  variant="secondary"
-                  size="full"
-                  type="reset"
-                  onClick={() => setResetKey(Date.now())}
-                  {...form.reset.getButtonProps()}
-                >
-                  Reset
-                </Button>
-                <Button
-                  form={form.id}
-                  disabled={!form.valid}
-                  variant="default"
-                  size="full"
-                  type="submit"
-                >
-                  Submit
-                </Button>
-              </div>
-            </CardFooter>
+            <FormButtons
+              form={form}
+              setResetKey={setResetKey}
+              isSingle={true}
+            />
           </Card>
         </Form>
       </FormProvider>

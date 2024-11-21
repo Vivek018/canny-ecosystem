@@ -11,56 +11,78 @@ export const columns: ColumnDef<PaymentFieldDataType>[] = [
     accessorKey: "name",
     header: "Field Name",
     cell: ({ row }) => {
-      return <p className='truncate w-48'>{`${row.original?.name}`}</p>
+      return <p className="truncate w-48">{`${row.original?.name}`}</p>;
     },
   },
   {
     accessorKey: "amount",
     header: "Amount",
     cell: ({ row }) => {
-      return row.original?.amount;
+      return row.original?.amount ?? "--";
     },
   },
   {
     accessorKey: "calculation_type",
     header: "Calculation Type",
     cell: ({ row }) => {
-      return row.original?.calculation_type;
+      return (
+        <p className="truncate w-20 capitalize">
+          {replaceUnderscore(row.original?.calculation_type)}
+        </p>
+      );
     },
   },
   {
     accessorKey: "payment_type",
     header: "Payment Type",
     cell: ({ row }) => {
-      return <p className='truncate w-20 capitalize'>{replaceUnderscore(row.original?.payment_type ?? "")}</p>
+      return (
+        <p className="truncate w-20 capitalize">
+          {replaceUnderscore(row.original?.payment_type ?? "")}
+        </p>
+      );
     },
   },
   {
     accessorKey: "is_active",
     header: "Status",
     cell: ({ row }) => {
-      return <p className='capitalize'>{row.original?.is_active ? "Active" : "Inactive"}</p>
+      return (
+        <p className="capitalize">
+          {row.original?.is_active ? "Active" : "Inactive"}
+        </p>
+      );
     },
   },
   {
     accessorKey: "consider_for_epf",
     header: "Consider for EPF",
     cell: ({ row }) => {
-      return <p className='capitalize'>{row.original?.consider_for_epf ? "Yes" : "No"}</p>
+      return (
+        <p className="capitalize">
+          {row.original?.consider_for_epf ? "Yes" : "No"}
+        </p>
+      );
     },
   },
   {
     accessorKey: "consider_for_esic",
     header: "Consider for ESIC",
     cell: ({ row }) => {
-      return <p className='capitalize'>{row.original?.consider_for_esic ? "Yes" : "No"}</p>
+      return (
+        <p className="capitalize">
+          {row.original?.consider_for_esic ? "Yes" : "No"}
+        </p>
+      );
     },
   },
   {
     accessorKey: "is_pro_rata",
-    header: "Is pro-rata",
+    header: "Is pro rata",
     cell: ({ row }) => {
-      return <p className='capitalize'>{row.original?.is_pro_rata ? "Yes" : "No"}</p>
+      return (
+        <p className="capitalize">{row.original?.is_pro_rata ? "Yes" : "No"}</p>
+      );
     },
   },
   {
@@ -77,9 +99,9 @@ export const columns: ColumnDef<PaymentFieldDataType>[] = [
           }}
           triggerChild={
             <DropdownMenuTrigger asChild>
-              <Button variant='ghost' className='h-8 w-8 p-0'>
-                <span className='sr-only'>Open menu</span>
-                <Icon name='dots' />
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <Icon name="dots-vertical" />
               </Button>
             </DropdownMenuTrigger>
           }

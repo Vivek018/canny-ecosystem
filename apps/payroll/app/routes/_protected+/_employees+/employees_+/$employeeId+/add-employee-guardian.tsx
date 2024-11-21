@@ -33,7 +33,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 
@@ -68,13 +68,13 @@ export default function AddEmployeeGuardian() {
   });
 
   return (
-    <section className='md:px-20 lg:px-28 2xl:px-40 py-4'>
+    <section className="md:px-20 lg:px-28 2xl:px-40 py-4">
       <FormProvider context={form.context}>
         <Form
-          method='POST'
-          encType='multipart/form-data'
+          method="POST"
+          encType="multipart/form-data"
           {...getFormProps(form)}
-          className='flex flex-col'
+          className="flex flex-col"
         >
           <Card>
             <CreateEmployeeGuardianDetails

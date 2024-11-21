@@ -35,7 +35,7 @@ export const zEmailSuffix = z
   .max(20)
   .regex(
     /^[A-Za-z0-9]+\.[A-Za-z]{2,}$/,
-    "Must contain a dot with at least one character before and two after."
+    "Must contain a dot with at least one character before and two after.",
   );
 
 export const SIZE_1MB = 1 * 1024 * 1024; // 1MB
@@ -50,21 +50,21 @@ export const zImage = z
   .any()
   .refine(
     (file) => (typeof file !== "string" ? file.size < SIZE_1MB : true),
-    "File size must be less than 1MB"
+    "File size must be less than 1MB",
   )
   .refine(
     (file) =>
       typeof file !== "string"
         ? ACCEPTED_IMAGE_TYPES.includes(file?.type)
         : true,
-    "Only .jpg, .jpeg, .png and .webp formats are supported."
+    "Only .jpg, .jpeg, .png and .webp formats are supported.",
   );
 
 export const zFile = z
   .any()
   .refine(
     (file) => (typeof file !== "string" ? file.size < SIZE_1MB * 5 : true),
-    "File size must be less than 5MB"
+    "File size must be less than 5MB",
   )
   .refine(
     (file) =>
@@ -79,7 +79,7 @@ export const zFile = z
             "application/docx",
           ].includes(file?.type)
         : true,
-    "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .docx formats are supported."
+    "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .docx formats are supported.",
   );
 
 export const parseDateSchema = z
@@ -397,7 +397,6 @@ export const EmployeeWorkHistorySchema = z.object({
   end_date: z.string(),
 });
 
-
 export const categoryArray = ["suggestion", "bug", "complain"] as const;
 export const severityArray = ["low", "normal", "urgent"] as const;
 
@@ -408,21 +407,30 @@ export const FeedbackSchema = z.object({
   category: z.enum(categoryArray).optional(),
   severity: z.enum(severityArray).default("normal"),
   user_id: z.string(),
-  company_id : z.string(),
+  company_id: z.string(),
 });
 // Payment Fields
-export const PaymentTypeEnum = ["fixed", "variable"] as const;
-export const CalculationTypeEnum = ["fixed", "basic"] as const;
+export const paymentTypeArray = ["fixed", "variable"] as const;
+export const calculationTypeArray = ["fixed", "percentage_of_basic"] as const;
 
-export const PaymentFieldSchema = z.object({
-  id: z.string().uuid().optional(),
-  name: zString,
-  payment_type: z.enum(PaymentTypeEnum).default("fixed"),
-  calculation_type: z.enum(CalculationTypeEnum).default("fixed"),
-  amount: z.number(),
-  is_active: z.boolean().default(false),
-  is_pro_rata: z.boolean().default(false),
-  consider_for_epf: z.boolean().default(false),
-  consider_for_esic: z.boolean().default(false),
-  company_id: z.string().uuid(),
-});
+export const PaymentFieldSchema = z
+  .object({
+    id: z.string().uuid().optional(),
+    name: zString,
+    payment_type: z.enum(paymentTypeArray).default("fixed"),
+    calculation_type: z.enum(calculationTypeArray).default("fixed"),
+    amount: z.number().optional(),
+    is_active: z.boolean().default(false),
+    is_pro_rata: z.boolean().default(false),
+    consider_for_epf: z.boolean().default(false),
+    consider_for_esic: z.boolean().default(false),
+    company_id: z.string().uuid(),
+  })
+  .refine(
+    (data) =>
+      !(data.payment_type === "variable" && data.calculation_type !== "fixed"),
+    {
+      message: `When payment type is "variable", calculation type must be "fixed".`,
+      path: ["calculation_type"],
+    },
+  );

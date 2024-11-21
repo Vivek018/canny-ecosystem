@@ -1,9 +1,18 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuSeparator } from "@canny_ecosystem/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@canny_ecosystem/ui/dropdown-menu";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useNavigate, useSubmit } from "@remix-run/react";
 import { DeletePaymentField } from "./delete-payment-field";
 
-export const PaymentFieldOptionsDropdown = ({ paymentField, triggerChild }: {
+export const PaymentFieldOptionsDropdown = ({
+  paymentField,
+  triggerChild,
+}: {
   paymentField: {
     id: string;
     is_active: boolean;
@@ -44,7 +53,7 @@ export const PaymentFieldOptionsDropdown = ({ paymentField, triggerChild }: {
 
   const handleEdit = () => {
     navigate(`/payment-fields/${paymentField.id}/update-payment-field`);
-  }
+  };
 
   return (
     <DropdownMenu>
@@ -63,9 +72,7 @@ export const PaymentFieldOptionsDropdown = ({ paymentField, triggerChild }: {
           >
             Make as Inactive
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={handleEdit}
-          >
+          <DropdownMenuItem onClick={handleEdit}>
             Edit payment field
           </DropdownMenuItem>
           <DropdownMenuSeparator />

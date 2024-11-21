@@ -37,7 +37,7 @@ export const DeleteCompany = ({ companyId }: { companyId: string }) => {
   };
 
   const handleDeleteCompany = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -47,7 +47,7 @@ export const DeleteCompany = ({ companyId }: { companyId: string }) => {
           method: "post",
           action: `/${companyId}/delete-company`,
           replace: true,
-        }
+        },
       );
     } else {
       e.preventDefault();
@@ -56,7 +56,7 @@ export const DeleteCompany = ({ companyId }: { companyId: string }) => {
   };
 
   return (
-    <Card className='border-destructive'>
+    <Card className="border-destructive">
       <CardHeader>
         <CardTitle>Delete Company</CardTitle>
         <CardDescription>
@@ -64,11 +64,11 @@ export const DeleteCompany = ({ companyId }: { companyId: string }) => {
           platform.
         </CardDescription>
       </CardHeader>
-      <CardFooter className='border-t pt-6 flex justify-between'>
+      <CardFooter className="border-t pt-6 flex justify-between">
         <div>This action is not reversible — please continue with caution.</div>
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button disabled={isLoading} variant='destructive-outline'>
+            <Button disabled={isLoading} variant="destructive-outline">
               Delete
             </Button>
           </AlertDialogTrigger>
@@ -80,21 +80,25 @@ export const DeleteCompany = ({ companyId }: { companyId: string }) => {
                 company and remove it's data from our servers.
               </AlertDialogDescription>
             </AlertDialogHeader>
-            <div className='py-4'>
-              <p className='text-sm text-foreground/80'>
+            <div className="py-4">
+              <p className="text-sm text-foreground/80">
                 Please type{" "}
-                <i className='text-foreground font-medium'>{DELETE_TEXT}</i> to
+                <i className="text-foreground font-medium">{DELETE_TEXT}</i> to
                 confirm.
               </p>
               <Input
-                type='text'
+                type="text"
                 value={inputValue}
                 onChange={(e) => {
                   setInputValue(e.target.value);
                   setInputError([]);
                 }}
-                className='border border-input rounded-md h-10 w-full'
-                placeholder='Confirm your action'
+                className="border border-input rounded-md h-10 w-full"
+                placeholder="Confirm your action"
+                onPaste={(e) => {
+                  e.preventDefault();
+                  return false;
+                }}
               />
               <ErrorList errors={inputError} />
             </div>

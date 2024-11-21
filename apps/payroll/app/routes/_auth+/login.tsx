@@ -11,7 +11,7 @@ import {
 } from "@remix-run/node";
 import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
 
-export async function loader ({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const error = url.searchParams.get("error");
   const { user } = await getSessionUser({ request });
@@ -21,7 +21,7 @@ export async function loader ({ request }: LoaderFunctionArgs) {
   }
 
   return json({ error });
-};
+}
 
 export async function action({ request }: ActionFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({

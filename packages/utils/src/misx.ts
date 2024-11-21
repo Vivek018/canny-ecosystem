@@ -146,10 +146,9 @@ export function extractJsonFromString(str: string): any | null {
   }
 }
 
-export function debounce<Callback extends (...args: Parameters<Callback>) => void>(
-  fn: Callback,
-  delay: number
-) {
+export function debounce<
+  Callback extends (...args: Parameters<Callback>) => void,
+>(fn: Callback, delay: number) {
   let timer: ReturnType<typeof setTimeout> | null = null;
   return (...args: Parameters<Callback>) => {
     if (timer) clearTimeout(timer);

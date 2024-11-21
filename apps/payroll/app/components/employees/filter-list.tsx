@@ -28,7 +28,7 @@ export function FilterList({ filterList }: Props) {
             new Date(filterList.dob_end),
             {
               includeTime: false,
-            }
+            },
           );
         }
 
@@ -66,7 +66,7 @@ export function FilterList({ filterList }: Props) {
             new Date(filterList.doj_end),
             {
               includeTime: false,
-            }
+            },
           );
         }
 
@@ -80,7 +80,7 @@ export function FilterList({ filterList }: Props) {
             new Date(filterList.dol_end),
             {
               includeTime: false,
-            }
+            },
           );
         }
 
@@ -110,25 +110,25 @@ export function FilterList({ filterList }: Props) {
   };
 
   return (
-    <ul className='flex flex-0 space-x-2 w-full overflow-scroll no-scrollbar'>
+    <ul className="flex flex-0 space-x-2 w-full overflow-scroll no-scrollbar">
       {filterList &&
         Object.entries(filterList)
           .filter(
             ([key, value]) =>
-              value !== null && value !== undefined && !key.endsWith("end")
+              value !== null && value !== undefined && !key.endsWith("end"),
           )
           .map(([key, value]) => {
             return (
               <li key={key}>
                 <Button
-                  className='rounded-full h-9 px-3 bg-secondary hover:bg-secondary font-normal text-[#878787] flex space-x-1 items-center group'
+                  className="rounded-full h-9 px-3 bg-secondary hover:bg-secondary font-normal text-[#878787] flex space-x-1 items-center group"
                   onClick={() => handleOnRemove(key)}
                 >
                   <Icon
-                    name='cross'
-                    className='scale-0 group-hover:scale-100 transition-all w-0 group-hover:w-4'
+                    name="cross"
+                    className="scale-0 group-hover:scale-100 transition-all w-0 group-hover:w-4"
                   />
-                  <span className='capitalize'>
+                  <span className="capitalize">
                     {renderFilter({
                       key,
                       value: value ?? "",

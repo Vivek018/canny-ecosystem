@@ -90,7 +90,7 @@ export async function createEmployee({
         supabase,
         data: { ...employeeBankDetailsData, employee_id: data.id },
         bypassAuth,
-      }
+      },
     );
 
     const { error: employeeProjectAssignmentError } =

@@ -2,7 +2,7 @@ import { EmployeesActions } from "@/components/employees/employee-actions";
 import { EmployeesSearchFilter } from "@/components/employees/employee-search-filter";
 import { FilterList } from "@/components/employees/filter-list";
 import { columns } from "@/components/employees/table/columns";
-import { DataTable } from "@/components/employees/table/date-table";
+import { DataTable } from "@/components/employees/table/data-table";
 import { VALID_FILTERS } from "@/constant";
 import { AIChat4o } from "@/utils/ai";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
@@ -51,7 +51,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const hasFilters =
     filters &&
     Object.values(filters).some(
-      (value) => value !== null && value !== undefined
+      (value) => value !== null && value !== undefined,
     );
 
   const { data, meta, error } = await getEmployeesByCompanyId({
@@ -67,7 +67,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   });
 
   const hasNextPage = Boolean(
-    meta?.count && meta.count / (page + 1) > pageSize
+    meta?.count && meta.count / (page + 1) > pageSize,
   );
 
   if (error) {
@@ -125,7 +125,7 @@ ${VALID_FILTERS.map(
   (filter) =>
     `name: "${filter.name}", type: "${filter.valueType}", description: "${
       filter.description
-    }", example: ${JSON.stringify(filter.example)}`
+    }", example: ${JSON.stringify(filter.example)}`,
 ).join("\n")}
 
 ### RULES
@@ -203,9 +203,9 @@ export default function Employees() {
   const noFilters = Object.values(filterList).every((value) => !value);
 
   return (
-    <section className='py-4 px-4'>
-      <div className='w-full flex items-center justify-between pb-4'>
-        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4'>
+    <section className="py-6 px-4">
+      <div className="w-full flex items-center justify-between pb-4">
+        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
           <EmployeesSearchFilter
             disabled={!data?.length && noFilters}
             projectArray={projectArray}

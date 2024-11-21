@@ -19,7 +19,7 @@ export const FormStepHeader = ({
             className={cn(
               "h-10 border grid place-items-center px-4 rounded-md",
               stepData[stepNumber] &&
-              "border-primary bg-primary text-primary-foreground",
+                "border-primary bg-primary text-primary-foreground",
               step - 1 === stepNumber
                 ? "border-primary bg-background text-primary"
                 : "border-input",

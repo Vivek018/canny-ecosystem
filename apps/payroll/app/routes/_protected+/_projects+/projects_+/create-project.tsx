@@ -77,7 +77,7 @@ export async function action({ request }: ActionFunctionArgs) {
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 
@@ -120,17 +120,17 @@ export default function CreateProject({
   });
 
   return (
-    <section className='md:px-20 lg:px-28 2xl:px-40 py-4'>
+    <section className="md:px-20 lg:px-28 2xl:px-40 py-4">
       <FormProvider context={form.context}>
         <Form
-          method='POST'
-          encType='multipart/form-data'
+          method="POST"
+          encType="multipart/form-data"
           {...getFormProps(form)}
-          className='flex flex-col'
+          className="flex flex-col"
         >
           <Card>
             <CardHeader>
-              <CardTitle className='text-3xl'>
+              <CardTitle className="text-3xl">
                 {replaceDash(PROJECT_TAG)}
               </CardTitle>
               <CardDescription>
@@ -152,12 +152,12 @@ export default function CreateProject({
                 labelProps={{ children: fields.name.name }}
                 errors={fields.name.errors}
               />
-              <div className='grid grid-cols-3 place-content-center justify-between gap-6'>
+              <div className="grid grid-cols-3 place-content-center justify-between gap-6">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.project_code, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.project_code.name
+                      fields.project_code.name,
                     )}`,
                   }}
                   labelProps={{
@@ -169,7 +169,7 @@ export default function CreateProject({
                   inputProps={{
                     ...getInputProps(fields.project_type, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.project_type.name
+                      fields.project_type.name,
                     )}`,
                   }}
                   labelProps={{
@@ -186,7 +186,7 @@ export default function CreateProject({
                     placeholder: `Select ${fields.status.name}`,
                   }}
                   options={transformStringArrayIntoOptions(
-                    statusArray as unknown as string[]
+                    statusArray as unknown as string[],
                   )}
                   labelProps={{
                     children: fields.status.name,
@@ -202,7 +202,7 @@ export default function CreateProject({
                 labelProps={{ children: fields.description.name }}
                 errors={fields.description.errors}
               />
-              <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
+              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
                 <SearchableSelectField
                   key={resetKey + 1}
                   inputProps={{
@@ -232,16 +232,16 @@ export default function CreateProject({
                   errors={fields.end_client_id.errors}
                 />
               </div>
-              <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
+              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.start_date, { type: "date" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.start_date.name
+                      fields.start_date.name,
                     )}`,
                     max: getValidDateForInput(new Date().toISOString()),
                     defaultValue: getValidDateForInput(
-                      fields.start_date.initialValue
+                      fields.start_date.initialValue,
                     ),
                   }}
                   labelProps={{
@@ -255,11 +255,11 @@ export default function CreateProject({
                       type: "date",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.estimated_end_date.name
+                      fields.estimated_end_date.name,
                     )}`,
                     min: getValidDateForInput(fields.start_date.value),
                     defaultValue: getValidDateForInput(
-                      fields.estimated_end_date.initialValue
+                      fields.estimated_end_date.initialValue,
                     ),
                   }}
                   labelProps={{
@@ -272,7 +272,7 @@ export default function CreateProject({
                 textareaProps={{
                   ...getTextareaProps(fields.risk_assessment),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.risk_assessment.name
+                    fields.risk_assessment.name,
                   )}`,
                 }}
                 labelProps={{
@@ -284,7 +284,7 @@ export default function CreateProject({
                 textareaProps={{
                   ...getTextareaProps(fields.quality_standards),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.quality_standards.name
+                    fields.quality_standards.name,
                   )}`,
                 }}
                 labelProps={{
@@ -296,12 +296,12 @@ export default function CreateProject({
                 textareaProps={{
                   ...getTextareaProps(fields.health_safety_requirements),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.health_safety_requirements.name
+                    fields.health_safety_requirements.name,
                   )}`,
                 }}
                 labelProps={{
                   children: replaceUnderscore(
-                    fields.health_safety_requirements.name
+                    fields.health_safety_requirements.name,
                   ),
                 }}
                 errors={fields.health_safety_requirements.errors}
@@ -310,12 +310,12 @@ export default function CreateProject({
                 textareaProps={{
                   ...getTextareaProps(fields.environmental_considerations),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.environmental_considerations.name
+                    fields.environmental_considerations.name,
                   )}`,
                 }}
                 labelProps={{
                   children: replaceUnderscore(
-                    fields.environmental_considerations.name
+                    fields.environmental_considerations.name,
                   ),
                 }}
                 errors={fields.environmental_considerations.errors}

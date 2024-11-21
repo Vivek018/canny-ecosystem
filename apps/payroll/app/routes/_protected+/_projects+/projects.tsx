@@ -37,37 +37,37 @@ export default function Projects() {
   const { isDocument } = useIsDocument();
 
   return (
-    <section className='py-[22px] px-4'>
-      <div className='w-full flex items-end justify-between'>
-        <Command className='overflow-visible'>
-          <div className='w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4'>
+    <section className="py-[22px] px-4">
+      <div className="w-full flex items-end justify-between">
+        <Command className="overflow-visible">
+          <div className="w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4">
             <CommandInput
-              divClassName='border border-input rounded-md h-10 flex-1'
-              placeholder='Search Projects'
+              divClassName="border border-input rounded-md h-10 flex-1"
+              placeholder="Search Projects"
               autoFocus={true}
             />
             <Link
-              to='/projects/create-project'
+              to="/projects/create-project"
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
-                "flex items-center gap-1"
+                "flex items-center gap-1",
               )}
             >
               <span>Add</span>
-              <span className='hidden md:flex justify-end'>Project</span>
+              <span className="hidden md:flex justify-end">Project</span>
             </Link>
           </div>
           <CommandEmpty
             className={cn(
               "w-full py-40 capitalize text-lg tracking-wide text-center",
-              !isDocument && "hidden"
+              !isDocument && "hidden",
             )}
           >
             No project found.
           </CommandEmpty>
-          <CommandList className='max-h-full py-6 overflow-x-visible overflow-y-visible'>
-            <CommandGroup className='p-0 overflow-visible'>
-              <div className='w-full grid gap-8 grid-cols-1'>
+          <CommandList className="max-h-full py-6 overflow-x-visible overflow-y-visible">
+            <CommandGroup className="p-0 overflow-visible">
+              <div className="w-full grid gap-8 grid-cols-1">
                 {data?.map((project) => (
                   <CommandItem
                     key={project.id}
@@ -80,7 +80,7 @@ export default function Projects() {
                       project?.project_client?.name +
                       project?.end_client?.name
                     }
-                    className='data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0'
+                    className="data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0"
                   >
                     <ProjectCard project={project} />
                   </CommandItem>

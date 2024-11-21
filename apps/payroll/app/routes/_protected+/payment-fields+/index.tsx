@@ -1,7 +1,10 @@
 import { columns } from "@/components/payment-field/table/columns";
 import { DataTable } from "@/components/payment-field/table/data-table";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { getPaymentFieldsByCompanyId, type PaymentFieldDataType } from "@canny_ecosystem/supabase/queries";
+import {
+  getPaymentFieldsByCompanyId,
+  type PaymentFieldDataType,
+} from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json, Link, useLoaderData } from "@remix-run/react";
@@ -14,7 +17,10 @@ import { Icon } from "@canny_ecosystem/ui/icon";
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data, error } = await getPaymentFieldsByCompanyId({ supabase, companyId });
+  const { data, error } = await getPaymentFieldsByCompanyId({
+    supabase,
+    companyId,
+  });
 
   if (error) throw error;
 
@@ -29,25 +35,31 @@ export default function PaymentField() {
 
   useEffect(() => {
     const filteredData = data?.filter((item: PaymentFieldDataType) =>
-      Object.values(item).some((value) => String(value).toLowerCase().includes(searchString.toLowerCase()))
+      Object.values(item).some((value) =>
+        String(value).toLowerCase().includes(searchString.toLowerCase()),
+      ),
     );
     setTableData(filteredData);
   }, [searchString, data]);
 
   return (
     <>
-      <section className='py-4'>
-        <div className='w-full flex items-center justify-between pb-4'>
-          <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-6'>
-            <div className="relative max-w-sm w-full">
+      <section className="py-[22px] px-4">
+        <div className="w-full flex items-center justify-between pb-4">
+          <div className="w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4">
+            <div className="relative w-full">
               <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                <Icon name="magnifying-glass" size="sm" className="text-gray-400" />
+                <Icon
+                  name="magnifying-glass"
+                  size="sm"
+                  className="text-gray-400"
+                />
               </div>
               <Input
                 placeholder="Search Payment Fields"
                 value={searchString}
                 onChange={(e) => setSearchString(e.target.value)}
-                className="pl-10 w-full"
+                className="pl-8 w-full focus-visible:ring-0"
               />
             </div>
             <Link

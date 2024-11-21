@@ -3,11 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "files": [
-    "tailwind.config.ts",
-    "postcss.config.js",
-    "globals.css"
-  ],
+  "files": ["tailwind.config.ts", "postcss.config.js", "globals.css"],
   "scripts": {
     "build:icons": "tsx ./src/other/build-icons.ts",
     "clean": "rm -rf .turbo node_modules",

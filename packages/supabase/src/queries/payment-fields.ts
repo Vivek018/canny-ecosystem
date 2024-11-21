@@ -62,7 +62,6 @@ export async function getPaymentFieldsByCompanyId({
   supabase: TypedSupabaseClient;
   companyId: string;
 }) {
-
   const columns = [
     "id",
     "company_id",
@@ -76,7 +75,7 @@ export async function getPaymentFieldsByCompanyId({
     "is_pro_rata",
   ] as const;
 
-  const {data, error} = await supabase
+  const { data, error } = await supabase
     .from("payment_fields")
     .select(`${columns.join(",")}`)
     .eq("company_id", companyId)
