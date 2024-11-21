@@ -64,7 +64,7 @@ export function RelationshipCard({
           </TooltipProvider>
           <DropdownMenu>
             <DropdownMenuTrigger className='p-2 py-2 rounded-md bg-secondary grid place-items-center'>
-              <Icon name='dots' size='xs' />
+              <Icon name='dots-vertical' size='xs' />
             </DropdownMenuTrigger>
             <DropdownMenuContent sideOffset={10} align='end'>
               <DropdownMenuGroup>
@@ -128,7 +128,7 @@ export function RelationshipCard({
           </div>
           <h2
             className={cn(
-              "capitalize p-2 border border-input rounded-md bg-muted/75 w-32 truncate",
+              "capitalize p-2 border border-input rounded-md bg-muted/75 max-w-32 truncate",
               !relationship?.child_company?.name &&
                 "bg-background text-muted-foreground"
             )}

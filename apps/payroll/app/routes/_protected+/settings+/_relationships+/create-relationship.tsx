@@ -19,7 +19,6 @@ import {
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { Form, json, useLoaderData } from "@remix-run/react";
-import { Button } from "@canny_ecosystem/ui/button";
 import { useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -31,7 +30,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
@@ -40,6 +38,7 @@ import { createRelationship } from "@canny_ecosystem/supabase/mutations";
 import type { RelationshipDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { getCompanies } from "@canny_ecosystem/supabase/queries";
 import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
+import { FormButtons } from "@/components/form/form-buttons";
 
 export const CREATE_RELATIONSHIP = "create-relationship";
 
@@ -74,7 +73,7 @@ export async function action({ request }: ActionFunctionArgs) {
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: submission.status === "error" ? 400 : 200 }
     );
   }
 
@@ -121,12 +120,12 @@ export default function CreateRelationship({
   });
 
   return (
-    <section className="md:px-20 lg:px-52 2xl:px-80 py-3">
+    <section className='md:px-20 lg:px-52 2xl:px-80 py-3'>
       <FormProvider context={form.context}>
-        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
+        <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
           <Card>
             <CardHeader>
-              <CardTitle className="text-3xl">
+              <CardTitle className='text-3xl'>
                 {replaceDash(RELATIONSHIP_TAG)}
               </CardTitle>
               <CardDescription>
@@ -143,7 +142,9 @@ export default function CreateRelationship({
                 inputProps={{
                   ...getInputProps(fields.relationship_type, { type: "text" }),
                   autoFocus: true,
-                  placeholder: `Enter ${replaceUnderscore(fields.relationship_type.name)}`,
+                  placeholder: `Enter ${replaceUnderscore(
+                    fields.relationship_type.name
+                  )}`,
                   className: "capitalize",
                 }}
                 labelProps={{
@@ -174,14 +175,16 @@ export default function CreateRelationship({
                   children: "Is this currently active?",
                 }}
               />
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+              <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
                 <Field
                   inputProps={{
                     ...getInputProps(fields.start_date, { type: "date" }),
-                    placeholder: `Enter ${replaceUnderscore(fields.start_date.name)}`,
+                    placeholder: `Enter ${replaceUnderscore(
+                      fields.start_date.name
+                    )}`,
                     max: getValidDateForInput(new Date().toISOString()),
                     defaultValue: getValidDateForInput(
-                      fields.start_date.initialValue,
+                      fields.start_date.initialValue
                     ),
                   }}
                   labelProps={{
@@ -192,10 +195,12 @@ export default function CreateRelationship({
                 <Field
                   inputProps={{
                     ...getInputProps(fields.end_date, { type: "date" }),
-                    placeholder: `Enter ${replaceUnderscore(fields.end_date.name)}`,
+                    placeholder: `Enter ${replaceUnderscore(
+                      fields.end_date.name
+                    )}`,
                     min: getValidDateForInput(fields.start_date.value),
                     defaultValue: getValidDateForInput(
-                      fields.end_date.initialValue,
+                      fields.end_date.initialValue
                     ),
                   }}
                   labelProps={{
@@ -212,28 +217,11 @@ export default function CreateRelationship({
                 errors={fields.terms.errors}
               />
             </CardContent>
-            <CardFooter>
-              <div className="ml-auto w-2/5 flex flex-row items-center justify-center gap-4">
-                <Button
-                  variant="secondary"
-                  size="full"
-                  type="reset"
-                  onClick={() => setResetKey(Date.now())}
-                  {...form.reset.getButtonProps()}
-                >
-                  Reset
-                </Button>
-                <Button
-                  form={form.id}
-                  disabled={!form.valid}
-                  variant="default"
-                  size="full"
-                  type="submit"
-                >
-                  Submit
-                </Button>
-              </div>
-            </CardFooter>
+            <FormButtons
+              form={form}
+              setResetKey={setResetKey}
+              isSingle={true}
+            />
           </Card>
         </Form>
       </FormProvider>

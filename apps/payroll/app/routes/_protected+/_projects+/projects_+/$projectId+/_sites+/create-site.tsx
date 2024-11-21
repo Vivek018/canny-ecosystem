@@ -17,7 +17,6 @@ import {
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { Form, json, useLoaderData } from "@remix-run/react";
-import { Button } from "@canny_ecosystem/ui/button";
 import { useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -27,7 +26,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
@@ -39,6 +37,7 @@ import { UPDATE_SITE } from "./$siteId.update-site";
 import { getLocationsForSelectByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
+import { FormButtons } from "@/components/form/form-buttons";
 
 export const CREATE_SITE = "create-site";
 
@@ -81,7 +80,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: submission.status === "error" ? 400 : 200 }
     );
   }
 
@@ -124,12 +123,12 @@ export default function CreateSite({
   });
 
   return (
-    <section className="md:px-20 lg:px-52 2xl:px-80">
+    <section className='md:px-20 lg:px-28 2xl:px-40 py-4'>
       <FormProvider context={form.context}>
-        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
+        <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
           <Card>
             <CardHeader>
-              <CardTitle className="text-3xl">
+              <CardTitle className='text-3xl'>
                 {replaceDash(SITE_TAG)}
               </CardTitle>
               <CardDescription>
@@ -154,11 +153,13 @@ export default function CreateSite({
                 }}
                 errors={fields.name.errors}
               />
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+              <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
                 <Field
                   inputProps={{
                     ...getInputProps(fields.site_code, { type: "text" }),
-                    placeholder: `Enter ${replaceUnderscore(fields.site_code.name)}`,
+                    placeholder: `Enter ${replaceUnderscore(
+                      fields.site_code.name
+                    )}`,
                     className: "capitalize",
                   }}
                   labelProps={{
@@ -168,7 +169,7 @@ export default function CreateSite({
                 />
                 <SearchableSelectField
                   key={resetKey}
-                  className="capitalize"
+                  className='capitalize'
                   options={locationOptionsFromUpdate ?? locationOptions}
                   inputProps={{
                     ...getInputProps(fields.company_location_id, {
@@ -203,7 +204,7 @@ export default function CreateSite({
                 errors={fields.address_line_1.errors}
               />
               <Field
-                className="-mt-4"
+                className='-mt-4'
                 inputProps={{
                   ...getInputProps(fields.address_line_2, { type: "text" }),
                   placeholder: replaceUnderscore(fields.address_line_2.name),
@@ -211,7 +212,7 @@ export default function CreateSite({
                 }}
                 errors={fields.address_line_2.errors}
               />
-              <div className="grid grid-cols-3 place-content-center justify-between gap-6">
+              <div className='grid grid-cols-3 place-content-center justify-between gap-6'>
                 <Field
                   inputProps={{
                     ...getInputProps(fields.city, { type: "text" }),
@@ -225,7 +226,7 @@ export default function CreateSite({
                 />
                 <SearchableSelectField
                   key={resetKey}
-                  className="capitalize"
+                  className='capitalize'
                   options={statesAndUTs}
                   inputProps={{
                     ...getInputProps(fields.state, { type: "text" }),
@@ -240,7 +241,9 @@ export default function CreateSite({
                   inputProps={{
                     ...getInputProps(fields.pincode, { type: "text" }),
                     className: "capitalize",
-                    placeholder: `Enter ${replaceUnderscore(fields.pincode.name)}`,
+                    placeholder: `Enter ${replaceUnderscore(
+                      fields.pincode.name
+                    )}`,
                   }}
                   labelProps={{
                     children: replaceUnderscore(fields.pincode.name),
@@ -248,7 +251,7 @@ export default function CreateSite({
                   errors={fields.pincode.errors}
                 />
               </div>
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+              <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
                 <Field
                   inputProps={{
                     ...getInputProps(fields.latitude, { type: "number" }),
@@ -264,7 +267,9 @@ export default function CreateSite({
                   inputProps={{
                     ...getInputProps(fields.longitude, { type: "number" }),
                     className: "capitalize",
-                    placeholder: `Enter ${replaceUnderscore(fields.longitude.name)}`,
+                    placeholder: `Enter ${replaceUnderscore(
+                      fields.longitude.name
+                    )}`,
                   }}
                   labelProps={{
                     children: replaceUnderscore(fields.longitude.name),
@@ -273,28 +278,11 @@ export default function CreateSite({
                 />
               </div>
             </CardContent>
-            <CardFooter>
-              <div className="ml-auto w-2/5 flex flex-row items-center justify-center gap-4">
-                <Button
-                  variant="secondary"
-                  size="full"
-                  type="reset"
-                  onClick={() => setResetKey(Date.now())}
-                  {...form.reset.getButtonProps()}
-                >
-                  Reset
-                </Button>
-                <Button
-                  form={form.id}
-                  disabled={!form.valid}
-                  variant="default"
-                  size="full"
-                  type="submit"
-                >
-                  Submit
-                </Button>
-              </div>
-            </CardFooter>
+            <FormButtons
+              form={form}
+              setResetKey={setResetKey}
+              isSingle={true}
+            />
           </Card>
         </Form>
       </FormProvider>

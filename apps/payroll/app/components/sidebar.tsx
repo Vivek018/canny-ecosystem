@@ -57,7 +57,7 @@ export function Sidebar({
           "no-scrollbar flex h-full flex-col gap-4 overflow-y-scroll overflow-x-hidden items-center"
         )}
       >
-        <ul className='flex w-full h-full flex-col py-2.5 gap-1.5 items-start'>
+        <ul className='flex w-full h-full flex-col py-2 gap-1.5 items-start'>
           {sideNavList?.map(({ icon, name, link }) => {
             if (!icon && !link && !name) return null;
             if (!icon || !link) {

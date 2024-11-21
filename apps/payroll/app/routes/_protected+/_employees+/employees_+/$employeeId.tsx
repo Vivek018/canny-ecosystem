@@ -15,20 +15,19 @@ export default function Employee() {
   const { employeeId } = useLoaderData<typeof loader>();
   const { pathname } = useLocation();
   return (
-    <section>
-      <div className="flex items-center gap-4 pt-4 pb-2">
+    <section className='relative'>
+      <div className='flex items-center gap-4 py-2.5 px-4 border-b'>
         <Link
-          prefetch="intent"
-          to="/employees"
+          prefetch='intent'
+          to='/employees'
           className={cn(
             buttonVariants({ variant: "outline" }),
-            "bg-card w-9 h-9 px-0 rounded-full",
+            "bg-card w-9 h-9 px-0 rounded-full"
           )}
         >
-          <Icon name="chevron-left" size="sm" />
+          <Icon name='chevron-left' size='sm' />
         </Link>
         <SecondaryMenu
-          className="pt-0 pb-0"
           items={[
             { label: "Overview", path: `/employees/${employeeId}` },
             {
@@ -40,7 +39,9 @@ export default function Employee() {
           Link={Link}
         />
       </div>
-      <Outlet />
+      <div className='px-4'>
+        <Outlet />
+      </div>
     </section>
   );
 }

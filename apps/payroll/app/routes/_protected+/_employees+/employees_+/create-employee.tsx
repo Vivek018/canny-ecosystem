@@ -25,8 +25,8 @@ import { Card } from "@canny_ecosystem/ui/card";
 import { useState } from "react";
 import { commitSession, getSession } from "@/utils/sessions";
 import { DEFAULT_ROUTE } from "@/constant";
-import { FormButtons } from "@/components/multi-step-form/form-buttons";
-import { useIsomorphicLayoutEffect } from "@canny_ecosystem/ui/hooks/isomorphic-layout-effect";
+import { FormButtons } from "@/components/form/form-buttons";
+import { useIsomorphicLayoutEffect } from "@canny_ecosystem/utils/hooks/isomorphic-layout-effect";
 import { CreateEmployeeDetails } from "@/components/employees/form/create-employee-details";
 import { CreateEmployeeStatutoryDetails } from "@/components/employees/form/create-employee-statutory-details";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
@@ -34,7 +34,7 @@ import { CreateEmployeeBankDetails } from "@/components/employees/form/create-em
 import { CreateEmployeeAddress } from "@/components/employees/form/create-employee-address";
 import type { EmployeeGuardianDatabaseInsert } from "@canny_ecosystem/supabase/types";
 import { CreateEmployeeGuardianDetails } from "@/components/employees/form/create-employee-guardian-details";
-import { FormStepHeader } from "@/components/multi-step-form/form-step-header";
+import { FormStepHeader } from "@/components/form/form-step-header";
 import {
   getEmployeesByPositionAndProjectSiteId,
   getProjectsByCompanyId,
@@ -268,8 +268,15 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function CreateEmployee() {
-  const { step, totalSteps, stepData, companyId, projectOptions, projectSiteOptions, siteEmployeeOptions } =
-    useLoaderData<typeof loader>();
+  const {
+    step,
+    totalSteps,
+    stepData,
+    companyId,
+    projectOptions,
+    projectSiteOptions,
+    siteEmployeeOptions,
+  } = useLoaderData<typeof loader>();
   const [resetKey, setResetKey] = useState(Date.now());
 
   const EMPLOYEE_TAG = CREATE_EMPLOYEE[step - 1];
@@ -295,8 +302,8 @@ export default function CreateEmployee() {
   });
 
   return (
-    <section className='lg:px-40 2xl:px-80 py-4'>
-      <div className='w-full overflow-scroll mx-auto mb-8'>
+    <section className='md:px-20 lg:px-28 2xl:px-40 py-4'>
+      <div className='w-full mx-auto mb-8'>
         <FormStepHeader
           totalSteps={totalSteps}
           step={step}

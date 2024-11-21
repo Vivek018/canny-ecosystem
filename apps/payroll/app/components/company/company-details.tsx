@@ -31,7 +31,9 @@ export const COMPANY_DETAILS = "company-details";
 
 export const CompanyDetails = ({
   updateValues,
-}: { updateValues: CompanyDatabaseUpdate }) => {
+}: {
+  updateValues: CompanyDatabaseUpdate;
+}) => {
   const [resetKey, setResetKey] = useState(Date.now());
 
   const [form, fields] = useForm({
@@ -48,7 +50,7 @@ export const CompanyDetails = ({
   return (
     <FormProvider context={form.context}>
       <Form
-        method="POST"
+        method='POST'
         {...getFormProps(form)}
         action={`/${updateValues.id}/update-company`}
       >
@@ -59,8 +61,8 @@ export const CompanyDetails = ({
               This is your company's visible details within canny.
             </CardDescription>
           </CardHeader>
-          <CardContent className="pb-2">
-            <div className="grid grid-cols-1 md:grid-cols-2 items-center justify-center md:gap-x-8">
+          <CardContent className='pb-2'>
+            <div className='grid grid-cols-1 md:grid-cols-2 items-center justify-center md:gap-x-8'>
               <input {...getInputProps(fields.id, { type: "hidden" })} />
               <Field
                 inputProps={{
@@ -72,43 +74,49 @@ export const CompanyDetails = ({
               <Field
                 inputProps={{
                   ...getInputProps(fields.email_suffix, { type: "text" }),
-                  placeholder: `Enter ${replaceUnderscore(fields.email_suffix.name)}`,
+                  placeholder: `Enter ${replaceUnderscore(
+                    fields.email_suffix.name
+                  )}`,
                 }}
                 errors={fields.email_suffix.errors}
               />
               <SearchableSelectField
                 key={resetKey}
-                className="w-full capitalize flex-1"
+                className='w-full capitalize flex-1'
                 options={transformStringArrayIntoOptions(
-                  company_type as unknown as string[],
+                  company_type as unknown as string[]
                 )}
                 inputProps={{
                   ...getInputProps(fields.company_type, { type: "text" }),
                 }}
-                placeholder={`Select ${replaceUnderscore(fields.company_type.name)}`}
+                placeholder={`Select ${replaceUnderscore(
+                  fields.company_type.name
+                )}`}
                 errors={fields.company_type.errors}
               />
               <SearchableSelectField
                 key={resetKey + 1}
-                className="w-full capitalize flex-1"
+                className='w-full capitalize flex-1'
                 options={transformStringArrayIntoOptions(
-                  company_size as unknown as string[],
+                  company_size as unknown as string[]
                 )}
                 inputProps={{
                   ...getInputProps(fields.company_size, { type: "text" }),
                 }}
-                placeholder={`Select ${replaceUnderscore(fields.company_size.name)}`}
+                placeholder={`Select ${replaceUnderscore(
+                  fields.company_size.name
+                )}`}
                 errors={fields.company_size.errors}
               />
             </div>
           </CardContent>
 
-          <CardFooter className="border-t pt-6 flex justify-between">
+          <CardFooter className='border-t pt-6 flex justify-between'>
             <div>Please use 32 characters at maximum.</div>
-            <div className="flex gap-4">
+            <div className='flex gap-4'>
               <Button
-                variant="secondary"
-                type="reset"
+                variant='secondary'
+                type='reset'
                 {...form.reset.getButtonProps()}
                 onClick={() => setResetKey(Date.now())}
               >
@@ -119,8 +127,8 @@ export const CompanyDetails = ({
                 disabled={
                   !form.valid || deepEqualCheck(form.initialValue, form.value)
                 }
-                variant="default"
-                type="submit"
+                variant='default'
+                type='submit'
               >
                 Save
               </Button>

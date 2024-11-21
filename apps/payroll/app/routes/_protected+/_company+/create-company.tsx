@@ -23,11 +23,11 @@ import { useState } from "react";
 import { commitSession, getSession } from "@/utils/sessions";
 import { DEFAULT_ROUTE } from "@/constant";
 import { CreateCompanyDetails } from "@/components/company/form/create-company-details";
-import { FormButtons } from "@/components/multi-step-form/form-buttons";
+import { FormButtons } from "@/components/form/form-buttons";
 import { CreateCompanyRegistrationDetails } from "@/components/company/form/create-company-registration-details";
 import type { CompanyRegistrationDetailsInsert } from "@canny_ecosystem/supabase/types";
-import { useIsomorphicLayoutEffect } from "@canny_ecosystem/ui/hooks/isomorphic-layout-effect";
-import { FormStepHeader } from "@/components/multi-step-form/form-step-header";
+import { FormStepHeader } from "@/components/form/form-step-header";
+import { useIsomorphicLayoutEffect } from "@canny_ecosystem/utils/hooks/isomorphic-layout-effect";
 
 export const CREATE_COMPANY = [
   "create-company",
@@ -71,7 +71,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await parseMultipartFormData(
     request,
-    createMemoryUploadHandler({ maxPartSize: SIZE_1MB }),
+    createMemoryUploadHandler({ maxPartSize: SIZE_1MB })
   );
   const action = formData.get("_action") as string;
 
@@ -136,7 +136,7 @@ export async function action({ request }: ActionFunctionArgs) {
       if (submission.status === "error") {
         return json(
           { result: submission.reply() },
-          { status: submission.status === "error" ? 400 : 200 },
+          { status: submission.status === "error" ? 400 : 200 }
         );
       }
     }
@@ -183,8 +183,8 @@ export default function CreateCompany() {
   });
 
   return (
-    <section className="lg:px-40 2xl:px-80 py-4">
-      <div className="w-full mx-auto mb-8">
+    <section className='md:px-20 lg:px-28 2xl:px-40 py-4'>
+      <div className='w-full mx-auto mb-8'>
         <FormStepHeader
           totalSteps={totalSteps}
           step={step}
@@ -193,13 +193,13 @@ export default function CreateCompany() {
       </div>
       <FormProvider context={form.context}>
         <Form
-          method="POST"
-          encType="multipart/form-data"
+          method='POST'
+          encType='multipart/form-data'
           {...getFormProps(form)}
-          className="flex flex-col"
+          className='flex flex-col'
         >
           <Card>
-            <div className="h-[500px] overflow-scroll">
+            <div className='h-[500px] overflow-scroll'>
               {step === 1 ? (
                 <CreateCompanyDetails key={resetKey} fields={fields as any} />
               ) : null}

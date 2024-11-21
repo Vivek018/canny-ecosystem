@@ -17,7 +17,7 @@ export const ProjectInformationCard = ({
   >;
 }) => {
   return (
-    <Card className="py-5 px-5 lg:my-0 w-max rounded">
+    <Card className="py-4 px-4 lg:my-0 w-max rounded">
       <h2 className="text-2xl tracking-wide font-bold pb-1.5 border-b">
         Project Information
       </h2>

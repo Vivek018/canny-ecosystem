@@ -27,10 +27,6 @@ export function UserMenu({
   dropdownContentRef?: React.RefObject<HTMLDivElement>;
   Link: React.ElementType;
 }) {
-  console.log(
-    userData.avatar,
-    "https://lh3.googleusercontent.com/a/ACg8ocK-QPmBk2xDJTgTO3CtBZoGrLeS7J7ZxiV8PW_RHaodrYjjKOw=s96-c"
-  );
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className='flex items-center justify-start gap-2 rounded group focus:outline-none focus:dark:brightness-125 hover:dark:brightness-125 focus:brightness-90 hover:brightness-90'>
