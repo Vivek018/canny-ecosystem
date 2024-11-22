@@ -28,14 +28,22 @@ export function DataTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
   });
 
+  const tableLength = table.getRowModel().rows?.length;
+
   return (
     <div className="relative mb-8">
-      <div className="relative border overflow-x-auto">
+      <div className={cn(
+        "relative border overflow-x-auto rounded",
+        !tableLength && "border-none",
+      )}>
         <div className="relative">
           <Table>
-            <DataTableHeader table={table} />
+          <DataTableHeader
+              table={table}
+              className={cn(!tableLength && "hidden")}
+            />
             <TableBody>
-              {table.getRowModel().rows?.length ? (
+              {tableLength ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
@@ -59,12 +67,12 @@ export function DataTable<TData, TValue>({
                   </TableRow>
                 ))
               ) : (
-                <TableRow>
+                <TableRow className={cn(!tableLength && "border-none")}>
                   <TableCell
                     colSpan={columns.length}
-                    className="h-24 text-center text-lg tracking-wide"
+                    className="h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize"
                   >
-                    No results.
+                    No Payment Fields Found.
                   </TableCell>
                 </TableRow>
               )}

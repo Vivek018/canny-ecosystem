@@ -135,7 +135,7 @@ export function DataTable<TData, TValue>({
           <Table>
             <DataTableHeader
               table={table}
-              className={!tableLength ? "hidden" : ""}
+              className={cn(!tableLength && "hidden")}
             />
             <TableBody>
               {tableLength ? (
