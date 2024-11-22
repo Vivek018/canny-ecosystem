@@ -4,6 +4,7 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 
 type Props = {
   table?: any;
+  className?:string;
   loading?: boolean;
 };
 
@@ -19,7 +20,7 @@ export const paymentFieldsColumnIdArray = [
   "is_pro_rata",
 ];
 
-export function DataTableHeader({ table, loading }: Props) {
+export function DataTableHeader({ table, className, loading }: Props) {
   const columnName = (id: string) =>
     loading ||
     table?.getAllLeafColumns()?.find((col: any) => {
@@ -27,7 +28,7 @@ export function DataTableHeader({ table, loading }: Props) {
     })?.columnDef?.header;
 
   return (
-    <TableHeader>
+    <TableHeader className={className}>
       <TableRow className="h-[45px] hover:bg-transparent">
         {paymentFieldsColumnIdArray?.map((id) => {
           return (

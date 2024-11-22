@@ -31,9 +31,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return json({ data });
 }
 
-export default function Projects() {
+export default function ProjectsIndex() {
   const { data } = useLoaderData<typeof loader>();
-
   const { isDocument } = useIsDocument();
 
   return (
