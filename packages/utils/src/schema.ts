@@ -415,8 +415,8 @@ export const EmployeeProvidentFundSchema = z
     employer_restrict_value: z.number().default(EMPLOYEE_RESTRICTED_VALUE),
     restrict_employer_contribution: z.boolean().default(false),
     restrict_employee_contribution: z.boolean().default(false),
-    include_employer_contribution: z.boolean().default(true),
-    include_employer_edli_contribution: z.boolean().default(true),
+    include_employer_contribution: z.boolean().default(false),
+    include_employer_edli_contribution: z.boolean().default(false),
     include_admin_charges: z.boolean().default(false),
   })
 

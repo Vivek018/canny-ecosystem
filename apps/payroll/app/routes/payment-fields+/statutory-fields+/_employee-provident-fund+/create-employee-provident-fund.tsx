@@ -108,15 +108,6 @@ const CreateEmployeeProvidentFund = ({
     },
   });
 
-  // useEffect(()=>{
-  //   if(form.value?.include_employer_contribution !== "on") {
-  //     console.log(form.value?.include_employer_contribution)
-  //     form.update({name: fields.include_employer_edli_contribution.name, value: false})
-  //     form.update({ name: fields.include_admin_charges.name, value: false })
-  //   }
-  // }, [form.value])
-  // console.log();
-
   return (
     <section className="md-px-20 lg:px-52 2xl:px-10 py-3 w-full">
       <Form method="POST" {...getFormProps(form)} className="flex flex-col">

@@ -86,7 +86,7 @@ export const updateEmployeeProvidentFund = async ({
 export const deleteEmployeeProvidentFund = async ({
   supabase,
   id,
-  bypassAuth = false,
+  bypassAuth = true,
 }: {
   supabase: TypedSupabaseClient;
   id: string;
@@ -103,7 +103,7 @@ export const deleteEmployeeProvidentFund = async ({
   }
 
   const { error, status } = await supabase
-    .from("statutory_bonus")
+    .from("employee_provident_fund")
     .delete()
     .eq("id", id)
     .select()

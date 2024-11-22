@@ -22,7 +22,6 @@ const PaymentFields = () => {
         Link={Link}
         // className="p-4"  
       />
-      <hr />
       <Outlet />
     </section>
   );

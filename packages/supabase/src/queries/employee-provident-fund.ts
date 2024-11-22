@@ -34,7 +34,10 @@ export const getEmployeeProvidentFundById = async ({
     "employee_contribution",
     "employer_contribution",
     "employee_restrict_value",
+    "employer_restrict_value",
+    "restrict_employee_contribution",
     "restrict_employer_contribution",
+    "include_employer_contribution",
     "include_employer_edli_contribution",
     "include_admin_charges",
   ] as const;
@@ -68,7 +71,10 @@ export const getEmployeeProvidentFundByCompanyId = async ({
     "employee_contribution",
     "employer_contribution",
     "employee_restrict_value",
+    "employer_restrict_value",
+    "restrict_employee_contribution",
     "restrict_employer_contribution",
+    "include_employer_contribution",
     "include_employer_edli_contribution",
     "include_admin_charges",
   ] as const;

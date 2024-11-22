@@ -6,15 +6,16 @@ const EmployeeStateInsurance = () => {
   return (
     <div className="py-5 pl-5">
       <div className="min-h-screen max-w-[50vw] py-6">
-        <div className="flex gap-5 items-center">
-          <h4 className="text-lg font-semibold">Employees' State Insurance</h4>
-          <Link
-            to="/payment-fields/statutory-fields/create-employee-state-insurance"
-            className="rounded-2xl px-3 p-2 bg-slate-300 cursor-pointer"
-          >
-            <Icon name="edit" className="w-[18px] h-[18px]" />
-          </Link>
-        </div>
+       <div className="flex items-center gap-5">
+            <h4 className="text-lg font-semibold">Employees' Provident Fund</h4>
+            <Link
+                  prefetch="intent"
+              to={`/payment-fields/statutory-fields/create-employee-state-insurance`}
+              className="p-2 rounded-full bg-secondary grid place-items-center"
+              >
+              <Icon name="edit" size="sm" />
+            </Link>
+          </div>
         <br />
         <br />
         <div className="flex flex-col justify-between gap-6">

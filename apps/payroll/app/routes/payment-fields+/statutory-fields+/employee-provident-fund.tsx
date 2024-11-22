@@ -2,7 +2,14 @@ import EmployerContributionSplitUp from "@/components/statutory-fields/employee-
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getEmployeeProvidentFundByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { Card } from "@canny_ecosystem/ui/card";
+import { buttonVariants } from "@canny_ecosystem/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardTitle,
+} from "@canny_ecosystem/ui/card";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { LoaderFunctionArgs, json } from "@remix-run/node";
 import { Link, useLoaderData, useSubmit } from "@remix-run/react";
@@ -85,7 +92,7 @@ const EmployeeProvidentFund = () => {
         method: "post",
         action: `/payment-fields/statutory-fields/${data?.[0]?.id}/delete-epf`,
         replace: true,
-      },
+      }
     );
   };
 
@@ -93,26 +100,14 @@ const EmployeeProvidentFund = () => {
     return (
       <div className="grid grid-cols-[60%_40%] py-5 pl-5 gap-3 place-content-center justify-between">
         <div className="min-h-screen pt-6">
-          <div className="flex gap-5">
+          <div className="flex items-center gap-5">
             <h4 className="text-lg font-semibold">Employees' Provident Fund</h4>
             <Link
+                  prefetch="intent"
               to={`/payment-fields/statutory-fields/${data?.[0]?.id}/update-epf`}
-              className="rounded-2xl p-2 bg-slate-300"
-            >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 15 15"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
+              className="p-2 rounded-full bg-secondary grid place-items-center"
               >
-                <path
-                  d="M11.8536 1.14645C11.6583 0.951184 11.3417 0.951184 11.1465 1.14645L3.71455 8.57836C3.62459 8.66832 3.55263 8.77461 3.50251 8.89155L2.04044 12.303C1.9599 12.491 2.00189 12.709 2.14646 12.8536C2.29103 12.9981 2.50905 13.0401 2.69697 12.9596L6.10847 11.4975C6.2254 11.4474 6.3317 11.3754 6.42166 11.2855L13.8536 3.85355C14.0488 3.65829 14.0488 3.34171 13.8536 3.14645L11.8536 1.14645ZM4.42166 9.28547L11.5 2.20711L12.7929 3.5L5.71455 10.5784L4.21924 11.2192L3.78081 10.7808L4.42166 9.28547Z"
-                  fill="currentColor"
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
-                ></path>
-              </svg>
+              <Icon name="edit" size="sm" />
             </Link>
           </div>
           <br />
@@ -187,7 +182,10 @@ const EmployeeProvidentFund = () => {
 
             <br />
 
-            <button onClick={handleDelete} className="flex gap-1 text-sm items-center text-blue-500 cursor-pointer">
+            <button
+              onClick={handleDelete}
+              className="flex gap-1 text-sm items-center text-blue-500 cursor-pointer"
+            >
               <svg
                 width="18"
                 height="18"
@@ -309,9 +307,28 @@ const EmployeeProvidentFund = () => {
     );
   } else {
     return (
-      <Link to="/payment-fields/statutory-fields/create-employee-provident-fund">
-        Enable
-      </Link>
+      <div className="flex flex-col items-center justify-end m-auto">
+        <div className="p-14"></div>
+        <Card className="flex flex-col items-center justify-between gap-5 w-1/2 pt-6 px-2">
+          <CardContent className="flex flex-col items-center justify-between gap-5">
+            <CardTitle>Are you registered for EPF?</CardTitle>
+            <CardDescription className="text-center text-[14px]">
+              Any organisation with 20 or more employees must register for the
+              Employee Provident Fund (EPF) scheme, a retirement benefit plan
+              for all salaried employees.
+            </CardDescription>
+          </CardContent>
+
+          <CardFooter>
+            <Link
+              to="/payment-fields/statutory-fields/create-employee-provident-fund"
+              className={buttonVariants({ variant: "primary-outline" })}
+            >
+              Enable EPF
+            </Link>
+          </CardFooter>
+        </Card>
+      </div>
     );
   }
 };

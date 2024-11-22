@@ -4,7 +4,7 @@ export const SecondarySidebar = ({
   className,
   items,
 }: {
-  className: string;
+  className?: string;
   items: {name: string, link: string}[]
 }) => {
   const { pathname } = useLocation();
@@ -12,7 +12,7 @@ export const SecondarySidebar = ({
   return (
     <aside
       className={cn(
-        "flex h-full flex-col items-start justify-start overflow-hidden bg-background border-r",
+        "flex py-4 h-full flex-col items-start justify-start overflow-hidden bg-background border-r",
         className
       )}
     >

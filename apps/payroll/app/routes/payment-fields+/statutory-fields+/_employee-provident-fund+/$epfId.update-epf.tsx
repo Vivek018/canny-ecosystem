@@ -27,6 +27,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     });
   }
 
+  console.log("=-", epfData)
+
   if (epfData?.error) {
     throw epfData.error;
   }
