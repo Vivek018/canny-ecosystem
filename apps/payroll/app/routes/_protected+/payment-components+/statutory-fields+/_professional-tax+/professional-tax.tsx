@@ -17,10 +17,14 @@ const ProfessionalTax = () => {
         </div>
         <br />
         <Card className="rounded w-[80%] h-full pl-4 pr-6 pb-8 pt-4 flex flex-col gap-5 justify-between">
-          <div className="flex justify-between items-center">
-            <h4>Head Office</h4>
-            <Link to={"/payment-fields/statutory-fields/create-professional-tax"} className="cursor-pointer p-2 rounded-2xl bg-gray-200">
-              <Icon name="edit" className="w-[18px] h-[18px]" />
+        <div className="flex items-center gap-5">
+            <h4 className="text-lg font-semibold">Employees' Provident Fund</h4>
+            <Link
+                  prefetch="intent"
+              to={`/payment-components/statutory-fields/create-professional-tax`}
+              className="p-2 rounded-full bg-secondary grid place-items-center"
+              >
+              <Icon name="edit" size="sm" />
             </Link>
           </div>
 

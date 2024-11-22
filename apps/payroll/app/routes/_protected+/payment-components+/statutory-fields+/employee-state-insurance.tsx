@@ -1,43 +1,69 @@
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import { getEmployeeStateInsuranceByCompanyId } from "@canny_ecosystem/supabase/queries";
+import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import { Link } from "@remix-run/react";
+import { json, LoaderFunctionArgs } from "@remix-run/node";
+import { Link, useLoaderData } from "@remix-run/react";
 import React from "react";
 
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const { supabase } = getSupabaseWithHeaders({ request });
+
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+  const { data, error } = await getEmployeeStateInsuranceByCompanyId({
+    supabase,
+    companyId,
+  });
+
+  console.log("daaaaaaaaaaaaaaaaaaa-", data, error);
+  if (error) throw error;
+  return json({ data: data as any });
+};
+
 const EmployeeStateInsurance = () => {
+  const { data } = useLoaderData<typeof loader>();
+  console.log(data?.[0]);
   return (
     <div className="py-5 pl-5">
       <div className="min-h-screen max-w-[50vw] py-6">
-       <div className="flex items-center gap-5">
-            <h4 className="text-lg font-semibold">Employees' Provident Fund</h4>
-            <Link
-                  prefetch="intent"
-              to={`/payment-fields/statutory-fields/create-employee-state-insurance`}
-              className="p-2 rounded-full bg-secondary grid place-items-center"
-              >
-              <Icon name="edit" size="sm" />
-            </Link>
-          </div>
+        <div className="flex items-center gap-5">
+          <h4 className="text-lg font-semibold">Employees' Provident Fund</h4>
+          <Link
+            prefetch="intent"
+            to={`/payment-components/statutory-fields/create-employee-state-insurance`}
+            className="p-2 rounded-full bg-secondary grid place-items-center"
+          >
+            <Icon name="edit" size="sm" />
+          </Link>
+        </div>
         <br />
         <br />
         <div className="flex flex-col justify-between gap-6">
           <div className="flex gap-10">
             <div className="min-w-[50%] text-gray-500">ESI Number</div>
-            <div className="self-start font-[500] text-[0.95rem]">-</div>
+            <div className="self-start font-[500] text-[0.95rem]">
+              {data?.[0]?.esi_number || "-"}
+            </div>
           </div>
           <div className="flex gap-10">
             <div className="min-w-[50%] text-gray-500">Deduction Cycle</div>
-            <div className="self-start font-[500] text-[0.95rem]">Monthly</div>
+            <div className="self-start font-[500] text-[0.95rem] capitalize">{data?.[0]?.deduction_cycle}</div>
           </div>
           <div className="flex gap-10">
             <div className="min-w-[40%] text-gray-500">
               Employees' Contribution
             </div>
-            <div className="self-start font-[500] text-[0.95rem]">0.75% of Gross Pay</div>
+            <div className="self-start font-[500] text-[0.95rem]">
+              {data?.[0]?.employees_contribution * 100}% of Gross Pay
+            </div>
           </div>
           <div className="flex gap-10">
             <div className="min-w-[40%] text-gray-500">
               Employer's Contribution
             </div>
-            <div className="self-start font-[500] text-[0.95rem]">3.25% of Gross Pay</div>
+            <div className="self-start font-[500] text-[0.95rem]">
+              {data?.[0]?.employers_contribution * 100}% of Gross Pay
+            </div>
           </div>
         </div>
         <br />

@@ -82,7 +82,7 @@ export function Sidebar({
                 }
               >
                 <Icon name={icon as IconName} size="md" className="shrink-0" />
-                <span className={cn("min-w-max", !isExpanded && "hidden")}>
+                <span className={cn(" truncate", !isExpanded && "hidden")}>
                   {name}
                 </span>
               </NavLink>

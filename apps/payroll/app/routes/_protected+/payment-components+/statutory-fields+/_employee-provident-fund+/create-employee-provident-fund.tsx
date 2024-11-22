@@ -1,9 +1,9 @@
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { createEmployeeStateInsurance } from "@canny_ecosystem/supabase/mutations";
+import { createEmployeeProvidentFund } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
-  EmployeeStateInsuranceDatabaseRow,
+  EmployeeProvidentFundDatabaseRow,
   Json,
 } from "@canny_ecosystem/supabase/types";
 import { Button } from "@canny_ecosystem/ui/button";
@@ -21,7 +21,6 @@ import {
 } from "@canny_ecosystem/ui/forms";
 import {
   EmployeeProvidentFundSchema,
-  EmployeeStateInsuranceSchema,
   getInitialValueFromZod,
   isGoodStatus,
   replaceDash,
@@ -36,7 +35,7 @@ import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { ActionFunctionArgs, json, LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
-import React from "react";
+import React, { useEffect } from "react";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -44,7 +43,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   console.log("FORM---------------", formData);
 
   const submission = parseWithZod(formData, {
-    schema: EmployeeStateInsuranceSchema,
+    schema: EmployeeProvidentFundSchema,
   });
 
   if (submission.status !== "success") {
@@ -54,7 +53,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     );
   }
 
-  const { status, error } = await createEmployeeStateInsurance({
+  const { status, error } = await createEmployeeProvidentFund({
     supabase,
     data: submission.value as any,
     bypassAuth: true,
@@ -62,14 +61,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   if (isGoodStatus(status)) {
     return safeRedirect(
-      "/payment-fields/statutory-fields/employee-state-insurance",
+      "/payment-components/statutory-fields/employee-provident-fund",
       {
         status: 303,
       }
     );
   }
-
-  console.log("--------------", status, error);
 
   return json({ status, error });
 };
@@ -77,42 +74,42 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+  console.log(companyId);
   return json({ companyId });
 };
 
-const CreateEmployeeStateInsurance = ({
+const CreateEmployeeProvidentFund = ({
   updateValues,
 }: {
   updateValues?: Json;
 }) => {
   const EPF_TAG = updateValues
-    ? "update-employee-state-insurance"
-    : "create-employee-state-insurance";
+    ? "update-employee-provident-fund"
+    : "create-employee-provident-fund";
 
   const initialValues =
-    updateValues ?? getInitialValueFromZod(EmployeeStateInsuranceSchema);
+    updateValues ?? getInitialValueFromZod(EmployeeProvidentFundSchema);
   console.log(initialValues);
 
   const { companyId } = useLoaderData<{ companyId: string }>();
-  console.log(companyId);
   const [form, fields] = useForm({
     id: EPF_TAG,
     constraint: getZodConstraint(EmployeeProvidentFundSchema),
     onValidate({ formData }) {
-      return parseWithZod(formData, { schema: EmployeeStateInsuranceSchema });
+      return parseWithZod(formData, { schema: EmployeeProvidentFundSchema });
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
     defaultValue: {
       ...(initialValues as {
-        [key: string]: EmployeeStateInsuranceDatabaseRow | null;
+        [key: string]: EmployeeProvidentFundDatabaseRow | null;
       }),
       company_id: companyId,
     },
   });
 
   return (
-    <section className="md-px-10 w-full lg:px-12 2xl:px-10 py-3">
+    <section className="md-px-20 lg:px-52 2xl:px-10 py-3 w-full">
       <Form method="POST" {...getFormProps(form)} className="flex flex-col">
         <Card>
           <CardHeader>
@@ -128,18 +125,18 @@ const CreateEmployeeStateInsurance = ({
             <div className="grid grid-cols-[50%,33%] place-content-center justify-between gap-6">
               <Field
                 inputProps={{
-                  ...getInputProps(fields.esi_number, { type: "text" }),
+                  ...getInputProps(fields.epf_number, { type: "text" }),
                   autoFocus: true,
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.esi_number.name
+                    fields.epf_number.name
                   )}`,
                   className: "capitalize",
                 }}
                 labelProps={{
                   className: "capitalize",
-                  children: replaceUnderscore(fields.esi_number.name),
+                  children: replaceUnderscore(fields.epf_number.name),
                 }}
-                errors={fields.esi_number.errors}
+                errors={fields.epf_number.errors}
               />
 
               <SearchableSelectField
@@ -157,53 +154,36 @@ const CreateEmployeeStateInsurance = ({
                 errors={fields.deduction_cycle.errors}
               />
             </div>
-            <div className="grid grid-cols-2 place-content-center justify-between gap-6">
-              <div className="flex items-center text-center">
-                <Field
-                  className="w-[40%]"
-                  inputProps={{
-                    ...getInputProps(fields.employees_contribution, {
-                      type: "number",
-                    }),
-                    disabled: true,
-                    autoFocus: true,
-                    placeholder: `Enter number`,
-                    className: "capitalize",
-                  }}
-                  labelProps={{
-                    className: "capitalize",
-                    children: replaceUnderscore(
-                      fields.employees_contribution.name
-                    ),
-                  }}
-                  errors={fields.employees_contribution.errors}
-                />
-                <p className="w-[20%] mb-5 font-[350] text-sm">of Gross Pay</p>
-              </div>
-              <div className="flex items-center text-center">
-                <Field
-                  className="w-[40%]"
-                  inputProps={{
-                    ...getInputProps(fields.employers_contribution, {
-                      type: "number",
-                    }),
-                    disabled: true,
-                    autoFocus: true,
-                    placeholder: `Enter number`,
-                    className: "capitalize",
-                  }}
-                  labelProps={{
-                    className: "capitalize",
-                    children: replaceUnderscore(
-                      fields.employers_contribution.name
-                    ),
-                  }}
-                  errors={fields.employers_contribution.errors}
-                />
-                <p className="w-[20%] mb-5 font-[350] text-sm">of Gross Pay</p>
-              </div>
+            <div className="grid grid-rows-2 place-content-center justify-between pb-5">
+              <CheckboxField
+                buttonProps={getInputProps(
+                  fields.restrict_employee_contribution,
+                  {
+                    type: "checkbox",
+                  }
+                )}
+                labelProps={{
+                  htmlFor: fields.restrict_employee_contribution.id,
+                  children:
+                    "Restrict employee's contribution to ₹15,000 of PF Wage",
+                }}
+                className="items-center"
+              />
+              <CheckboxField
+                buttonProps={getInputProps(
+                  fields.restrict_employer_contribution,
+                  {
+                    type: "checkbox",
+                  }
+                )}
+                labelProps={{
+                  htmlFor: fields.restrict_employer_contribution.id,
+                  children:
+                    "Restrict employer's contribution to ₹15,000 of PF Wage",
+                }}
+                className="items-center"
+              />
             </div>
-
             <CheckboxField
               buttonProps={getInputProps(fields.include_employer_contribution, {
                 type: "checkbox",
@@ -214,6 +194,31 @@ const CreateEmployeeStateInsurance = ({
               }}
               className="items-center"
             />
+            <div className="ml-7">
+              <CheckboxField
+                buttonProps={getInputProps(
+                  fields.include_employer_edli_contribution,
+                  {
+                    type: "checkbox",
+                  }
+                )}
+                labelProps={{
+                  htmlFor: fields.include_employer_edli_contribution.id,
+                  children: "Include employer's EDLI contribution in the CTC",
+                }}
+                className="items-center"
+              />
+              <CheckboxField
+                buttonProps={getInputProps(fields.include_admin_charges, {
+                  type: "checkbox",
+                })}
+                labelProps={{
+                  htmlFor: fields.include_admin_charges.id,
+                  children: "Include admin charges in the CTC",
+                }}
+                className="items-center"
+              />
+            </div>
           </CardContent>
           <CardFooter>
             <div className="ml-auto w-2/5 flex flex-row items-center justify-center gap-4">
@@ -221,7 +226,7 @@ const CreateEmployeeStateInsurance = ({
                 variant="secondary"
                 size="full"
                 type="reset"
-                  // onClick={() => setResetKey(Date.now())}
+                //   onClick={() => setResetKey(Date.now())}
                 {...form.reset.getButtonProps()}
               >
                 Reset
@@ -243,4 +248,4 @@ const CreateEmployeeStateInsurance = ({
   );
 };
 
-export default CreateEmployeeStateInsurance;
+export default CreateEmployeeProvidentFund;

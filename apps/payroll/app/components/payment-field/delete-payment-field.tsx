@@ -40,7 +40,7 @@ export const DeletePaymentField = ({
         {},
         {
           method: "post",
-          action: `/payment-fields/${paymentFieldId}/delete-payment-field`,
+          action: `/payment-components/payment-fields/${paymentFieldId}/delete-payment-field`,
           replace: true,
         },
       );

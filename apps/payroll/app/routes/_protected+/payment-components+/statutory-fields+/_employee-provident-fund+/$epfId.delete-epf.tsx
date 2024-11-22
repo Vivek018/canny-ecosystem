@@ -16,7 +16,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   
   console.log("-------------eee--------",status, error, epfId)
   if (isGoodStatus(status)) {
-    return safeRedirect("/payment-fields/statutory-fields/employee-provident-fund", { headers });
+    return safeRedirect("/payment-components/statutory-fields/employee-provident-fund", { headers });
   }
 
   if (error) {

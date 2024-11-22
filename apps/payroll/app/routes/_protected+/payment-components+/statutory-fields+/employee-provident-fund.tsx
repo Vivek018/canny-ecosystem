@@ -35,7 +35,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     companyId,
   });
 
-  console.log("daaaaaaaaaaaaaaaaaaa-", data, error);
   if (error) throw error;
   return json({ data: data as any });
 };
@@ -90,7 +89,7 @@ const EmployeeProvidentFund = () => {
       {},
       {
         method: "post",
-        action: `/payment-fields/statutory-fields/${data?.[0]?.id}/delete-epf`,
+        action: `/payment-components/statutory-fields/${data?.[0]?.id}/delete-epf`,
         replace: true,
       }
     );
@@ -104,7 +103,7 @@ const EmployeeProvidentFund = () => {
             <h4 className="text-lg font-semibold">Employees' Provident Fund</h4>
             <Link
                   prefetch="intent"
-              to={`/payment-fields/statutory-fields/${data?.[0]?.id}/update-epf`}
+              to={`/payment-components/statutory-fields/${data?.[0]?.id}/update-epf`}
               className="p-2 rounded-full bg-secondary grid place-items-center"
               >
               <Icon name="edit" size="sm" />
@@ -121,9 +120,8 @@ const EmployeeProvidentFund = () => {
             </div>
             <div className="flex gap-10">
               <div className="min-w-[30%] text-gray-500">Deduction Cycles</div>
-              <div className="self-start font-[500]">
-                {data?.[0]?.deduction_cycle.charAt(0).toUpperCase() +
-                  data?.[0]?.deduction_cycle.slice(1)}
+              <div className="self-start font-[500] capitalize">
+                {data?.[0]?.deduction_cycle}
               </div>
             </div>
             <div className="flex gap-10">
@@ -321,7 +319,7 @@ const EmployeeProvidentFund = () => {
 
           <CardFooter>
             <Link
-              to="/payment-fields/statutory-fields/create-employee-provident-fund"
+              to="/payment-components/statutory-fields/create-employee-provident-fund"
               className={buttonVariants({ variant: "primary-outline" })}
             >
               Enable EPF
