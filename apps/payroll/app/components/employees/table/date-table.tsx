@@ -190,7 +190,7 @@ export function DataTable<TData, TValue>({
                     )}
                   >
                     <div className='flex flex-col items-center gap-1'>
-                      <h2 className='text-xl font-medium'>No results.</h2>
+                      <h2 className='text-xl'>No employees found.</h2>
                       <p
                         className={cn(
                           "text-muted-foreground",
