@@ -80,6 +80,7 @@ export async function getPaymentFieldsByCompanyId({
     .select(`${columns.join(",")}`)
     .eq("company_id", companyId)
     .limit(HARD_QUERY_LIMIT)
+    .order("created_at", { ascending: false })
     .returns<PaymentFieldDataType[]>();
 
   return {
