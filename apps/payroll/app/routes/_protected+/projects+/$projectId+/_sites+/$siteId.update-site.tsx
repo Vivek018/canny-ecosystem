@@ -1,5 +1,5 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import CreateSite from "./create-site";
+import CreateSite from "./sites+/create-site";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { json, useLoaderData } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
@@ -67,7 +67,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: submission.status === "error" ? 400 : 200 }
     );
   }
 
