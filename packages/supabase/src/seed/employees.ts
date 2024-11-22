@@ -64,7 +64,8 @@ export function seedEmployeeBankDetails(): Omit<
   return {
     account_holder_name: faker.person.fullName(),
     account_number: faker.string.numeric(10),
-    account_type: accountTypeArray[Math.floor(Math.random() * accountTypeArray.length)],
+    account_type:
+      accountTypeArray[Math.floor(Math.random() * accountTypeArray.length)],
     ifsc_code: faker.string.alphanumeric(10),
     bank_name: faker.company.name(),
     branch_name: faker.company.buzzPhrase(),
@@ -97,9 +98,8 @@ export function seedEmployeeGuardianDetails(): Omit<
     last_name: faker.person.lastName(),
     date_of_birth: faker.date.past().toISOString(),
     is_emergency_contact: [true, false][faker.number.int({ min: 0, max: 1 })],
-    relationship: relationshipArray[
-      Math.floor(Math.random() * relationshipArray.length)
-    ],
+    relationship:
+      relationshipArray[Math.floor(Math.random() * relationshipArray.length)],
     address_same_as_employee: [true, false][
       faker.number.int({ min: 0, max: 1 })
     ],

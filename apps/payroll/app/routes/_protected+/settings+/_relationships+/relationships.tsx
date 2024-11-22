@@ -42,37 +42,37 @@ export default function Relationships() {
   const { isDocument } = useIsDocument();
 
   return (
-    <section className='py-4'>
-      <div className='w-full flex items-end justify-between'>
-        <Command className='overflow-visible'>
-          <div className='w-full md:w-3/4 lg:w-1/2 2xl:w-1/3 flex items-center gap-4'>
+    <section className="py-4">
+      <div className="w-full flex items-end justify-between">
+        <Command className="overflow-visible">
+          <div className="w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4">
             <CommandInput
-              divClassName='border border-input rounded-md h-10 flex-1'
-              placeholder='Search Relationships'
+              divClassName="border border-input rounded-md h-10 flex-1"
+              placeholder="Search Relationships"
               autoFocus={true}
             />
             <Link
-              to='/settings/create-relationship'
+              to="/settings/create-relationship"
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
-                "flex items-center gap-1"
+                "flex items-center gap-1",
               )}
             >
               <span>Add</span>
-              <span className='hidden md:flex justify-end'>Relationship</span>
+              <span className="hidden md:flex justify-end">Relationship</span>
             </Link>
           </div>
           <CommandEmpty
             className={cn(
               "w-full py-40 capitalize text-lg tracking-wide text-center",
-              !isDocument && "hidden"
+              !isDocument && "hidden",
             )}
           >
             No relationships found.
           </CommandEmpty>
-          <CommandList className='max-h-full py-6 overflow-x-visible overflow-y-visible'>
-            <CommandGroup className='p-0 overflow-visible'>
-              <div className='w-full grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4'>
+          <CommandList className="max-h-full py-6 overflow-x-visible overflow-y-visible">
+            <CommandGroup className="p-0 overflow-visible">
+              <div className="w-full grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
                 {data?.map((relationship) => (
                   <CommandItem
                     key={relationship?.id}
@@ -81,7 +81,7 @@ export default function Relationships() {
                       relationship?.parent_company?.name +
                       relationship?.child_company?.name
                     }
-                    className='data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0'
+                    className="data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0"
                   >
                     <RelationshipCard relationship={relationship} />
                   </CommandItem>

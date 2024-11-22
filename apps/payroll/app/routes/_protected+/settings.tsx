@@ -6,7 +6,7 @@ export default function Settings() {
 
   return (
     <section>
-      <div className='py-[18px] px-4 border-b'>
+      <div className="py-[18px] px-4 border-b">
         <SecondaryMenu
           items={[
             { label: "General", path: "/settings" },
@@ -18,7 +18,7 @@ export default function Settings() {
           Link={Link}
         />
       </div>
-      <div className='px-4'>
+      <div className="px-4">
         <Outlet />
       </div>
     </section>

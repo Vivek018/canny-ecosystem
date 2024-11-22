@@ -5,7 +5,7 @@ export default function Account() {
   const { pathname } = useLocation();
   return (
     <section>
-      <div className='py-[18px] px-4 border-b'>
+      <div className="py-[18px] px-4 border-b">
         <SecondaryMenu
           items={[
             { label: "Account", path: "/account" },
@@ -16,7 +16,7 @@ export default function Account() {
           Link={Link}
         />
       </div>
-      <div className='px-4'>
+      <div className="px-4">
         <Outlet />
       </div>
     </section>

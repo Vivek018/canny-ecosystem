@@ -38,26 +38,26 @@ export function Sidebar({
       className={cn(
         "fixed flex h-full flex-col overflow-hidden w-20 z-20 bg-background border-r transition-[width]",
         isExpanded && "w-52 shadow-2xl dark:shadow-foreground/10",
-        className
+        className,
       )}
       onMouseEnter={openSidebar}
       onMouseLeave={closeSidebar}
     >
       <div
         className={cn(
-          "min-h-[72px] max-h-[72px] my-auto justify-start flex items-center gap-2 px-[25px] border-b"
+          "min-h-[72px] max-h-[72px] my-auto justify-start flex items-center gap-2 px-[25px] border-b",
         )}
       >
-        <Link prefetch='intent' to='/'>
+        <Link prefetch="intent" to="/">
           <Logo />
         </Link>
       </div>
       <nav
         className={cn(
-          "no-scrollbar flex h-full flex-col gap-4 overflow-y-scroll overflow-x-hidden items-center"
+          "no-scrollbar flex h-full flex-col gap-4 overflow-y-scroll overflow-x-hidden items-center",
         )}
       >
-        <ul className='flex w-full h-full flex-col py-2 gap-1.5 items-start'>
+        <ul className="flex w-full h-full flex-col py-2 gap-1.5 items-start">
           {sideNavList?.map(({ icon, name, link }) => {
             if (!icon && !link && !name) return null;
             if (!icon || !link) {
@@ -67,7 +67,7 @@ export function Sidebar({
               <NavLink
                 key={icon + name}
                 to={link ?? ""}
-                prefetch='intent'
+                prefetch="intent"
                 className={({ isActive }: { isActive: boolean }) =>
                   cn(
                     "flex mx-4 cursor-pointer text-start text-sm justify-start w-12 px-3.5 rounded py-2.5 tracking-wide hover:bg-accent gap-3 transition-[width]",
@@ -77,11 +77,11 @@ export function Sidebar({
                       : "",
                     link === pathname
                       ? "cursor-auto bg-primary/25  text-primary hover:bg-primary/25"
-                      : ""
+                      : "",
                   )
                 }
               >
-                <Icon name={icon as IconName} size='md' className='shrink-0' />
+                <Icon name={icon as IconName} size="md" className="shrink-0" />
                 <span className={cn("min-w-max", !isExpanded && "hidden")}>
                   {name}
                 </span>
@@ -92,7 +92,7 @@ export function Sidebar({
       </nav>
       <div
         className={cn(
-          "w-full flex flex-col items-start justify-start px-4 gap-4 pt-6 pb-12 border-t"
+          "w-full flex flex-col items-start justify-start px-4 gap-4 pt-6 pb-12 border-t",
         )}
       >
         <ThemeSwitch

@@ -81,6 +81,10 @@ export const DeleteLocation = ({ locationId }: { locationId: string }) => {
             }}
             className="border border-input rounded-md h-10 w-full"
             placeholder="Confirm your action"
+            onPaste={(e) => {
+              e.preventDefault();
+              return false;
+            }}
           />
           <ErrorList errors={inputError} />
         </div>
