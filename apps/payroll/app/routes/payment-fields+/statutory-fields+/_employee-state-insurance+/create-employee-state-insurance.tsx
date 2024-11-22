@@ -62,7 +62,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   if (isGoodStatus(status)) {
     return safeRedirect(
-      "/payment_fields/statutory-bonus/employee-state-insurance",
+      "/payment-fields/statutory-fields/employee-state-insurance",
       {
         status: 303,
       }

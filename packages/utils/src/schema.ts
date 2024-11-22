@@ -398,20 +398,27 @@ export const EmployeeWorkHistorySchema = z.object({
 });
 
 const deductionCycleArray = ["monthly", "yearly", "half_yearly"] as const;
-const contributionRateArray = [20, 0] as number[];
+const EMPLOYEE_RESTRICTED_VALUE = 15000;
+const EMPLOYEE_RESTRICTED_RATE = 0.2;
 
-export const EmployeeProvidentFundSchema = z.object({
-  id: z.string().optional(),
-  company_id: z.string(),
-  epf_number: zNumberString.max(20),
-  deduction_cycle: z.enum(deductionCycleArray).default(deductionCycleArray[0]),
-  employee_contribution: z.number().default(contributionRateArray[0]),
-  employer_contribution: z.number().default(contributionRateArray[0]),
-  employee_restrict_value: z.number().min(0).optional(),
-  restrict_employer_contribution: z.boolean().default(false),
-  include_employer_esi_contribution: z.boolean().default(false),
-  include_admin_charges: z.boolean().default(false),
-});
+export const EmployeeProvidentFundSchema = z
+  .object({
+    id: z.string().optional(),
+    company_id: z.string(),
+    epf_number: z.string().max(20),
+    deduction_cycle: z
+      .enum(deductionCycleArray)
+      .default(deductionCycleArray[0]),
+    employee_contribution: z.number().default(EMPLOYEE_RESTRICTED_RATE),
+    employer_contribution: z.number().default(EMPLOYEE_RESTRICTED_RATE),
+    employee_restrict_value: z.number().default(EMPLOYEE_RESTRICTED_VALUE),
+    employer_restrict_value: z.number().default(EMPLOYEE_RESTRICTED_VALUE),
+    restrict_employer_contribution: z.boolean().default(false),
+    restrict_employee_contribution: z.boolean().default(false),
+    include_employer_contribution: z.boolean().default(true),
+    include_employer_edli_contribution: z.boolean().default(true),
+    include_admin_charges: z.boolean().default(false),
+  })
 
 export const EmployeeStateInsuranceSchema = z.object({
   id: z.string().optional(),

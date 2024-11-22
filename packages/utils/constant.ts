@@ -61,11 +61,11 @@ export const deductionCycles = [
 ];
 
 export const employeeContributionRate = [
-  { value: 0.2, label: "20% of Actual PF Wage" },
-  { value: 0, label: "Restrict Contribution to ₹15,000 of PF Wage"}
+  { value: false, label: "20% of Actual PF Wage" },
+  { value: true, label: "Restrict Contribution to ₹15,000 of PF Wage"}
 ]
 
 export const employerContributionRate = [
-  { value: 0.2, label: "20% of Actual PF Wage" },
-  { value: 0, label: "Restrict Contribution to ₹15,000 of PF Wage"}
+  { value: false, label: "20% of Actual PF Wage" },
+  { value: true, label: "Restrict Contribution to ₹15,000 of PF Wage"}
 ]

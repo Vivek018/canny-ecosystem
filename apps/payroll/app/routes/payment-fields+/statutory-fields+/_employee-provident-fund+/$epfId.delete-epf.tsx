@@ -8,14 +8,15 @@ import { json } from "@remix-run/react";
 export async function action({ request, params }: ActionFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const epfId = params.epfId;
-
+  
   const { status, error } = await deleteEmployeeProvidentFund({
     supabase,
     id: epfId ?? "",
   });
-
+  
+  console.log("-------------eee--------",status, error)
   if (isGoodStatus(status)) {
-    return safeRedirect("/payment_fields/employee-provident-fund", { headers });
+    return safeRedirect("/payment-fields/statutory-fields/employee-provident-fund", { headers });
   }
 
   if (error) {

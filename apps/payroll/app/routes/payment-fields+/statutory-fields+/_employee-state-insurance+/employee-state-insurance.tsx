@@ -9,7 +9,7 @@ const EmployeeStateInsurance = () => {
         <div className="flex gap-5 items-center">
           <h4 className="text-lg font-semibold">Employees' State Insurance</h4>
           <Link
-            to="/payment_fields/statutory-bonus/create-employee-state-insurance"
+            to="/payment-fields/statutory-fields/create-employee-state-insurance"
             className="rounded-2xl px-3 p-2 bg-slate-300 cursor-pointer"
           >
             <Icon name="edit" className="w-[18px] h-[18px]" />

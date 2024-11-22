@@ -1,8 +1,6 @@
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import {
-  createEmployeeProvidentFund,
-} from "@canny_ecosystem/supabase/mutations";
+import { createEmployeeProvidentFund } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
   EmployeeProvidentFundDatabaseRow,
@@ -37,7 +35,7 @@ import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { ActionFunctionArgs, json, LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
-import React from "react";
+import React, { useEffect } from "react";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -62,9 +60,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   });
 
   if (isGoodStatus(status)) {
-    return safeRedirect("/payment_fields/employee-provident-fund", {
-      status: 303,
-    });
+    return safeRedirect(
+      "/payment-fields/statutory-fields/employee-provident-fund",
+      {
+        status: 303,
+      }
+    );
   }
 
   return json({ status, error });
@@ -73,7 +74,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  console.log(companyId)
+  console.log(companyId);
   return json({ companyId });
 };
 
@@ -91,7 +92,6 @@ const CreateEmployeeProvidentFund = ({
   console.log(initialValues);
 
   const { companyId } = useLoaderData<{ companyId: string }>();
-  console.log(companyId)
   const [form, fields] = useForm({
     id: EPF_TAG,
     constraint: getZodConstraint(EmployeeProvidentFundSchema),
@@ -107,6 +107,15 @@ const CreateEmployeeProvidentFund = ({
       company_id: companyId,
     },
   });
+
+  // useEffect(()=>{
+  //   if(form.value?.include_employer_contribution !== "on") {
+  //     console.log(form.value?.include_employer_contribution)
+  //     form.update({name: fields.include_employer_edli_contribution.name, value: false})
+  //     form.update({ name: fields.include_admin_charges.name, value: false })
+  //   }
+  // }, [form.value])
+  // console.log();
 
   return (
     <section className="md-px-20 lg:px-52 2xl:px-10 py-3 w-full">
@@ -154,72 +163,42 @@ const CreateEmployeeProvidentFund = ({
                 errors={fields.deduction_cycle.errors}
               />
             </div>
-            <div className="grid grid-cols-2 place-content-center justify-between gap-6">
-              <SearchableSelectField
-                // key={resetKey}
-                className="capitalize"
-                options={employeeContributionRate}
-                inputProps={{
-                  ...getInputProps(fields.employee_contribution, {
-                    type: "text",
-                  }),
-                  // defaultValue: employeeContributionRate[0].value,
-                }}
-                placeholder={`Select an option`}
+            <div className="grid grid-rows-2 place-content-center justify-between pb-5">
+              <CheckboxField
+                buttonProps={getInputProps(
+                  fields.restrict_employee_contribution,
+                  {
+                    type: "checkbox",
+                  }
+                )}
                 labelProps={{
-                  children: replaceUnderscore(
-                    fields.employee_contribution.name
-                  ),
+                  htmlFor: fields.restrict_employee_contribution.id,
+                  children:
+                    "Restrict employee's contribution to ₹15,000 of PF Wage",
                 }}
-                errors={fields.employee_contribution.errors}
+                className="items-center"
               />
-              <SearchableSelectField
-                // key={resetKey}
-                className="capitalize"
-                options={employerContributionRate}
-                inputProps={{
-                  ...getInputProps(fields.employer_contribution, {
-                    type: "text",
-                  }),
-                  // defaultValue: employerContributionRate[0].value,
-                }}
-                placeholder={`Select an option`}
+              <CheckboxField
+                buttonProps={getInputProps(
+                  fields.restrict_employer_contribution,
+                  {
+                    type: "checkbox",
+                  }
+                )}
                 labelProps={{
-                  children: replaceUnderscore(
-                    fields.employer_contribution.name
-                  ),
+                  htmlFor: fields.restrict_employer_contribution.id,
+                  children:
+                    "Restrict employer's contribution to ₹15,000 of PF Wage",
                 }}
-                errors={fields.employer_contribution.errors}
+                className="items-center"
               />
             </div>
-            <Field
-              className="w-[40%]"
-              inputProps={{
-                ...getInputProps(fields.employee_restrict_value, {
-                  type: "number",
-                }),
-                defaultValue: "15000",
-                autoFocus: true,
-                placeholder: `Enter number`,
-                className: "capitalize",
-              }}
-              labelProps={{
-                className: "capitalize",
-                children: replaceUnderscore(
-                  fields.employee_restrict_value.name
-                ),
-              }}
-              errors={fields.employee_restrict_value.errors}
-            />
             <CheckboxField
-              buttonProps={getInputProps(
-                fields.restrict_employer_contribution,
-                {
-                  type: "checkbox",
-                }
-              )}
+              buttonProps={getInputProps(fields.include_employer_contribution, {
+                type: "checkbox",
+              })}
               labelProps={{
-                htmlFor: fields.restrict_employer_contribution.id,
+                htmlFor: fields.include_employer_contribution.id,
                 children: "Include employer's contribution in the CTC",
               }}
               className="items-center"
@@ -227,14 +206,14 @@ const CreateEmployeeProvidentFund = ({
             <div className="ml-7">
               <CheckboxField
                 buttonProps={getInputProps(
-                  fields.include_employer_esi_contribution,
+                  fields.include_employer_edli_contribution,
                   {
                     type: "checkbox",
                   }
                 )}
                 labelProps={{
-                  htmlFor: fields.include_employer_esi_contribution.id,
-                  children: "Include employer's contribution in the CTC",
+                  htmlFor: fields.include_employer_edli_contribution.id,
+                  children: "Include employer's EDLI contribution in the CTC",
                 }}
                 className="items-center"
               />
@@ -244,7 +223,7 @@ const CreateEmployeeProvidentFund = ({
                 })}
                 labelProps={{
                   htmlFor: fields.include_admin_charges.id,
-                  children: "Include employer's contribution in the CTC",
+                  children: "Include admin charges in the CTC",
                 }}
                 className="items-center"
               />

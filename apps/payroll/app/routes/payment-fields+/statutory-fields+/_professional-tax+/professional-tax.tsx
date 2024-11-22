@@ -19,7 +19,7 @@ const ProfessionalTax = () => {
         <Card className="rounded w-[80%] h-full pl-4 pr-6 pb-8 pt-4 flex flex-col gap-5 justify-between">
           <div className="flex justify-between items-center">
             <h4>Head Office</h4>
-            <Link to={"/payment_fields/statutory-bonus/create-professional-tax"} className="cursor-pointer p-2 rounded-2xl bg-gray-200">
+            <Link to={"/payment-fields/statutory-fields/create-professional-tax"} className="cursor-pointer p-2 rounded-2xl bg-gray-200">
               <Icon name="edit" className="w-[18px] h-[18px]" />
             </Link>
           </div>

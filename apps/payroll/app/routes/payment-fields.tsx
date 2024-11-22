@@ -11,16 +11,16 @@ const PaymentFields = () => {
         items={[
           {
             label: "Payment Fields",
-            path: "/payment_fields",
+            path: "/payment-fields",
           },
           {
             label: "Statutory fields",
-            path: "/payment_fields/statutory-fields",
+            path: "/payment-fields/statutory-fields",
           },
         ]}
         pathname={pathname}
         Link={Link}
-        className="p-4"
+        // className="p-4"  
       />
       <hr />
       <Outlet />

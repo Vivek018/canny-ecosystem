@@ -18,6 +18,7 @@ export type IconName =
   | "employee"
   | "feedback"
   | "import"
+  | "info"
   | "input"
   | "lab-timer"
   | "laptop"

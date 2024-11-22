@@ -53,9 +53,7 @@ const EmployerContributionSplitUp = ({
             <p>
               {" "}
               8.33% of PF Wage{" "}
-              <span className="cursor-pointer rounded-3xl bg-gray-400 p-1">
-                {"  "}i
-              </span>
+              <Icon name="info" size="sm" className="ml-0.5 cursor-pointer" />
             </p>
           </div>
         </div>
