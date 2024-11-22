@@ -16,14 +16,12 @@ export async function createLabourWelfareFund({
   bypassAuth?: boolean;
 }) {
   if (!bypassAuth) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user?.email) {
-      return { status: 400, error: "Unauthorized User" };
-    }
+    const {data: { user }} = await supabase.auth.getUser();
+    if (!user?.email) return { status: 400, error: "Unauthorized User" };
   }
+
+  console.log("data = ",data);return null;
+  
 
   const {
     error,
@@ -31,9 +29,7 @@ export async function createLabourWelfareFund({
     data: professionalTax,
   } = await supabase.from("labour_welfare_fund").insert(data).select().single();
 
-  if (error) {
-    console.error(error);
-  }
+  if (error) console.error(error);
 
   return { status, error, id: professionalTax?.id };
 }

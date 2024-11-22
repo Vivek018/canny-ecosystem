@@ -81,7 +81,7 @@ export const navList = [
   },
   {
     name: "Add Payment Field",
-    link: "/payment-fields/upsert",
+    link: "/payment-components/payment-fields/upsert",
     icon: "plus-circled",
   },
   {

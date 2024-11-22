@@ -63,7 +63,7 @@ export default function PaymentFieldsIndex() {
               />
             </div>
             <Link
-              to="/payment-fields/create-payment-field"
+              to="/payment-components/payment-fields/create-payment-field"
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
                 "flex items-center gap-1",

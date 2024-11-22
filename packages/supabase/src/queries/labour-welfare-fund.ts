@@ -1,9 +1,24 @@
 import { convertToNull } from "@canny_ecosystem/utils";
 import type {
+  InferredType,
   LabourWelfareFundDatabaseInsert,
+  LabourWelfareFundDatabaseRow,
   LabourWelfareFundDatabaseUpdate,
   TypedSupabaseClient,
 } from "../types";
+import { HARD_QUERY_LIMIT } from "../constant";
+
+export type LabourWelfareFundDataType = Pick<
+  LabourWelfareFundDatabaseRow,
+  | "id"
+  | "deduction_cycle"
+  | "employee_contribution"
+  | "employer_contribution"
+  | "company_id"
+  | "state"
+  | "status"
+>;
+
 export async function createLabourWelfareFund({
   supabase,
   data,
@@ -31,6 +46,7 @@ export async function createLabourWelfareFund({
   }
   return { status, error, id: professionalTax?.id };
 }
+
 export async function updateLabourWelfareFund({
   supabase,
   data,
@@ -60,6 +76,7 @@ export async function updateLabourWelfareFund({
   }
   return { status, error };
 }
+
 export async function deleteLabourWelfareFund({
   supabase,
   id,
@@ -87,4 +104,37 @@ export async function deleteLabourWelfareFund({
     console.error(error);
   }
   return { status, error };
+}
+
+
+export async function getLabourWelfareFundByCompanyId({
+  supabase,
+  companyId,
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+}) {
+  const columns = [
+    "id",
+    "company_id",
+    "state",
+    "employer_contribution",
+    "employee_contribution",
+    "deduction_cycle",
+    "status",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("labour_welfare_fund")
+    .select(columns.join(","))
+    .eq("company_id", companyId)
+    .limit(HARD_QUERY_LIMIT)
+    .order("created_at", { ascending: false })
+    .returns<
+      InferredType<LabourWelfareFundDataType, (typeof columns)[number]>[]
+    >();
+
+  if (error) console.error(error);
+
+  return { data, error };
 }
