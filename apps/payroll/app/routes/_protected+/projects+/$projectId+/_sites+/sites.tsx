@@ -47,37 +47,37 @@ export default function SitesIndex() {
   const { isDocument } = useIsDocument();
 
   return (
-    <section className="pb-4">
-      <div className="w-full flex items-end justify-between">
-        <Command className="overflow-visible">
-          <div className="w-full md:w-3/4 lg:w-1/2 2xl:w-1/3 py-4 flex items-center gap-4">
+    <section className='pb-4'>
+      <div className='w-full flex items-end justify-between'>
+        <Command className='overflow-visible'>
+          <div className='w-full md:w-3/4 lg:w-1/2 2xl:w-1/3 py-4 flex items-center gap-4'>
             <CommandInput
-              divClassName="border border-input rounded-md h-10 flex-1"
-              placeholder="Search Sites"
+              divClassName='border border-input rounded-md h-10 flex-1'
+              placeholder='Search Sites'
               autoFocus={true}
             />
             <Link
               to={`/projects/${projectId}/create-site`}
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
-                "flex items-center gap-1",
+                "flex items-center gap-1"
               )}
             >
               <span>Add</span>
-              <span className="hidden md:flex justify-end">Site</span>
+              <span className='hidden md:flex justify-end'>Site</span>
             </Link>
           </div>
           <CommandEmpty
             className={cn(
               "w-full py-40 capitalize text-lg tracking-wide text-center",
-              !isDocument && "hidden",
+              !isDocument && "hidden"
             )}
           >
             No site found.
           </CommandEmpty>
-          <CommandList className="max-h-full py-2 overflow-x-visible overflow-y-visible">
-            <CommandGroup className="p-0 overflow-visible">
-              <div className="w-full grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+          <CommandList className='max-h-full py-2 overflow-x-visible overflow-y-visible'>
+            <CommandGroup className='p-0 overflow-visible'>
+              <div className='w-full grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4'>
                 {data?.map((site) => (
                   <CommandItem
                     key={site.id}
@@ -91,7 +91,7 @@ export default function SitesIndex() {
                       replaceUnderscore(site.state) +
                       site.pincode
                     }
-                    className="data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0"
+                    className='data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0'
                   >
                     <SiteCard site={site} />
                   </CommandItem>
