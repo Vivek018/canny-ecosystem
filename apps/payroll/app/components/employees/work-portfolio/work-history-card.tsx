@@ -54,25 +54,25 @@ export const WorkHistoryItem = ({
   return (
     <Card
       key={workHistory.id}
-      className='w-[420px] shadow-none select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start'
+      className="w-[420px] shadow-none select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start"
     >
-      <CardHeader className='flex flex-row space-y-0 items-center justify-between p-4'>
-        <CardTitle className='text-lg tracking-wide'>
+      <CardHeader className="flex flex-row space-y-0 items-center justify-between p-4">
+        <CardTitle className="text-lg tracking-wide">
           {replaceUnderscore(workHistory.position ?? "--")}
         </CardTitle>
-        <div className='flex items-center gap-3'>
+        <div className="flex items-center gap-3">
           <TooltipProvider>
             <Tooltip delayDuration={100}>
               <TooltipTrigger asChild>
                 <Link
-                  prefetch='intent'
+                  prefetch="intent"
                   to={`/employees/${workHistory.employee_id}/work-portfolio/${workHistory.id}/update-work-history`}
                   className={cn(
                     buttonVariants({ variant: "muted" }),
-                    "px-2.5 h-min"
+                    "px-2.5 h-min",
                   )}
                 >
-                  <Icon name='edit' size='xs' />
+                  <Icon name="edit" size="xs" />
                 </Link>
               </TooltipTrigger>
               <TooltipContent>Edit</TooltipContent>
@@ -82,12 +82,12 @@ export const WorkHistoryItem = ({
             <DropdownMenuTrigger
               className={cn(
                 buttonVariants({ variant: "muted" }),
-                "px-2.5 h-min"
+                "px-2.5 h-min",
               )}
             >
-              <Icon name='dots-vertical' size='xs' />
+              <Icon name="dots-vertical" size="xs" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent sideOffset={10} align='end'>
+            <DropdownMenuContent sideOffset={10} align="end">
               <DropdownMenuGroup>
                 <DeleteWorkHistory
                   employeeId={workHistory.employee_id}
@@ -98,22 +98,22 @@ export const WorkHistoryItem = ({
           </DropdownMenu>
         </div>
       </CardHeader>
-      <CardContent className='flex flex-col justify-between gap-4 px-4'>
-        <DetailItem label='company name' value={workHistory.company_name} />
-        <div className='flex flex-col items-start'>
-          <h3 className='text-muted-foreground text-[13px] tracking-wide capitalize'>
+      <CardContent className="flex flex-col justify-between gap-4 px-4">
+        <DetailItem label="company name" value={workHistory.company_name} />
+        <div className="flex flex-col items-start">
+          <h3 className="text-muted-foreground text-[13px] tracking-wide capitalize">
             responsibilities
           </h3>
-          <p className='line-clamp-4 text-sm'>{workHistory.responsibilities}</p>
+          <p className="line-clamp-4 text-sm">{workHistory.responsibilities}</p>
         </div>
-        <div className='flex flex-row items-center justify-between'>
+        <div className="flex flex-row items-center justify-between">
           <DetailItem
-            label='start date'
+            label="start date"
             value={workHistory.start_date}
             formatter={formatDate}
           />
           <DetailItem
-            label='end date'
+            label="end date"
             value={workHistory.end_date}
             formatter={formatDate}
           />

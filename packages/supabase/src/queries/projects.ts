@@ -39,7 +39,7 @@ export async function getProjectsByCompanyId({
     .from("projects")
     .select(columns.join(","))
     .or(
-      `project_client_id.eq.${companyId},end_client_id.eq.${companyId},primary_contractor_id.eq.${companyId}`
+      `project_client_id.eq.${companyId},end_client_id.eq.${companyId},primary_contractor_id.eq.${companyId}`,
     )
     .limit(HARD_QUERY_LIMIT)
     .order("created_at", { ascending: false })
@@ -63,7 +63,7 @@ export async function getProjectNamesByCompanyId({
     .from("projects")
     .select("name")
     .or(
-      `project_client_id.eq.${companyId},end_client_id.eq.${companyId},primary_contractor_id.eq.${companyId}`
+      `project_client_id.eq.${companyId},end_client_id.eq.${companyId},primary_contractor_id.eq.${companyId}`,
     )
     .limit(HARD_QUERY_LIMIT)
     .order("created_at", { ascending: false })
@@ -112,7 +112,7 @@ export async function getProjectById({
     .select(columns.join(","))
     .eq("id", id)
     .or(
-      `project_client_id.eq.${companyId},end_client_id.eq.${companyId},primary_contractor_id.eq.${companyId}`
+      `project_client_id.eq.${companyId},end_client_id.eq.${companyId},primary_contractor_id.eq.${companyId}`,
     )
     .single<Omit<ProjectsWithCompany, "created_at" | "updated_at">>();
 
@@ -179,7 +179,7 @@ export async function getSiteNamesByProjectNameAndCompanyId({
   const { data, error } = await supabase
     .from("project_sites")
     .select(
-      "name, projects(name, project_client_id, end_client_id, primary_contractor_id)"
+      "name, projects(name, project_client_id, end_client_id, primary_contractor_id)",
     )
     .eq("projects.name", projectName)
     .match({

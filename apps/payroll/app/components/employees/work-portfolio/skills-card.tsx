@@ -51,25 +51,25 @@ export const SkillItem = ({ skill }: { skill: EmployeeSkill }) => {
   return (
     <Card
       key={skill.id}
-      className='w-[420px] shadow-none select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start'
+      className="w-[420px] shadow-none select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start"
     >
-      <CardHeader className='flex flex-row space-y-0 items-center justify-between p-4'>
-        <CardTitle className='text-lg tracking-wide'>
+      <CardHeader className="flex flex-row space-y-0 items-center justify-between p-4">
+        <CardTitle className="text-lg tracking-wide">
           {skill.skill_name ?? "--"}
         </CardTitle>
-        <div className='flex items-center gap-3'>
+        <div className="flex items-center gap-3">
           <TooltipProvider>
             <Tooltip delayDuration={100}>
               <TooltipTrigger asChild>
                 <Link
-                  prefetch='intent'
+                  prefetch="intent"
                   to={`/employees/${skill.employee_id}/work-portfolio/${skill.id}/update-employee-skill`}
                   className={cn(
                     buttonVariants({ variant: "muted" }),
-                    "px-2.5 h-min"
+                    "px-2.5 h-min",
                   )}
                 >
-                  <Icon name='edit' size='xs' />
+                  <Icon name="edit" size="xs" />
                 </Link>
               </TooltipTrigger>
               <TooltipContent>Edit</TooltipContent>
@@ -79,12 +79,12 @@ export const SkillItem = ({ skill }: { skill: EmployeeSkill }) => {
             <DropdownMenuTrigger
               className={cn(
                 buttonVariants({ variant: "muted" }),
-                "px-2.5 h-min"
+                "px-2.5 h-min",
               )}
             >
-              <Icon name='dots-vertical' size='xs' />
+              <Icon name="dots-vertical" size="xs" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent sideOffset={10} align='end'>
+            <DropdownMenuContent sideOffset={10} align="end">
               <DropdownMenuGroup>
                 <DeleteSkill
                   employeeId={skill.employee_id}
@@ -95,10 +95,10 @@ export const SkillItem = ({ skill }: { skill: EmployeeSkill }) => {
           </DropdownMenu>
         </div>
       </CardHeader>
-      <CardContent className='flex flex-row justify-between gap-0.5 px-4'>
-        <DetailItem label='Proficiency' value={skill.proficiency} />
+      <CardContent className="flex flex-row justify-between gap-0.5 px-4">
+        <DetailItem label="Proficiency" value={skill.proficiency} />
         <DetailItem
-          label='Years of experience'
+          label="Years of experience"
           value={skill.years_of_experience}
         />
       </CardContent>

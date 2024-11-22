@@ -63,7 +63,7 @@ export async function action({ request }: ActionFunctionArgs) {
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 
@@ -101,9 +101,9 @@ export default function Feedback() {
   });
 
   return (
-    <section className='flex flex-col gap-6 w-full lg:w-2/3 my-4'>
+    <section className="flex flex-col gap-6 w-full lg:w-2/3 my-4">
       <FormProvider context={form.context}>
-        <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
+        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
           <Card>
             <CardHeader>
               <CardTitle>Feedback</CardTitle>
@@ -128,12 +128,12 @@ export default function Feedback() {
                 }}
                 errors={fields.subject.errors}
               />
-              <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
+              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
                 <SearchableSelectField
                   key={resetKey}
-                  className='capitalize'
+                  className="capitalize"
                   options={transformStringArrayIntoOptions(
-                    categoryArray as unknown as string[]
+                    categoryArray as unknown as string[],
                   )}
                   inputProps={{
                     ...getInputProps(fields.category, { type: "text" }),
@@ -146,9 +146,9 @@ export default function Feedback() {
                 />
                 <SearchableSelectField
                   key={resetKey + 1}
-                  className='capitalize'
+                  className="capitalize"
                   options={transformStringArrayIntoOptions(
-                    severityArray as unknown as string[]
+                    severityArray as unknown as string[],
                   )}
                   inputProps={{
                     ...getInputProps(fields.severity, { type: "text" }),

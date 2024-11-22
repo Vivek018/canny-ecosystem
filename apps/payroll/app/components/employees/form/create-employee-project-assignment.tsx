@@ -56,7 +56,7 @@ export const CreateEmployeeProjectAssignment = ({
   return (
     <Fragment>
       <CardHeader>
-        <CardTitle className='text-3xl'>
+        <CardTitle className="text-3xl">
           {isUpdate ? "Update" : "Add"} Employee Project Assignment
         </CardTitle>
         <CardDescription>
@@ -65,11 +65,11 @@ export const CreateEmployeeProjectAssignment = ({
       </CardHeader>
       <CardContent>
         <input {...getInputProps(fields.employee_id, { type: "hidden" })} />
-        <div className='grid grid-cols-3 place-content-center justify-between gap-6'>
-          <div className='w-full flex flex-col gap-1.5'>
-            <div className='flex'>
+        <div className="grid grid-cols-3 place-content-center justify-between gap-6">
+          <div className="w-full flex flex-col gap-1.5">
+            <div className="flex">
               <Label>Projects</Label>
-              <sub className='text-primary'>*</sub>
+              <sub className="text-primary">*</sub>
             </div>
             <Combobox
               options={projectOptions ?? []}
@@ -86,7 +86,7 @@ export const CreateEmployeeProjectAssignment = ({
             />
           </div>
           <SearchableSelectField
-            className='capitalize'
+            className="capitalize"
             options={projectSiteOptions ?? projectSiteOptions ?? []}
             inputProps={{
               ...getInputProps(fields.project_site_id, { type: "text" }),
@@ -109,7 +109,7 @@ export const CreateEmployeeProjectAssignment = ({
             errors={fields.project_site_id.errors}
           />
           <SearchableSelectField
-            className='capitalize'
+            className="capitalize"
             options={siteEmployeeOptions ?? siteEmployeeOptions ?? []}
             inputProps={{
               ...getInputProps(fields.supervisor_id, { type: "text" }),
@@ -121,17 +121,17 @@ export const CreateEmployeeProjectAssignment = ({
             errors={fields.supervisor_id.errors}
           />
         </div>
-        <div className='grid grid-cols-3 place-content-center justify-between gap-6'>
+        <div className="grid grid-cols-3 place-content-center justify-between gap-6">
           <SearchableSelectField
-            className='capitalize'
+            className="capitalize"
             options={transformStringArrayIntoOptions(
-              assignmentTypeArray as unknown as string[]
+              assignmentTypeArray as unknown as string[],
             )}
             inputProps={{
               ...getInputProps(fields.assignment_type, { type: "text" }),
             }}
             placeholder={`Select ${replaceUnderscore(
-              fields.assignment_type.name
+              fields.assignment_type.name,
             )}`}
             labelProps={{
               children: replaceUnderscore(fields.assignment_type.name),
@@ -139,9 +139,9 @@ export const CreateEmployeeProjectAssignment = ({
             errors={fields.assignment_type.errors}
           />
           <SearchableSelectField
-            className='capitalize'
+            className="capitalize"
             options={transformStringArrayIntoOptions(
-              positionArray as unknown as string[]
+              positionArray as unknown as string[],
             )}
             inputProps={{
               ...getInputProps(fields.position, { type: "text" }),
@@ -153,9 +153,9 @@ export const CreateEmployeeProjectAssignment = ({
             errors={fields.position.errors}
           />
           <SearchableSelectField
-            className='capitalize'
+            className="capitalize"
             options={transformStringArrayIntoOptions(
-              skillLevelArray as unknown as string[]
+              skillLevelArray as unknown as string[],
             )}
             inputProps={{
               ...getInputProps(fields.skill_level, { type: "text" }),
@@ -167,14 +167,14 @@ export const CreateEmployeeProjectAssignment = ({
             errors={fields.skill_level.errors}
           />
         </div>
-        <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
+        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
           <Field
             inputProps={{
               ...getInputProps(fields.start_date, { type: "date" }),
               placeholder: `Enter ${replaceUnderscore(fields.start_date.name)}`,
               max: getValidDateForInput(new Date().toISOString()),
               defaultValue: getValidDateForInput(
-                String(fields.start_date.initialValue)
+                String(fields.start_date.initialValue),
               ),
             }}
             labelProps={{
@@ -190,7 +190,7 @@ export const CreateEmployeeProjectAssignment = ({
               placeholder: `Enter ${replaceUnderscore(fields.end_date.name)}`,
               min: getValidDateForInput(String(fields.start_date.value)),
               defaultValue: getValidDateForInput(
-                String(fields.end_date.initialValue)
+                String(fields.end_date.initialValue),
               ),
             }}
             labelProps={{
@@ -214,10 +214,10 @@ export const CreateEmployeeProjectAssignment = ({
               type: "date",
             }),
             placeholder: `Enter ${replaceUnderscore(
-              fields.probation_end_date.name
+              fields.probation_end_date.name,
             )}`,
             defaultValue: getValidDateForInput(
-              String(fields.probation_end_date.initialValue)
+              String(fields.probation_end_date.initialValue),
             ),
           }}
           labelProps={{

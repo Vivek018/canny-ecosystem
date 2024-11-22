@@ -15,7 +15,7 @@
     "@canny_ecosystem/utils": "*",
     "@supabase/ssr": "^0.5.1",
     "react": "^18.3.1",
-    "supabase": "^1.223.10"
+    "supabase": "^1.219.2"
   },
   "devDependencies": {
     "@faker-js/faker": "^9.0.3",

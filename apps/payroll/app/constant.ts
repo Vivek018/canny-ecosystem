@@ -1,5 +1,12 @@
 import type { NavList } from "@canny_ecosystem/types";
-import { assignmentTypeArray, educationArray, genderArray, positionArray, skillLevelArray, statusArray } from "@canny_ecosystem/utils";
+import {
+  assignmentTypeArray,
+  educationArray,
+  genderArray,
+  positionArray,
+  skillLevelArray,
+  statusArray,
+} from "@canny_ecosystem/utils";
 
 export const DEFAULT_ROUTE = "/";
 
@@ -15,13 +22,13 @@ export const workingDaysOptions = [
 
 export const sideNavList = [
   { name: "Dashboard", link: "/dashboard", icon: "dashboard" },
-  {name: "management"},
+  { name: "management" },
   { name: "Employees", link: "/employees", icon: "employee" },
   { name: "Finance" },
   { name: "Advances", link: "/advances", icon: "lab-timer" },
   {
     name: "Payment Fields",
-    link: "/payment_fields",
+    link: "/payment-fields",
     icon: "input",
   },
   {
@@ -74,7 +81,7 @@ export const navList = [
   },
   {
     name: "Add Payment Field",
-    link: "/payment_fields/upsert",
+    link: "/payment-fields/upsert",
     icon: "plus-circled",
   },
   {
@@ -100,7 +107,16 @@ export const VALID_FILTERS = [
     valueType: "string",
     description:
       "Filter by the name, project name, site name, employee code and mobile number of the individual",
-    example: ["John Doe", "Synthentica", "UABEADX", "Main Site", "Kota Site", "EMP123", "9876543210", "..."],
+    example: [
+      "John Doe",
+      "Synthentica",
+      "UABEADX",
+      "Main Site",
+      "Kota Site",
+      "EMP123",
+      "9876543210",
+      "...",
+    ],
   },
   {
     name: "dob_start",
@@ -119,15 +135,13 @@ export const VALID_FILTERS = [
   {
     name: "gender",
     valueType: genderArray,
-    description:
-      "Filter by gender",
+    description: "Filter by gender",
     example: "male",
   },
   {
     name: "education",
     valueType: educationArray,
-    description:
-      "Filter by the highest level of education.",
+    description: "Filter by the highest level of education.",
     example: "Bachelor's",
   },
   {

@@ -9,7 +9,7 @@ interface UseTypingAnimationOptions {
 export function useTypingAnimation(
   texts: string[],
   paused = false,
-  options: UseTypingAnimationOptions = {}
+  options: UseTypingAnimationOptions = {},
 ) {
   const { typingSpeed = 100, pauseDuration = 1500 } = options;
 

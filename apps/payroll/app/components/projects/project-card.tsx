@@ -29,30 +29,30 @@ export function ProjectCard({
   return (
     <Card
       key={project.id}
-      className='w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start'
+      className="w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start"
     >
-      <CardContent className='flex flex-row gap-0.5 justify-between items-center p-4'>
-        <div className='flex items-center flex-1 gap-10 justify-between pr-12'>
-          <CardTitle className='text-xl tracking-wide'>
+      <CardContent className="flex flex-row gap-0.5 justify-between items-center p-4">
+        <div className="flex items-center flex-1 gap-10 justify-between pr-12">
+          <CardTitle className="text-xl tracking-wide">
             <Link
-              prefetch='intent'
+              prefetch="intent"
               to={`${project?.id}`}
-              className='truncate max-w-96 font-bold text-wrap line-clamp-2 hover:text-primary'
+              className="truncate max-w-96 font-bold text-wrap line-clamp-2 hover:text-primary"
             >
               {project.name}
             </Link>
-            <div className='flex items-center gap-1.5'>
-              <p className='text-[11px] bg-muted-foreground w-max text-muted px-1.5 mt-1.5 rounded-md'>
+            <div className="flex items-center gap-1.5">
+              <p className="text-[11px] bg-muted-foreground w-max text-muted px-1.5 mt-1.5 rounded-md">
                 {project.status}
               </p>
-              <p className='text-[11px] bg-muted w-max text-muted-foreground px-1.5 mt-1.5 rounded-md'>
+              <p className="text-[11px] bg-muted w-max text-muted-foreground px-1.5 mt-1.5 rounded-md">
                 {project.project_type}
               </p>
             </div>
           </CardTitle>
-          <div className='flex flex-col items-center gap-1'>
+          <div className="flex flex-col items-center gap-1">
             <TooltipProvider>
-              <div className='flex items-center'>
+              <div className="flex items-center">
                 {companies.map((company, index) =>
                   company?.id ? (
                     <Tooltip key={company?.id} delayDuration={100}>
@@ -60,14 +60,14 @@ export function ProjectCard({
                         <Avatar
                           className={cn(
                             "w-12 h-12 border border-muted-foreground/30 shadow-sm hover:z-40",
-                            index !== 0 && "-ml-[18px]"
+                            index !== 0 && "-ml-[18px]",
                           )}
                         >
                           {company?.logo && (
                             <img src={company?.logo} alt={company?.name} />
                           )}
                           <AvatarFallback>
-                            <span className='tracking-widest text-sm'>
+                            <span className="tracking-widest text-sm">
                               {company?.name.charAt(0)}
                             </span>
                           </AvatarFallback>
@@ -75,10 +75,10 @@ export function ProjectCard({
                       </TooltipTrigger>
                       <TooltipContent>{company?.name}</TooltipContent>
                     </Tooltip>
-                  ) : null
+                  ) : null,
                 )}
               </div>
-              <p className='text-xs text-muted-foreground'>
+              <p className="text-xs text-muted-foreground">
                 Companies Involved
               </p>
             </TooltipProvider>
@@ -91,17 +91,17 @@ export function ProjectCard({
                 (getAutoTimeDifference(project.start_date, new Date())! /
                   getAutoTimeDifference(
                     project.start_date,
-                    project.estimated_end_date
+                    project.estimated_end_date,
                   )!) *
                 100
               }
-              className='w-80'
+              className="w-80"
             />
             <p
               className={cn(
                 "text-xs text-muted-foreground ml-auto mt-1",
                 getAutoTimeDifference(new Date(), project.estimated_end_date)! <
-                  0 && "hidden"
+                  0 && "hidden",
               )}
             >
               {getAutoTimeDifference(new Date(), project.estimated_end_date)}{" "}
@@ -111,34 +111,34 @@ export function ProjectCard({
           <div
             className={cn(
               "flex flex-col",
-              !project.actual_end_date && "hidden"
+              !project.actual_end_date && "hidden",
             )}
           >
-            <Progress value={100} className='w-80' />
+            <Progress value={100} className="w-80" />
             <p
               className={cn(
                 "text-xs text-muted-foreground ml-auto mt-1",
-                !project.actual_end_date && "hidden"
+                !project.actual_end_date && "hidden",
               )}
             >
               Took{" "}
               {getAutoTimeDifference(
                 project.start_date,
-                project.actual_end_date
+                project.actual_end_date,
               )}{" "}
               days
             </p>
           </div>
         </div>
-        <div className='flex flex-col items-center gap-4'>
+        <div className="flex flex-col items-center gap-4">
           <TooltipProvider>
             <Tooltip delayDuration={100}>
               <TooltipTrigger asChild>
                 <Link
                   to={`/projects/${project.id}/update-project`}
-                  className='p-2 rounded-md bg-secondary grid place-items-center border-foreground'
+                  className="p-2 rounded-md bg-secondary grid place-items-center border-foreground"
                 >
-                  <Icon name='edit' size='xs' />
+                  <Icon name="edit" size="xs" />
                 </Link>
               </TooltipTrigger>
               <TooltipContent>Edit</TooltipContent>
@@ -150,8 +150,8 @@ export function ProjectCard({
               actual_end_date: project.actual_end_date,
             }}
             triggerChild={
-              <DropdownMenuTrigger className='p-2 py-2 rounded-md bg-secondary grid place-items-center border-foreground'>
-                <Icon name='dots-vertical' size='xs' />
+              <DropdownMenuTrigger className="p-2 py-2 rounded-md bg-secondary grid place-items-center border-foreground">
+                <Icon name="dots-vertical" size="xs" />
               </DropdownMenuTrigger>
             }
           />
