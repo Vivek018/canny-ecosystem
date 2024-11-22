@@ -158,13 +158,17 @@ export function EmployeesSearchFilter({
   );
 
   useHotkeys(["meta+s", "ctrl+s"], (evt) => {
-    evt.preventDefault();
-    inputRef.current?.focus();
+    if (!disabled) {
+      evt.preventDefault();
+      inputRef.current?.focus();
+    }
   });
 
   useHotkeys(["meta+f", "ctrl+f"], (evt) => {
-    evt.preventDefault();
-    setIsOpen((prev) => !prev);
+    if (!disabled) {
+      evt.preventDefault();
+      setIsOpen((prev) => !prev);
+    }
   });
 
   const handleSearch = (evt: React.ChangeEvent<HTMLInputElement>) => {
