@@ -6,3 +6,6 @@ export * from "./feedback";
 export * from "./payment-field";
 export * from "./professional-tax";
 export * from "./labour-welfare-fund";
+export * from "./statutory-bonus";
+export * from "./employee-provident-fund";
+export * from "./employee-state-insurance";

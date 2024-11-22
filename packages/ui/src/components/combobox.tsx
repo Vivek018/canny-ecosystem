@@ -18,6 +18,11 @@ export interface ComboboxSelectOption {
   label: string;
 }
 
+export type DefaultOptionTypes = {
+  label: string;
+  value: boolean | string;
+};
+
 interface ComboboxProps {
   options: ComboboxSelectOption[];
   value: string;

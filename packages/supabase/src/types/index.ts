@@ -159,18 +159,48 @@ export type PaymentFieldDatabaseInsert =
 export type PaymentFieldDatabaseUpdate =
   Database["public"]["Tables"]["payment_fields"]["Update"];
 
-// Professional Tax
-export type ProfessionalTaxDatabaseRow =
-  Database["public"]["Tables"]["professional_tax"]["Row"];
-export type ProfessionalTaxDatabaseInsert =
-  Database["public"]["Tables"]["professional_tax"]["Insert"];
-export type ProfessionalTaxDatabaseUpdate =
-  Database["public"]["Tables"]["professional_tax"]["Update"];
+// Statutory Bonus
+export type StatutoryBonusDatabaseRow =
+  Database["public"]["Tables"]["statutory_bonus"]["Row"];
 
-// Labour Welfare Fund
-export type LabourWelfareFundDatabaseRow =
-  Database["public"]["Tables"]["labour_welfare_fund"]["Row"];
-export type LabourWelfareFundDatabaseInsert =
-  Database["public"]["Tables"]["labour_welfare_fund"]["Insert"];
-export type LabourWelfareFundDatabaseUpdate =
-  Database["public"]["Tables"]["labour_welfare_fund"]["Update"];
+export type StatutoryBonusDatabaseInsert =
+  Database["public"]["Tables"]["statutory_bonus"]["Insert"];
+  
+export type StatutoryBonusDatabaseUpdate =
+  Database["public"]["Tables"]["statutory_bonus"]["Update"];
+
+export type EmployeeProvidentFundDatabaseRow = 
+  Database["public"]["Tables"]["employee_provident_fund"]["Row"]
+
+export type EmployeeProvidentFundDatabaseInsert = 
+  Database["public"]["Tables"]["employee_provident_fund"]["Insert"]
+
+export type EmployeeProvidentFundDatabaseUpdate = 
+  Database["public"]["Tables"]["employee_provident_fund"]["Update"]
+  
+export type EmployeeStateInsuranceDatabaseRow = 
+  Database["public"]["Tables"]["employee_state_insurance"]["Row"]
+
+export type EmployeeStateInsuranceDatabaseInsert =
+  Database["public"]["Tables"]["employee_state_insurance"]["Insert"]
+
+export type EmployeeStateInsuranceDatabaseUpdate =
+  Database["public"]["Tables"]["employee_state_insurance"]["Update"]
+
+export type ProfessionalTaxDatabaseRow = 
+  Database["public"]["Tables"]["professional_tax"]["Row"]
+
+export type ProfessionalTaxDatabaseInsert =
+  Database["public"]["Tables"]["professional_tax"]["Insert"]
+
+export type ProfessionalTaxDatabaseUpdate =
+  Database["public"]["Tables"]["professional_tax"]["Update"]
+
+export type LabourWelfareFundDatabaseRow = 
+  Database["public"]["Tables"]["labour_welfare_fund"]["Row"]
+
+export type LabourWelfareFundDatabaseInsert = 
+  Database["public"]["Tables"]["labour_welfare_fund"]["Insert"]
+
+export type LabourWelfareFundDatabaseUpdate = 
+  Database["public"]["Tables"]["labour_welfare_fund"]["Update"]

@@ -83,6 +83,7 @@
     "./sheet": "./src/components/sheet.tsx",
     "./scroll-area": "./src/components/scroll-area.tsx",
     "./secondary-menu": "./src/components/secondary-menu.tsx",
+    "./secondary-sidebar": "./src/components/secondary-sidebar.tsx",
     "./forms": "./src/components/forms.tsx",
     "./tailwind.config": "./tailwind.config.ts",
     "./postcss": "./postcss.config.js"
