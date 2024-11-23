@@ -91,6 +91,7 @@ export async function deleteStatutoryBonus({
       .eq("id", id)
       .select()
       .single();
+      console.log("--------------------", error, status)
   
     if (error) {
       console.error(error);

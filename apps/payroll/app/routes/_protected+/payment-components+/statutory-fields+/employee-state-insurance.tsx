@@ -1,9 +1,10 @@
+import ESINoData from "@/components/statutory-fields/employee-state-insurance/esi-nodata";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getEmployeeStateInsuranceByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { json, LoaderFunctionArgs } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData, useSubmit } from "@remix-run/react";
 import React from "react";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -22,15 +23,28 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 const EmployeeStateInsurance = () => {
   const { data } = useLoaderData<typeof loader>();
-  console.log(data?.[0]);
+  const submit = useSubmit();
+
+  const handleDeleteESI = async () => {
+    submit(
+      {},
+      {
+        method: "post",
+        action: `/payment-components/statutory-fields/${data?.[0]?.id}/delete-esi`,
+        replace: true,
+      }
+    );
+  };
+
+  if (!data?.length) return <ESINoData />;
   return (
     <div className="py-5 pl-5">
       <div className="min-h-screen max-w-[50vw] py-6">
         <div className="flex items-center gap-5">
-          <h4 className="text-lg font-semibold">Employees' Provident Fund</h4>
+          <h4 className="text-lg font-semibold">Employees' State Insurance</h4>
           <Link
             prefetch="intent"
-            to={`/payment-components/statutory-fields/create-employee-state-insurance`}
+            to={`/payment-components/statutory-fields/${data?.[0]?.id}/update-esi`}
             className="p-2 rounded-full bg-secondary grid place-items-center"
           >
             <Icon name="edit" size="sm" />
@@ -47,7 +61,9 @@ const EmployeeStateInsurance = () => {
           </div>
           <div className="flex gap-10">
             <div className="min-w-[50%] text-gray-500">Deduction Cycle</div>
-            <div className="self-start font-[500] text-[0.95rem] capitalize">{data?.[0]?.deduction_cycle}</div>
+            <div className="self-start font-[500] text-[0.95rem] capitalize">
+              {data?.[0]?.deduction_cycle}
+            </div>
           </div>
           <div className="flex gap-10">
             <div className="min-w-[40%] text-gray-500">
@@ -69,7 +85,10 @@ const EmployeeStateInsurance = () => {
         <br />
         <hr />
         <br />
-        <button className="flex gap-1 text-sm items-center text-blue-500 cursor-pointer">
+        <button
+          className="flex gap-1 text-sm items-center text-blue-500 cursor-pointer"
+          onClick={handleDeleteESI}
+        >
           <svg
             width="18"
             height="18"

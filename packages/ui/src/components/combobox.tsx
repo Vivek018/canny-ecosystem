@@ -29,6 +29,7 @@ interface ComboboxProps {
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
+  disabled?: boolean;
 }
 
 export function Combobox({
@@ -37,6 +38,7 @@ export function Combobox({
   onChange,
   placeholder = "Select an option...",
   className,
+  disabled,
 }: ComboboxProps) {
   const [open, setOpen] = useState(false);
   const selectedOption = options?.find((option) => option.value === value);
@@ -45,6 +47,7 @@ export function Combobox({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
+          disabled={disabled}
           variant="outline"
           role="combobox"
           aria-expanded={open}

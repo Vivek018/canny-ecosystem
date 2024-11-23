@@ -8,6 +8,7 @@ import {
 export type EmployeeProvidentFundDataType = Pick<
   EmployeeProvidentFundDatabaseRow,
   | "id"
+  | "company_id"
   | "epf_number"
   | "deduction_cycle"
   | "employee_contribution"
@@ -29,6 +30,7 @@ export const getEmployeeProvidentFundById = async ({
 }) => {
   const columns = [
     "id",
+    "company_id",
     "epf_number",
     "deduction_cycle",
     "employee_contribution",
@@ -66,6 +68,7 @@ export const getEmployeeProvidentFundByCompanyId = async ({
 }) => {
   const columns = [
     "id",
+    "company_id",
     "epf_number",
     "deduction_cycle",
     "employee_contribution",

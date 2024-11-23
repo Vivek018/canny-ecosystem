@@ -1139,7 +1139,7 @@ export type Database = {
           created_at: string | null
           id: string
           payment_frequency: string
-          payout_month: number | null
+          payout_month: string | null
           percentage: number
           updated_at: string | null
         }
@@ -1148,7 +1148,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           payment_frequency?: string
-          payout_month?: number | null
+          payout_month?: string | null
           percentage?: number
           updated_at?: string | null
         }
@@ -1157,7 +1157,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           payment_frequency?: string
-          payout_month?: number | null
+          payout_month?: string | null
           percentage?: number
           updated_at?: string | null
         }
