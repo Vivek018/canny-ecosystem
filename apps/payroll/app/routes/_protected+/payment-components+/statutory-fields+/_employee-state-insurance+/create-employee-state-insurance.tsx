@@ -2,7 +2,7 @@ import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { createEmployeeStateInsurance } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import {
+import type {
   EmployeeStateInsuranceDatabaseRow,
   Json,
 } from "@canny_ecosystem/supabase/types";
@@ -20,17 +20,22 @@ import {
   SearchableSelectField,
 } from "@canny_ecosystem/ui/forms";
 import {
+  deductionCycleArray,
   EmployeeProvidentFundSchema,
   EmployeeStateInsuranceSchema,
   getInitialValueFromZod,
   isGoodStatus,
   replaceDash,
   replaceUnderscore,
+  transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
-import { deductionCycles } from "@canny_ecosystem/utils/constant";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { ActionFunctionArgs, json, LoaderFunctionArgs } from "@remix-run/node";
+import {
+  type ActionFunctionArgs,
+  json,
+  type LoaderFunctionArgs,
+} from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -62,7 +67,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       }
     );
   }
-
 
   return json({ status, error });
 };
@@ -115,12 +119,12 @@ const CreateEmployeeStateInsurance = ({
           <CardContent>
             <input {...getInputProps(fields.id, { type: "hidden" })} />
             <input {...getInputProps(fields.company_id, { type: "hidden" })} />
-            <div className="grid grid-rows-2 place-content-center justify-between">
+            <div className="flex flex-col w-1/3 justify-between">
               <Field
                 inputProps={{
                   ...getInputProps(fields.esi_number, { type: "text" }),
                   autoFocus: true,
-                  placeholder: `00-00-000000-000-0000`,
+                  placeholder: "00-00-000000-000-0000",
                   className: "capitalize",
                 }}
                 labelProps={{
@@ -132,18 +136,20 @@ const CreateEmployeeStateInsurance = ({
 
               <SearchableSelectField
                 className="capitalize"
-                options={deductionCycles}
+                options={transformStringArrayIntoOptions(
+                  deductionCycleArray as unknown as string[]
+                )}
                 inputProps={{
                   ...getInputProps(fields.deduction_cycle, { type: "text" }),
                 }}
-                placeholder={`Select an option`}
+                placeholder="Select an option"
                 labelProps={{
                   children: replaceUnderscore(fields.deduction_cycle.name),
                 }}
                 errors={fields.deduction_cycle.errors}
               />
             </div>
-            <div className="flex flex-col w-1/4 justify-between">
+            <div className="flex flex-col w-2/5 justify-between">
               <div className="flex   items-center justify-between gap-4">
                 <Field
                   className=""
@@ -153,7 +159,7 @@ const CreateEmployeeStateInsurance = ({
                     }),
                     disabled: true,
                     autoFocus: true,
-                    placeholder: `Enter number`,
+                    placeholder: "Enter number",
                     className: "capitalize",
                   }}
                   labelProps={{
@@ -175,7 +181,7 @@ const CreateEmployeeStateInsurance = ({
                     }),
                     disabled: true,
                     autoFocus: true,
-                    placeholder: `Enter number`,
+                    placeholder: "Enter number",
                     className: "capitalize",
                   }}
                   labelProps={{

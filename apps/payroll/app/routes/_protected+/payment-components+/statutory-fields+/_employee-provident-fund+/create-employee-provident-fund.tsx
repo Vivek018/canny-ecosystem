@@ -2,7 +2,7 @@ import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { createEmployeeProvidentFund } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import {
+import type {
   EmployeeProvidentFundDatabaseRow,
   Json,
 } from "@canny_ecosystem/supabase/types";
@@ -20,20 +20,18 @@ import {
   SearchableSelectField,
 } from "@canny_ecosystem/ui/forms";
 import {
+  deductionCycleArray,
   EmployeeProvidentFundSchema,
   getInitialValueFromZod,
   isGoodStatus,
   replaceDash,
   replaceUnderscore,
+  transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
-import {
-  deductionCycles,
-} from "@canny_ecosystem/utils/constant";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { type ActionFunctionArgs, json, type LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
-import React from "react";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -134,11 +132,11 @@ const CreateEmployeeProvidentFund = ({
               <SearchableSelectField
                 // key={resetKey}
                 className="capitalize"
-                options={deductionCycles}
+                options={transformStringArrayIntoOptions(deductionCycleArray as unknown as string[])}
                 inputProps={{
                   ...getInputProps(fields.deduction_cycle, { type: "text" }),
                 }}
-                placeholder={`Select an option`}
+                placeholder="Select an option"
                 labelProps={{
                   children: replaceUnderscore(fields.deduction_cycle.name),
                 }}
@@ -225,8 +223,8 @@ const CreateEmployeeProvidentFund = ({
                   </div>
 
                   <div className="absolute h-full top-2/3 left-4 transform -translate-x-1/2 -translate-y-1/2">
-                    <div className="h-[30px] w-[15px] border-l-2 border-b-2 border-gray-300"></div>
-                    <div className="h-[45px] w-[15px] border-l-2 border-b-2 border-gray-300"></div>
+                    <div className="h-[30px] w-[15px] border-l-2 border-b-2 border-gray-300" />
+                    <div className="h-[45px] w-[15px] border-l-2 border-b-2 border-gray-300" />
                   </div>
                 </>
               )}

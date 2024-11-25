@@ -4,7 +4,7 @@ import {
   createStatutoryBonus,
 } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import {
+import type {
   Json,
   StatutoryBonusDatabaseRow,
 } from "@canny_ecosystem/supabase/types";
@@ -30,7 +30,7 @@ import {
 } from "@canny_ecosystem/utils/constant";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { ActionFunctionArgs, json, LoaderFunctionArgs } from "@remix-run/node";
+import { type ActionFunctionArgs, json, type LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -126,7 +126,7 @@ export default function CreateStatutoryBonus({
                 inputProps={{
                   ...getInputProps(fields.payment_frequency, { type: "text" }),
                 }}
-                placeholder={`Select an option`}
+                placeholder="Select an option"
                 labelProps={{
                   children: replaceUnderscore(fields.payment_frequency.name),
                 }}
@@ -153,7 +153,7 @@ export default function CreateStatutoryBonus({
                   disabled: form.value?.payment_frequency !== "monthly",
                   ...getInputProps(fields.payout_month, { type: "text" }),
                 }}
-                placeholder={`Select an option`}
+                placeholder="Select an option"
                 labelProps={{
                   children: replaceUnderscore(fields.payout_month.name),
                 }}
