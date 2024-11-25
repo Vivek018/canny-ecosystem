@@ -5,22 +5,24 @@ export default function PaymentComponents() {
   const { pathname } = useLocation();
 
   return (
-    <section>
-      <SecondaryMenu
-        items={[
-          {
-            label: "Payment Fields",
-            path: "/payment-components/payment-fields",
-          },
-          {
-            label: "Statutory fields",
-            path: "/payment-components/statutory-fields",
-          },
-        ]}
-        pathname={pathname}
-        Link={Link}
-      />
+    <section className='flex flex-col h-full'>
+      <div className='py-[18px] px-4 border-b'>
+        <SecondaryMenu
+          items={[
+            {
+              label: "Payment Fields",
+              path: "/payment-components/payment-fields",
+            },
+            {
+              label: "Statutory fields",
+              path: "/payment-components/statutory-fields",
+            },
+          ]}
+          pathname={pathname}
+          Link={Link}
+        />
+      </div>
       <Outlet />
     </section>
   );
-};
+}
