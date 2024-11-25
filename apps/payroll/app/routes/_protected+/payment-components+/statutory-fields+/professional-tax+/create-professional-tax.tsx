@@ -167,6 +167,7 @@ export default function CreateProfessionalTax({
                 errors={fields.deduction_cycle.errors}
               />
               <RangeField
+                key={resetKey + 2}
                 labelProps={{ children: "Gross Salary Range" }}
                 inputProps={{
                   ...getInputProps(fields.gross_salary_range, {

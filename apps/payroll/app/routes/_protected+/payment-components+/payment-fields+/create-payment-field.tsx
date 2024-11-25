@@ -101,7 +101,7 @@ export default function CreatePaymentField({
   });
 
   return (
-    <section className="md:px-20 lg:px-52 2xl:px-80 py-3">
+    <section className="md:px-20 lg:px-52 2xl:px-80 py-4">
       <FormProvider context={form.context}>
         <Form method="POST" {...getFormProps(form)} className="flex flex-col">
           <Card>
