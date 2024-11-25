@@ -38,7 +38,7 @@ export const DeleteLabourWelfareFund = ({ labourWelfareFundId }: { labourWelfare
                 {},
                 {
                     method: "post",
-                    action: `/settings/${labourWelfareFundId}/delete-labour-welfare-fund`,
+                    action: `/payment-components/statutory-fields/${labourWelfareFundId}/delete-labour-welfare-fund`,
                     replace: true,
                 },
             );

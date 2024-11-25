@@ -33,14 +33,13 @@ import {
 } from "@canny_ecosystem/utils/constant";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { ActionFunctionArgs, json, LoaderFunctionArgs } from "@remix-run/node";
+import { type ActionFunctionArgs, json, type LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
 import React, { useEffect } from "react";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
-  console.log("FORM---------------", formData);
 
   const submission = parseWithZod(formData, {
     schema: EmployeeProvidentFundSchema,
@@ -74,7 +73,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  console.log(companyId);
   return json({ companyId });
 };
 
@@ -89,7 +87,6 @@ const CreateEmployeeProvidentFund = ({
 
   const initialValues =
     updateValues ?? getInitialValueFromZod(EmployeeProvidentFundSchema);
-  console.log(initialValues);
 
   const { companyId } = useLoaderData<{ companyId: string }>();
   const [form, fields] = useForm({

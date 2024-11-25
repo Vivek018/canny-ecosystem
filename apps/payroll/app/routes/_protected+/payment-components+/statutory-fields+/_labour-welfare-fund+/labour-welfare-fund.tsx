@@ -1,6 +1,6 @@
 import { LabourWelfareFundCard } from "@/components/statutory-fields/labour-welfare-fund/labour-welfare-fund-card";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { getLabourWelfareFundByCompanyId } from "@canny_ecosystem/supabase/queries";
+import { getLabourWelfareFundsByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import {
@@ -13,7 +13,6 @@ import {
 } from "@canny_ecosystem/ui/command";
 import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { replaceUnderscore } from "@canny_ecosystem/utils";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/react";
@@ -21,7 +20,7 @@ import { json } from "@remix-run/react";
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data, error } = await getLabourWelfareFundByCompanyId({ supabase, companyId });
+  const { data, error } = await getLabourWelfareFundsByCompanyId({ supabase, companyId });
 
   if (error) throw error;
 
@@ -35,13 +34,13 @@ export default function LabourWelfareFund() {
   const { isDocument } = useIsDocument();
 
   return (
-    <section className="py-4 px-4">
+    <section className="py-4 px-4 w-full">
       <div className="w-full flex items-end justify-between">
         <Command className="overflow-visible">
-          <div className="w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4">
+        <div className="w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4">
             <CommandInput
               divClassName="border border-input rounded-md h-10 flex-1"
-              placeholder="Search Locations"
+              placeholder="Search labour welfare funds"
               autoFocus={true}
             />
             <Link
@@ -67,9 +66,9 @@ export default function LabourWelfareFund() {
                   <CommandItem
                     key={labourWelfareFund.id}
                     value={labourWelfareFund.state}
-                    className="data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0"
+                    className="data-[selected=true]:bg-inherit data-[selected=true]:text-foreground"
                   >
-                    <LabourWelfareFundCard labourWelfareFund={labourWelfareFund}/>
+                    <LabourWelfareFundCard labourWelfareFund={labourWelfareFund} />
                   </CommandItem>
                 ))}
               </div>

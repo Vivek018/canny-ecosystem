@@ -5,7 +5,7 @@ import { json, useLoaderData } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
 import { safeRedirect } from "@/utils/server/http.server";
 import { isGoodStatus, LabourWelfareFundSchema } from "@canny_ecosystem/utils";
-import { getLabourWelfareFundByCompanyId } from "@canny_ecosystem/supabase/queries";
+import { getLabourWelfareFundsById } from "@canny_ecosystem/supabase/queries";
 import { updateLabourWelfareFund } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
@@ -18,7 +18,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   let labourWelfareFundData = null;
 
-  if (labourWelfareFundId) labourWelfareFundData = await getLabourWelfareFundByCompanyId({ supabase, companyId });
+  if (labourWelfareFundId) {
+    labourWelfareFundData = await getLabourWelfareFundsById({
+      supabase,
+      id: labourWelfareFundId,
+      companyId
+    });
+  }
 
   if (labourWelfareFundData?.error) throw labourWelfareFundData.error;
 
@@ -40,7 +46,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const { status, error } = await updateLabourWelfareFund({ supabase, data: submission.value });
 
-  if (isGoodStatus(status)) return safeRedirect("/payment-components/statutory-fields", { status: 303 });
+  if (isGoodStatus(status)) return safeRedirect("/payment-components/statutory-fields/labour-welfare-fund", { status: 303 });
 
   return json({ status, error });
 }

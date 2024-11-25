@@ -3,8 +3,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
@@ -14,7 +12,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@canny_ecosystem/ui/tooltip";
-import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Link } from "@remix-run/react";
 import { DeleteLabourWelfareFund } from "./delete-labour-welfare-fund";
 import {
@@ -36,7 +33,7 @@ export function LabourWelfareFundCard({
       key={labourWelfareFund.id}
       className="w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start"
     >
-      {/* <CardHeader className="flex flex-row space-y-0 items-center justify-between p-4">
+      <CardHeader className="flex flex-row space-y-0 items-center justify-between p-4">
         <CardTitle className="text-lg tracking-wide">{labourWelfareFund.state}</CardTitle>
         <div className="flex items-center gap-3">
           <TooltipProvider>
@@ -44,7 +41,7 @@ export function LabourWelfareFundCard({
               <TooltipTrigger asChild>
                 <Link
                   prefetch="intent"
-                  to={`/settings/${location.id}/update-location`}
+                  to={`/payment-components/statutory-fields/${labourWelfareFund.id}/update-labour-welfare-fund`}
                   className="p-2 rounded-md bg-secondary grid place-items-center"
                 >
                   <Icon name="edit" size="xs" />
@@ -59,59 +56,33 @@ export function LabourWelfareFundCard({
             </DropdownMenuTrigger>
             <DropdownMenuContent sideOffset={10} align="end">
               <DropdownMenuGroup>
-                <DropdownMenuItem
-                  className={cn(
-                    "py-2 text-[13px]",
-                    !location.latitude && "hidden",
-                  )}
-                  onClick={() => {
-                    navigator.clipboard.writeText(String(location.latitude));
-                  }}
-                >
-                  Copy Latitude
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className={cn(
-                    "py-2 text-[13px]",
-                    !location.longitude && "hidden",
-                  )}
-                  onClick={() => {
-                    navigator.clipboard.writeText(String(location.longitude));
-                  }}
-                >
-                  Copy Longitude
-                </DropdownMenuItem>
-                <DropdownMenuSeparator
-                  className={cn(
-                    !location.latitude && !location.longitude && "hidden",
-                  )}
-                />
-                <DeleteLocation locationId={location.id} />
+                <DeleteLabourWelfareFund labourWelfareFundId={labourWelfareFund.id} />
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-      </CardHeader> */}
-      {/* <CardContent className="flex flex-col gap-0.5 px-4">
-        <address className="not-italic line-clamp-3">
-          {`${location.address_line_1} ${location.address_line_2 ? location.address_line_2 : ""
-            }`}
-        </address>
-        <div className="flex items-center capitalize gap-2">
-          <p>{`${location.city},`}</p>
-          <p>{`${replaceUnderscore(location.state)}`}</p>
-          <p>{`- ${location.pincode}`}</p>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-2 w-full">
+        <div className="flex justify-between">
+          <span className="font-medium">Employee Contribution:</span>
+          <span>{labourWelfareFund.employee_contribution}</span>
         </div>
-      </CardContent> */}
-      <CardFooter
-        className={cn(
-          "px-2.5 ml-auto bg-secondary text-foreground py-1.5 text-sm tracking-wide font-sem rounded-tl-md border-foreground flex gap-1 justify-center",
-          !labourWelfareFund.status && "opacity-0",
-        )}
-      >
-        <Icon name="dot-filled" size="xs" />
-        Primary
-      </CardFooter>
+        <div className="flex justify-between">
+          <span className="font-medium">Employer Contribution:</span>
+          <span>{labourWelfareFund.employer_contribution}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="font-medium">Deduction Cycle:</span>
+          <span>{replaceUnderscore(labourWelfareFund.deduction_cycle)}</span>
+        </div>
+      </CardContent>
+      {
+        labourWelfareFund.status && <CardFooter
+          className="px-2.5 ml-auto bg-secondary text-foreground py-1.5 text-sm tracking-wide font-sem rounded-tl-md border-foreground flex gap-1 justify-center"
+        >
+          <Icon name="dot-filled" size="xs" />Active
+        </CardFooter>
+      }
     </Card>
   );
 }

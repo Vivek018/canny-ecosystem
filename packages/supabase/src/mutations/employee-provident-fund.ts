@@ -113,8 +113,6 @@ export const deleteEmployeeProvidentFund = async ({
     console.error(error);
   }
 
-  console.log("-------------------", status, error)
-
   return {
     status,
     error,

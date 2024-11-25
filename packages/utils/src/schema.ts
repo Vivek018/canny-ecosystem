@@ -397,28 +397,30 @@ export const EmployeeWorkHistorySchema = z.object({
   end_date: z.string(),
 });
 
-const deductionCycleArray = ["monthly", "yearly", "half_yearly"] as const;
+const deductionCycleArray = [
+  "monthly",
+  "quaterly",
+  "half_yearly",
+  "yearly",
+] as const;
 const EMPLOYEE_RESTRICTED_VALUE = 15000;
 const EMPLOYEE_RESTRICTED_RATE = 0.2;
 
-export const EmployeeProvidentFundSchema = z
-  .object({
-    id: z.string().optional(),
-    company_id: z.string(),
-    epf_number: z.string().max(20),
-    deduction_cycle: z
-      .enum(deductionCycleArray)
-      .default(deductionCycleArray[0]),
-    employee_contribution: z.number().default(EMPLOYEE_RESTRICTED_RATE),
-    employer_contribution: z.number().default(EMPLOYEE_RESTRICTED_RATE),
-    employee_restrict_value: z.number().default(EMPLOYEE_RESTRICTED_VALUE),
-    employer_restrict_value: z.number().default(EMPLOYEE_RESTRICTED_VALUE),
-    restrict_employer_contribution: z.boolean().default(false),
-    restrict_employee_contribution: z.boolean().default(false),
-    include_employer_contribution: z.boolean().default(false),
-    include_employer_edli_contribution: z.boolean().default(false),
-    include_admin_charges: z.boolean().default(false),
-  })
+export const EmployeeProvidentFundSchema = z.object({
+  id: z.string().optional(),
+  company_id: z.string(),
+  epf_number: z.string().max(20),
+  deduction_cycle: z.enum(deductionCycleArray).default(deductionCycleArray[0]),
+  employee_contribution: z.number().default(EMPLOYEE_RESTRICTED_RATE),
+  employer_contribution: z.number().default(EMPLOYEE_RESTRICTED_RATE),
+  employee_restrict_value: z.number().default(EMPLOYEE_RESTRICTED_VALUE),
+  employer_restrict_value: z.number().default(EMPLOYEE_RESTRICTED_VALUE),
+  restrict_employer_contribution: z.boolean().default(false),
+  restrict_employee_contribution: z.boolean().default(false),
+  include_employer_contribution: z.boolean().default(false),
+  include_employer_edli_contribution: z.boolean().default(false),
+  include_admin_charges: z.boolean().default(false),
+});
 
 export const EmployeeStateInsuranceSchema = z.object({
   id: z.string().optional(),
@@ -451,7 +453,7 @@ export const LabourWelfareFundSchema = z.object({
   state: z.string(),
   employee_contribution: z.number().default(6),
   employer_contribution: z.number().default(12),
-  deduction_cycle: z.enum(deductionCycleArray).default(deductionCycleArray[2]),
+  deduction_cycle: z.enum(deductionCycleArray).default(deductionCycleArray[0]),
   status: z.boolean().default(false),
 });
 
@@ -496,6 +498,7 @@ export const FeedbackSchema = z.object({
   user_id: z.string(),
   company_id: z.string(),
 });
+
 // Payment Fields
 export const paymentTypeArray = ["fixed", "variable"] as const;
 export const calculationTypeArray = ["fixed", "percentage_of_basic"] as const;
@@ -519,5 +522,5 @@ export const PaymentFieldSchema = z
     {
       message: `When payment type is "variable", calculation type must be "fixed".`,
       path: ["calculation_type"],
-    },
+    }
   );

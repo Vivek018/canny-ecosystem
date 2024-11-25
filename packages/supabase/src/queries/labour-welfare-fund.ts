@@ -106,20 +106,43 @@ export async function deleteLabourWelfareFund({
   return { status, error };
 }
 
-
-export async function getLabourWelfareFundByCompanyId({
+export async function getLabourWelfareFundsById({
   supabase,
+  id,
   companyId,
-}: {
-  supabase: TypedSupabaseClient;
-  companyId: string;
-}) {
+}: { supabase: TypedSupabaseClient; id: string; companyId: string }) {
   const columns = [
     "id",
     "company_id",
     "state",
-    "employer_contribution",
     "employee_contribution",
+    "employer_contribution",
+    "deduction_cycle",
+    "status",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("labour_welfare_fund")
+    .select(columns.join(","))
+    .eq("id", id)
+    .eq("company_id", companyId)
+    .single<InferredType<LabourWelfareFundDatabaseRow, (typeof columns)[number]>>();
+
+  if (error) console.error(error);
+
+  return { data, error };
+}
+
+export async function getLabourWelfareFundsByCompanyId({
+  supabase,
+  companyId,
+}: { supabase: TypedSupabaseClient; companyId: string }) {
+  const columns = [
+    "id",
+    "company_id",
+    "state",
+    "employee_contribution",
+    "employer_contribution",
     "deduction_cycle",
     "status",
   ] as const;
@@ -130,9 +153,7 @@ export async function getLabourWelfareFundByCompanyId({
     .eq("company_id", companyId)
     .limit(HARD_QUERY_LIMIT)
     .order("created_at", { ascending: false })
-    .returns<
-      InferredType<LabourWelfareFundDataType, (typeof columns)[number]>[]
-    >();
+    .returns<InferredType<LabourWelfareFundDatabaseRow, (typeof columns)[number]>[]>();
 
   if (error) console.error(error);
 

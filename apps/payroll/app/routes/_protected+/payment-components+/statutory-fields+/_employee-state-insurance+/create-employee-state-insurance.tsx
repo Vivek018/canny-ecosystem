@@ -41,7 +41,6 @@ import React from "react";
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
-  console.log("FORM---------------", formData);
 
   const submission = parseWithZod(formData, {
     schema: EmployeeStateInsuranceSchema,
@@ -69,7 +68,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     );
   }
 
-  console.log("--------------", status, error);
 
   return json({ status, error });
 };
@@ -91,10 +89,8 @@ const CreateEmployeeStateInsurance = ({
 
   const initialValues =
     updateValues ?? getInitialValueFromZod(EmployeeStateInsuranceSchema);
-  console.log(initialValues);
 
   const { companyId } = useLoaderData<{ companyId: string }>();
-  console.log(companyId);
   const [form, fields] = useForm({
     id: EPF_TAG,
     constraint: getZodConstraint(EmployeeProvidentFundSchema),

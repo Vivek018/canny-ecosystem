@@ -56,16 +56,17 @@ export const statesAndUTs = [
 
 export const deductionCycles = [
   { value: "monthly", label: "Monthly" },
-  { value: "yearly", label: "Yearly" },
+  { value: "quaterly", label: "Quaterly" },
   { value: "half_yearly", label: "Half Yearly" },
+  { value: "yearly", label: "Yearly" },
 ];
 
 export const employeeContributionRate = [
   { value: false, label: "20% of Actual PF Wage" },
-  { value: true, label: "Restrict Contribution to ₹15,000 of PF Wage"}
-]
+  { value: true, label: "Restrict Contribution to ₹15,000 of PF Wage" },
+];
 
 export const employerContributionRate = [
   { value: false, label: "20% of Actual PF Wage" },
-  { value: true, label: "Restrict Contribution to ₹15,000 of PF Wage"}
-]
+  { value: true, label: "Restrict Contribution to ₹15,000 of PF Wage" },
+];

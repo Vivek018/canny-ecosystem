@@ -1,4 +1,4 @@
-import { deductionCycleArray, isGoodStatus, LabourWelfareFundSchema, replaceUnderscore } from "@canny_ecosystem/utils";
+import { isGoodStatus, LabourWelfareFundSchema, replaceUnderscore } from "@canny_ecosystem/utils";
 import { CheckboxField, Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import { getInitialValueFromZod, replaceDash } from "@canny_ecosystem/utils";
 import { FormProvider, getFormProps, getInputProps, useForm } from "@conform-to/react";
@@ -13,7 +13,7 @@ import { UPDATE_LABOUR_WELFARE_FUND } from "./$labourWelfareFundId.update-labour
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@canny_ecosystem/ui/card";
 import { createLabourWelfareFund } from "@canny_ecosystem/supabase/mutations";
 import type { LabourWelfareFundDatabaseUpdate } from "@canny_ecosystem/supabase/types";
-import { statesAndUTs } from "@canny_ecosystem/utils/constant";
+import { deductionCycles } from "@canny_ecosystem/utils/constant";
 import { FormButtons } from "@/components/form/form-buttons";
 
 export const CREATE_LABOUR_WELFARE_FUND = "create-labour-welfare-fund";
@@ -26,9 +26,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+    // return null;
     const { supabase } = getSupabaseWithHeaders({ request });
     const formData = await request.formData();
-
     const submission = parseWithZod(formData, { schema: LabourWelfareFundSchema });
 
     if (submission.status !== "success") {
@@ -40,7 +40,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
     const { status, error } = await createLabourWelfareFund({ supabase, data: submission.value as any });
 
-    if (isGoodStatus(status)) return safeRedirect("/payment-components/statutory-fields", { status: 303 });
+    if (isGoodStatus(status)) return safeRedirect("/payment-components/statutory-fields/labour-welfare-fund", { status: 303 });
 
     return json({ status, error });
 }
@@ -50,7 +50,6 @@ export default function CreateLabourWelfareFund({ updateValues }: {
 }) {
     const { companyId } = useLoaderData<typeof loader>();
     const LABOUR_WELFARE_FUND_TAG = updateValues ? UPDATE_LABOUR_WELFARE_FUND : CREATE_LABOUR_WELFARE_FUND;
-
     const initialValues = updateValues ?? getInitialValueFromZod(LabourWelfareFundSchema);
     const [resetKey, setResetKey] = useState(Date.now());
 
@@ -67,9 +66,9 @@ export default function CreateLabourWelfareFund({ updateValues }: {
             company_id: initialValues.company_id ?? companyId,
         },
     });
-
+    
     return (
-        <section className="md:px-20 lg:px-52 2xl:px-80 py-3">
+        <section className="md:px-20 lg:px-32 2xl:px-80 py-3 w-full">
             <FormProvider context={form.context}>
                 <Form method="POST" {...getFormProps(form)} className="flex flex-col">
                     <Card>
@@ -102,7 +101,7 @@ export default function CreateLabourWelfareFund({ updateValues }: {
                                     placeholder: `Enter ${fields.employee_contribution.name}`,
                                 }}
                                 labelProps={{
-                                    children: fields.employee_contribution.name,
+                                    children: replaceUnderscore(fields.employee_contribution.name),
                                 }}
                                 errors={fields.employee_contribution.errors}
                             />
@@ -113,18 +112,32 @@ export default function CreateLabourWelfareFund({ updateValues }: {
                                     placeholder: `Enter ${fields.employer_contribution.name}`,
                                 }}
                                 labelProps={{
-                                    children: fields.employer_contribution.name,
+                                    children: replaceUnderscore(fields.employer_contribution.name),
                                 }}
                                 errors={fields.employer_contribution.errors}
                             />
+                            <SearchableSelectField
+                                key={resetKey}
+                                className="capitalize"
+                                options={deductionCycles}
+                                inputProps={{
+                                    ...getInputProps(fields.deduction_cycle, { type: "text" }),
+                                }}
+                                placeholder={`Select ${fields.deduction_cycle.name}`}
+                                labelProps={{
+                                    children: replaceUnderscore(fields.deduction_cycle.name),
+                                }}
+                                errors={fields.state.errors}
+                            />
                             <CheckboxField
-                                buttonProps={getInputProps(fields.status, { type: "checkbox" })}
+                                buttonProps={getInputProps(fields.status, {
+                                    type: "checkbox",
+                                })}
                                 labelProps={{
                                     htmlFor: fields.status.id,
-                                    children: fields.status.value ? "Enabled" : "Disabled",
+                                    children: fields.status.value ? "Active" : "In Active",
                                 }}
                             />
-                            {/* deduction field */}
                         </CardContent>
                         <FormButtons
                             form={form}
@@ -137,3 +150,5 @@ export default function CreateLabourWelfareFund({ updateValues }: {
         </section>
     );
 }
+
+
