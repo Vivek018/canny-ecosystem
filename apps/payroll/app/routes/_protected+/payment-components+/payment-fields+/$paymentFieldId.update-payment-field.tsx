@@ -59,7 +59,7 @@ export async function action({ request }: ActionFunctionArgs) {
   });
 
   if (isGoodStatus(status))
-    return safeRedirect("/payment-fields", { status: 303 });
+    return safeRedirect("/payment-components/payment-fields", { status: 303 });
 
   return json({ status, error });
 }

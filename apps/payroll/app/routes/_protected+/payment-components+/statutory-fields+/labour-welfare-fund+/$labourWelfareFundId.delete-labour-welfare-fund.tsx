@@ -1,5 +1,5 @@
 import { safeRedirect } from "@/utils/server/http.server";
-import { deletePaymentField } from "@canny_ecosystem/supabase/mutations";
+import { deleteLabourWelfareFund } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { isGoodStatus } from "@canny_ecosystem/utils";
 import type { ActionFunctionArgs } from "@remix-run/node";
@@ -7,14 +7,14 @@ import { json } from "@remix-run/react";
 
 export async function action({ request, params }: ActionFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
-  const paymentFieldId = params.paymentFieldId;
+  const labourWelfareFundId = params.labourWelfareFundId;
 
-  const { status, error } = await deletePaymentField({
+  const { status, error } = await deleteLabourWelfareFund({
     supabase,
-    id: paymentFieldId ?? "",
+    id: labourWelfareFundId ?? "",
   });
 
-  if (isGoodStatus(status)) return safeRedirect("/payment-components/payment-fields", { headers });
+  if (isGoodStatus(status)) return safeRedirect("/payment-components/statutory-fields/labour-welfare-fund", { headers });
 
   if (error) throw error;
 

@@ -30,7 +30,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const returnTo = formData.get("returnTo");
   if (isGoodStatus(status))
-    return safeRedirect(returnTo ?? "/payment-fields", { status: 303 });
+    return safeRedirect(returnTo ?? "/payment-components/payment-fields", { status: 303 });
 
   return json({ status, error });
 }

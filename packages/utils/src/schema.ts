@@ -397,7 +397,7 @@ export const EmployeeWorkHistorySchema = z.object({
   end_date: z.string(),
 });
 
-export const deductionCycleArray = ["monthly"] as const;
+export const deductionCycleArray=["monthly"] as const;
 export const EMPLOYEE_RESTRICTED_VALUE = 15000;
 export const EMPLOYEE_RESTRICTED_RATE = 0.2;
 
@@ -444,9 +444,7 @@ export const LabourWelfareFundSchema = z.object({
   state: z.string(),
   employee_contribution: z.number().default(6),
   employer_contribution: z.number().default(12),
-  deduction_cycle: z
-    .enum(lwfDeductionCycleArray)
-    .default(lwfDeductionCycleArray[2]),
+  deduction_cycle: z.enum(lwfDeductionCycleArray).default(lwfDeductionCycleArray[0]),
   status: z.boolean().default(false),
 });
 

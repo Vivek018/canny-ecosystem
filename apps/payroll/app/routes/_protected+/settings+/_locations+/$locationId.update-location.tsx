@@ -7,7 +7,6 @@ import { safeRedirect } from "@/utils/server/http.server";
 import { isGoodStatus, LocationSchema } from "@canny_ecosystem/utils";
 import { getLocationById } from "@canny_ecosystem/supabase/queries";
 import { updateLocation } from "@canny_ecosystem/supabase/mutations";
-import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
 export const UPDATE_LOCATION = "update-location";
 
@@ -15,14 +14,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const locationId = params.locationId;
   const { supabase } = getSupabaseWithHeaders({ request });
 
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   let locationData = null;
 
   if (locationId) {
     locationData = await getLocationById({
       supabase,
-      id: locationId,
-      companyId,
+      id: locationId
     });
   }
 
