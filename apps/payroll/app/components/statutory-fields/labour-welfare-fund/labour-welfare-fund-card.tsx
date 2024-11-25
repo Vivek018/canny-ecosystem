@@ -1,4 +1,4 @@
-import type { LabourWelfareFundDatabaseRow } from "@canny_ecosystem/supabase/types";
+ import type { LabourWelfareFundDatabaseRow } from "@canny_ecosystem/supabase/types";
 import {
   DropdownMenu,
   DropdownMenuContent,
