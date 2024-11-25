@@ -1,6 +1,6 @@
 import { useInputControl } from "@conform-to/react";
 import type React from "react";
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { Checkbox, type CheckboxProps } from "./checkbox";
 import { Input } from "./input";
 import { Label } from "./label";
@@ -24,9 +24,9 @@ export function ErrorList({
   const errorsToRender = errors?.filter(Boolean);
   if (!errorsToRender?.length) return null;
   return (
-    <ul id={id} className="flex flex-col gap-1">
+    <ul id={id} className='flex flex-col gap-1'>
       {errorsToRender.map((e) => (
-        <li key={e} className="text-[10px] text-destructive">
+        <li key={e} className='text-[10px] text-destructive'>
           {e}
         </li>
       ))}
@@ -56,7 +56,7 @@ export function Field({
 
   return (
     <div className={cn("w-full flex flex-col gap-1.5", className)}>
-      <div className="flex flex-row gap-[1px]">
+      <div className='flex flex-row gap-[1px]'>
         <Label htmlFor={id} {...labelProps} />
         <sub
           className={cn(
@@ -67,8 +67,8 @@ export function Field({
           *
         </sub>
       </div>
-      <div className="relative flex items-center">
-        {prefix && <span className="absolute left-2 text-muted">{prefix}</span>}
+      <div className='relative flex items-center'>
+        {prefix && <span className='absolute left-2 text-muted'>{prefix}</span>}
         <Input
           id={id}
           aria-invalid={errorId ? true : undefined}
@@ -81,10 +81,10 @@ export function Field({
           )}
         />
         {suffix && (
-          <span className="absolute right-2 text-muted">{suffix}</span>
+          <span className='absolute right-2 text-muted'>{suffix}</span>
         )}
       </div>
-      <div className="min-h-[28px] px-4 pb-4 pt-1">
+      <div className='min-h-[28px] px-4 pb-4 pt-1'>
         {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
       </div>
     </div>
@@ -109,7 +109,7 @@ export function TextareaField({
 
   return (
     <div className={cn("w-full flex flex-col gap-1.5", className)}>
-      <div className="flex flex-row gap-[1px]">
+      <div className='flex flex-row gap-[1px]'>
         <Label htmlFor={id} {...labelProps} />
         <sub
           className={cn(
@@ -126,7 +126,7 @@ export function TextareaField({
         aria-describedby={errorId}
         {...textareaProps}
       />
-      <div className="min-h-[28px] px-4 pb-4 pt-1">
+      <div className='min-h-[28px] px-4 pb-4 pt-1'>
         {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
       </div>
     </div>
@@ -165,7 +165,7 @@ export function CheckboxField({
 
   return (
     <div className={className}>
-      <div className="flex items-center gap-2">
+      <div className='flex items-center gap-2'>
         <Checkbox
           {...checkboxProps}
           id={id}
@@ -184,12 +184,12 @@ export function CheckboxField({
             input.blur();
             buttonProps.onBlur?.(event);
           }}
-          type="button"
+          type='button'
         />
         <Label
           htmlFor={id}
           {...labelProps}
-          className="self-center text-foreground"
+          className='self-center text-foreground'
         />
         <sub
           className={cn(
@@ -200,17 +200,13 @@ export function CheckboxField({
           *
         </sub>
       </div>
-      <div className="px-4 pb-6 pt-1">
+      <div className='px-4 pb-6 pt-1'>
         {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
       </div>
     </div>
   );
 }
 
-export type DefaultOptionTypes = {
-  label: string;
-  value: boolean | string;
-};
 type SearchableSelectFieldProps = {
   options: ComboboxSelectOption[];
   labelProps?: React.LabelHTMLAttributes<HTMLLabelElement>;
@@ -243,7 +239,7 @@ export function SearchableSelectField({
 
   return (
     <div className={cn("w-full flex flex-col gap-1.5", className)}>
-      <div className="flex">
+      <div className='flex'>
         <Label {...labelProps} />
         <sub
           className={cn(
@@ -255,7 +251,7 @@ export function SearchableSelectField({
         </sub>
       </div>
       <input
-        type="hidden"
+        type='hidden'
         id={id}
         name={inputProps.name}
         value={input.value ?? ""}
@@ -273,7 +269,7 @@ export function SearchableSelectField({
         placeholder={placeholder ?? inputProps.placeholder}
         disabled={inputProps.disabled}
       />
-      <div className="min-h-[32px] px-4 pb-3 pt-1">
+      <div className='min-h-[32px] px-4 pb-3 pt-1'>
         {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
       </div>
     </div>
@@ -366,7 +362,7 @@ export function JSONBField({
 
   return (
     <div className={cn("w-full flex flex-col gap-1.5", className)}>
-      <div className="flex">
+      <div className='flex'>
         <Label htmlFor={inputProps.id} {...labelProps} />
         <sub
           className={cn(
@@ -378,40 +374,40 @@ export function JSONBField({
         </sub>
       </div>
       {pairs.map((pair, index) => (
-        <div key={index.toString()} className="flex gap-2 mb-2">
+        <div key={index.toString()} className='flex gap-2 mb-2'>
           <Input
-            placeholder="Key"
+            placeholder='Key'
             value={pair.key}
             onChange={(e) => handleKeyChange(index, e.target.value)}
-            className="flex-1"
+            className='flex-1'
           />
           <Input
-            placeholder="Value"
+            placeholder='Value'
             value={pair.value}
             onChange={(e) => handleValueChange(index, e.target.value)}
-            className="flex-1"
+            className='flex-1'
           />
           <Button
-            type="button"
+            type='button'
             onClick={() => removePair(index)}
-            variant="destructive-outline"
-            className="px-3"
+            variant='destructive-outline'
+            className='px-3'
           >
-            <Icon name="cross" size="md" />
+            <Icon name='cross' size='md' />
           </Button>
         </div>
       ))}
       <Button
-        type="button"
+        type='button'
         onClick={addPair}
-        variant="primary-outline"
-        className="mt-2"
+        variant='primary-outline'
+        className='mt-2'
       >
         Add Key-Value Pair
       </Button>
       <input
         {...inputProps}
-        type="hidden"
+        type='hidden'
         id={id}
         defaultValue={undefined}
         value={JSON.stringify(
@@ -421,9 +417,177 @@ export function JSONBField({
           }, {} as Record<string, string>)
         )}
       />
-      <div className="min-h-[28px] px-4 pb-4 pt-1">
+      <div className='min-h-[28px] px-4 pb-4 pt-1'>
         {errors && errors.length > 0 ? <ErrorList errors={errors} /> : null}
       </div>
     </div>
   );
 }
+
+export type FieldConfig = {
+  key: string;
+  type: "number" | "text";
+  placeholder?: string;
+};
+
+export type RangeFieldProps = {
+  labelProps?: React.LabelHTMLAttributes<HTMLLabelElement>;
+  inputProps: {
+    id?: string;
+    name: string;
+    required?: boolean;
+    defaultValue?: string;
+    onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  };
+  errors?: string[];
+  className?: string;
+  fields: FieldConfig[];
+};
+
+export const RangeField = ({
+  labelProps,
+  inputProps,
+  errors,
+  className,
+  fields,
+}: RangeFieldProps) => {
+  const fallbackId = useId();
+  const id = inputProps.id ?? fallbackId;
+  const isRequired = inputProps.required;
+
+  const [ranges, setRanges] = useState<Array<Record<string, any>>>([
+    (() => {
+      const acc: Record<string, any> = {};
+      for (const field of fields) {
+        acc[field.key] = "";
+      }
+      return acc;
+    })(),
+  ]);
+
+  useEffect(() => {
+    try {
+      if (inputProps.defaultValue) {
+        const parsedValue = JSON.parse(inputProps.defaultValue);
+        if (Array.isArray(parsedValue)) {
+          setRanges(parsedValue);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to parse range value:", error);
+    }
+  }, [inputProps.defaultValue]);
+
+  const updateValue = (newRanges: Array<Record<string, any>>) => {
+    const event = {
+      target: {
+        name: inputProps.name,
+        value: JSON.stringify(newRanges),
+      },
+    } as React.ChangeEvent<HTMLInputElement>;
+
+    inputProps?.onChange?.(event);
+  };
+
+  const handleFieldChange = (
+    index: number,
+    fieldKey: string,
+    value: string
+  ) => {
+    const newRanges = [...ranges];
+    newRanges[index] = {
+      ...newRanges[index],
+      [fieldKey]:
+        fields.find((f) => f.key === fieldKey)?.type === "number"
+          ? Number(value) || 0
+          : value,
+    };
+    setRanges(newRanges);
+    updateValue(newRanges);
+  };
+
+  const addRange = () => {
+    const newRange = fields.reduce((acc: Record<string, any>, field) => {
+      acc[field.key] = field.type === "number" ? 0 : "";
+      return acc;
+    }, {} as Record<string, any>);
+
+    const newRanges = [...ranges, newRange];
+    setRanges(newRanges);
+    updateValue(newRanges);
+  };
+
+  const removeRange = (index: number) => {
+    const newRanges = ranges.filter((_, i) => i !== index);
+    setRanges(newRanges);
+    updateValue(newRanges);
+  };
+
+  return (
+    <div className={cn("w-full flex flex-col gap-1.5", className)}>
+      <div className='flex'>
+        <Label htmlFor={inputProps.id} {...labelProps} />
+        <sub
+          className={cn(
+            "hidden text-primary",
+            labelProps?.children && isRequired && "inline"
+          )}
+        >
+          *
+        </sub>
+      </div>
+
+      {ranges.map((range, index) => (
+        <div key={String(index)} className='flex gap-2 mb-2'>
+          {fields.map((field) => (
+            <Input
+              key={field.key}
+              type={field.type}
+              placeholder={field.placeholder || field.key}
+              value={range[field.key]}
+              onChange={(e) =>
+                handleFieldChange(index, field.key, e.target.value)
+              }
+              className='flex-1'
+            />
+          ))}
+          <Button
+            type='button'
+            onClick={() => removeRange(index)}
+            variant='destructive-outline'
+            className='px-3'
+          >
+            <Icon name='cross' />
+          </Button>
+        </div>
+      ))}
+
+      <Button
+        type='button'
+        onClick={addRange}
+        variant='primary-outline'
+        className='mt-2'
+      >
+        Add Range
+      </Button>
+
+      <input
+        {...inputProps}
+        type='hidden'
+        id={id}
+        defaultValue={undefined}
+        value={JSON.stringify(ranges)}
+      />
+
+      <div className='min-h-[28px] px-4 pb-4 pt-1'>
+        {errors && errors.length > 0 ? (
+          <div className='text-red-500'>
+            {errors.map((error, index) => (
+              <div key={String(index)}>{error}</div>
+            ))}
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+};

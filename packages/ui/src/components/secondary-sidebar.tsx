@@ -1,5 +1,5 @@
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { Link, NavLink, useLocation } from "@remix-run/react";
+import { NavLink, useLocation } from "@remix-run/react";
 export const SecondarySidebar = ({
   className,
   items,
@@ -12,22 +12,22 @@ export const SecondarySidebar = ({
   return (
     <aside
       className={cn(
-        "flex py-4 h-full flex-col items-start justify-start overflow-hidden bg-background border-r",
+        "flex py-4 flex-col items-start justify-start overflow-hidden bg-background border-r",
         className
       )}
     >
       <nav
         className={cn(
-          "no-scrollbar flex h-full flex-col px-4 gap-4 overflow-y-scroll overflow-x-hidden items-center"
+          "no-scrollbar h-full overflow-x-hidden overflow-y-scroll flex flex-col px-4 gap-4 items-center"
         )}
       >
-        <ul className="flex h-full flex-col gap-1.5 items-start">
+        <ul className='h-full flex flex-col gap-1.5 items-start'>
           {items?.map(({ name, link }) => {
             return (
               <NavLink
                 key={name + link}
                 to={link ?? ""}
-                prefetch="intent"
+                prefetch='intent'
                 className={({ isActive }: { isActive: boolean }) =>
                   cn(
                     "flex cursor-pointer text-start text-sm justify-start w-44 px-3.5 rounded py-2.5 tracking-wide hover:bg-accent gap-3 transition-[width]",
@@ -40,10 +40,7 @@ export const SecondarySidebar = ({
                   )
                 }
               >
-                {/* <span className="shrink-0">{name}</span> */}
-                <span className={cn("min-w-max")}>
-                  {name}
-                </span>
+                <span className={cn("min-w-max w-44 truncate")}>{name}</span>
               </NavLink>
             );
           })}
