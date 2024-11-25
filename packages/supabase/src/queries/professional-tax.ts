@@ -1,90 +1,67 @@
-import { convertToNull } from "@canny_ecosystem/utils";
-import type {
-  ProfessionalTaxDatabaseInsert,
-  ProfessionalTaxDatabaseUpdate,
-  TypedSupabaseClient,
-} from "../types";
-export async function createProfessionalTax({
+import { HARD_QUERY_LIMIT } from "../constant";
+import type { InferredType, ProfessionalTaxDatabaseRow, TypedSupabaseClient } from "../types";
+
+export async function getProfessionalTaxesByCompanyId({
   supabase,
-  data,
-  bypassAuth = false,
+  companyId,
 }: {
   supabase: TypedSupabaseClient;
-  data: ProfessionalTaxDatabaseInsert;
-  bypassAuth?: boolean;
+  companyId: string;
 }) {
-  if (!bypassAuth) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user?.email) {
-      return { status: 400, error: "Unauthorized User" };
-    }
-  }
-  const {
-    error,
-    status,
-    data: professionalTax,
-  } = await supabase.from("professional_tax").insert(data).select().single();
+  const columns = [
+    "id",
+    "company_id",
+    "state",
+    "pt_number",
+    "deduction_cycle",
+    "gross_salary_range",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("professional_tax")
+    .select(columns.join(","))
+    .eq("company_id", companyId)
+    .limit(HARD_QUERY_LIMIT)
+    .order("created_at", { ascending: false })
+    .returns<
+      InferredType<ProfessionalTaxDatabaseRow, (typeof columns)[number]>[]
+    >();
+
   if (error) {
     console.error(error);
   }
-  return { status, error, id: professionalTax?.id };
+
+  return { data, error };
 }
-export async function updateProfessionalTax({
-  supabase,
-  data,
-  bypassAuth = false,
-}: {
-  supabase: TypedSupabaseClient;
-  data: ProfessionalTaxDatabaseUpdate;
-  bypassAuth?: boolean;
-}) {
-  if (!bypassAuth) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user?.email) {
-      return { status: 400, error: "Unauthorized User" };
-    }
-  }
-  const updateData = convertToNull(data);
-  const { error, status } = await supabase
-    .from("professional_tax")
-    .update(updateData)
-    .eq("id", data.id!)
-    .select()
-    .single();
-  if (error) {
-    console.error("error", error);
-  }
-  return { status, error };
-}
-export async function deleteProfessionalTax({
+
+export async function getProfessionalTaxById({
   supabase,
   id,
-  bypassAuth = false,
+  companyId,
 }: {
   supabase: TypedSupabaseClient;
   id: string;
-  bypassAuth?: boolean;
+  companyId: string;
 }) {
-  if (!bypassAuth) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user?.email) {
-      return { status: 400, error: "Unauthorized User" };
-    }
-  }
-  const { error, status } = await supabase
+  const columns = [
+    "id",
+    "company_id",
+    "state",
+    "pt_number",
+    "deduction_cycle",
+    "gross_salary_range",
+  ] as const;
+
+  const { data, error } = await supabase
     .from("professional_tax")
-    .delete()
+    .select(columns.join(","))
     .eq("id", id)
-    .select()
-    .single();
+    .eq("company_id", companyId)
+    .single<InferredType<ProfessionalTaxDatabaseRow, (typeof columns)[number]>>();
+
   if (error) {
     console.error(error);
   }
-  return { status, error };
+
+  return { data, error };
 }

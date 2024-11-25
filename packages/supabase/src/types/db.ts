@@ -899,9 +899,7 @@ export type Database = {
           company_id: string
           created_at: string | null
           deduction_cycle: string
-          gross_salary_range:
-            | Database["public"]["CompositeTypes"]["salary_range_object"][]
-            | null
+          gross_salary_range: Json | null
           id: string
           pt_number: string
           state: string
@@ -911,9 +909,7 @@ export type Database = {
           company_id: string
           created_at?: string | null
           deduction_cycle?: string
-          gross_salary_range?:
-            | Database["public"]["CompositeTypes"]["salary_range_object"][]
-            | null
+          gross_salary_range?: Json | null
           id?: string
           pt_number: string
           state: string
@@ -923,9 +919,7 @@ export type Database = {
           company_id?: string
           created_at?: string | null
           deduction_cycle?: string
-          gross_salary_range?:
-            | Database["public"]["CompositeTypes"]["salary_range_object"][]
-            | null
+          gross_salary_range?: Json | null
           id?: string
           pt_number?: string
           state?: string

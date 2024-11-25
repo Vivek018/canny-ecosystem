@@ -430,24 +430,14 @@ export const EmployeeStateInsuranceSchema = z.object({
 export const ProfessionalTaxSchema = z.object({
   id: z.string().optional(),
   company_id: z.string(),
+  state: zString,
   pt_number: zNumberString.max(20),
   deduction_cycle: z.enum(deductionCycleArray).default(deductionCycleArray[0]),
-  state: z.string(),
-  gross_salary_range: z.array(
-    z.object({
-      start: z.number(),
-      end: z.number(),
-      tax_amount: z.number(),
-    })
-  ),
+  gross_salary_range: z.any(),
 });
 
-export const lwfDeductionCycleArray = [
-  "monthly",
-  "quaterly",
-  "half_yearly",
-  "yearly",
-] as const;
+export const lwfDeductionCycleArray = ["monthly", "quarterly", "half_yearly", "yearly"] as const;
+
 export const LabourWelfareFundSchema = z.object({
   id: z.string().optional(),
   company_id: z.string(),
@@ -463,29 +453,30 @@ const statutoryBonusPayFrequencyArray = ["monthly", "yearly"] as const;
 export const StatutoryBonusSchema = z
   .object({
     id: z.string().optional(),
+    company_id: z.string(),
     payment_frequency: z
       .enum(statutoryBonusPayFrequencyArray)
-      .default("monthly"),
-    percentage: z.number().min(0).max(1),
-    payout_month: z.string().nullable().optional(),
+      .default(statutoryBonusPayFrequencyArray[0]),
+    percentage: z.number().min(0).default(8.33).transform(value => value / 100),
+    payout_month: z.number().optional(),
   })
-  .superRefine((data, ctx) => {
-    if (data.payment_frequency === "yearly" && !data.payout_month) {
-      ctx.addIssue({
-        path: ["payout_month"],
-        message: "payout_month is required when payment_freq is 'yearly'",
-        code: z.ZodIssueCode.custom,
-      });
-    }
+  // .superRefine((data, ctx) => {
+  //   if (data.payment_frequency === "yearly" && !data.payout_month) {
+  //     ctx.addIssue({
+  //       path: ["payout_month"],
+  //       message: "payout_month is required when payment_freq is 'yearly'",
+  //       code: z.ZodIssueCode.custom,
+  //     });
+  //   }
 
-    if (data.payment_frequency === "monthly" && data.payout_month !== null) {
-      ctx.addIssue({
-        path: ["payout_month"],
-        message: "payout_month must be null when payment_freq is 'monthly'",
-        code: z.ZodIssueCode.custom,
-      });
-    }
-  });
+  //   if (data.payment_frequency === "monthly" && data.payout_month !== null) {
+  //     ctx.addIssue({
+  //       path: ["payout_month"],
+  //       message: "payout_month must be null when payment_freq is 'monthly'",
+  //       code: z.ZodIssueCode.custom,
+  //     });
+  //   }
+  // });
 
 export const categoryArray = ["suggestion", "bug", "complain"] as const;
 export const severityArray = ["low", "normal", "urgent"] as const;

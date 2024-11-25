@@ -196,6 +196,12 @@ export type ProfessionalTaxDatabaseInsert =
 export type ProfessionalTaxDatabaseUpdate =
   Database["public"]["Tables"]["professional_tax"]["Update"]
 
+export type ProfessionalTaxGrossSalaryRangeType = {
+  start: number;
+  end: number;
+  value: number;
+}[];
+
 export type LabourWelfareFundDatabaseRow = 
   Database["public"]["Tables"]["labour_welfare_fund"]["Row"]
 

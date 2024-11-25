@@ -7,3 +7,4 @@ export * from "./employee-provident-fund";
 export * from "./employee-state-insurance";
 export * from "./professional-tax";
 export * from "./labour-welfare-fund";
+export * from "./statutory-bonus";
