@@ -9,7 +9,7 @@ export default function StatutoryFields() {
         items={statutorySideNavList}
         className='flex-shrink-0'
       />
-      <div className="h-full w-full">
+      <div className='h-full w-full'>
         <Outlet />
       </div>
     </div>
