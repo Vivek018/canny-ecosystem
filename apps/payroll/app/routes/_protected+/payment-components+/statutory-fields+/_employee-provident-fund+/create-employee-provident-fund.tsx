@@ -40,7 +40,6 @@ import React, { useEffect } from "react";
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
-  console.log("FORM---------------", formData);
 
   const submission = parseWithZod(formData, {
     schema: EmployeeProvidentFundSchema,
@@ -74,7 +73,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  console.log(companyId);
   return json({ companyId });
 };
 
@@ -89,7 +87,6 @@ const CreateEmployeeProvidentFund = ({
 
   const initialValues =
     updateValues ?? getInitialValueFromZod(EmployeeProvidentFundSchema);
-  console.log(initialValues);
 
   const { companyId } = useLoaderData<{ companyId: string }>();
   const [form, fields] = useForm({
@@ -113,10 +110,7 @@ const CreateEmployeeProvidentFund = ({
       <Form method="POST" {...getFormProps(form)} className="flex flex-col">
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">{replaceDash(EPF_TAG)}</CardTitle>
-            <br />
-            <br />
-            <br />
+            <CardTitle className="text-2xl pb-5">{replaceDash(EPF_TAG)}</CardTitle>
             <hr />
           </CardHeader>
           <CardContent>
@@ -154,7 +148,7 @@ const CreateEmployeeProvidentFund = ({
                 errors={fields.deduction_cycle.errors}
               />
             </div>
-            <div className="grid grid-rows-2 place-content-center justify-between pb-5">
+            <div className="grid place-content-center justify-between pb-5 max-w-3/4">
               <CheckboxField
                 buttonProps={getInputProps(
                   fields.restrict_employee_contribution,
@@ -226,7 +220,6 @@ const CreateEmployeeProvidentFund = ({
                 variant="secondary"
                 size="full"
                 type="reset"
-                //   onClick={() => setResetKey(Date.now())}
                 {...form.reset.getButtonProps()}
               >
                 Reset

@@ -23,8 +23,7 @@ export const getStatutoryBonusById = async ({
   .from("statutory_bonus")
   .select(columns.join(","))
   .eq("id", id)
-  .limit(HARD_QUERY_LIMIT)
-  .returns<StatutoryBonusDataType[]>();
+  .single<StatutoryBonusDataType>();
     
   if (error) {
     console.error(error);

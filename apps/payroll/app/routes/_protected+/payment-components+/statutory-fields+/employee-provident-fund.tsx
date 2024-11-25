@@ -98,9 +98,9 @@ const EmployeeProvidentFund = () => {
 
   if (!data.length) return <EPFNoData />;
   return (
-    <div className="grid grid-cols-[60%_40%] py-5 pl-5 gap-3 place-content-center justify-between">
-      <div className="min-h-screen pt-6">
-        <div className="flex items-center gap-5">
+    <div className="grid grid-cols-[60%_40%] gap-3 place-content-center justify-between">
+      <div className="min-h-screen">
+        <div className="flex items-center gap-5 mb-8">
           <h4 className="text-lg font-semibold">Employees' Provident Fund</h4>
           <Link
             prefetch="intent"
@@ -110,37 +110,35 @@ const EmployeeProvidentFund = () => {
             <Icon name="edit" size="sm" />
           </Link>
         </div>
-        <br />
-        <br />
         <div className="flex flex-col justify-between gap-6">
-          <div className="flex gap-10">
-            <div className="min-w-[30%] text-gray-500">EPF Number</div>
-            <div className="self-start font-[500]">{data?.[0]?.epf_number}</div>
+          <div className="flex gap-2 max-lg:flex-col">
+            <div className="w-1/3 text-gray-500">EPF Number</div>
+            <div className="w-2/3 self-start font-[500]">{data?.[0]?.epf_number}</div>
           </div>
-          <div className="flex gap-10">
-            <div className="min-w-[30%] text-gray-500">Deduction Cycles</div>
-            <div className="self-start font-[500] capitalize">
+          <div className="flex gap-2 max-lg:flex-col">
+            <div className="w-1/3 text-gray-500">Deduction Cycles</div>
+            <div className="w-2/3 self-start font-[500] capitalize">
               {data?.[0]?.deduction_cycle}
             </div>
           </div>
-          <div className="flex gap-10">
-            <div className="min-w-[30%] text-gray-500">
+          <div className="flex gap-2 max-lg:flex-col">
+            <div className="w-1/3 text-gray-500">
               Employee Contribution Rate
             </div>
-            <div className="self-start font-[500]">12% of Actual Wage</div>
+            <div className="w-2/3 self-start font-[500]">12% of Actual Wage</div>
           </div>
-          <div className="flex gap-10">
-            <div className="min-w-[30%] text-gray-500">
+          <div className="flex gap-2 max-lg:flex-col">
+            <div className="w-1/3 text-gray-500">
               Employer Contribution Rate
             </div>
-            <div className="self-start font-[500]">
+            <div className="w-2/3 self-start font-[500]">
               12% of Actual Wage{" "}
-              <EmployerContributionSplitUp employersRate={{ value: 20 }} />
+              <EmployerContributionSplitUp />
             </div>
           </div>
-          <div className="flex gap-10">
-            <div className="min-w-[30%] text-gray-500">CTC Inclusions</div>
-            <div className="self-start font-[500] flex flex-col justify-between items-center gap-2">
+          <div className="flex gap-2 mb-2 max-lg:flex-col">
+            <div className="w-1/3 text-gray-500">CTC Inclusions</div>
+            <div className="w-2/3 self-start font-[500] flex flex-col justify-between items-center gap-2">
               <div className="self-start font-[500] flex items-center">
                 {data?.[0]?.restrict_employer_contribution ? (
                   <span className="text-green-500">&#10003;</span>
@@ -177,32 +175,18 @@ const EmployeeProvidentFund = () => {
             </div>
           </div>
 
-          <br />
-
           <button
             onClick={handleDelete}
             className="flex gap-1 text-sm items-center text-blue-500 cursor-pointer"
           >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 15 15"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M5.5 1C5.22386 1 5 1.22386 5 1.5C5 1.77614 5.22386 2 5.5 2H9.5C9.77614 2 10 1.77614 10 1.5C10 1.22386 9.77614 1 9.5 1H5.5ZM3 3.5C3 3.22386 3.22386 3 3.5 3H5H10H11.5C11.7761 3 12 3.22386 12 3.5C12 3.77614 11.7761 4 11.5 4H11V12C11 12.5523 10.5523 13 10 13H5C4.44772 13 4 12.5523 4 12V4L3.5 4C3.22386 4 3 3.77614 3 3.5ZM5 4H10V12H5V4Z"
-                fill="currentColor"
-                fill-rule="evenodd"
-                clip-rule="evenodd"
-              ></path>
-            </svg>
+
+            <Icon name="trash" />
             <span>Disable EPF</span>
           </button>
         </div>
       </div>
 
-      <div className="pt-3">
+      <div className="max-lg:invisible">
         <Card className="flex flex-col gap-5 mx-9 border-t-blue-400 border-2">
           <div className="p-6">
             <div className="flex flex-col gap-4">

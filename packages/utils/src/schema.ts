@@ -461,8 +461,8 @@ export const StatutoryBonusSchema = z
     payment_frequency: z
       .enum(statutoryBonusPayFrequencyArray)
       .default(statutoryBonusPayFrequencyArray[0]),
-    percentage: z.number().min(0).default(8.33),
-    payout_month: z.string().nullable().optional(),
+    percentage: z.number().min(0).default(8.33).transform(value => value / 100),
+    payout_month: z.number().optional(),
   })
   // .superRefine((data, ctx) => {
   //   if (data.payment_frequency === "yearly" && !data.payout_month) {

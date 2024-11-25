@@ -5,9 +5,9 @@ import React from "react";
 
 const LabourWelfareFund = () => {
   return (
-    <div className="py-5 pl-5">
-      <div className="min-h-screen max-w-[40vw] py-6">
-        <div className="flex flex-col gap-1 items-start">
+    <div className="">
+      <div className="min-h-screen max-w-[40vw]">
+        <div className="flex flex-col gap-1 items-start mb-2">
           <h4 className="text-lg font-semibold">Labour Welfare Fund</h4>
 
           <p className="text-[12.5px]">
@@ -15,8 +15,7 @@ const LabourWelfareFund = () => {
             conditions for employees.
           </p>
         </div>
-        <br />
-        <Card className="rounded w-[80%] h-full pl-4 pr-6 pb-8 pt-4 flex flex-col gap-5 justify-between">
+        <Card className="rounded w-[80%] h-full mb-2 pl-4 pr-6 pb-8 pt-4 flex flex-col gap-5 justify-between">
           <div className="flex justify-between items-center font-[600]  ">
             <h4>Gujarat</h4>
           </div>
@@ -42,7 +41,6 @@ const LabourWelfareFund = () => {
             </div>
           </div>
         </Card>
-        <br />
       </div>
     </div>
   );

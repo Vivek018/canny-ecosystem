@@ -1,7 +1,6 @@
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import {
-  createEmployeeStateInsurance,
   createStatutoryBonus,
 } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -25,7 +24,10 @@ import {
   replaceUnderscore,
   StatutoryBonusSchema,
 } from "@canny_ecosystem/utils";
-import { deductionCycles, paymentFrequencies, payoutMonths } from "@canny_ecosystem/utils/constant";
+import {
+  paymentFrequencies,
+  payoutMonths,
+} from "@canny_ecosystem/utils/constant";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { ActionFunctionArgs, json, LoaderFunctionArgs } from "@remix-run/node";
@@ -34,7 +36,6 @@ import { Form, useLoaderData } from "@remix-run/react";
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
-  console.log("FORM---------------", formData);
 
   const submission = parseWithZod(formData, {
     schema: StatutoryBonusSchema,
@@ -46,14 +47,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       { status: submission.status === "error" ? 400 : 200 }
     );
   }
-  console.log(submission.value);
 
   const { status, error } = await createStatutoryBonus({
     supabase,
     data: submission.value as any,
     bypassAuth: true,
   });
-  console.log("first, ", status, error)
 
   if (isGoodStatus(status)) {
     return safeRedirect(
@@ -63,8 +62,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       }
     );
   }
-
-  console.log("--------------", status, error);
 
   return json({ status, error });
 };
@@ -80,17 +77,17 @@ export default function CreateStatutoryBonus({
 }: {
   updateValues?: Json;
 }) {
-  const { companyId } = useLoaderData<{ companyId: string }>();
-
-  const STATUTOY_BONUS_TAG = updateValues
-    ? "update-statutory-bonus"
-    : "create-statutory-bonus";
-
+  
+  const STATUTORY_BONUS_TAG = updateValues
+  ? "update-statutory-bonus"
+  : "create-statutory-bonus";
+  
   const initialValues =
-    updateValues ?? getInitialValueFromZod(StatutoryBonusSchema);
-
+  updateValues ?? getInitialValueFromZod(StatutoryBonusSchema);
+  
+  const { companyId } = useLoaderData<{ companyId: string }>();
   const [form, fields] = useForm({
-    id: STATUTOY_BONUS_TAG,
+    id: STATUTORY_BONUS_TAG,
     constraint: getZodConstraint(StatutoryBonusSchema),
     onValidate: ({ formData }: { formData: FormData }) => {
       return parseWithZod(formData, { schema: StatutoryBonusSchema });
@@ -105,23 +102,19 @@ export default function CreateStatutoryBonus({
     },
   });
 
-  console.log(form.value);
   return (
     <section className="md-px-10 w-full lg:px-12 2xl:px-10 py-3">
       <Form method="POST" {...getFormProps(form)} className="flex flex-col">
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">
-              {replaceDash(STATUTOY_BONUS_TAG)}
+            <CardTitle className="text-2xl mb-6">
+              {replaceDash(STATUTORY_BONUS_TAG)}
             </CardTitle>
-            <br />
-            <br />
-            <br />
             <hr />
           </CardHeader>
           <CardContent>
-            <input {...getInputProps(fields?.id, { type: "hidden" })} />
-            <input {...getInputProps(fields?.company_id, { type: "hidden" })} />
+            <input {...getInputProps(fields.id, { type: "hidden" })} />
+            <input {...getInputProps(fields.company_id, { type: "hidden" })} />
             <div className="flex items-start justify-between gap-10">
               <SearchableSelectField
                 // key={resetKey}
@@ -142,19 +135,16 @@ export default function CreateStatutoryBonus({
                 inputProps={{
                   ...getInputProps(fields.percentage, { type: "number" }),
                   autoFocus: true,
-                  placeholder: `Enter ${replaceUnderscore(
-                    fields.percentage.name
-                  )}`,
+                  placeholder: `Enter ${fields.percentage.name}`,
                   className: "capitalize",
                 }}
                 labelProps={{
                   className: "capitalize",
-                  children: replaceUnderscore(fields.percentage.name),
+                  children: fields.percentage.name,
                 }}
                 errors={fields.percentage.errors}
               />
               <SearchableSelectField
-                // key={resetKey}
                 className="capitalize"
                 options={payoutMonths}
                 inputProps={{

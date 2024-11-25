@@ -40,7 +40,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const submission = parseWithZod(formData, {
     schema: StatutoryBonusSchema,
   });
-
+  
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
@@ -51,8 +51,9 @@ export async function action({ request }: ActionFunctionArgs) {
   const { status, error } = await updateStatutoryBonus({
     supabase,
     data: submission.value,
+    bypassAuth: true,
   });
-
+  
   if (isGoodStatus(status)) {
     return safeRedirect("/payment-components/statutory-fields/statutory-bonus", {
       status: 303,
@@ -61,7 +62,7 @@ export async function action({ request }: ActionFunctionArgs) {
   return json({ status, error });
 }
 
-export default function UpdateEmployeeProvidentFund() {
+export default function UpdateStatutoryBonus() {
   const { data } = useLoaderData<typeof loader>();
   return <CreateStatutoryBonus updateValues={data} />;
 }

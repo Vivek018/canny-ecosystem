@@ -5,9 +5,9 @@ import React from "react";
 
 const ProfessionalTax = () => {
   return (
-    <div className="py-5 pl-5">
-      <div className="min-h-screen max-w-[40vw] py-6">
-        <div className="flex flex-col gap-1 items-start">
+    <div className="">
+      <div className="min-h-screen max-w-[40vw]">
+        <div className="flex flex-col gap-1 items-start mb-3">
           <h4 className="text-lg font-semibold">Professional Tax</h4>
 
           <p className="text-[12.5px]">
@@ -15,7 +15,6 @@ const ProfessionalTax = () => {
             Tax slabs differ in each state.
           </p>
         </div>
-        <br />
         <Card className="rounded w-[80%] h-full pl-4 pr-6 pb-8 pt-4 flex flex-col gap-5 justify-between">
         <div className="flex items-center gap-5">
             <h4 className="text-lg font-semibold">Employees' Provident Fund</h4>
@@ -49,24 +48,9 @@ const ProfessionalTax = () => {
             </div>
           </div>
         </Card>
-        <br />
-        <hr />
-        <br />
+        <hr className="my-5" />
         <button className="flex gap-1 text-sm items-center text-blue-500 cursor-pointer">
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 15 15"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M5.5 1C5.22386 1 5 1.22386 5 1.5C5 1.77614 5.22386 2 5.5 2H9.5C9.77614 2 10 1.77614 10 1.5C10 1.22386 9.77614 1 9.5 1H5.5ZM3 3.5C3 3.22386 3.22386 3 3.5 3H5H10H11.5C11.7761 3 12 3.22386 12 3.5C12 3.77614 11.7761 4 11.5 4H11V12C11 12.5523 10.5523 13 10 13H5C4.44772 13 4 12.5523 4 12V4L3.5 4C3.22386 4 3 3.77614 3 3.5ZM5 4H10V12H5V4Z"
-              fill="currentColor"
-              fill-rule="evenodd"
-              clip-rule="evenodd"
-            ></path>
-          </svg>
+          <Icon name="trash" />
           <span>Disable PT</span>
         </button>
       </div>
