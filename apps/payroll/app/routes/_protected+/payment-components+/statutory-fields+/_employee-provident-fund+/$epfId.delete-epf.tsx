@@ -12,6 +12,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   const { status, error } = await deleteEmployeeProvidentFund({
     supabase,
     id: epfId ?? "",
+    bypassAuth: true
   });
   
   if (isGoodStatus(status)) {

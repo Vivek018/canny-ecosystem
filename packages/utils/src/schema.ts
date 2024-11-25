@@ -405,6 +405,10 @@ export const EmployeeProvidentFundSchema = z.object({
   id: z.string().optional(),
   company_id: z.string(),
   epf_number: z.string().max(20),
+  // .regex(
+  //   /^[A-Z]{2}\/[A-Z]{3}\/\d{7}\/[A-Z]{3}$/,
+  //   "Invalid format. Must match AA/AAA/0000000/XXX."
+  // ),
   deduction_cycle: z.enum(deductionCycleArray).default(deductionCycleArray[0]),
   employee_contribution: z.number().default(EMPLOYEE_RESTRICTED_RATE),
   employer_contribution: z.number().default(EMPLOYEE_RESTRICTED_RATE),
@@ -420,7 +424,11 @@ export const EmployeeProvidentFundSchema = z.object({
 export const EmployeeStateInsuranceSchema = z.object({
   id: z.string().optional(),
   company_id: z.string(),
-  esi_number: zNumberString.max(20),
+  esi_number: zNumberString,
+  // .regex(
+  //   /^\d{2}-\d{2}-\d{6}-\d{3}-\d{4}$/,
+  //   "Invalid format. Must match 00-00-000000-000-0000."
+  // ),
   deduction_cycle: z.enum(deductionCycleArray).default(deductionCycleArray[0]),
   employees_contribution: z.number().default(0.0075),
   employers_contribution: z.number().default(0.0325),
@@ -457,26 +465,24 @@ export const StatutoryBonusSchema = z
     payment_frequency: z
       .enum(statutoryBonusPayFrequencyArray)
       .default(statutoryBonusPayFrequencyArray[0]),
-    percentage: z.number().min(0).default(8.33).transform(value => value / 100),
+    percentage: z.number().min(0).default(8.33),
     payout_month: z.number().optional(),
   })
-  // .superRefine((data, ctx) => {
-  //   if (data.payment_frequency === "yearly" && !data.payout_month) {
-  //     ctx.addIssue({
-  //       path: ["payout_month"],
-  //       message: "payout_month is required when payment_freq is 'yearly'",
-  //       code: z.ZodIssueCode.custom,
-  //     });
-  //   }
+  .superRefine((data, ctx) => {
+    if (data.payment_frequency === "monthly" && !data.payout_month) {
+      ctx.addIssue({
+        path: ["payout_month"],
+        message: "payout_month is required when payment_freq is 'monthly'",
+        code: z.ZodIssueCode.custom,
+      });
+    }
 
-  //   if (data.payment_frequency === "monthly" && data.payout_month !== null) {
-  //     ctx.addIssue({
-  //       path: ["payout_month"],
-  //       message: "payout_month must be null when payment_freq is 'monthly'",
-  //       code: z.ZodIssueCode.custom,
-  //     });
-  //   }
-  // });
+    if (data.payment_frequency === "yearly") {
+      if (data.payout_month !== null) {
+        data.payout_month = 0;
+      }
+    }
+  });
 
 export const categoryArray = ["suggestion", "bug", "complain"] as const;
 export const severityArray = ["low", "normal", "urgent"] as const;

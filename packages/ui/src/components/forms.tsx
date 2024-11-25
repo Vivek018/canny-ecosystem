@@ -146,6 +146,7 @@ export function CheckboxField({
     name: string;
     form: string;
     value?: string;
+    disabled?: boolean;
   };
   errors?: ListOfErrors;
   className?: string;

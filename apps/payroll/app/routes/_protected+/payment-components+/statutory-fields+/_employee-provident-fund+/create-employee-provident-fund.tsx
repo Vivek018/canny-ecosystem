@@ -28,14 +28,12 @@ import {
 } from "@canny_ecosystem/utils";
 import {
   deductionCycles,
-  employeeContributionRate,
-  employerContributionRate,
 } from "@canny_ecosystem/utils/constant";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { type ActionFunctionArgs, json, type LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
-import React, { useEffect } from "react";
+import React from "react";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -95,7 +93,7 @@ const CreateEmployeeProvidentFund = ({
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: EmployeeProvidentFundSchema });
     },
-    shouldValidate: "onInput",
+    shouldValidate: "onBlur",
     shouldRevalidate: "onInput",
     defaultValue: {
       ...(initialValues as {
@@ -110,20 +108,20 @@ const CreateEmployeeProvidentFund = ({
       <Form method="POST" {...getFormProps(form)} className="flex flex-col">
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl pb-5">{replaceDash(EPF_TAG)}</CardTitle>
+            <CardTitle className="text-2xl pb-5">
+              {replaceDash(EPF_TAG)}
+            </CardTitle>
             <hr />
           </CardHeader>
           <CardContent>
             <input {...getInputProps(fields.id, { type: "hidden" })} />
             <input {...getInputProps(fields.company_id, { type: "hidden" })} />
-            <div className="grid grid-cols-[50%,33%] place-content-center justify-between gap-6">
+            <div className="grid grid-rows-2 place-content-center justify-between">
               <Field
                 inputProps={{
                   ...getInputProps(fields.epf_number, { type: "text" }),
                   autoFocus: true,
-                  placeholder: `Enter ${replaceUnderscore(
-                    fields.epf_number.name
-                  )}`,
+                  placeholder:"AA/AAA/0000000/XXX",
                   className: "capitalize",
                 }}
                 labelProps={{
@@ -139,7 +137,6 @@ const CreateEmployeeProvidentFund = ({
                 options={deductionCycles}
                 inputProps={{
                   ...getInputProps(fields.deduction_cycle, { type: "text" }),
-                  defaultValue: deductionCycles[0].value,
                 }}
                 placeholder={`Select an option`}
                 labelProps={{
@@ -178,40 +175,61 @@ const CreateEmployeeProvidentFund = ({
                 className="items-center"
               />
             </div>
-            <CheckboxField
-              buttonProps={getInputProps(fields.include_employer_contribution, {
-                type: "checkbox",
-              })}
-              labelProps={{
-                htmlFor: fields.include_employer_contribution.id,
-                children: "Include employer's contribution in the CTC",
-              }}
-              className="items-center"
-            />
-            <div className="ml-7">
+            <div className="relative h-full w-full">
               <CheckboxField
                 buttonProps={getInputProps(
-                  fields.include_employer_edli_contribution,
+                  fields.include_employer_contribution,
                   {
                     type: "checkbox",
                   }
                 )}
                 labelProps={{
-                  htmlFor: fields.include_employer_edli_contribution.id,
-                  children: "Include employer's EDLI contribution in the CTC",
+                  htmlFor: fields.include_employer_contribution.id,
+                  children: "Include employer's contribution in the CTC",
                 }}
                 className="items-center"
               />
-              <CheckboxField
-                buttonProps={getInputProps(fields.include_admin_charges, {
-                  type: "checkbox",
-                })}
-                labelProps={{
-                  htmlFor: fields.include_admin_charges.id,
-                  children: "Include admin charges in the CTC",
-                }}
-                className="items-center"
-              />
+              {form.value?.include_employer_contribution && (
+                <>
+                  <div className="ml-8">
+                    <CheckboxField
+                      buttonProps={{
+                        ...getInputProps(
+                          fields.include_employer_edli_contribution,
+                          {
+                            type: "checkbox",
+                          }
+                        ),
+                        disabled: !form.value?.include_employer_contribution,
+                      }}
+                      labelProps={{
+                        htmlFor: fields.include_employer_edli_contribution.id,
+                        children:
+                          "Include employer's EDLI contribution in the CTC",
+                      }}
+                      className="items-center"
+                    />
+                    <CheckboxField
+                      buttonProps={{
+                        disabled: !form.value?.include_employer_contribution,
+                        ...getInputProps(fields.include_admin_charges, {
+                          type: "checkbox",
+                        }),
+                      }}
+                      labelProps={{
+                        htmlFor: fields.include_admin_charges.id,
+                        children: "Include admin charges in the CTC",
+                      }}
+                      className="items-center"
+                    />
+                  </div>
+
+                  <div className="absolute h-full top-2/3 left-4 transform -translate-x-1/2 -translate-y-1/2">
+                    <div className="h-[30px] w-[15px] border-l-2 border-b-2 border-gray-300"></div>
+                    <div className="h-[45px] w-[15px] border-l-2 border-b-2 border-gray-300"></div>
+                  </div>
+                </>
+              )}
             </div>
           </CardContent>
           <CardFooter>

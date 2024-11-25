@@ -12,6 +12,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   const { status, error } = await deleteStateInsurence({
     supabase,
     id: esiId ?? "",
+    bypassAuth: true,
   });
 
   if (isGoodStatus(status)) {

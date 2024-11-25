@@ -27,9 +27,7 @@ import {
   replaceDash,
   replaceUnderscore,
 } from "@canny_ecosystem/utils";
-import {
-  deductionCycles,
-} from "@canny_ecosystem/utils/constant";
+import { deductionCycles } from "@canny_ecosystem/utils/constant";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { ActionFunctionArgs, json, LoaderFunctionArgs } from "@remix-run/node";
@@ -94,7 +92,7 @@ const CreateEmployeeStateInsurance = ({
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: EmployeeStateInsuranceSchema });
     },
-    shouldValidate: "onInput",
+    shouldValidate: "onBlur",
     shouldRevalidate: "onInput",
     defaultValue: {
       ...(initialValues as {
@@ -109,20 +107,20 @@ const CreateEmployeeStateInsurance = ({
       <Form method="POST" {...getFormProps(form)} className="flex flex-col">
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl mb-4">{replaceDash(EPF_TAG)}</CardTitle>
+            <CardTitle className="text-2xl mb-4">
+              {replaceDash(EPF_TAG)}
+            </CardTitle>
             <hr />
           </CardHeader>
           <CardContent>
             <input {...getInputProps(fields.id, { type: "hidden" })} />
             <input {...getInputProps(fields.company_id, { type: "hidden" })} />
-            <div className="grid grid-cols-[50%,33%] place-content-center justify-between gap-6">
+            <div className="grid grid-rows-2 place-content-center justify-between">
               <Field
                 inputProps={{
                   ...getInputProps(fields.esi_number, { type: "text" }),
                   autoFocus: true,
-                  placeholder: `Enter ${replaceUnderscore(
-                    fields.esi_number.name
-                  )}`,
+                  placeholder: `00-00-000000-000-0000`,
                   className: "capitalize",
                 }}
                 labelProps={{
@@ -137,7 +135,6 @@ const CreateEmployeeStateInsurance = ({
                 options={deductionCycles}
                 inputProps={{
                   ...getInputProps(fields.deduction_cycle, { type: "text" }),
-                  defaultValue: deductionCycles[0].value,
                 }}
                 placeholder={`Select an option`}
                 labelProps={{
@@ -146,10 +143,10 @@ const CreateEmployeeStateInsurance = ({
                 errors={fields.deduction_cycle.errors}
               />
             </div>
-            <div className="grid grid-cols-2 place-content-center justify-between gap-6">
-              <div className="flex items-center text-center">
+            <div className="flex flex-col w-1/4 justify-between">
+              <div className="flex   items-center justify-between gap-4">
                 <Field
-                  className="w-[40%]"
+                  className=""
                   inputProps={{
                     ...getInputProps(fields.employees_contribution, {
                       type: "number",
@@ -167,11 +164,11 @@ const CreateEmployeeStateInsurance = ({
                   }}
                   errors={fields.employees_contribution.errors}
                 />
-                <p className="w-[20%] mb-5 font-[350] text-sm">of Gross Pay</p>
+                <p className="mb-5 w-1/2 font-[350] text-sm">of Gross Pay</p>
               </div>
-              <div className="flex items-center text-center">
+              <div className="flex items-center justify-between gap-4">
                 <Field
-                  className="w-[40%]"
+                  className=""
                   inputProps={{
                     ...getInputProps(fields.employers_contribution, {
                       type: "number",
@@ -189,7 +186,7 @@ const CreateEmployeeStateInsurance = ({
                   }}
                   errors={fields.employers_contribution.errors}
                 />
-                <p className="w-[20%] mb-5 font-[350] text-sm">of Gross Pay</p>
+                <p className="w-1/2 mb-5 font-[350] text-sm">of Gross Pay</p>
               </div>
             </div>
 

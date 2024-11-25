@@ -21,24 +21,24 @@ const EmployerContributionSplitUp = () => {
       <PopoverContent
         sideOffset={10}
         align="start"
-        className="p-0 min-w-[30vw]"
+        className="p-0 min-w-[30vw] text-[0.85rem]"
       >
         <div className="p-2 flex flex-col gap-4">
-          <div className="px-2 pt-2 flex justify-between align-start text-[13px] font-[600] text-gray-500">
+          <div className="px-2 pt-2 flex justify-between align-starts font-[600] text-gray-500">
             <h4>CONTRIBUTION RATE</h4>
             <Icon name="cross" onClick={() => setOpen(false)} className="cursor-pointer" />
           </div>
 
           <hr />
 
-          <div className="px-2 flex justify-between align-start text-[13px] font-[500] text-black">
+          <div className="px-2 flex justify-between align-start text-[0.75rem] font-[500] text-black">
             <h4>SUB COMPONENTS</h4>
             <h4>EMPLOYER'S CONTRIBUTION</h4>
           </div>
           <hr />
         </div>
 
-        <div className="px-5 pt-2 mb-4 flex flex-col justify-between gap-5 align-start text-[15px] font-[500] text-black">
+        <div className="px-5 pt-2 mb-4 flex flex-col justify-between gap-5 align-start text-[0.85rem] font-[500] text-black">
           <div className="flex justify-between">
             <p> Employees' Provident Fund (EPF)</p>
             <p> 3.67% of PF Wage </p>

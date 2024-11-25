@@ -41,6 +41,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     schema: StatutoryBonusSchema,
   });
 
+
+  console.log("-------formData", formData)
+
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
@@ -92,7 +95,7 @@ export default function CreateStatutoryBonus({
     onValidate: ({ formData }: { formData: FormData }) => {
       return parseWithZod(formData, { schema: StatutoryBonusSchema });
     },
-    shouldValidate: "onInput",
+    shouldValidate: "onBlur",
     shouldRevalidate: "onInput",
     defaultValue: {
       ...(initialValues as {
@@ -115,14 +118,13 @@ export default function CreateStatutoryBonus({
           <CardContent>
             <input {...getInputProps(fields.id, { type: "hidden" })} />
             <input {...getInputProps(fields.company_id, { type: "hidden" })} />
-            <div className="flex items-start justify-between gap-10">
+            <div className="flex flex-col w-1/4 items-start justify-between gap-2">
               <SearchableSelectField
                 // key={resetKey}
                 className="capitalize"
                 options={paymentFrequencies}
                 inputProps={{
                   ...getInputProps(fields.payment_frequency, { type: "text" }),
-                  defaultValue: paymentFrequencies[0].value,
                 }}
                 placeholder={`Select an option`}
                 labelProps={{

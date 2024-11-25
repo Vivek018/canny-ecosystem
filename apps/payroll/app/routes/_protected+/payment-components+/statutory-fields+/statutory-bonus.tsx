@@ -49,16 +49,16 @@ export default function StatutoryBonus() {
             <Icon name="edit" size="sm" />
           </Link>
         </div>
-        <div className="flex justify-between min-w-4/5 gap-8 max-lg:flex-col">
+        <div className="flex justify-between min-w-4/5 text-[0.95rem] gap-8 max-lg:flex-col">
           <div className="flex flex-col gap-5 ">
             <div className=" text-gray-500">Bonus Payment Cycle</div>
-            <div className="self-start font-[500] text-[0.95rem] capitalize">
-              {data?.[0]?.payout_month || "Monthly"}
+            <div className="self-start font-[500] capitalize">
+              {data?.[0]?.payment_frequency || "Monthly"}
             </div>
           </div>
           <div className="flex flex-col gap-5">
             <div className="text-gray-500">Percentage of Bonus</div>
-            <div className="self-start font-[500] text-[0.95rem] capitalize">
+            <div className="self-start font-[500] capitalize">
               {data?.[0]?.percentage}%
             </div>
           </div>

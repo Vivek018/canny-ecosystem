@@ -3,6 +3,7 @@ import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getEmployeeStateInsuranceByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Icon } from "@canny_ecosystem/ui/icon";
+import { replaceUnderscore } from "@canny_ecosystem/utils";
 import { json, LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData, useSubmit } from "@remix-run/react";
 import React from "react";
@@ -38,7 +39,7 @@ const EmployeeStateInsurance = () => {
   if (!data?.length) return <ESINoData />;
   return (
     <div className=" w-full">
-      <div className="min-h-screen w-2/3">
+      <div className="min-h-screen w-2/5">
         <div className="flex items-center gap-5 mb-8">
           <h4 className="text-lg font-semibold">Employees' State Insurance</h4>
           <Link
@@ -49,24 +50,24 @@ const EmployeeStateInsurance = () => {
             <Icon name="edit" size="sm" />
           </Link>
           </div>
-        <div className="flex flex-col mb-2 justify-between gap-6 w-full">
+        <div className="flex flex-col mb-2 justify-between gap-6 w-full text-[0.95rem]">
         <div className="flex gap-1 max-md:flex-col">
             <div className="w-1/2 text-gray-500">ESI Number</div>
-            <div className="w-1/2 self-start font-[500] text-[0.95rem]">
+            <div className="w-1/2 self-start font-[500]">
               {data?.[0]?.esi_number || "-"}
             </div>
           </div>
           <div className="flex gap-1 max-md:flex-col">
             <div className="w-1/2 text-gray-500">Deduction Cycle</div>
-            <div className="w-1/2 self-start font-[500] text-[0.95rem] capitalize">
-              {data?.[0]?.deduction_cycle}
+            <div className="w-1/2 self-start font-[500] capitalize">
+              {replaceUnderscore(data?.[0]?.deduction_cycle)}
             </div>
           </div>
           <div className="flex gap-1 max-md:flex-col">
             <div className="w-1/2 text-gray-500">
               Employees' Contribution
             </div>
-            <div className="w-1/2 self-start font-[500] text-[0.95rem]">
+            <div className="w-1/2 self-start font-[500]">
               {data?.[0]?.employees_contribution * 100}% of Gross Pay
             </div>
           </div>
@@ -74,7 +75,7 @@ const EmployeeStateInsurance = () => {
             <div className="w-1/2 text-gray-500">
               Employer's Contribution
             </div>
-            <div className="w-1/2 self-start font-[500] text-[0.95rem]">
+            <div className="w-1/2 self-start font-[500]">
               {data?.[0]?.employers_contribution * 100}% of Gross Pay
             </div>
           </div>
