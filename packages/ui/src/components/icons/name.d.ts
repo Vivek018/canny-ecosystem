@@ -34,4 +34,5 @@ export type IconName =
   | "setting"
   | "sun"
   | "table"
+  | "trash"
   | "update";

@@ -18,17 +18,13 @@ export interface ComboboxSelectOption {
   label: string;
 }
 
-export type DefaultOptionTypes = {
-  label: string;
-  value: boolean | string;
-};
-
 interface ComboboxProps {
   options: ComboboxSelectOption[];
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
+  disabled?: boolean;
 }
 
 export function Combobox({
@@ -37,14 +33,16 @@ export function Combobox({
   onChange,
   placeholder = "Select an option...",
   className,
+  disabled,
 }: ComboboxProps) {
   const [open, setOpen] = useState(false);
-  const selectedOption = options?.find((option) => option.value === value);
+  const selectedOption = options?.find((option) => String(option.value) === String(value));
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
+          disabled={disabled}
           variant="outline"
           role="combobox"
           aria-expanded={open}
@@ -78,7 +76,7 @@ export function Combobox({
                   value={String(option.value + option.label)}
                   onSelect={() => {
                     onChange(
-                      String(option.value) === value
+                      String(option.value) === String(value)
                         ? ""
                         : String(option.value),
                     );
@@ -91,7 +89,7 @@ export function Combobox({
                     size="sm"
                     className={cn(
                       "mr-2 shrink-0",
-                      value === option.value ? "opacity-100" : "opacity-0",
+                      String(value) === String(option.value) ? "opacity-100" : "opacity-0",
                     )}
                   />
                   <p className="truncate capitalize">

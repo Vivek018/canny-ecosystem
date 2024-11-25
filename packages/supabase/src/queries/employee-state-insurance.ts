@@ -25,6 +25,7 @@ export const getEmployeeStateInsuranceById = async ({
 }) => {
   const columns = [
     "id",
+    "company_id",
     "esi_number",
     "deduction_cycle",
     "employees_contribution",
@@ -56,6 +57,7 @@ export const getEmployeeStateInsuranceByCompanyId = async ({
 }) => {
   const columns = [
     "id",
+    "company_id",
     "esi_number",
     "deduction_cycle",
     "employees_contribution",

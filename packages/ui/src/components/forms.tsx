@@ -267,6 +267,7 @@ export function SearchableSelectField({
           onChange?.(value);
         }}
         placeholder={placeholder ?? inputProps.placeholder}
+        disabled={inputProps.disabled}
       />
       <div className='min-h-[32px] px-4 pb-3 pt-1'>
         {errorId ? <ErrorList id={errorId} errors={errors} /> : null}

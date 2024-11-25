@@ -72,6 +72,7 @@
     "./table": "./src/components/table.tsx",
     "./toggle-group": "./src/components/toggle-group.tsx",
     "./toggle": "./src/components/toggle.tsx",
+    "./trash": "./src/components/trash.tsx",
     "./checkbox": "./src/components/checkbox.tsx",
     "./combobox": "./src/components/combobox.tsx",
     "./command": "./src/components/command.tsx",

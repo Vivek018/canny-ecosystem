@@ -29,19 +29,15 @@ import {
 } from "@canny_ecosystem/utils";
 import {
   deductionCycles,
-  employeeContributionRate,
-  employerContributionRate,
 } from "@canny_ecosystem/utils/constant";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { ActionFunctionArgs, json, LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
-import React from "react";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
-  console.log("FORM---------------", formData);
 
   const submission = parseWithZod(formData, {
     schema: EmployeeStateInsuranceSchema,
@@ -69,8 +65,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     );
   }
 
-  console.log("--------------", status, error);
-
   return json({ status, error });
 };
 
@@ -91,10 +85,8 @@ const CreateEmployeeStateInsurance = ({
 
   const initialValues =
     updateValues ?? getInitialValueFromZod(EmployeeStateInsuranceSchema);
-  console.log(initialValues);
 
   const { companyId } = useLoaderData<{ companyId: string }>();
-  console.log(companyId);
   const [form, fields] = useForm({
     id: EPF_TAG,
     constraint: getZodConstraint(EmployeeProvidentFundSchema),
@@ -116,10 +108,7 @@ const CreateEmployeeStateInsurance = ({
       <Form method="POST" {...getFormProps(form)} className="flex flex-col">
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">{replaceDash(EPF_TAG)}</CardTitle>
-            <br />
-            <br />
-            <br />
+            <CardTitle className="text-2xl mb-4">{replaceDash(EPF_TAG)}</CardTitle>
             <hr />
           </CardHeader>
           <CardContent>
@@ -143,7 +132,6 @@ const CreateEmployeeStateInsurance = ({
               />
 
               <SearchableSelectField
-                // key={resetKey}
                 className="capitalize"
                 options={deductionCycles}
                 inputProps={{
@@ -221,7 +209,6 @@ const CreateEmployeeStateInsurance = ({
                 variant="secondary"
                 size="full"
                 type="reset"
-                  // onClick={() => setResetKey(Date.now())}
                 {...form.reset.getButtonProps()}
               >
                 Reset

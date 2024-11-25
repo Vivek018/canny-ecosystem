@@ -1,35 +1,56 @@
-// import { TypedSupabaseClient } from "../types";
+import { HARD_QUERY_LIMIT } from "../constant";
+import { StatutoryBonusDatabaseRow, TypedSupabaseClient } from "../types";
 
-// export const getStatutoryBonusById = async ({
-//   supabase,
-//   id,
-// }: {
-//   supabase: TypedSupabaseClient;
-//   id: string;
-// }) => {
+export type StatutoryBonusDataType = Pick<
+  StatutoryBonusDatabaseRow,
+  | "id"
+  | "company_id"
+  | "payment_frequency"
+  | "percentage"
+  | "payout_month"
+>;
 
-//     const columns = [
-//       "id",
-//       "employee_id",
-//       "statutory_type",
-//       "amount",
-//     ] as const;
+export const getStatutoryBonusById = async ({
+  supabase,
+  id,
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+}) => {
+  const columns = ["id", "company_id", "payment_frequency", "percentage", "payout_month"] as const;
+    
+  const { data, error } = await supabase
+  .from("statutory_bonus")
+  .select(columns.join(","))
+  .eq("id", id)
+  .single<StatutoryBonusDataType>();
+    
+  if (error) {
+    console.error(error);
+  }
 
-//     const query = supabase
-//     .from("employees")
-//     .select(
-//       `${columns.join(",")},
-//       employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(
-//         employee_id, assignment_type, skill_level, position, start_date, end_date,
-//         project_sites!inner(id, name, projects!inner(id, name))
-//       )`,
-//       { count: "exact" }
-//     )
-//     .eq("id", id);
+  return { data, error };
+};
 
-//     // if (error) {
-//     //   console.error(error);
-//     // }
-
-//     // return { data, error };
-// };
+export const getStatutoryBonusByCompanyId = async ({
+    supabase,
+    companyId,
+  }: {
+    supabase: TypedSupabaseClient;
+    companyId: string;
+  }) => {
+    const columns = ["id", "company_id", "payment_frequency", "percentage", "payout_month"] as const;
+  
+    const { data, error } = await supabase
+      .from("statutory_bonus")
+      .select(columns.join(","))
+      .eq("company_id", companyId)
+      .limit(HARD_QUERY_LIMIT)
+      .returns<StatutoryBonusDataType[]>();
+  
+    if (error) {
+      console.error(error);
+    }
+  
+    return { data, error };
+  };  

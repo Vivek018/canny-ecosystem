@@ -4,34 +4,33 @@ import { json, useLoaderData } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
 import { safeRedirect } from "@/utils/server/http.server";
 import {
-  EmployeeProvidentFundSchema,
   isGoodStatus,
+  StatutoryBonusSchema,
 } from "@canny_ecosystem/utils";
-import { getEmployeeProvidentFundById } from "@canny_ecosystem/supabase/queries";
-import { updateEmployeeProvidentFund } from "@canny_ecosystem/supabase/mutations";
+import { getStatutoryBonusById } from "@canny_ecosystem/supabase/queries";
+import { updateStatutoryBonus } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import CreateEmployeeProvidentFund from "./create-employee-provident-fund";
-
+import CreateStatutoryBonus from "./create-statutory-bonus";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const epfId = params.epfId;
+  const sbId = params.sbId;
   const { supabase } = getSupabaseWithHeaders({ request });
 
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  let epfData = null;
+  let sbData = null;
 
-  if (epfId) {
-    epfData = await getEmployeeProvidentFundById({
+  if (sbId) {
+    sbData = await getStatutoryBonusById({
       supabase,
-      id: epfId,
+      id: sbId,
     });
   }
 
-  if (epfData?.error) {
-    throw epfData.error;
+  if (sbData?.error) {
+    throw sbData.error;
   }
 
-  return json({ data: epfData?.data, companyId });
+  return json({ data: sbData?.data, companyId });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -39,9 +38,9 @@ export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
 
   const submission = parseWithZod(formData, {
-    schema: EmployeeProvidentFundSchema,
+    schema: StatutoryBonusSchema,
   });
-
+  
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
@@ -49,20 +48,21 @@ export async function action({ request }: ActionFunctionArgs) {
     );
   }
 
-  const { status, error } = await updateEmployeeProvidentFund({
+  const { status, error } = await updateStatutoryBonus({
     supabase,
     data: submission.value,
+    bypassAuth: true,
   });
-
+  
   if (isGoodStatus(status)) {
-    return safeRedirect("/payment-components/statutory-fields/employee-provident-fund", {
+    return safeRedirect("/payment-components/statutory-fields/statutory-bonus", {
       status: 303,
     });
   }
   return json({ status, error });
 }
 
-export default function UpdateEmployeeProvidentFund() {
+export default function UpdateStatutoryBonus() {
   const { data } = useLoaderData<typeof loader>();
-  return <CreateEmployeeProvidentFund updateValues={data} />;
+  return <CreateStatutoryBonus updateValues={data} />;
 }
