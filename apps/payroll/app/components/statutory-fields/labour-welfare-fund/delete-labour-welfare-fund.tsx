@@ -38,7 +38,7 @@ export const DeleteLabourWelfareFund = ({ labourWelfareFundId }: { labourWelfare
                 {},
                 {
                     method: "post",
-                    action: `/payment-components/statutory-fields/${labourWelfareFundId}/delete-labour-welfare-fund`,
+                    action: `${labourWelfareFundId}/delete-labour-welfare-fund`,
                     replace: true,
                 },
             );
@@ -63,7 +63,7 @@ export const DeleteLabourWelfareFund = ({ labourWelfareFundId }: { labourWelfare
                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                     <AlertDialogDescription>
                         This action cannot be undone. This will permanently delete your
-                        location and remove it's data from our servers.
+                        lwf and remove it's data from our servers.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <div className="py-4">

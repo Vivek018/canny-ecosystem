@@ -23,6 +23,25 @@ import {
 } from "@canny_ecosystem/ui/card";
 import { replaceUnderscore } from "@canny_ecosystem/utils";
 
+type DetailItemProps = {
+  label: string;
+  value: string | number | null | undefined;
+  formatter?: (value: string | number) => string;
+};
+
+const DetailItem: React.FC<DetailItemProps> = ({ label, value, formatter }) => {
+  const formattedValue = value ? (formatter ? formatter(value) : value) : "--";
+
+  return (
+    <div className="flex flex-row items-center gap-4 text-base">
+      <h3 className="text-muted-foreground tracking-wide capitalize w-44 truncate">
+        {label}
+      </h3>
+      <p className="w-44 truncate">{formattedValue}</p>
+    </div>
+  );
+};
+
 export function LabourWelfareFundCard({
   labourWelfareFund,
 }: {
@@ -34,14 +53,14 @@ export function LabourWelfareFundCard({
       className="w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start"
     >
       <CardHeader className="flex flex-row space-y-0 items-center justify-between p-4">
-        <CardTitle className="text-lg tracking-wide">{labourWelfareFund.state}</CardTitle>
+        <CardTitle className="text-lg tracking-wide">{replaceUnderscore(labourWelfareFund.state)}</CardTitle>
         <div className="flex items-center gap-3">
           <TooltipProvider>
             <Tooltip delayDuration={100}>
               <TooltipTrigger asChild>
                 <Link
                   prefetch="intent"
-                  to={`/payment-components/statutory-fields/${labourWelfareFund.id}/update-labour-welfare-fund`}
+                  to={`${labourWelfareFund.id}/update-labour-welfare-fund`}
                   className="p-2 rounded-md bg-secondary grid place-items-center"
                 >
                   <Icon name="edit" size="xs" />
@@ -62,19 +81,10 @@ export function LabourWelfareFundCard({
           </DropdownMenu>
         </div>
       </CardHeader>
-      <CardContent className="flex flex-col gap-2 w-full">
-        <div className="flex justify-between">
-          <span className="font-medium">Employee Contribution:</span>
-          <span>{labourWelfareFund.employee_contribution}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="font-medium">Employer Contribution:</span>
-          <span>{labourWelfareFund.employer_contribution}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="font-medium">Deduction Cycle:</span>
-          <span>{replaceUnderscore(labourWelfareFund.deduction_cycle)}</span>
-        </div>
+      <CardContent className="flex flex-col gap-4">
+        <DetailItem label="Employee Contribution" value={labourWelfareFund.employee_contribution}/>
+        <DetailItem label="Employer Contribution" value={labourWelfareFund.employer_contribution}/>
+        <DetailItem label="Deduction Cycle" value={labourWelfareFund.deduction_cycle}/>
       </CardContent>
       {
         labourWelfareFund.status && <CardFooter

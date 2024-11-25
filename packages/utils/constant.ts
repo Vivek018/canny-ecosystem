@@ -54,13 +54,6 @@ export const statesAndUTs = [
   { value: "jammu_and_kashmir", label: "Jammu and Kashmir" },
 ];
 
-export const deductionCycles = [
-  { value: "monthly", label: "Monthly" },
-  { value: "quaterly", label: "Quaterly" },
-  { value: "half_yearly", label: "Half Yearly" },
-  { value: "yearly", label: "Yearly" },
-];
-
 export const employeeContributionRate = [
   { value: false, label: "20% of Actual PF Wage" },
   { value: true, label: "Restrict Contribution to ₹15,000 of PF Wage" },

@@ -5,9 +5,8 @@ import { json, useLoaderData } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
 import { safeRedirect } from "@/utils/server/http.server";
 import { isGoodStatus, LabourWelfareFundSchema } from "@canny_ecosystem/utils";
-import { getLabourWelfareFundsById } from "@canny_ecosystem/supabase/queries";
+import { getLabourWelfareFundById } from "@canny_ecosystem/supabase/queries";
 import { updateLabourWelfareFund } from "@canny_ecosystem/supabase/mutations";
-import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
 export const UPDATE_LABOUR_WELFARE_FUND = "update-labour-welfare-fund";
 
@@ -15,14 +14,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const labourWelfareFundId = params.labourWelfareFundId;
   const { supabase } = getSupabaseWithHeaders({ request });
 
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   let labourWelfareFundData = null;
 
   if (labourWelfareFundId) {
-    labourWelfareFundData = await getLabourWelfareFundsById({
+    labourWelfareFundData = await getLabourWelfareFundById({
       supabase,
-      id: labourWelfareFundId,
-      companyId
+      id: labourWelfareFundId
     });
   }
 

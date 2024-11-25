@@ -17,6 +17,7 @@ import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/react";
 
+
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
@@ -24,12 +25,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   if (error) throw error;
 
-  if (!data) throw new Error("No data found");
-
   return json({ data });
 }
 
-export default function LabourWelfareFund() {
+export default function LabourWelfareFundIndex() {
   const { data } = useLoaderData<typeof loader>();
   const { isDocument } = useIsDocument();
 
@@ -37,14 +36,14 @@ export default function LabourWelfareFund() {
     <section className="py-4 px-4 w-full">
       <div className="w-full flex items-end justify-between">
         <Command className="overflow-visible">
-        <div className="w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4">
+          <div className="w-full flex items-center gap-4">
             <CommandInput
               divClassName="border border-input rounded-md h-10 flex-1"
               placeholder="Search labour welfare funds"
               autoFocus={true}
             />
             <Link
-              to="/payment-components/statutory-fields/create-labour-welfare-fund"
+              to="create-labour-welfare-fund"
               className={cn(buttonVariants({ variant: "primary-outline" }), "flex items-center gap-1")}
             >
               <span>Add</span>
@@ -61,11 +60,11 @@ export default function LabourWelfareFund() {
           </CommandEmpty>
           <CommandList className="max-h-full py-6 overflow-x-visible overflow-y-visible">
             <CommandGroup className="p-0 overflow-visible">
-              <div className="w-full grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+              <div className="w-full grid gap-8 grid-cols-1 md:grid-cols-2 2xl:grid-cols-3">
                 {data?.map((labourWelfareFund) => (
                   <CommandItem
                     key={labourWelfareFund.id}
-                    value={labourWelfareFund.state}
+                    value={labourWelfareFund.state + labourWelfareFund.employee_contribution + labourWelfareFund.employer_contribution + labourWelfareFund.deduction_cycle}
                     className="data-[selected=true]:bg-inherit data-[selected=true]:text-foreground"
                   >
                     <LabourWelfareFundCard labourWelfareFund={labourWelfareFund} />

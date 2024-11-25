@@ -28,7 +28,7 @@ export const sideNavList = [
   { name: "Advances", link: "/advances", icon: "lab-timer" },
   {
     name: "Payment Components",
-    link: "/payment-components",
+    link: "/payment-components/payment-fields",
     icon: "input",
   },
   {

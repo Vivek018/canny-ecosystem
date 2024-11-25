@@ -1,4 +1,4 @@
-import { isGoodStatus, LabourWelfareFundSchema, replaceUnderscore } from "@canny_ecosystem/utils";
+import { isGoodStatus, LabourWelfareFundSchema, lwfDeductionCycleArray, replaceUnderscore, transformStringArrayIntoOptions } from "@canny_ecosystem/utils";
 import { CheckboxField, Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import { getInitialValueFromZod, replaceDash } from "@canny_ecosystem/utils";
 import { FormProvider, getFormProps, getInputProps, useForm } from "@conform-to/react";
@@ -13,7 +13,7 @@ import { UPDATE_LABOUR_WELFARE_FUND } from "./$labourWelfareFundId.update-labour
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@canny_ecosystem/ui/card";
 import { createLabourWelfareFund } from "@canny_ecosystem/supabase/mutations";
 import type { LabourWelfareFundDatabaseUpdate } from "@canny_ecosystem/supabase/types";
-import { deductionCycles } from "@canny_ecosystem/utils/constant";
+import { statesAndUTs } from "@canny_ecosystem/utils/constant";
 import { FormButtons } from "@/components/form/form-buttons";
 
 export const CREATE_LABOUR_WELFARE_FUND = "create-labour-welfare-fund";
@@ -26,7 +26,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-    // return null;
     const { supabase } = getSupabaseWithHeaders({ request });
     const formData = await request.formData();
     const submission = parseWithZod(formData, { schema: LabourWelfareFundSchema });
@@ -49,8 +48,10 @@ export default function CreateLabourWelfareFund({ updateValues }: {
     updateValues?: LabourWelfareFundDatabaseUpdate | null;
 }) {
     const { companyId } = useLoaderData<typeof loader>();
+
     const LABOUR_WELFARE_FUND_TAG = updateValues ? UPDATE_LABOUR_WELFARE_FUND : CREATE_LABOUR_WELFARE_FUND;
     const initialValues = updateValues ?? getInitialValueFromZod(LabourWelfareFundSchema);
+
     const [resetKey, setResetKey] = useState(Date.now());
 
     const [form, fields] = useForm({
@@ -68,7 +69,7 @@ export default function CreateLabourWelfareFund({ updateValues }: {
     });
     
     return (
-        <section className="md:px-20 lg:px-32 2xl:px-80 py-3 w-full">
+        <section className="p-4 w-full">
             <FormProvider context={form.context}>
                 <Form method="POST" {...getFormProps(form)} className="flex flex-col">
                     <Card>
@@ -82,15 +83,16 @@ export default function CreateLabourWelfareFund({ updateValues }: {
                         <CardContent>
                             <input {...getInputProps(fields.id, { type: "hidden" })} />
                             <input {...getInputProps(fields.company_id, { type: "hidden" })} />
-                            <Field
+                            <SearchableSelectField
+                                key={resetKey}
+                                className="capitalize"
+                                options={statesAndUTs}
                                 inputProps={{
                                     ...getInputProps(fields.state, { type: "text" }),
-                                    autoFocus: true,
-                                    placeholder: `Enter ${replaceUnderscore(fields.state.name)}`,
-                                    className: "capitalize",
                                 }}
+                                placeholder={`Select ${fields.state.name}`}
                                 labelProps={{
-                                    children: replaceUnderscore(fields.state.name),
+                                    children: fields.state.name,
                                 }}
                                 errors={fields.state.errors}
                             />
@@ -117,9 +119,9 @@ export default function CreateLabourWelfareFund({ updateValues }: {
                                 errors={fields.employer_contribution.errors}
                             />
                             <SearchableSelectField
-                                key={resetKey}
+                                key={resetKey+1}
                                 className="capitalize"
-                                options={deductionCycles}
+                                options={transformStringArrayIntoOptions(lwfDeductionCycleArray as unknown as string[])}
                                 inputProps={{
                                     ...getInputProps(fields.deduction_cycle, { type: "text" }),
                                 }}
@@ -127,7 +129,7 @@ export default function CreateLabourWelfareFund({ updateValues }: {
                                 labelProps={{
                                     children: replaceUnderscore(fields.deduction_cycle.name),
                                 }}
-                                errors={fields.state.errors}
+                                errors={fields.deduction_cycle.errors}
                             />
                             <CheckboxField
                                 buttonProps={getInputProps(fields.status, {
@@ -135,7 +137,7 @@ export default function CreateLabourWelfareFund({ updateValues }: {
                                 })}
                                 labelProps={{
                                     htmlFor: fields.status.id,
-                                    children: fields.status.value ? "Active" : "In Active",
+                                    children:"Is this currently active?",
                                 }}
                             />
                         </CardContent>

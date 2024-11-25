@@ -14,7 +14,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     id: labourWelfareFundId ?? "",
   });
 
-  if (isGoodStatus(status)) return safeRedirect("/payment-components/statutory-fields", { headers });
+  if (isGoodStatus(status)) return safeRedirect("/payment-components/statutory-fields/labour-welfare-fund", { headers });
 
   if (error) throw error;
 
