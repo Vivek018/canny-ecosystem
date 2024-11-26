@@ -1,18 +1,15 @@
+import { FormButtons } from "@/components/form/form-buttons";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import {
-  createStatutoryBonus,
-} from "@canny_ecosystem/supabase/mutations";
+import { createStatutoryBonus } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type {
   Json,
   StatutoryBonusDatabaseRow,
 } from "@canny_ecosystem/supabase/types";
-import { Button } from "@canny_ecosystem/ui/button";
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
@@ -30,8 +27,16 @@ import {
 } from "@canny_ecosystem/utils/constant";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { type ActionFunctionArgs, json, type LoaderFunctionArgs } from "@remix-run/node";
+import {
+  type ActionFunctionArgs,
+  json,
+  type LoaderFunctionArgs,
+} from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
+import { useState } from "react";
+import { UPDATE_STATUTORY_BONUS } from "./$sbId.update-statutory-bonus";
+
+export const CREATE_STATUTORY_BONUS = "create-statutory-bonus";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -40,9 +45,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const submission = parseWithZod(formData, {
     schema: StatutoryBonusSchema,
   });
-
-
-  console.log("-------formData", formData)
 
   if (submission.status !== "success") {
     return json(
@@ -80,15 +82,16 @@ export default function CreateStatutoryBonus({
 }: {
   updateValues?: Json;
 }) {
-  
   const STATUTORY_BONUS_TAG = updateValues
-  ? "update-statutory-bonus"
-  : "create-statutory-bonus";
-  
+    ? UPDATE_STATUTORY_BONUS
+    : CREATE_STATUTORY_BONUS;
+
   const initialValues =
-  updateValues ?? getInitialValueFromZod(StatutoryBonusSchema);
-  
+    updateValues ?? getInitialValueFromZod(StatutoryBonusSchema);
+
   const { companyId } = useLoaderData<{ companyId: string }>();
+  const [resetKey, setResetKey] = useState(Date.now());
+
   const [form, fields] = useForm({
     id: STATUTORY_BONUS_TAG,
     constraint: getZodConstraint(StatutoryBonusSchema),
@@ -120,7 +123,7 @@ export default function CreateStatutoryBonus({
             <input {...getInputProps(fields.company_id, { type: "hidden" })} />
             <div className="flex flex-col w-1/4 items-start justify-between gap-2">
               <SearchableSelectField
-                // key={resetKey}
+                key={resetKey}
                 className="capitalize"
                 options={paymentFrequencies}
                 inputProps={{
@@ -147,6 +150,7 @@ export default function CreateStatutoryBonus({
                 errors={fields.percentage.errors}
               />
               <SearchableSelectField
+                key={resetKey + 1}
                 className="capitalize"
                 options={payoutMonths}
                 inputProps={{
@@ -161,27 +165,7 @@ export default function CreateStatutoryBonus({
               />
             </div>
           </CardContent>
-          <CardFooter>
-            <div className="ml-auto w-2/5 flex flex-row items-center justify-center gap-4">
-              <Button
-                variant="secondary"
-                size="full"
-                type="reset"
-                {...form.reset.getButtonProps()}
-              >
-                Reset
-              </Button>
-              <Button
-                form={form.id}
-                disabled={!form.valid}
-                variant="default"
-                size="full"
-                type="submit"
-              >
-                Submit
-              </Button>
-            </div>
-          </CardFooter>
+          <FormButtons form={form} setResetKey={setResetKey} isSingle={true} />
         </Card>
       </Form>
     </section>

@@ -9,6 +9,8 @@ import { updateStatutoryBonus } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import CreateStatutoryBonus from "./create-statutory-bonus";
 
+export const UPDATE_STATUTORY_BONUS = "update-statutory-bonus";
+
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const sbId = params.sbId;
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -34,7 +36,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
 
-  let submission = parseWithZod(formData, {
+  const submission = parseWithZod(formData, {
     schema: StatutoryBonusSchema,
   });
 

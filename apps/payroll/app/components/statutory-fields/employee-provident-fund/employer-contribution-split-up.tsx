@@ -7,7 +7,7 @@ import {
 } from "@canny_ecosystem/ui/popover";
 import { Icon } from "@canny_ecosystem/ui/icon";
 
-const EmployerContributionSplitUp = () => {
+export default function EmployerContributionSplitUp() {
   const location = useLocation();
   const [open, setOpen] = useState(false);
 
@@ -26,7 +26,11 @@ const EmployerContributionSplitUp = () => {
         <div className="p-2 flex flex-col gap-4">
           <div className="px-2 pt-2 flex justify-between align-starts font-[600] text-gray-500">
             <h4>CONTRIBUTION RATE</h4>
-            <Icon name="cross" onClick={() => setOpen(false)} className="cursor-pointer" />
+            <Icon
+              name="cross"
+              onClick={() => setOpen(false)}
+              className="cursor-pointer"
+            />
           </div>
 
           <hr />
@@ -56,6 +60,4 @@ const EmployerContributionSplitUp = () => {
       </PopoverContent>
     </Popover>
   );
-};
-
-export default EmployerContributionSplitUp;
+}

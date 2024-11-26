@@ -11,7 +11,7 @@ import { Link } from "@remix-run/react";
 export default function EPFNoData() {
   return (
     <div className="flex flex-col items-center justify-end m-auto">
-        <div className="p-14"></div>
+        <div className="p-14" />
         <Card className="flex flex-col items-center justify-between gap-5 w-1/2 pt-6 px-2">
           <CardContent className="flex flex-col items-center justify-between gap-5">
             <CardTitle>Are you registered for EPF?</CardTitle>
@@ -24,7 +24,7 @@ export default function EPFNoData() {
 
           <CardFooter>
             <Link
-              to="/payment-components/statutory-fields/create-employee-provident-fund"
+              to="/payment-components/statutory-fields/employee-provident-fund/create-employee-provident-fund"
               className={buttonVariants({ variant: "primary-outline" })}
             >
               Enable EPF

@@ -1,3 +1,5 @@
+import { FormButtons } from "@/components/form/form-buttons";
+import { UPDATE_EMPLOYEE } from "@/routes/_protected+/employees+/$employeeId+/update-employee-details";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { createEmployeeStateInsurance } from "@canny_ecosystem/supabase/mutations";
@@ -6,11 +8,9 @@ import type {
   EmployeeStateInsuranceDatabaseRow,
   Json,
 } from "@canny_ecosystem/supabase/types";
-import { Button } from "@canny_ecosystem/ui/button";
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
@@ -37,6 +37,11 @@ import {
   type LoaderFunctionArgs,
 } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
+import { useState } from "react";
+import { UPDATE_EMPLOYEE_STATE_INSURANCE } from "./$esiId.update-esi";
+
+export const CREATE_EMPLOYEE_STATE_INSURANCE =
+  "create-employee-state-insurance";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -77,19 +82,21 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   return json({ companyId });
 };
 
-const CreateEmployeeStateInsurance = ({
+export default function CreateEmployeeStateInsurance({
   updateValues,
 }: {
   updateValues?: Json;
-}) => {
+}) {
   const EPF_TAG = updateValues
-    ? "update-employee-state-insurance"
-    : "create-employee-state-insurance";
+    ? UPDATE_EMPLOYEE_STATE_INSURANCE
+    : CREATE_EMPLOYEE_STATE_INSURANCE;
 
   const initialValues =
     updateValues ?? getInitialValueFromZod(EmployeeStateInsuranceSchema);
 
   const { companyId } = useLoaderData<{ companyId: string }>();
+  const [resetKey, setResetKey] = useState(Date.now());
+
   const [form, fields] = useForm({
     id: EPF_TAG,
     constraint: getZodConstraint(EmployeeProvidentFundSchema),
@@ -135,6 +142,7 @@ const CreateEmployeeStateInsurance = ({
               />
 
               <SearchableSelectField
+                key={resetKey}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
                   deductionCycleArray as unknown as string[]
@@ -207,31 +215,9 @@ const CreateEmployeeStateInsurance = ({
               className="items-center"
             />
           </CardContent>
-          <CardFooter>
-            <div className="ml-auto w-2/5 flex flex-row items-center justify-center gap-4">
-              <Button
-                variant="secondary"
-                size="full"
-                type="reset"
-                {...form.reset.getButtonProps()}
-              >
-                Reset
-              </Button>
-              <Button
-                form={form.id}
-                disabled={!form.valid}
-                variant="default"
-                size="full"
-                type="submit"
-              >
-                Submit
-              </Button>
-            </div>
-          </CardFooter>
+          <FormButtons form={form} setResetKey={setResetKey} isSingle={true} />
         </Card>
       </Form>
     </section>
   );
-};
-
-export default CreateEmployeeStateInsurance;
+}

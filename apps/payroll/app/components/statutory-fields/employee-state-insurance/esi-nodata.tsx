@@ -11,7 +11,7 @@ import { Link } from "@remix-run/react";
 export default function ESINoData() {
   return (
     <div className="flex flex-col items-center justify-end m-auto">
-      <div className="p-14"></div>
+      <div className="p-14" />
       <Card className="flex flex-col items-center justify-between gap-5 w-1/2 pt-6 px-2">
         <CardContent className="flex flex-col items-center justify-between gap-5">
           <CardTitle>Are you registered for ESI?</CardTitle>
@@ -25,7 +25,7 @@ export default function ESINoData() {
 
         <CardFooter>
           <Link
-            to="/payment-components/statutory-fields/create-employee-state-insurance"
+            to="/payment-components/statutory-fields/employee-state-insurance/create-employee-state-insurance"
             className={buttonVariants({ variant: "primary-outline" })}
           >
             Enable ESI

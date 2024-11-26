@@ -1,3 +1,4 @@
+import { FormButtons } from "@/components/form/form-buttons";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { createEmployeeProvidentFund } from "@canny_ecosystem/supabase/mutations";
@@ -6,11 +7,9 @@ import type {
   EmployeeProvidentFundDatabaseRow,
   Json,
 } from "@canny_ecosystem/supabase/types";
-import { Button } from "@canny_ecosystem/ui/button";
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
@@ -30,8 +29,16 @@ import {
 } from "@canny_ecosystem/utils";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { type ActionFunctionArgs, json, type LoaderFunctionArgs } from "@remix-run/node";
+import {
+  type ActionFunctionArgs,
+  json,
+  type LoaderFunctionArgs,
+} from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
+import { useState } from "react";
+import { UPDATE_EMPLOYEE_PROVIDENT_FUND } from "./$epfId.update-epf";
+
+export const CREATE_EMPLOYEE_PROVIDENT_FUND = "create-employee-provident-fund";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -72,17 +79,18 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   return json({ companyId });
 };
 
-const CreateEmployeeProvidentFund = ({
+export default function CreateEmployeeProvidentFund({
   updateValues,
 }: {
   updateValues?: Json;
-}) => {
+}) {
   const EPF_TAG = updateValues
-    ? "update-employee-provident-fund"
-    : "create-employee-provident-fund";
+    ? UPDATE_EMPLOYEE_PROVIDENT_FUND
+    : CREATE_EMPLOYEE_PROVIDENT_FUND;
 
   const initialValues =
     updateValues ?? getInitialValueFromZod(EmployeeProvidentFundSchema);
+  const [resetKey, setResetKey] = useState(Date.now());
 
   const { companyId } = useLoaderData<{ companyId: string }>();
   const [form, fields] = useForm({
@@ -119,7 +127,7 @@ const CreateEmployeeProvidentFund = ({
                 inputProps={{
                   ...getInputProps(fields.epf_number, { type: "text" }),
                   autoFocus: true,
-                  placeholder:"AA/AAA/0000000/XXX",
+                  placeholder: "AA/AAA/0000000/XXX",
                   className: "capitalize",
                 }}
                 labelProps={{
@@ -130,9 +138,11 @@ const CreateEmployeeProvidentFund = ({
               />
 
               <SearchableSelectField
-                // key={resetKey}
+                key={resetKey}
                 className="capitalize"
-                options={transformStringArrayIntoOptions(deductionCycleArray as unknown as string[])}
+                options={transformStringArrayIntoOptions(
+                  deductionCycleArray as unknown as string[]
+                )}
                 inputProps={{
                   ...getInputProps(fields.deduction_cycle, { type: "text" }),
                 }}
@@ -230,31 +240,9 @@ const CreateEmployeeProvidentFund = ({
               )}
             </div>
           </CardContent>
-          <CardFooter>
-            <div className="ml-auto w-2/5 flex flex-row items-center justify-center gap-4">
-              <Button
-                variant="secondary"
-                size="full"
-                type="reset"
-                {...form.reset.getButtonProps()}
-              >
-                Reset
-              </Button>
-              <Button
-                form={form.id}
-                disabled={!form.valid}
-                variant="default"
-                size="full"
-                type="submit"
-              >
-                Submit
-              </Button>
-            </div>
-          </CardFooter>
+          <FormButtons form={form} setResetKey={setResetKey} isSingle={true} />
         </Card>
       </Form>
     </section>
   );
-};
-
-export default CreateEmployeeProvidentFund;
+}

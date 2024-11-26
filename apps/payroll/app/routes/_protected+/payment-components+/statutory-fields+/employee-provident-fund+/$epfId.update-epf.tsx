@@ -4,33 +4,35 @@ import { json, useLoaderData } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
 import { safeRedirect } from "@/utils/server/http.server";
 import {
-  EmployeeStateInsuranceSchema,
+  EmployeeProvidentFundSchema,
   isGoodStatus,
 } from "@canny_ecosystem/utils";
-import { getEmployeeStateInsuranceById } from "@canny_ecosystem/supabase/queries";
-import { updateEmployeeStateInsurance } from "@canny_ecosystem/supabase/mutations";
+import { getEmployeeProvidentFundById } from "@canny_ecosystem/supabase/queries";
+import { updateEmployeeProvidentFund } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import CreateEmployeeStateInsurance from "./create-employee-state-insurance";
+import CreateEmployeeProvidentFund from "./create-employee-provident-fund";
+
+export const UPDATE_EMPLOYEE_PROVIDENT_FUND = "update-employee-provident-fund";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const esiId = params.esiId;
+  const epfId = params.epfId;
   const { supabase } = getSupabaseWithHeaders({ request });
 
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  let esiData = null;
+  let epfData = null;
 
-  if (esiId) {
-    esiData = await getEmployeeStateInsuranceById({
+  if (epfId) {
+    epfData = await getEmployeeProvidentFundById({
       supabase,
-      id: esiId,
+      id: epfId,
     });
   }
 
-  if (esiData?.error) {
-    throw esiData.error;
+  if (epfData?.error) {
+    throw epfData.error;
   }
 
-  return json({ data: esiData?.data, companyId });
+  return json({ data: epfData?.data, companyId });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -38,7 +40,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
 
   const submission = parseWithZod(formData, {
-    schema: EmployeeStateInsuranceSchema,
+    schema: EmployeeProvidentFundSchema,
   });
 
   if (submission.status !== "success") {
@@ -48,13 +50,13 @@ export async function action({ request }: ActionFunctionArgs) {
     );
   }
 
-  const { status, error } = await updateEmployeeStateInsurance({
+  const { status, error } = await updateEmployeeProvidentFund({
     supabase,
     data: submission.value,
   });
 
   if (isGoodStatus(status)) {
-    return safeRedirect("/payment-components/statutory-fields/employee-state-insurance", {
+    return safeRedirect("/payment-components/statutory-fields/employee-provident-fund", {
       status: 303,
     });
   }
@@ -63,5 +65,5 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function UpdateEmployeeProvidentFund() {
   const { data } = useLoaderData<typeof loader>();
-  return <CreateEmployeeStateInsurance updateValues={data} />;
+  return <CreateEmployeeProvidentFund updateValues={data} />;
 }

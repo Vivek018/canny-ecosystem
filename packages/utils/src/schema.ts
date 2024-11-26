@@ -397,7 +397,7 @@ export const EmployeeWorkHistorySchema = z.object({
   end_date: z.string(),
 });
 
-export const deductionCycleArray=["monthly"] as const;
+export const deductionCycleArray = ["monthly"] as const;
 export const EMPLOYEE_RESTRICTED_VALUE = 15000;
 export const EMPLOYEE_RESTRICTED_RATE = 0.2;
 
@@ -405,10 +405,6 @@ export const EmployeeProvidentFundSchema = z.object({
   id: z.string().optional(),
   company_id: z.string(),
   epf_number: z.string().max(20),
-  // .regex(
-  //   /^[A-Z]{2}\/[A-Z]{3}\/\d{7}\/[A-Z]{3}$/,
-  //   "Invalid format. Must match AA/AAA/0000000/XXX."
-  // ),
   deduction_cycle: z.enum(deductionCycleArray).default(deductionCycleArray[0]),
   employee_contribution: z.number().default(EMPLOYEE_RESTRICTED_RATE),
   employer_contribution: z.number().default(EMPLOYEE_RESTRICTED_RATE),
@@ -425,10 +421,6 @@ export const EmployeeStateInsuranceSchema = z.object({
   id: z.string().optional(),
   company_id: z.string(),
   esi_number: zNumberString,
-  // .regex(
-  //   /^\d{2}-\d{2}-\d{6}-\d{3}-\d{4}$/,
-  //   "Invalid format. Must match 00-00-000000-000-0000."
-  // ),
   deduction_cycle: z.enum(deductionCycleArray).default(deductionCycleArray[0]),
   employees_contribution: z.number().default(0.0075),
   employers_contribution: z.number().default(0.0325),
@@ -444,7 +436,12 @@ export const ProfessionalTaxSchema = z.object({
   gross_salary_range: z.any(),
 });
 
-export const lwfDeductionCycleArray = ["monthly", "quarterly", "half_yearly", "yearly"] as const;
+export const lwfDeductionCycleArray = [
+  "monthly",
+  "quarterly",
+  "half_yearly",
+  "yearly",
+] as const;
 
 export const LabourWelfareFundSchema = z.object({
   id: z.string().optional(),
@@ -452,7 +449,9 @@ export const LabourWelfareFundSchema = z.object({
   state: z.string(),
   employee_contribution: z.number().default(6),
   employer_contribution: z.number().default(12),
-  deduction_cycle: z.enum(lwfDeductionCycleArray).default(lwfDeductionCycleArray[0]),
+  deduction_cycle: z
+    .enum(lwfDeductionCycleArray)
+    .default(lwfDeductionCycleArray[0]),
   status: z.boolean().default(false),
 });
 
