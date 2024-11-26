@@ -433,7 +433,7 @@ export const ProfessionalTaxSchema = z.object({
   state: zString,
   pt_number: zNumberString.max(20),
   deduction_cycle: z.enum(deductionCycleArray).default(deductionCycleArray[0]),
-  gross_salary_range: z.any(),
+  gross_salary_range: z.any().optional(),
 });
 
 export const lwfDeductionCycleArray = ["monthly", "quarterly", "half_yearly", "yearly"] as const;
