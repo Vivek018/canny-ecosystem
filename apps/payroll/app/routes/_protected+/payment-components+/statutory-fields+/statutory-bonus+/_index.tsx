@@ -1,3 +1,4 @@
+import { DeleteStatutoryBonus } from "@/components/statutory-fields/statutory-bonus/delete-statutory-bonus";
 import StatutoryBonusNoData from "@/components/statutory-fields/statutory-bonus/statutory-bonus-nodata";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getStatutoryBonusByCompanyId } from "@canny_ecosystem/supabase/queries";
@@ -63,14 +64,9 @@ export default function StatutoryBonusIndex() {
           </div>
         </div>
         <hr className="my-6" />
-        <button
-          type="button"
-          className="flex gap-1 text-sm items-center text-blue-500 cursor-pointer"
-          onClick={handleDelete}
-        >
-          <Icon name="trash" />
-          <span>Disable Statutory Bonus</span>
-        </button>
+        <div>
+          <DeleteStatutoryBonus employeeStatutoryBonusId={data?.[0]?.id} />
+        </div>
       </div>
     </div>
   );

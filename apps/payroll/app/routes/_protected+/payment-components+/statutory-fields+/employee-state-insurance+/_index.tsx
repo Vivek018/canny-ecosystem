@@ -1,3 +1,4 @@
+import { DeleteEmployeeStateInsurance } from "@/components/statutory-fields/employee-state-insurance/delete-employee-state-insurance";
 import ESINoData from "@/components/statutory-fields/employee-state-insurance/esi-nodata";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getEmployeeStateInsuranceByCompanyId } from "@canny_ecosystem/supabase/queries";
@@ -5,7 +6,7 @@ import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { replaceUnderscore } from "@canny_ecosystem/utils";
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
-import { Link, useLoaderData, useSubmit } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -22,18 +23,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 export default function EmployeeStateInsuranceIndex() {
   const { data } = useLoaderData<typeof loader>();
-  const submit = useSubmit();
-
-  const handleDeleteESI = () => {
-    submit(
-      {},
-      {
-        method: "post",
-        action: `/payment-components/statutory-fields/employee-state-insurance/${data?.[0]?.id}/delete-esi`,
-        replace: true,
-      }
-    );
-  };
 
   if (!data?.length) return <ESINoData />;
   return (
@@ -76,14 +65,11 @@ export default function EmployeeStateInsuranceIndex() {
           </div>
         </div>
         <hr className="my-6" />
-        <button
-          type="button"
-          className="flex mt-2 gap-1 text-sm items-center text-blue-500 cursor-pointer"
-          onClick={handleDeleteESI}
-        >
-          <Icon name="trash" />
-          <span>Disable ESI</span>
-        </button>
+        <div>
+          <DeleteEmployeeStateInsurance
+            employeeStateInsuranceId={data?.[0]?.id}
+          />
+        </div>
       </div>
     </div>
   );
