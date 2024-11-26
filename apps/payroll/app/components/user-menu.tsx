@@ -29,8 +29,8 @@ export function UserMenu({
 }) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex items-center justify-start gap-2 rounded group focus:outline-none focus:dark:brightness-125 hover:dark:brightness-125 focus:brightness-90 hover:brightness-90">
-        <Avatar className="w-12 h-12 cursor-pointer">
+      <DropdownMenuTrigger className='flex items-center justify-start gap-2 rounded group focus:outline-none focus:dark:brightness-125 hover:dark:brightness-125 focus:brightness-90 hover:brightness-90'>
+        <Avatar className='w-12 h-12 cursor-pointer'>
           {userData?.avatar && (
             <AvatarImage
               src={userData?.avatar}
@@ -38,7 +38,7 @@ export function UserMenu({
             />
           )}
           <AvatarFallback>
-            <span className="text-xs">
+            <span className='text-xs'>
               {userData?.first_name?.charAt(0)?.toUpperCase()}
             </span>
           </AvatarFallback>
@@ -46,34 +46,34 @@ export function UserMenu({
         <div
           className={cn(
             "flex flex-col items-start group-hover:opacity-70 group-hover:dark:opacity-100 gap-0.5",
-            !isExpanded && "hidden",
+            !isExpanded && "hidden"
           )}
         >
-          <span className="truncate w-28 text-start">
+          <span className='truncate w-40 text-start'>
             {`${userData.first_name} ${userData.last_name}`}
           </span>
-          <span className="truncate w-28 text-start text-xs text-[#606060] font-normal">
+          <span className='truncate w-40 text-start text-xs text-[#606060] font-normal'>
             {userData.email}
           </span>
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent
         ref={dropdownContentRef}
-        className="w-[240px]"
-        align="start"
+        className='w-[240px]'
+        align='start'
       >
         <>
           <DropdownMenuLabel>
-            <div className="flex justify-between items-center">
-              <div className="flex flex-col">
-                <span className="truncate">
+            <div className='flex justify-between items-center'>
+              <div className='flex flex-col'>
+                <span className='truncate'>
                   {`${userData.first_name} ${userData.last_name}`}
                 </span>
-                <span className="truncate text-xs text-[#606060] font-normal">
+                <span className='truncate text-xs text-[#606060] font-normal'>
                   {userData.email}
                 </span>
               </div>
-              <div className="border py-0.5 px-3 rounded-full text-[11px] font-normal">
+              <div className='border py-0.5 px-3 rounded-full text-[11px] font-normal'>
                 Beta
               </div>
             </div>
@@ -82,13 +82,13 @@ export function UserMenu({
           <DropdownMenuSeparator />
 
           <DropdownMenuGroup>
-            <Link prefetch="intent" to="/user/account">
+            <Link prefetch='intent' to='/user/account'>
               <DropdownMenuItem>Account</DropdownMenuItem>
             </Link>
-            <Link prefetch="intent" to="/user/help">
+            <Link prefetch='intent' to='/user/help'>
               <DropdownMenuItem>Help</DropdownMenuItem>
             </Link>
-            <Link prefetch="intent" to="/user/feedback">
+            <Link prefetch='intent' to='/user/feedback'>
               <DropdownMenuItem>Feedback</DropdownMenuItem>
             </Link>
           </DropdownMenuGroup>
