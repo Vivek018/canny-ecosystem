@@ -9,7 +9,7 @@ export default function Settings() {
       <div className="py-[18px] px-4 border-b">
         <SecondaryMenu
           items={[
-            { label: "General", path: "/settings" },
+            { label: "General", path: "/settings/general" },
             { label: "Locations", path: "/settings/locations" },
             { label: "Relationships", path: "/settings/relationships" },
             { label: "Users", path: "/settings/users" },

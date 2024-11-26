@@ -8,9 +8,9 @@ export default function Account() {
       <div className="py-[18px] px-4 border-b">
         <SecondaryMenu
           items={[
-            { label: "Account", path: "/account" },
-            { label: "Help", path: "/account/help" },
-            { label: "Feedback", path: "/account/feedback" },
+            { label: "Account", path: "/user/account" },
+            { label: "Help", path: "/user/help" },
+            { label: "Feedback", path: "/user/feedback" },
           ]}
           pathname={pathname}
           Link={Link}

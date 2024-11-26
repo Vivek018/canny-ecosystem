@@ -82,13 +82,13 @@ export function UserMenu({
           <DropdownMenuSeparator />
 
           <DropdownMenuGroup>
-            <Link prefetch="intent" to="/account">
+            <Link prefetch="intent" to="/user/account">
               <DropdownMenuItem>Account</DropdownMenuItem>
             </Link>
-            <Link prefetch="intent" to="/account/help">
+            <Link prefetch="intent" to="/user/help">
               <DropdownMenuItem>Help</DropdownMenuItem>
             </Link>
-            <Link prefetch="intent" to="/account/feedback">
+            <Link prefetch="intent" to="/user/feedback">
               <DropdownMenuItem>Feedback</DropdownMenuItem>
             </Link>
           </DropdownMenuGroup>
