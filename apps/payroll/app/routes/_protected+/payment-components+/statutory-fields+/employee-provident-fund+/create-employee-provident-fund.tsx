@@ -5,6 +5,7 @@ import { createEmployeeProvidentFund } from "@canny_ecosystem/supabase/mutations
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type {
   EmployeeProvidentFundDatabaseRow,
+  EmployeeProvidentFundDatabaseUpdate,
   Json,
 } from "@canny_ecosystem/supabase/types";
 import {
@@ -82,7 +83,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export default function CreateEmployeeProvidentFund({
   updateValues,
 }: {
-  updateValues?: Json;
+  updateValues?: EmployeeProvidentFundDatabaseUpdate | null;
 }) {
   const EPF_TAG = updateValues
     ? UPDATE_EMPLOYEE_PROVIDENT_FUND
@@ -102,9 +103,7 @@ export default function CreateEmployeeProvidentFund({
     shouldValidate: "onBlur",
     shouldRevalidate: "onInput",
     defaultValue: {
-      ...(initialValues as {
-        [key: string]: EmployeeProvidentFundDatabaseRow | null;
-      }),
+      ...initialValues,
       company_id: companyId,
     },
   });
@@ -122,7 +121,7 @@ export default function CreateEmployeeProvidentFund({
           <CardContent>
             <input {...getInputProps(fields.id, { type: "hidden" })} />
             <input {...getInputProps(fields.company_id, { type: "hidden" })} />
-            <div className="grid grid-rows-2 place-content-center justify-between">
+            <div className="flex flex-col justify-between">
               <Field
                 inputProps={{
                   ...getInputProps(fields.epf_number, { type: "text" }),
@@ -153,7 +152,7 @@ export default function CreateEmployeeProvidentFund({
                 errors={fields.deduction_cycle.errors}
               />
             </div>
-            <div className="grid place-content-center justify-between pb-5 max-w-3/4">
+            <div className="flex flex-col justify-between pb-5">
               <CheckboxField
                 buttonProps={getInputProps(
                   fields.restrict_employee_contribution,

@@ -1,5 +1,5 @@
 import { convertToNull } from "@canny_ecosystem/utils";
-import {
+import type {
   EmployeeProvidentFundDatabaseInsert,
   EmployeeProvidentFundDatabaseUpdate,
   TypedSupabaseClient,

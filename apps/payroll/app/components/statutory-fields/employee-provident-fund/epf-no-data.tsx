@@ -8,7 +8,7 @@ import {
 } from "@canny_ecosystem/ui/card";
 import { Link } from "@remix-run/react";
 
-export default function EPFNoData() {
+export function EPFNoData() {
   return (
     <div className="flex flex-col items-center justify-end m-auto">
         <div className="p-14" />

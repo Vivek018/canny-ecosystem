@@ -467,7 +467,7 @@ export const StatutoryBonusSchema = z
     payout_month: z.number().optional(),
   })
   .superRefine((data, ctx) => {
-    if (data.payment_frequency === "monthly" && !data.payout_month) {
+    if (data.payment_frequency === "yearly" && !data.payout_month) {
       ctx.addIssue({
         path: ["payout_month"],
         message: "payout_month is required when payment_freq is 'monthly'",
@@ -475,9 +475,9 @@ export const StatutoryBonusSchema = z
       });
     }
 
-    if (data.payment_frequency === "yearly") {
+    if (data.payment_frequency === "monthly") {
       if (data.payout_month !== null) {
-        data.payout_month = 0;
+        data.payout_month = undefined;
       }
     }
   });

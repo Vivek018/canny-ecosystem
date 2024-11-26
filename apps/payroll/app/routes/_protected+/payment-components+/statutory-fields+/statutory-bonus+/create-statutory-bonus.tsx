@@ -6,6 +6,7 @@ import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type {
   Json,
   StatutoryBonusDatabaseRow,
+  StatutoryBonusDatabaseUpdate,
 } from "@canny_ecosystem/supabase/types";
 import {
   Card,
@@ -23,7 +24,7 @@ import {
   StatutoryBonusSchema,
   transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
-import {payoutMonths} from "@canny_ecosystem/utils/constant";
+import { payoutMonths } from "@canny_ecosystem/utils/constant";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import {
@@ -79,7 +80,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export default function CreateStatutoryBonus({
   updateValues = null,
 }: {
-  updateValues?: Json;
+  updateValues?: StatutoryBonusDatabaseUpdate | null;
 }) {
   const STATUTORY_BONUS_TAG = updateValues
     ? UPDATE_STATUTORY_BONUS
@@ -100,9 +101,7 @@ export default function CreateStatutoryBonus({
     shouldValidate: "onBlur",
     shouldRevalidate: "onInput",
     defaultValue: {
-      ...(initialValues as {
-        [key: string]: StatutoryBonusDatabaseRow | null;
-      }),
+      ...initialValues,
       company_id: companyId,
     },
   });
@@ -120,11 +119,13 @@ export default function CreateStatutoryBonus({
           <CardContent>
             <input {...getInputProps(fields.id, { type: "hidden" })} />
             <input {...getInputProps(fields.company_id, { type: "hidden" })} />
-            <div className="flex flex-col w-1/4 items-start justify-between gap-2">
+            <div className="flex flex-col items-start justify-between gap-2">
               <SearchableSelectField
                 key={resetKey}
                 className="capitalize"
-                options={transformStringArrayIntoOptions(statutoryBonusPayFrequencyArray as unknown as string[])}
+                options={transformStringArrayIntoOptions(
+                  statutoryBonusPayFrequencyArray as unknown as string[]
+                )}
                 inputProps={{
                   ...getInputProps(fields.payment_frequency, { type: "text" }),
                 }}

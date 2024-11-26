@@ -1,13 +1,13 @@
-import { HARD_QUERY_LIMIT } from "../constant";
-import { StatutoryBonusDatabaseRow, TypedSupabaseClient } from "../types";
+import { SINGLE_QUERY_LIMIT } from "../constant";
+import type {
+  InferredType,
+  StatutoryBonusDatabaseRow,
+  TypedSupabaseClient,
+} from "../types";
 
 export type StatutoryBonusDataType = Pick<
   StatutoryBonusDatabaseRow,
-  | "id"
-  | "company_id"
-  | "payment_frequency"
-  | "percentage"
-  | "payout_month"
+  "id" | "company_id" | "payment_frequency" | "percentage" | "payout_month"
 >;
 
 export const getStatutoryBonusById = async ({
@@ -17,14 +17,22 @@ export const getStatutoryBonusById = async ({
   supabase: TypedSupabaseClient;
   id: string;
 }) => {
-  const columns = ["id", "company_id", "payment_frequency", "percentage", "payout_month"] as const;
-    
+  const columns = [
+    "id",
+    "company_id",
+    "payment_frequency",
+    "percentage",
+    "payout_month",
+  ] as const;
+
   const { data, error } = await supabase
-  .from("statutory_bonus")
-  .select(columns.join(","))
-  .eq("id", id)
-  .single<StatutoryBonusDataType>();
-    
+    .from("statutory_bonus")
+    .select(columns.join(","))
+    .eq("id", id)
+    .single<
+      InferredType<StatutoryBonusDatabaseRow, (typeof columns)[number]>
+    >();
+
   if (error) {
     console.error(error);
   }
@@ -33,24 +41,32 @@ export const getStatutoryBonusById = async ({
 };
 
 export const getStatutoryBonusByCompanyId = async ({
-    supabase,
-    companyId,
-  }: {
-    supabase: TypedSupabaseClient;
-    companyId: string;
-  }) => {
-    const columns = ["id", "company_id", "payment_frequency", "percentage", "payout_month"] as const;
-  
-    const { data, error } = await supabase
-      .from("statutory_bonus")
-      .select(columns.join(","))
-      .eq("company_id", companyId)
-      .limit(HARD_QUERY_LIMIT)
-      .returns<StatutoryBonusDataType[]>();
-  
-    if (error) {
-      console.error(error);
-    }
-  
-    return { data, error };
-  };  
+  supabase,
+  companyId,
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+}) => {
+  const columns = [
+    "id",
+    "company_id",
+    "payment_frequency",
+    "percentage",
+    "payout_month",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("statutory_bonus")
+    .select(columns.join(","))
+    .eq("company_id", companyId)
+    .limit(SINGLE_QUERY_LIMIT)
+    .single<
+      InferredType<StatutoryBonusDatabaseRow, (typeof columns)[number]>
+    >();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { data, error };
+};

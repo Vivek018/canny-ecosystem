@@ -5,6 +5,7 @@ import { createEmployeeStateInsurance } from "@canny_ecosystem/supabase/mutation
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type {
   EmployeeStateInsuranceDatabaseRow,
+  EmployeeStateInsuranceDatabaseUpdate,
   Json,
 } from "@canny_ecosystem/supabase/types";
 import {
@@ -84,7 +85,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export default function CreateEmployeeStateInsurance({
   updateValues,
 }: {
-  updateValues?: Json;
+  updateValues?: EmployeeStateInsuranceDatabaseUpdate | null;
 }) {
   const EPF_TAG = updateValues
     ? UPDATE_EMPLOYEE_STATE_INSURANCE
@@ -105,9 +106,7 @@ export default function CreateEmployeeStateInsurance({
     shouldValidate: "onBlur",
     shouldRevalidate: "onInput",
     defaultValue: {
-      ...(initialValues as {
-        [key: string]: EmployeeStateInsuranceDatabaseRow | null;
-      }),
+      ...initialValues,
       company_id: companyId,
     },
   });
@@ -125,7 +124,7 @@ export default function CreateEmployeeStateInsurance({
           <CardContent>
             <input {...getInputProps(fields.id, { type: "hidden" })} />
             <input {...getInputProps(fields.company_id, { type: "hidden" })} />
-            <div className="flex flex-col w-1/3 justify-between">
+            <div className="flex flex-col justify-between">
               <Field
                 inputProps={{
                   ...getInputProps(fields.esi_number, { type: "text" }),
@@ -156,8 +155,8 @@ export default function CreateEmployeeStateInsurance({
                 errors={fields.deduction_cycle.errors}
               />
             </div>
-            <div className="flex flex-col w-2/5 justify-between">
-              <div className="flex   items-center justify-between gap-4">
+            <div className="flex flex-col justify-between">
+              <div className="flex items-center justify-between gap-4">
                 <Field
                   className=""
                   inputProps={{

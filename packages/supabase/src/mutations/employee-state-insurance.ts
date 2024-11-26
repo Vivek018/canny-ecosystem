@@ -1,5 +1,5 @@
 import { convertToNull } from "@canny_ecosystem/utils";
-import { EmployeeStateInsuranceDatabaseUpdate, EmployeeStateInsuranceDatabaseInsert, TypedSupabaseClient } from "../types";
+import type { EmployeeStateInsuranceDatabaseUpdate, EmployeeStateInsuranceDatabaseInsert, TypedSupabaseClient } from "../types";
 
 export async function createEmployeeStateInsurance({ supabase, data, bypassAuth= false }: {
     supabase: TypedSupabaseClient;
