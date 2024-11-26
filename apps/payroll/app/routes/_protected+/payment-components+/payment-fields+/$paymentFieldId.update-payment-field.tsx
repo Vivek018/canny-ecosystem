@@ -11,7 +11,6 @@ import {
 } from "@canny_ecosystem/utils";
 import { getPaymentFieldById } from "@canny_ecosystem/supabase/queries";
 import { updatePaymentField } from "@canny_ecosystem/supabase/mutations";
-import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
 export const UPDATE_PAYMENT_FIELD = "update-payment-field";
 
@@ -19,14 +18,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const paymentFieldId = params.paymentFieldId;
   const { supabase } = getSupabaseWithHeaders({ request });
 
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   let paymentFieldData = null;
 
   if (paymentFieldId) {
     paymentFieldData = await getPaymentFieldById({
       supabase,
       id: paymentFieldId,
-      companyId,
     });
   }
 
@@ -43,7 +40,7 @@ export async function action({ request }: ActionFunctionArgs) {
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: submission.status === "error" ? 400 : 200 }
     );
   }
 

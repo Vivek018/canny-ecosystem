@@ -6,7 +6,6 @@ import { safeRedirect } from "@/utils/server/http.server";
 import { isGoodStatus, ProfessionalTaxSchema } from "@canny_ecosystem/utils";
 import { getProfessionalTaxById } from "@canny_ecosystem/supabase/queries";
 import { updateProfessionalTax } from "@canny_ecosystem/supabase/mutations";
-import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import CreateProfessionalTax from "./create-professional-tax";
 
 export const UPDATE_PROFESSIONAL_TAX = "update-professional-tax";
@@ -15,14 +14,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const professionalTaxId = params.professionalTaxId;
   const { supabase } = getSupabaseWithHeaders({ request });
 
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   let professionalTaxData = null;
 
   if (professionalTaxId) {
     professionalTaxData = await getProfessionalTaxById({
       supabase,
-      id: professionalTaxId,
-      companyId,
+      id: professionalTaxId
     });
   }
 

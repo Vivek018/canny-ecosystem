@@ -4,7 +4,6 @@ import { EmployeeDetailsCard } from "@/components/employees/employee/details-car
 import { EmployeeGuardiansCard } from "@/components/employees/employee/guardians-card";
 import { EmployeePageHeader } from "@/components/employees/employee/page-header";
 import { EmployeeStatutoryCard } from "@/components/employees/employee/statutory-card";
-import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import {
   getEmployeeAddressesByEmployeeId,
@@ -21,12 +20,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const employeeId = params.employeeId;
 
   const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
   const { data, error } = await getEmployeeById({
     supabase,
     id: employeeId ?? "",
-    companyId,
   });
 
   if (error) {
@@ -41,7 +38,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     {
       supabase,
       id: employeeId ?? "",
-    },
+    }
   );
 
   const { data: employeeBankData } = await getEmployeeBankDetailsById({
@@ -78,7 +75,7 @@ export default function EmployeeIndex() {
   } = useLoaderData<typeof loader>();
 
   return (
-    <div className="w-full my-8 flex flex-col gap-8">
+    <div className='w-full my-8 flex flex-col gap-8'>
       <EmployeePageHeader employee={data} />
       <EmployeeDetailsCard employee={data} />
       <EmployeeStatutoryCard employeeStatutory={employeeStatutoryData} />
