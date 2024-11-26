@@ -81,7 +81,7 @@ export function EmployeePageHeader({
             employee={{
               id: employee.id,
               is_active: employee.is_active ?? false,
-              returnTo: `/employees/${employee.id}`,
+              returnTo: `/employees/${employee.id}/overview`,
             }}
             triggerChild={
               <DropdownMenuTrigger

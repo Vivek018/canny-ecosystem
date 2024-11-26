@@ -6,7 +6,6 @@ import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { safeRedirect } from "@/utils/server/http.server";
 import { updateEmployee } from "@canny_ecosystem/supabase/mutations";
 import { isGoodStatus, EmployeeSchema } from "@canny_ecosystem/utils";
-import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { CreateEmployeeDetails } from "@/components/employees/form/create-employee-details";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
 import { Card } from "@canny_ecosystem/ui/card";
@@ -19,12 +18,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const employeeId = params.employeeId;
   const { supabase } = getSupabaseWithHeaders({ request });
 
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-
   let data = null;
 
   if (employeeId) {
-    data = (await getEmployeeById({ supabase, id: employeeId, companyId }))
+    data = (await getEmployeeById({ supabase, id: employeeId}))
       .data;
   }
 
@@ -52,7 +49,7 @@ export async function action({ request }: ActionFunctionArgs) {
   });
 
   if (isGoodStatus(status)) {
-    return safeRedirect(`/employees/${submission.value?.id}`, { status: 303 });
+    return safeRedirect(`/employees/${submission.value?.id}/overview`, { status: 303 });
   }
   return json({ status, error });
 }
