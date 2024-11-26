@@ -30,7 +30,7 @@ export function UserMenu({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className='flex items-center justify-start gap-2 rounded group focus:outline-none focus:dark:brightness-125 hover:dark:brightness-125 focus:brightness-90 hover:brightness-90'>
-        <Avatar className='w-12 h-12 cursor-pointer'>
+        <Avatar className='w-[47px] h-[48px] cursor-pointer'>
           {userData?.avatar && (
             <AvatarImage
               src={userData?.avatar}
