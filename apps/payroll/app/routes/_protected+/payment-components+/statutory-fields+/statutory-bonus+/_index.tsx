@@ -36,7 +36,7 @@ export default function StatutoryBonusIndex() {
 
   if (!data.length) return <StatutoryBonusNoData />;
   return (
-    <div className="w-full">
+    <div className="p-4 w-full">
       <div className="min-h-screen w-2/5">
         <div className="flex items-center gap-5 mb-8">
           <h4 className="text-lg font-semibold">Statutory Bonus</h4>

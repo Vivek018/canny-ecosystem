@@ -1,5 +1,4 @@
 import { FormButtons } from "@/components/form/form-buttons";
-import { UPDATE_EMPLOYEE } from "@/routes/_protected+/employees+/$employeeId+/update-employee-details";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { createEmployeeStateInsurance } from "@canny_ecosystem/supabase/mutations";

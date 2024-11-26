@@ -19,12 +19,11 @@ import {
   isGoodStatus,
   replaceDash,
   replaceUnderscore,
+  statutoryBonusPayFrequencyArray,
   StatutoryBonusSchema,
+  transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
-import {
-  paymentFrequencies,
-  payoutMonths,
-} from "@canny_ecosystem/utils/constant";
+import {payoutMonths} from "@canny_ecosystem/utils/constant";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import {
@@ -125,7 +124,7 @@ export default function CreateStatutoryBonus({
               <SearchableSelectField
                 key={resetKey}
                 className="capitalize"
-                options={paymentFrequencies}
+                options={transformStringArrayIntoOptions(statutoryBonusPayFrequencyArray as unknown as string[])}
                 inputProps={{
                   ...getInputProps(fields.payment_frequency, { type: "text" }),
                 }}

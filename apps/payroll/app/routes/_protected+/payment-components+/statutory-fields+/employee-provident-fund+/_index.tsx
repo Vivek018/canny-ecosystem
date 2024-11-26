@@ -1,3 +1,4 @@
+import { DeleteEmployeeProvidentFund } from "@/components/statutory-fields/employee-provident-fund/delete-employee-provident-fund";
 import EmployerContributionSplitUp from "@/components/statutory-fields/employee-provident-fund/employer-contribution-split-up";
 import EPFNoData from "@/components/statutory-fields/employee-provident-fund/epf-nodata";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
@@ -92,7 +93,7 @@ export default function EmployeeProvidentFundIndex() {
 
   if (!data.length) return <EPFNoData />;
   return (
-    <div className="grid grid-cols-[3fr_2fr] gap-3 place-content-center justify-between">
+    <div className="p-4 grid grid-cols-[3fr_2fr] gap-3 place-content-center justify-between">
       <div className="min-h-screen">
         <div className="flex items-center gap-5 mb-8">
           <h4 className="text-lg font-semibold">Employees' Provident Fund</h4>
@@ -171,15 +172,9 @@ export default function EmployeeProvidentFundIndex() {
               </div>
             </div>
           </div>
-
-          <button
-            type="button"
-            onClick={handleDelete}
-            className="flex gap-1 text-sm my-4 items-center text-blue-500 cursor-pointer"
-          >
-            <Icon name="trash" />
-            <span>Disable EPF</span>
-          </button>
+            <div>
+            <DeleteEmployeeProvidentFund employeeProvidentFundId={data?.[0]?.id}/>
+            </div>
         </div>
       </div>
 
@@ -205,7 +200,7 @@ export default function EmployeeProvidentFundIndex() {
                   <div className="flex justify-between text-[0.85rem]">
                     <p>
                       EPF{" "}
-                      <span className="text-[0.75rem] text-gray-700">
+                      <span className="text-[0.75rem] text-gray-700 dark:text-gray-300">
                         {data?.[0]?.restrict_employee_contribution
                           ? "(Max of ₹ 15,000)"
                           : "(12% of 20000)"}
@@ -224,7 +219,7 @@ export default function EmployeeProvidentFundIndex() {
                   <div className="flex justify-between text-[0.85rem]">
                     <p>
                       EPS{" "}
-                      <span className="text-[0.75rem] text-gray-700">
+                      <span className="text-[0.75rem] text-gray-700 dark:text-gray-300">
                         (8.33% of {epfState?.employerContribution} (Max of ₹
                         15,000))
                       </span>
@@ -235,7 +230,7 @@ export default function EmployeeProvidentFundIndex() {
                   <div className="flex justify-between text-[0.85rem]">
                     <p>
                       EPF{" "}
-                      <span className="text-[0.75rem] text-gray-700">
+                      <span className="text-[0.75rem] text-gray-700 dark:text-gray-300">
                         (12% of 20000 - EPS)
                       </span>
                     </p>{" "}
@@ -248,7 +243,7 @@ export default function EmployeeProvidentFundIndex() {
                         <div className="flex justify-between text-[0.85rem]">
                           <p>
                             EDLI Contribution{" "}
-                            <span className="text-[0.75rem] text-gray-700">
+                            <span className="text-[0.75rem] text-gray-700 dark:text-gray-300">
                               (0.55% of {epfState?.employerContribution})
                             </span>
                           </p>{" "}
@@ -260,7 +255,7 @@ export default function EmployeeProvidentFundIndex() {
                         <div className="flex justify-between text-[0.85rem]">
                           <p>
                             EPF Admin Charges{" "}
-                            <span className="text-[0.75rem] text-gray-700">
+                            <span className="text-[0.75rem] text-gray-700 dark:text-gray-300">
                               (0.55% of {epfState?.employerContribution})
                             </span>
                           </p>{" "}

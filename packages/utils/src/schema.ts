@@ -455,8 +455,7 @@ export const LabourWelfareFundSchema = z.object({
   status: z.boolean().default(false),
 });
 
-const statutoryBonusPayFrequencyArray = ["monthly", "yearly"] as const;
-
+export const statutoryBonusPayFrequencyArray = ["monthly", "yearly"] as const;
 export const StatutoryBonusSchema = z
   .object({
     id: z.string().optional(),

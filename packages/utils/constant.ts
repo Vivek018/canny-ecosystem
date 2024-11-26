@@ -77,7 +77,3 @@ export const payoutMonths = [
   { value: 11, label: "November" },
   { value: 12, label: "December" },
 ];
-export const paymentFrequencies = [
-  { value: "monthly", label: "Monthly" },
-  { value: "yearly", label: "Yearly" },
-];
