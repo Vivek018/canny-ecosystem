@@ -1,16 +1,14 @@
+import { FormButtons } from "@/components/form/form-buttons";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { createEmployeeProvidentFund } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import {
-  EmployeeProvidentFundDatabaseRow,
-  Json,
+import type {
+  EmployeeProvidentFundDatabaseUpdate,
 } from "@canny_ecosystem/supabase/types";
-import { Button } from "@canny_ecosystem/ui/button";
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
@@ -20,22 +18,26 @@ import {
   SearchableSelectField,
 } from "@canny_ecosystem/ui/forms";
 import {
+  deductionCycleArray,
   EmployeeProvidentFundSchema,
   getInitialValueFromZod,
   isGoodStatus,
   replaceDash,
   replaceUnderscore,
+  transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
-import {
-  deductionCycles,
-  employeeContributionRate,
-  employerContributionRate,
-} from "@canny_ecosystem/utils/constant";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { type ActionFunctionArgs, json, type LoaderFunctionArgs } from "@remix-run/node";
+import {
+  type ActionFunctionArgs,
+  json,
+  type LoaderFunctionArgs,
+} from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
-import React, { useEffect } from "react";
+import { useState } from "react";
+import { UPDATE_EMPLOYEE_PROVIDENT_FUND } from "./$epfId.update-epf";
+
+export const CREATE_EMPLOYEE_PROVIDENT_FUND = "create-employee-provident-fund";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -76,17 +78,18 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   return json({ companyId });
 };
 
-const CreateEmployeeProvidentFund = ({
+export default function CreateEmployeeProvidentFund({
   updateValues,
 }: {
-  updateValues?: Json;
-}) => {
+  updateValues?: EmployeeProvidentFundDatabaseUpdate | null;
+}) {
   const EPF_TAG = updateValues
-    ? "update-employee-provident-fund"
-    : "create-employee-provident-fund";
+    ? UPDATE_EMPLOYEE_PROVIDENT_FUND
+    : CREATE_EMPLOYEE_PROVIDENT_FUND;
 
   const initialValues =
     updateValues ?? getInitialValueFromZod(EmployeeProvidentFundSchema);
+  const [resetKey, setResetKey] = useState(Date.now());
 
   const { companyId } = useLoaderData<{ companyId: string }>();
   const [form, fields] = useForm({
@@ -98,32 +101,30 @@ const CreateEmployeeProvidentFund = ({
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
     defaultValue: {
-      ...(initialValues as {
-        [key: string]: EmployeeProvidentFundDatabaseRow | null;
-      }),
+      ...initialValues,
       company_id: companyId,
     },
   });
 
   return (
-    <section className="md-px-20 lg:px-52 2xl:px-10 py-3 w-full">
+    <section className="p-4 w-full">
       <Form method="POST" {...getFormProps(form)} className="flex flex-col">
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl pb-5">{replaceDash(EPF_TAG)}</CardTitle>
+            <CardTitle className="text-2xl pb-5">
+              {replaceDash(EPF_TAG)}
+            </CardTitle>
             <hr />
           </CardHeader>
           <CardContent>
             <input {...getInputProps(fields.id, { type: "hidden" })} />
             <input {...getInputProps(fields.company_id, { type: "hidden" })} />
-            <div className="grid grid-cols-[50%,33%] place-content-center justify-between gap-6">
+            <div className="flex flex-col justify-between">
               <Field
                 inputProps={{
                   ...getInputProps(fields.epf_number, { type: "text" }),
                   autoFocus: true,
-                  placeholder: `Enter ${replaceUnderscore(
-                    fields.epf_number.name
-                  )}`,
+                  placeholder: "AA/AAA/0000000/XXX",
                   className: "capitalize",
                 }}
                 labelProps={{
@@ -134,21 +135,22 @@ const CreateEmployeeProvidentFund = ({
               />
 
               <SearchableSelectField
-                // key={resetKey}
+                key={resetKey}
                 className="capitalize"
-                options={deductionCycles}
+                options={transformStringArrayIntoOptions(
+                  deductionCycleArray as unknown as string[]
+                )}
                 inputProps={{
                   ...getInputProps(fields.deduction_cycle, { type: "text" }),
-                  defaultValue: deductionCycles[0].value,
                 }}
-                placeholder={`Select an option`}
+                placeholder="Select an option"
                 labelProps={{
                   children: replaceUnderscore(fields.deduction_cycle.name),
                 }}
                 errors={fields.deduction_cycle.errors}
               />
             </div>
-            <div className="grid place-content-center justify-between pb-5 max-w-3/4">
+            <div className="flex flex-col justify-between pb-5">
               <CheckboxField
                 buttonProps={getInputProps(
                   fields.restrict_employee_contribution,
@@ -178,67 +180,66 @@ const CreateEmployeeProvidentFund = ({
                 className="items-center"
               />
             </div>
-            <CheckboxField
-              buttonProps={getInputProps(fields.include_employer_contribution, {
-                type: "checkbox",
-              })}
-              labelProps={{
-                htmlFor: fields.include_employer_contribution.id,
-                children: "Include employer's contribution in the CTC",
-              }}
-              className="items-center"
-            />
-            <div className="ml-7">
+            <div className="relative h-full w-full">
               <CheckboxField
                 buttonProps={getInputProps(
-                  fields.include_employer_edli_contribution,
+                  fields.include_employer_contribution,
                   {
                     type: "checkbox",
                   }
                 )}
                 labelProps={{
-                  htmlFor: fields.include_employer_edli_contribution.id,
-                  children: "Include employer's EDLI contribution in the CTC",
+                  htmlFor: fields.include_employer_contribution.id,
+                  children: "Include employer's contribution in the CTC",
                 }}
                 className="items-center"
               />
-              <CheckboxField
-                buttonProps={getInputProps(fields.include_admin_charges, {
-                  type: "checkbox",
-                })}
-                labelProps={{
-                  htmlFor: fields.include_admin_charges.id,
-                  children: "Include admin charges in the CTC",
-                }}
-                className="items-center"
-              />
+              {form.value?.include_employer_contribution && (
+                <>
+                  <div className="ml-8">
+                    <CheckboxField
+                      buttonProps={{
+                        ...getInputProps(
+                          fields.include_employer_edli_contribution,
+                          {
+                            type: "checkbox",
+                          }
+                        ),
+                        disabled: !form.value?.include_employer_contribution,
+                      }}
+                      labelProps={{
+                        htmlFor: fields.include_employer_edli_contribution.id,
+                        children:
+                          "Include employer's EDLI contribution in the CTC",
+                      }}
+                      className="items-center"
+                    />
+                    <CheckboxField
+                      buttonProps={{
+                        disabled: !form.value?.include_employer_contribution,
+                        ...getInputProps(fields.include_admin_charges, {
+                          type: "checkbox",
+                        }),
+                      }}
+                      labelProps={{
+                        htmlFor: fields.include_admin_charges.id,
+                        children: "Include admin charges in the CTC",
+                      }}
+                      className="items-center"
+                    />
+                  </div>
+
+                  <div className="absolute h-full top-2/3 left-4 transform -translate-x-1/2 -translate-y-1/2">
+                    <div className="h-[30px] w-[15px] border-l-2 border-b-2 border-gray-300" />
+                    <div className="h-[45px] w-[15px] border-l-2 border-b-2 border-gray-300" />
+                  </div>
+                </>
+              )}
             </div>
           </CardContent>
-          <CardFooter>
-            <div className="ml-auto w-2/5 flex flex-row items-center justify-center gap-4">
-              <Button
-                variant="secondary"
-                size="full"
-                type="reset"
-                {...form.reset.getButtonProps()}
-              >
-                Reset
-              </Button>
-              <Button
-                form={form.id}
-                disabled={!form.valid}
-                variant="default"
-                size="full"
-                type="submit"
-              >
-                Submit
-              </Button>
-            </div>
-          </CardFooter>
+          <FormButtons form={form} setResetKey={setResetKey} isSingle={true} />
         </Card>
       </Form>
     </section>
   );
-};
-
-export default CreateEmployeeProvidentFund;
+}

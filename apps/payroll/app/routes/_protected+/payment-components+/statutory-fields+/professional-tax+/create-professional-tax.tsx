@@ -106,12 +106,12 @@ export default function CreateProfessionalTax({
   });
 
   return (
-    <section className='p-4'>
+    <section className="p-4">
       <FormProvider context={form.context}>
-        <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
+        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
           <Card>
             <CardHeader>
-              <CardTitle className='text-3xl'>
+              <CardTitle className="text-3xl">
                 {replaceDash(PROFESSIONAL_TAX_TAG)}
               </CardTitle>
               <CardDescription>
@@ -126,7 +126,7 @@ export default function CreateProfessionalTax({
               />
               <SearchableSelectField
                 key={resetKey}
-                className='capitalize'
+                className="capitalize"
                 options={statesAndUTs}
                 inputProps={{
                   ...getInputProps(fields.state, { type: "text" }),
@@ -151,7 +151,7 @@ export default function CreateProfessionalTax({
               />
               <SearchableSelectField
                 key={resetKey + 1}
-                className='capitalize'
+                className="capitalize"
                 options={transformStringArrayIntoOptions(
                   deductionCycleArray as unknown as string[]
                 )}
@@ -172,7 +172,7 @@ export default function CreateProfessionalTax({
                 inputProps={{
                   ...getInputProps(fields.gross_salary_range, {
                     type: "hidden",
-                  })
+                  }),
                 }}
                 fields={[
                   { key: "start", type: "number", placeholder: "Start Range" },

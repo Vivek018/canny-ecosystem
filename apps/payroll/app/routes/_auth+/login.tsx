@@ -79,7 +79,7 @@ export default function Login() {
                 Continue with Google
               </Button>
             </Form>
-            {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+            {error && <p className="text-destructive text-sm mt-2">{error}</p>}
           </div>
 
           <p className="text-xs text-[#878787]">

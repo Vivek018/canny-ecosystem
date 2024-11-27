@@ -33,7 +33,7 @@ export default function LabourWelfareFundIndex() {
   const { isDocument } = useIsDocument();
 
   return (
-    <section className='py-4 px-4 w-full'>
+    <section className='p-4 w-full'>
       <div className='w-full flex items-end justify-between'>
         <Command className='overflow-visible'>
           <div className='w-full flex items-center gap-4'>

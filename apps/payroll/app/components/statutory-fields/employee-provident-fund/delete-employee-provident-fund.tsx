@@ -11,25 +11,26 @@ import {
 } from "@canny_ecosystem/ui/alert-dialog";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { ErrorList } from "@canny_ecosystem/ui/forms";
+import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
-export const DeleteLabourWelfareFund = ({ labourWelfareFundId }: { labourWelfareFundId: string }) => {
+export const DeleteEmployeeProvidentFund = ({ employeeProvidentFundId }: { employeeProvidentFundId: string }) => {
     const [isLoading, setLoading] = useState(false);
     const [inputValue, setInputValue] = useState("");
     const [inputError, setInputError] = useState<string[]>([]);
     const submit = useSubmit();
 
-    const handleCancelLWF = () => {
+    const handleCancelEPF = () => {
         setInputError([]);
         setInputValue("");
         setLoading(false);
     };
 
-    const handleDeleteLWF = (
+    const handleDeleteEPF = (
         e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     ) => {
         if (inputValue === DELETE_TEXT) {
@@ -38,7 +39,7 @@ export const DeleteLabourWelfareFund = ({ labourWelfareFundId }: { labourWelfare
                 {},
                 {
                     method: "post",
-                    action: `${labourWelfareFundId}/delete-labour-welfare-fund`,
+                    action: `${employeeProvidentFundId}/delete-epf`,
                     replace: true,
                 },
             );
@@ -52,18 +53,18 @@ export const DeleteLabourWelfareFund = ({ labourWelfareFundId }: { labourWelfare
         <AlertDialog>
             <AlertDialogTrigger
                 className={cn(
-                    buttonVariants({ variant: "destructive-ghost", size: "full" }),
-                    "text-[13px] h-9",
+                    buttonVariants({ variant: "destructive-outline" }),
+                    "text-sm h-9 flex gap-1 items-center",
                 )}
             >
-                Delete Labour Welfare Fund
+                <Icon name="trash"size="md" />
+                <span>Delete EPF</span>
             </AlertDialogTrigger>
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                     <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete your
-                        lwf and remove it's data from our servers.
+                        This action cannot be undone. This will permanently delete your EPF and remove it's data from our servers.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <div className="py-4">
@@ -89,13 +90,13 @@ export const DeleteLabourWelfareFund = ({ labourWelfareFundId }: { labourWelfare
                     <ErrorList errors={inputError} />
                 </div>
                 <AlertDialogFooter>
-                    <AlertDialogCancel onClick={handleCancelLWF}>
+                    <AlertDialogCancel onClick={handleCancelEPF}>
                         Cancel
                     </AlertDialogCancel>
                     <AlertDialogAction
                         className={cn(buttonVariants({ variant: "destructive" }))}
-                        onClick={handleDeleteLWF}
-                        onSelect={handleDeleteLWF}
+                        onClick={handleDeleteEPF}
+                        onSelect={handleDeleteEPF}
                     >
                         {isLoading ? "Deleting..." : "Delete"}
                     </AlertDialogAction>
