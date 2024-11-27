@@ -496,8 +496,8 @@ export const FeedbackSchema = z.object({
 });
 
 export const UpdateUserNameSchema = z.object({
-  first_name: zString.max(15),
-  last_name: zString.max(15),
+  first_name: zString.max(20),
+  last_name: zString.max(20),
 });
 export const UpdateUserContactSchema = z.object({
   email: zEmail,

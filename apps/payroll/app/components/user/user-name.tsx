@@ -32,7 +32,6 @@ type UserNameProps = {
 
 export const UserName = ({ updateValues }: UserNameProps) => {
   const [form, fields] = useForm({
-    
     constraint: getZodConstraint(UpdateUserNameSchema),
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: UpdateUserNameSchema });
@@ -44,7 +43,11 @@ export const UserName = ({ updateValues }: UserNameProps) => {
 
   return (
     <FormProvider context={form.context}>
-      <Form method="POST" {...getFormProps(form)} action={"/user/user-name-update"}>
+      <Form
+        method="POST"
+        {...getFormProps(form)}
+        action={"/user/update-user-name"}
+      >
         <Card>
           <CardHeader>
             <CardTitle>Display Name</CardTitle>
@@ -52,34 +55,32 @@ export const UserName = ({ updateValues }: UserNameProps) => {
               Please enter your first name and last name.
             </CardDescription>
           </CardHeader>
-          <CardContent className="">
-            <div className="grid h-20 grid-cols-1 md:grid-cols-2 items-center justify-center md:gap-x-8">
-              <Field
-                inputProps={{
-                  ...getInputProps(fields.first_name, {
-                    type: "text",
-                  }),
-                  placeholder: `Enter ${replaceUnderscore(
-                    fields.first_name.name
-                  )}`,
-                }}
-                errors={fields.first_name.errors}
-              />
-              <Field
-                inputProps={{
-                  ...getInputProps(fields.last_name, {
-                    type: "text",
-                  }),
-                  placeholder: `Enter ${replaceUnderscore(
-                    fields.last_name.name
-                  )}`,
-                }}
-                errors={fields.last_name.errors}
-              />
-            </div>
+          <CardContent className="grid grid-cols-1 px-6 py-0 md:grid-cols-2 items-center justify-center md:gap-x-8">
+            <Field
+              inputProps={{
+                ...getInputProps(fields.first_name, {
+                  type: "text",
+                }),
+                placeholder: `Enter ${replaceUnderscore(
+                  fields.first_name.name
+                )}`,
+              }}
+              errors={fields.first_name.errors}
+            />
+            <Field
+              inputProps={{
+                ...getInputProps(fields.last_name, {
+                  type: "text",
+                }),
+                placeholder: `Enter ${replaceUnderscore(
+                  fields.last_name.name
+                )}`,
+              }}
+              errors={fields.last_name.errors}
+            />
           </CardContent>
           <CardFooter className="border-t justify-between pt-6">
-            <div>Please use 15 characters at maximum.</div>
+            <div>Please use 20 characters at maximum.</div>
             <div className="flex gap-4">
               <Button
                 variant="secondary"

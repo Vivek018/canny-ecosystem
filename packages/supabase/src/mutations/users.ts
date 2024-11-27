@@ -1,32 +1,5 @@
 import type { TypedSupabaseClient, UserDatabaseUpdate } from "../types";
 
-export async function updateUserLastLoginAndSetAvatar({
-  supabase,
-}: {
-  supabase: TypedSupabaseClient;
-}) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user?.email) {
-    return;
-  }
-
-  const { error, status } = await supabase.from("users").insert({
-    first_name: user?.user_metadata.full_name.split(" ")[0],
-    last_name: user?.user_metadata.full_name.split(" ")[1],
-    email: user?.email,
-    last_login: new Date().toISOString(),
-  });
-
-  if (error) {
-    console.error(error);
-  }
-
-  return { status };
-}
-
 export async function updateUserLastLogin({
   supabase,
 }: {

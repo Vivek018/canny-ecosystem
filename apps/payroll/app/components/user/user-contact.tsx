@@ -1,6 +1,7 @@
 import { Button } from "@canny_ecosystem/ui/button";
 import {
   Card,
+  CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
@@ -48,17 +49,16 @@ export const UserContact = ({ updateValues }: UserContactProps) => {
         <Form
           method="post"
           {...getFormProps(form)}
-          action={"/user/user-contact-update"}
+          action={"/user/update-user-contact"}
         >
-          <div className="flex justify-between items-center pr-6">
-            <CardHeader>
-              <CardTitle>Contact Details</CardTitle>
-              <CardDescription>
-                Change your email address or mobile number.
-              </CardDescription>
-            </CardHeader>
-          </div>
-          <div className="grid grid-cols-1 px-6 md:grid-cols-2 items-center justify-center md:gap-x-8">
+          <CardHeader>
+            <CardTitle>Contact Details</CardTitle>
+            <CardDescription>
+              Change your email address or mobile number.
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="grid grid-cols-1 px-6 py-0 md:grid-cols-2 items-center justify-center md:gap-x-8">
             <Field
               inputProps={{
                 ...getInputProps(fields.email, {
@@ -80,7 +80,7 @@ export const UserContact = ({ updateValues }: UserContactProps) => {
               }}
               errors={fields.mobile_number.errors}
             />
-          </div>
+          </CardContent>
           <CardFooter className="border-t justify-between pt-6">
             <div>
               This is your primary email address and mobile number for

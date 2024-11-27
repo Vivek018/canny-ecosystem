@@ -5,7 +5,6 @@ import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json, useLoaderData } from "@remix-run/react";
 import { UserName } from "@/components/user/user-name";
 import { UserContact } from "@/components/user/user-contact";
-import { UserDelete } from "@/components/user/delete-user";
 import { useEffect, useState } from "react";
 import { UserAvatar } from "@/components/user/user-avatar";
 
@@ -48,7 +47,6 @@ export default function Accountindex() {
       />
       <UserName key={userId + resetKey} updateValues={data} />
       <UserContact key={userId + resetKey + 1} updateValues={data} />
-      <UserDelete Id={data?.id ?? ""} />
     </section>
   );
 }

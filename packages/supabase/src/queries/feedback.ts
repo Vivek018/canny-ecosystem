@@ -1,4 +1,5 @@
-import {
+import { LIST_LIMIT } from "../constant";
+import type {
   FeedbackDatabaseRow,
   TypedSupabaseClient,
   UserDatabaseRow,
@@ -28,7 +29,7 @@ export async function getFeedbacksByCompanyId({
   supabase,
   companyId,
   page = 1,
-  limit = 9,
+  limit = LIST_LIMIT,
 }: {
   supabase: TypedSupabaseClient;
   companyId: string;
@@ -63,5 +64,5 @@ export async function getFeedbacksByCompanyId({
     console.error(error);
   }
 
-  return { data, error, totalCount: count??0 };
+  return { data, error, totalCount: count ?? 0 };
 }

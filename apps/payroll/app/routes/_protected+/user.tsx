@@ -38,7 +38,7 @@ export default function Account() {
         Link={Link}
       />
       </div>
-      <div className="px-4">
+      <div className="px-4 h-full">
       <Outlet />
       </div>
     </section>

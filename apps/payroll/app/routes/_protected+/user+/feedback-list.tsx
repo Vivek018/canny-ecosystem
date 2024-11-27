@@ -1,5 +1,6 @@
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
+import { LIST_LIMIT } from "@canny_ecosystem/supabase/constant";
 import {
   getCompanyById,
   getFeedbacksByCompanyId,
@@ -26,16 +27,15 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@canny_ecosystem/ui/pagination";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { formatDateTime } from "@canny_ecosystem/utils";
 
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, useSearchParams } from "@remix-run/react";
 
-const LIMIT = 9;
-
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
-  const page = Number.parseInt(url.searchParams.get("page") || "1", 10);
+  const page = Number.parseInt(url.searchParams.get("page") ?? "1");
 
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
@@ -49,14 +49,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
   }
 
   if (companyData.company_type !== "app_creator") {
-    return safeRedirect("/account/feedback-form");
+    return safeRedirect("/user/feedback-form");
   }
 
   const { data, error, totalCount } = await getFeedbacksByCompanyId({
     supabase,
     companyId,
     page,
-    limit: LIMIT,
+    limit: LIST_LIMIT,
   });
 
   if (error) {
@@ -66,12 +66,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function FeedbackList() {
-  const { data,  totalCount } = useLoaderData<typeof loader>();
+  const { data, page, totalCount } = useLoaderData<typeof loader>();
 
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const currentPage = Number.parseInt(searchParams.get("page") || "1", 10);
-  const totalPages = Math.ceil(totalCount / LIMIT);
+  const currentPage = page ?? 1;
+  const totalPages = Math.ceil(totalCount / LIST_LIMIT);
 
   const handlePrevious = () => {
     if (currentPage > 1) {
@@ -116,26 +116,24 @@ export default function FeedbackList() {
   };
 
   return (
-    <section className="pt-4 flex flex-col">
-      <div className="h-full flex flex-col w-full  flex-grow justify-between items-end">
-        <div className="min-h-[700px] max-h-[700px] overflow-y-scroll w-full grid gap-6 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 justify-start auto-rows-min">
+    <section className="pt-4 flex flex-col h-full">
+      <div className="h-full flex flex-col w-full flex-grow justify-between items-end">
+        <div className="flex-1 w-full grid gap-6 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 justify-start auto-rows-min">
           {data?.map((feedback) => (
             <Card
               key={feedback.id}
-              className="w-full select-text cursor-auto dark:border-[1.5px] h-max flex flex-col justify-between"
+              className="w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-between"
             >
-              <CardHeader className="flex flex-row space-y-0 items-center justify-between py-3">
-                <CardTitle className="text-base tracking-wide">
-                  {feedback.category}
-                </CardTitle>
+              <CardHeader className="flex flex-row space-y-0 items-center justify-between py-4">
+                <CardTitle className="font-bold">{feedback.category}</CardTitle>
                 <CardTitle
-                  className={`text-base px-1 tracking-wide ${
+                  className={cn("px-1" ,
                     feedback.severity === "urgent"
                       ? "text-destructive"
                       : feedback.severity === "normal"
                       ? "text-purple-500"
                       : "text-yellow-400"
-                  }`}
+          )}
                 >
                   {feedback.severity}
                 </CardTitle>
@@ -143,10 +141,8 @@ export default function FeedbackList() {
 
               <CardContent className="flex flex-col gap-0.5">
                 <article className="py-2">
-                  <h3 className="capitalize font-bold text-sm">
-                    {feedback.subject}
-                  </h3>
-                  <p className="pt-2 capitalize text-xs break-words line-clamp-4">
+                  <h3 className="capitalize text-sm">{feedback.subject}</h3>
+                  <p className="pt-1 capitalize text-xs text-muted-foreground break-words line-clamp-4">
                     {feedback.message}
                   </p>
                 </article>
@@ -186,14 +182,14 @@ export default function FeedbackList() {
           ))}
         </div>
 
-        <Pagination className="my-4">
+        <Pagination className="mb-8 pt-6 mt-auto">
           <PaginationContent>
             <PaginationItem className="mx-2">
               <PaginationPrevious
-                size=""
-                className={`cursor-pointer hover:text-primary px-3 ${
+                className={cn(
+                  "px-3",
                   currentPage === 1 && "opacity-50 cursor-not-allowed"
-                }`}
+                )}
                 onClick={handlePrevious}
               />
             </PaginationItem>
@@ -209,7 +205,6 @@ export default function FeedbackList() {
                 return (
                   <PaginationItem key={pageNum} className="mx-0.5">
                     <PaginationLink
-                      size=""
                       onClick={() => {
                         if (typeof pageNum === "number") {
                           goToPage(pageNum);
@@ -226,10 +221,10 @@ export default function FeedbackList() {
 
             <PaginationItem className="mx-2">
               <PaginationNext
-                size=""
-                className={`cursor-pointer hover:text-primary px-3 ${
+                className={cn(
+                  " px-3",
                   currentPage === totalPages && "opacity-50 cursor-not-allowed"
-                }`}
+                )}
                 onClick={handleNext}
               />
             </PaginationItem>
