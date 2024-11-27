@@ -5,7 +5,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@canny_ecosystem/ui/popover";
-import { Icon } from "@canny_ecosystem/ui/icon";
 
 export function EmployerContributionSplitUp() {
   const location = useLocation();
@@ -37,7 +36,7 @@ export function EmployerContributionSplitUp() {
           <hr />
         </div>
 
-        <div className="px-5 pt-2 mb-4 flex flex-col justify-between gap-5 align-start text-xs font-[500] text-black dark:text-gray-400">
+        <div className="px-5 pt-2 mb-4 flex flex-col justify-between gap-5 align-start text-xs font-medium text-black dark:text-gray-400">
           <div className="flex justify-between">
             <p> Employees' Provident Fund (EPF)</p>
             <p> 3.67% of PF Wage </p>
@@ -48,7 +47,6 @@ export function EmployerContributionSplitUp() {
             <p>
               {" "}
               8.33% of PF Wage{" "}
-              <Icon name="info" size="sm" className="ml-0.5 cursor-pointer" />
             </p>
           </div>
         </div>

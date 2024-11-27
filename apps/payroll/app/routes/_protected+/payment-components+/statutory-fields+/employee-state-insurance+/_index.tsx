@@ -19,6 +19,21 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   return json({ data });
 };
 
+type DetailItemProps = {
+  label: string;
+  value: string | number | null | undefined;
+  className?: string;
+};
+
+const DetailItem: React.FC<DetailItemProps> = ({ label, value, className }) => {
+  return (
+    <div className={`flex gap-1 max-md:flex-col ${className ?? ""}`}>
+      <div className="w-1/2 text-muted-foreground">{label}</div>
+      <div className="w-1/2 self-start">{value || "-"}</div>
+    </div>
+  );
+};
+
 export default function EmployeeStateInsuranceIndex() {
   const { data } = useLoaderData<typeof loader>();
 
@@ -37,28 +52,20 @@ export default function EmployeeStateInsuranceIndex() {
           </Link>
         </div>
         <div className="flex flex-col mb-2 justify-between gap-6 w-full">
-          <div className="flex gap-1 max-md:flex-col">
-            <div className="w-1/2 text-gray-500">ESI Number</div>
-            <div className="w-1/2 self-start">{data?.esi_number || "-"}</div>
-          </div>
-          <div className="flex gap-1 max-md:flex-col">
-            <div className="w-1/2 text-gray-500">Deduction Cycle</div>
-            <div className="w-1/2 self-start capitalize">
-              {replaceUnderscore(data?.deduction_cycle)}
-            </div>
-          </div>
-          <div className="flex gap-1 max-md:flex-col">
-            <div className="w-1/2 text-gray-500">Employees' Contribution</div>
-            <div className="w-1/2 self-start">
-              {data?.employees_contribution * 100}% of Gross Pay
-            </div>
-          </div>
-          <div className="flex gap-1 max-md:flex-col">
-            <div className="w-1/2 text-gray-500">Employer's Contribution</div>
-            <div className="w-1/2 self-start">
-              {data?.employers_contribution * 100}% of Gross Pay
-            </div>
-          </div>
+          <DetailItem label="ESI Number" value={data?.esi_number || "-"} />
+          <DetailItem
+            label="Deduction Cycle"
+            value={replaceUnderscore(data?.deduction_cycle) || "-"}
+            className="capitalize"
+          />
+          <DetailItem
+            label="Employees' Contribution"
+            value={`${data?.employees_contribution * 100}% of Gross Pay`}
+          />
+          <DetailItem
+            label="Employer's Contribution"
+            value={`${data?.employers_contribution * 100}% of Gross Pay`}
+          />
         </div>
         <hr className="my-6" />
         <div>

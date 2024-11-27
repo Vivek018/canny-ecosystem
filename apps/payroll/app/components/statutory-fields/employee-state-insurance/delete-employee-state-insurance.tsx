@@ -58,7 +58,7 @@ export const DeleteEmployeeStateInsurance = ({
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "sm" }),
-          "text-sm h-9 text-blue-500 flex gap-1 items-center"
+          "text-sm h-9 text-red-500 flex gap-1 items-center"
         )}
       >
         <Icon name="trash" size="md" />

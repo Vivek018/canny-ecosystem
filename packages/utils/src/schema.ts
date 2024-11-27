@@ -424,7 +424,7 @@ export const EmployeeStateInsuranceSchema = z.object({
   deduction_cycle: z.enum(deductionCycleArray).default(deductionCycleArray[0]),
   employees_contribution: z.number().default(0.0075),
   employers_contribution: z.number().default(0.0325),
-  include_employer_contribution: z.boolean().default(true),
+  include_employer_contribution: z.boolean().default(false),
 });
 
 export const ProfessionalTaxSchema = z.object({

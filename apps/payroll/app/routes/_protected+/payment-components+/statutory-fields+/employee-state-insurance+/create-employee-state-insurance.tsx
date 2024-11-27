@@ -4,9 +4,7 @@ import { safeRedirect } from "@/utils/server/http.server";
 import { createEmployeeStateInsurance } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type {
-  EmployeeStateInsuranceDatabaseRow,
   EmployeeStateInsuranceDatabaseUpdate,
-  Json,
 } from "@canny_ecosystem/supabase/types";
 import {
   Card,
@@ -176,7 +174,7 @@ export default function CreateEmployeeStateInsurance({
                   }}
                   errors={fields.employees_contribution.errors}
                 />
-                <p className="mb-5 w-1/2 font-[350] text-sm">of Gross Pay</p>
+                <p className="mb-5 w-1/2 font-light text-sm">of Gross Pay</p>
               </div>
               <div className="flex items-center justify-between gap-4">
                 <Field
@@ -198,7 +196,7 @@ export default function CreateEmployeeStateInsurance({
                   }}
                   errors={fields.employers_contribution.errors}
                 />
-                <p className="w-1/2 mb-5 font-[350] text-sm">of Gross Pay</p>
+                <p className="w-1/2 mb-5 font-light text-sm">of Gross Pay</p>
               </div>
             </div>
 

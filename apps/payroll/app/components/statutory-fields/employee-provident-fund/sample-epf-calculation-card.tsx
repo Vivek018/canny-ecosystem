@@ -1,7 +1,7 @@
+import { EMPLOYEE_EPF_PERCENTAGE } from "@/routes/_protected+/payment-components+/statutory-fields+/employee-provident-fund+/_index";
 import type { EmployeeProvidentFundDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { Card } from "@canny_ecosystem/ui/card";
 
-const EMPLOYEE_EPF_PERCENTAGE = 0.12;
 const EMPLOYER_EPS_PERCENTAGE = 0.0833;
 const EMPLOYER_EPF_PERCENTAGE = 0.12;
 const EMPLOYER_EDLI_PERCENTAGE = 0.005;
@@ -11,26 +11,24 @@ type DetailItemProps = {
   label: string;
   helperText: string;
   value: string | number | null | undefined;
-  formatter?: (value: string | number) => string;
 };
 
 const DetailItem: React.FC<DetailItemProps> = ({
   label,
   helperText,
   value,
-  formatter,
 }) => {
-  const formattedValue = value ? (formatter ? formatter(value) : value) : "--";
-
   return (
     <div className="flex justify-between text-sm">
       <p>
         {label}{" "}
-        <span className="text-xs text-gray-700 dark:text-gray-300">
-          {helperText}
-        </span>
+        {helperText && (
+          <span className="text-xs text-gray-700 dark:text-gray-300">
+            {helperText}
+          </span>
+        )}
       </p>
-      <p>₹ {formattedValue}</p>
+      <p>{value ? `₹ ${value}` : "-"}</p>
     </div>
   );
 };
@@ -40,18 +38,26 @@ export function SampleEPFCalculationCard({
 }: {
   data: Omit<EmployeeProvidentFundDatabaseRow, "created_at" | "updated_at">;
 }) {
+  const employeeEPFPercentage =
+    data?.employee_contribution ?? EMPLOYEE_EPF_PERCENTAGE;
+  const employerEPFPercentage =
+    data?.employer_contribution ?? EMPLOYER_EPF_PERCENTAGE;
+
   const currentEmployeeRate = data?.restrict_employee_contribution
-    ? 15000
+    ? employeeEPFPercentage ?? 15000
     : 20000;
   const currentEmployerRate = data?.restrict_employer_contribution
-    ? 15000
+    ? employerEPFPercentage ?? 15000
     : 20000;
 
-  const employeeEPF = currentEmployeeRate * EMPLOYEE_EPF_PERCENTAGE;
+  const employeeEPF = currentEmployeeRate * employeeEPFPercentage;
+
   const epsSubTotal = currentEmployerRate * EMPLOYER_EPS_PERCENTAGE;
-  const epfSubTotal =
-    currentEmployerRate * EMPLOYER_EPF_PERCENTAGE - epsSubTotal;
+
+  const epfSubTotal = currentEmployerRate * employeeEPFPercentage - epsSubTotal;
+
   const edliSubTotal = currentEmployerRate * EMPLOYER_EDLI_PERCENTAGE;
+
   const adminChargesSubTotal =
     currentEmployerRate * EMPLOYER_ADMIN_CHARGES_PERCENTAGE;
 
@@ -87,7 +93,7 @@ export function SampleEPFCalculationCard({
                 helperText={
                   data?.restrict_employee_contribution
                     ? "(Max of ₹ 15,000)"
-                    : "(12% of 20000)"
+                    : `(${employeeEPFPercentage * 100}% of 20000)`
                 }
               />
             </div>
@@ -107,7 +113,7 @@ export function SampleEPFCalculationCard({
                 label="EPF"
                 value={epfSubTotal}
                 helperText={`(${
-                  EMPLOYER_EPF_PERCENTAGE * 100
+                  employerEPFPercentage * 100
                 }% of ${currentEmployerRate} - EPS)`}
               />
               {data?.include_employer_contribution && (
@@ -135,7 +141,7 @@ export function SampleEPFCalculationCard({
 
               <hr />
 
-              <div className="flex justify-between text-sm font-[500]">
+              <div className="flex justify-between text-sm font-medium">
                 <p>Total </p> <p>₹ {total}</p>
               </div>
             </div>

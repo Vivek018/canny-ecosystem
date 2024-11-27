@@ -154,7 +154,7 @@ export default function CreateStatutoryBonus({
                 className="capitalize"
                 options={payoutMonths}
                 inputProps={{
-                  disabled: form.value?.payment_frequency !== "monthly",
+                  disabled: form.value?.payment_frequency === "monthly",
                   ...getInputProps(fields.payout_month, { type: "text" }),
                 }}
                 placeholder="Select an option"
