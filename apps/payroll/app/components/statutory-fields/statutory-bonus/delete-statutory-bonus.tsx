@@ -57,12 +57,12 @@ export const DeleteStatutoryBonus = ({
     <AlertDialog>
       <AlertDialogTrigger
         className={cn(
-          buttonVariants({ variant: "destructive-ghost", size: "sm" }),
-          "text-sm h-9 text-red-500 flex gap-1 items-center"
+          buttonVariants({ variant: "destructive-outline" }),
+          "text-sm h-9 flex gap-1 items-center"
         )}
       >
         <Icon name="trash" size="md" />
-        <span>Disable Statutory Bonus</span>
+        <span>Delete Statutory Bonus</span>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

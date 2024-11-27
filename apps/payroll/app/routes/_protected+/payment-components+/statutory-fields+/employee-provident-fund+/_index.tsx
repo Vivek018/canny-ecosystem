@@ -86,7 +86,7 @@ export default function EmployeeProvidentFundIndex() {
                 {data?.include_employer_contribution ? (
                   <span className="text-green-500">&#10003;</span>
                 ) : (
-                  <Icon name="cross" className="text-red-500" />
+                  <Icon name="cross" className="text-destructive" />
                 )}
                 <span className="ml-2">
                   {" "}
@@ -97,7 +97,7 @@ export default function EmployeeProvidentFundIndex() {
                 {data?.include_employer_edli_contribution ? (
                   <span className="text-green-500">&#10003;</span>
                 ) : (
-                  <Icon name="cross" className="text-red-500" />
+                  <Icon name="cross" className="text-destructive" />
                 )}
                 <span className="ml-2">
                   {" "}
@@ -108,7 +108,7 @@ export default function EmployeeProvidentFundIndex() {
                 {data?.include_admin_charges ? (
                   <span>&#10003;</span>
                 ) : (
-                  <Icon name="cross" className="text-red-500" />
+                  <Icon name="cross" className="text-destructive" />
                 )}
                 <span className="ml-2">
                   {" "}
@@ -117,6 +117,7 @@ export default function EmployeeProvidentFundIndex() {
               </div>
             </div>
           </div>
+          <hr />
           <div>
             <DeleteEmployeeProvidentFund employeeProvidentFundId={data?.id} />
           </div>

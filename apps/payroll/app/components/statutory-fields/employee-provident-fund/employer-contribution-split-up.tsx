@@ -1,5 +1,3 @@
-import { useLocation } from "@remix-run/react";
-import { useState } from "react";
 import {
   Popover,
   PopoverContent,
@@ -7,13 +5,11 @@ import {
 } from "@canny_ecosystem/ui/popover";
 
 export function EmployerContributionSplitUp() {
-  const location = useLocation();
-  const [open, setOpen] = useState(false);
 
   return (
-    <Popover key={location.key} open={open} onOpenChange={setOpen}>
+    <Popover>
       <PopoverTrigger asChild>
-        <span className="text-xs text-blue-600 cursor-pointer">
+        <span className="text-xs text-primary inline-block cursor-pointer">
           (View splitup)
         </span>
       </PopoverTrigger>
@@ -23,13 +19,13 @@ export function EmployerContributionSplitUp() {
         className="p-0 min-w-[30vw] text-sm"
       >
         <div className="p-2 flex flex-col gap-4">
-          <div className="px-2 pt-2 flex justify-between align-starts font-semibold text-gray-500 dark:text-gray-300">
+          <div className="px-2 pt-2 flex justify-between align-starts font-semibold text-muted-foreground">
             <h4>CONTRIBUTION RATE</h4>
           </div>
 
           <hr />
 
-          <div className="px-2 flex justify-between align-start text-xs text-black dark:text-gray-400">
+          <div className="px-2 flex justify-between align-start text-xs text-muted-foreground">
             <h4>SUB COMPONENTS</h4>
             <h4>EMPLOYER'S CONTRIBUTION</h4>
           </div>

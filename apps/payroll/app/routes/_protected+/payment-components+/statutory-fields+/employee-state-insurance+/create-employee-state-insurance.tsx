@@ -101,7 +101,7 @@ export default function CreateEmployeeStateInsurance({
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: EmployeeStateInsuranceSchema });
     },
-    shouldValidate: "onBlur",
+    shouldValidate: "onInput",
     shouldRevalidate: "onInput",
     defaultValue: {
       ...initialValues,
@@ -110,7 +110,7 @@ export default function CreateEmployeeStateInsurance({
   });
 
   return (
-    <section className="md-px-10 w-full lg:px-12 2xl:px-10 py-3">
+    <section className="p-4 w-full">
       <Form method="POST" {...getFormProps(form)} className="flex flex-col">
         <Card>
           <CardHeader>

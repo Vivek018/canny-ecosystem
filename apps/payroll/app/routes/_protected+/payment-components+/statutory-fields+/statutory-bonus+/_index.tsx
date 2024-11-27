@@ -29,8 +29,8 @@ type DetailItemProps = {
 const DetailItem: React.FC<DetailItemProps> = ({ label, value, className }) => {
   return (
     <div className={`flex gap-1 max-md:flex-col ${className ?? ""}`}>
-      <div className="w-1/2 text-muted-foreground">{label}</div>
-      <div className="w-1/2 self-start">{value || "-"}</div>
+      <div className="w-60 text-muted-foreground">{label}</div>
+      <div className="w-96 self-start">{value || "-"}</div>
     </div>
   );
 };
@@ -41,7 +41,7 @@ export default function StatutoryBonusIndex() {
   if (!data) return <StatutoryBonusNoData />;
   return (
     <div className="p-4 w-full">
-      <div className="min-h-screen w-2/5">
+      <div>
         <div className="flex items-center gap-5 mb-8">
           <h4 className="text-lg font-semibold">Statutory Bonus</h4>
           <Link
@@ -65,7 +65,7 @@ export default function StatutoryBonusIndex() {
           {data?.payout_month && data?.payment_frequency !== "monthly" && (
             <DetailItem
               label="Payout Month"
-              value={payoutMonths[data?.payout_month - 1].value}
+              value={payoutMonths[data?.payout_month - 1].label}
             />
           )}
         </div>

@@ -4,9 +4,7 @@ import { safeRedirect } from "@/utils/server/http.server";
 import { createEmployeeProvidentFund } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type {
-  EmployeeProvidentFundDatabaseRow,
   EmployeeProvidentFundDatabaseUpdate,
-  Json,
 } from "@canny_ecosystem/supabase/types";
 import {
   Card,
@@ -100,7 +98,7 @@ export default function CreateEmployeeProvidentFund({
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: EmployeeProvidentFundSchema });
     },
-    shouldValidate: "onBlur",
+    shouldValidate: "onInput",
     shouldRevalidate: "onInput",
     defaultValue: {
       ...initialValues,
@@ -109,7 +107,7 @@ export default function CreateEmployeeProvidentFund({
   });
 
   return (
-    <section className="md-px-20 lg:px-52 2xl:px-10 py-3 w-full">
+    <section className="p-4 w-full">
       <Form method="POST" {...getFormProps(form)} className="flex flex-col">
         <Card>
           <CardHeader>

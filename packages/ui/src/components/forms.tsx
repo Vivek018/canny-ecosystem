@@ -582,7 +582,7 @@ export const RangeField = ({
 
       <div className='min-h-[28px] px-4 pb-4 pt-1'>
         {errors && errors.length > 0 ? (
-          <div className='text-red-500'>
+          <div className='text-destructive'>
             {errors.map((error, index) => (
               <div key={String(index)}>{error}</div>
             ))}

@@ -53,12 +53,12 @@ export const DeleteEmployeeProvidentFund = ({ employeeProvidentFundId }: { emplo
         <AlertDialog>
             <AlertDialogTrigger
                 className={cn(
-                    buttonVariants({ variant: "destructive-ghost", size:"sm" }),
-                    "text-sm h-9 text-red-500 flex gap-1 items-center",
+                    buttonVariants({ variant: "destructive-outline" }),
+                    "text-sm h-9 flex gap-1 items-center",
                 )}
             >
                 <Icon name="trash"size="md" />
-                <span>Disable EPF</span>
+                <span>Delete EPF</span>
             </AlertDialogTrigger>
             <AlertDialogContent>
                 <AlertDialogHeader>

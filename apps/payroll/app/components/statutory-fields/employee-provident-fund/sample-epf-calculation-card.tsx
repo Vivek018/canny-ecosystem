@@ -10,7 +10,7 @@ const EMPLOYER_ADMIN_CHARGES_PERCENTAGE = 0.005;
 type DetailItemProps = {
   label: string;
   helperText: string;
-  value: string | number | null | undefined;
+  value: number | null | undefined;
 };
 
 const DetailItem: React.FC<DetailItemProps> = ({
@@ -28,7 +28,7 @@ const DetailItem: React.FC<DetailItemProps> = ({
           </span>
         )}
       </p>
-      <p>{value ? `₹ ${value}` : "-"}</p>
+      <p>{value ? `₹ ${value.toPrecision(4)}` : "-"}</p>
     </div>
   );
 };
@@ -44,10 +44,10 @@ export function SampleEPFCalculationCard({
     data?.employer_contribution ?? EMPLOYER_EPF_PERCENTAGE;
 
   const currentEmployeeRate = data?.restrict_employee_contribution
-    ? employeeEPFPercentage ?? 15000
+    ? data?.employee_restrict_value ?? 15000
     : 20000;
   const currentEmployerRate = data?.restrict_employer_contribution
-    ? employerEPFPercentage ?? 15000
+    ? data?.employer_restrict_value ?? 15000
     : 20000;
 
   const employeeEPF = currentEmployeeRate * employeeEPFPercentage;
