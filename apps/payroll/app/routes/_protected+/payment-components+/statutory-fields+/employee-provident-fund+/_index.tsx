@@ -34,7 +34,7 @@ const DetailItem: React.FC<DetailItemProps> = ({ label, value, className }) => {
   return (
     <div className={`flex gap-2 max-lg:flex-col ${className ?? ""}`}>
       <div className="w-52 text-muted-foreground">{label}</div>
-      <div className="self-start font-medium">{value || "-"}</div>
+      <div className="max-w-96 self-start font-medium">{value || "-"}</div>
     </div>
   );
 };
@@ -75,7 +75,7 @@ export default function EmployeeProvidentFundIndex() {
             <div className="w-52 text-muted-foreground">
               Employer Contribution Rate
             </div>
-            <div className="self-start font-medium">
+            <div className="max-w-96 self-start font-medium">
               {employerContributionRateText} <EmployerContributionSplitUp />
             </div>
           </div>

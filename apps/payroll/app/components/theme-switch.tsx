@@ -58,18 +58,18 @@ export const ThemeSwitch = ({
         <SelectTrigger
           noIcon={!isExpanded}
           className={cn(
-            "py-5 px-[12.5px] gap-2.5 h-12 w-12 rounded-full capitalize text-sm tracking-wide flex items-center justify-start transition-[width]",
+            "py-5 px-[13px] gap-2.5 h-12 w-12 rounded-full capitalize text-sm tracking-wide flex items-center justify-start transition-[width]",
             isExpanded && "w-full",
           )}
         >
           <ThemeIcon
             currentTheme={theme as Theme}
-            className="shrink-0"
+            className={cn("shrink-0")}
             size="md"
           />
           <p className={cn(!isExpanded && "hidden")}>{theme}</p>
         </SelectTrigger>
-        <SelectContent ref={selectContentRef}>
+        <SelectContent ref={selectContentRef} side="top">
           <SelectGroup>
             {themes.map((theme) => (
               <SelectItem key={theme} value={theme} className="capitalize">
