@@ -44,7 +44,7 @@ export const UserName = ({ updateValues }: UserNameProps) => {
 
   return (
     <FormProvider context={form.context}>
-      <Form method="POST" {...getFormProps(form)} action={"user-name-update"}>
+      <Form method="POST" {...getFormProps(form)} action={"/user/user-name-update"}>
         <Card>
           <CardHeader>
             <CardTitle>Display Name</CardTitle>

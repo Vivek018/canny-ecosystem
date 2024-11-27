@@ -20,7 +20,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   if (signOutError) {
     console.error("Error logging out:", signOutError);
-    return safeRedirect("/account", { headers });
+    return safeRedirect("/user/account", { headers });
   }
 
   const { error, status } = await deleteUser({ supabase, id: Id });

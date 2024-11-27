@@ -50,7 +50,7 @@ export const UserDelete = ({ Id }: { Id: string }) => {
       { id: Id },
       {
         method: "post",
-        action: "user-data-delete",
+        action: "/user/user-data-delete",
         replace: true,
       }
     );
@@ -93,6 +93,10 @@ export const UserDelete = ({ Id }: { Id: string }) => {
                 }}
                 className="border border-input rounded-md h-10 w-full"
                 placeholder="Confirm your action"
+                onPaste={(e) => {
+                  e.preventDefault();
+                  return false;
+                }}
               />
               <ErrorList errors={inputError} />
             </div>

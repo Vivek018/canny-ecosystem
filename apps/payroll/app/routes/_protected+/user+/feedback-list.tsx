@@ -118,7 +118,7 @@ export default function FeedbackList() {
   return (
     <section className="pt-4 flex flex-col">
       <div className="h-full flex flex-col w-full  flex-grow justify-between items-end">
-        <div className="min-h-[700px] max-h-[700px] overflow-y-scroll w-full grid gap-6 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
+        <div className="min-h-[700px] max-h-[700px] overflow-y-scroll w-full grid gap-6 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 justify-start auto-rows-min">
           {data?.map((feedback) => (
             <Card
               key={feedback.id}
@@ -131,7 +131,7 @@ export default function FeedbackList() {
                 <CardTitle
                   className={`text-base px-1 tracking-wide ${
                     feedback.severity === "urgent"
-                      ? "text-red-600"
+                      ? "text-destructive"
                       : feedback.severity === "normal"
                       ? "text-purple-500"
                       : "text-yellow-400"
@@ -201,9 +201,8 @@ export default function FeedbackList() {
               (pageNum, index) => {
                 if (pageNum === "...") {
                   return (
-                    <PaginationItem key={`ellipsis-${// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-index}`}>
-                      <PaginationEllipsis className="rotate-90" />
+                    <PaginationItem key={`ellipsis-${index.toString()}`}>
+                      <PaginationEllipsis />
                     </PaginationItem>
                   );
                 }

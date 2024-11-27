@@ -1,6 +1,6 @@
 import * as React from "react";
 import { cn } from "@/utils";
-import { ButtonProps, buttonVariants } from "@/components/button";
+import { type ButtonProps, buttonVariants } from "@/components/button";
 import { Icon } from "./icon";
 
 const Pagination = ({ className, ...props }: React.ComponentProps<"nav">) => (
@@ -53,6 +53,7 @@ const PaginationLink = ({
         size,
       }),
       isActive ? "cursor-default" : "cursor-pointer",
+      "h-8 w-8",
       className
     )}
     {...props}
@@ -70,7 +71,7 @@ const PaginationPrevious = ({
     className={cn(" flex justify-center items-center", className)}
     {...props}
   >
-    <Icon name="chevron-left" size="md" />
+    <Icon name="chevron-left" size="sm" className="shrink-0" />
   </PaginationLink>
 );
 PaginationPrevious.displayName = "PaginationPrevious";
@@ -85,7 +86,7 @@ const PaginationNext = ({
     className={cn("flex justify-center items-center", className)}
     {...props}
   >
-    <Icon name="chevron-right" size="md" />
+    <Icon name="chevron-right" size="sm" className="shrink-0" />
   </PaginationLink>
 );
 PaginationNext.displayName = "PaginationNext";
@@ -99,7 +100,7 @@ const PaginationEllipsis = ({
     className={cn("flex h-9 w-9 items-center justify-center", className)}
     {...props}
   >
-    <Icon name="dots" />
+    <Icon name="dots-horizontal" />
     <span className="sr-only">More pages</span>
   </span>
 );

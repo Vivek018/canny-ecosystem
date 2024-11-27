@@ -36,7 +36,6 @@ export const zEmailSuffix = z
   .regex(
     /^[A-Za-z0-9]+\.[A-Za-z]{2,}$/,
     "Must contain a dot with at least one character before and two after."
-    "Must contain a dot with at least one character before and two after."
   );
 
 export const SIZE_1MB = 1 * 1024 * 1024; // 1MB
@@ -52,7 +51,6 @@ export const zImage = z
   .refine(
     (file) => (typeof file !== "string" ? file.size < SIZE_1MB : true),
     "File size must be less than 1MB"
-    "File size must be less than 1MB"
   )
   .refine(
     (file) =>
@@ -60,14 +58,12 @@ export const zImage = z
         ? ACCEPTED_IMAGE_TYPES.includes(file?.type)
         : true,
     "Only .jpg, .jpeg, .png and .webp formats are supported."
-    "Only .jpg, .jpeg, .png and .webp formats are supported."
   );
 
 export const zFile = z
   .any()
   .refine(
     (file) => (typeof file !== "string" ? file.size < SIZE_1MB * 5 : true),
-    "File size must be less than 5MB"
     "File size must be less than 5MB"
   )
   .refine(
@@ -493,7 +489,7 @@ export const FeedbackSchema = z.object({
   id: z.string().optional(),
   subject: zString.min(3).max(30),
   message: zTextArea.max(500),
-  category: z.enum(categoryArray).optional(),
+  category: z.enum(categoryArray).default("suggestion"),
   severity: z.enum(severityArray).default("normal"),
   user_id: z.string(),
   company_id: z.string(),

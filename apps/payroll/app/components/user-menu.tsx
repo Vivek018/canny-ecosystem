@@ -88,7 +88,7 @@ export function UserMenu({
             <Link prefetch='intent' to='/user/help'>
               <DropdownMenuItem>Help</DropdownMenuItem>
             </Link>
-            <Link prefetch='intent' to='/user/feedback'>
+            <Link prefetch='intent' to='/user/feedback-form'>
               <DropdownMenuItem>Feedback</DropdownMenuItem>
             </Link>
           </DropdownMenuGroup>

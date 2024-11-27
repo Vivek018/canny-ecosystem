@@ -48,7 +48,7 @@ export const UserContact = ({ updateValues }: UserContactProps) => {
         <Form
           method="post"
           {...getFormProps(form)}
-          action={"user-contact-update"}
+          action={"/user/user-contact-update"}
         >
           <div className="flex justify-between items-center pr-6">
             <CardHeader>
@@ -86,7 +86,7 @@ export const UserContact = ({ updateValues }: UserContactProps) => {
               This is your primary email address and mobile number for
               notifications and more.
             </div>
-            <div className="flex  gap-4">
+            <div className="flex gap-4">
               <Button
                 variant="secondary"
                 type="reset"

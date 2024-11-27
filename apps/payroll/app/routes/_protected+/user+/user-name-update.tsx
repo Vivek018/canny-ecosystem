@@ -1,9 +1,11 @@
 
+import { DEFAULT_ROUTE } from "@/constant";
+import { safeRedirect } from "@/utils/server/http.server";
 import { updateUser } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { UpdateUserNameSchema } from "@canny_ecosystem/utils";
+import { isGoodStatus, UpdateUserNameSchema } from "@canny_ecosystem/utils";
 import { parseWithZod } from "@conform-to/zod";
-import { type ActionFunctionArgs, json, redirect } from "@remix-run/node";
+import { type ActionFunctionArgs, json } from "@remix-run/node";
 
 export async function action({ request }: ActionFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -24,9 +26,9 @@ export async function action({ request }: ActionFunctionArgs) {
     data: submission.value,
   });
 
-  if (status !== 200) {
-    console.log(status);
+  if (isGoodStatus(status)) {
+    return safeRedirect("/user/account");
   }
 
-  return redirect("/account");
+  return safeRedirect(DEFAULT_ROUTE);
 }

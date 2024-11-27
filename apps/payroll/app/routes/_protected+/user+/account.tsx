@@ -3,11 +3,11 @@ import { getUserByEmail } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json, useLoaderData } from "@remix-run/react";
-import { UserAvatar } from "../../components/accounts/user-avatar";
-import { UserName } from "@/components/accounts/user-name";
-import { UserContact } from "@/components/accounts/user-contact";
-import { UserDelete } from "@/components/accounts/user-delete";
+import { UserName } from "@/components/user/user-name";
+import { UserContact } from "@/components/user/user-contact";
+import { UserDelete } from "@/components/user/delete-user";
 import { useEffect, useState } from "react";
+import { UserAvatar } from "@/components/user/user-avatar";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -46,11 +46,8 @@ export default function Accountindex() {
         avatar={data?.avatar ?? ""}
         first_name={data?.first_name ?? ""}
       />
-
       <UserName key={userId + resetKey} updateValues={data} />
-
       <UserContact key={userId + resetKey + 1} updateValues={data} />
-
       <UserDelete Id={data?.id ?? ""} />
     </section>
   );
