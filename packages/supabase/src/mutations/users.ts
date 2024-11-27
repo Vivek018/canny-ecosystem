@@ -2,7 +2,9 @@ import type { TypedSupabaseClient, UserDatabaseUpdate } from "../types";
 
 export async function createUser({
   supabase,
-}: { supabase: TypedSupabaseClient }) {
+}: {
+  supabase: TypedSupabaseClient;
+}) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -27,7 +29,9 @@ export async function createUser({
 
 export async function updateUserLastLogin({
   supabase,
-}: { supabase: TypedSupabaseClient }) {
+}: {
+  supabase: TypedSupabaseClient;
+}) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -47,7 +51,7 @@ export async function updateUserLastLogin({
     console.error(error);
   }
 
-  return { status };
+  return { error, status };
 }
 
 export async function updateUser({
@@ -62,19 +66,47 @@ export async function updateUser({
   } = await supabase.auth.getUser();
 
   if (!user?.email) {
-    return;
+    return {
+      status: 400,
+      error: "No email found",
+    };
   }
 
   const { error, status } = await supabase
     .from("users")
     .update(data)
     .eq("email", user.email)
-    .select()
     .single();
 
   if (error) {
     console.error(error);
   }
 
-  return status;
+  return { error, status };
+}
+
+export async function deleteUser({
+  supabase,
+  id,
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+}) {
+  const { error, status } = await supabase
+    .from("users")
+    .delete()
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error deleting user:", error);
+    return { status, error };
+  }
+
+  if (status < 200 || status >= 300) {
+    console.error("Unexpected Supabase status:", status);
+  }
+
+  return { status, error: null };
 }

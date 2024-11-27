@@ -258,14 +258,14 @@ export function JSONBField({
   useIsomorphicLayoutEffect(() => {
     try {
       const parsedValue = JSON.parse(
-        inputProps.defaultValue?.toString() || "{}",
+        inputProps.defaultValue?.toString() || "{}"
       );
       const initialPairs = Object.entries(parsedValue).map(([key, value]) => ({
         key,
         value: String(value),
       }));
       setPairs(
-        initialPairs.length > 0 ? initialPairs : [{ key: "", value: "" }],
+        initialPairs.length > 0 ? initialPairs : [{ key: "", value: "" }]
       );
     } catch (error) {
       console.error("Failed to parse JSONB value:", error);
@@ -273,19 +273,16 @@ export function JSONBField({
   }, [inputProps.defaultValue]);
 
   const updateJSONBValue = (newPairs: { key: string; value: string }[]) => {
-    const jsonbValue = newPairs.reduce(
-      (acc, { key, value }) => {
-        if (key) {
-          try {
-            acc[key] = parseStringValue(value);
-          } catch {
-            acc[key] = value;
-          }
+    const jsonbValue = newPairs.reduce((acc, { key, value }) => {
+      if (key) {
+        try {
+          acc[key] = parseStringValue(value);
+        } catch {
+          acc[key] = value;
         }
-        return acc;
-      },
-      {} as Record<string, any>,
-    );
+      }
+      return acc;
+    }, {} as Record<string, any>);
     const event = {
       target: {
         name: inputProps.name,
@@ -365,13 +362,10 @@ export function JSONBField({
         id={id}
         defaultValue={undefined}
         value={JSON.stringify(
-          pairs.reduce(
-            (acc, { key, value }) => {
-              if (key) acc[key] = parseStringValue(value);
-              return acc;
-            },
-            {} as Record<string, string>,
-          ),
+          pairs.reduce((acc, { key, value }) => {
+            if (key) acc[key] = parseStringValue(value);
+            return acc;
+          }, {} as Record<string, string>)
         )}
       />
       <div className="min-h-[28px] px-4 pb-4 pt-1">

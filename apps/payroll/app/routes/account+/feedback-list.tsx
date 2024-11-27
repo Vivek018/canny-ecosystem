@@ -28,14 +28,14 @@ import {
 } from "@canny_ecosystem/ui/pagination";
 import { formatDateTime } from "@canny_ecosystem/utils";
 
-import { json, LoaderFunctionArgs } from "@remix-run/node";
+import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, useSearchParams } from "@remix-run/react";
 
 const LIMIT = 9;
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
-  const page = parseInt(url.searchParams.get("page") || "1", 10);
+  const page = Number.parseInt(url.searchParams.get("page") || "1", 10);
 
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
@@ -45,7 +45,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   });
 
   if (companyError || !companyData) {
-    throw new Error("Company not found" + `${companyError}`);
+    throw new Error(`Company not found${companyError}`);
   }
 
   if (companyData.company_type !== "app_creator") {
@@ -66,11 +66,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function FeedbackList() {
-  const { data, page, totalCount } = useLoaderData<typeof loader>();
+  const { data,  totalCount } = useLoaderData<typeof loader>();
 
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const currentPage = parseInt(searchParams.get("page") || "1", 10);
+  const currentPage = Number.parseInt(searchParams.get("page") || "1", 10);
   const totalPages = Math.ceil(totalCount / LIMIT);
 
   const handlePrevious = () => {
@@ -201,7 +201,8 @@ export default function FeedbackList() {
               (pageNum, index) => {
                 if (pageNum === "...") {
                   return (
-                    <PaginationItem key={`ellipsis-${index}`}>
+                    <PaginationItem key={`ellipsis-${// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+index}`}>
                       <PaginationEllipsis className="rotate-90" />
                     </PaginationItem>
                   );
