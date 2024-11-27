@@ -2,6 +2,7 @@ export * from "./users";
 export * from "./companies";
 export * from "./projects";
 export * from "./employees";
+export * from "./feedback";
 export * from "./payment-fields";
 export * from "./employee-provident-fund";
 export * from "./employee-state-insurance";
