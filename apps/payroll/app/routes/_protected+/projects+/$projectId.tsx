@@ -30,7 +30,7 @@ export default function Project() {
 
         <SecondaryMenu
           items={[
-            { label: "Overview", path: `/projects/${projectId}` },
+            { label: "Overview", path: `/projects/${projectId}/overview` },
             { label: "Sites", path: `/projects/${projectId}/sites` },
           ]}
           className="pt-0 pb-0"

@@ -37,11 +37,9 @@ export async function getProfessionalTaxesByCompanyId({
 export async function getProfessionalTaxById({
   supabase,
   id,
-  companyId,
 }: {
   supabase: TypedSupabaseClient;
   id: string;
-  companyId: string;
 }) {
   const columns = [
     "id",
@@ -56,7 +54,6 @@ export async function getProfessionalTaxById({
     .from("professional_tax")
     .select(columns.join(","))
     .eq("id", id)
-    .eq("company_id", companyId)
     .single<InferredType<ProfessionalTaxDatabaseRow, (typeof columns)[number]>>();
 
   if (error) {
