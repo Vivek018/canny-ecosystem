@@ -151,7 +151,7 @@ export function ProjectCard({
             }}
             triggerChild={
               <DropdownMenuTrigger className="p-2 py-2 rounded-md bg-secondary grid place-items-center border-foreground">
-                <Icon name="dots" size="xs" />
+                <Icon name="dots-vertical" size="xs" />
               </DropdownMenuTrigger>
             }
           />

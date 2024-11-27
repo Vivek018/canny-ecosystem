@@ -105,7 +105,7 @@ export async function getEmployeesByCompanyId({
         employee_id, assignment_type, skill_level, position, start_date, end_date,
         project_sites!inner(id, name, projects!inner(id, name))
       )`,
-      { count: "exact" }
+      { count: "exact" },
     )
     .eq("company_id", companyId);
 
@@ -161,7 +161,7 @@ export async function getEmployeesByCompanyId({
     }
 
     if (status) {
-      query.eq("is_active", !!status);
+      query.eq("is_active", status === "active");
     }
     if (gender) {
       query.eq("gender", gender.toLowerCase());
@@ -170,7 +170,10 @@ export async function getEmployeesByCompanyId({
       query.eq("education", education.toLowerCase());
     }
     if (project) {
-      query.eq("employee_project_assignment.project_sites.projects.name", project);
+      query.eq(
+        "employee_project_assignment.project_sites.projects.name",
+        project,
+      );
     }
     if (project_site) {
       query.eq("employee_project_assignment.project_sites.name", project_site);
@@ -216,8 +219,8 @@ export async function getEmployeesByPositionAndProjectSiteId({
     .from("employees")
     .select(
       `${columns.join(
-        ","
-      )},employee_project_assignment!employee_project_assignment_employee_id_fkey!inner(*)`
+        ",",
+      )},employee_project_assignment!employee_project_assignment_employee_id_fkey!inner(*)`,
     )
     .eq("employee_project_assignment.is_current", true)
     .eq("employee_project_assignment.project_site_id", projectSiteId)
@@ -238,11 +241,9 @@ export async function getEmployeesByPositionAndProjectSiteId({
 export async function getEmployeeById({
   supabase,
   id,
-  companyId,
 }: {
   supabase: TypedSupabaseClient;
   id: string;
-  companyId: string;
 }) {
   const columns = [
     "id",
@@ -266,7 +267,6 @@ export async function getEmployeeById({
     .from("employees")
     .select(columns.join(","))
     .eq("id", id)
-    .eq("company_id", companyId)
     .single<InferredType<EmployeeDatabaseRow, (typeof columns)[number]>>();
 
   if (error) {
@@ -650,8 +650,8 @@ export async function getEmployeeProjectAssignmentByEmployeeId({
     .from("employee_project_assignment")
     .select(
       `${columns.join(
-        ","
-      )}, project_sites(id, name, projects(name)), supervisor:employees!employee_project_assignments_supervisor_id_fkey(id, employee_code)`
+        ",",
+      )}, project_sites(id, name, projects(name)), supervisor:employees!employee_project_assignments_supervisor_id_fkey(id, employee_code)`,
     )
     .eq("employee_id", employeeId)
     .single<EmployeeProjectAssignmentDataType>();

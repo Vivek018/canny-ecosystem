@@ -40,13 +40,13 @@ export const ProjectHeader = ({
           project={{
             id: project.id,
             actual_end_date: project.actual_end_date,
-            returnTo: `/projects/${project.id}`,
+            returnTo: `/projects/${project.id}/overview`,
           }}
           triggerChild={
             <DropdownMenuTrigger
               className={cn(buttonVariants({ variant: "outline" }))}
             >
-              <Icon name="dots" size="xs" className="mr-1.5" />
+              <Icon name="dots-vertical" size="xs" className="mr-1.5" />
               <p>More Options</p>
             </DropdownMenuTrigger>
           }

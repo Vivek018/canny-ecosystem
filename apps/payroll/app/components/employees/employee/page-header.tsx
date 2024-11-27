@@ -55,7 +55,9 @@ export function EmployeePageHeader({
             </div>
             <div className="mt-3">
               <h1 className="text-3xl tracking-wide font-bold capitalize">
-                {`${employee?.first_name} ${employee?.middle_name ?? ""} ${employee?.last_name ?? ""}`}
+                {`${employee?.first_name} ${employee?.middle_name ?? ""} ${
+                  employee?.last_name ?? ""
+                }`}
               </h1>
               <p className="w-max bg-muted text-sm text-muted-foreground px-1.5 pb-0.5 mt-0.5 rounded">
                 {employee?.employee_code}
@@ -79,7 +81,7 @@ export function EmployeePageHeader({
             employee={{
               id: employee.id,
               is_active: employee.is_active ?? false,
-              returnTo: `/employees/${employee.id}`,
+              returnTo: `/employees/${employee.id}/overview`,
             }}
             triggerChild={
               <DropdownMenuTrigger
@@ -88,7 +90,7 @@ export function EmployeePageHeader({
                   "bg-card",
                 )}
               >
-                <Icon name="dots" size="xs" className="mr-1.5" />
+                <Icon name="dots-vertical" size="xs" className="mr-1.5" />
                 <p>More Options</p>
               </DropdownMenuTrigger>
             }

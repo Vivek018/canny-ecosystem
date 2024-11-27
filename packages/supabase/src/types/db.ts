@@ -439,10 +439,13 @@ export type Database = {
           employee_contribution: number
           employee_restrict_value: number | null
           employer_contribution: number
+          employer_restrict_value: number | null
           epf_number: string
           id: string
           include_admin_charges: boolean | null
-          include_employer_esi_contribution: boolean | null
+          include_employer_contribution: boolean | null
+          include_employer_edli_contribution: boolean | null
+          restrict_employee_contribution: boolean | null
           restrict_employer_contribution: boolean | null
           updated_at: string | null
         }
@@ -453,10 +456,13 @@ export type Database = {
           employee_contribution?: number
           employee_restrict_value?: number | null
           employer_contribution?: number
+          employer_restrict_value?: number | null
           epf_number: string
           id?: string
           include_admin_charges?: boolean | null
-          include_employer_esi_contribution?: boolean | null
+          include_employer_contribution?: boolean | null
+          include_employer_edli_contribution?: boolean | null
+          restrict_employee_contribution?: boolean | null
           restrict_employer_contribution?: boolean | null
           updated_at?: string | null
         }
@@ -467,10 +473,13 @@ export type Database = {
           employee_contribution?: number
           employee_restrict_value?: number | null
           employer_contribution?: number
+          employer_restrict_value?: number | null
           epf_number?: string
           id?: string
           include_admin_charges?: boolean | null
-          include_employer_esi_contribution?: boolean | null
+          include_employer_contribution?: boolean | null
+          include_employer_edli_contribution?: boolean | null
+          restrict_employee_contribution?: boolean | null
           restrict_employer_contribution?: boolean | null
           updated_at?: string | null
         }
@@ -890,9 +899,7 @@ export type Database = {
           company_id: string
           created_at: string | null
           deduction_cycle: string
-          gross_salary_range:
-            | Database["public"]["CompositeTypes"]["salary_range_object"][]
-            | null
+          gross_salary_range: Json | null
           id: string
           pt_number: string
           state: string
@@ -902,9 +909,7 @@ export type Database = {
           company_id: string
           created_at?: string | null
           deduction_cycle?: string
-          gross_salary_range?:
-            | Database["public"]["CompositeTypes"]["salary_range_object"][]
-            | null
+          gross_salary_range?: Json | null
           id?: string
           pt_number: string
           state: string
@@ -914,9 +919,7 @@ export type Database = {
           company_id?: string
           created_at?: string | null
           deduction_cycle?: string
-          gross_salary_range?:
-            | Database["public"]["CompositeTypes"]["salary_range_object"][]
-            | null
+          gross_salary_range?: Json | null
           id?: string
           pt_number?: string
           state?: string
@@ -1229,7 +1232,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      calculation_type: "fixed" | "basic"
+      calculation_type: "fixed" | "percentage_of_basic"
       feedback_category: "suggestion" | "bug" | "complain"
       feedback_severity: "low" | "normal" | "urgent"
       payment_type: "fixed" | "variable"

@@ -82,7 +82,7 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
                 "px-2.5 h-min",
               )}
             >
-              <Icon name="dots" size="xs" />
+              <Icon name="dots-vertical" size="xs" />
             </DropdownMenuTrigger>
             <DropdownMenuContent sideOffset={10} align="end">
               <DropdownMenuGroup>
@@ -99,7 +99,9 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
         <div className="flex flex-row items-center justify-between">
           <DetailItem
             label="Name"
-            value={`${guardian.first_name ?? "--"} ${guardian.last_name ?? "--"}`}
+            value={`${guardian.first_name ?? "--"} ${
+              guardian.last_name ?? "--"
+            }`}
           />
           <DetailItem label="Date of Birth" value={guardian.date_of_birth} />
           <DetailItem label="Gender" value={guardian.gender} />

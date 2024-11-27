@@ -82,7 +82,7 @@ export const SkillItem = ({ skill }: { skill: EmployeeSkill }) => {
                 "px-2.5 h-min",
               )}
             >
-              <Icon name="dots" size="xs" />
+              <Icon name="dots-vertical" size="xs" />
             </DropdownMenuTrigger>
             <DropdownMenuContent sideOffset={10} align="end">
               <DropdownMenuGroup>

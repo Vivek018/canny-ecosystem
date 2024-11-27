@@ -52,7 +52,9 @@ export function EditPaySequenceForm({
         <Form
           method="POST"
           {...getFormProps(form)}
-          action={`/projects/${projectId}/sites/${fields.id.value ?? fields.id.initialValue}/edit-pay-sequence`}
+          action={`/projects/${projectId}/sites/${
+            fields.id.value ?? fields.id.initialValue
+          }/edit-pay-sequence`}
           className="flex flex-col h-full"
         >
           <input {...getInputProps(fields.id, { type: "hidden" })} />
@@ -71,7 +73,9 @@ export function EditPaySequenceForm({
             inputProps={{
               ...getInputProps(fields.pay_frequency, { type: "text" }),
             }}
-            placeholder={`Select ${replaceUnderscore(fields.pay_frequency.name)}`}
+            placeholder={`Select ${replaceUnderscore(
+              fields.pay_frequency.name,
+            )}`}
             labelProps={{
               children: replaceUnderscore(fields.pay_frequency.name),
             }}

@@ -39,6 +39,7 @@
     "date-fns-tz": "^3.1.3",
     "execa": "^8.0.1",
     "react-day-picker": "^8.10.1",
+    "spin-delay": "^2.0.1",
     "tailwind-merge": "^1.11.0",
     "tailwindcss-animate": "^1.0.7"
   },
@@ -59,6 +60,7 @@
     "./utils/cn": "./src/utils/cn.ts",
     "./label": "./src/components/label.tsx",
     "./button": "./src/components/button.tsx",
+    "./status-button": "./src/components/status-button.tsx",
     "./icon": "./src/components/icon.tsx",
     "./logo": "./src/components/logo.tsx",
     "./tooltip": "./src/components/tooltip.tsx",
@@ -74,6 +76,7 @@
     "./table": "./src/components/table.tsx",
     "./toggle-group": "./src/components/toggle-group.tsx",
     "./toggle": "./src/components/toggle.tsx",
+    "./trash": "./src/components/trash.tsx",
     "./checkbox": "./src/components/checkbox.tsx",
     "./combobox": "./src/components/combobox.tsx",
     "./command": "./src/components/command.tsx",
@@ -86,12 +89,9 @@
     "./sheet": "./src/components/sheet.tsx",
     "./scroll-area": "./src/components/scroll-area.tsx",
     "./secondary-menu": "./src/components/secondary-menu.tsx",
+    "./secondary-sidebar": "./src/components/secondary-sidebar.tsx",
     "./forms": "./src/components/forms.tsx",
     "./tailwind.config": "./tailwind.config.ts",
-    "./postcss": "./postcss.config.js",
-    "./hooks/isomorphic-layout-effect": "./src/hooks/isomorphic-layout-effect.ts",
-    "./hooks/typing-animation": "./src/hooks/typing-animation.ts",
-    "./hooks/is-document": "./src/hooks/is-document.ts",
-    "./hooks/local-storage": "./src/hooks/local-storage.ts"
+    "./postcss": "./postcss.config.js"
   }
 }

@@ -1,5 +1,8 @@
-// import { getUser } from "@midday/supabase/cached-queries";
-import { Avatar, AvatarFallback } from "@canny_ecosystem/ui/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@canny_ecosystem/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,14 +29,12 @@ export function UserMenu({
 }) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex items-center justify-start gap-2 rounded group focus:outline-none focus:dark:brightness-150 hover:dark:brightness-150 focus:brightness-90 hover:brightness-90">
-        <Avatar className="w-12 h-12 cursor-pointer">
+      <DropdownMenuTrigger className='flex items-center justify-start gap-2 rounded group focus:outline-none focus:dark:brightness-125 hover:dark:brightness-125 focus:brightness-90 hover:brightness-90'>
+        <Avatar className='w-[47px] h-[48px] cursor-pointer'>
           {userData?.avatar && (
-            <img
+            <AvatarImage
               src={userData?.avatar}
               alt={userData?.first_name + userData?.last_name}
-              width={32}
-              height={32}
             />
           )}
           <AvatarFallback>
@@ -48,10 +49,10 @@ export function UserMenu({
             !isExpanded && "hidden"
           )}
         >
-          <span className="truncate">
+          <span className='truncate w-40 text-start'>
             {`${userData.first_name} ${userData.last_name}`}
           </span>
-          <span className="truncate text-xs text-[#606060] font-normal">
+          <span className='truncate w-40 text-start text-xs text-[#606060] font-normal'>
             {userData.email}
           </span>
         </div>
@@ -81,14 +82,14 @@ export function UserMenu({
           <DropdownMenuSeparator />
 
           <DropdownMenuGroup>
-            <Link prefetch="render" to="/account">
+            <Link prefetch='intent' to='/user/account'>
               <DropdownMenuItem>Account</DropdownMenuItem>
             </Link>
-            <Link prefetch="render" to="/account/help">
+            <Link prefetch='intent' to='/user/help'>
               <DropdownMenuItem>Help</DropdownMenuItem>
             </Link>
-            <Link prefetch="render" to="/account/feedback-form">
-              <DropdownMenuItem>Feedback Form</DropdownMenuItem>
+            <Link prefetch='intent' to='/user/feedback'>
+              <DropdownMenuItem>Feedback</DropdownMenuItem>
             </Link>
           </DropdownMenuGroup>
         </>

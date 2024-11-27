@@ -10,6 +10,6 @@
       ]
     }
   },
-  "include": ["src", "."],
+  "include": ["src", ".", "../utils/src/hooks"],
   "exclude": ["node_modules"]
 }

@@ -36,6 +36,7 @@ export const zEmailSuffix = z
   .regex(
     /^[A-Za-z0-9]+\.[A-Za-z]{2,}$/,
     "Must contain a dot with at least one character before and two after."
+    "Must contain a dot with at least one character before and two after."
   );
 
 export const SIZE_1MB = 1 * 1024 * 1024; // 1MB
@@ -51,6 +52,7 @@ export const zImage = z
   .refine(
     (file) => (typeof file !== "string" ? file.size < SIZE_1MB : true),
     "File size must be less than 1MB"
+    "File size must be less than 1MB"
   )
   .refine(
     (file) =>
@@ -58,12 +60,14 @@ export const zImage = z
         ? ACCEPTED_IMAGE_TYPES.includes(file?.type)
         : true,
     "Only .jpg, .jpeg, .png and .webp formats are supported."
+    "Only .jpg, .jpeg, .png and .webp formats are supported."
   );
 
 export const zFile = z
   .any()
   .refine(
     (file) => (typeof file !== "string" ? file.size < SIZE_1MB * 5 : true),
+    "File size must be less than 5MB"
     "File size must be less than 5MB"
   )
   .refine(
@@ -396,6 +400,91 @@ export const EmployeeWorkHistorySchema = z.object({
   start_date: z.string(),
   end_date: z.string(),
 });
+
+export const deductionCycleArray = ["monthly"] as const;
+export const EMPLOYEE_RESTRICTED_VALUE = 15000;
+export const EMPLOYEE_RESTRICTED_RATE = 0.2;
+
+export const EmployeeProvidentFundSchema = z.object({
+  id: z.string().optional(),
+  company_id: z.string(),
+  epf_number: z.string().max(20),
+  deduction_cycle: z.enum(deductionCycleArray).default(deductionCycleArray[0]),
+  employee_contribution: z.number().default(EMPLOYEE_RESTRICTED_RATE),
+  employer_contribution: z.number().default(EMPLOYEE_RESTRICTED_RATE),
+  employee_restrict_value: z.number().default(EMPLOYEE_RESTRICTED_VALUE),
+  employer_restrict_value: z.number().default(EMPLOYEE_RESTRICTED_VALUE),
+  restrict_employer_contribution: z.boolean().default(false),
+  restrict_employee_contribution: z.boolean().default(false),
+  include_employer_contribution: z.boolean().default(false),
+  include_employer_edli_contribution: z.boolean().default(false),
+  include_admin_charges: z.boolean().default(false),
+});
+
+export const EmployeeStateInsuranceSchema = z.object({
+  id: z.string().optional(),
+  company_id: z.string(),
+  esi_number: zNumberString,
+  deduction_cycle: z.enum(deductionCycleArray).default(deductionCycleArray[0]),
+  employees_contribution: z.number().default(0.0075),
+  employers_contribution: z.number().default(0.0325),
+  include_employer_contribution: z.boolean().default(false),
+});
+
+export const ProfessionalTaxSchema = z.object({
+  id: z.string().optional(),
+  company_id: z.string(),
+  state: zString,
+  pt_number: zNumberString.max(20),
+  deduction_cycle: z.enum(deductionCycleArray).default(deductionCycleArray[0]),
+  gross_salary_range: z.any().optional(),
+});
+
+export const lwfDeductionCycleArray = [
+  "monthly",
+  "quarterly",
+  "half_yearly",
+  "yearly",
+] as const;
+
+export const LabourWelfareFundSchema = z.object({
+  id: z.string().optional(),
+  company_id: z.string(),
+  state: z.string(),
+  employee_contribution: z.number().default(6),
+  employer_contribution: z.number().default(12),
+  deduction_cycle: z
+    .enum(lwfDeductionCycleArray)
+    .default(lwfDeductionCycleArray[0]),
+  status: z.boolean().default(false),
+});
+
+export const statutoryBonusPayFrequencyArray = ["monthly", "yearly"] as const;
+export const StatutoryBonusSchema = z
+  .object({
+    id: z.string().optional(),
+    company_id: z.string(),
+    payment_frequency: z
+      .enum(statutoryBonusPayFrequencyArray)
+      .default(statutoryBonusPayFrequencyArray[0]),
+    percentage: z.number().min(0).default(8.33),
+    payout_month: z.number().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.payment_frequency === "yearly" && !data.payout_month) {
+      ctx.addIssue({
+        path: ["payout_month"],
+        message: "payout_month is required when payment_freq is 'monthly'",
+        code: z.ZodIssueCode.custom,
+      });
+    }
+
+    if (data.payment_frequency === "monthly") {
+      if (data.payout_month !== null) {
+        data.payout_month = undefined;
+      }
+    }
+  });
 
 export const categoryArray = ["suggestion", "bug", "complain"] as const;
 export const severityArray = ["low", "normal", "urgent"] as const;

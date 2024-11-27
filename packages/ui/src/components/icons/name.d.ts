@@ -13,11 +13,13 @@ export type IconName =
   | "cross"
   | "dashboard"
   | "dot-filled"
-  | "dots"
+  | "dots-horizontal"
+  | "dots-vertical"
   | "edit"
   | "employee"
   | "feedback"
   | "import"
+  | "info"
   | "input"
   | "lab-timer"
   | "laptop"
@@ -31,4 +33,6 @@ export type IconName =
   | "search"
   | "setting"
   | "sun"
-  | "table";
+  | "table"
+  | "trash"
+  | "update";

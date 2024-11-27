@@ -1,7 +1,6 @@
 import { DEFAULT_ROUTE } from "@/constant";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getSessionUser } from "@canny_ecosystem/supabase/cached-queries";
-import { updateUserLastLogin } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Button } from "@canny_ecosystem/ui/button";
 import {
@@ -12,7 +11,7 @@ import {
 } from "@remix-run/node";
 import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const error = url.searchParams.get("error");
   const { user } = await getSessionUser({ request });
@@ -22,7 +21,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   }
 
   return json({ error });
-};
+}
 
 export async function action({ request }: ActionFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({
@@ -33,6 +32,10 @@ export async function action({ request }: ActionFunctionArgs) {
     provider: "google",
     options: {
       redirectTo: `${new URL(request.url).origin}/auth/callback`,
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      },
     },
   });
 
@@ -42,7 +45,6 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   if (data.url) {
-    await updateUserLastLogin({ supabase });
     return redirect(data.url, { headers });
   }
 
@@ -77,7 +79,7 @@ export default function Login() {
                 Continue with Google
               </Button>
             </Form>
-            {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+            {error && <p className="text-destructive text-sm mt-2">{error}</p>}
           </div>
 
           <p className="text-xs text-[#878787]">

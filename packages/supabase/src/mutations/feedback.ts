@@ -1,33 +1,33 @@
-import { FeedbackDatabaseInsert, TypedSupabaseClient } from "../types";
+import type { FeedbackDatabaseInsert, TypedSupabaseClient } from "../types";
 
 export async function createFeedback({
-    supabase,
-    data,
-    bypassAuth = false,
-  }: {
-    supabase: TypedSupabaseClient;
-    data: FeedbackDatabaseInsert;
-    bypassAuth?: boolean;
-  }) {
-    if (!bypassAuth) {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-  
-      if (!user?.email) {
-        return { status: 400, error: "Unauthorized User" };
-      }
-    }
-  
+  supabase,
+  data,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  data: FeedbackDatabaseInsert;
+  bypassAuth?: boolean;
+}) {
+  if (!bypassAuth) {
     const {
-      error,
-      status,
-      data: feedbackData,
-    } = await supabase.from("feedback").insert(data).select().single();
-  
-    if (error) {
-      console.error(error);
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
     }
-  
-    return { status, error, id: feedbackData?.id };
   }
+
+  const {
+    error,
+    status,
+    data: feedbackData,
+  } = await supabase.from("feedback").insert(data).select().single();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { status, error, id: feedbackData?.id };
+}

@@ -31,7 +31,9 @@ export const COMPANY_DETAILS = "company-details";
 
 export const CompanyDetails = ({
   updateValues,
-}: { updateValues: CompanyDatabaseUpdate }) => {
+}: {
+  updateValues: CompanyDatabaseUpdate;
+}) => {
   const [resetKey, setResetKey] = useState(Date.now());
 
   const [form, fields] = useForm({
@@ -72,7 +74,9 @@ export const CompanyDetails = ({
               <Field
                 inputProps={{
                   ...getInputProps(fields.email_suffix, { type: "text" }),
-                  placeholder: `Enter ${replaceUnderscore(fields.email_suffix.name)}`,
+                  placeholder: `Enter ${replaceUnderscore(
+                    fields.email_suffix.name,
+                  )}`,
                 }}
                 errors={fields.email_suffix.errors}
               />
@@ -85,7 +89,9 @@ export const CompanyDetails = ({
                 inputProps={{
                   ...getInputProps(fields.company_type, { type: "text" }),
                 }}
-                placeholder={`Select ${replaceUnderscore(fields.company_type.name)}`}
+                placeholder={`Select ${replaceUnderscore(
+                  fields.company_type.name,
+                )}`}
                 errors={fields.company_type.errors}
               />
               <SearchableSelectField
@@ -97,7 +103,9 @@ export const CompanyDetails = ({
                 inputProps={{
                   ...getInputProps(fields.company_size, { type: "text" }),
                 }}
-                placeholder={`Select ${replaceUnderscore(fields.company_size.name)}`}
+                placeholder={`Select ${replaceUnderscore(
+                  fields.company_size.name,
+                )}`}
                 errors={fields.company_size.errors}
               />
             </div>

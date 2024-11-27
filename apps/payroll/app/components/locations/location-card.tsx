@@ -55,7 +55,7 @@ export function LocationCard({
           </TooltipProvider>
           <DropdownMenu>
             <DropdownMenuTrigger className="p-2 py-2 rounded-md bg-secondary grid place-items-center">
-              <Icon name="dots" size="xs" />
+              <Icon name="dots-vertical" size="xs" />
             </DropdownMenuTrigger>
             <DropdownMenuContent sideOffset={10} align="end">
               <DropdownMenuGroup>
@@ -94,7 +94,9 @@ export function LocationCard({
       </CardHeader>
       <CardContent className="flex flex-col gap-0.5 px-4">
         <address className="not-italic line-clamp-3">
-          {`${location.address_line_1} ${location.address_line_2 ? location.address_line_2 : ""}`}
+          {`${location.address_line_1} ${
+            location.address_line_2 ? location.address_line_2 : ""
+          }`}
         </address>
         <div className="flex items-center capitalize gap-2">
           <p>{`${location.city},`}</p>

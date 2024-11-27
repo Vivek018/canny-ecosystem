@@ -1,6 +1,6 @@
 import type { TypedSupabaseClient, UserDatabaseUpdate } from "../types";
 
-export async function createUser({
+export async function updateUserLastLoginAndSetAvatar({
   supabase,
 }: {
   supabase: TypedSupabaseClient;
@@ -43,6 +43,7 @@ export async function updateUserLastLogin({
   const { error, status } = await supabase
     .from("users")
     .update({
+      avatar: user?.user_metadata?.avatar_url,
       last_login: new Date().toISOString(),
     })
     .eq("email", user.email);

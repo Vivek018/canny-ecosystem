@@ -1,3 +1,4 @@
+import { DEFAULT_ROUTE } from "@/constant";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { type ActionFunctionArgs, json } from "@remix-run/node";
@@ -12,5 +13,5 @@ export async function action({ request }: ActionFunctionArgs) {
     return json({ error: error.message }, { status: 500 });
   }
 
-  return safeRedirect("/login", { headers });
+  return safeRedirect(DEFAULT_ROUTE, { headers });
 }

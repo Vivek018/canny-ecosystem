@@ -68,7 +68,9 @@ export const DeleteCompany = ({ companyId }: { companyId: string }) => {
         <div>This action is not reversible — please continue with caution.</div>
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button variant="destructive-outline">Delete</Button>
+            <Button disabled={isLoading} variant="destructive-outline">
+              Delete
+            </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
@@ -93,6 +95,10 @@ export const DeleteCompany = ({ companyId }: { companyId: string }) => {
                 }}
                 className="border border-input rounded-md h-10 w-full"
                 placeholder="Confirm your action"
+                onPaste={(e) => {
+                  e.preventDefault();
+                  return false;
+                }}
               />
               <ErrorList errors={inputError} />
             </div>
