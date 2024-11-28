@@ -41,7 +41,7 @@ export default function NoUserFound() {
           </Link>
         </div>
         <div>
-          <ThemeSwitch theme={theme || "system"} />
+          <ThemeSwitch theme={theme ?? "system"} />
         </div>
       </header>
       <section className='flex min-h-screen max-h-screen justify-center items-center overflow-hidden p-6 -mt-20 md:p-0'>
