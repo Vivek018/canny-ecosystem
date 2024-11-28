@@ -397,6 +397,31 @@ export const EmployeeWorkHistorySchema = z.object({
   end_date: z.string(),
 });
 
+export const paymentTypeArray = ["fixed", "variable"] as const;
+export const calculationTypeArray = ["fixed", "percentage_of_basic"] as const;
+
+export const PaymentFieldSchema = z
+  .object({
+    id: z.string().uuid().optional(),
+    name: zString,
+    payment_type: z.enum(paymentTypeArray).default("fixed"),
+    calculation_type: z.enum(calculationTypeArray).default("fixed"),
+    amount: z.number().optional(),
+    is_active: z.boolean().default(false),
+    is_pro_rata: z.boolean().default(false),
+    consider_for_epf: z.boolean().default(false),
+    consider_for_esic: z.boolean().default(false),
+    company_id: z.string().uuid(),
+  })
+  .refine(
+    (data) =>
+      !(data.payment_type === "variable" && data.calculation_type !== "fixed"),
+    {
+      message: `When payment type is "variable", calculation type must be "fixed".`,
+      path: ["calculation_type"],
+    }
+  );
+
 export const deductionCycleArray = ["monthly"] as const;
 export const EMPLOYEE_RESTRICTED_VALUE = 15000;
 export const EMPLOYEE_RESTRICTED_RATE = 0.2;
