@@ -1,4 +1,8 @@
-import type { TypedSupabaseClient, UserDatabaseUpdate } from "../types";
+import type {
+  TypedSupabaseClient,
+  UserDatabaseInsert,
+  UserDatabaseUpdate,
+} from "../types";
 
 export async function updateUserLastLogin({
   supabase,
@@ -28,7 +32,38 @@ export async function updateUserLastLogin({
   return { error, status };
 }
 
-export async function updateUser({
+export async function updateUserById({
+  supabase,
+  data,
+}: {
+  supabase: TypedSupabaseClient;
+  data: UserDatabaseUpdate;
+}) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.email) {
+    return {
+      status: 400,
+      error: "No email found",
+    };
+  }
+
+  const { error, status } = await supabase
+    .from("users")
+    .update(data)
+    .eq("id", data.id ?? "")
+    .single();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { error, status };
+}
+
+export async function updateSameUserByEmail({
   supabase,
   data,
 }: {
@@ -59,7 +94,7 @@ export async function updateUser({
   return { error, status };
 }
 
-export async function deleteUser({
+export async function deleteUserById({
   supabase,
   id,
 }: {
@@ -83,4 +118,24 @@ export async function deleteUser({
   }
 
   return { status, error: null };
+}
+
+export async function createUserById({
+  supabase,
+  data,
+}: {
+  supabase: TypedSupabaseClient;
+  data: UserDatabaseInsert;
+}) {
+  const { error, status } = await supabase
+    .from("users")
+    .insert(data)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { status, error };
 }

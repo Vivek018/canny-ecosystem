@@ -1,5 +1,5 @@
 import { safeRedirect } from "@/utils/server/http.server";
-import { deleteUser } from "@canny_ecosystem/supabase/mutations";
+import { deleteUserById } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { isGoodStatus } from "@canny_ecosystem/utils";
 import { type ActionFunctionArgs, json } from "@remix-run/node";
@@ -23,7 +23,7 @@ export async function action({ request }: ActionFunctionArgs) {
     return safeRedirect("/user/account", { headers });
   }
 
-  const { error, status } = await deleteUser({ supabase, id: Id });
+  const { error, status } = await deleteUserById({ supabase, id: Id });
 
   if (isGoodStatus(status)) {
     return safeRedirect("/login", { headers });
