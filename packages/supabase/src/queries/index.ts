@@ -8,3 +8,4 @@ export * from "./employee-state-insurance";
 export * from "./professional-tax";
 export * from "./labour-welfare-fund";
 export * from "./statutory-bonus";
+export * from "./payment-template-assignments";

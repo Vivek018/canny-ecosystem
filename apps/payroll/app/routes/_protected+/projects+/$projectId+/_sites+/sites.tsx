@@ -93,7 +93,7 @@ export default function SitesIndex() {
                     }
                     className='data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0'
                   >
-                    <SiteCard site={site} />
+                    <SiteCard site={site} projectId={projectId}/>
                   </CommandItem>
                 ))}
               </div>
