@@ -6,7 +6,7 @@ import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, useSearchParams } from "@remix-run/react";
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs): Promise<Response> {
   const projectId = params.projectId;
   const siteId = params.siteId;
 
@@ -18,14 +18,30 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   });
 
   if (error) {
-    throw error;
+    return json({
+      status: "error",
+      message: "Failed to get site pay sequence",
+      error,
+      data,
+    });
   }
 
   if (!data) {
-    throw new Error("No data found");
+    return json({
+      status: "error",
+      message: "Site pay sequence not found",
+      error,
+      data,
+    });
   }
 
-  return json({ data, projectId });
+  return json({
+    status: "success",
+    message: "Site pay sequence loaded",
+    error: null,
+    data,
+    projectId,
+  });
 }
 
 export default function EditPaySequence() {

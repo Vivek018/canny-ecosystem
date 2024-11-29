@@ -20,11 +20,16 @@ import {
   useForm,
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { Form, json, useLoaderData } from "@remix-run/react";
-import { useState } from "react";
+import {
+  Form,
+  json,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
+import { useEffect, useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { safeRedirect } from "@/utils/server/http.server";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { UPDATE_PAYMENT_FIELD } from "./$paymentFieldId.update-payment-field";
 import {
@@ -38,6 +43,7 @@ import { createPaymentField } from "@canny_ecosystem/supabase/mutations";
 import type { PaymentFieldDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { FormButtons } from "@/components/form/form-buttons";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 export const CREATE_PAYMENT_FIELD = "create-payment-field";
 
@@ -48,7 +54,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return json({ companyId });
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export type ActionResponse = {
+  status: number;
+  error?: string;
+};
+
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
   const submission = parseWithZod(formData, {
@@ -68,15 +81,27 @@ export async function action({ request }: ActionFunctionArgs) {
   });
 
   if (isGoodStatus(status))
-    return safeRedirect("/payment-components/payment-fields", { status: 303 });
+    return json({
+      status: "success",
+      message: "Payment Field created",
+      error: null,
+    });
 
-  return json({ status, error });
+  return json(
+    {
+      status: "error",
+      message: "Payment Field creation failed",
+      error,
+    },
+    { status: 500 },
+  );
 }
 
 export default function CreatePaymentField({
   updateValues,
 }: { updateValues?: PaymentFieldDatabaseUpdate | null }) {
   const { companyId } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
   const PAYMENT_FIELD_TAG = updateValues
     ? UPDATE_PAYMENT_FIELD
     : CREATE_PAYMENT_FIELD;
@@ -99,6 +124,30 @@ export default function CreatePaymentField({
       company_id: initialValues.company_id ?? companyId,
     },
   });
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!actionData) return;
+
+    if (actionData?.status === "success") {
+      toast({
+        title: "Success",
+        description: actionData?.message,
+        variant: "success",
+      });
+      navigate(actionData?.returnTo ?? "/payment-components/payment-fields", {
+        replace: true,
+      });
+    } else {
+      toast({
+        title: "Error",
+        description:
+          actionData?.error?.message || "Payment Field creation failed",
+        variant: "destructive",
+      });
+    }
+  }, [actionData]);
 
   return (
     <section className="md:px-20 lg:px-52 2xl:px-80 py-4">

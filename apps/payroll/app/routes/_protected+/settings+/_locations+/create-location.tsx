@@ -16,8 +16,14 @@ import {
   useForm,
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { Form, json, useLoaderData } from "@remix-run/react";
-import { useState } from "react";
+import {
+  Form,
+  json,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
+import { useEffect, useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { safeRedirect } from "@/utils/server/http.server";
@@ -36,6 +42,7 @@ import { createLocation } from "@canny_ecosystem/supabase/mutations";
 import type { LocationDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { statesAndUTs } from "@canny_ecosystem/utils/constant";
 import { FormButtons } from "@/components/form/form-buttons";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 export const CREATE_LOCATION = "create-location";
 
@@ -46,7 +53,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return json({ companyId });
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
 
@@ -66,10 +75,14 @@ export async function action({ request }: ActionFunctionArgs) {
     data: submission.value as any,
   });
 
-  if (isGoodStatus(status)) {
-    return safeRedirect("/settings/locations", { status: 303 });
-  }
-  return json({ status, error });
+  if (isGoodStatus(status))
+    return json({
+      status: "success",
+      message: "Location created",
+      error: null,
+    });
+
+  return json({ status: "error", message: "Location creation failed", error }, { status: 500 });
 }
 
 export default function CreateLocation({
@@ -78,6 +91,7 @@ export default function CreateLocation({
   updateValues?: LocationDatabaseUpdate | null;
 }) {
   const { companyId } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
   const LOCATION_TAG = updateValues ? UPDATE_LOCATION : CREATE_LOCATION;
 
   const initialValues = updateValues ?? getInitialValueFromZod(LocationSchema);
@@ -96,6 +110,29 @@ export default function CreateLocation({
       company_id: initialValues.company_id ?? companyId,
     },
   });
+
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!actionData) return;
+    if (actionData?.status === "success") {
+      toast({
+        title: "Success",
+        description: actionData?.message,
+        variant: "success",
+      });
+      navigate("/settings/locations", {
+        replace: true,
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: actionData?.error?.message || "Location creation failed",
+        variant: "destructive",
+      });
+    }
+  }, [actionData, toast, navigate]);
 
   return (
     <section className="md:px-20 lg:px-52 2xl:px-80 py-4">

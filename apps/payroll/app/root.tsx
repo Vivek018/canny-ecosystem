@@ -30,6 +30,7 @@ import {
 } from "./utils/server/company.server";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { DEFAULT_ROUTE } from "./constant";
+import { Toaster } from "@canny_ecosystem/ui/toaster";
 
 export const links: LinksFunction = () => {
   return [
@@ -50,7 +51,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const { companyId, setCookie } = await getCompanyIdOrFirstCompany(
     request,
-    supabase,
+    supabase
   );
 
   if (setCookie) {
@@ -130,6 +131,7 @@ function App() {
         ) : (
           <Outlet />
         )}
+        <Toaster />
       </main>
     </Document>
   );

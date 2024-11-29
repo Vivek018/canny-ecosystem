@@ -1,8 +1,13 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { Form, json, useLoaderData } from "@remix-run/react";
+import {
+  Form,
+  json,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { safeRedirect } from "@/utils/server/http.server";
 import {
   EmployeeWorkHistorySchema,
   getInitialValueFromZod,
@@ -34,25 +39,47 @@ import {
   TextareaField,
 } from "@canny_ecosystem/ui/forms";
 import type { EmployeeWorkHistoryDatabaseUpdate } from "@canny_ecosystem/supabase/types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { UPDATE_EMPLOYEE_WORK_HISTORY } from "./$workHistoryId.update-work-history";
 import { FormButtons } from "@/components/form/form-buttons";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 export const ADD_EMPLOYEE_WORK_HISTORY = "add-employee-work-history";
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const employeeId = params.employeeId;
 
-  return json({ employeeId });
+  if (!employeeId) {
+    return json(
+      {
+        status: "error",
+        message: "Invalid employee id",
+        employeeId: null,
+      },
+      { status: 400 },
+    );
+  }
+
+  return json({ status: "success", message: "Employee id found", employeeId });
 }
 
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({
+  request,
+  params,
+}: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
 
   const employeeId = params.employeeId;
   if (!employeeId) {
-    return safeRedirect("/employees");
+    return json(
+      {
+        status: "error",
+        message: "Invalid employee id",
+        returnTo: "/employees",
+      },
+      { status: 400 },
+    );
   }
 
   const submission = parseWithZod(formData, {
@@ -72,11 +99,19 @@ export async function action({ request, params }: ActionFunctionArgs) {
   });
 
   if (isGoodStatus(status)) {
-    return safeRedirect(`/employees/${employeeId}/work-portfolio`, {
-      status: 303,
+    return json({
+      status: "success",
+      message: "Employee work history created",
+      error: null,
+      returnTo: `/employees/${employeeId}/work-portfolio`,
     });
   }
-  return json({ status, error });
+  return json({
+    status: "error",
+    message: "",
+    error,
+    returnTo: `/employees/${employeeId}/work-portfolio`,
+  });
 }
 
 export default function AddEmployeeWorkHistory({
@@ -85,6 +120,7 @@ export default function AddEmployeeWorkHistory({
   updateValues?: EmployeeWorkHistoryDatabaseUpdate | null;
 }) {
   const { employeeId } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
 
   const EMPLOYEE_WORK_HISTORY_TAG = updateValues
@@ -107,6 +143,28 @@ export default function AddEmployeeWorkHistory({
       employee_id: initialValues.employee_id ?? employeeId,
     },
   });
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (actionData) {
+      if (actionData?.status === "success") {
+        toast({
+          title: "Success",
+          description: actionData?.message || "Employee work history created",
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description:
+            actionData?.error?.message || "Employee work history failed",
+          variant: "destructive",
+        });
+      }
+      navigate(actionData.returnTo ?? -1);
+    }
+  }, [actionData]);
 
   return (
     <section className="md:px-20 lg:px-28 2xl:px-40 py-4">

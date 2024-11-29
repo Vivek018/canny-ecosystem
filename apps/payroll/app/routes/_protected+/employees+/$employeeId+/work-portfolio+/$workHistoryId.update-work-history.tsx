@@ -1,8 +1,7 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { json, useLoaderData } from "@remix-run/react";
+import { json, useActionData, useLoaderData, useNavigate } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
-import { safeRedirect } from "@/utils/server/http.server";
 import {
   EmployeeWorkHistorySchema,
   isGoodStatus,
@@ -10,6 +9,8 @@ import {
 import { getEmployeeWorkHistoryById } from "@canny_ecosystem/supabase/queries";
 import { updateEmployeeWorkHistory } from "@canny_ecosystem/supabase/mutations";
 import AddEmployeeWorkHistory from "./add-work-history";
+import { useEffect } from "react";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 export const UPDATE_EMPLOYEE_WORK_HISTORY = "update-employee-work-history";
 
@@ -27,16 +28,25 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   if (workHistoryData?.error) {
-    throw workHistoryData.error;
+    return json({
+      status: "error",
+      message: "Failed to get employee work history",
+      error: workHistoryData.error,
+      data: workHistoryData.data,
+    }, { status: 500 });
   }
 
-  return json({ data: workHistoryData?.data });
+  return json({
+    status: "success",
+    message: "Employee work history found",
+    data: workHistoryData?.data,
+    error: null,
+  });
 }
 
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({ request }: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
-  const employeeId = params.employeeId;
 
   const submission = parseWithZod(formData, {
     schema: EmployeeWorkHistorySchema,
@@ -55,14 +65,51 @@ export async function action({ request, params }: ActionFunctionArgs) {
   });
 
   if (isGoodStatus(status)) {
-    return safeRedirect(`/employees/${employeeId}/work-portfolio`, {
-      status: 303,
+    return json({
+      status: "success",
+      message: "Successfully updated employee work history",
+      error: null,
     });
   }
-  return json({ status, error });
+  return json({
+    status: "error",
+    message: "Failed to update employee work history",
+    error,
+  });
 }
 
 export default function UpdateEmployeeWorkHistory() {
-  const { data } = useLoaderData<typeof loader>();
+  const { data, status, error } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (status === "error") {
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to load",
+        variant: "destructive",
+      });
+      navigate(-1);
+    }
+    if(actionData) {
+      if(actionData?.status === "success") {
+        toast({
+          title: "Success",
+          description: actionData?.message || "Employee work history updated",
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: actionData?.error?.message || "Failed to update",
+          variant: "destructive",
+        })
+      }
+      navigate(-1);
+    }
+  }, [actionData]);
+
   return <AddEmployeeWorkHistory updateValues={data} />;
 }

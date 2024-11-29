@@ -1,9 +1,13 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import CreateRelationship from "./create-relationship";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { json, useLoaderData } from "@remix-run/react";
+import {
+  json,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
-import { safeRedirect } from "@/utils/server/http.server";
 import { isGoodStatus, RelationshipSchema } from "@canny_ecosystem/utils";
 import {
   getCompanies,
@@ -11,10 +15,15 @@ import {
 } from "@canny_ecosystem/supabase/queries";
 import { updateRelationship } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { useEffect } from "react";
 
 export const UPDATE_RELATIONSHIP = "update-relationship";
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({
+  request,
+  params,
+}: LoaderFunctionArgs): Promise<Response> {
   const relationshipId = params.relationshipId;
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
@@ -29,28 +38,64 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   if (relationshipData?.error) {
-    throw relationshipData.error;
+    return json(
+      {
+        status: "error",
+        message: "Failed to get relationship",
+        error: relationshipData.error,
+        data: null,
+        companyOptions: null,
+      },
+      {
+        status: 500,
+      },
+    );
   }
 
   const parentCompanyId = relationshipData?.data?.parent_company_id;
   const { data: companies, error } = await getCompanies({ supabase });
 
   if (error) {
-    throw error;
+    return json(
+      {
+        status: "error",
+        message: "Failed to get companies",
+        error,
+        data: null,
+        companyOptions: null,
+      },
+      { status: 500 },
+    );
   }
 
   if (!companies) {
-    throw new Error("No companies found");
+    return json(
+      {
+        status: "error",
+        message: "No companies found",
+        error,
+        data: null,
+        companyOptions: null,
+      },
+      { status: 500 },
+    );
   }
 
   const companyOptions = companies
     .filter((company) => company.id !== parentCompanyId)
     .map((company) => ({ label: company.name, value: company.id }));
 
-  return json({ data: relationshipData?.data, companyOptions });
+  return json({
+    status: "success",
+    message: "Relationship and Company Option data found.",
+    data: relationshipData?.data,
+    companyOptions,
+  });
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
 
@@ -70,14 +115,56 @@ export async function action({ request }: ActionFunctionArgs) {
     data: submission.value,
   });
 
-  if (isGoodStatus(status)) {
-    return safeRedirect("/settings/relationships", { status: 303 });
-  }
-  return json({ status, error });
+  if (isGoodStatus(status))
+    return json({
+      status: "success",
+      message: "Relationship updated",
+      error: null,
+    });
+
+  return json({
+    status: "error",
+    message: "Failed to update relationship",
+    error,
+  });
 }
 
 export default function UpdateRelationship() {
-  const { data, companyOptions } = useLoaderData<typeof loader>();
+  const { data, companyOptions, status, error } =
+    useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (status === "error") {
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to load",
+        variant: "destructive",
+      });
+    }
+
+    if (!actionData) return;
+    if (actionData?.status === "success") {
+      toast({
+        title: "Success",
+        description: actionData?.message,
+        variant: "success",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: actionData?.error?.message || "Relationship update failed",
+        variant: "destructive",
+      });
+    }
+    
+    navigate("/settings/relationships", {
+      replace: true,
+    });
+  }, [actionData]);
+
   return (
     <CreateRelationship
       updateValues={data}

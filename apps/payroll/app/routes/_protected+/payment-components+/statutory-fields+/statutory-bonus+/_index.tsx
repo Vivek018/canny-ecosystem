@@ -4,20 +4,36 @@ import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getStatutoryBonusByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Icon } from "@canny_ecosystem/ui/icon";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { payoutMonths } from "@canny_ecosystem/utils/constant";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json, Link, useLoaderData } from "@remix-run/react";
+import { useEffect } from "react";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { supabase } = getSupabaseWithHeaders({ request });
 
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data } = await getStatutoryBonusByCompanyId({
+  const { data, error } = await getStatutoryBonusByCompanyId({
     supabase,
     companyId,
   });
 
-  return json({ data });
+  if (error) {
+    return json({
+      status: "error",
+      message: "Failed to load data",
+      data,
+      error,
+    });
+  }
+
+  return json({
+    status: "success",
+    message: "Statutory Bonus loaded successfully",
+    data,
+    error,
+  });
 };
 
 type DetailItemProps = {
@@ -36,7 +52,18 @@ const DetailItem: React.FC<DetailItemProps> = ({ label, value, className }) => {
 };
 
 export default function StatutoryBonusIndex() {
-  const { data } = useLoaderData<typeof loader>();
+  const { data, status, error } = useLoaderData<typeof loader>();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (status === "error") {
+      toast({
+        title: "Warning",
+        description: error?.message || "Failed to load",
+        variant: "warning",
+      });
+    }
+  }, []);
 
   if (!data) return <StatutoryBonusNoData />;
   return (

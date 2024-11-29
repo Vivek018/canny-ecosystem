@@ -13,8 +13,11 @@ import { useEffect, useState } from "react";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({
+  request,
+}: LoaderFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   const { data, error } = await getPaymentFieldsByCompanyId({
@@ -22,16 +25,52 @@ export async function loader({ request }: LoaderFunctionArgs) {
     companyId,
   });
 
-  if (error) throw error;
+  if (error) {
+    return json(
+      { status: "error", message: error.message, error, data },
+      { status: 500 },
+    );
+  }
 
-  return json({ data: data as any });
+  if (!data || data.length === 0) {
+    return json(
+      {
+        status: "info",
+        message: "No payment fields found for this company",
+        data,
+      },
+      { status: 404 },
+    );
+  }
+
+  return json({
+    status: "success",
+    message: "Payment fields loaded successfully",
+    data,
+  });
 }
 
 export default function PaymentFieldsIndex() {
-  const { data } = useLoaderData<typeof loader>();
+  const { data, status, message } = useLoaderData<typeof loader>();
 
   const [searchString, setSearchString] = useState("");
   const [tableData, setTableData] = useState(data);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (status === "info" && message) {
+      toast({
+        title: "Info",
+        description: message || "No data found",
+      });
+    }
+
+    if (status === "error" && message)
+      toast({
+        title: "Error",
+        description: message || "Failed to load",
+      });
+  }, [data]);
 
   useEffect(() => {
     const filteredData = data?.filter((item: PaymentFieldDataType) =>

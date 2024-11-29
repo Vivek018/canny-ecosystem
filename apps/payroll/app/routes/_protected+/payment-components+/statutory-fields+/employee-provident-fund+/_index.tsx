@@ -6,22 +6,36 @@ import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getEmployeeProvidentFundByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Icon } from "@canny_ecosystem/ui/icon";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { type LoaderFunctionArgs, json } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData, useNavigate } from "@remix-run/react";
+import { useEffect } from "react";
 
 export const EMPLOYEE_EPF_PERCENTAGE = 0.12;
-
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { supabase } = getSupabaseWithHeaders({ request });
 
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data } = await getEmployeeProvidentFundByCompanyId({
+  const { data, error } = await getEmployeeProvidentFundByCompanyId({
     supabase,
     companyId,
   });
 
-  return json({ data });
+  if (error)
+    return json({
+      status: "error",
+      message: "Failed to load data",
+      error,
+      data,
+    });
+
+  return json({
+    status: "success",
+    message: "Employee Provident Fund",
+    error: null,
+    data,
+  });
 };
 
 type DetailItemProps = {
@@ -40,7 +54,8 @@ const DetailItem: React.FC<DetailItemProps> = ({ label, value, className }) => {
 };
 
 export default function EmployeeProvidentFundIndex() {
-  const { data } = useLoaderData<typeof loader>();
+  const { data, status, error } = useLoaderData<typeof loader>();
+  const { toast } = useToast();
 
   const employeeContributionRateText = data?.restrict_employee_contribution
     ? "Restrict Contribution to ₹15,000 of PF Wage"
@@ -49,6 +64,16 @@ export default function EmployeeProvidentFundIndex() {
   const employerContributionRateText = data?.restrict_employer_contribution
     ? "Restrict Contribution to ₹15,000 of PF Wage"
     : `${(data?.employer_contribution ?? EMPLOYEE_EPF_PERCENTAGE) * 100}% of Actual Wage`;
+
+  useEffect(() => {
+    if (status === "error") {
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to load data",
+        variant: "destructive",
+      });
+    }
+  }, []);
 
   if (!data) return <EPFNoData />;
   return (
@@ -66,7 +91,11 @@ export default function EmployeeProvidentFundIndex() {
         </div>
         <div className="flex flex-col justify-between gap-6 text-base">
           <DetailItem label="EPF Number" value={data?.epf_number} />
-          <DetailItem label="Deduction Cycles" value={data?.deduction_cycle} className="capitalize" />
+          <DetailItem
+            label="Deduction Cycles"
+            value={data?.deduction_cycle}
+            className="capitalize"
+          />
           <DetailItem
             label="Employee Contribution Rate"
             value={employeeContributionRateText}

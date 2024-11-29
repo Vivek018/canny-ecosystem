@@ -1,6 +1,11 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { json, useLoaderData } from "@remix-run/react";
+import {
+  json,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
 import { safeRedirect } from "@/utils/server/http.server";
 import {
@@ -11,6 +16,8 @@ import { getEmployeeStateInsuranceById } from "@canny_ecosystem/supabase/queries
 import { updateEmployeeStateInsurance } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import CreateEmployeeStateInsurance from "./create-employee-state-insurance";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { useEffect } from "react";
 
 export const UPDATE_EMPLOYEE_STATE_INSURANCE =
   "update-employee-state-insurance";
@@ -30,13 +37,27 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   if (esiData?.error) {
-    throw esiData.error;
+    return json({
+      status: "error",
+      message: "Failed to load data",
+      data: esiData?.data,
+      error: esiData.error,
+      companyId,
+    });
   }
 
-  return json({ data: esiData?.data, companyId });
+  return json({
+    status: "success",
+    message: "Employee State Insurance",
+    error: null,
+    data: esiData?.data,
+    companyId,
+  });
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
 
@@ -47,7 +68,7 @@ export async function action({ request }: ActionFunctionArgs) {
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 
@@ -57,17 +78,54 @@ export async function action({ request }: ActionFunctionArgs) {
   });
 
   if (isGoodStatus(status)) {
-    return safeRedirect(
-      "/payment-components/statutory-fields/employee-state-insurance",
-      {
-        status: 303,
-      }
-    );
+    return json({
+      status: "success",
+      message: "Employee State Insurance updated successfully",
+      error: null,
+    });
   }
-  return json({ status, error });
+
+  return json({
+    status: "error",
+    message: "Employee State Insurance update failed",
+    error,
+  });
 }
 
 export default function UpdateEmployeeProvidentFund() {
-  const { data } = useLoaderData<typeof loader>();
+  const { data, status, error } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (status === "error") {
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to load",
+        variant: "destructive",
+      });
+      navigate(-1);
+    }
+
+    if (!actionData) return;
+    if (actionData?.status === "success") {
+      toast({
+        title: "Success",
+        description: actionData?.message || "Employee State Insurance updated",
+        variant: "success",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description:
+          actionData?.error?.message ||
+          "Employee State Insurance update failed",
+        variant: "destructive",
+      });
+    }
+    navigate(-1);
+  }, [actionData]);
+
   return <CreateEmployeeStateInsurance updateValues={data} />;
 }

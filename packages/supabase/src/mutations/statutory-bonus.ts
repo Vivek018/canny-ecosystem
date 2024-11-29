@@ -89,8 +89,7 @@ export async function deleteStatutoryBonus({
       .from("statutory_bonus")
       .delete()
       .eq("id", id)
-      .select()
-      .single();
+      
   
     if (error) {
       console.error(error);

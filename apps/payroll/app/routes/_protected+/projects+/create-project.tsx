@@ -25,7 +25,12 @@ import {
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { Form, useLoaderData } from "@remix-run/react";
+import {
+  Form,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
 import { json } from "@remix-run/node";
 import { safeRedirect } from "@/utils/server/http.server";
 import {
@@ -41,32 +46,59 @@ import type { ProjectDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { UPDATE_PROJECT } from "./$projectId+/update-project";
 import { getCompanies } from "@canny_ecosystem/supabase/queries";
 import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FormButtons } from "@/components/form/form-buttons";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 export const CREATE_PROJECT = "create-project";
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({
+  request,
+}: LoaderFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   const { data: companies, error } = await getCompanies({ supabase });
 
   if (error) {
-    throw error;
+    return json(
+      {
+        status: "error",
+        message: "Failed to get companies",
+        error,
+        data: null,
+      },
+      { status: 500 },
+    );
   }
 
   if (!companies) {
-    throw new Error("No companies found");
+    return json(
+      {
+        status: "error",
+        message: "No companies found",
+        error: "No companies found",
+        data: null,
+      },
+      { status: 400 },
+    );
   }
 
   const companyOptions = companies
     .filter((company) => company.id !== companyId)
     .map((company) => ({ label: company.name, value: company.id }));
 
-  return json({ companyId, companyOptions });
+  return json({
+    status: "success",
+    message: "Companies found",
+    error: null,
+    companyId,
+    companyOptions,
+  });
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
 
@@ -87,9 +119,9 @@ export async function action({ request }: ActionFunctionArgs) {
   });
 
   if (isGoodStatus(status)) {
-    return safeRedirect("/projects");
+    return json({ status: "success", message: "Project created", error: null });
   }
-  return json({ status, error });
+  return json({ status: "error", message: "Project creation failed", error }, { status: 500 });
 }
 
 export default function CreateProject({
@@ -99,7 +131,9 @@ export default function CreateProject({
   updateValues?: ProjectDatabaseUpdate | null;
   companyOptionsFromUpdate?: ComboboxSelectOption[];
 }) {
-  const { companyId, companyOptions } = useLoaderData<typeof loader>();
+  const { companyId, companyOptions, status, error } =
+    useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
   const PROJECT_TAG = updateValues ? UPDATE_PROJECT : CREATE_PROJECT;
 
   const initialValues = updateValues ?? getInitialValueFromZod(ProjectSchema);
@@ -118,6 +152,37 @@ export default function CreateProject({
       project_client_id: initialValues.project_client_id ?? companyId,
     },
   });
+
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (status === "error") {
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to load",
+        variant: "destructive",
+      });
+    }
+
+    if (actionData) {
+      if (actionData?.status === "success") {
+        console.log("=====");
+        toast({
+          title: "Success",
+          description: actionData?.message,
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: actionData?.error?.message || "Project creation failed",
+          variant: "destructive",
+        });
+      }
+      navigate("/projects", { replace: true });
+    }
+  }, [actionData]);
 
   return (
     <section className="md:px-20 lg:px-28 2xl:px-40 py-4">

@@ -15,6 +15,8 @@ import {
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { RelationshipCard } from "@/components/relationships/relationship-card";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { useEffect } from "react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -27,19 +29,50 @@ export async function loader({ request }: LoaderFunctionArgs) {
   });
 
   if (error) {
-    throw error;
+    return json(
+      { status: "error", message: error.message, error, data },
+      { status: 500 },
+    );
   }
 
-  if (!data) {
-    throw new Error("No data found");
+  if (!data || data.length === 0) {
+    return json(
+      {
+        status: "info",
+        message: "No relationships found for this company",
+        data,
+      },
+      { status: 404 },
+    );
   }
 
-  return json({ data });
+  return json({
+    status: "success",
+    message: "Relationships found",
+    data,
+  });
 }
 
 export default function Relationships() {
-  const { data } = useLoaderData<typeof loader>();
+  const { data, status, message } = useLoaderData<typeof loader>();
   const { isDocument } = useIsDocument();
+
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (status === "info" && message) {
+      toast({
+        title: "Info",
+        description: message || "No data found",
+      });
+    }
+
+    if (status === "error" && message)
+      toast({
+        title: "Error",
+        description: message || "Failed to load",
+      });
+  }, [data]);
 
   return (
     <section className="py-4">

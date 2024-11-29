@@ -1,11 +1,13 @@
-import { safeRedirect } from "@/utils/server/http.server";
 import { updateSitePaySequence } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { isGoodStatus, SitePaySequenceSchema } from "@canny_ecosystem/utils";
 import { parseWithZod } from "@conform-to/zod";
 import { json, type ActionFunctionArgs } from "@remix-run/node";
+import { useActionData, useNavigate } from "@remix-run/react";
+import { useEffect } from "react";
 
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({ request, params }: ActionFunctionArgs): Promise<Response> {
   const projectId = params.projectId;
 
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -28,7 +30,38 @@ export async function action({ request, params }: ActionFunctionArgs) {
   });
 
   if (isGoodStatus(status)) {
-    return safeRedirect(`/projects/${projectId}/sites`, { status: 303 });
+    return json({
+      status: "success",
+      message: "Pay sequence updated",
+      error: null,
+      projectId
+    })
   }
-  return json({ status, error });
+  return json({ status: "error", message: "Pay sequence update failed", error, projectId }, { status: 500 });
+}
+
+export default function EditPaySequence() {
+  const actionData = useActionData<typeof action>();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (actionData) {
+      if (actionData?.status === "success") {
+        toast({
+          title: "Success",
+          description: actionData?.message,
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: actionData?.error,
+          variant: "destructive",
+        });
+      }
+      navigate(-1);
+    }
+  }, []);
+  return null
 }

@@ -1,8 +1,12 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { json, useLoaderData } from "@remix-run/react";
+import {
+  json,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
-import { safeRedirect } from "@/utils/server/http.server";
 import {
   EmployeeProvidentFundSchema,
   isGoodStatus,
@@ -11,6 +15,8 @@ import { getEmployeeProvidentFundById } from "@canny_ecosystem/supabase/queries"
 import { updateEmployeeProvidentFund } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import CreateEmployeeProvidentFund from "./create-employee-provident-fund";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { useEffect } from "react";
 
 export const UPDATE_EMPLOYEE_PROVIDENT_FUND = "update-employee-provident-fund";
 
@@ -19,6 +25,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
 
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+
   let epfData = null;
 
   if (epfId) {
@@ -29,13 +36,27 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   if (epfData?.error) {
-    throw epfData.error;
+    return json({
+      status: "error",
+      message: "Failed to load data",
+      data: epfData?.data,
+      error: epfData.error,
+      companyId,
+    });
   }
 
-  return json({ data: epfData?.data, companyId });
+  return json({
+    status: "success",
+    message: "Employee Provident Fund",
+    data: epfData?.data,
+    companyId,
+    error: null,
+  });
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
 
@@ -46,7 +67,7 @@ export async function action({ request }: ActionFunctionArgs) {
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 
@@ -56,14 +77,54 @@ export async function action({ request }: ActionFunctionArgs) {
   });
 
   if (isGoodStatus(status)) {
-    return safeRedirect("/payment-components/statutory-fields/employee-provident-fund", {
-      status: 303,
+    return json({
+      status: "success",
+      message: "Employee Provident Fund updated",
+      error: null,
     });
   }
-  return json({ status, error });
+
+  return json({
+    status: "error",
+    message: "Failed to update Employee Provident Fund",
+    error,
+  });
 }
 
 export default function UpdateEmployeeProvidentFund() {
-  const { data } = useLoaderData<typeof loader>();
+  const { data, status, error } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (status === "error") {
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to load",
+        variant: "destructive",
+      });
+      navigate(-1);
+    }
+    if (actionData) {
+      if (actionData?.status === "success") {
+        toast({
+          title: "Success",
+          description: actionData?.message || "Employee Provident Fund updated",
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description:
+            actionData?.error?.message ||
+            "Employee Provident Fund update failed",
+          variant: "destructive",
+        });
+      }
+      navigate(-1);
+    }
+  }, [actionData]);
+  
   return <CreateEmployeeProvidentFund updateValues={data} />;
 }

@@ -135,6 +135,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
   }
 
   return json({
+    status: "success",
+    message: "Employee form loaded",
     step,
     totalSteps,
     stepData,

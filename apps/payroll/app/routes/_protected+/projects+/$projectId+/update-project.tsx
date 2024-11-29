@@ -4,17 +4,26 @@ import {
   getCompanies,
   getProjectById,
 } from "@canny_ecosystem/supabase/queries";
-import { json, useLoaderData } from "@remix-run/react";
+import {
+  json,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
-import { safeRedirect } from "@/utils/server/http.server";
 import { updateProject } from "@canny_ecosystem/supabase/mutations";
 import { isGoodStatus, ProjectSchema } from "@canny_ecosystem/utils";
 import CreateProject from "../create-project";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { useEffect } from "react";
 
 export const UPDATE_PROJECT = "update-project";
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({
+  request,
+  params,
+}: LoaderFunctionArgs): Promise<Response> {
   const projectId = params.projectId;
   const { supabase } = getSupabaseWithHeaders({ request });
 
@@ -29,21 +38,38 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const { data: companies, error } = await getCompanies({ supabase });
 
   if (error) {
-    throw error;
+    return json({
+      status: "error",
+      message: "Failed to get companies",
+      error,
+      data: null,
+    });
   }
 
   if (!companies) {
-    throw new Error("No companies found");
+    return json({
+      status: "error",
+      message: "No companies found",
+      error: "No companies found",
+      data: null,
+    });
   }
 
   const companyOptions = companies
     .filter((company) => company.id !== companyId)
     .map((company) => ({ label: company.name, value: company.id }));
 
-  return json({ data, companyOptions });
+  return json({
+    status: "success",
+    message: "Project loaded",
+    data,
+    companyOptions,
+  });
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
 
@@ -64,13 +90,43 @@ export async function action({ request }: ActionFunctionArgs) {
   });
 
   if (isGoodStatus(status)) {
-    return safeRedirect("/projects", { status: 303 });
+    return json({
+      status: "success",
+      message: "Project updated successfully",
+      error: null,
+    });
   }
-  return json({ status, error });
+  return json({ status: "error", message: "Project update failed", error }, { status: 500 });
 }
 
 export default function UpdateProject() {
   const { data, companyOptions } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
+
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (actionData) {
+      if (actionData?.status === "success") {
+        toast({
+          title: "Success",
+          description: actionData?.message,
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: actionData?.message,
+          variant: "destructive",
+        });
+      }
+      navigate("/projects", {
+        replace: true,
+      });
+    }
+  }, [actionData]);
+
   return (
     <CreateProject
       updateValues={data}

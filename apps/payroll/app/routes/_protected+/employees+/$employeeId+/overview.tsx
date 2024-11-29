@@ -4,7 +4,6 @@ import { EmployeeDetailsCard } from "@/components/employees/employee/details-car
 import { EmployeeGuardiansCard } from "@/components/employees/employee/guardians-card";
 import { EmployeePageHeader } from "@/components/employees/employee/page-header";
 import { EmployeeStatutoryCard } from "@/components/employees/employee/statutory-card";
-import { safeRedirect } from "@/utils/server/http.server";
 import {
   getEmployeeAddressesByEmployeeId,
   getEmployeeBankDetailsById,
@@ -13,10 +12,15 @@ import {
   getEmployeeStatutoryDetailsById,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData, useNavigate } from "@remix-run/react";
+import { useEffect } from "react";
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({
+  request,
+  params,
+}: LoaderFunctionArgs): Promise<Response> {
   const employeeId = params.employeeId;
 
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -27,18 +31,28 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   });
 
   if (error) {
-    return safeRedirect("/employees", { status: 303 });
+    return json({
+      status: "error",
+      message: "Failed to get employee",
+      error,
+      data: null,
+    });
   }
 
   if (!data) {
-    throw new Error("No data found");
+    return json({
+      status: "error",
+      message: "Employee not found",
+      error,
+      data: null,
+    });
   }
 
   const { data: employeeStatutoryData } = await getEmployeeStatutoryDetailsById(
     {
       supabase,
       id: employeeId ?? "",
-    }
+    },
   );
 
   const { data: employeeBankData } = await getEmployeeBankDetailsById({
@@ -57,6 +71,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   });
 
   return json({
+    status: "success",
+    message: "Employee found",
+    error: null,
     data,
     employeeStatutoryData,
     employeeBankData,
@@ -72,10 +89,26 @@ export default function EmployeeIndex() {
     employeeBankData,
     employeeAddresses,
     employeeGuardians,
+    error,
+    status,
   } = useLoaderData<typeof loader>();
 
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (status === "error") {
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to load employee",
+        variant: "destructive",
+      });
+      navigate("/employees", { replace: true });
+    }
+  }, []);
+
   return (
-    <div className='w-full my-8 flex flex-col gap-8'>
+    <div className="w-full my-8 flex flex-col gap-8">
       <EmployeePageHeader employee={data} />
       <EmployeeDetailsCard employee={data} />
       <EmployeeStatutoryCard employeeStatutory={employeeStatutoryData} />

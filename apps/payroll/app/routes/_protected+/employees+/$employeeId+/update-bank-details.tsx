@@ -1,9 +1,14 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { getEmployeeBankDetailsById } from "@canny_ecosystem/supabase/queries";
-import { Form, json, useLoaderData } from "@remix-run/react";
+import {
+  Form,
+  json,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { safeRedirect } from "@/utils/server/http.server";
 import { updateEmployeeBankDetails } from "@canny_ecosystem/supabase/mutations";
 import {
   isGoodStatus,
@@ -12,8 +17,9 @@ import {
 import { CreateEmployeeBankDetails } from "@/components/employees/form/create-employee-bank-details";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
 import { Card } from "@canny_ecosystem/ui/card";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FormButtons } from "@/components/form/form-buttons";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 export const UPDATE_BANK_DETAILS = "update-employee-bank-details";
 
@@ -21,21 +27,33 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const employeeId = params.employeeId;
   const { supabase } = getSupabaseWithHeaders({ request });
 
-  let data = null;
+  let data: any;
+  let error: any;
 
   if (employeeId) {
-    data = (
-      await getEmployeeBankDetailsById({
-        supabase,
-        id: employeeId,
-      })
-    ).data;
+    ({ data, error } = await getEmployeeBankDetailsById({
+      supabase,
+      id: employeeId,
+    }));
   }
 
-  return json({ data });
+  if (!data)
+    return json({
+      status: "error",
+      message: "Failed to get employee bank details",
+      data,
+      error,
+    });
+
+  return json({
+    status: "success",
+    message: "Employee bank details found",
+    data,
+    error: null,
+  });
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
 
@@ -56,15 +74,22 @@ export async function action({ request }: ActionFunctionArgs) {
   });
 
   if (isGoodStatus(status)) {
-    return safeRedirect(`/employees/${submission.value?.employee_id}`, {
-      status: 303,
+    return json({
+      status: "success",
+      message: "Employee bank details updated successfully",
+      error: null,
     });
   }
-  return json({ status, error });
+  return json({
+    status: "error",
+    message: "Employee bank details update failed",
+    error,
+  });
 }
 
 export default function UpdateEmployeeBankDetails() {
-  const { data } = useLoaderData<typeof loader>();
+  const { data, status, message } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
   const currentSchema = EmployeeBankDetailsSchema;
 
@@ -78,6 +103,38 @@ export default function UpdateEmployeeBankDetails() {
     shouldRevalidate: "onInput",
     defaultValue: data,
   });
+
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (status === "error") {
+      toast({
+        title: "Error",
+        description:
+          message || "Failed to get employee bank details",
+        variant: "destructive",
+      });
+      navigate(-1);
+    }
+    if (actionData) {
+      if (actionData?.status === "success") {
+        toast({
+          title: "Success",
+          description: actionData?.message || "Employee bank details updated",
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description:
+            actionData?.error?.message || "Employee bank details update failed",
+          variant: "destructive",
+        });
+      }
+      navigate(-1);
+    }
+  }, [actionData]);
 
   return (
     <section className="md:px-20 lg:px-28 2xl:px-40 py-4">

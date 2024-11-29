@@ -1,27 +1,62 @@
-import { safeRedirect } from "@/utils/server/http.server";
 import { deleteEmployeeProvidentFund } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { isGoodStatus } from "@canny_ecosystem/utils";
 import type { ActionFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/react";
+import { json, useActionData, useNavigate } from "@remix-run/react";
+import { useEffect } from "react";
 
-export async function action({ request, params }: ActionFunctionArgs) {
-  const { supabase, headers } = getSupabaseWithHeaders({ request });
+export async function action({ request, params }: ActionFunctionArgs): Promise<Response> {
+  const { supabase } = getSupabaseWithHeaders({ request });
   const epfId = params.epfId;
-  
+
   const { status, error } = await deleteEmployeeProvidentFund({
     supabase,
     id: epfId ?? "",
-    bypassAuth: true
+    bypassAuth: true,
   });
-  
+
   if (isGoodStatus(status)) {
-    return safeRedirect("/payment-components/statutory-fields/employee-provident-fund", { headers });
+    return json({
+      status: "success",
+      message: "EPF deleted successfully",
+      error: null,
+    });
   }
 
-  if (error) {
-    throw error;
-  }
+  return json(
+    {
+      status: "error",
+      message: "Failed to delete EPF",
+      error,
+    },
+    { status: 500 },
+  );
+}
 
-  return json({ error: error?.toString() }, { status: 500 });
+export default function DeleteEmployeeProvidentFund() {
+  const actionData = useActionData<typeof action>();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (actionData) {
+      if (actionData?.status === "success") {
+        toast({
+          title: "Success",
+          description: actionData?.message,
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: actionData?.error?.message || "EPF delete failed",
+          variant: "destructive",
+        });
+      }
+
+      navigate(-1);
+    }
+  }, [actionData]);
+  return null;
 }

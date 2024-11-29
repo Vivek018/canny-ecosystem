@@ -1,9 +1,13 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import CreateSite from "./sites+/create-site";
+import CreateSite from "./create-site";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { json, useLoaderData } from "@remix-run/react";
+import {
+  json,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
-import { safeRedirect } from "@/utils/server/http.server";
 import { isGoodStatus, SiteSchema } from "@canny_ecosystem/utils";
 import {
   getLocationsForSelectByCompanyId,
@@ -11,10 +15,15 @@ import {
 } from "@canny_ecosystem/supabase/queries";
 import { updateSite } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { useEffect } from "react";
 
 export const UPDATE_SITE = "update-site";
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({
+  request,
+  params,
+}: LoaderFunctionArgs): Promise<Response> {
   const siteId = params.siteId;
 
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -27,11 +36,21 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   });
 
   if (error) {
-    throw error;
+    return json({
+      status: "error",
+      message: "Failed to get locations",
+      error,
+      locations,
+    });
   }
 
   if (!locations) {
-    throw new Error("No Locations Found");
+    return json({
+      status: "error",
+      message: "No locations found",
+      error,
+      locations,
+    });
   }
 
   const locationOptions = locations.map((location) => ({
@@ -49,13 +68,27 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   if (siteData?.error) {
-    throw siteData.error;
+    return json({
+      status: "error",
+      message: "Failed to get site",
+      error: siteData.error,
+      data: siteData.data,
+    });
   }
 
-  return json({ data: siteData?.data, locationOptions });
+  return json({
+    status: "success",
+    message: "Site found",
+    error: null,
+    data: siteData?.data,
+    locationOptions,
+  });
 }
 
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({
+  request,
+  params,
+}: ActionFunctionArgs): Promise<Response> {
   const projectId = params.projectId;
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
@@ -67,7 +100,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 
@@ -77,15 +110,59 @@ export async function action({ request, params }: ActionFunctionArgs) {
   });
 
   if (isGoodStatus(status)) {
-    return safeRedirect(`/projects/${projectId}/sites`, {
-      status: 303,
+    return json({
+      status: "success",
+      message: "Site updated",
+      error: null,
+      projectId,
     });
   }
-  return json({ status, error });
+  return json({
+    status: "error",
+    message: "Site update failed",
+    error,
+    projectId,
+  });
 }
 
 export default function UpdateSite() {
-  const { data, locationOptions } = useLoaderData<typeof loader>();
+  const { data, locationOptions, status, error } =
+    useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
+
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (status === "error") {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to load",
+        variant: "destructive",
+      });
+      navigate(-1);
+    }
+
+    if (actionData) {
+      if (actionData?.status === "success") {
+        toast({
+          title: "Success",
+          description: actionData?.message || "Site updated",
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: actionData?.error.message || "Site update failed",
+          variant: "destructive",
+        });
+      }
+      navigate(`/projects/${actionData?.projectId}/sites`, {
+        replace: true,
+      });
+    }
+  }, [actionData]);
+  console.log(actionData);
   return (
     <CreateSite
       updateValues={data}

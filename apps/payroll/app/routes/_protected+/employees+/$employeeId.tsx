@@ -8,24 +8,24 @@ import { Link, Outlet, useLoaderData, useLocation } from "@remix-run/react";
 export async function loader({ params }: LoaderFunctionArgs) {
   const employeeId = params.employeeId;
 
-  return json({ employeeId });
+  return json({ sucess: true, message: "Employee id found", employeeId });
 }
 
 export default function Employee() {
   const { employeeId } = useLoaderData<typeof loader>();
   const { pathname } = useLocation();
   return (
-    <section className='relative'>
-      <div className='flex items-center gap-4 py-2.5 px-4 border-b'>
+    <section className="relative">
+      <div className="flex items-center gap-4 py-2.5 px-4 border-b">
         <Link
-          prefetch='intent'
-          to='/employees'
+          prefetch="intent"
+          to="/employees"
           className={cn(
             buttonVariants({ variant: "outline" }),
-            "bg-card w-9 h-9 px-0 rounded-full"
+            "bg-card w-9 h-9 px-0 rounded-full",
           )}
         >
-          <Icon name='chevron-left' size='sm' />
+          <Icon name="chevron-left" size="sm" />
         </Link>
         <SecondaryMenu
           items={[
@@ -39,7 +39,7 @@ export default function Employee() {
           Link={Link}
         />
       </div>
-      <div className='px-4'>
+      <div className="px-4">
         <Outlet />
       </div>
     </section>

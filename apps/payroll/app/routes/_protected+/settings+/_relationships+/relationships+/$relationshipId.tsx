@@ -19,14 +19,29 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   });
 
   if (error) {
-    throw error;
+    return json({
+      status: "error",
+      message: error.message,
+      error,
+      data: null,
+    });
   }
 
   if (!data) {
-    throw new Error("No data found");
+    return json({
+      status: "info",
+      message: "No terms found for this relationship",
+      data: null,
+      error: null,
+    });
   }
 
-  return json({ data: data.terms });
+  return json({
+    status: "success",
+    message: "Terms found",
+    error: null,
+    data: data.terms,
+  });
 }
 
 export default function Relationship() {

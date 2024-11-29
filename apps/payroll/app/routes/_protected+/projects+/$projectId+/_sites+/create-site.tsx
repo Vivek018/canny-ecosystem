@@ -16,8 +16,14 @@ import {
   useForm,
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { Form, json, useLoaderData } from "@remix-run/react";
-import { useState } from "react";
+import {
+  Form,
+  json,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
+import { useEffect, useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { safeRedirect } from "@/utils/server/http.server";
@@ -38,10 +44,14 @@ import { getLocationsForSelectByCompanyId } from "@canny_ecosystem/supabase/quer
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 import { FormButtons } from "@/components/form/form-buttons";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 export const CREATE_SITE = "create-site";
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({
+  request,
+  params,
+}: LoaderFunctionArgs): Promise<Response> {
   const projectId = params.projectId;
 
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -52,11 +62,23 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   });
 
   if (error) {
-    throw error;
+    return json({
+      status: "error",
+      message: "Failed to get locations",
+      error,
+      locations,
+      projectId,
+    });
   }
 
   if (!locations) {
-    throw new Error("No Locations Found");
+    return json({
+      status: "error",
+      message: "No locations found",
+      error,
+      locations,
+      projectId,
+    });
   }
 
   const locationOptions = locations.map((location) => ({
@@ -64,10 +86,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     value: location.id,
   }));
 
-  return json({ projectId, locationOptions });
+  return json({
+    status: "success",
+    message: "Locations found",
+    error: null,
+    projectId,
+    locationOptions,
+  });
 }
 
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({ request, params }: ActionFunctionArgs): Promise<Response> {
   const projectId = params.projectId;
 
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -90,9 +118,22 @@ export async function action({ request, params }: ActionFunctionArgs) {
   });
 
   if (isGoodStatus(status)) {
-    return safeRedirect(`/projects/${projectId}/sites`, { status: 303 });
+    return json({
+      status: "success",
+      message: "Site created successfully",
+      error: null,
+      returnTo: `/projects/${projectId}/sites`,
+    });
   }
-  return json({ status, error });
+  return json(
+    {
+      status: "error",
+      message: "Site creation failed",
+      error,
+      returnTo: `/projects/${projectId}/sites`,
+    },
+    { status: 500 },
+  );
 }
 
 export default function CreateSite({
@@ -103,6 +144,7 @@ export default function CreateSite({
   locationOptionsFromUpdate: ComboboxSelectOption[];
 }) {
   const { projectId, locationOptions } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
   const SITE_TAG = updateValues ? UPDATE_SITE : CREATE_SITE;
 
   const initialValues = updateValues ?? getInitialValueFromZod(SiteSchema);
@@ -121,6 +163,27 @@ export default function CreateSite({
       project_id: initialValues.project_id ?? projectId,
     },
   });
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (actionData) {
+      if (actionData?.status === "success") {
+        toast({
+          title: "Success",
+          description: actionData.message,
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: actionData.error,
+          variant: "destructive",
+        });
+      }
+      navigate(actionData.returnTo);
+    }
+  }, [actionData]);
 
   return (
     <section className="md:px-20 lg:px-28 2xl:px-40 py-4">

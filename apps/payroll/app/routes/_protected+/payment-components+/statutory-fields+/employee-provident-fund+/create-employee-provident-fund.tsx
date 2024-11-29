@@ -1,11 +1,8 @@
 import { FormButtons } from "@/components/form/form-buttons";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { safeRedirect } from "@/utils/server/http.server";
 import { createEmployeeProvidentFund } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import type {
-  EmployeeProvidentFundDatabaseUpdate,
-} from "@canny_ecosystem/supabase/types";
+import type { EmployeeProvidentFundDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import {
   Card,
   CardContent,
@@ -33,13 +30,21 @@ import {
   json,
   type LoaderFunctionArgs,
 } from "@remix-run/node";
-import { Form, useLoaderData } from "@remix-run/react";
-import { useState } from "react";
+import {
+  Form,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
+import { useEffect, useState } from "react";
 import { UPDATE_EMPLOYEE_PROVIDENT_FUND } from "./$epfId.update-epf";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 export const CREATE_EMPLOYEE_PROVIDENT_FUND = "create-employee-provident-fund";
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({
+  request,
+}: ActionFunctionArgs): Promise<Response> => {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
 
@@ -50,7 +55,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 
@@ -61,21 +66,28 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   });
 
   if (isGoodStatus(status)) {
-    return safeRedirect(
-      "/payment-components/statutory-fields/employee-provident-fund",
-      {
-        status: 303,
-      }
-    );
+    return json({
+      status: "success",
+      message: "Employee Provident Fund created",
+      error: null,
+    });
   }
 
-  return json({ status, error });
+  return json({
+    status: "error",
+    message: "Failed to create Employee Provident Fund",
+    error,
+  });
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  return json({ companyId });
+  return json({
+    status: "success",
+    message: "Company ID found",
+    companyId,
+  });
 };
 
 export default function CreateEmployeeProvidentFund({
@@ -83,6 +95,8 @@ export default function CreateEmployeeProvidentFund({
 }: {
   updateValues?: EmployeeProvidentFundDatabaseUpdate | null;
 }) {
+  const { companyId } = useLoaderData<{ companyId: string }>();
+  const actionData = useActionData<typeof action>();
   const EPF_TAG = updateValues
     ? UPDATE_EMPLOYEE_PROVIDENT_FUND
     : CREATE_EMPLOYEE_PROVIDENT_FUND;
@@ -91,7 +105,6 @@ export default function CreateEmployeeProvidentFund({
     updateValues ?? getInitialValueFromZod(EmployeeProvidentFundSchema);
   const [resetKey, setResetKey] = useState(Date.now());
 
-  const { companyId } = useLoaderData<{ companyId: string }>();
   const [form, fields] = useForm({
     id: EPF_TAG,
     constraint: getZodConstraint(EmployeeProvidentFundSchema),
@@ -105,6 +118,27 @@ export default function CreateEmployeeProvidentFund({
       company_id: companyId,
     },
   });
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (actionData) {
+      if (actionData?.status === "success") {
+        toast({
+          title: "Success",
+          description: actionData?.message,
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: actionData?.error?.message,
+          variant: "destructive",
+        });
+      }
+      navigate(-1);
+    }
+  }, [actionData]);
 
   return (
     <section className="p-4 w-full">
@@ -138,7 +172,7 @@ export default function CreateEmployeeProvidentFund({
                 key={resetKey}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  deductionCycleArray as unknown as string[]
+                  deductionCycleArray as unknown as string[],
                 )}
                 inputProps={{
                   ...getInputProps(fields.deduction_cycle, { type: "text" }),
@@ -156,7 +190,7 @@ export default function CreateEmployeeProvidentFund({
                   fields.restrict_employee_contribution,
                   {
                     type: "checkbox",
-                  }
+                  },
                 )}
                 labelProps={{
                   htmlFor: fields.restrict_employee_contribution.id,
@@ -170,7 +204,7 @@ export default function CreateEmployeeProvidentFund({
                   fields.restrict_employer_contribution,
                   {
                     type: "checkbox",
-                  }
+                  },
                 )}
                 labelProps={{
                   htmlFor: fields.restrict_employer_contribution.id,
@@ -186,7 +220,7 @@ export default function CreateEmployeeProvidentFund({
                   fields.include_employer_contribution,
                   {
                     type: "checkbox",
-                  }
+                  },
                 )}
                 labelProps={{
                   htmlFor: fields.include_employer_contribution.id,
@@ -203,7 +237,7 @@ export default function CreateEmployeeProvidentFund({
                           fields.include_employer_edli_contribution,
                           {
                             type: "checkbox",
-                          }
+                          },
                         ),
                         disabled: !form.value?.include_employer_contribution,
                       }}

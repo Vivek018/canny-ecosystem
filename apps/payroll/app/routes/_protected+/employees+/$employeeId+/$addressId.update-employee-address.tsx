@@ -1,16 +1,22 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { Form, json, useLoaderData } from "@remix-run/react";
+import {
+  Form,
+  json,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { safeRedirect } from "@/utils/server/http.server";
 import { isGoodStatus, EmployeeAddressesSchema } from "@canny_ecosystem/utils";
 import { getEmployeeAddressById } from "@canny_ecosystem/supabase/queries";
 import { updateEmployeeAddress } from "@canny_ecosystem/supabase/mutations";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
 import { Card } from "@canny_ecosystem/ui/card";
 import { CreateEmployeeAddress } from "@/components/employees/form/create-employee-address";
 import { FormButtons } from "@/components/form/form-buttons";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 export const UPDATE_EMPLOYEE_ADDRESS = "update-employee-address";
 
@@ -27,7 +33,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   return json({ data });
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
 
@@ -48,16 +56,23 @@ export async function action({ request }: ActionFunctionArgs) {
   });
 
   if (isGoodStatus(status)) {
-    return safeRedirect(`/employees/${submission.value.employee_id}`, {
-      status: 303,
+    return json({
+      status: "success",
+      message: "Employee address updated successfully",
+      error: null,
     });
   }
 
-  return json({ status, error });
+  return json({
+    status: "error",
+    message: "Failed to update employee address",
+    error,
+  });
 }
 
 export default function UpdateEmployeeAddress() {
   const { data } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
   const currentSchema = EmployeeAddressesSchema;
 
@@ -71,6 +86,29 @@ export default function UpdateEmployeeAddress() {
     shouldRevalidate: "onInput",
     defaultValue: data,
   });
+
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (actionData) {
+      if (actionData?.status === "success") {
+        toast({
+          title: "Success",
+          description: actionData?.message || "Employee address updated",
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description:
+            actionData?.error?.message || "Employee address update failed",
+          variant: "destructive",
+        });
+      }
+      navigate(-1);
+    }
+  }, [actionData]);
 
   return (
     <section className="md:px-20 lg:px-28 2xl:px-40 py-4">

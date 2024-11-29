@@ -1,12 +1,19 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import CreateLocation from "./create-location";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { json, useLoaderData } from "@remix-run/react";
+import {
+  json,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
 import { safeRedirect } from "@/utils/server/http.server";
 import { isGoodStatus, LocationSchema } from "@canny_ecosystem/utils";
 import { getLocationById } from "@canny_ecosystem/supabase/queries";
 import { updateLocation } from "@canny_ecosystem/supabase/mutations";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { useEffect } from "react";
 
 export const UPDATE_LOCATION = "update-location";
 
@@ -19,7 +26,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   if (locationId) {
     locationData = await getLocationById({
       supabase,
-      id: locationId
+      id: locationId,
     });
   }
 
@@ -30,7 +37,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   return json({ data: locationData?.data });
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
 
@@ -50,13 +59,49 @@ export async function action({ request }: ActionFunctionArgs) {
     data: submission.value,
   });
 
-  if (isGoodStatus(status)) {
-    return safeRedirect("/settings/locations", { status: 303 });
-  }
-  return json({ status, error });
+  if (isGoodStatus(status))
+    return json({
+      status: "success",
+      message: "Location updated successfully",
+      error: null,
+    });
+
+  return json(
+    {
+      status: "error",
+      message: "Location update failed",
+      error,
+    },
+    { status: 500 },
+  );
 }
 
 export default function UpdateLocation() {
   const { data } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
+
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!actionData) return;
+    if (actionData?.status === "success") {
+      toast({
+        title: "Success",
+        description: actionData?.message,
+        variant: "success",
+      });
+      navigate("/settings/locations", {
+        replace: true,
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: actionData?.error?.message || "Location update failed",
+        variant: "destructive",
+      });
+    }
+  }, [actionData, toast, navigate]);
+
   return <CreateLocation updateValues={data} />;
 }

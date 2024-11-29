@@ -17,6 +17,8 @@ import { replaceUnderscore } from "@canny_ecosystem/utils";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/react";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { useEffect } from "react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -27,19 +29,52 @@ export async function loader({ request }: LoaderFunctionArgs) {
   });
 
   if (error) {
-    throw error;
+    return json(
+      { status: "error", message: error.message, error, data },
+      { status: 500 },
+    );
   }
 
-  if (!data) {
-    throw new Error("No data found");
+  if (!data || data.length === 0) {
+    return json(
+      {
+        status: "info",
+        message: "No locations found for this company",
+        data,
+        error: null,
+      },
+      { status: 404 },
+    );
   }
 
-  return json({ data });
+  return json({
+    status: "success",
+    message: "Locations found",
+    data,
+    error: null,
+  });
 }
 
 export default function Locations() {
-  const { data } = useLoaderData<typeof loader>();
+  const { data, status, message } = useLoaderData<typeof loader>();
   const { isDocument } = useIsDocument();
+
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (status === "info" && message) {
+      toast({
+        title: "Info",
+        description: message || "No data found",
+      });
+    }
+
+    if (status === "error" && message)
+      toast({
+        title: "Error",
+        description: message || "Failed to load",
+      });
+  }, [data]);
 
   return (
     <section className="py-4">

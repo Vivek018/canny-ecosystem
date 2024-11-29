@@ -1,16 +1,20 @@
-import { safeRedirect } from "@/utils/server/http.server";
 import { updateEmployee } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { isGoodStatus, z } from "@canny_ecosystem/utils";
 import { parseWithZod } from "@conform-to/zod";
 import { json, type ActionFunctionArgs } from "@remix-run/node";
+import { useActionData, useNavigate } from "@remix-run/react";
+import { useEffect } from "react";
 
 const UpdateActiveSchema = z.object({
   id: z.string(),
   is_active: z.enum(["true", "false"]).transform((val) => val === "true"),
 });
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
 
@@ -29,10 +33,48 @@ export async function action({ request }: ActionFunctionArgs) {
     supabase,
     data: submission.value,
   });
+  console.log(submission.value);
 
   const returnTo = formData.get("returnTo");
   if (isGoodStatus(status)) {
-    return safeRedirect(returnTo ?? "/employees", { status: 303 });
+    return json({
+      status: "success",
+      message: `Employee marked as ${submission.value.is_active ? "active" : "inactive"}`,
+      returnTo,
+      error: null,
+    });
   }
-  return json({ status, error });
+  return json({
+    status: "error",
+    message: "Employee update failed",
+    error,
+    returnTo,
+  });
+}
+
+export default function UpdateActive() {
+  const actionData = useActionData<typeof action>();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (actionData) {
+      if (actionData?.status === "success") {
+        toast({
+          title: "Success",
+          description: actionData?.message || "Employee updated",
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: actionData?.error?.message || "Employee update failed",
+          variant: "destructive",
+        });
+      }
+      navigate(-1);
+    }
+  }, [actionData]);
+
+  return null;
 }

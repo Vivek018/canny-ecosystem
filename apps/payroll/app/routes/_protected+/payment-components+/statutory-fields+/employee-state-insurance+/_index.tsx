@@ -4,19 +4,36 @@ import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getEmployeeStateInsuranceByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Icon } from "@canny_ecosystem/ui/icon";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { replaceUnderscore } from "@canny_ecosystem/utils";
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
+import { useEffect } from "react";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { supabase } = getSupabaseWithHeaders({ request });
 
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data } = await getEmployeeStateInsuranceByCompanyId({
+  const { data, error } = await getEmployeeStateInsuranceByCompanyId({
     supabase,
     companyId,
   });
-  return json({ data });
+
+  if (error) {
+    return json({
+      status: "error",
+      message: "Failed to load data",
+      error,
+      data,
+    });
+  }
+
+  return json({
+    status: "success",
+    message: "Employee State Insurance",
+    error: null,
+    data,
+  });
 };
 
 type DetailItemProps = {
@@ -35,7 +52,18 @@ const DetailItem: React.FC<DetailItemProps> = ({ label, value, className }) => {
 };
 
 export default function EmployeeStateInsuranceIndex() {
-  const { data } = useLoaderData<typeof loader>();
+  const { data, status, error } = useLoaderData<typeof loader>();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (status === "error") {
+      toast({
+        title: "Warning",
+        description: error?.message || "Failed to load data",
+        variant: "warning",
+      });
+    }
+  }, []);
 
   if (!data) return <ESINoData />;
   return (

@@ -1,6 +1,12 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { Form, json, useLoaderData } from "@remix-run/react";
+import {
+  Form,
+  json,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { safeRedirect } from "@/utils/server/http.server";
 import {
@@ -15,7 +21,7 @@ import {
 } from "@canny_ecosystem/supabase/queries";
 import { updateEmployeeProjectAssignment } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
 import { Card } from "@canny_ecosystem/ui/card";
 import {
@@ -24,11 +30,15 @@ import {
   PROJECT_SITE_PARAM,
 } from "@/components/employees/form/create-employee-project-assignment";
 import { FormButtons } from "@/components/form/form-buttons";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 export const UPDATE_EMPLOYEE_PROJECT_ASSIGNMENT =
   "update-employee-project-assignment";
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({
+  request,
+  params,
+}: LoaderFunctionArgs): Promise<Response> {
   const url = new URL(request.url);
   const urlSearchParams = new URLSearchParams(url.searchParams);
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -44,7 +54,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   if (projectAssignmentData?.error) {
-    throw projectAssignmentData.error;
+    return json({
+      status: "error",
+      message: "Failed to get employee project assignment",
+      error: projectAssignmentData.error,
+    });
   }
 
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
@@ -95,6 +109,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   return json({
+    status: "success",
+    message: "Employee project assignment found",
     data: projectAssignmentData?.data,
     projectOptions,
     projectSiteOptions,
@@ -102,10 +118,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   });
 }
 
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
-  const employeeId = params.employeeId;
 
   const submission = parseWithZod(formData, {
     schema: EmployeeProjectAssignmentSchema,
@@ -124,16 +141,29 @@ export async function action({ request, params }: ActionFunctionArgs) {
   });
 
   if (isGoodStatus(status)) {
-    return safeRedirect(`/employees/${employeeId}/work-portfolio`, {
-      status: 303,
+    return json({
+      status: "success",
+      message: "Employee project assignment updated successfully",
+      error: null,
     });
   }
-  return json({ status, error });
+  return json({
+    status: "error",
+    message: "Failed to update employee project assignment",
+    error,
+  });
 }
 
 export default function UpdateEmployeeProjectAssignment() {
-  const { data, projectOptions, projectSiteOptions, siteEmployeeOptions } =
-    useLoaderData<typeof loader>();
+  const {
+    data,
+    projectOptions,
+    projectSiteOptions,
+    siteEmployeeOptions,
+    status,
+    error
+  } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
   const currentSchema = EmployeeProjectAssignmentSchema;
 
@@ -147,6 +177,35 @@ export default function UpdateEmployeeProjectAssignment() {
     shouldRevalidate: "onInput",
     defaultValue: data,
   });
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (status === "error") {
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to load",
+        variant: "destructive",
+      });
+      navigate(-1);
+    }
+    if (actionData) {
+      if (actionData?.status === "success") {
+        toast({
+          title: "Success",
+          description: actionData?.message || "Employee updated",
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: actionData?.error?.message || "Employee update failed",
+          variant: "destructive",
+        });
+      }
+      navigate(-1);
+    }
+  }, [actionData]);
 
   return (
     <section className="md:px-20 lg:px-28 2xl:px-40 py-4">

@@ -15,6 +15,8 @@ import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json, Link, Outlet, useLoaderData } from "@remix-run/react";
+import { useEffect } from "react";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -25,15 +27,37 @@ export async function loader({ request }: LoaderFunctionArgs) {
   });
 
   if (error) {
-    throw error;
+    return json({
+      status: "error",
+      message: "Failed to get projects",
+      error,
+      data: null,
+    });
   }
 
-  return json({ data });
+  return json({
+    status: "error",
+    message: "Projects found",
+    error: null,
+    data,
+  });
 }
 
 export default function ProjectsIndex() {
-  const { data } = useLoaderData<typeof loader>();
+  const { data, status, error } = useLoaderData<typeof loader>();
   const { isDocument } = useIsDocument();
+
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (status === "error") {
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to load",
+        variant: "destructive",
+      });
+    }
+  }, [status]);
 
   return (
     <section className="py-4 px-4">

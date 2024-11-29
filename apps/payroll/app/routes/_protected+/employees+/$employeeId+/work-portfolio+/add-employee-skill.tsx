@@ -1,8 +1,13 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { Form, json, useLoaderData } from "@remix-run/react";
+import {
+  Form,
+  json,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { safeRedirect } from "@/utils/server/http.server";
 import {
   EmployeeSkillsSchema,
   getInitialValueFromZod,
@@ -28,25 +33,40 @@ import {
 import { createEmployeeSkill } from "@canny_ecosystem/supabase/mutations";
 import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import type { EmployeeSkillDatabaseUpdate } from "@canny_ecosystem/supabase/types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { UPDATE_EMPLOYEE_SKILL } from "./$skillId.update-employee-skill";
 import { FormButtons } from "@/components/form/form-buttons";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 export const ADD_EMPLOYEE_SKILL = "add-employee-skill";
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const employeeId = params.employeeId;
 
-  return json({ employeeId });
+  if (!employeeId)
+    return json({
+      status: "error",
+      message: "No employee id found",
+      employeeId,
+    });
+
+  return json({ status: "success", message: "Employee id found", employeeId });
 }
 
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({
+  request,
+  params,
+}: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
 
   const employeeId = params.employeeId;
   if (!employeeId) {
-    return safeRedirect("/employees");
+    return json({
+      status: "error",
+      message: "Invalid employee id",
+      returnTo: "/employees",
+    });
   }
 
   const submission = parseWithZod(formData, {
@@ -66,11 +86,20 @@ export async function action({ request, params }: ActionFunctionArgs) {
   });
 
   if (isGoodStatus(status)) {
-    return safeRedirect(`/employees/${employeeId}/work-portfolio`, {
-      status: 303,
+    return json({
+      status: "success",
+      message: "Successfully created employee skill",
+      error: null,
+      returnTo: `/employees/${employeeId}/work-portfolio`,
     });
   }
-  return json({ status, error });
+
+  return json({
+    status: "error",
+    message: "Failed to create employee skill",
+    error,
+    returnTo: `/employees/${employeeId}/work-portfolio`,
+  });
 }
 
 export default function AddEmployeeSkill({
@@ -78,7 +107,8 @@ export default function AddEmployeeSkill({
 }: {
   updateValues?: EmployeeSkillDatabaseUpdate | null;
 }) {
-  const { employeeId } = useLoaderData<typeof loader>();
+  const { employeeId, message, status } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
 
   const EMPLOYEE_SKILL_TAG = updateValues
@@ -101,6 +131,37 @@ export default function AddEmployeeSkill({
       employee_id: initialValues.employee_id ?? employeeId,
     },
   });
+
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (status === "error") {
+      toast({
+        title: "Error",
+        description: message || "Failed to load",
+        variant: "destructive",
+      });
+      navigate(-1);
+    }
+    if (actionData) {
+      if (actionData.status === "success") {
+        toast({
+          title: "Success",
+          description: actionData.message,
+          variant: "success",
+        });
+        navigate(actionData.returnTo);
+      } else {
+        toast({
+          title: "Error",
+          description: actionData.message,
+          variant: "destructive",
+        });
+      }
+      navigate(actionData.returnTo ?? -1);
+    }
+  }, [actionData]);
 
   return (
     <section className="md:px-20 lg:px-28 2xl:px-40 py-4">

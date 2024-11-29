@@ -1,12 +1,13 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { json, useLoaderData } from "@remix-run/react";
+import { json, useLoaderData, useNavigate } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
-import { safeRedirect } from "@/utils/server/http.server";
 import { EmployeeSkillsSchema, isGoodStatus } from "@canny_ecosystem/utils";
 import { getEmployeeSkillById } from "@canny_ecosystem/supabase/queries";
 import { updateEmployeeSkill } from "@canny_ecosystem/supabase/mutations";
 import AddEmployeeSkill from "./add-employee-skill";
+import { useEffect } from "react";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 export const UPDATE_EMPLOYEE_SKILL = "update-employee-skill";
 
@@ -24,10 +25,20 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   if (skillData?.error) {
-    throw skillData.error;
+    return json({
+      status: "error",
+      message: "Failed to get employee skill",
+      error: skillData.error,
+      data: skillData.data,
+    });
   }
 
-  return json({ data: skillData?.data });
+  return json({
+    status: "success",
+    message: "Employee skill found",
+    data: skillData?.data,
+    error: null,
+  });
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
@@ -52,14 +63,34 @@ export async function action({ request, params }: ActionFunctionArgs) {
   });
 
   if (isGoodStatus(status)) {
-    return safeRedirect(`/employees/${employeeId}/work-portfolio`, {
-      status: 303,
+    return json({
+      status,
+      message: "Successfully updated employee skill",
+      error: null,
     });
   }
-  return json({ status, error });
+  return json({
+    status: "error",
+    message: "Failed to update employee skill",
+    error,
+  });
 }
 
 export default function UpdateEmployeeSkill() {
-  const { data } = useLoaderData<typeof loader>();
+  const { data, status, error } = useLoaderData<typeof loader>();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (status === "error") {
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to load",
+        variant: "destructive",
+      });
+      navigate(-1);
+    }
+  }, []);
+
   return <AddEmployeeSkill updateValues={data} />;
 }
