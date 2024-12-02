@@ -528,3 +528,13 @@ export const UpdateUserContactSchema = z.object({
   email: zEmail,
   mobile_number: zNumber.min(10).max(10),
 });
+
+export const UserSchema = z.object({
+  id: z.string().uuid().optional(),
+  first_name: zString.max(20),
+  last_name: zString.max(20),
+  email: zEmail,
+  mobile_number: zNumber.min(10).max(10).optional(),
+  avatar: zImage.optional(),
+  is_active: z.boolean().default(false),
+});

@@ -3,10 +3,10 @@ import { getUserByEmail } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json, useLoaderData } from "@remix-run/react";
-import { UserName } from "@/components/user/user-name";
-import { UserContact } from "@/components/user/user-contact";
+import { UserName } from "@/components/accounts/user-name";
+import { UserContact } from "@/components/accounts/user-contact";
 import { useEffect, useState } from "react";
-import { UserAvatar } from "@/components/user/user-avatar";
+import { UserAvatar } from "@/components/accounts/user-avatar";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });

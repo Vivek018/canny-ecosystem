@@ -1,4 +1,29 @@
-import type { TypedSupabaseClient, UserDatabaseUpdate } from "../types";
+import { convertToNull } from "@canny_ecosystem/utils";
+import type {
+  TypedSupabaseClient,
+  UserDatabaseInsert,
+  UserDatabaseUpdate,
+} from "../types";
+
+export async function createUserById({
+  supabase,
+  data,
+}: {
+  supabase: TypedSupabaseClient;
+  data: UserDatabaseInsert;
+}) {
+  const { error, status } = await supabase
+    .from("users")
+    .insert(data)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { status, error };
+}
 
 export async function updateUserLastLogin({
   supabase,
@@ -28,7 +53,7 @@ export async function updateUserLastLogin({
   return { error, status };
 }
 
-export async function updateUser({
+export async function updateUserById({
   supabase,
   data,
 }: {
@@ -46,9 +71,44 @@ export async function updateUser({
     };
   }
 
+  const updateData = convertToNull(data);
+
   const { error, status } = await supabase
     .from("users")
-    .update(data)
+    .update(updateData)
+    .eq("id", data.id ?? "")
+    .single();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { error, status };
+}
+
+export async function updateSameUserByEmail({
+  supabase,
+  data,
+}: {
+  supabase: TypedSupabaseClient;
+  data: UserDatabaseUpdate;
+}) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.email) {
+    return {
+      status: 400,
+      error: "No email found",
+    };
+  }
+
+  const updateData = convertToNull(data);
+
+  const { error, status } = await supabase
+    .from("users")
+    .update(updateData)
     .eq("email", user.email)
     .single();
 
@@ -59,19 +119,14 @@ export async function updateUser({
   return { error, status };
 }
 
-export async function deleteUser({
+export async function deleteUserById({
   supabase,
   id,
 }: {
   supabase: TypedSupabaseClient;
   id: string;
 }) {
-  const { error, status } = await supabase
-    .from("users")
-    .delete()
-    .eq("id", id)
-    .select()
-    .single();
+  const { error, status } = await supabase.from("users").delete().eq("id", id);
 
   if (error) {
     console.error("Error deleting user:", error);

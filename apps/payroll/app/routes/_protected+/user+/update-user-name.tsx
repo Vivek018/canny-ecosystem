@@ -1,7 +1,6 @@
-
 import { DEFAULT_ROUTE } from "@/constant";
 import { safeRedirect } from "@/utils/server/http.server";
-import { updateUser } from "@canny_ecosystem/supabase/mutations";
+import { updateSameUserByEmail } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { isGoodStatus, UpdateUserNameSchema } from "@canny_ecosystem/utils";
 import { parseWithZod } from "@conform-to/zod";
@@ -21,7 +20,7 @@ export async function action({ request }: ActionFunctionArgs) {
     );
   }
 
-  const { status } = await updateUser({
+  const { status } = await updateSameUserByEmail({
     supabase,
     data: submission.value,
   });
