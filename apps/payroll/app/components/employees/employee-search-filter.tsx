@@ -187,7 +187,7 @@ export function EmployeesSearchFilter({
       debounceSubmit(
         { prompt: prompt },
         {
-          action: "/employees",
+          action: "/employees?index",
           method: "POST",
         },
       );

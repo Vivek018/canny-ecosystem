@@ -36,7 +36,7 @@ export default function ProjectsIndex() {
   const { isDocument } = useIsDocument();
 
   return (
-    <section className="py-[22px] px-4">
+    <section className="py-4 px-4">
       <div className="w-full flex items-end justify-between">
         <Command className="overflow-visible">
           <div className="w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4">

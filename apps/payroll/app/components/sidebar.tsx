@@ -37,7 +37,7 @@ export function Sidebar({
     <aside
       className={cn(
         "fixed flex h-full flex-col overflow-hidden w-20 z-20 bg-background border-r transition-[width]",
-        isExpanded && "w-52 shadow-2xl dark:shadow-foreground/10",
+        isExpanded && "w-64 shadow-2xl dark:shadow-foreground/10",
         className,
       )}
       onMouseEnter={openSidebar}
@@ -71,7 +71,7 @@ export function Sidebar({
                 className={({ isActive }: { isActive: boolean }) =>
                   cn(
                     "flex mx-4 cursor-pointer text-start text-sm justify-start w-12 px-3.5 rounded py-2.5 tracking-wide hover:bg-accent gap-3 transition-[width]",
-                    isExpanded && "w-44",
+                    isExpanded && "w-[220px]",
                     isActive
                       ? "bg-primary/15 text-primary hover:bg-primary/20"
                       : "",
@@ -82,7 +82,7 @@ export function Sidebar({
                 }
               >
                 <Icon name={icon as IconName} size="md" className="shrink-0" />
-                <span className={cn("min-w-max", !isExpanded && "hidden")}>
+                <span className={cn(" truncate", !isExpanded && "hidden")}>
                   {name}
                 </span>
               </NavLink>

@@ -19,23 +19,18 @@ export async function createLabourWelfareFund({
     const {
       data: { user },
     } = await supabase.auth.getUser();
-
-    if (!user?.email) {
-      return { status: 400, error: "Unauthorized User" };
-    }
+    if (!user?.email) return { status: 400, error: "Unauthorized User" };
   }
 
-  const {
-    error,
-    status,
-    data: professionalTax,
-  } = await supabase.from("labour_welfare_fund").insert(data).select().single();
+  const { error, status } = await supabase
+    .from("labour_welfare_fund")
+    .insert(data)
+    .select()
+    .single();
 
-  if (error) {
-    console.error(error);
-  }
+  if (error) console.error(error);
 
-  return { status, error, id: professionalTax?.id };
+  return { status, error };
 }
 
 export async function updateLabourWelfareFund({
@@ -52,9 +47,7 @@ export async function updateLabourWelfareFund({
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user?.email) {
-      return { status: 400, error: "Unauthorized User" };
-    }
+    if (!user?.email) return { status: 400, error: "Unauthorized User" };
   }
 
   const updateData = convertToNull(data);
@@ -66,9 +59,7 @@ export async function updateLabourWelfareFund({
     .select()
     .single();
 
-  if (error) {
-    console.error("error", error);
-  }
+  if (error) console.error("error", error);
 
   return { status, error };
 }
@@ -87,9 +78,7 @@ export async function deleteLabourWelfareFund({
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user?.email) {
-      return { status: 400, error: "Unauthorized User" };
-    }
+    if (!user?.email) return { status: 400, error: "Unauthorized User" };
   }
 
   const { error, status } = await supabase
@@ -99,9 +88,7 @@ export async function deleteLabourWelfareFund({
     .select()
     .single();
 
-  if (error) {
-    console.error(error);
-  }
+  if (error) console.error(error);
 
   return { status, error };
 }

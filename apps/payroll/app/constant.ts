@@ -27,8 +27,8 @@ export const sideNavList = [
   { name: "Finance" },
   { name: "Advances", link: "/advances", icon: "lab-timer" },
   {
-    name: "Payment Fields",
-    link: "/payment-fields",
+    name: "Payment Components",
+    link: "/payment-components/payment-fields",
     icon: "input",
   },
   {
@@ -81,7 +81,7 @@ export const navList = [
   },
   {
     name: "Add Payment Field",
-    link: "/payment-fields/upsert",
+    link: "/payment-components/payment-fields/upsert",
     icon: "plus-circled",
   },
   {
@@ -211,3 +211,31 @@ export const VALID_FILTERS = [
     example: "2024-11-30",
   },
 ];
+
+export const statutorySideNavList = [
+  {
+    name: "EPF",
+    link: "/payment-components/statutory-fields/employee-provident-fund",
+    icon: ""
+  },
+  {
+    name: "ESI",
+    link: "/payment-components/statutory-fields/employee-state-insurance",
+    icon: ""
+  },
+  {
+    name: "Professional Tax",
+    link: "/payment-components/statutory-fields/professional-tax",
+    icon: ""
+  },
+  {
+    name: "Labour welfare fund",
+    link: "/payment-components/statutory-fields/labour-welfare-fund",
+    icon: ""
+  },
+  {
+    name: "Statutory Bonus",
+    link: "/payment-components/statutory-fields/statutory-bonus",
+    icon: ""
+  }
+]

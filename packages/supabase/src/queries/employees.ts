@@ -241,11 +241,9 @@ export async function getEmployeesByPositionAndProjectSiteId({
 export async function getEmployeeById({
   supabase,
   id,
-  companyId,
 }: {
   supabase: TypedSupabaseClient;
   id: string;
-  companyId: string;
 }) {
   const columns = [
     "id",
@@ -269,7 +267,6 @@ export async function getEmployeeById({
     .from("employees")
     .select(columns.join(","))
     .eq("id", id)
-    .eq("company_id", companyId)
     .single<InferredType<EmployeeDatabaseRow, (typeof columns)[number]>>();
 
   if (error) {

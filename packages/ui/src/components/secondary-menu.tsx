@@ -6,7 +6,7 @@ export function SecondaryMenu({
   Link,
   className,
 }: {
-  items: { path: string; label: string }[];
+  items: { path?: string; label?: string }[];
   pathname: string;
   Link: React.ElementType;
   className?: string;
@@ -22,7 +22,7 @@ export function SecondaryMenu({
             className={cn(
               "text-muted-foreground font-medium underline-offset-4",
               "hover:underline focus:underline focus:outline-none",
-              pathname === item.path &&
+              pathname.includes(item.path) &&
                 "text-primary hover:no-underline focus:no-underline",
             )}
           >

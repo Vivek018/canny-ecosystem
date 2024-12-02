@@ -28,11 +28,11 @@ export const PaymentFieldOptionsDropdown = ({
       {
         id: paymentField.id,
         is_active: true,
-        returnTo: paymentField.returnTo ?? "/payment-fields",
+        returnTo: paymentField.returnTo ?? "/payment-components/payment-fields",
       },
       {
         method: "POST",
-        action: `/payment-fields/${paymentField.id}/update-payment-field-status`,
+        action: `/payment-components/payment-fields/${paymentField.id}/update-payment-field-status`,
       },
     );
   };
@@ -42,17 +42,17 @@ export const PaymentFieldOptionsDropdown = ({
       {
         id: paymentField.id,
         is_active: false,
-        returnTo: paymentField.returnTo ?? "/payment-fields",
+        returnTo: paymentField.returnTo ?? "/payment-components/payment-fields",
       },
       {
         method: "POST",
-        action: `/payment-fields/${paymentField.id}/update-payment-field-status`,
+        action: `/payment-components/payment-fields/${paymentField.id}/update-payment-field-status`,
       },
     );
   };
 
   const handleEdit = () => {
-    navigate(`/payment-fields/${paymentField.id}/update-payment-field`);
+    navigate(`/payment-components/payment-fields/${paymentField.id}/update-payment-field`);
   };
 
   return (

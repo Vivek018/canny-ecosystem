@@ -160,9 +160,8 @@ export async function getLocationsByCompanyId({
 
 export async function getLocationById({
   supabase,
-  id,
-  companyId,
-}: { supabase: TypedSupabaseClient; id: string; companyId: string }) {
+  id
+}: { supabase: TypedSupabaseClient; id: string; }) {
   const columns = [
     "id",
     "company_id",
@@ -181,7 +180,6 @@ export async function getLocationById({
     .from("company_locations")
     .select(columns.join(","))
     .eq("id", id)
-    .eq("company_id", companyId)
     .single<InferredType<LocationDatabaseRow, (typeof columns)[number]>>();
 
   if (error) {

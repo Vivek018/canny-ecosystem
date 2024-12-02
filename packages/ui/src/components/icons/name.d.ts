@@ -19,6 +19,7 @@ export type IconName =
   | "employee"
   | "feedback"
   | "import"
+  | "info"
   | "input"
   | "lab-timer"
   | "laptop"
@@ -33,4 +34,5 @@ export type IconName =
   | "setting"
   | "sun"
   | "table"
+  | "trash"
   | "update";

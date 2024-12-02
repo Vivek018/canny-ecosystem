@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "files": ["tailwind.config.ts", "postcss.config.js", "globals.css"],
+  "files": [
+    "tailwind.config.ts",
+    "postcss.config.js",
+    "globals.css"
+  ],
   "scripts": {
     "build:icons": "tsx ./src/other/build-icons.ts",
     "clean": "rm -rf .turbo node_modules",
@@ -72,6 +76,7 @@
     "./table": "./src/components/table.tsx",
     "./toggle-group": "./src/components/toggle-group.tsx",
     "./toggle": "./src/components/toggle.tsx",
+    "./trash": "./src/components/trash.tsx",
     "./checkbox": "./src/components/checkbox.tsx",
     "./combobox": "./src/components/combobox.tsx",
     "./command": "./src/components/command.tsx",
@@ -80,9 +85,11 @@
     "./dropdown-menu": "./src/components/dropdown-menu.tsx",
     "./dialog": "./src/components/dialog.tsx",
     "./alert-dialog": "./src/components/alert-dialog.tsx",
+    "./pagination": "./src/components/pagination.tsx",
     "./sheet": "./src/components/sheet.tsx",
     "./scroll-area": "./src/components/scroll-area.tsx",
     "./secondary-menu": "./src/components/secondary-menu.tsx",
+    "./secondary-sidebar": "./src/components/secondary-sidebar.tsx",
     "./forms": "./src/components/forms.tsx",
     "./tailwind.config": "./tailwind.config.ts",
     "./postcss": "./postcss.config.js"

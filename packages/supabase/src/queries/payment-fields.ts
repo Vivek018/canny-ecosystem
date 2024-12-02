@@ -8,11 +8,9 @@ import type {
 export async function getPaymentFieldById({
   supabase,
   id,
-  companyId,
 }: {
   supabase: TypedSupabaseClient;
   id: string;
-  companyId: string;
 }) {
   const columns = [
     "id",
@@ -31,7 +29,6 @@ export async function getPaymentFieldById({
     .from("payment_fields")
     .select(columns.join(","))
     .eq("id", id)
-    .eq("company_id", companyId)
     .single<InferredType<PaymentFieldDatabaseRow, (typeof columns)[number]>>();
 
   if (error) {

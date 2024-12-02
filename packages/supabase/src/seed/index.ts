@@ -36,7 +36,6 @@ const supabase = createClient(
 );
 
 async function seed() {
-  console.log("Seeding database...");
   const site_ids: string[] = [];
 
   console.time("Database has been seeded");
