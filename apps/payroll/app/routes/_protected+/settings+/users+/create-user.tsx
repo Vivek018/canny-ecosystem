@@ -71,24 +71,23 @@ export default function CreateUser({
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
-    defaultValue: { ...initialValues, avatar: undefined },
+    defaultValue: initialValues,
   });
 
   return (
-    <section className="md:px-20 lg:px-52 2xl:px-80 py-4">
+    <section className='md:px-20 lg:px-52 2xl:px-80 py-4'>
       <FormProvider context={form.context}>
-        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
+        <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
           <Card>
             <CardHeader>
               <CardTitle>{USER_TAG}</CardTitle>
-              <CardDescription className="lowercase">
-                You can {USER_TAG}{" "}
-                by filling this form
+              <CardDescription className='lowercase'>
+                You can {USER_TAG} by filling this form
               </CardDescription>
             </CardHeader>
             <CardContent>
               <input {...getInputProps(fields.id, { type: "hidden" })} />
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mb-10">
+              <div className='grid grid-cols-2 place-content-center justify-between gap-x-8 mb-10'>
                 <Field
                   inputProps={{
                     ...getInputProps(fields.first_name, { type: "text" }),
@@ -118,19 +117,7 @@ export default function CreateUser({
                   errors={fields.last_name.errors}
                 />
               </div>
-
-              <Field
-                inputProps={{
-                  ...getInputProps(fields.avatar, {
-                    type: "file",
-                  }),
-                }}
-                labelProps={{
-                  children: replaceUnderscore(fields.avatar.name),
-                }}
-                errors={fields.avatar.errors}
-              />
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10">
+              <div className='grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10'>
                 <Field
                   inputProps={{
                     ...getInputProps(fields.email, { type: "text" }),
@@ -160,7 +147,7 @@ export default function CreateUser({
               </div>
 
               <CheckboxField
-                className="mt-8"
+                className='mt-8'
                 buttonProps={getInputProps(fields.is_active, {
                   type: "checkbox",
                 })}
