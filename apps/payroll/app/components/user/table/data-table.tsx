@@ -22,8 +22,6 @@ export function UserDataTable<TData, TValue>({
   columns,
   data,
 }: UserDataTableProps<TData, TValue>) {
-
-  
   const table = useReactTable({
     data,
     columns,

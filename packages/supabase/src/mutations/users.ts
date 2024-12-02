@@ -1,8 +1,29 @@
+import { convertToNull } from "@canny_ecosystem/utils";
 import type {
   TypedSupabaseClient,
   UserDatabaseInsert,
   UserDatabaseUpdate,
 } from "../types";
+
+export async function createUserById({
+  supabase,
+  data,
+}: {
+  supabase: TypedSupabaseClient;
+  data: UserDatabaseInsert;
+}) {
+  const { error, status } = await supabase
+    .from("users")
+    .insert(data)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { status, error };
+}
 
 export async function updateUserLastLogin({
   supabase,
@@ -50,9 +71,11 @@ export async function updateUserById({
     };
   }
 
+  const updateData = convertToNull(data);
+
   const { error, status } = await supabase
     .from("users")
-    .update(data)
+    .update(updateData)
     .eq("id", data.id ?? "")
     .single();
 
@@ -81,9 +104,11 @@ export async function updateSameUserByEmail({
     };
   }
 
+  const updateData = convertToNull(data);
+
   const { error, status } = await supabase
     .from("users")
-    .update(data)
+    .update(updateData)
     .eq("email", user.email)
     .single();
 
@@ -113,24 +138,4 @@ export async function deleteUserById({
   }
 
   return { status, error: null };
-}
-
-export async function createUserById({
-  supabase,
-  data,
-}: {
-  supabase: TypedSupabaseClient;
-  data: UserDatabaseInsert;
-}) {
-  const { error, status } = await supabase
-    .from("users")
-    .insert(data)
-    .select()
-    .single();
-
-  if (error) {
-    console.error(error);
-  }
-
-  return { status, error };
 }

@@ -48,35 +48,33 @@ export async function getUserByEmail({
   // };
 }
 
-export type UserDataType = Pick<
-  UserDatabaseRow,
-  "first_name" | "last_name" | "email" | "mobile_number" | "is_active"|"id"
->;
-
 export async function getUsers({
   supabase,
 }: {
   supabase: TypedSupabaseClient;
 }) {
   const columns = [
+    "id",
     "avatar",
     "first_name",
     "last_name",
     "email",
     "mobile_number",
     "is_active",
-    "id"
   ] as const;
 
   const { data, error } = await supabase
     .from("users")
-    .select(`${columns.join(",")}`)
+    .select(columns.join(","))
     .order("created_at", { ascending: false })
-    .returns<UserDataType[]>();
+    .returns<InferredType<UserDatabaseRow, (typeof columns)[number]>[]>();
+
+  if (error) {
+    console.error(error);
+  }
 
   return { data, error };
 }
-
 
 export async function getUserById({
   supabase,

@@ -1,6 +1,6 @@
 import { replaceUnderscore } from "@canny_ecosystem/utils";
 import type { ColumnDef } from "@tanstack/react-table";
-import { DataOptionsDropdown } from "./data-table-options";
+import { UserOptionsDropdown } from "./user-options-dropdown";
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
@@ -9,31 +9,30 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@canny_ecosystem/ui/avatar";
+import type { UserDatabaseRow } from "@canny_ecosystem/supabase/types";
 
-export type Users = {
-  avatar: string;
-  id: string | "";
-  first_name: string;
-  last_name: string | "";
-  email: string | "";
-  mobile_number: number;
-  is_active: boolean;
+export type UsersType = {
+  avatar: UserDatabaseRow["avatar"] | string;
+  id: UserDatabaseRow["id"] | string;
+  first_name: UserDatabaseRow["first_name"] | string;
+  last_name: UserDatabaseRow["last_name"] | string;
+  email: UserDatabaseRow["email"] | string;
+  mobile_number: UserDatabaseRow["mobile_number"] | number;
+  is_active: UserDatabaseRow["is_active"] | boolean;
 };
 
-export const columns: ColumnDef<Users>[] = [
+export const columns: ColumnDef<UsersType>[] = [
   {
     accessorKey: "avatar",
     cell: ({ row }) => {
       return (
         <Avatar className="rounded-full w-7 h-7 flex items-center justify-center bg-accent">
-          <>
-            <AvatarImage src={row.original?.avatar ?? ""} />
-            <AvatarFallback className="rounded-md">
-              <span className="text-md uppercase">
-                {row.original.first_name.charAt(0)}
-              </span>
-            </AvatarFallback>
-          </>
+          <AvatarImage src={row.original?.avatar ?? ""} />
+          <AvatarFallback className="rounded-md">
+            <span className="text-md uppercase">
+              {row.original.first_name.charAt(0)}
+            </span>
+          </AvatarFallback>
         </Avatar>
       );
     },
@@ -42,9 +41,7 @@ export const columns: ColumnDef<Users>[] = [
     accessorKey: "first_name",
     header: "First Name",
     cell: ({ row }) => {
-      return (
-        <p className="truncate w-20 capitalize">{`${row.original?.first_name}`}</p>
-      );
+      return <p className="truncate w-28">{`${row.original?.first_name}`}</p>;
     },
   },
   {
@@ -52,7 +49,7 @@ export const columns: ColumnDef<Users>[] = [
     header: "Last Name",
     cell: ({ row }) => {
       return (
-        <p className=" w-20 capitalize">
+        <p className="truncate w-28">
           {replaceUnderscore(row.original?.last_name ?? "--")}
         </p>
       );
@@ -63,7 +60,7 @@ export const columns: ColumnDef<Users>[] = [
     header: "Email",
     cell: ({ row }) => {
       return (
-        <p className=" w-20">
+        <p className="truncate w-28">
           {replaceUnderscore(row.original?.email ?? "--")}
         </p>
       );
@@ -74,7 +71,7 @@ export const columns: ColumnDef<Users>[] = [
     header: "Mobile Number",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-32">{row.original?.mobile_number ?? "--"}</p>
+        <p className="truncate w-28">{row.original?.mobile_number ?? "--"}</p>
       );
     },
   },
@@ -96,7 +93,7 @@ export const columns: ColumnDef<Users>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       return (
-        <DataOptionsDropdown
+        <UserOptionsDropdown
           key={row.original.id}
           id={row.original.id}
           triggerChild={

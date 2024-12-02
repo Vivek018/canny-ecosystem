@@ -29,7 +29,7 @@ import { type ActionFunctionArgs, json } from "@remix-run/node";
 import { Form } from "@remix-run/react";
 import { UPDATE_USER_TAG } from "./$userId.update-user";
 
-export const CREATE_USER_TAG = "Create a User";
+export const CREATE_USER_TAG = "Create User";
 
 export async function action({ request }: ActionFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -80,16 +80,9 @@ export default function CreateUser({
         <Form method="POST" {...getFormProps(form)} className="flex flex-col">
           <Card>
             <CardHeader>
-              <CardTitle>
-                {USER_TAG === "Create a User"
-                  ? "Create A User"
-                  : "Update the User"}
-              </CardTitle>
-              <CardDescription>
-                You can{" "}
-                {USER_TAG === "Create a User"
-                  ? "create a user"
-                  : "update the user"}{" "}
+              <CardTitle>{USER_TAG}</CardTitle>
+              <CardDescription className="lowercase">
+                You can {USER_TAG}{" "}
                 by filling this form
               </CardDescription>
             </CardHeader>

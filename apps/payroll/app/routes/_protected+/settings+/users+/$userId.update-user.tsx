@@ -8,7 +8,7 @@ import { isGoodStatus, UserSchema } from "@canny_ecosystem/utils";
 import { updateUserById } from "@canny_ecosystem/supabase/mutations";
 import { getUserById } from "@canny_ecosystem/supabase/queries";
 
-export const UPDATE_USER_TAG = "Update a User";
+export const UPDATE_USER_TAG = "Update User";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const userId = params.userId;

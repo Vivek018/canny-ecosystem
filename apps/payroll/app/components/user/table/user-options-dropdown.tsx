@@ -5,10 +5,10 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@canny_ecosystem/ui/dropdown-menu";
-import { DeleteUser } from "./delete-user-option";
+import { DeleteUser } from "./delete-user";
 import { useNavigate } from "@remix-run/react";
 
-export const DataOptionsDropdown = ({
+export const UserOptionsDropdown = ({
   id,
   triggerChild,
 }: {
@@ -18,10 +18,9 @@ export const DataOptionsDropdown = ({
 }) => {
   const navigate = useNavigate();
 
-const handleEdit=()=>{
-  navigate(`/settings/users/${id}/update-user`);
-}
-
+  const handleEdit = () => {
+    navigate(`/settings/users/${id}/update-user`);
+  };
 
   return (
     <DropdownMenu>

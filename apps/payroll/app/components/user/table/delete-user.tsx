@@ -35,10 +35,10 @@ export const DeleteUser = ({ id }: { id: string }) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
       submit(
-        { id },
+        {},
         {
           method: "post",
-          action: "/settings/users",
+          action: `${id}/delete-user`,
           replace: true,
         }
       );
