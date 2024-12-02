@@ -16,15 +16,19 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   let userData = null;
 
   if (userId) {
-    userData = await getUserById({
+    const { data, error } = await getUserById({
       supabase,
       id: userId,
     });
+
+    if (error) {
+      throw error;
+    }
+
+    userData = data;
   }
 
-  if (userData?.error) throw userData.error;
-
-  return json({ data: userData?.data });
+  return json({ data: userData });
 }
 
 export async function action({ request }: ActionFunctionArgs) {

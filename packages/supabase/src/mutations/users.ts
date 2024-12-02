@@ -101,12 +101,7 @@ export async function deleteUserById({
   supabase: TypedSupabaseClient;
   id: string;
 }) {
-  const { error, status } = await supabase
-    .from("users")
-    .delete()
-    .eq("id", id)
-    .select()
-    .single();
+  const { error, status } = await supabase.from("users").delete().eq("id", id);
 
   if (error) {
     console.error("Error deleting user:", error);

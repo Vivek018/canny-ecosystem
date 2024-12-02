@@ -71,7 +71,7 @@ export default function CreateUser({
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
-    defaultValue: initialValues,
+    defaultValue: { ...initialValues, avatar: undefined },
   });
 
   return (
@@ -131,8 +131,6 @@ export default function CreateUser({
                   ...getInputProps(fields.avatar, {
                     type: "file",
                   }),
-
-                  placeholder: `Enter ${replaceUnderscore(fields.avatar.name)}`,
                 }}
                 labelProps={{
                   children: replaceUnderscore(fields.avatar.name),
