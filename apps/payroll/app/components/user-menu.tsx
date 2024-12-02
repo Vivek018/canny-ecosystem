@@ -66,14 +66,14 @@ export function UserMenu({
           <DropdownMenuLabel>
             <div className='flex justify-between items-center'>
               <div className='flex flex-col'>
-                <span className='w-40 truncate'>
+                <span className='w-36 truncate'>
                   {`${userData.first_name} ${userData.last_name}`}
                 </span>
-                <span className='truncate text-xs text-[#606060] font-normal'>
+                <span className='w-36 truncate text-xs text-[#606060] font-normal'>
                   {userData.email}
                 </span>
               </div>
-              <div className='border py-0.5 px-3 rounded-full text-[11px] font-normal'>
+              <div className='min-w-max border py-0.5 px-3 rounded-full text-[11px] font-normal flex-shrink-0'>
                 Beta
               </div>
             </div>
