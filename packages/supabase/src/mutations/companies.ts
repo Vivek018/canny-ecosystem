@@ -133,9 +133,7 @@ export async function deleteCompany({
   const { error, status } = await supabase
     .from("companies")
     .delete()
-    .eq("id", id)
-    .select()
-    .single();
+    .eq("id", id);
 
   if (error) {
     console.error(error);
@@ -321,9 +319,7 @@ export async function deleteLocation({
   const { error, status } = await supabase
     .from("company_locations")
     .delete()
-    .eq("id", id)
-    .select()
-    .single();
+    .eq("id", id);
 
   if (error) {
     console.error(error);
@@ -422,9 +418,7 @@ export async function deleteRelationship({
   const { error, status } = await supabase
     .from("company_relationships")
     .delete()
-    .eq("id", id)
-    .select()
-    .single();
+    .eq("id", id);
 
   if (error) {
     console.error(error);

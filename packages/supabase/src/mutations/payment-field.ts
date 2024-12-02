@@ -95,9 +95,7 @@ export async function deletePaymentField({
   const { error, status } = await supabase
     .from("payment_fields")
     .delete()
-    .eq("id", id)
-    .select()
-    .single();
+    .eq("id", id);
 
   if (error) {
     console.error(error);

@@ -97,9 +97,7 @@ export async function deleteProject({
   const { error, status } = await supabase
     .from("projects")
     .delete()
-    .eq("id", id)
-    .select()
-    .single();
+    .eq("id", id);
 
   if (error) {
     console.error(error);
@@ -205,9 +203,7 @@ export async function deleteSite({
   const { error, status } = await supabase
     .from("project_sites")
     .delete()
-    .eq("id", id)
-    .select()
-    .single();
+    .eq("id", id);
 
   if (error) {
     console.error(error);
