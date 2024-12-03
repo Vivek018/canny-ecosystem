@@ -14,9 +14,16 @@ import {
   getSiteNamesByProjectNameAndCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
+import { Spinner } from "@canny_ecosystem/ui/spinner";
 import { extractJsonFromString } from "@canny_ecosystem/utils";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { json, Outlet, redirect, useLoaderData } from "@remix-run/react";
+import {
+  json,
+  Outlet,
+  redirect,
+  useLoaderData,
+  useNavigation,
+} from "@remix-run/react";
 
 const pageSize = 20;
 
@@ -201,6 +208,8 @@ export default function EmployeesIndex() {
 
   const filterList = { ...filters, name: query };
   const noFilters = Object.values(filterList).every((value) => !value);
+  const navigation = useNavigation();
+  const isLoading = navigation.state === "loading";
 
   return (
     <section className="py-6 px-4">
@@ -227,7 +236,14 @@ export default function EmployeesIndex() {
         companyId={companyId}
         env={env}
       />
-      <Outlet />
+
+      {isLoading ? (
+        <div className="h-1/2 flex items-center justify-center">
+          <Spinner size={50} />
+        </div>
+      ) : (
+        <Outlet />
+      )}
     </section>
   );
 }

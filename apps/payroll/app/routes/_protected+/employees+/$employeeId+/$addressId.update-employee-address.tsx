@@ -22,56 +22,82 @@ export const UPDATE_EMPLOYEE_ADDRESS = "update-employee-address";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const addressId = params.addressId;
-  const { supabase } = getSupabaseWithHeaders({ request });
+  const employeeId = params.employeeId;
 
-  let data = null;
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
 
-  if (addressId) {
-    data = (await getEmployeeAddressById({ supabase, id: addressId })).data;
+    let data = null;
+
+    if (addressId) {
+      data = (await getEmployeeAddressById({ supabase, id: addressId })).data;
+    }
+
+    return json({
+      status: "success",
+      message: "Employee address found",
+      data,
+      error: null,
+      employeeId,
+    });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      data: null,
+      error,
+      employeeId,
+    }, { status: 500 });
   }
-
-  return json({ data });
 }
 
 export async function action({
   request,
 }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
 
-  const submission = parseWithZod(formData, {
-    schema: EmployeeAddressesSchema,
-  });
-
-  if (submission.status !== "success") {
-    return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
-    );
-  }
-
-  const { status, error } = await updateEmployeeAddress({
-    supabase,
-    data: submission.value,
-  });
-
-  if (isGoodStatus(status)) {
-    return json({
-      status: "success",
-      message: "Employee address updated successfully",
-      error: null,
+    const submission = parseWithZod(formData, {
+      schema: EmployeeAddressesSchema,
     });
-  }
 
-  return json({
-    status: "error",
-    message: "Failed to update employee address",
-    error,
-  });
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+
+    const { status, error } = await updateEmployeeAddress({
+      supabase,
+      data: submission.value,
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Employee address updated successfully",
+        error: null,
+      });
+    }
+
+    return json({
+      status: "error",
+      message: "Failed to update employee address",
+      error,
+    });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+    }, { status: 500 });
+  }
 }
 
 export default function UpdateEmployeeAddress() {
-  const { data } = useLoaderData<typeof loader>();
+  const { data, employeeId } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
   const currentSchema = EmployeeAddressesSchema;
@@ -106,7 +132,7 @@ export default function UpdateEmployeeAddress() {
           variant: "destructive",
         });
       }
-      navigate(-1);
+      navigate(`/employees/${employeeId}`);
     }
   }, [actionData]);
 

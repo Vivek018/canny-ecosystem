@@ -7,37 +7,56 @@ import { json, type ActionFunctionArgs } from "@remix-run/node";
 import { useActionData, useNavigate } from "@remix-run/react";
 import { useEffect } from "react";
 
-export async function action({ request, params }: ActionFunctionArgs): Promise<Response> {
+export async function action({
+  request,
+  params,
+}: ActionFunctionArgs): Promise<Response> {
   const projectId = params.projectId;
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
 
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
+    const submission = parseWithZod(formData, {
+      schema: SitePaySequenceSchema,
+    });
 
-  const submission = parseWithZod(formData, {
-    schema: SitePaySequenceSchema,
-  });
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
 
-  if (submission.status !== "success") {
+    const { status, error } = await updateSitePaySequence({
+      supabase,
+      data: submission.value,
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Pay sequence updated",
+        error: null,
+        projectId,
+      });
+    }
     return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      {
+        status: "error",
+        message: "Pay sequence update failed",
+        error,
+        projectId,
+      },
+      { status: 500 },
     );
-  }
-
-  const { status, error } = await updateSitePaySequence({
-    supabase,
-    data: submission.value,
-  });
-
-  if (isGoodStatus(status)) {
+  } catch (error) {
     return json({
-      status: "success",
-      message: "Pay sequence updated",
-      error: null,
-      projectId
-    })
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+      projectId,
+    });
   }
-  return json({ status: "error", message: "Pay sequence update failed", error, projectId }, { status: 500 });
 }
 
 export default function EditPaySequence() {
@@ -60,8 +79,8 @@ export default function EditPaySequence() {
           variant: "destructive",
         });
       }
-      navigate(-1);
+      navigate(`/projects/${actionData?.projectId}/sites`);
     }
   }, []);
-  return null
+  return null;
 }

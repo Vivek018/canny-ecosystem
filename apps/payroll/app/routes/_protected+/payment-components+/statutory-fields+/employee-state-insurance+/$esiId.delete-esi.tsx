@@ -10,28 +10,36 @@ export async function action({
   request,
   params,
 }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const esiId = params.esiId;
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const esiId = params.esiId;
 
-  const { status, error } = await deleteStateInsurence({
-    supabase,
-    id: esiId ?? "",
-    bypassAuth: true,
-  });
-
-  if (isGoodStatus(status)) {
-    return json({
-      status: "success",
-      message: "Employee State Insurance deleted successfully",
-      error: null,
+    const { status, error } = await deleteStateInsurence({
+      supabase,
+      id: esiId ?? "",
+      bypassAuth: true,
     });
-  }
 
-  return json({
-    status: "error",
-    message: "Failed to delete Employee State Insurance",
-    error,
-  });
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Employee State Insurance deleted successfully",
+        error: null,
+      });
+    }
+
+    return json({
+      status: "error",
+      message: "Failed to delete Employee State Insurance",
+      error,
+    });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+    }, { status: 500 });
+  }
 }
 
 export default function DeleteEmployeeStateInsurance() {
@@ -57,7 +65,9 @@ export default function DeleteEmployeeStateInsurance() {
       });
     }
 
-    navigate("/payment-components/statutory-fields/employee-state-insurance", { replace: true });
+    navigate("/payment-components/statutory-fields/employee-state-insurance", {
+      replace: true,
+    });
   }, [actionData]);
   return null;
 }

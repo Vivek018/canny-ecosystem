@@ -10,25 +10,33 @@ export async function action({
   request,
   params,
 }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const locationId = params.locationId;
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const locationId = params.locationId;
 
-  const { status, error } = await deleteLocation({
-    supabase,
-    id: locationId ?? "",
-  });
-
-  if (isGoodStatus(status))
-    return json({
-      status: "success",
-      message: "Location deleted",
-      error: null,
+    const { status, error } = await deleteLocation({
+      supabase,
+      id: locationId ?? "",
     });
 
-  return json(
-    { status: "error", message: "Location delete failed", error },
-    { status: 500 },
-  );
+    if (isGoodStatus(status))
+      return json({
+        status: "success",
+        message: "Location deleted",
+        error: null,
+      });
+
+    return json(
+      { status: "error", message: "Location delete failed", error },
+      { status: 500 },
+    );
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+    });
+  }
 }
 
 export default function DeleteLocation() {

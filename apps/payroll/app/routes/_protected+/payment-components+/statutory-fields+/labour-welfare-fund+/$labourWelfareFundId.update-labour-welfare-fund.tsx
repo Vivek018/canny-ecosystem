@@ -16,68 +16,90 @@ import { useEffect } from "react";
 
 export const UPDATE_LABOUR_WELFARE_FUND = "update-labour-welfare-fund";
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
-  const labourWelfareFundId = params.labourWelfareFundId;
-  const { supabase } = getSupabaseWithHeaders({ request });
+export async function loader({
+  request,
+  params,
+}: LoaderFunctionArgs): Promise<Response> {
+  try {
+    const labourWelfareFundId = params.labourWelfareFundId;
+    const { supabase } = getSupabaseWithHeaders({ request });
 
-  let labourWelfareFundData = null;
+    let labourWelfareFundData = null;
 
-  if (labourWelfareFundId) {
-    labourWelfareFundData = await getLabourWelfareFundById({
-      supabase,
-      id: labourWelfareFundId,
+    if (labourWelfareFundId) {
+      labourWelfareFundData = await getLabourWelfareFundById({
+        supabase,
+        id: labourWelfareFundId,
+      });
+    }
+
+    if (labourWelfareFundData?.error) {
+      return json({
+        status: "error",
+        message: "Failed to load data",
+        data: labourWelfareFundData?.data,
+        error: labourWelfareFundData.error,
+      });
+    }
+
+    return json({
+      status: "success",
+      message: "Labour Welfare Fund loaded successfully",
+      data: labourWelfareFundData?.data,
+      error: null,
     });
-  }
-
-  if (labourWelfareFundData?.error) {
+  } catch (error) {
     return json({
       status: "error",
       message: "Failed to load data",
-      data: labourWelfareFundData?.data,
-      error: labourWelfareFundData.error,
-    });
+      data: null,
+      error,
+    }, { status: 500 });
   }
-
-  return json({
-    status: "success",
-    message: "Labour Welfare Fund loaded successfully",
-    data: labourWelfareFundData?.data,
-    error: null,
-  });
 }
 
-export async function action({ request }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
 
-  const submission = parseWithZod(formData, {
-    schema: LabourWelfareFundSchema,
-  });
-
-  if (submission.status !== "success") {
-    return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
-    );
-  }
-
-  const { status, error } = await updateLabourWelfareFund({
-    supabase,
-    data: submission.value,
-  });
-
-  if (isGoodStatus(status))
-    return json({
-      status: "success",
-      message: "Labour Welfare Fund updated successfully",
-      error: null,
+    const submission = parseWithZod(formData, {
+      schema: LabourWelfareFundSchema,
     });
 
-  return json({
-    status: "error",
-    message: "Failed to update Labour Welfare Fund",
-    error,
-  });
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+
+    const { status, error } = await updateLabourWelfareFund({
+      supabase,
+      data: submission.value,
+    });
+
+    if (isGoodStatus(status))
+      return json({
+        status: "success",
+        message: "Labour Welfare Fund updated successfully",
+        error: null,
+      });
+
+    return json({
+      status: "error",
+      message: "Failed to update Labour Welfare Fund",
+      error,
+    });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "Failed to update Labour Welfare Fund",
+      error,
+    }, { status: 500 });
+  }
 }
 
 export default function UpdateLocation() {
@@ -93,7 +115,7 @@ export default function UpdateLocation() {
         description: error?.message || "Failed to load",
         variant: "destructive",
       });
-      navigate(-1);
+      navigate("/payment-components/statutory-fields/labour-welfare-fund");
     }
 
     if (!actionData) return;
@@ -112,7 +134,7 @@ export default function UpdateLocation() {
         variant: "destructive",
       });
     }
-    navigate("/payment-components/statutory-fields/labour-welfare-fund", { replace: true });
+    navigate("/payment-components/statutory-fields/labour-welfare-fund");
   }, [actionData]);
 
   return <CreateLabourWelfareFund updateValues={data} />;

@@ -6,27 +6,38 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { json, useActionData, useNavigate } from "@remix-run/react";
 import { useEffect } from "react";
 
-export async function action({ request, params }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
+export async function action({
+  request,
+  params,
+}: ActionFunctionArgs): Promise<Response> {
   const employeeId = params.employeeId;
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
 
-  const { status, error } = await deleteEmployee({
-    supabase,
-    id: employeeId ?? "",
-  });
+    const { status, error } = await deleteEmployee({
+      supabase,
+      id: employeeId ?? "",
+    });
 
-  if (isGoodStatus(status)) {
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Employee deleted successfully",
+        error: null,
+      });
+    }
+
+    return json(
+      { status: "error", message: "Failed to delete employee", error },
+      { status: 500 },
+    );
+  } catch (error) {
     return json({
-      status: "success",
-      message: "Employee deleted successfully",
-      error: null,
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
     });
   }
-
-  return json(
-    { status: "error", message: "Failed to delete employee", error },
-    { status: 500 },
-  );
 }
 
 export default function DeleteEmployee() {
@@ -49,7 +60,7 @@ export default function DeleteEmployee() {
           variant: "destructive",
         });
       }
-      navigate(-1);
+      navigate("/employees");
     }
   }, [actionData]);
 

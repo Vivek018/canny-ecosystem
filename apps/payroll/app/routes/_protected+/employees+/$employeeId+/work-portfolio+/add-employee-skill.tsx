@@ -43,63 +43,86 @@ export const ADD_EMPLOYEE_SKILL = "add-employee-skill";
 export async function loader({ params }: LoaderFunctionArgs) {
   const employeeId = params.employeeId;
 
-  if (!employeeId)
+  try {
+    if (!employeeId)
+      return json({
+        status: "error",
+        message: "No employee id found",
+        employeeId,
+      });
+
     return json({
-      status: "error",
-      message: "No employee id found",
+      status: "success",
+      message: "Employee id found",
       employeeId,
     });
-
-  return json({ status: "success", message: "Employee id found", employeeId });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "Failed to get employee id",
+      error,
+      employeeId
+    });
+  }
 }
 
 export async function action({
   request,
   params,
 }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
-
   const employeeId = params.employeeId;
-  if (!employeeId) {
+
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
+
+    if (!employeeId) {
+      return json({
+        status: "error",
+        message: "Invalid employee id",
+        returnTo: "/employees",
+      });
+    }
+
+    const submission = parseWithZod(formData, {
+      schema: EmployeeSkillsSchema,
+    });
+
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+
+    const { status, error } = await createEmployeeSkill({
+      supabase,
+      data: { ...submission.value, employee_id: employeeId },
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Successfully created employee skill",
+        error: null,
+        returnTo: `/employees/${employeeId}/work-portfolio`,
+      });
+    }
+
     return json({
       status: "error",
-      message: "Invalid employee id",
-      returnTo: "/employees",
+      message: "Failed to create employee skill",
+      error,
+      returnTo: `/employees/${employeeId}/work-portfolio`,
     });
-  }
-
-  const submission = parseWithZod(formData, {
-    schema: EmployeeSkillsSchema,
-  });
-
-  if (submission.status !== "success") {
-    return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
-    );
-  }
-
-  const { status, error } = await createEmployeeSkill({
-    supabase,
-    data: { ...submission.value, employee_id: employeeId },
-  });
-
-  if (isGoodStatus(status)) {
+  } catch (error) {
     return json({
-      status: "success",
-      message: "Successfully created employee skill",
-      error: null,
+      status: "error",
+      message: "Failed to create employee skill",
+      error,
       returnTo: `/employees/${employeeId}/work-portfolio`,
     });
   }
-
-  return json({
-    status: "error",
-    message: "Failed to create employee skill",
-    error,
-    returnTo: `/employees/${employeeId}/work-portfolio`,
-  });
 }
 
 export default function AddEmployeeSkill({
@@ -142,7 +165,7 @@ export default function AddEmployeeSkill({
         description: message || "Failed to load",
         variant: "destructive",
       });
-      navigate(-1);
+      navigate(`/employees/${employeeId}/work-portfolio`);
     }
     if (actionData) {
       if (actionData.status === "success") {

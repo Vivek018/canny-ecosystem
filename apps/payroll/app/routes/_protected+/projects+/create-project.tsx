@@ -32,7 +32,6 @@ import {
   useNavigate,
 } from "@remix-run/react";
 import { json } from "@remix-run/node";
-import { safeRedirect } from "@/utils/server/http.server";
 import {
   Card,
   CardContent,
@@ -55,73 +54,97 @@ export const CREATE_PROJECT = "create-project";
 export async function loader({
   request,
 }: LoaderFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data: companies, error } = await getCompanies({ supabase });
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    const { data: companies, error } = await getCompanies({ supabase });
 
-  if (error) {
-    return json(
-      {
-        status: "error",
-        message: "Failed to get companies",
-        error,
-        data: null,
-      },
-      { status: 500 },
-    );
+    if (error) {
+      return json(
+        {
+          status: "error",
+          message: "Failed to get companies",
+          error,
+          data: null,
+        },
+        { status: 500 },
+      );
+    }
+
+    if (!companies) {
+      return json(
+        {
+          status: "error",
+          message: "No companies found",
+          error: "No companies found",
+          data: null,
+        },
+        { status: 400 },
+      );
+    }
+
+    const companyOptions = companies
+      .filter((company) => company.id !== companyId)
+      .map((company) => ({ label: company.name, value: company.id }));
+
+    return json({
+      status: "success",
+      message: "Companies found",
+      error: null,
+      companyId,
+      companyOptions,
+    });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An error occurred",
+      error,
+      data: null,
+    }, { status: 500 });
   }
-
-  if (!companies) {
-    return json(
-      {
-        status: "error",
-        message: "No companies found",
-        error: "No companies found",
-        data: null,
-      },
-      { status: 400 },
-    );
-  }
-
-  const companyOptions = companies
-    .filter((company) => company.id !== companyId)
-    .map((company) => ({ label: company.name, value: company.id }));
-
-  return json({
-    status: "success",
-    message: "Companies found",
-    error: null,
-    companyId,
-    companyOptions,
-  });
 }
 
 export async function action({
   request,
 }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
 
-  const submission = parseWithZod(formData, {
-    schema: ProjectSchema,
-  });
+    const submission = parseWithZod(formData, {
+      schema: ProjectSchema,
+    });
 
-  if (submission.status !== "success") {
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+
+    const { status, error } = await createProject({
+      supabase,
+      data: submission.value,
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Project created",
+        error: null,
+      });
+    }
     return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: "error", message: "Project creation failed", error },
+      { status: 500 },
     );
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An error occurred",
+      error,
+    }, { status: 500 });
   }
-
-  const { status, error } = await createProject({
-    supabase,
-    data: submission.value,
-  });
-
-  if (isGoodStatus(status)) {
-    return json({ status: "success", message: "Project created", error: null });
-  }
-  return json({ status: "error", message: "Project creation failed", error }, { status: 500 });
 }
 
 export default function CreateProject({
@@ -167,7 +190,6 @@ export default function CreateProject({
 
     if (actionData) {
       if (actionData?.status === "success") {
-        console.log("=====");
         toast({
           title: "Success",
           description: actionData?.message,

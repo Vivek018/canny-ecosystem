@@ -10,26 +10,42 @@ export async function action({
   request,
   params,
 }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
   const guardianId = params.guardianId;
+  const employeeId = params.employeeId;
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
 
-  const { status, error } = await deleteEmployeeGuardian({
-    supabase,
-    id: guardianId ?? "",
-  });
+    const { status, error } = await deleteEmployeeGuardian({
+      supabase,
+      id: guardianId ?? "",
+    });
 
-  if (isGoodStatus(status)) {
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Employee guardian deleted successfully",
+        error: null,
+        employeeId,
+      });
+    }
+
+    return json(
+      {
+        status: "error",
+        message: "Failed to delete employee guardian",
+        error,
+        employeeId,
+      },
+      { status: 500 },
+    );
+  } catch (error) {
     return json({
-      status: "success",
-      message: "Employee guardian deleted successfully",
-      error: null,
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+      employeeId,
     });
   }
-
-  return json(
-    { status: "error", message: "Failed to delete employee guardian", error },
-    { status: 500 },
-  );
 }
 
 export default function DeleteEmployeeGuardian() {
@@ -52,7 +68,7 @@ export default function DeleteEmployeeGuardian() {
           variant: "destructive",
         });
       }
-      navigate(-1);
+      navigate(`/employees/${actionData?.employeeId}`);
     }
   }, [actionData]);
 

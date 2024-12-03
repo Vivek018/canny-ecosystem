@@ -18,36 +18,40 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 export async function loader({
   request,
 }: LoaderFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data, error } = await getPaymentFieldsByCompanyId({
-    supabase,
-    companyId,
-  });
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    const { data, error } = await getPaymentFieldsByCompanyId({
+      supabase,
+      companyId,
+    });
 
-  if (error) {
-    return json(
-      { status: "error", message: error.message, error, data },
-      { status: 500 },
-    );
-  }
+    if (error) {
+      return json(
+        { status: "error", message: error.message, error, data },
+        { status: 500 },
+      );
+    }
 
-  if (!data || data.length === 0) {
-    return json(
-      {
+    if (!data || data.length === 0) {
+      return json({
         status: "info",
         message: "No payment fields found for this company",
         data,
-      },
-      { status: 404 },
+      });
+    }
+
+    return json({
+      status: "success",
+      message: "Payment fields loaded successfully",
+      data,
+    });
+  } catch (error) {
+    return json(
+      { status: "error", message: "Failed to load data", error },
+      { status: 500 },
     );
   }
-
-  return json({
-    status: "success",
-    message: "Payment fields loaded successfully",
-    data,
-  });
 }
 
 export default function PaymentFieldsIndex() {

@@ -8,34 +8,44 @@ import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { type LoaderFunctionArgs, json } from "@remix-run/node";
-import { Link, useLoaderData, useNavigate } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import { useEffect } from "react";
 
 export const EMPLOYEE_EPF_PERCENTAGE = 0.12;
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { supabase } = getSupabaseWithHeaders({ request });
+export const loader = async ({
+  request,
+}: LoaderFunctionArgs): Promise<Response> => {
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
 
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data, error } = await getEmployeeProvidentFundByCompanyId({
-    supabase,
-    companyId,
-  });
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    const { data, error } = await getEmployeeProvidentFundByCompanyId({
+      supabase,
+      companyId,
+    });
 
-  if (error)
+    if (error)
+      return json({
+        status: "error",
+        message: "Failed to load data",
+        error,
+        data,
+      });
+
+    return json({
+      status: "success",
+      message: "Employee Provident Fund",
+      error: null,
+      data,
+    });
+  } catch (error) {
     return json({
       status: "error",
       message: "Failed to load data",
       error,
-      data,
-    });
-
-  return json({
-    status: "success",
-    message: "Employee Provident Fund",
-    error: null,
-    data,
-  });
+    }, { status: 500 });
+  }
 };
 
 type DetailItemProps = {
@@ -66,7 +76,7 @@ export default function EmployeeProvidentFundIndex() {
     : `${(data?.employer_contribution ?? EMPLOYEE_EPF_PERCENTAGE) * 100}% of Actual Wage`;
 
   useEffect(() => {
-    if (status === "error") {
+    if (status === "error" && error?.code !== "PGRST116") {
       toast({
         title: "Error",
         description: error?.message || "Failed to load data",

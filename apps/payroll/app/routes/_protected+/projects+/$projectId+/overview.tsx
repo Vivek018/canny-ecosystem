@@ -16,39 +16,48 @@ export async function loader({
 }: LoaderFunctionArgs): Promise<Response> {
   const projectId = params.projectId;
 
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-  const { data, error } = await getProjectById({
-    supabase,
-    id: projectId ?? "",
-    companyId,
-  });
+    const { data, error } = await getProjectById({
+      supabase,
+      id: projectId ?? "",
+      companyId,
+    });
 
-  if (error) {
+    if (error) {
+      return json({
+        status: "error",
+        message: "Failed to get project",
+        error,
+        data: null,
+      });
+    }
+
+    if (!data) {
+      return json({
+        status: "error",
+        message: "Project not found",
+        error: null,
+        data: null,
+      });
+    }
+
+    return json({
+      status: "success",
+      message: "Project found",
+      error: null,
+      data,
+    });
+  } catch (error) {
     return json({
       status: "error",
-      message: "Failed to get project",
+      message: "An unexpected error occurred",
       error,
       data: null,
-    });
+    }, { status: 500 });
   }
-
-  if (!data) {
-    return json({
-      status: "error",
-      message: "Project not found",
-      error: null,
-      data: null,
-    });
-  }
-
-  return json({
-    status: "success",
-    message: "Project found",
-    error: null,
-    data,
-  });
 }
 
 export default function ProjectIndex() {

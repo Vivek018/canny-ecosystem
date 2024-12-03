@@ -10,30 +10,42 @@ export async function action({
   request,
   params,
 }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
   const workHistoryId = params.workHistoryId;
+  const employeeId = params.employeeId;
 
-  const { status, error } = await deleteEmployeeWorkHistory({
-    supabase,
-    id: workHistoryId ?? "",
-  });
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const { status, error } = await deleteEmployeeWorkHistory({
+      supabase,
+      id: workHistoryId ?? "",
+    });
 
-  if (isGoodStatus(status)) {
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Employee work history deleted successfully",
+        error: null,
+        employeeId,
+      });
+    }
+
+    return json(
+      {
+        status: "error",
+        message: "Failed to delete employee work history",
+        error,
+        employeeId,
+      },
+      { status: 500 },
+    );
+  } catch (error) {
     return json({
-      status: "success",
-      message: "Employee work history deleted successfully",
-      error: null,
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+      employeeId,
     });
   }
-
-  return json(
-    {
-      status: "error",
-      message: "Failed to delete employee work history",
-      error,
-    },
-    { status: 500 },
-  );
 }
 
 export default function DeleteWorkHistory() {
@@ -57,7 +69,7 @@ export default function DeleteWorkHistory() {
           variant: "destructive",
         });
       }
-      navigate(-1);
+      navigate(`/employees/${actionData?.employeeId}/work-portfolio`);
     }
   }, [actionData]);
 

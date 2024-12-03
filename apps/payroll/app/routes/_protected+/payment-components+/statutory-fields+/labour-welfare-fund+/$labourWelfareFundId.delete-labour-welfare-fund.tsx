@@ -10,27 +10,35 @@ export async function action({
   request,
   params,
 }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const labourWelfareFundId = params.labourWelfareFundId;
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const labourWelfareFundId = params.labourWelfareFundId;
 
-  const { status, error } = await deleteLabourWelfareFund({
-    supabase,
-    id: labourWelfareFundId ?? "",
-  });
-
-  if (isGoodStatus(status)) {
-    return json({
-      status: "success",
-      message: "Labour Welfare Fund deleted successfully",
-      error: null,
+    const { status, error } = await deleteLabourWelfareFund({
+      supabase,
+      id: labourWelfareFundId ?? "",
     });
-  }
 
-  return json({
-    status: "error",
-    message: "Failed to delete Labour Welfare Fund",
-    error,
-  });
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Labour Welfare Fund deleted successfully",
+        error: null,
+      });
+    }
+
+    return json({
+      status: "error",
+      message: "Failed to delete Labour Welfare Fund",
+      error,
+    });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+    }, { status: 500 });
+  }
 }
 
 export default function DeleteLabourWelfareFund() {
@@ -54,7 +62,9 @@ export default function DeleteLabourWelfareFund() {
           variant: "destructive",
         });
       }
-      navigate("/payment-components/statutory-fields/labour-welfare-fund", { replace: true });
+      navigate("/payment-components/statutory-fields/labour-welfare-fund", {
+        replace: true,
+      });
     }
   }, [actionData]);
 

@@ -10,30 +10,35 @@ export async function action({
   request,
   params,
 }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const sbId = params.sbId;
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const sbId = params.sbId;
 
-  const { status, error } = await deleteStatutoryBonus({
-    supabase,
-    id: sbId ?? "",
-  });
-
-
-  if (isGoodStatus(status)) {
-    return json({
-      status: 'success',
-      message: "Statutory Bonus deleted successfully",
-      error: null,
+    const { status, error } = await deleteStatutoryBonus({
+      supabase,
+      id: sbId ?? "",
     });
-  }
 
-  return json(
-    {
-      status: 'error',
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Statutory Bonus deleted successfully",
+        error: null,
+      });
+    }
+
+    return json({
+      status: "error",
       message: "Failed to delete Statutory Bonus",
       error,
-    },
-  );
+    });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+    }, { status: 500 });
+  }
 }
 
 export default function DeleteStatutoryBonus() {

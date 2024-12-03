@@ -21,12 +21,15 @@ export async function action({
   request,
   params,
 }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
 
   const employeeId = params.employeeId;
-  if (!employeeId) {
-    return json({
+  
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
+    
+    if (!employeeId) {
+      return json({
       status: "error",
       message: "Invalid employee id",
       returnTo: "/employees",
@@ -43,7 +46,7 @@ export async function action({
       { status: submission.status === "error" ? 400 : 200 },
     );
   }
-
+  
   const { status, error } = await createEmployeeAddresses({
     supabase,
     data: { ...submission.value, employee_id: employeeId },
@@ -58,6 +61,13 @@ export async function action({
     });
   }
   return json({ status, error });
+} catch (error) {
+  return json({
+    status: "error",
+    message: "An unexpected error occurred",
+    error,
+  })
+}
 }
 
 export default function AddEmployeeAddress() {
@@ -89,15 +99,14 @@ export default function AddEmployeeAddress() {
           description: actionData?.message || "Address added",
           variant: "success",
         });
-        navigate(-1);
       } else {
         toast({
           title: "Error",
           description: actionData?.error?.message || "Address add failed",
           variant: "destructive",
         });
-        navigate(actionData?.returnTo ?? -1);
       }
+      navigate(actionData?.returnTo ?? -1);
     }
   }, [actionData]);
 

@@ -58,38 +58,46 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export async function action({
   request,
 }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
 
-  const submission = parseWithZod(formData, {
-    schema: ProfessionalTaxSchema,
-  });
-
-  if (submission.status !== "success") {
-    return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
-    );
-  }
-
-  const { status, error } = await createProfessionalTax({
-    supabase,
-    data: submission.value as any,
-  });
-
-  if (isGoodStatus(status)) {
-    return json({
-      status: "success",
-      message: "Professional Tax created successfully",
-      error: null,
+    const submission = parseWithZod(formData, {
+      schema: ProfessionalTaxSchema,
     });
-  }
 
-  return json({
-    status: "error",
-    message: "Error creating Professional Tax",
-    error,
-  });
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+
+    const { status, error } = await createProfessionalTax({
+      supabase,
+      data: submission.value as any,
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Professional Tax created successfully",
+        error: null,
+      });
+    }
+
+    return json({
+      status: "error",
+      message: "Error creating Professional Tax",
+      error,
+    });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+    }, { status: 500 });
+  }
 }
 
 export default function CreateProfessionalTax({

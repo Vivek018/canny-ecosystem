@@ -1,4 +1,3 @@
-import { safeRedirect } from "@/utils/server/http.server";
 import { deleteProject } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
@@ -8,26 +7,35 @@ import { json, useActionData, useNavigate } from "@remix-run/react";
 import { useEffect } from "react";
 
 export async function action({ request, params }: ActionFunctionArgs) {
-  const { supabase, headers } = getSupabaseWithHeaders({ request });
   const projectId = params.projectId;
 
-  const { status, error } = await deleteProject({
-    supabase,
-    id: projectId ?? "",
-  });
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
 
-  if (isGoodStatus(status)) {
-    return json({
-      status: "success",
-      message: "Project deleted",
-      error: null,
+    const { status, error } = await deleteProject({
+      supabase,
+      id: projectId ?? "",
     });
-  }
 
-  return json(
-    { status: "error", message: "Failed to delete project", error },
-    { status: 500 },
-  );
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Project deleted",
+        error: null,
+      });
+    }
+
+    return json(
+      { status: "error", message: "Failed to delete project", error },
+      { status: 500 },
+    );
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+    }, { status: 500 });
+  }
 }
 
 export default function DeleteProject() {

@@ -25,35 +25,50 @@ export const UPDATE_BANK_DETAILS = "update-employee-bank-details";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const employeeId = params.employeeId;
-  const { supabase } = getSupabaseWithHeaders({ request });
 
-  let data: any;
-  let error: any;
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
 
-  if (employeeId) {
-    ({ data, error } = await getEmployeeBankDetailsById({
-      supabase,
-      id: employeeId,
-    }));
-  }
+    let data: any;
+    let error: any;
 
-  if (!data)
+    if (employeeId) {
+      ({ data, error } = await getEmployeeBankDetailsById({
+        supabase,
+        id: employeeId,
+      }));
+    }
+
+    if (!data)
+      return json({
+        status: "error",
+        message: "Failed to get employee bank details",
+        data,
+        error,
+        employeeId,
+      });
+
+    return json({
+      status: "success",
+      message: "Employee bank details found",
+      data,
+      error: null,
+      employeeId,
+    });
+  } catch (error) {
     return json({
       status: "error",
-      message: "Failed to get employee bank details",
-      data,
+      message: "An unexpected error occurred",
       error,
+      data: null,
+      employeeId,
     });
-
-  return json({
-    status: "success",
-    message: "Employee bank details found",
-    data,
-    error: null,
-  });
+  }
 }
 
-export async function action({ request }: ActionFunctionArgs): Promise<Response> {
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
 
@@ -88,7 +103,7 @@ export async function action({ request }: ActionFunctionArgs): Promise<Response>
 }
 
 export default function UpdateEmployeeBankDetails() {
-  const { data, status, message } = useLoaderData<typeof loader>();
+  const { data, status, message, employeeId } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
   const currentSchema = EmployeeBankDetailsSchema;
@@ -111,11 +126,10 @@ export default function UpdateEmployeeBankDetails() {
     if (status === "error") {
       toast({
         title: "Error",
-        description:
-          message || "Failed to get employee bank details",
+        description: message || "Failed to get employee bank details",
         variant: "destructive",
       });
-      navigate(-1);
+      navigate(`/employees/${employeeId}/work-portfolio`);
     }
     if (actionData) {
       if (actionData?.status === "success") {
@@ -132,7 +146,7 @@ export default function UpdateEmployeeBankDetails() {
           variant: "destructive",
         });
       }
-      navigate(-1);
+      navigate(`/employees/${employeeId}/work-portfolio`);
     }
   }, [actionData]);
 

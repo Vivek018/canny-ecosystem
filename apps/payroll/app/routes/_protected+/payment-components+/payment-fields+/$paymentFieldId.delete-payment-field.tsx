@@ -10,29 +10,37 @@ export async function action({
   request,
   params,
 }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const paymentFieldId = params.paymentFieldId;
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const paymentFieldId = params.paymentFieldId;
 
-  const { status, error } = await deletePaymentField({
-    supabase,
-    id: paymentFieldId ?? "",
-  });
-
-  if (isGoodStatus(status))
-    return json({
-      status: "success",
-      message: "Payment Field deleted",
-      error: null,
+    const { status, error } = await deletePaymentField({
+      supabase,
+      id: paymentFieldId ?? "",
     });
 
-  return json(
-    {
+    if (isGoodStatus(status))
+      return json({
+        status: "success",
+        message: "Payment Field deleted",
+        error: null,
+      });
+
+    return json(
+      {
+        status: "error",
+        message: "Payment Field delete failed",
+        error,
+      },
+      { status: 500 },
+    );
+  } catch (error) {
+    return json({
       status: "error",
-      message: "Payment Field delete failed",
+      message: "An unexpected error occurred",
       error,
-    },
-    { status: 500 },
-  );
+    }, { status: 500 });
+  }
 }
 
 export default function DeletePaymentField() {
@@ -52,7 +60,8 @@ export default function DeletePaymentField() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.error?.message || "Payment Field delete failed",
+          description:
+            actionData?.error?.message || "Payment Field delete failed",
           variant: "destructive",
         });
       }

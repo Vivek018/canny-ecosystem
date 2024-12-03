@@ -19,38 +19,49 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { useEffect } from "react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
 
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-  const { data, error } = await getRelationshipsByCompanyId({
-    supabase,
-    companyId,
-  });
+    const { data, error } = await getRelationshipsByCompanyId({
+      supabase,
+      companyId,
+    });
 
-  if (error) {
-    return json(
-      { status: "error", message: error.message, error, data },
-      { status: 500 },
-    );
+    if (error) {
+      return json(
+        { status: "error", message: error.message, error, data },
+        { status: 500 },
+      );
+    }
+
+    if (!data || data.length === 0) {
+      return json(
+        {
+          status: "info",
+          message: "No relationships found for this company",
+          data,
+          error: null,
+        },
+        { status: 404 },
+      );
+    }
+
+    return json({
+      status: "success",
+      message: "Relationships found",
+      data,
+      error: null,
+    });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+      data: null,
+    });
   }
-
-  if (!data || data.length === 0) {
-    return json(
-      {
-        status: "info",
-        message: "No relationships found for this company",
-        data,
-      },
-      { status: 404 },
-    );
-  }
-
-  return json({
-    status: "success",
-    message: "Relationships found",
-    data,
-  });
 }
 
 export default function Relationships() {

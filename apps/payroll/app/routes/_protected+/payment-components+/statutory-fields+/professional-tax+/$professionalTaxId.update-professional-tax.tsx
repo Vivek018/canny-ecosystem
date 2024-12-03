@@ -17,33 +17,42 @@ import { useEffect } from "react";
 export const UPDATE_PROFESSIONAL_TAX = "update-professional-tax";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const professionalTaxId = params.professionalTaxId;
-  const { supabase } = getSupabaseWithHeaders({ request });
+  try {
+    const professionalTaxId = params.professionalTaxId;
+    const { supabase } = getSupabaseWithHeaders({ request });
 
-  let professionalTaxData = null;
+    let professionalTaxData = null;
 
-  if (professionalTaxId) {
-    professionalTaxData = await getProfessionalTaxById({
-      supabase,
-      id: professionalTaxId,
+    if (professionalTaxId) {
+      professionalTaxData = await getProfessionalTaxById({
+        supabase,
+        id: professionalTaxId,
+      });
+    }
+
+    if (professionalTaxData?.error) {
+      return json({
+        status: "error",
+        message: "Failed to get Professional Tax",
+        error: professionalTaxData?.error,
+        data: professionalTaxData?.data,
+      });
+    }
+
+    return json({
+      status: "success",
+      message: "Professional Tax loaded successfully",
+      data: professionalTaxData?.data,
+      error: null,
     });
-  }
-
-  if (professionalTaxData?.error) {
+  } catch (error) {
     return json({
       status: "error",
-      message: "Failed to get Professional Tax",
-      error: professionalTaxData?.error,
-      data: professionalTaxData?.data,
-    });
+      message: "An unexpected error occurred",
+      error,
+      data: null,
+    }, { status: 500 });
   }
-
-  return json({
-    status: "success",
-    message: "Professional Tax loaded successfully",
-    data: professionalTaxData?.data,
-    error: null,
-  });
 }
 
 export async function action({

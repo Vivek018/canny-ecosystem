@@ -18,29 +18,40 @@ import { json, Link, Outlet, useLoaderData } from "@remix-run/react";
 import { useEffect } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data, error } = await getProjectsByCompanyId({
-    supabase,
-    companyId,
-  });
+export async function loader({
+  request,
+}: LoaderFunctionArgs): Promise<Response> {
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    const { data, error } = await getProjectsByCompanyId({
+      supabase,
+      companyId,
+    });
 
-  if (error) {
+    if (error) {
+      return json({
+        status: "error",
+        message: "Failed to get projects",
+        error,
+        data: null,
+      });
+    }
+
+    return json({
+      status: "success",
+      message: "Projects found",
+      error: null,
+      data,
+    });
+  } catch (error) { 
     return json({
       status: "error",
-      message: "Failed to get projects",
+      message: "An unexpected error occurred",
       error,
       data: null,
-    });
+    }, { status: 500 });
   }
-
-  return json({
-    status: "error",
-    message: "Projects found",
-    error: null,
-    data,
-  });
 }
 
 export default function ProjectsIndex() {
@@ -91,7 +102,7 @@ export default function ProjectsIndex() {
           <CommandList className="max-h-full py-6 overflow-x-visible overflow-y-visible">
             <CommandGroup className="p-0 overflow-visible">
               <div className="w-full grid gap-8 grid-cols-1">
-                {data?.map((project) => (
+                {data?.map((project: any) => (
                   <CommandItem
                     key={project.id}
                     value={

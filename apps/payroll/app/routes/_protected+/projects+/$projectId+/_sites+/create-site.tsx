@@ -54,86 +54,112 @@ export async function loader({
 }: LoaderFunctionArgs): Promise<Response> {
   const projectId = params.projectId;
 
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data: locations, error } = await getLocationsForSelectByCompanyId({
-    supabase,
-    companyId,
-  });
-
-  if (error) {
-    return json({
-      status: "error",
-      message: "Failed to get locations",
-      error,
-      locations,
-      projectId,
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    const { data: locations, error } = await getLocationsForSelectByCompanyId({
+      supabase,
+      companyId,
     });
-  }
 
-  if (!locations) {
-    return json({
-      status: "error",
-      message: "No locations found",
-      error,
-      locations,
-      projectId,
-    });
-  }
+    if (error) {
+      return json({
+        status: "error",
+        message: "Failed to get locations",
+        error,
+        locations,
+        projectId,
+      });
+    }
 
-  const locationOptions = locations.map((location) => ({
-    label: location.name,
-    value: location.id,
-  }));
+    if (!locations) {
+      return json({
+        status: "error",
+        message: "No locations found",
+        error,
+        locations,
+        projectId,
+      });
+    }
 
-  return json({
-    status: "success",
-    message: "Locations found",
-    error: null,
-    projectId,
-    locationOptions,
-  });
-}
+    const locationOptions = locations.map((location) => ({
+      label: location.name,
+      value: location.id,
+    }));
 
-export async function action({ request, params }: ActionFunctionArgs): Promise<Response> {
-  const projectId = params.projectId;
-
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
-
-  const submission = parseWithZod(formData, {
-    schema: SiteSchema,
-  });
-
-  if (submission.status !== "success") {
-    return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
-    );
-  }
-
-  const { status, error } = await createSite({
-    supabase,
-    data: submission.value as any,
-  });
-
-  if (isGoodStatus(status)) {
     return json({
       status: "success",
-      message: "Site created successfully",
+      message: "Locations found",
       error: null,
-      returnTo: `/projects/${projectId}/sites`,
+      projectId,
+      locationOptions,
     });
+  } catch (error) {
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 },
+    );
   }
-  return json(
-    {
-      status: "error",
-      message: "Site creation failed",
-      error,
-      returnTo: `/projects/${projectId}/sites`,
-    },
-    { status: 500 },
-  );
+}
+
+export async function action({
+  request,
+  params,
+}: ActionFunctionArgs): Promise<Response> {
+  const projectId = params.projectId;
+
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
+
+    const submission = parseWithZod(formData, {
+      schema: SiteSchema,
+    });
+
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+
+    const { status, error } = await createSite({
+      supabase,
+      data: submission.value as any,
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Site created successfully",
+        error: null,
+        returnTo: `/projects/${projectId}/sites`,
+      });
+    }
+    return json(
+      {
+        status: "error",
+        message: "Site creation failed",
+        error,
+        returnTo: `/projects/${projectId}/sites`,
+      },
+      { status: 500 },
+    );
+  } catch (error) {
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+        returnTo: `/projects/${projectId}/sites`,
+      },
+      { status: 500 },
+    );
+  }
 }
 
 export default function CreateSite({

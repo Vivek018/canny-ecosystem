@@ -10,26 +10,43 @@ export async function action({
   request,
   params,
 }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
   const addressId = params.addressId;
+  const employeeId = params.employeeId;
 
-  const { status, error } = await deleteEmployeeAddress({
-    supabase,
-    id: addressId ?? "",
-  });
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
 
-  if (isGoodStatus(status)) {
-    return json({
-      status: "success",
-      message: "Employee address deleted successfully",
-      error: null,
+    const { status, error } = await deleteEmployeeAddress({
+      supabase,
+      id: addressId ?? "",
     });
-  }
 
-  return json(
-    { status: "error", message: "Failed to delete employee address", error },
-    { status: 500 },
-  );
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Employee address deleted successfully",
+        error: null,
+        employeeId,
+      });
+    }
+
+    return json(
+      {
+        status: "error",
+        message: "Failed to delete employee address",
+        error,
+        employeeId,
+      },
+      { status: 500 },
+    );
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+      employeeId,
+    },  { status: 500 });
+  }
 }
 
 export default function DeleteEmployeeAddress() {
@@ -53,7 +70,7 @@ export default function DeleteEmployeeAddress() {
           variant: "destructive",
         });
       }
-      navigate(-1);
+      navigate(`/employees/${actionData?.employeeId}`);
     }
   }, [actionData]);
 

@@ -9,39 +9,48 @@ import { useLoaderData, useSearchParams } from "@remix-run/react";
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const relationshipId = params.relationshipId;
 
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-  const { data, error } = await getRelationshipTermsById({
-    supabase,
-    id: relationshipId ?? "",
-    companyId,
-  });
+    const { data, error } = await getRelationshipTermsById({
+      supabase,
+      id: relationshipId ?? "",
+      companyId,
+    });
 
-  if (error) {
+    if (error) {
+      return json({
+        status: "error",
+        message: error.message,
+        error,
+        data: null,
+      });
+    }
+
+    if (!data) {
+      return json({
+        status: "info",
+        message: "No terms found for this relationship",
+        data: null,
+        error: null,
+      });
+    }
+
+    return json({
+      status: "success",
+      message: "Terms found",
+      error: null,
+      data: data.terms,
+    });
+  } catch (error) {
     return json({
       status: "error",
-      message: error.message,
+      message: "An unexpected error occurred",
       error,
       data: null,
-    });
+    }, { status: 500 });
   }
-
-  if (!data) {
-    return json({
-      status: "info",
-      message: "No terms found for this relationship",
-      data: null,
-      error: null,
-    });
-  }
-
-  return json({
-    status: "success",
-    message: "Terms found",
-    error: null,
-    data: data.terms,
-  });
 }
 
 export default function Relationship() {

@@ -20,75 +20,95 @@ import { useEffect } from "react";
 
 export const UPDATE_EMPLOYEE_PROVIDENT_FUND = "update-employee-provident-fund";
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({
+  request,
+  params,
+}: LoaderFunctionArgs): Promise<Response> {
   const epfId = params.epfId;
-  const { supabase } = getSupabaseWithHeaders({ request });
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
 
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-  let epfData = null;
+    let epfData = null;
 
-  if (epfId) {
-    epfData = await getEmployeeProvidentFundById({
-      supabase,
-      id: epfId,
+    if (epfId) {
+      epfData = await getEmployeeProvidentFundById({
+        supabase,
+        id: epfId,
+      });
+    }
+
+    if (epfData?.error) {
+      return json({
+        status: "error",
+        message: "Failed to load data",
+        data: epfData?.data,
+        error: epfData.error,
+        companyId,
+      });
+    }
+
+    return json({
+      status: "success",
+      message: "Employee Provident Fund",
+      data: epfData?.data,
+      companyId,
+      error: null,
     });
-  }
-
-  if (epfData?.error) {
+  } catch (error) {
     return json({
       status: "error",
-      message: "Failed to load data",
-      data: epfData?.data,
-      error: epfData.error,
-      companyId,
-    });
+      message: "An unexpected error occurred",
+      error,
+      data: null,
+    }, { status: 500 });
   }
-
-  return json({
-    status: "success",
-    message: "Employee Provident Fund",
-    data: epfData?.data,
-    companyId,
-    error: null,
-  });
 }
 
 export async function action({
   request,
 }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
 
-  const submission = parseWithZod(formData, {
-    schema: EmployeeProvidentFundSchema,
-  });
-
-  if (submission.status !== "success") {
-    return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
-    );
-  }
-
-  const { status, error } = await updateEmployeeProvidentFund({
-    supabase,
-    data: submission.value,
-  });
-
-  if (isGoodStatus(status)) {
-    return json({
-      status: "success",
-      message: "Employee Provident Fund updated",
-      error: null,
+    const submission = parseWithZod(formData, {
+      schema: EmployeeProvidentFundSchema,
     });
-  }
 
-  return json({
-    status: "error",
-    message: "Failed to update Employee Provident Fund",
-    error,
-  });
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+
+    const { status, error } = await updateEmployeeProvidentFund({
+      supabase,
+      data: submission.value,
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Employee Provident Fund updated",
+        error: null,
+      });
+    }
+
+    return json({
+      status: "error",
+      message: "Failed to update Employee Provident Fund",
+      error,
+    });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+    }, { status: 500 });
+  }
 }
 
 export default function UpdateEmployeeProvidentFund() {
@@ -104,7 +124,7 @@ export default function UpdateEmployeeProvidentFund() {
         description: error?.message || "Failed to load",
         variant: "destructive",
       });
-      navigate(-1);
+      navigate("/payment-components/statutory-fields/employee-provident-fund");
     }
     if (actionData) {
       if (actionData?.status === "success") {
@@ -122,9 +142,9 @@ export default function UpdateEmployeeProvidentFund() {
           variant: "destructive",
         });
       }
-      navigate(-1);
+      navigate("/payment-components/statutory-fields/employee-provident-fund");
     }
   }, [actionData]);
-  
+
   return <CreateEmployeeProvidentFund updateValues={data} />;
 }

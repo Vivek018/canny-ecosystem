@@ -49,69 +49,95 @@ export const ADD_EMPLOYEE_WORK_HISTORY = "add-employee-work-history";
 export async function loader({ params }: LoaderFunctionArgs) {
   const employeeId = params.employeeId;
 
-  if (!employeeId) {
+  try {
+    if (!employeeId) {
+      return json(
+        {
+          status: "error",
+          message: "Invalid employee id",
+          employeeId: null,
+        },
+        { status: 400 },
+      );
+    }
+
+    return json({
+      status: "success",
+      message: "Employee id found",
+      employeeId,
+    });
+  } catch (error) {
     return json(
       {
         status: "error",
-        message: "Invalid employee id",
+        message: "An unexpected error occurred",
+        error,
         employeeId: null,
       },
-      { status: 400 },
+      { status: 500 },
     );
   }
-
-  return json({ status: "success", message: "Employee id found", employeeId });
 }
 
 export async function action({
   request,
   params,
 }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
-
   const employeeId = params.employeeId;
-  if (!employeeId) {
-    return json(
-      {
-        status: "error",
-        message: "Invalid employee id",
-        returnTo: "/employees",
-      },
-      { status: 400 },
-    );
-  }
 
-  const submission = parseWithZod(formData, {
-    schema: EmployeeWorkHistorySchema,
-  });
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
 
-  if (submission.status !== "success") {
-    return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
-    );
-  }
+    if (!employeeId) {
+      return json(
+        {
+          status: "error",
+          message: "Invalid employee id",
+          returnTo: "/employees",
+        },
+        { status: 400 },
+      );
+    }
 
-  const { status, error } = await createEmployeeWorkHistory({
-    supabase,
-    data: { ...submission.value, employee_id: employeeId },
-  });
+    const submission = parseWithZod(formData, {
+      schema: EmployeeWorkHistorySchema,
+    });
 
-  if (isGoodStatus(status)) {
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+
+    const { status, error } = await createEmployeeWorkHistory({
+      supabase,
+      data: { ...submission.value, employee_id: employeeId },
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Employee work history created",
+        error: null,
+        returnTo: `/employees/${employeeId}/work-portfolio`,
+      });
+    }
     return json({
-      status: "success",
-      message: "Employee work history created",
-      error: null,
+      status: "error",
+      message: "",
+      error,
       returnTo: `/employees/${employeeId}/work-portfolio`,
     });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+      returnTo: `/employees/${employeeId}/work-portfolio`,
+    }, { status: 500 });
   }
-  return json({
-    status: "error",
-    message: "",
-    error,
-    returnTo: `/employees/${employeeId}/work-portfolio`,
-  });
 }
 
 export default function AddEmployeeWorkHistory({

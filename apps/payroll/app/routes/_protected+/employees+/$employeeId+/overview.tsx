@@ -23,63 +23,71 @@ export async function loader({
 }: LoaderFunctionArgs): Promise<Response> {
   const employeeId = params.employeeId;
 
-  const { supabase } = getSupabaseWithHeaders({ request });
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
 
-  const { data, error } = await getEmployeeById({
-    supabase,
-    id: employeeId ?? "",
-  });
-
-  if (error) {
-    return json({
-      status: "error",
-      message: "Failed to get employee",
-      error,
-      data: null,
-    });
-  }
-
-  if (!data) {
-    return json({
-      status: "error",
-      message: "Employee not found",
-      error,
-      data: null,
-    });
-  }
-
-  const { data: employeeStatutoryData } = await getEmployeeStatutoryDetailsById(
-    {
+    const { data, error } = await getEmployeeById({
       supabase,
       id: employeeId ?? "",
-    },
-  );
+    });
 
-  const { data: employeeBankData } = await getEmployeeBankDetailsById({
-    supabase,
-    id: employeeId ?? "",
-  });
+    if (error) {
+      return json({
+        status: "error",
+        message: "Failed to get employee",
+        error,
+        data: null,
+      });
+    }
 
-  const { data: employeeAddresses } = await getEmployeeAddressesByEmployeeId({
-    supabase,
-    employeeId: employeeId ?? "",
-  });
+    if (!data) {
+      return json({
+        status: "error",
+        message: "Employee not found",
+        error,
+        data: null,
+      });
+    }
 
-  const { data: employeeGuardians } = await getEmployeeGuardiansByEmployeeId({
-    supabase,
-    employeeId: employeeId ?? "",
-  });
+    const { data: employeeStatutoryData } =
+      await getEmployeeStatutoryDetailsById({
+        supabase,
+        id: employeeId ?? "",
+      });
 
-  return json({
-    status: "success",
-    message: "Employee found",
-    error: null,
-    data,
-    employeeStatutoryData,
-    employeeBankData,
-    employeeAddresses,
-    employeeGuardians,
-  });
+    const { data: employeeBankData } = await getEmployeeBankDetailsById({
+      supabase,
+      id: employeeId ?? "",
+    });
+
+    const { data: employeeAddresses } = await getEmployeeAddressesByEmployeeId({
+      supabase,
+      employeeId: employeeId ?? "",
+    });
+
+    const { data: employeeGuardians } = await getEmployeeGuardiansByEmployeeId({
+      supabase,
+      employeeId: employeeId ?? "",
+    });
+
+    return json({
+      status: "success",
+      message: "Employee found",
+      error: null,
+      data,
+      employeeStatutoryData,
+      employeeBankData,
+      employeeAddresses,
+      employeeGuardians,
+    });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+      data: null,
+    });
+  }
 }
 
 export default function EmployeeIndex() {

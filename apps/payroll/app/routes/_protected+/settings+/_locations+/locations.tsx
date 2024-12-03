@@ -21,38 +21,47 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { useEffect } from "react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data, error } = await getLocationsByCompanyId({
-    supabase,
-    companyId,
-  });
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    const { data, error } = await getLocationsByCompanyId({
+      supabase,
+      companyId,
+    });
 
-  if (error) {
-    return json(
-      { status: "error", message: error.message, error, data },
-      { status: 500 },
-    );
+    if (error) {
+      return json(
+        { status: "error", message: error.message, error, data },
+        { status: 500 },
+      );
+    }
+
+    if (!data || data.length === 0) {
+      return json(
+        {
+          status: "info",
+          message: "No locations found for this company",
+          data,
+          error: null,
+        },
+        { status: 404 },
+      );
+    }
+
+    return json({
+      status: "success",
+      message: "Locations found",
+      data,
+      error: null,
+    });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+      data: null,
+    });
   }
-
-  if (!data || data.length === 0) {
-    return json(
-      {
-        status: "info",
-        message: "No locations found for this company",
-        data,
-        error: null,
-      },
-      { status: 404 },
-    );
-  }
-
-  return json({
-    status: "success",
-    message: "Locations found",
-    data,
-    error: null,
-  });
 }
 
 export default function Locations() {

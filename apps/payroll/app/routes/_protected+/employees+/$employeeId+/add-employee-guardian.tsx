@@ -21,48 +21,64 @@ export async function action({
   request,
   params,
 }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
-
   const employeeId = params.employeeId;
-  if (!employeeId) {
+
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
+
+    if (!employeeId) {
+      return json(
+        {
+          status: "error",
+          message: "Invalid employee id",
+          returnTo: "/employees",
+        },
+        { status: 400 },
+      );
+    }
+
+    const submission = parseWithZod(formData, {
+      schema: EmployeeGuardiansSchema,
+    });
+
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+
+    const { status, error } = await createEmployeeGuardians({
+      supabase,
+      data: { ...submission.value, employee_id: employeeId },
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Guardian added successfully",
+        error: null,
+        returnTo: `/employees/${employeeId}`,
+      });
+    }
     return json(
       {
         status: "error",
-        message: "Invalid employee id",
-        returnTo: "/employees",
+        message: "Failed to add guardian",
+        error,
+        returnTo: `/employees/${employeeId}`,
       },
-      { status: 400 },
+      { status: 500 },
     );
-  }
-
-  const submission = parseWithZod(formData, {
-    schema: EmployeeGuardiansSchema,
-  });
-
-  if (submission.status !== "success") {
-    return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
-    );
-  }
-
-  const { status, error } = await createEmployeeGuardians({
-    supabase,
-    data: { ...submission.value, employee_id: employeeId },
-  });
-
-  if (isGoodStatus(status)) {
+  } catch (error) {
     return json({
-      status: "success",
-      message: "Guardian added successfully",
-      error: null,
+      status: "error",
+      message: "Failed to add guardian",
+      error,
+      returnTo: `/employees/${employeeId}`,
     });
   }
-  return json(
-    { status: "error", message: "Failed to add guardian", error },
-    { status: 500 },
-  );
 }
 
 export default function AddEmployeeGuardian() {
@@ -93,15 +109,14 @@ export default function AddEmployeeGuardian() {
         description: actionData?.message,
         variant: "success",
       });
-      navigate(-1);
     } else {
       toast({
         title: "Error",
         description: actionData?.message,
         variant: "destructive",
       });
-      navigate(actionData?.returnTo ?? -1);
     }
+    navigate(actionData?.returnTo ?? -1);
   }, [actionData]);
 
   return (

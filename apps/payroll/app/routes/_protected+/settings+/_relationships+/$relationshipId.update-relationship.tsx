@@ -25,108 +25,133 @@ export async function loader({
   params,
 }: LoaderFunctionArgs): Promise<Response> {
   const relationshipId = params.relationshipId;
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  let relationshipData = null;
 
-  if (relationshipId) {
-    relationshipData = await getRelationshipById({
-      supabase,
-      id: relationshipId,
-      companyId,
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    let relationshipData = null;
+
+    if (relationshipId) {
+      relationshipData = await getRelationshipById({
+        supabase,
+        id: relationshipId,
+        companyId,
+      });
+    }
+
+    if (relationshipData?.error) {
+      return json(
+        {
+          status: "error",
+          message: "Failed to get relationship",
+          error: relationshipData.error,
+          data: null,
+          companyOptions: null,
+        },
+        {
+          status: 500,
+        },
+      );
+    }
+
+    const parentCompanyId = relationshipData?.data?.parent_company_id;
+    const { data: companies, error } = await getCompanies({ supabase });
+
+    if (error) {
+      return json(
+        {
+          status: "error",
+          message: "Failed to get companies",
+          error,
+          data: null,
+          companyOptions: null,
+        },
+        { status: 500 },
+      );
+    }
+
+    if (!companies) {
+      return json(
+        {
+          status: "error",
+          message: "No companies found",
+          error,
+          data: null,
+          companyOptions: null,
+        },
+        { status: 500 },
+      );
+    }
+
+    const companyOptions = companies
+      .filter((company) => company.id !== parentCompanyId)
+      .map((company) => ({ label: company.name, value: company.id }));
+
+    return json({
+      status: "success",
+      message: "Relationship and Company Option data found.",
+      data: relationshipData?.data,
+      companyOptions,
+      error: null,
     });
-  }
-
-  if (relationshipData?.error) {
+  } catch (error) {
     return json(
       {
         status: "error",
-        message: "Failed to get relationship",
-        error: relationshipData.error,
-        data: null,
-        companyOptions: null,
-      },
-      {
-        status: 500,
-      },
-    );
-  }
-
-  const parentCompanyId = relationshipData?.data?.parent_company_id;
-  const { data: companies, error } = await getCompanies({ supabase });
-
-  if (error) {
-    return json(
-      {
-        status: "error",
-        message: "Failed to get companies",
+        message: "An unexpected error occurred.",
         error,
         data: null,
-        companyOptions: null,
       },
       { status: 500 },
     );
   }
-
-  if (!companies) {
-    return json(
-      {
-        status: "error",
-        message: "No companies found",
-        error,
-        data: null,
-        companyOptions: null,
-      },
-      { status: 500 },
-    );
-  }
-
-  const companyOptions = companies
-    .filter((company) => company.id !== parentCompanyId)
-    .map((company) => ({ label: company.name, value: company.id }));
-
-  return json({
-    status: "success",
-    message: "Relationship and Company Option data found.",
-    data: relationshipData?.data,
-    companyOptions,
-  });
 }
 
 export async function action({
   request,
 }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
 
-  const submission = parseWithZod(formData, {
-    schema: RelationshipSchema,
-  });
-
-  if (submission.status !== "success") {
-    return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
-    );
-  }
-
-  const { status, error } = await updateRelationship({
-    supabase,
-    data: submission.value,
-  });
-
-  if (isGoodStatus(status))
-    return json({
-      status: "success",
-      message: "Relationship updated",
-      error: null,
+    const submission = parseWithZod(formData, {
+      schema: RelationshipSchema,
     });
 
-  return json({
-    status: "error",
-    message: "Failed to update relationship",
-    error,
-  });
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+
+    const { status, error } = await updateRelationship({
+      supabase,
+      data: submission.value,
+    });
+
+    if (isGoodStatus(status))
+      return json({
+        status: "success",
+        message: "Relationship updated",
+        error: null,
+      });
+
+    return json({
+      status: "error",
+      message: "Failed to update relationship",
+      error,
+    });
+  } catch (error) {
+    return json(
+      {
+        status: "error",
+        message: "Failed to update relationship",
+        error,
+      },
+      { status: 500 },
+    );
+  }
 }
 
 export default function UpdateRelationship() {
@@ -159,7 +184,7 @@ export default function UpdateRelationship() {
         variant: "destructive",
       });
     }
-    
+
     navigate("/settings/relationships", {
       replace: true,
     });

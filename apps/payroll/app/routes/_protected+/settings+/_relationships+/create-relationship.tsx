@@ -18,11 +18,16 @@ import {
   useForm,
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { Form, json, useActionData, useLoaderData, useNavigate } from "@remix-run/react";
+import {
+  Form,
+  json,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
 import { useEffect, useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { safeRedirect } from "@/utils/server/http.server";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
 import { UPDATE_RELATIONSHIP } from "./$relationshipId.update-relationship";
@@ -43,83 +48,106 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 export const CREATE_RELATIONSHIP = "create-relationship";
 
-export async function loader({ request }: LoaderFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data: companies, error } = await getCompanies({ supabase });
+export async function loader({
+  request,
+}: LoaderFunctionArgs): Promise<Response> {
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    const { data: companies, error } = await getCompanies({ supabase });
 
-  if (error) {
-    return json(
-      {
-        status: "error",
-        message: error.message,
-        error,
-        data: null,
-      },
-      {
-        status: 500,
-      },
-    );
-  }
+    if (error) {
+      return json(
+        {
+          status: "error",
+          message: error.message,
+          error,
+          data: null,
+        },
+        {
+          status: 500,
+        },
+      );
+    }
 
-  if (!companies) {
-    return json(
-      {
-        status: "error",
-        message: "Company ID is missing or invalid",
-        data: null,
-        error: "No companies found",
-      },
-      { status: 400 },
-    );
-  }
+    if (!companies) {
+      return json(
+        {
+          status: "error",
+          message: "Company ID is missing or invalid",
+          data: null,
+          error: "No companies found",
+        },
+        { status: 400 },
+      );
+    }
 
-  const companyOptions = companies
-    .filter((company) => company.id !== companyId)
-    .map((company) => ({ label: company.name, value: company.id }));
+    const companyOptions = companies
+      .filter((company) => company.id !== companyId)
+      .map((company) => ({ label: company.name, value: company.id }));
 
-  // return json({ companyId, companyOptions });
-  return json({
-    status: "success",
-    message: "Relationship created",
-    companyId,
-    companyOptions,
-    error: null,
-  })
-}
-
-export async function action({ request }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
-
-  const submission = parseWithZod(formData, {
-    schema: RelationshipSchema,
-  });
-
-  if (submission.status !== "success") {
-    return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
-    );
-  }
-
-  const { status, error } = await createRelationship({
-    supabase,
-    data: submission.value as any,
-  });
-
-  if (isGoodStatus(status))
+    // return json({ companyId, companyOptions });
     return json({
       status: "success",
       message: "Relationship created",
+      companyId,
+      companyOptions,
       error: null,
     });
+  } catch (error) {
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 },
+    );
+  }
+}
 
-  return json({
-    status: "error",
-    message: "Failed to create relationship",
-    error,
-  });
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
+
+    const submission = parseWithZod(formData, {
+      schema: RelationshipSchema,
+    });
+
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+
+    const { status, error } = await createRelationship({
+      supabase,
+      data: submission.value as any,
+    });
+
+    if (isGoodStatus(status))
+      return json({
+        status: "success",
+        message: "Relationship created",
+        error: null,
+      });
+
+    return json({
+      status: "error",
+      message: "Failed to create relationship",
+      error,
+    });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+    });
+  }
 }
 
 export default function CreateRelationship({
@@ -169,13 +197,13 @@ export default function CreateRelationship({
     } else {
       toast({
         title: "Error",
-        description: actionData.error?.message || "Relationship creation failed",
+        description:
+          actionData.error?.message || "Relationship creation failed",
         variant: "destructive",
       });
     }
     navigate("/settings/relationships", { replace: true });
   }, [actionData]);
-
 
   return (
     <section className="md:px-20 lg:px-52 2xl:px-80 py-4">

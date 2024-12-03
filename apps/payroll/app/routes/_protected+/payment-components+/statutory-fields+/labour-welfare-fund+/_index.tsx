@@ -14,7 +14,7 @@ import {
 import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Link, useLoaderData, useNavigate } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { useEffect } from "react";
@@ -22,48 +22,55 @@ import { useEffect } from "react";
 export async function loader({
   request,
 }: LoaderFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data, error } = await getLabourWelfareFundsByCompanyId({
-    supabase,
-    companyId,
-  });
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    const { data, error } = await getLabourWelfareFundsByCompanyId({
+      supabase,
+      companyId,
+    });
 
-  if (error) {
-    return json(
-      {
-        status: "error",
-        message: "Failed to load data",
-        data,
-      },
-      {
-        status: 500,
-      },
-    );
+    if (error) {
+      return json(
+        {
+          status: "error",
+          message: "Failed to load data",
+          data,
+        },
+        {
+          status: 500,
+        },
+      );
+    }
+
+    return json({
+      status: "success",
+      message: "Labour Welfare Funds loaded successfully",
+      data,
+      error: null,
+    });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      data: null,
+      error,
+    }, { status: 500 });
   }
-
-  return json({
-    status: "success",
-    message: "Labour Welfare Funds loaded successfully",
-    data,
-    error: null,
-  });
 }
 
 export default function LabourWelfareFundIndex() {
   const { data, status, error } = useLoaderData<typeof loader>();
   const { isDocument } = useIsDocument();
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   useEffect(() => {
-    if (status === "error") {
+    if (status === "error" && error?.code !== "PGRST116") {
       toast({
-        title: "Warning",
+        title: "Error",
         description: error?.message || "Failed to load",
-        variant: "warning",
+        variant: "destructive",
       });
-      navigate(-1);
     }
   }, []);
 

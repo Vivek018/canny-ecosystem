@@ -47,46 +47,62 @@ export const CREATE_EMPLOYEE_STATE_INSURANCE =
 export const action = async ({
   request,
 }: ActionFunctionArgs): Promise<Response> => {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
 
-  const submission = parseWithZod(formData, {
-    schema: EmployeeStateInsuranceSchema,
-  });
-
-  if (submission.status !== "success") {
-    return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
-    );
-  }
-
-  const { status, error } = await createEmployeeStateInsurance({
-    supabase,
-    data: submission.value as any,
-    bypassAuth: true,
-  });
-
-  if (isGoodStatus(status)) {
-    return json({
-      status: "success",
-      message: "Employee State Insurance created successfully",
-      error: null,
+    const submission = parseWithZod(formData, {
+      schema: EmployeeStateInsuranceSchema,
     });
-  }
 
-  return json({
-    status: "error",
-    message: "Failed to create Employee State Insurance",
-    error,
-  });
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+
+    const { status, error } = await createEmployeeStateInsurance({
+      supabase,
+      data: submission.value as any,
+      bypassAuth: true,
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Employee State Insurance created successfully",
+        error: null,
+      });
+    }
+
+    return json({
+      status: "error",
+      message: "Failed to create Employee State Insurance",
+      error,
+    });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+    }, { status: 500 });
+  }
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-  return json({ status: "success", message: "Company ID found", companyId });
+    return json({ status: "success", message: "Company ID found", companyId });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+    }, { status: 500 });
+  }
 };
 
 export default function CreateEmployeeStateInsurance({
@@ -136,7 +152,7 @@ export default function CreateEmployeeStateInsurance({
         variant: "destructive",
       });
     }
-    navigate(-1);
+    navigate("/payment-components/statutory-fields/employee-state-insurance");
   }, [actionData]);
 
   return (

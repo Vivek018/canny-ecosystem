@@ -7,7 +7,6 @@ import {
   useNavigate,
 } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
-import { safeRedirect } from "@/utils/server/http.server";
 import {
   EmployeeStateInsuranceSchema,
   isGoodStatus,
@@ -22,74 +21,95 @@ import { useEffect } from "react";
 export const UPDATE_EMPLOYEE_STATE_INSURANCE =
   "update-employee-state-insurance";
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({
+  request,
+  params,
+}: LoaderFunctionArgs): Promise<Response> {
   const esiId = params.esiId;
-  const { supabase } = getSupabaseWithHeaders({ request });
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
 
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  let esiData = null;
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    let esiData = null;
 
-  if (esiId) {
-    esiData = await getEmployeeStateInsuranceById({
-      supabase,
-      id: esiId,
-    });
-  }
+    if (esiId) {
+      esiData = await getEmployeeStateInsuranceById({
+        supabase,
+        id: esiId,
+      });
+    }
 
-  if (esiData?.error) {
+    if (esiData?.error) {
+      return json({
+        status: "error",
+        message: "Failed to load data",
+        data: esiData?.data,
+        error: esiData.error,
+        companyId,
+      });
+    }
+
     return json({
-      status: "error",
-      message: "Failed to load data",
+      status: "success",
+      message: "Employee State Insurance",
+      error: null,
       data: esiData?.data,
-      error: esiData.error,
       companyId,
     });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+      data: null,
+      companyId: null,
+    }, { status: 500 });
   }
-
-  return json({
-    status: "success",
-    message: "Employee State Insurance",
-    error: null,
-    data: esiData?.data,
-    companyId,
-  });
 }
 
 export async function action({
   request,
 }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
 
-  const submission = parseWithZod(formData, {
-    schema: EmployeeStateInsuranceSchema,
-  });
-
-  if (submission.status !== "success") {
-    return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
-    );
-  }
-
-  const { status, error } = await updateEmployeeStateInsurance({
-    supabase,
-    data: submission.value,
-  });
-
-  if (isGoodStatus(status)) {
-    return json({
-      status: "success",
-      message: "Employee State Insurance updated successfully",
-      error: null,
+    const submission = parseWithZod(formData, {
+      schema: EmployeeStateInsuranceSchema,
     });
-  }
 
-  return json({
-    status: "error",
-    message: "Employee State Insurance update failed",
-    error,
-  });
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+
+    const { status, error } = await updateEmployeeStateInsurance({
+      supabase,
+      data: submission.value,
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Employee State Insurance updated successfully",
+        error: null,
+      });
+    }
+
+    return json({
+      status: "error",
+      message: "Employee State Insurance update failed",
+      error,
+    });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+    }, { status: 500 });
+  }
 }
 
 export default function UpdateEmployeeProvidentFund() {
@@ -105,7 +125,7 @@ export default function UpdateEmployeeProvidentFund() {
         description: error?.message || "Failed to load",
         variant: "destructive",
       });
-      navigate(-1);
+      navigate("/payment-components/statutory-fields/employee-state-insurance");
     }
 
     if (!actionData) return;
@@ -124,7 +144,7 @@ export default function UpdateEmployeeProvidentFund() {
         variant: "destructive",
       });
     }
-    navigate(-1);
+    navigate("/payment-components/statutory-fields/employee-state-insurance");
   }, [actionData]);
 
   return <CreateEmployeeStateInsurance updateValues={data} />;

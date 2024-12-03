@@ -10,26 +10,37 @@ export async function action({
   request,
   params,
 }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const relationshipId = params.relationshipId;
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const relationshipId = params.relationshipId;
 
-  const { status, error } = await deleteRelationship({
-    supabase,
-    id: relationshipId ?? "",
-  });
-
-  if (isGoodStatus(status)) {
-    return json({
-      status: "success",
-      message: "Relationship deleted",
-      error: null,
+    const { status, error } = await deleteRelationship({
+      supabase,
+      id: relationshipId ?? "",
     });
-  }
 
-  return json(
-    { status: "error", message: "Failed to delete relationship", error },
-    { status: 500 },
-  );
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Relationship deleted",
+        error: null,
+      });
+    }
+
+    return json(
+      { status: "error", message: "Failed to delete relationship", error },
+      { status: 500 },
+    );
+  } catch (error) {
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 },
+    );
+  }
 }
 
 export default function DeleteRelationship() {

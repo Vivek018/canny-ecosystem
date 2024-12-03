@@ -1,8 +1,13 @@
 import { SecondaryMenu } from "@canny_ecosystem/ui/secondary-menu";
-import { Link, Outlet, useLocation } from "@remix-run/react";
+import { Spinner } from "@canny_ecosystem/ui/spinner";
+import { Link, Outlet, useLocation, useNavigation } from "@remix-run/react";
 
 export default function Settings() {
   const { pathname } = useLocation();
+  const navigation = useNavigation();
+  const isLoading =
+    navigation.state === "loading" ||
+    navigation.location?.pathname.startsWith("/settings");
 
   return (
     <section>
@@ -19,7 +24,13 @@ export default function Settings() {
         />
       </div>
       <div className="px-4">
-        <Outlet />
+        {isLoading ? (
+          <div className="mt-20 flex items-center justify-center">
+            <Spinner size={50} />
+          </div>
+        ) : (
+          <Outlet />
+        )}
       </div>
     </section>
   );

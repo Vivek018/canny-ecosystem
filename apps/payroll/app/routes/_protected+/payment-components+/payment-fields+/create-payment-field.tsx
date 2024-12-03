@@ -48,10 +48,27 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 export const CREATE_PAYMENT_FIELD = "create-payment-field";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-  return json({ companyId });
+    return json({
+      staus: "success",
+      message: "Company ID found",
+      companyId,
+      error: null,
+    });
+  } catch (error) {
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+        companyId: null,
+      },
+      { status: 500 },
+    );
+  }
 }
 
 export type ActionResponse = {
@@ -62,39 +79,50 @@ export type ActionResponse = {
 export async function action({
   request,
 }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
-  const submission = parseWithZod(formData, {
-    schema: PaymentFieldSchema,
-  });
-
-  if (submission.status !== "success") {
-    return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
-    );
-  }
-
-  const { status, error } = await createPaymentField({
-    supabase,
-    data: submission.value as any,
-  });
-
-  if (isGoodStatus(status))
-    return json({
-      status: "success",
-      message: "Payment Field created",
-      error: null,
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
+    const submission = parseWithZod(formData, {
+      schema: PaymentFieldSchema,
     });
 
-  return json(
-    {
-      status: "error",
-      message: "Payment Field creation failed",
-      error,
-    },
-    { status: 500 },
-  );
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+
+    const { status, error } = await createPaymentField({
+      supabase,
+      data: submission.value as any,
+    });
+
+    if (isGoodStatus(status))
+      return json({
+        status: "success",
+        message: "Payment Field created",
+        error: null,
+      });
+
+    return json(
+      {
+        status: "error",
+        message: "Payment Field creation failed",
+        error,
+      },
+      { status: 500 },
+    );
+  } catch (error) {
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 },
+    );
+  }
 }
 
 export default function CreatePaymentField({

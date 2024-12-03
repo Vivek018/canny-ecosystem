@@ -26,63 +26,71 @@ export async function loader({
 }: LoaderFunctionArgs): Promise<Response> {
   const siteId = params.siteId;
 
-  const { supabase } = getSupabaseWithHeaders({ request });
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
 
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-  const { data: locations, error } = await getLocationsForSelectByCompanyId({
-    supabase,
-    companyId,
-  });
-
-  if (error) {
-    return json({
-      status: "error",
-      message: "Failed to get locations",
-      error,
-      locations,
-    });
-  }
-
-  if (!locations) {
-    return json({
-      status: "error",
-      message: "No locations found",
-      error,
-      locations,
-    });
-  }
-
-  const locationOptions = locations.map((location) => ({
-    label: location.name,
-    value: location.id,
-  }));
-
-  let siteData = null;
-
-  if (siteId) {
-    siteData = await getSiteById({
+    const { data: locations, error } = await getLocationsForSelectByCompanyId({
       supabase,
-      id: siteId,
+      companyId,
     });
-  }
 
-  if (siteData?.error) {
+    if (error) {
+      return json({
+        status: "error",
+        message: "Failed to get locations",
+        error,
+        locations,
+      });
+    }
+
+    if (!locations) {
+      return json({
+        status: "error",
+        message: "No locations found",
+        error,
+        locations,
+      });
+    }
+
+    const locationOptions = locations.map((location) => ({
+      label: location.name,
+      value: location.id,
+    }));
+
+    let siteData = null;
+
+    if (siteId) {
+      siteData = await getSiteById({
+        supabase,
+        id: siteId,
+      });
+    }
+
+    if (siteData?.error) {
+      return json({
+        status: "error",
+        message: "Failed to get site",
+        error: siteData.error,
+        data: siteData.data,
+      });
+    }
+
+    return json({
+      status: "success",
+      message: "Site found",
+      error: null,
+      data: siteData?.data,
+      locationOptions,
+    });
+  } catch (error) {
     return json({
       status: "error",
-      message: "Failed to get site",
-      error: siteData.error,
-      data: siteData.data,
-    });
+      message: "An unexpected error occurred",
+      error,
+    }, { status: 500 });
   }
-
-  return json({
-    status: "success",
-    message: "Site found",
-    error: null,
-    data: siteData?.data,
-    locationOptions,
-  });
 }
 
 export async function action({
@@ -90,39 +98,51 @@ export async function action({
   params,
 }: ActionFunctionArgs): Promise<Response> {
   const projectId = params.projectId;
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
 
-  const submission = parseWithZod(formData, {
-    schema: SiteSchema,
-  });
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
 
-  if (submission.status !== "success") {
-    return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
-    );
-  }
+    const submission = parseWithZod(formData, {
+      schema: SiteSchema,
+    });
 
-  const { status, error } = await updateSite({
-    supabase,
-    data: submission.value,
-  });
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
 
-  if (isGoodStatus(status)) {
+    const { status, error } = await updateSite({
+      supabase,
+      data: submission.value,
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Site updated",
+        error: null,
+        projectId,
+      });
+    }
     return json({
-      status: "success",
-      message: "Site updated",
-      error: null,
+      status: "error",
+      message: "Site update failed",
+      error,
       projectId,
     });
+  } catch (error) {
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 },
+    );
   }
-  return json({
-    status: "error",
-    message: "Site update failed",
-    error,
-    projectId,
-  });
 }
 
 export default function UpdateSite() {
@@ -140,7 +160,7 @@ export default function UpdateSite() {
         description: error.message || "Failed to load",
         variant: "destructive",
       });
-      navigate(-1);
+      navigate(`/projects/${data?.projectId}/sites`, { replace: true });
     }
 
     if (actionData) {
@@ -157,12 +177,12 @@ export default function UpdateSite() {
           variant: "destructive",
         });
       }
-      navigate(`/projects/${actionData?.projectId}/sites`, {
+      navigate(`/projects/${data?.projectId}/sites`, {
         replace: true,
       });
     }
   }, [actionData]);
-  console.log(actionData);
+
   return (
     <CreateSite
       updateValues={data}

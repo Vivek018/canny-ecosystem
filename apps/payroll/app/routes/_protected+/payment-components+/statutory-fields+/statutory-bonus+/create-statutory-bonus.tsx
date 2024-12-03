@@ -39,46 +39,70 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 export const CREATE_STATUTORY_BONUS = "create-statutory-bonus";
 
-export const action = async ({ request }: ActionFunctionArgs): Promise<Response> => {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
+export const action = async ({
+  request,
+}: ActionFunctionArgs): Promise<Response> => {
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
 
-  const submission = parseWithZod(formData, {
-    schema: StatutoryBonusSchema,
-  });
+    const submission = parseWithZod(formData, {
+      schema: StatutoryBonusSchema,
+    });
 
-  if (submission.status !== "success") {
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+
+    const { status, error } = await createStatutoryBonus({
+      supabase,
+      data: submission.value as any,
+      bypassAuth: true,
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Statutory Bonus created successfully",
+        error: null,
+      });
+    }
+
+    return json({
+      status: "error",
+      message: "Failed to create Statutory Bonus",
+      error,
+    });
+  } catch (error) {
     return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 },
     );
   }
-
-  const { status, error } = await createStatutoryBonus({
-    supabase,
-    data: submission.value as any,
-    bypassAuth: true,
-  });
-
-  if (isGoodStatus(status)) {
-    return json({
-      status: "success",
-      message: "Statutory Bonus created successfully",
-      error: null,
-    });
-  }
-
-  return json({
-    status: "error",
-    message: "Failed to create Statutory Bonus",
-    error,
-  });
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  return json({ status: "success", message: "Company ID found", companyId });
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    return json({ status: "success", message: "Company ID found", companyId });
+  } catch (error) {
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 },
+    );
+  }
 };
 
 export default function CreateStatutoryBonus({

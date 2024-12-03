@@ -6,32 +6,43 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { json, useActionData, useNavigate } from "@remix-run/react";
 import { useEffect } from "react";
 
-export async function action({ request, params }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const epfId = params.epfId;
+export async function action({
+  request,
+  params,
+}: ActionFunctionArgs): Promise<Response> {
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const epfId = params.epfId;
 
-  const { status, error } = await deleteEmployeeProvidentFund({
-    supabase,
-    id: epfId ?? "",
-    bypassAuth: true,
-  });
-
-  if (isGoodStatus(status)) {
-    return json({
-      status: "success",
-      message: "EPF deleted successfully",
-      error: null,
+    const { status, error } = await deleteEmployeeProvidentFund({
+      supabase,
+      id: epfId ?? "",
+      bypassAuth: true,
     });
-  }
 
-  return json(
-    {
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "EPF deleted successfully",
+        error: null,
+      });
+    }
+
+    return json(
+      {
+        status: "error",
+        message: "Failed to delete EPF",
+        error,
+      },
+      { status: 500 },
+    );
+  } catch (error) {
+    return json({
       status: "error",
-      message: "Failed to delete EPF",
+      message: "An unexpected error occurred",
       error,
-    },
-    { status: 500 },
-  );
+    }, { status: 500 });
+  }
 }
 
 export default function DeleteEmployeeProvidentFund() {
@@ -55,7 +66,7 @@ export default function DeleteEmployeeProvidentFund() {
         });
       }
 
-      navigate(-1);
+      navigate("/payment-components/statutory-fields/employee-provident-fund");
     }
   }, [actionData]);
   return null;

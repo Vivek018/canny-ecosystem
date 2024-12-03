@@ -16,72 +16,87 @@ import { useEffect, useState } from "react";
 export async function loader({
   request,
 }: LoaderFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-  const { data: companyData, error: companyError } = await getCompanyById({
-    supabase,
-    id: companyId!,
-  });
+    const { data: companyData, error: companyError } = await getCompanyById({
+      supabase,
+      id: companyId!,
+    });
 
-  const {
-    data: companyRegistrationDetailsData,
-    error: companyRegistrationDetailsError,
-  } = await getCompanyRegistrationDetailsByCompanyId({
-    supabase,
-    companyId,
-  });
+    const {
+      data: companyRegistrationDetailsData,
+      error: companyRegistrationDetailsError,
+    } = await getCompanyRegistrationDetailsByCompanyId({
+      supabase,
+      companyId,
+    });
 
-  if (companyError) {
-    return json(
-      {
-        status: "error",
-        message: "Failed to get company",
-        error: companyError,
-        companyData: null,
-        companyRegistrationDetailsData: null,
-      },
-      { status: 500 },
-    );
+    if (companyError) {
+      return json(
+        {
+          status: "error",
+          message: "Failed to get company",
+          error: companyError,
+          companyData: null,
+          companyRegistrationDetailsData: null,
+        },
+        { status: 500 },
+      );
+    }
+    if (companyRegistrationDetailsError) {
+      return json(
+        {
+          status: "error",
+          message: "Failed to get company registration details",
+          error: companyRegistrationDetailsError,
+          companyData: null,
+          companyRegistrationDetailsData: null,
+        },
+        { status: 500 },
+      );
+    }
+
+    if (!companyData) {
+      return json(
+        {
+          status: "info",
+          message: "Company not found",
+          error: null,
+          companyData: null,
+          companyRegistrationDetailsData: null,
+        },
+        { status: 404 },
+      );
+    }
+
+    return json({
+      status: "success",
+      message: "Company found",
+      error: null,
+      companyData,
+      companyRegistrationDetailsData,
+    });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "Failed to get company",
+      error,
+      companyData: null,
+      companyRegistrationDetailsData: null,
+    });
   }
-  if (companyRegistrationDetailsError) {
-    return json(
-      {
-        status: "error",
-        message: "Failed to get company registration details",
-        error: companyRegistrationDetailsError,
-        companyData: null,
-        companyRegistrationDetailsData: null,
-      },
-      { status: 500 },
-    );
-  }
-
-  if (!companyData) {
-    return json(
-      {
-        status: "info",
-        message: "Company not found",
-        error: null,
-        companyData: null,
-        companyRegistrationDetailsData: null,
-      },
-      { status: 404 },
-    );
-  }
-
-  return json({
-    status: "success",
-    message: "Company found",
-    error: null,
-    companyData,
-    companyRegistrationDetailsData,
-  });
 }
 
 export default function SettingGeneral() {
-  const { companyData, companyRegistrationDetailsData, status, error, message } =
-    useLoaderData<typeof loader>();
+  const {
+    companyData,
+    companyRegistrationDetailsData,
+    status,
+    error,
+    message,
+  } = useLoaderData<typeof loader>();
   const [resetKey, setResetKey] = useState(Date.now());
   const companyId = companyData.id;
   const { toast } = useToast();

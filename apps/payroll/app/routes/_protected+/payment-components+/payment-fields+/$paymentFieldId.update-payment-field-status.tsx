@@ -15,41 +15,50 @@ const UpdateActiveSchema = z.object({
 export async function action({
   request,
 }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
-
-  const submission = parseWithZod(formData, { schema: UpdateActiveSchema });
-
-  if (submission.status !== "success") {
-    return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
-    );
-  }
-
-  const { status, error } = await updatePaymentField({
-    supabase,
-    data: submission.value,
-  });
-
-  const returnTo = formData.get("returnTo");
-  if (isGoodStatus(status))
-    return json({
-      status: "success",
-      message: "Payment Field updated successfully",
-      returnTo,
-      error: null,
+  try {
+    
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
+    
+    const submission = parseWithZod(formData, { schema: UpdateActiveSchema });
+    
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+    
+    const { status, error } = await updatePaymentField({
+      supabase,
+      data: submission.value,
     });
 
-  return json(
-    {
-      status: "error",
-      message: "Payment Field update failed",
-      returnTo,
-      error,
-    },
-    { status: 500 },
-  );
+    const returnTo = formData.get("returnTo");
+  if (isGoodStatus(status))
+    return json({
+  status: "success",
+  message: "Payment Field updated successfully",
+  returnTo,
+  error: null,
+});
+
+return json(
+  {
+    status: "error",
+    message: "Payment Field update failed",
+    returnTo,
+    error,
+  },
+  { status: 500 },
+);
+} catch (error) {
+ return json({
+  status: "error",
+  message: "An unexpected error occurred",
+  error,
+ }) 
+}
 }
 
 export default function UpdatePaymentFieldStatus() {

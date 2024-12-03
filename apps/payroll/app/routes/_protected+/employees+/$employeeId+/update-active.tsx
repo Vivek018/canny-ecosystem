@@ -15,27 +15,29 @@ const UpdateActiveSchema = z.object({
 export async function action({
   request,
 }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
 
-  const submission = parseWithZod(formData, {
+  try {
+    const formData = await request.formData();
+    const returnTo = formData.get("returnTo");
+    
+    const { supabase } = getSupabaseWithHeaders({ request });
+    
+    const submission = parseWithZod(formData, {
     schema: UpdateActiveSchema,
   });
-
+  
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
       { status: submission.status === "error" ? 400 : 200 },
     );
   }
-
+  
   const { status, error } = await updateEmployee({
     supabase,
     data: submission.value,
   });
-  console.log(submission.value);
 
-  const returnTo = formData.get("returnTo");
   if (isGoodStatus(status)) {
     return json({
       status: "success",
@@ -50,6 +52,13 @@ export async function action({
     error,
     returnTo,
   });
+} catch (error) {
+ return json({
+  status: "error",
+  message: "An unexpected error occurred",
+  error,
+ }) 
+}
 }
 
 export default function UpdateActive() {
@@ -72,7 +81,7 @@ export default function UpdateActive() {
           variant: "destructive",
         });
       }
-      navigate(-1);
+      navigate(actionData?.returnTo ?? "/employees");
     }
   }, [actionData]);
 

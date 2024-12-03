@@ -22,62 +22,97 @@ export const UPDATE_PAYMENT_FIELD = "update-payment-field";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const paymentFieldId = params.paymentFieldId;
-  const { supabase } = getSupabaseWithHeaders({ request });
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
 
-  let paymentFieldData = null;
+    let paymentFieldData = null;
 
-  if (paymentFieldId) {
-    paymentFieldData = await getPaymentFieldById({
-      supabase,
-      id: paymentFieldId,
+    if (paymentFieldId) {
+      paymentFieldData = await getPaymentFieldById({
+        supabase,
+        id: paymentFieldId,
+      });
+    }
+
+    if (paymentFieldData?.error) {
+      return json(
+        {
+          status: "error",
+          message: "Failed to load data",
+          error: paymentFieldData.error,
+          data: null,
+        },
+        { status: 500 },
+      );
+    }
+
+    return json({
+      status: "success",
+      message: "Payment Field loaded",
+      data: paymentFieldData?.data,
+      error: null,
     });
+  } catch (error) {
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+        data: null,
+      },
+      { status: 500 },
+    );
   }
-
-  if (paymentFieldData?.error) throw paymentFieldData.error;
-
-  return json({ data: paymentFieldData?.data });
 }
 
 export async function action({
   request,
 }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
-  const submission = parseWithZod(formData, { schema: PaymentFieldSchema });
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
+    const submission = parseWithZod(formData, { schema: PaymentFieldSchema });
 
-  if (submission.status !== "success") {
-    return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
-    );
-  }
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
 
-  const { status, error } = await updatePaymentField({
-    supabase,
-    data: {
-      ...submission.value,
-      amount:
-        submission.value.payment_type === paymentTypeArray[1]
-          ? null
-          : submission.value.amount,
-    },
-  });
-
-  if (isGoodStatus(status))
-    return json({
-      status: "success",
-      message: "Payment Field updated",
-      error: null,
+    const { status, error } = await updatePaymentField({
+      supabase,
+      data: {
+        ...submission.value,
+        amount:
+          submission.value.payment_type === paymentTypeArray[1]
+            ? null
+            : submission.value.amount,
+      },
     });
 
-  return json(
-    {
+    if (isGoodStatus(status))
+      return json({
+        status: "success",
+        message: "Payment Field updated",
+        error: null,
+      });
+
+    return json(
+      {
+        status: "error",
+        message: "Payment Field update failed",
+        error,
+      },
+      { status: 500 },
+    );
+  } catch (error) {
+    return json({
       status: "error",
-      message: "Payment Field update failed",
+      message: "An unexpected error occurred",
       error,
-    },
-    { status: 500 },
-  );
+    }, { status: 500 });
+  }
 }
 
 export default function UpdatePaymentField() {
@@ -102,7 +137,8 @@ export default function UpdatePaymentField() {
     } else {
       toast({
         title: "Error",
-        description: actionData?.error?.message || "Payment Field update failed",
+        description:
+          actionData?.error?.message || "Payment Field update failed",
         variant: "destructive",
       });
     }

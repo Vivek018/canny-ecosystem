@@ -45,49 +45,65 @@ export const CREATE_EMPLOYEE_PROVIDENT_FUND = "create-employee-provident-fund";
 export const action = async ({
   request,
 }: ActionFunctionArgs): Promise<Response> => {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
 
-  const submission = parseWithZod(formData, {
-    schema: EmployeeProvidentFundSchema,
-  });
-
-  if (submission.status !== "success") {
-    return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
-    );
-  }
-
-  const { status, error } = await createEmployeeProvidentFund({
-    supabase,
-    data: submission.value as any,
-    bypassAuth: true,
-  });
-
-  if (isGoodStatus(status)) {
-    return json({
-      status: "success",
-      message: "Employee Provident Fund created",
-      error: null,
+    const submission = parseWithZod(formData, {
+      schema: EmployeeProvidentFundSchema,
     });
-  }
 
-  return json({
-    status: "error",
-    message: "Failed to create Employee Provident Fund",
-    error,
-  });
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+
+    const { status, error } = await createEmployeeProvidentFund({
+      supabase,
+      data: submission.value as any,
+      bypassAuth: true,
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Employee Provident Fund created",
+        error: null,
+      });
+    }
+
+    return json({
+      status: "error",
+      message: "Failed to create Employee Provident Fund",
+      error,
+    });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "Failed to create Employee Provident Fund",
+      error,
+    }, { status: 500 });
+  }
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  return json({
-    status: "success",
-    message: "Company ID found",
-    companyId,
-  });
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    return json({
+      status: "success",
+      message: "Company ID found",
+      companyId,
+    });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+    }, { status: 500 });
+  }
 };
 
 export default function CreateEmployeeProvidentFund({
@@ -136,7 +152,7 @@ export default function CreateEmployeeProvidentFund({
           variant: "destructive",
         });
       }
-      navigate(-1);
+      navigate("/payment-components/statutory-fields/employee-provident-fund");
     }
   }, [actionData]);
 

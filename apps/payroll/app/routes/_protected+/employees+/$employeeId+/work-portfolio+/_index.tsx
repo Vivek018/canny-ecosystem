@@ -18,40 +18,53 @@ export async function loader({
 }: LoaderFunctionArgs): Promise<Response> {
   const employeeId = params.employeeId;
 
-  const { supabase } = getSupabaseWithHeaders({ request });
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
 
-  const { data: employeeProjectAssignment } =
-    await getEmployeeProjectAssignmentByEmployeeId({
-      supabase,
-      employeeId: employeeId ?? "",
+    const { data: employeeProjectAssignment } =
+      await getEmployeeProjectAssignmentByEmployeeId({
+        supabase,
+        employeeId: employeeId ?? "",
+      });
+
+    const { data: employeeWorkHistories } =
+      await getEmployeeWorkHistoriesByEmployeeId({
+        supabase,
+        employeeId: employeeId ?? "",
+      });
+
+    const { data: employeeSkills, error } = await getEmployeeSkillsByEmployeeId(
+      {
+        supabase,
+        employeeId: employeeId ?? "",
+      },
+    );
+
+    if (error)
+      return json({
+        status: "error",
+        message: "Failed to get employee skills",
+        error,
+        employeeId,
+      });
+
+    return json({
+      status: "success",
+      message: "Employee skills found",
+      error: null,
+      employeeProjectAssignment,
+      employeeWorkHistories,
+      employeeSkills,
+      employeeId,
     });
-
-  const { data: employeeWorkHistories } =
-    await getEmployeeWorkHistoriesByEmployeeId({
-      supabase,
-      employeeId: employeeId ?? "",
-    });
-
-  const { data: employeeSkills, error } = await getEmployeeSkillsByEmployeeId({
-    supabase,
-    employeeId: employeeId ?? "",
-  });
-
-  if (error)
+  } catch (error) {
     return json({
       status: "error",
-      message: "Failed to get employee skills",
+      message: "An unexpected error occurred",
       error,
+      employeeId,
     });
-
-  return json({
-    status: "success",
-    message: "Employee skills found",
-    error: null,
-    employeeProjectAssignment,
-    employeeWorkHistories,
-    employeeSkills,
-  });
+  }
 }
 
 export default function WorkPortfolio() {
@@ -61,6 +74,7 @@ export default function WorkPortfolio() {
     employeeSkills,
     status,
     message,
+    employeeId,
   } = useLoaderData<typeof loader>();
 
   const { toast } = useToast();
@@ -73,7 +87,7 @@ export default function WorkPortfolio() {
         description: message,
         variant: "destructive",
       });
-      navigate(-1);
+      navigate(`/employees/${employeeId}/work-portfolio`);
     }
   }, []);
 

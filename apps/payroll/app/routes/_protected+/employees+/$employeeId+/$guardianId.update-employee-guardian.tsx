@@ -22,73 +22,98 @@ export const UPDATE_EMPLOYEE_GUARDIAN = "update-employee-guardian";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const guardianId = params.guardianId;
-  const { supabase } = getSupabaseWithHeaders({ request });
+  const employeeId = params.employeeId;
 
-  let data = null;
-  let error = null;
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
 
-  if (guardianId) {
-    ({ data, error } = await getEmployeeGuardianById({
-      supabase,
-      id: guardianId,
-    }));
-  }
+    let data = null;
+    let error = null;
 
-  if (error)
+    if (guardianId) {
+      ({ data, error } = await getEmployeeGuardianById({
+        supabase,
+        id: guardianId,
+      }));
+    }
+
+    if (error)
+      return json({
+        status: "error",
+        message: "Failed to get employee guardian",
+        data,
+        error,
+        employeeId,
+      });
+
+    return json({
+      status: "success",
+      message: "Employee guardian found",
+      data,
+      error: null,
+      employeeId,
+    });
+  } catch (error) {
     return json({
       status: "error",
-      message: "Failed to get employee guardian",
-      data,
+      message: "An unexpected error occurred",
+      data: null,
       error,
+      employeeId,
     });
-
-  return json({
-    status: "success",
-    message: "Employee guardian found",
-    data,
-    error: null,
-  });
+  }
 }
 
 export async function action({
   request,
 }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
 
-  const submission = parseWithZod(formData, {
-    schema: EmployeeGuardiansSchema,
-  });
+    const submission = parseWithZod(formData, {
+      schema: EmployeeGuardiansSchema,
+    });
 
-  if (submission.status !== "success") {
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+
+    const { status, error } = await updateEmployeeGuardian({
+      supabase,
+      data: submission.value,
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Employee guardian updated successfully",
+        error: null,
+      });
+    }
+
     return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      {
+        status: "error",
+        message: "Employee guardian update failed",
+        error,
+      },
+      { status: 500 },
     );
-  }
-
-  const { status, error } = await updateEmployeeGuardian({
-    supabase,
-    data: submission.value,
-  });
-
-  if (isGoodStatus(status)) {
+  } catch (error) {
     return json({
-      status: "success",
-      message: "Employee guardian updated successfully",
-      error: null,
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
     });
   }
-
-  return json({
-    status: "error",
-    message: "Employee guardian update failed",
-    error,
-  }, { status: 500 });
 }
 
 export default function UpdateEmployeeGuardian() {
-  const { data } = useLoaderData<typeof loader>();
+  const { data, employeeId } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
   const currentSchema = EmployeeGuardiansSchema;
@@ -122,7 +147,7 @@ export default function UpdateEmployeeGuardian() {
           variant: "destructive",
         });
       }
-      navigate(-1);
+      navigate(`/employees/${employeeId}`);
     }
   }, [actionData]);
 

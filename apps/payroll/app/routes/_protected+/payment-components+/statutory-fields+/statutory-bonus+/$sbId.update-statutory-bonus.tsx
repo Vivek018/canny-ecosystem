@@ -18,71 +18,88 @@ import { useEffect } from "react";
 export const UPDATE_STATUTORY_BONUS = "update-statutory-bonus";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const sbId = params.sbId;
-  const { supabase } = getSupabaseWithHeaders({ request });
+  try {
+    const sbId = params.sbId;
+    const { supabase } = getSupabaseWithHeaders({ request });
 
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  let sbData = null;
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    let sbData = null;
 
-  if (sbId) {
-    sbData = await getStatutoryBonusById({
-      supabase,
-      id: sbId,
+    if (sbId) {
+      sbData = await getStatutoryBonusById({
+        supabase,
+        id: sbId,
+      });
+    }
+
+    if (sbData?.error) {
+      return json({
+        status: "error",
+        message: "Failed to load data",
+        error: sbData?.error,
+        data: null,
+      });
+    }
+
+    return json({
+      status: "success",
+      message: "Statutory Bonus loaded successfully",
+      data: sbData?.data,
+      companyId,
     });
-  }
-
-  if (sbData?.error) {
+  } catch (error) {
     return json({
       status: "error",
-      message: "Failed to load data",
-      error: sbData?.error,
+      message: "An unexpected error occurred",
       data: null,
-    });
+      error,
+    }, { status: 500 });
   }
-
-  return json({
-    status: "success",
-    message: "Statutory Bonus loaded successfully",
-    data: sbData?.data,
-    companyId,
-  });
 }
 
 export async function action({
   request,
 }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
 
-  const submission = parseWithZod(formData, {
-    schema: StatutoryBonusSchema,
-  });
-
-  if (submission.status !== "success") {
-    return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
-    );
-  }
-
-  const { status, error } = await updateStatutoryBonus({
-    supabase,
-    data: submission.value,
-    bypassAuth: true,
-  });
-
-  if (isGoodStatus(status)) {
-    return json({
-      status: "success",
-      message: "Statutory Bonus updated successfully",
-      error: null,
+    const submission = parseWithZod(formData, {
+      schema: StatutoryBonusSchema,
     });
+
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+
+    const { status, error } = await updateStatutoryBonus({
+      supabase,
+      data: submission.value,
+      bypassAuth: true,
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Statutory Bonus updated successfully",
+        error: null,
+      });
+    }
+    return json({
+      status: "error",
+      message: "Failed to update Statutory Bonus",
+      error,
+    });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+    }, { status: 500 });
   }
-  return json({
-    status: "error",
-    message: "Failed to update Statutory Bonus",
-    error,
-  });
 }
 
 export default function UpdateStatutoryBonus() {

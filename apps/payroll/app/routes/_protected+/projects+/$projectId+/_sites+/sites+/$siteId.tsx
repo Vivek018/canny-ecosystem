@@ -6,42 +6,54 @@ import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, useSearchParams } from "@remix-run/react";
 
-export async function loader({ request, params }: LoaderFunctionArgs): Promise<Response> {
+export async function loader({
+  request,
+  params,
+}: LoaderFunctionArgs): Promise<Response> {
   const projectId = params.projectId;
   const siteId = params.siteId;
 
-  const { supabase } = getSupabaseWithHeaders({ request });
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
 
-  const { data, error } = await getSitePaySequenceInSite({
-    supabase,
-    siteId: siteId!,
-  });
+    const { data, error } = await getSitePaySequenceInSite({
+      supabase,
+      siteId: siteId!,
+    });
 
-  if (error) {
+    if (error) {
+      return json({
+        status: "error",
+        message: "Failed to get site pay sequence",
+        error,
+        data,
+      });
+    }
+
+    if (!data) {
+      return json({
+        status: "error",
+        message: "Site pay sequence not found",
+        error,
+        data,
+      });
+    }
+
+    return json({
+      status: "success",
+      message: "Site pay sequence loaded",
+      error: null,
+      data,
+      projectId,
+    });
+  } catch (error) {
     return json({
       status: "error",
-      message: "Failed to get site pay sequence",
+      message: "An unexpected error occurred",
       error,
-      data,
-    });
+      data: null,
+    }, { status: 500 });
   }
-
-  if (!data) {
-    return json({
-      status: "error",
-      message: "Site pay sequence not found",
-      error,
-      data,
-    });
-  }
-
-  return json({
-    status: "success",
-    message: "Site pay sequence loaded",
-    error: null,
-    data,
-    projectId,
-  });
 }
 
 export default function EditPaySequence() {

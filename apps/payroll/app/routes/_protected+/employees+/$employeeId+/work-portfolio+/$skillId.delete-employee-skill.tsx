@@ -10,30 +10,43 @@ export async function action({
   request,
   params,
 }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
   const skillId = params.skillId;
+  const employeeId = params.employeeId;
 
-  const { status, error } = await deleteEmployeeSkill({
-    supabase,
-    id: skillId ?? "",
-  });
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
 
-  if (isGoodStatus(status)) {
+    const { status, error } = await deleteEmployeeSkill({
+      supabase,
+      id: skillId ?? "",
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Employee skill deleted successfully",
+        error: null,
+        employeeId,
+      });
+    }
+
+    return json(
+      {
+        status: "error",
+        message: "Failed to delete employee skill",
+        error,
+        employeeId,
+      },
+      { status: 500 },
+    );
+  } catch (error) {
     return json({
-      status: "success",
-      message: "Employee skill deleted successfully",
-      error: null,
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+      employeeId,
     });
   }
-
-  return json(
-    {
-      status: "error",
-      message: "Failed to delete employee skill",
-      error,
-    },
-    { status: 500 },
-  );
 }
 
 export default function DeleteEmployeeSkill() {
@@ -57,7 +70,7 @@ export default function DeleteEmployeeSkill() {
           variant: "destructive",
         });
       }
-      navigate(-1);
+      navigate(`/employees/${actionData?.employeeId}/work-portfolio`);
     }
   }, [actionData]);
 

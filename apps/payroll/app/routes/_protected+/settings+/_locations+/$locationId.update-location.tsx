@@ -8,7 +8,6 @@ import {
   useNavigate,
 } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
-import { safeRedirect } from "@/utils/server/http.server";
 import { isGoodStatus, LocationSchema } from "@canny_ecosystem/utils";
 import { getLocationById } from "@canny_ecosystem/supabase/queries";
 import { updateLocation } from "@canny_ecosystem/supabase/mutations";
@@ -19,22 +18,37 @@ export const UPDATE_LOCATION = "update-location";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const locationId = params.locationId;
-  const { supabase } = getSupabaseWithHeaders({ request });
 
-  let locationData = null;
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
 
-  if (locationId) {
-    locationData = await getLocationById({
-      supabase,
-      id: locationId,
+    let locationData = null;
+
+    if (locationId) {
+      locationData = await getLocationById({
+        supabase,
+        id: locationId,
+      });
+    }
+
+    if (locationData?.error) {
+      throw locationData.error;
+    }
+
+    return json({
+      status: "success",
+      message: "Location loaded",
+      data: locationData?.data,
+      error: null,
+    });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+      data: null,
     });
   }
-
-  if (locationData?.error) {
-    throw locationData.error;
-  }
-
-  return json({ data: locationData?.data });
 }
 
 export async function action({

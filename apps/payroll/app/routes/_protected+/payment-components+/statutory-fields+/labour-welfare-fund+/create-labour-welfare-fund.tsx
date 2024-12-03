@@ -47,44 +47,63 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 export const CREATE_LABOUR_WELFARE_FUND = "create-labour-welfare-fund";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-  return json({ status: "success", message: "Company ID found", companyId });
+    return json({ status: "success", message: "Company ID found", companyId });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+      companyId: null,
+    }, { status: 500 });
+  }
 }
 
-export async function action({ request }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
-  const submission = parseWithZod(formData, {
-    schema: LabourWelfareFundSchema,
-  });
-
-  if (submission.status !== "success") {
-    return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
-    );
-  }
-
-  const { status, error } = await createLabourWelfareFund({
-    supabase,
-    data: submission.value as any,
-  });
-
-  if (isGoodStatus(status)) {
-    return json({
-      status: "success",
-      message: "Labour Welfare Fund created successfully",
-      error: null,
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
+    const submission = parseWithZod(formData, {
+      schema: LabourWelfareFundSchema,
     });
-  }
 
-  return json({
-    status: "error",
-    message: "Failed to create Labour Welfare Fund",
-    error,
-  });
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+
+    const { status, error } = await createLabourWelfareFund({
+      supabase,
+      data: submission.value as any,
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Labour Welfare Fund created successfully",
+        error: null,
+      });
+    }
+
+    return json({
+      status: "error",
+      message: "Failed to create Labour Welfare Fund",
+      error,
+    });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+    }, { status: 500 });
+  }
 }
 
 export default function CreateLabourWelfareFund({
@@ -138,7 +157,9 @@ export default function CreateLabourWelfareFund({
       });
     }
 
-    navigate("/payment-components/statutory-fields/labour-welfare-fund", { replace: true });
+    navigate("/payment-components/statutory-fields/labour-welfare-fund", {
+      replace: true,
+    });
   }, [actionData]);
 
   return (

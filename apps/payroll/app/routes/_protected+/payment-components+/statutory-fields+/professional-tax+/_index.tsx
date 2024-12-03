@@ -53,9 +53,9 @@ export default function ProfessionalTaxIndex() {
   useEffect(() => {
     if (status === "error") {
       toast({
-        title: "Warning",
+        title: "Error",
         description: error?.message || "Failed to load",
-        variant: "warning",
+        variant: "destructive",
       });
     }
   }, []);

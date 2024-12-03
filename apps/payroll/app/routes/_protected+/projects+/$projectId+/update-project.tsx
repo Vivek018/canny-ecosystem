@@ -25,78 +25,107 @@ export async function loader({
   params,
 }: LoaderFunctionArgs): Promise<Response> {
   const projectId = params.projectId;
-  const { supabase } = getSupabaseWithHeaders({ request });
 
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
 
-  let data = null;
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-  if (projectId) {
-    data = (await getProjectById({ supabase, id: projectId, companyId })).data;
-  }
+    let data = null;
 
-  const { data: companies, error } = await getCompanies({ supabase });
+    if (projectId) {
+      data = (await getProjectById({ supabase, id: projectId, companyId }))
+        .data;
+    }
 
-  if (error) {
+    const { data: companies, error } = await getCompanies({ supabase });
+
+    if (error) {
+      return json({
+        status: "error",
+        message: "Failed to get companies",
+        error,
+        data: null,
+      });
+    }
+
+    if (!companies) {
+      return json({
+        status: "error",
+        message: "No companies found",
+        error: "No companies found",
+        data: null,
+      });
+    }
+
+    const companyOptions = companies
+      .filter((company) => company.id !== companyId)
+      .map((company) => ({ label: company.name, value: company.id }));
+
     return json({
-      status: "error",
-      message: "Failed to get companies",
-      error,
-      data: null,
+      status: "success",
+      message: "Project loaded",
+      data,
+      companyOptions,
     });
+  } catch (error) {
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+        data: null,
+      },
+      { status: 500 },
+    );
   }
-
-  if (!companies) {
-    return json({
-      status: "error",
-      message: "No companies found",
-      error: "No companies found",
-      data: null,
-    });
-  }
-
-  const companyOptions = companies
-    .filter((company) => company.id !== companyId)
-    .map((company) => ({ label: company.name, value: company.id }));
-
-  return json({
-    status: "success",
-    message: "Project loaded",
-    data,
-    companyOptions,
-  });
 }
 
 export async function action({
   request,
 }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
 
-  const submission = parseWithZod(formData, {
-    schema: ProjectSchema,
-  });
+    const submission = parseWithZod(formData, {
+      schema: ProjectSchema,
+    });
 
-  if (submission.status !== "success") {
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+
+    const { status, error } = await updateProject({
+      supabase,
+      data: submission.value,
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Project updated successfully",
+        error: null,
+      });
+    }
     return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: "error", message: "Project update failed", error },
+      { status: 500 },
+    );
+  } catch (error) {
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+        data: null,
+      },
+      { status: 500 },
     );
   }
-
-  const { status, error } = await updateProject({
-    supabase,
-    data: submission.value,
-  });
-
-  if (isGoodStatus(status)) {
-    return json({
-      status: "success",
-      message: "Project updated successfully",
-      error: null,
-    });
-  }
-  return json({ status: "error", message: "Project update failed", error }, { status: 500 });
 }
 
 export default function UpdateProject() {

@@ -9,7 +9,6 @@ import {
   useNavigate,
 } from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { safeRedirect } from "@/utils/server/http.server";
 import { updateEmployeeStatutoryDetails } from "@canny_ecosystem/supabase/mutations";
 import { isGoodStatus, EmployeeStatutorySchema } from "@canny_ecosystem/utils";
 import { CreateEmployeeStatutoryDetails } from "@/components/employees/form/create-employee-statutory-details";
@@ -26,68 +25,92 @@ export async function loader({
   params,
 }: LoaderFunctionArgs): Promise<Response> {
   const employeeId = params.employeeId;
-  const { supabase } = getSupabaseWithHeaders({ request });
 
-  let data = null;
-  let error = null;
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
 
-  if (employeeId) {
-    ({ data, error } = await getEmployeeStatutoryDetailsById({
-      supabase,
-      id: employeeId,
-    }));
-  }
+    let data = null;
+    let error = null;
 
-  if (error)
+    if (employeeId) {
+      ({ data, error } = await getEmployeeStatutoryDetailsById({
+        supabase,
+        id: employeeId,
+      }));
+    }
+
+    if (error)
+      return json({
+        status: "error",
+        message: "Failed to load statutory",
+        data,
+        error,
+        employeeId,
+      });
+
+    return json({
+      status: "success",
+      message: "Statutory found",
+      data,
+      error: null,
+      employeeId,
+    });
+  } catch (error) {
     return json({
       status: "error",
       message: "Failed to load statutory",
-      data,
       error,
+      data: null,
+      employeeId,
     });
-
-  return json({
-    status: "success",
-    message: "Statutory found",
-    data,
-    error: null,
-  });
+  }
 }
 
 export async function action({
   request,
 }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
 
-  const submission = parseWithZod(formData, {
-    schema: EmployeeStatutorySchema,
-  });
+    const submission = parseWithZod(formData, {
+      schema: EmployeeStatutorySchema,
+    });
 
-  if (submission.status !== "success") {
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+
+    const { status, error } = await updateEmployeeStatutoryDetails({
+      supabase,
+      data: submission.value,
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Statutory updated successfully",
+        error: null,
+      });
+    }
     return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: "error", message: "Statutory update failed", error },
+      { status: 500 },
     );
-  }
-
-  const { status, error } = await updateEmployeeStatutoryDetails({
-    supabase,
-    data: submission.value,
-  });
-
-  if (isGoodStatus(status)) {
+  } catch (error) {
     return json({
-      status: "success",
-      message: "Statutory updated successfully",
-      error: null,
+      status: "error",
+      message: "Statutory update failed",
+      error,
     });
   }
-  return json({ status: "error", message: "Statutory update failed", error }, { status: 500});
 }
 
 export default function UpdateStatutoryDetails() {
-  const { data, status, error } = useLoaderData<typeof loader>();
+  const { data, status, error, employeeId } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
   const currentSchema = EmployeeStatutorySchema;
@@ -110,11 +133,10 @@ export default function UpdateStatutoryDetails() {
     if (status === "error") {
       toast({
         title: "Error",
-        description:
-          error.message || "Failed to get statutory details",
+        description: error.message || "Failed to get statutory details",
         variant: "destructive",
       });
-      navigate(-1);
+      navigate(`/employees/${data?.id}/work-portfolio`);
     }
     if (actionData) {
       if (actionData?.status === "success") {
@@ -130,7 +152,7 @@ export default function UpdateStatutoryDetails() {
           variant: "destructive",
         });
       }
-      navigate(-1);
+      navigate(`/employees/${employeeId}/work-portfolio`);
     }
   }, [actionData]);
 

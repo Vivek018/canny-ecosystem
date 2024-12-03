@@ -26,7 +26,6 @@ import {
 import { useEffect, useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { safeRedirect } from "@/utils/server/http.server";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
 import { UPDATE_LOCATION } from "./$locationId.update-location";
@@ -47,42 +46,70 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 export const CREATE_LOCATION = "create-location";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-  return json({ companyId });
+    return json({
+      status: "success",
+      message: "CompanyId found",
+      companyId,
+      error: null,
+    });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+      companyId: null,
+    });
+  }
 }
 
 export async function action({
   request,
 }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
 
-  const submission = parseWithZod(formData, {
-    schema: LocationSchema,
-  });
-
-  if (submission.status !== "success") {
-    return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
-    );
-  }
-
-  const { status, error } = await createLocation({
-    supabase,
-    data: submission.value as any,
-  });
-
-  if (isGoodStatus(status))
-    return json({
-      status: "success",
-      message: "Location created",
-      error: null,
+    const submission = parseWithZod(formData, {
+      schema: LocationSchema,
     });
 
-  return json({ status: "error", message: "Location creation failed", error }, { status: 500 });
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+
+    const { status, error } = await createLocation({
+      supabase,
+      data: submission.value as any,
+    });
+
+    if (isGoodStatus(status))
+      return json({
+        status: "success",
+        message: "Location created",
+        error: null,
+      });
+
+    return json(
+      { status: "error", message: "Location creation failed", error },
+      { status: 500 },
+    );
+  } catch (error) {
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 },
+    );
+  }
 }
 
 export default function CreateLocation({

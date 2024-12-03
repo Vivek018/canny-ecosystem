@@ -6,27 +6,38 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { json, useActionData, useNavigate } from "@remix-run/react";
 import { useEffect } from "react";
 
-export async function action({ request, params }: ActionFunctionArgs): Promise<Response> {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const professionalTaxId = params.professionalTaxId;
+export async function action({
+  request,
+  params,
+}: ActionFunctionArgs): Promise<Response> {
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const professionalTaxId = params.professionalTaxId;
 
-  const { status, error } = await deleteProfessionalTax({
-    supabase,
-    id: professionalTaxId ?? "",
-  });
-
-  if (isGoodStatus(status)) {
-    return json({
-      status: "success",
-      message: "Professional Tax deleted successfully",
-      error: null,
+    const { status, error } = await deleteProfessionalTax({
+      supabase,
+      id: professionalTaxId ?? "",
     });
-  }
 
-  return json(
-    { status: "error", message: "Failed to delete Professional Tax", error },
-    { status: 500 },
-  );
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Professional Tax deleted successfully",
+        error: null,
+      });
+    }
+
+    return json(
+      { status: "error", message: "Failed to delete Professional Tax", error },
+      { status: 500 },
+    );
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+    }, { status: 500 });
+  }
 }
 
 export default function DeleteProfessionalTax() {
@@ -50,9 +61,11 @@ export default function DeleteProfessionalTax() {
           variant: "destructive",
         });
       }
-      navigate("/payment-components/statutory-fields/professional-tax", { replace: true });
+      navigate("/payment-components/statutory-fields/professional-tax", {
+        replace: true,
+      });
     }
-  }, [actionData])
+  }, [actionData]);
 
   return null;
 }

@@ -10,30 +10,42 @@ import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json, Link, useLoaderData } from "@remix-run/react";
 import { useEffect } from "react";
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { supabase } = getSupabaseWithHeaders({ request });
+export const loader = async ({ request }: LoaderFunctionArgs): Promise<Response> => {
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
 
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data, error } = await getStatutoryBonusByCompanyId({
-    supabase,
-    companyId,
-  });
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    const { data, error } = await getStatutoryBonusByCompanyId({
+      supabase,
+      companyId,
+    });
 
-  if (error) {
+    if (error) {
+      return json({
+        status: "error",
+        message: "Failed to load data",
+        data,
+        error,
+      });
+    }
+
     return json({
-      status: "error",
-      message: "Failed to load data",
+      status: "success",
+      message: "Statutory Bonus loaded successfully",
       data,
       error,
     });
+  } catch (error) {
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        data: null,
+        error,
+      },
+      { status: 500 },
+    );
   }
-
-  return json({
-    status: "success",
-    message: "Statutory Bonus loaded successfully",
-    data,
-    error,
-  });
 };
 
 type DetailItemProps = {
@@ -52,15 +64,15 @@ const DetailItem: React.FC<DetailItemProps> = ({ label, value, className }) => {
 };
 
 export default function StatutoryBonusIndex() {
-  const { data, status, error } = useLoaderData<typeof loader>();
+  const { data, status, message, error } = useLoaderData<typeof loader>();
   const { toast } = useToast();
 
   useEffect(() => {
-    if (status === "error") {
+    if (status === "error" && error?.code !== "PGRST116") {
       toast({
-        title: "Warning",
-        description: error?.message || "Failed to load",
-        variant: "warning",
+        title: "Error",
+        description: error?.message ?? message ?? "Failed to load",
+        variant: "destructive",
       });
     }
   }, []);
