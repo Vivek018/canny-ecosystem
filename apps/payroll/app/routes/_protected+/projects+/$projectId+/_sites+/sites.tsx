@@ -16,34 +16,35 @@ import { replaceUnderscore } from "@canny_ecosystem/utils";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/react";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const projectId = params.projectId;
 
   const { supabase } = getSupabaseWithHeaders({ request });
 
-  if (!projectId) {
-    throw new Error("No Project Id");
-  }
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-  const { data, error } = await getSitesByProjectId({
-    supabase,
-    projectId,
-  });
+  if (!projectId) throw new Error("No Project Id");
 
-  if (error) {
-    throw error;
-  }
+  const { data, error } = await getSitesByProjectId({supabase,projectId});
 
-  if (!data) {
-    throw new Error("No data found");
-  }
+  if (error) throw error;
 
-  return json({ data, projectId });
+  if (!data) throw new Error("No data found");
+
+  const env = {
+    SUPABASE_URL: process.env.SUPABASE_URL!,
+    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
+  };
+
+  return json({ data, projectId, companyId, env });
 }
 
+export async function action() { return null }
+
 export default function SitesIndex() {
-  const { data, projectId } = useLoaderData<typeof loader>();
+  const { data, projectId, companyId, env } = useLoaderData<typeof loader>();
   const { isDocument } = useIsDocument();
 
   return (
@@ -93,7 +94,7 @@ export default function SitesIndex() {
                     }
                     className='data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0'
                   >
-                    <SiteCard site={site} projectId={projectId}/>
+                    <SiteCard site={site} env={env} companyId={companyId} />
                   </CommandItem>
                 ))}
               </div>

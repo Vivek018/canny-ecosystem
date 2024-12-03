@@ -7,100 +7,87 @@ import {
   DropdownMenuTrigger,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@canny_ecosystem/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@canny_ecosystem/ui/tooltip";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Form, Link, useNavigate, useSubmit } from "@remix-run/react";
 import { DeleteSite } from "./delete-site";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@canny_ecosystem/ui/card";
-import type { SitesWithLocation } from "@canny_ecosystem/supabase/queries";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@canny_ecosystem/ui/card";
+import { getPaymentTemplateAssignmentBySiteId, getPaymentTemplatesByCompanyId, type SitesWithLocation } from "@canny_ecosystem/supabase/queries";
 import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
-import { getInitialValueFromZod, getValidDateForInput, replaceUnderscore, z } from "@canny_ecosystem/utils";
-import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@canny_ecosystem/ui/dialog";
+import { getInitialValueFromZod, getValidDateForInput, PaymentTemplateFormSiteDialogSchema, replaceUnderscore, z } from "@canny_ecosystem/utils";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@canny_ecosystem/ui/dialog";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import { FormProvider, getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { useState } from "react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
+import { useSupabase } from "@canny_ecosystem/supabase/client";
+import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
+import { Spinner } from "@canny_ecosystem/ui/spinner";
 
-export function SiteCard({ site, projectId }: { site: Omit<SitesWithLocation, "created_at" | "updated_at"> }) {
+type paymentTemplateIptionsType = {
+  label: string;
+  value: string;
+}
+
+export function SiteCard({ site, env, companyId }: { site: Omit<SitesWithLocation, "created_at" | "updated_at">, env: SupabaseEnv, companyId: string }) {
+  const { supabase } = useSupabase({ env });
+  const [initialValues, setInitialValues] = useState(null);
+  const [showSpinner, setShowSpinner] = useState(true);
+  const [paymentTemplatesOptions, setPaymentTemplatesOptions] = useState<paymentTemplateIptionsType[]>([]);
+  const submit = useSubmit();
+
   const navigate = useNavigate();
 
   const viewPaySequenceSearchParam = `${modalSearchParamNames.view_pay_sequence}=true`;
   const editPaySequenceSearchParam = `${modalSearchParamNames.edit_pay_sequence}=true`;
 
-  // Template linking.. 
-  const submit = useSubmit();
-  const [paymentTemplatesOptions, setPaymentTemplatesOptions] = useState<any>([]);
-  const showPaymentTemplates = () => {
-    // fetch from DB..
-    const dummyPaymentTemplatesOptions = [{
-      id: "c1af93e4-39f9-4a3c-a12d-26bdb25bccca",
-      name: "test payment template",
-    }];
-    const newPaymentTemplatesOptions = dummyPaymentTemplatesOptions
-      .map((paymentTemplate) => ({ label: paymentTemplate.name, value: paymentTemplate.id }));
-    setPaymentTemplatesOptions(newPaymentTemplatesOptions);
-  }
-  const createSiteLink = (e) => {
-    e.preventDefault();
-    // return null;
-    submit(
-      {
-        site_id: site.id,
-        is_active: false,
-        returnTo: `/projects/${projectId}/sites`,
-        assignment_type: "site",
-        effective_from: fields.effective_from.value,
-        effective_to: fields.effective_to.value,
-        template_id: fields.payment_template.value
-      },
-      {
-        method: "POST",
-        action: `/templates/${projectId}/create-site-link`,
-      },
-    );
-  }
-
-  const deleteSiteLink = () => {
-    submit(
-      {
-        site_id: site.id,
-        is_active: false,
-        returnTo: `/projects/${projectId}/sites`,
-      },
-      {
-        method: "POST",
-        action: `/templates/${projectId}/delete-site-link`,
-      },
-    );
-  }
-  
-  const paymentTemplateFormDialogSchema = z.object({
-    effective_from: z.string().default(new Date().toISOString().split("T")[0]),
-    effective_to: z.string().optional(),
-    payment_template: z.string()
-  });
-
   const [form, fields] = useForm({
     id: "payment-template-form",
-    constraint: getZodConstraint(paymentTemplateFormDialogSchema),
+    constraint: getZodConstraint(PaymentTemplateFormSiteDialogSchema),
     onValidate({ formData }) {
-      return parseWithZod(formData, { schema: paymentTemplateFormDialogSchema });
+      return parseWithZod(formData, { schema: PaymentTemplateFormSiteDialogSchema });
     },
-    defaultValue: getInitialValueFromZod(paymentTemplateFormDialogSchema),
-    shouldValidate: 'onInput'
+    defaultValue: initialValues ?? getInitialValueFromZod(PaymentTemplateFormSiteDialogSchema),
+    shouldValidate: 'onInput',
+    shouldRevalidate: 'onInput'
   });
+
+  async function setLinkedDataIfExists() {
+    const { data } = await getPaymentTemplateAssignmentBySiteId({ supabase, site_id: site.id });
+    setShowSpinner(false);
+    if (data) {
+      const values = {
+        effective_from: data.effective_from,
+        effective_to: data.effective_to,
+        template_id: data.template_id,
+      };
+      setInitialValues(values as any);
+      form.update({ value: values });
+    }
+  }
+
+  const openPaymentTemplateDialog = async () => {
+    setLinkedDataIfExists();
+    const { data } = await getPaymentTemplatesByCompanyId({ supabase, company_id: companyId });
+    if (data) {
+      const newPaymentTemplatesOptions = data?.map((paymentTemplate) => ({ label: paymentTemplate.name, value: paymentTemplate.id }));
+      setPaymentTemplatesOptions(newPaymentTemplatesOptions);
+    }
+  }
+
+  const deleteSiteLink = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
+    submit(
+      {
+        returnTo: `/projects/${site.project_id}/sites`,
+      },
+      {
+        method: "POST",
+        action: `/templates/${site.project_id}/${site.id}/delete-site-link`,
+      },
+    );
+  }
 
   return (
     <Card
@@ -137,48 +124,25 @@ export function SiteCard({ site, projectId }: { site: Omit<SitesWithLocation, "c
               <DropdownMenuGroup>
                 <DropdownMenuItem
                   onClick={() => {
-                    navigate(
-                      `/projects/${site.project_id}/sites/${site.id}?${viewPaySequenceSearchParam}`,
-                    );
+                    navigate(`/projects/${site.project_id}/sites/${site.id}?${viewPaySequenceSearchParam}`);
                   }}
                 >
                   View Pay Sequence
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => {
-                    navigate(
-                      `/projects/${site.project_id}/sites/${site.id}?${editPaySequenceSearchParam}`,
-                    );
+                    navigate(`/projects/${site.project_id}/sites/${site.id}?${editPaySequenceSearchParam}`);
                   }}
                 >
                   Edit Pay Sequence
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                {/* <DropdownMenuItem
-                  className={cn("py-2 text-[13px]", !site.latitude && "hidden")}
-                  onClick={() => {
-                    navigator.clipboard.writeText(String(site.latitude));
-                  }}
-                >
-                  Copy Latitude
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className={cn(
-                    "py-2 text-[13px]",
-                    !site.longitude && "hidden",
-                  )}
-                  onClick={() => {
-                    navigator.clipboard.writeText(String(site.longitude));
-                  }}
-                >
-                  Copy Longitude
-                </DropdownMenuItem> */}
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button
                       variant="ghost"
                       className="item-start justify-start px-2 font-normal w-full"
-                      onClick={showPaymentTemplates}
+                      onClick={openPaymentTemplateDialog}
                     >
                       Link template
                     </Button>
@@ -189,6 +153,7 @@ export function SiteCard({ site, projectId }: { site: Omit<SitesWithLocation, "c
                       <Form
                         method="POST"
                         {...getFormProps(form)}
+                        action={`/templates/${site.project_id}/${site.id}/${initialValues ? "update" : "create"}-site-link`}
                         className="space-y-6 w-full"
                       >
                         <div className="grid grid-cols-2 gap-4">
@@ -199,9 +164,7 @@ export function SiteCard({ site, projectId }: { site: Omit<SitesWithLocation, "c
                               className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none",
                               placeholder: replaceUnderscore(fields.effective_from.name),
                               max: getValidDateForInput(new Date().toISOString()),
-                              defaultValue: getValidDateForInput(
-                                fields.effective_from.initialValue,
-                              ),
+                              defaultValue: getValidDateForInput(fields.effective_from.initialValue as string),
                             }}
                             labelProps={{
                               children: replaceUnderscore(fields.effective_from.name),
@@ -215,10 +178,8 @@ export function SiteCard({ site, projectId }: { site: Omit<SitesWithLocation, "c
                               ...getInputProps(fields.effective_to, { type: "date" }),
                               className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none",
                               placeholder: replaceUnderscore(fields.effective_to.name),
-                              min: getValidDateForInput(fields.effective_from.value),
-                              defaultValue: getValidDateForInput(
-                                fields.effective_to.initialValue,
-                              ),
+                              min: getValidDateForInput(fields.effective_from.value as string),
+                              defaultValue: getValidDateForInput(fields.effective_to.initialValue as string),
                             }}
                             labelProps={{
                               children: replaceUnderscore(fields.effective_to.name),
@@ -228,33 +189,35 @@ export function SiteCard({ site, projectId }: { site: Omit<SitesWithLocation, "c
                           />
                         </div>
                         <SearchableSelectField
-                          key={0}
+                          key={initialValues}
                           className="capitalize"
                           options={paymentTemplatesOptions}
                           inputProps={{
-                            ...getInputProps(fields.payment_template, { type: "text" }),
+                            ...getInputProps(fields.template_id, { type: "text" }),
                           }}
-                          placeholder={`Select ${fields.payment_template.name}`}
+                          placeholder={`Select ${fields.template_id.name}`}
                           labelProps={{
-                            children: replaceUnderscore(fields.payment_template.name),
+                            children: replaceUnderscore(fields.template_id.name),
                           }}
-                          errors={fields.payment_template.errors}
+                          errors={fields.template_id.errors}
                         />
-                        <Button onClick={createSiteLink} variant="default" className="w-full">Link Template</Button>
+                        {
+                          showSpinner ? <div className="flex justify-center"><Spinner /></div> : <>
+                            <Button variant="default" className="w-full">{initialValues ? "Update" : "Link"} Template</Button>
+                            <Button
+                              variant="destructive-ghost"
+                              className={`w-full ${!initialValues && "hidden"}`}
+                              onClick={(e) => deleteSiteLink(e)}
+                            >
+                              Delete link
+                            </Button>
+                          </>
+                        }
                       </Form>
                     </FormProvider>
                   </DialogContent>
                 </Dialog>
-                <Button
-                  variant="destructive-ghost"
-                  className="item-start justify-start px-2 font-normal w-full"
-                  onClick={deleteSiteLink}
-                >
-                  Delete link
-                </Button>
-                <DropdownMenuSeparator
-                  className={cn(!site.latitude && !site.longitude && "hidden")}
-                />
+                <DropdownMenuSeparator className={cn(!site.latitude && !site.longitude && "hidden")} />
                 <DeleteSite projectId={site.project_id} siteId={site.id} />
               </DropdownMenuGroup>
             </DropdownMenuContent>
@@ -263,8 +226,7 @@ export function SiteCard({ site, projectId }: { site: Omit<SitesWithLocation, "c
       </CardHeader>
       <CardContent className="flex flex-col gap-0.5 px-4">
         <address className="not-italic line-clamp-3">
-          {`${site.address_line_1} ${site.address_line_2 ? site.address_line_2 : ""
-            }`}
+          {`${site.address_line_1} ${site.address_line_2 ? site.address_line_2 : ""}`}
         </address>
         <div className="flex items-center capitalize gap-2">
           <p>{`${site.city},`}</p>

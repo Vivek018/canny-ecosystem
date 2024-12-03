@@ -6,32 +6,78 @@ import {
   DropdownMenuSeparator,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { Form, useLoaderData, useSubmit } from "@remix-run/react";
+import { Form, redirect, useSubmit } from "@remix-run/react";
 import { DeleteEmployee } from "./delete-employee";
-import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@canny_ecosystem/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@canny_ecosystem/ui/dialog";
 import { Button } from "@canny_ecosystem/ui/button";
 import { useState } from "react";
 import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import { FormProvider, getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { eligibilityOptionsArray, getInitialValueFromZod, getValidDateForInput, replaceUnderscore, z } from "@canny_ecosystem/utils";
+import { eligibilityOptionsArray, getInitialValueFromZod, getValidDateForInput, PaymentTemplateFormDialogSchema, replaceUnderscore, transformStringArrayIntoOptions, z } from "@canny_ecosystem/utils";
+import { useSupabase } from "@canny_ecosystem/supabase/client";
+import { getPaymentTemplateAssignmentByEmployeeId, getPaymentTemplatesByCompanyId } from "@canny_ecosystem/supabase/queries";
+import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
+import { Spinner } from "@canny_ecosystem/ui/spinner";
 
-export const EmployeeOptionsDropdown = ({ employee, triggerChild }: {
+type initialValuesType = {
+  effective_from: string;
+  effective_to: string | null;
+  template_id: string;
+  eligibility_option: "position" | "skill_level" | null;
+}
+
+type paymentTemplateIptionsType = {
+  label: string;
+  value: string;
+}
+
+export const EmployeeOptionsDropdown = ({ employee, triggerChild, env }: {
   employee: {
     id: string;
     is_active: boolean;
     returnTo?: string;
+    employee_project_assignment: { [x: string]: any; },
+    companyId: string
   };
   triggerChild: React.ReactElement;
+  env: SupabaseEnv
 }) => {
-  const loaderData = useLoaderData<any>();
+  const { supabase } = useSupabase({ env });
+  const [paymentTemplatesOptions, setPaymentTemplatesOptions] = useState<paymentTemplateIptionsType[]>([]);
+  const [initialValues, setInitialValues] = useState<initialValuesType | null>(null);
+  const [showSpinner, setShowSpinner] = useState(true);
+  const [resetKey, _setResetKey] = useState(Date.now());
   const submit = useSubmit();
 
-  const [paymentTemplatesOptions, setPaymentTemplatesOptions] = useState<any>([]);
-  const employee_project_assignment = []; //loaderData?.data.find(e => e.id === employee.id).employee_project_assignment;
-  const eligibilityOptions = eligibilityOptionsArray.map((eligibilityOption) => {
-    return { label: eligibilityOption, value: eligibilityOption }
+  const [form, fields] = useForm({
+    id: "payment-template-form",
+    constraint: getZodConstraint(PaymentTemplateFormDialogSchema),
+    onValidate({ formData }) {
+      return parseWithZod(formData, { schema: PaymentTemplateFormDialogSchema });
+    },
+    defaultValue: initialValues ?? getInitialValueFromZod(PaymentTemplateFormDialogSchema),
+    shouldValidate: 'onInput',
+    shouldRevalidate: 'onInput'
   });
+
+  async function setLinkedDataIfExists() {
+    const { data } = await getPaymentTemplateAssignmentByEmployeeId({
+      supabase,
+      employee_id: employee.id,
+    });
+    setShowSpinner(false);
+    if (data) {
+      const values = {
+        effective_from: data.effective_from,
+        effective_to: data.effective_to,
+        template_id: data.template_id,
+        eligibility_option: data.eligibility_option,
+      };
+      setInitialValues(values);
+      form.update({ value: values });
+    }
+  }
 
   const handleMarkAsActive = () => {
     submit(
@@ -61,69 +107,49 @@ export const EmployeeOptionsDropdown = ({ employee, triggerChild }: {
     );
   };
 
-  const showPaymentTemplates = () => {
-    // fetch from DB..
-    const dummyPaymentTemplatesOptions = [{
-      id: "c1af93e4-39f9-4a3c-a12d-26bdb25bccca",
-      name: "test payment template",
-    }];
-    const newPaymentTemplatesOptions = dummyPaymentTemplatesOptions
-      .map((paymentTemplate) => ({ label: paymentTemplate.name, value: paymentTemplate.id }));
-    setPaymentTemplatesOptions(newPaymentTemplatesOptions);
+  const openPaymentTemplateDialog = async () => {
+    setLinkedDataIfExists();
+    const { data } = await getPaymentTemplatesByCompanyId({ supabase, company_id: employee.companyId });
+    if (data) {
+      const newPaymentTemplatesOptions = data?.map((paymentTemplate) => (
+        { label: paymentTemplate.name, value: paymentTemplate.id }
+      ));
+      setPaymentTemplatesOptions(newPaymentTemplatesOptions);
+    }
   }
 
-  const createEmployeeLink = (e) => {
+  const createOrEditEmployeeLink = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const validation = parseWithZod(new FormData(e.currentTarget.form), { schema: PaymentTemplateFormDialogSchema });
+    if (validation.status !== 'success') return redirect("/employees");
+    submit(
+      {
+        effective_from: fields.effective_from?.value || "",
+        effective_to: fields.effective_to?.value || "",
+        template_id: fields.template_id?.value || "",
+        eligibility_option: fields.eligibility_option?.value || "",
+        [fields.eligibility_option.value || ""]: employee.employee_project_assignment[fields.eligibility_option.value || '']
+      },
+      {
+        method: "POST",
+        action: `/templates/${employee.id}/${initialValues ? "update" : "create"}-employee-link`,
+      },
+    );
+  }
+
+  const deleteEmployeeLink = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     submit(
       {
-        employee_id: employee.id,
-        is_active: false,
-        returnTo: employee.returnTo ?? "/employees",
-        assignment_type: "employee",
-        effective_from: fields.effective_from.value,
-        effective_to: fields.effective_to.value,
-        template_id: fields.payment_template.value,
-        eligibility_option: fields.eligibility_option.value,
-        [fields.eligibility_option.value] : employee_project_assignment[fields.eligibility_option.value]
-      },
-      {
-        method: "POST",
-        action: "/templates/create-employee-link",
-      },
-    );
-  }
-
-  const deleteEmployeeLink = () => {
-    submit(
-      {
-        employee_id: employee.id,
         is_active: false,
         returnTo: employee.returnTo ?? "/employees",
       },
       {
         method: "POST",
-        action: "/templates/delete-employee-link",
+        action: `/templates/${employee.id}/delete-employee-link`,
       },
     );
   }
-
-
-  const paymentTemplateFormDialogSchema = z.object({
-    effective_from: z.string().default(new Date().toISOString().split("T")[0]),
-    effective_to: z.string().optional(),
-    payment_template: z.string(),
-    eligibility_option: z.string(),
-  });
-
-  const [form, fields] = useForm({
-    id: "payment-template-form",
-    constraint: getZodConstraint(paymentTemplateFormDialogSchema),
-    onValidate({ formData }) {
-      return parseWithZod(formData, { schema: paymentTemplateFormDialogSchema });
-    },
-    defaultValue: getInitialValueFromZod(paymentTemplateFormDialogSchema),
-    shouldValidate: 'onInput'
-  });
 
   return (
     <DropdownMenu>
@@ -148,7 +174,7 @@ export const EmployeeOptionsDropdown = ({ employee, triggerChild }: {
               <Button
                 variant="ghost"
                 className="item-start justify-start px-2 font-normal w-full"
-                onClick={showPaymentTemplates}
+                onClick={openPaymentTemplateDialog}
               >
                 Link template
               </Button>
@@ -156,11 +182,7 @@ export const EmployeeOptionsDropdown = ({ employee, triggerChild }: {
             <DialogContent className="sm:max-w-[600px]">
               <DialogTitle className="text-xl font-semibold mb-4">Link Payment Template</DialogTitle>
               <FormProvider context={form.context}>
-                <Form
-                  method="POST"
-                  {...getFormProps(form)}
-                  className="space-y-6 w-full"
-                >
+                <Form method="POST" {...getFormProps(form)} className="space-y-6 w-full">
                   <div className="grid grid-cols-2 gap-4">
                     <Field
                       className="w-full"
@@ -169,9 +191,7 @@ export const EmployeeOptionsDropdown = ({ employee, triggerChild }: {
                         className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none",
                         placeholder: replaceUnderscore(fields.effective_from.name),
                         max: getValidDateForInput(new Date().toISOString()),
-                        defaultValue: getValidDateForInput(
-                          fields.effective_from.initialValue,
-                        ),
+                        defaultValue: getValidDateForInput(fields.effective_from.initialValue),
                       }}
                       labelProps={{
                         children: replaceUnderscore(fields.effective_from.name),
@@ -199,22 +219,22 @@ export const EmployeeOptionsDropdown = ({ employee, triggerChild }: {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <SearchableSelectField
-                      key={0}
+                      key={resetKey}
                       className="capitalize"
                       options={paymentTemplatesOptions}
                       inputProps={{
-                        ...getInputProps(fields.payment_template, { type: "text" }),
+                        ...getInputProps(fields.template_id, { type: "text" }),
                       }}
-                      placeholder={`Select ${fields.payment_template.name}`}
+                      placeholder={`Select ${fields.template_id.name}`}
                       labelProps={{
-                        children: replaceUnderscore(fields.payment_template.name),
+                        children: replaceUnderscore(fields.template_id.name),
                       }}
-                      errors={fields.payment_template.errors}
+                      errors={fields.template_id.errors}
                     />
                     <SearchableSelectField
-                      key={1}
+                      key={resetKey + 1}
                       className="capitalize"
-                      options={eligibilityOptions}
+                      options={transformStringArrayIntoOptions(eligibilityOptionsArray as unknown as string[])}
                       inputProps={{
                         ...getInputProps(fields.eligibility_option, { type: "text" }),
                       }}
@@ -225,18 +245,24 @@ export const EmployeeOptionsDropdown = ({ employee, triggerChild }: {
                       errors={fields.eligibility_option.errors}
                     />
                   </div>
-                  <Button onClick={createEmployeeLink} variant="default" className="w-full">Link Template</Button>
+                  {
+                    showSpinner ? <div className="flex justify-center"><Spinner /></div> : <>
+                      <Button onClick={(e) => createOrEditEmployeeLink(e as any)} variant="default" className="w-full">
+                        {initialValues ? "Update" : "Link"} Template
+                      </Button>
+                      <Button
+                        variant="destructive-ghost"
+                        className={`w-full ${!initialValues && "hidden"}`}
+                        onClick={(e) => deleteEmployeeLink(e)}
+                      >
+                        Delete link
+                      </Button>
+                    </>
+                  }
                 </Form>
               </FormProvider>
             </DialogContent>
           </Dialog>
-          <Button
-            variant="ghost"
-            className="item-start justify-start px-2 font-normal w-full"
-            onClick={deleteEmployeeLink}
-          >
-            Delete link
-          </Button>
           <DropdownMenuSeparator />
           <DeleteEmployee employeeId={employee.id} />
         </DropdownMenuGroup>

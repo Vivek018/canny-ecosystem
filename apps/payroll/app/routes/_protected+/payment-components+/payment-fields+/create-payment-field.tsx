@@ -73,25 +73,18 @@ export async function action({ request }: ActionFunctionArgs) {
   return json({ status, error });
 }
 
-export default function CreatePaymentField({
-  updateValues,
-}: { updateValues?: PaymentFieldDatabaseUpdate | null }) {
+export default function CreatePaymentField({ updateValues }: { updateValues?: PaymentFieldDatabaseUpdate | null }) {
   const { companyId } = useLoaderData<typeof loader>();
-  const PAYMENT_FIELD_TAG = updateValues
-    ? UPDATE_PAYMENT_FIELD
-    : CREATE_PAYMENT_FIELD;
+  const PAYMENT_FIELD_TAG = updateValues ? UPDATE_PAYMENT_FIELD : CREATE_PAYMENT_FIELD;
 
-  const initialValues =
-    updateValues ?? getInitialValueFromZod(PaymentFieldSchema);
+  const initialValues = updateValues ?? getInitialValueFromZod(PaymentFieldSchema);
 
   const [resetKey, setResetKey] = useState(Date.now());
 
   const [form, fields] = useForm({
     id: PAYMENT_FIELD_TAG,
     constraint: getZodConstraint(PaymentFieldSchema),
-    onValidate({ formData }) {
-      return parseWithZod(formData, { schema: PaymentFieldSchema });
-    },
+    onValidate({ formData }) { return parseWithZod(formData, { schema: PaymentFieldSchema }) },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
     defaultValue: {
@@ -180,7 +173,7 @@ export default function CreatePaymentField({
                 errors={fields.amount.errors}
                 prefix={
                   fields.calculation_type.value === calculationTypeArray[0] ||
-                  fields.calculation_type.value === undefined
+                    fields.calculation_type.value === undefined
                     ? "Rs"
                     : undefined
                 }

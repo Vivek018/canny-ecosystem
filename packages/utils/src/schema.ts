@@ -547,3 +547,16 @@ export const PaymentTemplateAssignemntSchema = z.object({
   effective_to: z.string().date().optional(),
   is_active: z.boolean().optional().default(false),
 });
+
+export const PaymentTemplateFormDialogSchema = z.object({
+  effective_from: z.string().default(new Date().toISOString().split("T")[0]),
+  effective_to: z.string().optional(),
+  template_id: z.string(),
+  eligibility_option: z.string()
+});
+
+export const PaymentTemplateFormSiteDialogSchema = z.object({
+  effective_from: z.string().default(new Date().toISOString().split("T")[0]),
+  effective_to: z.string().optional(),
+  template_id: z.string()
+});
