@@ -1,4 +1,4 @@
-import { isGoodStatus, z } from "@canny_ecosystem/utils";
+import { DeleteEmployeeLinkSchema, isGoodStatus } from "@canny_ecosystem/utils";
 import { parseWithZod } from "@conform-to/zod";
 import { json } from "@remix-run/react";
 import type { ActionFunctionArgs } from "@remix-run/node";
@@ -7,16 +7,12 @@ import { safeRedirect } from "@/utils/server/http.server";
 import { deletePaymentTemplateAssignment } from "@canny_ecosystem/supabase/mutations";
 import { getPaymentTemplateAssignmentIdByEmployeeId } from "@canny_ecosystem/supabase/queries";
 
-const DeleteLinkSchema = z.object({
-    is_active: z.enum(["true", "false"]).transform((val) => val === "true"),
-});
-
 export async function action({ request, params }: ActionFunctionArgs) {
     const { supabase } = getSupabaseWithHeaders({ request });
     const formData = await request.formData();
     const { employeeId: employee_id } = params;
 
-    const submission = parseWithZod(formData, { schema: DeleteLinkSchema });
+    const submission = parseWithZod(formData, { schema: DeleteEmployeeLinkSchema });
 
     if (submission.status !== "success") {
         return json(

@@ -9,35 +9,42 @@ import {
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@canny_ecosystem/ui/tooltip";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { Form, Link, useNavigate, useSubmit } from "@remix-run/react";
+import { Form, Link, useNavigate, useNavigation, useSearchParams } from "@remix-run/react";
 import { DeleteSite } from "./delete-site";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@canny_ecosystem/ui/card";
-import { getPaymentTemplateAssignmentBySiteId, getPaymentTemplatesByCompanyId, type SitesWithLocation } from "@canny_ecosystem/supabase/queries";
+import { getPaymentTemplateAssignmentBySiteId, getPaymentTemplatesByCompanyId, type PaymentTemplateAssignmentsType, type SitesWithLocation } from "@canny_ecosystem/supabase/queries";
 import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
-import { getInitialValueFromZod, getValidDateForInput, PaymentTemplateFormSiteDialogSchema, replaceUnderscore, z } from "@canny_ecosystem/utils";
+import { eligibilityOptionsArray, getInitialValueFromZod, getValidDateForInput, PaymentTemplateFormSiteDialogSchema, positionArray, replaceUnderscore, skillLevelArray, transformStringArrayIntoOptions } from "@canny_ecosystem/utils";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@canny_ecosystem/ui/dialog";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import { FormProvider, getFormProps, getInputProps, useForm } from "@conform-to/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { Spinner } from "@canny_ecosystem/ui/spinner";
-
-type paymentTemplateIptionsType = {
-  label: string;
-  value: string;
-}
+import { DeleteSitePaymentTemplateAssignment } from "./delete-site-payment-template-assignment";
+import TemplateAssignmentDialogContent from "./template-assignment-form";
 
 export function SiteCard({ site, env, companyId }: { site: Omit<SitesWithLocation, "created_at" | "updated_at">, env: SupabaseEnv, companyId: string }) {
   const { supabase } = useSupabase({ env });
+  const [searchParams] = useSearchParams();
+  const currentPaymentTemplateAssignmentId = searchParams.get("currentPaymentTemplateAssignmentId");
+  const action = searchParams.get("action");
+
   const [initialValues, setInitialValues] = useState(null);
+  const [linkedTemplates, setLinkedTemplates] = useState<PaymentTemplateAssignmentsType[] | null>([]);
   const [showSpinner, setShowSpinner] = useState(true);
-  const [paymentTemplatesOptions, setPaymentTemplatesOptions] = useState<paymentTemplateIptionsType[]>([]);
-  const submit = useSubmit();
+  const [resetKey, setResetKey] = useState(Date.now());
+  const [paymentTemplatesOptions, setPaymentTemplatesOptions] = useState<{
+    label: string;
+    value: string;
+  }[]>([]);
 
   const navigate = useNavigate();
+  const navigation = useNavigation();
+  const disableAll = navigation.state === "submitting" || navigation.state === "loading";
 
   const viewPaySequenceSearchParam = `${modalSearchParamNames.view_pay_sequence}=true`;
   const editPaySequenceSearchParam = `${modalSearchParamNames.edit_pay_sequence}=true`;
@@ -55,20 +62,13 @@ export function SiteCard({ site, env, companyId }: { site: Omit<SitesWithLocatio
 
   async function setLinkedDataIfExists() {
     const { data } = await getPaymentTemplateAssignmentBySiteId({ supabase, site_id: site.id });
+
+    setLinkedTemplates(data as any);
     setShowSpinner(false);
-    if (data) {
-      const values = {
-        effective_from: data.effective_from,
-        effective_to: data.effective_to,
-        template_id: data.template_id,
-      };
-      setInitialValues(values as any);
-      form.update({ value: values });
-    }
   }
 
   const openPaymentTemplateDialog = async () => {
-    setLinkedDataIfExists();
+    await setLinkedDataIfExists();
     const { data } = await getPaymentTemplatesByCompanyId({ supabase, company_id: companyId });
     if (data) {
       const newPaymentTemplatesOptions = data?.map((paymentTemplate) => ({ label: paymentTemplate.name, value: paymentTemplate.id }));
@@ -76,18 +76,29 @@ export function SiteCard({ site, env, companyId }: { site: Omit<SitesWithLocatio
     }
   }
 
-  const deleteSiteLink = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault();
-    submit(
-      {
-        returnTo: `/projects/${site.project_id}/sites`,
-      },
-      {
-        method: "POST",
-        action: `/templates/${site.project_id}/${site.id}/delete-site-link`,
-      },
-    );
-  }
+  useEffect(() => {
+    if (currentPaymentTemplateAssignmentId) {
+      if (linkedTemplates) {
+        const currentPaymentTemplate = linkedTemplates.find((linkedTemplate: { id: string; }) => linkedTemplate.id === currentPaymentTemplateAssignmentId);
+
+        if (currentPaymentTemplate) {
+          const values = {
+            effective_from: currentPaymentTemplate.effective_from as string,
+            effective_to: currentPaymentTemplate.effective_to,
+            template_id: currentPaymentTemplate.template_id,
+            name: currentPaymentTemplate.name as string,
+            eligibility_option: currentPaymentTemplate.eligibility_option,
+            position: currentPaymentTemplate.position,
+            skill_level: currentPaymentTemplate.skill_level
+          };
+
+          setInitialValues(values as any);
+          setResetKey(Date.now())
+          form.update({ value: values });
+        }
+      }
+    }
+  }, [currentPaymentTemplateAssignmentId])
 
   return (
     <Card
@@ -148,73 +159,160 @@ export function SiteCard({ site, env, companyId }: { site: Omit<SitesWithLocatio
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[600px]">
-                    <DialogTitle className="text-xl font-semibold mb-4">Link Payment Template</DialogTitle>
-                    <FormProvider context={form.context}>
-                      <Form
-                        method="POST"
-                        {...getFormProps(form)}
-                        action={`/templates/${site.project_id}/${site.id}/${initialValues ? "update" : "create"}-site-link`}
-                        className="space-y-6 w-full"
-                      >
-                        <div className="grid grid-cols-2 gap-4">
-                          <Field
-                            className="w-full"
-                            inputProps={{
-                              ...getInputProps(fields.effective_from, { type: "date" }),
-                              className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none",
-                              placeholder: replaceUnderscore(fields.effective_from.name),
-                              max: getValidDateForInput(new Date().toISOString()),
-                              defaultValue: getValidDateForInput(fields.effective_from.initialValue as string),
-                            }}
-                            labelProps={{
-                              children: replaceUnderscore(fields.effective_from.name),
-                              className: "block text-sm font-medium text-gray-700 mb-1"
-                            }}
-                            errors={fields.effective_from.errors}
-                          />
-                          <Field
-                            className="w-full"
-                            inputProps={{
-                              ...getInputProps(fields.effective_to, { type: "date" }),
-                              className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none",
-                              placeholder: replaceUnderscore(fields.effective_to.name),
-                              min: getValidDateForInput(fields.effective_from.value as string),
-                              defaultValue: getValidDateForInput(fields.effective_to.initialValue as string),
-                            }}
-                            labelProps={{
-                              children: replaceUnderscore(fields.effective_to.name),
-                              className: "block text-sm font-medium text-gray-700 mb-1"
-                            }}
-                            errors={fields.effective_to.errors}
-                          />
-                        </div>
-                        <SearchableSelectField
-                          key={initialValues}
-                          className="capitalize"
-                          options={paymentTemplatesOptions}
-                          inputProps={{
-                            ...getInputProps(fields.template_id, { type: "text" }),
-                          }}
-                          placeholder={`Select ${fields.template_id.name}`}
-                          labelProps={{
-                            children: replaceUnderscore(fields.template_id.name),
-                          }}
-                          errors={fields.template_id.errors}
-                        />
-                        {
-                          showSpinner ? <div className="flex justify-center"><Spinner /></div> : <>
-                            <Button variant="default" className="w-full">{initialValues ? "Update" : "Link"} Template</Button>
-                            <Button
-                              variant="destructive-ghost"
-                              className={`w-full ${!initialValues && "hidden"}`}
-                              onClick={(e) => deleteSiteLink(e)}
-                            >
-                              Delete link
-                            </Button>
-                          </>
-                        }
-                      </Form>
-                    </FormProvider>
+                    <DialogTitle className="text-xl font-semibold mb-4">
+                      {
+                        action ?
+                          <>{initialValues ? "Update" : "Create"} payment template</>
+                          :
+                          <>Linked payment templates</>
+                      }
+
+                    </DialogTitle>
+                    {
+                      action
+                        ?
+                        <FormProvider context={form.context}>
+                          <Form
+                            method="POST"
+                            {...getFormProps(form)}
+                            action={
+                              action === "update"
+                                ?
+                                `/templates/${site.project_id}/${site.id}/${currentPaymentTemplateAssignmentId}/update-site-link`
+                                :
+                                `/templates/${site.project_id}/${site.id}/create-site-link`
+                            }
+                            className="space-y-6 w-full"
+                          >
+                            <Field
+                              className="w-full"
+                              inputProps={{
+                                ...getInputProps(fields.name, { type: "text" }),
+                                className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none capitalize",
+                                placeholder: replaceUnderscore(fields.name.name),
+                                disabled: showSpinner,
+                                defaultValue: fields.name.initialValue
+                              }}
+                              labelProps={{
+                                children: replaceUnderscore(fields.name.name),
+                                className: "block text-sm font-medium text-gray-700"
+                              }}
+                              errors={fields.name.errors}
+                            />
+                            <div className="grid grid-cols-2 gap-4">
+                              <Field
+                                className="w-full"
+                                inputProps={{
+                                  ...getInputProps(fields.effective_from, { type: "date" }),
+                                  className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none",
+                                  placeholder: replaceUnderscore(fields.effective_from.name),
+                                  max: getValidDateForInput(new Date().toISOString()),
+                                  defaultValue: getValidDateForInput(fields.effective_from.initialValue as string), disabled: showSpinner
+                                }}
+                                labelProps={{
+                                  children: replaceUnderscore(fields.effective_from.name),
+                                  className: "block text-sm font-medium text-gray-700 mb-1"
+                                }}
+                                errors={fields.effective_from.errors}
+                              />
+                              <Field
+                                className="w-full"
+                                inputProps={{
+                                  ...getInputProps(fields.effective_to, { type: "date" }),
+                                  className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none",
+                                  placeholder: replaceUnderscore(fields.effective_to.name),
+                                  min: getValidDateForInput(fields.effective_from.value as string),
+                                  defaultValue: getValidDateForInput(fields.effective_to.initialValue as string),
+                                  disabled: showSpinner
+                                }}
+                                labelProps={{
+                                  children: replaceUnderscore(fields.effective_to.name),
+                                  className: "block text-sm font-medium text-gray-700 mb-1"
+                                }}
+                                errors={fields.effective_to.errors}
+                              />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                              <SearchableSelectField
+                                key={resetKey}
+                                className="capitalize"
+                                options={paymentTemplatesOptions}
+                                inputProps={{
+                                  ...getInputProps(fields.template_id, { type: "text" }),
+                                  disabled: showSpinner,
+                                  defaultValue: fields.template_id.initialValue
+                                }}
+                                placeholder={"Select payment templates"}
+                                labelProps={{
+                                  children: "Payment templates",
+                                }}
+                                errors={fields.template_id.errors}
+                              />
+                              <SearchableSelectField
+                                key={resetKey + 1}
+                                className="capitalize"
+                                options={transformStringArrayIntoOptions(eligibilityOptionsArray as unknown as string[])}
+                                inputProps={{
+                                  ...getInputProps(fields.eligibility_option, { type: "text" }),
+                                  disabled: showSpinner,
+                                  defaultValue: fields.eligibility_option.initialValue
+                                }}
+                                placeholder={`Select ${fields.eligibility_option.name}`}
+                                labelProps={{
+                                  children: replaceUnderscore(fields.eligibility_option.name),
+                                }}
+                                errors={fields.eligibility_option.errors}
+                              />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                              <SearchableSelectField
+                                key={resetKey + 2}
+                                className="capitalize"
+                                options={transformStringArrayIntoOptions(positionArray as unknown as string[])}
+                                inputProps={{
+                                  ...getInputProps(fields.position, { type: "text" }),
+                                  disabled: (showSpinner || fields.eligibility_option.value !== "position"),
+                                  defaultValue: fields.position.initialValue
+                                }}
+                                placeholder={`Select ${fields.position.name}`}
+                                labelProps={{
+                                  children: replaceUnderscore(fields.position.name),
+                                }}
+                                errors={fields.position.errors}
+                              />
+                              <SearchableSelectField
+                                key={resetKey + 3}
+                                className="capitalize"
+                                options={transformStringArrayIntoOptions(skillLevelArray as unknown as string[])}
+                                inputProps={{
+                                  ...getInputProps(fields.skill_level, { type: "text" }),
+                                  disabled: (showSpinner || fields.eligibility_option.value !== "skill_level"),
+                                  defaultValue: fields.skill_level.initialValue
+                                }}
+                                placeholder={`Select ${fields.skill_level.name}`}
+                                labelProps={{
+                                  children: replaceUnderscore(fields.skill_level.name),
+                                }}
+                                errors={fields.skill_level.errors}
+                              />
+                            </div>
+
+                            {
+                              showSpinner ? <div className="flex justify-center"><Spinner /></div> : <>
+                                <Button variant="default" className="w-full" disabled={!form.valid || disableAll}>
+                                  {initialValues ? "Update" : "Link"} Template
+                                </Button>
+                                <div className={`w-full ${!initialValues && "hidden"}`}>
+                                  <DeleteSitePaymentTemplateAssignment projectId={site.project_id} templateAssignmentId={currentPaymentTemplateAssignmentId as string} />
+                                </div>
+                              </>
+                            }
+                          </Form>
+                        </FormProvider>
+                        :
+                        <TemplateAssignmentDialogContent linkedTemplates={linkedTemplates} />
+                    }
+
                   </DialogContent>
                 </Dialog>
                 <DropdownMenuSeparator className={cn(!site.latitude && !site.longitude && "hidden")} />
@@ -253,6 +351,6 @@ export function SiteCard({ site, env, companyId }: { site: Omit<SitesWithLocatio
           Active
         </div>
       </CardFooter>
-    </Card>
+    </Card >
   );
 }

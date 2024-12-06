@@ -906,6 +906,7 @@ export type Database = {
           employee_id: string | null
           id: string
           is_active: boolean | null
+          name: string
           position: string | null
           site_id: string | null
           skill_level: string | null
@@ -923,6 +924,7 @@ export type Database = {
           employee_id?: string | null
           id?: string
           is_active?: boolean | null
+          name: string
           position?: string | null
           site_id?: string | null
           skill_level?: string | null
@@ -940,6 +942,7 @@ export type Database = {
           employee_id?: string | null
           id?: string
           is_active?: boolean | null
+          name?: string
           position?: string | null
           site_id?: string | null
           skill_level?: string | null
@@ -983,9 +986,9 @@ export type Database = {
           epf_id: string | null
           esi_id: string | null
           id: string
-          labour_welfare_fund: string | null
+          lwf_id: string | null
           payment_field_id: string | null
-          professional_tax: string | null
+          pt_id: string | null
           target_type: Database["public"]["Enums"]["assignment_target_type"]
           template_id: string
           updated_at: string | null
@@ -1002,9 +1005,9 @@ export type Database = {
           epf_id?: string | null
           esi_id?: string | null
           id?: string
-          labour_welfare_fund?: string | null
+          lwf_id?: string | null
           payment_field_id?: string | null
-          professional_tax?: string | null
+          pt_id?: string | null
           target_type: Database["public"]["Enums"]["assignment_target_type"]
           template_id: string
           updated_at?: string | null
@@ -1021,9 +1024,9 @@ export type Database = {
           epf_id?: string | null
           esi_id?: string | null
           id?: string
-          labour_welfare_fund?: string | null
+          lwf_id?: string | null
           payment_field_id?: string | null
-          professional_tax?: string | null
+          pt_id?: string | null
           target_type?: Database["public"]["Enums"]["assignment_target_type"]
           template_id?: string
           updated_at?: string | null
@@ -1051,8 +1054,8 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "payment_template_components_labour_welfare_fund_fkey"
-            columns: ["labour_welfare_fund"]
+            foreignKeyName: "payment_template_components_lwf_id_fkey"
+            columns: ["lwf_id"]
             isOneToOne: false
             referencedRelation: "labour_welfare_fund"
             referencedColumns: ["id"]
@@ -1065,8 +1068,8 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "payment_template_components_professional_tax_fkey"
-            columns: ["professional_tax"]
+            foreignKeyName: "payment_template_components_pt_id_fkey"
+            columns: ["pt_id"]
             isOneToOne: false
             referencedRelation: "professional_tax"
             referencedColumns: ["id"]
@@ -1222,17 +1225,17 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "project_site_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "project_sites_company_address_id_fkey"
             columns: ["company_location_id"]
             isOneToOne: false
             referencedRelation: "company_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_sites_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]

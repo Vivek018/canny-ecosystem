@@ -14,7 +14,7 @@ import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { replaceUnderscore } from "@canny_ecosystem/utils";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Link, Outlet, useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/react";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
@@ -102,7 +102,6 @@ export default function SitesIndex() {
           </CommandList>
         </Command>
       </div>
-      <Outlet />
     </section>
   );
 }

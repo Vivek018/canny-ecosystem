@@ -548,15 +548,58 @@ export const PaymentTemplateAssignemntSchema = z.object({
   is_active: z.boolean().optional().default(false),
 });
 
-export const PaymentTemplateFormDialogSchema = z.object({
+export const PaymentTemplateFormEmployeeDialogSchema = z.object({
+  name: z.string(),
   effective_from: z.string().default(new Date().toISOString().split("T")[0]),
   effective_to: z.string().optional(),
   template_id: z.string(),
-  eligibility_option: z.string()
 });
 
 export const PaymentTemplateFormSiteDialogSchema = z.object({
+  name: z.string(),
   effective_from: z.string().default(new Date().toISOString().split("T")[0]),
   effective_to: z.string().optional(),
-  template_id: z.string()
+  template_id: z.string(),
+  eligibility_option: z.enum(eligibilityOptionsArray).optional(),
+  position: z.string().optional(),
+  skill_level: z.string().optional(),
+});
+
+// Payment Template Assignment
+export const CreateEmployeeLinkSchema = z.object({
+  template_id: z.string().uuid(),
+  effective_from: z.string(),
+  effective_to: z.string().optional(),
+  name: z.string(),
+});
+
+export const UpdateEmployeeLinkSchema = z.object({
+  template_id: z.string().uuid(),
+  effective_from: z.string(),
+  effective_to: z.string().optional(),
+  name: z.string(),
+});
+
+export const DeleteEmployeeLinkSchema = z.object({
+  is_active: z.enum(["true", "false"]).transform((val) => val === "true"),
+});
+
+export const CreateSiteLinkSchema = z.object({
+  name: z.string(),
+  effective_from: z.string().default(new Date().toISOString().split("T")[0]),
+  effective_to: z.string().optional(),
+  template_id: z.string(),
+  eligibility_option: z.enum(eligibilityOptionsArray).optional(),
+  position: z.string().optional(),
+  skill_level: z.string().optional(),
+});
+
+export const UpdateSiteLinkSchema = z.object({
+  name: z.string(),
+  effective_from: z.string().default(new Date().toISOString().split("T")[0]),
+  effective_to: z.string().optional(),
+  template_id: z.string(),
+  eligibility_option: z.enum(eligibilityOptionsArray).optional(),
+  position: z.string().optional(),
+  skill_level: z.string().optional(),
 });

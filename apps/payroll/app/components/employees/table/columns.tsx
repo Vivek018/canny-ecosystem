@@ -198,7 +198,6 @@ export const columns = ({ env, companyId }: { env: SupabaseEnv, companyId: strin
           employee={{
             id: row.original.id,
             is_active: row.original.is_active ?? false,
-            employee_project_assignment: row.original.employee_project_assignment,
             companyId
           }}
           triggerChild={
