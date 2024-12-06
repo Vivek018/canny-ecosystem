@@ -8,7 +8,7 @@ import { Button, buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { useSearchParams } from "@remix-run/react";
 
-export default function TemplateAssignmentDialogContent({ linkedTemplates }: { linkedTemplates: PaymentTemplateAssignmentsType[] | null}) {
+export default function SiteLinkedTemplates({ linkedTemplates }: { linkedTemplates: PaymentTemplateAssignmentsType[] | null}) {
     const [searchString, setSearchString] = useState("");
     const [tableData, setTableData] = useState(linkedTemplates);
     const [searchParams, setSearchParams] = useSearchParams();

@@ -25,10 +25,11 @@ import { useSupabase } from "@canny_ecosystem/supabase/client";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { Spinner } from "@canny_ecosystem/ui/spinner";
 import { DeleteSitePaymentTemplateAssignment } from "./delete-site-payment-template-assignment";
-import TemplateAssignmentDialogContent from "./template-assignment-form";
+import SiteLinkedTemplates from "./site-linked-templates";
 
 export function SiteCard({ site, env, companyId }: { site: Omit<SitesWithLocation, "created_at" | "updated_at">, env: SupabaseEnv, companyId: string }) {
   const { supabase } = useSupabase({ env });
+
   const [searchParams] = useSearchParams();
   const currentPaymentTemplateAssignmentId = searchParams.get("currentPaymentTemplateAssignmentId");
   const action = searchParams.get("action");
@@ -48,6 +49,9 @@ export function SiteCard({ site, env, companyId }: { site: Omit<SitesWithLocatio
 
   const viewPaySequenceSearchParam = `${modalSearchParamNames.view_pay_sequence}=true`;
   const editPaySequenceSearchParam = `${modalSearchParamNames.edit_pay_sequence}=true`;
+
+  const updateURL = `/templates/${site.project_id}/${site.id}/${currentPaymentTemplateAssignmentId}/update-site-link`;
+  const createURL = `/templates/${site.project_id}/${site.id}/create-site-link`;
 
   const [form, fields] = useForm({
     id: "payment-template-form",
@@ -100,6 +104,10 @@ export function SiteCard({ site, env, companyId }: { site: Omit<SitesWithLocatio
     }
   }, [currentPaymentTemplateAssignmentId])
 
+  const handleOpenChange = () => {
+    navigate(`/projects/${site.project_id}/sites`);
+  };
+
   return (
     <Card
       key={site.id}
@@ -148,7 +156,7 @@ export function SiteCard({ site, env, companyId }: { site: Omit<SitesWithLocatio
                   Edit Pay Sequence
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <Dialog>
+                <Dialog onOpenChange={handleOpenChange}>
                   <DialogTrigger asChild>
                     <Button
                       variant="ghost"
@@ -175,21 +183,15 @@ export function SiteCard({ site, env, companyId }: { site: Omit<SitesWithLocatio
                           <Form
                             method="POST"
                             {...getFormProps(form)}
-                            action={
-                              action === "update"
-                                ?
-                                `/templates/${site.project_id}/${site.id}/${currentPaymentTemplateAssignmentId}/update-site-link`
-                                :
-                                `/templates/${site.project_id}/${site.id}/create-site-link`
-                            }
+                            action={action === "update" ? updateURL : createURL}
                             className="space-y-6 w-full"
                           >
                             <Field
                               className="w-full"
                               inputProps={{
                                 ...getInputProps(fields.name, { type: "text" }),
-                                className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none capitalize",
-                                placeholder: replaceUnderscore(fields.name.name),
+                                className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none",
+                                placeholder: "Name",
                                 disabled: showSpinner,
                                 defaultValue: fields.name.initialValue
                               }}
@@ -310,7 +312,7 @@ export function SiteCard({ site, env, companyId }: { site: Omit<SitesWithLocatio
                           </Form>
                         </FormProvider>
                         :
-                        <TemplateAssignmentDialogContent linkedTemplates={linkedTemplates} />
+                        <SiteLinkedTemplates linkedTemplates={linkedTemplates} />
                     }
 
                   </DialogContent>

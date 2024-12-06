@@ -112,7 +112,6 @@ export const EmployeeOptionsDropdown = ({ employee, triggerChild, env }: {
       setPaymentTemplatesOptions(newPaymentTemplatesOptions);
     }
   }
-  console.log("form.value = ",form.value);
 
   return (
     <DropdownMenu>
@@ -155,8 +154,8 @@ export const EmployeeOptionsDropdown = ({ employee, triggerChild, env }: {
                     className="w-full"
                     inputProps={{
                       ...getInputProps(fields.name, { type: "text" }),
-                      className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none capitalize",
-                      placeholder: fields.name.name,
+                      className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none",
+                      placeholder:"Name",
                     }}
                     labelProps={{
                       children: fields.name.name,
