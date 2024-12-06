@@ -44,119 +44,127 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const step = Number.parseInt(url.searchParams.get(STEP) || "1");
   const totalSteps = schemas.length;
-
-  const session = await getSession(request.headers.get("Cookie"));
   const stepData: any[] = [];
 
-  for (let i = 1; i <= totalSteps; i++) {
-    stepData.push(await session.get(`${SESSION_KEY_PREFIX}${i}`));
-  }
+  try {
+    const session = await getSession(request.headers.get("Cookie"));
 
-  if (step < 1 || step > totalSteps) {
-    url.searchParams.set(STEP, "1");
-    return redirect(url.toString(), { status: 302 });
-  }
+    for (let i = 1; i <= totalSteps; i++) {
+      stepData.push(await session.get(`${SESSION_KEY_PREFIX}${i}`));
+    }
 
-  return json({ step, totalSteps, stepData });
+    if (step < 1 || step > totalSteps) {
+      url.searchParams.set(STEP, "1");
+      return redirect(url.toString(), { status: 302 });
+    }
+
+    return json({ step, totalSteps, stepData, error: null });
+  } catch (error) {
+    return json({ error, step, totalSteps, stepData });
+  }
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-  const url = new URL(request.url);
-  const session = await getSession(request.headers.get("Cookie"));
+  try {
+    const url = new URL(request.url);
+    const session = await getSession(request.headers.get("Cookie"));
 
-  const step = Number.parseInt(url.searchParams.get(STEP) || "1");
-  const currentSchema = schemas[step - 1];
-  const totalSteps = schemas.length;
+    const step = Number.parseInt(url.searchParams.get(STEP) || "1");
+    const currentSchema = schemas[step - 1];
+    const totalSteps = schemas.length;
 
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await parseMultipartFormData(
-    request,
-    createMemoryUploadHandler({ maxPartSize: SIZE_1MB }),
-  );
-  const action = formData.get("_action") as string;
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await parseMultipartFormData(
+      request,
+      createMemoryUploadHandler({ maxPartSize: SIZE_1MB }),
+    );
+    const action = formData.get("_action") as string;
 
-  const submission = parseWithZod(formData, {
-    schema: currentSchema,
-  });
-
-  if (action === "submit") {
-    if (submission.status === "success") {
-      const companyData = session.get(`${SESSION_KEY_PREFIX}1`);
-      const companyRegistrationDetails = submission.value as Omit<
-        CompanyRegistrationDetailsInsert,
-        "company_id"
-      >;
-
-      const { status, companyError, registrationDetailsError, id } =
-        await createCompany({
-          supabase,
-          companyData,
-          companyRegistrationDetails,
-        });
-
-      if (companyError) {
-        for (let i = 1; i <= totalSteps; i++) {
-          session.unset(`${SESSION_KEY_PREFIX}${i}`);
-        }
-        const headers = new Headers();
-        headers.append("Set-Cookie", await commitSession(session));
-        url.searchParams.delete(STEP);
-        return redirect(url.toString(), { headers });
-      }
-
-      if (registrationDetailsError) {
-        for (let i = 1; i <= totalSteps; i++) {
-          session.unset(`${SESSION_KEY_PREFIX}${i}`);
-        }
-        const headers = new Headers();
-        headers.append("Set-Cookie", setCompanyId(id));
-        headers.append("Set-Cookie", await commitSession(session));
-        return redirect(DEFAULT_ROUTE, {
-          headers,
-        });
-      }
-
-      if (isGoodStatus(status)) {
-        for (let i = 1; i <= totalSteps; i++) {
-          session.unset(`${SESSION_KEY_PREFIX}${i}`);
-        }
-        const headers = new Headers();
-        headers.append("Set-Cookie", setCompanyId(id));
-        headers.append("Set-Cookie", await commitSession(session));
-        return redirect(DEFAULT_ROUTE, {
-          headers,
-        });
-      }
-    }
-  } else if (action === "next" || action === "back" || action === "skip") {
-    if (action === "next") {
-      if (submission.status === "success") {
-        session.set(`${SESSION_KEY_PREFIX}${step}`, submission.value);
-      }
-      if (submission.status === "error") {
-        return json(
-          { result: submission.reply() },
-          { status: submission.status === "error" ? 400 : 200 },
-        );
-      }
-    }
-
-    let nextStep = step;
-    if (action === "next" || action === "skip") {
-      nextStep = Math.min(step + 1, totalSteps);
-    } else if (action === "back") {
-      nextStep = Math.max(step - 1, 1);
-    }
-
-    url.searchParams.set(STEP, String(nextStep));
-    return redirect(url.toString(), {
-      headers: {
-        "Set-Cookie": await commitSession(session),
-      },
+    const submission = parseWithZod(formData, {
+      schema: currentSchema,
     });
-  }
 
-  return json({});
+    if (action === "submit") {
+      if (submission.status === "success") {
+        const companyData = session.get(`${SESSION_KEY_PREFIX}1`);
+        const companyRegistrationDetails = submission.value as Omit<
+          CompanyRegistrationDetailsInsert,
+          "company_id"
+        >;
+
+        const { status, companyError, registrationDetailsError, id } =
+          await createCompany({
+            supabase,
+            companyData,
+            companyRegistrationDetails,
+          });
+
+        if (companyError) {
+          for (let i = 1; i <= totalSteps; i++) {
+            session.unset(`${SESSION_KEY_PREFIX}${i}`);
+          }
+          const headers = new Headers();
+          headers.append("Set-Cookie", await commitSession(session));
+          url.searchParams.delete(STEP);
+          return redirect(url.toString(), { headers });
+        }
+
+        if (registrationDetailsError) {
+          for (let i = 1; i <= totalSteps; i++) {
+            session.unset(`${SESSION_KEY_PREFIX}${i}`);
+          }
+          const headers = new Headers();
+          headers.append("Set-Cookie", setCompanyId(id));
+          headers.append("Set-Cookie", await commitSession(session));
+          return redirect(DEFAULT_ROUTE, {
+            headers,
+          });
+        }
+
+        if (isGoodStatus(status)) {
+          for (let i = 1; i <= totalSteps; i++) {
+            session.unset(`${SESSION_KEY_PREFIX}${i}`);
+          }
+          const headers = new Headers();
+          headers.append("Set-Cookie", setCompanyId(id));
+          headers.append("Set-Cookie", await commitSession(session));
+          return redirect(DEFAULT_ROUTE, {
+            headers,
+          });
+        }
+      }
+    } else if (action === "next" || action === "back" || action === "skip") {
+      if (action === "next") {
+        if (submission.status === "success") {
+          session.set(`${SESSION_KEY_PREFIX}${step}`, submission.value);
+        }
+        if (submission.status === "error") {
+          return json(
+            { result: submission.reply() },
+            { status: submission.status === "error" ? 400 : 200 },
+          );
+        }
+      }
+
+      let nextStep = step;
+      if (action === "next" || action === "skip") {
+        nextStep = Math.min(step + 1, totalSteps);
+      } else if (action === "back") {
+        nextStep = Math.max(step - 1, 1);
+      }
+
+      url.searchParams.set(STEP, String(nextStep));
+      return redirect(url.toString(), {
+        headers: {
+          "Set-Cookie": await commitSession(session),
+        },
+      });
+    }
+
+    return json({});
+  } catch (error) {
+    return json({ error });
+  }
 }
 
 export default function CreateCompany() {

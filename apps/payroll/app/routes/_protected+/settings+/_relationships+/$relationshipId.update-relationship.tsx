@@ -2,6 +2,8 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import CreateRelationship from "./create-relationship";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
+  Await,
+  defer,
   json,
   useActionData,
   useLoaderData,
@@ -16,91 +18,48 @@ import {
 import { updateRelationship } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
+import type {
+  CompanyDatabaseRow,
+  RelationshipDatabaseUpdate,
+} from "@canny_ecosystem/supabase/types";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 export const UPDATE_RELATIONSHIP = "update-relationship";
 
-export async function loader({
-  request,
-  params,
-}: LoaderFunctionArgs): Promise<Response> {
+export async function loader({ request, params }: LoaderFunctionArgs) {
   const relationshipId = params.relationshipId;
 
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-    let relationshipData = null;
+    let relationshipPromise = null;
 
     if (relationshipId) {
-      relationshipData = await getRelationshipById({
+      relationshipPromise = await getRelationshipById({
         supabase,
         id: relationshipId,
         companyId,
       });
     }
 
-    if (relationshipData?.error) {
-      return json(
-        {
-          status: "error",
-          message: "Failed to get relationship",
-          error: relationshipData.error,
-          data: null,
-          companyOptions: null,
-        },
-        {
-          status: 500,
-        },
-      );
-    }
-
-    const parentCompanyId = relationshipData?.data?.parent_company_id;
-    const { data: companies, error } = await getCompanies({ supabase });
+    const { data: companiesData, error } = await getCompanies({ supabase });
 
     if (error) {
-      return json(
-        {
-          status: "error",
-          message: "Failed to get companies",
-          error,
-          data: null,
-          companyOptions: null,
-        },
-        { status: 500 },
-      );
+      throw error;
     }
 
-    if (!companies) {
-      return json(
-        {
-          status: "error",
-          message: "No companies found",
-          error,
-          data: null,
-          companyOptions: null,
-        },
-        { status: 500 },
-      );
-    }
-
-    const companyOptions = companies
-      .filter((company) => company.id !== parentCompanyId)
-      .map((company) => ({ label: company.name, value: company.id }));
-
-    return json({
-      status: "success",
-      message: "Relationship and Company Option data found.",
-      data: relationshipData?.data,
-      companyOptions,
+    return defer({
+      relationshipPromise,
+      companiesData,
       error: null,
     });
   } catch (error) {
     return json(
       {
-        status: "error",
-        message: "An unexpected error occurred.",
         error,
-        data: null,
+        relationshipPromise: null,
+        companiesData: null,
       },
       { status: 500 },
     );
@@ -155,21 +114,13 @@ export async function action({
 }
 
 export default function UpdateRelationship() {
-  const { data, companyOptions, status, error } =
+  const { relationshipPromise, companiesData, error } =
     useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (status === "error") {
-      toast({
-        title: "Error",
-        description: error?.message || "Failed to load",
-        variant: "destructive",
-      });
-    }
-
     if (!actionData) return;
     if (actionData?.status === "success") {
       toast({
@@ -189,6 +140,45 @@ export default function UpdateRelationship() {
       replace: true,
     });
   }, [actionData]);
+
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Await resolve={relationshipPromise}>
+        {(resolvedData) => {
+          if (!resolvedData)
+            return <ErrorBoundary message="Failed to load relationship" />;
+          return (
+            <UpdateRelationshipWrapper
+              data={resolvedData.data}
+              error={resolvedData.error}
+              companiesData={companiesData}
+            />
+          );
+        }}
+      </Await>
+    </Suspense>
+  );
+}
+
+export function UpdateRelationshipWrapper({
+  data,
+  error,
+  companiesData,
+}: {
+  data: RelationshipDatabaseUpdate | null;
+  error: Error | null | { message: string };
+  companiesData: Pick<CompanyDatabaseRow, "id" | "name">[] | null;
+}) {
+  const parentCompanyId = data?.parent_company_id;
+  const companyOptions = companiesData
+    ?.filter((company) => company.id !== parentCompanyId)
+    .map((company) => ({ label: company.name, value: company.id }));
+
+  if (error) {
+    return (
+      <ErrorBoundary error={error} message="Failed to load relationship" />
+    );
+  }
 
   return (
     <CreateRelationship

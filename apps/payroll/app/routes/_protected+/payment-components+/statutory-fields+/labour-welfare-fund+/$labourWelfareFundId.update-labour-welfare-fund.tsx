@@ -2,6 +2,8 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import CreateLabourWelfareFund from "./create-labour-welfare-fund";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
+  Await,
+  defer,
   json,
   useActionData,
   useLoaderData,
@@ -12,49 +14,39 @@ import { isGoodStatus, LabourWelfareFundSchema } from "@canny_ecosystem/utils";
 import { getLabourWelfareFundById } from "@canny_ecosystem/supabase/queries";
 import { updateLabourWelfareFund } from "@canny_ecosystem/supabase/mutations";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
+import { ErrorBoundary } from "@/components/error-boundary";
+import type { LabourWelfareFundDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import { StatutoryBonusNoData } from "@/components/statutory-fields/statutory-bonus/statutory-bonus-no-data";
 
 export const UPDATE_LABOUR_WELFARE_FUND = "update-labour-welfare-fund";
 
-export async function loader({
-  request,
-  params,
-}: LoaderFunctionArgs): Promise<Response> {
+export async function loader({ request, params }: LoaderFunctionArgs) {
   try {
     const labourWelfareFundId = params.labourWelfareFundId;
     const { supabase } = getSupabaseWithHeaders({ request });
 
-    let labourWelfareFundData = null;
+    let labourWelfareFundPromise = null;
 
     if (labourWelfareFundId) {
-      labourWelfareFundData = await getLabourWelfareFundById({
+      labourWelfareFundPromise = getLabourWelfareFundById({
         supabase,
         id: labourWelfareFundId,
       });
-    }
 
-    if (labourWelfareFundData?.error) {
-      return json({
-        status: "error",
-        message: "Failed to load data",
-        data: labourWelfareFundData?.data,
-        error: labourWelfareFundData.error,
+      return defer({
+        labourWelfareFundPromise,
+        error: null,
       });
     }
-
-    return json({
-      status: "success",
-      message: "Labour Welfare Fund loaded successfully",
-      data: labourWelfareFundData?.data,
-      error: null,
-    });
   } catch (error) {
-    return json({
-      status: "error",
-      message: "Failed to load data",
-      data: null,
-      error,
-    }, { status: 500 });
+    return json(
+      {
+        error,
+        labourWelfareFundPromise: null,
+      },
+      { status: 500 },
+    );
   }
 }
 
@@ -94,30 +86,24 @@ export async function action({
       error,
     });
   } catch (error) {
-    return json({
-      status: "error",
-      message: "Failed to update Labour Welfare Fund",
-      error,
-    }, { status: 500 });
+    return json(
+      {
+        status: "error",
+        message: "Failed to update Labour Welfare Fund",
+        error,
+      },
+      { status: 500 },
+    );
   }
 }
 
-export default function UpdateLocation() {
-  const { data, status, error } = useLoaderData<typeof loader>();
+export default function UpdateLabourWelfareFund() {
+  const { labourWelfareFundPromise, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (status === "error") {
-      toast({
-        title: "Error",
-        description: error?.message || "Failed to load",
-        variant: "destructive",
-      });
-      navigate("/payment-components/statutory-fields/labour-welfare-fund");
-    }
-
     if (!actionData) return;
 
     if (actionData?.status === "success") {
@@ -137,5 +123,56 @@ export default function UpdateLocation() {
     navigate("/payment-components/statutory-fields/labour-welfare-fund");
   }, [actionData]);
 
-  return <CreateLabourWelfareFund updateValues={data} />;
+  if (error)
+    return (
+      <ErrorBoundary
+        error={error}
+        message="Failed to load Labour Welfare Fund"
+      />
+    );
+
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Await resolve={labourWelfareFundPromise}>
+        {(resolvedData) => {
+          if (!resolvedData)
+            return (
+              <ErrorBoundary message="Failed to load Labour Welfare Fund" />
+            );
+          return (
+            <UpdateLabourWelfareFundWrapper
+              data={resolvedData.data}
+              error={resolvedData.error}
+            />
+          );
+        }}
+      </Await>
+    </Suspense>
+  );
+}
+
+export function UpdateLabourWelfareFundWrapper({
+  data,
+  error,
+}: {
+  data: LabourWelfareFundDatabaseUpdate | null;
+  error: Error | null | { message: string };
+}) {
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to load Labour Welfare Fund",
+        variant: "destructive",
+      });
+    }
+  }, [error]);
+
+  return (
+    <>
+      <CreateLabourWelfareFund updateValues={data} />;
+    </>
+  );
 }

@@ -1,6 +1,8 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
+  Await,
+  defer,
   json,
   useActionData,
   useLoaderData,
@@ -16,53 +18,45 @@ import { updateEmployeeProvidentFund } from "@canny_ecosystem/supabase/mutations
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import CreateEmployeeProvidentFund from "./create-employee-provident-fund";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
+import { ErrorBoundary } from "@/components/error-boundary";
+import type { EmployeeAddressDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 
 export const UPDATE_EMPLOYEE_PROVIDENT_FUND = "update-employee-provident-fund";
 
-export async function loader({
-  request,
-  params,
-}: LoaderFunctionArgs): Promise<Response> {
+export async function loader({ request, params }: LoaderFunctionArgs) {
   const epfId = params.epfId;
+
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
 
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-    let epfData = null;
+    let epfPromise = null;
 
     if (epfId) {
-      epfData = await getEmployeeProvidentFundById({
+      epfPromise = getEmployeeProvidentFundById({
         supabase,
         id: epfId,
       });
     }
 
-    if (epfData?.error) {
-      return json({
-        status: "error",
-        message: "Failed to load data",
-        data: epfData?.data,
-        error: epfData.error,
-        companyId,
-      });
-    }
-
-    return json({
-      status: "success",
-      message: "Employee Provident Fund",
-      data: epfData?.data,
+    return defer({
+      message: "EPF data loaded",
+      epfPromise,
       companyId,
       error: null,
     });
   } catch (error) {
-    return json({
-      status: "error",
-      message: "An unexpected error occurred",
-      error,
-      data: null,
-    }, { status: 500 });
+    return json(
+      {
+        message: "Failed to load EPF data",
+        error,
+        epfPromise: null,
+        companyId: null,
+      },
+      { status: 500 },
+    );
   }
 }
 
@@ -103,29 +97,24 @@ export async function action({
       error,
     });
   } catch (error) {
-    return json({
-      status: "error",
-      message: "An unexpected error occurred",
-      error,
-    }, { status: 500 });
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 },
+    );
   }
 }
 
 export default function UpdateEmployeeProvidentFund() {
-  const { data, status, error } = useLoaderData<typeof loader>();
+  const { epfPromise, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (status === "error") {
-      toast({
-        title: "Error",
-        description: error?.message || "Failed to load",
-        variant: "destructive",
-      });
-      navigate("/payment-components/statutory-fields/employee-provident-fund");
-    }
     if (actionData) {
       if (actionData?.status === "success") {
         toast({
@@ -145,6 +134,45 @@ export default function UpdateEmployeeProvidentFund() {
       navigate("/payment-components/statutory-fields/employee-provident-fund");
     }
   }, [actionData]);
+
+  if (error)
+    return <ErrorBoundary error={error} message="Failed to load EPF" />;
+
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Await resolve={epfPromise}>
+        {(resolvedData) => {
+          if (!resolvedData)
+            return <ErrorBoundary message="Failed to load EPF" />;
+          return (
+            <UpdateEPFWrapper
+              data={resolvedData.data}
+              error={resolvedData.error}
+            />
+          );
+        }}
+      </Await>
+    </Suspense>
+  );
+}
+
+export function UpdateEPFWrapper({
+  data,
+  error,
+}: {
+  data: EmployeeAddressDatabaseUpdate | null;
+  error: Error | null | { message: string };
+}) {
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (error)
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to load EPF",
+        variant: "destructive",
+      });
+  }, [error]);
 
   return <CreateEmployeeProvidentFund updateValues={data} />;
 }

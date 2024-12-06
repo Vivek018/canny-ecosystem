@@ -1,6 +1,8 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
+  Await,
+  defer,
   json,
   useActionData,
   useLoaderData,
@@ -13,47 +15,42 @@ import { updateStatutoryBonus } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import CreateStatutoryBonus from "./create-statutory-bonus";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
+import type { StatutoryBonusDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 export const UPDATE_STATUTORY_BONUS = "update-statutory-bonus";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
+  const sbId = params.sbId;
+
   try {
-    const sbId = params.sbId;
     const { supabase } = getSupabaseWithHeaders({ request });
 
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-    let sbData = null;
+    let sbPromise = null;
 
     if (sbId) {
-      sbData = await getStatutoryBonusById({
+      sbPromise = getStatutoryBonusById({
         supabase,
         id: sbId,
       });
     }
 
-    if (sbData?.error) {
-      return json({
-        status: "error",
-        message: "Failed to load data",
-        error: sbData?.error,
-        data: null,
-      });
-    }
-
-    return json({
-      status: "success",
-      message: "Statutory Bonus loaded successfully",
-      data: sbData?.data,
+    return defer({
+      sbPromise,
       companyId,
+      error: null,
     });
   } catch (error) {
-    return json({
-      status: "error",
-      message: "An unexpected error occurred",
-      data: null,
-      error,
-    }, { status: 500 });
+    return json(
+      {
+        sbPromise: null,
+        companyId: null,
+        error,
+      },
+      { status: 500 },
+    );
   }
 }
 
@@ -94,16 +91,19 @@ export async function action({
       error,
     });
   } catch (error) {
-    return json({
-      status: "error",
-      message: "An unexpected error occurred",
-      error,
-    }, { status: 500 });
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 },
+    );
   }
 }
 
 export default function UpdateStatutoryBonus() {
-  const { data } = useLoaderData<typeof loader>();
+  const { sbPromise, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -128,6 +128,47 @@ export default function UpdateStatutoryBonus() {
       replace: true,
     });
   }, [actionData]);
+
+  if (error)
+    return (
+      <ErrorBoundary error={error} message="Failed to load Statutory Bonus" />
+    );
+
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Await resolve={sbPromise}>
+        {(resolvedData) => {
+          if (!resolvedData)
+            return <ErrorBoundary message="Failed to load Statutory Bonus" />;
+          return (
+            <UpdateStatutoryBonusWrapper
+              data={resolvedData.data}
+              error={resolvedData.error}
+            />
+          );
+        }}
+      </Await>
+    </Suspense>
+  );
+}
+
+export function UpdateStatutoryBonusWrapper({
+  data,
+  error,
+}: {
+  data: StatutoryBonusDatabaseUpdate | null;
+  error: Error | null | { message: string };
+}) {
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (error)
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to load Statutory Bonus",
+        variant: "destructive",
+      });
+  }, [error]);
 
   return <CreateStatutoryBonus updateValues={data} />;
 }

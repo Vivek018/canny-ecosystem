@@ -1,102 +1,59 @@
-import { SiteCard } from "@/components/sites/site-card";
 import { getSitesByProjectId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import {
   Command,
   CommandEmpty,
-  CommandGroup,
   CommandInput,
-  CommandItem,
   CommandList,
 } from "@canny_ecosystem/ui/command";
 import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { replaceUnderscore } from "@canny_ecosystem/utils";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Link, Outlet, useLoaderData } from "@remix-run/react";
+import { Await, defer, Link, Outlet, useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/react";
-import { useEffect } from "react";
-import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { Suspense } from "react";
+import { SitesWrapper } from "@/components/projects/sites/sites-wrapper";
+import { ErrorBoundary } from "@/components/error-boundary";
 
-export async function loader({ request, params }: LoaderFunctionArgs): Promise<Response> {
+export async function loader({ request, params }: LoaderFunctionArgs) {
   const projectId = params.projectId;
 
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
 
     if (!projectId) {
-      return json({
-        status: "error",
-        message: "No project id found",
-        error: null,
-        data: null,
-        projectId,
-      });
+      throw new Error("No projectId provided");
     }
 
-    const { data, error } = await getSitesByProjectId({
+    const sitesPromise = getSitesByProjectId({
       supabase,
       projectId,
     });
 
-    if (error) {
-      return json({
-        status: "error",
-        message: "Failed to get sites",
-        error,
-        data,
-        projectId,
-      });
-    }
-
-    if (!data) {
-      return json({
-        status: "error",
-        message: "No sites found",
-        error: null,
-        data,
-        projectId,
-      });
-    }
-
-    return json({
-      status: "success",
-      message: "Sites loaded",
+    return defer({
       error: null,
-      data,
+      sitesPromise,
       projectId,
     });
   } catch (error) {
-    return json({
-      status: "error",
-      message: "An unexpected error occurred",
-      error,
-      data: null,
-      projectId,
-    }, { status: 500 });
+    return json(
+      {
+        error,
+        sitesPromise: null,
+        projectId,
+      },
+      { status: 500 },
+    );
   }
 }
 
 export default function SitesIndex() {
-  const { data, projectId, status, error } = useLoaderData<typeof loader>();
+  const { sitesPromise, projectId, error } = useLoaderData<typeof loader>();
   const { isDocument } = useIsDocument();
 
-  const { toast } = useToast();
-
-  useEffect(() => {
-    if (status === "error") {
-      toast({
-        title: "Error",
-        description: error?.message || "Failed to get sites",
-        variant: "destructive",
-      });
-    } else if (data?.length === 0) {
-      toast({
-        title: "No sites found",
-      });
-    }
-  }, []);
+  if (error)
+    return <ErrorBoundary error={error} message="Failed to load sites" />;
 
   return (
     <section className="pb-4">
@@ -128,28 +85,11 @@ export default function SitesIndex() {
             No site found.
           </CommandEmpty>
           <CommandList className="max-h-full py-2 overflow-x-visible overflow-y-visible">
-            <CommandGroup className="p-0 overflow-visible">
-              <div className="w-full grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-                {data?.map((site: any) => (
-                  <CommandItem
-                    key={site.id}
-                    value={
-                      site.name +
-                      site.site_code +
-                      site.company_location?.name +
-                      site.address_line_1 +
-                      site.address_line_2 +
-                      site.city +
-                      replaceUnderscore(site.state) +
-                      site.pincode
-                    }
-                    className="data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0"
-                  >
-                    <SiteCard site={site} />
-                  </CommandItem>
-                ))}
-              </div>
-            </CommandGroup>
+            <Suspense fallback={<div>Loading...</div>}>
+              <Await resolve={sitesPromise}>
+                {(resolvedData) => <SitesWrapper sitesData={resolvedData} />}
+              </Await>
+            </Suspense>
           </CommandList>
         </Command>
       </div>

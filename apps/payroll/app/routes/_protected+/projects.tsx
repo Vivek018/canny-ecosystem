@@ -3,7 +3,9 @@ import { Outlet, useNavigation } from "@remix-run/react";
 
 export default function Projects() {
   const navigation = useNavigation();
-  const isLoading = navigation.state === "loading" || navigation.location?.pathname.startsWith("/projects");
+  const isLoading =
+    navigation.state === "loading" &&
+    navigation.location?.pathname.startsWith("/projects");
 
   if (isLoading)
     return (

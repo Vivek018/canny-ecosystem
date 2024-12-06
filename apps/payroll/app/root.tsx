@@ -31,6 +31,7 @@ import {
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { DEFAULT_ROUTE } from "./constant";
 import { Toaster } from "@canny_ecosystem/ui/toaster";
+import { ErrorBoundary } from "./components/error-boundary";
 
 export const links: LinksFunction = () => {
   return [
@@ -46,31 +47,47 @@ export const headers: HeadersFunction = ({ loaderHeaders }) => {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { user: sessionUser } = await getSessionUser({ request });
-  const { supabase } = getSupabaseWithHeaders({ request });
+  try {
+    const { user: sessionUser } = await getSessionUser({ request });
+    const { supabase } = getSupabaseWithHeaders({ request });
 
-  const { companyId, setCookie } = await getCompanyIdOrFirstCompany(
-    request,
-    supabase
-  );
+    const { companyId, setCookie } = await getCompanyIdOrFirstCompany(
+      request,
+      supabase,
+    );
 
-  if (setCookie) {
-    const headers = new Headers();
-    headers.append("Set-Cookie", setCompanyId(companyId));
-    return safeRedirect(DEFAULT_ROUTE, { headers });
-  }
+    if (setCookie) {
+      const headers = new Headers();
+      headers.append("Set-Cookie", setCompanyId(companyId));
+      return safeRedirect(DEFAULT_ROUTE, { headers });
+    }
 
-  return json({
-    sessionUser,
-    requestInfo: {
-      hints: getHints(request),
-      path: new URL(request.url).pathname,
-      userPrefs: {
-        theme: getTheme(request),
-        companyId: companyId,
+    return json({
+      sessionUser,
+      requestInfo: {
+        hints: getHints(request),
+        path: new URL(request.url).pathname,
+        userPrefs: {
+          theme: getTheme(request),
+          companyId: companyId,
+        },
       },
-    },
-  });
+      error: null,
+    });
+  } catch (error) {
+    return json({
+      error,
+      sessionUser: null,
+      requestInfo: {
+        hints: null,
+        path: new URL(request.url).pathname,
+        userPrefs: {
+          theme: null,
+          companyId: null,
+        },
+      },
+    });
+  }
 }
 
 function Document({
@@ -102,11 +119,14 @@ function Document({
 
 function App() {
   const {
+    error,
     sessionUser,
     requestInfo: {
       userPrefs: { theme: initialTheme },
     },
   } = useLoaderData<typeof loader>();
+
+  if (error) return <ErrorBoundary error={error} />;
 
   const nonce = useNonce();
   const theme = useTheme();

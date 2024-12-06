@@ -2,6 +2,8 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { getEmployeeStatutoryDetailsById } from "@canny_ecosystem/supabase/queries";
 import {
+  Await,
+  defer,
   Form,
   json,
   useActionData,
@@ -14,54 +16,41 @@ import { isGoodStatus, EmployeeStatutorySchema } from "@canny_ecosystem/utils";
 import { CreateEmployeeStatutoryDetails } from "@/components/employees/form/create-employee-statutory-details";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
 import { Card } from "@canny_ecosystem/ui/card";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
+import type { EmployeeStatutoryDetailsDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 export const UPDATE_EMPLOYEE_STATUTORY = "update-employee-statutory";
 
-export async function loader({
-  request,
-  params,
-}: LoaderFunctionArgs): Promise<Response> {
+export async function loader({ request, params }: LoaderFunctionArgs) {
   const employeeId = params.employeeId;
 
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
 
-    let data = null;
-    let error = null;
+    let employeeStatutoryDetailsPromise = null;
 
     if (employeeId) {
-      ({ data, error } = await getEmployeeStatutoryDetailsById({
+      employeeStatutoryDetailsPromise = getEmployeeStatutoryDetailsById({
         supabase,
         id: employeeId,
-      }));
+      });
+    } else {
+      throw new Error("No employeeId provided");
     }
 
-    if (error)
-      return json({
-        status: "error",
-        message: "Failed to load statutory",
-        data,
-        error,
-        employeeId,
-      });
-
-    return json({
-      status: "success",
-      message: "Statutory found",
-      data,
-      error: null,
+    return defer({
+      employeeStatutoryDetailsPromise,
       employeeId,
+      error: null,
     });
   } catch (error) {
     return json({
-      status: "error",
-      message: "Failed to load statutory",
       error,
-      data: null,
       employeeId,
+      employeeStatutoryDetailsPromise: null,
     });
   }
 }
@@ -110,7 +99,42 @@ export async function action({
 }
 
 export default function UpdateStatutoryDetails() {
-  const { data, status, error, employeeId } = useLoaderData<typeof loader>();
+  const { employeeStatutoryDetailsPromise, error, employeeId } =
+    useLoaderData<typeof loader>();
+
+  if (error)
+    return (
+      <ErrorBoundary error={error} message="Failed to load statutory details" />
+    );
+
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Await resolve={employeeStatutoryDetailsPromise}>
+        {(resolvedData) => {
+          if (!resolvedData)
+            return <ErrorBoundary message="Failed to load statutory details" />;
+          return (
+            <UpdateStatutoryDetailsWrapper
+              data={resolvedData.data}
+              error={resolvedData.error}
+              employeeId={employeeId}
+            />
+          );
+        }}
+      </Await>
+    </Suspense>
+  );
+}
+
+export function UpdateStatutoryDetailsWrapper({
+  data,
+  error,
+  employeeId,
+}: {
+  data: EmployeeStatutoryDetailsDatabaseUpdate | null;
+  error: Error | null | { message: string };
+  employeeId: string | undefined;
+}) {
   const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
   const currentSchema = EmployeeStatutorySchema;
@@ -130,13 +154,13 @@ export default function UpdateStatutoryDetails() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (status === "error") {
+    if (error) {
       toast({
         title: "Error",
         description: error.message || "Failed to get statutory details",
         variant: "destructive",
       });
-      navigate(`/employees/${data?.id}/work-portfolio`);
+      navigate(`/employees/${data?.employee_id}/work-portfolio`);
     }
     if (actionData) {
       if (actionData?.status === "success") {

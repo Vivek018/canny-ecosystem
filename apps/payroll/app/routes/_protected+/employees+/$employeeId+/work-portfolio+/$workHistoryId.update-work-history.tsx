@@ -1,6 +1,8 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
+  Await,
+  defer,
   json,
   useActionData,
   useLoaderData,
@@ -14,58 +16,48 @@ import {
 import { getEmployeeWorkHistoryById } from "@canny_ecosystem/supabase/queries";
 import { updateEmployeeWorkHistory } from "@canny_ecosystem/supabase/mutations";
 import AddEmployeeWorkHistory from "./add-work-history";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
+import type { EmployeeWorkHistoryDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 export const UPDATE_EMPLOYEE_WORK_HISTORY = "update-employee-work-history";
 
-export async function loader({
-  request,
-  params,
-}: LoaderFunctionArgs): Promise<Response> {
+export async function loader({ request, params }: LoaderFunctionArgs) {
   const workHistoryId = params.workHistoryId;
-  let workHistoryData = null;
+  const employeeId = params.employeeId;
+
+  let workHistoryPromise = null;
 
   try {
+    if (!employeeId) throw new Error("No employeeId provided");
+
     const { supabase } = getSupabaseWithHeaders({ request });
     if (workHistoryId) {
-      workHistoryData = await getEmployeeWorkHistoryById({
+      workHistoryPromise = getEmployeeWorkHistoryById({
         supabase,
         id: workHistoryId,
       });
     }
 
-    if (workHistoryData?.error) {
-      return json(
-        {
-          status: "error",
-          message: "Failed to get employee work history",
-          error: workHistoryData.error,
-          data: workHistoryData.data,
-        },
-        { status: 500 },
-      );
-    }
-
-    return json({
-      status: "success",
-      message: "Employee work history found",
-      data: workHistoryData?.data,
+    return defer({
+      workHistoryPromise,
       error: null,
     });
   } catch (error) {
     return json({
-      status: "error",
-      message: "An unexpected error occurred",
-      data: null,
       error,
+      workHistoryPromise: null,
     });
   }
 }
 
 export async function action({
   request,
+  params,
 }: ActionFunctionArgs): Promise<Response> {
+  const employeeId = params.employeeId;
+
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
     const formData = await request.formData();
@@ -90,39 +82,34 @@ export async function action({
       return json({
         status: "success",
         message: "Successfully updated employee work history",
+        employeeId,
         error: null,
       });
     }
     return json({
       status: "error",
       message: "Failed to update employee work history",
+      employeeId,
       error,
     });
   } catch (error) {
     return json({
       status: "error",
       message: "An unexpected error occurred",
-      data: null,
       error,
+      employeeId,
+      data: null,
     });
   }
 }
 
 export default function UpdateEmployeeWorkHistory() {
-  const { data, status, error } = useLoaderData<typeof loader>();
+  const { workHistoryPromise, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (status === "error") {
-      toast({
-        title: "Error",
-        description: error?.message || "Failed to load",
-        variant: "destructive",
-      });
-      navigate(`/employees/${data?.employeeId}/work-portfolio`);
-    }
     if (actionData) {
       if (actionData?.status === "success") {
         toast({
@@ -137,9 +124,43 @@ export default function UpdateEmployeeWorkHistory() {
           variant: "destructive",
         });
       }
-      navigate(`/employees/${data?.employeeId}/work-portfolio`);
+      navigate(`/employees/${actionData?.employeeId}/work-portfolio`);
     }
   }, [actionData]);
 
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Await resolve={workHistoryPromise}>
+        {(resolvedData) => {
+          if (!resolvedData)
+            return (
+              <ErrorBoundary message="Failed to load employee work history data" />
+            );
+          return (
+            <UpdateEmployeeWorkHistoryWrapper
+              data={resolvedData.data}
+              error={resolvedData.error}
+            />
+          );
+        }}
+      </Await>
+    </Suspense>
+  );
+}
+
+export function UpdateEmployeeWorkHistoryWrapper({
+  data,
+  error,
+}: {
+  data: EmployeeWorkHistoryDatabaseUpdate | null;
+  error: Error | null | { message: string };
+}) {
+  if (error)
+    return (
+      <ErrorBoundary
+        error={error}
+        message="Failed to load employee work history data"
+      />
+    );
   return <AddEmployeeWorkHistory updateValues={data} />;
 }

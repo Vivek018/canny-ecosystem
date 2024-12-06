@@ -2,6 +2,8 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import CreateSite from "./create-site";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
+  Await,
+  defer,
   json,
   useActionData,
   useLoaderData,
@@ -16,80 +18,64 @@ import {
 import { updateSite } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 export const UPDATE_SITE = "update-site";
 
 export async function loader({
   request,
   params,
-}: LoaderFunctionArgs): Promise<Response> {
+}: LoaderFunctionArgs) {
   const siteId = params.siteId;
+  const projectId = params.projectId;
 
   try {
+    if (!projectId) throw new Error("No projectId provided");
+
     const { supabase } = getSupabaseWithHeaders({ request });
 
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-    const { data: locations, error } = await getLocationsForSelectByCompanyId({
+    const locationOptionsPromise = getLocationsForSelectByCompanyId({
       supabase,
       companyId,
+    }).then(({ data, error }) => {
+      if (data) {
+        const locationOptions = data.map((location) => ({
+          label: location.name,
+          value: location.id,
+        }));
+        return { data: locationOptions, error };
+      }
+      return { data, error };
     });
 
-    if (error) {
-      return json({
-        status: "error",
-        message: "Failed to get locations",
-        error,
-        locations,
-      });
-    }
-
-    if (!locations) {
-      return json({
-        status: "error",
-        message: "No locations found",
-        error,
-        locations,
-      });
-    }
-
-    const locationOptions = locations.map((location) => ({
-      label: location.name,
-      value: location.id,
-    }));
-
-    let siteData = null;
+    let sitePromise = null;
 
     if (siteId) {
-      siteData = await getSiteById({
+      sitePromise = await getSiteById({
         supabase,
         id: siteId,
       });
     }
 
-    if (siteData?.error) {
-      return json({
-        status: "error",
-        message: "Failed to get site",
-        error: siteData.error,
-        data: siteData.data,
-      });
-    }
-
-    return json({
-      status: "success",
-      message: "Site found",
+    return defer({
       error: null,
-      data: siteData?.data,
-      locationOptions,
+      sitePromise,
+      locationOptionsPromise,
+      projectId,
     });
   } catch (error) {
-    return json({
-      status: "error",
-      message: "An unexpected error occurred",
-      error,
-    }, { status: 500 });
+    return json(
+      {
+        error,
+        sitePromise: null,
+        locationOptionsPromise: null,
+        projectId,
+      },
+      { status: 500 },
+    );
   }
 }
 
@@ -137,7 +123,7 @@ export async function action({
     return json(
       {
         status: "error",
-        message: "An unexpected error occurred",
+        message: "Failed to update site",
         error,
       },
       { status: 500 },
@@ -146,23 +132,13 @@ export async function action({
 }
 
 export default function UpdateSite() {
-  const { data, locationOptions, status, error } =
-    useLoaderData<typeof loader>();
+  const { sitePromise, error, projectId } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (status === "error") {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to load",
-        variant: "destructive",
-      });
-      navigate(`/projects/${data?.projectId}/sites`, { replace: true });
-    }
-
     if (actionData) {
       if (actionData?.status === "success") {
         toast({
@@ -177,16 +153,42 @@ export default function UpdateSite() {
           variant: "destructive",
         });
       }
-      navigate(`/projects/${data?.projectId}/sites`, {
+      navigate(`/projects/${projectId}/sites`, {
         replace: true,
       });
     }
   }, [actionData]);
 
+  if (error)
+    return <ErrorBoundary error={error} message="Failed to load site" />;
+
   return (
-    <CreateSite
-      updateValues={data}
-      locationOptionsFromUpdate={locationOptions}
-    />
+    <Suspense fallback={<div>Loading...</div>}>
+      <Await resolve={sitePromise}>
+        {(resolvedData) => <UpdateSiteWrapper siteData={resolvedData} />}
+      </Await>
+    </Suspense>
+  );
+}
+
+export function UpdateSiteWrapper({
+  siteData: { data: siteData, error },
+}: any) {
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to load site",
+        variant: "destructive",
+      });
+    }
+  }, [error]);
+
+  return (
+    <>
+      <CreateSite updateValues={siteData?.data} />
+    </>
   );
 }

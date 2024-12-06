@@ -1,6 +1,8 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
+  Await,
+  defer,
   json,
   useActionData,
   useLoaderData,
@@ -11,51 +13,39 @@ import { EmployeeSkillsSchema, isGoodStatus } from "@canny_ecosystem/utils";
 import { getEmployeeSkillById } from "@canny_ecosystem/supabase/queries";
 import { updateEmployeeSkill } from "@canny_ecosystem/supabase/mutations";
 import AddEmployeeSkill from "./add-employee-skill";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { ErrorBoundary } from "@/components/error-boundary";
+import type { EmployeeSkillDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 
 export const UPDATE_EMPLOYEE_SKILL = "update-employee-skill";
 
-export async function loader({ request, params }: LoaderFunctionArgs): Promise<Response> {
+export async function loader({ request, params }: LoaderFunctionArgs) {
   const skillId = params.skillId;
   const employeeId = params.employeeId;
 
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
 
-    let skillData = null;
+    let skillPromise = null;
 
     if (skillId) {
-      skillData = await getEmployeeSkillById({
+      skillPromise = getEmployeeSkillById({
         supabase,
         id: skillId,
       });
     }
 
-    if (skillData?.error) {
-      return json({
-        status: "error",
-        message: "Failed to get employee skill",
-        error: skillData.error,
-        data: skillData.data,
-        employeeId,
-      });
-    }
-
-    return json({
-      status: "success",
-      message: "Employee skill found",
-      data: skillData?.data,
-      error: null,
+    return defer({
+      skillPromise,
       employeeId,
+      error: null,
     });
   } catch (error) {
     return json({
-      status: "error",
-      message: "An unexpected error occurred",
       error,
-      data: null,
       employeeId,
+      skillPromise: null,
     });
   }
 }
@@ -86,7 +76,7 @@ export async function action({
 
   if (isGoodStatus(status)) {
     return json({
-      status,
+      status: "success",
       message: "Successfully updated employee skill",
       error: null,
       employeeId,
@@ -101,21 +91,12 @@ export async function action({
 }
 
 export default function UpdateEmployeeSkill() {
-  const { data, status, error, employeeId } = useLoaderData<typeof loader>();
+  const { skillPromise, error, employeeId } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (status === "error") {
-      toast({
-        title: "Error",
-        description: error?.message || "Failed to load",
-        variant: "destructive",
-      });
-      navigate(`/employees/${employeeId}/work-portfolio`);
-    }
-
     if (actionData) {
       if (actionData?.status === "success") {
         toast({
@@ -134,5 +115,47 @@ export default function UpdateEmployeeSkill() {
     }
   }, [actionData]);
 
+  if (error)
+    return (
+      <ErrorBoundary
+        error={error}
+        message="Failed to load employee skills data"
+      />
+    );
+
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Await resolve={skillPromise}>
+        {(resolvedData) => {
+          if (!resolvedData)
+            return (
+              <ErrorBoundary message="Failed to load employee skills data" />
+            );
+          return (
+            <UpdateEmployeeSkillWrapper
+              data={resolvedData?.data}
+              error={resolvedData?.error}
+            />
+          );
+        }}
+      </Await>
+    </Suspense>
+  );
+}
+
+export function UpdateEmployeeSkillWrapper({
+  data,
+  error,
+}: {
+  data: EmployeeSkillDatabaseUpdate | null;
+  error: Error | null | { message: string };
+}) {
+  if (error)
+    return (
+      <ErrorBoundary
+        error={error}
+        message="Failed to load employee skills data"
+      />
+    );
   return <AddEmployeeSkill updateValues={data} />;
 }

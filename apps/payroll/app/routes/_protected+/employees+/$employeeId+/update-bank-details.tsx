@@ -2,6 +2,8 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { getEmployeeBankDetailsById } from "@canny_ecosystem/supabase/queries";
 import {
+  Await,
+  defer,
   Form,
   json,
   useActionData,
@@ -17,9 +19,11 @@ import {
 import { CreateEmployeeBankDetails } from "@/components/employees/form/create-employee-bank-details";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
 import { Card } from "@canny_ecosystem/ui/card";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
+import type { EmployeeBankDetailsDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 export const UPDATE_BANK_DETAILS = "update-employee-bank-details";
 
@@ -29,39 +33,27 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
 
-    let data: any;
-    let error: any;
+    let employeeBankDetailsPromise = null;
 
     if (employeeId) {
-      ({ data, error } = await getEmployeeBankDetailsById({
+      employeeBankDetailsPromise = getEmployeeBankDetailsById({
         supabase,
         id: employeeId,
-      }));
+      });
+    } else {
+      throw new Error("No employeeId provided");
     }
 
-    if (!data)
-      return json({
-        status: "error",
-        message: "Failed to get employee bank details",
-        data,
-        error,
-        employeeId,
-      });
-
-    return json({
-      status: "success",
-      message: "Employee bank details found",
-      data,
+    return defer({
+      employeeBankDetailsPromise,
       error: null,
       employeeId,
     });
   } catch (error) {
     return json({
-      status: "error",
-      message: "An unexpected error occurred",
       error,
-      data: null,
       employeeId,
+      employeeBankDetailsPromise: null,
     });
   }
 }
@@ -103,7 +95,48 @@ export async function action({
 }
 
 export default function UpdateEmployeeBankDetails() {
-  const { data, status, message, employeeId } = useLoaderData<typeof loader>();
+  const { employeeBankDetailsPromise, employeeId, error } =
+    useLoaderData<typeof loader>();
+
+  if (error)
+    return (
+      <ErrorBoundary
+        error={error}
+        message="Failed to load employee bank details"
+      />
+    );
+
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Await resolve={employeeBankDetailsPromise}>
+        {(resolvedData) => {
+          if (!resolvedData)
+            return (
+              <ErrorBoundary message="Failed to load employee bank details" />
+            );
+          return (
+            <UpdateEmployeeBankDetailsWrapper
+              data={resolvedData.data}
+              error={resolvedData.error}
+              employeeId={employeeId}
+            />
+          );
+        }}
+      </Await>
+    </Suspense>
+  );
+}
+
+
+export function UpdateEmployeeBankDetailsWrapper({
+  data,
+  error,
+  employeeId,
+}: {
+  data: EmployeeBankDetailsDatabaseUpdate | null;
+  error: Error | null | { message: string };
+  employeeId: string | undefined;
+}) {
   const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
   const currentSchema = EmployeeBankDetailsSchema;
@@ -123,13 +156,12 @@ export default function UpdateEmployeeBankDetails() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (status === "error") {
+    if (error) {
       toast({
         title: "Error",
-        description: message || "Failed to get employee bank details",
+        description: error.message,
         variant: "destructive",
       });
-      navigate(`/employees/${employeeId}/work-portfolio`);
     }
     if (actionData) {
       if (actionData?.status === "success") {

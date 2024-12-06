@@ -2,6 +2,8 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { getEmployeeById } from "@canny_ecosystem/supabase/queries";
 import {
+  Await,
+  defer,
   Form,
   json,
   useActionData,
@@ -14,51 +16,38 @@ import { isGoodStatus, EmployeeSchema } from "@canny_ecosystem/utils";
 import { CreateEmployeeDetails } from "@/components/employees/form/create-employee-details";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
 import { Card } from "@canny_ecosystem/ui/card";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
+import type { EmployeeDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 export const UPDATE_EMPLOYEE = "update-employee";
 
-export async function loader({
-  request,
-  params,
-}: LoaderFunctionArgs): Promise<Response> {
+export async function loader({ request, params }: LoaderFunctionArgs) {
   const employeeId = params.employeeId;
 
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
 
-    let data = null;
-    let error = null;
+    let employeePromise = null;
 
     if (employeeId) {
-      ({ data, error } = await getEmployeeById({ supabase, id: employeeId }));
+      employeePromise = getEmployeeById({ supabase, id: employeeId });
+    } else {
+      throw new Error("No employeeId provided");
     }
 
-    if (error)
-      return json({
-        status: "error",
-        message: "Failed to get employee",
-        error,
-        data,
-        employeeId,
-      });
-
-    return json({
-      status: "success",
-      message: "Employee found",
-      data,
-      error: null,
+    return defer({
+      employeePromise,
       employeeId,
+      error: null,
     });
   } catch (error) {
     return json({
-      status: "error",
-      message: "An unexpected error occurred",
       error,
-      data: null,
       employeeId,
+      employeePromise: null,
     });
   }
 }
@@ -108,7 +97,40 @@ export async function action({
 }
 
 export default function UpdateEmployeeDetails() {
-  const { data, status, message, employeeId } = useLoaderData<typeof loader>();
+  const { employeePromise, employeeId, error } = useLoaderData<typeof loader>();
+
+  if (error)
+    return (
+      <ErrorBoundary error={error} message="Failed to load employee details" />
+    );
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Await resolve={employeePromise}>
+        {(resolvedData) => {
+          if (!resolvedData)
+            return <ErrorBoundary message="Failed to load employee details" />;
+          return (
+            <UpdateEmployeeDetailsWrapper
+              data={resolvedData.data}
+              error={resolvedData.error}
+              employeeId={employeeId}
+            />
+          );
+        }}
+      </Await>
+    </Suspense>
+  );
+}
+
+export function UpdateEmployeeDetailsWrapper({
+  data,
+  error,
+  employeeId,
+}: {
+  data: EmployeeDatabaseUpdate | null;
+  error: Error | null | { message: string };
+  employeeId: string | undefined;
+}) {
   const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
   const currentSchema = EmployeeSchema;
@@ -121,22 +143,20 @@ export default function UpdateEmployeeDetails() {
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
-    defaultValue: data,
+    defaultValue: { ...data },
   });
 
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (status === "error") {
+    if (error) {
       toast({
         title: "Error",
-        description: message || "Failed to get employee details",
+        description: error?.message || "Failed to load employee details",
         variant: "destructive",
       });
-      navigate(`/employees/${employeeId}/overview`);
     }
-
     if (actionData) {
       if (actionData?.status === "success") {
         toast({

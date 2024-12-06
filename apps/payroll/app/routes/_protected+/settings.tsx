@@ -5,9 +5,7 @@ import { Link, Outlet, useLocation, useNavigation } from "@remix-run/react";
 export default function Settings() {
   const { pathname } = useLocation();
   const navigation = useNavigation();
-  const isLoading =
-    navigation.state === "loading" ||
-    navigation.location?.pathname.startsWith("/settings");
+  const isLoading = navigation.state === "loading";
 
   return (
     <section>

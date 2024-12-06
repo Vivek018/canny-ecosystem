@@ -53,16 +53,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
     return json({
-      staus: "success",
-      message: "Company ID found",
       companyId,
       error: null,
     });
   } catch (error) {
     return json(
       {
-        status: "error",
-        message: "An unexpected error occurred",
         error,
         companyId: null,
       },
@@ -164,9 +160,6 @@ export default function CreatePaymentField({
         description: actionData?.message,
         variant: "success",
       });
-      navigate(actionData?.returnTo ?? "/payment-components/payment-fields", {
-        replace: true,
-      });
     } else {
       toast({
         title: "Error",
@@ -175,6 +168,9 @@ export default function CreatePaymentField({
         variant: "destructive",
       });
     }
+    navigate("/payment-components/payment-fields", {
+      replace: true,
+    });
   }, [actionData]);
 
   return (

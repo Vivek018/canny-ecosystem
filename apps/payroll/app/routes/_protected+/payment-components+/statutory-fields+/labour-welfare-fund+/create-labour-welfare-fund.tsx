@@ -19,6 +19,7 @@ import {
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import {
+  defer,
   Form,
   json,
   useActionData,
@@ -28,7 +29,6 @@ import {
 import { useEffect, useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { safeRedirect } from "@/utils/server/http.server";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { UPDATE_LABOUR_WELFARE_FUND } from "./$labourWelfareFundId.update-labour-welfare-fund";
 import {
@@ -51,11 +51,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-    return json({ status: "success", message: "Company ID found", companyId });
+    return defer({ companyId, error: null });
   } catch (error) {
     return json({
-      status: "error",
-      message: "An unexpected error occurred",
       error,
       companyId: null,
     }, { status: 500 });

@@ -1,6 +1,8 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
+  Await,
+  defer,
   json,
   useActionData,
   useLoaderData,
@@ -16,54 +18,43 @@ import { updateEmployeeStateInsurance } from "@canny_ecosystem/supabase/mutation
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import CreateEmployeeStateInsurance from "./create-employee-state-insurance";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
+import type { EmployeeStateInsuranceDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 export const UPDATE_EMPLOYEE_STATE_INSURANCE =
   "update-employee-state-insurance";
 
-export async function loader({
-  request,
-  params,
-}: LoaderFunctionArgs): Promise<Response> {
+export async function loader({ request, params }: LoaderFunctionArgs) {
   const esiId = params.esiId;
+
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
 
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-    let esiData = null;
+    let esiPromise = null;
 
     if (esiId) {
-      esiData = await getEmployeeStateInsuranceById({
+      esiPromise = getEmployeeStateInsuranceById({
         supabase,
         id: esiId,
       });
     }
 
-    if (esiData?.error) {
-      return json({
-        status: "error",
-        message: "Failed to load data",
-        data: esiData?.data,
-        error: esiData.error,
-        companyId,
-      });
-    }
-
-    return json({
-      status: "success",
-      message: "Employee State Insurance",
+    return defer({
       error: null,
-      data: esiData?.data,
+      esiPromise,
       companyId,
     });
   } catch (error) {
-    return json({
-      status: "error",
-      message: "An unexpected error occurred",
-      error,
-      data: null,
-      companyId: null,
-    }, { status: 500 });
+    return json(
+      {
+        error,
+        esiPromise: null,
+        companyId: null,
+      },
+      { status: 500 },
+    );
   }
 }
 
@@ -104,30 +95,24 @@ export async function action({
       error,
     });
   } catch (error) {
-    return json({
-      status: "error",
-      message: "An unexpected error occurred",
-      error,
-    }, { status: 500 });
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 },
+    );
   }
 }
 
-export default function UpdateEmployeeProvidentFund() {
-  const { data, status, error } = useLoaderData<typeof loader>();
+export default function UpdateEmployeeStateInsurance() {
+  const { esiPromise, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (status === "error") {
-      toast({
-        title: "Error",
-        description: error?.message || "Failed to load",
-        variant: "destructive",
-      });
-      navigate("/payment-components/statutory-fields/employee-state-insurance");
-    }
-
     if (!actionData) return;
     if (actionData?.status === "success") {
       toast({
@@ -146,6 +131,46 @@ export default function UpdateEmployeeProvidentFund() {
     }
     navigate("/payment-components/statutory-fields/employee-state-insurance");
   }, [actionData]);
+
+  if (error)
+    return <ErrorBoundary error={error} message="Failed to load ESI" />;
+
+  return (
+    <Suspense>
+      <Await resolve={esiPromise}>
+        {(resolvedData) => {
+          if (!resolvedData)
+            return <ErrorBoundary message="Failed to load ESI" />;
+          return (
+            <UpdateEmployeeStateInsuranceWrapper
+              data={resolvedData.data}
+              error={resolvedData.error}
+            />
+          );
+        }}
+      </Await>
+    </Suspense>
+  );
+}
+
+export function UpdateEmployeeStateInsuranceWrapper({
+  data,
+  error,
+}: {
+  data: EmployeeStateInsuranceDatabaseUpdate | null;
+  error: Error | null | { message: string };
+}) {
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to load ESI",
+        variant: "destructive",
+      });
+    }
+  }, [error]);
 
   return <CreateEmployeeStateInsurance updateValues={data} />;
 }

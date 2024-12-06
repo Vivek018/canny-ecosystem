@@ -80,11 +80,14 @@ export const action = async ({
       error,
     });
   } catch (error) {
-    return json({
-      status: "error",
-      message: "Failed to create Employee Provident Fund",
-      error,
-    }, { status: 500 });
+    return json(
+      {
+        status: "error",
+        message: "Failed to create Employee Provident Fund",
+        error,
+      },
+      { status: 500 },
+    );
   }
 };
 
@@ -93,16 +96,17 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
     return json({
-      status: "success",
-      message: "Company ID found",
       companyId,
+      error: null,
     });
   } catch (error) {
-    return json({
-      status: "error",
-      message: "An unexpected error occurred",
-      error,
-    }, { status: 500 });
+    return json(
+      {
+        error,
+        companyId: null,
+      },
+      { status: 500 },
+    );
   }
 };
 

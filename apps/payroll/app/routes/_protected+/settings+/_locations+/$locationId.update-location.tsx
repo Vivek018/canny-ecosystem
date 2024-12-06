@@ -2,6 +2,8 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import CreateLocation from "./create-location";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
+  Await,
+  defer,
   json,
   useActionData,
   useLoaderData,
@@ -12,7 +14,8 @@ import { isGoodStatus, LocationSchema } from "@canny_ecosystem/utils";
 import { getLocationById } from "@canny_ecosystem/supabase/queries";
 import { updateLocation } from "@canny_ecosystem/supabase/mutations";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 export const UPDATE_LOCATION = "update-location";
 
@@ -22,31 +25,25 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
 
-    let locationData = null;
+    let locationPromise = null;
 
     if (locationId) {
-      locationData = await getLocationById({
+      locationPromise = await getLocationById({
         supabase,
         id: locationId,
       });
+    } else {
+      throw new Error("No locationId provided");
     }
 
-    if (locationData?.error) {
-      throw locationData.error;
-    }
-
-    return json({
-      status: "success",
-      message: "Location loaded",
-      data: locationData?.data,
+    return defer({
+      locationPromise,
       error: null,
     });
   } catch (error) {
     return json({
-      status: "error",
-      message: "An unexpected error occurred",
       error,
-      data: null,
+      locationPromise: null,
     });
   }
 }
@@ -91,7 +88,7 @@ export async function action({
 }
 
 export default function UpdateLocation() {
-  const { data } = useLoaderData<typeof loader>();
+  const { locationPromise, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
   const { toast } = useToast();
@@ -105,9 +102,6 @@ export default function UpdateLocation() {
         description: actionData?.message,
         variant: "success",
       });
-      navigate("/settings/locations", {
-        replace: true,
-      });
     } else {
       toast({
         title: "Error",
@@ -115,7 +109,26 @@ export default function UpdateLocation() {
         variant: "destructive",
       });
     }
-  }, [actionData, toast, navigate]);
+    navigate("/settings/locations", {
+      replace: true,
+    });
+  }, [actionData]);
 
-  return <CreateLocation updateValues={data} />;
+  if(error) {
+    return <ErrorBoundary error={error} message="Failed to load location" />
+  }
+
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Await resolve={locationPromise}>
+        {(resolvedData) => {
+          if (!resolvedData)
+            return <ErrorBoundary message="Failed to load location" />;
+          if (resolvedData.error)
+            return <ErrorBoundary error={resolvedData.error} />;
+          return <CreateLocation updateValues={resolvedData.data} />;
+        }}
+      </Await>
+    </Suspense>
+  );
 }

@@ -1,6 +1,8 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
+  Await,
+  defer,
   Form,
   json,
   useActionData,
@@ -11,12 +13,14 @@ import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { isGoodStatus, EmployeeAddressesSchema } from "@canny_ecosystem/utils";
 import { getEmployeeAddressById } from "@canny_ecosystem/supabase/queries";
 import { updateEmployeeAddress } from "@canny_ecosystem/supabase/mutations";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
 import { Card } from "@canny_ecosystem/ui/card";
 import { CreateEmployeeAddress } from "@/components/employees/form/create-employee-address";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
+import type { EmployeeAddressDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 export const UPDATE_EMPLOYEE_ADDRESS = "update-employee-address";
 
@@ -27,27 +31,29 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
 
-    let data = null;
+    let employeeAddressPromise = null;
 
     if (addressId) {
-      data = (await getEmployeeAddressById({ supabase, id: addressId })).data;
+      employeeAddressPromise = getEmployeeAddressById({
+        supabase,
+        id: addressId,
+      });
     }
 
-    return json({
-      status: "success",
-      message: "Employee address found",
-      data,
-      error: null,
+    return defer({
+      employeeAddressPromise,
       employeeId,
+      error: null,
     });
   } catch (error) {
-    return json({
-      status: "error",
-      message: "An unexpected error occurred",
-      data: null,
-      error,
-      employeeId,
-    }, { status: 500 });
+    return json(
+      {
+        error,
+        employeeId,
+        employeeAddressPromise: null,
+      },
+      { status: 500 },
+    );
   }
 }
 
@@ -88,16 +94,54 @@ export async function action({
       error,
     });
   } catch (error) {
-    return json({
-      status: "error",
-      message: "An unexpected error occurred",
-      error,
-    }, { status: 500 });
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 },
+    );
   }
 }
 
 export default function UpdateEmployeeAddress() {
-  const { data, employeeId } = useLoaderData<typeof loader>();
+  const { employeeAddressPromise, employeeId, error } =
+    useLoaderData<typeof loader>();
+
+  if (error)
+    return (
+      <ErrorBoundary error={error} message="Failed to load employee details" />
+    );
+
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Await resolve={employeeAddressPromise}>
+        {(resolvedData) => {
+          if (!resolvedData)
+            return <ErrorBoundary message="Failed to load employee details" />;
+          return (
+            <UpdateEmployeeAddressWrapper
+              data={resolvedData.data}
+              error={resolvedData.error}
+              employeeId={employeeId}
+            />
+          );
+        }}
+      </Await>
+    </Suspense>
+  );
+}
+
+export function UpdateEmployeeAddressWrapper({
+  data,
+  error,
+  employeeId,
+}: {
+  data: EmployeeAddressDatabaseUpdate | null;
+  error: Error | null | { message: string };
+  employeeId: string | undefined;
+}) {
   const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
   const currentSchema = EmployeeAddressesSchema;
@@ -117,6 +161,13 @@ export default function UpdateEmployeeAddress() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (error) {
+      toast({
+        title: "Error",
+        description: error?.message || "Employee address update failed",
+        variant: "destructive",
+      });
+    }
     if (actionData) {
       if (actionData?.status === "success") {
         toast({

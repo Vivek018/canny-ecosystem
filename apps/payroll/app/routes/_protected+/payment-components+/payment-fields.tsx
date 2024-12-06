@@ -3,11 +3,7 @@ import { Outlet, useNavigation } from "@remix-run/react";
 
 export default function PaymentFields() {
   const navigation = useNavigation();
-  const isLoading =
-    navigation.state === "loading" ||
-    navigation.location?.pathname.startsWith(
-      "/payment-components/payment-fields",
-    );
+  const isLoading = navigation.state === "loading";
 
   if (isLoading) {
     return (

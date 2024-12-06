@@ -2,6 +2,8 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import CreatePaymentField from "./create-payment-field";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
+  Await,
+  defer,
   json,
   useActionData,
   useLoaderData,
@@ -15,50 +17,37 @@ import {
 } from "@canny_ecosystem/utils";
 import { getPaymentFieldById } from "@canny_ecosystem/supabase/queries";
 import { updatePaymentField } from "@canny_ecosystem/supabase/mutations";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { ErrorBoundary } from "@/components/error-boundary";
+import type { PaymentFieldDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 
 export const UPDATE_PAYMENT_FIELD = "update-payment-field";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const paymentFieldId = params.paymentFieldId;
+
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
 
-    let paymentFieldData = null;
+    let paymentFieldPromise = null;
 
     if (paymentFieldId) {
-      paymentFieldData = await getPaymentFieldById({
+      paymentFieldPromise = getPaymentFieldById({
         supabase,
         id: paymentFieldId,
       });
     }
 
-    if (paymentFieldData?.error) {
-      return json(
-        {
-          status: "error",
-          message: "Failed to load data",
-          error: paymentFieldData.error,
-          data: null,
-        },
-        { status: 500 },
-      );
-    }
-
-    return json({
-      status: "success",
-      message: "Payment Field loaded",
-      data: paymentFieldData?.data,
+    return defer({
+      paymentFieldPromise,
       error: null,
     });
   } catch (error) {
     return json(
       {
-        status: "error",
-        message: "An unexpected error occurred",
         error,
-        data: null,
+        paymentFieldPromise: null,
       },
       { status: 500 },
     );
@@ -107,16 +96,19 @@ export async function action({
       { status: 500 },
     );
   } catch (error) {
-    return json({
-      status: "error",
-      message: "An unexpected error occurred",
-      error,
-    }, { status: 500 });
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 },
+    );
   }
 }
 
 export default function UpdatePaymentField() {
-  const { data } = useLoaderData<typeof loader>();
+  const { paymentFieldPromise } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
   const navigate = useNavigate();
@@ -124,15 +116,12 @@ export default function UpdatePaymentField() {
 
   useEffect(() => {
     if (!actionData) return;
+
     if (actionData?.status === "success") {
       toast({
         title: "Success",
         description: actionData?.message,
         variant: "success",
-      });
-
-      navigate(actionData?.returnTo ?? "/payment-components/payment-fields", {
-        replace: true,
       });
     } else {
       toast({
@@ -142,7 +131,51 @@ export default function UpdatePaymentField() {
         variant: "destructive",
       });
     }
-  }, [actionData, toast, navigate]);
 
-  return <CreatePaymentField updateValues={data} />;
+    navigate("/payment-components/payment-fields", {
+      replace: true,
+    });
+  }, [actionData]);
+
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Await resolve={paymentFieldPromise}>
+        {(resolvedData) => {
+          if (!resolvedData)
+            return <ErrorBoundary message="Failed to load payment field" />;
+          return (
+            <UpdatePaymentFieldWrapper
+              data={resolvedData?.data}
+              error={resolvedData?.error}
+            />
+          );
+        }}
+      </Await>
+    </Suspense>
+  );
+}
+
+export function UpdatePaymentFieldWrapper({
+  data,
+  error,
+}: {
+  data: PaymentFieldDatabaseUpdate | null;
+  error: Error | null | { message: string };
+}) {
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (error)
+      toast({
+        title: "Error",
+        description: error?.message,
+        variant: "destructive",
+      });
+  }, [error]);
+
+  return (
+    <>
+      <CreatePaymentField updateValues={data} />
+    </>
+  );
 }

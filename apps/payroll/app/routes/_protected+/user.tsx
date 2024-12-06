@@ -6,7 +6,7 @@ export default function Account() {
   const { pathname } = useLocation();
   const navigation = useNavigation();
   const isLoading =
-    navigation.state === "loading" ||
+    navigation.state === "loading" &&
     navigation.location?.pathname.startsWith("/user");
 
   return (

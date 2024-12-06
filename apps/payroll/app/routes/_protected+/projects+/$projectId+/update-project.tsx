@@ -5,6 +5,8 @@ import {
   getProjectById,
 } from "@canny_ecosystem/supabase/queries";
 import {
+  Await,
+  defer,
   json,
   useActionData,
   useLoaderData,
@@ -16,14 +18,12 @@ import { isGoodStatus, ProjectSchema } from "@canny_ecosystem/utils";
 import CreateProject from "../create-project";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 export const UPDATE_PROJECT = "update-project";
 
-export async function loader({
-  request,
-  params,
-}: LoaderFunctionArgs): Promise<Response> {
+export async function loader({ request, params }: LoaderFunctionArgs) {
   const projectId = params.projectId;
 
   try {
@@ -31,50 +31,35 @@ export async function loader({
 
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-    let data = null;
+    let projectPromise = null;
+    if (projectId)
+      projectPromise = getProjectById({ supabase, id: projectId, companyId });
 
-    if (projectId) {
-      data = (await getProjectById({ supabase, id: projectId, companyId }))
-        .data;
-    }
+    const companyOptionsPromise = getCompanies({ supabase }).then(
+      ({ data, error }) => {
+        if (data) {
+          const companyOptions = data
+            .filter((company) => company.id !== companyId)
+            .map((company) => ({ label: company.name, value: company.id }));
+          return { data: companyOptions, error };
+        }
+        return { data: null, error };
+      },
+    );
 
-    const { data: companies, error } = await getCompanies({ supabase });
-
-    if (error) {
-      return json({
-        status: "error",
-        message: "Failed to get companies",
-        error,
-        data: null,
-      });
-    }
-
-    if (!companies) {
-      return json({
-        status: "error",
-        message: "No companies found",
-        error: "No companies found",
-        data: null,
-      });
-    }
-
-    const companyOptions = companies
-      .filter((company) => company.id !== companyId)
-      .map((company) => ({ label: company.name, value: company.id }));
-
-    return json({
-      status: "success",
-      message: "Project loaded",
-      data,
-      companyOptions,
+    return defer({
+      projectPromise,
+      companyOptionsPromise,
+      companyId,
+      error: null,
     });
   } catch (error) {
     return json(
       {
-        status: "error",
-        message: "An unexpected error occurred",
         error,
-        data: null,
+        companyId: null,
+        projectPromise: null,
+        companyOptionsPromise: null,
       },
       { status: 500 },
     );
@@ -129,7 +114,7 @@ export async function action({
 }
 
 export default function UpdateProject() {
-  const { data, companyOptions } = useLoaderData<typeof loader>();
+  const { projectPromise, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
   const { toast } = useToast();
@@ -140,13 +125,13 @@ export default function UpdateProject() {
       if (actionData?.status === "success") {
         toast({
           title: "Success",
-          description: actionData?.message,
+          description: actionData?.message || "Project updated",
           variant: "success",
         });
       } else {
         toast({
           title: "Error",
-          description: actionData?.message,
+          description: actionData?.message || "Project update failed",
           variant: "destructive",
         });
       }
@@ -156,10 +141,14 @@ export default function UpdateProject() {
     }
   }, [actionData]);
 
+  if (error)
+    return <ErrorBoundary error={error} message="Failed to load project" />;
+
   return (
-    <CreateProject
-      updateValues={data}
-      companyOptionsFromUpdate={companyOptions}
-    />
+    <Suspense fallback={<div>Loading...</div>}>
+      <Await resolve={projectPromise}>
+        {(projectData) => <CreateProject updateValues={projectData?.data} />}
+      </Await>
+    </Suspense>
   );
 }
