@@ -216,7 +216,7 @@ export default function EmployeesIndex() {
       </div>
       <DataTable
         data={data ?? []}
-        columns={columns}
+        columns={columns({env,companyId})}
         count={count ?? data?.length ?? 0}
         query={query}
         filters={filters}
