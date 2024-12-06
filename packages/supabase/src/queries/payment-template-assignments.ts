@@ -83,6 +83,22 @@ export async function getPaymentTemplateAssignmentIdBySiteId({
   return { data, error };
 }
 
+export type PaymentTemplateAssignmentsType = Pick<
+  PaymentTemplateAssignmentsDatabaseRow,
+  | "id"
+  | "template_id"
+  | "assignment_type"
+  | "employee_id"
+  | "site_id"
+  | "eligibility_option"
+  | "position"
+  | "skill_level"
+  | "effective_from"
+  | "effective_to"
+  | "is_active"
+  | "name"
+>;
+
 export async function getPaymentTemplateAssignmentBySiteId({
   supabase,
   site_id,
@@ -105,25 +121,11 @@ export async function getPaymentTemplateAssignmentBySiteId({
   const { data, error } = await supabase
     .from("payment_template_assignments")
     .select(columns.join(","))
-    .eq("site_id", site_id);
+    .eq("site_id", site_id).returns<PaymentTemplateAssignmentsType[]>();
 
   if (error) console.error(error);
 
   return { data, error };
 }
 
-export type PaymentTemplateAssignmentsType = Pick<
-  PaymentTemplateAssignmentsDatabaseRow,
-  | "id"
-  | "template_id"
-  | "assignment_type"
-  | "employee_id"
-  | "site_id"
-  | "eligibility_option"
-  | "position"
-  | "skill_level"
-  | "effective_from"
-  | "effective_to"
-  | "is_active"
-  | "name"
->;
+

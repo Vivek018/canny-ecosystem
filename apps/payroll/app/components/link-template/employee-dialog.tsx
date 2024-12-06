@@ -3,22 +3,77 @@ import { Dialog, DialogTrigger, DialogContent, DialogTitle } from "@canny_ecosys
 import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import { StatusButton } from "@canny_ecosystem/ui/status-button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { replaceUnderscore, getValidDateForInput } from "@canny_ecosystem/utils";
-import { FormProvider, getFormProps, getInputProps } from "@conform-to/react";
-import { Form } from "@remix-run/react";
+import { replaceUnderscore, getValidDateForInput, getInitialValueFromZod, PaymentTemplateFormEmployeeDialogSchema } from "@canny_ecosystem/utils";
+import { FormProvider, getFormProps, getInputProps, useForm } from "@conform-to/react";
+import { Form, useNavigation } from "@remix-run/react";
 import { DeleteEmployeePaymentTemplateAssignment } from "../employees/delete-employee-payment-template-assignment";
+import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
+import { useSupabase } from "@canny_ecosystem/supabase/client";
+import { getPaymentTemplateAssignmentByEmployeeId, getPaymentTemplatesByCompanyId } from "@canny_ecosystem/supabase/queries";
+import { getZodConstraint, parseWithZod } from "@conform-to/zod";
+import { useState } from "react";
 
-export function EmployeeDialog({
-    initialValues,
-    employeId,
-    form,
-    fields,
-    paymentTemplatesOptions,
-    navigation,
-    openPaymentTemplateDialog,
-    resetKey
-}: any) {
+export function EmployeeDialog({ employee, env }: {
+    employee: {
+        id: string;
+        is_active: boolean;
+        returnTo?: string;
+        companyId: string
+    };
+    env: SupabaseEnv
+}) {
+    const { supabase } = useSupabase({ env });
+    const navigation = useNavigation();
+
+    const [paymentTemplatesOptions, setPaymentTemplatesOptions] = useState<{
+        label: string;
+        value: string;
+    }[]>([]);
+    const [initialValues, setInitialValues] = useState(null);
+    const [resetKey, setResetKey] = useState(Date.now());
+
     const disableAll = navigation.state === "submitting" || navigation.state === "loading";
+
+    const [form, fields] = useForm({
+        id: "payment-template-form",
+        constraint: getZodConstraint(PaymentTemplateFormEmployeeDialogSchema),
+        onValidate({ formData }) {
+            return parseWithZod(formData, { schema: PaymentTemplateFormEmployeeDialogSchema });
+        },
+        defaultValue: initialValues ?? getInitialValueFromZod(PaymentTemplateFormEmployeeDialogSchema),
+        shouldValidate: 'onInput',
+        shouldRevalidate: 'onInput',
+    });
+
+    async function setLinkedDataIfExists() {
+        const { data } = await getPaymentTemplateAssignmentByEmployeeId({
+            supabase,
+            employee_id: employee.id,
+        });
+        if (data) {
+            const values = {
+                effective_from: data.effective_from,
+                effective_to: data.effective_to,
+                template_id: data.template_id,
+                name: data.name
+            };
+            setInitialValues(values as any);
+            setResetKey(Date.now());
+            form.update({ value: values });
+        }
+    }
+
+    const openPaymentTemplateDialog = async () => {
+        await setLinkedDataIfExists();
+        const { data } = await getPaymentTemplatesByCompanyId({ supabase, company_id: employee.companyId });
+        if (data) {
+            const newPaymentTemplatesOptions = data?.map((paymentTemplate) => (
+                { label: paymentTemplate.name, value: paymentTemplate.id }
+            ));
+            setPaymentTemplatesOptions(newPaymentTemplatesOptions);
+        }
+    }
+
     return (
         <Dialog>
             <DialogTrigger asChild>
@@ -36,7 +91,7 @@ export function EmployeeDialog({
                     <Form
                         method="POST"
                         {...getFormProps(form)}
-                        action={`/templates/${employeId}/${initialValues ? "update" : "create"}-employee-link`}
+                        action={`/templates/${employee.id}/${initialValues ? "update" : "create"}-employee-link`}
                     >
                         <Field
                             className="w-full"
@@ -99,7 +154,7 @@ export function EmployeeDialog({
                             {initialValues ? "Update" : "Create"}{" "}link template
                         </StatusButton>
                         <div className={cn("w-full mt-3", !initialValues && "hidden")}>
-                            <DeleteEmployeePaymentTemplateAssignment employeeId={employeId} />
+                            <DeleteEmployeePaymentTemplateAssignment employeeId={employee.id} />
                         </div>
                     </Form>
                 </FormProvider>

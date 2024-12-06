@@ -2,31 +2,100 @@ import { Button } from "@canny_ecosystem/ui/button";
 import { Dialog, DialogTrigger, DialogContent, DialogTitle } from "@canny_ecosystem/ui/dialog";
 import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { replaceUnderscore, getValidDateForInput, transformStringArrayIntoOptions, eligibilityOptionsArray, positionArray, skillLevelArray } from "@canny_ecosystem/utils";
-import { FormProvider, getFormProps, getInputProps } from "@conform-to/react";
-import { Form, useNavigate } from "@remix-run/react";
+import { replaceUnderscore, getValidDateForInput, transformStringArrayIntoOptions, eligibilityOptionsArray, positionArray, skillLevelArray, getInitialValueFromZod, PaymentTemplateFormSiteDialogSchema } from "@canny_ecosystem/utils";
+import { FormProvider, getFormProps, getInputProps, useForm } from "@conform-to/react";
+import { Form, useNavigate, useNavigation, useSearchParams } from "@remix-run/react";
 import { DeleteSitePaymentTemplateAssignment } from "../sites/delete-site-payment-template-assignment";
 import { SiteLinkedTemplates } from "../sites/site-linked-templates";
+import { getZodConstraint, parseWithZod } from "@conform-to/zod";
+import { useSupabase } from "@canny_ecosystem/supabase/client";
+import { useEffect, useState } from "react";
+import { type PaymentTemplateAssignmentsType, type SitesWithLocation, getPaymentTemplateAssignmentBySiteId, getPaymentTemplatesByCompanyId } from "@canny_ecosystem/supabase/queries";
+import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 
-export function SiteDialog({
-    openPaymentTemplateDialog,
-    initialValues,
-    form,
-    fields,
-    paymentTemplatesOptions,
-    resetKey,
-    disableAll,
-    linkedTemplates,
-    projectId,
-    currentPaymentTemplateAssignmentId,
-    action,
-    updateURL,
-    createURL
-}: any) {
+export function SiteDialog({ site, env, companyId }: { site: Omit<SitesWithLocation, "created_at" | "updated_at">, env: SupabaseEnv, companyId: string }) {
+    const { supabase } = useSupabase({ env });
+
+    const [searchParams] = useSearchParams();
+    const currentPaymentTemplateAssignmentId = searchParams.get("currentPaymentTemplateAssignmentId");
+    const action = searchParams.get("action");
+
+    const [initialValues, setInitialValues] = useState(null);
+    const [linkedTemplates, setLinkedTemplates] = useState<PaymentTemplateAssignmentsType[] | null>([]);
+    const [resetKey, setResetKey] = useState(Date.now());
+    const [paymentTemplatesOptions, setPaymentTemplatesOptions] = useState<{
+        label: string;
+        value: string;
+    }[]>([]);
+
     const navigate = useNavigate();
+    const navigation = useNavigation();
+    const disableAll = navigation.state === "submitting" || navigation.state === "loading";
+
+    const updateURL = `/templates/${site.project_id}/${site.id}/${currentPaymentTemplateAssignmentId}/update-site-link`;
+    const createURL = `/templates/${site.project_id}/${site.id}/create-site-link`;
+
+    async function setLinkedDataIfExists() {
+        const { data } = await getPaymentTemplateAssignmentBySiteId({ supabase, site_id: site.id });
+        setLinkedTemplates(data);
+    }
+
+    const openPaymentTemplateDialog = async () => {
+        setResetKey(Date.now());
+        setInitialValues(null);
+        await setLinkedDataIfExists();
+        const { data } = await getPaymentTemplatesByCompanyId({ supabase, company_id: companyId });
+        if (data) {
+            const newPaymentTemplatesOptions = data?.map((paymentTemplate) => ({ label: paymentTemplate.name, value: paymentTemplate.id }));
+            setPaymentTemplatesOptions(newPaymentTemplatesOptions);
+        }
+        form.reset();
+    }
+
     const handleOpenChange = () => {
-        navigate(`/projects/${projectId}/sites`);
+        navigate(`/projects/${site.project_id}/sites`);
     };
+
+    const [form, fields] = useForm({
+        id: "payment-template-form",
+        constraint: getZodConstraint(PaymentTemplateFormSiteDialogSchema),
+        onValidate({ formData }) {
+            return parseWithZod(formData, { schema: PaymentTemplateFormSiteDialogSchema });
+        },
+        defaultValue: getInitialValueFromZod(PaymentTemplateFormSiteDialogSchema),
+        shouldValidate: 'onInput',
+        shouldRevalidate: 'onInput'
+    });
+
+    useEffect(() => {
+        setResetKey(Date.now());
+        setInitialValues(null);
+    }, [action]);
+
+    useEffect(() => {
+        if (currentPaymentTemplateAssignmentId) {
+            if (linkedTemplates) {
+                const currentPaymentTemplate = linkedTemplates.find((linkedTemplate: { id: string; }) => linkedTemplate.id === currentPaymentTemplateAssignmentId);
+
+                if (currentPaymentTemplate) {
+                    const values = {
+                        effective_from: currentPaymentTemplate.effective_from as string,
+                        effective_to: currentPaymentTemplate.effective_to,
+                        template_id: currentPaymentTemplate.template_id,
+                        name: currentPaymentTemplate.name as string,
+                        eligibility_option: currentPaymentTemplate.eligibility_option,
+                        position: currentPaymentTemplate.position,
+                        skill_level: currentPaymentTemplate.skill_level
+                    };
+
+                    setInitialValues(values as any);
+                    setResetKey(Date.now())
+                    form.update({ value: values });
+                }
+            }
+        }
+    }, [currentPaymentTemplateAssignmentId]);
+
     return (
         <Dialog onOpenChange={handleOpenChange}>
             <DialogTrigger asChild>
@@ -126,7 +195,8 @@ export function SiteDialog({
                                         options={transformStringArrayIntoOptions(positionArray as unknown as string[])}
                                         inputProps={{
                                             ...getInputProps(fields.position, { type: "text" }),
-                                            defaultValue: fields.position.initialValue
+                                            defaultValue: fields.position.initialValue,
+                                            disabled: (fields.eligibility_option.value !== "position"),
                                         }}
                                         placeholder={`Select ${fields.position.name}`}
                                         labelProps={{
@@ -140,7 +210,8 @@ export function SiteDialog({
                                         options={transformStringArrayIntoOptions(skillLevelArray as unknown as string[])}
                                         inputProps={{
                                             ...getInputProps(fields.skill_level, { type: "text" }),
-                                            defaultValue: fields.skill_level.initialValue
+                                            defaultValue: fields.skill_level.initialValue,
+                                            disabled: (fields.eligibility_option.value !== "skill_level"),
                                         }}
                                         placeholder={`Select ${fields.skill_level.name}`}
                                         labelProps={{
@@ -153,7 +224,7 @@ export function SiteDialog({
                                     {initialValues ? "Update" : "Create"}{" "}link template
                                 </Button>
                                 <div className={cn("w-full mt-3", !initialValues && "hidden")}>
-                                    <DeleteSitePaymentTemplateAssignment projectId={projectId} templateAssignmentId={currentPaymentTemplateAssignmentId as string} />
+                                    <DeleteSitePaymentTemplateAssignment projectId={site.project_id} templateAssignmentId={currentPaymentTemplateAssignmentId as string} />
                                 </div>
                             </Form>
                         </FormProvider>

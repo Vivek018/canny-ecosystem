@@ -9,96 +9,20 @@ import {
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@canny_ecosystem/ui/tooltip";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { Link, useNavigate, useNavigation, useSearchParams } from "@remix-run/react";
+import { Link, useNavigate } from "@remix-run/react";
 import { DeleteSite } from "./delete-site";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@canny_ecosystem/ui/card";
-import { getPaymentTemplateAssignmentBySiteId, getPaymentTemplatesByCompanyId, type PaymentTemplateAssignmentsType, type SitesWithLocation } from "@canny_ecosystem/supabase/queries";
+import type { SitesWithLocation } from "@canny_ecosystem/supabase/queries";
 import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
-import { getInitialValueFromZod, PaymentTemplateFormSiteDialogSchema, replaceUnderscore } from "@canny_ecosystem/utils";
-import { useForm } from "@conform-to/react";
-import { useState, useEffect } from "react";
-import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { useSupabase } from "@canny_ecosystem/supabase/client";
+import { replaceUnderscore } from "@canny_ecosystem/utils";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
-import { SiteDialog } from "../link-template/SiteDialog";
+import { SiteDialog } from "../link-template/site-dialog";
 
 export function SiteCard({ site, env, companyId }: { site: Omit<SitesWithLocation, "created_at" | "updated_at">, env: SupabaseEnv, companyId: string }) {
-  const { supabase } = useSupabase({ env });
-
-  const [searchParams] = useSearchParams();
-  const currentPaymentTemplateAssignmentId = searchParams.get("currentPaymentTemplateAssignmentId");
-  const action = searchParams.get("action");
-
-  const [initialValues, setInitialValues] = useState(null);
-  const [linkedTemplates, setLinkedTemplates] = useState<PaymentTemplateAssignmentsType[] | null>([]);
-  const [resetKey, setResetKey] = useState(Date.now());
-  const [paymentTemplatesOptions, setPaymentTemplatesOptions] = useState<{
-    label: string;
-    value: string;
-  }[]>([]);
-
   const navigate = useNavigate();
-  const navigation = useNavigation();
-  const disableAll = navigation.state === "submitting" || navigation.state === "loading";
 
   const viewPaySequenceSearchParam = `${modalSearchParamNames.view_pay_sequence}=true`;
   const editPaySequenceSearchParam = `${modalSearchParamNames.edit_pay_sequence}=true`;
-
-  const updateURL = `/templates/${site.project_id}/${site.id}/${currentPaymentTemplateAssignmentId}/update-site-link`;
-  const createURL = `/templates/${site.project_id}/${site.id}/create-site-link`;
-
-  const [form, fields] = useForm({
-    id: "payment-template-form",
-    constraint: getZodConstraint(PaymentTemplateFormSiteDialogSchema),
-    onValidate({ formData }) {
-      return parseWithZod(formData, { schema: PaymentTemplateFormSiteDialogSchema });
-    },
-    defaultValue: initialValues ?? getInitialValueFromZod(PaymentTemplateFormSiteDialogSchema),
-    shouldValidate: 'onInput',
-    shouldRevalidate: 'onInput'
-  });
-
-  async function setLinkedDataIfExists() {
-    const { data } = await getPaymentTemplateAssignmentBySiteId({ supabase, site_id: site.id });
-    setLinkedTemplates(data as any);
-  }
-
-  const openPaymentTemplateDialog = async () => {
-    await setLinkedDataIfExists();
-    const { data } = await getPaymentTemplatesByCompanyId({ supabase, company_id: companyId });
-    if (data) {
-      const newPaymentTemplatesOptions = data?.map((paymentTemplate) => ({ label: paymentTemplate.name, value: paymentTemplate.id }));
-      setPaymentTemplatesOptions(newPaymentTemplatesOptions);
-    }
-  }
-
-  useEffect(() => {
-    if (currentPaymentTemplateAssignmentId) {
-      if (linkedTemplates) {
-        const currentPaymentTemplate = linkedTemplates.find((linkedTemplate: { id: string; }) => linkedTemplate.id === currentPaymentTemplateAssignmentId);
-
-        if (currentPaymentTemplate) {
-          const values = {
-            effective_from: currentPaymentTemplate.effective_from as string,
-            effective_to: currentPaymentTemplate.effective_to,
-            template_id: currentPaymentTemplate.template_id,
-            name: currentPaymentTemplate.name as string,
-            eligibility_option: currentPaymentTemplate.eligibility_option,
-            position: currentPaymentTemplate.position,
-            skill_level: currentPaymentTemplate.skill_level
-          };
-
-          setInitialValues(values as any);
-          setResetKey(Date.now())
-          form.update({ value: values });
-        }
-      }
-    }
-  }, [currentPaymentTemplateAssignmentId]);
-
-  useEffect(() => {
-    if (action === "create") setInitialValues(null);
-  }, [action]);
 
   return (
     <Card
@@ -148,21 +72,7 @@ export function SiteCard({ site, env, companyId }: { site: Omit<SitesWithLocatio
                   Edit Pay Sequence
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <SiteDialog
-                  openPaymentTemplateDialog={openPaymentTemplateDialog}
-                  initialValues={initialValues}
-                  form={form}
-                  fields={fields}
-                  paymentTemplatesOptions={paymentTemplatesOptions}
-                  resetKey={resetKey}
-                  disableAll={disableAll}
-                  linkedTemplates={linkedTemplates}
-                  projectId={site.project_id}
-                  currentPaymentTemplateAssignmentId={currentPaymentTemplateAssignmentId}
-                  action={action}
-                  updateURL={updateURL}
-                  createURL={createURL}
-                />
+                <SiteDialog env={env} site={site} companyId={companyId} />
                 <DropdownMenuSeparator className={cn(!site.latitude && !site.longitude && "hidden")} />
                 <DeleteSite projectId={site.project_id} siteId={site.id} />
               </DropdownMenuGroup>
