@@ -10,7 +10,7 @@ import {
 import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Await, defer, Link, Outlet, useLoaderData } from "@remix-run/react";
+import { Await, defer, Link, useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/react";
 import { Suspense } from "react";
 import { SitesWrapper } from "@/components/projects/sites/sites-wrapper";
@@ -23,7 +23,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
 
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
     if (!projectId) throw new Error("No projectId provided");
 
@@ -32,11 +32,17 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       projectId,
     });
 
+    const env = {
+      SUPABASE_URL: process.env.SUPABASE_URL!,
+      SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
+    };
+
     return defer({
       error: null,
       sitesPromise,
       projectId,
       companyId,
+      env,
     });
   } catch (error) {
     return json(
@@ -44,17 +50,21 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         error,
         sitesPromise: null,
         projectId,
-        companyId: null
+        companyId: null,
+        env: null,
       },
       { status: 500 },
     );
   }
 }
 
-export async function action() { return null }
+export async function action() {
+  return null;
+}
 
 export default function SitesIndex() {
-  const { sitesPromise, projectId, error } = useLoaderData<typeof loader>();
+  const { sitesPromise, projectId, error, env, companyId } =
+    useLoaderData<typeof loader>();
   const { isDocument } = useIsDocument();
 
   if (error)
@@ -92,7 +102,18 @@ export default function SitesIndex() {
           <CommandList className="max-h-full py-2 overflow-x-visible overflow-y-visible">
             <Suspense fallback={<div>Loading...</div>}>
               <Await resolve={sitesPromise}>
-                {(resolvedData) => <SitesWrapper sitesData={resolvedData} />}
+                {(resolvedData) => {
+                  if (!resolvedData)
+                    return <ErrorBoundary message="Failed to load sites" />;
+                  return (
+                    <SitesWrapper
+                      data={resolvedData.data}
+                      error={resolvedData.error}
+                      env={env!}
+                      companyId={companyId ?? ""}
+                    />
+                  );
+                }}
               </Await>
             </Suspense>
           </CommandList>
