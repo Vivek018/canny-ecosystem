@@ -86,9 +86,7 @@ export async function deletePaymentTemplateAssignment({
   const { error, status } = await supabase
     .from("payment_template_assignments")
     .delete()
-    .eq("id", id)
-    .select()
-    .single();
+    .eq("id", id);
 
   if (error) console.error(error);
 
