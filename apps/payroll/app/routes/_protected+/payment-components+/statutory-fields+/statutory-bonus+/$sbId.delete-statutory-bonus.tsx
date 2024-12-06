@@ -12,6 +12,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   const { status, error } = await deleteStatutoryBonus({
     supabase,
     id: sbId ?? "",
+    bypassAuth: true
   });
 
   if (isGoodStatus(status)) {

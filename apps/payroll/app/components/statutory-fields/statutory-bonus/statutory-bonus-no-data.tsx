@@ -8,10 +8,10 @@ import {
 } from "@canny_ecosystem/ui/card";
 import { Link } from "@remix-run/react";
 
-export default function StatutoryBonusNoData() {
+export function StatutoryBonusNoData() {
   return (
     <div className="flex flex-col items-center justify-end m-auto">
-      <div className="p-14"></div>
+      <div className="p-14" />
       <Card className="flex flex-col items-center justify-between gap-5 w-1/2 pt-6 px-2">
         <CardContent className="flex flex-col items-center justify-between gap-5">
           <CardTitle>
@@ -27,7 +27,7 @@ export default function StatutoryBonusNoData() {
 
         <CardFooter>
           <Link
-            to="/payment-components/statutory-fields/create-statutory-bonus"
+            to="/payment-components/statutory-fields/statutory-bonus/create-statutory-bonus"
             className={buttonVariants({ variant: "primary-outline" })}
           >
             Enable Statutory Bonus

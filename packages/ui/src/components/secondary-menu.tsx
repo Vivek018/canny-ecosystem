@@ -6,7 +6,7 @@ export function SecondaryMenu({
   Link,
   className,
 }: {
-  items: { path: string; label: string }[];
+  items: { path?: string; label?: string }[];
   pathname: string;
   Link: React.ElementType;
   className?: string;

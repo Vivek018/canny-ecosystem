@@ -3,14 +3,13 @@ import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { json, useLoaderData } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
 import { safeRedirect } from "@/utils/server/http.server";
-import {
-  isGoodStatus,
-  StatutoryBonusSchema,
-} from "@canny_ecosystem/utils";
+import { isGoodStatus, StatutoryBonusSchema } from "@canny_ecosystem/utils";
 import { getStatutoryBonusById } from "@canny_ecosystem/supabase/queries";
 import { updateStatutoryBonus } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import CreateStatutoryBonus from "./create-statutory-bonus";
+
+export const UPDATE_STATUTORY_BONUS = "update-statutory-bonus";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const sbId = params.sbId;
@@ -40,7 +39,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const submission = parseWithZod(formData, {
     schema: StatutoryBonusSchema,
   });
-  
+
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
@@ -53,11 +52,14 @@ export async function action({ request }: ActionFunctionArgs) {
     data: submission.value,
     bypassAuth: true,
   });
-  
+
   if (isGoodStatus(status)) {
-    return safeRedirect("/payment-components/statutory-fields/statutory-bonus", {
-      status: 303,
-    });
+    return safeRedirect(
+      "/payment-components/statutory-fields/statutory-bonus",
+      {
+        status: 303,
+      }
+    );
   }
   return json({ status, error });
 }

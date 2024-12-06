@@ -397,6 +397,31 @@ export const EmployeeWorkHistorySchema = z.object({
   end_date: z.string(),
 });
 
+export const paymentTypeArray = ["fixed", "variable"] as const;
+export const calculationTypeArray = ["fixed", "percentage_of_basic"] as const;
+
+export const PaymentFieldSchema = z
+  .object({
+    id: z.string().uuid().optional(),
+    name: zString,
+    payment_type: z.enum(paymentTypeArray).default("fixed"),
+    calculation_type: z.enum(calculationTypeArray).default("fixed"),
+    amount: z.number().optional(),
+    is_active: z.boolean().default(false),
+    is_pro_rata: z.boolean().default(false),
+    consider_for_epf: z.boolean().default(false),
+    consider_for_esic: z.boolean().default(false),
+    company_id: z.string().uuid(),
+  })
+  .refine(
+    (data) =>
+      !(data.payment_type === "variable" && data.calculation_type !== "fixed"),
+    {
+      message: `When payment type is "variable", calculation type must be "fixed".`,
+      path: ["calculation_type"],
+    }
+  );
+
 export const deductionCycleArray = ["monthly"] as const;
 export const EMPLOYEE_RESTRICTED_VALUE = 15000;
 export const EMPLOYEE_RESTRICTED_RATE = 0.2;
@@ -420,11 +445,11 @@ export const EmployeeProvidentFundSchema = z.object({
 export const EmployeeStateInsuranceSchema = z.object({
   id: z.string().optional(),
   company_id: z.string(),
-  esi_number: zNumberString.max(20),
+  esi_number: zNumberString,
   deduction_cycle: z.enum(deductionCycleArray).default(deductionCycleArray[0]),
   employees_contribution: z.number().default(0.0075),
   employers_contribution: z.number().default(0.0325),
-  include_employer_contribution: z.boolean().default(true),
+  include_employer_contribution: z.boolean().default(false),
 });
 
 export const ProfessionalTaxSchema = z.object({
@@ -455,38 +480,32 @@ export const LabourWelfareFundSchema = z.object({
   status: z.boolean().default(false),
 });
 
-const statutoryBonusPayFrequencyArray = ["monthly", "yearly"] as const;
+export const statutoryBonusPayFrequencyArray = ["monthly", "yearly"] as const;
+export const StatutoryBonusSchema = z
+  .object({
+    id: z.string().optional(),
+    company_id: z.string(),
+    payment_frequency: z
+      .enum(statutoryBonusPayFrequencyArray)
+      .default(statutoryBonusPayFrequencyArray[0]),
+    percentage: z.number().min(0).default(8.33),
+    payout_month: z.number().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.payment_frequency === "yearly" && !data.payout_month) {
+      ctx.addIssue({
+        path: ["payout_month"],
+        message: "payout_month is required when payment_freq is 'monthly'",
+        code: z.ZodIssueCode.custom,
+      });
+    }
 
-export const StatutoryBonusSchema = z.object({
-  id: z.string().optional(),
-  company_id: z.string(),
-  payment_frequency: z
-    .enum(statutoryBonusPayFrequencyArray)
-    .default(statutoryBonusPayFrequencyArray[0]),
-  percentage: z
-    .number()
-    .min(0)
-    .default(8.33)
-    .transform((value) => value / 100),
-  payout_month: z.number().optional(),
-});
-// .superRefine((data, ctx) => {
-//   if (data.payment_frequency === "yearly" && !data.payout_month) {
-//     ctx.addIssue({
-//       path: ["payout_month"],
-//       message: "payout_month is required when payment_freq is 'yearly'",
-//       code: z.ZodIssueCode.custom,
-//     });
-//   }
-
-//   if (data.payment_frequency === "monthly" && data.payout_month !== null) {
-//     ctx.addIssue({
-//       path: ["payout_month"],
-//       message: "payout_month must be null when payment_freq is 'monthly'",
-//       code: z.ZodIssueCode.custom,
-//     });
-//   }
-// });
+    if (data.payment_frequency === "monthly") {
+      if (data.payout_month !== null) {
+        data.payout_month = undefined;
+      }
+    }
+  });
 
 export const categoryArray = ["suggestion", "bug", "complain"] as const;
 export const severityArray = ["low", "normal", "urgent"] as const;
@@ -495,37 +514,32 @@ export const FeedbackSchema = z.object({
   id: z.string().optional(),
   subject: zString.min(3).max(30),
   message: zTextArea.max(500),
-  category: z.enum(categoryArray).optional(),
+  category: z.enum(categoryArray).default("suggestion"),
   severity: z.enum(severityArray).default("normal"),
   user_id: z.string(),
   company_id: z.string(),
 });
 
-// Payment Fields
-export const paymentTypeArray = ["fixed", "variable"] as const;
-export const calculationTypeArray = ["fixed", "percentage_of_basic"] as const;
+export const UpdateUserNameSchema = z.object({
+  first_name: zString.max(20),
+  last_name: zString.max(20),
+});
+export const UpdateUserContactSchema = z.object({
+  email: zEmail,
+  mobile_number: zNumber.min(10).max(10),
+});
 
-export const PaymentFieldSchema = z
-  .object({
-    id: z.string().uuid().optional(),
-    name: zString,
-    payment_type: z.enum(paymentTypeArray).default("fixed"),
-    calculation_type: z.enum(calculationTypeArray).default("fixed"),
-    amount: z.number().optional(),
-    is_active: z.boolean().default(false),
-    is_pro_rata: z.boolean().default(false),
-    consider_for_epf: z.boolean().default(false),
-    consider_for_esic: z.boolean().default(false),
-    company_id: z.string().uuid(),
-  })
-  .refine(
-    (data) =>
-      !(data.payment_type === "variable" && data.calculation_type !== "fixed"),
-    {
-      message: `When payment type is "variable", calculation type must be "fixed".`,
-      path: ["calculation_type"],
-    },
-  );
+export const UserSchema = z.object({
+  id: z.string().uuid().optional(),
+  first_name: zString.max(20),
+  last_name: zString.max(20),
+  email: zEmail,
+  mobile_number: zNumber.min(10).max(10).optional(),
+  avatar: zImage.optional(),
+  is_active: z.boolean().default(false),
+});
+
+
 
 // Payment Template Assignment
 export const paymentAssignmentTypesArray = ["employee", "site"] as const;

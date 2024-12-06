@@ -84,9 +84,7 @@ export async function deleteLabourWelfareFund({
   const { error, status } = await supabase
     .from("labour_welfare_fund")
     .delete()
-    .eq("id", id)
-    .select()
-    .single();
+    .eq("id", id);
 
   if (error) console.error(error);
 

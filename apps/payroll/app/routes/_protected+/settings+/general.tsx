@@ -15,7 +15,6 @@ import { useEffect, useState } from "react";
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-
   const { data: companyData, error: companyError } = await getCompanyById({
     supabase,
     id: companyId!,
