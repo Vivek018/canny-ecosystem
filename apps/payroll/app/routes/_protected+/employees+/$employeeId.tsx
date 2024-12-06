@@ -1,16 +1,9 @@
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { SecondaryMenu } from "@canny_ecosystem/ui/secondary-menu";
-import { Spinner } from "@canny_ecosystem/ui/spinner";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
-import {
-  Link,
-  Outlet,
-  useLoaderData,
-  useLocation,
-  useNavigation,
-} from "@remix-run/react";
+import { Link, Outlet, useLoaderData, useLocation } from "@remix-run/react";
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const employeeId = params.employeeId;
@@ -21,8 +14,6 @@ export async function loader({ params }: LoaderFunctionArgs) {
 export default function Employee() {
   const { employeeId } = useLoaderData<typeof loader>();
   const { pathname } = useLocation();
-  const navigation = useNavigation();
-  const isLoading = navigation.state === "loading";
 
   return (
     <section className="relative">
@@ -50,13 +41,7 @@ export default function Employee() {
         />
       </div>
       <div className="px-4">
-        {isLoading ? (
-          <div className="mt-20 flex items-center justify-center">
-            <Spinner size={50} />
-          </div>
-        ) : (
-          <Outlet />
-        )}
+        <Outlet />
       </div>
     </section>
   );

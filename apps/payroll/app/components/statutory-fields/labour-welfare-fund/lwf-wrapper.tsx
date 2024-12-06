@@ -71,7 +71,7 @@ export function LWFWrapper({
           <CommandList className="max-h-full py-6 overflow-x-visible overflow-y-visible">
             <CommandGroup className="p-0 overflow-visible">
               <div className="w-full grid gap-8 grid-cols-1 md:grid-cols-2 2xl:grid-cols-3">
-                {data?.map((labourWelfareFund: any) => (
+                {data?.map((labourWelfareFund) => (
                   <CommandItem
                     key={labourWelfareFund.id}
                     value={
