@@ -1,5 +1,5 @@
 import { convertToNull } from "@canny_ecosystem/utils";
-import { StatutoryBonusDatabaseInsert, StatutoryBonusDatabaseUpdate, TypedSupabaseClient } from "../types";
+import type { StatutoryBonusDatabaseInsert, StatutoryBonusDatabaseUpdate, TypedSupabaseClient } from "../types";
 
 export async function createStatutoryBonus({ supabase, data, bypassAuth= false }: {
     supabase: TypedSupabaseClient;

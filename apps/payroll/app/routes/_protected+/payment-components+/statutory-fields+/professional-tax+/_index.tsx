@@ -42,7 +42,7 @@ export default function ProfessionalTaxIndex() {
   const { isDocument } = useIsDocument();
 
   return (
-    <section className='py-4 px-4'>
+    <section className='p-4'>
       <div className='w-full flex items-end justify-between'>
         <Command className='overflow-visible'>
           <div className='w-full flex items-center gap-4'>

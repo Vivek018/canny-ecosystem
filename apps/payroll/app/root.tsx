@@ -122,7 +122,7 @@ function App() {
                 </Link>
               </div>
               <div>
-                <ThemeSwitch theme={initialTheme || "system"} />
+                <ThemeSwitch theme={initialTheme ?? "system"} />
               </div>
             </header>
             <Outlet />

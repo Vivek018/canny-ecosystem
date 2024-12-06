@@ -167,26 +167,19 @@ export async function getSitesByProjectId({
   return { data, error };
 }
 
-export async function getSiteNamesByProjectNameAndCompanyId({
+export async function getSiteNamesByProjectName({
   supabase,
   projectName,
-  companyId,
 }: {
   supabase: TypedSupabaseClient;
   projectName: string;
-  companyId: string;
 }) {
   const { data, error } = await supabase
     .from("project_sites")
     .select(
-      "name, projects(name, project_client_id, end_client_id, primary_contractor_id)",
+      "name, projects!inner(name, project_client_id, end_client_id, primary_contractor_id)",
     )
     .eq("projects.name", projectName)
-    .match({
-      "projects.project_client_id": companyId,
-      "projects.end_client_id": companyId,
-      "projects.primary_contractor_id": companyId,
-    })
     .limit(HARD_QUERY_LIMIT)
     .order("created_at", { ascending: false })
     .returns<{ name: string }[]>();

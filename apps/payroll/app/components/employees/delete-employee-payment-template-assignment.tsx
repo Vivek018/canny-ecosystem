@@ -54,11 +54,11 @@ export const DeleteEmployeePaymentTemplateAssignment = ({ employeeId }: { employ
     <AlertDialog>
       <AlertDialogTrigger
         className={cn(
-          buttonVariants({ variant: "destructive-ghost", size: "full" }),
+          buttonVariants({ variant: "destructive-outline", size: "full" }),
           "text-[13px] h-9",
         )}
       >
-        Delete Template
+        Delete link template
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

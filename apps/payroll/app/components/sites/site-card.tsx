@@ -9,23 +9,18 @@ import {
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@canny_ecosystem/ui/tooltip";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { Form, Link, useNavigate, useNavigation, useSearchParams } from "@remix-run/react";
+import { Link, useNavigate, useNavigation, useSearchParams } from "@remix-run/react";
 import { DeleteSite } from "./delete-site";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@canny_ecosystem/ui/card";
 import { getPaymentTemplateAssignmentBySiteId, getPaymentTemplatesByCompanyId, type PaymentTemplateAssignmentsType, type SitesWithLocation } from "@canny_ecosystem/supabase/queries";
 import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
-import { eligibilityOptionsArray, getInitialValueFromZod, getValidDateForInput, PaymentTemplateFormSiteDialogSchema, positionArray, replaceUnderscore, skillLevelArray, transformStringArrayIntoOptions } from "@canny_ecosystem/utils";
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@canny_ecosystem/ui/dialog";
-import { Button } from "@canny_ecosystem/ui/button";
-import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
-import { FormProvider, getFormProps, getInputProps, useForm } from "@conform-to/react";
+import { getInitialValueFromZod, PaymentTemplateFormSiteDialogSchema, replaceUnderscore } from "@canny_ecosystem/utils";
+import { useForm } from "@conform-to/react";
 import { useState, useEffect } from "react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
-import { Spinner } from "@canny_ecosystem/ui/spinner";
-import { DeleteSitePaymentTemplateAssignment } from "./delete-site-payment-template-assignment";
-import { SiteLinkedTemplates } from "./site-linked-templates";
+import { SiteDialog } from "../link-template/SiteDialog";
 
 export function SiteCard({ site, env, companyId }: { site: Omit<SitesWithLocation, "created_at" | "updated_at">, env: SupabaseEnv, companyId: string }) {
   const { supabase } = useSupabase({ env });
@@ -36,7 +31,6 @@ export function SiteCard({ site, env, companyId }: { site: Omit<SitesWithLocatio
 
   const [initialValues, setInitialValues] = useState(null);
   const [linkedTemplates, setLinkedTemplates] = useState<PaymentTemplateAssignmentsType[] | null>([]);
-  const [showSpinner, setShowSpinner] = useState(true);
   const [resetKey, setResetKey] = useState(Date.now());
   const [paymentTemplatesOptions, setPaymentTemplatesOptions] = useState<{
     label: string;
@@ -66,9 +60,7 @@ export function SiteCard({ site, env, companyId }: { site: Omit<SitesWithLocatio
 
   async function setLinkedDataIfExists() {
     const { data } = await getPaymentTemplateAssignmentBySiteId({ supabase, site_id: site.id });
-
     setLinkedTemplates(data as any);
-    setShowSpinner(false);
   }
 
   const openPaymentTemplateDialog = async () => {
@@ -102,11 +94,11 @@ export function SiteCard({ site, env, companyId }: { site: Omit<SitesWithLocatio
         }
       }
     }
-  }, [currentPaymentTemplateAssignmentId])
+  }, [currentPaymentTemplateAssignmentId]);
 
-  const handleOpenChange = () => {
-    navigate(`/projects/${site.project_id}/sites`);
-  };
+  useEffect(() => {
+    if (action === "create") setInitialValues(null);
+  }, [action]);
 
   return (
     <Card
@@ -156,167 +148,21 @@ export function SiteCard({ site, env, companyId }: { site: Omit<SitesWithLocatio
                   Edit Pay Sequence
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <Dialog onOpenChange={handleOpenChange}>
-                  <DialogTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="item-start justify-start px-2 font-normal w-full"
-                      onClick={openPaymentTemplateDialog}
-                    >
-                      Link template
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[600px]">
-                    <DialogTitle className="text-xl font-semibold mb-4">
-                      {
-                        action ?
-                          <>{initialValues ? "Update" : "Create"} payment template</>
-                          :
-                          <>Linked payment templates</>
-                      }
-
-                    </DialogTitle>
-                    {
-                      action
-                        ?
-                        <FormProvider context={form.context}>
-                          <Form
-                            method="POST"
-                            {...getFormProps(form)}
-                            action={action === "update" ? updateURL : createURL}
-                            className="space-y-6 w-full"
-                          >
-                            <Field
-                              className="w-full"
-                              inputProps={{
-                                ...getInputProps(fields.name, { type: "text" }),
-                                className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none",
-                                placeholder: "Name",
-                                disabled: showSpinner,
-                                defaultValue: fields.name.initialValue
-                              }}
-                              labelProps={{
-                                children: replaceUnderscore(fields.name.name),
-                                className: "block text-sm font-medium text-gray-700"
-                              }}
-                              errors={fields.name.errors}
-                            />
-                            <div className="grid grid-cols-2 gap-4">
-                              <Field
-                                className="w-full"
-                                inputProps={{
-                                  ...getInputProps(fields.effective_from, { type: "date" }),
-                                  className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none",
-                                  placeholder: replaceUnderscore(fields.effective_from.name),
-                                  max: getValidDateForInput(new Date().toISOString()),
-                                  defaultValue: getValidDateForInput(fields.effective_from.initialValue as string), disabled: showSpinner
-                                }}
-                                labelProps={{
-                                  children: replaceUnderscore(fields.effective_from.name),
-                                  className: "block text-sm font-medium text-gray-700 mb-1"
-                                }}
-                                errors={fields.effective_from.errors}
-                              />
-                              <Field
-                                className="w-full"
-                                inputProps={{
-                                  ...getInputProps(fields.effective_to, { type: "date" }),
-                                  className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none",
-                                  placeholder: replaceUnderscore(fields.effective_to.name),
-                                  min: getValidDateForInput(fields.effective_from.value as string),
-                                  defaultValue: getValidDateForInput(fields.effective_to.initialValue as string),
-                                  disabled: showSpinner
-                                }}
-                                labelProps={{
-                                  children: replaceUnderscore(fields.effective_to.name),
-                                  className: "block text-sm font-medium text-gray-700 mb-1"
-                                }}
-                                errors={fields.effective_to.errors}
-                              />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                              <SearchableSelectField
-                                key={resetKey}
-                                className="capitalize"
-                                options={paymentTemplatesOptions}
-                                inputProps={{
-                                  ...getInputProps(fields.template_id, { type: "text" }),
-                                  disabled: showSpinner,
-                                  defaultValue: fields.template_id.initialValue
-                                }}
-                                placeholder={"Select payment templates"}
-                                labelProps={{
-                                  children: "Payment templates",
-                                }}
-                                errors={fields.template_id.errors}
-                              />
-                              <SearchableSelectField
-                                key={resetKey + 1}
-                                className="capitalize"
-                                options={transformStringArrayIntoOptions(eligibilityOptionsArray as unknown as string[])}
-                                inputProps={{
-                                  ...getInputProps(fields.eligibility_option, { type: "text" }),
-                                  disabled: showSpinner,
-                                  defaultValue: fields.eligibility_option.initialValue
-                                }}
-                                placeholder={`Select ${fields.eligibility_option.name}`}
-                                labelProps={{
-                                  children: replaceUnderscore(fields.eligibility_option.name),
-                                }}
-                                errors={fields.eligibility_option.errors}
-                              />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                              <SearchableSelectField
-                                key={resetKey + 2}
-                                className="capitalize"
-                                options={transformStringArrayIntoOptions(positionArray as unknown as string[])}
-                                inputProps={{
-                                  ...getInputProps(fields.position, { type: "text" }),
-                                  disabled: (showSpinner || fields.eligibility_option.value !== "position"),
-                                  defaultValue: fields.position.initialValue
-                                }}
-                                placeholder={`Select ${fields.position.name}`}
-                                labelProps={{
-                                  children: replaceUnderscore(fields.position.name),
-                                }}
-                                errors={fields.position.errors}
-                              />
-                              <SearchableSelectField
-                                key={resetKey + 3}
-                                className="capitalize"
-                                options={transformStringArrayIntoOptions(skillLevelArray as unknown as string[])}
-                                inputProps={{
-                                  ...getInputProps(fields.skill_level, { type: "text" }),
-                                  disabled: (showSpinner || fields.eligibility_option.value !== "skill_level"),
-                                  defaultValue: fields.skill_level.initialValue
-                                }}
-                                placeholder={`Select ${fields.skill_level.name}`}
-                                labelProps={{
-                                  children: replaceUnderscore(fields.skill_level.name),
-                                }}
-                                errors={fields.skill_level.errors}
-                              />
-                            </div>
-
-                            {
-                              showSpinner ? <div className="flex justify-center"><Spinner /></div> : <>
-                                <Button variant="default" className="w-full" disabled={!form.valid || disableAll}>
-                                  {initialValues ? "Update" : "Link"} Template
-                                </Button>
-                                <div className={`w-full ${!initialValues && "hidden"}`}>
-                                  <DeleteSitePaymentTemplateAssignment projectId={site.project_id} templateAssignmentId={currentPaymentTemplateAssignmentId as string} />
-                                </div>
-                              </>
-                            }
-                          </Form>
-                        </FormProvider>
-                        :
-                        <SiteLinkedTemplates linkedTemplates={linkedTemplates} />
-                    }
-
-                  </DialogContent>
-                </Dialog>
+                <SiteDialog
+                  openPaymentTemplateDialog={openPaymentTemplateDialog}
+                  initialValues={initialValues}
+                  form={form}
+                  fields={fields}
+                  paymentTemplatesOptions={paymentTemplatesOptions}
+                  resetKey={resetKey}
+                  disableAll={disableAll}
+                  linkedTemplates={linkedTemplates}
+                  projectId={site.project_id}
+                  currentPaymentTemplateAssignmentId={currentPaymentTemplateAssignmentId}
+                  action={action}
+                  updateURL={updateURL}
+                  createURL={createURL}
+                />
                 <DropdownMenuSeparator className={cn(!site.latitude && !site.longitude && "hidden")} />
                 <DeleteSite projectId={site.project_id} siteId={site.id} />
               </DropdownMenuGroup>

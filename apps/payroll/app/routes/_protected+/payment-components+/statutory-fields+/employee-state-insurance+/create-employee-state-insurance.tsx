@@ -1,16 +1,14 @@
+import { FormButtons } from "@/components/form/form-buttons";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { createEmployeeStateInsurance } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import {
-  EmployeeStateInsuranceDatabaseRow,
-  Json,
+import type {
+  EmployeeStateInsuranceDatabaseUpdate,
 } from "@canny_ecosystem/supabase/types";
-import { Button } from "@canny_ecosystem/ui/button";
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
@@ -20,20 +18,28 @@ import {
   SearchableSelectField,
 } from "@canny_ecosystem/ui/forms";
 import {
+  deductionCycleArray,
   EmployeeProvidentFundSchema,
   EmployeeStateInsuranceSchema,
   getInitialValueFromZod,
   isGoodStatus,
   replaceDash,
   replaceUnderscore,
+  transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
-import {
-  deductionCycles,
-} from "@canny_ecosystem/utils/constant";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { ActionFunctionArgs, json, LoaderFunctionArgs } from "@remix-run/node";
+import {
+  type ActionFunctionArgs,
+  json,
+  type LoaderFunctionArgs,
+} from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
+import { useState } from "react";
+import { UPDATE_EMPLOYEE_STATE_INSURANCE } from "./$esiId.update-esi";
+
+export const CREATE_EMPLOYEE_STATE_INSURANCE =
+  "create-employee-state-insurance";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -65,7 +71,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     );
   }
 
-
   return json({ status, error });
 };
 
@@ -75,19 +80,21 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   return json({ companyId });
 };
 
-const CreateEmployeeStateInsurance = ({
+export default function CreateEmployeeStateInsurance({
   updateValues,
 }: {
-  updateValues?: Json;
-}) => {
+  updateValues?: EmployeeStateInsuranceDatabaseUpdate | null;
+}) {
   const EPF_TAG = updateValues
-    ? "update-employee-state-insurance"
-    : "create-employee-state-insurance";
+    ? UPDATE_EMPLOYEE_STATE_INSURANCE
+    : CREATE_EMPLOYEE_STATE_INSURANCE;
 
   const initialValues =
     updateValues ?? getInitialValueFromZod(EmployeeStateInsuranceSchema);
 
   const { companyId } = useLoaderData<{ companyId: string }>();
+  const [resetKey, setResetKey] = useState(Date.now());
+
   const [form, fields] = useForm({
     id: EPF_TAG,
     constraint: getZodConstraint(EmployeeProvidentFundSchema),
@@ -97,32 +104,30 @@ const CreateEmployeeStateInsurance = ({
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
     defaultValue: {
-      ...(initialValues as {
-        [key: string]: EmployeeStateInsuranceDatabaseRow | null;
-      }),
+      ...initialValues,
       company_id: companyId,
     },
   });
 
   return (
-    <section className="md-px-10 w-full lg:px-12 2xl:px-10 py-3">
+    <section className="p-4 w-full">
       <Form method="POST" {...getFormProps(form)} className="flex flex-col">
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl mb-4">{replaceDash(EPF_TAG)}</CardTitle>
+            <CardTitle className="text-2xl mb-4">
+              {replaceDash(EPF_TAG)}
+            </CardTitle>
             <hr />
           </CardHeader>
           <CardContent>
             <input {...getInputProps(fields.id, { type: "hidden" })} />
             <input {...getInputProps(fields.company_id, { type: "hidden" })} />
-            <div className="grid grid-cols-[50%,33%] place-content-center justify-between gap-6">
+            <div className="flex flex-col justify-between">
               <Field
                 inputProps={{
                   ...getInputProps(fields.esi_number, { type: "text" }),
                   autoFocus: true,
-                  placeholder: `Enter ${replaceUnderscore(
-                    fields.esi_number.name
-                  )}`,
+                  placeholder: "00-00-000000-000-0000",
                   className: "capitalize",
                 }}
                 labelProps={{
@@ -133,30 +138,32 @@ const CreateEmployeeStateInsurance = ({
               />
 
               <SearchableSelectField
+                key={resetKey}
                 className="capitalize"
-                options={deductionCycles}
+                options={transformStringArrayIntoOptions(
+                  deductionCycleArray as unknown as string[]
+                )}
                 inputProps={{
                   ...getInputProps(fields.deduction_cycle, { type: "text" }),
-                  defaultValue: deductionCycles[0].value,
                 }}
-                placeholder={`Select an option`}
+                placeholder="Select an option"
                 labelProps={{
                   children: replaceUnderscore(fields.deduction_cycle.name),
                 }}
                 errors={fields.deduction_cycle.errors}
               />
             </div>
-            <div className="grid grid-cols-2 place-content-center justify-between gap-6">
-              <div className="flex items-center text-center">
+            <div className="flex flex-col justify-between">
+              <div className="flex items-center justify-between gap-4">
                 <Field
-                  className="w-[40%]"
+                  className=""
                   inputProps={{
                     ...getInputProps(fields.employees_contribution, {
                       type: "number",
                     }),
                     disabled: true,
                     autoFocus: true,
-                    placeholder: `Enter number`,
+                    placeholder: "Enter number",
                     className: "capitalize",
                   }}
                   labelProps={{
@@ -167,18 +174,18 @@ const CreateEmployeeStateInsurance = ({
                   }}
                   errors={fields.employees_contribution.errors}
                 />
-                <p className="w-[20%] mb-5 font-[350] text-sm">of Gross Pay</p>
+                <p className="mb-5 w-1/2 font-light text-sm">of Gross Pay</p>
               </div>
-              <div className="flex items-center text-center">
+              <div className="flex items-center justify-between gap-4">
                 <Field
-                  className="w-[40%]"
+                  className=""
                   inputProps={{
                     ...getInputProps(fields.employers_contribution, {
                       type: "number",
                     }),
                     disabled: true,
                     autoFocus: true,
-                    placeholder: `Enter number`,
+                    placeholder: "Enter number",
                     className: "capitalize",
                   }}
                   labelProps={{
@@ -189,7 +196,7 @@ const CreateEmployeeStateInsurance = ({
                   }}
                   errors={fields.employers_contribution.errors}
                 />
-                <p className="w-[20%] mb-5 font-[350] text-sm">of Gross Pay</p>
+                <p className="w-1/2 mb-5 font-light text-sm">of Gross Pay</p>
               </div>
             </div>
 
@@ -204,31 +211,9 @@ const CreateEmployeeStateInsurance = ({
               className="items-center"
             />
           </CardContent>
-          <CardFooter>
-            <div className="ml-auto w-2/5 flex flex-row items-center justify-center gap-4">
-              <Button
-                variant="secondary"
-                size="full"
-                type="reset"
-                {...form.reset.getButtonProps()}
-              >
-                Reset
-              </Button>
-              <Button
-                form={form.id}
-                disabled={!form.valid}
-                variant="default"
-                size="full"
-                type="submit"
-              >
-                Submit
-              </Button>
-            </div>
-          </CardFooter>
+          <FormButtons form={form} setResetKey={setResetKey} isSingle={true} />
         </Card>
       </Form>
     </section>
   );
-};
-
-export default CreateEmployeeStateInsurance;
+}

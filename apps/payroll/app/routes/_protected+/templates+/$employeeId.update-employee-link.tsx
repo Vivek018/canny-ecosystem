@@ -7,8 +7,6 @@ import { safeRedirect } from "@/utils/server/http.server";
 import { updatePaymentTemplateAssignment } from "@canny_ecosystem/supabase/mutations";
 import { getPaymentTemplateAssignmentIdByEmployeeId } from "@canny_ecosystem/supabase/queries";
 
-
-
 export async function action({ request, params }: ActionFunctionArgs) {
     const { supabase } = getSupabaseWithHeaders({ request });
     const { employeeId: employee_id } = params;

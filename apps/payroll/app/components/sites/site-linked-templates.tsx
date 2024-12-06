@@ -31,7 +31,7 @@ export function SiteLinkedTemplates({ linkedTemplates }: { linkedTemplates: Paym
     return (
         <section className="py-4 px-4">
             <div className="w-full flex items-center justify-between pb-4">
-                <div className="w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4">
+                <div className="w-full flex items-center gap-4">
                     <div className="relative w-full">
                         <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
                             <Icon
@@ -48,7 +48,7 @@ export function SiteLinkedTemplates({ linkedTemplates }: { linkedTemplates: Paym
                         />
                     </div>
                     <Button
-                        className={cn(buttonVariants({ variant: "primary-outline" }), "flex items-center gap-1")}
+                        className={cn(buttonVariants({ variant: "primary-outline" }), "flex items-center gap-1 capitalize")}
                         onClick={(e) => linkNewTemplate(e)}
                     >
                         Link new template

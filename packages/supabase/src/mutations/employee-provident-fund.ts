@@ -1,5 +1,5 @@
 import { convertToNull } from "@canny_ecosystem/utils";
-import {
+import type {
   EmployeeProvidentFundDatabaseInsert,
   EmployeeProvidentFundDatabaseUpdate,
   TypedSupabaseClient,
@@ -105,9 +105,7 @@ export const deleteEmployeeProvidentFund = async ({
   const { error, status } = await supabase
     .from("employee_provident_fund")
     .delete()
-    .eq("id", id)
-    .select()
-    .single();
+    .eq("id", id);
 
   if (error) {
     console.error(error);

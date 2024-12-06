@@ -1,5 +1,5 @@
-import { HARD_QUERY_LIMIT } from "../constant";
-import {
+import { SINGLE_QUERY_LIMIT } from "../constant";
+import type {
   EmployeeStateInsuranceDatabaseRow,
   InferredType,
   TypedSupabaseClient,
@@ -69,8 +69,10 @@ export const getEmployeeStateInsuranceByCompanyId = async ({
     .from("employee_state_insurance")
     .select(columns.join(","))
     .eq("company_id", companyId)
-    .limit(HARD_QUERY_LIMIT)
-    .returns<EmployeeStateInsuranceDataType[]>();
+    .limit(SINGLE_QUERY_LIMIT)
+    .single<
+      InferredType<EmployeeStateInsuranceDatabaseRow, (typeof columns)[number]>
+    >();
 
   if (error) {
     console.error(error);

@@ -52,9 +52,9 @@ export const DeleteSitePaymentTemplateAssignment = ({ projectId, templateAssignm
     return (
         <AlertDialog>
             <AlertDialogTrigger
-                className={cn(buttonVariants({ variant: "destructive-ghost", size: "full" }), "text-[13px] h-9")}
+                className={cn(buttonVariants({ variant: "destructive-outline", size: "full" }), "text-[13px] h-9")}
             >
-                Delete Template
+                Delete link template
             </AlertDialogTrigger>
             <AlertDialogContent>
                 <AlertDialogHeader>

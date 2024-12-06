@@ -1,18 +1,16 @@
+import { FormButtons } from "@/components/form/form-buttons";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import {
-  createStatutoryBonus,
-} from "@canny_ecosystem/supabase/mutations";
+import { createStatutoryBonus } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import {
+import type {
   Json,
   StatutoryBonusDatabaseRow,
+  StatutoryBonusDatabaseUpdate,
 } from "@canny_ecosystem/supabase/types";
-import { Button } from "@canny_ecosystem/ui/button";
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
@@ -22,16 +20,23 @@ import {
   isGoodStatus,
   replaceDash,
   replaceUnderscore,
+  statutoryBonusPayFrequencyArray,
   StatutoryBonusSchema,
+  transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
-import {
-  paymentFrequencies,
-  payoutMonths,
-} from "@canny_ecosystem/utils/constant";
+import { payoutMonths } from "@canny_ecosystem/utils/constant";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { ActionFunctionArgs, json, LoaderFunctionArgs } from "@remix-run/node";
+import {
+  type ActionFunctionArgs,
+  json,
+  type LoaderFunctionArgs,
+} from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
+import { useState } from "react";
+import { UPDATE_STATUTORY_BONUS } from "./$sbId.update-statutory-bonus";
+
+export const CREATE_STATUTORY_BONUS = "create-statutory-bonus";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -75,17 +80,18 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export default function CreateStatutoryBonus({
   updateValues = null,
 }: {
-  updateValues?: Json;
+  updateValues?: StatutoryBonusDatabaseUpdate | null;
 }) {
-  
   const STATUTORY_BONUS_TAG = updateValues
-  ? "update-statutory-bonus"
-  : "create-statutory-bonus";
-  
+    ? UPDATE_STATUTORY_BONUS
+    : CREATE_STATUTORY_BONUS;
+
   const initialValues =
-  updateValues ?? getInitialValueFromZod(StatutoryBonusSchema);
-  
+    updateValues ?? getInitialValueFromZod(StatutoryBonusSchema);
+
   const { companyId } = useLoaderData<{ companyId: string }>();
+  const [resetKey, setResetKey] = useState(Date.now());
+
   const [form, fields] = useForm({
     id: STATUTORY_BONUS_TAG,
     constraint: getZodConstraint(StatutoryBonusSchema),
@@ -95,15 +101,13 @@ export default function CreateStatutoryBonus({
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
     defaultValue: {
-      ...(initialValues as {
-        [key: string]: StatutoryBonusDatabaseRow | null;
-      }),
+      ...initialValues,
       company_id: companyId,
     },
   });
 
   return (
-    <section className="md-px-10 w-full lg:px-12 2xl:px-10 py-3">
+    <section className="p-4 w-full">
       <Form method="POST" {...getFormProps(form)} className="flex flex-col">
         <Card>
           <CardHeader>
@@ -115,16 +119,17 @@ export default function CreateStatutoryBonus({
           <CardContent>
             <input {...getInputProps(fields.id, { type: "hidden" })} />
             <input {...getInputProps(fields.company_id, { type: "hidden" })} />
-            <div className="flex items-start justify-between gap-10">
+            <div className="flex flex-col items-start justify-between gap-2">
               <SearchableSelectField
-                // key={resetKey}
+                key={resetKey}
                 className="capitalize"
-                options={paymentFrequencies}
+                options={transformStringArrayIntoOptions(
+                  statutoryBonusPayFrequencyArray as unknown as string[]
+                )}
                 inputProps={{
                   ...getInputProps(fields.payment_frequency, { type: "text" }),
-                  defaultValue: paymentFrequencies[0].value,
                 }}
-                placeholder={`Select an option`}
+                placeholder="Select an option"
                 labelProps={{
                   children: replaceUnderscore(fields.payment_frequency.name),
                 }}
@@ -145,13 +150,14 @@ export default function CreateStatutoryBonus({
                 errors={fields.percentage.errors}
               />
               <SearchableSelectField
+                key={resetKey + 1}
                 className="capitalize"
                 options={payoutMonths}
                 inputProps={{
-                  disabled: form.value?.payment_frequency !== "monthly",
+                  disabled: form.value?.payment_frequency === "monthly",
                   ...getInputProps(fields.payout_month, { type: "text" }),
                 }}
-                placeholder={`Select an option`}
+                placeholder="Select an option"
                 labelProps={{
                   children: replaceUnderscore(fields.payout_month.name),
                 }}
@@ -159,27 +165,7 @@ export default function CreateStatutoryBonus({
               />
             </div>
           </CardContent>
-          <CardFooter>
-            <div className="ml-auto w-2/5 flex flex-row items-center justify-center gap-4">
-              <Button
-                variant="secondary"
-                size="full"
-                type="reset"
-                {...form.reset.getButtonProps()}
-              >
-                Reset
-              </Button>
-              <Button
-                form={form.id}
-                disabled={!form.valid}
-                variant="default"
-                size="full"
-                type="submit"
-              >
-                Submit
-              </Button>
-            </div>
-          </CardFooter>
+          <FormButtons form={form} setResetKey={setResetKey} isSingle={true} />
         </Card>
       </Form>
     </section>

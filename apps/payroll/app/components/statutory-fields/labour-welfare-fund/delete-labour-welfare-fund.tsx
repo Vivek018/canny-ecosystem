@@ -23,13 +23,13 @@ export const DeleteLabourWelfareFund = ({ labourWelfareFundId }: { labourWelfare
     const [inputError, setInputError] = useState<string[]>([]);
     const submit = useSubmit();
 
-    const handleCancelLocation = () => {
+    const handleCancelLWF = () => {
         setInputError([]);
         setInputValue("");
         setLoading(false);
     };
 
-    const handleDeleteLocation = (
+    const handleDeleteLWF = (
         e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     ) => {
         if (inputValue === DELETE_TEXT) {
@@ -89,13 +89,13 @@ export const DeleteLabourWelfareFund = ({ labourWelfareFundId }: { labourWelfare
                     <ErrorList errors={inputError} />
                 </div>
                 <AlertDialogFooter>
-                    <AlertDialogCancel onClick={handleCancelLocation}>
+                    <AlertDialogCancel onClick={handleCancelLWF}>
                         Cancel
                     </AlertDialogCancel>
                     <AlertDialogAction
                         className={cn(buttonVariants({ variant: "destructive" }))}
-                        onClick={handleDeleteLocation}
-                        onSelect={handleDeleteLocation}
+                        onClick={handleDeleteLWF}
+                        onSelect={handleDeleteLWF}
                     >
                         {isLoading ? "Deleting..." : "Delete"}
                     </AlertDialogAction>
