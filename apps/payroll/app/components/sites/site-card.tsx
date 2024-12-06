@@ -25,7 +25,7 @@ import { useSupabase } from "@canny_ecosystem/supabase/client";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { Spinner } from "@canny_ecosystem/ui/spinner";
 import { DeleteSitePaymentTemplateAssignment } from "./delete-site-payment-template-assignment";
-import SiteLinkedTemplates from "./site-linked-templates";
+import { SiteLinkedTemplates } from "./site-linked-templates";
 
 export function SiteCard({ site, env, companyId }: { site: Omit<SitesWithLocation, "created_at" | "updated_at">, env: SupabaseEnv, companyId: string }) {
   const { supabase } = useSupabase({ env });

@@ -8,9 +8,15 @@ export const columns = (): ColumnDef<{ id: string, name: string }>[] => {
       accessorKey: "name",
       header: "Template name",
       cell: ({ row }) => {
-        // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
         return <p
           onClick={() => {
+            const updatedSearchParams = new URLSearchParams(searchParams);
+            updatedSearchParams.set("currentPaymentTemplateAssignmentId", row.original.id);
+
+            updatedSearchParams.set("action", "update");
+            setSearchParams(updatedSearchParams);
+          }}
+          onKeyDown={() => {
             const updatedSearchParams = new URLSearchParams(searchParams);
             updatedSearchParams.set("currentPaymentTemplateAssignmentId", row.original.id);
 
