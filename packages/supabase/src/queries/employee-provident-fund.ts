@@ -5,21 +5,6 @@ import type {
   TypedSupabaseClient,
 } from "../types";
 
-export type EmployeeProvidentFundDataType = Pick<
-  EmployeeProvidentFundDatabaseRow,
-  | "id"
-  | "company_id"
-  | "epf_number"
-  | "deduction_cycle"
-  | "employee_contribution"
-  | "employer_contribution"
-  | "employee_restrict_value"
-  | "restrict_employer_contribution"
-  | "company_id"
-  | "include_admin_charges"
-  | "include_employer_edli_contribution"
->;
-
 export const getEmployeeProvidentFundById = async ({
   supabase,
   id,

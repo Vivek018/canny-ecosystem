@@ -95,9 +95,7 @@ export async function deleteProfessionalTax({
   const { error, status } = await supabase
     .from("professional_tax")
     .delete()
-    .eq("id", id)
-    .select()
-    .single();
+    .eq("id", id);
 
   if (error) {
     console.error(error);

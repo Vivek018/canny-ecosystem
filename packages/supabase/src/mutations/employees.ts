@@ -193,9 +193,7 @@ export async function deleteEmployee({
   const { error, status } = await supabase
     .from("employees")
     .delete()
-    .eq("id", id)
-    .select()
-    .single();
+    .eq("id", id);
 
   if (error) {
     console.error(error);
@@ -455,9 +453,7 @@ export async function deleteEmployeeAddress({
   const { error, status } = await supabase
     .from("employee_addresses")
     .delete()
-    .eq("id", id)
-    .select()
-    .single();
+    .eq("id", id);
 
   if (error) {
     console.error(error);
@@ -523,9 +519,7 @@ export async function deleteEmployeeGuardian({
   const { error, status } = await supabase
     .from("employee_guardians")
     .delete()
-    .eq("id", id)
-    .select()
-    .single();
+    .eq("id", id);
 
   if (error) {
     console.error(error);
@@ -622,9 +616,7 @@ export async function deleteEmployeeSkill({
   const { error, status } = await supabase
     .from("employee_skills")
     .delete()
-    .eq("id", id)
-    .select()
-    .single();
+    .eq("id", id);
 
   if (error) {
     console.error(error);
@@ -721,9 +713,7 @@ export async function deleteEmployeeWorkHistory({
   const { error, status } = await supabase
     .from("employee_work_history")
     .delete()
-    .eq("id", id)
-    .select()
-    .single();
+    .eq("id", id);
 
   if (error) {
     console.error(error);

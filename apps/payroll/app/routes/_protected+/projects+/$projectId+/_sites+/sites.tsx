@@ -15,6 +15,7 @@ import { json } from "@remix-run/react";
 import { Suspense } from "react";
 import { SitesWrapper } from "@/components/projects/sites/sites-wrapper";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const projectId = params.projectId;
@@ -22,9 +23,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
 
-    if (!projectId) {
-      throw new Error("No projectId provided");
-    }
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+
+    if (!projectId) throw new Error("No projectId provided");
 
     const sitesPromise = getSitesByProjectId({
       supabase,
@@ -35,6 +36,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       error: null,
       sitesPromise,
       projectId,
+      companyId,
     });
   } catch (error) {
     return json(
@@ -42,11 +44,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         error,
         sitesPromise: null,
         projectId,
+        companyId: null
       },
       { status: 500 },
     );
   }
 }
+
+export async function action() { return null }
 
 export default function SitesIndex() {
   const { sitesPromise, projectId, error } = useLoaderData<typeof loader>();
@@ -93,7 +98,6 @@ export default function SitesIndex() {
           </CommandList>
         </Command>
       </div>
-      <Outlet />
     </section>
   );
 }

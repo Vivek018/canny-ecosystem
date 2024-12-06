@@ -8,7 +8,7 @@ import { useEffect } from "react";
 export function SitesWrapper({ sitesData: { data, error } }: {
   sitesData: {
     data: SitesWithLocation[];
-    error: any;
+    error: Error | null | { message: string };
   };
 }) {
   const { toast } = useToast();

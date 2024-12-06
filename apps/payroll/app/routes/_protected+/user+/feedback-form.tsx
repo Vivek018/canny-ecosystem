@@ -1,10 +1,4 @@
-import {
-  Form,
-  json,
-  useActionData,
-  useLoaderData,
-  useNavigate,
-} from "@remix-run/react";
+import { Form, json, useLoaderData,  } from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import {
   FormProvider,
@@ -14,6 +8,7 @@ import {
   useForm,
 } from "@conform-to/react";
 import { DEFAULT_ROUTE } from "@/constant";
+import { safeRedirect } from "@/utils/server/http.server";
 import {
   categoryArray,
   FeedbackSchema,
@@ -29,7 +24,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
@@ -42,88 +37,51 @@ import {
 } from "@canny_ecosystem/ui/forms";
 import { createFeedback } from "@canny_ecosystem/supabase/mutations";
 import { FormButtons } from "@/components/form/form-buttons";
-import { useToast } from "@canny_ecosystem/ui/use-toast";
 
-export async function loader({
-  request,
-}: LoaderFunctionArgs): Promise<Response> {
-  try {
-    const { supabase } = getSupabaseWithHeaders({ request });
 
-    const { user } = await getAuthUser({ request });
-    let userData = null;
 
-    if (user?.email) {
-      const { data } = await getUserByEmail({ supabase, email: user?.email });
-      userData = data;
-    }
+export async function loader({ request }: LoaderFunctionArgs) {
+  const { supabase } = getSupabaseWithHeaders({ request });
 
-    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+  const { user } = await getAuthUser({ request });
+  let userData = null;
 
-    return json({
-      status: "success",
-      message: "Company ID found",
-      userId: userData?.id,
-      companyId,
-      error: null,
-    });
-  } catch (error) {
-    return json(
-      {
-        status: "error",
-        message: "An unexpected error occurred",
-        error,
-      },
-      { status: 500 },
-    );
+  if (user?.email) {
+    const { data } = await getUserByEmail({ supabase, email: user?.email });
+    userData = data;
   }
+
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+
+  return json({ userId: userData?.id, companyId });
 }
 
-export async function action({
-  request,
-}: ActionFunctionArgs): Promise<Response> {
-  try {
-    const { supabase } = getSupabaseWithHeaders({ request });
-    const formData = await request.formData();
+export async function action({ request }: ActionFunctionArgs) {
+  const { supabase } = getSupabaseWithHeaders({ request });
+  const formData = await request.formData();
 
-    const submission = parseWithZod(formData, { schema: FeedbackSchema });
+  const submission = parseWithZod(formData, { schema: FeedbackSchema });
 
-    if (submission.status !== "success") {
-      return json(
-        { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
-      );
-    }
-
-    const { status, error } = await createFeedback({
-      supabase,
-      data: submission.value,
-    });
-
-    if (isGoodStatus(status)) {
-      return json({
-        status: "success",
-        message: "Feedback created successfully",
-        error: null,
-      });
-    }
-    return json({
-      status: "error",
-      message: "Failed to create feedback",
-      error,
-    });
-  } catch (error) {
-    return json({
-      status: "error",
-      message: "An unexpected error occurred",
-      error,
-    });
+  if (submission.status !== "success") {
+    return json(
+      { result: submission.reply() },
+      { status: submission.status === "error" ? 400 : 200 },
+    );
   }
+
+  const { status, error } = await createFeedback({
+    supabase,
+    data: submission.value,
+  });
+
+  if (isGoodStatus(status)) {
+    return safeRedirect(DEFAULT_ROUTE);
+  }
+  return json({ status, error });
 }
 
 export default function Feedback() {
   const { userId, companyId } = useLoaderData<typeof loader>();
-  const actionData = useActionData<typeof action>();
 
   const initialValues = getInitialValueFromZod(FeedbackSchema);
 
@@ -142,36 +100,10 @@ export default function Feedback() {
       user_id: userId,
       company_id: companyId,
     },
+    
+    
   });
-  const { toast } = useToast();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!userId || !companyId) {
-      toast({
-        title: "Error",
-        description: "User or company not found",
-        variant: "destructive",
-      });
-    }
-    if (actionData) {
-      if (actionData?.status === "success") {
-        toast({
-          title: "Success",
-          description: actionData.message,
-          variant: "success",
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: actionData.error,
-          variant: "destructive",
-        });
-      }
-      navigate(DEFAULT_ROUTE);
-    }
-  }, [actionData]);
-
+  
   return (
     <section className="flex flex-col gap-6 w-full lg:w-2/3 my-4">
       <FormProvider context={form.context}>

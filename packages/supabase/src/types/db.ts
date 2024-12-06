@@ -894,6 +894,239 @@ export type Database = {
           },
         ]
       }
+      payment_template_assignments: {
+        Row: {
+          assignment_type: Database["public"]["Enums"]["template_assignment_type"]
+          created_at: string | null
+          effective_from: string
+          effective_to: string | null
+          eligibility_option:
+            | Database["public"]["Enums"]["eligibility_option_type"]
+            | null
+          employee_id: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          position: string | null
+          site_id: string | null
+          skill_level: string | null
+          template_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          assignment_type: Database["public"]["Enums"]["template_assignment_type"]
+          created_at?: string | null
+          effective_from: string
+          effective_to?: string | null
+          eligibility_option?:
+            | Database["public"]["Enums"]["eligibility_option_type"]
+            | null
+          employee_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          position?: string | null
+          site_id?: string | null
+          skill_level?: string | null
+          template_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          assignment_type?: Database["public"]["Enums"]["template_assignment_type"]
+          created_at?: string | null
+          effective_from?: string
+          effective_to?: string | null
+          eligibility_option?:
+            | Database["public"]["Enums"]["eligibility_option_type"]
+            | null
+          employee_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          position?: string | null
+          site_id?: string | null
+          skill_level?: string | null
+          template_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_template_assignments_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_template_assignments_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "project_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_template_assignments_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "payment_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_template_components: {
+        Row: {
+          bonus_id: string | null
+          calculation_type:
+            | Database["public"]["Enums"]["template_calculation_type"]
+            | null
+          calculation_value: number | null
+          component_type: Database["public"]["Enums"]["template_component_type"]
+          created_at: string | null
+          display_order: number | null
+          epf_id: string | null
+          esi_id: string | null
+          id: string
+          lwf_id: string | null
+          payment_field_id: string | null
+          pt_id: string | null
+          target_type: Database["public"]["Enums"]["assignment_target_type"]
+          template_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          bonus_id?: string | null
+          calculation_type?:
+            | Database["public"]["Enums"]["template_calculation_type"]
+            | null
+          calculation_value?: number | null
+          component_type: Database["public"]["Enums"]["template_component_type"]
+          created_at?: string | null
+          display_order?: number | null
+          epf_id?: string | null
+          esi_id?: string | null
+          id?: string
+          lwf_id?: string | null
+          payment_field_id?: string | null
+          pt_id?: string | null
+          target_type: Database["public"]["Enums"]["assignment_target_type"]
+          template_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          bonus_id?: string | null
+          calculation_type?:
+            | Database["public"]["Enums"]["template_calculation_type"]
+            | null
+          calculation_value?: number | null
+          component_type?: Database["public"]["Enums"]["template_component_type"]
+          created_at?: string | null
+          display_order?: number | null
+          epf_id?: string | null
+          esi_id?: string | null
+          id?: string
+          lwf_id?: string | null
+          payment_field_id?: string | null
+          pt_id?: string | null
+          target_type?: Database["public"]["Enums"]["assignment_target_type"]
+          template_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_template_components_bonus_id_fkey"
+            columns: ["bonus_id"]
+            isOneToOne: false
+            referencedRelation: "statutory_bonus"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_template_components_epf_id_fkey"
+            columns: ["epf_id"]
+            isOneToOne: false
+            referencedRelation: "employee_provident_fund"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_template_components_esi_id_fkey"
+            columns: ["esi_id"]
+            isOneToOne: false
+            referencedRelation: "employee_state_insurance"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_template_components_lwf_id_fkey"
+            columns: ["lwf_id"]
+            isOneToOne: false
+            referencedRelation: "labour_welfare_fund"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_template_components_payment_field_id_fkey"
+            columns: ["payment_field_id"]
+            isOneToOne: false
+            referencedRelation: "payment_fields"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_template_components_pt_id_fkey"
+            columns: ["pt_id"]
+            isOneToOne: false
+            referencedRelation: "professional_tax"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_template_components_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "payment_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_templates: {
+        Row: {
+          annual_ctc: number
+          company_id: string
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          is_default: boolean | null
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          annual_ctc: number
+          company_id: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_default?: boolean | null
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          annual_ctc?: number
+          company_id?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_default?: boolean | null
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_templates_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       professional_tax: {
         Row: {
           company_id: string
@@ -992,17 +1225,17 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "project_site_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "project_sites_company_address_id_fkey"
             columns: ["company_location_id"]
             isOneToOne: false
             referencedRelation: "company_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_sites_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]
@@ -1232,10 +1465,26 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      assignment_target_type:
+        | "payment_field"
+        | "epf"
+        | "esic"
+        | "bonus"
+        | "pt"
+        | "lwf"
       calculation_type: "fixed" | "percentage_of_basic"
+      eligibility_option_type: "position" | "skill_level"
       feedback_category: "suggestion" | "bug" | "complain"
       feedback_severity: "low" | "normal" | "urgent"
       payment_type: "fixed" | "variable"
+      template_assignment_type: "employee" | "site"
+      template_calculation_type: "variable" | "percentage_of_ctc"
+      template_component_type:
+        | "earning"
+        | "deduction"
+        | "statutory_contribution"
+        | "bonus"
+        | "other"
     }
     CompositeTypes: {
       salary_range_object: {
