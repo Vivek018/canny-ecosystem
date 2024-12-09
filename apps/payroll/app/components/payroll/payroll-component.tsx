@@ -1,4 +1,4 @@
-import { PayrollDataTable } from "@/components/payroll/table/payroll-table";
+import { PayrollDataTable } from "@/components/payroll/table/data-table";
 import { Button } from "@canny_ecosystem/ui/button";
 
 import { Icon } from "@canny_ecosystem/ui/icon";

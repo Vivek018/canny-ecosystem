@@ -11,7 +11,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ExitPaymentTableHeader } from "./exit-payment-table-header";
+import { ExitPaymentTableHeader } from "./data-table-headers";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];

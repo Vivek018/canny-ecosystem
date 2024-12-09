@@ -9,29 +9,23 @@ type Props = {
 };
 
 // make sure the order is same as header order
-export const ExitPaymentColumnIdArray = [
-  "employee_name",
-  "last_working_day",
-  "reason_for_exit",
-  "final_settlement_date",
-  "organization_payable_days",
-  "employee_payable_days",
+export const payrollFieldsColumnIdArray = [
+  "name",
+  "paid_days",
+  "gross_pay",
+  "taxes",
+  "discount",
   "bonus",
-  "diwali_bonus",
-  "commission",
-  "joining_bonus",
-  "yearly_bonus",
-  "leave_encashment",
-  "gift_coupon",
-  "computer_service_charges",
-  "gratuity",
-  "deduction",
-  "note",
-] as const;
+  "email",
+  "mobile_number",
+  "reimbursements",
+  "net_pay",
+  "company_name",
+  "site_name",
+  "area",
+];
 
-export type ExitPaymentColumnId = typeof ExitPaymentColumnIdArray[number];
-
-export function ExitPaymentTableHeader({ table, className, loading }: Props) {
+export function PayrollTableHeader({ table, className, loading }: Props) {
   const columnName = (id: string) =>
     loading ||
     table?.getAllLeafColumns()?.find((col: any) => {
@@ -41,13 +35,13 @@ export function ExitPaymentTableHeader({ table, className, loading }: Props) {
   return (
     <TableHeader className={className}>
       <TableRow className="h-[45px] hover:bg-transparent">
-        {ExitPaymentColumnIdArray?.map((id) => {
+        {payrollFieldsColumnIdArray?.map((id) => {
           return (
             <TableHead
               key={id}
               className={cn(
                 "px-4 py-2",
-                id === "employee_name" && "sticky left-0 bg-card z-10"
+                id === "name" && "sticky left-0 bg-card z-10"
               )}
             >
               <Button
@@ -60,7 +54,6 @@ export function ExitPaymentTableHeader({ table, className, loading }: Props) {
             </TableHead>
           );
         })}
-        <TableHead className="sticky right-0 min-w-20 max-w-20 bg-card z-10" />
       </TableRow>
     </TableHeader>
   );

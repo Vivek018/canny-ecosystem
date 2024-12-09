@@ -37,7 +37,7 @@ export function PayrollStatus({data}:PayrollStatusProps) {
           <Button className="px-4 mt-8 mx-7">Create Pay Run</Button>
         </Link>
       </CardContent>
-      <div className="my-2 mx-9 text-slate-400">
+      <div className="my-2 mx-9 text-muted-foreground">
         You haven't processed this pay run yet !
       </div>
     </Card>

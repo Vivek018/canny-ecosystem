@@ -109,7 +109,7 @@ export function PayrollSheet({row, rowData}:{row:any, rowData:any}) {
             <Button
               className=""
               type="submit"
-              onClick={() => console.log("Save changes for", rowData)}
+              onClick={() => {}}
             >
               Save changes
             </Button>

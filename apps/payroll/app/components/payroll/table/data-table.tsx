@@ -10,7 +10,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { PayrollTableHeader } from "./payroll-table-header";
+import { PayrollTableHeader } from "./data-table-headers";
 
 import { PayrollSheet } from "../payroll-sheet";
 
@@ -28,7 +28,7 @@ export function PayrollDataTable<TData, TValue>({
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
-  console.log(data);
+
   const tableLength = table.getRowModel().rows?.length;
 
   return (

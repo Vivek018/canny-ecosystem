@@ -1,5 +1,5 @@
 import { ExitPaymentColumns } from "@/components/exit-payment/table/columns";
-import { ExitPaymentTable } from "@/components/exit-payment/table/exit-payment-table";
+import { ExitPaymentTable } from "@/components/exit-payment/table/data-table";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
@@ -327,7 +327,7 @@ export default function Exits() {
             />
           </div>
           <Link
-            to="/approvals/exit-form"
+            to="/approvals/exits/exit-form"
             className={cn(
               buttonVariants({ variant: "primary-outline" }),
               "flex items-center gap-1"
