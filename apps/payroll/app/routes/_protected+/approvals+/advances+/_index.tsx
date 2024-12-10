@@ -202,7 +202,7 @@ export default function Reimbursements() {
             />
           </div>
           <Link
-            to="#"
+            to="advances-form"
             className={cn(
               buttonVariants({ variant: "primary-outline" }),
               "flex items-center gap-1"
@@ -213,7 +213,10 @@ export default function Reimbursements() {
           </Link>
         </div>
       </div>
-      <ReimbursementsTable data={tableData as any} columns={ReimbursementsColumns} />
+      <ReimbursementsTable
+        data={tableData as any}
+        columns={ReimbursementsColumns}
+      />
     </section>
   );
 }
