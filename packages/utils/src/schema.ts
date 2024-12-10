@@ -539,6 +539,35 @@ export const UserSchema = z.object({
   is_active: z.boolean().default(false),
 });
 
+export const reasonforexitArray = [
+  "resigned by employee",
+  "terminated by employee",
+  "by death",
+  "by disability",
+] as const;
+
+export const ExitPaymentPage1Schema = z.object({
+  last_working_day: z.string(),
+  reason_for_exit: z.enum(reasonforexitArray),
+  final_settlement_date: z.string(),
+  note: zTextArea.max(100).optional(),
+});
+
+export const ExitPaymentPage2Schema = z.object({
+  organization_payable_days: zNumber,
+  employee_payable_days: zNumber,
+  bonus: zNumber.optional(),
+  diwali_bonus: zNumber.optional(),
+  commission: zNumber.optional(),
+  joining_bonus: zNumber.optional(),
+  yearly_bonus: zNumber.optional(),
+  leave_encashment: zNumber.optional(),
+  gift_coupon: zNumber.optional(),
+  computer_servive_charges: zNumber.optional(),
+  gratuity: zNumber.optional(),
+  deduction: zNumber.optional(),
+});
+
 
 
 // Payment Template Assignment

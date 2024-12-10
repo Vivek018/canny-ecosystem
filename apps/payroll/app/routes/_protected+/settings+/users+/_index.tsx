@@ -1,4 +1,4 @@
-import { columns, type UsersType } from "@/components/user/table/columns";
+import { columns } from "@/components/user/table/columns";
 import { UserDataTable } from "@/components/user/table/data-table";
 
 import { getUsers } from "@canny_ecosystem/supabase/queries";
@@ -28,11 +28,14 @@ export default function Users() {
   const [tableData, setTableData] = useState(data);
 
   useEffect(() => {
-    const filteredData = data?.filter((item: UsersType) =>
-      Object.values(item).some((value) =>
-        String(value).toLowerCase().includes(searchString.toLowerCase())
+    const filteredData = data?.filter((item) =>
+      Object.entries(item).some(
+        ([key, value]) =>
+          key !== "avatar" &&
+          String(value).toLowerCase().includes(searchString.toLowerCase())
       )
     );
+
     setTableData(filteredData);
   }, [searchString, data]);
 
