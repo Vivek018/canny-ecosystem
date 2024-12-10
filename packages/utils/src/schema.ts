@@ -35,7 +35,7 @@ export const zEmailSuffix = z
   .max(20)
   .regex(
     /^[A-Za-z0-9]+\.[A-Za-z]{2,}$/,
-    "Must contain a dot with at least one character before and two after."
+    "Must contain a dot with at least one character before and two after.",
   );
 
 export const SIZE_1MB = 1 * 1024 * 1024; // 1MB
@@ -50,21 +50,21 @@ export const zImage = z
   .any()
   .refine(
     (file) => (typeof file !== "string" ? file.size < SIZE_1MB : true),
-    "File size must be less than 1MB"
+    "File size must be less than 1MB",
   )
   .refine(
     (file) =>
       typeof file !== "string"
         ? ACCEPTED_IMAGE_TYPES.includes(file?.type)
         : true,
-    "Only .jpg, .jpeg, .png and .webp formats are supported."
+    "Only .jpg, .jpeg, .png and .webp formats are supported.",
   );
 
 export const zFile = z
   .any()
   .refine(
     (file) => (typeof file !== "string" ? file.size < SIZE_1MB * 5 : true),
-    "File size must be less than 5MB"
+    "File size must be less than 5MB",
   )
   .refine(
     (file) =>
@@ -79,7 +79,7 @@ export const zFile = z
             "application/docx",
           ].includes(file?.type)
         : true,
-    "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .docx formats are supported."
+    "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .docx formats are supported.",
   );
 
 export const parseDateSchema = z
@@ -566,4 +566,83 @@ export const ExitPaymentPage2Schema = z.object({
   computer_servive_charges: zNumber.optional(),
   gratuity: zNumber.optional(),
   deduction: zNumber.optional(),
+});
+
+
+
+// Payment Template Assignment
+export const paymentAssignmentTypesArray = ["employee", "site"] as const;
+export const eligibilityOptionsArray = ["position", "skill_level"] as const;
+export const PaymentTemplateAssignemntSchema = z.object({
+  id: z.string().uuid().optional(),
+  template_id: z.string().uuid(),
+  assignment_type: z.enum(paymentAssignmentTypesArray).default("employee"),
+  employee_id: z.string().uuid().optional(),
+  site_id: z.string().uuid().optional(),
+  eligibility_option: z.enum(eligibilityOptionsArray).default("position"),
+  position: z.string().optional(),
+  skill_level: z.string().optional(),
+  effective_from: z
+    .string()
+    .date()
+    .optional()
+    .default(new Date().toISOString().split("T")[0]),
+  effective_to: z.string().date().optional(),
+  is_active: z.boolean().optional().default(false),
+});
+
+export const PaymentTemplateFormEmployeeDialogSchema = z.object({
+  name: z.string(),
+  effective_from: z.string().default(new Date().toISOString().split("T")[0]),
+  effective_to: z.string().optional(),
+  template_id: z.string(),
+});
+
+export const PaymentTemplateFormSiteDialogSchema = z.object({
+  name: z.string(),
+  effective_from: z.string().default(new Date().toISOString().split("T")[0]),
+  effective_to: z.string().optional(),
+  template_id: z.string(),
+  eligibility_option: z.enum(eligibilityOptionsArray).optional(),
+  position: z.string().optional(),
+  skill_level: z.string().optional(),
+});
+
+// Payment Template Assignment
+export const CreateEmployeeLinkSchema = z.object({
+  template_id: z.string().uuid(),
+  effective_from: z.string(),
+  effective_to: z.string().optional(),
+  name: z.string(),
+});
+
+export const UpdateEmployeeLinkSchema = z.object({
+  template_id: z.string().uuid(),
+  effective_from: z.string(),
+  effective_to: z.string().optional(),
+  name: z.string(),
+});
+
+export const DeleteEmployeeLinkSchema = z.object({
+  is_active: z.enum(["true", "false"]).transform((val) => val === "true"),
+});
+
+export const CreateSiteLinkSchema = z.object({
+  name: z.string(),
+  effective_from: z.string().default(new Date().toISOString().split("T")[0]),
+  effective_to: z.string().optional(),
+  template_id: z.string(),
+  eligibility_option: z.enum(eligibilityOptionsArray).optional(),
+  position: z.string().optional(),
+  skill_level: z.string().optional(),
+});
+
+export const UpdateSiteLinkSchema = z.object({
+  name: z.string(),
+  effective_from: z.string().default(new Date().toISOString().split("T")[0]),
+  effective_to: z.string().optional(),
+  template_id: z.string(),
+  eligibility_option: z.enum(eligibilityOptionsArray).optional(),
+  position: z.string().optional(),
+  skill_level: z.string().optional(),
 });

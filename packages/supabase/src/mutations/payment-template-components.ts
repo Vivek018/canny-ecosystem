@@ -1,50 +1,45 @@
 import { convertToNull } from "@canny_ecosystem/utils";
 
 import type {
-  ProfessionalTaxDatabaseInsert,
-  ProfessionalTaxDatabaseUpdate,
+  PaymentTemplateComponentsDatabaseInsert,
+  PaymentTemplateComponentsDatabaseUpdate,
   TypedSupabaseClient,
 } from "../types";
 
-export async function createProfessionalTax({
+export async function createPaymentTemplateComponent({
   supabase,
   data,
   bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
-  data: ProfessionalTaxDatabaseInsert;
+  data: PaymentTemplateComponentsDatabaseInsert;
   bypassAuth?: boolean;
 }) {
   if (!bypassAuth) {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-
-    if (!user?.email) {
-      return { status: 400, error: "Unauthorized User" };
-    }
+    if (!user?.email) return { status: 400, error: "Unauthorized User" };
   }
 
-  const {
-    error,
-    status,
-    data: professionalTax,
-  } = await supabase.from("professional_tax").insert(data).select().single();
+  const { error, status } = await supabase
+    .from("payment_template_components")
+    .insert(data)
+    .select()
+    .single();
 
-  if (error) {
-    console.error(error);
-  }
+  if (error) console.error(error);
 
-  return { status, error, id: professionalTax?.id };
+  return { status, error };
 }
 
-export async function updateProfessionalTax({
+export async function updatePaymentTemplateComponent({
   supabase,
   data,
   bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
-  data: ProfessionalTaxDatabaseUpdate;
+  data: PaymentTemplateComponentsDatabaseUpdate;
   bypassAuth?: boolean;
 }) {
   if (!bypassAuth) {
@@ -52,28 +47,24 @@ export async function updateProfessionalTax({
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user?.email) {
-      return { status: 400, error: "Unauthorized User" };
-    }
+    if (!user?.email) return { status: 400, error: "Unauthorized User" };
   }
 
   const updateData = convertToNull(data);
 
   const { error, status } = await supabase
-    .from("professional_tax")
+    .from("payment_template_components")
     .update(updateData)
     .eq("id", data.id!)
     .select()
     .single();
 
-  if (error) {
-    console.error("error", error);
-  }
+  if (error) console.error("error", error);
 
   return { status, error };
 }
 
-export async function deleteProfessionalTax({
+export async function deletePaymentTemplateComponent({
   supabase,
   id,
   bypassAuth = false,
@@ -87,19 +78,15 @@ export async function deleteProfessionalTax({
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user?.email) {
-      return { status: 400, error: "Unauthorized User" };
-    }
+    if (!user?.email) return { status: 400, error: "Unauthorized User" };
   }
 
   const { error, status } = await supabase
-    .from("professional_tax")
+    .from("payment_template_components")
     .delete()
     .eq("id", id);
 
-  if (error) {
-    console.error(error);
-  }
+  if (error) console.error(error);
 
   return { status, error };
 }

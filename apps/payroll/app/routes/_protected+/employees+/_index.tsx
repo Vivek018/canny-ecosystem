@@ -11,7 +11,7 @@ import {
   type EmployeeFilters,
   getEmployeesByCompanyId,
   getProjectNamesByCompanyId,
-  getSiteNamesByProjectNameAndCompanyId,
+  getSiteNamesByProjectName,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { extractJsonFromString } from "@canny_ecosystem/utils";
@@ -81,10 +81,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   let projectSiteData = null;
   if (filters.project) {
-    const { data } = await getSiteNamesByProjectNameAndCompanyId({
+    const { data } = await getSiteNamesByProjectName({
       supabase,
       projectName: filters.project,
-      companyId,
     });
     projectSiteData = data;
   }
@@ -217,7 +216,7 @@ export default function EmployeesIndex() {
       </div>
       <DataTable
         data={data ?? []}
-        columns={columns}
+        columns={columns({env,companyId})}
         count={count ?? data?.length ?? 0}
         query={query}
         filters={filters}
