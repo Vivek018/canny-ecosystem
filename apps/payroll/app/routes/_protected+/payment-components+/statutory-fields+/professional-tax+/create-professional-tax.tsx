@@ -48,10 +48,17 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 export const CREATE_PROFESSIONAL_TAX = "create-professional-tax";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-  return json({ status: "success", message: "Company ID found", companyId });
+    return json({ companyId, error: null });
+  } catch (error) {
+    return json({
+      error,
+      companyId: null,
+    });
+  }
 }
 
 export async function action({
@@ -91,11 +98,14 @@ export async function action({
       error,
     });
   } catch (error) {
-    return json({
-      status: "error",
-      message: "An unexpected error occurred",
-      error,
-    }, { status: 500 });
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 },
+    );
   }
 }
 
@@ -150,7 +160,7 @@ export default function CreateProfessionalTax({
     navigate("/payment-components/statutory-fields/professional-tax", {
       replace: true,
     });
-  }, [actionData, toast]);
+  }, [actionData]);
 
   return (
     <section className="p-4">

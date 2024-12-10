@@ -4,7 +4,8 @@ import { getInputProps } from "@conform-to/react";
 import { useEffect } from "react";
 
 export function CompanyListsWrapper({
-  companyOptions: { data: companyOptions, error },
+  data: companyOptions,
+  error,
   fields,
   resetKey,
   companyOptionsFromUpdate,

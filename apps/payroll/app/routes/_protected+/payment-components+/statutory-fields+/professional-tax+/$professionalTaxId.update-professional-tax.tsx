@@ -28,7 +28,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     let professionalTaxPromise = null;
 
     if (professionalTaxId) {
-      professionalTaxPromise = await getProfessionalTaxById({
+      professionalTaxPromise = getProfessionalTaxById({
         supabase,
         id: professionalTaxId,
       });

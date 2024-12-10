@@ -4,7 +4,10 @@ import { useEffect } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import type { ProjectsWithCompany } from "@canny_ecosystem/supabase/queries";
 
-export function ProjectsWrapper({ resolvedData: { data, error } }: any) {
+export function ProjectsWrapper({
+  data,
+  error,
+}: { data: Omit<ProjectsWithCompany, "created_at" | "updated_at">[] | null; error: Error | null | { message: string } }) {
   const { toast } = useToast();
 
   useEffect(() => {
@@ -19,7 +22,7 @@ export function ProjectsWrapper({ resolvedData: { data, error } }: any) {
 
   return (
     <div className="w-full grid gap-8 grid-cols-1">
-      {data?.map((project: ProjectsWithCompany) => (
+      {data?.map((project) => (
         <CommandItem
           key={project.id}
           value={

@@ -17,13 +17,13 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { Suspense, useEffect } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import type { LabourWelfareFundDatabaseUpdate } from "@canny_ecosystem/supabase/types";
-import { StatutoryBonusNoData } from "@/components/statutory-fields/statutory-bonus/statutory-bonus-no-data";
 
 export const UPDATE_LABOUR_WELFARE_FUND = "update-labour-welfare-fund";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
+  const labourWelfareFundId = params.labourWelfareFundId;
+
   try {
-    const labourWelfareFundId = params.labourWelfareFundId;
     const { supabase } = getSupabaseWithHeaders({ request });
 
     let labourWelfareFundPromise = null;
@@ -39,6 +39,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         error: null,
       });
     }
+
+    throw new Error("No identity key provided");
   } catch (error) {
     return json(
       {
@@ -170,9 +172,5 @@ export function UpdateLabourWelfareFundWrapper({
     }
   }, [error]);
 
-  return (
-    <>
-      <CreateLabourWelfareFund updateValues={data} />;
-    </>
-  );
+  return <CreateLabourWelfareFund updateValues={data} />;
 }

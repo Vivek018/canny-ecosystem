@@ -1,4 +1,3 @@
-import { EMPLOYEE_EPF_PERCENTAGE } from "@/routes/_protected+/payment-components+/statutory-fields+/employee-provident-fund+/_index";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Link } from "@remix-run/react";
 import { EmployerContributionSplitUp } from "./employer-contribution-split-up";
@@ -7,6 +6,7 @@ import { SampleEPFCalculationCard } from "./sample-epf-calculation-card";
 import { EPFNoData } from "./epf-no-data";
 import { DeleteEmployeeProvidentFund } from "./delete-employee-provident-fund";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { EMPLOYEE_EPF_PERCENTAGE } from "@canny_ecosystem/utils/constant";
 
 type DetailItemProps = {
   label: string;
@@ -30,7 +30,7 @@ export function EPFWrapper({
     EmployeeProvidentFundDatabaseRow,
     "created_at" | "updated_at"
   > | null;
-  error: any | Error | null | { message: string };
+  error: Error | null | { message: string };
 }) {
 
   const employeeContributionRateText = data?.restrict_employee_contribution

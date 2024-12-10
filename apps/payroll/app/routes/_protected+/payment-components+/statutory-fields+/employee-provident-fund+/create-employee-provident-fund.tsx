@@ -42,9 +42,28 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 export const CREATE_EMPLOYEE_PROVIDENT_FUND = "create-employee-provident-fund";
 
-export const action = async ({
+export async function loader({ request }: LoaderFunctionArgs) {
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    return json({
+      companyId,
+      error: null,
+    });
+  } catch (error) {
+    return json(
+      {
+        error,
+        companyId: null,
+      },
+      { status: 500 },
+    );
+  }
+}
+
+export async function action({
   request,
-}: ActionFunctionArgs): Promise<Response> => {
+}: ActionFunctionArgs): Promise<Response> {
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
     const formData = await request.formData();
@@ -89,26 +108,7 @@ export const action = async ({
       { status: 500 },
     );
   }
-};
-
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-  try {
-    const { supabase } = getSupabaseWithHeaders({ request });
-    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-    return json({
-      companyId,
-      error: null,
-    });
-  } catch (error) {
-    return json(
-      {
-        error,
-        companyId: null,
-      },
-      { status: 500 },
-    );
-  }
-};
+}
 
 export default function CreateEmployeeProvidentFund({
   updateValues,
@@ -142,22 +142,21 @@ export default function CreateEmployeeProvidentFund({
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (actionData) {
-      if (actionData?.status === "success") {
-        toast({
-          title: "Success",
-          description: actionData?.message,
-          variant: "success",
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: actionData?.error?.message,
-          variant: "destructive",
-        });
-      }
-      navigate("/payment-components/statutory-fields/employee-provident-fund");
+    if (!actionData) return;
+    if (actionData?.status === "success") {
+      toast({
+        title: "Success",
+        description: actionData?.message,
+        variant: "success",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: actionData?.error?.message,
+        variant: "destructive",
+      });
     }
+    navigate("/payment-components/statutory-fields/employee-provident-fund");
   }, [actionData]);
 
   return (

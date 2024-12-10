@@ -33,11 +33,14 @@ export async function action({
       error,
     });
   } catch (error) {
-    return json({
-      status: "error",
-      message: "An unexpected error occurred",
-      error,
-    }, { status: 500 });
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 },
+    );
   }
 }
 
@@ -47,25 +50,24 @@ export default function DeleteLabourWelfareFund() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (actionData) {
-      if (actionData?.status === "success") {
-        toast({
-          title: "Success",
-          description: actionData?.message || "Labour Welfare Fund deleted",
-          variant: "success",
-        });
-      } else {
-        toast({
-          title: "Error",
-          description:
-            actionData?.error.message || "Labour Welfare Fund delete failed",
-          variant: "destructive",
-        });
-      }
-      navigate("/payment-components/statutory-fields/labour-welfare-fund", {
-        replace: true,
+    if (!actionData) return;
+    if (actionData?.status === "success") {
+      toast({
+        title: "Success",
+        description: actionData?.message || "Labour Welfare Fund deleted",
+        variant: "success",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description:
+          actionData?.error.message || "Labour Welfare Fund delete failed",
+        variant: "destructive",
       });
     }
+    navigate("/payment-components/statutory-fields/labour-welfare-fund", {
+      replace: true,
+    });
   }, [actionData]);
 
   return null;

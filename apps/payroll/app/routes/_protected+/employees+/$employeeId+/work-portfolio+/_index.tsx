@@ -30,7 +30,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         employeeId: employeeId ?? "",
       });
 
-    const employeeSkillsPromise = await getEmployeeSkillsByEmployeeId({
+    const employeeSkillsPromise = getEmployeeSkillsByEmployeeId({
       supabase,
       employeeId: employeeId ?? "",
     });

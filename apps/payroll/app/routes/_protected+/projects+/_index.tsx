@@ -1,4 +1,3 @@
-import { ProjectCard } from "@/components/projects/project-card";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getProjectsByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -8,7 +7,6 @@ import {
   CommandEmpty,
   CommandGroup,
   CommandInput,
-  CommandItem,
   CommandList,
 } from "@canny_ecosystem/ui/command";
 import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
@@ -24,7 +22,6 @@ import {
 } from "@remix-run/react";
 import { Suspense } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
-import { ProjectDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { ProjectsWrapper } from "@/components/projects/projects-wrapper";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -97,9 +94,19 @@ export default function ProjectsIndex() {
             <CommandGroup className="p-0 overflow-visible">
               <Suspense fallback={<div>Loading...</div>}>
                 <Await resolve={projectsPromise}>
-                  {(resolvedData) => (
-                    <ProjectsWrapper resolvedData={resolvedData} />
-                  )}
+                  {(resolvedData) => {
+                    if (!resolvedData)
+                      return (
+                        <ErrorBoundary message="Failed to load projects" />
+                      );
+                      console.log(resolvedData)
+                    return (
+                      <ProjectsWrapper
+                        data={resolvedData.data}
+                        error={resolvedData.error}
+                      />
+                    );
+                  }}
                 </Await>
               </Suspense>
             </CommandGroup>

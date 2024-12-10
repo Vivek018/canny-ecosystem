@@ -150,10 +150,8 @@ export async function action({
 
 export default function CreateSite({
   updateValues,
-  // locationOptionsFromUpdate,
 }: {
   updateValues?: SiteDatabaseUpdate | null;
-  // locationOptionsFromUpdate: ComboboxSelectOption[];
 }) {
   const { projectId, locationOptionsPromise, error } =
     useLoaderData<typeof loader>();
@@ -248,13 +246,16 @@ export default function CreateSite({
                 />
                 <Suspense fallback={<div>Loading...</div>}>
                   <Await resolve={locationOptionsPromise}>
-                    {(resolvedData) => (
+                    {(resolvedData) => {
+                      if(!resolvedData) return <ErrorBoundary message="Failed to load locations" />
+                      return(
                       <LocationsListWrapper
-                        locationOptions={resolvedData}
+                        data={resolvedData.data}
+                        error={resolvedData.error}
                         fields={fields}
                         resetKey={resetKey}
                       />
-                    )}
+                    )}}
                   </Await>
                 </Suspense>
               </div>

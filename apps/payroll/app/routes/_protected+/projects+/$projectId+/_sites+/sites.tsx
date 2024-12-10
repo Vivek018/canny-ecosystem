@@ -48,8 +48,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return json(
       {
         error,
-        sitesPromise: null,
         projectId,
+        sitesPromise: null,
         companyId: null,
         env: null,
       },

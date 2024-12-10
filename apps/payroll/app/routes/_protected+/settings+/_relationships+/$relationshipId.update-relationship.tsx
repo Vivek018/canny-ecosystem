@@ -36,7 +36,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     let relationshipPromise = null;
 
     if (relationshipId) {
-      relationshipPromise = await getRelationshipById({
+      relationshipPromise = getRelationshipById({
         supabase,
         id: relationshipId,
         companyId,

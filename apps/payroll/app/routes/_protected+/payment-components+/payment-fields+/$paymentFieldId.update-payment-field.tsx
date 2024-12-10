@@ -173,9 +173,5 @@ export function UpdatePaymentFieldWrapper({
       });
   }, [error]);
 
-  return (
-    <>
-      <CreatePaymentField updateValues={data} />
-    </>
-  );
+  return <CreatePaymentField updateValues={data} />;
 }

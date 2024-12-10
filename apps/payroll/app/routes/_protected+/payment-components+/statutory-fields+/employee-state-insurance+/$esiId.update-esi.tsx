@@ -136,7 +136,7 @@ export default function UpdateEmployeeStateInsurance() {
     return <ErrorBoundary error={error} message="Failed to load ESI" />;
 
   return (
-    <Suspense>
+    <Suspense fallback={<div>Loading...</div>}>
       <Await resolve={esiPromise}>
         {(resolvedData) => {
           if (!resolvedData)

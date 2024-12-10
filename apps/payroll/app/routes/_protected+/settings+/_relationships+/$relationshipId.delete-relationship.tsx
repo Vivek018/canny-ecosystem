@@ -10,9 +10,10 @@ export async function action({
   request,
   params,
 }: ActionFunctionArgs): Promise<Response> {
+  const relationshipId = params.relationshipId;
+
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
-    const relationshipId = params.relationshipId;
 
     const { status, error } = await deleteRelationship({
       supabase,
@@ -49,7 +50,7 @@ export default function DeleteRelationship() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (actionData) {
+    if (!actionData) return;
       if (actionData?.status === "success") {
         toast({
           title: "Success",
@@ -64,8 +65,8 @@ export default function DeleteRelationship() {
           variant: "destructive",
         });
       }
-    }
     navigate("/settings/relationships", { replace: true });
-  }, []);
+  }, [actionData]);
+  
   return null;
 }

@@ -19,7 +19,6 @@ import {
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import {
-  defer,
   Form,
   json,
   useActionData,
@@ -51,7 +50,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-    return defer({ companyId, error: null });
+    return json({ companyId, error: null });
   } catch (error) {
     return json({
       error,

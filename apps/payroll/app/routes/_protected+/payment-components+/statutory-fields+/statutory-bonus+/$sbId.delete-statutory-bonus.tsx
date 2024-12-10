@@ -10,9 +10,10 @@ export async function action({
   request,
   params,
 }: ActionFunctionArgs): Promise<Response> {
+  const sbId = params.sbId;
+
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
-    const sbId = params.sbId;
 
     const { status, error } = await deleteStatutoryBonus({
       supabase,
@@ -33,11 +34,14 @@ export async function action({
       error,
     });
   } catch (error) {
-    return json({
-      status: "error",
-      message: "An unexpected error occurred",
-      error,
-    }, { status: 500 });
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 },
+    );
   }
 }
 
@@ -47,25 +51,25 @@ export default function DeleteStatutoryBonus() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (actionData) {
-      if (actionData?.status === "success") {
-        toast({
-          title: "Success",
-          description: actionData?.message || "Statutory Bonus deleted",
-          variant: "success",
-        });
-      } else {
-        toast({
-          title: "Error",
-          description:
-            actionData?.error?.message || "Statutory Bonus delete failed",
-          variant: "destructive",
-        });
-      }
-      navigate("/payment-components/statutory-fields/statutory-bonus", {
-        replace: true,
+    if (!actionData) return;
+    if (actionData?.status === "success") {
+      toast({
+        title: "Success",
+        description: actionData?.message || "Statutory Bonus deleted",
+        variant: "success",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description:
+          actionData?.error?.message || "Statutory Bonus delete failed",
+        variant: "destructive",
       });
     }
+
+    navigate("/payment-components/statutory-fields/statutory-bonus", {
+      replace: true,
+    });
   }, [actionData]);
 
   return null;

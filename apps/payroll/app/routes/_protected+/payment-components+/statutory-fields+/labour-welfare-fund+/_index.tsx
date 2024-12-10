@@ -47,10 +47,11 @@ export default function LabourWelfareFundIndex() {
     <Suspense fallback={<div>Loading...</div>}>
       <Await resolve={labourWelfareFundPromise}>
         {(resolvedData) => {
-          if (!resolvedData)
+          if (!resolvedData) {
             return (
               <ErrorBoundary message="Failed to load labour welfare funds" />
-            );
+            )
+          }
           return (
             <LWFWrapper data={resolvedData.data} error={resolvedData.error} />
           );

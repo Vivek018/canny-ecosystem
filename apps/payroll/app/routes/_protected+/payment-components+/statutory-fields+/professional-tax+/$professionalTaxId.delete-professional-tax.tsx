@@ -32,11 +32,14 @@ export async function action({
       { status: 500 },
     );
   } catch (error) {
-    return json({
-      status: "error",
-      message: "An unexpected error occurred",
-      error,
-    }, { status: 500 });
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 },
+    );
   }
 }
 
@@ -46,25 +49,24 @@ export default function DeleteProfessionalTax() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (actionData) {
-      if (actionData?.status === "success") {
-        toast({
-          title: "Success",
-          description: actionData?.message || "Professional Tax deleted",
-          variant: "success",
-        });
-      } else {
-        toast({
-          title: "Error",
-          description:
-            actionData?.error.message || "Professional Tax delete failed",
-          variant: "destructive",
-        });
-      }
-      navigate("/payment-components/statutory-fields/professional-tax", {
-        replace: true,
+    if (!actionData) return;
+    if (actionData?.status === "success") {
+      toast({
+        title: "Success",
+        description: actionData?.message || "Professional Tax deleted",
+        variant: "success",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description:
+          actionData?.error.message || "Professional Tax delete failed",
+        variant: "destructive",
       });
     }
+    navigate("/payment-components/statutory-fields/professional-tax", {
+      replace: true,
+    });
   }, [actionData]);
 
   return null;

@@ -1,15 +1,11 @@
 import { ErrorBoundary } from "@/components/error-boundary";
-import { EPFNoData } from "@/components/statutory-fields/employee-provident-fund/epf-no-data";
 import { EPFWrapper } from "@/components/statutory-fields/employee-provident-fund/epf-wrapper";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getEmployeeProvidentFundByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-
 import { type LoaderFunctionArgs, defer, json } from "@remix-run/node";
 import { Await, useLoaderData } from "@remix-run/react";
 import { Suspense } from "react";
-
-export const EMPLOYEE_EPF_PERCENTAGE = 0.12;
 
 export const loader = async ({
   request,
@@ -18,7 +14,7 @@ export const loader = async ({
     const { supabase } = getSupabaseWithHeaders({ request });
 
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-    const epfPromise = await getEmployeeProvidentFundByCompanyId({
+    const epfPromise = getEmployeeProvidentFundByCompanyId({
       supabase,
       companyId,
     });

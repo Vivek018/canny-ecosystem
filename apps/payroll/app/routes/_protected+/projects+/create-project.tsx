@@ -279,14 +279,21 @@ export default function CreateProject({
               />
               <Suspense fallback={<div>Loading...</div>}>
                 <Await resolve={companyOptionsPromise}>
-                  {(resolvedData) => (
-                    <CompanyListsWrapper
-                      companyOptions={resolvedData}
-                      fields={fields}
-                      resetKey={resetKey}
-                      companyOptionsFromUpdate={companyOptionsFromUpdate}
-                    />
-                  )}
+                  {(resolvedData) => {
+                    if (!resolvedData)
+                      return (
+                        <ErrorBoundary message="Failed to load company options" />
+                      );
+                    return (
+                      <CompanyListsWrapper
+                        data={resolvedData.data}
+                        error={resolvedData.error}
+                        fields={fields}
+                        resetKey={resetKey}
+                        companyOptionsFromUpdate={companyOptionsFromUpdate}
+                      />
+                    );
+                  }}
                 </Await>
               </Suspense>
               <div className="grid grid-cols-2 place-content-center justify-between gap-6">

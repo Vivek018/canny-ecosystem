@@ -86,7 +86,6 @@ export async function loader({
       .filter((company) => company.id !== companyId)
       .map((company) => ({ label: company.name, value: company.id }));
 
-    // return json({ companyId, companyOptions });
     return json({
       status: "success",
       message: "Relationship created",

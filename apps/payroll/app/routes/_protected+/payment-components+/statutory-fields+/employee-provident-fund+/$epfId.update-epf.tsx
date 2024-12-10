@@ -42,7 +42,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     return defer({
-      message: "EPF data loaded",
       epfPromise,
       companyId,
       error: null,
@@ -50,7 +49,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   } catch (error) {
     return json(
       {
-        message: "Failed to load EPF data",
         error,
         epfPromise: null,
         companyId: null,
@@ -115,24 +113,22 @@ export default function UpdateEmployeeProvidentFund() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (actionData) {
-      if (actionData?.status === "success") {
-        toast({
-          title: "Success",
-          description: actionData?.message || "Employee Provident Fund updated",
-          variant: "success",
-        });
-      } else {
-        toast({
-          title: "Error",
-          description:
-            actionData?.error?.message ||
-            "Employee Provident Fund update failed",
-          variant: "destructive",
-        });
-      }
-      navigate("/payment-components/statutory-fields/employee-provident-fund");
+    if (!actionData) return;
+    if (actionData?.status === "success") {
+      toast({
+        title: "Success",
+        description: actionData?.message || "Employee Provident Fund updated",
+        variant: "success",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description:
+          actionData?.error?.message || "Employee Provident Fund update failed",
+        variant: "destructive",
+      });
     }
+    navigate("/payment-components/statutory-fields/employee-provident-fund");
   }, [actionData]);
 
   if (error)

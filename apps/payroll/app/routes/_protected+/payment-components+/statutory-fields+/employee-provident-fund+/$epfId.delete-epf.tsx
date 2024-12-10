@@ -10,9 +10,10 @@ export async function action({
   request,
   params,
 }: ActionFunctionArgs): Promise<Response> {
+  const epfId = params.epfId;
+
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
-    const epfId = params.epfId;
 
     const { status, error } = await deleteEmployeeProvidentFund({
       supabase,
@@ -37,11 +38,14 @@ export async function action({
       { status: 500 },
     );
   } catch (error) {
-    return json({
-      status: "error",
-      message: "An unexpected error occurred",
-      error,
-    }, { status: 500 });
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 },
+    );
   }
 }
 
@@ -51,23 +55,22 @@ export default function DeleteEmployeeProvidentFund() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (actionData) {
-      if (actionData?.status === "success") {
-        toast({
-          title: "Success",
-          description: actionData?.message,
-          variant: "success",
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: actionData?.error?.message || "EPF delete failed",
-          variant: "destructive",
-        });
-      }
-
-      navigate("/payment-components/statutory-fields/employee-provident-fund");
+    if (!actionData) return;
+    if (actionData?.status === "success") {
+      toast({
+        title: "Success",
+        description: actionData?.message,
+        variant: "success",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: actionData?.error?.message || "EPF delete failed",
+        variant: "destructive",
+      });
     }
+
+    navigate("/payment-components/statutory-fields/employee-provident-fund");
   }, [actionData]);
   return null;
 }

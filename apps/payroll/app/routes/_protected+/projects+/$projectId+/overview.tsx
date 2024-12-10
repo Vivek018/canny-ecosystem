@@ -21,16 +21,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     });
 
     return defer({
-      status: "success",
-      message: "Project found",
       error: null,
       projectPromise,
     });
   } catch (error) {
     return json(
       {
-        status: "error",
-        message: "An unexpected error occurred",
         error,
         projectPromise: null,
       },
@@ -48,9 +44,16 @@ export default function ProjectIndex() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <Await resolve={projectPromise}>
-        {(resolvedData) => (
-          <ProjectOverviewWrapper projectData={resolvedData} />
-        )}
+        {(resolvedData) => {
+          if (!resolvedData)
+            return <ErrorBoundary message="Failed to load project" />;
+          return (
+            <ProjectOverviewWrapper
+              data={resolvedData.data}
+              error={resolvedData.error}
+            />
+          );
+        }}
       </Await>
     </Suspense>
   );

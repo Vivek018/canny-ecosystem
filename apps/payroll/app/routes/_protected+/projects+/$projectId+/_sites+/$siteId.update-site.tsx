@@ -20,13 +20,11 @@ import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { Suspense, useEffect } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
+import type { SiteDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 
 export const UPDATE_SITE = "update-site";
 
-export async function loader({
-  request,
-  params,
-}: LoaderFunctionArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
   const siteId = params.siteId;
   const projectId = params.projectId;
 
@@ -54,7 +52,7 @@ export async function loader({
     let sitePromise = null;
 
     if (siteId) {
-      sitePromise = await getSiteById({
+      sitePromise = getSiteById({
         supabase,
         id: siteId,
       });
@@ -165,15 +163,28 @@ export default function UpdateSite() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <Await resolve={sitePromise}>
-        {(resolvedData) => <UpdateSiteWrapper siteData={resolvedData} />}
+        {(resolvedData) => {
+          if (!resolvedData)
+            return <ErrorBoundary message="Failed to load site" />;
+          return (
+            <UpdateSiteWrapper
+              data={resolvedData.data}
+              error={resolvedData.error}
+            />
+          );
+        }}
       </Await>
     </Suspense>
   );
 }
 
 export function UpdateSiteWrapper({
-  siteData: { data: siteData, error },
-}: any) {
+  data,
+  error,
+}: {
+  data: SiteDatabaseUpdate | null;
+  error: Error | null | { message: string };
+}) {
   const { toast } = useToast();
 
   useEffect(() => {
@@ -186,9 +197,5 @@ export function UpdateSiteWrapper({
     }
   }, [error]);
 
-  return (
-    <>
-      <CreateSite updateValues={siteData?.data} />
-    </>
-  );
+  return <CreateSite updateValues={data} />;
 }

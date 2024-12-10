@@ -28,7 +28,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     let locationPromise = null;
 
     if (locationId) {
-      locationPromise = await getLocationById({
+      locationPromise = getLocationById({
         supabase,
         id: locationId,
       });

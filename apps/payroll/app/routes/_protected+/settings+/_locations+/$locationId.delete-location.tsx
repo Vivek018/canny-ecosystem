@@ -46,7 +46,7 @@ export default function DeleteLocation() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (actionData) {
+    if (!actionData) return;
       if (actionData?.status === "success") {
         toast({
           title: "Success",
@@ -60,8 +60,8 @@ export default function DeleteLocation() {
           variant: "destructive",
         });
       }
-    }
     navigate("/settings/locations", { replace: true });
-  }, []);
+  }, [actionData]);
+  
   return null;
 }
