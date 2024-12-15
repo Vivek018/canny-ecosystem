@@ -73,6 +73,52 @@ export type EmployeeDataType = Pick<
   };
 };
 
+export async function getEmployeesByOnlyCompanyId({
+  supabase,
+  companyId,
+  
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+
+}) {
+
+  const columns = [
+    "id",
+    "employee_code",
+    "first_name",
+    "middle_name",
+    "last_name",
+    "date_of_birth",
+    "education",
+    "primary_mobile_number",
+    "is_active",
+    "gender",
+  ] as const;
+
+  const {data,error} =await  supabase
+    .from("employees")
+    .select(
+      `${columns.join(",")},
+      employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(
+        employee_id, assignment_type, skill_level, position, start_date, end_date,
+        project_sites!inner(id, name, projects!inner(id, name))
+      )`,
+      { count: "exact" },
+    )
+    .eq("company_id", companyId);
+
+
+  if (error) {
+    console.error("Error fetching employees:", error);
+    return { data: null, error };
+  }
+
+  return {
+    data,
+    error: null,
+  };
+}
 export async function getEmployeesByCompanyId({
   supabase,
   companyId,

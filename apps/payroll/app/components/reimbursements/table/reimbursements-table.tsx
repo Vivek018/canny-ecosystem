@@ -27,7 +27,7 @@ export function ReimbursementsTable<TData, TValue>({
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
-
+  
   const tableLength = table.getRowModel().rows?.length;
 
   return (

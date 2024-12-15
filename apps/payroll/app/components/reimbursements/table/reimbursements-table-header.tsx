@@ -10,15 +10,19 @@ type Props = {
 
 // make sure the order is same as header order
 export const ReimbursementsColumnIdArray = [
-  "claim_number",
   "employee_name",
   "submitted_date",
   "status",
-  "claim_amount",
+  "claimed_amount",
   "approved_amount",
-]
+  "is_deductible"
+];
 
-export function ReimbursementsTableHeader({ table, className, loading }: Props) {
+export function ReimbursementsTableHeader({
+  table,
+  className,
+  loading,
+}: Props) {
   const columnName = (id: string) =>
     loading ||
     table?.getAllLeafColumns()?.find((col: any) => {

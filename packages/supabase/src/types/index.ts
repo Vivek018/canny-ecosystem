@@ -225,3 +225,11 @@ export type PaymentTemplateComponentsDatabaseInsert =
   Database["public"]["Tables"]["payment_template_components"]["Insert"];
 export type PaymentTemplateComponentsDatabaseUpdate =
   Database["public"]["Tables"]["payment_template_components"]["Update"];
+
+
+// Reimbursement 
+
+export type ReimbursementInsert =
+  Database["public"]["Tables"]["reimbursements"]["Insert"];
+  export type ReimbursementRow =
+  Database["public"]["Tables"]["reimbursements"]["Row"];
