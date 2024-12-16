@@ -233,3 +233,6 @@ export type ReimbursementInsert =
   Database["public"]["Tables"]["reimbursements"]["Insert"];
   export type ReimbursementRow =
   Database["public"]["Tables"]["reimbursements"]["Row"];
+  export type ReimbursementsUpdate =
+  Database["public"]["Tables"]["reimbursements"]["Update"];
+ 

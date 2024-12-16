@@ -1,3 +1,4 @@
+import { HARD_QUERY_LIMIT } from "../constant";
 import type {
   InferredType,
   TypedSupabaseClient,
@@ -67,6 +68,7 @@ export async function getUsers({
     .from("users")
     .select(columns.join(","))
     .order("created_at", { ascending: false })
+    .limit(HARD_QUERY_LIMIT)
     .returns<InferredType<UserDatabaseRow, (typeof columns)[number]>[]>();
 
   if (error) {

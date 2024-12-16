@@ -1,4 +1,4 @@
-import type{ ReimbursementInsert, TypedSupabaseClient } from "../types";
+import type{ ReimbursementInsert, ReimbursementsUpdate, TypedSupabaseClient } from "../types";
 
 export async function createReimbursementsFromData({
   supabase,
@@ -20,22 +20,26 @@ export async function createReimbursementsFromData({
   return { status, error };
 }
 
-export async function updateReimbursementsFromData({
+export async function updateReimbursementsByEmployeeId({employee_id,
   supabase,
   data,
 }: {
+  employee_id: number;
   supabase: TypedSupabaseClient;
-  data: ReimbursementInsert;
+  data: ReimbursementsUpdate;
 }) {
+  
+  
+
   const { error, status } = await supabase
     .from("reimbursements")
     .update(data)
-    .select()
+    .eq("employee_id", employee_id ?? "")
     .single();
 
   if (error) {
     console.error(error);
   }
 
-  return { status, error };
+  return { error, status };
 }

@@ -1432,8 +1432,8 @@ export type Database = {
       }
       reimbursements: {
         Row: {
-          approved_amount: number | null
-          claimed_amount: number
+          user_id:string
+          amount: number
           company_id: string
           created_at: string | null
           employee_id: string
@@ -1444,8 +1444,8 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
-          approved_amount?: number | null
-          claimed_amount: number
+          user_id:string
+          amount: number
           company_id: string
           created_at?: string | null
           employee_id: string
@@ -1456,8 +1456,8 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
-          approved_amount?: number | null
-          claimed_amount?: number
+          user_id:string
+          amount?: number
           company_id?: string
           created_at?: string | null
           employee_id?: string

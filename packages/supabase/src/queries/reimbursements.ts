@@ -1,6 +1,9 @@
 import { HARD_QUERY_LIMIT } from "../constant";
-import type{ ReimbursementRow, TypedSupabaseClient } from "../types";
-
+import type {
+  InferredType,
+  ReimbursementRow,
+  TypedSupabaseClient,
+} from "../types";
 
 export async function getReimbursementsByCompanyId({
   supabase,
@@ -11,14 +14,13 @@ export async function getReimbursementsByCompanyId({
 }) {
   const columns = [
     "id",
-    "employee_id",
+    "employees (id, first_name, last_name)",
     "company_id",
     "is_deductible",
     "status",
-    "claimed_amount",
-    "approved_amount",
+    "amount",
+    "user_id",
     "submitted_date",
-    
   ] as const;
 
   const { data, error } = await supabase
@@ -31,6 +33,39 @@ export async function getReimbursementsByCompanyId({
   if (error) {
     console.error(error);
   }
-  
+
+  return { data, error };
+}
+
+export async function getReimbursementsByEmployeeId({
+  supabase,
+  employeeId,
+}: {
+  supabase: TypedSupabaseClient;
+  employeeId: string;
+}) {
+  const columns = [
+    "id",
+    "employee_id",
+    "company_id",
+    "is_deductible",
+    "status",
+    "amount",
+    "submitted_date",
+    "user_id",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("reimbursements")
+    .select(columns.join(","))
+    .eq("employee_id", employeeId)
+    .order("created_at", {ascending: false})
+    .limit(HARD_QUERY_LIMIT)
+    .returns<InferredType<ReimbursementRow, (typeof columns)[ number ]>>();
+
+  if (error) {
+    console.error(error);
+  }
+
   return { data, error };
 }
