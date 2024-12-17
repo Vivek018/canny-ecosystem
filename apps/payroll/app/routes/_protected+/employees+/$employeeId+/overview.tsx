@@ -49,17 +49,24 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       employeeId: employeeId ?? "",
     });
 
+    const env = {
+      SUPABASE_URL: process.env.SUPABASE_URL!,
+      SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
+    };
+
     return defer({
       employeePromise,
       employeeStatutoryDetailsPromise,
       employeeBankDetailsPromise,
       employeeAddressesPromise,
       employeeGuardiansPromise,
+      env,
       error: null,
     });
   } catch (error) {
     return json({
       error,
+      env: null,
       employeePromise: null,
       employeeStatutoryDetailsPromise: null,
       employeeBankDetailsPromise: null,
@@ -72,6 +79,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export default function EmployeeIndex() {
   const {
     error,
+    env,
     employeePromise,
     employeeStatutoryDetailsPromise,
     employeeBankDetailsPromise,
@@ -81,23 +89,26 @@ export default function EmployeeIndex() {
 
   if (error) {
     return (
-      <ErrorBoundary error={error} message="Failed to load employee details" />
+      <ErrorBoundary error={error} message='Failed to load employee details' />
     );
   }
 
   return (
-    <div className="w-full my-8 flex flex-col gap-8">
+    <div className='w-full py-6 flex flex-col gap-8'>
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={employeePromise}>
           {(resolvedData: { data: any; error: any } | null) => {
-            if (!resolvedData)
-              return <ErrorBoundary message="Failed to load employee" />;
+            if (!resolvedData || !env)
+              return <ErrorBoundary message='Failed to load employee' />;
             return (
               <>
                 <CommonWrapper
                   error={resolvedData.error}
                   Component={
-                    <EmployeePageHeader employee={resolvedData.data} />
+                    <EmployeePageHeader
+                      employee={resolvedData.data}
+                      env={env}
+                    />
                   }
                 />
                 <CommonWrapper
@@ -117,7 +128,7 @@ export default function EmployeeIndex() {
           {(resolvedData: { data: any; error: any } | null) => {
             if (!resolvedData)
               return (
-                <ErrorBoundary message="Failed to load employee statutory details" />
+                <ErrorBoundary message='Failed to load employee statutory details' />
               );
             return (
               <CommonWrapper
@@ -138,7 +149,7 @@ export default function EmployeeIndex() {
           {(resolvedData: { data: any; error: any } | null) => {
             if (!resolvedData)
               return (
-                <ErrorBoundary message="Failed to load employee bank details" />
+                <ErrorBoundary message='Failed to load employee bank details' />
               );
             return (
               <CommonWrapper
@@ -157,7 +168,7 @@ export default function EmployeeIndex() {
           {(resolvedData: { data: any; error: any } | null) => {
             if (!resolvedData)
               return (
-                <ErrorBoundary message="Failed to load employee addresses" />
+                <ErrorBoundary message='Failed to load employee addresses' />
               );
             return (
               <CommonWrapper
@@ -178,7 +189,7 @@ export default function EmployeeIndex() {
           {(resolvedData: { data: any; error: any } | null) => {
             if (!resolvedData)
               return (
-                <ErrorBoundary message="Failed to load employee guardians details" />
+                <ErrorBoundary message='Failed to load employee guardians details' />
               );
             return (
               <CommonWrapper

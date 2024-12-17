@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { CompanyRegistrationDetails } from "./company-registration-details";
 import { DeleteCompany } from "./delete-company";
 import { toast } from "@canny_ecosystem/ui/use-toast";
@@ -12,7 +12,6 @@ export default function CompanyRegistrationDetailsWrapper({
   error: Error | null | { message: string };
 }) {
   const companyId = data?.company_id ?? "";
-  const [resetKey, _setResetKey] = React.useState(Date.now());
 
   useEffect(() => {
     if (error)
@@ -26,7 +25,6 @@ export default function CompanyRegistrationDetailsWrapper({
   return (
     <>
       <CompanyRegistrationDetails
-        key={companyId + resetKey + 1}
         updateValues={{
           ...data,
           company_id: data?.company_id ?? companyId,

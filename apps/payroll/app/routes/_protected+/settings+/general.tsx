@@ -9,7 +9,7 @@ import {
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Await, defer, json, useLoaderData } from "@remix-run/react";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {
@@ -49,21 +49,27 @@ export default function SettingGeneral() {
   const { companyDetailsPromise, companyRegistrationDetailsPromise, error } =
     useLoaderData<typeof loader>();
 
+  const [resetKey, setResetKey] = useState(Date.now());
+
+  useEffect(() => {
+    setResetKey(Date.now());
+  }, [companyDetailsPromise, companyRegistrationDetailsPromise]);
+
   if (error) {
     return (
-      <ErrorBoundary error={error} message="Failed to load company details" />
+      <ErrorBoundary error={error} message='Failed to load company details' />
     );
   }
 
   return (
-    <>
-      <section className="flex flex-col gap-6 w-full lg:w-2/3 my-4">
+    <section key={resetKey}>
+      <div className='flex flex-col gap-6 w-full lg:w-2/3 py-4'>
         <Suspense fallback={<div>Loading...</div>}>
           <Await resolve={companyDetailsPromise}>
             {(resolvedData) => {
               if (!resolvedData)
                 return (
-                  <ErrorBoundary message="Failed to load company details" />
+                  <ErrorBoundary message='Failed to load company details' />
                 );
               return (
                 <CompanyDetailsWrapper
@@ -74,15 +80,15 @@ export default function SettingGeneral() {
             }}
           </Await>
         </Suspense>
-      </section>
+      </div>
 
-      <section className="flex flex-col gap-6 w-full lg:w-2/3 my-4">
+      <div className='flex flex-col gap-6 w-full lg:w-2/3 py-4'>
         <Suspense fallback={<div>Loading...</div>}>
           <Await resolve={companyRegistrationDetailsPromise}>
             {(resolvedData) => {
               if (!resolvedData)
                 return (
-                  <ErrorBoundary message="Failed to load company registration details" />
+                  <ErrorBoundary message='Failed to load company registration details' />
                 );
               return (
                 <CompanyRegistrationDetailsWrapper
@@ -93,7 +99,7 @@ export default function SettingGeneral() {
             }}
           </Await>
         </Suspense>
-      </section>
-    </>
+      </div>
+    </section>
   );
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { CompanyDetails } from "./company-details";
 import { CompanyLogo } from "./company-logo";
 import { toast } from "@canny_ecosystem/ui/use-toast";
@@ -12,9 +12,6 @@ export function CompanyDetailsWrapper({
   data: CompanyDatabaseUpdate | null;
   error: Error | null | { message: string };
 }) {
-  const companyId = data?.id ?? "";
-
-  const [resetKey, _setResetKey] = useState(Date.now());
 
   useEffect(() => {
     if (error) {
@@ -34,7 +31,7 @@ export function CompanyDetailsWrapper({
   return (
     <>
       <CompanyLogo name={data?.name ?? ""} logo={data?.logo ?? undefined} />
-      <CompanyDetails key={companyId + resetKey} updateValues={data} />
+      <CompanyDetails updateValues={data} />
     </>
   );
 }

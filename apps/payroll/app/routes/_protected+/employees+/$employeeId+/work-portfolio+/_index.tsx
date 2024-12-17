@@ -63,7 +63,7 @@ export default function WorkPortfolio() {
     return <ErrorBoundary error={error} message="Failed to load data" />;
 
   return (
-    <div className="w-full my-8 flex flex-col gap-8">
+    <div className="w-full py-4 flex flex-col gap-8">
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={employeeProjectAssignmentPromise}>
           {(resolvedData) => {
