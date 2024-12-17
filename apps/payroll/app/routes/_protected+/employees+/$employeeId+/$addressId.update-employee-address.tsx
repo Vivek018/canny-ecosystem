@@ -1,63 +1,148 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { Form, json, useLoaderData } from "@remix-run/react";
+import {
+  Await,
+  defer,
+  Form,
+  json,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { safeRedirect } from "@/utils/server/http.server";
 import { isGoodStatus, EmployeeAddressesSchema } from "@canny_ecosystem/utils";
 import { getEmployeeAddressById } from "@canny_ecosystem/supabase/queries";
 import { updateEmployeeAddress } from "@canny_ecosystem/supabase/mutations";
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
 import { Card } from "@canny_ecosystem/ui/card";
 import { CreateEmployeeAddress } from "@/components/employees/form/create-employee-address";
 import { FormButtons } from "@/components/form/form-buttons";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
+import type { EmployeeAddressDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 export const UPDATE_EMPLOYEE_ADDRESS = "update-employee-address";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const addressId = params.addressId;
-  const { supabase } = getSupabaseWithHeaders({ request });
+  const employeeId = params.employeeId;
 
-  let data = null;
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
 
-  if (addressId) {
-    data = (await getEmployeeAddressById({ supabase, id: addressId })).data;
-  }
+    let employeeAddressPromise = null;
 
-  return json({ data });
-}
+    if (addressId) {
+      employeeAddressPromise = getEmployeeAddressById({
+        supabase,
+        id: addressId,
+      });
+    }
 
-export async function action({ request }: ActionFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
-
-  const submission = parseWithZod(formData, {
-    schema: EmployeeAddressesSchema,
-  });
-
-  if (submission.status !== "success") {
+    return defer({
+      employeeAddressPromise,
+      employeeId,
+      error: null,
+    });
+  } catch (error) {
     return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      {
+        error,
+        employeeId,
+        employeeAddressPromise: null,
+      },
+      { status: 500 },
     );
   }
+}
 
-  const { status, error } = await updateEmployeeAddress({
-    supabase,
-    data: submission.value,
-  });
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
 
-  if (isGoodStatus(status)) {
-    return safeRedirect(`/employees/${submission.value.employee_id}`, {
-      status: 303,
+    const submission = parseWithZod(formData, {
+      schema: EmployeeAddressesSchema,
     });
-  }
 
-  return json({ status, error });
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+
+    const { status, error } = await updateEmployeeAddress({
+      supabase,
+      data: submission.value,
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Employee address updated successfully",
+        error: null,
+      });
+    }
+
+    return json({
+      status: "error",
+      message: "Failed to update employee address",
+      error,
+    });
+  } catch (error) {
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 },
+    );
+  }
 }
 
 export default function UpdateEmployeeAddress() {
-  const { data } = useLoaderData<typeof loader>();
+  const { employeeAddressPromise, employeeId, error } =
+    useLoaderData<typeof loader>();
+
+  if (error)
+    return (
+      <ErrorBoundary error={error} message="Failed to load employee details" />
+    );
+
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Await resolve={employeeAddressPromise}>
+        {(resolvedData) => {
+          if (!resolvedData)
+            return <ErrorBoundary message="Failed to load employee details" />;
+          return (
+            <UpdateEmployeeAddressWrapper
+              data={resolvedData.data}
+              error={resolvedData.error}
+              employeeId={employeeId}
+            />
+          );
+        }}
+      </Await>
+    </Suspense>
+  );
+}
+
+export function UpdateEmployeeAddressWrapper({
+  data,
+  error,
+  employeeId,
+}: {
+  data: EmployeeAddressDatabaseUpdate | null;
+  error: Error | null | { message: string };
+  employeeId: string | undefined;
+}) {
+  const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
   const currentSchema = EmployeeAddressesSchema;
 
@@ -71,6 +156,36 @@ export default function UpdateEmployeeAddress() {
     shouldRevalidate: "onInput",
     defaultValue: data,
   });
+
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: "Error",
+        description: error?.message || "Employee address update failed",
+        variant: "destructive",
+      });
+    }
+    if (actionData) {
+      if (actionData?.status === "success") {
+        toast({
+          title: "Success",
+          description: actionData?.message || "Employee address updated",
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description:
+            actionData?.error?.message || "Employee address update failed",
+          variant: "destructive",
+        });
+      }
+      navigate(`/employees/${employeeId}`);
+    }
+  }, [actionData]);
 
   return (
     <section className="md:px-20 lg:px-28 2xl:px-40 py-4">

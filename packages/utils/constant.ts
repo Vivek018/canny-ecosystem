@@ -217,3 +217,9 @@ export const privacyPolicyData = [
       "If you have any questions or concerns about this privacy policy, or if you wish to exercise your rights regarding your personal data, please contact us using the contact information provided on the platform. We are committed to addressing your inquiries and ensuring that your data is handled securely and in accordance with this policy.",
   },
 ];
+
+export const EMPLOYEE_EPF_PERCENTAGE = 0.12;
+export const EMPLOYER_EPF_PERCENTAGE = 0.12;
+export const EMPLOYER_EDLI_PERCENTAGE = 0.005;
+export const EMPLOYER_EPS_PERCENTAGE = 0.0833;
+export const EMPLOYER_ADMIN_CHARGES_PERCENTAGE = 0.005;

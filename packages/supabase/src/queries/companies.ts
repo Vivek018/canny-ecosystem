@@ -151,11 +151,16 @@ export async function getLocationsByCompanyId({
     .order("created_at", { ascending: false })
     .returns<InferredType<LocationDatabaseRow, (typeof columns)[number]>[]>();
 
+  let supabaseError = null;
   if (error) {
     console.error(error);
+    supabaseError = error;
+  }
+  else if (!data?.length) {
+    supabaseError = { message: "No locations found" };
   }
 
-  return { data, error };
+  return { data, error: supabaseError };
 }
 
 export async function getLocationById({

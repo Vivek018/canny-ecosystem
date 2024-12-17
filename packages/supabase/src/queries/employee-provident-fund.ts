@@ -72,7 +72,7 @@ export const getEmployeeProvidentFundByCompanyId = async ({
     .select(columns.join(","))
     .eq("company_id", companyId)
     .limit(SINGLE_QUERY_LIMIT)
-    .single<
+    .maybeSingle<
       InferredType<EmployeeProvidentFundDatabaseRow, (typeof columns)[number]>
     >();
 

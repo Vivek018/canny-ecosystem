@@ -16,11 +16,18 @@ import {
   useForm,
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { Form, json, useLoaderData } from "@remix-run/react";
-import { useState } from "react";
+import {
+  Await,
+  defer,
+  Form,
+  json,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
+import { Suspense, useEffect, useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { safeRedirect } from "@/utils/server/http.server";
 
 import {
   Card,
@@ -38,80 +45,126 @@ import { getLocationsForSelectByCompanyId } from "@canny_ecosystem/supabase/quer
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 import { FormButtons } from "@/components/form/form-buttons";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { LocationsListWrapper } from "@/components/projects/sites/locations-list-wrapper";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 export const CREATE_SITE = "create-site";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const projectId = params.projectId;
 
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data: locations, error } = await getLocationsForSelectByCompanyId({
-    supabase,
-    companyId,
-  });
+  try {
+    if (!projectId) throw new Error("No projectId provided");
 
-  if (error) {
-    throw error;
-  }
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    const locationOptionsPromise = getLocationsForSelectByCompanyId({
+      supabase,
+      companyId,
+    }).then(({ data, error }) => {
+      if (data) {
+        const locationOptions = data.map((location) => ({
+          label: location.name,
+          value: location.id,
+        }));
+        return { data: locationOptions, error };
+      }
+      return { data, error };
+    });
 
-  if (!locations) {
-    throw new Error("No Locations Found");
-  }
-
-  const locationOptions = locations.map((location) => ({
-    label: location.name,
-    value: location.id,
-  }));
-
-  return json({ projectId, locationOptions });
-}
-
-export async function action({ request, params }: ActionFunctionArgs) {
-  const projectId = params.projectId;
-
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
-
-  const submission = parseWithZod(formData, {
-    schema: SiteSchema,
-  });
-
-  if (submission.status !== "success") {
+    return defer({
+      error: null,
+      projectId,
+      locationOptionsPromise,
+    });
+  } catch (error) {
     return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      {
+        error,
+        projectId,
+        locationOptionsPromise: null,
+      },
+      { status: 500 },
     );
   }
+}
 
-  const { status, error } = await createSite({
-    supabase,
-    data: submission.value as any,
-  });
+export async function action({
+  request,
+  params,
+}: ActionFunctionArgs): Promise<Response> {
+  const projectId = params.projectId;
 
-  if (isGoodStatus(status)) {
-    return safeRedirect(`/projects/${projectId}/sites`, { status: 303 });
+  try {
+    if (!projectId) throw new Error("No projectId provided");
+
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
+
+    const submission = parseWithZod(formData, {
+      schema: SiteSchema,
+    });
+
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+
+    const { status, error } = await createSite({
+      supabase,
+      data: submission.value as any,
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Site created successfully",
+        error: null,
+        returnTo: `/projects/${projectId}/sites`,
+      });
+    }
+    return json(
+      {
+        status: "error",
+        message: "Site creation failed",
+        error,
+        returnTo: `/projects/${projectId}/sites`,
+      },
+      { status: 500 },
+    );
+  } catch (error) {
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+        returnTo: `/projects/${projectId}/sites`,
+      },
+      { status: 500 },
+    );
   }
-  return json({ status, error });
 }
 
 export default function CreateSite({
   updateValues,
-  locationOptionsFromUpdate,
 }: {
   updateValues?: SiteDatabaseUpdate | null;
-  locationOptionsFromUpdate: ComboboxSelectOption[];
 }) {
-  const { projectId, locationOptions } = useLoaderData<typeof loader>();
-  const SITE_TAG = updateValues ? UPDATE_SITE : CREATE_SITE;
-
-  const initialValues = updateValues ?? getInitialValueFromZod(SiteSchema);
-  const [resetKey, setResetKey] = useState(Date.now());
-
-  const [form, fields] = useForm({
-    id: SITE_TAG,
-    constraint: getZodConstraint(SiteSchema),
-    onValidate({ formData }) {
+  const { projectId, locationOptionsPromise, error } =
+    useLoaderData<typeof loader>();
+    const actionData = useActionData<typeof action>();
+    const SITE_TAG = updateValues ? UPDATE_SITE : CREATE_SITE;
+    
+    const initialValues = updateValues ?? getInitialValueFromZod(SiteSchema);
+    const [resetKey, setResetKey] = useState(Date.now());
+    
+    const [form, fields] = useForm({
+      id: SITE_TAG,
+      constraint: getZodConstraint(SiteSchema),
+      onValidate({ formData }) {
       return parseWithZod(formData, { schema: SiteSchema });
     },
     shouldValidate: "onInput",
@@ -121,6 +174,30 @@ export default function CreateSite({
       project_id: initialValues.project_id ?? projectId,
     },
   });
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    if (actionData) {
+      if (actionData?.status === "success") {
+        toast({
+          title: "Success",
+          description: actionData.message,
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: actionData.error,
+          variant: "destructive",
+        });
+      }
+      navigate(actionData.returnTo);
+    }
+  }, [actionData]);
+
+  if (error)
+    return <ErrorBoundary error={error} message="Failed to create site" />;
 
   return (
     <section className="md:px-20 lg:px-28 2xl:px-40 py-4">
@@ -167,21 +244,20 @@ export default function CreateSite({
                   }}
                   errors={fields.site_code.errors}
                 />
-                <SearchableSelectField
-                  key={resetKey}
-                  className="capitalize"
-                  options={locationOptionsFromUpdate ?? locationOptions}
-                  inputProps={{
-                    ...getInputProps(fields.company_location_id, {
-                      type: "text",
-                    }),
-                  }}
-                  placeholder={"Select Company Location"}
-                  labelProps={{
-                    children: "Company Location",
-                  }}
-                  errors={fields.company_location_id.errors}
-                />
+                <Suspense fallback={<div>Loading...</div>}>
+                  <Await resolve={locationOptionsPromise}>
+                    {(resolvedData) => {
+                      if(!resolvedData) return <ErrorBoundary message="Failed to load locations" />
+                      return(
+                      <LocationsListWrapper
+                        data={resolvedData.data}
+                        error={resolvedData.error}
+                        fields={fields}
+                        resetKey={resetKey}
+                      />
+                    )}}
+                  </Await>
+                </Suspense>
               </div>
               <CheckboxField
                 buttonProps={getInputProps(fields.is_active, {
