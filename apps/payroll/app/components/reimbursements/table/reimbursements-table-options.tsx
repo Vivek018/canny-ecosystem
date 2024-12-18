@@ -3,22 +3,29 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuSeparator,
 } from "@canny_ecosystem/ui/dropdown-menu";
 
 import { useNavigate } from "@remix-run/react";
+import { DeleteReimbursement } from "./delete_reimbursement";
 
 export const ReimbursementOptionsDropdown = ({
-  id,
+  reimbursementId,
+  employeeId,
   triggerChild,
+  isEmployeeRoute = false,
 }: {
-  id: string;
-
+  reimbursementId: string;
+  employeeId:string;
   triggerChild: React.ReactElement;
+  isEmployeeRoute?: boolean;
 }) => {
   const navigate = useNavigate();
 
   const handleEdit = () => {
-    navigate(`/approvals/reimbursements/${id}/add-reimbursements`);
+    navigate(
+      isEmployeeRoute ? `/employees/${employeeId}/reimbursements/${reimbursementId}/update-reimbursements` : `/approvals/reimbursements/${reimbursementId}/update-reimbursements`
+    );
   };
 
   return (
@@ -27,8 +34,10 @@ export const ReimbursementOptionsDropdown = ({
       <DropdownMenuContent sideOffset={10} align="end">
         <DropdownMenuGroup>
           <DropdownMenuItem onClick={handleEdit}>
-            Add Reimbursement
+            Update Reimbursement
           </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DeleteReimbursement isEmployeeRoute={isEmployeeRoute} id={reimbursementId} employeeId={employeeId}/>
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>

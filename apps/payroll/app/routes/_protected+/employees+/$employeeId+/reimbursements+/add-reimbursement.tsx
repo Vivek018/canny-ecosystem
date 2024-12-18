@@ -11,7 +11,7 @@ import {
   replaceUnderscore,
   transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
-import { getEmployeeById } from "@canny_ecosystem/supabase/queries";
+
 import {
   FormProvider,
   getFormProps,
@@ -31,35 +31,36 @@ import {
   SearchableSelectField,
 } from "@canny_ecosystem/ui/forms";
 import { FormButtons } from "@/components/form/form-buttons";
-
-import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { createReimbursementsFromData } from "@canny_ecosystem/supabase/mutations";
+import type { ReimbursementsUpdate } from "@canny_ecosystem/supabase/types";
+import { UPDATE_REIMBURSEMENTS_TAG } from "../../../approvals+/reimbursements+/$reimbursementId.update-reimbursements";
+import { getUsers } from "@canny_ecosystem/supabase/queries";
+import { useState } from "react";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
-
-export const UPDATE_USER_TAG = "Update User";
+export const ADD_REIMBURSEMENTS_TAG = "Add Reimbursements";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
+  const employeeId = params.employeeId;
 
-  const employeeId = params.id??"";
-
-  const { data, error } = await getEmployeeById({
-    supabase,
-
-    id: employeeId,
-  });
-
-  if (error) {
-    throw error;
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+  const { data: userData, error: userError } = await getUsers({ supabase });
+  if (userError || !userData) {
+    throw userError;
   }
 
-  return json({ data });
+  const userOptions = userData.map((userData) => ({
+    label: userData.email?.toLowerCase(),
+    value: userData.id,
+  }));
+
+  return json({ userOptions, companyId, employeeId });
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const employeeId = params.id;
+  const employeeId = params.employeeId;
   const formData = await request.formData();
   const submission = parseWithZod(formData, { schema: ReimbursementSchema });
 
@@ -69,32 +70,52 @@ export async function action({ request, params }: ActionFunctionArgs) {
       { status: submission.status === "error" ? 400 : 200 }
     );
   }
-  const reimbursementData={company_id:companyId, employee_id:employeeId,...submission.value as any}
-  
-  
-    const { status, error } = await createReimbursementsFromData({
-      supabase,
-      data: reimbursementData,
+  const reimbursementData = submission.value;
+
+  const { status, error } = await createReimbursementsFromData({
+    supabase,
+    data: reimbursementData,
+  });
+
+  if (isGoodStatus(status))
+    return safeRedirect(`/employees/${employeeId}/reimbursements`, {
+      status: 303,
     });
 
-    if (isGoodStatus(status))
-      return safeRedirect("/approvals/reimbursements", { status: 303 });
-
-    return json({ status, error });
+  return json({ status, error });
 }
 
-export default function AddReimbursements() {
-  const { data } = useLoaderData<typeof loader>();
+export default function AddReimbursements({
+  updateValues,
+  userOptionsFromUpdate,
+}: {
+  reimbursementId?: string;
+  updateValues?: ReimbursementsUpdate | null;
+  userOptionsFromUpdate?: any;
+}) {
+  const [resetKey, setResetKey] = useState(Date.now());
+  const { userOptions, employeeId, companyId } = useLoaderData<typeof loader>();
 
-  const initialValues = data ?? getInitialValueFromZod(ReimbursementSchema);
+  const REIMBURSEMENTS_TAG = updateValues
+    ? UPDATE_REIMBURSEMENTS_TAG
+    : ADD_REIMBURSEMENTS_TAG;
+
+  const initialValues =
+    updateValues ?? getInitialValueFromZod(ReimbursementSchema);
+
   const [form, fields] = useForm({
+    id: REIMBURSEMENTS_TAG,
     constraint: getZodConstraint(ReimbursementSchema),
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: ReimbursementSchema });
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
-    defaultValue: initialValues,
+    defaultValue: {
+      ...initialValues,
+      company_id: initialValues.company_id ?? companyId,
+      employee_id: initialValues.employee_id ?? employeeId,
+    },
   });
 
   return (
@@ -103,44 +124,27 @@ export default function AddReimbursements() {
         <Form method="POST" {...getFormProps(form)} className="flex flex-col">
           <Card>
             <CardHeader>
-              <CardTitle>Add Reimbursements</CardTitle>
+              <CardTitle>
+                {REIMBURSEMENTS_TAG === "Add Reimbursements"
+                  ? "Add Reimbursement"
+                  : "Update Reimbursement"}
+              </CardTitle>
               <CardDescription className="">
-                You can add reimbursements by filling this form
+                {REIMBURSEMENTS_TAG === "Add Reimbursements"
+                  ? "You can add reimbursements by filling this form"
+                  : "You can update reimbursements by filling this form"}
               </CardDescription>
             </CardHeader>
             <CardContent>
-              
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mb-10">
-                <Field
-                  inputProps={{
-                    ...getInputProps(fields.first_name, { type: "text" }),
-                    placeholder: `Enter ${replaceUnderscore(
-                      fields.first_name.name
-                    )}`,
-                    className: "capitalize",
-                    readOnly: true,
-                    disabled:true
-                  }}
-                  labelProps={{
-                    children: replaceUnderscore(fields.first_name.name),
-                  }}
-                />
-                <Field
-                  inputProps={{
-                    ...getInputProps(fields.last_name, { type: "text" }),
-
-                    placeholder: `Enter ${replaceUnderscore(
-                      fields.last_name.name
-                    )}`,
-                    className: "capitalize",
-                    readOnly: true,
-                    disabled:true
-                  }}
-                  labelProps={{
-                    children: replaceUnderscore(fields.last_name.name),
-                  }}
-                />
+              <div className="flex justify-center items-center mt-5">
+                <span className="text-primary">{}</span>
               </div>
+              <input
+                {...getInputProps(fields.company_id, { type: "hidden" })}
+              />
+              <input
+                {...getInputProps(fields.employee_id, { type: "hidden" })}
+              />
               <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10">
                 <Field
                   inputProps={{
@@ -153,9 +157,11 @@ export default function AddReimbursements() {
                   labelProps={{
                     children: replaceUnderscore(fields.submitted_date.name),
                   }}
+                  errors={fields.submitted_date.errors}
                 />
                 <SearchableSelectField
-                  className="w-full capitalize flex-1"
+                  key={resetKey}
+                  className="w-full capitalize flex-1 "
                   options={transformStringArrayIntoOptions(
                     ReimbursementStatusArray as unknown as string[]
                   )}
@@ -165,33 +171,42 @@ export default function AddReimbursements() {
                   placeholder={`Select ${replaceUnderscore(
                     fields.status.name
                   )}`}
+                  labelProps={{
+                    children: "Status",
+                  }}
                   errors={fields.status.errors}
                 />
               </div>
               <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10">
                 <Field
                   inputProps={{
-                    ...getInputProps(fields.claimed_amount, {
+                    ...getInputProps(fields.amount, {
                       type: "number",
                     }),
-
+                    placeholder: `Enter ${replaceUnderscore(
+                      fields.amount.name
+                    )}`,
                     className: "",
                   }}
                   labelProps={{
-                    children: replaceUnderscore(fields.claimed_amount.name),
+                    children: replaceUnderscore(fields.amount.name),
                   }}
+                  errors={fields.amount.errors}
                 />
-                <Field
+                <SearchableSelectField
+                  key={resetKey + 1}
                   inputProps={{
-                    ...getInputProps(fields.approved_amount, {
-                      type: "number",
+                    ...getInputProps(fields.user_id, {
+                      type: "text",
                     }),
-
-                    className: "",
+                    placeholder: "Select an authority that approved",
                   }}
+                  className="lowercase"
+                  options={userOptions ?? userOptionsFromUpdate}
                   labelProps={{
-                    children: replaceUnderscore(fields.approved_amount.name),
+                    children: "Approved By",
                   }}
+                  errors={fields.user_id.errors}
                 />
               </div>
 
@@ -206,7 +221,11 @@ export default function AddReimbursements() {
               />
             </CardContent>
 
-            <FormButtons form={form} isSingle={true} />
+            <FormButtons
+              form={form}
+              setResetKey={setResetKey}
+              isSingle={true}
+            />
           </Card>
         </Form>
       </FormProvider>

@@ -13,9 +13,9 @@ export const ReimbursementsColumnIdArray = [
   "employee_name",
   "submitted_date",
   "status",
-  "claimed_amount",
-  "approved_amount",
-  "is_deductible"
+  "amount",
+  "is_deductible",
+  "user_id"
 ];
 
 export function ReimbursementsTableHeader({

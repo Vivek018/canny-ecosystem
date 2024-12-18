@@ -1,4 +1,8 @@
-import type{ ReimbursementInsert, ReimbursementsUpdate, TypedSupabaseClient } from "../types";
+import type {
+  ReimbursementInsert,
+  ReimbursementsUpdate,
+  TypedSupabaseClient,
+} from "../types";
 
 export async function createReimbursementsFromData({
   supabase,
@@ -20,21 +24,19 @@ export async function createReimbursementsFromData({
   return { status, error };
 }
 
-export async function updateReimbursementsByEmployeeId({employee_id,
+export async function updateReimbursementsById({
+  reimbursementId,
   supabase,
   data,
 }: {
-  employee_id: number;
+  reimbursementId: string;
   supabase: TypedSupabaseClient;
   data: ReimbursementsUpdate;
 }) {
-  
-  
-
   const { error, status } = await supabase
     .from("reimbursements")
     .update(data)
-    .eq("employee_id", employee_id ?? "")
+    .eq("id", reimbursementId ?? "")
     .single();
 
   if (error) {
@@ -42,4 +44,28 @@ export async function updateReimbursementsByEmployeeId({employee_id,
   }
 
   return { error, status };
+}
+
+export async function deleteReimbursementById({
+  supabase,
+  id,
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+}) {
+  const { error, status } = await supabase
+    .from("reimbursements")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    console.error("Error deleting user:", error);
+    return { status, error };
+  }
+
+  if (status < 200 || status >= 300) {
+    console.error("Unexpected Supabase status:", status);
+  }
+
+  return { status, error: null };
 }

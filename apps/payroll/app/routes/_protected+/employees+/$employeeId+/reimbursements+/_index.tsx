@@ -1,57 +1,66 @@
 import { reimbursementsColumns } from "@/components/reimbursements/table/columns";
 import { ReimbursementsTable } from "@/components/reimbursements/table/reimbursements-table";
-import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { LAZY_LOADING_LIMIT } from "@canny_ecosystem/supabase/constant";
-import { getReimbursementsByCompanyId } from "@canny_ecosystem/supabase/queries";
+import { getReimbursementsByEmployeeId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
+import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json, useLoaderData } from "@remix-run/react";
+import { json, Link, useLoaderData } from "@remix-run/react";
 import { useEffect, useState } from "react";
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+export const UPDATE_REIMBURSEMENTS_TAG = "Update Reimbursements";
 
-  const { data: reimbursementData, error: reimbursementError } =
-    await getReimbursementsByCompanyId({
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  const employeeId = params.employeeId;
+  const { supabase } = getSupabaseWithHeaders({ request });
+  let reimbursementData = null;
+
+  if (employeeId) {
+    const { data, error } = await getReimbursementsByEmployeeId({
       supabase,
-      companyId,
+      employeeId: employeeId,
       from: 0,
       to: LAZY_LOADING_LIMIT - 1,
     });
-  if (reimbursementError || !reimbursementData) {
-    throw reimbursementError;
+
+    if (error) {
+      throw error;
+    }
+
+    reimbursementData = data;
   }
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
-
-  return json({ reimbursementData, env, companyId });
+  return json({ data: reimbursementData, env, employeeId });
 }
 
-export default function Reimbursements() {
-  const { reimbursementData, env, companyId } = useLoaderData<typeof loader>();
+export default function ReimbursementsIndex() {
+  const { data, env, employeeId } = useLoaderData<typeof loader>();
 
   const [searchString, setSearchString] = useState("");
-  const [tableData, setTableData] = useState(reimbursementData);
+  const [tableData, setTableData] = useState(data);
+
   const [hasData, setHasData] = useState(true);
+
   useEffect(() => {
-    const filteredData = reimbursementData.filter((item) =>
+    const filteredData = data?.filter((item) =>
       Object.values(item).some((value) =>
         String(value).toLowerCase().includes(searchString.toLowerCase())
       )
     );
-    setTableData(filteredData);
-    setHasData(false);
-  }, [searchString, reimbursementData]);
+    setTableData(filteredData!);
+    setHasData(true);
+  }, [searchString, data]);
 
   return (
     <section className="m-4">
       <div className="w-full flex items-center justify-between pb-4">
-        <div className="w-full  flex justify-between items-center">
+        <div className="w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4">
           <div className="relative w-96">
             <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
               <Icon
@@ -67,15 +76,25 @@ export default function Reimbursements() {
               className="pl-8 h-10 w-full focus-visible:ring-0"
             />
           </div>
+          <Link
+            to={"add-reimbursement"}
+            className={cn(
+              buttonVariants({ variant: "primary-outline" }),
+              "flex items-center gap-1"
+            )}
+          >
+            <span>Add</span>
+            <span className="hidden md:flex justify-end">Claim</span>
+          </Link>
         </div>
       </div>
       <ReimbursementsTable
         data={tableData as any}
-        columns={reimbursementsColumns({})}
+        columns={reimbursementsColumns({ isEmployeeRoute: true })}
         hasNextPage={hasData}
         pageSize={LAZY_LOADING_LIMIT}
         env={env}
-        companyId={companyId}
+        employeeId={employeeId}
       />
     </section>
   );

@@ -648,12 +648,14 @@ export const UpdateSiteLinkSchema = z.object({
 export const ReimbursementStatusArray = ["pending", "approved"] as const;
 
 export const ReimbursementSchema = z.object({
-  
   first_name: zString.optional(),
   last_name: zString.optional(),
   submitted_date: z.string(),
   status: z.enum(ReimbursementStatusArray),
-  claimed_amount: zNumber,
-  approved_amount: zNumber,
+  amount: zNumber,
+  user_id:z.string().optional(),
   is_deductible: z.boolean().optional().default(false),
+  company_id:z.string(),
+  employee_id:z.string(),
+
 });

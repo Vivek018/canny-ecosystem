@@ -1,6 +1,5 @@
 import { SecondaryMenu } from "@canny_ecosystem/ui/secondary-menu";
-import { Outlet, useLocation,Link} from "@remix-run/react";
-
+import { Outlet, useLocation, Link } from "@remix-run/react";
 
 export default function Approvals() {
   const { pathname } = useLocation();
@@ -13,10 +12,7 @@ export default function Approvals() {
               label: "Reimbursements",
               path: "/approvals/reimbursements",
             },
-            {
-              label: "Advances",
-              path: "/approvals/advances",
-            },
+
             {
               label: "Exits",
               path: "/approvals/exits",

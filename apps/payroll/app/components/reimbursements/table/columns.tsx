@@ -2,16 +2,33 @@ import { Button } from "@canny_ecosystem/ui/button";
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { ReimbursementOptionsDropdown } from "./reimbursements-table-options";
+import type { ReimbursementRow } from "@canny_ecosystem/supabase/types";
+import type { ColumnDef } from "@tanstack/react-table";
 
-export const ReimbursementsColumns = [
+export type ReimbursementType = {
+  id: ReimbursementRow["id"] | string;
+
+  employee_name: ReimbursementRow | string;
+  submitted_date: ReimbursementRow["submitted_date"] | string;
+  status: ReimbursementRow["status"] | string;
+  amount: ReimbursementRow["amount"] | string;
+  is_deductible: ReimbursementRow["is_deductible"] | string;
+  user_id: ReimbursementRow["user_id"] | number;
+};
+
+export const reimbursementsColumns = ({
+  isEmployeeRoute = false,
+}: {
+  isEmployeeRoute?: boolean;
+}): ColumnDef<ReimbursementType>[] => [
   {
     accessorKey: "employee_name",
     header: "Employee Name",
     cell: ({ row }) => {
       return (
         <p className="truncate capitalize w-48">{`${
-          row.original?.first_name ?? "--"
-        } ${row.original?.last_name ?? "--"}`}</p>
+          row.original?.employees.first_name ?? "--"
+        } ${row.original?.employees.last_name ?? "--"}`}</p>
       );
     },
   },
@@ -29,28 +46,24 @@ export const ReimbursementsColumns = [
     header: "Status",
     cell: ({ row }) => {
       return (
-        <p className="truncate capitalize ">{row.original?.status ?? "--"}</p>
+        <p className="truncate capitalize ">
+          {row.original?.status
+            ? row.original.status.toLowerCase() === "pending"
+              ? `${row.original.status}`
+              : row.original.status
+            : "--"}
+        </p>
       );
     },
   },
   {
-    accessorKey: "claimed_amount",
-    header: "Claim Amount",
+    accessorKey: "amount",
+    header: "Amount",
     cell: ({ row }) => {
-      return (
-        <p className=" truncate">{row.original?.claimed_amount ?? "--"}</p>
-      );
+      return <p className=" truncate">{row.original?.amount ?? "--"}</p>;
     },
   },
-  {
-    accessorKey: "approved_amount",
-    header: "Aprroved Amount",
-    cell: ({ row }) => {
-      return (
-        <p className="truncate">{row.original?.approved_amount ?? "--"}</p>
-      );
-    },
-  },
+
   {
     accessorKey: "is_deductible",
     header: "Is Deductible",
@@ -66,6 +79,13 @@ export const ReimbursementsColumns = [
       );
     },
   },
+  {
+    accessorKey: "user_id",
+    header: "Approved By",
+    cell: ({ row }) => {
+      return <p className=" truncate">{row.original?.users?.email ?? "--"}</p>;
+    },
+  },
 
   {
     id: "actions",
@@ -75,7 +95,9 @@ export const ReimbursementsColumns = [
       return (
         <ReimbursementOptionsDropdown
           key={row.original.id}
-          id={row.original.id}
+          reimbursementId={row.original.id}
+          employeeId={row.original?.employees.id}
+          isEmployeeRoute={isEmployeeRoute}
           triggerChild={
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
