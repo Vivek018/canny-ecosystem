@@ -12,18 +12,19 @@ import { TableCell, TableRow } from "@canny_ecosystem/ui/table";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { flexRender } from "@tanstack/react-table";
 
-export function PayrollSheet({row, rowData}:{row:any, rowData:any}) {
+export function PayrollSheet({ row, rowData }: { row: any; rowData: any }) {
+  
   return (
-    <Sheet >
+    <Sheet>
       <SheetTrigger asChild>
         <TableRow key={row.id} className="relative  cursor-pointer select-text">
-          {row.getVisibleCells().map((cell:any) => (
+          {row.getVisibleCells().map((cell: any) => (
             <TableCell
               key={cell.id}
               className={cn(
                 " px-3 md:px-4 py-2 hidden md:table-cell",
                 cell.column.id === "name" &&
-                  "sticky left-0 min-w-12 max-w-12 bg-card z-10"
+                  "sticky left-0 min-w-12 max-w-12 bg-card z-10",
               )}
             >
               {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -106,11 +107,7 @@ export function PayrollSheet({row, rowData}:{row:any, rowData:any}) {
         </div>
         <SheetFooter className="my-20">
           <SheetClose asChild>
-            <Button
-              className=""
-              type="submit"
-              onClick={() => {}}
-            >
+            <Button className="" type="submit" onClick={() => {}}>
               Save changes
             </Button>
           </SheetClose>

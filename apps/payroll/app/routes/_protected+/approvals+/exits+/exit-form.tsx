@@ -72,7 +72,7 @@ export async function action({ request }: ActionFunctionArgs) {
       const page2Data = submission.value;
 
       const data = { ...page1Data, ...page2Data };
-      console.log(data);
+
       for (let i = 1; i <= totalSteps; i++) {
         session.unset(`${SESSION_KEY_PREFIX}${i}`);
       }

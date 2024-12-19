@@ -5,53 +5,50 @@ import {
   TableCell,
   TableRow,
 } from "@canny_ecosystem/ui/table";
-import { Spinner } from "@canny_ecosystem/ui/spinner";
 import {
   type ColumnDef,
-  type VisibilityState,
-  flexRender,
   getCoreRowModel,
   useReactTable,
+  type VisibilityState,
 } from "@tanstack/react-table";
-import { useEffect } from "react";
-import { useState } from "react";
-import { DataTableHeader } from "./data-table-header";
-import { useEmployeesStore } from "@/store/employees";
-import { useInView } from "react-intersection-observer";
-import { useSearchParams } from "@remix-run/react";
+import { ExitPaymentTableHeader } from "./data-table-header";
+import { ExitPaymentsSheet } from "@/components/exits/exit_payments_sheet";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
-import { useSupabase } from "@canny_ecosystem/supabase/client";
 import {
-  type EmployeeFilters,
-  getEmployeesByCompanyId,
+  type ExitFilterType,
+  getExits,
 } from "@canny_ecosystem/supabase/queries";
+import { useState, useEffect } from "react";
+import { useSupabase } from "@canny_ecosystem/supabase/client";
+import { useInView } from "react-intersection-observer";
+import { useEmployeesStore } from "@/store/employees";
+import { Spinner } from "@canny_ecosystem/ui/spinner";
+import { useSearchParams } from "@remix-run/react";
 import { Button } from "@canny_ecosystem/ui/button";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   count: number;
-  hasNextPage: boolean;
   query?: string | null;
-  filters?: EmployeeFilters;
+  filters?: ExitFilterType;
   noFilters?: boolean;
+  hasNextPage: boolean;
   pageSize: number;
   initialColumnVisibility?: VisibilityState;
-  companyId: string;
   env: SupabaseEnv;
 }
 
-export function DataTable<TData, TValue>({
-  columns,
+export function ExitPaymentTable<TData, TValue>({
   data: initialData,
+  columns,
   count,
   query,
   filters,
   noFilters,
-  pageSize,
   hasNextPage: initialHasNextPage,
+  pageSize,
   initialColumnVisibility,
-  companyId,
   env,
 }: DataTableProps<TData, TValue>) {
   const [data, setData] = useState(initialData);
@@ -64,18 +61,16 @@ export function DataTable<TData, TValue>({
   const { rowSelection, setRowSelection, setColumns } = useEmployeesStore();
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    initialColumnVisibility ?? {}
+    initialColumnVisibility ?? {},
   );
 
   const loadMoreEmployees = async () => {
     const formattedFrom = from;
     const to = formattedFrom + pageSize;
     const sortParam = searchParams.get("sort");
-    
     try {
-      const { data } = await getEmployeesByCompanyId({
+      const { data } = await getExits({
         supabase,
-        companyId,
         params: {
           from: from,
           to: to,
@@ -125,86 +120,53 @@ export function DataTable<TData, TValue>({
   const tableLength = table.getRowModel().rows?.length;
 
   return (
-    <div className='relative mb-8'>
+    <div className="relative mb-8">
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
-          !tableLength && "border-none"
+          !tableLength && "border-none",
         )}
       >
-        <div className='relative'>
+        <div className="relative">
           <Table>
-            <DataTableHeader
+            <ExitPaymentTableHeader
               table={table}
               className={cn(!tableLength && "hidden")}
             />
             <TableBody>
               {tableLength ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                    className='relative h-[40px] md:h-[45px] cursor-default select-text'
-                  >
-                    {row.getVisibleCells().map((cell) => {
-                      return (
-                        <TableCell
-                          key={cell.id}
-                          className={cn(
-                            "px-3 md:px-4 py-2",
-                            (cell.column.id === "select" ||
-                              cell.column.id === "employee_code" ||
-                              cell.column.id === "full_name" ||
-                              cell.column.id === "primary_mobile_number" ||
-                              cell.column.id === "date_of_birth" ||
-                              cell.column.id === "education" ||
-                              cell.column.id === "gender" ||
-                              cell.column.id === "is_active") &&
-                              "hidden md:table-cell",
-                            cell.column.id === "select" &&
-                              "sticky left-0 min-w-12 max-w-12 bg-card z-10",
-                            cell.column.id === "employee_code" &&
-                              "sticky left-12 bg-card z-10",
-                            cell.column.id === "full_name" &&
-                              "sticky left-48 bg-card z-10",
-                            cell.column.id === "actions" &&
-                              "sticky right-0 min-w-20 max-w-20 bg-card z-10"
-                          )}
-                        >
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                ))
+                table.getRowModel().rows.map((row) => {
+                  const rowData = row.original;
+
+                  return (
+                    <ExitPaymentsSheet
+                      key={row.id}
+                      row={row}
+                      rowData={rowData}
+                    />
+                  );
+                })
               ) : (
-                <TableRow
-                  className={cn("flex flex-col", !tableLength && "border-none")}
-                >
+                <TableRow className={cn(!tableLength && "border-none")}>
                   <TableCell
                     colSpan={columns.length}
-                    className={cn(
-                      "h-96 bg-background grid place-items-center text-center tracking-wide"
-                    )}
+                    className="h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize"
                   >
-                    <div className='flex flex-col items-center gap-1'>
-                      <h2 className='text-xl'>No employees found.</h2>
+                    <div className="flex flex-col items-center gap-1">
+                      <h2 className="text-xl">No Exit Payment Fields Found.</h2>
                       <p
                         className={cn(
                           "text-muted-foreground",
-                          !data?.length && noFilters && "hidden"
+                          !data?.length && noFilters && "hidden",
                         )}
                       >
                         Try another search, or adjusting the filters
                       </p>
                       <Button
-                        variant='outline'
+                        variant="outline"
                         className={cn(
                           "mt-4",
-                          !data?.length && noFilters && "hidden"
+                          !data?.length && noFilters && "hidden",
                         )}
                         onClick={() => {
                           setSearchParams();
@@ -222,10 +184,10 @@ export function DataTable<TData, TValue>({
       </div>
 
       {hasNextPage && (
-        <div className='flex items-center justify-center mt-6' ref={ref}>
-          <div className='flex items-center space-x-2 px-6 py-5'>
+        <div className="flex items-center justify-center mt-6" ref={ref}>
+          <div className="flex items-center space-x-2 px-6 py-5">
             <Spinner />
-            <span className='text-sm text-[#606060]'>Loading more...</span>
+            <span className="text-sm text-[#606060]">Loading more...</span>
           </div>
         </div>
       )}

@@ -226,13 +226,22 @@ export type PaymentTemplateComponentsDatabaseInsert =
 export type PaymentTemplateComponentsDatabaseUpdate =
   Database["public"]["Tables"]["payment_template_components"]["Update"];
 
-
-// Reimbursement 
+// Reimbursement
 
 export type ReimbursementInsert =
   Database["public"]["Tables"]["reimbursements"]["Insert"];
-  export type ReimbursementRow =
+export type ReimbursementRow =
   Database["public"]["Tables"]["reimbursements"]["Row"];
-  export type ReimbursementsUpdate =
+export type ReimbursementsUpdate =
   Database["public"]["Tables"]["reimbursements"]["Update"];
- 
+
+export type ExitsRow = Database["public"]["Tables"]["exits"]["Row"];
+export type ExitsInsert = Database["public"]["Tables"]["exits"]["Insert"];
+export type ExitsUpdate = Database["public"]["Tables"]["exits"]["Update"];
+
+export type ExitPaymentsRow =
+  Database["public"]["Tables"]["exit_payments"]["Row"];
+export type ExitPaymentsInsert =
+  Database["public"]["Tables"]["exit_payments"]["Insert"];
+export type ExitPaymentsUpdate =
+  Database["public"]["Tables"]["exit_payments"]["Update"];
