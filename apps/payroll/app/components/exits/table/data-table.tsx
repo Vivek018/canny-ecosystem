@@ -61,7 +61,7 @@ export function ExitPaymentTable<TData, TValue>({
   const { rowSelection, setRowSelection, setColumns } = useEmployeesStore();
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    initialColumnVisibility ?? {},
+    initialColumnVisibility ?? {}
   );
 
   const loadMoreEmployees = async () => {
@@ -124,7 +124,7 @@ export function ExitPaymentTable<TData, TValue>({
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
-          !tableLength && "border-none",
+          !tableLength && "border-none"
         )}
       >
         <div className="relative">
@@ -157,7 +157,7 @@ export function ExitPaymentTable<TData, TValue>({
                       <p
                         className={cn(
                           "text-muted-foreground",
-                          !data?.length && noFilters && "hidden",
+                          !data?.length && noFilters && "hidden"
                         )}
                       >
                         Try another search, or adjusting the filters
@@ -166,7 +166,7 @@ export function ExitPaymentTable<TData, TValue>({
                         variant="outline"
                         className={cn(
                           "mt-4",
-                          !data?.length && noFilters && "hidden",
+                          !data?.length && noFilters && "hidden"
                         )}
                         onClick={() => {
                           setSearchParams();

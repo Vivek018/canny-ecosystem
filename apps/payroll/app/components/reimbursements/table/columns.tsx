@@ -8,10 +8,10 @@ import type {
   UserDatabaseRow,
 } from "@canny_ecosystem/supabase/types";
 import type { ColumnDef } from "@tanstack/react-table";
+import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 
 export type ReimbursementType = {
   id: ReimbursementRow["id"] | string;
-
   employee_name: Pick<EmployeeDatabaseRow, "id" | "first_name" | "last_name">;
   submitted_date: ReimbursementRow["submitted_date"] | string;
   status: ReimbursementRow["status"] | string;
@@ -26,6 +26,17 @@ export const reimbursementsColumns = ({
 }: {
   isEmployeeRoute?: boolean;
 }): ColumnDef<ReimbursementType>[] => [
+  {
+    id: "select",
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
   {
     accessorKey: "employee_name",
     header: "Employee Name",

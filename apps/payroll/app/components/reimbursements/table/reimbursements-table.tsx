@@ -22,7 +22,6 @@ import { useSupabase } from "@canny_ecosystem/supabase/client";
 import { Spinner } from "@canny_ecosystem/ui/spinner";
 
 interface DataTableProps<TData, TValue> {
-  
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   hasNextPage: boolean;
@@ -58,7 +57,6 @@ export function ReimbursementsTable<TData, TValue>({
           companyId,
           from,
           to,
-          
         });
         if (data) {
           setData((prevData: any) => [...prevData, ...data] as TData[]);
@@ -141,7 +139,13 @@ export function ReimbursementsTable<TData, TValue>({
                               (cell.getValue() === "approved"
                                 ? "text-green"
                                 : cell.getValue() === "pending" &&
-                                  "text-muted-foreground")
+                                  "text-muted-foreground"),
+                            cell.column.id === "select" &&
+                              "sticky left-0 min-w-12 max-w-12 bg-card z-10",
+                            cell.column.id === "actions" &&
+                              "sticky right-0 min-w-20 max-w-20 bg-card z-10",
+                            cell.column.id === "employee_name" &&
+                              " sticky left-12 min-w-20 max-w-36 bg-card z-10"
                           )}
                         >
                           {flexRender(

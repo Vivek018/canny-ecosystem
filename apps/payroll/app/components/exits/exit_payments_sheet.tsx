@@ -13,13 +13,16 @@ import { flexRender } from "@tanstack/react-table";
 export function ExitPaymentsSheet({
   row,
   rowData,
-}: { row: any; rowData: any }) {
+}: {
+  row: any;
+  rowData: any;
+}) {
   const paymentSummary = rowData.exit_payments?.reduce(
     (
       acc: Record<string, number>,
       payment: Omit<ExitPaymentsRow, "created_at" | "updated_at"> & {
         payment_fields: { name: string };
-      },
+      }
     ) => {
       const key = payment.payment_fields.name;
       const value = payment.amount;
@@ -29,7 +32,7 @@ export function ExitPaymentsSheet({
       acc.total += value;
       return acc;
     },
-    {},
+    {}
   );
 
   return (
@@ -46,9 +49,10 @@ export function ExitPaymentsSheet({
                 key={cell.id}
                 className={cn(
                   "px-3 md:px-4 py-4 hidden md:table-cell",
-                    cell.column.id === "select" &&
+                  cell.column.id === "select" &&
                     "sticky left-0 min-w-12 max-w-12 bg-card z-10",
-                  cell.column.id === "actions" && "sticky right-0 min-w-20 max-w-20 bg-card z-10",
+                  cell.column.id === "actions" &&
+                    "sticky right-0 min-w-20 max-w-20 bg-card z-10"
                 )}
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -60,8 +64,7 @@ export function ExitPaymentsSheet({
               <TableCell
                 className={cn(
                   "px-3 md:px-4 py-4 hidden md:table-cell",
-                  (
-                    cell.column.id === "last_working_day" ||
+                  (cell.column.id === "last_working_day" ||
                     cell.column.id === "final_working_day" ||
                     cell.column.id === "organization_payable_days" ||
                     cell.column.id === "employee_payable_days" ||
@@ -69,7 +72,7 @@ export function ExitPaymentsSheet({
                     cell.column.id === "note") &&
                     "hidden md:table-cell",
                   cell.column.id === "employee_name" &&
-                    "sticky left-12 bg-card z-10",
+                    "sticky left-12 bg-card z-10"
                 )}
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -84,7 +87,9 @@ export function ExitPaymentsSheet({
             <div>
               <h1 className="text-primary text-3xl">
                 {rowData.employee_name
-                  ? `${rowData.employee_name.first_name} ${rowData.employee_name.middle_name ?? ""} ${rowData.employee_name.last_name}`
+                  ? `${rowData.employee_name.first_name} ${
+                      rowData.employee_name.middle_name ?? ""
+                    } ${rowData.employee_name.last_name}`
                   : "--"}
               </h1>
             </div>
