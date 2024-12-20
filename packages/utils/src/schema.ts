@@ -653,7 +653,7 @@ export const ReimbursementSchema = z.object({
   last_name: zString.optional(),
   submitted_date: z.string(),
   status: z.enum(ReimbursementStatusArray),
-  amount: zNumber,
+  amount: zNumber.min(1).max(100000000),
   user_id:z.string().optional(),
   is_deductible: z.boolean().optional().default(false),
   company_id:z.string(),

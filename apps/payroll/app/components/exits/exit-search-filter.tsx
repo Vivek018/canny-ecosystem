@@ -177,7 +177,7 @@ export function ExitsSearchFilter({
             placeholder={
               disabled
                 ? "No Exits Data to Search And Filter"
-                : "Search Employees"
+                : "Search Exits"
             }
             disabled={disabled}
             className="pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70"

@@ -64,7 +64,7 @@ export function ExitPaymentTable<TData, TValue>({
     initialColumnVisibility ?? {}
   );
 
-  const loadMoreEmployees = async () => {
+  const loadMoreExit = async () => {
     const formattedFrom = from;
     const to = formattedFrom + pageSize;
     const sortParam = searchParams.get("sort");
@@ -107,7 +107,7 @@ export function ExitPaymentTable<TData, TValue>({
 
   useEffect(() => {
     if (inView) {
-      loadMoreEmployees();
+      loadMoreExit();
     }
   }, [inView]);
 
