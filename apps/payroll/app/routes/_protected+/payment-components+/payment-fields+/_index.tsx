@@ -28,7 +28,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function PaymentFieldsIndex() {
-  const { data } = useLoaderData<typeof loader>();
+  const { data } = useLoaderData<typeof loader>(); 
   
   const [searchString, setSearchString] = useState("");
   const [tableData, setTableData] = useState(data);

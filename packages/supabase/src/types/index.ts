@@ -87,6 +87,14 @@ export type EmployeeDatabaseInsert =
 export type EmployeeDatabaseUpdate =
   Database["public"]["Tables"]["employees"]["Update"];
 
+// Employees attendance
+export type EmployeeAttendanceDatabaseRow =
+  Database["public"]["Tables"]["employee_attendance"]["Row"];
+export type EmployeeAttendanceDatabaseInsert =
+  Database["public"]["Tables"]["employee_attendance"]["Insert"];
+export type EmployeeAttendanceDatabaseUpdate =
+  Database["public"]["Tables"]["employee_attendance"]["Update"];
+
 // Employee Statutory Details
 export type EmployeeStatutoryDetailsDatabaseRow =
   Database["public"]["Tables"]["employee_statutory_details"]["Row"];
@@ -225,3 +233,18 @@ export type PaymentTemplateComponentsDatabaseInsert =
   Database["public"]["Tables"]["payment_template_components"]["Insert"];
 export type PaymentTemplateComponentsDatabaseUpdate =
   Database["public"]["Tables"]["payment_template_components"]["Update"];
+
+// Payroll
+export type PayrollDatabaseRow = Database["public"]["Tables"]["payroll"]["Row"];
+export type PayrollDatabaseInsert =
+  Database["public"]["Tables"]["payroll"]["Insert"];
+export type PayrollDatabaseUpdate =
+  Database["public"]["Tables"]["payroll"]["Update"];
+
+// Reimbursement
+export type ReimbursementInsert =
+  Database["public"]["Tables"]["reimbursements"]["Insert"];
+export type ReimbursementRow =
+  Database["public"]["Tables"]["reimbursements"]["Row"];
+export type ReimbursementsUpdate =
+  Database["public"]["Tables"]["reimbursements"]["Update"];

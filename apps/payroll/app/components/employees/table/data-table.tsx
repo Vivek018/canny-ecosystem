@@ -21,10 +21,7 @@ import { useInView } from "react-intersection-observer";
 import { useSearchParams } from "@remix-run/react";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
-import {
-  type EmployeeFilters,
-  getEmployeesByCompanyId,
-} from "@canny_ecosystem/supabase/queries";
+import { type EmployeeFilters,getEmployeesByCompanyId} from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
 
 interface DataTableProps<TData, TValue> {

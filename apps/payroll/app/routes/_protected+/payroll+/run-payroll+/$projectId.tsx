@@ -1,7 +1,5 @@
-import { SiteCard } from "@/components/sites/site-card";
-import { getSitesByProjectId } from "@canny_ecosystem/supabase/queries";
+import { getPayrollBySiteId, getSitesWithEmployeeCountByProjectId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { buttonVariants } from "@canny_ecosystem/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -14,41 +12,43 @@ import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { replaceUnderscore } from "@canny_ecosystem/utils";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Link, Outlet, useLoaderData } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/react";
-import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import { PayrollStatus } from "@/components/payroll/payroll-status";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const projectId = params.projectId;
 
   const { supabase } = getSupabaseWithHeaders({ request });
 
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-
   if (!projectId) throw new Error("No Project Id");
 
-  const { data, error } = await getSitesByProjectId({supabase,projectId});
+  const { data: siteData, error: siteError } = await getSitesWithEmployeeCountByProjectId({ supabase, projectId });
+  
+  const newSiteData = await Promise.all(
+    (siteData ?? []).map(async (site:any) => {
+      const tmp = { ...site };
+      const { data } = await getPayrollBySiteId({ supabase, site_id: site.id });
+      tmp.is_approved = data ? (data.status === "approved") : false;
+      return tmp;
+    })
+  );
 
-  if (error) throw error;
+  if (siteError) throw siteError;
 
-  if (!data) throw new Error("No data found");
+  if (!newSiteData) throw new Error("No site data found");
 
-  const env = {
-    SUPABASE_URL: process.env.SUPABASE_URL!,
-    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
-  };
-
-  return json({ data, projectId, companyId, env });
+  return json({ data: newSiteData });
 }
 
-export async function action() { return null }
+export async function action() { return null; }
 
 export default function SitesIndex() {
-  const { data, projectId, companyId, env } = useLoaderData<typeof loader>();
+  const { data } = useLoaderData<typeof loader>();
   const { isDocument } = useIsDocument();
 
   return (
-    <section className='pb-4'>
+    <section className='p-4'>
       <div className='w-full flex items-end justify-between'>
         <Command className='overflow-visible'>
           <div className='w-full md:w-3/4 lg:w-1/2 2xl:w-1/3 py-4 flex items-center gap-4'>
@@ -57,16 +57,6 @@ export default function SitesIndex() {
               placeholder='Search Sites'
               autoFocus={true}
             />
-            <Link
-              to={`/projects/${projectId}/create-site`}
-              className={cn(
-                buttonVariants({ variant: "primary-outline" }),
-                "flex items-center gap-1"
-              )}
-            >
-              <span>Add</span>
-              <span className='hidden md:flex justify-end'>Site</span>
-            </Link>
           </div>
           <CommandEmpty
             className={cn(
@@ -77,9 +67,9 @@ export default function SitesIndex() {
             No site found.
           </CommandEmpty>
           <CommandList className='max-h-full py-2 overflow-x-visible overflow-y-visible'>
-            <CommandGroup className='p-0 overflow-visible'>
-              <div className='w-full grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4'>
-                {data?.map((site) => (
+            <CommandGroup className='w-full p-0 overflow-visible'>
+              <div className='flex-col'>
+                {data?.map((site :any) => (
                   <CommandItem
                     key={site.id}
                     value={
@@ -92,16 +82,15 @@ export default function SitesIndex() {
                       replaceUnderscore(site.state) +
                       site.pincode
                     }
-                    className='data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0'
+                    className='w-full data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0'
                   >
-                    <SiteCard site={site} env={env} companyId={companyId} />
+                    {!site.is_approved && <PayrollStatus data={site} />} 
                   </CommandItem>
                 ))}
               </div>
             </CommandGroup>
           </CommandList>
         </Command>
-        <Outlet/>
       </div>
     </section>
   );

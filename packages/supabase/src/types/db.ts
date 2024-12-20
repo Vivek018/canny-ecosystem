@@ -261,6 +261,56 @@ export type Database = {
           },
         ]
       }
+      employee_attendance: {
+        Row: {
+          created_at: string | null
+          date: string | null
+          employee_id: string | null
+          holiday: boolean | null
+          id: string
+          no_of_hours: number | null
+          present: boolean | null
+          site_id: string | null
+          total_working_days: number | null
+          updated_at: string | null
+          working_shift: Database["public"]["Enums"]["working_shift"] | null
+        }
+        Insert: {
+          created_at?: string | null
+          date?: string | null
+          employee_id?: string | null
+          holiday?: boolean | null
+          id?: string
+          no_of_hours?: number | null
+          present?: boolean | null
+          site_id?: string | null
+          total_working_days?: number | null
+          updated_at?: string | null
+          working_shift?: Database["public"]["Enums"]["working_shift"] | null
+        }
+        Update: {
+          created_at?: string | null
+          date?: string | null
+          employee_id?: string | null
+          holiday?: boolean | null
+          id?: string
+          no_of_hours?: number | null
+          present?: boolean | null
+          site_id?: string | null
+          total_working_days?: number | null
+          updated_at?: string | null
+          working_shift?: Database["public"]["Enums"]["working_shift"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_attendance_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "project_sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employee_bank_details: {
         Row: {
           account_holder_name: string | null
@@ -746,6 +796,101 @@ export type Database = {
           },
         ]
       }
+      exit_payments: {
+        Row: {
+          amount: number
+          created_at: string | null
+          exit_id: string
+          id: string
+          payment_fields_id: string
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          exit_id: string
+          id?: string
+          payment_fields_id: string
+          type?: string
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          exit_id?: string
+          id?: string
+          payment_fields_id?: string
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exit_payments_exit_id_fkey"
+            columns: ["exit_id"]
+            isOneToOne: false
+            referencedRelation: "exits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "exit_payments_payment_fields_id_fkey"
+            columns: ["payment_fields_id"]
+            isOneToOne: false
+            referencedRelation: "payment_fields"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      exits: {
+        Row: {
+          created_at: string | null
+          employee_id: string
+          employee_payable_days: number
+          final_settlement_date: string
+          id: string
+          last_working_day: string
+          note: string | null
+          organization_payable_days: number
+          reason: string
+          total: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          employee_id: string
+          employee_payable_days: number
+          final_settlement_date: string
+          id?: string
+          last_working_day: string
+          note?: string | null
+          organization_payable_days: number
+          reason: string
+          total?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          employee_id?: string
+          employee_payable_days?: number
+          final_settlement_date?: string
+          id?: string
+          last_working_day?: string
+          note?: string | null
+          organization_payable_days?: number
+          reason?: string
+          total?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exits_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       feedback: {
         Row: {
           category: Database["public"]["Enums"]["feedback_category"] | null
@@ -1127,6 +1272,105 @@ export type Database = {
           },
         ]
       }
+      payroll: {
+        Row: {
+          commission: number | null
+          created_at: string | null
+          id: string
+          run_date: string | null
+          site_id: string
+          status: Database["public"]["Enums"]["payroll_status"] | null
+          total_employees: number | null
+          total_net_amount: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          commission?: number | null
+          created_at?: string | null
+          id?: string
+          run_date?: string | null
+          site_id?: string
+          status?: Database["public"]["Enums"]["payroll_status"] | null
+          total_employees?: number | null
+          total_net_amount?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          commission?: number | null
+          created_at?: string | null
+          id?: string
+          run_date?: string | null
+          site_id?: string
+          status?: Database["public"]["Enums"]["payroll_status"] | null
+          total_employees?: number | null
+          total_net_amount?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payroll_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "company_locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payroll_entries: {
+        Row: {
+          amount: number | null
+          created_at: string | null
+          employee_id: string | null
+          id: string
+          payment_status: Database["public"]["Enums"]["payroll_status"] | null
+          payment_template_components_id: string | null
+          payroll_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string | null
+          employee_id?: string | null
+          id?: string
+          payment_status?: Database["public"]["Enums"]["payroll_status"] | null
+          payment_template_components_id?: string | null
+          payroll_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string | null
+          employee_id?: string | null
+          id?: string
+          payment_status?: Database["public"]["Enums"]["payroll_status"] | null
+          payment_template_components_id?: string | null
+          payroll_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payroll_entries_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payroll_entries_payment_template_components_id_fkey"
+            columns: ["payment_template_components_id"]
+            isOneToOne: false
+            referencedRelation: "payment_template_components"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payroll_entries_payroll_id_fkey"
+            columns: ["payroll_id"]
+            isOneToOne: false
+            referencedRelation: "payroll"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       professional_tax: {
         Row: {
           company_id: string
@@ -1325,6 +1569,67 @@ export type Database = {
           },
         ]
       }
+      reimbursements: {
+        Row: {
+          amount: number | null
+          company_id: string
+          created_at: string | null
+          employee_id: string
+          id: string
+          is_deductible: boolean | null
+          status: string | null
+          submitted_date: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount?: number | null
+          company_id: string
+          created_at?: string | null
+          employee_id: string
+          id?: string
+          is_deductible?: boolean | null
+          status?: string | null
+          submitted_date?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number | null
+          company_id?: string
+          created_at?: string | null
+          employee_id?: string
+          id?: string
+          is_deductible?: boolean | null
+          status?: string | null
+          submitted_date?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reimbursements_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reimbursements_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reimbursements_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       site_pay_sequence: {
         Row: {
           created_at: string
@@ -1477,6 +1782,7 @@ export type Database = {
       feedback_category: "suggestion" | "bug" | "complain"
       feedback_severity: "low" | "normal" | "urgent"
       payment_type: "fixed" | "variable"
+      payroll_status: "pending" | "approved"
       template_assignment_type: "employee" | "site"
       template_calculation_type: "variable" | "percentage_of_ctc"
       template_component_type:
@@ -1485,6 +1791,7 @@ export type Database = {
         | "statutory_contribution"
         | "bonus"
         | "other"
+      working_shift: "day" | "afternoon" | "night"
     }
     CompositeTypes: {
       salary_range_object: {

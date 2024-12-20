@@ -161,4 +161,4 @@ export function EmployeeDialog({ employee, env }: {
             </DialogContent>
         </Dialog>
     )
-}
+};

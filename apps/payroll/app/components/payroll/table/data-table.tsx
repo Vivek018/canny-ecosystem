@@ -1,28 +1,16 @@
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-} from "@canny_ecosystem/ui/table";
-import {
-  type ColumnDef,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+import { Table, TableBody, TableCell, TableRow } from "@canny_ecosystem/ui/table";
+import { type ColumnDef, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { PayrollTableHeader } from "./data-table-headers";
-
 import { PayrollSheet } from "../payroll-sheet";
 
 interface PayrollTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  editable:boolean;
 }
 
-export function PayrollDataTable<TData, TValue>({
-  columns,
-  data,
-}: PayrollTableProps<TData, TValue>) {
+export function PayrollDataTable<TData, TValue>({ columns, data, editable }: PayrollTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
@@ -48,9 +36,7 @@ export function PayrollDataTable<TData, TValue>({
             {tableLength ? (
               table.getRowModel().rows.map((row) => {
                 const rowData = row.original;
-                return (
-                  <PayrollSheet key={row.id} row={row} rowData={rowData} />
-                );
+                return <PayrollSheet key={row.id} row={row} rowData={rowData} editable={editable}/>
               })
             ) : (
               <TableRow className={cn(!tableLength && "border-none")}>

@@ -11,18 +11,14 @@ type Props = {
 // make sure the order is same as header order
 export const payrollFieldsColumnIdArray = [
   "name",
-  "paid_days",
-  "gross_pay",
-  "taxes",
-  "discount",
-  "bonus",
-  "email",
-  "mobile_number",
+  "employee_code",
+  "present_days",
+  "designation",
+  "rate",
   "reimbursements",
+  "gross_pay",
+  "deductions",
   "net_pay",
-  "company_name",
-  "site_name",
-  "area",
 ];
 
 export function PayrollTableHeader({ table, className, loading }: Props) {

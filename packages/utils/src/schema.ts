@@ -646,3 +646,25 @@ export const UpdateSiteLinkSchema = z.object({
   position: z.string().optional(),
   skill_level: z.string().optional(),
 });
+
+// Payroll
+export const PayrollSchema = z.object({
+  gross_pay:z.number(),
+  reimbursements:z.number(),
+  site_id: z.string().optional(),
+  employee_id: z.string().optional(),
+});
+export type PayrollEmployeeData = {
+  deductions: number;
+  employee_code: string;
+  employee_id: string;
+  gross_pay: number;
+  name: string;
+  net_pay: number;
+  present_days: number;
+  rate: number;
+  reimbursements: number;
+  site_id: string;
+  status: string;
+  designation:string;
+};

@@ -238,6 +238,32 @@ export async function getEmployeesByPositionAndProjectSiteId({
   };
 }
 
+export async function getEmployeeIdsByProjectSiteId({
+  supabase,
+  projectSiteId,
+}: {
+  supabase: TypedSupabaseClient;
+  projectSiteId: string;
+}) {
+  const columns = ["employee_id"] as const;
+
+  const { data, error } = await supabase
+    .from("employee_project_assignment")
+    .select(`${columns.join(",")}`)
+    .eq("project_site_id", projectSiteId)
+    .limit(MID_QUERY_LIMIT)
+    .returns<
+      InferredType<
+        EmployeeProjectAssignmentDatabaseRow,
+        (typeof columns)[number]
+      >[]
+    >();
+
+  if (error) console.error(error);
+
+  return { data, error };
+}
+
 export async function getEmployeeById({
   supabase,
   id,

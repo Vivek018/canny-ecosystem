@@ -1,104 +1,66 @@
-
-
+// @ts-nocheck
 export const payrollColumns = [
   {
     accessorKey: "name",
     header: "Employee Name",
     cell: ({ row }) => {
-      return <p className="truncate capitalize w-48">{`${row.original?.name ??"--"}`}</p>;
-    }},
-
-  {
-    accessorKey: "paid_days",
-    header: "Paid Days",
-    cell: ({ row }) => {
-      return <p className="truncate">{`${row.original?.paid_days ??"--"}`}</p>;
-    },
-    
+      return <p className="truncate capitalize w-48">{`${row.original?.name ?? "--"}`}</p>;
+    }
   },
   {
-    accessorKey: "gross_pay",
-    header: "Gross Pay",
+    accessorKey: "employee_code",
+    header: "Employee Code",
     cell: ({ row }) => {
-      return (
-        <p className="truncate  capitalize">
-          {row.original?.gross_pay ?? ""}
-        </p>
-      );
-    },
+      return <p className="truncate capitalize w-48">{`${row.original?.employee_code ?? "--"}`}</p>;
+    }
   },
   {
-    accessorKey: "taxes",
-    header: "Taxes",
+    accessorKey: "present_days",
+    header: "Present Days",
     cell: ({ row }) => {
-      return (
-        <p className="truncate ">
-          {row.original?.taxes ?? "--"}
-        </p>
-      );
-    },
+      return <p className="truncate capitalize w-48">{`${row.original?.present_days ?? "--"}`}</p>;
+    }
   },
   {
-    accessorKey: "discount",
-    header: "Discount",
+    accessorKey: "designation",
+    header: "Designation",
     cell: ({ row }) => {
-      return <p className=" truncate">{row.original?.discount ?? "--"}</p>;
-    },
+      return <p className="truncate capitalize w-48">{`${row.original?.designation ?? "--"}`}</p>;
+    }
   },
   {
-    accessorKey: "bonus",
-    header: "Bonus",
+    accessorKey: "rate",
+    header: "Rate",
     cell: ({ row }) => {
-      return <p className="truncate">{row.original?.bonus ??"--"}</p>;
-    },
-  },
-  {
-    accessorKey: "email",
-    header: "Email",
-    cell: ({ row }) => {
-      return <p className="truncate">{row.original?.email??"--"}</p>;
-    },
-  },
-  {
-    accessorKey: "mobile_number",
-    header: "Mobile Number",
-    cell: ({ row }) => {
-      return <p className=" truncate">{row.original?.mobile_number??"--"}</p>;
-    },
+      return <p className="truncate capitalize w-48">{`${row.original?.rate ?? "--"}`}</p>;
+    }
   },
   {
     accessorKey: "reimbursements",
     header: "Reimbursements",
     cell: ({ row }) => {
-      return <p className="truncate">{row.original?.reimbursements ??"--"}</p>;
-    },
+      return <p className="truncate capitalize w-48">{`${row.original?.reimbursements ?? "--"}`}</p>;
+    }
+  },
+  {
+    accessorKey: "gross_pay",
+    header: "Gross Pay",
+    cell: ({ row }) => {
+      return <p className="truncate capitalize w-48">{`${row.original?.gross_pay ?? "--"}`}</p>;
+    }
+  },
+  {
+    accessorKey: "deductions",
+    header: "Deductions",
+    cell: ({ row }) => {
+      return <p className="truncate capitalize w-48">{`${row.original?.deductions ?? "--"}`}</p>;
+    }
   },
   {
     accessorKey: "net_pay",
     header: "Net Pay",
     cell: ({ row }) => {
-      return <p className=" truncate">{row.original?.net_pay??"--"}</p>;
-    },
-  },
-  {
-    accessorKey: "company_name",
-    header: "Company Name",
-    cell: ({ row }) => {
-      return <p className="capitalize truncate">{row.original?.company_name ??"--"}</p>;
-    },
-  },
-  {
-    accessorKey: "site_name",
-    header: "Site Name",
-    cell: ({ row }) => {
-      return <p className="capitalize truncate">{row.original?.site_name??"--"}</p>;
-    },
-  },
-  {
-    accessorKey: "area",
-    header: "Area",
-    cell: ({ row }) => {
-      return <p className="capitalize truncate">{row.original?.area??"--"}</p>;
-    },
-  },
+      return <p className="truncate capitalize w-48">{`${row.original?.net_pay ?? "--"}`}</p>;
+    }
+  }
 ];
