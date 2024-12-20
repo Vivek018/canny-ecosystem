@@ -16,15 +16,17 @@ export const ReimbursementOptionsDropdown = ({
   isEmployeeRoute = false,
 }: {
   reimbursementId: string;
-  employeeId:string;
+  employeeId: string;
   triggerChild: React.ReactElement;
   isEmployeeRoute?: boolean;
 }) => {
   const navigate = useNavigate();
-
+  
   const handleEdit = () => {
     navigate(
-      isEmployeeRoute ? `/employees/${employeeId}/reimbursements/${reimbursementId}/update-reimbursements` : `/approvals/reimbursements/${reimbursementId}/update-reimbursements`
+      isEmployeeRoute
+        ? `/employees/${employeeId}/reimbursements/${reimbursementId}/update-reimbursements`
+        : `/approvals/reimbursements/${reimbursementId}/update-reimbursements`
     );
   };
 
@@ -37,7 +39,11 @@ export const ReimbursementOptionsDropdown = ({
             Update Reimbursement
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DeleteReimbursement isEmployeeRoute={isEmployeeRoute} id={reimbursementId} employeeId={employeeId}/>
+          <DeleteReimbursement
+            isEmployeeRoute={isEmployeeRoute}
+            id={reimbursementId}
+            employeeId={employeeId}
+          />
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>

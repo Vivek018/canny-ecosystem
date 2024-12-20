@@ -36,7 +36,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     reimbursementData = data;
   }
   const userOptions = userData.map((userData) => ({
-    label: userData.email.toLowerCase(),
+    label: userData?.email?.toLowerCase(),
     value: userData.id,
   }));
 
@@ -62,20 +62,20 @@ export async function action({ request, params }: ActionFunctionArgs) {
     data: submission.value as any,
   });
 
-  if (isGoodStatus(status)) return safeRedirect("/", { status: 303 });
+  if (isGoodStatus(status))
+    return safeRedirect("/approvals/reimbursements", { status: 303 });
 
   return json({ status, error });
 }
 
 export default function UpdateReimbursememts() {
-  const { data, userOptions} = useLoaderData<typeof loader>();
+  const { data, userOptions } = useLoaderData<typeof loader>();
   const updatableData = data;
 
   return (
     <AddReimbursements
       updateValues={updatableData}
       userOptionsFromUpdate={userOptions as any}
-      
     />
   );
 }

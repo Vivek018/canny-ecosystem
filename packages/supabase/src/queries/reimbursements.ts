@@ -8,18 +8,19 @@ import type {
 export async function getReimbursementsByCompanyId({
   supabase,
   companyId,
-  from,
-  to,
-  filters,
-  searchQuery,
+  params,
 }: {
   supabase: TypedSupabaseClient;
   companyId: string;
-  from: number;
-  to: number;
-  filters?: ReimbursementFilters;
-  searchQuery?: string;
+  params: {
+    from: number;
+    to: number;
+    sort?: [string, "asc" | "desc"];
+    searchQuery?: string;
+    filters?: ReimbursementFilters;
+  };
 }) {
+  const { from, to, sort, searchQuery, filters } = params;
   const columns = [
     "id",
     "company_id",
@@ -34,18 +35,37 @@ export async function getReimbursementsByCompanyId({
     .select(
       `
         ${columns.join(",")},
-            employee_name:employees!inner(first_name,middle_name,last_name),
-          users!inner(id,email)`
+  employee_name:employees!inner(first_name,middle_name,last_name),
+          users!inner(id,email)`,
+      { count: "exact" }
     )
     .eq("company_id", companyId);
 
+  if (sort) {
+    const [column, direction] = sort;
+    query.order(column, { ascending: direction === "asc" });
+  } else {
+    query.order("created_at", { ascending: false });
+  }
   if (searchQuery) {
-    query.or(
-      `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*`,
-      {
-        referencedTable: "employees",
+    const searchQueryArray = searchQuery.split(" ");
+    if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
+      for (const searchQueryElement of searchQueryArray) {
+        query.or(
+          `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*`,
+          {
+            referencedTable: "employees",
+          }
+        );
       }
-    );
+    } else {
+      query.or(
+        `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*`,
+        {
+          referencedTable: "employees",
+        }
+      );
+    }
   }
 
   if (filters) {
@@ -54,7 +74,7 @@ export async function getReimbursementsByCompanyId({
       submitted_date_end,
       status,
       is_deductible,
-      user_email,
+      users,
     } = filters;
 
     const dateFilters = [
@@ -74,18 +94,19 @@ export async function getReimbursementsByCompanyId({
     if (is_deductible) {
       query.eq("is_deductible", is_deductible.toLowerCase());
     }
-    if (user_email) {
-      query.eq("users.email", user_email);
+    if (users) {
+      query.eq("users.email", users);
     }
   }
 
-  const { data, error } = await query.range(from, to);
+  const { data, count, error } = await query.range(from, to);
   if (error) {
     console.error(error);
   }
 
-  return { data, error };
+  return { data, meta: { count: count ?? data?.length }, error };
 }
+
 export async function getReimbursementsById({
   supabase,
   reimbursementId,
@@ -122,26 +143,27 @@ export type ReimbursementFilters = {
   submitted_date_end?: string | undefined | null;
   status?: string | undefined | null;
   is_deductible?: string | undefined | null;
-  user_email?: string | undefined | null;
+  users?: string | undefined | null;
 };
 
 export async function getReimbursementsByEmployeeId({
   supabase,
   employeeId,
-  from,
-  to,
-  filters,
+  params,
 }: {
   supabase: TypedSupabaseClient;
   employeeId: string;
-  from: number;
-  to: number;
-  filters?: ReimbursementFilters;
-  searchQuery?: string;
+  params: {
+    from: number;
+    to: number;
+    sort?: [string, "asc" | "desc"];
+    searchQuery?: string;
+    filters?: ReimbursementFilters;
+  };
 }) {
+  const { from, to, sort, filters } = params;
   const columns = [
     "id",
-
     "company_id",
     "is_deductible",
     "status",
@@ -154,18 +176,26 @@ export async function getReimbursementsByEmployeeId({
     .select(
       `
         ${columns.join(",")},
-            employee_name:employees!inner(first_name, last_name),
-          users!inner(id,email)`
+            employee_name:employees!inner(id,first_name,middle_name,last_name),
+          users!inner(id,email)`,
+      { count: "exact" }
     )
     .eq("employee_id", employeeId);
 
+  if (sort) {
+    const [column, direction] = sort;
+    query.order(column, { ascending: direction === "asc" });
+  } else {
+    query.order("created_at", { ascending: false });
+  }
+  
   if (filters) {
     const {
       submitted_date_start,
       submitted_date_end,
       status,
       is_deductible,
-      user_email,
+      users,
     } = filters;
 
     const dateFilters = [
@@ -185,14 +215,14 @@ export async function getReimbursementsByEmployeeId({
     if (is_deductible) {
       query.eq("is_deductible", is_deductible.toLowerCase());
     }
-    if (user_email) {
-      query.eq("users.email", user_email);
+    if (users) {
+      query.eq("users.email", users);
     }
   }
-  const { data, error } = await query.range(from, to);
+  const { data, count, error } = await query.range(from, to);
   if (error) {
     console.error(error);
   }
 
-  return { data, error };
+  return { data, meta: { count: count ?? data?.length }, error };
 }

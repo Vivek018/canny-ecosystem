@@ -12,7 +12,7 @@ import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 
 export type ReimbursementType = {
   id: ReimbursementRow["id"] | string;
-  employee_name: Pick<EmployeeDatabaseRow, "id" | "first_name" | "last_name">;
+  employee_name: Pick<EmployeeDatabaseRow, "id" | "first_name" | "last_name"|"middle_name">;
   submitted_date: ReimbursementRow["submitted_date"] | string;
   status: ReimbursementRow["status"] | string;
   amount: ReimbursementRow["amount"] | string;
@@ -42,9 +42,11 @@ export const reimbursementsColumns = ({
     header: "Employee Name",
     cell: ({ row }) => {
       return (
-        <p className="truncate capitalize w-48">{`${
-          row.original?.employee_name.first_name ?? "--"
-        } ${row.original?.employee_name.last_name ?? "--"}`}</p>
+        <p className="truncate text-primary/80 w-48 group-hover:text-primary">{`${
+          row.original.employee_name?.first_name
+        } ${row.original.employee_name?.middle_name ?? ""} ${
+          row.original.employee_name?.last_name ?? ""
+        }`}</p>
       );
     },
   },

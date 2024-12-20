@@ -31,22 +31,24 @@ import {
 import type { ReimbursementFilters } from "@canny_ecosystem/supabase/queries";
 import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
 
-
 export function ReimbursementSearchFilter({
   disabled,
   userEmails,
+  employeeId,
 }: {
   disabled?: boolean;
-  userEmails?:(string| null|undefined)[];
+  userEmails?: (string | null | undefined)[];
+  employeeId?: string | undefined;
 }) {
   const [prompt, setPrompt] = useState("");
   const navigation = useNavigation();
   const isSubmitting =
     navigation.state === "submitting" ||
     (navigation.state === "loading" &&
-      navigation.location.pathname === "/employees" &&
+      navigation.location.pathname ===
+        `/employees/${employeeId}/reimbursements` &&
       navigation.location.search.length);
-  
+
   const inputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -57,7 +59,7 @@ export function ReimbursementSearchFilter({
     submitted_date_end: "",
     status: "",
     is_deductible: "",
-    user_email:"",
+    users: "",
   };
 
   const [filterParams, setFilterParams] = useState(initialFilterParams);
@@ -66,8 +68,6 @@ export function ReimbursementSearchFilter({
   const debounceSubmit = useDebounce((target: any, options?: SubmitOptions) => {
     submit(target, options);
   }, 300);
-
-  
 
   const deleteAllSearchParams = () => {
     for (const [key, _val] of Object.entries(filterParams)) {
@@ -91,7 +91,7 @@ export function ReimbursementSearchFilter({
     submitted_date_end: searchParams.get("submitted_date_end"),
     status: searchParams.get("status"),
     is_deductible: searchParams.get("is_deductible"),
-    user_email:searchParams.get("user_email"),
+    users: searchParams.get("users"),
   };
 
   useEffect(() => {
@@ -145,7 +145,9 @@ export function ReimbursementSearchFilter({
       debounceSubmit(
         { prompt: prompt },
         {
-          action: "/employees?index",
+          action: employeeId
+            ? `/employees/${employeeId}/reimbursements?index`
+            : "/approvals/reimbursements?index",
           method: "POST",
         }
       );
@@ -191,7 +193,6 @@ export function ReimbursementSearchFilter({
             className="pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70"
             value={prompt}
             onChange={handleSearch}
-            
             autoComplete="on"
             autoCapitalize="none"
             autoCorrect="off"
@@ -339,7 +340,7 @@ export function ReimbursementSearchFilter({
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
-              <span>Users Email</span>
+              <span>Users</span>
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent
@@ -350,12 +351,11 @@ export function ReimbursementSearchFilter({
                 {userEmails?.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className="capitalize"
-                    checked={filterParams?.user_email === name}
+                    checked={filterParams?.users === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
                         ...prev,
-                        user_email: name,
+                        users: name,
                       }));
                     }}
                   >

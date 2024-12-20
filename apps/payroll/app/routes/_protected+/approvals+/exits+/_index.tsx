@@ -2,7 +2,10 @@ import { ExitsSearchFilter } from "@/components/exits/exit-search-filter";
 import { FilterList } from "@/components/exits/filter-list";
 import { ExitPaymentColumns } from "@/components/exits/table/columns";
 import { ExitPaymentTable } from "@/components/exits/table/data-table";
-import { MAX_QUERY_LIMIT } from "@canny_ecosystem/supabase/constant";
+import {
+  LAZY_LOADING_LIMIT,
+  MAX_QUERY_LIMIT,
+} from "@canny_ecosystem/supabase/constant";
 import {
   type ExitFilterType,
   getExits,
@@ -44,7 +47,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined,
+        (value) => value !== null && value !== undefined
       );
 
     const { data, meta, error } = await getExits({
@@ -59,7 +62,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
 
     const hasNextPage = Boolean(
-      meta?.count && meta.count / (page + 1) > pageSize,
+      meta?.count && meta.count / (page + 1) > LAZY_LOADING_LIMIT
     );
 
     if (error) {

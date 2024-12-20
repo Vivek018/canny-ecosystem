@@ -10,6 +10,7 @@ import {
   flexRender,
   getCoreRowModel,
   useReactTable,
+  type VisibilityState,
 } from "@tanstack/react-table";
 import { ReimbursementsTableHeader } from "./reimbursements-table-header";
 import { useInView } from "react-intersection-observer";
@@ -17,9 +18,13 @@ import { useEffect, useState } from "react";
 import {
   getReimbursementsByCompanyId,
   getReimbursementsByEmployeeId,
+  type ReimbursementFilters,
 } from "@canny_ecosystem/supabase/queries";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
 import { Spinner } from "@canny_ecosystem/ui/spinner";
+import { useSearchParams } from "@remix-run/react";
+import { Button } from "@canny_ecosystem/ui/button";
+import { useReimbursementStore } from "@/store/reimbursements";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -29,6 +34,10 @@ interface DataTableProps<TData, TValue> {
   env: any;
   companyId?: string;
   employeeId?: string;
+  noFilters?: boolean;
+  filters?: ReimbursementFilters;
+  query?: string | null;
+  initialColumnVisibility: VisibilityState;
 }
 
 export function ReimbursementsTable<TData, TValue>({
@@ -38,25 +47,39 @@ export function ReimbursementsTable<TData, TValue>({
   pageSize,
   env,
   companyId,
+  noFilters,
   employeeId,
+  filters,
+  initialColumnVisibility,
+  query,
 }: DataTableProps<TData, TValue>) {
   const [data, setData] = useState(initialData);
   const [from, setFrom] = useState(pageSize);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [hasNextPage, setHasNextPage] = useState(initialHasNextPage);
   const { supabase } = useSupabase({ env });
 
   const { ref, inView } = useInView();
-
+  const { rowSelection, setRowSelection, setColumns } = useReimbursementStore();
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+    initialColumnVisibility ?? {}
+  );
   const loadMoreEmployees = async () => {
     const formattedFrom = from;
     const to = formattedFrom + pageSize;
+    const sortParam = searchParams.get("sort");
     if (companyId) {
       try {
         const { data } = await getReimbursementsByCompanyId({
           supabase,
           companyId,
-          from,
-          to,
+          params: {
+            from: from,
+            to: to,
+            filters,
+            searchQuery: query ?? undefined,
+            sort: sortParam?.split(":") as [string, "asc" | "desc"],
+          },
         });
         if (data) {
           setData((prevData: any) => [...prevData, ...data] as TData[]);
@@ -72,8 +95,12 @@ export function ReimbursementsTable<TData, TValue>({
         const { data } = await getReimbursementsByEmployeeId({
           supabase,
           employeeId,
-          from,
-          to,
+          params: {
+            from: from,
+            to: to,
+            filters,
+            sort: sortParam?.split(":") as [string, "asc" | "desc"],
+          },
         });
         if (data) {
           setData(
@@ -92,7 +119,16 @@ export function ReimbursementsTable<TData, TValue>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    onRowSelectionChange: setRowSelection,
+    onColumnVisibilityChange: setColumnVisibility,
+    state: {
+      rowSelection,
+      columnVisibility,
+    },
   });
+  useEffect(() => {
+    setColumns(table.getAllLeafColumns());
+  }, [columnVisibility]);
 
   useEffect(() => {
     if (inView) {
@@ -163,7 +199,29 @@ export function ReimbursementsTable<TData, TValue>({
                     colSpan={columns.length}
                     className="h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize"
                   >
-                    No Reimbursement Fields Found.
+                    <div className="flex flex-col items-center gap-1">
+                      <h2 className="text-xl">No Exit Payment Fields Found.</h2>
+                      <p
+                        className={cn(
+                          "text-muted-foreground",
+                          !data?.length && noFilters && "hidden"
+                        )}
+                      >
+                        Try another search, or adjusting the filters
+                      </p>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "mt-4",
+                          !data?.length && noFilters && "hidden"
+                        )}
+                        onClick={() => {
+                          setSearchParams();
+                        }}
+                      >
+                        Clear Filters
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               )}

@@ -11,7 +11,6 @@ import {
 } from "@canny_ecosystem/supabase/queries";
 import AddReimbursements from "./add-reimbursement";
 
-
 export const UPDATE_REIMBURSEMENTS_TAG = "Update Reimbursements";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
@@ -45,11 +44,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
+  const employeeId = params.employeeId;
   const reimbursementId = params.reimbursementId;
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
   const submission = parseWithZod(formData, { schema: ReimbursementSchema });
-
+  console.log(employeeId);
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
@@ -63,7 +63,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
     data: submission.value as any,
   });
 
-  if (isGoodStatus(status)) return safeRedirect("/", { status: 303 });
+  if (isGoodStatus(status))
+    return safeRedirect(`/employees/${employeeId}/reimbursements`, {
+      status: 303,
+    });
 
   return json({ status, error });
 }

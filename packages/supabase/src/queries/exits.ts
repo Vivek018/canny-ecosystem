@@ -73,7 +73,7 @@ export const getExits = async ({
           employee_name:employees!inner(first_name, middle_name, last_name),
           exit_payments(amount, type, payment_fields!payment_fields_id(name))
     `,
-      { count: "exact" },
+      { count: "exact" }
     )
     .limit(HARD_QUERY_LIMIT);
 
@@ -87,12 +87,24 @@ export const getExits = async ({
 
   // Full-text search
   if (searchQuery) {
-    query.or(
-      `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*`,
-      {
-        referencedTable: "employees",
-      },
-    );
+    const searchQueryArray = searchQuery.split(" ");
+    if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
+      for (const searchQueryElement of searchQueryArray) {
+        query.or(
+          `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*`,
+          {
+            referencedTable: "employees",
+          }
+        );
+      }
+    } else {
+      query.or(
+        `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*`,
+        {
+          referencedTable: "employees",
+        }
+      );
+    }
   }
 
   // Filters

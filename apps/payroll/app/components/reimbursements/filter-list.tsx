@@ -8,7 +8,7 @@ type Props = {
   filters: ReimbursementFilters | undefined;
 };
 
-export function FilterList({filters}:Props) {
+export function FilterList({ filters }: Props) {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const renderFilter = ({
@@ -18,8 +18,6 @@ export function FilterList({filters}:Props) {
     key: string;
     value: string | null | undefined;
   }) => {
-  
-
     if (!value) return null;
 
     switch (key) {
@@ -32,18 +30,16 @@ export function FilterList({filters}:Props) {
           );
         }
         return formatDate(new Date(value));
+
+      case "name":
       case "status":
       case "is_deductible":
-      case "user_email":
+      case "users":
         return value;
-        default:
-          return null; 
+      default:
+        return null;
     }
   };
-    
-    
-  
-
 
   const handleOnRemove = (key: string) => {
     const updatedSearchParams = new URLSearchParams(searchParams);
@@ -55,7 +51,6 @@ export function FilterList({filters}:Props) {
     updatedSearchParams.delete(key);
     setSearchParams(updatedSearchParams);
   };
- 
 
   return (
     <ul className="flex flex-0 space-x-2 w-full overflow-scroll no-scrollbar">

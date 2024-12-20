@@ -69,7 +69,7 @@ export const DeleteReimbursement = ({
           "text-[13px] h-9"
         )}
       >
-        Delete User
+        Delete Reimbursement
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
