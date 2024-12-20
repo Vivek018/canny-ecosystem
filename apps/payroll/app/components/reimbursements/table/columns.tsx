@@ -1,0 +1,117 @@
+import { Button } from "@canny_ecosystem/ui/button";
+import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
+import { Icon } from "@canny_ecosystem/ui/icon";
+import { ReimbursementOptionsDropdown } from "./reimbursements-table-options";
+
+import type { ColumnDef } from "@tanstack/react-table";
+import { Checkbox } from "@canny_ecosystem/ui/checkbox";
+import type { ReimbursementDataType } from "@canny_ecosystem/supabase/queries";
+
+export const reimbursementsColumns = ({
+  isEmployeeRoute = false,
+}: {
+  isEmployeeRoute?: boolean;
+}): ColumnDef<ReimbursementDataType>[] => [
+  {
+    id: "select",
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: "employee_name",
+    header: "Employee Name",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate text-primary/80 w-48 group-hover:text-primary">{`${
+          row.original.employee_name?.first_name
+        } ${row.original.employee_name?.middle_name ?? ""} ${
+          row.original.employee_name?.last_name ?? ""
+        }`}</p>
+      );
+    },
+  },
+  {
+    accessorKey: "submitted_date",
+    header: "Submitted Date",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate ">{row.original?.submitted_date ?? "--"}</p>
+      );
+    },
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate capitalize ">
+          {row.original?.status
+            ? row.original.status.toLowerCase() === "pending"
+              ? `${row.original.status}`
+              : row.original.status
+            : "--"}
+        </p>
+      );
+    },
+  },
+  {
+    accessorKey: "amount",
+    header: "Amount",
+    cell: ({ row }) => {
+      return <p className=" truncate">{row.original?.amount ?? "--"}</p>;
+    },
+  },
+
+  {
+    accessorKey: "is_deductible",
+    header: "Is Deductible",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate capitalize">
+          {row.original?.is_deductible === undefined
+            ? "--"
+            : row.original?.is_deductible
+            ? "true"
+            : "false"}
+        </p>
+      );
+    },
+  },
+  {
+    accessorKey: "user_id",
+    header: "Approved By",
+    cell: ({ row }) => {
+      return <p className=" truncate">{row.original?.users?.email ?? "--"}</p>;
+    },
+  },
+
+  {
+    id: "actions",
+    enableSorting: false,
+    enableHiding: false,
+    cell: ({ row }) => {
+      return (
+        <ReimbursementOptionsDropdown
+          key={row.original.id}
+          reimbursementId={row.original.id}
+          employeeId={row.original?.employee_name.id}
+          isEmployeeRoute={isEmployeeRoute}
+          triggerChild={
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <Icon name="dots-vertical" />
+              </Button>
+            </DropdownMenuTrigger>
+          }
+        />
+      );
+    },
+  },
+];

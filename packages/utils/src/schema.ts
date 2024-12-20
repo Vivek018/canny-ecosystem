@@ -419,7 +419,7 @@ export const PaymentFieldSchema = z
     {
       message: `When payment type is "variable", calculation type must be "fixed".`,
       path: ["calculation_type"],
-    }
+    },
   );
 
 export const deductionCycleArray = ["monthly"] as const;
@@ -539,7 +539,34 @@ export const UserSchema = z.object({
   is_active: z.boolean().default(false),
 });
 
+export const reasonforexitArray = [
+  "resigned by employee",
+  "terminated by employee",
+  "by death",
+  "by disability",
+] as const;
 
+export const ExitPaymentPage1Schema = z.object({
+  last_working_day: z.string(),
+  reason_for_exit: z.enum(reasonforexitArray),
+  final_settlement_date: z.string(),
+  note: zTextArea.max(100).optional(),
+});
+
+export const ExitPaymentPage2Schema = z.object({
+  organization_payable_days: zNumber,
+  employee_payable_days: zNumber,
+  bonus: zNumber.optional(),
+  diwali_bonus: zNumber.optional(),
+  commission: zNumber.optional(),
+  joining_bonus: zNumber.optional(),
+  yearly_bonus: zNumber.optional(),
+  leave_encashment: zNumber.optional(),
+  gift_coupon: zNumber.optional(),
+  computer_servive_charges: zNumber.optional(),
+  gratuity: zNumber.optional(),
+  deduction: zNumber.optional(),
+});
 
 // Payment Template Assignment
 export const paymentAssignmentTypesArray = ["employee", "site"] as const;
@@ -617,3 +644,28 @@ export const UpdateSiteLinkSchema = z.object({
   position: z.string().optional(),
   skill_level: z.string().optional(),
 });
+
+export const ReimbursementStatusArray = ["pending", "approved"] as const;
+export const ReimbursementDeductibleArray = ["true", "false"] as const;
+
+export const ReimbursementSchema = z.object({
+  first_name: zString.optional(),
+  last_name: zString.optional(),
+  submitted_date: z.string(),
+  status: z.enum(ReimbursementStatusArray),
+  amount: zNumber.min(1).max(100000000),
+  user_id:z.string().optional(),
+  is_deductible: z.boolean().optional().default(false),
+  company_id:z.string(),
+  employee_id:z.string(),
+
+});
+
+export const exitReasonArray = [
+  "Resignation",
+  "Retirement",
+  "Transfer",
+  "Termination",
+  "Medical",
+  "Other",
+] as const;

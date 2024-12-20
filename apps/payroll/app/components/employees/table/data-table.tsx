@@ -71,6 +71,7 @@ export function DataTable<TData, TValue>({
     const formattedFrom = from;
     const to = formattedFrom + pageSize;
     const sortParam = searchParams.get("sort");
+    
     try {
       const { data } = await getEmployeesByCompanyId({
         supabase,
