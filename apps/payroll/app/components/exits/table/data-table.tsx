@@ -21,7 +21,7 @@ import {
 import { useState, useEffect } from "react";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
 import { useInView } from "react-intersection-observer";
-import { useEmployeesStore } from "@/store/employees";
+import { useExitsStore } from "@/store/exits";
 import { Spinner } from "@canny_ecosystem/ui/spinner";
 import { useSearchParams } from "@remix-run/react";
 import { Button } from "@canny_ecosystem/ui/button";
@@ -58,7 +58,7 @@ export function ExitPaymentTable<TData, TValue>({
   const { supabase } = useSupabase({ env });
 
   const { ref, inView } = useInView();
-  const { rowSelection, setRowSelection, setColumns } = useEmployeesStore();
+  const { rowSelection, setRowSelection, setColumns } = useExitsStore();
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
     initialColumnVisibility ?? {}
