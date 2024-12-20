@@ -1,11 +1,12 @@
-import { EMPLOYEE_EPF_PERCENTAGE } from "@/routes/_protected+/payment-components+/statutory-fields+/employee-provident-fund+/_index";
 import type { EmployeeProvidentFundDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { Card } from "@canny_ecosystem/ui/card";
-
-const EMPLOYER_EPS_PERCENTAGE = 0.0833;
-const EMPLOYER_EPF_PERCENTAGE = 0.12;
-const EMPLOYER_EDLI_PERCENTAGE = 0.005;
-const EMPLOYER_ADMIN_CHARGES_PERCENTAGE = 0.005;
+import {
+  EMPLOYEE_EPF_PERCENTAGE,
+  EMPLOYER_ADMIN_CHARGES_PERCENTAGE,
+  EMPLOYER_EDLI_PERCENTAGE,
+  EMPLOYER_EPF_PERCENTAGE,
+  EMPLOYER_EPS_PERCENTAGE,
+} from "@canny_ecosystem/utils/constant";
 
 type DetailItemProps = {
   label: string;

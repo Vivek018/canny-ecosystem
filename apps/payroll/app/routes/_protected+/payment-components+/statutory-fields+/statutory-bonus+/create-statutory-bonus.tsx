@@ -1,13 +1,8 @@
 import { FormButtons } from "@/components/form/form-buttons";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { safeRedirect } from "@/utils/server/http.server";
 import { createStatutoryBonus } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import type {
-  Json,
-  StatutoryBonusDatabaseRow,
-  StatutoryBonusDatabaseUpdate,
-} from "@canny_ecosystem/supabase/types";
+import type { StatutoryBonusDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import {
   Card,
   CardContent,
@@ -32,49 +27,82 @@ import {
   json,
   type LoaderFunctionArgs,
 } from "@remix-run/node";
-import { Form, useLoaderData } from "@remix-run/react";
-import { useState } from "react";
+import {
+  Form,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
+import { useEffect, useState } from "react";
 import { UPDATE_STATUTORY_BONUS } from "./$sbId.update-statutory-bonus";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 export const CREATE_STATUTORY_BONUS = "create-statutory-bonus";
 
-export const action = async ({ request }: ActionFunctionArgs) => {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
+export const action = async ({
+  request,
+}: ActionFunctionArgs): Promise<Response> => {
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
 
-  const submission = parseWithZod(formData, {
-    schema: StatutoryBonusSchema,
-  });
+    const submission = parseWithZod(formData, {
+      schema: StatutoryBonusSchema,
+    });
 
-  if (submission.status !== "success") {
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+
+    const { status, error } = await createStatutoryBonus({
+      supabase,
+      data: submission.value as any,
+      bypassAuth: true,
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Statutory Bonus created successfully",
+        error: null,
+      });
+    }
+
+    return json({
+      status: "error",
+      message: "Failed to create Statutory Bonus",
+      error,
+    });
+  } catch (error) {
     return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
-    );
-  }
-
-  const { status, error } = await createStatutoryBonus({
-    supabase,
-    data: submission.value as any,
-    bypassAuth: true,
-  });
-
-  if (isGoodStatus(status)) {
-    return safeRedirect(
-      "/payment-components/statutory-fields/statutory-bonus",
       {
-        status: 303,
-      }
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 },
     );
   }
-
-  return json({ status, error });
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  return json({ companyId });
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    return json({ status: "success", message: "Company ID found", companyId });
+  } catch (error) {
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 },
+    );
+  }
 };
 
 export default function CreateStatutoryBonus({
@@ -82,6 +110,8 @@ export default function CreateStatutoryBonus({
 }: {
   updateValues?: StatutoryBonusDatabaseUpdate | null;
 }) {
+  const { companyId } = useLoaderData<{ companyId: string }>();
+  const actionData = useActionData<typeof action>();
   const STATUTORY_BONUS_TAG = updateValues
     ? UPDATE_STATUTORY_BONUS
     : CREATE_STATUTORY_BONUS;
@@ -89,7 +119,6 @@ export default function CreateStatutoryBonus({
   const initialValues =
     updateValues ?? getInitialValueFromZod(StatutoryBonusSchema);
 
-  const { companyId } = useLoaderData<{ companyId: string }>();
   const [resetKey, setResetKey] = useState(Date.now());
 
   const [form, fields] = useForm({
@@ -105,6 +134,30 @@ export default function CreateStatutoryBonus({
       company_id: companyId,
     },
   });
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!actionData) return;
+
+    if (actionData.status === "success") {
+      toast({
+        title: "Success",
+        description: actionData?.message || "Statutory Bonus created",
+        variant: "success",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: actionData?.message || "Failed to create Statutory Bonus",
+        variant: "destructive",
+      });
+    }
+
+    navigate("/payment-components/statutory-fields/statutory-bonus", {
+      replace: true,
+    });
+  }, [actionData]);
 
   return (
     <section className="p-4 w-full">
@@ -124,7 +177,7 @@ export default function CreateStatutoryBonus({
                 key={resetKey}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  statutoryBonusPayFrequencyArray as unknown as string[]
+                  statutoryBonusPayFrequencyArray as unknown as string[],
                 )}
                 inputProps={{
                   ...getInputProps(fields.payment_frequency, { type: "text" }),

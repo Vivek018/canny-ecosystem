@@ -1,46 +1,43 @@
-import { columns } from "@/components/payment-field/table/columns";
-import { DataTable } from "@/components/payment-field/table/data-table";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import {
-  getPaymentFieldsByCompanyId,
-  type PaymentFieldDataType,
-} from "@canny_ecosystem/supabase/queries";
+import { getPaymentFieldsByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json, Link, useLoaderData } from "@remix-run/react";
+import { Await, defer, json, Link, useLoaderData } from "@remix-run/react";
 import { Input } from "@canny_ecosystem/ui/input";
-import { useEffect, useState } from "react";
+import { Suspense, useState } from "react";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
+import { ErrorBoundary } from "@/components/error-boundary";
+import { PaymentFieldTableWrapper } from "@/components/payment-field/payment-field-table-wrapper";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data, error } = await getPaymentFieldsByCompanyId({
-    supabase,
-    companyId,
-  });
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    const paymentFieldPromise = getPaymentFieldsByCompanyId({
+      supabase,
+      companyId,
+    });
 
-  if (error) throw error;
-
-  return json({ data: data as any });
+    return defer({
+      paymentFieldPromise,
+      error: null,
+    });
+  } catch (error) {
+    return json({ paymentFieldPromise: null, error }, { status: 500 });
+  }
 }
 
 export default function PaymentFieldsIndex() {
-  const { data } = useLoaderData<typeof loader>();
-  
-  const [searchString, setSearchString] = useState("");
-  const [tableData, setTableData] = useState(data);
+  const { paymentFieldPromise, error } = useLoaderData<typeof loader>();
 
-  useEffect(() => {
-    const filteredData = data?.filter((item: PaymentFieldDataType) =>
-      Object.values(item).some((value) =>
-        String(value).toLowerCase().includes(searchString.toLowerCase()),
-      ),
+  const [searchString, setSearchString] = useState("");
+
+  if (error)
+    return (
+      <ErrorBoundary error={error} message="Failed to load payment fields" />
     );
-    setTableData(filteredData);
-  }, [searchString, data]);
 
   return (
     <>
@@ -74,7 +71,23 @@ export default function PaymentFieldsIndex() {
             </Link>
           </div>
         </div>
-        <DataTable data={tableData ?? []} columns={columns} />
+        <Suspense fallback={<div>Loading...</div>}>
+          <Await resolve={paymentFieldPromise}>
+            {(resolvedData) => {
+              if (!resolvedData)
+                return (
+                  <ErrorBoundary message="Failed to load payment fields" />
+                );
+              return (
+                <PaymentFieldTableWrapper
+                  data={resolvedData?.data}
+                  error={resolvedData?.error}
+                  searchString={searchString}
+                />
+              );
+            }}
+          </Await>
+        </Suspense>
       </section>
     </>
   );

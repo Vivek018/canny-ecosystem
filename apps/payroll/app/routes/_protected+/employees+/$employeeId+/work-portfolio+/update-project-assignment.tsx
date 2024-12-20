@@ -1,8 +1,13 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { Form, json, useLoaderData } from "@remix-run/react";
+import {
+  Form,
+  json,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { safeRedirect } from "@/utils/server/http.server";
 import {
   EmployeeProjectAssignmentSchema,
   isGoodStatus,
@@ -15,7 +20,7 @@ import {
 } from "@canny_ecosystem/supabase/queries";
 import { updateEmployeeProjectAssignment } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
 import { Card } from "@canny_ecosystem/ui/card";
 import {
@@ -24,116 +29,157 @@ import {
   PROJECT_SITE_PARAM,
 } from "@/components/employees/form/create-employee-project-assignment";
 import { FormButtons } from "@/components/form/form-buttons";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 export const UPDATE_EMPLOYEE_PROJECT_ASSIGNMENT =
   "update-employee-project-assignment";
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
-  const url = new URL(request.url);
-  const urlSearchParams = new URLSearchParams(url.searchParams);
-  const { supabase } = getSupabaseWithHeaders({ request });
+export async function loader({
+  request,
+  params,
+}: LoaderFunctionArgs): Promise<Response> {
   const employeeId = params.employeeId;
 
-  let projectAssignmentData = null;
+  try {
+    const url = new URL(request.url);
+    const urlSearchParams = new URLSearchParams(url.searchParams);
+    const { supabase } = getSupabaseWithHeaders({ request });
 
-  if (employeeId) {
-    projectAssignmentData = await getEmployeeProjectAssignmentByEmployeeId({
-      supabase,
-      employeeId: employeeId,
-    });
-  }
+    let projectAssignmentData = null;
 
-  if (projectAssignmentData?.error) {
-    throw projectAssignmentData.error;
-  }
-
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data: projects } = await getProjectsByCompanyId({
-    supabase,
-    companyId,
-  });
-
-  const projectOptions = projects?.map((project) => ({
-    label: project?.name,
-    value: project?.id,
-  }));
-
-  let projectSiteOptions: any = [];
-
-  const projectParamId = urlSearchParams.get(PROJECT_PARAM);
-
-  if (projectParamId?.length) {
-    const { data: projectSites } = await getSitesByProjectId({
-      supabase,
-      projectId: projectParamId,
-    });
-
-    projectSiteOptions = projectSites?.map((projectSite) => ({
-      label: projectSite?.name,
-      value: projectSite?.id,
-    }));
-  }
-
-  let siteEmployeeOptions: any = [];
-
-  const projectSiteParamId = urlSearchParams.get(PROJECT_SITE_PARAM);
-
-  if (projectSiteParamId?.length) {
-    const { data: siteEmployees } =
-      await getEmployeesByPositionAndProjectSiteId({
+    if (employeeId) {
+      projectAssignmentData = await getEmployeeProjectAssignmentByEmployeeId({
         supabase,
-        position: "supervisor",
-        projectSiteId: projectSiteParamId,
+        employeeId: employeeId,
+      });
+    }
+
+    if (projectAssignmentData?.error) {
+      return json({
+        status: "error",
+        message: "Failed to get employee project assignment",
+        error: projectAssignmentData.error,
+      });
+    }
+
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    const { data: projects } = await getProjectsByCompanyId({
+      supabase,
+      companyId,
+    });
+
+    const projectOptions = projects?.map((project) => ({
+      label: project?.name,
+      value: project?.id,
+    }));
+
+    let projectSiteOptions: any = [];
+
+    const projectParamId = urlSearchParams.get(PROJECT_PARAM);
+
+    if (projectParamId?.length) {
+      const { data: projectSites } = await getSitesByProjectId({
+        supabase,
+        projectId: projectParamId,
       });
 
-    siteEmployeeOptions = siteEmployees
-      ?.filter((siteEmployee) => siteEmployee.id !== employeeId)
-      .map((siteEmployee) => ({
-        label: siteEmployee?.employee_code,
-        value: siteEmployee?.id,
+      projectSiteOptions = projectSites?.map((projectSite) => ({
+        label: projectSite?.name,
+        value: projectSite?.id,
       }));
-  }
+    }
 
-  return json({
-    data: projectAssignmentData?.data,
-    projectOptions,
-    projectSiteOptions,
-    siteEmployeeOptions,
-  });
-}
+    let siteEmployeeOptions: any = [];
 
-export async function action({ request, params }: ActionFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
-  const employeeId = params.employeeId;
+    const projectSiteParamId = urlSearchParams.get(PROJECT_SITE_PARAM);
 
-  const submission = parseWithZod(formData, {
-    schema: EmployeeProjectAssignmentSchema,
-  });
+    if (projectSiteParamId?.length) {
+      const { data: siteEmployees } =
+        await getEmployeesByPositionAndProjectSiteId({
+          supabase,
+          position: "supervisor",
+          projectSiteId: projectSiteParamId,
+        });
 
-  if (submission.status !== "success") {
-    return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
-    );
-  }
+      siteEmployeeOptions = siteEmployees
+        ?.filter((siteEmployee) => siteEmployee.id !== employeeId)
+        .map((siteEmployee) => ({
+          label: siteEmployee?.employee_code,
+          value: siteEmployee?.id,
+        }));
+    }
 
-  const { status, error } = await updateEmployeeProjectAssignment({
-    supabase,
-    data: submission.value,
-  });
-
-  if (isGoodStatus(status)) {
-    return safeRedirect(`/employees/${employeeId}/work-portfolio`, {
-      status: 303,
+    return json({
+      status: "success",
+      message: "Employee project assignment found",
+      data: projectAssignmentData?.data,
+      projectOptions,
+      projectSiteOptions,
+      siteEmployeeOptions,
+    });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
     });
   }
-  return json({ status, error });
+}
+
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
+
+    const submission = parseWithZod(formData, {
+      schema: EmployeeProjectAssignmentSchema,
+    });
+
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+
+    const { status, error } = await updateEmployeeProjectAssignment({
+      supabase,
+      data: submission.value,
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Employee project assignment updated successfully",
+        error: null,
+      });
+    }
+    return json({
+      status: "error",
+      message: "Failed to update employee project assignment",
+      error,
+    });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+    });
+  }
 }
 
 export default function UpdateEmployeeProjectAssignment() {
-  const { data, projectOptions, projectSiteOptions, siteEmployeeOptions } =
-    useLoaderData<typeof loader>();
+  const {
+    data,
+    projectOptions,
+    projectSiteOptions,
+    siteEmployeeOptions,
+    status,
+    error,
+  } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
   const currentSchema = EmployeeProjectAssignmentSchema;
 
@@ -147,6 +193,35 @@ export default function UpdateEmployeeProjectAssignment() {
     shouldRevalidate: "onInput",
     defaultValue: data,
   });
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (status === "error") {
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to load",
+        variant: "destructive",
+      });
+      navigate(`/employees/${data?.employee_id}/work-portfolio`);
+    }
+    if (actionData) {
+      if (actionData?.status === "success") {
+        toast({
+          title: "Success",
+          description: actionData?.message || "Employee updated",
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: actionData?.error?.message || "Employee update failed",
+          variant: "destructive",
+        });
+      }
+      navigate(`/employees/${data?.employee_id}/work-portfolio`);
+    }
+  }, [actionData]);
 
   return (
     <section className="md:px-20 lg:px-28 2xl:px-40 py-4">

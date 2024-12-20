@@ -16,7 +16,12 @@ import {
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { extractJsonFromString } from "@canny_ecosystem/utils";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { json, Outlet, redirect, useLoaderData } from "@remix-run/react";
+import {
+  json,
+  Outlet,
+  redirect,
+  useLoaderData,
+} from "@remix-run/react";
 
 const pageSize = 20;
 
@@ -226,7 +231,7 @@ export default function EmployeesIndex() {
         companyId={companyId}
         env={env}
       />
-      <Outlet />
+        <Outlet />
     </section>
   );
 }
