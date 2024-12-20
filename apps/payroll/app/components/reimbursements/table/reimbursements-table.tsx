@@ -37,7 +37,7 @@ interface DataTableProps<TData, TValue> {
   noFilters?: boolean;
   filters?: ReimbursementFilters;
   query?: string | null;
-  initialColumnVisibility: VisibilityState;
+  initialColumnVisibility?: VisibilityState;
 }
 
 export function ReimbursementsTable<TData, TValue>({

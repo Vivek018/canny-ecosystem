@@ -1,9 +1,30 @@
 import { formatUTCDate } from "@canny_ecosystem/utils";
 import type {
+  EmployeeDatabaseRow,
   InferredType,
   ReimbursementRow,
   TypedSupabaseClient,
+  UserDatabaseRow,
 } from "../types";
+
+export type ReimbursementDataType = Pick<
+  ReimbursementRow,
+  | "id"
+  | "employee_id"
+  | "company_id"
+  | "is_deductible"
+  | "status"
+  | "amount"
+  | "submitted_date"
+  | "user_id"
+> & {
+  employee_name: Pick<
+    EmployeeDatabaseRow,
+    "id" | "first_name" | "middle_name" | "last_name"
+  >;
+} & {
+  users: Pick<UserDatabaseRow, "id" | "email">;
+};
 
 export async function getReimbursementsByCompanyId({
   supabase,
@@ -188,7 +209,7 @@ export async function getReimbursementsByEmployeeId({
   } else {
     query.order("created_at", { ascending: false });
   }
-  
+
   if (filters) {
     const {
       submitted_date_start,

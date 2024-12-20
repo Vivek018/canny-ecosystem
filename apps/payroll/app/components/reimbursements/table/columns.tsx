@@ -2,30 +2,16 @@ import { Button } from "@canny_ecosystem/ui/button";
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { ReimbursementOptionsDropdown } from "./reimbursements-table-options";
-import type {
-  EmployeeDatabaseRow,
-  ReimbursementRow,
-  UserDatabaseRow,
-} from "@canny_ecosystem/supabase/types";
+
 import type { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@canny_ecosystem/ui/checkbox";
-
-export type ReimbursementType = {
-  id: ReimbursementRow["id"] | string;
-  employee_name: Pick<EmployeeDatabaseRow, "id" | "first_name" | "last_name"|"middle_name">;
-  submitted_date: ReimbursementRow["submitted_date"] | string;
-  status: ReimbursementRow["status"] | string;
-  amount: ReimbursementRow["amount"] | string;
-  is_deductible: ReimbursementRow["is_deductible"] | string;
-  user_id: ReimbursementRow["user_id"] | number;
-  users: Pick<UserDatabaseRow, "email">;
-};
+import type { ReimbursementDataType } from "@canny_ecosystem/supabase/queries";
 
 export const reimbursementsColumns = ({
   isEmployeeRoute = false,
 }: {
   isEmployeeRoute?: boolean;
-}): ColumnDef<ReimbursementType>[] => [
+}): ColumnDef<ReimbursementDataType>[] => [
   {
     id: "select",
     cell: ({ row }) => (

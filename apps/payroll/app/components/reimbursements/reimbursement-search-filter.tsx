@@ -46,7 +46,9 @@ export function ReimbursementSearchFilter({
     navigation.state === "submitting" ||
     (navigation.state === "loading" &&
       navigation.location.pathname ===
-        `/employees/${employeeId}/reimbursements` &&
+        (employeeId
+          ? `/employees/${employeeId}/reimbursements`
+          : "/approvals/reimbursements") &&
       navigation.location.search.length);
 
   const inputRef = useRef<HTMLInputElement>(null);
