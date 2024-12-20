@@ -2,18 +2,23 @@ import { Button } from "@canny_ecosystem/ui/button";
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { ReimbursementOptionsDropdown } from "./reimbursements-table-options";
-import type { ReimbursementRow } from "@canny_ecosystem/supabase/types";
+import type {
+  EmployeeDatabaseRow,
+  ReimbursementRow,
+  UserDatabaseRow,
+} from "@canny_ecosystem/supabase/types";
 import type { ColumnDef } from "@tanstack/react-table";
 
 export type ReimbursementType = {
   id: ReimbursementRow["id"] | string;
 
-  employee_name: ReimbursementRow | string;
+  employee_name: Pick<EmployeeDatabaseRow, "id" | "first_name" | "last_name">;
   submitted_date: ReimbursementRow["submitted_date"] | string;
   status: ReimbursementRow["status"] | string;
   amount: ReimbursementRow["amount"] | string;
   is_deductible: ReimbursementRow["is_deductible"] | string;
   user_id: ReimbursementRow["user_id"] | number;
+  users: Pick<UserDatabaseRow, "email">;
 };
 
 export const reimbursementsColumns = ({
@@ -27,8 +32,8 @@ export const reimbursementsColumns = ({
     cell: ({ row }) => {
       return (
         <p className="truncate capitalize w-48">{`${
-          row.original?.employees.first_name ?? "--"
-        } ${row.original?.employees.last_name ?? "--"}`}</p>
+          row.original?.employee_name.first_name ?? "--"
+        } ${row.original?.employee_name.last_name ?? "--"}`}</p>
       );
     },
   },
@@ -96,7 +101,7 @@ export const reimbursementsColumns = ({
         <ReimbursementOptionsDropdown
           key={row.original.id}
           reimbursementId={row.original.id}
-          employeeId={row.original?.employees.id}
+          employeeId={row.original?.employee_name.id}
           isEmployeeRoute={isEmployeeRoute}
           triggerChild={
             <DropdownMenuTrigger asChild>

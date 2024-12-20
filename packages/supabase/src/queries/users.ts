@@ -78,6 +78,32 @@ export async function getUsers({
   return { data, error };
 }
 
+
+export async function getUsersEmail({
+  supabase,
+}: {
+  supabase: TypedSupabaseClient;
+}) {
+  const columns = [
+   
+    "email",
+    
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("users")
+    .select(`${columns.join(",")},email`)
+    .order("created_at", { ascending: false })
+    .limit(HARD_QUERY_LIMIT)
+    .returns<InferredType<UserDatabaseRow, (typeof columns)[number]>[]>();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { data, error };
+}
+
 export async function getUserById({
   supabase,
   id,

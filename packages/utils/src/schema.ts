@@ -646,6 +646,7 @@ export const UpdateSiteLinkSchema = z.object({
 });
 
 export const ReimbursementStatusArray = ["pending", "approved"] as const;
+export const ReimbursementDeductibleArray = ["true", "false"] as const;
 
 export const ReimbursementSchema = z.object({
   first_name: zString.optional(),

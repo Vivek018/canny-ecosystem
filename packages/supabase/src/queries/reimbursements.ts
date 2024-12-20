@@ -1,4 +1,4 @@
-
+import { formatUTCDate } from "@canny_ecosystem/utils";
 import type {
   InferredType,
   ReimbursementRow,
@@ -10,38 +10,82 @@ export async function getReimbursementsByCompanyId({
   companyId,
   from,
   to,
+  filters,
+  searchQuery,
 }: {
   supabase: TypedSupabaseClient;
   companyId: string;
   from: number;
   to: number;
+  filters?: ReimbursementFilters;
+  searchQuery?: string;
 }) {
   const columns = [
     "id",
-    "employees (id, first_name, last_name)",
     "company_id",
     "is_deductible",
     "status",
     "amount",
-    "users (id, email)",
     "submitted_date",
   ] as const;
 
-  const { data, error } = await supabase
+  const query = supabase
     .from("reimbursements")
-    .select(columns.join(","), { count: "exact" })
-    .eq("company_id", companyId)
-    .range(from, to)
-    .order("created_at", { ascending: false })
-    .returns<Omit<ReimbursementRow, "created_at" | "updated_at">[]>();
+    .select(
+      `
+        ${columns.join(",")},
+            employee_name:employees!inner(first_name,middle_name,last_name),
+          users!inner(id,email)`
+    )
+    .eq("company_id", companyId);
 
+  if (searchQuery) {
+    query.or(
+      `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*`,
+      {
+        referencedTable: "employees",
+      }
+    );
+  }
+
+  if (filters) {
+    const {
+      submitted_date_start,
+      submitted_date_end,
+      status,
+      is_deductible,
+      user_email,
+    } = filters;
+
+    const dateFilters = [
+      {
+        field: "submitted_date",
+        start: submitted_date_start,
+        end: submitted_date_end,
+      },
+    ];
+    for (const { field, start, end } of dateFilters) {
+      if (start) query.gte(field, formatUTCDate(start));
+      if (end) query.lte(field, formatUTCDate(end));
+    }
+    if (status) {
+      query.eq("status", status.toLowerCase());
+    }
+    if (is_deductible) {
+      query.eq("is_deductible", is_deductible.toLowerCase());
+    }
+    if (user_email) {
+      query.eq("users.email", user_email);
+    }
+  }
+
+  const { data, error } = await query.range(from, to);
   if (error) {
-    console.error("Error fetching reimbursements:", error);
+    console.error(error);
   }
 
   return { data, error };
 }
-
 export async function getReimbursementsById({
   supabase,
   reimbursementId,
@@ -73,16 +117,12 @@ export async function getReimbursementsById({
   return { data, error };
 }
 
-
-type ReimbursementRowNew = {
-  id: string;
-  company_id: string;
-  is_deductible: boolean;
-  status: string;
-  amount: number;
-  submitted_date: string;
-  employees: { id: string; first_name: string; last_name: string };
-  users: { id: string; email: string };
+export type ReimbursementFilters = {
+  submitted_date_start?: string | undefined | null;
+  submitted_date_end?: string | undefined | null;
+  status?: string | undefined | null;
+  is_deductible?: string | undefined | null;
+  user_email?: string | undefined | null;
 };
 
 export async function getReimbursementsByEmployeeId({
@@ -90,31 +130,66 @@ export async function getReimbursementsByEmployeeId({
   employeeId,
   from,
   to,
+  filters,
 }: {
   supabase: TypedSupabaseClient;
   employeeId: string;
   from: number;
   to: number;
+  filters?: ReimbursementFilters;
+  searchQuery?: string;
 }) {
   const columns = [
     "id",
-    "employees (id, first_name, last_name)",
+
     "company_id",
     "is_deductible",
     "status",
     "amount",
     "submitted_date",
-    "users (id, email)",
   ] as const;
 
-  const { data, error } = await supabase
+  const query = supabase
     .from("reimbursements")
-    .select(columns.join(","))
-    .eq("employee_id", employeeId)
-    .range(from, to)
-    .order("created_at", { ascending: false })
-    .returns<ReimbursementRowNew[]>();
+    .select(
+      `
+        ${columns.join(",")},
+            employee_name:employees!inner(first_name, last_name),
+          users!inner(id,email)`
+    )
+    .eq("employee_id", employeeId);
 
+  if (filters) {
+    const {
+      submitted_date_start,
+      submitted_date_end,
+      status,
+      is_deductible,
+      user_email,
+    } = filters;
+
+    const dateFilters = [
+      {
+        field: "submitted_date",
+        start: submitted_date_start,
+        end: submitted_date_end,
+      },
+    ];
+    for (const { field, start, end } of dateFilters) {
+      if (start) query.gte(field, formatUTCDate(start));
+      if (end) query.lte(field, formatUTCDate(end));
+    }
+    if (status) {
+      query.eq("status", status.toLowerCase());
+    }
+    if (is_deductible) {
+      query.eq("is_deductible", is_deductible.toLowerCase());
+    }
+    if (user_email) {
+      query.eq("users.email", user_email);
+    }
+  }
+  const { data, error } = await query.range(from, to);
   if (error) {
     console.error(error);
   }

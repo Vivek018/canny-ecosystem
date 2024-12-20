@@ -1,22 +1,40 @@
+import { FilterList } from "@/components/reimbursements/filter-list";
+import { ReimbursementSearchFilter } from "@/components/reimbursements/reimbursement-search-filter";
 import { reimbursementsColumns } from "@/components/reimbursements/table/columns";
 import { ReimbursementsTable } from "@/components/reimbursements/table/reimbursements-table";
 import { LAZY_LOADING_LIMIT } from "@canny_ecosystem/supabase/constant";
-import { getReimbursementsByEmployeeId } from "@canny_ecosystem/supabase/queries";
+import { getReimbursementsByEmployeeId, getUsersEmail } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
-import { Icon } from "@canny_ecosystem/ui/icon";
-import { Input } from "@canny_ecosystem/ui/input";
+
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json, Link, useLoaderData } from "@remix-run/react";
-import { useEffect, useState } from "react";
+
 
 export const UPDATE_REIMBURSEMENTS_TAG = "Update Reimbursements";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
+  const url = new URL(request.url);
   const employeeId = params.employeeId;
   const { supabase } = getSupabaseWithHeaders({ request });
   let reimbursementData = null;
+  const searchParams = new URLSearchParams(url.searchParams);
+
+  const query = searchParams.get("name") ?? undefined;
+
+  const filters = {
+    submitted_date_start: searchParams.get("submitted_date_start") ?? undefined,
+    submitted_date_end: searchParams.get("submitted_date_end") ?? undefined,
+    status: searchParams.get("status") ?? undefined,
+    is_deductible: searchParams.get("is_deductible") ?? undefined,
+    user_email: searchParams.get("user_email") ?? undefined,
+  };
+
+  const { data, error } = await getUsersEmail({ supabase });
+  if (error) {
+    throw error;
+  }
 
   if (employeeId) {
     const { data, error } = await getReimbursementsByEmployeeId({
@@ -24,6 +42,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       employeeId: employeeId,
       from: 0,
       to: LAZY_LOADING_LIMIT - 1,
+      filters,
+      searchQuery: query ?? undefined,
     });
 
     if (error) {
@@ -36,46 +56,34 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
-  return json({ data: reimbursementData, env, employeeId });
+  return json({
+    data: reimbursementData as any,
+    env,
+    employeeId,
+    filters,
+    query,
+    userEmails: data?.map((user) => user.email) ?? [],
+  });
 }
 
 export default function ReimbursementsIndex() {
-  const { data, env, employeeId } = useLoaderData<typeof loader>();
+  const { data, env, employeeId, filters, userEmails } =
+    useLoaderData<typeof loader>();
 
-  const [searchString, setSearchString] = useState("");
-  const [tableData, setTableData] = useState(data);
+  
 
-  const [hasData, setHasData] = useState(true);
-
-  useEffect(() => {
-    const filteredData = data?.filter((item) =>
-      Object.values(item).some((value) =>
-        String(value).toLowerCase().includes(searchString.toLowerCase())
-      )
-    );
-    setTableData(filteredData!);
-    setHasData(true);
-  }, [searchString, data]);
-
+  const noFilters = Object.values(filters).every((value) => !value);
+  console.log("data:", data);
+  
   return (
     <section className="m-4">
       <div className="w-full flex items-center justify-between pb-4">
-        <div className="w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4">
-          <div className="relative w-96">
-            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-              <Icon
-                name="magnifying-glass"
-                size="sm"
-                className="text-gray-400"
-              />
-            </div>
-            <Input
-              placeholder="Search Users"
-              value={searchString}
-              onChange={(e) => setSearchString(e.target.value)}
-              className="pl-8 h-10 w-full focus-visible:ring-0"
-            />
+        <div className="w-full flex justify-between items-center ">
+          <div className="flex gap-3">
+            <ReimbursementSearchFilter disabled={!data?.length && noFilters} userEmails={userEmails} />
+            <FilterList filters={filters} />
           </div>
+
           <Link
             to={"add-reimbursement"}
             className={cn(
@@ -89,9 +97,9 @@ export default function ReimbursementsIndex() {
         </div>
       </div>
       <ReimbursementsTable
-        data={tableData as any}
+        data={data ?? []}
         columns={reimbursementsColumns({ isEmployeeRoute: true })}
-        hasNextPage={hasData}
+        hasNextPage={true}
         pageSize={LAZY_LOADING_LIMIT}
         env={env}
         employeeId={employeeId}

@@ -58,6 +58,7 @@ export function ReimbursementsTable<TData, TValue>({
           companyId,
           from,
           to,
+          
         });
         if (data) {
           setData((prevData: any) => [...prevData, ...data] as TData[]);
