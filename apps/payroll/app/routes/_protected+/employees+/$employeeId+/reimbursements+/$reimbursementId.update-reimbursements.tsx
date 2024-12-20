@@ -49,7 +49,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
   const submission = parseWithZod(formData, { schema: ReimbursementSchema });
-  console.log(employeeId);
+ 
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
