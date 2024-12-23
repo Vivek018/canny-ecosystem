@@ -60,7 +60,7 @@ export function PayrollComponent({ data, editable }: {
       },
     );
   }
-
+  
   return (
     <section className="m-4">
       <div className="flex justify-between items-center p-2">
