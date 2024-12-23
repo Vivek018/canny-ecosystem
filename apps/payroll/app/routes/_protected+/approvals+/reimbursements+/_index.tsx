@@ -133,6 +133,7 @@ export default function Reimbursements() {
         columns={reimbursementsColumns({})}
         filters={filters}
         hasNextPage={hasNextPage}
+        noFilters={noFilters}
         pageSize={LAZY_LOADING_LIMIT}
         env={env}
         query={query}

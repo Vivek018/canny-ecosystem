@@ -112,6 +112,7 @@ export async function action({ request }: ActionFunctionArgs) {
 export default function ExitsIndex() {
   const { data, count, query, filters, hasNextPage, env } =
     useLoaderData<typeof loader>();
+  const noFilters = filters ? Object.values(filters).every((value) => !value) : true;
   const filterList = { ...filters, name: query };
 
   return (
@@ -127,6 +128,7 @@ export default function ExitsIndex() {
         columns={ExitPaymentColumns}
         count={count ?? data?.length ?? 0}
         query={query}
+        noFilters={noFilters}
         filters={filters}
         hasNextPage={hasNextPage}
         pageSize={pageSize}

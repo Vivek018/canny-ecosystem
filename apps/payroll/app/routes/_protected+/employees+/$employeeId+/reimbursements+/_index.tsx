@@ -145,6 +145,7 @@ export default function ReimbursementsIndex() {
       </div>
       <ReimbursementsTable
         data={data ?? []}
+        noFilters={noFilters}
         columns={reimbursementsColumns({ isEmployeeRoute: true })}
         hasNextPage={hasNextPage}
         pageSize={LAZY_LOADING_LIMIT}
