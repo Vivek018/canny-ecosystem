@@ -7,7 +7,8 @@ import {
 import { Label } from "@canny_ecosystem/ui/label";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { replaceUnderscore } from "@canny_ecosystem/utils";
-import { useNavigate } from "@remix-run/react";
+import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
+import { useNavigate, useSearchParams } from "@remix-run/react";
 
 export const ViewRelationshipTermsDialog = ({
   values,
@@ -15,6 +16,9 @@ export const ViewRelationshipTermsDialog = ({
   values: any;
 }) => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const isParamViewPaySequence = searchParams.get("step") === modalSearchParamNames.view_pay_sequence;
 
   const handleOpenChange = () => {
     navigate(-1);
@@ -24,14 +28,14 @@ export const ViewRelationshipTermsDialog = ({
   const objectValues: string[] = Object.values(values);
 
   return (
-    <Dialog defaultOpen={true} onOpenChange={handleOpenChange}>
+    <Dialog open={isParamViewPaySequence} onOpenChange={handleOpenChange}>
       <DialogContent
         className={cn(
           "max-w-max pl-5 pr-40",
-          !objectKeys.length && "pr-4 pl-4",
+          !objectKeys.length && "pr-4 pl-4"
         )}
       >
-        <DialogHeader className="mb-4">
+        <DialogHeader className='mb-4'>
           <DialogTitle>Term Details</DialogTitle>
         </DialogHeader>
         <div
@@ -40,10 +44,10 @@ export const ViewRelationshipTermsDialog = ({
           {objectKeys.map((key, index) => (
             <div
               key={key.toString() + index.toString()}
-              className="flex items-center gap-2"
+              className='flex items-center gap-2'
             >
-              <Label className="font-bold">{replaceUnderscore(key)}:</Label>
-              <p className="text-base">{objectValues[index]}</p>
+              <Label className='font-bold'>{replaceUnderscore(key)}:</Label>
+              <p className='text-base'>{objectValues[index]}</p>
             </div>
           ))}
         </div>

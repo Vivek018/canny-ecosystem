@@ -1,74 +1,131 @@
+import { SiteDialog } from "@/components/link-template/site-dialog";
 import { EditPaySequenceSheet } from "@/components/pay-sequence/edit-pay-sequence-sheet";
 import { ViewPaySequenceDialog } from "@/components/pay-sequence/view-pay-sequence-dialog";
-import { getSitePaySequenceInSite } from "@canny_ecosystem/supabase/queries";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import {
+  getPaymentTemplateAssignmentsBySiteId,
+  getPaymentTemplatesByCompanyId,
+  getSitePaySequenceInSite,
+  type PaymentTemplateAssignmentsType,
+} from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
+import type { SitePaySequenceDatabaseRow } from "@canny_ecosystem/supabase/types";
+import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, useSearchParams } from "@remix-run/react";
 
-export async function loader({
-  request,
-  params,
-}: LoaderFunctionArgs): Promise<Response> {
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  const url = new URL(request.url);
+  const searchParams = url.searchParams;
+
   const projectId = params.projectId;
   const siteId = params.siteId;
+
+  let paymentTemplatesOptions: ComboboxSelectOption[] = [];
+  let linkTemplates: PaymentTemplateAssignmentsType[] = [];
+  let paySequenceData: Omit<SitePaySequenceDatabaseRow, "created_at"> | null =
+    null;
 
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
 
-    const { data, error } = await getSitePaySequenceInSite({
-      supabase,
-      siteId: siteId!,
-    });
-
-    if (error) {
-      return json({
-        status: "error",
-        message: "Failed to get site pay sequence",
-        error,
-        data,
+    if (searchParams.get("step")?.includes("pay-sequence")) {
+      const { data } = await getSitePaySequenceInSite({
+        supabase,
+        siteId: siteId!,
       });
+      if (data) {
+        paySequenceData = data;
+      }
     }
 
-    if (!data) {
-      return json({
-        status: "error",
-        message: "Site pay sequence not found",
-        error,
-        data,
-      });
+    if (searchParams.get("step")?.includes("link-template")) {
+      const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+
+      const { data: paymentTemplatesData } =
+        await getPaymentTemplatesByCompanyId({
+          supabase,
+          companyId: companyId,
+        });
+
+      if (paymentTemplatesData) {
+        paymentTemplatesOptions = paymentTemplatesData?.map(
+          (paymentTemplate) => ({
+            label: paymentTemplate.name,
+            value: paymentTemplate.id ?? "",
+          })
+        );
+      }
+
+      const { data: linkTemplatesData } =
+        await getPaymentTemplateAssignmentsBySiteId({
+          supabase,
+          siteId: siteId!,
+        });
+
+      if (linkTemplatesData) {
+        linkTemplates = linkTemplatesData;
+      }
     }
 
     return json({
-      status: "success",
-      message: "Site pay sequence loaded",
-      error: null,
-      data,
+      siteId,
       projectId,
+      paySequenceData,
+      paymentTemplatesOptions,
+      linkTemplates,
     });
   } catch (error) {
     return json(
       {
-        status: "error",
-        message: "An unexpected error occurred",
+        siteId,
+        projectId,
         error,
-        data: null,
+        paySequenceData,
+        paymentTemplatesOptions,
+        linkTemplates,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
 
 export default function EditPaySequence() {
-  const { data, projectId } = useLoaderData<typeof loader>();
+  const {
+    siteId,
+    projectId,
+    paySequenceData,
+    linkTemplates,
+    paymentTemplatesOptions,
+  } = useLoaderData<typeof loader>();
 
   const [searchParams] = useSearchParams();
 
-  if (searchParams.get(modalSearchParamNames.view_pay_sequence) === "true") {
-    return <ViewPaySequenceDialog values={data} />;
+  const step = searchParams.get("step");
+
+  if (step === modalSearchParamNames.view_link_template) {
+    return (
+      <SiteDialog
+        siteId={siteId!}
+        projectId={projectId!}
+        paymentTemplateOptions={paymentTemplatesOptions}
+        linkTemplates={linkTemplates}
+      />
+    );
   }
-  if (searchParams.get(modalSearchParamNames.edit_pay_sequence) === "true") {
-    return <EditPaySequenceSheet updateValues={data} projectId={projectId!} />;
+
+  if (step === modalSearchParamNames.view_pay_sequence && paySequenceData) {
+    return <ViewPaySequenceDialog values={paySequenceData} />;
+  }
+
+  if (step === modalSearchParamNames.edit_pay_sequence && paySequenceData) {
+    return (
+      <EditPaySequenceSheet
+        updateValues={paySequenceData}
+        projectId={projectId!}
+      />
+    );
   }
 
   return null;

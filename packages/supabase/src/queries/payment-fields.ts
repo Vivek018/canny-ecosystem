@@ -80,17 +80,12 @@ export async function getPaymentFieldsByCompanyId({
     .order("created_at", { ascending: false })
     .returns<PaymentFieldDataType[]>();
 
-  let supabaseError = null;
-
   if (error) {
     console.error(error);
-    supabaseError = error;
-  } else if (!data?.length) {
-    supabaseError = { message: "No payment fields found" };
   }
 
   return {
     data,
-    error: supabaseError,
-  };
+    error,
+  }
 }
