@@ -106,7 +106,7 @@ export default function EditPaySequence() {
 
   if (step === modalSearchParamNames.view_link_template) {
     return (
-      <SiteDialog
+    <SiteDialog
         siteId={siteId!}
         projectId={projectId!}
         paymentTemplateOptions={paymentTemplatesOptions}

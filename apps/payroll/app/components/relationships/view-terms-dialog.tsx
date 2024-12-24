@@ -18,7 +18,7 @@ export const ViewRelationshipTermsDialog = ({
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const isParamViewPaySequence = searchParams.get("step") === modalSearchParamNames.view_pay_sequence;
+  const isParamRelationshipTerms = searchParams.get("step") === modalSearchParamNames.view_relationship_terms;
 
   const handleOpenChange = () => {
     navigate(-1);
@@ -28,7 +28,7 @@ export const ViewRelationshipTermsDialog = ({
   const objectValues: string[] = Object.values(values);
 
   return (
-    <Dialog open={isParamViewPaySequence} onOpenChange={handleOpenChange}>
+    <Dialog open={isParamRelationshipTerms} onOpenChange={handleOpenChange}>
       <DialogContent
         className={cn(
           "max-w-max pl-5 pr-40",
