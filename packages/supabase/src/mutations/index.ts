@@ -3,7 +3,7 @@ export * from "./companies";
 export * from "./projects";
 export * from "./employees";
 export * from "./feedback";
-export * from "./payment-field";
+export * from "./payment-fields";
 export * from "./professional-tax";
 export * from "./labour-welfare-fund";
 export * from "./statutory-bonus";

@@ -31,6 +31,7 @@ export type IconName =
   | "plus"
   | "project"
   | "search"
+  | "select-drop"
   | "setting"
   | "sun"
   | "table"

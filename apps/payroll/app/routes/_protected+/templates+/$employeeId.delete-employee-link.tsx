@@ -1,4 +1,4 @@
-import { DeleteEmployeeLinkSchema, isGoodStatus } from "@canny_ecosystem/utils";
+import { isGoodStatus, z } from "@canny_ecosystem/utils";
 import { parseWithZod } from "@conform-to/zod";
 import { json } from "@remix-run/react";
 import type { ActionFunctionArgs } from "@remix-run/node";
@@ -6,6 +6,10 @@ import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { deletePaymentTemplateAssignment } from "@canny_ecosystem/supabase/mutations";
 import { getPaymentTemplateAssignmentIdByEmployeeId } from "@canny_ecosystem/supabase/queries";
+
+const DeleteEmployeeLinkSchema = z.object({
+  is_active: z.enum(["true", "false"]).transform((val) => val === "true"),
+});
 
 export async function action({ request, params }: ActionFunctionArgs) {
     const { supabase } = getSupabaseWithHeaders({ request });

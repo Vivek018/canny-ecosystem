@@ -539,16 +539,16 @@ export const UserSchema = z.object({
   is_active: z.boolean().default(false),
 });
 
-export const reasonforexitArray = [
-  "resigned by employee",
-  "terminated by employee",
-  "by death",
-  "by disability",
+export const reasonForExitArray = [
+  "resigned_by_employee",
+  "terminated_by_employee",
+  "by_death",
+  "by_disability",
 ] as const;
 
 export const ExitPaymentPage1Schema = z.object({
   last_working_day: z.string(),
-  reason_for_exit: z.enum(reasonforexitArray),
+  reason_for_exit: z.enum(reasonForExitArray),
   final_settlement_date: z.string(),
   note: zTextArea.max(100).optional(),
 });
@@ -568,74 +568,77 @@ export const ExitPaymentPage2Schema = z.object({
   deduction: zNumber.optional(),
 });
 
+// Payment Templates
+export const PaymentTemplateSchema = z.object({
+  id: z.string().uuid().optional(),
+  name: zString.min(3).max(50),
+  description: zTextArea.max(500).optional(),
+  is_active: z.boolean().default(false),
+  is_default: z.boolean().default(false),
+  company_id: z.string().uuid(),
+});
+
+export const statutoryFieldsArray = [
+  "epf",
+  "esi",
+  "bonus",
+  "pt",
+  "lwf",
+] as const;
+
+export const componentTypeArray = [
+  "earning",
+  "deduction",
+  "statutory_contribution",
+  "bonus",
+  "other",
+] as const;
+
+export const templateCalculationTypeArray = [
+  "variable",
+  "percentage_of_CTC",
+] as const;
+
+export const PaymentTemplateComponentsSchema = z.object({
+  monthly_ctc: z.number(),
+  state: zString,
+  payment_template_components: z.array(
+    z.object({
+      id: z.string().uuid().optional(),
+      target_type: z
+        .enum(["payment_field", ...statutoryFieldsArray])
+        .default("payment_field"),
+      payment_field_id: z.string().uuid().optional(),
+      epf_id: z.string().uuid().optional(),
+      esi_id: z.string().uuid().optional(),
+      bonus_id: z.string().uuid().optional(),
+      pt_id: z.string().uuid().optional(),
+      lwf_id: z.string().uuid().optional(),
+      component_type: z.enum(componentTypeArray).default("earning"),
+      calculation_type: z
+        .enum(templateCalculationTypeArray)
+        .default("variable"),
+      calculation_value: z.number().optional(),
+      display_order: z.number().int().optional(),
+      is_active: z.boolean().default(false),
+      company_id: z.string().uuid(),
+    }),
+  ),
+});
+
 // Payment Template Assignment
 export const paymentAssignmentTypesArray = ["employee", "site"] as const;
 export const eligibilityOptionsArray = ["position", "skill_level"] as const;
-export const PaymentTemplateAssignemntSchema = z.object({
-  id: z.string().uuid().optional(),
-  template_id: z.string().uuid(),
-  assignment_type: z.enum(paymentAssignmentTypesArray).default("employee"),
-  employee_id: z.string().uuid().optional(),
-  site_id: z.string().uuid().optional(),
-  eligibility_option: z.enum(eligibilityOptionsArray).default("position"),
-  position: z.string().optional(),
-  skill_level: z.string().optional(),
-  effective_from: z
-    .string()
-    .date()
-    .optional()
-    .default(new Date().toISOString().split("T")[0]),
-  effective_to: z.string().date().optional(),
-  is_active: z.boolean().optional().default(false),
-});
-
-export const PaymentTemplateFormEmployeeDialogSchema = z.object({
-  name: z.string(),
-  effective_from: z.string().default(new Date().toISOString().split("T")[0]),
-  effective_to: z.string().optional(),
-  template_id: z.string(),
-});
-
-export const PaymentTemplateFormSiteDialogSchema = z.object({
-  name: z.string(),
-  effective_from: z.string().default(new Date().toISOString().split("T")[0]),
-  effective_to: z.string().optional(),
-  template_id: z.string(),
-  eligibility_option: z.enum(eligibilityOptionsArray).optional(),
-  position: z.string().optional(),
-  skill_level: z.string().optional(),
-});
 
 // Payment Template Assignment
-export const CreateEmployeeLinkSchema = z.object({
-  template_id: z.string().uuid(),
-  effective_from: z.string(),
-  effective_to: z.string().optional(),
-  name: z.string(),
-});
-
-export const UpdateEmployeeLinkSchema = z.object({
-  template_id: z.string().uuid(),
-  effective_from: z.string(),
-  effective_to: z.string().optional(),
-  name: z.string(),
-});
-
-export const DeleteEmployeeLinkSchema = z.object({
-  is_active: z.enum(["true", "false"]).transform((val) => val === "true"),
-});
-
-export const CreateSiteLinkSchema = z.object({
+export const EmployeeLinkSchema = z.object({
   name: z.string(),
   effective_from: z.string().default(new Date().toISOString().split("T")[0]),
   effective_to: z.string().optional(),
   template_id: z.string(),
-  eligibility_option: z.enum(eligibilityOptionsArray).optional(),
-  position: z.string().optional(),
-  skill_level: z.string().optional(),
 });
 
-export const UpdateSiteLinkSchema = z.object({
+export const SiteLinkSchema = z.object({
   name: z.string(),
   effective_from: z.string().default(new Date().toISOString().split("T")[0]),
   effective_to: z.string().optional(),
@@ -654,11 +657,10 @@ export const ReimbursementSchema = z.object({
   submitted_date: z.string(),
   status: z.enum(ReimbursementStatusArray),
   amount: zNumber.min(1).max(100000000),
-  user_id:z.string().optional(),
+  user_id: z.string().optional(),
   is_deductible: z.boolean().optional().default(false),
-  company_id:z.string(),
-  employee_id:z.string(),
-
+  company_id: z.string(),
+  employee_id: z.string(),
 });
 
 export const exitReasonArray = [

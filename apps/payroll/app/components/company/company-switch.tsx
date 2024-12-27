@@ -31,7 +31,7 @@ export const CompanySwitch = ({
   const submit = useSubmit();
   const linkRef = useRef<HTMLAnchorElement | null>(null);
   const location = useLocation();
-  const companyId = useCompanyId();
+  const { companyId } = useCompanyId();
   const [open, setOpen] = useState(false);
 
   const currentCompany = companies.find((company) => company.id === companyId);
@@ -42,7 +42,7 @@ export const CompanySwitch = ({
       {
         method: "POST",
         action: "/cookie",
-      },
+      }
     );
     setOpen(false);
   };
@@ -51,37 +51,37 @@ export const CompanySwitch = ({
     <Popover key={location.key} open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          variant="outline"
-          role="combobox"
+          variant='outline'
+          role='combobox'
           aria-expanded={open}
           className={cn(
             "bg-card truncate justify-between capitalize rounded pl-1.5 pr-3 w-64 h-12",
-            !currentCompany && "text-muted-foreground",
+            !currentCompany && "text-muted-foreground"
           )}
         >
-          <div className="flex items-center gap-2">
-            <Avatar className="w-[34px] h-[34px] border border-muted-foreground/30 shadow-sm rounded-sm">
-              <AvatarFallback className="rounded-sm">
-                <span className="tracking-widest capitalize text-xs ml-[1.5px]">
+          <div className='flex items-center gap-2'>
+            <Avatar className='w-[34px] h-[34px] border border-muted-foreground/30 shadow-sm rounded-sm'>
+              <AvatarFallback className='rounded-sm'>
+                <span className='tracking-widest capitalize text-xs ml-[1.5px]'>
                   {currentCompany?.name.charAt(0)}
                 </span>
               </AvatarFallback>
             </Avatar>
-            <p className="w-40 text-start truncate">
+            <p className='w-40 text-start truncate'>
               {currentCompany ? currentCompany.name : "Select a company"}
             </p>
           </div>
           <Icon
-            name="caret-sort"
-            size="md"
+            name='caret-sort'
+            size='md'
             className={cn("ml-2 shrink-0 opacity-75")}
           />
         </Button>
       </PopoverTrigger>
-      <PopoverContent sideOffset={10} align="end" className="p-0 w-64">
+      <PopoverContent sideOffset={10} align='end' className='p-0 w-64'>
         <Command>
-          <CommandInput placeholder="Search companies..." />
-          <CommandEmpty className="w-full py-6 text-center">
+          <CommandInput placeholder='Search companies...' />
+          <CommandEmpty className='w-full py-6 text-center'>
             No company found.
           </CommandEmpty>
           <CommandList>
@@ -94,15 +94,15 @@ export const CompanySwitch = ({
                   disabled={currentCompany?.id === company.id}
                   className={cn("py-2 px-2")}
                 >
-                  <div className="flex items-center gap-1.5">
-                    <Avatar className="w-8 h-8 border border-muted-foreground/30 shadow-sm rounded-sm">
-                      <AvatarFallback className="rounded-sm">
-                        <span className="tracking-widest capitalize text-xs ml-[1.5px]">
+                  <div className='flex items-center gap-1.5'>
+                    <Avatar className='w-8 h-8 border border-muted-foreground/30 shadow-sm rounded-sm'>
+                      <AvatarFallback className='rounded-sm'>
+                        <span className='tracking-widest capitalize text-xs ml-[1.5px]'>
                           {company.name.charAt(0)}
                         </span>
                       </AvatarFallback>
                     </Avatar>
-                    <p className="font-medium tracking-wide ml-1 truncate w-40">
+                    <p className='font-medium tracking-wide ml-1 truncate w-40'>
                       {replaceUnderscore(company.name)}
                     </p>
                   </div>
@@ -111,13 +111,13 @@ export const CompanySwitch = ({
             </CommandGroup>
           </CommandList>
         </Command>
-        <div className="p-1.5 border-t">
+        <div className='p-1.5 border-t'>
           <Link
             ref={linkRef}
-            to="/create-company"
+            to='/create-company'
             className={cn(
               buttonVariants({ variant: "primary-ghost" }),
-              "w-full cursor-pointer capitalize",
+              "w-full cursor-pointer capitalize"
             )}
             onClick={() => setOpen(false)}
           >

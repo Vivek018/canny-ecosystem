@@ -32,7 +32,6 @@ export const getEmployeeProvidentFundById = async ({
     .from("employee_provident_fund")
     .select(columns.join(","))
     .eq("id", id)
-    .limit(SINGLE_QUERY_LIMIT)
     .single<
       InferredType<EmployeeProvidentFundDatabaseRow, (typeof columns)[number]>
     >();
@@ -72,6 +71,7 @@ export const getEmployeeProvidentFundByCompanyId = async ({
     .select(columns.join(","))
     .eq("company_id", companyId)
     .limit(SINGLE_QUERY_LIMIT)
+    .order("created_at", { ascending: false })
     .maybeSingle<
       InferredType<EmployeeProvidentFundDatabaseRow, (typeof columns)[number]>
     >();

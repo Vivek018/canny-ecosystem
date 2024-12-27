@@ -73,6 +73,7 @@
     "./spinner": "./src/components/spinner.tsx",
     "./avatar": "./src/components/avatar.tsx",
     "./select": "./src/components/select.tsx",
+    "./multi-select-combobox": "./src/components/multi-select-combobox.tsx",
     "./progress": "./src/components/progress.tsx",
     "./table": "./src/components/table.tsx",
     "./toggle-group": "./src/components/toggle-group.tsx",
