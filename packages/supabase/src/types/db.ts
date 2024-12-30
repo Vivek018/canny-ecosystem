@@ -810,7 +810,7 @@ export type Database = {
           amount: number
           created_at?: string | null
           exit_id: string
-          id: string
+          id?: string
           payment_fields_id: string
           type?: string
           updated_at?: string | null
@@ -852,6 +852,7 @@ export type Database = {
           note: string | null
           organization_payable_days: number
           reason: string
+          total: number | null
           updated_at: string | null
         }
         Insert: {
@@ -859,11 +860,12 @@ export type Database = {
           employee_id: string
           employee_payable_days: number
           final_settlement_date: string
-          id: string
+          id?: string
           last_working_day: string
           note?: string | null
           organization_payable_days: number
           reason: string
+          total?: number | null
           updated_at?: string | null
         }
         Update: {
@@ -876,6 +878,7 @@ export type Database = {
           note?: string | null
           organization_payable_days?: number
           reason?: string
+          total?: number | null
           updated_at?: string | null
         }
         Relationships: [
@@ -1308,7 +1311,7 @@ export type Database = {
             foreignKeyName: "payroll_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: false
-            referencedRelation: "company_locations"
+            referencedRelation: "project_sites"
             referencedColumns: ["id"]
           },
         ]

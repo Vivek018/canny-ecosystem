@@ -223,3 +223,25 @@ export const EMPLOYER_EPF_PERCENTAGE = 0.12;
 export const EMPLOYER_EDLI_PERCENTAGE = 0.005;
 export const EMPLOYER_EPS_PERCENTAGE = 0.0833;
 export const EMPLOYER_ADMIN_CHARGES_PERCENTAGE = 0.005;
+
+export const employeeExitReasons = [
+  "Resignation",
+  "Termination",
+  "Retirement",
+  "Health Reasons",
+  "Career Change",
+  "Other",
+];
+
+export const exitPaymentFields = [
+  "Bonus",
+  "Diwali Bonus",
+  "Commission",
+  "Joining Bonus",
+  "Yearly Bonus",
+  "Leave encashment",
+  "Gift Coupon",
+  "Gratuity",
+  "Computer Service Charges",
+  "Deduction"
+]

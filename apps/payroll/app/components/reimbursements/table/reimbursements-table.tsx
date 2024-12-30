@@ -18,6 +18,7 @@ import { useEffect, useState } from "react";
 import {
   getReimbursementsByCompanyId,
   getReimbursementsByEmployeeId,
+  type ReimbursementDataType,
   type ReimbursementFilters,
 } from "@canny_ecosystem/supabase/queries";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
@@ -60,7 +61,7 @@ export function ReimbursementsTable<TData, TValue>({
   const { supabase } = useSupabase({ env });
 
   const { ref, inView } = useInView();
-  const { rowSelection, setRowSelection, setColumns } = useReimbursementStore();
+  const { rowSelection, setSelectedRows, setRowSelection, setColumns } = useReimbursementStore();
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
     initialColumnVisibility ?? {}
   );
@@ -126,6 +127,15 @@ export function ReimbursementsTable<TData, TValue>({
       columnVisibility,
     },
   });
+
+  useEffect(() => {
+    const rowArray = [];
+    for (const row of table.getSelectedRowModel().rows) {
+      rowArray.push(row.original);
+    }
+    setSelectedRows(rowArray as ReimbursementDataType[]);
+  }, [rowSelection]);
+
   useEffect(() => {
     setColumns(table.getAllLeafColumns());
   }, [columnVisibility]);

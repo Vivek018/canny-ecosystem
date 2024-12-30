@@ -29,9 +29,9 @@ export const reimbursementsColumns = ({
     cell: ({ row }) => {
       return (
         <p className="truncate text-primary/80 w-48 group-hover:text-primary">{`${
-          row.original.employee_name?.first_name
-        } ${row.original.employee_name?.middle_name ?? ""} ${
-          row.original.employee_name?.last_name ?? ""
+          row.original.employees?.first_name
+        } ${row.original.employees?.middle_name ?? ""} ${
+          row.original.employees?.last_name ?? ""
         }`}</p>
       );
     },
@@ -100,7 +100,7 @@ export const reimbursementsColumns = ({
         <ReimbursementOptionsDropdown
           key={row.original.id}
           reimbursementId={row.original.id}
-          employeeId={row.original?.employee_name.id}
+          employeeId={row.original?.employees.id}
           isEmployeeRoute={isEmployeeRoute}
           triggerChild={
             <DropdownMenuTrigger asChild>

@@ -71,8 +71,6 @@ export function ExitPaymentsSheet({
                     cell.column.id === "reason" ||
                     cell.column.id === "note") &&
                     "hidden md:table-cell",
-                  cell.column.id === "employee_name" &&
-                    "sticky left-12 bg-card z-10"
                 )}
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -86,10 +84,10 @@ export function ExitPaymentsSheet({
           <SheetTitle className="flex  justify-between">
             <div>
               <h1 className="text-primary text-3xl">
-                {rowData.employee_name
-                  ? `${rowData.employee_name.first_name} ${
-                      rowData.employee_name.middle_name ?? ""
-                    } ${rowData.employee_name.last_name}`
+                {rowData.employees
+                  ? `${rowData.employees.first_name} ${
+                      rowData.employees.middle_name ?? ""
+                    } ${rowData.employees.last_name}`
                   : "--"}
               </h1>
             </div>

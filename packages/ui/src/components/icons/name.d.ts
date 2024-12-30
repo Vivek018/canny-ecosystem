@@ -3,6 +3,7 @@
 export type IconName =
   | "calendar"
   | "caret-sort"
+  | "chart"
   | "check"
   | "chevron-down"
   | "chevron-left"
@@ -30,6 +31,7 @@ export type IconName =
   | "plus-circled"
   | "plus"
   | "project"
+  | "report"
   | "search"
   | "setting"
   | "sun"

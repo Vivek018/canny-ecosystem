@@ -1,4 +1,5 @@
 import { FilterList } from "@/components/reimbursements/filter-list";
+import { ReimbursementActions } from "@/components/reimbursements/reimbursement-actions";
 import { ReimbursementSearchFilter } from "@/components/reimbursements/reimbursement-search-filter";
 import { reimbursementsColumns } from "@/components/reimbursements/table/columns";
 import { ReimbursementsTable } from "@/components/reimbursements/table/reimbursements-table";
@@ -8,7 +9,9 @@ import {
   MAX_QUERY_LIMIT,
 } from "@canny_ecosystem/supabase/constant";
 import {
+  getProjectNamesByCompanyId,
   getReimbursementsByCompanyId,
+  getSiteNamesByProjectName,
   getUsersEmail,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -32,6 +35,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
     is_deductible: searchParams.get("is_deductible") ?? undefined,
     users: searchParams.get("users") ?? undefined,
     name: query,
+    project: searchParams.get("project") ?? undefined,
+    project_site: searchParams.get("project_site") ?? undefined,
   };
   const { data, error } = await getUsersEmail({ supabase });
   if (error) {
@@ -41,7 +46,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const hasFilters =
     filters &&
     Object.values(filters).some(
-      (value) => value !== null && value !== undefined
+      (value) => value !== null && value !== undefined,
     );
 
   const {
@@ -56,8 +61,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
       to: hasFilters
         ? MAX_QUERY_LIMIT
         : page > 0
-        ? LAZY_LOADING_LIMIT
-        : LAZY_LOADING_LIMIT - 1,
+          ? LAZY_LOADING_LIMIT
+          : LAZY_LOADING_LIMIT - 1,
       filters,
       searchQuery: query ?? undefined,
       sort: sortParam?.split(":") as [string, "asc" | "desc"],
@@ -66,13 +71,28 @@ export async function loader({ request }: LoaderFunctionArgs) {
   if (reimbursementError || !reimbursementData) {
     throw reimbursementError;
   }
+
+    const { data: projectData } = await getProjectNamesByCompanyId({
+      supabase,
+      companyId,
+    });
+  
+    let projectSiteData = null;
+    if (filters.project) {
+      const { data } = await getSiteNamesByProjectName({
+        supabase,
+        projectName: filters.project,
+      });
+      projectSiteData = data;
+    }
+  
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
 
   const hasNextPage = Boolean(
-    meta?.count && meta.count / (page + 1) > LAZY_LOADING_LIMIT
+    meta?.count && meta.count / (page + 1) > LAZY_LOADING_LIMIT,
   );
 
   return json({
@@ -83,6 +103,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
     filters,
     query,
     userEmails: data?.map((user) => user.email) ?? [],
+    projectArray: projectData?.map((project) => project.name) ?? [],
+    projectSiteArray: projectSiteData?.map((site) => site.name) ?? [],
   });
 }
 
@@ -113,6 +135,8 @@ export default function Reimbursements() {
     filters,
     userEmails,
     hasNextPage,
+    projectArray,
+    projectSiteArray,
   } = useLoaderData<typeof loader>();
 
   const noFilters = Object.values(filters).every((value) => !value);
@@ -124,9 +148,12 @@ export default function Reimbursements() {
           <ReimbursementSearchFilter
             disabled={!reimbursementData?.length && noFilters}
             userEmails={userEmails}
+            projectArray={projectArray}
+            projectSiteArray={projectSiteArray}
           />
           <FilterList filters={filters} />
         </div>
+        <ReimbursementActions isEmpty={!reimbursementData?.length} />
       </div>
       <ReimbursementsTable
         data={reimbursementData as any}
