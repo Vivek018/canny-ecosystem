@@ -100,7 +100,7 @@ export const MultiSelectCombobox = ({
             placeholder={placeholder || `Search ${label}...`}
             aria-label={`Search ${label}`}
           />
-          <CommandList>
+          <CommandList className="max-h-[180px]">
             <CommandEmpty>No {label} found.</CommandEmpty>
             <CommandGroup>
               {options.map((option) => (

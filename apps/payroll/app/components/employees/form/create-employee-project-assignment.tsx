@@ -29,8 +29,8 @@ import {
 
 type FieldsType = {
   [K in keyof typeof EmployeeProjectAssignmentSchema.shape]: FieldMetadata<
-    typeof EmployeeProjectAssignmentSchema,
-    typeof EmployeeProjectAssignmentSchema,
+    (typeof EmployeeProjectAssignmentSchema.shape)[K]["_type"],
+    (typeof EmployeeProjectAssignmentSchema.shape)[K],
     string[]
   >;
 };

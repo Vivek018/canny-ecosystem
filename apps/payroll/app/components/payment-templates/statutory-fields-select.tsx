@@ -57,20 +57,16 @@ export const StatutoryFieldsSelect: FC<StatutoryFieldsSelectProps> = ({
   };
 
   const handleFieldChange = async (newSelectedFields: string[]) => {
-    // Find newly selected fields
     const newlySelected = newSelectedFields.filter(
       (field) => !selectedFields.includes(field)
     );
 
-    // Find deselected fields
     const deselected = selectedFields.filter(
       (field) => !newSelectedFields.includes(field)
     );
 
-    // Update selected fields state
     setSelectedFields(newSelectedFields);
 
-    // Handle newly selected fields
     for (const field of newlySelected) {
       const data = await getSelectedStatutoryField(
         field as (typeof statutoryFieldsArray)[number]
@@ -81,7 +77,6 @@ export const StatutoryFieldsSelect: FC<StatutoryFieldsSelectProps> = ({
       });
     }
 
-    // Handle deselected fields
     for (const field of deselected) {
       setSelectedStatutoryFields({
         ...selectedStatutoryFields,

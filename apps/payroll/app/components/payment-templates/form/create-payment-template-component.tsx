@@ -7,6 +7,7 @@ import {
 import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import {
+  replaceUnderscore,
   statutoryFieldsArray,
   transformStringArrayIntoOptions,
   type PaymentTemplateComponentsSchema,
@@ -21,8 +22,8 @@ import { StatutoryFieldsSelect } from "../statutory-fields-select";
 
 type FieldsType = {
   [K in keyof typeof PaymentTemplateComponentsSchema.shape]: FieldMetadata<
-    typeof PaymentTemplateComponentsSchema,
-    typeof PaymentTemplateComponentsSchema,
+    (typeof PaymentTemplateComponentsSchema.shape)[K]["_type"],
+    (typeof PaymentTemplateComponentsSchema.shape)[K],
     string[]
   >;
 };
@@ -38,7 +39,6 @@ export function CreatePaymentTemplateComponentDetails({
 }) {
   const { selectedPaymentFields } = usePaymentComponentsStore();
 
-  console.log(selectedPaymentFields);
 
   return (
     <Fragment>
@@ -52,8 +52,11 @@ export function CreatePaymentTemplateComponentDetails({
         <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
           <Field
             inputProps={{
-              type: "number",
-              placeholder: "Enter CTC per month",
+              ...getInputProps(fields.monthly_ctc, { type: "number" }),
+              placeholder: `Enter ${replaceUnderscore(
+                fields.monthly_ctc.name
+              )}`,
+              autoFocus: true,
               min: 0,
               max: 100000000,
               maxLength: 9,

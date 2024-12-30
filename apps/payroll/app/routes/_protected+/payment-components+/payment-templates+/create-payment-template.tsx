@@ -46,7 +46,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const totalSteps = schemas.length;
 
   const session = await getSession(request.headers.get("Cookie"));
-  const stepData: any[] = [];
+  const stepData: (typeof schemas)[number][] = [];
 
   for (let i = 1; i <= totalSteps; i++) {
     stepData.push(await session.get(`${SESSION_KEY_PREFIX}${i}`));
@@ -228,7 +228,9 @@ export default function CreatePaymentTemplate() {
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
-    defaultValue: defaultValues,
+    defaultValue: {
+      ...defaultValues
+    },
   });
 
   return (
@@ -257,6 +259,7 @@ export default function CreatePaymentTemplate() {
               ) : null}
               {step === 2 ? (
                 <CreatePaymentTemplateComponentDetails
+                  key={resetKey + 1}
                   fields={fields as any}
                   paymentFieldOptions={paymentFieldOptions ?? []}
                   env={env}

@@ -11,12 +11,11 @@ import {
 } from "@canny_ecosystem/utils";
 import { Field } from "@canny_ecosystem/ui/forms";
 import { type FieldMetadata, getInputProps } from "@conform-to/react";
-import type { CompanyRegistrationDetailsInsert } from "@canny_ecosystem/supabase/types";
 
 type FieldsType = {
   [K in keyof typeof CompanyRegistrationDetailsSchema.shape]: FieldMetadata<
-    CompanyRegistrationDetailsInsert,
-    CompanyRegistrationDetailsInsert,
+    (typeof CompanyRegistrationDetailsSchema.shape)[K]["_type"],
+    (typeof CompanyRegistrationDetailsSchema.shape)[K],
     string[]
   >;
 };
@@ -29,20 +28,22 @@ export function CreateCompanyRegistrationDetails({
   return (
     <Fragment>
       <CardHeader>
-        <CardTitle className="text-3xl">
+        <CardTitle className='text-3xl'>
           Create Company Registration Details
         </CardTitle>
         <CardDescription>
           Add Company Registration details of the company
         </CardDescription>
       </CardHeader>
-      <CardContent className="grid grid-cols-2 gap-x-6">
+      <CardContent className='grid grid-cols-2 gap-x-6'>
         <Field
-          className="col-span-2"
+          className='col-span-2'
           inputProps={{
             ...getInputProps(fields.registration_number, { type: "text" }),
             autoFocus: true,
-            placeholder: `Enter ${replaceUnderscore(fields.registration_number.name)}`,
+            placeholder: `Enter ${replaceUnderscore(
+              fields.registration_number.name
+            )}`,
           }}
           labelProps={{
             children: replaceUnderscore(fields.registration_number.name),

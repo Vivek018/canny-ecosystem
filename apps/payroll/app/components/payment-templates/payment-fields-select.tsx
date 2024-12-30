@@ -50,7 +50,7 @@ export const PaymentFieldsSelect: FC<PaymentFieldsSelectProps> = ({
   const handleRenderSelectedItem = (values: string[]): string => {
     if (values.length === 0) return "";
 
-    if (values.length <= 6) {
+    if (values.length <= 3) {
       return options
         .reduce<string[]>((accumulator, option) => {
           if (values.includes(String(option.value))) {
@@ -87,7 +87,7 @@ export const PaymentFieldsSelect: FC<PaymentFieldsSelectProps> = ({
       />
       <span id='payment-field-description' className='sr-only'>
         Select one or more payment fields. Shows individual payment fields names
-        when 6 or fewer are selected.
+        when 3 or fewer are selected.
       </span>
     </div>
   );

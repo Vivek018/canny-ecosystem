@@ -15,8 +15,8 @@ import { Fragment } from "react";
 
 type FieldsType = {
   [K in keyof typeof PaymentTemplateSchema.shape]: FieldMetadata<
-    typeof PaymentTemplateSchema,
-    typeof PaymentTemplateSchema,
+    (typeof PaymentTemplateSchema.shape)[K]["_type"],
+    (typeof PaymentTemplateSchema.shape)[K],
     string[]
   >;
 };
