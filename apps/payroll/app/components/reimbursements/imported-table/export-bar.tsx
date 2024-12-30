@@ -1,8 +1,7 @@
 import { Button } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { formatDate, formatDateTime } from "@canny_ecosystem/utils";
+import { formatDateTime } from "@canny_ecosystem/utils";
 import Papa from "papaparse";
-import { useState } from "react";
 
 export function ExportBar({
   rows,
