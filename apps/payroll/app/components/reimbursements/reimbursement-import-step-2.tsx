@@ -128,7 +128,7 @@ export default function ReimbursementImportStep2({
               />
             </div>
             <Input
-              placeholder="Search Users"
+              placeholder="Search Reimbursements"
               value={searchString}
               onChange={(e) => setSearchString(e.target.value)}
               className="pl-8 h-10 w-full focus-visible:ring-0"

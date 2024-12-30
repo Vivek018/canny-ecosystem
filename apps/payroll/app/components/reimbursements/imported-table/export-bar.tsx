@@ -1,7 +1,10 @@
+import type { ReimbursementDataType } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { formatDateTime } from "@canny_ecosystem/utils";
+import type { VisibilityState } from "@tanstack/react-table";
 import Papa from "papaparse";
+import { ReimbursementsColumnIdArray } from "../table/reimbursements-table-header";
 
 export function ExportBar({
   rows,
@@ -10,58 +13,47 @@ export function ExportBar({
   columnVisibility,
 }: {
   rows: number;
-  data: any;
+  data: ReimbursementDataType[];
   className: string;
-  columnVisibility: any;
+  columnVisibility: VisibilityState;
 }) {
   const totalAmount = data.reduce(
-    (sum: number, entry: any) => sum + entry.amount,
+    (sum: number, { amount }) => sum + (amount ?? 0),
     0
   );
+  const toBeExportedData = data.map((element) => {
+    const exportedData: {
+      [key: (typeof ReimbursementsColumnIdArray)[number]]: string | number | boolean;
+    } = {};
 
-  const toBeExportedData = data.map(
-    ({
-      amount,
-      status,
-      submitted_date,
-      is_deductible,
-      users: { email },
-      employee_name: {
-        first_name,
-        middle_name,
-        last_name,
-        employee_code,
-        employee_project_assignment: {
-          project_sites: {
-            name: projectSiteName,
-            projects: { name: projectName },
-          },
-        },
-      },
-    }: any) => {
-      const exportedData: any = {};
-
-      if (columnVisibility.employee_code !== false)
-        exportedData.employee_code = employee_code;
-      if (columnVisibility.employee_name !== false)
-        exportedData.employee_name = `${first_name} ${middle_name} ${last_name}`;
-      if (columnVisibility.submitted_date !== false)
-        exportedData.submitted_date = submitted_date;
-      if (columnVisibility.amount !== false) exportedData.amount = amount;
-      if (columnVisibility.status !== false) exportedData.status = status;
-      if (columnVisibility.is_deductible !== false)
-        exportedData.is_deductible = is_deductible;
-      if (columnVisibility.email !== false) exportedData.email = email;
-      if (columnVisibility.project_name !== false)
-        exportedData.project_name = projectName;
-      if (columnVisibility.project_site_name !== false)
-        exportedData.project_site_name = projectSiteName;
-
-      return exportedData;
+    for (const key of ReimbursementsColumnIdArray) {
+      if (columnVisibility[key] === false) {
+        continue;
+      }
+      if (key === "employee_code") {
+        exportedData[key] = element.employee_name.employee_code;
+      } else if (key === "employee_name") {
+        exportedData[
+          key
+        ] = `${element.employee_name.first_name} ${element.employee_name.middle_name} ${element.employee_name.last_name}`;
+      } else if (key === "email") {
+        exportedData[key] = element.users.email ?? "";
+      } else if (key === "project_name") {
+        exportedData[key] =
+          element.employee_name.employee_project_assignment.project_sites.projects.name;
+      } else if (key === "project_site_name") {
+        exportedData[key] =
+          element.employee_name.employee_project_assignment.project_sites.name;
+      } else {
+        exportedData[key] = element[key as keyof ReimbursementDataType] as any;
+      }
     }
-  );
 
-  const handleExport = () => {
+    return exportedData;
+  });
+
+  const handleExport = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
     const csv = Papa.unparse(toBeExportedData);
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
@@ -82,25 +74,19 @@ export function ExportBar({
   return (
     <div
       className={cn(
-        "w-full fixed bottom-8 mx-auto flex gap-3 justify-center items-center",
+        "fixed bottom-8 left-0 right-0 mx-auto h-14 w-max shadow-md rounded-full flex gap-10 justify-between items-center px-3 border bg-card text-card-foreground",
         className
       )}
     >
-      <div className="h-14 font-semibold shadow-md rounded-full flex justify-between items-center px-4 border bg-card text-card-foreground">
+      <div className="h-9 font-semibold rounded-full flex justify-between items-center px-4 border bg-card text-card-foreground">
         Amount: <span className="ml-1.5">{totalAmount}</span>
       </div>
-      <div className="h-14 shadow-md rounded-full flex gap-10 justify-between items-center px-3 border bg-card text-card-foreground">
-        <span className="flex items-center space-x-1 bg-dark rounded-md">
-          <p className="font-semibold">{rows} Selected</p>
-        </span>
-        <Button
-          onClick={handleExport}
-          variant="default"
-          className="rounded-full"
-        >
-          Export
-        </Button>
+      <div className="flex items-center space-x-1 bg-dark rounded-md">
+        <p className="font-semibold">{rows} Selected</p>
       </div>
+      <Button onClick={handleExport} variant="default" className="rounded-full">
+        Export
+      </Button>
     </div>
   );
 }

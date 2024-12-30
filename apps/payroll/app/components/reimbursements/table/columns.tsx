@@ -24,6 +24,7 @@ export const reimbursementsColumns = ({
     enableHiding: false,
   },
   {
+    enableSorting: false,
     accessorKey: "employee_code",
     header: "Employee Code",
     cell: ({ row }) => {
@@ -35,6 +36,7 @@ export const reimbursementsColumns = ({
     },
   },
   {
+    enableSorting: false,
     accessorKey: "employee_name",
     header: "Employee Name",
     cell: ({ row }) => {
@@ -92,6 +94,7 @@ export const reimbursementsColumns = ({
     },
   },
   {
+    enableSorting: false,
     accessorKey: "email",
     header: "Approved By",
     cell: ({ row }) => {
@@ -99,6 +102,7 @@ export const reimbursementsColumns = ({
     },
   },
   {
+    enableSorting: false,
     accessorKey: "project_name",
     header: "Project",
     cell: ({ row }) => {
@@ -113,6 +117,7 @@ export const reimbursementsColumns = ({
     },
   },
   {
+    enableSorting: false,
     accessorKey: "project_site_name",
     header: "Project Site",
     cell: ({ row }) => {

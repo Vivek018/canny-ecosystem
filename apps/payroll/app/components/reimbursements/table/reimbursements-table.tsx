@@ -131,7 +131,7 @@ export function ReimbursementsTable<TData, TValue>({
 
   
 
-  const selectedRowsData = table
+  const selectedRowsData= table
     .getSelectedRowModel()
     .rows?.map((row) => row.original);
 
@@ -247,7 +247,7 @@ export function ReimbursementsTable<TData, TValue>({
       <ExportBar
         className={cn(!table.getSelectedRowModel().rows.length && "hidden")}
         rows={table.getSelectedRowModel().rows.length}
-        data={selectedRowsData}
+        data={selectedRowsData as any}
         columnVisibility={columnVisibility}
       />
     </div>

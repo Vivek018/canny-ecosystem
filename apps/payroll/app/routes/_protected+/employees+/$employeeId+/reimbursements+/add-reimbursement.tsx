@@ -136,9 +136,6 @@ export default function AddReimbursements({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex justify-center items-center mt-5">
-                <span className="text-primary">{}</span>
-              </div>
               <input
                 {...getInputProps(fields.company_id, { type: "hidden" })}
               />
