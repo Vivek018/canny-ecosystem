@@ -74,7 +74,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
   const { status, error } = await createReimbursementsFromData({
     supabase,
-    data: reimbursementData,
+    data: reimbursementData as any,
   });
 
   if (isGoodStatus(status))
@@ -202,7 +202,7 @@ export default function AddReimbursements({
                     placeholder: "Select an authority that approved",
                   }}
                   className="lowercase"
-                  options={userOptions ?? userOptionsFromUpdate}
+                  options={userOptions as any ?? userOptionsFromUpdate}
                   labelProps={{
                     children: "Approved By",
                   }}

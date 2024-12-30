@@ -24,11 +24,22 @@ export const reimbursementsColumns = ({
     enableHiding: false,
   },
   {
+    accessorKey: "employee_code",
+    header: "Employee Code",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate">
+          {row.original?.employee_name?.employee_code ?? "--"}
+        </p>
+      );
+    },
+  },
+  {
     accessorKey: "employee_name",
     header: "Employee Name",
     cell: ({ row }) => {
       return (
-        <p className="truncate text-primary/80 w-48 group-hover:text-primary">{`${
+        <p className="truncate w-48 group-hover:text-primary">{`${
           row.original.employee_name?.first_name
         } ${row.original.employee_name?.middle_name ?? ""} ${
           row.original.employee_name?.last_name ?? ""
@@ -36,6 +47,7 @@ export const reimbursementsColumns = ({
       );
     },
   },
+
   {
     accessorKey: "submitted_date",
     header: "Submitted Date",
@@ -74,20 +86,44 @@ export const reimbursementsColumns = ({
     cell: ({ row }) => {
       return (
         <p className="truncate capitalize">
-          {row.original?.is_deductible === undefined
-            ? "--"
-            : row.original?.is_deductible
-            ? "true"
-            : "false"}
+          {String(row.original?.is_deductible) ?? "--"}
         </p>
       );
     },
   },
   {
-    accessorKey: "user_id",
+    accessorKey: "email",
     header: "Approved By",
     cell: ({ row }) => {
       return <p className=" truncate">{row.original?.users?.email ?? "--"}</p>;
+    },
+  },
+  {
+    accessorKey: "project_name",
+    header: "Project",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate ">
+          {
+            row.original.employee_name?.employee_project_assignment
+              .project_sites.projects.name
+          }
+        </p>
+      );
+    },
+  },
+  {
+    accessorKey: "project_site_name",
+    header: "Project Site",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate ">
+          {
+            row.original.employee_name?.employee_project_assignment
+              .project_sites.name
+          }
+        </p>
+      );
     },
   },
 

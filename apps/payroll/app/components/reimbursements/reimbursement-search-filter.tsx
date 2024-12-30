@@ -35,10 +35,14 @@ export function ReimbursementSearchFilter({
   disabled,
   userEmails,
   employeeId,
+  projectArray,
+  projectSiteArray,
 }: {
   disabled?: boolean;
   userEmails?: (string | null | undefined)[];
   employeeId?: string | undefined;
+  projectArray: string[];
+  projectSiteArray: string[];
 }) {
   const [prompt, setPrompt] = useState("");
   const navigation = useNavigation();
@@ -62,6 +66,8 @@ export function ReimbursementSearchFilter({
     status: "",
     is_deductible: "",
     users: "",
+    project: "",
+    project_site: "",
   };
 
   const [filterParams, setFilterParams] = useState(initialFilterParams);
@@ -94,6 +100,8 @@ export function ReimbursementSearchFilter({
     status: searchParams.get("status"),
     is_deductible: searchParams.get("is_deductible"),
     users: searchParams.get("users"),
+    project: searchParams.get("project"),
+    project_site: searchParams.get("project_site"),
   };
 
   useEffect(() => {
@@ -368,7 +376,79 @@ export function ReimbursementSearchFilter({
             </DropdownMenuPortal>
           </DropdownMenuSub>
         </DropdownMenuGroup>
+        <DropdownMenuGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <span>Project</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent
+                sideOffset={14}
+                alignOffset={-4}
+                className="p-0"
+              >
+                {projectArray?.map((name, index) => (
+                  <DropdownMenuCheckboxItem
+                    key={name + index.toString()}
+                    className="capitalize"
+                    checked={filterParams?.project === name}
+                    onCheckedChange={() => {
+                      setFilterParams((prev) => ({
+                        ...prev,
+                        project: name,
+                      }));
+                    }}
+                  >
+                    {name}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+        </DropdownMenuGroup>
+
+        <DropdownMenuGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <span>Project Site</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent
+                sideOffset={14}
+                alignOffset={-4}
+                className="p-0"
+              >
+                {!searchParamsList.project ? (
+                  <DropdownMenuCheckboxItem
+                    disabled={true}
+                    className="p-8 items-center justify-center"
+                  >
+                    Select Project First
+                  </DropdownMenuCheckboxItem>
+                ) : (
+                  projectSiteArray?.map((name, index) => (
+                    <DropdownMenuCheckboxItem
+                      key={name + index.toString()}
+                      className="capitalize"
+                      checked={filterParams?.project_site === name}
+                      onCheckedChange={() => {
+                        setFilterParams((prev) => ({
+                          ...prev,
+                          project_site: name,
+                        }));
+                      }}
+                    >
+                      {name}
+                    </DropdownMenuCheckboxItem>
+                  ))
+                )}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+        </DropdownMenuGroup>
+
       </DropdownMenuContent>
     </DropdownMenu>
+    
   );
 }

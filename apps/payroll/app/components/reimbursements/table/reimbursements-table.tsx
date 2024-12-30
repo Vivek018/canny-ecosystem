@@ -25,6 +25,7 @@ import { Spinner } from "@canny_ecosystem/ui/spinner";
 import { useSearchParams } from "@remix-run/react";
 import { Button } from "@canny_ecosystem/ui/button";
 import { useReimbursementStore } from "@/store/reimbursements";
+import { ExportBar } from "../imported-table/export-bar";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -60,6 +61,7 @@ export function ReimbursementsTable<TData, TValue>({
   const { supabase } = useSupabase({ env });
 
   const { ref, inView } = useInView();
+
   const { rowSelection, setRowSelection, setColumns } = useReimbursementStore();
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
     initialColumnVisibility ?? {}
@@ -82,7 +84,7 @@ export function ReimbursementsTable<TData, TValue>({
           },
         });
         if (data) {
-          setData((prevData: any) => [...prevData, ...data] as TData[]);
+          setData((prevData) => [...prevData, ...data] as TData[]);
         }
         setFrom(to + 1);
         setHasNextPage(data?.length! > to);
@@ -104,7 +106,7 @@ export function ReimbursementsTable<TData, TValue>({
         });
         if (data) {
           setData(
-            (prevData: any) => [...prevData, ...(data as any)] as TData[]
+            (prevData) => [...prevData, ...(data)] as TData[]
           );
         }
         setFrom(to + 1);
@@ -126,6 +128,13 @@ export function ReimbursementsTable<TData, TValue>({
       columnVisibility,
     },
   });
+
+  
+
+  const selectedRowsData = table
+    .getSelectedRowModel()
+    .rows?.map((row) => row.original);
+
   useEffect(() => {
     setColumns(table.getAllLeafColumns());
   }, [columnVisibility]);
@@ -163,7 +172,7 @@ export function ReimbursementsTable<TData, TValue>({
                 table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
-                    className="relative  cursor-default select-text"
+                    className="relative cursor-default select-text"
                   >
                     {row.getVisibleCells().map((cell) => {
                       return (
@@ -179,9 +188,7 @@ export function ReimbursementsTable<TData, TValue>({
                             cell.column.id === "select" &&
                               "sticky left-0 min-w-12 max-w-12 bg-card z-10",
                             cell.column.id === "actions" &&
-                              "sticky right-0 min-w-20 max-w-20 bg-card z-10",
-                            cell.column.id === "employee_name" &&
-                              " sticky left-12 min-w-20 max-w-36 bg-card z-10"
+                              "sticky right-0 min-w-20 max-w-20 bg-card z-10"
                           )}
                         >
                           {flexRender(
@@ -237,6 +244,12 @@ export function ReimbursementsTable<TData, TValue>({
           </div>
         </div>
       )}
+      <ExportBar
+        className={cn(!table.getSelectedRowModel().rows.length && "hidden")}
+        rows={table.getSelectedRowModel().rows.length}
+        data={selectedRowsData}
+        columnVisibility={columnVisibility}
+      />
     </div>
   );
 }

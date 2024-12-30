@@ -35,6 +35,8 @@ export function FilterList({ filters }: Props) {
       case "status":
       case "is_deductible":
       case "users":
+      case "project":
+      case "project_site":
         return value;
       default:
         return null;
