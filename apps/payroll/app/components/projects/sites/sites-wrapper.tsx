@@ -1,6 +1,5 @@
 import { SiteCard } from "@/components/sites/site-card";
 import type { SitesWithLocation } from "@canny_ecosystem/supabase/queries";
-import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { CommandGroup, CommandItem } from "@canny_ecosystem/ui/command";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { replaceUnderscore } from "@canny_ecosystem/utils";
@@ -9,13 +8,9 @@ import { useEffect } from "react";
 export function SitesWrapper({
   data,
   error,
-  env,
-  companyId,
 }: {
   data: Omit<SitesWithLocation, "created_at" | "updated_at">[] | null;
   error: Error | null | { message: string };
-  env: SupabaseEnv;
-  companyId: string;
 }) {
   const { toast } = useToast();
 
@@ -47,7 +42,7 @@ export function SitesWrapper({
             }
             className="data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0"
           >
-            <SiteCard site={site} env={env} companyId={companyId} />
+            <SiteCard site={site} />
           </CommandItem>
         ))}
       </div>

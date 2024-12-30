@@ -7,55 +7,63 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Button, buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { useSearchParams } from "@remix-run/react";
+import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
 
-export function SiteLinkedTemplates({ linkedTemplates }: { linkedTemplates: PaymentTemplateAssignmentsType[] | null }) {
-    const [searchString, setSearchString] = useState("");
-    const [tableData, setTableData] = useState(linkedTemplates);
-    const [searchParams, setSearchParams] = useSearchParams();
+export function SiteLinkedTemplates({
+  linkedTemplates,
+}: {
+  linkedTemplates: PaymentTemplateAssignmentsType[] | null;
+}) {
+  const [searchString, setSearchString] = useState("");
+  const [tableData, setTableData] = useState(linkedTemplates);
+  const [searchParams, setSearchParams] = useSearchParams();
 
-    useEffect(() => {
-        const filteredData = linkedTemplates?.filter((item: PaymentTemplateAssignmentsType) =>
-            Object.values(item).some((value) =>
-                String(value).toLowerCase().includes(searchString.toLowerCase()),
-            ),
-        );
-        setTableData(filteredData as any);
-    }, [searchString, linkedTemplates]);
-
-    const linkNewTemplate = (e: React.MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault();
-        searchParams.set("action", "create");
-        setSearchParams(searchParams);
-    }
-
-    return (
-        <section className="py-4 px-4">
-            <div className="w-full flex items-center justify-between pb-4">
-                <div className="w-full flex items-center gap-4">
-                    <div className="relative w-full">
-                        <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                            <Icon
-                                name="magnifying-glass"
-                                size="sm"
-                                className="text-gray-400"
-                            />
-                        </div>
-                        <Input
-                            placeholder="Search linked templates"
-                            value={searchString}
-                            onChange={(e) => setSearchString(e.target.value)}
-                            className="pl-8 h-10 w-full focus-visible:ring-0"
-                        />
-                    </div>
-                    <Button
-                        className={cn(buttonVariants({ variant: "primary-outline" }), "flex items-center gap-1 capitalize")}
-                        onClick={(e) => linkNewTemplate(e)}
-                    >
-                        Link new template
-                    </Button>
-                </div>
-            </div>
-            <DataTable data={tableData ?? []} columns={columns()} />
-        </section >
+  useEffect(() => {
+    const filteredData = linkedTemplates?.filter((item) =>
+      Object.values(item).some((value) =>
+        String(value).toLowerCase().includes(searchString.toLowerCase())
+      )
     );
+    setTableData(filteredData ?? []);
+  }, [searchString, linkedTemplates]);
+
+  const linkNewTemplate = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    searchParams.set("action", modalSearchParamNames.create_link_template);
+    setSearchParams(searchParams);
+  };
+
+  return (
+    <section className='py-4 px-4'>
+      <div className='w-full flex items-center justify-between pb-4'>
+        <div className='w-full flex items-center gap-4'>
+          <div className='relative w-full'>
+            <div className='absolute inset-y-0 left-3 flex items-center pointer-events-none'>
+              <Icon
+                name='magnifying-glass'
+                size='sm'
+                className='text-gray-400'
+              />
+            </div>
+            <Input
+              placeholder='Search linked templates'
+              value={searchString}
+              onChange={(e) => setSearchString(e.target.value)}
+              className='pl-8 h-10 w-full focus-visible:ring-0'
+            />
+          </div>
+          <Button
+            className={cn(
+              buttonVariants({ variant: "primary-outline" }),
+              "flex items-center gap-1 capitalize"
+            )}
+            onClick={(e) => linkNewTemplate(e)}
+          >
+            Link new template
+          </Button>
+        </div>
+      </div>
+      <DataTable data={tableData ?? []} columns={columns()} />
+    </section>
+  );
 }

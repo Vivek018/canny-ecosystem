@@ -10,7 +10,7 @@ import { getPaymentTemplateAssignmentIdByEmployeeId } from "@canny_ecosystem/sup
 export async function action({ request, params }: ActionFunctionArgs) {
     const { supabase } = getSupabaseWithHeaders({ request });
     const formData = await request.formData();
-    const { employeeId: employee_id } = params;
+    const employeeId = params.employeeId;
 
     const submission = parseWithZod(formData, { schema: DeleteEmployeeLinkSchema });
 
@@ -22,9 +22,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
     }
 
     let templateId = null;
-    if(employee_id){
-        const { data } = await getPaymentTemplateAssignmentIdByEmployeeId({ supabase, employee_id });
-        templateId = data?.id;
+    if (employeeId) {
+      const { data } = await getPaymentTemplateAssignmentIdByEmployeeId({
+        supabase,
+        employeeId,
+      });
+      templateId = data?.id;
     }
 
     if (templateId) {

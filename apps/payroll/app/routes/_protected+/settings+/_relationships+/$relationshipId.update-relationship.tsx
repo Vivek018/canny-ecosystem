@@ -114,7 +114,7 @@ export async function action({
 }
 
 export default function UpdateRelationship() {
-  const { relationshipPromise, companiesData, error } =
+  const { relationshipPromise, companiesData } =
     useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();

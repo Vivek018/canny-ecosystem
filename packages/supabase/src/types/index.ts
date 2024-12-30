@@ -210,6 +210,14 @@ export type LabourWelfareFundDatabaseInsert =
 export type LabourWelfareFundDatabaseUpdate =
   Database["public"]["Tables"]["labour_welfare_fund"]["Update"];
 
+// Payment templates
+export type PaymentTemplateDatabaseRow =
+  Database["public"]["Tables"]["payment_templates"]["Row"];
+export type PaymentTemplateDatabaseInsert =
+  Database["public"]["Tables"]["payment_templates"]["Insert"];
+export type PaymentTemplateDatabaseUpdate =
+  Database["public"]["Tables"]["payment_templates"]["Update"];
+
 // Payment template assignment
 export type PaymentTemplateAssignmentsDatabaseRow =
   Database["public"]["Tables"]["payment_template_assignments"]["Row"];
