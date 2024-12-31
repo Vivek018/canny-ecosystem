@@ -3,6 +3,7 @@ import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { TableHead, TableHeader, TableRow } from "@canny_ecosystem/ui/table";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { exitPaymentFields } from "@canny_ecosystem/utils/constant";
 import { useSearchParams } from "@remix-run/react";
 
 type Props = {
@@ -15,23 +16,14 @@ type Props = {
 export const ExitPaymentColumnIdArray = [
   "employee_code",
   "employee_name",
-  "project_name",
-  "site_name",
+  "project",
+  "project_site",
   "last_working_day",
   "reason",
   "final_settlement_date",
   "organization_payable_days",
   "employee_payable_days",
-  "bonus",
-  "diwali_bonus",
-  "commision",
-  "joining_bonus",
-  "yearly_bonus",
-  "leave_encashment",
-  "gift_coupon",
-  "gratuity",
-  "computer_service_charges",
-  "deduction",
+  ...exitPaymentFields,
   "total",
   "note",
 ] as const;

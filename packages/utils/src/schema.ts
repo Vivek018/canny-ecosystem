@@ -440,6 +440,7 @@ export const EmployeeProvidentFundSchema = z.object({
   include_employer_contribution: z.boolean().default(false),
   include_employer_edli_contribution: z.boolean().default(false),
   include_admin_charges: z.boolean().default(false),
+  is_default: z.boolean().default(true),
 });
 
 export const EmployeeStateInsuranceSchema = z.object({
@@ -540,10 +541,10 @@ export const UserSchema = z.object({
 });
 
 export const reasonforexitArray = [
-  "resigned by employee",
-  "terminated by employee",
-  "by death",
-  "by disability",
+  "resigned",
+  "terminated",
+  "death",
+  "disability",
 ] as const;
 
 export const ExitPaymentPage1Schema = z.object({

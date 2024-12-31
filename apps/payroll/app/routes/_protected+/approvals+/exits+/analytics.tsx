@@ -98,7 +98,7 @@ export default function ExitAnalytics() {
   const exitByReasonsData = Object.values(
     dataSource.reduce(
       (acc, row) => {
-        const reason = row.reason.toLowerCase().replace(/\s+/g, "_") || "Other";
+        const reason = row.reason.toLowerCase().replace(/\s+/g, "_") || "other";
 
         if (!acc[reason]) {
           acc[reason] = { reason, amount: 0 };

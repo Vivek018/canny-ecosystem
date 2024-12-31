@@ -26,6 +26,7 @@ import { useExitsStore } from "@/store/exits";
 import { Spinner } from "@canny_ecosystem/ui/spinner";
 import { useSearchParams } from "@remix-run/react";
 import { Button } from "@canny_ecosystem/ui/button";
+import { ExportBar } from "../import-export/export-bar";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -129,6 +130,10 @@ export function ExitPaymentTable<TData, TValue>({
 
   const tableLength = table.getRowModel().rows?.length;
 
+  const selectedRowsData = table
+    .getSelectedRowModel()
+    .rows?.map((row) => row.original);
+
   return (
     <div className="relative mb-8">
       <div
@@ -201,6 +206,12 @@ export function ExitPaymentTable<TData, TValue>({
           </div>
         </div>
       )}
+      <ExportBar
+        className={cn(!table.getSelectedRowModel().rows.length && "hidden")}
+        rows={table.getSelectedRowModel().rows.length}
+        data={selectedRowsData as any}
+        columnVisibility={columnVisibility}
+      />
     </div>
   );
 }

@@ -495,6 +495,7 @@ export type Database = {
           include_admin_charges: boolean | null
           include_employer_contribution: boolean | null
           include_employer_edli_contribution: boolean | null
+          is_default: boolean | null
           restrict_employee_contribution: boolean | null
           restrict_employer_contribution: boolean | null
           updated_at: string | null
@@ -512,6 +513,7 @@ export type Database = {
           include_admin_charges?: boolean | null
           include_employer_contribution?: boolean | null
           include_employer_edli_contribution?: boolean | null
+          is_default?: boolean | null
           restrict_employee_contribution?: boolean | null
           restrict_employer_contribution?: boolean | null
           updated_at?: string | null
@@ -529,6 +531,7 @@ export type Database = {
           include_admin_charges?: boolean | null
           include_employer_contribution?: boolean | null
           include_employer_edli_contribution?: boolean | null
+          is_default?: boolean | null
           restrict_employee_contribution?: boolean | null
           restrict_employer_contribution?: boolean | null
           updated_at?: string | null
@@ -591,6 +594,7 @@ export type Database = {
           esi_number: string
           id: string
           include_employer_contribution: boolean
+          is_default: boolean | null
           updated_at: string | null
         }
         Insert: {
@@ -602,6 +606,7 @@ export type Database = {
           esi_number: string
           id?: string
           include_employer_contribution?: boolean
+          is_default?: boolean | null
           updated_at?: string | null
         }
         Update: {
@@ -613,6 +618,7 @@ export type Database = {
           esi_number?: string
           id?: string
           include_employer_contribution?: boolean
+          is_default?: boolean | null
           updated_at?: string | null
         }
         Relationships: [
@@ -885,7 +891,7 @@ export type Database = {
           {
             foreignKeyName: "exits_employee_id_fkey"
             columns: ["employee_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "employees"
             referencedColumns: ["id"]
           },
@@ -1670,6 +1676,7 @@ export type Database = {
           company_id: string
           created_at: string | null
           id: string
+          is_default: boolean | null
           payment_frequency: string
           payout_month: number | null
           percentage: number
@@ -1679,6 +1686,7 @@ export type Database = {
           company_id: string
           created_at?: string | null
           id?: string
+          is_default?: boolean | null
           payment_frequency?: string
           payout_month?: number | null
           percentage?: number
@@ -1688,6 +1696,7 @@ export type Database = {
           company_id?: string
           created_at?: string | null
           id?: string
+          is_default?: boolean | null
           payment_frequency?: string
           payout_month?: number | null
           percentage?: number

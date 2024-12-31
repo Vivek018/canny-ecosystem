@@ -59,7 +59,9 @@ export const getStatutoryBonusByCompanyId = async ({
     .from("statutory_bonus")
     .select(columns.join(","))
     .eq("company_id", companyId)
+    .eq("is_default", true)
     .limit(SINGLE_QUERY_LIMIT)
+    .order("created_at", { ascending: false })
     .maybeSingle<
       InferredType<StatutoryBonusDatabaseRow, (typeof columns)[number]>
     >();

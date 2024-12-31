@@ -43,8 +43,8 @@ export const ExitPaymentColumns: ColumnDef<ExitDataType>[] = [
     },
   },
   {
-    accessorKey: "project_name",
-    header: "Project Name",
+    accessorKey: "project",
+    header: "Project",
     cell: ({ row }) => {
       return (
         <p className="truncate capitalize">
@@ -55,8 +55,8 @@ export const ExitPaymentColumns: ColumnDef<ExitDataType>[] = [
     },
   },
   {
-    accessorKey: "site_name",
-    header: "Site Name",
+    accessorKey: "project_site",
+    header: "Project Site",
     cell: ({ row }) => {
       return (
         <p className="truncate capitalize">

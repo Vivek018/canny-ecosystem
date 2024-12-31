@@ -97,7 +97,7 @@ export function ExitPaymentByTime({
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
-        <CardTitle>Pie Chart - Exit Payment by Time</CardTitle>
+        <CardTitle>Exit Payment by Time</CardTitle>
         <CardDescription>Over the period</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">

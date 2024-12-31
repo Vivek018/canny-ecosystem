@@ -47,7 +47,7 @@ export function ReimbursementTopEmployees({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Bar Chart - Top Employees Reimbursements</CardTitle>
+        <CardTitle>Top Employees Reimbursements</CardTitle>
         <CardDescription>Over the period</CardDescription>
       </CardHeader>
       <CardContent>

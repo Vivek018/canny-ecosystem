@@ -35,7 +35,7 @@ export function ReimbursementPerEmployer({ chartData }: { chartData: { employer:
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
-        <CardTitle>Radial Chart - Reimbursement per Employer</CardTitle>
+        <CardTitle>Reimbursement per Employer</CardTitle>
         <CardDescription>Over the period</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">

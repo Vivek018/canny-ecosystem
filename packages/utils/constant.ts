@@ -225,23 +225,23 @@ export const EMPLOYER_EPS_PERCENTAGE = 0.0833;
 export const EMPLOYER_ADMIN_CHARGES_PERCENTAGE = 0.005;
 
 export const employeeExitReasons = [
-  "Resignation",
-  "Termination",
-  "Retirement",
-  "Health Reasons",
-  "Career Change",
-  "Other",
+  "resignation",
+  "termination",
+  "retirement",
+  "health_reasons",
+  "career_change",
+  "other",
 ];
 
 export const exitPaymentFields = [
-  "Bonus",
-  "Diwali Bonus",
-  "Commission",
-  "Joining Bonus",
-  "Yearly Bonus",
-  "Leave encashment",
-  "Gift Coupon",
-  "Gratuity",
-  "Computer Service Charges",
-  "Deduction"
+  "bonus",
+  "diwali_bonus",
+  "commission",
+  "joining_bonus",
+  "yearly_bonus",
+  "leave_encashment",
+  "gift_coupon",
+  "gratuity",
+  "computer_service_charges",
+  "deduction"
 ]

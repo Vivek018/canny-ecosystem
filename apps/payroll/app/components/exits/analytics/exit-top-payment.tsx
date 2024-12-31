@@ -26,9 +26,9 @@ import { replaceUnderscore } from "@canny_ecosystem/utils";
 
 const chartConfig = Object.fromEntries(
   exitPaymentFields.map((field, i) => [
-    field.toLowerCase().replace(/\s+/g, "_"),
+    field,
     {
-      label: field,
+      label: replaceUnderscore(field),
       color: `hsl(var(--chart-${i + 1}))`,
     },
   ]),
@@ -51,7 +51,7 @@ export function ExitTopPayment({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Bar Chart - Exits Top Payment</CardTitle>
+        <CardTitle>Exits Top Payment</CardTitle>
         <CardDescription>Over the period</CardDescription>
       </CardHeader>
       <CardContent>
@@ -61,6 +61,7 @@ export function ExitTopPayment({
             accessibilityLayer
             data={transformedChartData}
             layout="vertical"
+            className="capitalize"
             margin={{
               right: 16,
             }}
@@ -78,7 +79,9 @@ export function ExitTopPayment({
             <XAxis dataKey="amount" type="number" hide />
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent indicator="line" />}
+              content={
+                <ChartTooltipContent indicator="line" className="capitalize" />
+              }
             />
             <Bar
               dataKey="amount"
