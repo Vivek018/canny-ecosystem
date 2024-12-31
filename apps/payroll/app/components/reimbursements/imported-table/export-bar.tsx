@@ -23,7 +23,10 @@ export function ExportBar({
   );
   const toBeExportedData = data.map((element) => {
     const exportedData: {
-      [key: (typeof ReimbursementsColumnIdArray)[number]]: string | number | boolean;
+      [key: (typeof ReimbursementsColumnIdArray)[number]]:
+        | string
+        | number
+        | boolean;
     } = {};
 
     for (const key of ReimbursementsColumnIdArray) {
@@ -74,19 +77,26 @@ export function ExportBar({
   return (
     <div
       className={cn(
-        "fixed bottom-8 left-0 right-0 mx-auto h-14 w-max shadow-md rounded-full flex gap-10 justify-between items-center px-3 border bg-card text-card-foreground",
+        "z-50 fixed bottom-8 left-0 right-0 mx-auto h-14 w-max shadow-md rounded-full flex gap-10 justify-between items-center px-3 border bg-accent text-accent-foreground",
         className
       )}
     >
-      <div className="h-9 font-semibold rounded-full flex justify-between items-center px-4 border bg-card text-card-foreground">
-        Amount: <span className="ml-1.5">{totalAmount}</span>
-      </div>
-      <div className="flex items-center space-x-1 bg-dark rounded-md">
+      <div className="ml-2 flex items-center space-x-1 bg-dark rounded-md">
         <p className="font-semibold">{rows} Selected</p>
       </div>
-      <Button onClick={handleExport} variant="default" className="rounded-full">
-        Export
-      </Button>
+      <div className="flex justify-center items-center gap-2">
+        <div className="h-10 text-[16px] tracking-wide font-medium rounded-full flex justify-between items-center px-6 border bg-card text-card-foreground">
+          Amount: <span className="ml-1.5">{totalAmount}</span>
+        </div>
+        <Button
+          onClick={handleExport}
+          variant="default"
+          size="lg"
+          className="rounded-full"
+        >
+          Export
+        </Button>
+      </div>
     </div>
   );
 }
