@@ -229,12 +229,12 @@ export default function CreatePaymentTemplate() {
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
     defaultValue: {
-      ...defaultValues
+      ...defaultValues,
     },
   });
 
   return (
-    <section className='md:px-20 lg:px-28 2xl:px-40 py-4'>
+    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
       <div className='w-full mx-auto mb-8'>
         <FormStepHeader
           totalSteps={totalSteps}

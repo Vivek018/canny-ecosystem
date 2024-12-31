@@ -34,27 +34,26 @@ export function ProfessionalTaxWrapper({
       });
     }
   }, [error]);
-  
 
   return (
-    <section className="p-4">
-      <div className="w-full flex items-end justify-between">
-        <Command className="overflow-visible">
-          <div className="w-full flex items-center gap-4">
+    <section className='p-4'>
+      <div className='w-full flex items-end justify-between'>
+        <Command className='overflow-visible'>
+          <div className='w-full flex items-center gap-4'>
             <CommandInput
-              divClassName="border border-input rounded-md h-10 flex-1"
-              placeholder="Search Professional Taxes"
+              divClassName='border border-input rounded-md h-10 flex-1'
+              placeholder='Search Professional Taxes'
               autoFocus={true}
             />
             <Link
-              to="create-professional-tax"
+              to='create-professional-tax'
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
-                "flex items-center gap-1",
+                "flex items-center gap-1"
               )}
             >
               <span>Add</span>
-              <span className="hidden md:flex justify-end">
+              <span className='hidden md:flex justify-end'>
                 Professional Tax
               </span>
             </Link>
@@ -62,14 +61,14 @@ export function ProfessionalTaxWrapper({
           <CommandEmpty
             className={cn(
               "w-full py-40 capitalize text-lg tracking-wide text-center",
-              !isDocument && "hidden",
+              !isDocument && "hidden"
             )}
           >
             No professional taxes found.
           </CommandEmpty>
-          <CommandList className="max-h-full py-6 overflow-x-visible overflow-y-visible">
-            <CommandGroup className="p-0 overflow-visible">
-              <div className="w-full grid gap-8 grid-cols-1 md:grid-cols-2 2xl:grid-cols-3">
+          <CommandList className='max-h-full py-6 overflow-x-visible overflow-y-visible'>
+            <CommandGroup className='p-0 overflow-visible'>
+              <div className='w-full grid gap-8 grid-cols-1 md:grid-cols-2 2xl:grid-cols-3'>
                 {data?.map((professionalTax) => (
                   <CommandItem
                     key={professionalTax.id}
@@ -79,7 +78,7 @@ export function ProfessionalTaxWrapper({
                       professionalTax.deduction_cycle +
                       professionalTax.gross_salary_range?.toString()
                     }
-                    className="data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0"
+                    className='data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0'
                   >
                     <ProfessionalTaxCard professionalTax={professionalTax} />
                   </CommandItem>

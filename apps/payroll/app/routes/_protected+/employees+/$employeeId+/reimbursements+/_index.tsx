@@ -48,7 +48,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       (value) => value !== null && value !== undefined
     );
 
-  let theMeta=null
+  let theMeta = null;
   if (employeeId) {
     const { data, error, meta } = await getReimbursementsByEmployeeId({
       supabase,
@@ -71,7 +71,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     reimbursementData = data;
-    theMeta=meta
+    theMeta = meta;
   }
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,
@@ -92,7 +92,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   });
 }
 
-
 export async function action({ request }: ActionFunctionArgs) {
   const url = new URL(request.url);
   const formData = await request.formData();
@@ -111,18 +110,17 @@ export async function action({ request }: ActionFunctionArgs) {
   return redirect(url.toString());
 }
 
-
 export default function ReimbursementsIndex() {
-  const { data, env, employeeId, filters, userEmails,hasNextPage } =
+  const { data, env, employeeId, filters, userEmails, hasNextPage } =
     useLoaderData<typeof loader>();
 
   const noFilters = Object.values(filters).every((value) => !value);
 
   return (
-    <section className="m-4">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="w-full flex justify-between items-center ">
-          <div className="flex gap-3">
+    <section className='m-4'>
+      <div className='w-full flex items-center justify-between pb-4'>
+        <div className='w-full flex justify-between items-center '>
+          <div className='flex gap-3'>
             <ReimbursementSearchFilter
               disabled={!data?.length && noFilters}
               userEmails={userEmails}
@@ -139,7 +137,7 @@ export default function ReimbursementsIndex() {
             )}
           >
             <span>Add</span>
-            <span className="hidden md:flex justify-end">Claim</span>
+            <span className='hidden md:flex justify-end'>Claim</span>
           </Link>
         </div>
       </div>

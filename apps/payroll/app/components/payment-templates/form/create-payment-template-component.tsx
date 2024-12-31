@@ -37,7 +37,7 @@ export function CreatePaymentTemplateComponentDetails({
   paymentFieldOptions: ComboboxSelectOption[];
   env: SupabaseEnv;
 }) {
-  const { selectedPaymentFields, selectedStatutoryFields } = usePaymentComponentsStore();
+  const { selectedPaymentFields } = usePaymentComponentsStore();
 
   return (
     <Fragment>
@@ -90,11 +90,17 @@ export function CreatePaymentTemplateComponentDetails({
             state={String(fields.state.value)}
           />
         </div>
-        <div className="w-full grid grid-cols-4 gap-4 justify-between border-b py-2 font-medium">
+        <div className='w-full grid grid-cols-4 gap-4 justify-between border-b py-2 font-semibold'>
           <p>Component Name</p>
           <p>Component Type</p>
-          <p>Calculation Type</p>
+          <p>Payment Type</p>
           <p>Amount</p>
+        </div>
+        <div className='w-full grid grid-cols-4 gap-4 justify-between py-4'>
+          <p>{selectedPaymentFields[0]?.name}</p>
+          <p>{"earning"}</p>
+          <p>{selectedPaymentFields[0]?.payment_type}</p>
+          <p>{selectedPaymentFields[0]?.amount}</p>
         </div>
       </CardContent>
     </Fragment>

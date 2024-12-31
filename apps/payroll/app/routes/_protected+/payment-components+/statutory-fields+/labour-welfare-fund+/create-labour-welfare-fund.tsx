@@ -52,10 +52,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     return json({ companyId, error: null });
   } catch (error) {
-    return json({
-      error,
-      companyId: null,
-    }, { status: 500 });
+    return json(
+      {
+        error,
+        companyId: null,
+      },
+      { status: 500 }
+    );
   }
 }
 
@@ -72,7 +75,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -95,11 +98,14 @@ export async function action({
       error,
     });
   } catch (error) {
-    return json({
-      status: "error",
-      message: "An unexpected error occurred",
-      error,
-    }, { status: 500 });
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 }
+    );
   }
 }
 
@@ -160,12 +166,12 @@ export default function CreateLabourWelfareFund({
   }, [actionData]);
 
   return (
-    <section className="p-4 w-full">
+    <section className='p-4 w-full'>
       <FormProvider context={form.context}>
-        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
+        <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
           <Card>
             <CardHeader>
-              <CardTitle className="text-3xl">
+              <CardTitle className='text-3xl'>
                 {replaceDash(LABOUR_WELFARE_FUND_TAG)}
               </CardTitle>
               <CardDescription>
@@ -180,7 +186,7 @@ export default function CreateLabourWelfareFund({
               />
               <SearchableSelectField
                 key={resetKey}
-                className="capitalize"
+                className='capitalize'
                 options={statesAndUTs}
                 inputProps={{
                   ...getInputProps(fields.state, { type: "text" }),
@@ -201,7 +207,7 @@ export default function CreateLabourWelfareFund({
                 }}
                 labelProps={{
                   children: replaceUnderscore(
-                    fields.employee_contribution.name,
+                    fields.employee_contribution.name
                   ),
                 }}
                 errors={fields.employee_contribution.errors}
@@ -216,16 +222,16 @@ export default function CreateLabourWelfareFund({
                 }}
                 labelProps={{
                   children: replaceUnderscore(
-                    fields.employer_contribution.name,
+                    fields.employer_contribution.name
                   ),
                 }}
                 errors={fields.employer_contribution.errors}
               />
               <SearchableSelectField
                 key={resetKey + 1}
-                className="capitalize"
+                className='capitalize'
                 options={transformStringArrayIntoOptions(
-                  lwfDeductionCycleArray as unknown as string[],
+                  lwfDeductionCycleArray as unknown as string[]
                 )}
                 inputProps={{
                   ...getInputProps(fields.deduction_cycle, { type: "text" }),

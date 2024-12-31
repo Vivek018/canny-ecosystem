@@ -61,7 +61,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
       status: "error",
       message: "Failed to get employee id",
       error,
-      employeeId
+      employeeId,
     });
   }
 }
@@ -91,7 +91,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -187,17 +187,17 @@ export default function AddEmployeeSkill({
   }, [actionData]);
 
   return (
-    <section className="md:px-20 lg:px-28 2xl:px-40 py-4">
+    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
       <FormProvider context={form.context}>
         <Form
-          method="POST"
-          encType="multipart/form-data"
+          method='POST'
+          encType='multipart/form-data'
           {...getFormProps(form)}
-          className="flex flex-col"
+          className='flex flex-col'
         >
           <Card>
             <CardHeader>
-              <CardTitle className="text-3xl">
+              <CardTitle className='text-3xl'>
                 {replaceDash(EMPLOYEE_SKILL_TAG)}
               </CardTitle>
               <CardDescription>
@@ -214,7 +214,7 @@ export default function AddEmployeeSkill({
                   ...getInputProps(fields.skill_name, { type: "text" }),
                   autoFocus: true,
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.skill_name.name,
+                    fields.skill_name.name
                   )}`,
                   className: "capitalize",
                 }}
@@ -225,9 +225,9 @@ export default function AddEmployeeSkill({
               />
               <SearchableSelectField
                 key={resetKey}
-                className="capitalize"
+                className='capitalize'
                 options={transformStringArrayIntoOptions(
-                  proficiencyArray as unknown as string[],
+                  proficiencyArray as unknown as string[]
                 )}
                 inputProps={{
                   ...getInputProps(fields.proficiency, { type: "text" }),
@@ -245,7 +245,7 @@ export default function AddEmployeeSkill({
                   }),
                   autoFocus: true,
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.years_of_experience.name,
+                    fields.years_of_experience.name
                   )}`,
                   className: "capitalize",
                 }}

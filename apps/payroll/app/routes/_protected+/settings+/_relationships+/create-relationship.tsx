@@ -66,7 +66,7 @@ export async function loader({
         },
         {
           status: 500,
-        },
+        }
       );
     }
 
@@ -78,7 +78,7 @@ export async function loader({
           data: null,
           error: "No companies found",
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -100,7 +100,7 @@ export async function loader({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -119,7 +119,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -205,12 +205,12 @@ export default function CreateRelationship({
   }, [actionData]);
 
   return (
-    <section className="md:px-20 lg:px-52 2xl:px-80 py-4">
+    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
       <FormProvider context={form.context}>
-        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
+        <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
           <Card>
             <CardHeader>
-              <CardTitle className="text-3xl">
+              <CardTitle className='text-3xl'>
                 {replaceDash(RELATIONSHIP_TAG)}
               </CardTitle>
               <CardDescription>
@@ -228,7 +228,7 @@ export default function CreateRelationship({
                   ...getInputProps(fields.relationship_type, { type: "text" }),
                   autoFocus: true,
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.relationship_type.name,
+                    fields.relationship_type.name
                   )}`,
                   className: "capitalize",
                 }}
@@ -260,16 +260,16 @@ export default function CreateRelationship({
                   children: "Is this currently active?",
                 }}
               />
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+              <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
                 <Field
                   inputProps={{
                     ...getInputProps(fields.start_date, { type: "date" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.start_date.name,
+                      fields.start_date.name
                     )}`,
                     max: getValidDateForInput(new Date().toISOString()),
                     defaultValue: getValidDateForInput(
-                      fields.start_date.initialValue,
+                      fields.start_date.initialValue
                     ),
                   }}
                   labelProps={{
@@ -281,11 +281,11 @@ export default function CreateRelationship({
                   inputProps={{
                     ...getInputProps(fields.end_date, { type: "date" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.end_date.name,
+                      fields.end_date.name
                     )}`,
                     min: getValidDateForInput(fields.start_date.value),
                     defaultValue: getValidDateForInput(
-                      fields.end_date.initialValue,
+                      fields.end_date.initialValue
                     ),
                   }}
                   labelProps={{

@@ -1,12 +1,11 @@
 import { SecondaryMenu } from "@canny_ecosystem/ui/secondary-menu";
-import { Outlet, useLocation,Link} from "@remix-run/react";
-
+import { Outlet, useLocation, Link } from "@remix-run/react";
 
 export default function Payroll() {
   const { pathname } = useLocation();
   return (
-    <section className="flex flex-col h-full">
-      <div className="py-[18px] px-4 border-b">
+    <section className='flex flex-col h-full'>
+      <div className='py-[18px] px-4 border-b'>
         <SecondaryMenu
           items={[
             {

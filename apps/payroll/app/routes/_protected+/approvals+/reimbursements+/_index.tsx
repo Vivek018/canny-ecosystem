@@ -118,9 +118,9 @@ export default function Reimbursements() {
   const noFilters = Object.values(filters).every((value) => !value);
 
   return (
-    <section className="m-4">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="w-full  flex justify-between items-center gap-3">
+    <section className='m-4'>
+      <div className='w-full flex items-center justify-between pb-4'>
+        <div className='w-full  flex justify-between items-center gap-3'>
           <ReimbursementSearchFilter
             disabled={!reimbursementData?.length && noFilters}
             userEmails={userEmails}

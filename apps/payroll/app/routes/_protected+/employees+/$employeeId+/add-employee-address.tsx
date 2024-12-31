@@ -21,53 +21,52 @@ export async function action({
   request,
   params,
 }: ActionFunctionArgs): Promise<Response> {
-
   const employeeId = params.employeeId;
-  
+
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
     const formData = await request.formData();
-    
+
     if (!employeeId) {
       return json({
-      status: "error",
-      message: "Invalid employee id",
-      returnTo: "/employees",
+        status: "error",
+        message: "Invalid employee id",
+        returnTo: "/employees",
+      });
+    }
+
+    const submission = parseWithZod(formData, {
+      schema: EmployeeAddressesSchema,
     });
-  }
 
-  const submission = parseWithZod(formData, {
-    schema: EmployeeAddressesSchema,
-  });
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 }
+      );
+    }
 
-  if (submission.status !== "success") {
-    return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
-    );
-  }
-  
-  const { status, error } = await createEmployeeAddresses({
-    supabase,
-    data: { ...submission.value, employee_id: employeeId },
-  });
+    const { status, error } = await createEmployeeAddresses({
+      supabase,
+      data: { ...submission.value, employee_id: employeeId },
+    });
 
-  if (isGoodStatus(status)) {
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Address added successfully",
+        error: null,
+        returnTo: `/employees/${employeeId}`,
+      });
+    }
+    return json({ status, error });
+  } catch (error) {
     return json({
-      status: "success",
-      message: "Address added successfully",
-      error: null,
-      returnTo: `/employees/${employeeId}`,
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
     });
   }
-  return json({ status, error });
-} catch (error) {
-  return json({
-    status: "error",
-    message: "An unexpected error occurred",
-    error,
-  })
-}
 }
 
 export default function AddEmployeeAddress() {
@@ -111,13 +110,13 @@ export default function AddEmployeeAddress() {
   }, [actionData]);
 
   return (
-    <section className="md:px-20 lg:px-28 2xl:px-40 py-4">
+    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
       <FormProvider context={form.context}>
         <Form
-          method="POST"
-          encType="multipart/form-data"
+          method='POST'
+          encType='multipart/form-data'
           {...getFormProps(form)}
-          className="flex flex-col"
+          className='flex flex-col'
         >
           <Card>
             <CreateEmployeeAddress key={resetKey} fields={fields as any} />
