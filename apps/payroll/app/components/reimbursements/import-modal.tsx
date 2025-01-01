@@ -6,9 +6,12 @@ import {
   DialogTitle,
 } from "@canny_ecosystem/ui/dialog";
 import { Input } from "@canny_ecosystem/ui/input";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
 import { useNavigate, useSearchParams } from "@remix-run/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+
 
 export const ImportReimbursementModal = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -16,8 +19,7 @@ export const ImportReimbursementModal = () => {
   const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
 
   const navigate = useNavigate();
-
-  const MAX_FILE_SIZE_LIMIT = 3145728;
+  const MAX_FILE_SIZE_LIMIT = 3145728; // 3MB
 
   const isOpen =
     searchParams.get("step") === modalSearchParamNames.import_reimbursement;
@@ -27,21 +29,27 @@ export const ImportReimbursementModal = () => {
     setSearchParams(searchParams);
   };
 
+
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedFile(undefined);
+      setEligibleFileSize(true);
+    }
+  }, [isOpen]);
+
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event?.target?.files![0];
+    const file = event?.target?.files?.[0];
     if (file) {
       setSelectedFile(file);
-      if (file.size > MAX_FILE_SIZE_LIMIT) {
-        setEligibleFileSize(false);
-        alert("File size exceeds the 3MB limit");
-      } else {
-        setEligibleFileSize(true);
-      }
+      setEligibleFileSize(file.size <= MAX_FILE_SIZE_LIMIT);
+    } else {
+      setSelectedFile(undefined);
+      setEligibleFileSize(true); 
     }
   };
 
   const handleFileSubmit = () => {
-    if (eligibleFileSize) {
+    if (eligibleFileSize && selectedFile) {
       navigate("/approvals/reimbursements/import-data", {
         state: { file: selectedFile },
       });
@@ -49,12 +57,8 @@ export const ImportReimbursementModal = () => {
   };
 
   const formatFileSize = (size: number) => {
-    if (size < 1024) {
-      return `${size} Bytes`;
-    }
-    if (size < 1024 * 1024) {
-      return `${(size / 1024).toFixed(2)} KB`;
-    }
+    if (size < 1024) return `${size} Bytes`;
+    if (size < 1024 * 1024) return `${(size / 1024).toFixed(2)} KB`;
     return `${(size / (1024 * 1024)).toFixed(2)} MB`;
   };
 
@@ -64,8 +68,8 @@ export const ImportReimbursementModal = () => {
         <DialogTitle>Choose the file to be imported</DialogTitle>
         <div className="flex justify-between">
           <DialogDescription className="text-muted-foreground">
-            only .csv format supported! <br />
-            maximum upload size is 3MB!
+            Only .csv format is supported! <br />
+            Maximum upload size is 3MB!
           </DialogDescription>
           <Button
             className={selectedFile ? "flex" : "hidden"}
@@ -78,11 +82,15 @@ export const ImportReimbursementModal = () => {
         <Input type="file" accept=".csv" onChange={handleFileSelect} />
 
         <p
-          className={
-            selectedFile ? "flex text-sm text-muted-foreground" : "hidden"
-          }
+          className={cn(
+            "text-sm",
+            selectedFile ? "flex" : "hidden",
+            !eligibleFileSize ? "text-destructive" : "text-muted-foreground"
+          )}
         >
-          Your file size : {formatFileSize(selectedFile?.size!)}
+          {!eligibleFileSize
+            ? "File size exceeds the 3MB limit"
+            : `Your file size: ${formatFileSize(selectedFile?.size ?? 0)}`}
         </p>
       </DialogContent>
     </Dialog>
