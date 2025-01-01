@@ -7,11 +7,10 @@ import {
 } from "@canny_ecosystem/ui/dialog";
 import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { SIZE_1KB, SIZE_1MB } from "@canny_ecosystem/utils";
 import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
 import { useNavigate, useSearchParams } from "@remix-run/react";
 import { useState, useEffect } from "react";
-
-
 
 export const ImportReimbursementModal = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -19,7 +18,8 @@ export const ImportReimbursementModal = () => {
   const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
 
   const navigate = useNavigate();
-  const MAX_FILE_SIZE_LIMIT = 3145728; // 3MB
+
+  const MAX_FILE_SIZE_LIMIT = SIZE_1MB * 3;
 
   const isOpen =
     searchParams.get("step") === modalSearchParamNames.import_reimbursement;
@@ -28,7 +28,6 @@ export const ImportReimbursementModal = () => {
     searchParams.delete("step");
     setSearchParams(searchParams);
   };
-
 
   useEffect(() => {
     if (isOpen) {
@@ -44,7 +43,7 @@ export const ImportReimbursementModal = () => {
       setEligibleFileSize(file.size <= MAX_FILE_SIZE_LIMIT);
     } else {
       setSelectedFile(undefined);
-      setEligibleFileSize(true); 
+      setEligibleFileSize(true);
     }
   };
 
@@ -57,9 +56,9 @@ export const ImportReimbursementModal = () => {
   };
 
   const formatFileSize = (size: number) => {
-    if (size < 1024) return `${size} Bytes`;
-    if (size < 1024 * 1024) return `${(size / 1024).toFixed(2)} KB`;
-    return `${(size / (1024 * 1024)).toFixed(2)} MB`;
+    if (size < SIZE_1KB) return `${size} Bytes`;
+    if (size < SIZE_1MB) return `${(size / SIZE_1KB).toFixed(2)} KB`;
+    return `${(size / SIZE_1MB).toFixed(2)} MB`;
   };
 
   return (
@@ -74,6 +73,7 @@ export const ImportReimbursementModal = () => {
           <Button
             className={selectedFile ? "flex" : "hidden"}
             onClick={handleFileSubmit}
+            disabled={!eligibleFileSize}
           >
             Confirm file
           </Button>

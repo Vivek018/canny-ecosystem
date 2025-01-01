@@ -38,7 +38,9 @@ export const zEmailSuffix = z
     "Must contain a dot with at least one character before and two after."
   );
 
-export const SIZE_1MB = 1 * 1024 * 1024; // 1MB
+export const SIZE_1KB = 1 * 1024; //1KB
+export const SIZE_1MB = 1 * SIZE_1KB * SIZE_1KB; // 1MB
+
 const ACCEPTED_IMAGE_TYPES = [
   "image/jpeg",
   "image/jpg",

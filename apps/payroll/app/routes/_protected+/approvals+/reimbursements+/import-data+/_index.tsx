@@ -46,6 +46,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const totalSteps = schemas.length;
 
   const session = await getSession(request.headers.get("Cookie"));
+  const headers = {
+    "Set-Cookie": await commitSession(await getSession()),
+  };
   const stepData: any[] = [];
 
   for (let i = 1; i <= totalSteps; i++) {
@@ -57,7 +60,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return redirect(url.toString(), { status: 302 });
   }
 
-  return json({ step, totalSteps, stepData });
+  return json({ step, totalSteps, stepData }, { headers });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -77,11 +80,10 @@ export async function action({ request }: ActionFunctionArgs) {
   });
 
   if (action === "submit") {
-    if (submission.status === "success") {
-      const parsedData = ImportReimbursementDataSchema.safeParse(
-        JSON.parse(formData.get("stringified_data") as string)
-      );
-
+    const parsedData = ImportReimbursementDataSchema.safeParse(
+      JSON.parse(formData.get("stringified_data") as string)
+    );
+    if (parsedData.success) {
       const importedData = parsedData.data?.data;
 
       const userEmails = importedData!.map((value) => value.email!);
