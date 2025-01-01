@@ -7,6 +7,7 @@ import {
 import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import {
+  componentTypeArray,
   replaceUnderscore,
   statutoryFieldsArray,
   transformStringArrayIntoOptions,
@@ -39,6 +40,19 @@ export function CreatePaymentTemplateComponentDetails({
 }) {
   const { selectedPaymentFields } = usePaymentComponentsStore();
 
+  const paymentTemplateComponentsField =
+    fields.payment_template_components.getFieldList();
+
+  const targetTypeDefaultValue = (
+    fields: { name: string; value: string | null | undefined }[]
+  ) => {
+    for (const field of fields) {
+      if (field.value) {
+        return field.name.replace("_id", "");
+      }
+    }
+  };
+
   return (
     <Fragment>
       <CardHeader>
@@ -61,6 +75,7 @@ export function CreatePaymentTemplateComponentDetails({
               maxLength: 9,
             }}
             labelProps={{ children: "Enter CTC per month" }}
+            errors={fields.monthly_ctc.errors}
           />
           <SearchableSelectField
             className='capitalize'
@@ -87,21 +102,97 @@ export function CreatePaymentTemplateComponentDetails({
               statutoryFieldsArray as unknown as string[]
             )}
             env={env}
-            state={String(fields.state.value)}
+            state={fields.state.value ?? ""}
           />
         </div>
-        <div className='w-full grid grid-cols-4 gap-4 justify-between border-b py-2 font-semibold'>
+        <div className='w-full grid grid-cols-3 gap-3 justify-between border-b py-2 font-semibold'>
           <p>Component Name</p>
           <p>Component Type</p>
-          <p>Payment Type</p>
           <p>Amount</p>
         </div>
-        <div className='w-full grid grid-cols-4 gap-4 justify-between py-4'>
-          <p>{selectedPaymentFields[0]?.name}</p>
-          <p>{"earning"}</p>
-          <p>{selectedPaymentFields[0]?.payment_type}</p>
-          <p>{selectedPaymentFields[0]?.amount}</p>
-        </div>
+        {paymentTemplateComponentsField.map((field, index) => {
+          const fieldSet = field.getFieldset();
+
+          const defaultTargetType = targetTypeDefaultValue([
+            fieldSet.epf_id,
+            fieldSet.esi_id,
+            fieldSet.lwf_id,
+            fieldSet.pt_id,
+            fieldSet.bonus_id,
+          ]);
+
+          return (
+            <div
+              key={index.toString()}
+              className='w-full grid grid-cols-3 gap-3 justify-between py-4'
+            >
+              <input {...getInputProps(fieldSet.id, { type: "hidden" })} />
+              <input
+                {...getInputProps(fieldSet.payment_field_id, {
+                  type: "hidden",
+                })}
+              />
+              <input {...getInputProps(fieldSet.epf_id, { type: "hidden" })} />
+              <input {...getInputProps(fieldSet.esi_id, { type: "hidden" })} />
+              <input {...getInputProps(fieldSet.lwf_id, { type: "hidden" })} />
+              <input {...getInputProps(fieldSet.pt_id, { type: "hidden" })} />
+              <input
+                {...getInputProps(fieldSet.bonus_id, { type: "hidden" })}
+              />
+
+              <input
+                {...getInputProps(fieldSet.target_type, { type: "hidden" })}
+                defaultValue={fieldSet.target_type.value ?? defaultTargetType}
+              />
+              {defaultTargetType && (
+                <Field
+                  inputProps={{
+                    ...getInputProps(defaultTargetType as any, {
+                      type: "text",
+                    }),
+                    value:
+                      fieldSet[
+                        defaultTargetType as "payment_field"
+                      ].getFieldset().name.value ??
+                      fieldSet[
+                        defaultTargetType as "payment_field"
+                      ].getFieldset().name.initialValue,
+                    disabled: true,
+                  }}
+                />
+              )}
+              <SearchableSelectField
+                className='capitalize'
+                options={transformStringArrayIntoOptions(
+                  componentTypeArray as unknown as string[]
+                )}
+                inputProps={{
+                  ...getInputProps(fieldSet.component_type, { type: "text" }),
+                  defaultValue: selectedPaymentFields[0]?.calculation_type,
+                }}
+                placeholder={`Select ${fieldSet.component_type.name}`}
+                labelProps={{
+                  children: fieldSet.component_type.name,
+                }}
+                errors={fieldSet.component_type.errors}
+              />
+              <Field
+                inputProps={{
+                  ...getInputProps(fieldSet.calculation_value, {
+                    type: "number",
+                  }),
+                  placeholder: `Enter ${replaceUnderscore(
+                    fieldSet.calculation_value.name
+                  )}`,
+                  min: 0,
+                  max: 100000000,
+                  maxLength: 9,
+                }}
+                errors={fieldSet.calculation_value.errors}
+              />
+            </div>
+          );
+        })}
       </CardContent>
     </Fragment>
   );

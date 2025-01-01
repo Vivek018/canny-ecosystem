@@ -540,10 +540,10 @@ export const UserSchema = z.object({
 });
 
 export const reasonForExitArray = [
-  "resigned_by_employee",
-  "terminated_by_employee",
-  "by_death",
-  "by_disability",
+  "resigned",
+  "terminated",
+  "death",
+  "disability",
 ] as const;
 
 export const ExitPaymentPage1Schema = z.object({
@@ -594,11 +594,6 @@ export const componentTypeArray = [
   "other",
 ] as const;
 
-export const templateCalculationTypeArray = [
-  "variable",
-  "percentage_of_CTC",
-] as const;
-
 export const PaymentTemplateComponentsSchema = z.object({
   monthly_ctc: z.number(),
   state: zString,
@@ -609,19 +604,45 @@ export const PaymentTemplateComponentsSchema = z.object({
         .enum(["payment_field", ...statutoryFieldsArray])
         .default("payment_field"),
       payment_field_id: z.string().uuid().optional(),
+      payment_field: z
+        .object({
+          name: zNumberString.optional(),
+        })
+        .optional(),
       epf_id: z.string().uuid().optional(),
+      epf: z
+        .object({
+          name: zNumberString.optional(),
+        })
+        .optional(),
       esi_id: z.string().uuid().optional(),
+      esi: z
+        .object({
+          name: zNumberString.optional(),
+        })
+        .optional(),
       bonus_id: z.string().uuid().optional(),
-      pt_id: z.string().uuid().optional(),
+      bonus: z
+        .object({
+          name: zNumberString.optional(),
+        })
+        .optional(),
       lwf_id: z.string().uuid().optional(),
+      lwf: z
+        .object({
+          name: zNumberString.optional(),
+        })
+        .optional(),
+      pt_id: z.string().uuid().optional(),
+      pt: z
+        .object({
+          name: zNumberString.optional(),
+        })
+        .optional(),
       component_type: z.enum(componentTypeArray).default("earning"),
-      calculation_type: z
-        .enum(templateCalculationTypeArray)
-        .default("variable"),
       calculation_value: z.number().optional(),
       display_order: z.number().int().optional(),
       is_active: z.boolean().default(false),
-      company_id: z.string().uuid(),
     }),
   ),
 });
