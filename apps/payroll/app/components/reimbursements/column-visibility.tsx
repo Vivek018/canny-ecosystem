@@ -1,4 +1,5 @@
-import { useEmployeesStore } from "@/store/employees";
+
+import { useReimbursementStore } from "@/store/reimbursements";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 import { Icon } from "@canny_ecosystem/ui/icon";
@@ -8,8 +9,19 @@ import {
   PopoverTrigger,
 } from "@canny_ecosystem/ui/popover";
 
+
+type ColumnType = {
+  id: string;
+  columnDef: {
+    enableHiding?: boolean;
+    header: string;
+  };
+  getIsVisible: () => boolean;
+  toggleVisibility: (checked: boolean) => void;
+};
+
 export function ColumnVisibility({ disabled }: { disabled?: boolean}) {
-  const { columns } = useEmployeesStore();
+  const { columns} = useReimbursementStore();
 
   return (
     <Popover>
@@ -27,8 +39,8 @@ export function ColumnVisibility({ disabled }: { disabled?: boolean}) {
       <PopoverContent className="w-[200px] p-0" align="end" sideOffset={8}>
         <div className="flex flex-col p-4 space-y-3 max-h-[352px] overflow-auto">
           {columns
-            .filter((column: any) => column?.columnDef?.enableHiding !== false)
-            .map((column: any) => {
+            .filter((column:any) => column?.columnDef?.enableHiding !== false)
+            .map((column:any) => {
               return (
                 <div key={column.id} className="flex items-center space-x-2">
                   <Checkbox

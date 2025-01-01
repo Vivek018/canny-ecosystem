@@ -6,6 +6,7 @@ import { ReimbursementOptionsDropdown } from "./reimbursements-table-options";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 import type { ReimbursementDataType } from "@canny_ecosystem/supabase/queries";
+import { formatDate } from "@canny_ecosystem/utils";
 
 export const reimbursementsColumns = ({
   isEmployeeRoute = false,
@@ -24,11 +25,24 @@ export const reimbursementsColumns = ({
     enableHiding: false,
   },
   {
+    enableSorting: false,
+    accessorKey: "employee_code",
+    header: "Employee Code",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate">
+          {row.original?.employee_name?.employee_code ?? "--"}
+        </p>
+      );
+    },
+  },
+  {
+    enableSorting: false,
     accessorKey: "employee_name",
     header: "Employee Name",
     cell: ({ row }) => {
       return (
-        <p className="truncate text-primary/80 w-48 group-hover:text-primary">{`${
+        <p className="truncate w-48 group-hover:text-primary">{`${
           row.original.employee_name?.first_name
         } ${row.original.employee_name?.middle_name ?? ""} ${
           row.original.employee_name?.last_name ?? ""
@@ -36,12 +50,15 @@ export const reimbursementsColumns = ({
       );
     },
   },
+
   {
     accessorKey: "submitted_date",
     header: "Submitted Date",
     cell: ({ row }) => {
       return (
-        <p className="truncate ">{row.original?.submitted_date ?? "--"}</p>
+        <p className="truncate ">
+          {formatDate(row.original?.submitted_date ?? "") ?? "--"}
+        </p>
       );
     },
   },
@@ -74,20 +91,47 @@ export const reimbursementsColumns = ({
     cell: ({ row }) => {
       return (
         <p className="truncate capitalize">
-          {row.original?.is_deductible === undefined
-            ? "--"
-            : row.original?.is_deductible
-            ? "true"
-            : "false"}
+          {String(row.original?.is_deductible) ?? "--"}
         </p>
       );
     },
   },
   {
-    accessorKey: "user_id",
+    enableSorting: false,
+    accessorKey: "email",
     header: "Approved By",
     cell: ({ row }) => {
       return <p className=" truncate">{row.original?.users?.email ?? "--"}</p>;
+    },
+  },
+  {
+    enableSorting: false,
+    accessorKey: "project_name",
+    header: "Project",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate ">
+          {
+            row.original.employee_name?.employee_project_assignment
+              .project_sites.projects.name
+          }
+        </p>
+      );
+    },
+  },
+  {
+    enableSorting: false,
+    accessorKey: "project_site_name",
+    header: "Project Site",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate ">
+          {
+            row.original.employee_name?.employee_project_assignment
+              .project_sites.name
+          }
+        </p>
+      );
     },
   },
 

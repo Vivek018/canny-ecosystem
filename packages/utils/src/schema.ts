@@ -35,10 +35,12 @@ export const zEmailSuffix = z
   .max(20)
   .regex(
     /^[A-Za-z0-9]+\.[A-Za-z]{2,}$/,
-    "Must contain a dot with at least one character before and two after.",
+    "Must contain a dot with at least one character before and two after."
   );
 
-export const SIZE_1MB = 1 * 1024 * 1024; // 1MB
+export const SIZE_1KB = 1 * 1024; //1KB
+export const SIZE_1MB = 1 * SIZE_1KB * SIZE_1KB; // 1MB
+
 const ACCEPTED_IMAGE_TYPES = [
   "image/jpeg",
   "image/jpg",
@@ -50,21 +52,21 @@ export const zImage = z
   .any()
   .refine(
     (file) => (typeof file !== "string" ? file.size < SIZE_1MB : true),
-    "File size must be less than 1MB",
+    "File size must be less than 1MB"
   )
   .refine(
     (file) =>
       typeof file !== "string"
         ? ACCEPTED_IMAGE_TYPES.includes(file?.type)
         : true,
-    "Only .jpg, .jpeg, .png and .webp formats are supported.",
+    "Only .jpg, .jpeg, .png and .webp formats are supported."
   );
 
 export const zFile = z
   .any()
   .refine(
     (file) => (typeof file !== "string" ? file.size < SIZE_1MB * 5 : true),
-    "File size must be less than 5MB",
+    "File size must be less than 5MB"
   )
   .refine(
     (file) =>
@@ -79,7 +81,7 @@ export const zFile = z
             "application/docx",
           ].includes(file?.type)
         : true,
-    "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .docx formats are supported.",
+    "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .docx formats are supported."
   );
 
 export const parseDateSchema = z
@@ -419,7 +421,7 @@ export const PaymentFieldSchema = z
     {
       message: `When payment type is "variable", calculation type must be "fixed".`,
       path: ["calculation_type"],
-    },
+    }
   );
 
 export const deductionCycleArray = ["monthly"] as const;
@@ -645,7 +647,7 @@ export const UpdateSiteLinkSchema = z.object({
   skill_level: z.string().optional(),
 });
 
-export const ReimbursementStatusArray = ["pending", "approved"] as const;
+export const ReimbursementStatusArray = ["approved", "pending"] as const;
 export const ReimbursementDeductibleArray = ["true", "false"] as const;
 
 export const ReimbursementSchema = z.object({
@@ -653,12 +655,20 @@ export const ReimbursementSchema = z.object({
   last_name: zString.optional(),
   submitted_date: z.string(),
   status: z.enum(ReimbursementStatusArray),
-  amount: zNumber.min(1).max(100000000),
-  user_id:z.string().optional(),
+  amount: z.number().min(1).max(100000000),
+  user_id: z.string().optional(),
   is_deductible: z.boolean().optional().default(false),
-  company_id:z.string(),
-  employee_id:z.string(),
+  company_id: z.string(),
+  employee_id: z.string(),
+});
 
+export const ImportReimbursementHeaderSchema = z.object({
+  submitted_date: z.string(),
+  employee_code: z.string(),
+  amount: z.string(),
+  email: z.string().optional(),
+  is_deductible: z.string().optional(),
+  status: z.string().optional(),
 });
 
 export const exitReasonArray = [
@@ -669,3 +679,26 @@ export const exitReasonArray = [
   "Medical",
   "Other",
 ] as const;
+
+export const ImportReimbursementDataSchema = z.object({
+  data: z.array(
+    z.object({
+      submitted_date: z.string(),
+      employee_code: zNumberString,
+      amount: z.preprocess(
+        (value) =>
+          typeof value === "string" ? Number.parseFloat(value) : value,
+        z.number()
+      ),
+      email: zEmail.optional(),
+      is_deductible: z
+        .preprocess(
+          (value) =>
+            typeof value === "string" ? value.toLowerCase() === "true" : value,
+          z.boolean().default(false)
+        )
+        .default(false),
+      status: z.enum(ReimbursementStatusArray),
+    })
+  ),
+});
