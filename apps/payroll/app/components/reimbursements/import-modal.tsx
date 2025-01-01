@@ -12,9 +12,12 @@ import { useState } from "react";
 
 export const ImportReimbursementModal = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-
+  const [eligibleFileSize, setEligibleFileSize] = useState<boolean>(true);
   const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
+
   const navigate = useNavigate();
+
+  const MAX_FILE_SIZE_LIMIT = 3145728;
 
   const isOpen =
     searchParams.get("step") === modalSearchParamNames.import_reimbursement;
@@ -26,13 +29,33 @@ export const ImportReimbursementModal = () => {
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event?.target?.files![0];
-    setSelectedFile(file);
+    if (file) {
+      setSelectedFile(file);
+      if (file.size > MAX_FILE_SIZE_LIMIT) {
+        setEligibleFileSize(false);
+        alert("File size exceeds the 3MB limit");
+      } else {
+        setEligibleFileSize(true);
+      }
+    }
   };
 
   const handleFileSubmit = () => {
-    navigate("/approvals/reimbursements/import-data", {
-      state: { file: selectedFile },
-    });
+    if (eligibleFileSize) {
+      navigate("/approvals/reimbursements/import-data", {
+        state: { file: selectedFile },
+      });
+    }
+  };
+
+  const formatFileSize = (size: number) => {
+    if (size < 1024) {
+      return `${size} Bytes`;
+    }
+    if (size < 1024 * 1024) {
+      return `${(size / 1024).toFixed(2)} KB`;
+    }
+    return `${(size / (1024 * 1024)).toFixed(2)} MB`;
   };
 
   return (
@@ -42,7 +65,7 @@ export const ImportReimbursementModal = () => {
         <div className="flex justify-between">
           <DialogDescription className="text-muted-foreground">
             only .csv format supported! <br />
-            maximum upload size is 5MB!
+            maximum upload size is 3MB!
           </DialogDescription>
           <Button
             className={selectedFile ? "flex" : "hidden"}
@@ -52,14 +75,14 @@ export const ImportReimbursementModal = () => {
           </Button>
         </div>
 
-        <Input type="file" accept=".csv"  onChange={handleFileSelect} />
+        <Input type="file" accept=".csv" onChange={handleFileSelect} />
 
         <p
           className={
             selectedFile ? "flex text-sm text-muted-foreground" : "hidden"
           }
         >
-          Your file size : {selectedFile?.size} KB
+          Your file size : {formatFileSize(selectedFile?.size!)}
         </p>
       </DialogContent>
     </Dialog>

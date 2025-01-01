@@ -79,7 +79,7 @@ export function ImportedDataTable<TData, TValue>({
                     colSpan={columns.length}
                     className="h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize"
                   >
-                    No User Found
+                    No Reimbursements Found
                   </TableCell>
                 </TableRow>
               )}

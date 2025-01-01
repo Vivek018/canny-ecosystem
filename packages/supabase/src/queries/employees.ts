@@ -249,7 +249,8 @@ export async function getEmployeeIdsByEmployeeCodes({
   const { data, error } = await supabase
     .from("employees")
     .select(columns.join(","))
-    .in("employee_code", employeeCodes);
+    .in("employee_code", employeeCodes)
+    .returns<InferredType<EmployeeDatabaseRow, (typeof columns)[number]>[]>();
 
   if (error) {
     console.error(error);

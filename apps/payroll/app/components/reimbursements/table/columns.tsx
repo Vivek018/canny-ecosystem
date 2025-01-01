@@ -6,6 +6,7 @@ import { ReimbursementOptionsDropdown } from "./reimbursements-table-options";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 import type { ReimbursementDataType } from "@canny_ecosystem/supabase/queries";
+import { formatDate } from "@canny_ecosystem/utils";
 
 export const reimbursementsColumns = ({
   isEmployeeRoute = false,
@@ -55,7 +56,9 @@ export const reimbursementsColumns = ({
     header: "Submitted Date",
     cell: ({ row }) => {
       return (
-        <p className="truncate ">{row.original?.submitted_date ?? "--"}</p>
+        <p className="truncate ">
+          {formatDate(row.original?.submitted_date ?? "") ?? "--"}
+        </p>
       );
     },
   },

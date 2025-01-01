@@ -645,7 +645,7 @@ export const UpdateSiteLinkSchema = z.object({
   skill_level: z.string().optional(),
 });
 
-export const ReimbursementStatusArray = ["pending", "approved"] as const;
+export const ReimbursementStatusArray = ["approved", "pending"] as const;
 export const ReimbursementDeductibleArray = ["true", "false"] as const;
 
 export const ReimbursementSchema = z.object({
@@ -658,10 +658,9 @@ export const ReimbursementSchema = z.object({
   is_deductible: z.boolean().optional().default(false),
   company_id: z.string(),
   employee_id: z.string(),
-  
 });
 
-export const ImportReimbursementSchema = z.object({
+export const ImportReimbursementHeaderSchema = z.object({
   submitted_date: z.string(),
   employee_code: z.string(),
   amount: z.string(),
@@ -679,14 +678,25 @@ export const exitReasonArray = [
   "Other",
 ] as const;
 
-
-export const ImportSchema = z.object({
-  submitted_date: z.string(),
-  employee_code: zNumberString,
-  amount: z.number(),
-  email: zEmail.optional(),
-  is_deductible: z.boolean().default(false),
-  status: z.enum(ReimbursementStatusArray).default("approved"), 
+export const ImportReimbursementDataSchema = z.object({
+  data: z.array(
+    z.object({
+      submitted_date: z.string(),
+      employee_code: zNumberString,
+      amount: z.preprocess(
+        (value) =>
+          typeof value === "string" ? Number.parseFloat(value) : value,
+        z.number()
+      ),
+      email: zEmail.optional(),
+      is_deductible: z
+        .preprocess(
+          (value) =>
+            typeof value === "string" ? value.toLowerCase() === "true" : value,
+          z.boolean().default(false)
+        )
+        .default(false),
+      status: z.enum(ReimbursementStatusArray),
+    })
+  ),
 });
-
-export const WholeArraySchema = z.array(ImportSchema);

@@ -59,7 +59,7 @@ export const ImportedDataColumns : ColumnDef<ImportReimbursementDataType>[] = [
     cell: ({ row }) => {
       return (
         <p className="truncate capitalize">
-          {String(row.original?.is_deductible) ?? "--"}
+          {row.original?.is_deductible ?? "--"}
         </p>
       );
     },

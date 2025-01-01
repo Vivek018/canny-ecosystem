@@ -6,16 +6,43 @@ import {
   CardTitle,
 } from "@canny_ecosystem/ui/card";
 import { SearchableSelectField } from "@canny_ecosystem/ui/forms";
-import { transformStringArrayIntoOptions } from "@canny_ecosystem/utils";
-import { getInputProps } from "@conform-to/react";
+import { type ImportReimbursementHeaderSchema, transformStringArrayIntoOptions } from "@canny_ecosystem/utils";
+import { type FieldMetadata, getInputProps } from "@conform-to/react";
+import { useEffect, useState } from "react";
+import Papa from "papaparse";
 
-export function ReimbursementImportStep1({
+
+type FieldsType = {
+  [K in keyof typeof ImportReimbursementHeaderSchema.shape]: FieldMetadata<
+    (typeof ImportReimbursementHeaderSchema.shape)[K]["_type"],
+    (typeof ImportReimbursementHeaderSchema.shape)[K],
+    string[]
+  >;
+};
+
+export function ReimbursementImportHeader({
   fields,
-  array,
+  file
 }: {
-  fields: any;
-  array: any;
+  fields: FieldsType;
+  file:any
 }) {
+
+  const [headerArray, setHeaderArray] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (file) {
+      Papa.parse(file, {
+        skipEmptyLines: true,
+        complete: (results: any) => {
+          const headers = results.data[0].filter(
+            (header: string) => header !== null && header.trim() !== ""
+          );
+          setHeaderArray(headers);
+        },
+      });
+    }
+  }, [file]);
   return (
     <Card className="m-4">
       <CardHeader>
@@ -33,7 +60,7 @@ export function ReimbursementImportStep1({
               }),
             }}
             className="lowercase"
-            options={transformStringArrayIntoOptions(array)}
+            options={transformStringArrayIntoOptions(headerArray)}
             labelProps={{
               children: "Employee Code",
             }}
@@ -46,7 +73,7 @@ export function ReimbursementImportStep1({
               }),
             }}
             className="lowercase"
-            options={transformStringArrayIntoOptions(array)}
+            options={transformStringArrayIntoOptions(headerArray)}
             labelProps={{
               children: "Amount",
             }}
@@ -59,7 +86,7 @@ export function ReimbursementImportStep1({
               }),
             }}
             className="lowercase"
-            options={transformStringArrayIntoOptions(array)}
+            options={transformStringArrayIntoOptions(headerArray)}
             labelProps={{
               children: "Submitted Date",
             }}
@@ -72,7 +99,7 @@ export function ReimbursementImportStep1({
               }),
             }}
             className="lowercase"
-            options={transformStringArrayIntoOptions(array)}
+            options={transformStringArrayIntoOptions(headerArray)}
             labelProps={{
               children: "Approved By",
             }}
@@ -80,7 +107,7 @@ export function ReimbursementImportStep1({
           />
           <SearchableSelectField
             className="capitalize"
-            options={transformStringArrayIntoOptions(array)}
+            options={transformStringArrayIntoOptions(headerArray)}
             inputProps={{
               ...getInputProps(fields.status, { type: "text" }),
             }}
@@ -91,7 +118,7 @@ export function ReimbursementImportStep1({
           />
           <SearchableSelectField
             className="capitalize"
-            options={transformStringArrayIntoOptions(array)}
+            options={transformStringArrayIntoOptions(headerArray)}
             inputProps={{
               ...getInputProps(fields.is_deductible, { type: "text" }),
             }}

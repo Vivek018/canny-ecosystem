@@ -1,158 +1,239 @@
-import { useState, useEffect } from "react";
-import Papa from "papaparse";
 import {
-  Form,
-  json,
-  redirect,
-  useLoaderData,
-  useLocation,
-} from "@remix-run/react";
-import {
-  type ActionFunctionArgs,
-  createCookieSessionStorage,
-  type LoaderFunctionArgs,
-} from "@remix-run/node";
-import { FormProvider, getFormProps, useForm } from "@conform-to/react";
-import { parseWithZod, getZodConstraint } from "@conform-to/zod";
-import { FormButtons } from "@/components/form/form-buttons";
-import { ReimbursementImportStep1 } from "@/components/reimbursements/reimbursement-import-step-1";
-import ReimbursementImportStep2 from "@/components/reimbursements/reimbursement-import-step-2";
-import { ImportReimbursementSchema } from "@canny_ecosystem/utils";
+  ImportReimbursementHeaderSchema,
+  ImportReimbursementDataSchema,
+  isGoodStatus,
+} from "@canny_ecosystem/utils";
 
-const sessionStorage = createCookieSessionStorage({
-  cookie: {
-    name: "my-session",
-    secrets: ["your-secret-here"],
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-  },
-});
+import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
+import { getInitialValueFromZod } from "@canny_ecosystem/utils";
+import { FormProvider, getFormProps, useForm } from "@conform-to/react";
+import { getZodConstraint, parseWithZod } from "@conform-to/zod";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { Form, useLoaderData, useLocation } from "@remix-run/react";
+import { json, redirect } from "@remix-run/node";
+import { Card } from "@canny_ecosystem/ui/card";
+
+import { useState } from "react";
+import { commitSession, getSession } from "@/utils/sessions";
+import { FormButtons } from "@/components/form/form-buttons";
+import { FormStepHeader } from "@/components/form/form-step-header";
+import { useIsomorphicLayoutEffect } from "@canny_ecosystem/utils/hooks/isomorphic-layout-effect";
+import { ReimbursementImportHeader } from "@/components/reimbursements/reimbursement-import-header";
+import { ReimbursementImportData } from "@/components/reimbursements/reimbursement-import-data";
+
+import {
+  getEmployeeIdsByEmployeeCodes,
+  getUserIdsByUserEmails,
+} from "@canny_ecosystem/supabase/queries";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import { createReimbursementsFromImportedData } from "@canny_ecosystem/supabase/mutations";
+import { safeRedirect } from "@/utils/server/http.server";
+
+export const IMPORT_REIMBURSEMENT = ["map-headers", "validate-imported-data"];
+
+export const STEP = "step";
+
+const SESSION_KEY_PREFIX = "multiStepReimbursementImport_step_";
+
+const schemas = [
+  ImportReimbursementHeaderSchema,
+  ImportReimbursementDataSchema,
+];
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const session = await sessionStorage.getSession(
-    request.headers.get("Cookie")
-  );
-  const mappingData = session.get("submissionData");
-  
+  const url = new URL(request.url);
+  const step = Number.parseInt(url.searchParams.get(STEP) || "1");
+  const totalSteps = schemas.length;
 
-  const headers = {
-    "Set-Cookie": await sessionStorage.commitSession(
-      await sessionStorage.getSession()
-    ),
-  };
+  const session = await getSession(request.headers.get("Cookie"));
+  const stepData: any[] = [];
 
-  if (!mappingData) {
-    return json({ mappingData: null, fileData: null }, { headers });
+  for (let i = 1; i <= totalSteps; i++) {
+    stepData.push(await session.get(`${SESSION_KEY_PREFIX}${i}`));
   }
 
-  return json({ mappingData}, { headers });
+  if (step < 1 || step > totalSteps) {
+    url.searchParams.set(STEP, "1");
+    return redirect(url.toString(), { status: 302 });
+  }
+
+  return json({ step, totalSteps, stepData });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+  const url = new URL(request.url);
+  const session = await getSession(request.headers.get("Cookie"));
+
+  const step = Number.parseInt(url.searchParams.get(STEP) || "1");
+  const currentSchema = schemas[step - 1];
+  const totalSteps = schemas.length;
+
+  const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
+  const action = formData.get("_action") as string;
+
   const submission = parseWithZod(formData, {
-    schema: ImportReimbursementSchema,
+    schema: currentSchema,
   });
 
-  if (submission.status !== "success") {
-    return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
-    );
+  if (action === "submit") {
+    if (submission.status === "success") {
+      const parsedData = ImportReimbursementDataSchema.safeParse(
+        JSON.parse(formData.get("stringified_data") as string)
+      );
+
+      const importedData = parsedData.data?.data;
+
+      const userEmails = importedData!.map((value) => value.email!);
+
+      const employeeCodes = importedData!.map((value) => value.employee_code);
+
+      const { data: employees, error } = await getEmployeeIdsByEmployeeCodes({
+        supabase,
+        employeeCodes,
+      });
+
+      if (error) {
+        throw error;
+      }
+      const { data: users, error: userError } = await getUserIdsByUserEmails({
+        supabase,
+        userEmails,
+      });
+
+      if (userError) {
+        throw userError;
+      }
+
+      const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+
+      const updatedData = importedData!.map((item: any) => {
+        const employeeId = employees?.find(
+          (e) => e.employee_code === item.employee_code
+        )?.id;
+        const userId = users?.find((u) => u.email === item.email)?.id;
+
+        const { email, employee_code, ...rest } = item;
+        return {
+          ...rest,
+          ...(employeeId ? { employee_id: employeeId } : {}),
+          ...(userId ? { user_id: userId } : {}),
+          company_id: companyId,
+        };
+      });
+
+      const { status, error: dataEntryError } =
+        await createReimbursementsFromImportedData({
+          supabase,
+          data: updatedData,
+        });
+
+      if (isGoodStatus(status))
+        return safeRedirect("/approvals/reimbursements", { status: 303 });
+      if (dataEntryError) {
+        throw error;
+      }
+    }
+  } else if (action === "next" || action === "back" || action === "skip") {
+    if (action === "next") {
+      if (submission.status === "success") {
+        session.set(`${SESSION_KEY_PREFIX}${step}`, submission.value);
+      }
+      if (submission.status === "error") {
+        return json(
+          { result: submission.reply() },
+          { status: submission.status === "error" ? 400 : 200 }
+        );
+      }
+    }
+
+    let nextStep = step;
+    if (action === "next" || action === "skip") {
+      nextStep = Math.min(step + 1, totalSteps);
+    } else if (action === "back") {
+      nextStep = Math.max(step - 1, 1);
+    }
+
+    url.searchParams.set(STEP, String(nextStep));
+    return redirect(url.toString(), {
+      headers: {
+        "Set-Cookie": await commitSession(session),
+      },
+    });
   }
-  const session = await sessionStorage.getSession(
-    request.headers.get("Cookie")
-  );
 
-  session.set("submissionData", submission.value);
-  
-
-  return redirect("/approvals/reimbursements/import-data", {
-    headers: {
-      "Set-Cookie": await sessionStorage.commitSession(session),
-    },
-  });
+  return json({});
 }
 
 export default function ReimbursementImportFieldMapping() {
-  const { mappingData, fileData } = useLoaderData() as {
-    mappingData: any | null;
-    fileData: any | null;
-  };
+  const { step, totalSteps, stepData } = useLoaderData<typeof loader>();
+  const stepOneData = stepData[0];
 
-  const location = useLocation();
-  const [fileContent, setFileContent] = useState<string | null>(null);
-  const [array, setArray] = useState<string[]>([]);
-  const [formSubmitted, setFormSubmitted] = useState(false);
   const [resetKey, setResetKey] = useState(Date.now());
 
+  const location = useLocation();
+  const [file] = useState(location.state?.file);
+
+  const IMPORT_TAG = IMPORT_REIMBURSEMENT[step - 1];
+  const currentSchema = schemas[step - 1];
+  const initialValues = getInitialValueFromZod(currentSchema);
+
+  useIsomorphicLayoutEffect(() => {
+    setResetKey(Date.now());
+  }, [step]);
+
   const [form, fields] = useForm({
-    constraint: getZodConstraint(ImportReimbursementSchema),
-    onValidate({ formData }) {
-      return parseWithZod(formData, { schema: ImportReimbursementSchema });
+    id: IMPORT_TAG,
+    constraint: getZodConstraint(currentSchema),
+    onValidate: ({ formData }: { formData: FormData }) => {
+      return parseWithZod(formData, { schema: currentSchema });
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
+    defaultValue: stepData[step - 1] ?? initialValues,
   });
 
-  useEffect(() => {
-    const file = location.state?.file;
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const content = e.target?.result as string;
-        setFileContent(content);
-
-        Papa.parse(file, {
-          skipEmptyLines: true,
-          complete: (results:any) => {
-            const headers = results.data[0].filter(
-              (header: string) => header !== null && header.trim() !== ""
-            );
-            setArray(headers);
-          },
-        });
-      };
-      reader.readAsText(file);
-    }
-  }, [location.state?.file]);
-
-  const [parsedData, setParsedData] = useState({});
-
-  useEffect(() => {
-    if (mappingData) {
-      const fieldMapping = Object.fromEntries(
-        Object.entries(mappingData).map(([key, value]) => [value, key])
-      );
-
-      const fileToUse = fileContent || fileData;
-
-      setParsedData({ fieldMapping, file: fileToUse});
-      setFormSubmitted(true);
-    }
-  }, [mappingData, fileContent, fileData]);
-
   return (
-    <section className="w-full">
-      {!formSubmitted ? (
-        <FormProvider context={form.context}>
-          <Form method="POST" {...getFormProps(form)} className="flex flex-col">
-            
-            <ReimbursementImportStep1
-              key={resetKey}
-              fields={fields}
-              array={array}
-            />
+    <section className="md:px-20 lg:px-28 2xl:px-40 py-4">
+      <div className="w-full mx-auto mb-8">
+        <FormStepHeader
+          totalSteps={totalSteps}
+          step={step}
+          stepData={stepData}
+        />
+      </div>
+      <FormProvider context={form.context}>
+        <Form
+          method="POST"
+          encType="multipart/form-data"
+          {...getFormProps(form)}
+          className="flex flex-col"
+        >
+          <Card>
+            <div className="h-[500px] overflow-scroll">
+              {step === 1 ? (
+                <ReimbursementImportHeader
+                  key={resetKey}
+                  file={file}
+                  fields={fields as any}
+                />
+              ) : null}
+              {step === 2 ? (
+                <ReimbursementImportData
+                  fieldMapping={stepOneData}
+                  file={file}
+                />
+              ) : null}
+            </div>
             <FormButtons
-              setResetKey={setResetKey}
               form={form}
-              isSingle={true}
+              setResetKey={setResetKey}
+              step={step}
+              totalSteps={totalSteps}
             />
-          </Form>
-        </FormProvider>
-      ) : (
-        <ReimbursementImportStep2 parsedData={parsedData} />
-      )}
+          </Card>
+        </Form>
+      </FormProvider>
     </section>
   );
 }
