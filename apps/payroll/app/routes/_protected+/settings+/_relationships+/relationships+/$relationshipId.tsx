@@ -44,12 +44,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       data: data.terms,
     });
   } catch (error) {
-    return json({
-      status: "error",
-      message: "An unexpected error occurred",
-      error,
-      data: null,
-    }, { status: 500 });
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+        data: null,
+      },
+      { status: 500 }
+    );
   }
 }
 
@@ -58,9 +61,9 @@ export default function Relationship() {
 
   const [searchParams] = useSearchParams();
 
-  if (
-    searchParams.get(modalSearchParamNames.view_relationship_terms) === "true"
-  ) {
+  const step = searchParams.get("step");
+
+  if (step === modalSearchParamNames.view_relationship_terms) {
     return <ViewRelationshipTermsDialog values={data} />;
   }
 

@@ -1,11 +1,21 @@
 import { formatUTCDate } from "@canny_ecosystem/utils";
 import type {
   EmployeeDatabaseRow,
+  EmployeeProjectAssignmentDatabaseRow,
   InferredType,
+  ProjectDatabaseRow,
   ReimbursementRow,
+  SiteDatabaseRow,
   TypedSupabaseClient,
   UserDatabaseRow,
 } from "../types";
+
+export type ImportReimbursementDataType = Pick<
+  ReimbursementRow,
+  "amount" | "is_deductible" | "status" | "submitted_date"
+> & { email: UserDatabaseRow["email"] } & {
+  employee_code: EmployeeDatabaseRow["employee_code"];
+};
 
 export type ReimbursementDataType = Pick<
   ReimbursementRow,
@@ -20,8 +30,22 @@ export type ReimbursementDataType = Pick<
 > & {
   employees: Pick<
     EmployeeDatabaseRow,
-    "id" | "first_name" | "middle_name" | "last_name"
-  >;
+    "id" | "first_name" | "middle_name" | "last_name" | "employee_code"
+  > & {
+    employee_project_assignment: Pick<
+      EmployeeProjectAssignmentDatabaseRow,
+      "employee_id"
+    > & {
+      project_sites: {
+        id: SiteDatabaseRow["id"];
+        name: SiteDatabaseRow["name"];
+        projects: {
+          id: ProjectDatabaseRow["id"];
+          name: ProjectDatabaseRow["name"];
+        };
+      };
+    };
+  };
 } & {
   users: Pick<UserDatabaseRow, "id" | "email">;
 };
@@ -67,6 +91,7 @@ export async function getReimbursementsByCompanyId({
   } else {
     query.order("created_at", { ascending: false });
   }
+
   if (searchQuery) {
     const searchQueryArray = searchQuery.split(" ");
     if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
@@ -119,15 +144,17 @@ export async function getReimbursementsByCompanyId({
     if (users) {
       query.eq("users.email", users);
     }
-    
     if (project) {
       query.eq(
         "employees.employee_project_assignment.project_sites.projects.name",
-        project,
+        project
       );
     }
     if (project_site) {
-      query.eq("employees.employee_project_assignment.project_sites.name", project_site);
+      query.eq(
+        "employees.employee_project_assignment.project_sites.name",
+        project_site
+      );
     }
   }
 

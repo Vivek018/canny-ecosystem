@@ -105,7 +105,7 @@ export async function getEmployeesByCompanyId({
         employee_id, assignment_type, skill_level, position, start_date, end_date,
         project_sites!inner(id, name, projects!inner(id, name))
       )`,
-      { count: "exact" },
+      { count: "exact" }
     )
     .eq("company_id", companyId);
 
@@ -172,7 +172,7 @@ export async function getEmployeesByCompanyId({
     if (project) {
       query.eq(
         "employee_project_assignment.project_sites.projects.name",
-        project,
+        project
       );
     }
     if (project_site) {
@@ -219,8 +219,8 @@ export async function getEmployeesByPositionAndProjectSiteId({
     .from("employees")
     .select(
       `${columns.join(
-        ",",
-      )},employee_project_assignment!employee_project_assignment_employee_id_fkey!inner(*)`,
+        ","
+      )},employee_project_assignment!employee_project_assignment_employee_id_fkey!inner(*)`
     )
     .eq("employee_project_assignment.is_current", true)
     .eq("employee_project_assignment.project_site_id", projectSiteId)
@@ -236,6 +236,27 @@ export async function getEmployeesByPositionAndProjectSiteId({
     data,
     error,
   };
+}
+export async function getEmployeeIdsByEmployeeCodes({
+  supabase,
+  employeeCodes,
+}: {
+  supabase: TypedSupabaseClient;
+  employeeCodes: string[];
+}) {
+  const columns = ["employee_code", "id"] as const;
+
+  const { data, error } = await supabase
+    .from("employees")
+    .select(columns.join(","))
+    .in("employee_code", employeeCodes)
+    .returns<InferredType<EmployeeDatabaseRow, (typeof columns)[number]>[]>();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { data, error };
 }
 
 export async function getEmployeeById({
@@ -650,8 +671,8 @@ export async function getEmployeeProjectAssignmentByEmployeeId({
     .from("employee_project_assignment")
     .select(
       `${columns.join(
-        ",",
-      )}, project_sites(id, name, projects(name)), supervisor:employees!employee_project_assignments_supervisor_id_fkey(id, employee_code)`,
+        ","
+      )}, project_sites(id, name, projects(name)), supervisor:employees!employee_project_assignments_supervisor_id_fkey(id, employee_code)`
     )
     .eq("employee_id", employeeId)
     .single<EmployeeProjectAssignmentDataType>();

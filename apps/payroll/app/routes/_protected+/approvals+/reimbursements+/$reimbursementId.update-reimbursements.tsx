@@ -75,7 +75,7 @@ export default function UpdateReimbursememts() {
   return (
     <AddReimbursements
       updateValues={updatableData}
-      userOptionsFromUpdate={userOptions as any}
+      userOptionsFromUpdate={userOptions}
     />
   );
 }

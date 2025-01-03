@@ -74,7 +74,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
   const { status, error } = await createReimbursementsFromData({
     supabase,
-    data: reimbursementData,
+    data: reimbursementData as any,
   });
 
   if (isGoodStatus(status))
@@ -136,9 +136,6 @@ export default function AddReimbursements({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex justify-center items-center mt-5">
-                <span className="text-primary">{}</span>
-              </div>
               <input
                 {...getInputProps(fields.company_id, { type: "hidden" })}
               />
@@ -202,7 +199,7 @@ export default function AddReimbursements({
                     placeholder: "Select an authority that approved",
                   }}
                   className="lowercase"
-                  options={userOptions ?? userOptionsFromUpdate}
+                  options={userOptions as any ?? userOptionsFromUpdate}
                   labelProps={{
                     children: "Approved By",
                   }}

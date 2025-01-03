@@ -1,27 +1,34 @@
-import type { PostgrestError } from "@supabase/supabase-js";
-import type { TypedSupabaseClient } from "../types";
-
-type PaymentTemplate = {
-  id: string;
-  name: string;
-}
+import type {
+  InferredType,
+  PaymentTemplateAssignmentsDatabaseInsert,
+  TypedSupabaseClient,
+} from "../types";
+import { HARD_QUERY_LIMIT } from "../constant";
 
 export async function getPaymentTemplatesByCompanyId({
   supabase,
-  company_id,
-}: { 
-  supabase: TypedSupabaseClient; 
-  company_id: string 
-}): Promise<{ 
-  data: PaymentTemplate[] | null; 
-  error: PostgrestError | null 
-}> {
+  companyId,
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+}) {
   const columns = ["id", "name"] as const;
   const { data, error } = await supabase
     .from("payment_templates")
     .select(columns.join(","))
-    .eq("company_id", company_id);
-  
-  if (error) console.error(error);
-  return { data: data as PaymentTemplate[] | null, error };
+    .eq("company_id", companyId)
+    .limit(HARD_QUERY_LIMIT)
+    .order("created_at", { ascending: true })
+    .returns<
+      InferredType<
+        PaymentTemplateAssignmentsDatabaseInsert,
+        (typeof columns)[number]
+      >[]
+    >();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { data, error };
 }

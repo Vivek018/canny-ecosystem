@@ -1,8 +1,12 @@
+import { ColumnVisibility } from "@/components/reimbursements/column-visibility";
 import { FilterList } from "@/components/reimbursements/filter-list";
-import { ReimbursementActions } from "@/components/reimbursements/reimbursement-actions";
+import { ImportReimbursementMenu } from "@/components/reimbursements/import-menu";
+import { ImportReimbursementModal } from "@/components/reimbursements/import-modal";
 import { ReimbursementSearchFilter } from "@/components/reimbursements/reimbursement-search-filter";
 import { reimbursementsColumns } from "@/components/reimbursements/table/columns";
 import { ReimbursementsTable } from "@/components/reimbursements/table/reimbursements-table";
+import { useReimbursementStore } from "@/store/reimbursements";
+
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
   LAZY_LOADING_LIMIT,
@@ -15,9 +19,11 @@ import {
   getUsersEmail,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
+import { Button } from "@canny_ecosystem/ui/button";
+import { Icon } from "@canny_ecosystem/ui/icon";
 
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { json, redirect, useLoaderData } from "@remix-run/react";
+import { json, redirect, useLoaderData, useNavigate } from "@remix-run/react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -72,20 +78,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
     throw reimbursementError;
   }
 
-    const { data: projectData } = await getProjectNamesByCompanyId({
-      supabase,
-      companyId,
-    });
-  
-    let projectSiteData = null;
-    if (filters.project) {
-      const { data } = await getSiteNamesByProjectName({
-        supabase,
-        projectName: filters.project,
-      });
-      projectSiteData = data;
-    }
-  
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
@@ -94,7 +86,19 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const hasNextPage = Boolean(
     meta?.count && meta.count / (page + 1) > LAZY_LOADING_LIMIT,
   );
+  const { data: projectData } = await getProjectNamesByCompanyId({
+    supabase,
+    companyId,
+  });
 
+  let projectSiteData = null;
+  if (filters.project) {
+    const { data } = await getSiteNamesByProjectName({
+      supabase,
+      projectName: filters.project,
+    });
+    projectSiteData = data;
+  }
   return json({
     reimbursementData,
     env,
@@ -102,9 +106,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
     hasNextPage,
     filters,
     query,
-    userEmails: data?.map((user) => user.email) ?? [],
     projectArray: projectData?.map((project) => project.name) ?? [],
     projectSiteArray: projectSiteData?.map((site) => site.name) ?? [],
+    userEmails: data?.map((user) => user.email) ?? [],
   });
 }
 
@@ -114,13 +118,11 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const prompt = formData.get("prompt") as string | null;
 
-  // Prepare search parameters
   const searchParams = new URLSearchParams();
   if (prompt && prompt.trim().length > 0) {
     searchParams.append("name", prompt.trim());
   }
 
-  // Update the URL with the search parameters
   url.search = searchParams.toString();
 
   return redirect(url.toString());
@@ -138,13 +140,15 @@ export default function Reimbursements() {
     projectArray,
     projectSiteArray,
   } = useLoaderData<typeof loader>();
+  const navigate = useNavigate();
+  const { selectedRows } = useReimbursementStore();
 
   const noFilters = Object.values(filters).every((value) => !value);
 
   return (
     <section className="m-4">
       <div className="w-full flex items-center justify-between pb-4">
-        <div className="w-full  flex justify-between items-center gap-3">
+        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
           <ReimbursementSearchFilter
             disabled={!reimbursementData?.length && noFilters}
             userEmails={userEmails}
@@ -153,7 +157,24 @@ export default function Reimbursements() {
           />
           <FilterList filters={filters} />
         </div>
-        <ReimbursementActions isEmpty={!reimbursementData?.length} />
+        <div className="space-x-2 hidden md:flex">
+          {!selectedRows.length ? (
+            <>
+              <ColumnVisibility disabled={!reimbursementData?.length} />
+              <ImportReimbursementMenu />
+            </>
+          ) : (
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-10 w-10"
+              disabled={!selectedRows.length}
+              onClick={() => navigate("/approvals/reimbursements/analytics")}
+            >
+              <Icon name="chart" className="h-[18px] w-[18px]" />
+            </Button>
+          )}
+        </div>
       </div>
       <ReimbursementsTable
         data={reimbursementData as any}
@@ -166,6 +187,7 @@ export default function Reimbursements() {
         query={query}
         companyId={companyId}
       />
+      <ImportReimbursementModal />
     </section>
   );
 }

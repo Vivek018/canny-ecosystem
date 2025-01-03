@@ -450,5 +450,6 @@ export function ReimbursementSearchFilter({
 
       </DropdownMenuContent>
     </DropdownMenu>
+    
   );
 }

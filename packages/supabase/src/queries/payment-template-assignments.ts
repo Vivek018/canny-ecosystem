@@ -1,3 +1,4 @@
+import { HARD_QUERY_LIMIT } from "../constant";
 import type {
   InferredType,
   PaymentTemplateAssignmentsDatabaseRow,
@@ -6,14 +7,14 @@ import type {
 
 export async function getPaymentTemplateAssignmentIdByEmployeeId({
   supabase,
-  employee_id,
-}: { supabase: TypedSupabaseClient; employee_id: string }) {
+  employeeId,
+}: { supabase: TypedSupabaseClient; employeeId: string }) {
   const columns = ["id"] as const;
 
   const { data, error } = await supabase
     .from("payment_template_assignments")
     .select(columns.join(","))
-    .eq("employee_id", employee_id)
+    .eq("employee_id", employeeId)
     .single<
       InferredType<
         PaymentTemplateAssignmentsDatabaseRow,
@@ -28,8 +29,8 @@ export async function getPaymentTemplateAssignmentIdByEmployeeId({
 
 export async function getPaymentTemplateAssignmentByEmployeeId({
   supabase,
-  employee_id,
-}: { supabase: TypedSupabaseClient; employee_id: string }) {
+  employeeId,
+}: { supabase: TypedSupabaseClient; employeeId: string }) {
   const columns = [
     "id",
     "template_id",
@@ -48,29 +49,7 @@ export async function getPaymentTemplateAssignmentByEmployeeId({
   const { data, error } = await supabase
     .from("payment_template_assignments")
     .select(columns.join(","))
-    .eq("employee_id", employee_id)
-    .single<
-      InferredType<
-        PaymentTemplateAssignmentsDatabaseRow,
-        (typeof columns)[number]
-      >
-    >();
-
-  if (error) console.error(error);
-
-  return { data, error };
-}
-
-export async function getPaymentTemplateAssignmentIdBySiteId({
-  supabase,
-  site_id,
-}: { supabase: TypedSupabaseClient; site_id: string }) {
-  const columns = ["id"] as const;
-
-  const { data, error } = await supabase
-    .from("payment_template_assignments")
-    .select(columns.join(","))
-    .eq("site_id", site_id)
+    .eq("employee_id", employeeId)
     .single<
       InferredType<
         PaymentTemplateAssignmentsDatabaseRow,
@@ -99,10 +78,10 @@ export type PaymentTemplateAssignmentsType = Pick<
   | "name"
 >;
 
-export async function getPaymentTemplateAssignmentBySiteId({
+export async function getPaymentTemplateAssignmentsBySiteId({
   supabase,
-  site_id,
-}: { supabase: TypedSupabaseClient; site_id: string }) {
+  siteId,
+}: { supabase: TypedSupabaseClient; siteId: string }) {
   const columns = [
     "id",
     "template_id",
@@ -121,7 +100,10 @@ export async function getPaymentTemplateAssignmentBySiteId({
   const { data, error } = await supabase
     .from("payment_template_assignments")
     .select(columns.join(","))
-    .eq("site_id", site_id).returns<PaymentTemplateAssignmentsType[]>();
+    .eq("site_id", siteId)
+    .limit(HARD_QUERY_LIMIT)
+    .order("created_at", { ascending: false })
+    .returns<PaymentTemplateAssignmentsType[]>();
 
   if (error) console.error(error);
 
