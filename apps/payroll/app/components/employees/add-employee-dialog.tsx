@@ -6,6 +6,7 @@ import {
   DropdownMenuTrigger,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
+import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
 import { useNavigate, useSearchParams } from "@remix-run/react";
 
 export function AddEmployeeDialog() {
@@ -22,8 +23,7 @@ export function AddEmployeeDialog() {
       <DropdownMenuContent sideOffset={10} align="end">
         <DropdownMenuItem
           onClick={() => {
-            searchParams.set("step", "import");
-            searchParams.set("hide", "true");
+            searchParams.set("step", modalSearchParamNames.import_employee);
             setSearchParams(searchParams);
           }}
           className="space-x-2 flex items-center"

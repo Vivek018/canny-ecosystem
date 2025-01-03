@@ -31,13 +31,13 @@ export const DeleteReimbursement = ({
   const [inputError, setInputError] = useState<string[]>([]);
   const submit = useSubmit();
 
-  const handleCancelUser = () => {
+  const handleCancleReimbursement = () => {
     setInputError([]);
     setInputValue("");
     setLoading(false);
   };
 
-  const handleDeleteUser = (
+  const handleDeleteReimbursement = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     if (inputValue === DELETE_TEXT) {
@@ -103,13 +103,13 @@ export const DeleteReimbursement = ({
           <ErrorList errors={inputError} />
         </div>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={handleCancelUser}>
+          <AlertDialogCancel onClick={handleCancleReimbursement}>
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
             className={cn(buttonVariants({ variant: "destructive" }))}
-            onClick={handleDeleteUser}
-            onSelect={handleDeleteUser}
+            onClick={handleDeleteReimbursement}
+            onSelect={handleDeleteReimbursement}
           >
             {isLoading ? "Deleting..." : "Delete"}
           </AlertDialogAction>

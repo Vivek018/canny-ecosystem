@@ -27,6 +27,7 @@ export function ImportedDataTable<TData, TValue>({
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
+ 
 
   const tableLength = table.getRowModel().rows?.length;
 
@@ -56,12 +57,7 @@ export function ImportedDataTable<TData, TValue>({
                         <TableCell
                           key={cell.id}
                           className={cn(
-                            "h-[60px] px-3 md:px-4 py-2 hidden md:table-cell",
-                            cell.column.id === "status" &&
-                              (cell.getValue() === "approved"
-                                ? "text-green"
-                                : cell.getValue() === "pending" &&
-                                  "text-muted-foreground")
+                            "h-[60px] px-3 md:px-4 py-2 hidden md:table-cell"
                           )}
                         >
                           {flexRender(
@@ -77,9 +73,9 @@ export function ImportedDataTable<TData, TValue>({
                 <TableRow className={cn(!tableLength && "border-none")}>
                   <TableCell
                     colSpan={columns.length}
-                    className="h-80 grid place-items-center text-center tracking-wide text-xl capitalize"
+                    className="h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize"
                   >
-                    No Reimbursements Found
+                    No Employees Found
                   </TableCell>
                 </TableRow>
               )}

@@ -1,7 +1,6 @@
 import {
-  ImportReimbursementHeaderSchema,
-  ImportReimbursementDataSchema,
-  isGoodStatus,
+  ImportEmployeeHeaderSchema,
+  ImportEmployeeDataSchema,
 } from "@canny_ecosystem/utils";
 
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -18,27 +17,18 @@ import { commitSession, getSession } from "@/utils/sessions";
 import { FormButtons } from "@/components/form/form-buttons";
 import { FormStepHeader } from "@/components/form/form-step-header";
 import { useIsomorphicLayoutEffect } from "@canny_ecosystem/utils/hooks/isomorphic-layout-effect";
-import { ReimbursementImportHeader } from "@/components/reimbursements/reimbursement-import-header";
-import { ReimbursementImportData } from "@/components/reimbursements/reimbursement-import-data";
 
-import {
-  getEmployeeIdsByEmployeeCodes,
-  getUserIdsByUserEmails,
-} from "@canny_ecosystem/supabase/queries";
+import { EmployeeImportHeader } from "@/components/employees/employee-import-header";
+import { EmployeeImportData } from "@/components/employees/employee-import-data";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { createReimbursementsFromImportedData } from "@canny_ecosystem/supabase/mutations";
-import { safeRedirect } from "@/utils/server/http.server";
 
-export const IMPORT_REIMBURSEMENT = ["map-headers", "validate-imported-data"];
+export const IMPORT_EMPLOYEES = ["map-headers", "validate-imported-data"];
 
 export const STEP = "step";
 
-const SESSION_KEY_PREFIX = "multiStepReimbursementImport_step_";
+const SESSION_KEY_PREFIX = "multiStepEmployeeImport_step_";
 
-const schemas = [
-  ImportReimbursementHeaderSchema,
-  ImportReimbursementDataSchema,
-];
+const schemas = [ImportEmployeeHeaderSchema, ImportEmployeeDataSchema];
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -60,7 +50,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return redirect(url.toString(), { status: 302 });
   }
 
-  return json({ step, totalSteps, stepData }, { headers });
+  return json({ step, totalSteps, stepData });
+  // return json({ step, totalSteps, stepData }, { headers });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -80,61 +71,33 @@ export async function action({ request }: ActionFunctionArgs) {
   });
 
   if (action === "submit") {
-    const parsedData = ImportReimbursementDataSchema.safeParse(
+    const parsedData = ImportEmployeeDataSchema.safeParse(
       JSON.parse(formData.get("stringified_data") as string)
     );
+  
+
     if (parsedData.success) {
       const importedData = parsedData.data?.data;
 
-      const userEmails = importedData!.map((value) => value.email!);
-
-      const employeeCodes = importedData!.map((value) => value.employee_code);
-
-      const { data: employees, error } = await getEmployeeIdsByEmployeeCodes({
-        supabase,
-        employeeCodes,
-      });
-
-      if (error) {
-        throw error;
-      }
-      const { data: users, error: userError } = await getUserIdsByUserEmails({
-        supabase,
-        userEmails,
-      });
-
-      if (userError) {
-        throw userError;
-      }
-
       const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-      const updatedData = importedData!.map((item: any) => {
-        const employeeId = employees?.find(
-          (e) => e.employee_code === item.employee_code
-        )?.id;
-        const userId = users?.find((u) => u.email === item.email)?.id;
+      const updatedData = importedData.map((entry) => ({
+        ...entry,
+        company_id: companyId,
+      }));
 
-        const { email, employee_code, ...rest } = item;
-        return {
-          ...rest,
-          ...(employeeId ? { employee_id: employeeId } : {}),
-          ...(userId ? { user_id: userId } : {}),
-          company_id: companyId,
-        };
-      });
+      console.log(updatedData);
 
-      const { status, error: dataEntryError } =
-        await createReimbursementsFromImportedData({
-          supabase,
-          data: updatedData,
-        });
-
-      if (isGoodStatus(status))
-        return safeRedirect("/approvals/reimbursements", { status: 303 });
-      if (dataEntryError) {
-        throw error;
-      }
+      // const { status, error: dataEntryError } =
+      //   await createReimbursementsFromImportedData({
+      //     supabase,
+      //     data: updatedData,
+      //   });
+      // if (isGoodStatus(status))
+      //   return safeRedirect("/approvals/reimbursements", { status: 303 });
+      // if (dataEntryError) {
+      //   throw error;
+      // }
     }
   } else if (action === "next" || action === "back" || action === "skip") {
     if (action === "next") {
@@ -167,7 +130,7 @@ export async function action({ request }: ActionFunctionArgs) {
   return json({});
 }
 
-export default function ReimbursementImportFieldMapping() {
+export default function EmployeeImportFieldMapping() {
   const { step, totalSteps, stepData } = useLoaderData<typeof loader>();
   const stepOneData = stepData[0];
 
@@ -176,7 +139,7 @@ export default function ReimbursementImportFieldMapping() {
   const location = useLocation();
   const [file] = useState(location.state?.file);
 
-  const IMPORT_TAG = IMPORT_REIMBURSEMENT[step - 1];
+  const IMPORT_TAG = IMPORT_EMPLOYEES[step - 1];
   const currentSchema = schemas[step - 1];
   const initialValues = getInitialValueFromZod(currentSchema);
 
@@ -212,19 +175,16 @@ export default function ReimbursementImportFieldMapping() {
           className="flex flex-col"
         >
           <Card>
-            <div className="h-[600px] overflow-scroll">
+            <div className="h-[500px] overflow-scroll">
               {step === 1 ? (
-                <ReimbursementImportHeader
+                <EmployeeImportHeader
                   key={resetKey}
                   file={file}
                   fields={fields as any}
                 />
               ) : null}
               {step === 2 ? (
-                <ReimbursementImportData
-                  fieldMapping={stepOneData}
-                  file={file}
-                />
+                <EmployeeImportData fieldMapping={stepOneData} file={file} />
               ) : null}
             </div>
             <FormButtons

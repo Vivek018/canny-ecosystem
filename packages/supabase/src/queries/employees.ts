@@ -13,6 +13,7 @@ import type {
   SiteDatabaseRow,
   TypedSupabaseClient,
 } from "../types";
+
 import { HARD_QUERY_LIMIT, MID_QUERY_LIMIT } from "../constant";
 
 export type EmployeeFilters = {
@@ -683,3 +684,19 @@ export async function getEmployeeProjectAssignmentByEmployeeId({
 
   return { data, error };
 }
+
+export type ImportEmployeeDataType = Pick<
+  EmployeeDatabaseRow,
+  | "employee_code"
+  | "first_name"
+  | "middle_name"
+  | "last_name"
+  | "gender"
+  | "education"
+  | "marital_status"
+  | "is_active"
+  | "date_of_birth"
+  | "personal_email"
+  | "primary_mobile_number"
+  | "secondary_mobile_number"
+>;

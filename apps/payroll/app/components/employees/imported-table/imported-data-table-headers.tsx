@@ -9,26 +9,32 @@ type Props = {
 };
 
 // make sure the order is same as header order
-export const ImportReimbursementDataArray = [
+export const ImportEmployeeDataArray = [
   "employee_code",
-  "submitted_date",
-  "amount",
-  "email",
-  "status",
-  "is_deductible",
+  "first_name",
+  "middle_name",
+  "last_name",
+  "gender",
+  "education",
+  "marital_status",
+  "is_active",
+  "date_of_birth",
+  "personal_email",
+  "primary_mobile_number",
+  "secondary_mobile_number",
 ];
 
 export function ImportedDataTableHeader({ table, className, loading }: Props) {
   const columnName = (id: string) =>
     loading ||
-    table?.getAllLeafColumns()?.find((col: { id: string; }) => {
+    table?.getAllLeafColumns()?.find((col: { id: string }) => {
       return col.id === id;
     })?.columnDef?.header;
 
   return (
     <TableHeader className={className}>
       <TableRow className="h-[45px] hover:bg-transparent">
-        {ImportReimbursementDataArray?.map((id) => {
+        {ImportEmployeeDataArray?.map((id) => {
           return (
             <TableHead key={id} className={cn("px-4 py-2")}>
               <Button

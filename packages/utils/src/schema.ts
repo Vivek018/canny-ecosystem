@@ -90,6 +90,8 @@ export const parseDateSchema = z
   .transform((v: any) => isValid(v))
   .refine((v) => !!v, { message: "Invalid date" });
 
+export const booleanArray = ["true", "false"] as const;
+
 // Theme
 export const themes = ["light", "dark", "system"] as const;
 
@@ -624,7 +626,7 @@ export const UpdateEmployeeLinkSchema = z.object({
 });
 
 export const DeleteEmployeeLinkSchema = z.object({
-  is_active: z.enum(["true", "false"]).transform((val) => val === "true"),
+  is_active: z.enum(booleanArray).transform((val) => val === "true"),
 });
 
 export const CreateSiteLinkSchema = z.object({
@@ -647,14 +649,11 @@ export const UpdateSiteLinkSchema = z.object({
   skill_level: z.string().optional(),
 });
 
-export const ReimbursementStatusArray = ["approved", "pending"] as const;
-export const ReimbursementDeductibleArray = ["true", "false"] as const;
+export const reimbursementStatusArray = ["approved", "pending"] as const;
 
 export const ReimbursementSchema = z.object({
-  first_name: zString.optional(),
-  last_name: zString.optional(),
   submitted_date: z.string(),
-  status: z.enum(ReimbursementStatusArray),
+  status: z.enum(reimbursementStatusArray),
   amount: z.number().min(1).max(100000000),
   user_id: z.string().optional(),
   is_deductible: z.boolean().optional().default(false),
@@ -662,14 +661,42 @@ export const ReimbursementSchema = z.object({
   employee_id: z.string(),
 });
 
-export const ImportReimbursementHeaderSchema = z.object({
-  submitted_date: z.string(),
-  employee_code: z.string(),
-  amount: z.string(),
-  email: z.string().optional(),
-  is_deductible: z.string().optional(),
-  status: z.string().optional(),
-});
+export const ImportReimbursementHeaderSchema = z
+  .object({
+    submitted_date: z.string(),
+    employee_code: z.string(),
+    amount: z.string(),
+    email: z.string().optional(),
+    is_deductible: z.string().optional(),
+    status: z.string(),
+  })
+  .refine(
+    (data) => {
+      const values = [
+        data.submitted_date,
+        data.employee_code,
+        data.amount,
+        data.email,
+        data.is_deductible,
+        data.status,
+      ].filter(Boolean);
+
+      const uniqueValues = new Set(values);
+      return uniqueValues.size === values.length;
+    },
+    {
+      message:
+        "Some fields have the same value. Please select different options.",
+      path: [
+        "employee_code",
+        "amount",
+        "submitted_date",
+        "email",
+        "is_deductible",
+        "status",
+      ],
+    }
+  );
 
 export const exitReasonArray = [
   "Resignation",
@@ -680,25 +707,110 @@ export const exitReasonArray = [
   "Other",
 ] as const;
 
-export const ImportReimbursementDataSchema = z.object({
-  data: z.array(
-    z.object({
-      submitted_date: z.string(),
-      employee_code: zNumberString,
-      amount: z.preprocess(
-        (value) =>
-          typeof value === "string" ? Number.parseFloat(value) : value,
-        z.number()
-      ),
-      email: zEmail.optional(),
-      is_deductible: z
-        .preprocess(
-          (value) =>
-            typeof value === "string" ? value.toLowerCase() === "true" : value,
-          z.boolean().default(false)
-        )
-        .default(false),
-      status: z.enum(ReimbursementStatusArray),
-    })
+export const ImportSingleReimbursementDataSchema = z.object({
+  submitted_date: z.string(),
+  employee_code: zNumberString,
+  amount: z.preprocess(
+    (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
+    z.number()
   ),
+  email: zEmail.optional(),
+  is_deductible: z
+    .preprocess(
+      (value) =>
+        typeof value === "string" ? value.toLowerCase() === "true" : value,
+      z.boolean().default(false)
+    )
+    .default(false),
+  status: z.enum(reimbursementStatusArray),
+});
+
+export const ImportReimbursementDataSchema = z.object({
+  data: z.array(ImportSingleReimbursementDataSchema),
+});
+
+export const ImportEmployeeHeaderSchema = z
+  .object({
+    employee_code: z.string(),
+    first_name: z.string(),
+    middle_name: z.string().optional(),
+    last_name: z.string(),
+    gender: z.string().optional(),
+    education: z.string().optional(),
+    marital_status: z.string().optional(),
+    is_active: z.string().optional(),
+    date_of_birth: z.string(),
+    personal_email: z.string().optional(),
+    primary_mobile_number: z.string(),
+    secondary_mobile_number: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      const values = [
+        data.employee_code,
+        data.first_name,
+        data.middle_name,
+        data.last_name,
+        data.gender,
+        data.education,
+        data.marital_status,
+        data.is_active,
+        data.date_of_birth,
+        data.personal_email,
+        data.primary_mobile_number,
+        data.secondary_mobile_number,
+      ].filter(Boolean);
+
+      const uniqueValues = new Set(values);
+      return uniqueValues.size === values.length;
+    },
+    {
+      message:
+        "Some fields have the same value. Please select different options.",
+      path: [
+        "employee_code",
+        "first_name",
+        "middle_name",
+        "last_name",
+        "gender",
+        "education",
+        "marital_status",
+        "is_active",
+        "date_of_birth",
+        "personal_email",
+        "primary_mobile_number",
+        "secondary_mobile_number",
+      ],
+    }
+  );
+
+export const ImportSingleEmployeeDataSchema = z.object({
+  first_name: zString.min(3),
+  middle_name: zString.min(3).optional(),
+  last_name: zString.min(3),
+  employee_code: zNumberString.min(3),
+  marital_status: z.enum(maritalStatusArray).default("unmarried"),
+  date_of_birth: z.string(),
+  gender: z.enum(genderArray).default("male"),
+  education: z.enum(educationArray).optional(),
+  is_active: z
+    .preprocess(
+      (value) =>
+        typeof value === "string" ? value.toLowerCase() === "true" : value,
+      z.boolean().default(false)
+    )
+    .default(false),
+  primary_mobile_number: z.preprocess((value) => {
+    const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
+    return Number.isNaN(parsed) ? undefined : parsed;
+  }, z.number()),
+  secondary_mobile_number: z.preprocess((value) => {
+    const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
+    return Number.isNaN(parsed) ? undefined : parsed;
+  }, z.number().optional()),
+  personal_email: zEmail.optional(),
+});
+
+export const ImportEmployeeDataSchema = z.object({
+  data: z.array(ImportSingleEmployeeDataSchema),
 });
