@@ -36,13 +36,13 @@ export function ReimbursementSearchFilter({
   userEmails,
   employeeId,
   projectArray,
-  projectSiteArray
+  projectSiteArray,
 }: {
   disabled?: boolean;
   userEmails?: (string | null | undefined)[];
   employeeId?: string | undefined;
   projectArray: string[];
-  projectSiteArray: string[]
+  projectSiteArray: string[];
 }) {
   const [prompt, setPrompt] = useState("");
   const navigation = useNavigation();
@@ -376,7 +376,6 @@ export function ReimbursementSearchFilter({
             </DropdownMenuPortal>
           </DropdownMenuSub>
         </DropdownMenuGroup>
-
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
