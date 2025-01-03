@@ -77,7 +77,7 @@ export function ExitPaymentTableHeader({ table, className, loading }: Props) {
             }}
           />
         </TableHead>
-        
+
         {ExitPaymentColumnIdArray?.map((id) => {
           return (
             isVisible(id) && (

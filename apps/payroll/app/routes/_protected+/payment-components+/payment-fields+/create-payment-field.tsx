@@ -62,7 +62,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         error,
         companyId: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -85,7 +85,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -107,7 +107,7 @@ export async function action({
         message: "Payment Field creation failed",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -116,7 +116,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -176,12 +176,12 @@ export default function CreatePaymentField({
   }, [actionData]);
 
   return (
-    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
       <FormProvider context={form.context}>
-        <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
+        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
           <Card>
             <CardHeader>
-              <CardTitle className='text-3xl'>
+              <CardTitle className="text-3xl">
                 {replaceDash(PAYMENT_FIELD_TAG)}
               </CardTitle>
               <CardDescription>
@@ -208,15 +208,15 @@ export default function CreatePaymentField({
               />
               <SearchableSelectField
                 key={resetKey}
-                className='capitalize'
+                className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  paymentTypeArray as unknown as string[]
+                  paymentTypeArray as unknown as string[],
                 )}
                 inputProps={{
                   ...getInputProps(fields.payment_type, { type: "text" }),
                 }}
                 placeholder={`Select ${replaceUnderscore(
-                  fields.payment_type.name
+                  fields.payment_type.name,
                 )}`}
                 labelProps={{
                   children: replaceUnderscore(fields.payment_type.name),
@@ -226,15 +226,15 @@ export default function CreatePaymentField({
 
               <SearchableSelectField
                 key={resetKey + 1}
-                className='capitalize'
+                className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  calculationTypeArray as unknown as string[]
+                  calculationTypeArray as unknown as string[],
                 )}
                 inputProps={{
                   ...getInputProps(fields.calculation_type, { type: "text" }),
                 }}
                 placeholder={`Select ${replaceUnderscore(
-                  fields.calculation_type.name
+                  fields.calculation_type.name,
                 )}`}
                 labelProps={{
                   children: replaceUnderscore(fields.calculation_type.name),
@@ -249,7 +249,7 @@ export default function CreatePaymentField({
                   placeholder: `Enter ${replaceUnderscore(
                     fields.calculation_type.value === calculationTypeArray[0]
                       ? fields.amount.name
-                      : "Percentage"
+                      : "Percentage",
                   )}`,
                   disabled: fields.payment_type.value === paymentTypeArray[1],
                 }}
@@ -257,7 +257,7 @@ export default function CreatePaymentField({
                   children: replaceUnderscore(
                     fields.calculation_type.value === calculationTypeArray[0]
                       ? fields.amount.name
-                      : "percentage"
+                      : "percentage",
                   ),
                 }}
                 errors={fields.amount.errors}
@@ -273,11 +273,11 @@ export default function CreatePaymentField({
                     : undefined
                 }
                 className={cn(
-                  fields.payment_type.value === paymentTypeArray[1] && "hidden"
+                  fields.payment_type.value === paymentTypeArray[1] && "hidden",
                 )}
               />
 
-              <div className='grid grid-cols-2 place-content-center justify-between gap-x-4'>
+              <div className="grid grid-cols-2 place-content-center justify-between gap-x-4">
                 <CheckboxField
                   buttonProps={getInputProps(fields.is_active, {
                     type: "checkbox",

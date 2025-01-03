@@ -38,7 +38,7 @@ export const DeleteReimbursement = ({
   };
 
   const handleDeleteUser = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -53,7 +53,7 @@ export const DeleteReimbursement = ({
           method: "post",
           action: `/approvals/reimbursements/${id}/delete-reimbursement`,
           replace: true,
-        }
+        },
       );
     } else {
       e.preventDefault();
@@ -66,7 +66,7 @@ export const DeleteReimbursement = ({
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
-          "text-[13px] h-9"
+          "text-[13px] h-9",
         )}
       >
         Delete Reimbursement

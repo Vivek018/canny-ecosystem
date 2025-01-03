@@ -13,7 +13,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
   if (!userId || typeof userId !== "string") {
     return json(
       { error: "User ID is required and must be a string" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 

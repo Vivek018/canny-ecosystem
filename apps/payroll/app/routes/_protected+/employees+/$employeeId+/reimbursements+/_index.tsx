@@ -45,7 +45,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const hasFilters =
     filters &&
     Object.values(filters).some(
-      (value) => value !== null && value !== undefined
+      (value) => value !== null && value !== undefined,
     );
 
   let theMeta = null;
@@ -58,8 +58,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         to: hasFilters
           ? MAX_QUERY_LIMIT
           : page > 0
-          ? LAZY_LOADING_LIMIT
-          : LAZY_LOADING_LIMIT - 1,
+            ? LAZY_LOADING_LIMIT
+            : LAZY_LOADING_LIMIT - 1,
         filters,
         searchQuery: query ?? undefined,
         sort: sortParam?.split(":") as [string, "asc" | "desc"],
@@ -78,7 +78,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
   const hasNextPage = Boolean(
-    theMeta?.count && theMeta.count / (page + 1) > LAZY_LOADING_LIMIT
+    theMeta?.count && theMeta.count / (page + 1) > LAZY_LOADING_LIMIT,
   );
 
   return json({
@@ -117,10 +117,10 @@ export default function ReimbursementsIndex() {
   const noFilters = Object.values(filters).every((value) => !value);
 
   return (
-    <section className='m-4'>
-      <div className='w-full flex items-center justify-between pb-4'>
-        <div className='w-full flex justify-between items-center '>
-          <div className='flex gap-3'>
+    <section className="m-4">
+      <div className="w-full flex items-center justify-between pb-4">
+        <div className="w-full flex justify-between items-center ">
+          <div className="flex gap-3">
             <ReimbursementSearchFilter
               disabled={!data?.length && noFilters}
               userEmails={userEmails}
@@ -133,11 +133,11 @@ export default function ReimbursementsIndex() {
             to={"add-reimbursement"}
             className={cn(
               buttonVariants({ variant: "primary-outline" }),
-              "flex items-center gap-1"
+              "flex items-center gap-1",
             )}
           >
             <span>Add</span>
-            <span className='hidden md:flex justify-end'>Claim</span>
+            <span className="hidden md:flex justify-end">Claim</span>
           </Link>
         </div>
       </div>

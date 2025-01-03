@@ -71,7 +71,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 
@@ -102,7 +102,7 @@ export default function UpdateEmployeeBankDetails() {
     return (
       <ErrorBoundary
         error={error}
-        message='Failed to load employee bank details'
+        message="Failed to load employee bank details"
       />
     );
 
@@ -112,7 +112,7 @@ export default function UpdateEmployeeBankDetails() {
         {(resolvedData) => {
           if (!resolvedData)
             return (
-              <ErrorBoundary message='Failed to load employee bank details' />
+              <ErrorBoundary message="Failed to load employee bank details" />
             );
           return (
             <UpdateEmployeeBankDetailsWrapper
@@ -182,13 +182,13 @@ export function UpdateEmployeeBankDetailsWrapper({
   }, [actionData]);
 
   return (
-    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
       <FormProvider context={form.context}>
         <Form
-          method='POST'
-          encType='multipart/form-data'
+          method="POST"
+          encType="multipart/form-data"
           {...getFormProps(form)}
-          className='flex flex-col'
+          className="flex flex-col"
         >
           <Card>
             <CreateEmployeeBankDetails

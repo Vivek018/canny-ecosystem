@@ -34,9 +34,9 @@ export function ExitPaymentStep1({ fields }: { fields: any }) {
         />
 
         <SearchableSelectField
-          className='capitalize'
+          className="capitalize"
           options={transformStringArrayIntoOptions(
-            reasonForExitArray as unknown as string[]
+            reasonForExitArray as unknown as string[],
           )}
           inputProps={{
             ...getInputProps(fields.reason_for_exit, { type: "text" }),

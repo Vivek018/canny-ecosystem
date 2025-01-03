@@ -30,7 +30,7 @@ export const DeleteUser = ({ id }: { id: string }) => {
   };
 
   const handleDeleteUser = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -40,7 +40,7 @@ export const DeleteUser = ({ id }: { id: string }) => {
           method: "post",
           action: `${id}/delete-user`,
           replace: true,
-        }
+        },
       );
     } else {
       e.preventDefault();
@@ -53,7 +53,7 @@ export const DeleteUser = ({ id }: { id: string }) => {
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
-          "text-[13px] h-9"
+          "text-[13px] h-9",
         )}
       >
         Delete User

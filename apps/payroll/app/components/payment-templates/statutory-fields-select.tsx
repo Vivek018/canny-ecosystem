@@ -34,7 +34,7 @@ export const StatutoryFieldsSelect: FC<StatutoryFieldsSelectProps> = ({
   const { supabase } = useSupabase({ env });
 
   const getSelectedStatutoryField = async (
-    statutoryFieldName: (typeof statutoryFieldsArray)[number]
+    statutoryFieldName: (typeof statutoryFieldsArray)[number],
   ) => {
     if (!companyId?.length) return;
 
@@ -58,18 +58,18 @@ export const StatutoryFieldsSelect: FC<StatutoryFieldsSelectProps> = ({
 
   const handleFieldChange = async (newSelectedFields: string[]) => {
     const newlySelected = newSelectedFields.filter(
-      (field) => !selectedFields.includes(field)
+      (field) => !selectedFields.includes(field),
     );
 
     const deselected = selectedFields.filter(
-      (field) => !newSelectedFields.includes(field)
+      (field) => !newSelectedFields.includes(field),
     );
 
     setSelectedFields(newSelectedFields);
 
     for (const field of newlySelected) {
       const data = await getSelectedStatutoryField(
-        field as (typeof statutoryFieldsArray)[number]
+        field as (typeof statutoryFieldsArray)[number],
       );
       setSelectedStatutoryFields({
         ...selectedStatutoryFields,
@@ -86,12 +86,15 @@ export const StatutoryFieldsSelect: FC<StatutoryFieldsSelectProps> = ({
   };
 
   useEffect(() => {
-    const updates = statutoryFieldsArray.reduce((acc, field) => {
-      if (!selectedFields.includes(field)) {
-        acc[field] = null;
-      }
-      return acc;
-    }, {} as Record<string, null>);
+    const updates = statutoryFieldsArray.reduce(
+      (acc, field) => {
+        if (!selectedFields.includes(field)) {
+          acc[field] = null;
+        }
+        return acc;
+      },
+      {} as Record<string, null>,
+    );
 
     setSelectedStatutoryFields({
       ...selectedStatutoryFields,
@@ -119,25 +122,25 @@ export const StatutoryFieldsSelect: FC<StatutoryFieldsSelectProps> = ({
   return (
     <div className={className}>
       <MultiSelectCombobox
-        label='Statutory Fields'
+        label="Statutory Fields"
         options={options}
         value={selectedFields}
         onChange={handleFieldChange}
         renderItem={(option) => (
           <div
-            role='option'
+            role="option"
             aria-selected={selectedFields.includes(String(option.value))}
           >
             {option.label}
           </div>
         )}
         renderSelectedItem={handleRenderSelectedItem}
-        aria-label='Filter by statutory field'
-        aria-required='false'
-        aria-multiselectable='true'
-        aria-describedby='statutory-field-description'
+        aria-label="Filter by statutory field"
+        aria-required="false"
+        aria-multiselectable="true"
+        aria-describedby="statutory-field-description"
       />
-      <span id='statutory-field-description' className='sr-only'>
+      <span id="statutory-field-description" className="sr-only">
         Select one or more statutory fields. Shows individual statutory names
         when 6 or fewer are selected.
       </span>

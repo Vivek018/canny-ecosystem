@@ -9,8 +9,8 @@ import { InfoCard } from "./info-card";
 
 export function PayrollComponent({ data, demo, heading, netDiff }: any) {
   return (
-    <section className='m-4'>
-      <div className='flex justify-between items-center p-2'>
+    <section className="m-4">
+      <div className="flex justify-between items-center p-2">
         <div>
           Please check the data below. If data is correst aprrove and make
           payment to employees.
@@ -19,7 +19,7 @@ export function PayrollComponent({ data, demo, heading, netDiff }: any) {
           <Button>Submit & Approve</Button>
         </div>
       </div>
-      <div className='grid gap-6 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-4 my-4'>
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-4 my-4">
         <InfoCard
           heading={heading.payroll_cost}
           value={demo.payroll_cost}
@@ -42,22 +42,22 @@ export function PayrollComponent({ data, demo, heading, netDiff }: any) {
           isPercentage={false}
         />
       </div>
-      <div className='py-4'>
-        <div className='w-full flex items-center justify-between pb-4'>
-          <div className='w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4'>
-            <div className='relative w-full'>
-              <div className='absolute inset-y-0 left-3 flex items-center pointer-events-none'>
+      <div className="py-4">
+        <div className="w-full flex items-center justify-between pb-4">
+          <div className="w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4">
+            <div className="relative w-full">
+              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
                 <Icon
-                  name='magnifying-glass'
-                  size='sm'
-                  className='text-gray-400'
+                  name="magnifying-glass"
+                  size="sm"
+                  className="text-gray-400"
                 />
               </div>
               <Input
-                placeholder='Search Users'
+                placeholder="Search Users"
                 // value={searchString}
                 // onChange={(e) => setSearchString(e.target.value)}
-                className='pl-8 h-10 w-full focus-visible:ring-0'
+                className="pl-8 h-10 w-full focus-visible:ring-0"
               />
             </div>
           </div>

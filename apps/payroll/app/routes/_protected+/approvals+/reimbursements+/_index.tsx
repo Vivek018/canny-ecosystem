@@ -41,7 +41,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const hasFilters =
     filters &&
     Object.values(filters).some(
-      (value) => value !== null && value !== undefined
+      (value) => value !== null && value !== undefined,
     );
 
   const {
@@ -56,8 +56,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
       to: hasFilters
         ? MAX_QUERY_LIMIT
         : page > 0
-        ? LAZY_LOADING_LIMIT
-        : LAZY_LOADING_LIMIT - 1,
+          ? LAZY_LOADING_LIMIT
+          : LAZY_LOADING_LIMIT - 1,
       filters,
       searchQuery: query ?? undefined,
       sort: sortParam?.split(":") as [string, "asc" | "desc"],
@@ -72,7 +72,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   };
 
   const hasNextPage = Boolean(
-    meta?.count && meta.count / (page + 1) > LAZY_LOADING_LIMIT
+    meta?.count && meta.count / (page + 1) > LAZY_LOADING_LIMIT,
   );
 
   return json({
@@ -118,9 +118,9 @@ export default function Reimbursements() {
   const noFilters = Object.values(filters).every((value) => !value);
 
   return (
-    <section className='m-4'>
-      <div className='w-full flex items-center justify-between pb-4'>
-        <div className='w-full  flex justify-between items-center gap-3'>
+    <section className="m-4">
+      <div className="w-full flex items-center justify-between pb-4">
+        <div className="w-full  flex justify-between items-center gap-3">
           <ReimbursementSearchFilter
             disabled={!reimbursementData?.length && noFilters}
             userEmails={userEmails}

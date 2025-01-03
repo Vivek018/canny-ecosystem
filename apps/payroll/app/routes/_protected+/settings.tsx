@@ -19,7 +19,7 @@ export default function Settings() {
         />
       </div>
       <div className="px-4">
-          <Outlet />
+        <Outlet />
       </div>
     </section>
   );

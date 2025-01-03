@@ -11,15 +11,19 @@ import { DeleteEmployee } from "./delete-employee";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { EmployeeDialog } from "../link-template/employee-dialog";
 
-export const EmployeeOptionsDropdown = ({ employee, triggerChild, env }: {
+export const EmployeeOptionsDropdown = ({
+  employee,
+  triggerChild,
+  env,
+}: {
   employee: {
     id: string;
     is_active: boolean;
     returnTo?: string;
-    companyId: string
+    companyId: string;
   };
   triggerChild: React.ReactElement;
-  env: SupabaseEnv
+  env: SupabaseEnv;
 }) => {
   const submit = useSubmit();
 

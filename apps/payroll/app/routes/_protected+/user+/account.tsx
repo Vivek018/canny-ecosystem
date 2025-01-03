@@ -40,7 +40,7 @@ export default function Accountindex() {
   }, [data]);
 
   return (
-    <section className='flex flex-col gap-6 w-full lg:w-2/3 my-4'>
+    <section className="flex flex-col gap-6 w-full lg:w-2/3 my-4">
       <UserAvatar
         avatar={data?.avatar ?? ""}
         first_name={data?.first_name ?? ""}

@@ -39,8 +39,15 @@ export default function Locations() {
     <Suspense fallback={<div>Loading...</div>}>
       <Await resolve={locationsPromise}>
         {(resolvedData) => {
-          if(!resolvedData) return <ErrorBoundary message="Failed to load locations" />;
-          return <LocationsWrapper data={resolvedData.data} error={resolvedData.error} />}}
+          if (!resolvedData)
+            return <ErrorBoundary message="Failed to load locations" />;
+          return (
+            <LocationsWrapper
+              data={resolvedData.data}
+              error={resolvedData.error}
+            />
+          );
+        }}
       </Await>
     </Suspense>
   );

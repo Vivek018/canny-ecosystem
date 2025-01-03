@@ -39,7 +39,7 @@ export const MultiSelectCombobox = ({
     onChange(
       value.includes(currentValue)
         ? value.filter((val) => val !== currentValue)
-        : [...value, currentValue]
+        : [...value, currentValue],
     );
   };
 
@@ -52,13 +52,13 @@ export const MultiSelectCombobox = ({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <div
-          role='combobox'
+          role="combobox"
           aria-expanded={open}
-          aria-haspopup='listbox'
-          aria-controls='multi-select-options'
+          aria-haspopup="listbox"
+          aria-controls="multi-select-options"
           aria-label={`Select ${label}`}
           tabIndex={0}
-          className='flex h-10 min-w-[200px] cursor-pointer items-center justify-start gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground'
+          className="flex h-10 min-w-[200px] cursor-pointer items-center justify-start gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
           onClick={() => setOpen(!open)}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
@@ -66,34 +66,34 @@ export const MultiSelectCombobox = ({
             }
           }}
         >
-          <Icon name='select-drop' size='sm' className='mb-[3px]' />
+          <Icon name="select-drop" size="sm" className="mb-[3px]" />
           {value.length > 0 && (
-            <span className='text-muted-foreground'>{label}</span>
+            <span className="text-muted-foreground">{label}</span>
           )}
 
-          <div className='flex-1 overflow-hidden'>
+          <div className="flex-1 overflow-hidden">
             {value.length > 0 ? renderSelectedItem(value) : `Select ${label}`}
           </div>
 
-          <span className='z-10 ml-auto flex items-center gap-2'>
+          <span className="z-10 ml-auto flex items-center gap-2">
             {value.length > 0 && (
               <button
-                type='button'
-                aria-label='Clear selection'
-                className='z-10 rounded-sm opacity-50 hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-gray-300'
+                type="button"
+                aria-label="Clear selection"
+                className="z-10 rounded-sm opacity-50 hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
                 onClick={handleClear}
               >
-                <Icon name='cross' size='sm' />
+                <Icon name="cross" size="sm" />
               </button>
             )}
-            <Icon name='caret-sort' size='sm' />
+            <Icon name="caret-sort" size="sm" />
           </span>
         </div>
       </PopoverTrigger>
 
       <PopoverContent
-        className='w-[--radix-popover-trigger-width] p-0'
-        id='multi-select-options'
+        className="w-[--radix-popover-trigger-width] p-0"
+        id="multi-select-options"
       >
         <Command>
           <CommandInput
@@ -111,11 +111,11 @@ export const MultiSelectCombobox = ({
                   aria-selected={value.includes(String(option.value))}
                 >
                   <Icon
-                    name='check'
-                    size='sm'
+                    name="check"
+                    size="sm"
                     className={cn(
                       "mr-1",
-                      !value.includes(String(option.value)) && "opacity-0"
+                      !value.includes(String(option.value)) && "opacity-0",
                     )}
                   />
                   {renderItem(option)}

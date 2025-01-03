@@ -5,7 +5,10 @@ import { Link } from "@remix-run/react";
 import { EmployeeOptionsDropdown } from "../employee-option-dropdown";
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@canny_ecosystem/ui/avatar";
-import type { EmployeeDatabaseRow, SupabaseEnv } from "@canny_ecosystem/supabase/types";
+import type {
+  EmployeeDatabaseRow,
+  SupabaseEnv,
+} from "@canny_ecosystem/supabase/types";
 
 export function EmployeePageHeader({
   employee,
@@ -85,7 +88,7 @@ export function EmployeePageHeader({
               id: employee.id,
               is_active: employee.is_active ?? false,
               returnTo: `/employees/${employee.id}/overview`,
-              companyId: employee.company_id, 
+              companyId: employee.company_id,
             }}
             env={env}
             triggerChild={

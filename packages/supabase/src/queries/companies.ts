@@ -155,8 +155,7 @@ export async function getLocationsByCompanyId({
   if (error) {
     console.error(error);
     supabaseError = error;
-  }
-  else if (!data?.length) {
+  } else if (!data?.length) {
     supabaseError = { message: "No locations found" };
   }
 
@@ -165,8 +164,8 @@ export async function getLocationsByCompanyId({
 
 export async function getLocationById({
   supabase,
-  id
-}: { supabase: TypedSupabaseClient; id: string; }) {
+  id,
+}: { supabase: TypedSupabaseClient; id: string }) {
   const columns = [
     "id",
     "company_id",

@@ -31,7 +31,6 @@ export function ESIWrapper({
   > | null;
   error: Error | null | { message: string };
 }) {
-
   if (error)
     return <ErrorBoundary error={error} message="Failed to load ESI" />;
   if (!data) return <ESINoData />;

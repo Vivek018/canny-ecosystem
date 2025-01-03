@@ -73,7 +73,7 @@ export const getExits = async ({
           employee_name:employees!inner(first_name, middle_name, last_name),
           exit_payments(amount, type, payment_fields!payment_fields_id(name))
     `,
-      { count: "exact" }
+      { count: "exact" },
     )
     .limit(HARD_QUERY_LIMIT);
 
@@ -94,7 +94,7 @@ export const getExits = async ({
           `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*`,
           {
             referencedTable: "employees",
-          }
+          },
         );
       }
     } else {
@@ -102,7 +102,7 @@ export const getExits = async ({
         `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*`,
         {
           referencedTable: "employees",
-        }
+        },
       );
     }
   }

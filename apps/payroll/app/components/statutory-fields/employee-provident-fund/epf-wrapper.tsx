@@ -32,7 +32,6 @@ export function EPFWrapper({
   > | null;
   error: Error | null | { message: string };
 }) {
-
   const employeeContributionRateText = data?.restrict_employee_contribution
     ? "Restrict Contribution to ₹15,000 of PF Wage"
     : `${(data?.employee_contribution ?? EMPLOYEE_EPF_PERCENTAGE) * 100}% of Actual Wage`;

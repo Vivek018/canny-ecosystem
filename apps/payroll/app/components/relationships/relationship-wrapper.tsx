@@ -14,7 +14,7 @@ export function RelationshipWrapper({
   const { toast } = useToast();
 
   useEffect(() => {
-    if(error) {
+    if (error) {
       toast({
         title: "Error",
         description: error?.message || "Failed to load",

@@ -59,7 +59,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const formData = await unstable_parseMultipartFormData(
     request,
-    unstable_createMemoryUploadHandler({ maxPartSize: SIZE_1MB })
+    unstable_createMemoryUploadHandler({ maxPartSize: SIZE_1MB }),
   );
   const action = formData.get("_action") as string;
 
@@ -89,7 +89,7 @@ export async function action({ request }: ActionFunctionArgs) {
       if (submission.status === "error") {
         return json(
           { result: submission.reply() },
-          { status: submission.status === "error" ? 400 : 200 }
+          { status: submission.status === "error" ? 400 : 200 },
         );
       }
     }
@@ -136,8 +136,8 @@ export default function ExitForm() {
   });
 
   return (
-    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
-      <div className='w-full mx-auto mb-8'>
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
+      <div className="w-full mx-auto mb-8">
         <FormStepHeader
           totalSteps={totalSteps}
           step={step}
@@ -146,13 +146,13 @@ export default function ExitForm() {
       </div>
       <FormProvider context={form.context}>
         <Form
-          method='POST'
-          encType='multipart/form-data'
+          method="POST"
+          encType="multipart/form-data"
           {...getFormProps(form)}
-          className='flex flex-col'
+          className="flex flex-col"
         >
           <Card>
-            <div className='h-[650px] overflow-scroll'>
+            <div className="h-[650px] overflow-scroll">
               {step === 1 ? (
                 <Step1 key={resetKey} fields={fields as any} />
               ) : null}

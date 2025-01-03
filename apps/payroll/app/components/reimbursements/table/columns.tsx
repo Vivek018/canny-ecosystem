@@ -77,8 +77,8 @@ export const reimbursementsColumns = ({
           {row.original?.is_deductible === undefined
             ? "--"
             : row.original?.is_deductible
-            ? "true"
-            : "false"}
+              ? "true"
+              : "false"}
         </p>
       );
     },

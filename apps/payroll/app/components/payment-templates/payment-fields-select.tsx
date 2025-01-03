@@ -32,14 +32,14 @@ export const PaymentFieldsSelect: FC<PaymentFieldsSelectProps> = ({
         newSelectedFields.map(async (id) => {
           const { data } = await getPaymentFieldById({ supabase, id });
           return data;
-        })
+        }),
       );
 
       // Filter out any null values and set the data
       setSelectedPaymentFields(
         selectedFieldsData.filter(
-          (data): data is PaymentFieldDataType => data !== null
-        )
+          (data): data is PaymentFieldDataType => data !== null,
+        ),
       );
     } else {
       // If no fields are selected, set an empty array
@@ -67,25 +67,25 @@ export const PaymentFieldsSelect: FC<PaymentFieldsSelectProps> = ({
   return (
     <div className={className}>
       <MultiSelectCombobox
-        label='Payment Field'
+        label="Payment Field"
         options={options}
         value={selectedFields}
         onChange={handleFieldChange}
         renderItem={(option) => (
           <div
-            role='option'
+            role="option"
             aria-selected={selectedFields.includes(String(option.value))}
           >
             {option.label}
           </div>
         )}
         renderSelectedItem={handleRenderSelectedItem}
-        aria-label='Filter by payment field'
-        aria-required='false'
-        aria-multiselectable='true'
-        aria-describedby='payment-field-description'
+        aria-label="Filter by payment field"
+        aria-required="false"
+        aria-multiselectable="true"
+        aria-describedby="payment-field-description"
       />
-      <span id='payment-field-description' className='sr-only'>
+      <span id="payment-field-description" className="sr-only">
         Select one or more payment fields. Shows individual payment fields names
         when 3 or fewer are selected.
       </span>

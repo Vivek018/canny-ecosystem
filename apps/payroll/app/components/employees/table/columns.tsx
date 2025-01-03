@@ -10,7 +10,10 @@ import type { EmployeeDataType } from "@canny_ecosystem/supabase/queries";
 import { EmployeeOptionsDropdown } from "../employee-option-dropdown";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 
-export const columns = ({ env, companyId }: { env: SupabaseEnv, companyId: string }): ColumnDef<EmployeeDataType>[] => [
+export const columns = ({
+  env,
+  companyId,
+}: { env: SupabaseEnv; companyId: string }): ColumnDef<EmployeeDataType>[] => [
   {
     id: "select",
     cell: ({ row }) => (
@@ -42,9 +45,11 @@ export const columns = ({ env, companyId }: { env: SupabaseEnv, companyId: strin
     cell: ({ row }) => {
       return (
         <Link to={`${row.original.id}`} prefetch="intent" className="group">
-          <p className="truncate text-primary/80 w-48 group-hover:text-primary">{`${row.original?.first_name
-            } ${row.original?.middle_name ?? ""} ${row.original?.last_name ?? ""
-            }`}</p>
+          <p className="truncate text-primary/80 w-48 group-hover:text-primary">{`${
+            row.original?.first_name
+          } ${row.original?.middle_name ?? ""} ${
+            row.original?.last_name ?? ""
+          }`}</p>
         </Link>
       );
     },
@@ -198,7 +203,7 @@ export const columns = ({ env, companyId }: { env: SupabaseEnv, companyId: strin
           employee={{
             id: row.original.id,
             is_active: row.original.is_active ?? false,
-            companyId
+            companyId,
           }}
           triggerChild={
             <DropdownMenuTrigger asChild>

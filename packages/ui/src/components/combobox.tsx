@@ -37,7 +37,7 @@ export function Combobox({
 }: ComboboxProps) {
   const [open, setOpen] = useState(false);
   const selectedOption = options?.find(
-    (option) => String(option.value) === String(value)
+    (option) => String(option.value) === String(value),
   );
 
   return (
@@ -51,11 +51,11 @@ export function Combobox({
           className={cn(
             "truncate justify-between",
             !selectedOption && "text-muted-foreground",
-            className
+            className,
           )}
         >
           {replaceUnderscore(
-            selectedOption ? selectedOption?.label : placeholder
+            selectedOption ? selectedOption?.label : placeholder,
           )}
           <Icon
             name="caret-sort"
@@ -80,7 +80,7 @@ export function Combobox({
                     onChange(
                       String(option.value) === String(value)
                         ? ""
-                        : String(option.value)
+                        : String(option.value),
                     );
                     setOpen(false);
                   }}
@@ -93,12 +93,10 @@ export function Combobox({
                       "mr-2 shrink-0",
                       String(value) === String(option.value)
                         ? "opacity-100"
-                        : "opacity-0"
+                        : "opacity-0",
                     )}
                   />
-                  <p className="truncate">
-                    {replaceUnderscore(option?.label)}
-                  </p>
+                  <p className="truncate">{replaceUnderscore(option?.label)}</p>
                 </CommandItem>
               ))}
             </CommandGroup>

@@ -109,7 +109,9 @@ export const AddressItem = ({ address }: { address: EmployeeAddress }) => {
       </CardHeader>
       <CardContent className="flex flex-col gap-0.5 px-4">
         <address className="not-italic line-clamp-3">
-          {`${address.address_line_1 ?? "--"} ${address.address_line_2 ? address.address_line_2 : ""}`}
+          {`${address.address_line_1 ?? "--"} ${
+            address.address_line_2 ? address.address_line_2 : ""
+          }`}
         </address>
         <div className="flex items-center capitalize gap-2">
           <p>{`${address.city ?? "--"},`}</p>

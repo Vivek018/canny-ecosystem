@@ -14,7 +14,6 @@ export const ExitOptionsDropdown = ({
   exitId: string;
   triggerChild: React.ReactElement;
 }) => {
-
   return (
     <DropdownMenu>
       {triggerChild}

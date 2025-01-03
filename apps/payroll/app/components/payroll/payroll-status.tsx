@@ -5,17 +5,20 @@ import { Link } from "@remix-run/react";
 
 type PayrollStatusProps = {
   data: any;
-  
 };
-export function PayrollStatus({data}:PayrollStatusProps) {
-    
+export function PayrollStatus({ data }: PayrollStatusProps) {
   return (
     <Card className="w-fill m-4 select-text cursor-auto dark:border-[1.5px] h-40 flex flex-col justify-between">
       <CardContent className="flex flex-row gap-0.5 justify-start items-center py-2 px-2">
         <div className="flex pt-6 px-4 items-center flex-1 gap-10 justify-start">
           <div className="text-md mx-3 text-bolder tracking-wide flex-col justify-center items-center">
             EMPLOYEES's NET PAY
-            <p className={cn("p-2 mt-2 w-auto font-bold  text-center text-muted-foreground text-sm  rounded-md", data.status==="YET TO BE PROCESS"? "bg-muted": "bg-green")}>
+            <p
+              className={cn(
+                "p-2 mt-2 w-auto font-bold  text-center text-muted-foreground text-sm  rounded-md",
+                data.status === "YET TO BE PROCESS" ? "bg-muted" : "bg-green",
+              )}
+            >
               {data.status}
             </p>
           </div>

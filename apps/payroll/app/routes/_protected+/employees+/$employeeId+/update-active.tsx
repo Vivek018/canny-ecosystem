@@ -15,50 +15,49 @@ const UpdateActiveSchema = z.object({
 export async function action({
   request,
 }: ActionFunctionArgs): Promise<Response> {
-
   try {
     const formData = await request.formData();
     const returnTo = formData.get("returnTo");
-    
-    const { supabase } = getSupabaseWithHeaders({ request });
-    
-    const submission = parseWithZod(formData, {
-    schema: UpdateActiveSchema,
-  });
-  
-  if (submission.status !== "success") {
-    return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
-    );
-  }
-  
-  const { status, error } = await updateEmployee({
-    supabase,
-    data: submission.value,
-  });
 
-  if (isGoodStatus(status)) {
+    const { supabase } = getSupabaseWithHeaders({ request });
+
+    const submission = parseWithZod(formData, {
+      schema: UpdateActiveSchema,
+    });
+
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+
+    const { status, error } = await updateEmployee({
+      supabase,
+      data: submission.value,
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: `Employee marked as ${submission.value.is_active ? "active" : "inactive"}`,
+        returnTo,
+        error: null,
+      });
+    }
     return json({
-      status: "success",
-      message: `Employee marked as ${submission.value.is_active ? "active" : "inactive"}`,
+      status: "error",
+      message: "Employee update failed",
+      error,
       returnTo,
-      error: null,
+    });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
     });
   }
-  return json({
-    status: "error",
-    message: "Employee update failed",
-    error,
-    returnTo,
-  });
-} catch (error) {
- return json({
-  status: "error",
-  message: "An unexpected error occurred",
-  error,
- }) 
-}
 }
 
 export default function UpdateActive() {

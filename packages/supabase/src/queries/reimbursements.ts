@@ -58,7 +58,7 @@ export async function getReimbursementsByCompanyId({
         ${columns.join(",")},
   employee_name:employees!inner(first_name,middle_name,last_name),
           users!inner(id,email)`,
-      { count: "exact" }
+      { count: "exact" },
     )
     .eq("company_id", companyId);
 
@@ -76,7 +76,7 @@ export async function getReimbursementsByCompanyId({
           `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*`,
           {
             referencedTable: "employees",
-          }
+          },
         );
       }
     } else {
@@ -84,7 +84,7 @@ export async function getReimbursementsByCompanyId({
         `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*`,
         {
           referencedTable: "employees",
-        }
+        },
       );
     }
   }
@@ -199,7 +199,7 @@ export async function getReimbursementsByEmployeeId({
         ${columns.join(",")},
             employee_name:employees!inner(id,first_name,middle_name,last_name),
           users!inner(id,email)`,
-      { count: "exact" }
+      { count: "exact" },
     )
     .eq("employee_id", employeeId);
 

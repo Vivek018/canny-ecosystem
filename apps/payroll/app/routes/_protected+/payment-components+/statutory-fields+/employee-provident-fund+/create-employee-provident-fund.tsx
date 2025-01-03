@@ -56,7 +56,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         error,
         companyId: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -75,7 +75,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -105,7 +105,7 @@ export async function action({
         message: "Failed to create Employee Provident Fund",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -160,11 +160,11 @@ export default function CreateEmployeeProvidentFund({
   }, [actionData]);
 
   return (
-    <section className='p-4 w-full'>
-      <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
+    <section className="p-4 w-full">
+      <Form method="POST" {...getFormProps(form)} className="flex flex-col">
         <Card>
           <CardHeader>
-            <CardTitle className='text-2xl pb-5'>
+            <CardTitle className="text-2xl pb-5">
               {replaceDash(EPF_TAG)}
             </CardTitle>
             <hr />
@@ -172,7 +172,7 @@ export default function CreateEmployeeProvidentFund({
           <CardContent>
             <input {...getInputProps(fields.id, { type: "hidden" })} />
             <input {...getInputProps(fields.company_id, { type: "hidden" })} />
-            <div className='flex flex-col justify-between'>
+            <div className="flex flex-col justify-between">
               <Field
                 inputProps={{
                   ...getInputProps(fields.epf_number, { type: "text" }),
@@ -189,74 +189,74 @@ export default function CreateEmployeeProvidentFund({
 
               <SearchableSelectField
                 key={resetKey}
-                className='capitalize'
+                className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  deductionCycleArray as unknown as string[]
+                  deductionCycleArray as unknown as string[],
                 )}
                 inputProps={{
                   ...getInputProps(fields.deduction_cycle, { type: "text" }),
                 }}
-                placeholder='Select an option'
+                placeholder="Select an option"
                 labelProps={{
                   children: replaceUnderscore(fields.deduction_cycle.name),
                 }}
                 errors={fields.deduction_cycle.errors}
               />
             </div>
-            <div className='flex flex-col justify-between pb-5'>
+            <div className="flex flex-col justify-between pb-5">
               <CheckboxField
                 buttonProps={getInputProps(
                   fields.restrict_employee_contribution,
                   {
                     type: "checkbox",
-                  }
+                  },
                 )}
                 labelProps={{
                   htmlFor: fields.restrict_employee_contribution.id,
                   children:
                     "Restrict employee's contribution to ₹15,000 of PF Wage",
                 }}
-                className='items-center'
+                className="items-center"
               />
               <CheckboxField
                 buttonProps={getInputProps(
                   fields.restrict_employer_contribution,
                   {
                     type: "checkbox",
-                  }
+                  },
                 )}
                 labelProps={{
                   htmlFor: fields.restrict_employer_contribution.id,
                   children:
                     "Restrict employer's contribution to ₹15,000 of PF Wage",
                 }}
-                className='items-center'
+                className="items-center"
               />
             </div>
-            <div className='relative h-full w-full'>
+            <div className="relative h-full w-full">
               <CheckboxField
                 buttonProps={getInputProps(
                   fields.include_employer_contribution,
                   {
                     type: "checkbox",
-                  }
+                  },
                 )}
                 labelProps={{
                   htmlFor: fields.include_employer_contribution.id,
                   children: "Include employer's contribution in the CTC",
                 }}
-                className='items-center'
+                className="items-center"
               />
               {form.value?.include_employer_contribution && (
                 <>
-                  <div className='ml-8'>
+                  <div className="ml-8">
                     <CheckboxField
                       buttonProps={{
                         ...getInputProps(
                           fields.include_employer_edli_contribution,
                           {
                             type: "checkbox",
-                          }
+                          },
                         ),
                         disabled: !form.value?.include_employer_contribution,
                       }}
@@ -265,7 +265,7 @@ export default function CreateEmployeeProvidentFund({
                         children:
                           "Include employer's EDLI contribution in the CTC",
                       }}
-                      className='items-center'
+                      className="items-center"
                     />
                     <CheckboxField
                       buttonProps={{
@@ -278,13 +278,13 @@ export default function CreateEmployeeProvidentFund({
                         htmlFor: fields.include_admin_charges.id,
                         children: "Include admin charges in the CTC",
                       }}
-                      className='items-center'
+                      className="items-center"
                     />
                   </div>
 
-                  <div className='absolute h-full top-2/3 left-4 transform -translate-x-1/2 -translate-y-1/2'>
-                    <div className='h-[30px] w-[15px] border-l-2 border-b-2 border-gray-300' />
-                    <div className='h-[45px] w-[15px] border-l-2 border-b-2 border-gray-300' />
+                  <div className="absolute h-full top-2/3 left-4 transform -translate-x-1/2 -translate-y-1/2">
+                    <div className="h-[30px] w-[15px] border-l-2 border-b-2 border-gray-300" />
+                    <div className="h-[45px] w-[15px] border-l-2 border-b-2 border-gray-300" />
                   </div>
                 </>
               )}

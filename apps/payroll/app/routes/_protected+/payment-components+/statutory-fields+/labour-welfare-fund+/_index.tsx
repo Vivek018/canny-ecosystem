@@ -50,7 +50,7 @@ export default function LabourWelfareFundIndex() {
           if (!resolvedData) {
             return (
               <ErrorBoundary message="Failed to load labour welfare funds" />
-            )
+            );
           }
           return (
             <LWFWrapper data={resolvedData.data} error={resolvedData.error} />

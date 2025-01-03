@@ -398,7 +398,7 @@ export const EmployeeWorkHistorySchema = z.object({
 });
 
 export const paymentTypeArray = ["fixed", "variable"] as const;
-export const calculationTypeArray = ["fixed", "percentage_of_basic"] as const;
+export const calculationTypeArray = ["fixed", "percentage_of_ctc"] as const;
 
 export const PaymentFieldSchema = z
   .object({
@@ -424,7 +424,10 @@ export const PaymentFieldSchema = z
 
 export const deductionCycleArray = ["monthly"] as const;
 export const EMPLOYEE_RESTRICTED_VALUE = 15000;
-export const EMPLOYEE_RESTRICTED_RATE = 0.2;
+export const EMPLOYER_RESTRICTED_VALUE = 15000;
+export const EDLI_RESTRICTED_VALUE = 75;
+export const EMPLOYEE_RESTRICTED_RATE = 0.12;
+export const EMPLOYER_RESTRICTED_RATE = 0.12;
 
 export const EmployeeProvidentFundSchema = z.object({
   id: z.string().optional(),
@@ -432,12 +435,13 @@ export const EmployeeProvidentFundSchema = z.object({
   epf_number: z.string().max(20),
   deduction_cycle: z.enum(deductionCycleArray).default(deductionCycleArray[0]),
   employee_contribution: z.number().default(EMPLOYEE_RESTRICTED_RATE),
-  employer_contribution: z.number().default(EMPLOYEE_RESTRICTED_RATE),
+  employer_contribution: z.number().default(EMPLOYER_RESTRICTED_RATE),
   employee_restrict_value: z.number().default(EMPLOYEE_RESTRICTED_VALUE),
-  employer_restrict_value: z.number().default(EMPLOYEE_RESTRICTED_VALUE),
+  employer_restrict_value: z.number().default(EMPLOYER_RESTRICTED_VALUE),
   restrict_employer_contribution: z.boolean().default(false),
   restrict_employee_contribution: z.boolean().default(false),
   include_employer_contribution: z.boolean().default(false),
+  edli_restrict_value: z.number().default(EDLI_RESTRICTED_VALUE),
   include_employer_edli_contribution: z.boolean().default(false),
   include_admin_charges: z.boolean().default(false),
 });
@@ -595,7 +599,7 @@ export const componentTypeArray = [
 ] as const;
 
 export const PaymentTemplateComponentsSchema = z.object({
-  monthly_ctc: z.number(),
+  monthly_ctc: z.number().min(0).max(100000000),
   state: zString,
   payment_template_components: z.array(
     z.object({
@@ -607,6 +611,9 @@ export const PaymentTemplateComponentsSchema = z.object({
       payment_field: z
         .object({
           name: zNumberString.optional(),
+          calculation_type: z.enum(calculationTypeArray).optional(),
+          payment_type: z.enum(paymentTypeArray).optional(),
+          amount: z.number().optional(),
         })
         .optional(),
       epf_id: z.string().uuid().optional(),

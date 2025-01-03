@@ -75,7 +75,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -104,7 +104,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -163,12 +163,12 @@ export default function CreateProfessionalTax({
   }, [actionData]);
 
   return (
-    <section className='p-4'>
+    <section className="p-4">
       <FormProvider context={form.context}>
-        <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
+        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
           <Card>
             <CardHeader>
-              <CardTitle className='text-3xl'>
+              <CardTitle className="text-3xl">
                 {replaceDash(PROFESSIONAL_TAX_TAG)}
               </CardTitle>
               <CardDescription>
@@ -183,7 +183,7 @@ export default function CreateProfessionalTax({
               />
               <SearchableSelectField
                 key={resetKey}
-                className='capitalize'
+                className="capitalize"
                 options={statesAndUTs}
                 inputProps={{
                   ...getInputProps(fields.state, { type: "text" }),
@@ -198,7 +198,7 @@ export default function CreateProfessionalTax({
                 inputProps={{
                   ...getInputProps(fields.pt_number, { type: "text" }),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.pt_number.name
+                    fields.pt_number.name,
                   )}`,
                 }}
                 labelProps={{
@@ -208,15 +208,15 @@ export default function CreateProfessionalTax({
               />
               <SearchableSelectField
                 key={resetKey + 1}
-                className='capitalize'
+                className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  deductionCycleArray as unknown as string[]
+                  deductionCycleArray as unknown as string[],
                 )}
                 inputProps={{
                   ...getInputProps(fields.deduction_cycle, { type: "text" }),
                 }}
                 placeholder={`Select ${replaceUnderscore(
-                  fields.deduction_cycle.name
+                  fields.deduction_cycle.name,
                 )}`}
                 labelProps={{
                   children: replaceUnderscore(fields.deduction_cycle.name),

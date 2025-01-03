@@ -57,19 +57,19 @@ export default function SettingGeneral() {
 
   if (error) {
     return (
-      <ErrorBoundary error={error} message='Failed to load company details' />
+      <ErrorBoundary error={error} message="Failed to load company details" />
     );
   }
 
   return (
     <section key={resetKey}>
-      <div className='flex flex-col gap-6 w-full lg:w-2/3 py-4'>
+      <div className="flex flex-col gap-6 w-full lg:w-2/3 py-4">
         <Suspense fallback={<div>Loading...</div>}>
           <Await resolve={companyDetailsPromise}>
             {(resolvedData) => {
               if (!resolvedData)
                 return (
-                  <ErrorBoundary message='Failed to load company details' />
+                  <ErrorBoundary message="Failed to load company details" />
                 );
               return (
                 <CompanyDetailsWrapper
@@ -82,13 +82,13 @@ export default function SettingGeneral() {
         </Suspense>
       </div>
 
-      <div className='flex flex-col gap-6 w-full lg:w-2/3 py-4'>
+      <div className="flex flex-col gap-6 w-full lg:w-2/3 py-4">
         <Suspense fallback={<div>Loading...</div>}>
           <Await resolve={companyRegistrationDetailsPromise}>
             {(resolvedData) => {
               if (!resolvedData)
                 return (
-                  <ErrorBoundary message='Failed to load company registration details' />
+                  <ErrorBoundary message="Failed to load company registration details" />
                 );
               return (
                 <CompanyRegistrationDetailsWrapper

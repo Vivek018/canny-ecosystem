@@ -16,7 +16,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 
@@ -29,7 +29,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     } as any,
     id: templateAssignmentId as string,
   });
-  
+
   if (isGoodStatus(status)) {
     return safeRedirect(`/projects/${projectId}/sites`, { status: 303 });
   }

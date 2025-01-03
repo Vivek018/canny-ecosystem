@@ -58,38 +58,38 @@ export default function Login() {
   const error = actionData?.error || loaderData.error;
 
   return (
-    <section className='flex min-h-screen justify-center items-center overflow-hidden p-6 -mt-20 md:p-0'>
-      <div className='relative z-20 m-auto flex w-full max-w-[450px] flex-col py-8'>
-        <div className='flex w-full flex-col justify-center relative'>
-          <div className='pb-4 bg-gradient-to-r from-primary dark:via-primary dark:to-[#848484] to-[#000] inline-block text-transparent bg-clip-text mx-auto'>
-            <h1 className='font-extrabold uppercase pb-1 tracking-widest text-4xl'>
+    <section className="flex min-h-screen justify-center items-center overflow-hidden p-6 -mt-20 md:p-0">
+      <div className="relative z-20 m-auto flex w-full max-w-[450px] flex-col py-8">
+        <div className="flex w-full flex-col justify-center relative">
+          <div className="pb-4 bg-gradient-to-r from-primary dark:via-primary dark:to-[#848484] to-[#000] inline-block text-transparent bg-clip-text mx-auto">
+            <h1 className="font-extrabold uppercase pb-1 tracking-widest text-4xl">
               CANNY ECOSYSTEM
             </h1>
           </div>
 
-          <p className='font-medium text-center pb-2 text-[#878787]'>
+          <p className="font-medium text-center pb-2 text-[#878787]">
             Managing your workforce effortlessly, from fully transparent
             operations to most detailed insights, all in one end to end
             ecosystem.
           </p>
 
-          <div className='pointer-events-auto my-6 flex flex-col'>
-            <Form method='POST'>
-              <Button type='submit' variant='default' className='w-full'>
+          <div className="pointer-events-auto my-6 flex flex-col">
+            <Form method="POST">
+              <Button type="submit" variant="default" className="w-full">
                 Continue with Google
               </Button>
             </Form>
-            {error && <p className='text-destructive text-sm mt-2'>{error}</p>}
+            {error && <p className="text-destructive text-sm mt-2">{error}</p>}
           </div>
 
-          <p className='text-xs text-[#878787]'>
+          <p className="text-xs text-[#878787]">
             By clicking continue, you acknowledge that you have read and agree
             to Canny's{" "}
-            <Link to='/terms' className='underline'>
+            <Link to="/terms" className="underline">
               Terms of Service
             </Link>{" "}
             and{" "}
-            <Link to='/policy' className='underline'>
+            <Link to="/policy" className="underline">
               Privacy Policy
             </Link>
             .

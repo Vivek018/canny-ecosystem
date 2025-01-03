@@ -62,7 +62,6 @@ export function CreateEmployeeAddress({
             type: "checkbox",
           })}
           labelProps={{
-            htmlFor: fields.is_primary.id,
             children: "Is this your primary address?",
           }}
         />

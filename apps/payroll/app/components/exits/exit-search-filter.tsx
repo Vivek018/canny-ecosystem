@@ -26,7 +26,6 @@ import { exitReasonArray, replaceUnderscore } from "@canny_ecosystem/utils";
 import type { ExitFilterType } from "@canny_ecosystem/supabase/queries";
 import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
 
-
 export function ExitsSearchFilter({
   disabled,
 }: {
@@ -142,7 +141,7 @@ export function ExitsSearchFilter({
     );
     // if (prompt.split(" ").length > 1) {
     // } else {
-      if (prompt.length) {
+    if (prompt.length) {
       searchParams.set("name", prompt);
       setSearchParams(searchParams);
     }
@@ -175,9 +174,7 @@ export function ExitsSearchFilter({
             tabIndex={-1}
             ref={inputRef}
             placeholder={
-              disabled
-                ? "No Exits Data to Search And Filter"
-                : "Search Exits"
+              disabled ? "No Exits Data to Search And Filter" : "Search Exits"
             }
             disabled={disabled}
             className="pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70"

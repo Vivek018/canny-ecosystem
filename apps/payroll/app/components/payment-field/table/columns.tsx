@@ -42,7 +42,7 @@ export const columns: ColumnDef<PaymentFieldDataType>[] = [
         </p>
       );
     },
-  }, 
+  },
   {
     accessorKey: "is_active",
     header: "Status",
