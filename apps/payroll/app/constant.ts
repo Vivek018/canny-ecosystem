@@ -242,4 +242,9 @@ export const statutorySideNavList = [
     link: "/payment-components/statutory-fields/statutory-bonus",
     icon: "",
   },
+  {
+    name: "Gratuity",
+    link: "/payment-components/statutory-fields/gratuity",
+    icon: "",
+  }
 ];

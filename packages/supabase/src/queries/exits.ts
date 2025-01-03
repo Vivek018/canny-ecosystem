@@ -7,7 +7,6 @@ import type {
   InferredType,
   TypedSupabaseClient,
 } from "../types";
-import { ProjectsWithCompany } from "./projects";
 
 export type ExitFilterType = {
   last_working_day_start?: string | undefined | null;

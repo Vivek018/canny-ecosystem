@@ -168,7 +168,7 @@ export default function CreateProfessionalTax({
         <Form method="POST" {...getFormProps(form)} className="flex flex-col">
           <Card>
             <CardHeader>
-              <CardTitle className="text-3xl">
+              <CardTitle className="text-3xl capitalize">
                 {replaceDash(PROFESSIONAL_TAX_TAG)}
               </CardTitle>
               <CardDescription>

@@ -451,6 +451,7 @@ export const EmployeeStateInsuranceSchema = z.object({
   employees_contribution: z.number().default(0.0075),
   employers_contribution: z.number().default(0.0325),
   include_employer_contribution: z.boolean().default(false),
+  is_default: z.boolean().default(true),
 });
 
 export const ProfessionalTaxSchema = z.object({
@@ -491,6 +492,7 @@ export const StatutoryBonusSchema = z
       .default(statutoryBonusPayFrequencyArray[0]),
     percentage: z.number().min(0).default(8.33),
     payout_month: z.number().optional(),
+    is_default: z.boolean().default(true),
   })
   .superRefine((data, ctx) => {
     if (data.payment_frequency === "yearly" && !data.payout_month) {
@@ -507,6 +509,17 @@ export const StatutoryBonusSchema = z
       }
     }
   });
+
+export const GratuitySchema = z.object({
+  id: z.string().optional(),
+  company_id: z.string(),
+  is_default: z.boolean().default(true),
+  eligibility_years: z.number().min(0).default(4.5),
+  present_day_per_year: z.number().min(1).max(365).default(240),
+  payment_days_per_year: z.number().min(1).max(365).default(15),
+  max_multiply_limit: z.number().min(0).default(20),
+  max_amount_limit: z.number().min(0).default(3000000),
+});
 
 export const categoryArray = ["suggestion", "bug", "complain"] as const;
 export const severityArray = ["low", "normal", "urgent"] as const;
@@ -655,11 +668,10 @@ export const ReimbursementSchema = z.object({
   submitted_date: z.string(),
   status: z.enum(ReimbursementStatusArray),
   amount: zNumber.min(1).max(100000000),
-  user_id:z.string().optional(),
+  user_id: z.string().optional(),
   is_deductible: z.boolean().optional().default(false),
-  company_id:z.string(),
-  employee_id:z.string(),
-
+  company_id: z.string(),
+  employee_id: z.string(),
 });
 
 export const exitReasonArray = [

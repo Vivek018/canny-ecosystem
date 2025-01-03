@@ -35,7 +35,7 @@ const chartConfig = Object.fromEntries(
 ) as ChartConfig;
 
 chartConfig.amount = {
-  label: "Amount",
+  label: "Total Amount",
   color: "hsl(var(--background))",
 };
 
@@ -80,7 +80,10 @@ export function ExitTopPayment({
             <ChartTooltip
               cursor={false}
               content={
-                <ChartTooltipContent indicator="line" className="capitalize" />
+                <ChartTooltipContent
+                  indicator="line"
+                  className="capitalize w-2/3"
+                />
               }
             />
             <Bar

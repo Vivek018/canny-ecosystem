@@ -948,6 +948,53 @@ export type Database = {
           },
         ]
       }
+      gratuity: {
+        Row: {
+          company_id: string
+          created_at: string | null
+          eligibility_years: number | null
+          id: string
+          is_default: boolean | null
+          max_amount_limit: number | null
+          max_multiply_limit: number | null
+          payment_days_per_year: number | null
+          present_day_per_year: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string | null
+          eligibility_years?: number | null
+          id?: string
+          is_default?: boolean | null
+          max_amount_limit?: number | null
+          max_multiply_limit?: number | null
+          payment_days_per_year?: number | null
+          present_day_per_year?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string | null
+          eligibility_years?: number | null
+          id?: string
+          is_default?: boolean | null
+          max_amount_limit?: number | null
+          max_multiply_limit?: number | null
+          payment_days_per_year?: number | null
+          present_day_per_year?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gratuity_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       labour_welfare_fund: {
         Row: {
           company_id: string
@@ -1791,7 +1838,7 @@ export type Database = {
       feedback_category: "suggestion" | "bug" | "complain"
       feedback_severity: "low" | "normal" | "urgent"
       payment_type: "fixed" | "variable"
-      payroll_status: "pending" | "approved"
+      payroll_status: "pending" | "approved" | "created"
       template_assignment_type: "employee" | "site"
       template_calculation_type: "variable" | "percentage_of_ctc"
       template_component_type:

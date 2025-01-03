@@ -18,21 +18,19 @@ import { DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
-export const DeleteEmployeeProvidentFund = ({
-  employeeProvidentFundId,
-}: { employeeProvidentFundId: string }) => {
+export const DeleteGratuity = ({ gratuityId }: { gratuityId: string }) => {
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [inputError, setInputError] = useState<string[]>([]);
   const submit = useSubmit();
 
-  const handleCancelEPF = () => {
+  const handleCancelGratuity = () => {
     setInputError([]);
     setInputValue("");
     setLoading(false);
   };
 
-  const handleDeleteEPF = (
+  const handleDeleteGratuity = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
@@ -41,7 +39,7 @@ export const DeleteEmployeeProvidentFund = ({
         {},
         {
           method: "post",
-          action: `${employeeProvidentFundId}/delete-epf`,
+          action: `${gratuityId}/delete-gratuity`,
           replace: true,
         },
       );
@@ -60,14 +58,14 @@ export const DeleteEmployeeProvidentFund = ({
         )}
       >
         <Icon name="trash" size="md" />
-        <span>Delete EPF</span>
+        <span>Delete Gratuity</span>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your EPF
-            and remove it's data from our servers.
+            This action cannot be undone. This will permanently delete your
+            gratuity and remove it's data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="py-4">
@@ -93,13 +91,13 @@ export const DeleteEmployeeProvidentFund = ({
           <ErrorList errors={inputError} />
         </div>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={handleCancelEPF}>
+          <AlertDialogCancel onClick={handleCancelGratuity}>
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
             className={cn(buttonVariants({ variant: "destructive" }))}
-            onClick={handleDeleteEPF}
-            onSelect={handleDeleteEPF}
+            onClick={handleDeleteGratuity}
+            onSelect={handleDeleteGratuity}
           >
             {isLoading ? "Deleting..." : "Delete"}
           </AlertDialogAction>
