@@ -1,5 +1,5 @@
-import { useImportStoreForEmployee } from "@/store/import";
-import type { ImportEmployeeDataType } from "@canny_ecosystem/supabase/queries";
+import { useImportStoreForEmployeePersonals } from "@/store/import";
+import type { ImportEmployeePersonalsDataType } from "@canny_ecosystem/supabase/queries";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,7 +17,7 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import {
   educationArray,
   genderArray,
-  ImportSingleEmployeeDataSchema,
+  ImportSingleEmployeePersonalsDataSchema,
   maritalStatusArray,
   transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
@@ -28,9 +28,9 @@ export const UpdateImportedEmployee = ({
   dataToUpdate,
 }: {
   indexToUpdate: number;
-  dataToUpdate: ImportEmployeeDataType;
+  dataToUpdate: ImportEmployeePersonalsDataType;
 }) => {
-  const { importData, setImportData } = useImportStoreForEmployee();
+  const { importData, setImportData } = useImportStoreForEmployeePersonals();
   const [data, setData] = useState(dataToUpdate);
 
   const onChange = (key: keyof typeof dataToUpdate, value: string) => {
@@ -38,7 +38,8 @@ export const UpdateImportedEmployee = ({
   };
 
   const handleUpdate = () => {
-    const parsedResult = ImportSingleEmployeeDataSchema.safeParse(data);
+    const parsedResult =
+      ImportSingleEmployeePersonalsDataSchema.safeParse(data);
 
     if (parsedResult.success) {
       setImportData({
@@ -74,7 +75,6 @@ export const UpdateImportedEmployee = ({
               }}
             />
             <Field
-            
               inputProps={{
                 type: "text",
                 value: data.first_name!,
@@ -85,7 +85,7 @@ export const UpdateImportedEmployee = ({
           </div>
           <div className="grid grid-cols-2 place-content-center justify-between gap-3">
             <Field
-            className="gap-0 -mt-1"
+              className="gap-0 -mt-1"
               inputProps={{
                 type: "text",
                 value: data.middle_name!,
@@ -94,7 +94,7 @@ export const UpdateImportedEmployee = ({
               }}
             />
             <Field
-            className="gap-0 -mt-1"
+              className="gap-0 -mt-1"
               inputProps={{
                 type: "text",
                 value: data.last_name!,

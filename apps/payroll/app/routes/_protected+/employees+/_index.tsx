@@ -1,7 +1,11 @@
 import { EmployeesActions } from "@/components/employees/employee-actions";
 import { EmployeesSearchFilter } from "@/components/employees/employee-search-filter";
 import { FilterList } from "@/components/employees/filter-list";
-import { ImportEmployeeModal } from "@/components/employees/import-modal";
+import { ImportEmployeeAddressModal } from "@/components/employees/import-modal-address";
+import { ImportEmployeeBankingModal } from "@/components/employees/import-modal-banking";
+import { ImportEmployeeGuardiansModal } from "@/components/employees/import-modal-guardians";
+import { ImportEmployeePersonalsModal } from "@/components/employees/import-modal-personals";
+import { ImportEmployeeStatutoryModal } from "@/components/employees/import-modal-statutory";
 import { columns } from "@/components/employees/table/columns";
 import { DataTable } from "@/components/employees/table/data-table";
 import { VALID_FILTERS } from "@/constant";
@@ -227,7 +231,11 @@ export default function EmployeesIndex() {
         companyId={companyId}
         env={env}
       />
-      <ImportEmployeeModal />
+      <ImportEmployeePersonalsModal />
+      <ImportEmployeeStatutoryModal />
+      <ImportEmployeeBankingModal />
+      <ImportEmployeeAddressModal />
+      <ImportEmployeeGuardiansModal />
       <Outlet />
     </section>
   );

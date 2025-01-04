@@ -8,21 +8,21 @@ import {
 import { SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import {
   transformStringArrayIntoOptions,
-  type ImportEmployeeHeaderSchema,
+  type ImportEmployeePersonalsHeaderSchema,
 } from "@canny_ecosystem/utils";
 import { type FieldMetadata, getInputProps } from "@conform-to/react";
 import { useEffect, useState } from "react";
 import Papa from "papaparse";
 
 type FieldsType = {
-  [K in keyof typeof ImportEmployeeHeaderSchema.shape]: FieldMetadata<
-    (typeof ImportEmployeeHeaderSchema.shape)[K]["_type"],
-    (typeof ImportEmployeeHeaderSchema.shape)[K],
+  [K in keyof typeof ImportEmployeePersonalsHeaderSchema.shape]: FieldMetadata<
+    (typeof ImportEmployeePersonalsHeaderSchema.shape)[K]["_type"],
+    (typeof ImportEmployeePersonalsHeaderSchema.shape)[K],
     string[]
   >;
 };
 
-export function EmployeeImportHeader({
+export function EmployeePersonalsImportHeader({
   fields,
   file,
 }: {
@@ -191,7 +191,9 @@ export function EmployeeImportHeader({
             className="capitalize"
             options={transformStringArrayIntoOptions(headerArray)}
             inputProps={{
-              ...getInputProps(fields.secondary_mobile_number, { type: "text" }),
+              ...getInputProps(fields.secondary_mobile_number, {
+                type: "text",
+              }),
             }}
             labelProps={{
               children: "Secondary Mobile Number",

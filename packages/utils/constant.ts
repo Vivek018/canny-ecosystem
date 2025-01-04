@@ -3,7 +3,11 @@ export const SECONDS_IN_A_MONTH = 60 * 60 * 24 * 30;
 export const DELETE_TEXT = "permanently delete";
 
 export const modalSearchParamNames = {
-  import_employee:"import-employee",
+  import_employee_personals:"import-employee-personals",
+  import_employee_statutory:"import-employee-statutory",
+  import_employee_banking:"import-employee-banking",
+  import_employee_address:"import-employee-address",
+  import_employee_guardians:"import-employee-guardians",
   import_reimbursement: "import-reimbursement",
   view_link_template: "view-link-template", 
   create_link_template: "create-link-template",

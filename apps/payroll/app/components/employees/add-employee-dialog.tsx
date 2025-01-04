@@ -22,21 +22,76 @@ export function AddEmployeeDialog() {
       </DropdownMenuTrigger>
       <DropdownMenuContent sideOffset={10} align="end">
         <DropdownMenuItem
-          onClick={() => {
-            searchParams.set("step", modalSearchParamNames.import_employee);
-            setSearchParams(searchParams);
-          }}
-          className="space-x-2 flex items-center"
-        >
-          <Icon name="import" size="sm" className="mb-0.5" />
-          <span>Import/backfill</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem
           onClick={() => navigate("/employees/create-employee")}
           className="space-x-2"
         >
           <Icon name="plus-circled" size="sm" />
           <span>Create employee</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            searchParams.set(
+              "step",
+              modalSearchParamNames.import_employee_personals
+            );
+            setSearchParams(searchParams);
+          }}
+          className="space-x-2 flex items-center"
+        >
+          <Icon name="import" size="sm" className="mb-0.5" />
+          <span>Import Personals</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            searchParams.set(
+              "step",
+              modalSearchParamNames.import_employee_statutory
+            );
+            setSearchParams(searchParams);
+          }}
+          className="space-x-2 flex items-center"
+        >
+          <Icon name="import" size="sm" className="mb-0.5" />
+          <span>Import Statutory</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            searchParams.set(
+              "step",
+              modalSearchParamNames.import_employee_banking
+            );
+            setSearchParams(searchParams);
+          }}
+          className="space-x-2 flex items-center"
+        >
+          <Icon name="import" size="sm" className="mb-0.5" />
+          <span>Import Banking</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            searchParams.set(
+              "step",
+              modalSearchParamNames.import_employee_address
+            );
+            setSearchParams(searchParams);
+          }}
+          className="space-x-2 flex items-center"
+        >
+          <Icon name="import" size="sm" className="mb-0.5" />
+          <span>Import Address</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            searchParams.set(
+              "step",
+              modalSearchParamNames.import_employee_guardians
+            );
+            setSearchParams(searchParams);
+          }}
+          className="space-x-2 flex items-center"
+        >
+          <Icon name="import" size="sm" className="mb-0.5" />
+          <span>Import Guardian's</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

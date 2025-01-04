@@ -685,7 +685,7 @@ export async function getEmployeeProjectAssignmentByEmployeeId({
   return { data, error };
 }
 
-export type ImportEmployeeDataType = Pick<
+export type ImportEmployeePersonalsDataType = Pick<
   EmployeeDatabaseRow,
   | "employee_code"
   | "first_name"
@@ -700,3 +700,62 @@ export type ImportEmployeeDataType = Pick<
   | "primary_mobile_number"
   | "secondary_mobile_number"
 >;
+
+export type ImportEmployeeStatutoryDataType = Pick<
+  EmployeeStatutoryDetailsDatabaseRow,
+  | "aadhaar_number"
+  | "pan_number"
+  | "uan_number"
+  | "pf_number"
+  | "esic_number"
+  | "driving_license_number"
+  | "driving_license_expiry"
+  | "passport_number"
+  | "passport_expiry"
+> & {
+  employee_code: EmployeeDatabaseRow["employee_code"];
+};
+
+export type ImportEmployeeBankingDataType = Pick<
+  EmployeeBankDetailsDatabaseRow,
+  | "account_holder_name"
+  | "account_number"
+  | "ifsc_code"
+  | "account_type"
+  | "bank_name"
+  | "branch_name"
+> & {
+  employee_code: EmployeeDatabaseRow["employee_code"];
+};
+
+export type ImportEmployeeAddressDataType = Pick<
+  EmployeeAddressDatabaseRow,
+  | "address_type"
+  | "address_line_1"
+  | "address_line_2"
+  | "city"
+  | "pincode"
+  | "state"
+  | "country"
+  | "latitude"
+  | "longitude"
+  | "is_primary"
+> & {
+  employee_code: EmployeeDatabaseRow["employee_code"];
+};
+
+export type ImportEmployeeGuardiansDataType = Pick<
+  EmployeeGuardianDatabaseRow,
+  | "relationship"
+  | "first_name"
+  | "last_name"
+  | "date_of_birth"
+  | "gender"
+  | "mobile_number"
+  | "alternate_mobile_number"
+  | "email"
+  | "is_emergency_contact"
+  | "address_same_as_employee"
+> & {
+  employee_code: EmployeeDatabaseRow["employee_code"];
+};

@@ -1,20 +1,20 @@
-import { ImportedDataColumns } from "@/components/employees/imported-table/columns";
-import { ImportedDataTable } from "@/components/employees/imported-table/imported-data-table";
-import { useImportStoreForEmployee } from "@/store/import";
-import type { ImportEmployeeDataType } from "@canny_ecosystem/supabase/queries";
+import { ImportedDataColumns } from "@/components/employees/imported-banking-table/columns";
+import { ImportedDataTable } from "@/components/employees/imported-banking-table/imported-data-table";
+import { useImportStoreForEmployeeBanking } from "@/store/import";
+import type { ImportEmployeeBankingDataType } from "@canny_ecosystem/supabase/queries";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
 import Papa from "papaparse";
 import { useState, useEffect } from "react";
 
-export function EmployeeImportData({
+export function EmployeeBankingImportData({
   fieldMapping,
   file,
 }: {
   fieldMapping: Record<string, string>;
   file: any;
 }) {
-  const { importData, setImportData } = useImportStoreForEmployee();
+  const { importData, setImportData } = useImportStoreForEmployeeBanking();
 
   const swappedFieldMapping = Object.fromEntries(
     Object.entries(fieldMapping).map(([key, value]) => [value, key])
@@ -33,7 +33,9 @@ export function EmployeeImportData({
             Object.values(entry!).some((value) => String(value).trim() !== "")
           );
 
-          setImportData({ data: finalTableData as ImportEmployeeDataType[] });
+          setImportData({
+            data: finalTableData as ImportEmployeeBankingDataType[],
+          });
         },
         error: (error) => {
           console.error("Parsing error: ", error);

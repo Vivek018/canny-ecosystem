@@ -12,7 +12,7 @@ import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
 import { useNavigate, useSearchParams } from "@remix-run/react";
 import { useState, useEffect } from "react";
 
-export const ImportEmployeeModal = () => {
+export const ImportEmployeeAddressModal = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [eligibleFileSize, setEligibleFileSize] = useState<boolean>(true);
   const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
@@ -22,7 +22,7 @@ export const ImportEmployeeModal = () => {
   const MAX_FILE_SIZE_LIMIT = SIZE_1MB * 3;
 
   const isOpen =
-    searchParams.get("step") === modalSearchParamNames.import_employee;
+    searchParams.get("step") === modalSearchParamNames.import_employee_address;
 
   const onClose = () => {
     searchParams.delete("step");
@@ -49,7 +49,7 @@ export const ImportEmployeeModal = () => {
 
   const handleFileSubmit = () => {
     if (eligibleFileSize && selectedFile) {
-      navigate("/employees/import-data", {
+      navigate("/employees/import-address", {
         state: { file: selectedFile },
       });
     }

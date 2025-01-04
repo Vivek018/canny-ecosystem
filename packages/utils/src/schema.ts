@@ -729,7 +729,7 @@ export const ImportReimbursementDataSchema = z.object({
   data: z.array(ImportSingleReimbursementDataSchema),
 });
 
-export const ImportEmployeeHeaderSchema = z
+export const ImportEmployeePersonalsHeaderSchema = z
   .object({
     employee_code: z.string(),
     first_name: z.string(),
@@ -784,7 +784,7 @@ export const ImportEmployeeHeaderSchema = z
     }
   );
 
-export const ImportSingleEmployeeDataSchema = z.object({
+export const ImportSingleEmployeePersonalsDataSchema = z.object({
   first_name: zString.min(3),
   middle_name: zString.min(3).optional(),
   last_name: zString.min(3),
@@ -811,6 +811,325 @@ export const ImportSingleEmployeeDataSchema = z.object({
   personal_email: zEmail.optional(),
 });
 
-export const ImportEmployeeDataSchema = z.object({
-  data: z.array(ImportSingleEmployeeDataSchema),
+export const ImportEmployeePersonalsDataSchema = z.object({
+  data: z.array(ImportSingleEmployeePersonalsDataSchema),
+});
+
+export const ImportEmployeeStatutoryHeaderSchema = z
+  .object({
+    employee_code: z.string(),
+    aadhaar_number: z.string(),
+    pan_number: z.string().optional(),
+    uan_number: z.string(),
+    pf_number: z.string(),
+    esic_number: z.string(),
+    driving_license_number: z.string().optional(),
+    driving_license_expiry: z.string().optional(),
+    passport_number: z.string().optional(),
+    passport_expiry: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      const values = [
+        data.employee_code,
+        data.aadhaar_number,
+        data.pan_number,
+        data.uan_number,
+        data.pf_number,
+        data.esic_number,
+        data.driving_license_number,
+        data.driving_license_expiry,
+        data.passport_number,
+        data.passport_expiry,
+      ].filter(Boolean);
+
+      const uniqueValues = new Set(values);
+      return uniqueValues.size === values.length;
+    },
+    {
+      message:
+        "Some fields have the same value. Please select different options.",
+      path: [
+        "employee_code",
+        "aadhaar_number",
+        "pan_number",
+        "uan_number",
+        "pf_number",
+        "esic_number",
+        "driving_license_number",
+        "driving_license_expiry",
+        "passport_number",
+        "passport_expiry",
+      ],
+    }
+  );
+
+export const ImportSingleEmployeeStatutoryDataSchema = z.object({
+  employee_code: zNumberString.min(3),
+  aadhaar_number: zNumber.min(12).max(12),
+  pan_number: zNumberString.max(10).optional(),
+  uan_number: zNumberString.max(12),
+  pf_number: zNumberString.max(20),
+  esic_number: zNumberString.max(20),
+  driving_license_number: zNumberString.max(20).optional(),
+  driving_license_expiry: z.string().optional(),
+  passport_number: zNumberString.max(20).optional(),
+  passport_expiry: z.string().optional(),
+
+  // primary_mobile_number: z.preprocess((value) => {
+  //   const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
+  //   return Number.isNaN(parsed) ? undefined : parsed;
+  // }, z.number()),
+  // secondary_mobile_number: z.preprocess((value) => {
+  //   const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
+  //   return Number.isNaN(parsed) ? undefined : parsed;
+  // }, z.number().optional()),
+});
+
+export const ImportEmployeeStatutoryDataSchema = z.object({
+  data: z.array(ImportSingleEmployeeStatutoryDataSchema),
+});
+
+export const ImportEmployeeBankingHeaderSchema = z
+  .object({
+    employee_code: z.string(),
+    account_holder_name: z.string().optional(),
+    account_number: z.string(),
+    ifsc_code: z.string(),
+    account_type: z.string().optional(),
+    bank_name: z.string(),
+    branch_name: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      const values = [
+        data.employee_code,
+        data.account_holder_name,
+        data.account_number,
+        data.ifsc_code,
+        data.account_type,
+        data.bank_name,
+        data.branch_name,
+      ].filter(Boolean);
+
+      const uniqueValues = new Set(values);
+      return uniqueValues.size === values.length;
+    },
+    {
+      message:
+        "Some fields have the same value. Please select different options.",
+      path: [
+        "employee_code",
+        "account_holder_name",
+        "account_number",
+        "ifsc_code",
+        "account_type",
+        "bank_name",
+        "branch_name",
+      ],
+    }
+  );
+
+export const ImportSingleEmployeeBankingDataSchema = z.object({
+  employee_code: zNumberString.min(3),
+  account_number: zNumber.min(10).max(20),
+  ifsc_code: zNumberString.min(3).max(11),
+  account_holder_name: zString.min(3).optional(),
+  account_type: z.enum(accountTypeArray).default("savings"),
+  bank_name: zString.min(3),
+  branch_name: zNumberString.min(3).optional(),
+  // is_active: z
+  //   .preprocess(
+  //     (value) =>
+  //       typeof value === "string" ? value.toLowerCase() === "true" : value,
+  //     z.boolean().default(false)
+  //   )
+  //   .default(false),
+  // primary_mobile_number: z.preprocess((value) => {
+  //   const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
+  //   return Number.isNaN(parsed) ? undefined : parsed;
+  // }, z.number()),
+  // secondary_mobile_number: z.preprocess((value) => {
+  //   const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
+  //   return Number.isNaN(parsed) ? undefined : parsed;
+  // }, z.number().optional()),
+});
+
+export const ImportEmployeeBankingDataSchema = z.object({
+  data: z.array(ImportSingleEmployeeBankingDataSchema),
+});
+
+export const ImportEmployeeAddressHeaderSchema = z
+  .object({
+    employee_code: z.string(),
+    address_type: z.string(),
+    address_line_1: z.string(),
+    address_line_2: z.string(),
+    city: z.string(),
+    pincode: z.string(),
+    state: z.string(),
+    country: z.string(),
+    latitude: z.string().optional(),
+    longitude: z.string().optional(),
+    is_primary: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      const values = [
+        data.employee_code,
+        data.address_type,
+        data.address_line_1,
+        data.address_line_2,
+        data.city,
+        data.pincode,
+        data.state,
+        data.country,
+        data.latitude,
+        data.longitude,
+        data.is_primary,
+      ].filter(Boolean);
+
+      const uniqueValues = new Set(values);
+      return uniqueValues.size === values.length;
+    },
+    {
+      message:
+        "Some fields have the same value. Please select different options.",
+      path: [
+        "employee_code",
+        "address_type",
+        "address_line_1",
+        "address_line_2",
+        "city",
+        "pincode",
+        "state",
+        "country",
+        "latitude",
+        "longitude",
+        "is_primary",
+      ],
+    }
+  );
+
+export const ImportSingleEmployeeAddressDataSchema = z.object({
+  employee_code: zNumberString.min(3),
+  address_type: zString.min(3).max(20),
+  is_primary: z.boolean().default(false),
+  address_line_1: z
+    .string()
+    .min(3)
+    .max(textMaxLength * 2),
+  address_line_2: z
+    .string()
+    .max(textMaxLength * 2)
+    .optional(),
+  state: zString,
+  city: zString.min(3),
+  pincode: zNumber.min(6).max(6),
+  latitude: z.number().min(-90).max(90).optional(),
+  longitude: z.number().min(-180).max(180).optional(),
+  // is_active: z
+  //   .preprocess(
+  //     (value) =>
+  //       typeof value === "string" ? value.toLowerCase() === "true" : value,
+  //     z.boolean().default(false)
+  //   )
+  //   .default(false),
+  // primary_mobile_number: z.preprocess((value) => {
+  //   const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
+  //   return Number.isNaN(parsed) ? undefined : parsed;
+  // }, z.number()),
+  // secondary_mobile_number: z.preprocess((value) => {
+  //   const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
+  //   return Number.isNaN(parsed) ? undefined : parsed;
+  // }, z.number().optional()),
+});
+
+export const ImportEmployeeAddressDataSchema = z.object({
+  data: z.array(ImportSingleEmployeeAddressDataSchema),
+});
+
+export const ImportEmployeeGuardiansHeaderSchema = z
+  .object({
+    employee_code: z.string().optional(),
+    relationship: z.string().optional(),
+    first_name: z.string().optional(),
+    last_name: z.string().optional(),
+    date_of_birth: z.string().optional(),
+    gender: z.string().optional(),
+    mobile_number: z.string().optional(),
+    alternate_mobile_number: z.string().optional(),
+    email: z.string().optional(),
+    is_emergency_contact: z.string().optional(),
+    address_same_as_employee: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      const values = [
+        data.employee_code,
+        data.relationship,
+        data.first_name,
+        data.last_name,
+        data.date_of_birth,
+        data.gender,
+        data.mobile_number,
+        data.alternate_mobile_number,
+        data.email,
+        data.is_emergency_contact,
+        data.address_same_as_employee,
+      ].filter(Boolean);
+
+      const uniqueValues = new Set(values);
+      return uniqueValues.size === values.length;
+    },
+    {
+      message:
+        "Some fields have the same value. Please select different options.",
+      path: [
+        "employee_code",
+        "relationship",
+        "first_name",
+        "last_name",
+        "date_of_birth",
+        "gender",
+        "mobile_number",
+        "alternate_mobile_number",
+        "email",
+        "is_emergency_contact",
+        "address_same_as_employee",
+      ],
+    }
+  );
+
+export const ImportSingleEmployeeGuardiansDataSchema = z.object({
+  employee_code: zNumberString.min(3),
+  relationship: z.enum(relationshipArray).optional(),
+  first_name: zString.min(3).max(50).optional(),
+  last_name: zString.min(3).max(50).optional(),
+  date_of_birth: z.string().optional(),
+  gender: z.enum(genderArray).optional(),
+  is_emergency_contact: z.boolean().default(false),
+  address_same_as_employee: z.boolean().default(false),
+  mobile_number: zNumber.min(10).max(10).optional(),
+  alternate_mobile_number: zNumber.min(10).max(10).optional(),
+  email: zEmail.optional(),
+  // is_active: z
+  //   .preprocess(
+  //     (value) =>
+  //       typeof value === "string" ? value.toLowerCase() === "true" : value,
+  //     z.boolean().default(false)
+  //   )
+  //   .default(false),
+  // primary_mobile_number: z.preprocess((value) => {
+  //   const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
+  //   return Number.isNaN(parsed) ? undefined : parsed;
+  // }, z.number()),
+  // secondary_mobile_number: z.preprocess((value) => {
+  //   const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
+  //   return Number.isNaN(parsed) ? undefined : parsed;
+  // }, z.number().optional()),
+});
+
+export const ImportEmployeeGuardiansDataSchema = z.object({
+  data: z.array(ImportSingleEmployeeGuardiansDataSchema),
 });

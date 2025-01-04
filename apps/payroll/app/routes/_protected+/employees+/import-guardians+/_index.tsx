@@ -1,6 +1,6 @@
 import {
-  ImportEmployeeHeaderSchema,
-  ImportEmployeeDataSchema,
+  ImportEmployeeGuardiansHeaderSchema,
+  ImportEmployeeGuardiansDataSchema,
 } from "@canny_ecosystem/utils";
 
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -18,17 +18,23 @@ import { FormButtons } from "@/components/form/form-buttons";
 import { FormStepHeader } from "@/components/form/form-step-header";
 import { useIsomorphicLayoutEffect } from "@canny_ecosystem/utils/hooks/isomorphic-layout-effect";
 
-import { EmployeeImportHeader } from "@/components/employees/employee-import-header";
-import { EmployeeImportData } from "@/components/employees/employee-import-data";
+import { EmployeeGuardiansImportHeader } from "@/components/employees/employee-guardians-import-header";
+import { EmployeeGuardiansImportData } from "@/components/employees/employee-guardians-import-data";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
-export const IMPORT_EMPLOYEES = ["map-headers", "validate-imported-data"];
+export const IMPORT_EMPLOYEE_GUARDIANS = [
+  "guardians-map-headers",
+  "guardians-validate-imported-data",
+];
 
 export const STEP = "step";
 
-const SESSION_KEY_PREFIX = "multiStepEmployeeImport_step_";
+const SESSION_KEY_PREFIX = "multiStepEmployeeGuardiansImport_step_";
 
-const schemas = [ImportEmployeeHeaderSchema, ImportEmployeeDataSchema];
+const schemas = [
+  ImportEmployeeGuardiansHeaderSchema,
+  ImportEmployeeGuardiansDataSchema,
+];
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -71,10 +77,9 @@ export async function action({ request }: ActionFunctionArgs) {
   });
 
   if (action === "submit") {
-    const parsedData = ImportEmployeeDataSchema.safeParse(
+    const parsedData = ImportEmployeeGuardiansDataSchema.safeParse(
       JSON.parse(formData.get("stringified_data") as string)
     );
-  
 
     if (parsedData.success) {
       const importedData = parsedData.data?.data;
@@ -130,7 +135,7 @@ export async function action({ request }: ActionFunctionArgs) {
   return json({});
 }
 
-export default function EmployeeImportFieldMapping() {
+export default function EmployeeGuardiansImportFieldMapping() {
   const { step, totalSteps, stepData } = useLoaderData<typeof loader>();
   const stepOneData = stepData[0];
 
@@ -139,7 +144,7 @@ export default function EmployeeImportFieldMapping() {
   const location = useLocation();
   const [file] = useState(location.state?.file);
 
-  const IMPORT_TAG = IMPORT_EMPLOYEES[step - 1];
+  const IMPORT_TAG = IMPORT_EMPLOYEE_GUARDIANS[step - 1];
   const currentSchema = schemas[step - 1];
   const initialValues = getInitialValueFromZod(currentSchema);
 
@@ -177,14 +182,14 @@ export default function EmployeeImportFieldMapping() {
           <Card>
             <div className="h-[500px] overflow-scroll">
               {step === 1 ? (
-                <EmployeeImportHeader
+                <EmployeeGuardiansImportHeader
                   key={resetKey}
                   file={file}
                   fields={fields as any}
                 />
               ) : null}
               {step === 2 ? (
-                <EmployeeImportData fieldMapping={stepOneData} file={file} />
+                <EmployeeGuardiansImportData fieldMapping={stepOneData} file={file} />
               ) : null}
             </div>
             <FormButtons
