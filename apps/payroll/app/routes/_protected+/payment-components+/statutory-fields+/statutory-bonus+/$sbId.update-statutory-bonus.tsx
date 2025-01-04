@@ -75,7 +75,6 @@ export async function action({
     const { status, error } = await updateStatutoryBonus({
       supabase,
       data: submission.value,
-      bypassAuth: true,
     });
 
     if (isGoodStatus(status)) {

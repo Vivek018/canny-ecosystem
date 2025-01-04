@@ -3,6 +3,7 @@ import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { TableHead, TableHeader, TableRow } from "@canny_ecosystem/ui/table";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { exitPaymentFields } from "@canny_ecosystem/utils/constant";
 import { useSearchParams } from "@remix-run/react";
 
 type Props = {
@@ -13,12 +14,17 @@ type Props = {
 
 // make sure the order is same as header order
 export const ExitPaymentColumnIdArray = [
+  "employee_code",
   "employee_name",
+  "project",
+  "project_site",
   "last_working_day",
   "reason",
   "final_settlement_date",
   "organization_payable_days",
   "employee_payable_days",
+  ...exitPaymentFields,
+  "total",
   "note",
 ] as const;
 
@@ -77,17 +83,11 @@ export function ExitPaymentTableHeader({ table, className, loading }: Props) {
             }}
           />
         </TableHead>
-        
+
         {ExitPaymentColumnIdArray?.map((id) => {
           return (
             isVisible(id) && (
-              <TableHead
-                key={id}
-                className={cn(
-                  "px-4 py-2",
-                  id === "employee_name" && "sticky left-12 bg-card z-10",
-                )}
-              >
+              <TableHead key={id} className={cn("px-4 py-2")}>
                 <Button
                   className="p-0 hover:bg-transparent space-x-2 disabled:opacity-100"
                   variant="ghost"
@@ -118,7 +118,6 @@ export function ExitPaymentTableHeader({ table, className, loading }: Props) {
             )
           );
         })}
-        <TableHead className="sticky right-0 min-w-20 max-w-20 bg-card z-10" />
       </TableRow>
     </TableHeader>
   );

@@ -15,6 +15,7 @@ import { ExitPaymentTableHeader } from "./data-table-header";
 import { ExitPaymentsSheet } from "@/components/exits/exit_payments_sheet";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import {
+  type ExitDataType,
   type ExitFilterType,
   getExits,
 } from "@canny_ecosystem/supabase/queries";
@@ -25,6 +26,7 @@ import { useExitsStore } from "@/store/exits";
 import { Spinner } from "@canny_ecosystem/ui/spinner";
 import { useSearchParams } from "@remix-run/react";
 import { Button } from "@canny_ecosystem/ui/button";
+import { ExportBar } from "../import-export/export-bar";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -58,10 +60,11 @@ export function ExitPaymentTable<TData, TValue>({
   const { supabase } = useSupabase({ env });
 
   const { ref, inView } = useInView();
-  const { rowSelection, setRowSelection, setColumns } = useExitsStore();
+  const { rowSelection, setSelectedRows, setRowSelection, setColumns } =
+    useExitsStore();
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    initialColumnVisibility ?? {}
+    initialColumnVisibility ?? {},
   );
 
   const loadMoreExit = async () => {
@@ -102,6 +105,14 @@ export function ExitPaymentTable<TData, TValue>({
   });
 
   useEffect(() => {
+    const rowArray = [];
+    for (const row of table.getSelectedRowModel().rows) {
+      rowArray.push(row.original);
+    }
+    setSelectedRows(rowArray as ExitDataType[]);
+  }, [rowSelection]);
+
+  useEffect(() => {
     setColumns(table.getAllLeafColumns());
   }, [columnVisibility]);
 
@@ -119,12 +130,16 @@ export function ExitPaymentTable<TData, TValue>({
 
   const tableLength = table.getRowModel().rows?.length;
 
+  const selectedRowsData = table
+    .getSelectedRowModel()
+    .rows?.map((row) => row.original);
+
   return (
     <div className="relative mb-8">
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
-          !tableLength && "border-none"
+          !tableLength && "border-none",
         )}
       >
         <div className="relative">
@@ -157,7 +172,7 @@ export function ExitPaymentTable<TData, TValue>({
                       <p
                         className={cn(
                           "text-muted-foreground",
-                          !data?.length && noFilters && "hidden"
+                          !data?.length && noFilters && "hidden",
                         )}
                       >
                         Try another search, or adjusting the filters
@@ -166,7 +181,7 @@ export function ExitPaymentTable<TData, TValue>({
                         variant="outline"
                         className={cn(
                           "mt-4",
-                          !data?.length && noFilters && "hidden"
+                          !data?.length && noFilters && "hidden",
                         )}
                         onClick={() => {
                           setSearchParams();
@@ -191,6 +206,12 @@ export function ExitPaymentTable<TData, TValue>({
           </div>
         </div>
       )}
+      <ExportBar
+        className={cn(!table.getSelectedRowModel().rows.length && "hidden")}
+        rows={table.getSelectedRowModel().rows.length}
+        data={selectedRowsData as any}
+        columnVisibility={columnVisibility}
+      />
     </div>
   );
 }

@@ -36,6 +36,8 @@ export const sideNavList = [
     link: "/payment-components",
     icon: "input",
   },
+  { name: "Stats" },
+  { name: "Reports", link: "/reports", icon: "report" },
 
   { name: "General" },
   { name: "Projects", link: "/projects", icon: "project" },
@@ -49,6 +51,7 @@ export const sideNavList = [
 export const navList = [
   ...sideNavList,
   { name: "Analytics", link: "/analytics", icon: "chart" },
+
   { name: "Users", link: "/users", icon: "avatar" },
   {
     name: "Profile",
@@ -239,4 +242,9 @@ export const statutorySideNavList = [
     link: "/payment-components/statutory-fields/statutory-bonus",
     icon: "",
   },
+  {
+    name: "Gratuity",
+    link: "/payment-components/statutory-fields/gratuity",
+    icon: "",
+  }
 ];

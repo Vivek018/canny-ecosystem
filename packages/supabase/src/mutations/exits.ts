@@ -27,7 +27,6 @@ export const createExit = async ({
   const {
     error,
     status,
-    data: exitsData,
   } = await supabase
     .from("exits")
     .insert(data)
@@ -39,7 +38,6 @@ export const createExit = async ({
   }
 
   return {
-    exitsData,
     status,
     error,
   };

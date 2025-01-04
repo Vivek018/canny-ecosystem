@@ -18,6 +18,7 @@ import { useEffect, useState } from "react";
 import {
   getReimbursementsByCompanyId,
   getReimbursementsByEmployeeId,
+  type ReimbursementDataType,
   type ReimbursementFilters,
 } from "@canny_ecosystem/supabase/queries";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
@@ -61,10 +62,10 @@ export function ReimbursementsTable<TData, TValue>({
   const { supabase } = useSupabase({ env });
 
   const { ref, inView } = useInView();
-
-  const { rowSelection, setRowSelection, setColumns } = useReimbursementStore();
+  const { rowSelection, setSelectedRows, setRowSelection, setColumns } =
+    useReimbursementStore();
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    initialColumnVisibility ?? {}
+    initialColumnVisibility ?? {},
   );
   const loadMoreEmployees = async () => {
     const formattedFrom = from;
@@ -105,9 +106,7 @@ export function ReimbursementsTable<TData, TValue>({
           },
         });
         if (data) {
-          setData(
-            (prevData) => [...prevData, ...(data)] as TData[]
-          );
+          setData((prevData) => [...prevData, ...data] as TData[]);
         }
         setFrom(to + 1);
         setHasNextPage(data?.length! > to);
@@ -129,11 +128,17 @@ export function ReimbursementsTable<TData, TValue>({
     },
   });
 
-  
-
-  const selectedRowsData= table
+  const selectedRowsData = table
     .getSelectedRowModel()
     .rows?.map((row) => row.original);
+
+  useEffect(() => {
+    const rowArray = [];
+    for (const row of table.getSelectedRowModel().rows) {
+      rowArray.push(row.original);
+    }
+    setSelectedRows(rowArray as ReimbursementDataType[]);
+  }, [rowSelection]);
 
   useEffect(() => {
     setColumns(table.getAllLeafColumns());
@@ -158,7 +163,7 @@ export function ReimbursementsTable<TData, TValue>({
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
-          !tableLength && "border-none"
+          !tableLength && "border-none",
         )}
       >
         <div className="relative">
@@ -172,6 +177,7 @@ export function ReimbursementsTable<TData, TValue>({
                 table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
                     className="relative cursor-default select-text"
                   >
                     {row.getVisibleCells().map((cell) => {
@@ -180,20 +186,15 @@ export function ReimbursementsTable<TData, TValue>({
                           key={cell.id}
                           className={cn(
                             "px-3 md:px-4 py-4 hidden md:table-cell",
-                            cell.column.id === "status" &&
-                              (cell.getValue() === "approved"
-                                ? "text-green"
-                                : cell.getValue() === "pending" &&
-                                  "text-muted-foreground"),
                             cell.column.id === "select" &&
                               "sticky left-0 min-w-12 max-w-12 bg-card z-10",
                             cell.column.id === "actions" &&
-                              "sticky right-0 min-w-20 max-w-20 bg-card z-10"
+                              "sticky right-0 min-w-20 max-w-20 bg-card z-10",
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                         </TableCell>
                       );
@@ -211,7 +212,7 @@ export function ReimbursementsTable<TData, TValue>({
                       <p
                         className={cn(
                           "text-muted-foreground",
-                          !data?.length && noFilters && "hidden"
+                          !data?.length && noFilters && "hidden",
                         )}
                       >
                         Try another search, or adjusting the filters
@@ -220,7 +221,7 @@ export function ReimbursementsTable<TData, TValue>({
                         variant="outline"
                         className={cn(
                           "mt-4",
-                          !data?.length && noFilters && "hidden"
+                          !data?.length && noFilters && "hidden",
                         )}
                         onClick={() => {
                           setSearchParams();

@@ -22,7 +22,7 @@ export function ExitPaymentsSheet({
       acc: Record<string, number>,
       payment: Omit<ExitPaymentsRow, "created_at" | "updated_at"> & {
         payment_fields: { name: string };
-      }
+      },
     ) => {
       const key = payment.payment_fields.name;
       const value = payment.amount;
@@ -32,7 +32,7 @@ export function ExitPaymentsSheet({
       acc.total += value;
       return acc;
     },
-    {}
+    {},
   );
 
   return (
@@ -52,7 +52,7 @@ export function ExitPaymentsSheet({
                   cell.column.id === "select" &&
                     "sticky left-0 min-w-12 max-w-12 bg-card z-10",
                   cell.column.id === "actions" &&
-                    "sticky right-0 min-w-20 max-w-20 bg-card z-10"
+                    "sticky right-0 min-w-20 max-w-20 bg-card z-10",
                 )}
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -71,8 +71,6 @@ export function ExitPaymentsSheet({
                     cell.column.id === "reason" ||
                     cell.column.id === "note") &&
                     "hidden md:table-cell",
-                  cell.column.id === "employee_name" &&
-                    "sticky left-12 bg-card z-10"
                 )}
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -86,10 +84,10 @@ export function ExitPaymentsSheet({
           <SheetTitle className="flex  justify-between">
             <div>
               <h1 className="text-primary text-3xl">
-                {rowData.employee_name
-                  ? `${rowData.employee_name.first_name} ${
-                      rowData.employee_name.middle_name ?? ""
-                    } ${rowData.employee_name.last_name}`
+                {rowData.employees
+                  ? `${rowData.employees.first_name} ${
+                      rowData.employees.middle_name ?? ""
+                    } ${rowData.employees.last_name}`
                   : "--"}
               </h1>
             </div>

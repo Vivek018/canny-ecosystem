@@ -495,6 +495,7 @@ export type Database = {
           include_admin_charges: boolean | null
           include_employer_contribution: boolean | null
           include_employer_edli_contribution: boolean | null
+          is_default: boolean | null
           restrict_employee_contribution: boolean | null
           restrict_employer_contribution: boolean | null
           updated_at: string | null
@@ -512,6 +513,7 @@ export type Database = {
           include_admin_charges?: boolean | null
           include_employer_contribution?: boolean | null
           include_employer_edli_contribution?: boolean | null
+          is_default?: boolean | null
           restrict_employee_contribution?: boolean | null
           restrict_employer_contribution?: boolean | null
           updated_at?: string | null
@@ -529,6 +531,7 @@ export type Database = {
           include_admin_charges?: boolean | null
           include_employer_contribution?: boolean | null
           include_employer_edli_contribution?: boolean | null
+          is_default?: boolean | null
           restrict_employee_contribution?: boolean | null
           restrict_employer_contribution?: boolean | null
           updated_at?: string | null
@@ -591,6 +594,7 @@ export type Database = {
           esi_number: string
           id: string
           include_employer_contribution: boolean
+          is_default: boolean | null
           updated_at: string | null
         }
         Insert: {
@@ -602,6 +606,7 @@ export type Database = {
           esi_number: string
           id?: string
           include_employer_contribution?: boolean
+          is_default?: boolean | null
           updated_at?: string | null
         }
         Update: {
@@ -613,6 +618,7 @@ export type Database = {
           esi_number?: string
           id?: string
           include_employer_contribution?: boolean
+          is_default?: boolean | null
           updated_at?: string | null
         }
         Relationships: [
@@ -810,7 +816,7 @@ export type Database = {
           amount: number
           created_at?: string | null
           exit_id: string
-          id: string
+          id?: string
           payment_fields_id: string
           type?: string
           updated_at?: string | null
@@ -852,6 +858,7 @@ export type Database = {
           note: string | null
           organization_payable_days: number
           reason: string
+          total: number | null
           updated_at: string | null
         }
         Insert: {
@@ -859,11 +866,12 @@ export type Database = {
           employee_id: string
           employee_payable_days: number
           final_settlement_date: string
-          id: string
+          id?: string
           last_working_day: string
           note?: string | null
           organization_payable_days: number
           reason: string
+          total?: number | null
           updated_at?: string | null
         }
         Update: {
@@ -876,13 +884,14 @@ export type Database = {
           note?: string | null
           organization_payable_days?: number
           reason?: string
+          total?: number | null
           updated_at?: string | null
         }
         Relationships: [
           {
             foreignKeyName: "exits_employee_id_fkey"
             columns: ["employee_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "employees"
             referencedColumns: ["id"]
           },
@@ -935,6 +944,53 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gratuity: {
+        Row: {
+          company_id: string
+          created_at: string | null
+          eligibility_years: number | null
+          id: string
+          is_default: boolean | null
+          max_amount_limit: number | null
+          max_multiply_limit: number | null
+          payment_days_per_year: number | null
+          present_day_per_year: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string | null
+          eligibility_years?: number | null
+          id?: string
+          is_default?: boolean | null
+          max_amount_limit?: number | null
+          max_multiply_limit?: number | null
+          payment_days_per_year?: number | null
+          present_day_per_year?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string | null
+          eligibility_years?: number | null
+          id?: string
+          is_default?: boolean | null
+          max_amount_limit?: number | null
+          max_multiply_limit?: number | null
+          payment_days_per_year?: number | null
+          present_day_per_year?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gratuity_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
             referencedColumns: ["id"]
           },
         ]
@@ -1308,7 +1364,7 @@ export type Database = {
             foreignKeyName: "payroll_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: false
-            referencedRelation: "company_locations"
+            referencedRelation: "project_sites"
             referencedColumns: ["id"]
           },
         ]
@@ -1667,6 +1723,7 @@ export type Database = {
           company_id: string
           created_at: string | null
           id: string
+          is_default: boolean | null
           payment_frequency: string
           payout_month: number | null
           percentage: number
@@ -1676,6 +1733,7 @@ export type Database = {
           company_id: string
           created_at?: string | null
           id?: string
+          is_default?: boolean | null
           payment_frequency?: string
           payout_month?: number | null
           percentage?: number
@@ -1685,6 +1743,7 @@ export type Database = {
           company_id?: string
           created_at?: string | null
           id?: string
+          is_default?: boolean | null
           payment_frequency?: string
           payout_month?: number | null
           percentage?: number
@@ -1779,7 +1838,7 @@ export type Database = {
       feedback_category: "suggestion" | "bug" | "complain"
       feedback_severity: "low" | "normal" | "urgent"
       payment_type: "fixed" | "variable"
-      payroll_status: "pending" | "approved"
+      payroll_status: "pending" | "approved" | "created"
       template_assignment_type: "employee" | "site"
       template_calculation_type: "variable" | "percentage_of_ctc"
       template_component_type:

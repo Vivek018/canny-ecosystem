@@ -60,7 +60,6 @@ export const action = async ({
     const { status, error } = await createStatutoryBonus({
       supabase,
       data: submission.value as any,
-      bypassAuth: true,
     });
 
     if (isGoodStatus(status)) {
@@ -164,7 +163,7 @@ export default function CreateStatutoryBonus({
       <Form method="POST" {...getFormProps(form)} className="flex flex-col">
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl mb-6">
+            <CardTitle className="text-2xl mb-6 capitalize">
               {replaceDash(STATUTORY_BONUS_TAG)}
             </CardTitle>
             <hr />

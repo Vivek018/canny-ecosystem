@@ -28,7 +28,7 @@ export type ReimbursementDataType = Pick<
   | "submitted_date"
   | "user_id"
 > & {
-  employee_name: Pick<
+  employees: Pick<
     EmployeeDatabaseRow,
     "id" | "first_name" | "middle_name" | "last_name" | "employee_code"
   > & {
@@ -78,9 +78,8 @@ export async function getReimbursementsByCompanyId({
   const query = supabase
     .from("reimbursements")
     .select(
-      `
-        ${columns.join(",")},
-  employee_name:employees!inner(first_name,middle_name,last_name,employee_code,employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(project_sites!inner(id, name, projects!inner(id, name)))),
+      `${columns.join(",")},
+          employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(project_sites!inner(id, name, projects!inner(id, name)))),
           users!inner(id,email)`,
       { count: "exact" }
     )
@@ -106,7 +105,7 @@ export async function getReimbursementsByCompanyId({
       }
     } else {
       query.or(
-        `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*`,
+        `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`,
         {
           referencedTable: "employees",
         }
@@ -122,7 +121,7 @@ export async function getReimbursementsByCompanyId({
       is_deductible,
       users,
       project,
-      project_site,
+      project_site
     } = filters;
 
     const dateFilters = [
@@ -238,7 +237,7 @@ export async function getReimbursementsByEmployeeId({
     .select(
       `
         ${columns.join(",")},
-            employee_name:employees!inner(id,first_name,middle_name,last_name,employee_code,employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(project_sites!inner(id, name, projects!inner(id, name)))),
+          employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(project_sites!inner(id, name, projects!inner(id, name)))),
           users!inner(id,email)`,
       { count: "exact" }
     )

@@ -34,19 +34,19 @@ export function ExportBar({
         continue;
       }
       if (key === "employee_code") {
-        exportedData[key] = element.employee_name.employee_code;
+        exportedData[key] = element.employees.employee_code;
       } else if (key === "employee_name") {
         exportedData[
           key
-        ] = `${element.employee_name.first_name} ${element.employee_name.middle_name} ${element.employee_name.last_name}`;
+        ] = `${element.employees.first_name} ${element.employees.middle_name} ${element.employees.last_name}`;
       } else if (key === "email") {
         exportedData[key] = element.users.email ?? "";
       } else if (key === "project_name") {
         exportedData[key] =
-          element.employee_name.employee_project_assignment.project_sites.projects.name;
+          element.employees.employee_project_assignment.project_sites.projects.name;
       } else if (key === "project_site_name") {
         exportedData[key] =
-          element.employee_name.employee_project_assignment.project_sites.name;
+          element.employees.employee_project_assignment.project_sites.name;
       } else {
         exportedData[key] = element[key as keyof ReimbursementDataType] as any;
       }
