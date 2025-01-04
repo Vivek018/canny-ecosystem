@@ -22,12 +22,11 @@ import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
 import {
   type EmployeeFilters,
-  EmployeeReportDataType,
   getEmployeesReportByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
 import { ExportBar } from "../export-bar";
-import { useGratuityReportStore } from "@/store/gratuity-report";
+import { useReportsStore } from "@/store/reports";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -65,7 +64,7 @@ export function DataTable<TData, TValue>({
   const { supabase } = useSupabase({ env });
 
   const { ref, inView } = useInView();
-  const { rowSelection, setRowSelection, setColumns } = useGratuityReportStore();
+  const { rowSelection, setRowSelection, setColumns } = useReportsStore();
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
     initialColumnVisibility ?? {},

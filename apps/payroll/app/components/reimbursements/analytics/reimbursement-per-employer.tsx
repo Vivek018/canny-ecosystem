@@ -14,6 +14,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@canny_ecosystem/ui/chart";
+import type { ReimbursementDataType } from "@canny_ecosystem/supabase/queries";
 
 const chartConfig = {
   amount: {
@@ -25,11 +26,40 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function ReimbursementPerEmployer({ chartData }: { chartData: { employer: string; amount: number }[] }) {
+export function ReimbursementPerEmployer({
+  chartData,
+}: { chartData: ReimbursementDataType[] }) {
 
-  const transformData = chartData.map((row, i) => ({
+  
+  const totalEmployerAmountData = chartData.reduce(
+    (acc, row) => {
+      const email = row.users.email;
+      if (email) {
+        if (!acc[email]) {
+          acc[email] = { employer: email, amount: 0 };
+        }
+        acc[email].amount += row.amount ?? 0;
+      }
+      return acc;
+    },
+    {} as Record<string, { employer: string; amount: number }>,
+  );
+
+  const topUsersData = Object.values(totalEmployerAmountData)
+    .sort((a, b) => b.amount - a.amount)
+    .slice(0, 4);
+
+  if (Object.values(totalEmployerAmountData).length > 5) {
+    const othersAmount = Object.values(totalEmployerAmountData)
+      .slice(4)
+      .reduce((acc, user) => acc + user.amount, 0);
+
+    topUsersData.push({ employer: "Others", amount: othersAmount });
+  }
+
+  const transformData = topUsersData.map((row, i) => ({
     ...row,
-    fill: `hsl(var(--chart-${i+1}))`,
+    fill: `hsl(var(--chart-${i + 1}))`,
   }));
 
   return (

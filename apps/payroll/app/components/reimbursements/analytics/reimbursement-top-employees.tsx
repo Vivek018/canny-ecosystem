@@ -1,4 +1,3 @@
-import { TrendingUp } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -23,6 +22,7 @@ import {
   ChartTooltipContent,
 } from "@canny_ecosystem/ui/chart";
 import { replaceUnderscore } from "@canny_ecosystem/utils";
+import type { ReimbursementDataType } from "@canny_ecosystem/supabase/queries";
 
 const chartConfig = {
   amount: {
@@ -36,12 +36,28 @@ const chartConfig = {
 
 export function ReimbursementTopEmployees({
   chartData,
-}: { chartData: { employee_name: string; amount: number }[] }) {
+}: { chartData: ReimbursementDataType[] }) {
+  const employeeTotals = chartData.reduce(
+    (acc, row) => {
+      const employee_name = `${row.employees.first_name}_${row.employees.middle_name || ""}_${row.employees.last_name}`;
+      acc[employee_name] = (acc[employee_name] || 0) + (row.amount || 0);
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
-  const transformChartData = chartData.map((row, i) => ({
+  const topEmployeesData = Object.entries(employeeTotals)
+    .map(([employee_name, totalAmount]) => ({
+      employee_name,
+      amount: totalAmount,
+    }))
+    .sort((a, b) => b.amount - a.amount)
+    .slice(0, 5);
+
+  const transformChartData = topEmployeesData.map((row, i) => ({
     ...row,
     employee_name: replaceUnderscore(row.employee_name),
-    fill: `hsl(var(--chart-${i+1}))`,
+    fill: `hsl(var(--chart-${i + 1}))`,
   }));
 
   return (

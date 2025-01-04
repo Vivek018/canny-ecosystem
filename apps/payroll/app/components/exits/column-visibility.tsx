@@ -7,13 +7,17 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@canny_ecosystem/ui/popover";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
 
-export function ColumnVisibility({ disabled }: { disabled?: boolean }) {
+export function ColumnVisibility({
+  disabled,
+  hidden,
+}: { disabled?: boolean; hidden?: boolean }) {
   const { columns } = useExitsStore();
 
   return (
     <Popover>
-      <PopoverTrigger asChild>
+      <PopoverTrigger asChild className={cn(hidden && "hidden")}>
         <Button
           variant="outline"
           size="icon"

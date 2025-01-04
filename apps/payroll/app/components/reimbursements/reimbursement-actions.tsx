@@ -1,19 +1,22 @@
-import { useReimbursementStore } from "@/store/reimbursements";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useNavigate } from "@remix-run/react";
+import { ColumnVisibility } from "./column-visibility";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { useReimbursementStore } from "@/store/reimbursements";
 
 export function ReimbursementActions({ isEmpty }: { isEmpty: boolean }) {
   const { selectedRows } = useReimbursementStore();
   const navigate = useNavigate();
 
   return (
-    <div className={cn("space-x-2 hidden md:flex", !selectedRows.length && "hidden md:hidden")}>
+    <div className="space-x-2 hidden md:flex">
+      <ColumnVisibility disabled={isEmpty} hidden={!!selectedRows.length} />
+
       <Button
         variant="outline"
         size="icon"
-        className="h-10 w-10"
+        className={cn("h-10 w-10", !selectedRows.length && "hidden")}
         disabled={!selectedRows.length}
         onClick={() => navigate("/approvals/reimbursements/analytics")}
       >

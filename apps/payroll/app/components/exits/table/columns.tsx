@@ -145,7 +145,7 @@ export const ExitPaymentColumns: ColumnDef<ExitDataType>[] = [
     },
   },
   {
-    accessorKey: "commision",
+    accessorKey: "commission",
     header: "Commision",
     cell: ({ row }) => {
       const commision = row.original.exit_payments.find(

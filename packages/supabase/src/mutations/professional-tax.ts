@@ -28,14 +28,13 @@ export async function createProfessionalTax({
   const {
     error,
     status,
-    data: professionalTax,
   } = await supabase.from("professional_tax").insert(data).select().single();
 
   if (error) {
     console.error(error);
   }
 
-  return { status, error, id: professionalTax?.id };
+  return { status, error };
 }
 
 export async function updateProfessionalTax({

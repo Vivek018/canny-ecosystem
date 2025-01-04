@@ -227,15 +227,6 @@ export const EMPLOYER_EDLI_PERCENTAGE = 0.005;
 export const EMPLOYER_EPS_PERCENTAGE = 0.0833;
 export const EMPLOYER_ADMIN_CHARGES_PERCENTAGE = 0.005;
 
-export const employeeExitReasons = [
-  "resignation",
-  "termination",
-  "retirement",
-  "health_reasons",
-  "career_change",
-  "other",
-];
-
 export const exitPaymentFields = [
   "bonus",
   "diwali_bonus",

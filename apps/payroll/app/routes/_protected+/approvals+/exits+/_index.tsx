@@ -1,4 +1,3 @@
-import { ColumnVisibility } from "@/components/exits/column-visibility";
 import { ExitActions } from "@/components/exits/exit-actions";
 import { ExitsSearchFilter } from "@/components/exits/exit-search-filter";
 import { FilterList } from "@/components/exits/filter-list";
@@ -146,6 +145,7 @@ export default function ExitsIndex() {
     projectArray,
     projectSiteArray,
   } = useLoaderData<typeof loader>();
+
   const noFilters = filters
     ? Object.values(filters).every((value) => !value)
     : true;
@@ -163,7 +163,6 @@ export default function ExitsIndex() {
           <FilterList filterList={filterList} />
         </div>
         <div className="space-x-2 hidden md:flex">
-          <ColumnVisibility disabled={!data?.length} />
           <ExitActions isEmpty={!data?.length} />
         </div>
       </div>

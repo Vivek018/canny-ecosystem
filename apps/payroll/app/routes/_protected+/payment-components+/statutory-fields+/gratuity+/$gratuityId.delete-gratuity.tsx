@@ -17,7 +17,6 @@ export async function action({
     const { status, error } = await deleteGratuity({
       supabase,
       id: gratuityId ?? "",
-      bypassAuth: true,
     });
 
     if (isGoodStatus(status)) {

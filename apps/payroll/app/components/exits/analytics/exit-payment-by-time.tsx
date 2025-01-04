@@ -1,4 +1,3 @@
-import { TrendingUp } from "lucide-react";
 import { Pie, PieChart } from "recharts";
 
 import {
@@ -15,11 +14,11 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@canny_ecosystem/ui/chart";
+import type { ExitDataType } from "@canny_ecosystem/supabase/queries";
 
 const chartConfig = {
   amount: {
     label: "Amount",
-    icon: TrendingUp,
   },
   january: {
     label: "January",
@@ -73,21 +72,74 @@ const chartConfig = {
 
 export function ExitPaymentByTime({
   chartData,
-  isYearly = false,
 }: {
-  chartData: { year: number | null; month: string | null; amount: number }[];
-  isYearly?: boolean;
+  chartData: ExitDataType[];
 }) {
+  const exitYears = new Set(
+    chartData.map((row) => new Date(row.final_settlement_date).getFullYear()),
+  );
+
+  let exitByTimeData = [];
+
+  if (exitYears.size > 1) {
+    exitByTimeData = Object.values(
+      chartData.reduce(
+        (
+          acc: Record<
+            number,
+            { year: number; amount: number; month: string | null }
+          >,
+          row,
+        ) => {
+          if (row.final_settlement_date) {
+            const date = new Date(row.final_settlement_date);
+            const year = date.getFullYear();
+
+            if (!acc[year]) {
+              acc[year] = { year, amount: 0, month: null };
+            }
+            acc[year].amount += row.total || 0;
+          }
+          return acc;
+        },
+        {},
+      ),
+    );
+  } else {
+    exitByTimeData = Object.values(
+      chartData.reduce(
+        (
+          acc: Record<
+            string,
+            { month: string; amount: number; year: number | null }
+          >,
+          row,
+        ) => {
+          if (row.final_settlement_date) {
+            const date = new Date(row.final_settlement_date);
+            const monthName = date.toLocaleString("default", { month: "long" });
+
+            if (!acc[monthName]) {
+              acc[monthName] = { month: monthName, amount: 0, year: null };
+            }
+            acc[monthName].amount += row.total || 0;
+          }
+          return acc;
+        },
+        {},
+      ),
+    );
+  }
   let transformedChartData = [];
 
-  if (isYearly) {
-    transformedChartData = chartData.map((row, i) => ({
+  if (exitYears.size > 1) {
+    transformedChartData = exitByTimeData.map((row, i) => ({
       ...row,
       year: row.year,
       fill: `hsl(var(--chart-${i + 1}))`,
     }));
   } else {
-    transformedChartData = chartData.map((row, i) => ({
+    transformedChartData = exitByTimeData.map((row, i) => ({
       ...row,
       month: row.month?.toLowerCase(),
       fill: `hsl(var(--chart-${i + 1}))`,
@@ -114,14 +166,14 @@ export function ExitPaymentByTime({
               data={transformedChartData}
               dataKey="amount"
               label
-              nameKey={isYearly ? "year" : "month"}
+              nameKey={exitYears.size > 1 ? "year" : "month"}
             />
           </PieChart>
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="leading-none text-muted-foreground">
-          Showing total exits for {isYearly ? "years" : "the year"}.
+          Showing total exits for {exitYears.size > 1 ? "years" : "the year"}.
         </div>
       </CardFooter>
     </Card>

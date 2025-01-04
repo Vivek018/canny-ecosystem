@@ -23,6 +23,7 @@ import {
 } from "@canny_ecosystem/ui/chart";
 import { exitPaymentFields } from "@canny_ecosystem/utils/constant";
 import { replaceUnderscore } from "@canny_ecosystem/utils";
+import type { ExitDataType } from "@canny_ecosystem/supabase/queries";
 
 const chartConfig = Object.fromEntries(
   exitPaymentFields.map((field, i) => [
@@ -41,8 +42,30 @@ chartConfig.amount = {
 
 export function ExitTopPayment({
   chartData,
-}: { chartData: { amount: number; costType: string }[] }) {
-  const transformedChartData = chartData.map((data, i) => ({
+}: { chartData: ExitDataType[] }) {
+
+  const exitTopPaymentData = Object.values(
+    chartData.reduce(
+      (acc, row) => {
+        if (row.exit_payments) {
+          const payments = row.exit_payments;
+          for (const payment of payments) {
+            const costType = payment.payment_fields.name
+              .toLowerCase()
+              .replace(/\s+/g, "_");
+            if (!acc[costType]) {
+              acc[costType] = { amount: 0, costType };
+            }
+            acc[costType].amount += payment.amount;
+          }
+        }
+        return acc;
+      },
+      {} as Record<string, { amount: number; costType: string }>,
+    ),
+  );
+
+  const transformedChartData = exitTopPaymentData.map((data, i) => ({
     ...data,
     costType: replaceUnderscore(data.costType.toLowerCase()),
     fill: `hsl(var(--chart-${i + 1}))`,

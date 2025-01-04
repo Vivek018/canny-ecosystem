@@ -14,6 +14,7 @@ import {
   ChartTooltipContent,
 } from "@canny_ecosystem/ui/chart";
 import { useMemo, useState } from "react";
+import type { ReimbursementDataType } from "@canny_ecosystem/supabase/queries";
 
 const chartConfig = {
   amount: {
@@ -24,13 +25,19 @@ const chartConfig = {
 
 export function ReimbursementTrend({
   chartData,
-}: { chartData: { date: string | null; amount: number | null }[] }) {
+}: { chartData: ReimbursementDataType[] }) {
+  
   const [activeChart, setActiveChart] =
-    useState<keyof typeof chartConfig>("amount");
+  useState<keyof typeof chartConfig>("amount");
+
+  const trendData = chartData.map((row) => ({
+    date: row.submitted_date,
+    amount: row.amount,
+  }));
 
   const total = useMemo(
     () => ({
-      amount: chartData.reduce((acc, curr) => acc + (curr.amount || 0), 0),
+      amount: trendData.reduce((acc, curr) => acc + (curr.amount || 0), 0),
     }),
     [],
   );
@@ -73,7 +80,7 @@ export function ReimbursementTrend({
         >
           <LineChart
             accessibilityLayer
-            data={chartData}
+            data={trendData}
             margin={{
               left: 12,
               right: 12,

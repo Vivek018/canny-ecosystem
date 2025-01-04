@@ -22,7 +22,7 @@ export function ExitPaymentsSheet({
       acc: Record<string, number>,
       payment: Omit<ExitPaymentsRow, "created_at" | "updated_at"> & {
         payment_fields: { name: string };
-      }
+      },
     ) => {
       const key = payment.payment_fields.name;
       const value = payment.amount;
@@ -32,7 +32,7 @@ export function ExitPaymentsSheet({
       acc.total += value;
       return acc;
     },
-    {}
+    {},
   );
 
   return (
@@ -52,7 +52,7 @@ export function ExitPaymentsSheet({
                   cell.column.id === "select" &&
                     "sticky left-0 min-w-12 max-w-12 bg-card z-10",
                   cell.column.id === "actions" &&
-                    "sticky right-0 min-w-20 max-w-20 bg-card z-10"
+                    "sticky right-0 min-w-20 max-w-20 bg-card z-10",
                 )}
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}

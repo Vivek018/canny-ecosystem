@@ -1,5 +1,4 @@
 import { Pie, PieChart } from "recharts";
-
 import {
   Card,
   CardContent,
@@ -11,11 +10,10 @@ import {
 import {
   type ChartConfig,
   ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
 } from "@canny_ecosystem/ui/chart";
+import type { ReimbursementDataType } from "@canny_ecosystem/supabase/queries";
 
 const chartConfig = {
   amount: {
@@ -33,12 +31,30 @@ const chartConfig = {
 
 export function ReimbursementByDeductible({
   chartData,
-}: { chartData: { type: string; amount: number }[] }) {
+}: { chartData: ReimbursementDataType[] }) {
+  const totalDeductibleData = Object.values(
+    chartData.reduce(
+      (
+        acc: Record<
+          string,
+          { type: "deductible" | "nonDeductible"; amount: number }
+        >,
+        row,
+      ) => {
+        const type = row.is_deductible ? "deductible" : "nonDeductible";
+        if (!acc[type]) {
+          acc[type] = { type, amount: 0 };
+        }
+        acc[type].amount += row.amount ?? 0;
+        return acc;
+      },
+      {},
+    ),
+  );
 
-  const transformedChartData = chartData.map((data, i) => ({
+  const transformedChartData = totalDeductibleData.map((data, i) => ({
     ...data,
-    type:
-      data.type === "deductible" ? "Deductible" : "Non Deductible",
+    type: data.type === "deductible" ? "Deductible" : "Non Deductible",
     fill: `hsl(var(--chart-${i + 1}))`,
   }));
 
@@ -54,8 +70,17 @@ export function ReimbursementByDeductible({
           className="mx-auto aspect-square max-h-[250px] pb-0 [&_.recharts-pie-label-text]:fill-foreground"
         >
           <PieChart>
-            <ChartTooltip content={<ChartTooltipContent hideLabel />} wrapperStyle={{ width: "60%" }} cursor={false} />
-            <Pie data={transformedChartData} dataKey="amount" nameKey="type" stroke="0" />
+            <ChartTooltip
+              content={<ChartTooltipContent hideLabel />}
+              wrapperStyle={{ width: "60%" }}
+              cursor={false}
+            />
+            <Pie
+              data={transformedChartData}
+              dataKey="amount"
+              nameKey="type"
+              stroke="0"
+            />
           </PieChart>
         </ChartContainer>
       </CardContent>
@@ -64,5 +89,6 @@ export function ReimbursementByDeductible({
           Showing deductible and non-deductible ratio.
         </div>
       </CardFooter>
-    </Card>  );
+    </Card>
+  );
 }

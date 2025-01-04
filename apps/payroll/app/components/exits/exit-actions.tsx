@@ -2,6 +2,8 @@ import { useExitsStore } from "@/store/exits";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { useNavigate } from "@remix-run/react";
+import { ColumnVisibility } from "./column-visibility";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
 
 export function ExitActions({ isEmpty }: { isEmpty: boolean }) {
   const { selectedRows } = useExitsStore();
@@ -9,10 +11,12 @@ export function ExitActions({ isEmpty }: { isEmpty: boolean }) {
 
   return (
     <div className="space-x-2 hidden md:flex">
+      <ColumnVisibility disabled={isEmpty} hidden={!!selectedRows.length} />
+
       <Button
         variant="outline"
         size="icon"
-        className="h-10 w-10"
+        className={cn("h-10 w-10", !selectedRows.length && "hidden")}
         disabled={!selectedRows.length}
         onClick={() => navigate("/approvals/exits/analytics")}
       >

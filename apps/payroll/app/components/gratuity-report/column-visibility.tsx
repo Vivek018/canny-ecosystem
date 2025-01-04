@@ -1,4 +1,4 @@
-import { useGratuityReportStore } from "@/store/gratuity-report";
+import { useGratuityReportStore } from "@/store/reports";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 import { Icon } from "@canny_ecosystem/ui/icon";

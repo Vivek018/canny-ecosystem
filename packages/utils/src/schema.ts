@@ -35,7 +35,7 @@ export const zEmailSuffix = z
   .max(20)
   .regex(
     /^[A-Za-z0-9]+\.[A-Za-z]{2,}$/,
-    "Must contain a dot with at least one character before and two after."
+    "Must contain a dot with at least one character before and two after.",
   );
 
 export const SIZE_1KB = 1 * 1024; //1KB
@@ -52,21 +52,21 @@ export const zImage = z
   .any()
   .refine(
     (file) => (typeof file !== "string" ? file.size < SIZE_1MB : true),
-    "File size must be less than 1MB"
+    "File size must be less than 1MB",
   )
   .refine(
     (file) =>
       typeof file !== "string"
         ? ACCEPTED_IMAGE_TYPES.includes(file?.type)
         : true,
-    "Only .jpg, .jpeg, .png and .webp formats are supported."
+    "Only .jpg, .jpeg, .png and .webp formats are supported.",
   );
 
 export const zFile = z
   .any()
   .refine(
     (file) => (typeof file !== "string" ? file.size < SIZE_1MB * 5 : true),
-    "File size must be less than 5MB"
+    "File size must be less than 5MB",
   )
   .refine(
     (file) =>
@@ -81,7 +81,7 @@ export const zFile = z
             "application/docx",
           ].includes(file?.type)
         : true,
-    "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .docx formats are supported."
+    "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .docx formats are supported.",
   );
 
 export const parseDateSchema = z
@@ -421,7 +421,7 @@ export const PaymentFieldSchema = z
     {
       message: `When payment type is "variable", calculation type must be "fixed".`,
       path: ["calculation_type"],
-    }
+    },
   );
 
 export const deductionCycleArray = ["monthly"] as const;
@@ -555,16 +555,18 @@ export const UserSchema = z.object({
   is_active: z.boolean().default(false),
 });
 
-export const reasonforexitArray = [
-  "resigned",
-  "terminated",
-  "death",
-  "disability",
+export const reasonForExitArray = [
+  "resignation",
+  "termination",
+  "retirement",
+  "health_reasons",
+  "career_change",
+  "other",
 ] as const;
 
 export const ExitPaymentPage1Schema = z.object({
   last_working_day: z.string(),
-  reason_for_exit: z.enum(reasonforexitArray),
+  reason_for_exit: z.enum(reasonForExitArray),
   final_settlement_date: z.string(),
   note: zTextArea.max(100).optional(),
 });
@@ -702,17 +704,17 @@ export const ImportReimbursementDataSchema = z.object({
       amount: z.preprocess(
         (value) =>
           typeof value === "string" ? Number.parseFloat(value) : value,
-        z.number()
+        z.number(),
       ),
       email: zEmail.optional(),
       is_deductible: z
         .preprocess(
           (value) =>
             typeof value === "string" ? value.toLowerCase() === "true" : value,
-          z.boolean().default(false)
+          z.boolean().default(false),
         )
         .default(false),
       status: z.enum(ReimbursementStatusArray),
-    })
+    }),
   ),
 });

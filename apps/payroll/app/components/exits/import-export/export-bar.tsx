@@ -79,11 +79,11 @@ export function ExportBar({
   return (
     <div
       className={cn(
-        "z-50 fixed bottom-8 left-0 right-0 mx-auto h-14 w-max shadow-md rounded-full flex gap-10 justify-between items-center px-3 border bg-accent text-accent-foreground",
+        "z-40 fixed bottom-8 left-0 right-0 mx-auto h-14 w-max shadow-md rounded-full flex gap-10 justify-between items-center px-3 text-sm border dark:border-muted-foreground/30 bg-card text-card-foreground",
         className,
       )}
     >
-      <div className="ml-2 flex items-center space-x-1 bg-dark rounded-md">
+      <div className="ml-2 flex items-center space-x-1 rounded-md">
         <p className="font-semibold">{rows} Selected</p>
       </div>
       <div className="flex justify-center items-center gap-2">

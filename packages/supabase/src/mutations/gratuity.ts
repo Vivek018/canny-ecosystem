@@ -24,18 +24,17 @@ export const createGratuity = async ({
     }
   }
 
-  const {
-    error,
-    status,
-    data: gratuityData,
-  } = await supabase.from("gratuity").insert(data).select().single();
+  const { error, status } = await supabase
+    .from("gratuity")
+    .insert(data)
+    .select()
+    .single();
 
   if (error) {
     console.error("error", error);
   }
 
   return {
-    gratuityData,
     status,
     error,
   };

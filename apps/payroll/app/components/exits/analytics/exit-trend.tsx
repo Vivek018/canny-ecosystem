@@ -14,6 +14,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@canny_ecosystem/ui/chart";
+import type { ExitDataType } from "@canny_ecosystem/supabase/queries";
 
 const chartConfig = {
   date: {
@@ -26,15 +27,18 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function ExitTrend({
-  chartData,
-}: { chartData: { date: string; amount: number }[] }) {
+export function ExitTrend({ chartData }: { chartData: ExitDataType[] }) {
   const [activeChart, setActiveChart] =
     React.useState<keyof typeof chartConfig>("amount");
 
+  const trendData = chartData.map((row) => ({
+    date: row.final_settlement_date,
+    amount: row.total || 0,
+  }));
+
   const total = React.useMemo(
     () => ({
-      amount: chartData.reduce((acc, curr) => acc + curr.amount, 0),
+      amount: trendData.reduce((acc, curr) => acc + curr.amount, 0),
     }),
     [],
   );
@@ -77,7 +81,7 @@ export function ExitTrend({
         >
           <LineChart
             accessibilityLayer
-            data={chartData}
+            data={trendData}
             margin={{
               left: 12,
               right: 12,

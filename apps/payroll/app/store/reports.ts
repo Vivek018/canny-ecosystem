@@ -2,7 +2,7 @@ import type { EmployeeDataType } from "@canny_ecosystem/supabase/queries";
 import type { RowSelectionState, Updater } from "@tanstack/react-table";
 import { create } from "zustand";
 
-interface GratuityReportState {
+interface ReportsState {
   columns: string[];
   setColumns: (columns?: any[]) => void;
   setRowSelection: (updater: Updater<RowSelectionState>) => void;
@@ -11,7 +11,7 @@ interface GratuityReportState {
   setSelectedRows: (updater: Updater<EmployeeDataType[]>) => void;
 }
 
-export const useGratuityReportStore = create<GratuityReportState>()((set) => ({
+export const useReportsStore = create<ReportsState>()((set) => ({
   columns: [],
   rowSelection: {},
   setColumns: (columns) => set({ columns }),

@@ -1,5 +1,4 @@
 import * as React from "react";
-import { TrendingUp } from "lucide-react";
 import { Label, Pie, PieChart } from "recharts";
 
 import {
@@ -16,11 +15,11 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@canny_ecosystem/ui/chart";
+import type { ExitDataType } from "@canny_ecosystem/supabase/queries";
 
 const chartConfig = {
   count: {
     label: "Count",
-    icon: TrendingUp,
   },
   january: {
     label: "January",
@@ -74,25 +73,60 @@ const chartConfig = {
 
 export function ExitByTime({
   chartData,
-  isYearly,
 }: {
-  chartData: { year: number | null; month: string | null; count: number }[];
-  isYearly: boolean;
+  chartData: ExitDataType[];
 }) {
+
+  const exitLastWorkingYears = new Set(
+    chartData.map((row) => {
+      const date = new Date(row.last_working_day || "");
+      return date.getFullYear();
+    }),
+  );
+
+  const exitsByTimeData: { year: number | null; count: number; month: string | null }[] = [];
+
+  if (exitLastWorkingYears.size > 1) {
+    for (const year of exitLastWorkingYears) {
+      const count = chartData.filter(
+        (row) => new Date(row.last_working_day).getFullYear() === year,
+      ).length;
+      exitsByTimeData.push({ year, count, month: null });
+    }
+  } else {
+    const groupedByMonth = chartData.reduce(
+      (acc: Record<string, number>, row) => {
+        const month = new Date(row.last_working_day).toLocaleString("default", {
+          month: "long",
+        });
+        if (!acc[month]) {
+          acc[month] = 0;
+        }
+        acc[month]++;
+        return acc;
+      },
+      {},
+    );
+
+    for (const month in groupedByMonth) {
+      exitsByTimeData.push({ month, count: groupedByMonth[month], year: null });
+    }
+  }
+
   const totalExitCount = React.useMemo(() => {
-    return chartData.reduce((acc, curr) => acc + curr.count, 0);
+    return exitsByTimeData.reduce((acc, curr) => acc + curr.count, 0);
   }, []);
 
   let transformedChartData = [];
 
-  if (isYearly) {
-    transformedChartData = chartData.map((row, i) => ({
+  if (exitLastWorkingYears.size > 1) {
+    transformedChartData = exitsByTimeData.map((row, i) => ({
       ...row,
       year: row.year,
       fill: `hsl(var(--chart-${i + 1}))`,
     }));
   } else {
-    transformedChartData = chartData.map((row, i) => ({
+    transformedChartData = exitsByTimeData.map((row, i) => ({
       ...row,
       month: row.month?.toLowerCase(),
       fill: `hsl(var(--chart-${i + 1}))`,
@@ -118,7 +152,7 @@ export function ExitByTime({
             <Pie
               data={transformedChartData}
               dataKey="count"
-              nameKey={isYearly ? "year" : "month"}
+              nameKey={exitLastWorkingYears.size > 1 ? "year" : "month"}
               innerRadius={60}
               strokeWidth={5}
             >

@@ -5,12 +5,6 @@ import type {
 } from "../types";
 import { SINGLE_QUERY_LIMIT } from "../constant";
 
-// export type ProjectsWithCompany = ProjectDatabaseRow & {
-//   project_client: { id: string; name: string; logo: string };
-//   end_client: { id: string; name: string; logo: string };
-//   primary_contractor: { id: string; name: string; logo: string };
-// };
-
 export async function getGratuityByCompanyId({
   supabase,
   companyId,

@@ -82,7 +82,6 @@ export async function action({
     const { status, error } = await createEmployeeStateInsurance({
       supabase,
       data: submission.value as any,
-      bypassAuth: true,
     });
 
     if (isGoodStatus(status)) {

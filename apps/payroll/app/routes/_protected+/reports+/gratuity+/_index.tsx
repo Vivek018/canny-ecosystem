@@ -140,7 +140,7 @@ export async function action({ request }: ActionFunctionArgs) {
   return redirect(url.toString());
 }
 
-export default function EmployeesReport() {
+export default function GratuityReport() {
   const {
     data,
     gratuityData,
