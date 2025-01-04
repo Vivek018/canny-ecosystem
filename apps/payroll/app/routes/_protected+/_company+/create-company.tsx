@@ -61,17 +61,17 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-    const url = new URL(request.url);
-    const session = await getSession(request.headers.get("Cookie"));
+  const url = new URL(request.url);
+  const session = await getSession(request.headers.get("Cookie"));
 
-    const step = Number.parseInt(url.searchParams.get(STEP) || "1");
+  const step = Number.parseInt(url.searchParams.get(STEP) || "1");
   const currentSchema = schemas[step - 1];
   const totalSteps = schemas.length;
 
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await parseMultipartFormData(
     request,
-    createMemoryUploadHandler({ maxPartSize: SIZE_1MB })
+    createMemoryUploadHandler({ maxPartSize: SIZE_1MB }),
   );
   const action = formData.get("_action") as string;
 
@@ -136,7 +136,7 @@ export async function action({ request }: ActionFunctionArgs) {
       if (submission.status === "error") {
         return json(
           { result: submission.reply() },
-          { status: submission.status === "error" ? 400 : 200 }
+          { status: submission.status === "error" ? 400 : 200 },
         );
       }
     }
@@ -183,8 +183,8 @@ export default function CreateCompany() {
   });
 
   return (
-    <section className='md:px-20 lg:px-28 2xl:px-40 py-4'>
-      <div className='w-full mx-auto mb-8'>
+    <section className="md:px-20 lg:px-28 2xl:px-40 py-4">
+      <div className="w-full mx-auto mb-8">
         <FormStepHeader
           totalSteps={totalSteps}
           step={step}
@@ -193,13 +193,13 @@ export default function CreateCompany() {
       </div>
       <FormProvider context={form.context}>
         <Form
-          method='POST'
-          encType='multipart/form-data'
+          method="POST"
+          encType="multipart/form-data"
           {...getFormProps(form)}
-          className='flex flex-col'
+          className="flex flex-col"
         >
           <Card>
-            <div className='h-[500px] overflow-scroll'>
+            <div className="h-[500px] overflow-scroll">
               {step === 1 ? (
                 <CreateCompanyDetails key={resetKey} fields={fields as any} />
               ) : null}

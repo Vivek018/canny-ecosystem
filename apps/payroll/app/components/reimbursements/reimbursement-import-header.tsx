@@ -6,11 +6,13 @@ import {
   CardTitle,
 } from "@canny_ecosystem/ui/card";
 import { SearchableSelectField } from "@canny_ecosystem/ui/forms";
-import { type ImportReimbursementHeaderSchema, transformStringArrayIntoOptions } from "@canny_ecosystem/utils";
+import {
+  type ImportReimbursementHeaderSchema,
+  transformStringArrayIntoOptions,
+} from "@canny_ecosystem/utils";
 import { type FieldMetadata, getInputProps } from "@conform-to/react";
 import { useEffect, useState } from "react";
 import Papa from "papaparse";
-
 
 type FieldsType = {
   [K in keyof typeof ImportReimbursementHeaderSchema.shape]: FieldMetadata<
@@ -22,12 +24,11 @@ type FieldsType = {
 
 export function ReimbursementImportHeader({
   fields,
-  file
+  file,
 }: {
   fields: FieldsType;
-  file:any
+  file: any;
 }) {
-
   const [headerArray, setHeaderArray] = useState<string[]>([]);
 
   useEffect(() => {
@@ -36,7 +37,7 @@ export function ReimbursementImportHeader({
         skipEmptyLines: true,
         complete: (results: any) => {
           const headers = results.data[0].filter(
-            (header: string) => header !== null && header.trim() !== ""
+            (header: string) => header !== null && header.trim() !== "",
           );
           setHeaderArray(headers);
         },

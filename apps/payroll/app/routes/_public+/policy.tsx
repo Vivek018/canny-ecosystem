@@ -1,10 +1,7 @@
 import { privacyPolicyData } from "@canny_ecosystem/utils/constant";
 
-
-
 export default function Policy() {
   return (
-    
     <section className="pb-10 md:pb-20">
       <div className="my-8 text-center">
         <span className="text-5xl h-14 font-extrabold bg-gradient-to-r from-primary dark:via-primary dark:to-[#848484] to-[#000] inline-block text-transparent bg-clip-text">
@@ -42,4 +39,3 @@ export default function Policy() {
     </section>
   );
 }
-

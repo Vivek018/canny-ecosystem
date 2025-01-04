@@ -1,19 +1,19 @@
 import { buttonVariants } from "@canny_ecosystem/ui/button";
-import { Link, Outlet } from "@remix-run/react";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { Link } from "@remix-run/react";
 
 export default function ReportsIndex() {
   return (
-    <section className="py-6 px-6">
-      <span className="flex items-center justify-between pb-4 text-xl">
-        Payroll Overview
-      </span>
+    <section className="flex flex-col items-start  py-6 px-6">
+      <h1 className="flex items-center tracking-wide font-bold justify-between pb-4 text-xl">
+        Gratuity Reports
+      </h1>
       <Link
-        to="/reports/gratuity"
-        className={buttonVariants({ variant: "link" })}
+        to="gratuity"
+        className={cn(buttonVariants({ variant: "link" }), "px-0")}
       >
         Gratuity Eligibility
       </Link>
-      <Outlet />
     </section>
   );
 }

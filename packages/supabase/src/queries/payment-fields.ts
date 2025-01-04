@@ -87,5 +87,5 @@ export async function getPaymentFieldsByCompanyId({
   return {
     data,
     error,
-  }
+  };
 }

@@ -114,8 +114,8 @@ export default function UpdateLocation() {
     });
   }, [actionData]);
 
-  if(error) {
-    return <ErrorBoundary error={error} message="Failed to load location" />
+  if (error) {
+    return <ErrorBoundary error={error} message="Failed to load location" />;
   }
 
   return (

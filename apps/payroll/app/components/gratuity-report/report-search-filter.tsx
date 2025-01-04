@@ -142,17 +142,17 @@ export function GratuityReportSearchFilter({
   };
 
   const handleSubmit = () => {
-      debounceSubmit(
-        { prompt: prompt },
-        {
-          action: "/reports/gratuity?index",
-          method: "POST",
-        },
-      );
-      if (prompt.length) {
-        searchParams.set("name", prompt);
-        setSearchParams(searchParams);
-      }
+    debounceSubmit(
+      { prompt: prompt },
+      {
+        action: "/reports/gratuity?index",
+        method: "POST",
+      },
+    );
+    if (prompt.length) {
+      searchParams.set("name", prompt);
+      setSearchParams(searchParams);
+    }
   };
 
   const hasValidFilters =

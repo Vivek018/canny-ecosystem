@@ -76,7 +76,6 @@ export function ExitByTime({
 }: {
   chartData: ExitDataType[];
 }) {
-
   const exitLastWorkingYears = new Set(
     chartData.map((row) => {
       const date = new Date(row.last_working_day || "");
@@ -84,7 +83,11 @@ export function ExitByTime({
     }),
   );
 
-  const exitsByTimeData: { year: number | null; count: number; month: string | null }[] = [];
+  const exitsByTimeData: {
+    year: number | null;
+    count: number;
+    month: string | null;
+  }[] = [];
 
   if (exitLastWorkingYears.size > 1) {
     for (const year of exitLastWorkingYears) {

@@ -1,6 +1,16 @@
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { Table, TableBody, TableCell, TableRow } from "@canny_ecosystem/ui/table";
-import { type ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+} from "@canny_ecosystem/ui/table";
+import {
+  type ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
 import { DataTableHeader } from "./data-table-header";
 
 interface DataTableProps<TData, TValue> {
@@ -8,17 +18,26 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
 }
 
-export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
-  const table = useReactTable({data,columns,getCoreRowModel: getCoreRowModel()});
+export function DataTable<TData, TValue>({
+  columns,
+  data,
+}: DataTableProps<TData, TValue>) {
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
 
   const tableLength = table.getRowModel().rows?.length;
 
   return (
     <div className="relative mb-8">
-      <div className={cn(
-        "relative border overflow-x-auto rounded",
-        !tableLength && "border-none",
-      )}>
+      <div
+        className={cn(
+          "relative border overflow-x-auto rounded",
+          !tableLength && "border-none",
+        )}
+      >
         <div className="relative">
           <Table>
             <DataTableHeader

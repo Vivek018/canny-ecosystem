@@ -4,7 +4,7 @@ export const DELETE_TEXT = "permanently delete";
 
 export const modalSearchParamNames = {
   import_reimbursement: "import-reimbursement",
-  view_link_template: "view-link-template", 
+  view_link_template: "view-link-template",
   create_link_template: "create-link-template",
   update_link_template: "update-link-template",
   view_relationship_terms: "view-relationship-terms",
@@ -237,5 +237,5 @@ export const exitPaymentFields = [
   "gift_coupon",
   "gratuity",
   "computer_service_charges",
-  "deduction"
-]
+  "deduction",
+];

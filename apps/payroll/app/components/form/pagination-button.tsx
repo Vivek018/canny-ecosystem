@@ -73,7 +73,7 @@ export default function PaginationButton({
           <PaginationPrevious
             className={cn(
               "px-3",
-              currentPage === 1 && "opacity-50 cursor-not-allowed"
+              currentPage === 1 && "opacity-50 cursor-not-allowed",
             )}
             onClick={handlePrevious}
           />
@@ -106,7 +106,7 @@ export default function PaginationButton({
           <PaginationNext
             className={cn(
               " px-3",
-              currentPage === totalPages && "opacity-50 cursor-not-allowed"
+              currentPage === totalPages && "opacity-50 cursor-not-allowed",
             )}
             onClick={handleNext}
           />

@@ -26,9 +26,8 @@ const chartConfig = {
 export function ReimbursementTrend({
   chartData,
 }: { chartData: ReimbursementDataType[] }) {
-  
   const [activeChart, setActiveChart] =
-  useState<keyof typeof chartConfig>("amount");
+    useState<keyof typeof chartConfig>("amount");
 
   const trendData = chartData.map((row) => ({
     date: row.submitted_date,

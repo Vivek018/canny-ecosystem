@@ -32,8 +32,8 @@ export default function Users() {
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase())
-      )
+          String(value).toLowerCase().includes(searchString.toLowerCase()),
+      ),
     );
 
     setTableData(filteredData);
@@ -62,7 +62,7 @@ export default function Users() {
             to="/settings/users/create-user"
             className={cn(
               buttonVariants({ variant: "primary-outline" }),
-              "flex items-center gap-1"
+              "flex items-center gap-1",
             )}
           >
             <span>Add</span>

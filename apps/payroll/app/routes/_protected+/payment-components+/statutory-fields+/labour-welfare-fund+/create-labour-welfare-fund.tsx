@@ -52,10 +52,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     return json({ companyId, error: null });
   } catch (error) {
-    return json({
-      error,
-      companyId: null,
-    }, { status: 500 });
+    return json(
+      {
+        error,
+        companyId: null,
+      },
+      { status: 500 },
+    );
   }
 }
 
@@ -95,11 +98,14 @@ export async function action({
       error,
     });
   } catch (error) {
-    return json({
-      status: "error",
-      message: "An unexpected error occurred",
-      error,
-    }, { status: 500 });
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 },
+    );
   }
 }
 

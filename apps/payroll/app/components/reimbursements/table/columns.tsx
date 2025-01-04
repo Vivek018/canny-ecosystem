@@ -112,8 +112,8 @@ export const reimbursementsColumns = ({
       return (
         <p className="truncate ">
           {
-            row.original.employees?.employee_project_assignment
-              .project_sites.projects.name
+            row.original.employees?.employee_project_assignment.project_sites
+              .projects.name
           }
         </p>
       );
@@ -127,8 +127,8 @@ export const reimbursementsColumns = ({
       return (
         <p className="truncate ">
           {
-            row.original.employees?.employee_project_assignment
-              .project_sites.name
+            row.original.employees?.employee_project_assignment.project_sites
+              .name
           }
         </p>
       );

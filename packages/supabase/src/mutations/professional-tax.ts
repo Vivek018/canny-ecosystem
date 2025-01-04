@@ -25,10 +25,11 @@ export async function createProfessionalTax({
     }
   }
 
-  const {
-    error,
-    status,
-  } = await supabase.from("professional_tax").insert(data).select().single();
+  const { error, status } = await supabase
+    .from("professional_tax")
+    .insert(data)
+    .select()
+    .single();
 
   if (error) {
     console.error(error);

@@ -131,12 +131,15 @@ export async function action({
       returnTo: `/employees/${employeeId}/work-portfolio`,
     });
   } catch (error) {
-    return json({
-      status: "error",
-      message: "An unexpected error occurred",
-      error,
-      returnTo: `/employees/${employeeId}/work-portfolio`,
-    }, { status: 500 });
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+        returnTo: `/employees/${employeeId}/work-portfolio`,
+      },
+      { status: 500 },
+    );
   }
 }
 

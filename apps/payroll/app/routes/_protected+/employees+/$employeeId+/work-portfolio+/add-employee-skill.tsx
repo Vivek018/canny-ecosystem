@@ -61,7 +61,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
       status: "error",
       message: "Failed to get employee id",
       error,
-      employeeId
+      employeeId,
     });
   }
 }

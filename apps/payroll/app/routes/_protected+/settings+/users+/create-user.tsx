@@ -40,7 +40,7 @@ export async function action({ request }: ActionFunctionArgs) {
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 
@@ -75,91 +75,91 @@ export default function CreateUser({
   });
 
   return (
-      <section className='md:px-20 lg:px-52 2xl:px-80 py-4'>
-        <FormProvider context={form.context}>
-          <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
-            <Card>
-              <CardHeader>
-                <CardTitle>{USER_TAG}</CardTitle>
-                <CardDescription className='lowercase'>
-                  You can {USER_TAG} by filling this form
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <input {...getInputProps(fields.id, { type: "hidden" })} />
-                <div className='grid grid-cols-2 place-content-center justify-between gap-x-8 mb-10'>
-                  <Field
-                    inputProps={{
-                      ...getInputProps(fields.first_name, { type: "text" }),
-                      autoFocus: true,
-                      placeholder: `Enter ${replaceUnderscore(
-                        fields.first_name.name
-                      )}`,
-                      className: "capitalize",
-                    }}
-                    labelProps={{
-                      children: replaceUnderscore(fields.first_name.name),
-                    }}
-                    errors={fields.first_name.errors}
-                  />
-                  <Field
-                    inputProps={{
-                      ...getInputProps(fields.last_name, { type: "text" }),
-
-                      placeholder: `Enter ${replaceUnderscore(
-                        fields.last_name.name
-                      )}`,
-                      className: "capitalize",
-                    }}
-                    labelProps={{
-                      children: replaceUnderscore(fields.last_name.name),
-                    }}
-                    errors={fields.last_name.errors}
-                  />
-                </div>
-                <div className='grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10'>
-                  <Field
-                    inputProps={{
-                      ...getInputProps(fields.email, { type: "text" }),
-
-                      placeholder: `Enter ${replaceUnderscore(
-                        fields.email.name
-                      )}`,
-                    }}
-                    labelProps={{
-                      children: replaceUnderscore(fields.email.name),
-                    }}
-                    errors={fields.email.errors}
-                  />
-                  <Field
-                    inputProps={{
-                      ...getInputProps(fields.mobile_number, { type: "text" }),
-
-                      placeholder: `Enter ${replaceUnderscore(
-                        fields.mobile_number.name
-                      )}`,
-                    }}
-                    labelProps={{
-                      children: replaceUnderscore(fields.mobile_number.name),
-                    }}
-                    errors={fields.mobile_number.errors}
-                  />
-                </div>
-
-                <CheckboxField
-                  className='mt-8'
-                  buttonProps={getInputProps(fields.is_active, {
-                    type: "checkbox",
-                  })}
-                  labelProps={{
-                    children: "Mark this as Active",
+    <section className="md:px-20 lg:px-52 2xl:px-80 py-4">
+      <FormProvider context={form.context}>
+        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
+          <Card>
+            <CardHeader>
+              <CardTitle>{USER_TAG}</CardTitle>
+              <CardDescription className="lowercase">
+                You can {USER_TAG} by filling this form
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <input {...getInputProps(fields.id, { type: "hidden" })} />
+              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mb-10">
+                <Field
+                  inputProps={{
+                    ...getInputProps(fields.first_name, { type: "text" }),
+                    autoFocus: true,
+                    placeholder: `Enter ${replaceUnderscore(
+                      fields.first_name.name,
+                    )}`,
+                    className: "capitalize",
                   }}
+                  labelProps={{
+                    children: replaceUnderscore(fields.first_name.name),
+                  }}
+                  errors={fields.first_name.errors}
                 />
-              </CardContent>
-              <FormButtons form={form} isSingle={true} />
-            </Card>
-          </Form>
-        </FormProvider>
-      </section>
+                <Field
+                  inputProps={{
+                    ...getInputProps(fields.last_name, { type: "text" }),
+
+                    placeholder: `Enter ${replaceUnderscore(
+                      fields.last_name.name,
+                    )}`,
+                    className: "capitalize",
+                  }}
+                  labelProps={{
+                    children: replaceUnderscore(fields.last_name.name),
+                  }}
+                  errors={fields.last_name.errors}
+                />
+              </div>
+              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10">
+                <Field
+                  inputProps={{
+                    ...getInputProps(fields.email, { type: "text" }),
+
+                    placeholder: `Enter ${replaceUnderscore(
+                      fields.email.name,
+                    )}`,
+                  }}
+                  labelProps={{
+                    children: replaceUnderscore(fields.email.name),
+                  }}
+                  errors={fields.email.errors}
+                />
+                <Field
+                  inputProps={{
+                    ...getInputProps(fields.mobile_number, { type: "text" }),
+
+                    placeholder: `Enter ${replaceUnderscore(
+                      fields.mobile_number.name,
+                    )}`,
+                  }}
+                  labelProps={{
+                    children: replaceUnderscore(fields.mobile_number.name),
+                  }}
+                  errors={fields.mobile_number.errors}
+                />
+              </div>
+
+              <CheckboxField
+                className="mt-8"
+                buttonProps={getInputProps(fields.is_active, {
+                  type: "checkbox",
+                })}
+                labelProps={{
+                  children: "Mark this as Active",
+                }}
+              />
+            </CardContent>
+            <FormButtons form={form} isSingle={true} />
+          </Card>
+        </Form>
+      </FormProvider>
+    </section>
   );
 }

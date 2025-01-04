@@ -33,11 +33,14 @@ export async function action({
       error,
     });
   } catch (error) {
-    return json({
-      status: "error",
-      message: "An unexpected error occurred",
-      error,
-    }, { status: 500 });
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 },
+    );
   }
 }
 
@@ -57,9 +60,7 @@ export default function DeleteGratuity() {
     } else {
       toast({
         title: "Error",
-        description:
-          actionData?.error?.message ||
-          "Gratuity delete failed",
+        description: actionData?.error?.message || "Gratuity delete failed",
         type: "error",
       });
     }

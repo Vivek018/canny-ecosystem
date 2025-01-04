@@ -3,18 +3,18 @@ import { PayrollComponent } from "@/components/payroll/payroll-component";
 const employeesDemo = [
   {
     name: "John Doe",
-      paid_days: 25,
-      gross_pay: 5000,
-      taxes: 800,
-      discount: 200,
-      bonus: 500,
-      email: "johndoe@example.com",
-      mobile_number: "123-456-7890",
-      reimbursements: 1,
-      company_name: "TechCorp Inc.",
-      site_name: "Downtown Office",
-      area: "New York",
-      net_pay: 4650,
+    paid_days: 25,
+    gross_pay: 5000,
+    taxes: 800,
+    discount: 200,
+    bonus: 500,
+    email: "johndoe@example.com",
+    mobile_number: "123-456-7890",
+    reimbursements: 1,
+    company_name: "TechCorp Inc.",
+    site_name: "Downtown Office",
+    area: "New York",
+    net_pay: 4650,
   },
   {
     name: "Jane Smith",
@@ -324,21 +324,21 @@ const headings = {
   employees: "TOTAL EMPLOYEES",
 };
 
-const calculatePercentageChange = (current :number, previous:number) => {
+const calculatePercentageChange = (current: number, previous: number) => {
   return ((current - previous) / previous) * 100;
 };
 
 const netPayrollCost = calculatePercentageChange(
   Number(currentDemo.payroll_cost),
-  Number(lastMonthDemo.payroll_cost)
+  Number(lastMonthDemo.payroll_cost),
 );
 const netEmployeeNetPay = calculatePercentageChange(
   Number(currentDemo.employeess_net_pay),
-  Number(lastMonthDemo.employeess_net_pay)
+  Number(lastMonthDemo.employeess_net_pay),
 );
 const netPendingPayments = calculatePercentageChange(
   Number(currentDemo.pending_payments),
-  Number(lastMonthDemo.pending_payments)
+  Number(lastMonthDemo.pending_payments),
 );
 const employeediff =
   Number(currentDemo.employees) - Number(lastMonthDemo.employees);

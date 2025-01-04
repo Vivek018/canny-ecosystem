@@ -1,5 +1,9 @@
 import { HARD_QUERY_LIMIT } from "../constant";
-import type { InferredType, ProfessionalTaxDatabaseRow, TypedSupabaseClient } from "../types";
+import type {
+  InferredType,
+  ProfessionalTaxDatabaseRow,
+  TypedSupabaseClient,
+} from "../types";
 
 export async function getProfessionalTaxesByCompanyId({
   supabase,
@@ -54,7 +58,9 @@ export async function getProfessionalTaxById({
     .from("professional_tax")
     .select(columns.join(","))
     .eq("id", id)
-    .single<InferredType<ProfessionalTaxDatabaseRow, (typeof columns)[number]>>();
+    .single<
+      InferredType<ProfessionalTaxDatabaseRow, (typeof columns)[number]>
+    >();
 
   if (error) {
     console.error(error);

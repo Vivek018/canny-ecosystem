@@ -130,9 +130,9 @@ export function DataTable<TData, TValue>({
     },
   });
 
-  const selectedRowsData= table
-  .getSelectedRowModel()
-  .rows?.map((row) => row.original);
+  const selectedRowsData = table
+    .getSelectedRowModel()
+    .rows?.map((row) => row.original);
 
   useEffect(() => {
     setColumns(table.getAllLeafColumns());

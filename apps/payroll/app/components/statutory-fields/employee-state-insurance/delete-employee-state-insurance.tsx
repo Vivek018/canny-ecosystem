@@ -35,7 +35,7 @@ export const DeleteEmployeeStateInsurance = ({
   };
 
   const handleDeleteESI = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -45,7 +45,7 @@ export const DeleteEmployeeStateInsurance = ({
           method: "post",
           action: `${employeeStateInsuranceId}/delete-esi`,
           replace: true,
-        }
+        },
       );
     } else {
       e.preventDefault();
@@ -58,7 +58,7 @@ export const DeleteEmployeeStateInsurance = ({
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "destructive-outline" }),
-          "text-sm h-9 flex gap-1 items-center"
+          "text-sm h-9 flex gap-1 items-center",
         )}
       >
         <Icon name="trash" size="md" />

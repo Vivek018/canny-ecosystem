@@ -7,9 +7,7 @@ import { type LoaderFunctionArgs, defer, json } from "@remix-run/node";
 import { Await, useLoaderData } from "@remix-run/react";
 import { Suspense } from "react";
 
-export const loader = async ({
-  request,
-}: LoaderFunctionArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
 
@@ -37,7 +35,8 @@ export const loader = async ({
 export default function EmployeeProvidentFundIndex() {
   const { epfPromise, error } = useLoaderData<typeof loader>();
 
-  if(error) return <ErrorBoundary error={error} message="Failed to load data" />
+  if (error)
+    return <ErrorBoundary error={error} message="Failed to load data" />;
 
   return (
     <div className="p-4 flex gap-3 place-content-center justify-between">
@@ -47,10 +46,7 @@ export default function EmployeeProvidentFundIndex() {
             if (!resolvedData)
               return <ErrorBoundary message="Failed to load data" />;
             return (
-              <EPFWrapper
-                data={resolvedData.data}
-                error={resolvedData.error}
-              />
+              <EPFWrapper data={resolvedData.data} error={resolvedData.error} />
             );
           }}
         </Await>

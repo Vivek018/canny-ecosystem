@@ -27,7 +27,7 @@ export const FormButtons = ({
     navigation.state === "submitting" || navigation.state === "loading";
 
   return (
-    <CardFooter className={cn("flex items-center justify-between",className)}>
+    <CardFooter className={cn("flex items-center justify-between", className)}>
       <div className={cn("flex flex-row items-center justify-center gap-4")}>
         <Button
           variant="outline"

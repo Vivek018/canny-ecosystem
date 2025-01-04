@@ -67,7 +67,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
   const reimbursementData = submission.value;
@@ -160,13 +160,13 @@ export default function AddReimbursements({
                   key={resetKey}
                   className="w-full capitalize flex-1 "
                   options={transformStringArrayIntoOptions(
-                    ReimbursementStatusArray as unknown as string[]
+                    ReimbursementStatusArray as unknown as string[],
                   )}
                   inputProps={{
                     ...getInputProps(fields.status, { type: "text" }),
                   }}
                   placeholder={`Select ${replaceUnderscore(
-                    fields.status.name
+                    fields.status.name,
                   )}`}
                   labelProps={{
                     children: "Status",
@@ -181,7 +181,7 @@ export default function AddReimbursements({
                       type: "number",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.amount.name
+                      fields.amount.name,
                     )}`,
                     className: "",
                   }}
@@ -199,7 +199,7 @@ export default function AddReimbursements({
                     placeholder: "Select an authority that approved",
                   }}
                   className="lowercase"
-                  options={userOptions as any ?? userOptionsFromUpdate}
+                  options={(userOptions as any) ?? userOptionsFromUpdate}
                   labelProps={{
                     children: "Approved By",
                   }}

@@ -254,7 +254,6 @@ export type ExitPaymentsInsert =
 export type ExitPaymentsUpdate =
   Database["public"]["Tables"]["exit_payments"]["Update"];
 
-
 export type GratuityDatabaseRow =
   Database["public"]["Tables"]["gratuity"]["Row"];
 export type GratuityDatabaseInsert =

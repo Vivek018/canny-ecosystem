@@ -21,12 +21,12 @@ export const ReimbursementOptionsDropdown = ({
   isEmployeeRoute?: boolean;
 }) => {
   const navigate = useNavigate();
-  
+
   const handleEdit = () => {
     navigate(
       isEmployeeRoute
         ? `/employees/${employeeId}/reimbursements/${reimbursementId}/update-reimbursements`
-        : `/approvals/reimbursements/${reimbursementId}/update-reimbursements`
+        : `/approvals/reimbursements/${reimbursementId}/update-reimbursements`,
     );
   };
 

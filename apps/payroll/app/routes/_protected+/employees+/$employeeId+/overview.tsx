@@ -89,17 +89,17 @@ export default function EmployeeIndex() {
 
   if (error) {
     return (
-      <ErrorBoundary error={error} message='Failed to load employee details' />
+      <ErrorBoundary error={error} message="Failed to load employee details" />
     );
   }
 
   return (
-    <div className='w-full py-6 flex flex-col gap-8'>
+    <div className="w-full py-6 flex flex-col gap-8">
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={employeePromise}>
           {(resolvedData: { data: any; error: any } | null) => {
             if (!resolvedData || !env)
-              return <ErrorBoundary message='Failed to load employee' />;
+              return <ErrorBoundary message="Failed to load employee" />;
             return (
               <>
                 <CommonWrapper
@@ -128,7 +128,7 @@ export default function EmployeeIndex() {
           {(resolvedData: { data: any; error: any } | null) => {
             if (!resolvedData)
               return (
-                <ErrorBoundary message='Failed to load employee statutory details' />
+                <ErrorBoundary message="Failed to load employee statutory details" />
               );
             return (
               <CommonWrapper
@@ -149,7 +149,7 @@ export default function EmployeeIndex() {
           {(resolvedData: { data: any; error: any } | null) => {
             if (!resolvedData)
               return (
-                <ErrorBoundary message='Failed to load employee bank details' />
+                <ErrorBoundary message="Failed to load employee bank details" />
               );
             return (
               <CommonWrapper
@@ -168,7 +168,7 @@ export default function EmployeeIndex() {
           {(resolvedData: { data: any; error: any } | null) => {
             if (!resolvedData)
               return (
-                <ErrorBoundary message='Failed to load employee addresses' />
+                <ErrorBoundary message="Failed to load employee addresses" />
               );
             return (
               <CommonWrapper
@@ -189,7 +189,7 @@ export default function EmployeeIndex() {
           {(resolvedData: { data: any; error: any } | null) => {
             if (!resolvedData)
               return (
-                <ErrorBoundary message='Failed to load employee guardians details' />
+                <ErrorBoundary message="Failed to load employee guardians details" />
               );
             return (
               <CommonWrapper

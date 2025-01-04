@@ -118,6 +118,7 @@ export function ExitPaymentTableHeader({ table, className, loading }: Props) {
             )
           );
         })}
+        <TableHead className="sticky right-0 min-w-20 max-w-20 bg-card z-10" />
       </TableRow>
     </TableHeader>
   );

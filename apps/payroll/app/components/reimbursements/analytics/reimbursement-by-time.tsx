@@ -75,7 +75,6 @@ export function ReimbursementByTime({
 }: {
   chartData: ReimbursementDataType[];
 }) {
-  
   const reimbursementYears = new Set(
     chartData.map((row) => {
       const date = new Date(row.submitted_date || "");

@@ -81,7 +81,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   if (action === "submit") {
     const parsedData = ImportReimbursementDataSchema.safeParse(
-      JSON.parse(formData.get("stringified_data") as string)
+      JSON.parse(formData.get("stringified_data") as string),
     );
     if (parsedData.success) {
       const importedData = parsedData.data?.data;
@@ -111,7 +111,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
       const updatedData = importedData!.map((item: any) => {
         const employeeId = employees?.find(
-          (e) => e.employee_code === item.employee_code
+          (e) => e.employee_code === item.employee_code,
         )?.id;
         const userId = users?.find((u) => u.email === item.email)?.id;
 
@@ -144,7 +144,7 @@ export async function action({ request }: ActionFunctionArgs) {
       if (submission.status === "error") {
         return json(
           { result: submission.reply() },
-          { status: submission.status === "error" ? 400 : 200 }
+          { status: submission.status === "error" ? 400 : 200 },
         );
       }
     }

@@ -24,10 +24,7 @@ export const createEmployeeProvidentFund = async ({
     }
   }
 
-  const {
-    error,
-    status,
-  } = await supabase
+  const { error, status } = await supabase
     .from("employee_provident_fund")
     .insert(data)
     .select()

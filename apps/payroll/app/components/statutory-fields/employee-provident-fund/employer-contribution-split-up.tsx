@@ -5,7 +5,6 @@ import {
 } from "@canny_ecosystem/ui/popover";
 
 export function EmployerContributionSplitUp() {
-
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -40,10 +39,7 @@ export function EmployerContributionSplitUp() {
 
           <div className="flex justify-between">
             <p> Employees' Pension Scheme </p>
-            <p>
-              {" "}
-              8.33% of PF Wage{" "}
-            </p>
+            <p> 8.33% of PF Wage </p>
           </div>
         </div>
       </PopoverContent>

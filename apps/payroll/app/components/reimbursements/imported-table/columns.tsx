@@ -1,7 +1,7 @@
-import type{ ImportReimbursementDataType } from "@canny_ecosystem/supabase/queries";
-import type{ ColumnDef } from "@tanstack/react-table";
+import type { ImportReimbursementDataType } from "@canny_ecosystem/supabase/queries";
+import type { ColumnDef } from "@tanstack/react-table";
 
-export const ImportedDataColumns : ColumnDef<ImportReimbursementDataType>[] = [
+export const ImportedDataColumns: ColumnDef<ImportReimbursementDataType>[] = [
   {
     accessorKey: "employee_code",
     header: "Employee Code",

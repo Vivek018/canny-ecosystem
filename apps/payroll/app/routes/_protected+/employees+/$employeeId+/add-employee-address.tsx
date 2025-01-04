@@ -21,53 +21,52 @@ export async function action({
   request,
   params,
 }: ActionFunctionArgs): Promise<Response> {
-
   const employeeId = params.employeeId;
-  
+
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
     const formData = await request.formData();
-    
+
     if (!employeeId) {
       return json({
-      status: "error",
-      message: "Invalid employee id",
-      returnTo: "/employees",
+        status: "error",
+        message: "Invalid employee id",
+        returnTo: "/employees",
+      });
+    }
+
+    const submission = parseWithZod(formData, {
+      schema: EmployeeAddressesSchema,
     });
-  }
 
-  const submission = parseWithZod(formData, {
-    schema: EmployeeAddressesSchema,
-  });
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
 
-  if (submission.status !== "success") {
-    return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
-    );
-  }
-  
-  const { status, error } = await createEmployeeAddresses({
-    supabase,
-    data: { ...submission.value, employee_id: employeeId },
-  });
+    const { status, error } = await createEmployeeAddresses({
+      supabase,
+      data: { ...submission.value, employee_id: employeeId },
+    });
 
-  if (isGoodStatus(status)) {
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Address added successfully",
+        error: null,
+        returnTo: `/employees/${employeeId}`,
+      });
+    }
+    return json({ status, error });
+  } catch (error) {
     return json({
-      status: "success",
-      message: "Address added successfully",
-      error: null,
-      returnTo: `/employees/${employeeId}`,
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
     });
   }
-  return json({ status, error });
-} catch (error) {
-  return json({
-    status: "error",
-    message: "An unexpected error occurred",
-    error,
-  })
-}
 }
 
 export default function AddEmployeeAddress() {

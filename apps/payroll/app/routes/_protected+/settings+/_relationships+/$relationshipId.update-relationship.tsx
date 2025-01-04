@@ -114,8 +114,7 @@ export async function action({
 }
 
 export default function UpdateRelationship() {
-  const { relationshipPromise, companiesData } =
-    useLoaderData<typeof loader>();
+  const { relationshipPromise, companiesData } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();

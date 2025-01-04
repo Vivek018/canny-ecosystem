@@ -35,7 +35,7 @@ export function AdvancesTable<TData, TValue>({
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
-          !tableLength && "border-none"
+          !tableLength && "border-none",
         )}
       >
         <div className="relative">
@@ -61,13 +61,13 @@ export function AdvancesTable<TData, TValue>({
                               (cell.getValue() === "Approved"
                                 ? "text-green"
                                 : cell.getValue() === "Rejected"
-                                ? "text-destructive"
-                                : "text-muted-foreground")
+                                  ? "text-destructive"
+                                  : "text-muted-foreground"),
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                         </TableCell>
                       );

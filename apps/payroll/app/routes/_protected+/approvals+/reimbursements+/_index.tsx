@@ -118,7 +118,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const prompt = formData.get("prompt") as string | null;
 
-  
   const searchParams = new URLSearchParams();
   if (prompt && prompt.trim().length > 0) {
     searchParams.append("name", prompt.trim());

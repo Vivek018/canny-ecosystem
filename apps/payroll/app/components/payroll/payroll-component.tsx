@@ -8,8 +8,6 @@ import { payrollColumns } from "@/components/payroll/table/columns";
 import { InfoCard } from "./info-card";
 
 export function PayrollComponent({ data, demo, heading, netDiff }: any) {
-  
-
   return (
     <section className="m-4">
       <div className="flex justify-between items-center p-2">
@@ -22,13 +20,27 @@ export function PayrollComponent({ data, demo, heading, netDiff }: any) {
         </div>
       </div>
       <div className="grid gap-6 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-4 my-4">
-      
-        <InfoCard heading={heading.payroll_cost} value={demo.payroll_cost} netDiff={netDiff.payroll_cost} />
-        <InfoCard heading={heading.employeess_net_pay} value={demo.employeess_net_pay} netDiff={netDiff.employeess_net_pay} />
-        <InfoCard heading={heading.pending_payments} value={demo.pending_payments} netDiff={netDiff.pending_payments} />
-        <InfoCard heading={heading.employees} value={demo.employees} netDiff={netDiff.employees} isPercentage={false} />
-      
-        
+        <InfoCard
+          heading={heading.payroll_cost}
+          value={demo.payroll_cost}
+          netDiff={netDiff.payroll_cost}
+        />
+        <InfoCard
+          heading={heading.employeess_net_pay}
+          value={demo.employeess_net_pay}
+          netDiff={netDiff.employeess_net_pay}
+        />
+        <InfoCard
+          heading={heading.pending_payments}
+          value={demo.pending_payments}
+          netDiff={netDiff.pending_payments}
+        />
+        <InfoCard
+          heading={heading.employees}
+          value={demo.employees}
+          netDiff={netDiff.employees}
+          isPercentage={false}
+        />
       </div>
       <div className="py-4">
         <div className="w-full flex items-center justify-between pb-4">

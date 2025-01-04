@@ -24,7 +24,7 @@ export function Step2({ fields }: { fields: any }) {
             }}
             labelProps={{
               children: replaceUnderscore(
-                fields.organization_payable_days.name
+                fields.organization_payable_days.name,
               ),
             }}
             errors={fields.organization_payable_days.errors}

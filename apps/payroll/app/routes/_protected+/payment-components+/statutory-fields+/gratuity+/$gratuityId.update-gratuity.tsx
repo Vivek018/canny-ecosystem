@@ -9,27 +9,17 @@ import {
   useNavigate,
 } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
-import {
-  GratuitySchema,
-  isGoodStatus,
-} from "@canny_ecosystem/utils";
-import {
-  getGratuityById,
-} from "@canny_ecosystem/supabase/queries";
-import {
-  updateGratuity,
-} from "@canny_ecosystem/supabase/mutations";
+import { GratuitySchema, isGoodStatus } from "@canny_ecosystem/utils";
+import { getGratuityById } from "@canny_ecosystem/supabase/queries";
+import { updateGratuity } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { Suspense, useEffect } from "react";
-import type {
-  GratuityDatabaseUpdate,
-} from "@canny_ecosystem/supabase/types";
+import type { GratuityDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { ErrorBoundary } from "@/components/error-boundary";
 import CreateGratuity from "./create-gratuity";
 
-export const UPDATE_GRATUITY =
-  "update-gratuity";
+export const UPDATE_GRATUITY = "update-gratuity";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const gratuityId = params.gratuityId;

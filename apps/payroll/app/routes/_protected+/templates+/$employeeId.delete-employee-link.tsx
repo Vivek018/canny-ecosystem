@@ -8,34 +8,40 @@ import { deletePaymentTemplateAssignment } from "@canny_ecosystem/supabase/mutat
 import { getPaymentTemplateAssignmentIdByEmployeeId } from "@canny_ecosystem/supabase/queries";
 
 export async function action({ request, params }: ActionFunctionArgs) {
-    const { supabase } = getSupabaseWithHeaders({ request });
-    const formData = await request.formData();
-    const employeeId = params.employeeId;
+  const { supabase } = getSupabaseWithHeaders({ request });
+  const formData = await request.formData();
+  const employeeId = params.employeeId;
 
-    const submission = parseWithZod(formData, { schema: DeleteEmployeeLinkSchema });
+  const submission = parseWithZod(formData, {
+    schema: DeleteEmployeeLinkSchema,
+  });
 
-    if (submission.status !== "success") {
-        return json(
-            { result: submission.reply() },
-            { status: submission.status === "error" ? 400 : 200 },
-        );
-    }
+  if (submission.status !== "success") {
+    return json(
+      { result: submission.reply() },
+      { status: submission.status === "error" ? 400 : 200 },
+    );
+  }
 
-    let templateId = null;
-    if (employeeId) {
-      const { data } = await getPaymentTemplateAssignmentIdByEmployeeId({
-        supabase,
-        employeeId,
-      });
-      templateId = data?.id;
-    }
+  let templateId = null;
+  if (employeeId) {
+    const { data } = await getPaymentTemplateAssignmentIdByEmployeeId({
+      supabase,
+      employeeId,
+    });
+    templateId = data?.id;
+  }
 
-    if (templateId) {
-        const { status, error } = await deletePaymentTemplateAssignment({ supabase, id: templateId });
-        if (isGoodStatus(status)) return safeRedirect("/employees", { status: 303 });
+  if (templateId) {
+    const { status, error } = await deletePaymentTemplateAssignment({
+      supabase,
+      id: templateId,
+    });
+    if (isGoodStatus(status))
+      return safeRedirect("/employees", { status: 303 });
 
-        return json({ status, error });
-    }
+    return json({ status, error });
+  }
 
-    return null;
+  return null;
 }

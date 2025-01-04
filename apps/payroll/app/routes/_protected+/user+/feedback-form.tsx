@@ -1,4 +1,4 @@
-import { Form, json, useLoaderData,  } from "@remix-run/react";
+import { Form, json, useLoaderData } from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import {
   FormProvider,
@@ -37,8 +37,6 @@ import {
 } from "@canny_ecosystem/ui/forms";
 import { createFeedback } from "@canny_ecosystem/supabase/mutations";
 import { FormButtons } from "@/components/form/form-buttons";
-
-
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -100,10 +98,8 @@ export default function Feedback() {
       user_id: userId,
       company_id: companyId,
     },
-    
-    
   });
-  
+
   return (
     <section className="flex flex-col gap-6 w-full lg:w-2/3 my-4">
       <FormProvider context={form.context}>

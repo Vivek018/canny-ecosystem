@@ -56,14 +56,14 @@ export function ReimbursementsTableHeader({
   const isEnableSorting = (id: string) =>
     (
       loading ||
-      table?.getAllLeafColumns()?.find((col: { id: string; }) => {
+      table?.getAllLeafColumns()?.find((col: { id: string }) => {
         return col.id === id;
       })
     )?.getCanSort();
 
   const columnName = (id: string) =>
     loading ||
-    table?.getAllLeafColumns()?.find((col: { id: string; }) => {
+    table?.getAllLeafColumns()?.find((col: { id: string }) => {
       return col.id === id;
     })?.columnDef?.header;
 
@@ -99,14 +99,14 @@ export function ReimbursementsTableHeader({
                     name="chevron-up"
                     className={cn(
                       "hidden",
-                      id === column && value === "desc" && "flex"
+                      id === column && value === "desc" && "flex",
                     )}
                   />
                   <Icon
                     name="chevron-down"
                     className={cn(
                       "hidden",
-                      id === column && value === "asc" && "flex"
+                      id === column && value === "asc" && "flex",
                     )}
                   />
                 </Button>

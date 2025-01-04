@@ -41,7 +41,7 @@ export function PayrollTableHeader({ table, className, loading }: Props) {
               key={id}
               className={cn(
                 "px-4 py-2",
-                id === "name" && "sticky left-0 bg-card z-10"
+                id === "name" && "sticky left-0 bg-card z-10",
               )}
             >
               <Button

@@ -40,10 +40,7 @@ chartConfig.amount = {
   color: "hsl(var(--background))",
 };
 
-export function ExitTopPayment({
-  chartData,
-}: { chartData: ExitDataType[] }) {
-
+export function ExitTopPayment({ chartData }: { chartData: ExitDataType[] }) {
   const exitTopPaymentData = Object.values(
     chartData.reduce(
       (acc, row) => {

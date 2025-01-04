@@ -127,7 +127,6 @@ export default function UpdateEmployeeBankDetails() {
   );
 }
 
-
 export function UpdateEmployeeBankDetailsWrapper({
   data,
   error,

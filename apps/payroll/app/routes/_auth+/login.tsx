@@ -33,8 +33,8 @@ export async function action({ request }: ActionFunctionArgs) {
     options: {
       redirectTo: `${new URL(request.url).origin}/auth/callback`,
       queryParams: {
-        access_type: 'offline',
-        prompt: 'consent',
+        access_type: "offline",
+        prompt: "consent",
       },
     },
   });
