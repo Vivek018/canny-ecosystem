@@ -121,7 +121,6 @@ export function getPTComponentFromField<
   let calculationValue = 0;
 
   for (const range of JSON.parse(field.gross_salary_range)) {
-    console.log(range, value);
     if (range.start <= value && value <= range.end) {
       calculationValue = range.value;
       break;
