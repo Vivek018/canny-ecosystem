@@ -16,7 +16,6 @@ import {
 } from "@canny_ecosystem/ui/forms";
 import {
   deductionCycleArray,
-  EmployeeProvidentFundSchema,
   EmployeeStateInsuranceSchema,
   getInitialValueFromZod,
   isGoodStatus,
@@ -128,7 +127,7 @@ export default function CreateEmployeeStateInsurance({
 
   const [form, fields] = useForm({
     id: EPF_TAG,
-    constraint: getZodConstraint(EmployeeProvidentFundSchema),
+    constraint: getZodConstraint(EmployeeStateInsuranceSchema),
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: EmployeeStateInsuranceSchema });
     },

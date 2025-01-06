@@ -18,7 +18,14 @@ import { PaymentFieldsSelect } from "../payment-fields-select";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { statesAndUTs } from "@canny_ecosystem/utils/constant";
 import { StatutoryFieldsSelect } from "../statutory-fields-select";
-import { SelectedPaymentField } from "../selected-payment-field";
+import {
+  SelectedBonusField,
+  SelectedEPFField,
+  SelectedESIField,
+  SelectedLWFField,
+  SelectedPaymentField,
+  SelectedPTField,
+} from "../selected-field";
 
 type FieldsType = {
   [K in keyof typeof PaymentTemplateComponentsSchema.shape]: FieldMetadata<
@@ -41,7 +48,7 @@ export function CreatePaymentTemplateComponentDetails({
     fields.payment_template_components.getFieldList();
 
   const targetTypeDefaultValue = (
-    fields: { name: string; value: string | null | undefined }[],
+    fields: { name: string; value: string | null | undefined }[]
   ) => {
     for (const field of fields) {
       if (field.value) {
@@ -53,18 +60,18 @@ export function CreatePaymentTemplateComponentDetails({
   return (
     <Fragment>
       <CardHeader>
-        <CardTitle className="text-3xl">Create Payment Template</CardTitle>
+        <CardTitle className='text-3xl'>Create Payment Template</CardTitle>
         <CardDescription>
           Create a payment template that will be central in all of canny apps
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+        <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
           <Field
             inputProps={{
               ...getInputProps(fields.monthly_ctc, { type: "number" }),
               placeholder: `Enter ${replaceUnderscore(
-                fields.monthly_ctc.name,
+                fields.monthly_ctc.name
               )}`,
               autoFocus: true,
             }}
@@ -72,7 +79,7 @@ export function CreatePaymentTemplateComponentDetails({
             errors={fields.monthly_ctc.errors}
           />
           <SearchableSelectField
-            className="capitalize"
+            className='capitalize'
             options={statesAndUTs}
             inputProps={{
               ...getInputProps(fields.state, { type: "text" }),
@@ -84,29 +91,33 @@ export function CreatePaymentTemplateComponentDetails({
             errors={fields.state.errors}
           />
         </div>
-        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+        <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
           <PaymentFieldsSelect
-            className="pb-4"
+            className='pb-4'
             options={paymentFieldOptions}
             env={env}
           />
           <StatutoryFieldsSelect
-            className="pb-4"
+            className='pb-4'
             options={transformStringArrayIntoOptions(
-              statutoryFieldsArray as unknown as string[],
+              statutoryFieldsArray as unknown as string[]
             )}
             env={env}
             state={fields.state.value ?? ""}
           />
         </div>
-        <div className="w-full grid grid-cols-3 gap-3 justify-between border-b py-2 font-semibold">
+        <div className='w-full grid grid-cols-3 gap-3 justify-between border-b py-2 font-semibold'>
           <p>Component Name</p>
           <p>Component Type</p>
           <p>Amount</p>
         </div>
-        <div className="flex flex-col items-center justify-center py-1">
+        <div className='flex flex-col items-center justify-center py-1'>
           {paymentTemplateComponentsField.map((field, index) => {
             const fieldSet = field.getFieldset();
+
+            const value = Number.parseFloat(
+              fields.monthly_ctc.value ?? fields.monthly_ctc.initialValue ?? "0"
+            );
 
             const defaultTargetType = targetTypeDefaultValue([
               fieldSet.payment_field_id,
@@ -117,25 +128,34 @@ export function CreatePaymentTemplateComponentDetails({
               fieldSet.bonus_id,
             ]);
 
-            return (
-              <div
-                key={index.toString()}
-                className="w-full grid grid-cols-3 gap-3 justify-between"
-              >
-                <input {...getInputProps(fieldSet.id, { type: "hidden" })} />
-                {defaultTargetType === "payment_field" && (
-                  <SelectedPaymentField
-                    field={fieldSet}
-                    monthlyCtc={Number.parseFloat(
-                      fields.monthly_ctc.value ??
-                        fields.monthly_ctc.initialValue ??
-                        "0",
-                    )}
-                  />
-                )}
-                
-              </div>
-            );
+            if (defaultTargetType) {
+              return (
+                <div
+                  key={index.toString()}
+                  className='w-full grid grid-cols-3 gap-3 justify-between'
+                >
+                  <input {...getInputProps(fieldSet.id, { type: "hidden" })} />
+                  {defaultTargetType === "payment_field" && (
+                    <SelectedPaymentField field={fieldSet} monthlyCtc={value} />
+                  )}
+                  {defaultTargetType === "epf" && (
+                    <SelectedEPFField field={fieldSet} value={value} />
+                  )}
+                  {defaultTargetType === "esi" && (
+                    <SelectedESIField field={fieldSet} value={value} />
+                  )}
+                  {defaultTargetType === "pt" && (
+                    <SelectedPTField field={fieldSet} value={value} />
+                  )}
+                  {defaultTargetType === "lwf" && (
+                    <SelectedLWFField field={fieldSet} value={value} />
+                  )}
+                  {defaultTargetType === "bonus" && (
+                    <SelectedBonusField field={fieldSet} value={value} />
+                  )}
+                </div>
+              );
+            }
           })}
         </div>
       </CardContent>

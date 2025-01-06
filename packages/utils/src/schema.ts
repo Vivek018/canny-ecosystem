@@ -400,27 +400,27 @@ export const EmployeeWorkHistorySchema = z.object({
 export const paymentTypeArray = ["fixed", "variable"] as const;
 export const calculationTypeArray = ["fixed", "percentage_of_ctc"] as const;
 
-export const PaymentFieldSchema = z
-  .object({
-    id: z.string().uuid().optional(),
-    name: zString,
-    payment_type: z.enum(paymentTypeArray).default("fixed"),
-    calculation_type: z.enum(calculationTypeArray).default("fixed"),
-    amount: z.number().optional(),
-    is_active: z.boolean().default(false),
-    is_pro_rata: z.boolean().default(false),
-    consider_for_epf: z.boolean().default(false),
-    consider_for_esic: z.boolean().default(false),
-    company_id: z.string().uuid(),
-  })
-  .refine(
-    (data) =>
-      !(data.payment_type === "variable" && data.calculation_type !== "fixed"),
-    {
-      message: `When payment type is "variable", calculation type must be "fixed".`,
-      path: ["calculation_type"],
-    },
-  );
+export const PaymentFieldSchemaObject = z.object({
+  id: z.string().uuid().optional(),
+  name: zString,
+  payment_type: z.enum(paymentTypeArray).default("fixed"),
+  calculation_type: z.enum(calculationTypeArray).default("fixed"),
+  amount: z.number().optional(),
+  is_active: z.boolean().default(false),
+  is_pro_rata: z.boolean().default(false),
+  consider_for_epf: z.boolean().default(false),
+  consider_for_esic: z.boolean().default(false),
+  company_id: z.string().uuid(),
+});
+
+export const PaymentFieldSchema = PaymentFieldSchemaObject.refine(
+  (data) =>
+    !(data.payment_type === "variable" && data.calculation_type !== "fixed"),
+  {
+    message: `When payment type is "variable", calculation type must be "fixed".`,
+    path: ["calculation_type"],
+  },
+);
 
 export const deductionCycleArray = ["monthly"] as const;
 export const EMPLOYEE_RESTRICTED_VALUE = 15000;
@@ -446,13 +446,16 @@ export const EmployeeProvidentFundSchema = z.object({
   include_admin_charges: z.boolean().default(false),
 });
 
+export const ESI_EMPLOYEE_CONTRIBUTION = 0.0075;
+export const ESI_EMPLOYER_CONTRIBUTION = 0.0325;
+
 export const EmployeeStateInsuranceSchema = z.object({
   id: z.string().optional(),
   company_id: z.string(),
   esi_number: zNumberString,
   deduction_cycle: z.enum(deductionCycleArray).default(deductionCycleArray[0]),
-  employees_contribution: z.number().default(0.0075),
-  employers_contribution: z.number().default(0.0325),
+  employees_contribution: z.number().default(ESI_EMPLOYEE_CONTRIBUTION),
+  employers_contribution: z.number().default(ESI_EMPLOYER_CONTRIBUTION),
   include_employer_contribution: z.boolean().default(false),
 });
 
@@ -485,17 +488,19 @@ export const LabourWelfareFundSchema = z.object({
 });
 
 export const statutoryBonusPayFrequencyArray = ["monthly", "yearly"] as const;
-export const StatutoryBonusSchema = z
-  .object({
-    id: z.string().optional(),
-    company_id: z.string(),
-    payment_frequency: z
-      .enum(statutoryBonusPayFrequencyArray)
-      .default(statutoryBonusPayFrequencyArray[0]),
-    percentage: z.number().min(0).default(8.33),
-    payout_month: z.number().optional(),
-  })
-  .superRefine((data, ctx) => {
+
+export const StatutoryBonusSchemaObject = z.object({
+  id: z.string().optional(),
+  company_id: z.string(),
+  payment_frequency: z
+    .enum(statutoryBonusPayFrequencyArray)
+    .default(statutoryBonusPayFrequencyArray[0]),
+  percentage: z.number().min(0).default(8.33),
+  payout_month: z.number().optional(),
+});
+
+export const StatutoryBonusSchema = StatutoryBonusSchemaObject.superRefine(
+  (data, ctx) => {
     if (data.payment_frequency === "yearly" && !data.payout_month) {
       ctx.addIssue({
         path: ["payout_month"],
@@ -509,7 +514,8 @@ export const StatutoryBonusSchema = z
         data.payout_month = undefined;
       }
     }
-  });
+  },
+);
 
 export const categoryArray = ["suggestion", "bug", "complain"] as const;
 export const severityArray = ["low", "normal", "urgent"] as const;
@@ -608,44 +614,43 @@ export const PaymentTemplateComponentsSchema = z.object({
         .enum(["payment_field", ...statutoryFieldsArray])
         .default("payment_field"),
       payment_field_id: z.string().uuid().optional(),
-      payment_field: z
-        .object({
-          name: zNumberString.optional(),
-          calculation_type: z.enum(calculationTypeArray).optional(),
-          payment_type: z.enum(paymentTypeArray).optional(),
-          amount: z.number().optional(),
-        })
-        .optional(),
+      payment_field: PaymentFieldSchemaObject.omit({
+        id: true,
+        company_id: true,
+      }).optional(),
       epf_id: z.string().uuid().optional(),
-      epf: z
-        .object({
-          name: zNumberString.optional(),
-        })
-        .optional(),
+      epf: EmployeeProvidentFundSchema.omit({
+        id: true,
+        company_id: true,
+      }).optional(),
       esi_id: z.string().uuid().optional(),
-      esi: z
-        .object({
-          name: zNumberString.optional(),
-        })
-        .optional(),
+      esi: EmployeeStateInsuranceSchema.omit({
+        id: true,
+        company_id: true,
+      }).optional(),
       bonus_id: z.string().uuid().optional(),
-      bonus: z
-        .object({
-          name: zNumberString.optional(),
+      bonus: StatutoryBonusSchemaObject.omit({
+        id: true,
+        company_id: true,
+      })
+        .extend({
+          name: zNumberString.default("Bonus").optional(),
         })
         .optional(),
       lwf_id: z.string().uuid().optional(),
-      lwf: z
-        .object({
-          name: zNumberString.optional(),
+      lwf: LabourWelfareFundSchema.omit({
+        id: true,
+        company_id: true,
+      })
+        .extend({
+          name: zNumberString.default("Labour Welfare Fund").optional(),
         })
         .optional(),
       pt_id: z.string().uuid().optional(),
-      pt: z
-        .object({
-          name: zNumberString.optional(),
-        })
-        .optional(),
+      pt: ProfessionalTaxSchema.omit({
+        id: true,
+        company_id: true,
+      }).optional(),
       component_type: z.enum(componentTypeArray).default("earning"),
       calculation_value: z.number().optional(),
       display_order: z.number().int().optional(),

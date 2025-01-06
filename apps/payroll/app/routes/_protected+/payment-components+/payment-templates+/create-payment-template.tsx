@@ -3,7 +3,14 @@ import { FormStepHeader } from "@/components/form/form-step-header";
 import { CreatePaymentTemplateComponentDetails } from "@/components/payment-templates/form/create-payment-template-component";
 import { CreatePaymentTemplateDetails } from "@/components/payment-templates/form/create-payment-template-details";
 import { usePaymentComponentsStore } from "@/store/payment-components";
-import { getSelectedComponentFromField } from "@/utils/payment";
+import {
+  getBonusComponentFromField,
+  getEPFComponentFromField,
+  getESIComponentFromField,
+  getLWFComponentFromField,
+  getPTComponentFromField,
+  getSelectedPaymentComponentFromField,
+} from "@/utils/payment";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { commitSession, getSession } from "@/utils/sessions";
 import { getPaymentFieldNamesByCompanyId } from "@canny_ecosystem/supabase/queries";
@@ -170,7 +177,7 @@ export async function action({ request }: ActionFunctionArgs) {
       if (submission.status === "error") {
         return json(
           { result: submission.reply() },
-          { status: submission.status === "error" ? 400 : 200 },
+          { status: submission.status === "error" ? 400 : 200 }
         );
       }
     }
@@ -205,7 +212,8 @@ export default function CreatePaymentTemplate() {
       ? getInitialValueFromZod(currentSchema)
       : undefined;
 
-  const { selectedPaymentFields } = usePaymentComponentsStore();
+  const { selectedPaymentFields, selectedStatutoryFields } =
+    usePaymentComponentsStore();
 
   const defaultValues =
     step === 1
@@ -235,28 +243,54 @@ export default function CreatePaymentTemplate() {
 
   useEffect(() => {
     if (step === 2) {
+      const maxValue = Number.parseFloat(fields.monthly_ctc.value ?? "0");
       form.update({
         value: {
           ...form.value,
-          payment_template_components: selectedPaymentFields.map(
-            (paymentField) =>
-              getSelectedComponentFromField({
+          payment_template_components: [
+            ...selectedPaymentFields.map((paymentField) =>
+              getSelectedPaymentComponentFromField({
                 field: paymentField,
-                monthlyCtc: Number.parseFloat(fields.monthly_ctc.value ?? "0"),
-              }),
-          ),
+                monthlyCtc: maxValue,
+              })
+            ),
+            getEPFComponentFromField({
+              field: selectedStatutoryFields.epf,
+              value: maxValue,
+            }),
+            getESIComponentFromField({
+              field: selectedStatutoryFields.esi,
+              value: maxValue,
+            }),
+            getPTComponentFromField({
+              field: selectedStatutoryFields.pt,
+              value: maxValue,
+            }),
+            getLWFComponentFromField({
+              field: selectedStatutoryFields.lwf,
+            }),
+            getBonusComponentFromField({
+              field: selectedStatutoryFields.bonus,
+              value: maxValue,
+            }),
+          ],
         },
       });
     }
-  }, [selectedPaymentFields, fields.monthly_ctc.value]);
+  }, [
+    selectedPaymentFields,
+    selectedStatutoryFields,
+    fields.monthly_ctc.value,
+    fields.state.value,
+  ]);
 
   useIsomorphicLayoutEffect(() => {
     setResetKey(Date.now());
   }, [step]);
 
   return (
-    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
-      <div className="w-full mx-auto mb-8">
+    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
+      <div className='w-full mx-auto mb-8'>
         <FormStepHeader
           totalSteps={totalSteps}
           step={step}
@@ -265,13 +299,13 @@ export default function CreatePaymentTemplate() {
       </div>
       <FormProvider context={form.context}>
         <Form
-          method="POST"
-          encType="multipart/form-data"
+          method='POST'
+          encType='multipart/form-data'
           {...getFormProps(form)}
-          className="flex flex-col"
+          className='flex flex-col'
         >
           <Card>
-            <div className="h-[500px] overflow-scroll">
+            <div className='h-[500px] overflow-scroll'>
               {step === 1 ? (
                 <CreatePaymentTemplateDetails
                   key={resetKey}
