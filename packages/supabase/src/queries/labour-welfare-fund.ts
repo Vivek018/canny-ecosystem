@@ -8,7 +8,7 @@ import { HARD_QUERY_LIMIT } from "../constant";
 export async function getLabourWelfareFundById({
   supabase,
   id,
-}: { supabase: TypedSupabaseClient; id: string;}) {
+}: { supabase: TypedSupabaseClient; id: string }) {
   const columns = [
     "id",
     "company_id",
@@ -23,7 +23,9 @@ export async function getLabourWelfareFundById({
     .from("labour_welfare_fund")
     .select(columns.join(","))
     .eq("id", id)
-    .single<InferredType<LabourWelfareFundDatabaseRow, (typeof columns)[number]>>();
+    .single<
+      InferredType<LabourWelfareFundDatabaseRow, (typeof columns)[number]>
+    >();
 
   if (error) console.error(error);
 
@@ -50,7 +52,9 @@ export async function getLabourWelfareFundsByCompanyId({
     .eq("company_id", companyId)
     .limit(HARD_QUERY_LIMIT)
     .order("created_at", { ascending: false })
-    .returns<InferredType<LabourWelfareFundDatabaseRow, (typeof columns)[number]>[]>();
+    .returns<
+      InferredType<LabourWelfareFundDatabaseRow, (typeof columns)[number]>[]
+    >();
 
   if (error) console.error(error);
 

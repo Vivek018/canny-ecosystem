@@ -167,6 +167,25 @@ export async function getSitesByProjectId({
   return { data, error };
 }
 
+export async function getAllSitesByProjectId({
+  supabase,
+  projectId,
+}: {
+  supabase: TypedSupabaseClient;
+  projectId: string;
+}) {
+  const columns = ["id"] as const;
+  const { data, error } = await supabase
+    .from("project_sites")
+    .select(columns.join(","))
+    .eq("project_id", projectId)
+    .returns<{id:string}[]>();
+
+  if (error) console.error(error);
+
+  return { data, error };
+}
+
 export async function getSitesWithEmployeeCountByProjectId({
   supabase,
   projectId,
@@ -189,7 +208,7 @@ export async function getSitesWithEmployeeCountByProjectId({
     "is_active",
     "company_location:company_locations!company_location_id (id, name)",
     "project_id",
-    "employees_count:employee_project_assignment!project_site_id(count)"
+    "employees_count:employee_project_assignment!project_site_id(count)",
   ] as const;
 
   const { data, error } = await supabase
@@ -198,10 +217,7 @@ export async function getSitesWithEmployeeCountByProjectId({
     .eq("project_id", projectId)
     .limit(HARD_QUERY_LIMIT)
     .order("created_at", { ascending: false })
-    .returns<Omit<SitesWithLocation, "created_at" | "updated_at">& {
-      employees_count: {count: number}[];
-    }[]>();
-
+    .returns<SitesWithLocation[]>();
 
   if (error) console.error(error);
 

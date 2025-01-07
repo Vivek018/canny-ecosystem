@@ -1,21 +1,51 @@
-import { ProjectCard } from "@/components/projects/project-card";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { getProjectsByCompanyId } from "@canny_ecosystem/supabase/queries";
+import { getAllSitesByProjectId, getPendingPayrollCountBySiteId, getProjectsByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@canny_ecosystem/ui/command";
 import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json, Outlet, useLoaderData } from "@remix-run/react";
+import { PayrollProjectCard } from "@/components/payroll/payroll-project-card";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data, error } = await getProjectsByCompanyId({ supabase, companyId });
+  const { data: projectData, error: projectError } = await getProjectsByCompanyId({ supabase, companyId });
 
-  if (error) throw error;
+  await Promise.all(
+    (projectData ?? []).map(async (project:any) => {
+      // Setting number of sites
+      const { data: siteData } = await getAllSitesByProjectId({
+        supabase,
+        projectId: project.id,
+      });
+      project.totalSites = siteData?.length || 0;
 
-  return json({ data });
+      // Initialize pending payroll
+      project.pendingPayroll = 0;
+
+      // Calculate pending payroll for all sites
+      if (siteData?.length) {
+        const payrollCounts = await Promise.all(
+          siteData.map(async (site: any) => {
+            const { data } = await getPendingPayrollCountBySiteId({
+              supabase,
+              siteId: site.id,
+            });
+            return data ?? 0;
+          })
+        );
+
+        // Sum up pending payroll counts
+        project.pendingPayroll = payrollCounts.reduce((sum, count) => sum + count, 0);
+      }
+    })
+  );
+
+  if (projectError) throw projectError;
+
+  return json({ data: projectData });
 }
 
 export default function ProjectsIndex() {
@@ -58,7 +88,7 @@ export default function ProjectsIndex() {
                     }
                     className="data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0"
                   >
-                    <ProjectCard project={project} />
+                    <PayrollProjectCard project={project} />
                   </CommandItem>
                 ))}
               </div>

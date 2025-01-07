@@ -1,20 +1,16 @@
-import type {
-  InferredType,
-  PaymentTemplateComponentsDatabaseRow,
-  TypedSupabaseClient,
-} from "../types";
-import { SINGLE_QUERY_LIMIT } from "../constant";
+import type {PaymentTemplateComponentsDatabaseRow, TypedSupabaseClient} from "../types";
 
-export async function getPaymentTemplateComponentByTemplateId({
+export async function getPaymentTemplateComponentsByTemplateId({
   supabase,
   templateID,
 }: {
   supabase: TypedSupabaseClient;
   templateID: string;
-}){
+}) {
   const columns = [
     "id",
     "target_type",
+    "template_id",
     "payment_field_id",
     "epf_id",
     "esi_id",
@@ -22,7 +18,6 @@ export async function getPaymentTemplateComponentByTemplateId({
     "pt_id",
     "lwf_id",
     "component_type",
-    "calculation_type",
     "calculation_value",
     "display_order",
   ] as const;
@@ -30,14 +25,8 @@ export async function getPaymentTemplateComponentByTemplateId({
   const { data, error } = await supabase
     .from("payment_template_components")
     .select(columns.join(","))
-    .limit(SINGLE_QUERY_LIMIT)
     .eq("template_id", templateID)
-    .single<
-      InferredType<
-        PaymentTemplateComponentsDatabaseRow,
-        (typeof columns)[number]
-      >
-    >();
+    .returns<PaymentTemplateComponentsDatabaseRow[]>();
 
   if (error) console.error(error);
 

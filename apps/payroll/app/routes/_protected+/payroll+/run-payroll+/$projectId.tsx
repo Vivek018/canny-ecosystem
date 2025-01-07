@@ -1,4 +1,4 @@
-import { getPayrollBySiteId, getSitesWithEmployeeCountByProjectId } from "@canny_ecosystem/supabase/queries";
+import { getPayrollBySiteId, getSitesWithEmployeeCountByProjectId, type SitesWithLocation } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
   Command,
@@ -24,13 +24,29 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   if (!projectId) throw new Error("No Project Id");
 
   const { data: siteData, error: siteError } = await getSitesWithEmployeeCountByProjectId({ supabase, projectId });
-  
-  const newSiteData = await Promise.all(
-    (siteData ?? []).map(async (site:any) => {
+
+  const newSiteData: SitesWithLocation[] = [];
+  await Promise.all(
+    (siteData ?? []).map(async (site) => {
       const tmp = { ...site };
-      const { data } = await getPayrollBySiteId({ supabase, site_id: site.id });
-      tmp.is_approved = data ? (data.status === "approved") : false;
-      return tmp;
+      const { data: payrolls } = await getPayrollBySiteId({ supabase, site_id: site.id });
+
+      let add = true;
+      const currentDate = new Date();
+      const currentYearMonth = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+      (payrolls ?? []).map((payroll) => {
+        if (payroll?.run_date?.startsWith(currentYearMonth)) add = false;
+        const payrollTmp = { ...tmp } as SitesWithLocation & { runDate: string | null, is_approved: boolean };
+        payrollTmp.runDate = payroll?.run_date;
+        payrollTmp.is_approved = (payroll.status === "approved");
+        newSiteData.push(payrollTmp);
+      });
+      if (add) {
+        const payrollTmp = { ...tmp } as SitesWithLocation & { runDate: string | null, is_approved: boolean };
+        payrollTmp.runDate = "";
+        payrollTmp.is_approved = false;
+        newSiteData.push(payrollTmp);
+      }
     })
   );
 
@@ -41,10 +57,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   return json({ data: newSiteData });
 }
 
-export async function action() { return null; }
-
 export default function SitesIndex() {
-  const { data } = useLoaderData<typeof loader>();
+  const { data } = useLoaderData<any>();
+  const isEarliestSiteDate = (site: { id: string; runDate: string; }) => {
+    const earliestDate = data
+      .filter((entry: { id: string; }) => entry.id === site.id)
+      .reduce((min: string, entry: { runDate: string; }) => entry.runDate < min ? entry.runDate : min, site.runDate);
+    return (site.runDate === earliestDate);
+  }
+
   const { isDocument } = useIsDocument();
 
   return (
@@ -69,7 +90,7 @@ export default function SitesIndex() {
           <CommandList className='max-h-full py-2 overflow-x-visible overflow-y-visible'>
             <CommandGroup className='w-full p-0 overflow-visible'>
               <div className='flex-col'>
-                {data?.map((site :any) => (
+                {data?.map((site:any) => (
                   <CommandItem
                     key={site.id}
                     value={
@@ -84,7 +105,7 @@ export default function SitesIndex() {
                     }
                     className='w-full data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0'
                   >
-                    {!site.is_approved && <PayrollStatus data={site} />} 
+                    {!site.is_approved && <PayrollStatus data={site} disable={!isEarliestSiteDate(site)} />}
                   </CommandItem>
                 ))}
               </div>

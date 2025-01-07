@@ -3,17 +3,8 @@ import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { createStatutoryBonus } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import type {
-  Json,
-  StatutoryBonusDatabaseRow,
-  StatutoryBonusDatabaseUpdate,
-} from "@canny_ecosystem/supabase/types";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@canny_ecosystem/ui/card";
+import type { StatutoryBonusDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import { Card, CardContent, CardHeader, CardTitle } from "@canny_ecosystem/ui/card";
 import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import {
   getInitialValueFromZod,
@@ -55,7 +46,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   const { status, error } = await createStatutoryBonus({
     supabase,
-    data: submission.value as any,
+    data: submission.value,
     bypassAuth: true,
   });
 

@@ -19,7 +19,7 @@ export const pipe =
     fns.reduce((prev, fn) => fn(prev), val);
 
 export function getInitialValueFromZod<T extends z.ZodTypeAny>(
-  schema: T
+  schema: T,
 ): z.infer<T> {
   let unwrappedSchema = schema;
   while (unwrappedSchema instanceof z.ZodEffects) {
@@ -36,12 +36,12 @@ export function getInitialValueFromZod<T extends z.ZodTypeAny>(
         return [key, value._def.defaultValue()];
       }
       return [key, undefined];
-    })
+    }),
   ) as z.infer<T>;
 }
 
 export function transformStringArrayIntoOptions(
-  arr: string[]
+  arr: string[],
 ): { value: string; label: string }[] {
   return arr.map((str) => ({
     value: str,
@@ -60,7 +60,7 @@ export function getOrdinalSuffix(n: number): string {
 
 export function deepEqualCheck(
   obj1: { [x: string]: any } | null | undefined,
-  obj2: { [x: string]: any } | null | undefined
+  obj2: { [x: string]: any } | null | undefined,
 ) {
   if (obj1 === obj2) {
     return true;
@@ -156,7 +156,7 @@ export function extractJsonFromString(str: string): any | null {
 }
 
 export function debounce<
-  Callback extends (...args: Parameters<Callback>) => void
+  Callback extends (...args: Parameters<Callback>) => void,
 >(fn: Callback, delay: number) {
   let timer: ReturnType<typeof setTimeout> | null = null;
   return (...args: Parameters<Callback>) => {
@@ -165,4 +165,19 @@ export function debounce<
       fn(...args);
     }, delay);
   };
+}
+
+export function getCurrentMonthIndex() {
+  const date = new Date();
+  return date.getMonth() + 1;
+}
+
+export function toCamelCase(str: string) {
+  return str
+    .toLowerCase()
+    .split(" ")
+    .map((word, index) =>
+      index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1),
+    )
+    .join("");
 }

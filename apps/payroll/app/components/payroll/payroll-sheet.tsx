@@ -1,23 +1,47 @@
+import { useEffect, useState } from "react";
+import { type PayrollEmployeeData, PayrollSchema } from "@canny_ecosystem/utils";
+import { FormProvider, getFormProps, getInputProps, useForm } from "@conform-to/react";
+import { Field } from "@canny_ecosystem/ui/forms";
+import { Form } from "@remix-run/react";
 import {
-  Sheet, SheetClose, SheetContent, SheetFooter, SheetHeader, SheetTitle, SheetTrigger,
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger
 } from "@canny_ecosystem/ui/sheet";
 import { TableCell, TableRow } from "@canny_ecosystem/ui/table";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { flexRender } from "@tanstack/react-table";
-import { useState } from "react";
-import { Field } from "@canny_ecosystem/ui/forms";
-import { Form } from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import {type  PayrollEmployeeData, PayrollSchema } from "@canny_ecosystem/utils";
-import { FormProvider, getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { FormButtons } from "../form/form-buttons";
 
-export function PayrollSheet({ row, rowData, editable }: { row:any, rowData:PayrollEmployeeData, editable: boolean }) {
+const getFullName = (name: string) => {
+  if (name === "epf") return "employee provident fund";
+  if (name === "esi") return "employee state insurance";
+  if (name === "pt") return "professional tax";
+  if (name === "statutoryBonus") return "statutory bonus";
+  if (name === "lwf") return "labour welfare fund";
+}
+
+export function PayrollSheet({ row, rowData, editable }: { row: any, rowData: PayrollEmployeeData, editable: boolean }) {
   const [_resetKey, setResetKey] = useState(Date.now());
+  const [netPay, setNetPay] = useState(0);
+
+  // initial values
   const initialValues = {
-    gross_pay: rowData.gross_pay,
-    reimbursements: rowData.reimbursements
-  }
+    gross_pay: rowData.gross_pay ?? 0,
+    reimbursements: rowData.reimbursements ?? 0,
+  };
+
+  const templateComponents: { paymentTemplateComponentId: string; name: string }[] = []; // to keep track of which field is linked to which template
+  rowData.templateComponents.map((row:any) => {
+    initialValues[row.name] = row.amount;
+    const { paymentTemplateComponentId, name } = row;
+    templateComponents.push({ paymentTemplateComponentId, name });
+  });
 
   const [form, fields] = useForm({
     id: rowData.employee_id,
@@ -30,35 +54,80 @@ export function PayrollSheet({ row, rowData, editable }: { row:any, rowData:Payr
     defaultValue: {
       ...initialValues,
       site_id: rowData.site_id,
-      employee_id: rowData.employee_id
+      employee_id: rowData.employee_id,
+      payrollId: rowData.payrollId,
+      templateComponents: JSON.stringify(templateComponents)
     },
   });
 
-  const grossPay = Number(fields.gross_pay.value ?? 0);
-  const reimbursements = Number(fields.reimbursements.value ?? 0);
+  const earnings = [
+    {
+      title: "Gross Pay",
+      inputPropField: fields.gross_pay,
+      placeholder: "Enter gross pay",
+      errors: fields.gross_pay.errors,
+      value: fields.gross_pay.value
+    }
+  ];
+  const deductions = [
+    {
+      title: "Reimbrushments",
+      inputPropField: fields.reimbursements,
+      placeholder: "Enter reimbursements",
+      errors: fields.reimbursements.errors,
+      value: fields.reimbursements.value
+    }
+  ];
+
+  rowData.templateComponents.map((row:any) => {
+    const { name } = row;
+    const paymentFieldData = {
+      title: row[name].name ? row[name].name : getFullName(row.name),
+      inputPropField: fields[name],
+      placeholder: `Enter ${row[name].name}`,
+      errors: fields[name].errors,
+      value: fields[name].value
+    } as any;
+
+    if (row[name].componentType === "deductions" || row[name].componentType === "statutory_contribution")
+      deductions.push(paymentFieldData);
+    else
+      earnings.push(paymentFieldData)
+  });
+
+  useEffect(() => {
+    let newNetPay = 0;
+    for (const earning of earnings) newNetPay += Number(earning.value);
+    for (const deduction of deductions) newNetPay -= Number(deduction.value);
+
+    setNetPay(newNetPay);
+  }, [
+    fields.gross_pay.value,
+    fields.reimbursements.value,
+    ...rowData.templateComponents
+      .map((row: { name: string }) => fields[row.name].value)
+  ]);
 
   return (
     <Sheet>
       <SheetTrigger asChild>
         <TableRow key={row.id} className="relative cursor-pointer select-text">
-          {
-            row.getVisibleCells().map((cell:any) => (
-              <TableCell
-                key={cell.id}
-                className={cn(
-                  "px-3 md:px-4 py-2 hidden md:table-cell",
-                  cell.column.id === "name" &&
-                  "sticky left-0 min-w-12 max-w-12 bg-card z-10"
-                )}
-              >
-                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-              </TableCell>
-            ))
-          }
+          {row.getVisibleCells().map((cell: any) => (
+            <TableCell
+              key={cell.id}
+              className={cn(
+                "px-3 md:px-4 py-2 hidden md:table-cell",
+                cell.column.id === "name" &&
+                "sticky left-0 min-w-12 max-w-12 bg-card z-10"
+              )}
+            >
+              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+            </TableCell>
+          ))}
         </TableRow>
       </SheetTrigger>
-      <SheetContent className="w-[800px]">
-        <SheetHeader className="m-5">
+      <SheetContent className="w-[800px] flex flex-col h-full overflow-hidden">
+        <SheetHeader className="m-5 flex-shrink-0">
           <SheetTitle className="flex justify-between">
             <div>
               <h1 className="text-primary text-3xl">{rowData.name}</h1>
@@ -69,104 +138,107 @@ export function PayrollSheet({ row, rowData, editable }: { row:any, rowData:Payr
 
             <div className="flex flex-col items-end justify-around">
               <h2 className="text-xl text-muted-foreground">Net Pay</h2>
-              {
-                editable
-                  ?
-                  <p className="font-bold">Rs {grossPay - reimbursements}</p>
-                  :
-                  <p className="font-bold">Rs {initialValues.gross_pay - initialValues.reimbursements}</p>
-              }
+              <p className="font-bold">Rs {netPay}</p>
             </div>
           </SheetTitle>
         </SheetHeader>
-        <FormProvider context={form.context}>
-          <Form
-            method="POST"
-            {...getFormProps(form)}
-            className="flex flex-col"
-            action={"/payroll/run-payroll/update-payroll-entry"}
-          >
-            <input {...getInputProps(fields.site_id, { type: "hidden" })} />
-            <input {...getInputProps(fields.employee_id, { type: "hidden" })} />
-            <div className="mx-5 flex justify-between">
-              <h3 className="my-3 text-muted-foreground font-semibold">Paid Days</h3>
-              <p className="my-3 font-bold">{rowData.present_days ?? "--"}</p>
-            </div>
-            <hr />
-            <div className="mx-5 flex justify-between">
-              <h3 className="my-3 text-green font-semibold">(+) EARNINGS</h3>
-              <p className="my-3 font-bold">Amount</p>
-            </div>
-            <hr />
-            <div className="flex justify-between mx-5">
-              <div>
-                <h3 className="my-3 text-muted-foreground font-semibold">Gross Pay (in Rs)</h3>
+        <div className="flex-1 overflow-y-auto px-5">
+          <FormProvider context={form.context}>
+            <Form
+              method="POST"
+              {...getFormProps(form)}
+              className="flex flex-col"
+              action="/payroll/run-payroll/update-payroll-entry"
+            >
+              <input {...getInputProps(fields.site_id, { type: "hidden" })} />
+              <input {...getInputProps(fields.employee_id, { type: "hidden" })} />
+              <input {...getInputProps(fields.payrollId, { type: "hidden" })} />
+              <input {...getInputProps(fields.templateComponents, { type: "hidden" })} />
+              <div className="flex justify-between">
+                <h3 className="my-3 text-muted-foreground font-semibold">Paid Days</h3>
+                <p className="my-3 font-bold">{rowData.present_days ?? "--"}</p>
               </div>
-              <div className="text-end font-semibold">
-                {
-                  editable
-                    ?
-                    <Field
-                      inputProps={{
-                        ...getInputProps(fields.gross_pay, { type: "number" }),
-                        className: "capitalize",
-                        placeholder: `Enter ${fields.gross_pay.name}`,
-                      }}
-                      errors={fields.gross_pay.errors}
-                    />
-                    :
-                    <p className="mt-3">{initialValues.gross_pay}</p>
-                }
+              <hr />
+
+              {/* EARNINGS */}
+              <div className="flex justify-between">
+                <h3 className="my-3 text-green font-semibold">(+) EARNINGS (in Rs)</h3>
+                <p className="my-3 font-bold">Amount</p>
               </div>
-            </div>
-            <hr />
-            <div className="mx-5 flex justify-between">
-              <h3 className="my-3 text-destructive font-semibold">(-) DEDUCTION</h3>
-              <p className="my-3 font-bold">Amount</p>
-            </div>
-            <hr />
-            <div className="flex justify-between mx-5">
-              <div>
-                <h3 className="my-3 text-muted-foreground font-semibold">Reimbursements (in Rs)</h3>
-              </div>
-              <div className="text-end font-semibold">
-                {
-                  editable
-                    ?
-                    <Field
-                      inputProps={{
-                        ...getInputProps(fields.reimbursements, { type: "number" }),
-                        className: "capitalize",
-                        placeholder: `Enter ${fields.reimbursements.name}`,
-                      }}
-                      errors={fields.reimbursements.errors}
-                    />
-                    :
-                    <p className="mt-3">{initialValues.reimbursements}</p>
-                }
-              </div>
-            </div>
-            <hr />
-            <div className="flex justify-between mx-5">
-              <h3 className="my-3 text-muted-foreground font-semibold">Net Pay</h3>
+              <hr />
               {
-                editable
-                  ?
-                  <p className="font-bold">Rs {grossPay - reimbursements}</p>
-                  :
-                  <p className="font-bold mt-3">Rs {initialValues.gross_pay - initialValues.reimbursements}</p>
+                earnings.map((earning, key) => {
+                  return <div className="flex justify-between" key={key as any}>
+                    <div>
+                      <h3 className="my-3 text-muted-foreground font-semibold capitalize">{earning.title}</h3>
+                    </div>
+                    <div className="text-end font-semibold">
+                      {editable ? (
+                        <Field
+                          inputProps={{
+                            ...getInputProps(earning.inputPropField, { type: "number" }),
+                            className: "capitalize",
+                            placeholder: earning.placeholder
+                          }}
+                          errors={earning.errors}
+                        />
+                      ) : (
+                        <p className="mt-3">{earning.value ? earning.value : '-'}</p>
+                      )}
+                    </div>
+                  </div>
+                })
               }
-            </div>
-          </Form>
-        </FormProvider>
-        <SheetFooter className="my-20">
+              <hr />
+
+              {/* DEDUCTIONS */}
+              <div className="flex justify-between">
+                <h3 className="my-3 text-destructive font-semibold">(-) DEDUCTION (in Rs)</h3>
+                <p className="my-3 font-bold">Amount</p>
+              </div>
+              <hr />
+              {
+                deductions.map((deduction, key) => {
+                  return <div className="flex justify-between" key={key as any}>
+                    <div>
+                      <h3 className="my-3 text-muted-foreground font-semibold capitalize">{deduction.title}</h3>
+                    </div>
+                    <div className="text-end font-semibold">
+                      {editable ? (
+                        <Field
+                          inputProps={{
+                            ...getInputProps(deduction.inputPropField, { type: "number" }),
+                            className: "capitalize",
+                            placeholder: deduction.placeholder
+                          }}
+                          errors={deduction.errors}
+                        />
+                      ) : (
+                        <p className="mt-3">{deduction.value ? deduction.value : "-"}</p>
+                      )}
+                    </div>
+                  </div>
+                })
+              }
+              <hr />
+
+              <div className="flex justify-between">
+                <h3 className="my-3 text-muted-foreground font-semibold">Net Pay</h3>
+                <p className="font-bold">Rs {netPay}</p>
+              </div>
+            </Form>
+          </FormProvider>
+        </div>
+        <SheetFooter className="mt-6 flex-shrink-0">
           <SheetClose asChild>
             {
-              editable && <FormButtons
-                form={form}
-                setResetKey={setResetKey}
-                isSingle={true}
-              />
+              editable && (
+                <FormButtons
+                  form={form}
+                  setResetKey={setResetKey}
+                  isSingle={true}
+                />
+              )
             }
           </SheetClose>
         </SheetFooter>

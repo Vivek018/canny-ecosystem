@@ -15,6 +15,7 @@ export async function createProfessionalTax({
   data: ProfessionalTaxDatabaseInsert;
   bypassAuth?: boolean;
 }) {
+  
   if (!bypassAuth) {
     const {
       data: { user },

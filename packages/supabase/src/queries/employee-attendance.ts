@@ -6,10 +6,10 @@ import type {
 
 export async function getAttendanceByEmployeeId({
   supabase,
-  employee_id,
+  employeeId,
 }: {
   supabase: TypedSupabaseClient;
-  employee_id: string;
+  employeeId: string;
 }) {
   const columns = [
     "date",
@@ -26,7 +26,7 @@ export async function getAttendanceByEmployeeId({
   const { data, error } = await supabase
     .from("employee_attendance")
     .select(columns.join(","))
-    .eq("employee_id", employee_id)
+    .eq("employee_id", employeeId)
     .single<
       InferredType<EmployeeAttendanceDatabaseRow, (typeof columns)[number]>
     >();

@@ -10,6 +10,9 @@ import {
 
 export const DEFAULT_ROUTE = "/";
 
+export const CANNY_MANAGEMENT_SERVICES_COMPANY_ID =
+  "0638799b-6608-4326-8da0-8ac1fa38f0e7";
+
 export const workingDaysOptions = [
   { value: "0", label: "Sun" },
   { value: "1", label: "Mon" },

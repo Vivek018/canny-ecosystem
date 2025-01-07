@@ -419,7 +419,7 @@ export const PaymentFieldSchema = z
     {
       message: `When payment type is "variable", calculation type must be "fixed".`,
       path: ["calculation_type"],
-    }
+    },
   );
 
 export const deductionCycleArray = ["monthly"] as const;
@@ -568,8 +568,6 @@ export const ExitPaymentPage2Schema = z.object({
   deduction: zNumber.optional(),
 });
 
-
-
 // Payment Template Assignment
 export const paymentAssignmentTypesArray = ["employee", "site"] as const;
 export const eligibilityOptionsArray = ["position", "skill_level"] as const;
@@ -648,12 +646,22 @@ export const UpdateSiteLinkSchema = z.object({
 });
 
 // Payroll
-export const PayrollSchema = z.object({
-  gross_pay:z.number(),
-  reimbursements:z.number(),
-  site_id: z.string().optional(),
-  employee_id: z.string().optional(),
-});
+export const PayrollSchema = z
+  .object({
+    employee_id: z.string().optional(),
+    site_id: z.string().optional(),
+    payrollId: z.string().optional(),
+    gross_pay: z.number().optional(),
+    statutoryBonus: z.number().optional(),
+    reimbursements: z.number().optional(),
+    epf: z.number().optional(),
+    esi: z.number().optional(),
+    pt: z.number().optional(),
+    lwf: z.number().optional(),
+    templateComponents: z.any(),
+  })
+  .catchall(z.any());
+
 export type PayrollEmployeeData = {
   deductions: number;
   employee_code: string;
@@ -666,5 +674,8 @@ export type PayrollEmployeeData = {
   reimbursements: number;
   site_id: string;
   status: string;
-  designation:string;
+  designation: string;
+  payment_template_components_id: string;
+  templateComponents:any;
+  payrollId:string;
 };

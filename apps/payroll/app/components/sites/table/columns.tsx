@@ -6,7 +6,7 @@ export const columns = (): ColumnDef<{ id: string, name: string }>[] => {
   return [
     {
       accessorKey: "name",
-      header: "Template name",
+      header: "Linked Assignments",
       cell: ({ row }) => {
         return <p
           onClick={() => {

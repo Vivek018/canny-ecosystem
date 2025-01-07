@@ -160,8 +160,8 @@ export async function getLocationsByCompanyId({
 
 export async function getLocationById({
   supabase,
-  id
-}: { supabase: TypedSupabaseClient; id: string; }) {
+  id,
+}: { supabase: TypedSupabaseClient; id: string }) {
   const columns = [
     "id",
     "company_id",
@@ -255,6 +255,28 @@ export async function getRelationshipById({
   if (error) {
     console.error(error);
   }
+
+  return { data, error };
+}
+
+export async function getRelationshipIdByParentIdAndChildId({
+  supabase,
+  parentCompanyId,
+  childCompanyId,
+}: { 
+  supabase: TypedSupabaseClient; 
+  parentCompanyId: string;
+  childCompanyId:string }) {
+  const columns = ["id"] as const;
+
+  const { data, error } = await supabase
+    .from("company_relationships")
+    .select(columns.join(","))
+    .eq("parent_company_id", parentCompanyId)
+    .eq("child_company_id",childCompanyId)
+    .single<Omit<RelationshipWithCompany, "created_at" | "updated_at">>();
+
+  if (error) console.error(error);
 
   return { data, error };
 }
