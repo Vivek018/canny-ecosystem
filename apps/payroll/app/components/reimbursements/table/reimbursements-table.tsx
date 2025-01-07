@@ -25,7 +25,7 @@ import { Spinner } from "@canny_ecosystem/ui/spinner";
 import { useSearchParams } from "@remix-run/react";
 import { Button } from "@canny_ecosystem/ui/button";
 import { useReimbursementStore } from "@/store/reimbursements";
-import { ExportBar } from "../imported-table/export-bar";
+import { ExportBar } from "../import-export/export-bar";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -105,9 +105,7 @@ export function ReimbursementsTable<TData, TValue>({
           },
         });
         if (data) {
-          setData(
-            (prevData) => [...prevData, ...(data)] as TData[]
-          );
+          setData((prevData) => [...prevData, ...data] as TData[]);
         }
         setFrom(to + 1);
         setHasNextPage(data?.length! > to);
@@ -129,9 +127,7 @@ export function ReimbursementsTable<TData, TValue>({
     },
   });
 
-  
-
-  const selectedRowsData= table
+  const selectedRowsData = table
     .getSelectedRowModel()
     .rows?.map((row) => row.original);
 

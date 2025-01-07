@@ -729,22 +729,22 @@ export const ImportReimbursementDataSchema = z.object({
   data: z.array(ImportSingleReimbursementDataSchema),
 });
 
-export const ImportEmployeePersonalsHeaderSchema = z
-  .object({
-    employee_code: z.string(),
-    first_name: z.string(),
-    middle_name: z.string().optional(),
-    last_name: z.string(),
-    gender: z.string().optional(),
-    education: z.string().optional(),
-    marital_status: z.string().optional(),
-    is_active: z.string().optional(),
-    date_of_birth: z.string(),
-    personal_email: z.string().optional(),
-    primary_mobile_number: z.string(),
-    secondary_mobile_number: z.string().optional(),
-  })
-  .refine(
+export const ImportEmployeePersonalsHeaderSchemaObject = z.object({
+  employee_code: z.string(),
+  first_name: z.string(),
+  middle_name: z.string().optional(),
+  last_name: z.string(),
+  gender: z.string().optional(),
+  education: z.string().optional(),
+  marital_status: z.string().optional(),
+  is_active: z.string().optional(),
+  date_of_birth: z.string(),
+  personal_email: z.string().optional(),
+  primary_mobile_number: z.string(),
+  secondary_mobile_number: z.string().optional(),
+});
+export const ImportEmployeePersonalsHeaderSchema =
+  ImportEmployeePersonalsHeaderSchemaObject.refine(
     (data) => {
       const values = [
         data.employee_code,
@@ -815,20 +815,21 @@ export const ImportEmployeePersonalsDataSchema = z.object({
   data: z.array(ImportSingleEmployeePersonalsDataSchema),
 });
 
-export const ImportEmployeeStatutoryHeaderSchema = z
-  .object({
-    employee_code: z.string(),
-    aadhaar_number: z.string(),
-    pan_number: z.string().optional(),
-    uan_number: z.string(),
-    pf_number: z.string(),
-    esic_number: z.string(),
-    driving_license_number: z.string().optional(),
-    driving_license_expiry: z.string().optional(),
-    passport_number: z.string().optional(),
-    passport_expiry: z.string().optional(),
-  })
-  .refine(
+export const ImportEmployeeStatutoryHeaderSchemaObject = z.object({
+  employee_code: z.string(),
+  aadhaar_number: z.string(),
+  pan_number: z.string().optional(),
+  uan_number: z.string(),
+  pf_number: z.string(),
+  esic_number: z.string(),
+  driving_license_number: z.string().optional(),
+  driving_license_expiry: z.string().optional(),
+  passport_number: z.string().optional(),
+  passport_expiry: z.string().optional(),
+});
+
+export const ImportEmployeeStatutoryHeaderSchema =
+  ImportEmployeeStatutoryHeaderSchemaObject.refine(
     (data) => {
       const values = [
         data.employee_code,
@@ -867,40 +868,38 @@ export const ImportEmployeeStatutoryHeaderSchema = z
 export const ImportSingleEmployeeStatutoryDataSchema = z.object({
   employee_code: zNumberString.min(3),
   aadhaar_number: zNumber.min(12).max(12),
-  pan_number: zNumberString.max(10).optional(),
+  pan_number: z.preprocess(
+    (value) => (value === "" ? undefined : value),
+    z.string().max(10).optional()
+  ),
   uan_number: zNumberString.max(12),
   pf_number: zNumberString.max(20),
   esic_number: zNumberString.max(20),
-  driving_license_number: zNumberString.max(20).optional(),
+  driving_license_number: z.preprocess(
+    (value) => (value === "" ? undefined : value),
+    z.string().max(20).optional()
+  ),
   driving_license_expiry: z.string().optional(),
   passport_number: zNumberString.max(20).optional(),
   passport_expiry: z.string().optional(),
-
-  // primary_mobile_number: z.preprocess((value) => {
-  //   const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
-  //   return Number.isNaN(parsed) ? undefined : parsed;
-  // }, z.number()),
-  // secondary_mobile_number: z.preprocess((value) => {
-  //   const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
-  //   return Number.isNaN(parsed) ? undefined : parsed;
-  // }, z.number().optional()),
 });
 
 export const ImportEmployeeStatutoryDataSchema = z.object({
   data: z.array(ImportSingleEmployeeStatutoryDataSchema),
 });
 
-export const ImportEmployeeBankingHeaderSchema = z
-  .object({
-    employee_code: z.string(),
-    account_holder_name: z.string().optional(),
-    account_number: z.string(),
-    ifsc_code: z.string(),
-    account_type: z.string().optional(),
-    bank_name: z.string(),
-    branch_name: z.string().optional(),
-  })
-  .refine(
+export const ImportEmployeeBankingHeaderSchemaObject = z.object({
+  employee_code: z.string(),
+  account_holder_name: z.string().optional(),
+  account_number: z.string(),
+  ifsc_code: z.string(),
+  account_type: z.string().optional(),
+  bank_name: z.string(),
+  branch_name: z.string().optional(),
+});
+
+export const ImportEmployeeBankingHeaderSchema =
+  ImportEmployeeBankingHeaderSchemaObject.refine(
     (data) => {
       const values = [
         data.employee_code,
@@ -938,42 +937,28 @@ export const ImportSingleEmployeeBankingDataSchema = z.object({
   account_type: z.enum(accountTypeArray).default("savings"),
   bank_name: zString.min(3),
   branch_name: zNumberString.min(3).optional(),
-  // is_active: z
-  //   .preprocess(
-  //     (value) =>
-  //       typeof value === "string" ? value.toLowerCase() === "true" : value,
-  //     z.boolean().default(false)
-  //   )
-  //   .default(false),
-  // primary_mobile_number: z.preprocess((value) => {
-  //   const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
-  //   return Number.isNaN(parsed) ? undefined : parsed;
-  // }, z.number()),
-  // secondary_mobile_number: z.preprocess((value) => {
-  //   const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
-  //   return Number.isNaN(parsed) ? undefined : parsed;
-  // }, z.number().optional()),
 });
 
 export const ImportEmployeeBankingDataSchema = z.object({
   data: z.array(ImportSingleEmployeeBankingDataSchema),
 });
 
-export const ImportEmployeeAddressHeaderSchema = z
-  .object({
-    employee_code: z.string(),
-    address_type: z.string(),
-    address_line_1: z.string(),
-    address_line_2: z.string(),
-    city: z.string(),
-    pincode: z.string(),
-    state: z.string(),
-    country: z.string(),
-    latitude: z.string().optional(),
-    longitude: z.string().optional(),
-    is_primary: z.string().optional(),
-  })
-  .refine(
+export const ImportEmployeeAddressHeaderSchemaObject = z.object({
+  employee_code: z.string(),
+  address_type: z.string(),
+  address_line_1: z.string(),
+  address_line_2: z.string(),
+  city: z.string(),
+  pincode: z.string(),
+  state: z.string(),
+  country: z.string(),
+  latitude: z.string().optional(),
+  longitude: z.string().optional(),
+  is_primary: z.string().optional(),
+});
+
+export const ImportEmployeeAddressHeaderSchema =
+  ImportEmployeeAddressHeaderSchemaObject.refine(
     (data) => {
       const values = [
         data.employee_code,
@@ -1014,7 +999,11 @@ export const ImportEmployeeAddressHeaderSchema = z
 export const ImportSingleEmployeeAddressDataSchema = z.object({
   employee_code: zNumberString.min(3),
   address_type: zString.min(3).max(20),
-  is_primary: z.boolean().default(false),
+  is_primary: z.preprocess(
+    (value) =>
+      typeof value === "string" ? value.toLowerCase() === "true" : value,
+    z.boolean().default(false)
+  ),
   address_line_1: z
     .string()
     .min(3)
@@ -1026,44 +1015,35 @@ export const ImportSingleEmployeeAddressDataSchema = z.object({
   state: zString,
   city: zString.min(3),
   pincode: zNumber.min(6).max(6),
-  latitude: z.number().min(-90).max(90).optional(),
-  longitude: z.number().min(-180).max(180).optional(),
-  // is_active: z
-  //   .preprocess(
-  //     (value) =>
-  //       typeof value === "string" ? value.toLowerCase() === "true" : value,
-  //     z.boolean().default(false)
-  //   )
-  //   .default(false),
-  // primary_mobile_number: z.preprocess((value) => {
-  //   const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
-  //   return Number.isNaN(parsed) ? undefined : parsed;
-  // }, z.number()),
-  // secondary_mobile_number: z.preprocess((value) => {
-  //   const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
-  //   return Number.isNaN(parsed) ? undefined : parsed;
-  // }, z.number().optional()),
+  latitude: z.preprocess(
+    (value) => (value === "" ? undefined : value),
+    z.string().max(180).min(-180).optional()
+  ),
+  longitude: z.preprocess(
+    (value) => (value === "" ? undefined : value),
+    z.string().max(180).min(-180).optional()
+  ),
 });
 
 export const ImportEmployeeAddressDataSchema = z.object({
   data: z.array(ImportSingleEmployeeAddressDataSchema),
 });
 
-export const ImportEmployeeGuardiansHeaderSchema = z
-  .object({
-    employee_code: z.string().optional(),
-    relationship: z.string().optional(),
-    first_name: z.string().optional(),
-    last_name: z.string().optional(),
-    date_of_birth: z.string().optional(),
-    gender: z.string().optional(),
-    mobile_number: z.string().optional(),
-    alternate_mobile_number: z.string().optional(),
-    email: z.string().optional(),
-    is_emergency_contact: z.string().optional(),
-    address_same_as_employee: z.string().optional(),
-  })
-  .refine(
+export const ImportEmployeeGuardiansHeaderSchemaObject = z.object({
+  employee_code: z.string().optional(),
+  relationship: z.string().optional(),
+  first_name: z.string().optional(),
+  last_name: z.string().optional(),
+  date_of_birth: z.string().optional(),
+  gender: z.string().optional(),
+  mobile_number: z.string().optional(),
+  alternate_mobile_number: z.string().optional(),
+  email: z.string().optional(),
+  is_emergency_contact: z.string().optional(),
+  address_same_as_employee: z.string().optional(),
+});
+export const ImportEmployeeGuardiansHeaderSchema =
+  ImportEmployeeGuardiansHeaderSchemaObject.refine(
     (data) => {
       const values = [
         data.employee_code,
@@ -1108,26 +1088,25 @@ export const ImportSingleEmployeeGuardiansDataSchema = z.object({
   last_name: zString.min(3).max(50).optional(),
   date_of_birth: z.string().optional(),
   gender: z.enum(genderArray).optional(),
-  is_emergency_contact: z.boolean().default(false),
-  address_same_as_employee: z.boolean().default(false),
-  mobile_number: zNumber.min(10).max(10).optional(),
-  alternate_mobile_number: zNumber.min(10).max(10).optional(),
+  is_emergency_contact: z.preprocess(
+    (value) =>
+      typeof value === "string" ? value.toLowerCase() === "true" : value,
+    z.boolean().default(false)
+  ),
+  address_same_as_employee: z.preprocess(
+    (value) =>
+      typeof value === "string" ? value.toLowerCase() === "true" : value,
+    z.boolean().default(false)
+  ),
+  mobile_number: z.preprocess(
+    (value) => (value === "" ? undefined : value),
+    z.string().max(10).min(10).optional()
+  ),
+  alternate_mobile_number: z.preprocess(
+    (value) => (value === "" ? undefined : value),
+    z.string().max(10).min(10).optional()
+  ),
   email: zEmail.optional(),
-  // is_active: z
-  //   .preprocess(
-  //     (value) =>
-  //       typeof value === "string" ? value.toLowerCase() === "true" : value,
-  //     z.boolean().default(false)
-  //   )
-  //   .default(false),
-  // primary_mobile_number: z.preprocess((value) => {
-  //   const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
-  //   return Number.isNaN(parsed) ? undefined : parsed;
-  // }, z.number()),
-  // secondary_mobile_number: z.preprocess((value) => {
-  //   const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
-  //   return Number.isNaN(parsed) ? undefined : parsed;
-  // }, z.number().optional()),
 });
 
 export const ImportEmployeeGuardiansDataSchema = z.object({

@@ -18,8 +18,8 @@ import { commitSession, getSession } from "@/utils/sessions";
 import { FormButtons } from "@/components/form/form-buttons";
 import { FormStepHeader } from "@/components/form/form-step-header";
 import { useIsomorphicLayoutEffect } from "@canny_ecosystem/utils/hooks/isomorphic-layout-effect";
-import { ReimbursementImportHeader } from "@/components/reimbursements/reimbursement-import-header";
-import { ReimbursementImportData } from "@/components/reimbursements/reimbursement-import-data";
+import { ReimbursementImportHeader } from "@/components/reimbursements/import-export/reimbursement-import-header";
+import { ReimbursementImportData } from "@/components/reimbursements/import-export/reimbursement-import-data";
 
 import {
   getEmployeeIdsByEmployeeCodes,

@@ -7,22 +7,22 @@ import {
 } from "@canny_ecosystem/ui/card";
 import { SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import {
+  type ImportEmployeeGuardiansHeaderSchemaObject,
   transformStringArrayIntoOptions,
-  type ImportEmployeeAddressHeaderSchema,
 } from "@canny_ecosystem/utils";
 import { type FieldMetadata, getInputProps } from "@conform-to/react";
 import { useEffect, useState } from "react";
 import Papa from "papaparse";
 
 type FieldsType = {
-  [K in keyof typeof ImportEmployeeAddressHeaderSchema.shape]: FieldMetadata<
-    (typeof ImportEmployeeAddressHeaderSchema.shape)[K]["_type"],
-    (typeof ImportEmployeeAddressHeaderSchema.shape)[K],
+  [K in keyof typeof ImportEmployeeGuardiansHeaderSchemaObject.shape]: FieldMetadata<
+    (typeof ImportEmployeeGuardiansHeaderSchemaObject.shape)[K]["_type"],
+    (typeof ImportEmployeeGuardiansHeaderSchemaObject.shape)[K],
     string[]
   >;
 };
 
-export function EmployeeAddressImportHeader({
+export function EmployeeGuardiansImportHeader({
   fields,
   file,
 }: {
@@ -69,123 +69,127 @@ export function EmployeeAddressImportHeader({
           />
           <SearchableSelectField
             inputProps={{
-              ...getInputProps(fields.address_type, {
+              ...getInputProps(fields.relationship, {
                 type: "text",
               }),
             }}
             className="lowercase"
             options={transformStringArrayIntoOptions(headerArray)}
             labelProps={{
-              children: "Address Type",
+              children: "Relation",
             }}
-            errors={fields.address_type.errors}
+            errors={fields.relationship.errors}
           />
           <SearchableSelectField
             inputProps={{
-              ...getInputProps(fields.address_line_1, {
+              ...getInputProps(fields.first_name, {
                 type: "text",
               }),
             }}
             className="lowercase"
             options={transformStringArrayIntoOptions(headerArray)}
             labelProps={{
-              children: "Address Line 1",
+              children: "First Name",
             }}
-            errors={fields.address_line_1.errors}
+            errors={fields.first_name.errors}
           />
           <SearchableSelectField
             inputProps={{
-              ...getInputProps(fields.address_line_2, {
+              ...getInputProps(fields.last_name, {
                 type: "text",
               }),
             }}
             className="lowercase"
             options={transformStringArrayIntoOptions(headerArray)}
             labelProps={{
-              children: "Address Line 2",
+              children: "Last Name",
             }}
-            errors={fields.address_line_2.errors}
+            errors={fields.last_name.errors}
           />
           <SearchableSelectField
             inputProps={{
-              ...getInputProps(fields.city, {
+              ...getInputProps(fields.date_of_birth, {
                 type: "text",
               }),
             }}
             className="lowercase"
             options={transformStringArrayIntoOptions(headerArray)}
             labelProps={{
-              children: "City",
+              children: "Date Of Birth",
             }}
-            errors={fields.city.errors}
+            errors={fields.date_of_birth.errors}
           />
           <SearchableSelectField
             className="capitalize"
             options={transformStringArrayIntoOptions(headerArray)}
             inputProps={{
-              ...getInputProps(fields.pincode, { type: "text" }),
+              ...getInputProps(fields.gender, { type: "text" }),
             }}
             labelProps={{
-              children: "Pincode",
+              children: "Gender",
             }}
-            errors={fields.pincode.errors}
+            errors={fields.gender.errors}
           />
           <SearchableSelectField
             className="capitalize"
             options={transformStringArrayIntoOptions(headerArray)}
             inputProps={{
-              ...getInputProps(fields.state, { type: "text" }),
+              ...getInputProps(fields.mobile_number, { type: "text" }),
             }}
             labelProps={{
-              children: "State",
+              children: "Mobile Number",
             }}
-            errors={fields.state.errors}
+            errors={fields.mobile_number.errors}
           />
           <SearchableSelectField
             className="capitalize"
             options={transformStringArrayIntoOptions(headerArray)}
             inputProps={{
-              ...getInputProps(fields.country, { type: "text" }),
+              ...getInputProps(fields.alternate_mobile_number, {
+                type: "text",
+              }),
             }}
             labelProps={{
-              children: "Country",
+              children: "Alternate Mobile Number",
             }}
-            errors={fields.country.errors}
+            errors={fields.alternate_mobile_number.errors}
           />
           <SearchableSelectField
             inputProps={{
-              ...getInputProps(fields.latitude, {
+              ...getInputProps(fields.email, {
                 type: "text",
               }),
             }}
             className="lowercase"
             options={transformStringArrayIntoOptions(headerArray)}
             labelProps={{
-              children: "Latitude",
+              children: "Email",
             }}
-            errors={fields.latitude.errors}
+            errors={fields.email.errors}
           />
           <SearchableSelectField
             className="capitalize"
             options={transformStringArrayIntoOptions(headerArray)}
             inputProps={{
-              ...getInputProps(fields.longitude, { type: "text" }),
+              ...getInputProps(fields.is_emergency_contact, { type: "text" }),
             }}
             labelProps={{
-              children: "Longitude",
+              children: "Is Emergency Contact",
             }}
-            errors={fields.longitude.errors}
+            errors={fields.is_emergency_contact.errors}
           />
           <SearchableSelectField
             className="capitalize"
             options={transformStringArrayIntoOptions(headerArray)}
             inputProps={{
-              ...getInputProps(fields.is_primary, { type: "text" }),
+              ...getInputProps(fields.address_same_as_employee, {
+                type: "text",
+              }),
             }}
             labelProps={{
-              children: "Is Primary",
+              children: "Address same as Employee",
             }}
-            errors={fields.is_primary.errors}
+            errors={fields.address_same_as_employee.errors}
           />
         </div>
       </CardContent>

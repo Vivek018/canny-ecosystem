@@ -8,16 +8,16 @@ import {
 import { SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import {
   transformStringArrayIntoOptions,
-  type ImportEmployeeStatutoryHeaderSchema,
+  type ImportEmployeeStatutoryHeaderSchemaObject,
 } from "@canny_ecosystem/utils";
 import { type FieldMetadata, getInputProps } from "@conform-to/react";
 import { useEffect, useState } from "react";
 import Papa from "papaparse";
 
 type FieldsType = {
-  [K in keyof typeof ImportEmployeeStatutoryHeaderSchema.shape]: FieldMetadata<
-    (typeof ImportEmployeeStatutoryHeaderSchema.shape)[K]["_type"],
-    (typeof ImportEmployeeStatutoryHeaderSchema.shape)[K],
+  [K in keyof typeof ImportEmployeeStatutoryHeaderSchemaObject.shape]: FieldMetadata<
+    (typeof ImportEmployeeStatutoryHeaderSchemaObject.shape)[K]["_type"],
+    (typeof ImportEmployeeStatutoryHeaderSchemaObject.shape)[K],
     string[]
   >;
 };
@@ -76,7 +76,7 @@ export function EmployeeStatutoryImportHeader({
             className="lowercase"
             options={transformStringArrayIntoOptions(headerArray)}
             labelProps={{
-              children: "Aadhaar Card",
+              children: "Aadhaar Number",
             }}
             errors={fields.aadhaar_number.errors}
           />
@@ -89,7 +89,7 @@ export function EmployeeStatutoryImportHeader({
             className="lowercase"
             options={transformStringArrayIntoOptions(headerArray)}
             labelProps={{
-              children: "Pan Card",
+              children: "Pan Number",
             }}
             errors={fields.pan_number.errors}
           />

@@ -26,11 +26,11 @@ export function EmployeeGuardiansImportData({
         header: true,
         skipEmptyLines: true,
         transformHeader: (header) => {
-          return swappedFieldMapping[header.toLowerCase()] || header;
+          return swappedFieldMapping[header] || header;
         },
         complete: (results) => {
           const finalTableData = results.data.filter((entry) =>
-            Object.values(entry!).some((value) => String(value).trim() !== "")
+            Object.values(entry!).filter((value) => String(value).trim()?.length)
           );
 
           setImportData({

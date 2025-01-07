@@ -15,18 +15,18 @@ type Props = {
 export const employeeColumnIdArray = [
   "employee_code",
   "full_name",
-  "primary_mobile_number",
+  "mobile_number",
   "date_of_birth",
   "education",
   "gender",
-  "is_active",
-  "employee_project_assignment_project_site_project_name",
-  "employee_project_assignment_project_site_name",
-  "employee_project_assignment_assignment_type",
-  "employee_project_assignment_position",
-  "employee_project_assignment_skill_level",
-  "employee_project_assignment_start_date",
-  "employee_project_assignment_end_date",
+  "status",
+  "project_name",
+  "project_site_name",
+  "assignment_type",
+  "position",
+  "skill_level",
+  "start_date",
+  "end_date",
 ];
 
 export function DataTableHeader({ table, loading, className }: Props) {

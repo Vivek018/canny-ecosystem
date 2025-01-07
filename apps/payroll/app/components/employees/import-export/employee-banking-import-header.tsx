@@ -8,16 +8,16 @@ import {
   import { SearchableSelectField } from "@canny_ecosystem/ui/forms";
   import {
     transformStringArrayIntoOptions,
-    type ImportEmployeeBankingHeaderSchema,
+    type ImportEmployeeBankingHeaderSchemaObject,
   } from "@canny_ecosystem/utils";
   import { type FieldMetadata, getInputProps } from "@conform-to/react";
   import { useEffect, useState } from "react";
   import Papa from "papaparse";
   
   type FieldsType = {
-    [K in keyof typeof ImportEmployeeBankingHeaderSchema.shape]: FieldMetadata<
-      (typeof ImportEmployeeBankingHeaderSchema.shape)[K]["_type"],
-      (typeof ImportEmployeeBankingHeaderSchema.shape)[K],
+    [K in keyof typeof ImportEmployeeBankingHeaderSchemaObject.shape]: FieldMetadata<
+      (typeof ImportEmployeeBankingHeaderSchemaObject.shape)[K]["_type"],
+      (typeof ImportEmployeeBankingHeaderSchemaObject.shape)[K],
       string[]
     >;
   };

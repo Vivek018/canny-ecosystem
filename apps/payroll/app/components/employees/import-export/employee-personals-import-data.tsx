@@ -1,48 +1,48 @@
-import { ImportedDataColumns } from "@/components/employees/imported-banking-table/columns";
-import { ImportedDataTable } from "@/components/employees/imported-banking-table/imported-data-table";
-import { useImportStoreForEmployeeBanking } from "@/store/import";
-import type { ImportEmployeeBankingDataType } from "@canny_ecosystem/supabase/queries";
+import { ImportedDataColumns } from "@/components/employees/imported-personals-table/columns";
+import { ImportedDataTable } from "@/components/employees/imported-personals-table/imported-data-table";
+import { useImportStoreForEmployeePersonals } from "@/store/import";
+import type { ImportEmployeePersonalsDataType } from "@canny_ecosystem/supabase/queries";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
 import Papa from "papaparse";
 import { useState, useEffect } from "react";
 
-export function EmployeeBankingImportData({
+export function EmployeePersonalsImportData({
   fieldMapping,
   file,
 }: {
   fieldMapping: Record<string, string>;
   file: any;
 }) {
-  const { importData, setImportData } = useImportStoreForEmployeeBanking();
+  const { importData, setImportData } = useImportStoreForEmployeePersonals();
 
   const swappedFieldMapping = Object.fromEntries(
     Object.entries(fieldMapping).map(([key, value]) => [value, key])
   );
 
   useEffect(() => {
-    if (file) {
-      Papa.parse(file, {
-        header: true,
-        skipEmptyLines: true,
-        transformHeader: (header) => {
-          return swappedFieldMapping[header.toLowerCase()] || header;
-        },
-        complete: (results) => {
-          const finalTableData = results.data.filter((entry) =>
-            Object.values(entry!).some((value) => String(value).trim() !== "")
-          );
-
-          setImportData({
-            data: finalTableData as ImportEmployeeBankingDataType[],
-          });
-        },
-        error: (error) => {
-          console.error("Parsing error: ", error);
-        },
-      });
-    }
-  }, [file, fieldMapping]);
+      if (file) {
+        Papa.parse(file, {
+          header: true,
+          skipEmptyLines: true,
+          transformHeader: (header) => {
+            return swappedFieldMapping[header] || header;
+          },
+          complete: (results) => {
+            const finalTableData = results.data.filter((entry) =>
+              Object.values(entry!).filter((value) => String(value).trim()?.length)
+            );
+  
+            setImportData({
+              data: finalTableData as ImportEmployeePersonalsDataType[],
+            });
+          },
+          error: (error) => {
+            console.error("Parsing error: ", error);
+          },
+        });
+      }
+    }, [file, fieldMapping]);
 
   const [searchString, setSearchString] = useState("");
   const [tableData, setTableData] = useState(importData.data);

@@ -21,28 +21,28 @@ export function EmployeeAddressImportData({
   );
 
   useEffect(() => {
-    if (file) {
-      Papa.parse(file, {
-        header: true,
-        skipEmptyLines: true,
-        transformHeader: (header) => {
-          return swappedFieldMapping[header.toLowerCase()] || header;
-        },
-        complete: (results) => {
-          const finalTableData = results.data.filter((entry) =>
-            Object.values(entry!).some((value) => String(value).trim() !== "")
-          );
-
-          setImportData({
-            data: finalTableData as ImportEmployeeAddressDataType[],
-          });
-        },
-        error: (error) => {
-          console.error("Parsing error: ", error);
-        },
-      });
-    }
-  }, [file, fieldMapping]);
+      if (file) {
+        Papa.parse(file, {
+          header: true,
+          skipEmptyLines: true,
+          transformHeader: (header) => {
+            return swappedFieldMapping[header] || header;
+          },
+          complete: (results) => {
+            const finalTableData = results.data.filter((entry) =>
+              Object.values(entry!).filter((value) => String(value).trim()?.length)
+            );
+  
+            setImportData({
+              data: finalTableData as ImportEmployeeAddressDataType[],
+            });
+          },
+          error: (error) => {
+            console.error("Parsing error: ", error);
+          },
+        });
+      }
+    }, [file, fieldMapping]);
 
   const [searchString, setSearchString] = useState("");
   const [tableData, setTableData] = useState(importData.data);

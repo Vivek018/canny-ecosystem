@@ -15,6 +15,13 @@ export const ImportedDataColumns: ColumnDef<ImportEmployeeGuardiansDataType>[] =
       },
     },
     {
+      accessorKey: "relationship",
+      header: "Relationship",
+      cell: ({ row }) => {
+        return <p className="truncate">{row.original.relationship}</p>;
+      },
+    },
+    {
       accessorKey: "first_name",
       header: "First Name",
       cell: ({ row }) => {

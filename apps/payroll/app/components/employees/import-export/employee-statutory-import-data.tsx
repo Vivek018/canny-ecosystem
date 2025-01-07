@@ -1,20 +1,20 @@
-import { ImportedDataColumns } from "@/components/reimbursements/imported-table/columns";
-import { ImportedDataTable } from "@/components/reimbursements/imported-table/imported-data-table";
-import { useImportStoreForReimbursement } from "@/store/import";
-import type { ImportReimbursementDataType } from "@canny_ecosystem/supabase/queries";
+import { ImportedDataColumns } from "@/components/employees/imported-statutory-table/columns";
+import { ImportedDataTable } from "@/components/employees/imported-statutory-table/imported-data-table";
+import { useImportStoreForEmployeeStatutory } from "@/store/import";
+import type { ImportEmployeeStatutoryDataType } from "@canny_ecosystem/supabase/queries";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
 import Papa from "papaparse";
 import { useState, useEffect } from "react";
 
-export function ReimbursementImportData({
+export function EmployeeStatutoryImportData({
   fieldMapping,
   file,
 }: {
   fieldMapping: Record<string, string>;
   file: any;
 }) {
-  const { importData, setImportData } = useImportStoreForReimbursement();
+  const { importData, setImportData } = useImportStoreForEmployeeStatutory();
 
   const swappedFieldMapping = Object.fromEntries(
     Object.entries(fieldMapping).map(([key, value]) => [value, key])
@@ -26,15 +26,17 @@ export function ReimbursementImportData({
         header: true,
         skipEmptyLines: true,
         transformHeader: (header) => {
-          return swappedFieldMapping[header.toLowerCase()] || header;
+          return swappedFieldMapping[header] || header;
         },
         complete: (results) => {
           const finalTableData = results.data.filter((entry) =>
-            Object.values(entry!).some((value) => String(value).trim() !== "")
+            Object.values(entry!).filter(
+              (value) => String(value).trim()?.length
+            )
           );
 
           setImportData({
-            data: finalTableData as ImportReimbursementDataType[],
+            data: finalTableData as ImportEmployeeStatutoryDataType[],
           });
         },
         error: (error) => {
@@ -42,7 +44,7 @@ export function ReimbursementImportData({
         },
       });
     }
-  }, []);
+  }, [file, fieldMapping]);
 
   const [searchString, setSearchString] = useState("");
   const [tableData, setTableData] = useState(importData.data);
@@ -71,7 +73,7 @@ export function ReimbursementImportData({
               />
             </div>
             <Input
-              placeholder="Search Reimbursements"
+              placeholder="Search Employees"
               value={searchString}
               onChange={(e) => setSearchString(e.target.value)}
               className="pl-8 h-10 w-full focus-visible:ring-0"

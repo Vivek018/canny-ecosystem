@@ -18,8 +18,8 @@ import { FormButtons } from "@/components/form/form-buttons";
 import { FormStepHeader } from "@/components/form/form-step-header";
 import { useIsomorphicLayoutEffect } from "@canny_ecosystem/utils/hooks/isomorphic-layout-effect";
 
-import { EmployeeAddressImportHeader } from "@/components/employees/employee-address-import-header";
-import { EmployeeAddressImportData } from "@/components/employees/employee-address-import-data";
+import { EmployeeAddressImportHeader } from "@/components/employees/import-export/employee-address-import-header";
+import { EmployeeAddressImportData } from "@/components/employees/import-export/employee-address-import-data";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
 export const IMPORT_EMPLOYEE_ADDRESS = [
@@ -80,7 +80,7 @@ export async function action({ request }: ActionFunctionArgs) {
     const parsedData = ImportEmployeeAddressDataSchema.safeParse(
       JSON.parse(formData.get("stringified_data") as string)
     );
-
+    console.log("========>", parsedData.error);
     if (parsedData.success) {
       const importedData = parsedData.data?.data;
 
@@ -91,7 +91,7 @@ export async function action({ request }: ActionFunctionArgs) {
         company_id: companyId,
       }));
 
-      console.log(updatedData);
+      console.log("addressData:", updatedData);
 
       // const { status, error: dataEntryError } =
       //   await createReimbursementsFromImportedData({
@@ -189,7 +189,10 @@ export default function EmployeeAddressImportFieldMapping() {
                 />
               ) : null}
               {step === 2 ? (
-                <EmployeeAddressImportData fieldMapping={stepOneData} file={file} />
+                <EmployeeAddressImportData
+                  fieldMapping={stepOneData}
+                  file={file}
+                />
               ) : null}
             </div>
             <FormButtons

@@ -1,20 +1,20 @@
-import { ImportedDataColumns } from "@/components/employees/imported-personals-table/columns";
-import { ImportedDataTable } from "@/components/employees/imported-personals-table/imported-data-table";
-import { useImportStoreForEmployeePersonals } from "@/store/import";
-import type { ImportEmployeePersonalsDataType } from "@canny_ecosystem/supabase/queries";
+import { ImportedDataColumns } from "@/components/reimbursements/imported-table/columns";
+import { ImportedDataTable } from "@/components/reimbursements/imported-table/imported-data-table";
+import { useImportStoreForReimbursement } from "@/store/import";
+import type { ImportReimbursementDataType } from "@canny_ecosystem/supabase/queries";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
 import Papa from "papaparse";
 import { useState, useEffect } from "react";
 
-export function EmployeePersonalsImportData({
+export function ReimbursementImportData({
   fieldMapping,
   file,
 }: {
   fieldMapping: Record<string, string>;
   file: any;
 }) {
-  const { importData, setImportData } = useImportStoreForEmployeePersonals();
+  const { importData, setImportData } = useImportStoreForReimbursement();
 
   const swappedFieldMapping = Object.fromEntries(
     Object.entries(fieldMapping).map(([key, value]) => [value, key])
@@ -26,7 +26,7 @@ export function EmployeePersonalsImportData({
         header: true,
         skipEmptyLines: true,
         transformHeader: (header) => {
-          return swappedFieldMapping[header.toLowerCase()] || header;
+          return swappedFieldMapping[header] || header;
         },
         complete: (results) => {
           const finalTableData = results.data.filter((entry) =>
@@ -34,7 +34,7 @@ export function EmployeePersonalsImportData({
           );
 
           setImportData({
-            data: finalTableData as ImportEmployeePersonalsDataType[],
+            data: finalTableData as ImportReimbursementDataType[],
           });
         },
         error: (error) => {
@@ -42,7 +42,7 @@ export function EmployeePersonalsImportData({
         },
       });
     }
-  }, [file, fieldMapping]);
+  }, []);
 
   const [searchString, setSearchString] = useState("");
   const [tableData, setTableData] = useState(importData.data);
@@ -71,7 +71,7 @@ export function EmployeePersonalsImportData({
               />
             </div>
             <Input
-              placeholder="Search Employees"
+              placeholder="Search Reimbursements"
               value={searchString}
               onChange={(e) => setSearchString(e.target.value)}
               className="pl-8 h-10 w-full focus-visible:ring-0"
