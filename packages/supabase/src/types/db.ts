@@ -255,7 +255,7 @@ export type Database = {
           {
             foreignKeyName: "employee_addresses_employee_id_fkey"
             columns: ["employee_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "employees"
             referencedColumns: ["id"]
           },
@@ -598,6 +598,7 @@ export type Database = {
           id: string
           include_employer_contribution: boolean
           is_default: boolean | null
+          max_limit: number | null
           updated_at: string | null
         }
         Insert: {
@@ -610,6 +611,7 @@ export type Database = {
           id?: string
           include_employer_contribution?: boolean
           is_default?: boolean | null
+          max_limit?: number | null
           updated_at?: string | null
         }
         Update: {
@@ -622,6 +624,7 @@ export type Database = {
           id?: string
           include_employer_contribution?: boolean
           is_default?: boolean | null
+          max_limit?: number | null
           updated_at?: string | null
         }
         Relationships: [

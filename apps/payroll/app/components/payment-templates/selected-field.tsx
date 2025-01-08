@@ -1,3 +1,4 @@
+import { usePaymentComponentsStore } from "@/store/payment-components";
 import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import {
@@ -6,7 +7,7 @@ import {
   type PaymentTemplateComponentsSchema,
 } from "@canny_ecosystem/utils";
 import { type FieldMetadata, getInputProps } from "@conform-to/react";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect } from "react";
 
 type FieldsType = {
   [K in keyof typeof PaymentTemplateComponentsSchema.shape.payment_template_components.element.shape]: FieldMetadata<
@@ -20,23 +21,106 @@ const errorClassName = "min-h-min pt-0 pb-0";
 
 export const SelectedPaymentField = ({
   field,
-  monthlyCtc,
-  disable,
-  percentage,
+  fieldOptions: {
+    fieldName,
+    percentageAmount,
+    disabled,
+    considerForEPF,
+    considerForESI,
+  },
 }: {
   field: FieldsType;
-  monthlyCtc?: number;
-  disable?: boolean;
-  percentage?: boolean;
+  fieldOptions: {
+    fieldName: string;
+    percentageAmount: number | null | undefined;
+    disabled: boolean;
+    considerForEPF: boolean | null | undefined;
+    considerForESI: boolean | null | undefined;
+  };
 }) => {
-  const [disabled] = useState(
-    disable ?? field.payment_field.getFieldset().payment_type.value === "fixed"
+  const fieldId =
+    field.payment_field_id.value ?? field.payment_field_id.initialValue ?? "";
+  const value = Number.parseFloat(
+    field.calculation_value.value ?? field.calculation_value.initialValue ?? "0"
   );
-  const [isPercentage] = useState(
-    percentage ??
-      field.payment_field.getFieldset().calculation_type.value ===
-        "percentage_of_ctc"
-  );
+  const componentType =
+    field.component_type.value ?? field.component_type.initialValue ?? "";
+
+  const {
+    valueForEPF,
+    valueForESI,
+    grossValue,
+    setValueForEPF,
+    setValueForESI,
+    setGrossValue,
+    setBasicValue,
+  } = usePaymentComponentsStore();
+
+  useEffect(() => {
+    if (considerForEPF) {
+      setValueForEPF({
+        ...valueForEPF,
+        [fieldId]: value,
+      });
+
+      if (!value) {
+        setValueForEPF({
+          ...valueForEPF,
+          [fieldId]: 0,
+        });
+      }
+    }
+
+    if (considerForESI) {
+      setValueForESI({
+        ...valueForESI,
+        [fieldId]: value,
+      });
+    }
+
+    if (componentType === "earning") {
+      setGrossValue({
+        ...grossValue,
+        [fieldId]: value,
+      });
+    } else {
+      setGrossValue({
+        ...grossValue,
+        [fieldId]: 0,
+      });
+    }
+
+    if (fieldName === "basic") {
+      setBasicValue(value);
+    }
+
+    return () => {
+      if (considerForEPF) {
+        setValueForEPF({
+          ...valueForEPF,
+          [fieldId]: 0,
+        });
+      }
+
+      if (considerForESI) {
+        setValueForESI({
+          ...valueForESI,
+          [fieldId]: 0,
+        });
+      }
+
+      if (componentType === "earning") {
+        setGrossValue({
+          ...grossValue,
+          [fieldId]: 0,
+        });
+      }
+
+      if (fieldName === "basic") {
+        setBasicValue(0);
+      }
+    };
+  }, [fieldId, componentType, value]);
 
   return (
     <Fragment>
@@ -46,20 +130,10 @@ export const SelectedPaymentField = ({
         })}
       />
 
-      <input
-        {...getInputProps(field.target_type, { type: "hidden" })}
-        defaultValue={field.target_type.value ?? "payment_field"}
-      />
-      <Field
-        inputProps={{
-          ...getInputProps(field.payment_field.getFieldset().name, {
-            type: "text",
-          }),
-          disabled: true,
-          className: "disabled:opacity-100",
-        }}
-        errorClassName={errorClassName}
-      />
+      <input {...getInputProps(field.target_type, { type: "hidden" })} />
+      <div className='flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm  items-center shadow-sm'>
+        {fieldName}
+      </div>
       <SearchableSelectField
         className='capitalize'
         options={transformStringArrayIntoOptions(
@@ -80,8 +154,6 @@ export const SelectedPaymentField = ({
             }),
             className: "border-muted-foreground",
             placeholder: "Enter Calculation Value Per Month",
-            min: 0,
-            max: monthlyCtc ?? field.calculation_value.max,
             disabled: disabled,
           }}
           errors={field.calculation_value.errors}
@@ -90,10 +162,10 @@ export const SelectedPaymentField = ({
         <p
           className={cn(
             "h-9 w-52 text-sm tracking-wide truncate hidden justify-center items-center bg-muted text-muted-foreground rounded",
-            isPercentage && "flex"
+            percentageAmount && "flex"
           )}
         >
-          {field.payment_field.getFieldset().amount.initialValue}% of CTC
+          {percentageAmount}% of CTC
         </p>
       </div>
     </Fragment>
@@ -102,10 +174,13 @@ export const SelectedPaymentField = ({
 
 export const SelectedEPFField = ({
   field,
-  value,
+  epf: { epfName, percentageAmount },
 }: {
   field: FieldsType;
-  value?: number;
+  epf: {
+    epfName: string;
+    percentageAmount: number | null | undefined;
+  };
 }) => {
   return (
     <Fragment>
@@ -114,21 +189,10 @@ export const SelectedEPFField = ({
           type: "hidden",
         })}
       />
-
-      <input
-        {...getInputProps(field.target_type, { type: "hidden" })}
-        defaultValue={field.target_type.value ?? "epf"}
-      />
-      <Field
-        inputProps={{
-          ...getInputProps(field.epf.getFieldset().epf_number, {
-            type: "text",
-          }),
-          disabled: true,
-          className: "disabled:opacity-100",
-        }}
-        errorClassName={errorClassName}
-      />
+      <input {...getInputProps(field.target_type, { type: "hidden" })} />
+      <div className='flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm  items-center shadow-sm'>
+        {epfName}
+      </div>
       <SearchableSelectField
         className='capitalize'
         options={transformStringArrayIntoOptions(
@@ -136,6 +200,7 @@ export const SelectedEPFField = ({
         )}
         inputProps={{
           ...getInputProps(field.component_type, { type: "text" }),
+          disabled: true,
         }}
         placeholder='Select Component Type'
         errors={field.component_type.errors}
@@ -149,8 +214,6 @@ export const SelectedEPFField = ({
             }),
             className: "border-muted-foreground",
             placeholder: "Enter Calculation Value Per Month",
-            min: 0,
-            max: value ?? field.calculation_value.max,
             disabled: true,
           }}
           errors={field.calculation_value.errors}
@@ -161,10 +224,7 @@ export const SelectedEPFField = ({
             "h-9 w-52 text-sm tracking-wide truncate flex justify-center items-center bg-muted text-muted-foreground rounded"
           )}
         >
-          {Number.parseFloat(
-            field.epf.getFieldset().employee_contribution.initialValue ?? "0"
-          ) * 100}
-          % of Earnings
+          {(percentageAmount ?? 0) * 100}% of Earnings
         </p>
       </div>
     </Fragment>
@@ -173,10 +233,13 @@ export const SelectedEPFField = ({
 
 export const SelectedESIField = ({
   field,
-  value,
+  esi: { esiName, employeesContribution },
 }: {
   field: FieldsType;
-  value?: number;
+  esi: {
+    esiName: string;
+    employeesContribution: number | null | undefined;
+  };
 }) => {
   return (
     <Fragment>
@@ -186,20 +249,10 @@ export const SelectedESIField = ({
         })}
       />
 
-      <input
-        {...getInputProps(field.target_type, { type: "hidden" })}
-        defaultValue={field.target_type.value ?? "esi"}
-      />
-      <Field
-        inputProps={{
-          ...getInputProps(field.esi.getFieldset().esi_number, {
-            type: "text",
-          }),
-          disabled: true,
-          className: "disabled:opacity-100",
-        }}
-        errorClassName={errorClassName}
-      />
+      <input {...getInputProps(field.target_type, { type: "hidden" })} />
+      <div className='flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm  items-center shadow-sm'>
+        {esiName}
+      </div>
       <SearchableSelectField
         className='capitalize'
         options={transformStringArrayIntoOptions(
@@ -207,6 +260,7 @@ export const SelectedESIField = ({
         )}
         inputProps={{
           ...getInputProps(field.component_type, { type: "text" }),
+          disabled: true,
         }}
         placeholder='Select Component Type'
         errors={field.component_type.errors}
@@ -220,8 +274,7 @@ export const SelectedESIField = ({
             }),
             className: "border-muted-foreground",
             placeholder: "Enter Calculation Value Per Month",
-            min: 0,
-            max: value,
+
             disabled: true,
           }}
           errors={field.calculation_value.errors}
@@ -232,10 +285,7 @@ export const SelectedESIField = ({
             "h-9 w-52 text-sm tracking-wide truncate flex justify-center items-center bg-muted text-muted-foreground rounded"
           )}
         >
-          {Number.parseFloat(
-            field.esi.getFieldset().employees_contribution.initialValue ?? "0"
-          ) * 100}
-          % of Earnings
+          {(employeesContribution ?? 0) * 100}% of Earnings
         </p>
       </div>
     </Fragment>
@@ -244,10 +294,12 @@ export const SelectedESIField = ({
 
 export const SelectedPTField = ({
   field,
-  value,
+  pt: { ptName },
 }: {
   field: FieldsType;
-  value?: number;
+  pt: {
+    ptName: string;
+  };
 }) => {
   return (
     <Fragment>
@@ -257,20 +309,10 @@ export const SelectedPTField = ({
         })}
       />
 
-      <input
-        {...getInputProps(field.target_type, { type: "hidden" })}
-        defaultValue={field.target_type.value ?? "pt"}
-      />
-      <Field
-        inputProps={{
-          ...getInputProps(field.pt.getFieldset().pt_number, {
-            type: "text",
-          }),
-          disabled: true,
-          className: "disabled:opacity-100",
-        }}
-        errorClassName={errorClassName}
-      />
+      <input {...getInputProps(field.target_type, { type: "hidden" })} />
+      <div className='flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm  items-center shadow-sm'>
+        {ptName}
+      </div>
       <SearchableSelectField
         className='capitalize'
         options={transformStringArrayIntoOptions(
@@ -278,6 +320,7 @@ export const SelectedPTField = ({
         )}
         inputProps={{
           ...getInputProps(field.component_type, { type: "text" }),
+          disabled: true,
         }}
         placeholder='Select Component Type'
         errors={field.component_type.errors}
@@ -290,8 +333,7 @@ export const SelectedPTField = ({
           }),
           className: "border-muted-foreground",
           placeholder: "Enter Calculation Value Per Month",
-          min: 0,
-          max: value,
+
           disabled: true,
         }}
         errors={field.calculation_value.errors}
@@ -303,10 +345,12 @@ export const SelectedPTField = ({
 
 export const SelectedLWFField = ({
   field,
-  value,
+  lwf: { lwfName },
 }: {
   field: FieldsType;
-  value?: number;
+  lwf: {
+    lwfName: string;
+  };
 }) => {
   return (
     <Fragment>
@@ -316,20 +360,10 @@ export const SelectedLWFField = ({
         })}
       />
 
-      <input
-        {...getInputProps(field.target_type, { type: "hidden" })}
-        defaultValue={field.target_type.value ?? "lwf"}
-      />
-      <Field
-        inputProps={{
-          ...getInputProps(field.lwf.getFieldset().name, {
-            type: "text",
-          }),
-          disabled: true,
-          className: "disabled:opacity-100",
-        }}
-        errorClassName={errorClassName}
-      />
+      <input {...getInputProps(field.target_type, { type: "hidden" })} />
+      <div className='flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm  items-center shadow-sm'>
+        {lwfName}
+      </div>
       <SearchableSelectField
         className='capitalize'
         options={transformStringArrayIntoOptions(
@@ -337,6 +371,7 @@ export const SelectedLWFField = ({
         )}
         inputProps={{
           ...getInputProps(field.component_type, { type: "text" }),
+          disabled: true,
         }}
         placeholder='Select Component Type'
         errors={field.component_type.errors}
@@ -349,8 +384,7 @@ export const SelectedLWFField = ({
           }),
           className: "border-muted-foreground",
           placeholder: "Enter Calculation Value Per Month",
-          min: 0,
-          max: value,
+
           disabled: true,
         }}
         errors={field.calculation_value.errors}
@@ -362,10 +396,13 @@ export const SelectedLWFField = ({
 
 export const SelectedBonusField = ({
   field,
-  value,
+  bonus: { bonusName, bonusPercentage },
 }: {
   field: FieldsType;
-  value?: number;
+  bonus: {
+    bonusName: string;
+    bonusPercentage: number | null | undefined;
+  };
 }) => {
   return (
     <Fragment>
@@ -375,20 +412,10 @@ export const SelectedBonusField = ({
         })}
       />
 
-      <input
-        {...getInputProps(field.target_type, { type: "hidden" })}
-        defaultValue={field.target_type.value ?? "bonus"}
-      />
-      <Field
-        inputProps={{
-          ...getInputProps(field.bonus.getFieldset().name, {
-            type: "text",
-          }),
-          disabled: true,
-          className: "disabled:opacity-100",
-        }}
-        errorClassName={errorClassName}
-      />
+      <input {...getInputProps(field.target_type, { type: "hidden" })} />
+      <div className='flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm  items-center shadow-sm'>
+        {bonusName}
+      </div>
       <SearchableSelectField
         className='capitalize'
         options={transformStringArrayIntoOptions(
@@ -396,6 +423,7 @@ export const SelectedBonusField = ({
         )}
         inputProps={{
           ...getInputProps(field.component_type, { type: "text" }),
+          disabled: true,
         }}
         placeholder='Select Component Type'
         errors={field.component_type.errors}
@@ -409,8 +437,7 @@ export const SelectedBonusField = ({
             }),
             className: "border-muted-foreground",
             placeholder: "Enter Calculation Value Per Month",
-            min: 0,
-            max: value,
+
             disabled: true,
           }}
           errors={field.calculation_value.errors}
@@ -421,10 +448,7 @@ export const SelectedBonusField = ({
             "h-9 w-52 text-sm tracking-wide truncate flex justify-center items-center bg-muted text-muted-foreground rounded"
           )}
         >
-          {Number.parseFloat(
-            field.bonus.getFieldset().percentage.initialValue ?? "8.33"
-          )}
-          % of Basic
+          {bonusPercentage}% of Basic
         </p>
       </div>
     </Fragment>

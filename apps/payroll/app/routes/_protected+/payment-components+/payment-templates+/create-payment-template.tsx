@@ -3,14 +3,6 @@ import { FormStepHeader } from "@/components/form/form-step-header";
 import { CreatePaymentTemplateComponentDetails } from "@/components/payment-templates/form/create-payment-template-component";
 import { CreatePaymentTemplateDetails } from "@/components/payment-templates/form/create-payment-template-details";
 import { usePaymentComponentsStore } from "@/store/payment-components";
-import {
-  getBonusComponentFromField,
-  getEPFComponentFromField,
-  getESIComponentFromField,
-  getLWFComponentFromField,
-  getPTComponentFromField,
-  getSelectedPaymentComponentFromField,
-} from "@/utils/payment";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { commitSession, getSession } from "@/utils/sessions";
 import { getPaymentFieldNamesByCompanyId } from "@canny_ecosystem/supabase/queries";
@@ -34,6 +26,17 @@ import {
 } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
 import { useEffect, useState } from "react";
+import {
+  getBonusComponentFromField,
+  getEPFComponentFromField,
+  getESIComponentFromField,
+  getGrossValue,
+  getLWFComponentFromField,
+  getPTComponentFromField,
+  getSelectedPaymentComponentFromField,
+  getValueforEPF,
+  getValueforESI,
+} from "@/utils/payment";
 
 export const CREATE_PAYMENT_TEMPLATE = [
   "create-payment-template",
@@ -212,9 +215,6 @@ export default function CreatePaymentTemplate() {
       ? getInitialValueFromZod(currentSchema)
       : undefined;
 
-  const { selectedPaymentFields, selectedStatutoryFields } =
-    usePaymentComponentsStore();
-
   const defaultValues =
     step === 1
       ? stepData[step - 1]
@@ -241,43 +241,76 @@ export default function CreatePaymentTemplate() {
     },
   });
 
+  const {
+    valueForEPF,
+    valueForESI,
+    grossValue,
+    basicValue,
+    selectedPaymentFields,
+    selectedStatutoryFields,
+  } = usePaymentComponentsStore();
+
   useEffect(() => {
-    if (step === 2) {
-      const maxValue = Number.parseFloat(fields.monthly_ctc.value ?? "0");
-      form.update({
-        value: {
-          ...form.value,
-          payment_template_components: [
-            ...selectedPaymentFields.map((paymentField) =>
-              getSelectedPaymentComponentFromField({
-                field: paymentField,
-                monthlyCtc: maxValue,
-              })
-            ),
-            getEPFComponentFromField({
-              field: selectedStatutoryFields.epf,
-              value: maxValue,
-            }),
-            getESIComponentFromField({
-              field: selectedStatutoryFields.esi,
-              value: maxValue,
-            }),
-            getPTComponentFromField({
-              field: selectedStatutoryFields.pt,
-              value: maxValue,
-            }),
-            getLWFComponentFromField({
-              field: selectedStatutoryFields.lwf,
-            }),
-            getBonusComponentFromField({
-              field: selectedStatutoryFields.bonus,
-              value: maxValue,
-            }),
-          ],
-        },
-      });
-    }
+    const maxValue = Number.parseFloat(fields.monthly_ctc.value ?? "0");
+
+    const existingComponents =
+      (fields.payment_template_components.value as Exclude<
+        typeof fields.payment_template_components.value,
+        string
+      >) || [];
+
+    const updatedComponents = [
+      ...selectedPaymentFields.map((paymentField) => {
+        const existingComponent = existingComponents?.find(
+          (component) => component?.payment_field_id === paymentField?.id
+        );
+
+        return {
+          ...getSelectedPaymentComponentFromField({
+            field: paymentField,
+            monthlyCtc: maxValue,
+          }),
+          ...existingComponent,
+        };
+      }),
+      getEPFComponentFromField({
+        field: selectedStatutoryFields.epf,
+        value: getValueforEPF({
+          epf: selectedStatutoryFields.epf!,
+          values: valueForEPF,
+        }),
+      }),
+      getESIComponentFromField({
+        field: selectedStatutoryFields.esi,
+        value: getValueforESI({
+          esi: selectedStatutoryFields.esi!,
+          values: valueForESI,
+        }),
+      }),
+      getPTComponentFromField({
+        field: selectedStatutoryFields.pt,
+        value: getGrossValue({ values: grossValue }),
+      }),
+      getLWFComponentFromField({
+        field: selectedStatutoryFields.lwf,
+      }),
+      getBonusComponentFromField({
+        field: selectedStatutoryFields.bonus,
+        value: basicValue,
+      }),
+    ];
+
+    form.update({
+      value: {
+        ...form.value,
+        payment_template_components: updatedComponents as any,
+      },
+    });
   }, [
+    valueForEPF,
+    valueForESI,
+    grossValue,
+    basicValue,
     selectedPaymentFields,
     selectedStatutoryFields,
     fields.monthly_ctc.value,
@@ -290,7 +323,7 @@ export default function CreatePaymentTemplate() {
 
   return (
     <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
-      <div className='w-full mx-auto mb-8'>
+      <div className='w-full mx-auto mb-4'>
         <FormStepHeader
           totalSteps={totalSteps}
           step={step}

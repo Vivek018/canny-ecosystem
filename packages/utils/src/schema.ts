@@ -448,6 +448,7 @@ export const EmployeeProvidentFundSchema = z.object({
 
 export const ESI_EMPLOYEE_CONTRIBUTION = 0.0075;
 export const ESI_EMPLOYER_CONTRIBUTION = 0.0325;
+export const ESI_MAX_LIMIT = 21000;
 
 export const EmployeeStateInsuranceSchema = z.object({
   id: z.string().optional(),
@@ -457,6 +458,7 @@ export const EmployeeStateInsuranceSchema = z.object({
   employees_contribution: z.number().default(ESI_EMPLOYEE_CONTRIBUTION),
   employers_contribution: z.number().default(ESI_EMPLOYER_CONTRIBUTION),
   include_employer_contribution: z.boolean().default(false),
+  max_limit: z.number().default(ESI_MAX_LIMIT),
 });
 
 export const ProfessionalTaxSchema = z.object({
@@ -600,8 +602,6 @@ export const componentTypeArray = [
   "earning",
   "deduction",
   "statutory_contribution",
-  "bonus",
-  "other",
 ] as const;
 
 export const PaymentTemplateComponentsSchema = z.object({
@@ -614,43 +614,11 @@ export const PaymentTemplateComponentsSchema = z.object({
         .enum(["payment_field", ...statutoryFieldsArray])
         .default("payment_field"),
       payment_field_id: z.string().uuid().optional(),
-      payment_field: PaymentFieldSchemaObject.omit({
-        id: true,
-        company_id: true,
-      }).optional(),
       epf_id: z.string().uuid().optional(),
-      epf: EmployeeProvidentFundSchema.omit({
-        id: true,
-        company_id: true,
-      }).optional(),
       esi_id: z.string().uuid().optional(),
-      esi: EmployeeStateInsuranceSchema.omit({
-        id: true,
-        company_id: true,
-      }).optional(),
       bonus_id: z.string().uuid().optional(),
-      bonus: StatutoryBonusSchemaObject.omit({
-        id: true,
-        company_id: true,
-      })
-        .extend({
-          name: zNumberString.default("Bonus").optional(),
-        })
-        .optional(),
       lwf_id: z.string().uuid().optional(),
-      lwf: LabourWelfareFundSchema.omit({
-        id: true,
-        company_id: true,
-      })
-        .extend({
-          name: zNumberString.default("Labour Welfare Fund").optional(),
-        })
-        .optional(),
       pt_id: z.string().uuid().optional(),
-      pt: ProfessionalTaxSchema.omit({
-        id: true,
-        company_id: true,
-      }).optional(),
       component_type: z.enum(componentTypeArray).default("earning"),
       calculation_value: z.number().optional(),
       display_order: z.number().int().optional(),

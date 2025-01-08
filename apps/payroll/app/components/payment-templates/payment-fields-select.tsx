@@ -1,4 +1,4 @@
-import { type FC, useState } from "react";
+import { type FC, useEffect, useState } from "react";
 import { MultiSelectCombobox } from "@canny_ecosystem/ui/multi-select-combobox";
 import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
@@ -13,39 +13,45 @@ interface PaymentFieldsSelectProps {
   className?: string;
   options: ComboboxSelectOption[];
   env: SupabaseEnv;
+  disabled?: boolean;
 }
 
 export const PaymentFieldsSelect: FC<PaymentFieldsSelectProps> = ({
   className,
   options,
   env,
+  disabled,
 }) => {
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
   const { setSelectedPaymentFields } = usePaymentComponentsStore();
   const { supabase } = useSupabase({ env });
 
-  const handleFieldChange = async (newSelectedFields: string[]) => {
-    setSelectedFields(newSelectedFields);
-
-    if (newSelectedFields.length > 0) {
+  const fetchData = async (selectedFields: string[]) => {
+    if (selectedFields.length > 0) {
       const selectedFieldsData = await Promise.all(
-        newSelectedFields.map(async (id) => {
+        selectedFields.map(async (id) => {
           const { data } = await getPaymentFieldById({ supabase, id });
           return data;
-        }),
+        })
       );
 
-      // Filter out any null values and set the data
       setSelectedPaymentFields(
         selectedFieldsData.filter(
-          (data): data is PaymentFieldDataType => data !== null,
-        ),
+          (data): data is PaymentFieldDataType => data !== null
+        )
       );
     } else {
-      // If no fields are selected, set an empty array
       setSelectedPaymentFields([]);
     }
   };
+
+  const handleFieldChange = (newSelectedFields: string[]) => {
+    setSelectedFields(newSelectedFields);
+  };
+
+  useEffect(() => {
+    fetchData(selectedFields);
+  }, [selectedFields]);
 
   const handleRenderSelectedItem = (values: string[]): string => {
     if (values.length === 0) return "";
@@ -67,25 +73,26 @@ export const PaymentFieldsSelect: FC<PaymentFieldsSelectProps> = ({
   return (
     <div className={className}>
       <MultiSelectCombobox
-        label="Payment Field"
+        label='Payment Field'
         options={options}
         value={selectedFields}
         onChange={handleFieldChange}
         renderItem={(option) => (
           <div
-            role="option"
+            role='option'
             aria-selected={selectedFields.includes(String(option.value))}
           >
             {option.label}
           </div>
         )}
         renderSelectedItem={handleRenderSelectedItem}
-        aria-label="Filter by payment field"
-        aria-required="false"
-        aria-multiselectable="true"
-        aria-describedby="payment-field-description"
+        disabled={disabled}
+        aria-label='Filter by payment field'
+        aria-required='false'
+        aria-multiselectable='true'
+        aria-describedby='payment-field-description'
       />
-      <span id="payment-field-description" className="sr-only">
+      <span id='payment-field-description' className='sr-only'>
         Select one or more payment fields. Shows individual payment fields names
         when 3 or fewer are selected.
       </span>

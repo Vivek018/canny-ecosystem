@@ -14,6 +14,7 @@ export type EmployeeStateInsuranceDataType = Pick<
   | "employees_contribution"
   | "employers_contribution"
   | "include_employer_contribution"
+  | "max_limit"
 >;
 
 export const getEmployeeStateInsuranceById = async ({
@@ -63,6 +64,8 @@ export const getEmployeeStateInsuranceByCompanyId = async ({
     "employees_contribution",
     "employers_contribution",
     "include_employer_contribution",
+    "max_limit",
+    "is_default",
   ] as const;
 
   const { data, error } = await supabase

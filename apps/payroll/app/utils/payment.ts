@@ -12,6 +12,7 @@ import {
   componentTypeArray,
   EMPLOYEE_RESTRICTED_VALUE,
   ESI_EMPLOYEE_CONTRIBUTION,
+  ESI_MAX_LIMIT,
 } from "@canny_ecosystem/utils";
 import { EMPLOYEE_EPF_PERCENTAGE } from "@canny_ecosystem/utils/constant";
 
@@ -24,27 +25,22 @@ export function getSelectedPaymentComponentFromField<
 
   if (field.payment_type === "fixed") {
     if (field.calculation_type === "fixed" && field.amount) {
-      calculationValue = field.amount ?? 0;
+      calculationValue = field.amount;
     }
     if (field.calculation_type === "percentage_of_ctc" && monthlyCtc) {
       calculationValue = (monthlyCtc * (field.amount ?? 0)) / 100;
     }
   } else if (field.payment_type === "variable") {
     if (field.calculation_type === "fixed") {
-      calculationValue = field.amount ?? 0;
+      calculationValue = field.amount;
     }
   }
 
   return {
     payment_field_id: field.id,
-    payment_field: {
-      name: field.name,
-      calculation_type: field.calculation_type,
-      payment_type: field.payment_type,
-      amount: field.amount,
-    },
+    target_type: "payment_field",
     component_type: componentTypeArray[0],
-    calculation_value: calculationValue ?? field.amount,
+    calculation_value: calculationValue?.toFixed(2) ?? 0,
   };
 }
 
@@ -53,32 +49,12 @@ export function getEPFComponentFromField<
 >({ field, value }: { field: T | undefined | null; value: number }) {
   if (!field) return null;
 
-  let maxValue = value;
-
-  if (field.restrict_employee_contribution) {
-    maxValue = field.employee_restrict_value ?? EMPLOYEE_RESTRICTED_VALUE;
-  }
-
   const calculationValue =
-    maxValue * (field.employee_contribution ?? EMPLOYEE_EPF_PERCENTAGE);
+    value * (field.employee_contribution ?? EMPLOYEE_EPF_PERCENTAGE);
 
   return {
     epf_id: field.id,
-    epf: {
-      epf_number: field.epf_number,
-      deduction_cycle: field.deduction_cycle,
-      employee_contribution: field.employee_contribution,
-      employer_contribution: field.employer_contribution,
-      employee_restrict_value: field.employee_restrict_value,
-      employer_restrict_value: field.employer_restrict_value,
-      restrict_employee_contribution: field.restrict_employee_contribution,
-      restrict_employer_contribution: field.restrict_employer_contribution,
-      include_employer_contribution: field.include_employer_contribution,
-      edli_restrict_value: field.edli_restrict_value,
-      include_employer_edli_contribution:
-        field.include_employer_edli_contribution,
-      include_admin_charges: field.include_admin_charges,
-    },
+    target_type: "epf",
     component_type: "statutory_contribution",
     calculation_value: calculationValue.toFixed(2),
   };
@@ -94,13 +70,7 @@ export function getESIComponentFromField<
 
   return {
     esi_id: field.id,
-    esi: {
-      esi_number: field.esi_number,
-      deduction_cycle: field.deduction_cycle,
-      employees_contribution: field.employees_contribution,
-      employers_contribution: field.employers_contribution,
-      include_employer_contribution: field.include_employer_contribution,
-    },
+    target_type: "esi",
     component_type: "statutory_contribution",
     calculation_value: calculationValue.toFixed(2),
   };
@@ -129,11 +99,7 @@ export function getPTComponentFromField<
 
   return {
     pt_id: field.id,
-    pt: {
-      pt_number: field.pt_number,
-      state: field.state,
-      deduction_cycle: field.deduction_cycle,
-    },
+    target_type: "pt",
     component_type: "statutory_contribution",
     calculation_value: calculationValue,
   };
@@ -158,13 +124,7 @@ export function getLWFComponentFromField<
 
   return {
     lwf_id: field.id,
-    lwf: {
-      name: "Labour Welfare Fund",
-      state: field.state,
-      employee_contribution: field.employee_contribution,
-      employer_contribution: field.employer_contribution,
-      deduction_cycle: field.deduction_cycle,
-    },
+    target_type: "lwf",
     component_type: "statutory_contribution",
     calculation_value: calculationValue,
   };
@@ -184,13 +144,63 @@ export function getBonusComponentFromField<T extends StatutoryBonusDataType>({
 
   return {
     bonus_id: field.id,
-    bonus: {
-      name: "Bonus",
-      payment_frequency: field.payment_frequency,
-      percentage: field.percentage,
-      payout_month: field.payout_month,
-    },
-    component_type: "bonus",
+    target_type: "bonus",
+    component_type: "earning",
     calculation_value: calculationValue.toFixed(2),
   };
+}
+
+export function getValueforEPF({
+  epf,
+  values,
+}: {
+  epf: Omit<EmployeeProvidentFundDatabaseRow, "created_at" | "updated_at">;
+  values: { [key: string]: number };
+}) {
+  let value = 0;
+
+  for (const key in values) {
+    value += values[key];
+  }
+
+  if (epf?.restrict_employee_contribution) {
+    if (value >= (epf?.employee_restrict_value ?? EMPLOYEE_RESTRICTED_VALUE)) {
+      return epf?.employee_restrict_value ?? EMPLOYEE_RESTRICTED_VALUE;
+    }
+  }
+
+  return value;
+}
+
+export function getValueforESI({
+  esi,
+  values,
+}: {
+  esi: EmployeeStateInsuranceDataType;
+  values: { [key: string]: number };
+}) {
+  let value = 0;
+
+  for (const key in values) {
+    value += values[key];
+  }
+  if (value > (esi?.max_limit ?? ESI_MAX_LIMIT)) {
+    return 0;
+  }
+
+  return value;
+}
+
+export function getGrossValue({
+  values,
+}: {
+  values: { [key: string]: number };
+}) {
+  let value = 0;
+
+  for (const key in values) {
+    value += values[key];
+  }
+
+  return value;
 }

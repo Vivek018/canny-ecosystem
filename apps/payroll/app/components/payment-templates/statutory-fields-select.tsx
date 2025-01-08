@@ -19,6 +19,7 @@ interface StatutoryFieldsSelectProps {
   options: ComboboxSelectOption[];
   env: SupabaseEnv;
   state: string;
+  disabled?: boolean;
 }
 
 export const StatutoryFieldsSelect: FC<StatutoryFieldsSelectProps> = ({
@@ -26,6 +27,7 @@ export const StatutoryFieldsSelect: FC<StatutoryFieldsSelectProps> = ({
   options,
   env,
   state,
+  disabled,
 }) => {
   const { companyId } = useCompanyId();
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
@@ -33,9 +35,7 @@ export const StatutoryFieldsSelect: FC<StatutoryFieldsSelectProps> = ({
     usePaymentComponentsStore();
   const { supabase } = useSupabase({ env });
 
-  const getSelectedStatutoryField = async (
-    statutoryFieldName: (typeof statutoryFieldsArray)[number],
-  ) => {
+  const fetchStatutoryFieldData = async (selectedFields: string[]) => {
     if (!companyId?.length) return;
 
     const fetchFunctions = {
@@ -48,59 +48,37 @@ export const StatutoryFieldsSelect: FC<StatutoryFieldsSelectProps> = ({
         getLabourWelfareFundByStateAndCompanyId({ supabase, state, companyId }),
     };
 
-    const fetchFunction = fetchFunctions[statutoryFieldName];
-    if (fetchFunction) {
-      const { data } = await fetchFunction();
-      return data;
-    }
-    return null;
-  };
+    // Initialize updates object with null values for all fields
+    const updates = statutoryFieldsArray.reduce((acc, field) => {
+      acc[field] = null;
+      return acc;
+    }, {} as Record<string, any>);
 
-  const handleFieldChange = async (newSelectedFields: string[]) => {
-    const newlySelected = newSelectedFields.filter(
-      (field) => !selectedFields.includes(field),
-    );
-
-    const deselected = selectedFields.filter(
-      (field) => !newSelectedFields.includes(field),
-    );
-
-    setSelectedFields(newSelectedFields);
-
-    for (const field of newlySelected) {
-      const data = await getSelectedStatutoryField(
-        field as (typeof statutoryFieldsArray)[number],
-      );
-      setSelectedStatutoryFields({
-        ...selectedStatutoryFields,
-        [field]: data,
-      });
-    }
-
-    for (const field of deselected) {
-      setSelectedStatutoryFields({
-        ...selectedStatutoryFields,
-        [field]: null,
-      });
-    }
-  };
-
-  useEffect(() => {
-    const updates = statutoryFieldsArray.reduce(
-      (acc, field) => {
-        if (!selectedFields.includes(field)) {
-          acc[field] = null;
+    // Fetch data for selected fields
+    await Promise.all(
+      selectedFields.map(async (field) => {
+        const fetchFunction =
+          fetchFunctions[field as keyof typeof fetchFunctions];
+        if (fetchFunction) {
+          const { data } = await fetchFunction();
+          updates[field] = data;
         }
-        return acc;
-      },
-      {} as Record<string, null>,
+      })
     );
 
     setSelectedStatutoryFields({
       ...selectedStatutoryFields,
       ...updates,
     });
-  }, []);
+  };
+
+  const handleFieldChange = (newSelectedFields: string[]) => {
+    setSelectedFields(newSelectedFields);
+  };
+
+  useEffect(() => {
+    fetchStatutoryFieldData(selectedFields);
+  }, [selectedFields, state]);
 
   const handleRenderSelectedItem = (values: string[]): string => {
     if (values.length === 0) return "";
@@ -122,25 +100,26 @@ export const StatutoryFieldsSelect: FC<StatutoryFieldsSelectProps> = ({
   return (
     <div className={className}>
       <MultiSelectCombobox
-        label="Statutory Fields"
+        label='Statutory Fields'
         options={options}
         value={selectedFields}
         onChange={handleFieldChange}
         renderItem={(option) => (
           <div
-            role="option"
+            role='option'
             aria-selected={selectedFields.includes(String(option.value))}
           >
             {option.label}
           </div>
         )}
         renderSelectedItem={handleRenderSelectedItem}
-        aria-label="Filter by statutory field"
-        aria-required="false"
-        aria-multiselectable="true"
-        aria-describedby="statutory-field-description"
+        disabled={disabled}
+        aria-label='Filter by statutory field'
+        aria-required='false'
+        aria-multiselectable='true'
+        aria-describedby='statutory-field-description'
       />
-      <span id="statutory-field-description" className="sr-only">
+      <span id='statutory-field-description' className='sr-only'>
         Select one or more statutory fields. Shows individual statutory names
         when 6 or fewer are selected.
       </span>

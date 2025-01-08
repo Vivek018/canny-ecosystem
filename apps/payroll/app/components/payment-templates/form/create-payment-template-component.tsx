@@ -26,6 +26,7 @@ import {
   SelectedPaymentField,
   SelectedPTField,
 } from "../selected-field";
+import { usePaymentComponentsStore } from "@/store/payment-components";
 
 type FieldsType = {
   [K in keyof typeof PaymentTemplateComponentsSchema.shape]: FieldMetadata<
@@ -56,6 +57,9 @@ export function CreatePaymentTemplateComponentDetails({
       }
     }
   };
+
+  const { selectedPaymentFields, selectedStatutoryFields } =
+    usePaymentComponentsStore();
 
   return (
     <Fragment>
@@ -91,19 +95,19 @@ export function CreatePaymentTemplateComponentDetails({
             errors={fields.state.errors}
           />
         </div>
-        <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
+        <div className='grid grid-cols-2 place-content-center justify-between gap-6 mb-4'>
           <PaymentFieldsSelect
-            className='pb-4'
             options={paymentFieldOptions}
             env={env}
+            disabled={!fields.state.value || !fields.monthly_ctc.value}
           />
           <StatutoryFieldsSelect
-            className='pb-4'
             options={transformStringArrayIntoOptions(
               statutoryFieldsArray as unknown as string[]
             )}
             env={env}
             state={fields.state.value ?? ""}
+            disabled={!fields.state.value || !fields.monthly_ctc.value}
           />
         </div>
         <div className='w-full grid grid-cols-3 gap-3 justify-between border-b py-2 font-semibold'>
@@ -115,10 +119,6 @@ export function CreatePaymentTemplateComponentDetails({
           {paymentTemplateComponentsField.map((field, index) => {
             const fieldSet = field.getFieldset();
 
-            const value = Number.parseFloat(
-              fields.monthly_ctc.value ?? fields.monthly_ctc.initialValue ?? "0"
-            );
-
             const defaultTargetType = targetTypeDefaultValue([
               fieldSet.payment_field_id,
               fieldSet.epf_id,
@@ -128,30 +128,81 @@ export function CreatePaymentTemplateComponentDetails({
               fieldSet.bonus_id,
             ]);
 
+            const paymentField = selectedPaymentFields.find(
+              (paymentField) =>
+                paymentField.id ===
+                (fieldSet.payment_field_id.value ??
+                  fieldSet.payment_field_id.initialValue)
+            );
+
             if (defaultTargetType) {
               return (
                 <div
                   key={index.toString()}
-                  className='w-full grid grid-cols-3 gap-3 justify-between'
+                  className='w-full grid grid-cols-3 gap-3 justify-between items-center'
                 >
                   <input {...getInputProps(fieldSet.id, { type: "hidden" })} />
                   {defaultTargetType === "payment_field" && (
-                    <SelectedPaymentField field={fieldSet} monthlyCtc={value} />
+                    <SelectedPaymentField
+                      field={fieldSet}
+                      fieldOptions={{
+                        fieldName: paymentField?.name ?? "",
+                        percentageAmount:
+                          paymentField?.calculation_type === "percentage_of_ctc"
+                            ? paymentField?.amount
+                            : null,
+                        disabled: paymentField?.payment_type === "fixed",
+                        considerForEPF: paymentField?.consider_for_epf,
+                        considerForESI: paymentField?.consider_for_esic,
+                      }}
+                    />
                   )}
                   {defaultTargetType === "epf" && (
-                    <SelectedEPFField field={fieldSet} value={value} />
+                    <SelectedEPFField
+                      field={fieldSet}
+                      epf={{
+                        epfName:
+                          "Provident Fund",
+                        percentageAmount:
+                          selectedStatutoryFields.epf?.employee_contribution,
+                      }}
+                    />
                   )}
                   {defaultTargetType === "esi" && (
-                    <SelectedESIField field={fieldSet} value={value} />
+                    <SelectedESIField
+                      field={fieldSet}
+                      esi={{
+                        esiName: "Employee State Insurance",
+                        employeesContribution:
+                          selectedStatutoryFields.esi?.employees_contribution,
+                      }}
+                    />
                   )}
                   {defaultTargetType === "pt" && (
-                    <SelectedPTField field={fieldSet} value={value} />
+                    <SelectedPTField
+                      field={fieldSet}
+                      pt={{
+                        ptName: "Professional Tax",
+                      }}
+                    />
                   )}
                   {defaultTargetType === "lwf" && (
-                    <SelectedLWFField field={fieldSet} value={value} />
+                    <SelectedLWFField
+                      field={fieldSet}
+                      lwf={{
+                        lwfName: "Labour Welfare Fund",
+                      }}
+                    />
                   )}
                   {defaultTargetType === "bonus" && (
-                    <SelectedBonusField field={fieldSet} value={value} />
+                    <SelectedBonusField
+                      field={fieldSet}
+                      bonus={{
+                        bonusName: "Bonus",
+                        bonusPercentage:
+                          selectedStatutoryFields.bonus?.percentage,
+                      }}
+                    />
                   )}
                 </div>
               );
