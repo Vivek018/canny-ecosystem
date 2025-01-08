@@ -1,14 +1,12 @@
+import { FilterList } from "@/components/reports/epf-report/filter-list";
+import { EPFReportSearchFilter } from "@/components/reports/epf-report/report-search-filter";
+import { columns } from "@/components/reports/epf-report/table/columns";
+import { DataTable } from "@/components/reports/epf-report/table/data-table";
 import { ColumnVisibility } from "@/components/reports/column-visibility";
-import { FilterList } from "@/components/reports/gratuity-report/filter-list";
-import { GratuityReportSearchFilter } from "@/components/reports/gratuity-report/report-search-filter";
-import { columns } from "@/components/reports/gratuity-report/table/columns";
-import { DataTable } from "@/components/reports/gratuity-report/table/data-table";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { MAX_QUERY_LIMIT } from "@canny_ecosystem/supabase/constant";
 import {
-  type EmployeeFilters,
   getEmployeesReportByCompanyId,
-  getGratuityByCompanyId,
   getProjectNamesByCompanyId,
   getSiteNamesByProjectName,
 } from "@canny_ecosystem/supabase/queries";
@@ -17,6 +15,15 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json, Outlet, redirect, useLoaderData } from "@remix-run/react";
 
 const pageSize = 20;
+
+export type EPFReportFilters = {
+  start_month: string | undefined;
+  end_month: string | undefined;
+  start_year: string | undefined;
+  end_year: string | undefined;
+  project: string | undefined;
+  project_site: string | undefined;
+};
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -29,11 +36,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const query = searchParams.get("name") ?? undefined;
 
-  const filters: EmployeeFilters = {
-    doj_start: searchParams.get("doj_start") ?? undefined,
-    doj_end: searchParams.get("doj_end") ?? undefined,
-    dol_start: searchParams.get("dol_start") ?? undefined,
-    dol_end: searchParams.get("dol_end") ?? undefined,
+  const filters: EPFReportFilters = {
+    start_month: searchParams.get("start_month") ?? undefined,
+    end_month: searchParams.get("end_month") ?? undefined,
+    start_year: searchParams.get("start_year") ?? undefined,
+    end_year: searchParams.get("end_year") ?? undefined,
     project: searchParams.get("project") ?? undefined,
     project_site: searchParams.get("project_site") ?? undefined,
   };
@@ -56,17 +63,17 @@ export async function loader({ request }: LoaderFunctionArgs) {
     },
   });
 
-  const { data: gratuityData, error: gratuityError } =
-    await getGratuityByCompanyId({
-      supabase,
-      companyId,
-    });
+  // const { data: epfData, error: epfError } =
+  //   await getEmployeeProvidentFundByCompanyId({
+  //     supabase,
+  //     companyId,
+  //   });
 
   const hasNextPage = Boolean(
     meta?.count && meta.count / (page + 1) > pageSize,
   );
 
-  if (error || gratuityError) {
+  if (error) {
     throw error;
   }
 
@@ -89,28 +96,26 @@ export async function loader({ request }: LoaderFunctionArgs) {
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
 
-  const gratuityReportData = data.map((employee: any) => {
-    const gratuityEligibleYears: number = gratuityData?.eligibility_years ?? 5;
-    const joining_date = new Date(
-      employee.employee_project_assignment.start_date,
-    );
-    const totalDays = gratuityEligibleYears * 365.25;
-
-    const employeeWorkingYears =
-      new Date().getFullYear() - joining_date.getFullYear();
-
+  const epfReportData = data.map((employee: any) => {
     return {
       ...employee,
-      is_eligible_for_gratuity: employeeWorkingYears >= gratuityEligibleYears,
-      employee_eligible_date: new Date(
-        joining_date.setDate(joining_date.getDate() + totalDays),
-      ),
+      pf_acc_number: "vregerg",
+      uan: "4214155125",
+      pf_wage: 42141,
+      employee_pf_amount: 4324,
+      employee_vpf_amount: 41234,
+      employer_pf_amount: 432143,
+      employer_eps_amount: 4324,
+      employer_edli_contribution: 22414,
+      employer_pf_admin_charges: 4324,
+      total_contribution: 5245,
+      start_date: new Date(),
+      end_date: new Date(),
     };
   });
 
   return json({
-    data: gratuityReportData as any,
-    gratuityData,
+    data: epfReportData as any,
     count: meta?.count,
     query,
     filters,
@@ -140,10 +145,9 @@ export async function action({ request }: ActionFunctionArgs) {
   return redirect(url.toString());
 }
 
-export default function GratuityReport() {
+export default function EPFReport() {
   const {
     data,
-    gratuityData,
     count,
     query,
     filters,
@@ -161,7 +165,7 @@ export default function GratuityReport() {
     <section className="py-6 px-4">
       <div className="w-full flex items-center justify-between pb-4">
         <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
-          <GratuityReportSearchFilter
+          <EPFReportSearchFilter
             disabled={!data?.length && noFilters}
             projectArray={projectArray}
             projectSiteArray={projectSiteArray}
@@ -172,7 +176,6 @@ export default function GratuityReport() {
       </div>
       <DataTable
         data={data ?? []}
-        gratuityEligibleYears={gratuityData?.eligibility_years ?? 0}
         columns={columns()}
         count={count ?? data?.length ?? 0}
         query={query}

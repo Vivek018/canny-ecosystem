@@ -7,6 +7,6 @@
     },
     "strict": true
   },
-  "include": ["**/*.ts", "**/*.tsx", "tailwind.config.ts", "types/index.d.ts"],
+  "include": ["**/*.ts", "**/*.tsx", "tailwind.config.ts", "types/index.d.ts", "app/routes/_protected+/reports+/statutory-bonus-monthly+"],
   "exclude": ["node_modules"]
 }

@@ -31,7 +31,7 @@ import { useEffect, useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { UPDATE_PAYMENT_FIELD } from "./$paymentFieldId.update-payment-field";
+import { UPDATE_PAYMENT_FIELD } from "./$paymentFieldId+/update-payment-field";
 import {
   Card,
   CardContent,
@@ -179,7 +179,7 @@ export default function CreatePaymentField({
         <Form method="POST" {...getFormProps(form)} className="flex flex-col">
           <Card>
             <CardHeader>
-              <CardTitle className="text-3xl">
+              <CardTitle className="text-3xl capitalize">
                 {replaceDash(PAYMENT_FIELD_TAG)}
               </CardTitle>
               <CardDescription>
