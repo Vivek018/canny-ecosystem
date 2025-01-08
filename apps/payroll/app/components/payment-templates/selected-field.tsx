@@ -9,6 +9,8 @@ import {
 import { type FieldMetadata, getInputProps } from "@conform-to/react";
 import { Fragment, useEffect } from "react";
 
+const errorClassName = "min-h-min pt-0 pb-0";
+
 type FieldsType = {
   [K in keyof typeof PaymentTemplateComponentsSchema.shape.payment_template_components.element.shape]: FieldMetadata<
     (typeof PaymentTemplateComponentsSchema.shape.payment_template_components.element.shape)[K]["_type"],
@@ -17,14 +19,12 @@ type FieldsType = {
   >;
 };
 
-const errorClassName = "min-h-min pt-0 pb-0";
-
 export const SelectedPaymentField = ({
   field,
   fieldOptions: {
     fieldName,
     percentageAmount,
-    disabled,
+    readOnly,
     considerForEPF,
     considerForESI,
   },
@@ -33,7 +33,7 @@ export const SelectedPaymentField = ({
   fieldOptions: {
     fieldName: string;
     percentageAmount: number | null | undefined;
-    disabled: boolean;
+    readOnly: boolean;
     considerForEPF: boolean | null | undefined;
     considerForESI: boolean | null | undefined;
   };
@@ -57,59 +57,28 @@ export const SelectedPaymentField = ({
   } = usePaymentComponentsStore();
 
   useEffect(() => {
-    if (considerForEPF) {
-      setValueForEPF({
-        ...valueForEPF,
-        [fieldId]: value,
-      });
-
-      if (!value) {
-        setValueForEPF({
-          ...valueForEPF,
-          [fieldId]: 0,
-        });
-      }
-    }
-
-    if (considerForESI) {
-      setValueForESI({
-        ...valueForESI,
-        [fieldId]: value,
-      });
-    }
-
-    if (componentType === "earning") {
-      setGrossValue({
-        ...grossValue,
-        [fieldId]: value,
-      });
-    } else {
-      setGrossValue({
-        ...grossValue,
-        [fieldId]: 0,
-      });
-    }
-
-    if (fieldName === "basic") {
-      setBasicValue(value);
-    }
-
-    return () => {
+    // Update state when field is present
+    if (fieldId) {
       if (considerForEPF) {
         setValueForEPF({
           ...valueForEPF,
-          [fieldId]: 0,
+          [fieldId]: value || 0,
         });
       }
 
       if (considerForESI) {
         setValueForESI({
           ...valueForESI,
-          [fieldId]: 0,
+          [fieldId]: value,
         });
       }
 
       if (componentType === "earning") {
+        setGrossValue({
+          ...grossValue,
+          [fieldId]: value,
+        });
+      } else {
         setGrossValue({
           ...grossValue,
           [fieldId]: 0,
@@ -117,10 +86,40 @@ export const SelectedPaymentField = ({
       }
 
       if (fieldName === "basic") {
-        setBasicValue(0);
+        setBasicValue(value);
+      }
+    }
+
+    // Cleanup state when field is removed
+    return () => {
+      if (considerForEPF) {
+        const updatedEPF = { ...valueForEPF };
+        delete updatedEPF[fieldId];
+        setValueForEPF(updatedEPF);
+      }
+
+      if (considerForESI) {
+        const updatedESI = { ...valueForESI };
+        delete updatedESI[fieldId];
+        setValueForESI(updatedESI);
+      }
+
+      const updatedGross = { ...grossValue };
+      delete updatedGross[fieldId];
+      setGrossValue(updatedGross);
+
+      if (fieldName === "basic") {
+        setBasicValue(0); // Reset basic value if needed
       }
     };
-  }, [fieldId, componentType, value]);
+  }, [
+    fieldId,
+    componentType,
+    value,
+    considerForEPF,
+    considerForESI,
+    fieldName,
+  ]);
 
   return (
     <Fragment>
@@ -154,7 +153,7 @@ export const SelectedPaymentField = ({
             }),
             className: "border-muted-foreground",
             placeholder: "Enter Calculation Value Per Month",
-            disabled: disabled,
+            readOnly: readOnly,
           }}
           errors={field.calculation_value.errors}
           errorClassName={errorClassName}
@@ -200,7 +199,7 @@ export const SelectedEPFField = ({
         )}
         inputProps={{
           ...getInputProps(field.component_type, { type: "text" }),
-          disabled: true,
+          readOnly: true,
         }}
         placeholder='Select Component Type'
         errors={field.component_type.errors}
@@ -214,7 +213,7 @@ export const SelectedEPFField = ({
             }),
             className: "border-muted-foreground",
             placeholder: "Enter Calculation Value Per Month",
-            disabled: true,
+            readOnly: true,
           }}
           errors={field.calculation_value.errors}
           errorClassName={errorClassName}
@@ -260,7 +259,7 @@ export const SelectedESIField = ({
         )}
         inputProps={{
           ...getInputProps(field.component_type, { type: "text" }),
-          disabled: true,
+          readOnly: true,
         }}
         placeholder='Select Component Type'
         errors={field.component_type.errors}
@@ -274,8 +273,7 @@ export const SelectedESIField = ({
             }),
             className: "border-muted-foreground",
             placeholder: "Enter Calculation Value Per Month",
-
-            disabled: true,
+            readOnly: true,
           }}
           errors={field.calculation_value.errors}
           errorClassName={errorClassName}
@@ -320,7 +318,7 @@ export const SelectedPTField = ({
         )}
         inputProps={{
           ...getInputProps(field.component_type, { type: "text" }),
-          disabled: true,
+          readOnly: true,
         }}
         placeholder='Select Component Type'
         errors={field.component_type.errors}
@@ -334,7 +332,7 @@ export const SelectedPTField = ({
           className: "border-muted-foreground",
           placeholder: "Enter Calculation Value Per Month",
 
-          disabled: true,
+          readOnly: true,
         }}
         errors={field.calculation_value.errors}
         errorClassName={errorClassName}
@@ -371,7 +369,7 @@ export const SelectedLWFField = ({
         )}
         inputProps={{
           ...getInputProps(field.component_type, { type: "text" }),
-          disabled: true,
+          readOnly: true,
         }}
         placeholder='Select Component Type'
         errors={field.component_type.errors}
@@ -385,7 +383,7 @@ export const SelectedLWFField = ({
           className: "border-muted-foreground",
           placeholder: "Enter Calculation Value Per Month",
 
-          disabled: true,
+          readOnly: true,
         }}
         errors={field.calculation_value.errors}
         errorClassName={errorClassName}
@@ -423,7 +421,7 @@ export const SelectedBonusField = ({
         )}
         inputProps={{
           ...getInputProps(field.component_type, { type: "text" }),
-          disabled: true,
+          readOnly: true,
         }}
         placeholder='Select Component Type'
         errors={field.component_type.errors}
@@ -438,7 +436,7 @@ export const SelectedBonusField = ({
             className: "border-muted-foreground",
             placeholder: "Enter Calculation Value Per Month",
 
-            disabled: true,
+            readOnly: true,
           }}
           errors={field.calculation_value.errors}
           errorClassName={errorClassName}

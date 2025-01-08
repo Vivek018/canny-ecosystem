@@ -45,11 +45,6 @@ export const MultiSelectCombobox = ({
     );
   };
 
-  const handleClear = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onChange([]);
-  };
-
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
@@ -78,20 +73,6 @@ export const MultiSelectCombobox = ({
         </div>
 
         <span className='z-10 ml-auto flex items-center gap-2'>
-          {value.length > 0 && (
-            <div
-              aria-label='Clear selection'
-              className='z-10 rounded-sm opacity-50 hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-gray-300'
-              onClick={handleClear}
-              onKeyUp={(e: any) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  handleClear(e);
-                }
-              }}
-            >
-              <Icon name='cross' size='sm' />
-            </div>
-          )}
           <Icon name='caret-sort' size='sm' />
         </span>
       </PopoverTrigger>

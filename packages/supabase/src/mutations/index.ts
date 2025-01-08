@@ -10,6 +10,6 @@ export * from "./statutory-bonus";
 export * from "./employee-provident-fund";
 export * from "./employee-state-insurance";
 export * from "./payment-template-assignments";
-export * from "./payment-template-components";
+export * from "./payment-templates";
 export * from "./reimbursements";
 export * from "./exits";

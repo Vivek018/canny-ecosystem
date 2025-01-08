@@ -1280,36 +1280,39 @@ export type Database = {
       }
       payment_templates: {
         Row: {
-          annual_ctc: number
           company_id: string
           created_at: string | null
           description: string | null
           id: string
           is_active: boolean | null
           is_default: boolean | null
+          monthly_ctc: number
           name: string
+          state: string | null
           updated_at: string | null
         }
         Insert: {
-          annual_ctc: number
           company_id: string
           created_at?: string | null
           description?: string | null
           id?: string
           is_active?: boolean | null
           is_default?: boolean | null
+          monthly_ctc: number
           name: string
+          state?: string | null
           updated_at?: string | null
         }
         Update: {
-          annual_ctc?: number
           company_id?: string
           created_at?: string | null
           description?: string | null
           id?: string
           is_active?: boolean | null
           is_default?: boolean | null
+          monthly_ctc?: number
           name?: string
+          state?: string | null
           updated_at?: string | null
         }
         Relationships: [

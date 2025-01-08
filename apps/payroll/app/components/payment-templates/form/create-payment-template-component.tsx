@@ -142,6 +142,7 @@ export function CreatePaymentTemplateComponentDetails({
                   className='w-full grid grid-cols-3 gap-3 justify-between items-center'
                 >
                   <input {...getInputProps(fieldSet.id, { type: "hidden" })} />
+
                   {defaultTargetType === "payment_field" && (
                     <SelectedPaymentField
                       field={fieldSet}
@@ -151,7 +152,7 @@ export function CreatePaymentTemplateComponentDetails({
                           paymentField?.calculation_type === "percentage_of_ctc"
                             ? paymentField?.amount
                             : null,
-                        disabled: paymentField?.payment_type === "fixed",
+                        readOnly: paymentField?.payment_type === "fixed",
                         considerForEPF: paymentField?.consider_for_epf,
                         considerForESI: paymentField?.consider_for_esic,
                       }}
@@ -161,8 +162,7 @@ export function CreatePaymentTemplateComponentDetails({
                     <SelectedEPFField
                       field={fieldSet}
                       epf={{
-                        epfName:
-                          "Provident Fund",
+                        epfName: "Provident Fund",
                         percentageAmount:
                           selectedStatutoryFields.epf?.employee_contribution,
                       }}

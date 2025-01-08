@@ -622,7 +622,6 @@ export const PaymentTemplateComponentsSchema = z.object({
       component_type: z.enum(componentTypeArray).default("earning"),
       calculation_value: z.number().optional(),
       display_order: z.number().int().optional(),
-      is_active: z.boolean().default(false),
     }),
   ),
 });

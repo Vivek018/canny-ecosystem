@@ -11,6 +11,7 @@ import type { PaymentTemplateComponentDatabaseInsert } from "@canny_ecosystem/su
 import { Card } from "@canny_ecosystem/ui/card";
 import {
   getInitialValueFromZod,
+  isGoodStatus,
   PaymentTemplateComponentsSchema,
   PaymentTemplateSchema,
   z,
@@ -37,6 +38,8 @@ import {
   getValueforEPF,
   getValueforESI,
 } from "@/utils/payment";
+import { createPaymentTemplate } from "@canny_ecosystem/supabase/mutations";
+import { DEFAULT_ROUTE } from "@/constant";
 
 export const CREATE_PAYMENT_TEMPLATE = [
   "create-payment-template",
@@ -128,49 +131,49 @@ export async function action({ request }: ActionFunctionArgs) {
         >[];
       };
 
-      // const {
-      //   status,
-      //   employeeError,
-      //   employeeStatutoryDetailsError,
-      // } = await createEmployee({
-      //   supabase,
-      //   employeeData,
-      //   employeeStatutoryDetailsData,
-      // });
+      const { status, templateError, templateComponentsError } =
+        await createPaymentTemplate({
+          supabase,
+          templateData: {
+            ...paymentTemplateDetailsData,
+            monthly_ctc: paymentTemplateComponentsData.monthly_ctc,
+            state: paymentTemplateComponentsData.state,
+          },
+          templateComponentsData:
+            paymentTemplateComponentsData.payment_template_components,
+        });
 
-      // if (employeeError) {
-      //   for (let i = 1; i <= totalSteps; i++) {
-      //     session.unset(`${SESSION_KEY_PREFIX}${i}`);
-      //   }
-      //   const headers = new Headers();
-      //   headers.append("Set-Cookie", await commitSession(session));
-      //   url.searchParams.delete(STEP);
-      //   return redirect(url.toString(), { headers });
-      // }
+      if (templateError) {
+        for (let i = 1; i <= totalSteps; i++) {
+          session.unset(`${SESSION_KEY_PREFIX}${i}`);
+        }
+        const headers = new Headers();
+        headers.append("Set-Cookie", await commitSession(session));
+        url.searchParams.delete(STEP);
+        return redirect(url.toString(), { headers });
+      }
 
-      // if (
-      //   employeeStatutoryDetailsError
-      // ) {
-      //   for (let i = 1; i <= totalSteps; i++) {
-      //     session.unset(`${SESSION_KEY_PREFIX}${i}`);
-      //   }
-      //   const headers = new Headers();
-      //   headers.append("Set-Cookie", await commitSession(session));
-      //   return redirect(DEFAULT_ROUTE, {
-      //     headers,
-      //   });
-      // }
+      if (templateComponentsError) {
+        for (let i = 1; i <= totalSteps; i++) {
+          session.unset(`${SESSION_KEY_PREFIX}${i}`);
+        }
+        const headers = new Headers();
+        headers.append("Set-Cookie", await commitSession(session));
+        return redirect(DEFAULT_ROUTE, {
+          headers,
+        });
+      }
 
-      // if (isGoodStatus(status)) {
-      //   for (let i = 1; i <= totalSteps; i++) {
-      //     session.unset(`${SESSION_KEY_PREFIX}${i}`);
-      //   }
-      //   const headers = new Headers();
-      //   headers.append("Set-Cookie", await commitSession(session));
-      //   return redirect("/employees", {
-      //     headers,
-      //   });
-      // }
+      if (isGoodStatus(status)) {
+        for (let i = 1; i <= totalSteps; i++) {
+          session.unset(`${SESSION_KEY_PREFIX}${i}`);
+        }
+        const headers = new Headers();
+        headers.append("Set-Cookie", await commitSession(session));
+        return redirect("/payment-components/payment-templates", {
+          headers,
+        });
+      }
     }
   } else if (action === "next" || action === "back" || action === "skip") {
     if (action === "next") {
