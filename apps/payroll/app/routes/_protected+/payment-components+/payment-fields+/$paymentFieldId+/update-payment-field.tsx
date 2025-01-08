@@ -1,5 +1,5 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import CreatePaymentField from "./create-payment-field";
+import CreatePaymentField from "../create-payment-field";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
   Await,

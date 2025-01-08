@@ -5,13 +5,22 @@ import { Icon } from "@canny_ecosystem/ui/icon";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { PaymentFieldDataType } from "@canny_ecosystem/supabase/queries";
 import { PaymentFieldOptionsDropdown } from "../payment-field-options-dropdown";
+import { Link } from "@remix-run/react";
 
 export const columns: ColumnDef<PaymentFieldDataType>[] = [
   {
     accessorKey: "name",
     header: "Field Name",
     cell: ({ row }) => {
-      return <p className="truncate w-48">{`${row.original?.name}`}</p>;
+      return (
+        <Link
+          to={`${row.original.id}/reports`}
+          prefetch="intent"
+          className="group"
+        >
+          <p className="truncate text-primary/80 group-hover:text-primary w-48">{`${row.original?.name}`}</p>
+        </Link>
+      );
     },
   },
   {
