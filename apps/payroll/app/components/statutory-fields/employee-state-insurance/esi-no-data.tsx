@@ -34,4 +34,4 @@ export function ESINoData() {
       </Card>
     </div>
   );
-};
+}

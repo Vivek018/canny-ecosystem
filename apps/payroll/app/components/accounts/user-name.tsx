@@ -62,7 +62,7 @@ export const UserName = ({ updateValues }: UserNameProps) => {
                   type: "text",
                 }),
                 placeholder: `Enter ${replaceUnderscore(
-                  fields.first_name.name
+                  fields.first_name.name,
                 )}`,
               }}
               errors={fields.first_name.errors}
@@ -73,7 +73,7 @@ export const UserName = ({ updateValues }: UserNameProps) => {
                   type: "text",
                 }),
                 placeholder: `Enter ${replaceUnderscore(
-                  fields.last_name.name
+                  fields.last_name.name,
                 )}`,
               }}
               errors={fields.last_name.errors}

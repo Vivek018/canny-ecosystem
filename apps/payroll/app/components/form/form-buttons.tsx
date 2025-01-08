@@ -10,6 +10,7 @@ export const FormButtons = ({
   setResetKey,
   step,
   totalSteps,
+  className,
   isSingle = false,
 }: {
   form: FormMetadata<any, string[]>;
@@ -17,6 +18,7 @@ export const FormButtons = ({
   step?: number;
   totalSteps?: number;
   isSingle?: boolean;
+  className?: string;
 }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigation = useNavigation();
@@ -25,7 +27,7 @@ export const FormButtons = ({
     navigation.state === "submitting" || navigation.state === "loading";
 
   return (
-    <CardFooter className="flex items-center justify-between">
+    <CardFooter className={cn("flex items-center justify-between", className)}>
       <div className={cn("flex flex-row items-center justify-center gap-4")}>
         <Button
           variant="outline"

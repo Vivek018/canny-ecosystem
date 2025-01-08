@@ -14,7 +14,6 @@ export async function createStatutoryBonus({
   data: StatutoryBonusDatabaseInsert;
   bypassAuth?: boolean;
 }) {
-  
   if (!bypassAuth) {
     const {
       data: { user },
@@ -102,9 +101,7 @@ export async function deleteStatutoryBonus({
   const { error, status } = await supabase
     .from("statutory_bonus")
     .delete()
-    .eq("id", id)
-    .select()
-    .single();
+    .eq("id", id);
 
   if (error) {
     console.error(error);

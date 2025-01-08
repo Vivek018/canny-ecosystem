@@ -38,7 +38,9 @@ export const zEmailSuffix = z
     "Must contain a dot with at least one character before and two after.",
   );
 
-export const SIZE_1MB = 1 * 1024 * 1024; // 1MB
+export const SIZE_1KB = 1 * 1024; //1KB
+export const SIZE_1MB = 1 * SIZE_1KB * SIZE_1KB; // 1MB
+
 const ACCEPTED_IMAGE_TYPES = [
   "image/jpeg",
   "image/jpg",
@@ -440,6 +442,7 @@ export const EmployeeProvidentFundSchema = z.object({
   include_employer_contribution: z.boolean().default(false),
   include_employer_edli_contribution: z.boolean().default(false),
   include_admin_charges: z.boolean().default(false),
+  is_default: z.boolean().default(true),
 });
 
 export const EmployeeStateInsuranceSchema = z.object({
@@ -450,6 +453,7 @@ export const EmployeeStateInsuranceSchema = z.object({
   employees_contribution: z.number().default(0.0075),
   employers_contribution: z.number().default(0.0325),
   include_employer_contribution: z.boolean().default(false),
+  is_default: z.boolean().default(true),
 });
 
 export const ProfessionalTaxSchema = z.object({
@@ -490,6 +494,7 @@ export const StatutoryBonusSchema = z
       .default(statutoryBonusPayFrequencyArray[0]),
     percentage: z.number().min(0).default(8.33),
     payout_month: z.number().optional(),
+    is_default: z.boolean().default(true),
   })
   .superRefine((data, ctx) => {
     if (data.payment_frequency === "yearly" && !data.payout_month) {
@@ -506,6 +511,17 @@ export const StatutoryBonusSchema = z
       }
     }
   });
+
+export const GratuitySchema = z.object({
+  id: z.string().optional(),
+  company_id: z.string(),
+  is_default: z.boolean().default(true),
+  eligibility_years: z.number().min(0).default(4.5),
+  present_day_per_year: z.number().min(1).max(365).default(240),
+  payment_days_per_year: z.number().min(1).max(365).default(15),
+  max_multiply_limit: z.number().min(0).default(20),
+  max_amount_limit: z.number().min(0).default(3000000),
+});
 
 export const categoryArray = ["suggestion", "bug", "complain"] as const;
 export const severityArray = ["low", "normal", "urgent"] as const;
@@ -539,16 +555,18 @@ export const UserSchema = z.object({
   is_active: z.boolean().default(false),
 });
 
-export const reasonforexitArray = [
-  "resigned by employee",
-  "terminated by employee",
-  "by death",
-  "by disability",
+export const reasonForExitArray = [
+  "resignation",
+  "termination",
+  "retirement",
+  "health_reasons",
+  "career_change",
+  "other",
 ] as const;
 
 export const ExitPaymentPage1Schema = z.object({
   last_working_day: z.string(),
-  reason_for_exit: z.enum(reasonforexitArray),
+  reason_for_exit: z.enum(reasonForExitArray),
   final_settlement_date: z.string(),
   note: zTextArea.max(100).optional(),
 });
@@ -643,6 +661,62 @@ export const UpdateSiteLinkSchema = z.object({
   eligibility_option: z.enum(eligibilityOptionsArray).optional(),
   position: z.string().optional(),
   skill_level: z.string().optional(),
+});
+
+export const ReimbursementStatusArray = ["approved", "pending"] as const;
+export const ReimbursementDeductibleArray = ["true", "false"] as const;
+
+export const ReimbursementSchema = z.object({
+  first_name: zString.optional(),
+  last_name: zString.optional(),
+  submitted_date: z.string(),
+  status: z.enum(ReimbursementStatusArray),
+  amount: z.number().min(1).max(100000000),
+  user_id: z.string().optional(),
+  is_deductible: z.boolean().optional().default(false),
+  company_id: z.string(),
+  employee_id: z.string(),
+});
+
+export const ImportReimbursementHeaderSchema = z.object({
+  submitted_date: z.string(),
+  employee_code: z.string(),
+  amount: z.string(),
+  email: z.string().optional(),
+  is_deductible: z.string().optional(),
+  status: z.string().optional(),
+});
+
+export const exitReasonArray = [
+  "Resignation",
+  "Retirement",
+  "Transfer",
+  "Termination",
+  "Medical",
+  "Other",
+] as const;
+
+export const ImportReimbursementDataSchema = z.object({
+  data: z.array(
+    z.object({
+      submitted_date: z.string(),
+      employee_code: zNumberString,
+      amount: z.preprocess(
+        (value) =>
+          typeof value === "string" ? Number.parseFloat(value) : value,
+        z.number(),
+      ),
+      email: zEmail.optional(),
+      is_deductible: z
+        .preprocess(
+          (value) =>
+            typeof value === "string" ? value.toLowerCase() === "true" : value,
+          z.boolean().default(false),
+        )
+        .default(false),
+      status: z.enum(ReimbursementStatusArray),
+    }),
+  ),
 });
 
 // Payroll

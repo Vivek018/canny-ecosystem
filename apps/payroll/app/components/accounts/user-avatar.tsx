@@ -31,8 +31,8 @@ export const UserAvatar = ({
           <CardHeader>
             <CardTitle>Avatar</CardTitle>
             <CardDescription>
-              This is your Avatar. Click on the avatar to upload a
-              custom one from your files.
+              This is your Avatar. Click on the avatar to upload a custom one
+              from your files.
             </CardDescription>
           </CardHeader>
 

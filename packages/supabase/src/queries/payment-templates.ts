@@ -8,22 +8,30 @@ type PaymentTemplate = {
 
 export async function getPaymentTemplatesByCompanyId({
   supabase,
-  company_id,
-}: { 
-  supabase: TypedSupabaseClient; 
-  company_id: string 
-}): Promise<{ 
-  data: PaymentTemplate[] | null; 
-  error: PostgrestError | null 
-}> {
+  companyId,
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+}) {
   const columns = ["id", "name"] as const;
   const { data, error } = await supabase
     .from("payment_templates")
     .select(columns.join(","))
-    .eq("company_id", company_id);
-  
-  if (error) console.error(error);
-  return { data: data as PaymentTemplate[] | null, error };
+    .eq("company_id", companyId)
+    .limit(HARD_QUERY_LIMIT)
+    .order("created_at", { ascending: true })
+    .returns<
+      InferredType<
+        PaymentTemplateAssignmentsDatabaseInsert,
+        (typeof columns)[number]
+      >[]
+    >();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { data, error };
 }
 
 export async function getPaymentTemplateByEmployeeId({

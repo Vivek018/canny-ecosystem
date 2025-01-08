@@ -80,6 +80,10 @@ export async function getPaymentFieldsByCompanyId({
     .order("created_at", { ascending: false })
     .returns<PaymentFieldDataType[]>();
 
+  if (error) {
+    console.error(error);
+  }
+
   return {
     data,
     error,

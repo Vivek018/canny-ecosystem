@@ -1,3 +1,4 @@
+import { HARD_QUERY_LIMIT } from "../constant";
 import type {
   InferredType,
   TypedSupabaseClient,
@@ -67,6 +68,28 @@ export async function getUsers({
     .from("users")
     .select(columns.join(","))
     .order("created_at", { ascending: false })
+    .limit(HARD_QUERY_LIMIT)
+    .returns<InferredType<UserDatabaseRow, (typeof columns)[number]>[]>();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { data, error };
+}
+
+export async function getUsersEmail({
+  supabase,
+}: {
+  supabase: TypedSupabaseClient;
+}) {
+  const columns = ["email"] as const;
+
+  const { data, error } = await supabase
+    .from("users")
+    .select(`${columns.join(",")},email`)
+    .order("created_at", { ascending: false })
+    .limit(HARD_QUERY_LIMIT)
     .returns<InferredType<UserDatabaseRow, (typeof columns)[number]>[]>();
 
   if (error) {
@@ -118,4 +141,26 @@ export async function getUserById({
   //   },
   //   error: null,
   // };
+}
+
+export async function getUserIdsByUserEmails({
+  supabase,
+  userEmails,
+}: {
+  supabase: TypedSupabaseClient;
+  userEmails: string[];
+}) {
+  const columns = ["email", "id"] as const;
+
+  const { data, error } = await supabase
+    .from("users")
+    .select(columns.join(","))
+    .in("email", userEmails)
+    .returns<InferredType<UserDatabaseRow, (typeof columns)[number]>[]>();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { data, error };
 }

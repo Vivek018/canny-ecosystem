@@ -30,7 +30,7 @@ export function PayrollDataTable<TData, TValue>({ columns, data, editable }: Pay
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
-          !tableLength && "border-none"
+          !tableLength && "border-none",
         )}
       >
         <Table>

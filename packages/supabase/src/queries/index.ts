@@ -15,3 +15,6 @@ export * from "./employee-attendance";
 export * from "./payment-templates-components";
 export * from "./reimbursements";
 export * from "./payroll";
+export * from "./reimbursements";
+export * from "./exits";
+export * from "./gratuity";

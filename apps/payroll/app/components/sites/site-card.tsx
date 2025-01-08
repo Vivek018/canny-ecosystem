@@ -7,22 +7,36 @@ import {
   DropdownMenuTrigger,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@canny_ecosystem/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@canny_ecosystem/ui/tooltip";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Link, useNavigate } from "@remix-run/react";
 import { DeleteSite } from "./delete-site";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@canny_ecosystem/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@canny_ecosystem/ui/card";
 import type { SitesWithLocation } from "@canny_ecosystem/supabase/queries";
 import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
 import { replaceUnderscore } from "@canny_ecosystem/utils";
-import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
-import { SiteDialog } from "../link-template/site-dialog";
 
-export function SiteCard({ site, env, companyId }: { site: Omit<SitesWithLocation, "created_at" | "updated_at">, env: SupabaseEnv, companyId: string }) {
+export function SiteCard({
+  site,
+}: {
+  site: Omit<SitesWithLocation, "created_at" | "updated_at">;
+}) {
   const navigate = useNavigate();
 
-  const viewPaySequenceSearchParam = `${modalSearchParamNames.view_pay_sequence}=true`;
-  const editPaySequenceSearchParam = `${modalSearchParamNames.edit_pay_sequence}=true`;
+  const viewLinkTemplateSearchParam = `step=${modalSearchParamNames.view_link_template}`;
+  const viewPaySequenceSearchParam = `step=${modalSearchParamNames.view_pay_sequence}`;
+  const editPaySequenceSearchParam = `step=${modalSearchParamNames.edit_pay_sequence}`;
 
   return (
     <Card
@@ -59,21 +73,36 @@ export function SiteCard({ site, env, companyId }: { site: Omit<SitesWithLocatio
               <DropdownMenuGroup>
                 <DropdownMenuItem
                   onClick={() => {
-                    navigate(`/projects/${site.project_id}/sites/${site.id}?${viewPaySequenceSearchParam}`);
+                    navigate(
+                      `/projects/${site.project_id}/sites/${site.id}?${viewPaySequenceSearchParam}`,
+                    );
                   }}
                 >
                   View Pay Sequence
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => {
-                    navigate(`/projects/${site.project_id}/sites/${site.id}?${editPaySequenceSearchParam}`);
+                    navigate(
+                      `/projects/${site.project_id}/sites/${site.id}?${editPaySequenceSearchParam}`,
+                    );
                   }}
                 >
                   Edit Pay Sequence
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <SiteDialog env={env} site={site} companyId={companyId} />
-                <DropdownMenuSeparator className={cn(!site.latitude && !site.longitude && "hidden")} />
+                <DropdownMenuItem
+                  onClick={() => {
+                    navigate(
+                      `/projects/${site.project_id}/sites/${site.id}?${viewLinkTemplateSearchParam}`,
+                    );
+                  }}
+                >
+                  Link Template
+                </DropdownMenuItem>
+                {/* <SiteDialog env={env} site={site} companyId={companyId} /> */}
+                <DropdownMenuSeparator
+                  className={cn(!site.latitude && !site.longitude && "hidden")}
+                />
                 <DeleteSite projectId={site.project_id} siteId={site.id} />
               </DropdownMenuGroup>
             </DropdownMenuContent>
@@ -82,7 +111,9 @@ export function SiteCard({ site, env, companyId }: { site: Omit<SitesWithLocatio
       </CardHeader>
       <CardContent className="flex flex-col gap-0.5 px-4">
         <address className="not-italic line-clamp-3">
-          {`${site.address_line_1} ${site.address_line_2 ? site.address_line_2 : ""}`}
+          {`${site.address_line_1} ${
+            site.address_line_2 ? site.address_line_2 : ""
+          }`}
         </address>
         <div className="flex items-center capitalize gap-2">
           <p>{`${site.city},`}</p>
@@ -109,6 +140,6 @@ export function SiteCard({ site, env, companyId }: { site: Omit<SitesWithLocatio
           Active
         </div>
       </CardFooter>
-    </Card >
+    </Card>
   );
 }

@@ -32,12 +32,11 @@ export function Step1({ fields }: { fields: any }) {
           }}
           errors={fields.last_working_day.errors}
         />
-        
 
         <SearchableSelectField
           className="capitalize"
           options={transformStringArrayIntoOptions(
-            reasonforexitArray as unknown as string[]
+            reasonforexitArray as unknown as string[],
           )}
           inputProps={{
             ...getInputProps(fields.reason_for_exit, { type: "text" }),
@@ -59,7 +58,6 @@ export function Step1({ fields }: { fields: any }) {
           }}
           errors={fields.final_settlement_date.errors}
         />
-        
 
         <TextareaField
           textareaProps={{

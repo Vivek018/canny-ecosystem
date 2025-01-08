@@ -17,7 +17,9 @@ import { DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
-export const DeleteEmployeePaymentTemplateAssignment = ({ employeeId }: { employeeId: string }) => {
+export const DeleteEmployeePaymentTemplateAssignment = ({
+  employeeId,
+}: { employeeId: string }) => {
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [inputError, setInputError] = useState<string[]>([]);
@@ -65,12 +67,15 @@ export const DeleteEmployeePaymentTemplateAssignment = ({ employeeId }: { employ
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
             This action cannot be undone. This will permanently delete your
-            employee's payment template assignment and remove it's data from our servers.
+            employee's payment template assignment and remove it's data from our
+            servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="py-4">
           <p className="text-sm text-foreground/80">
-            Please type{" "}<i className="text-foreground font-medium">{DELETE_TEXT}</i> to confirm.
+            Please type{" "}
+            <i className="text-foreground font-medium">{DELETE_TEXT}</i> to
+            confirm.
           </p>
           <Input
             type="text"
@@ -89,7 +94,9 @@ export const DeleteEmployeePaymentTemplateAssignment = ({ employeeId }: { employ
           <ErrorList errors={inputError} />
         </div>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={handleCancelEmployeePaymentTemplateAssignment}>
+          <AlertDialogCancel
+            onClick={handleCancelEmployeePaymentTemplateAssignment}
+          >
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction

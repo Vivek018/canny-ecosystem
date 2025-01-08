@@ -218,6 +218,14 @@ export type LabourWelfareFundDatabaseInsert =
 export type LabourWelfareFundDatabaseUpdate =
   Database["public"]["Tables"]["labour_welfare_fund"]["Update"];
 
+// Payment templates
+export type PaymentTemplateDatabaseRow =
+  Database["public"]["Tables"]["payment_templates"]["Row"];
+export type PaymentTemplateDatabaseInsert =
+  Database["public"]["Tables"]["payment_templates"]["Insert"];
+export type PaymentTemplateDatabaseUpdate =
+  Database["public"]["Tables"]["payment_templates"]["Update"];
+
 // Payment template assignment
 export type PaymentTemplateAssignmentsDatabaseRow =
   Database["public"]["Tables"]["payment_template_assignments"]["Row"];
@@ -256,3 +264,21 @@ export type ReimbursementRow =
   Database["public"]["Tables"]["reimbursements"]["Row"];
 export type ReimbursementsUpdate =
   Database["public"]["Tables"]["reimbursements"]["Update"];
+
+export type ExitsRow = Database["public"]["Tables"]["exits"]["Row"];
+export type ExitsInsert = Database["public"]["Tables"]["exits"]["Insert"];
+export type ExitsUpdate = Database["public"]["Tables"]["exits"]["Update"];
+
+export type ExitPaymentsRow =
+  Database["public"]["Tables"]["exit_payments"]["Row"];
+export type ExitPaymentsInsert =
+  Database["public"]["Tables"]["exit_payments"]["Insert"];
+export type ExitPaymentsUpdate =
+  Database["public"]["Tables"]["exit_payments"]["Update"];
+
+export type GratuityDatabaseRow =
+  Database["public"]["Tables"]["gratuity"]["Row"];
+export type GratuityDatabaseInsert =
+  Database["public"]["Tables"]["gratuity"]["Insert"];
+export type GratuityDatabaseUpdate =
+  Database["public"]["Tables"]["gratuity"]["Update"];

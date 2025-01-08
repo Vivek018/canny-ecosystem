@@ -32,13 +32,15 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="relative mb-8">
-      <div className={cn(
-        "relative border overflow-x-auto rounded",
-        !tableLength && "border-none",
-      )}>
+      <div
+        className={cn(
+          "relative border overflow-x-auto rounded",
+          !tableLength && "border-none",
+        )}
+      >
         <div className="relative">
           <Table>
-          <DataTableHeader
+            <DataTableHeader
               table={table}
               className={cn(!tableLength && "hidden")}
             />

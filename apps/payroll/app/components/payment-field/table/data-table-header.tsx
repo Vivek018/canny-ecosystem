@@ -4,7 +4,7 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 
 type Props = {
   table?: any;
-  className?:string;
+  className?: string;
   loading?: boolean;
 };
 

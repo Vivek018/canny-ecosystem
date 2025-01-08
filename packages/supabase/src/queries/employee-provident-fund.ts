@@ -65,14 +65,17 @@ export const getEmployeeProvidentFundByCompanyId = async ({
     "include_employer_contribution",
     "include_employer_edli_contribution",
     "include_admin_charges",
+    "is_default",
   ] as const;
 
   const { data, error } = await supabase
     .from("employee_provident_fund")
     .select(columns.join(","))
     .eq("company_id", companyId)
+    .eq("is_default", true)
     .limit(SINGLE_QUERY_LIMIT)
-    .single<
+    .order("created_at", { ascending: false })
+    .maybeSingle<
       InferredType<EmployeeProvidentFundDatabaseRow, (typeof columns)[number]>
     >();
 

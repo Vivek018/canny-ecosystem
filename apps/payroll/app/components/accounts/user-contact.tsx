@@ -75,7 +75,7 @@ export const UserContact = ({ updateValues }: UserContactProps) => {
                   type: "text",
                 }),
                 placeholder: `Enter ${replaceUnderscore(
-                  fields.mobile_number.name
+                  fields.mobile_number.name,
                 )}`,
               }}
               errors={fields.mobile_number.errors}

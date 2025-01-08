@@ -36,7 +36,9 @@ export function Combobox({
   disabled,
 }: ComboboxProps) {
   const [open, setOpen] = useState(false);
-  const selectedOption = options?.find((option) => String(option.value) === String(value));
+  const selectedOption = options?.find(
+    (option) => String(option.value) === String(value),
+  );
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -47,7 +49,7 @@ export function Combobox({
           role="combobox"
           aria-expanded={open}
           className={cn(
-            "truncate justify-between capitalize",
+            "truncate justify-between",
             !selectedOption && "text-muted-foreground",
             className,
           )}
@@ -89,12 +91,12 @@ export function Combobox({
                     size="sm"
                     className={cn(
                       "mr-2 shrink-0",
-                      String(value) === String(option.value) ? "opacity-100" : "opacity-0",
+                      String(value) === String(option.value)
+                        ? "opacity-100"
+                        : "opacity-0",
                     )}
                   />
-                  <p className="truncate capitalize">
-                    {replaceUnderscore(option?.label)}
-                  </p>
+                  <p className="truncate">{replaceUnderscore(option?.label)}</p>
                 </CommandItem>
               ))}
             </CommandGroup>

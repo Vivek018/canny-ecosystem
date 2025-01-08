@@ -25,17 +25,17 @@ export async function createPaymentField({
     }
   }
 
-  const {
-    error,
-    status,
-    data: paymentFieldData,
-  } = await supabase.from("payment_fields").insert(data).select().single();
+  const { error, status } = await supabase
+    .from("payment_fields")
+    .insert(data)
+    .select()
+    .single();
 
   if (error) {
     console.error(error);
   }
 
-  return { status, error, id: paymentFieldData?.id };
+  return { status, error };
 }
 
 export async function updatePaymentField({

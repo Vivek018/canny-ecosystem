@@ -11,17 +11,17 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ExitPaymentTableHeader } from "./data-table-headers";
+import { ImportedDataTableHeader } from "./imported-data-table-headers";
 
-interface DataTableProps<TData, TValue> {
+interface ImportedDataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 
-export function ExitPaymentTable<TData, TValue>({
+export function ImportedDataTable<TData, TValue>({
   columns,
   data,
-}: DataTableProps<TData, TValue>) {
+}: ImportedDataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
@@ -35,12 +35,12 @@ export function ExitPaymentTable<TData, TValue>({
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
-          !tableLength && "border-none"
+          !tableLength && "border-none",
         )}
       >
         <div className="relative">
           <Table>
-            <ExitPaymentTableHeader
+            <ImportedDataTableHeader
               table={table}
               className={cn(!tableLength && "hidden")}
             />
@@ -49,27 +49,24 @@ export function ExitPaymentTable<TData, TValue>({
                 table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
-                    className="relative  cursor-default select-text"
+                    className="relative h-[40px] md:h-[45px] cursor-default select-text"
                   >
                     {row.getVisibleCells().map((cell) => {
                       return (
                         <TableCell
                           key={cell.id}
                           className={cn(
-                            "px-3 md:px-4 py-4 hidden md:table-cell",
+                            "h-[60px] px-3 md:px-4 py-2 hidden md:table-cell",
                             cell.column.id === "status" &&
-                              (cell.getValue() === "Approved"
+                              (cell.getValue() === "approved"
                                 ? "text-green"
-                                : cell.getValue() === "Rejected"
-                                ? "text-destructive"
-                                : "text-muted-foreground"),
-                            cell.column.id === "employee_name" &&
-                              "sticky left-0 bg-card z-10"
+                                : cell.getValue() === "pending" &&
+                                  "text-muted-foreground"),
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                         </TableCell>
                       );
@@ -82,7 +79,7 @@ export function ExitPaymentTable<TData, TValue>({
                     colSpan={columns.length}
                     className="h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize"
                   >
-                    No Exit Payment Fields Found.
+                    No Reimbursements Found
                   </TableCell>
                 </TableRow>
               )}

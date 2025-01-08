@@ -36,7 +36,7 @@ export function RelationshipCard({
   relationship: Omit<RelationshipWithCompany, "created_at" | "updated_at">;
 }) {
   const navigate = useNavigate();
-  const viewRelationshipTermsParam = `${modalSearchParamNames.view_relationship_terms}=true`;
+  const viewRelationshipTermsParam = `step=${modalSearchParamNames.view_relationship_terms}`;
 
   return (
     <Card

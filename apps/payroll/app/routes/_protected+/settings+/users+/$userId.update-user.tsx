@@ -12,46 +12,60 @@ export const UPDATE_USER_TAG = "Update User";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const userId = params.userId;
-  const { supabase } = getSupabaseWithHeaders({ request });
-  let userData = null;
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    let userData = null;
 
-  if (userId) {
-    const { data, error } = await getUserById({
-      supabase,
-      id: userId,
-    });
+    if (userId) {
+      const { data, error } = await getUserById({
+        supabase,
+        id: userId,
+      });
 
-    if (error) {
-      throw error;
+      if (error) {
+        throw error;
+      }
+
+      userData = data;
     }
 
-    userData = data;
+    return json({ data: userData });
+  } catch (error) {
+    return json({
+      error,
+      data: null,
+    });
   }
-
-  return json({ data: userData });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
-  const submission = parseWithZod(formData, { schema: UserSchema });
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
+    const submission = parseWithZod(formData, { schema: UserSchema });
 
-  if (submission.status !== "success") {
-    return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
-    );
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+
+    const { status, error } = await updateUserById({
+      supabase,
+      data: submission.value,
+    });
+
+    if (isGoodStatus(status))
+      return safeRedirect("/settings/users", { status: 303 });
+
+    return json({ status, error });
+  } catch (error) {
+    return json({
+      error,
+      status: null,
+    });
   }
-
-  const { status, error } = await updateUserById({
-    supabase,
-    data: submission.value,
-  });
-
-  if (isGoodStatus(status))
-    return safeRedirect("/settings/users", { status: 303 });
-
-  return json({ status, error });
 }
 
 export default function UpdateUser() {

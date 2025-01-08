@@ -1,8 +1,7 @@
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { Form, json } from "@remix-run/react";
+import { Form, json, useActionData, useNavigate } from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { safeRedirect } from "@/utils/server/http.server";
 import { createEmployeeAddresses } from "@canny_ecosystem/supabase/mutations";
 import {
   isGoodStatus,
@@ -12,42 +11,62 @@ import {
 import { CreateEmployeeAddress } from "@/components/employees/form/create-employee-address";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
 import { Card } from "@canny_ecosystem/ui/card";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FormButtons } from "@/components/form/form-buttons";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 export const ADD_EMPLOYEE_ADDRESS = "add-employee-address";
 
-export async function action({ request, params }: ActionFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
-
+export async function action({
+  request,
+  params,
+}: ActionFunctionArgs): Promise<Response> {
   const employeeId = params.employeeId;
-  if (!employeeId) {
-    return safeRedirect("/employees");
-  }
 
-  const submission = parseWithZod(formData, {
-    schema: EmployeeAddressesSchema,
-  });
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
 
-  if (submission.status !== "success") {
-    return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
-    );
-  }
+    if (!employeeId) {
+      return json({
+        status: "error",
+        message: "Invalid employee id",
+        returnTo: "/employees",
+      });
+    }
 
-  const { status, error } = await createEmployeeAddresses({
-    supabase,
-    data: { ...submission.value, employee_id: employeeId },
-  });
+    const submission = parseWithZod(formData, {
+      schema: EmployeeAddressesSchema,
+    });
 
-  if (isGoodStatus(status)) {
-    return safeRedirect(`/employees/${employeeId}`, {
-      status: 303,
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+
+    const { status, error } = await createEmployeeAddresses({
+      supabase,
+      data: { ...submission.value, employee_id: employeeId },
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Address added successfully",
+        error: null,
+        returnTo: `/employees/${employeeId}`,
+      });
+    }
+    return json({ status, error });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
     });
   }
-  return json({ status, error });
 }
 
 export default function AddEmployeeAddress() {
@@ -66,6 +85,29 @@ export default function AddEmployeeAddress() {
     shouldRevalidate: "onInput",
     defaultValue: initialValues,
   });
+
+  const actionData = useActionData<typeof action>();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (actionData) {
+      if (actionData?.status === "success") {
+        toast({
+          title: "Success",
+          description: actionData?.message || "Address added",
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: actionData?.error?.message || "Address add failed",
+          variant: "destructive",
+        });
+      }
+      navigate(actionData?.returnTo ?? -1);
+    }
+  }, [actionData]);
 
   return (
     <section className="md:px-20 lg:px-28 2xl:px-40 py-4">

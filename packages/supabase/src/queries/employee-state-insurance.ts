@@ -69,8 +69,10 @@ export const getEmployeeStateInsuranceByCompanyId = async ({
     .from("employee_state_insurance")
     .select(columns.join(","))
     .eq("company_id", companyId)
+    .eq("is_default", true)
     .limit(SINGLE_QUERY_LIMIT)
-    .single<
+    .order("created_at", { ascending: false })
+    .maybeSingle<
       InferredType<EmployeeStateInsuranceDatabaseRow, (typeof columns)[number]>
     >();
 

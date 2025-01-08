@@ -61,10 +61,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-    const url = new URL(request.url);
-    const session = await getSession(request.headers.get("Cookie"));
+  const url = new URL(request.url);
+  const session = await getSession(request.headers.get("Cookie"));
 
-    const step = Number.parseInt(url.searchParams.get(STEP) || "1");
+  const step = Number.parseInt(url.searchParams.get(STEP) || "1");
   const currentSchema = schemas[step - 1];
   const totalSteps = schemas.length;
 

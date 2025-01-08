@@ -12,4 +12,6 @@ export * from "./employee-state-insurance";
 export * from "./payment-template-assignments";
 export * from "./payment-template-components";
 export * from "./reimbursements";
+export * from "./exits";
+export * from "./gratuity";
 export * from "./payroll";
