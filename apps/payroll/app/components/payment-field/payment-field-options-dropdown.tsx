@@ -74,6 +74,8 @@ export const PaymentFieldOptionsDropdown = ({
           </DropdownMenuItem>
         </DropdownMenuGroup>
 
+        <DropdownMenuSeparator />
+
         <DropdownMenuGroup>
           <DropdownMenuItem
             className={cn(paymentField.is_active && "hidden")}

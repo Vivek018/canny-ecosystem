@@ -71,7 +71,7 @@ export const columns = (): ColumnDef<PaymentFieldsReportType>[] => [
     header: "Field Name",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-28 capitalize">{row.original?.field_name}</p>
+        <p className="truncate w-48 capitalize">{row.original?.field_name}</p>
       );
     }
   },

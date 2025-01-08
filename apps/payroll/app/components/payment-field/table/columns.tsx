@@ -18,7 +18,7 @@ export const columns: ColumnDef<PaymentFieldDataType>[] = [
           prefetch="intent"
           className="group"
         >
-          <p className="truncate text-primary/80 group-hover:text-primary w-28">{`${row.original?.name}`}</p>
+          <p className="truncate text-primary/80 group-hover:text-primary w-48">{`${row.original?.name}`}</p>
         </Link>
       );
     },
