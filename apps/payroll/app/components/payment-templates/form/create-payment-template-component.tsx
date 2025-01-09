@@ -13,7 +13,7 @@ import {
   type PaymentTemplateComponentsSchema,
 } from "@canny_ecosystem/utils";
 import { getInputProps, type FieldMetadata } from "@conform-to/react";
-import { Fragment } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { PaymentFieldsSelect } from "../payment-fields-select";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { statesAndUTs } from "@canny_ecosystem/utils/constant";
@@ -37,16 +37,31 @@ type FieldsType = {
 };
 
 export function CreatePaymentTemplateComponentDetails({
+  resetKey,
   fields,
   paymentFieldOptions,
   env,
+  isUpdate = false,
 }: {
+  resetKey?: number;
   fields: FieldsType;
   paymentFieldOptions: ComboboxSelectOption[];
   env: SupabaseEnv;
+  isUpdate?: boolean;
 }) {
   const paymentTemplateComponentsField =
     fields.payment_template_components.getFieldList();
+
+  const [
+    { paymentFieldDefaultValue, statutoryFieldDefaultValue },
+    setSelectFieldDefaultValues,
+  ] = useState<{
+    paymentFieldDefaultValue: string[];
+    statutoryFieldDefaultValue: string[];
+  }>({
+    paymentFieldDefaultValue: [],
+    statutoryFieldDefaultValue: [],
+  });
 
   const targetTypeDefaultValue = (
     fields: { name: string; value: string | null | undefined }[]
@@ -58,19 +73,66 @@ export function CreatePaymentTemplateComponentDetails({
     }
   };
 
+  useEffect(() => {
+    if (isUpdate) {
+      const getFieldValues = (idKey: string, value: string) =>
+        paymentTemplateComponentsField
+          .filter((field) => (field as any).getFieldset()[idKey]?.value)
+          .map(() => value);
+
+      const paymentFieldDefaultValue = paymentTemplateComponentsField
+        .filter((field) => field.getFieldset().payment_field_id?.value)
+        .map((field) => field.getFieldset().payment_field_id.value);
+
+      const statutoryFieldDefaultValue = [
+        ...getFieldValues("epf_id", "epf"),
+        ...getFieldValues("esi_id", "esi"),
+        ...getFieldValues("pt_id", "pt"),
+        ...getFieldValues("lwf_id", "lwf"),
+        ...getFieldValues("bonus_id", "bonus"),
+      ];
+
+      const mergeUniqueValues = (
+        existingValues: string[],
+        newValues: (string | undefined)[]
+      ): string[] => [
+        ...existingValues,
+        ...newValues.filter(
+          (val): val is string =>
+            val !== undefined && !existingValues.includes(val)
+        ),
+      ];
+
+      setSelectFieldDefaultValues((prev) => ({
+        paymentFieldDefaultValue: mergeUniqueValues(
+          prev.paymentFieldDefaultValue,
+          paymentFieldDefaultValue
+        ),
+        statutoryFieldDefaultValue: mergeUniqueValues(
+          prev.statutoryFieldDefaultValue,
+          statutoryFieldDefaultValue
+        ),
+      }));
+    }
+  }, [resetKey]);
+
   const { selectedPaymentFields, selectedStatutoryFields } =
     usePaymentComponentsStore();
 
   return (
     <Fragment>
       <CardHeader>
-        <CardTitle className='text-3xl'>Create Payment Template</CardTitle>
+        <CardTitle className='text-3xl'>
+          {isUpdate ? "Update" : "Create"} Payment Template
+        </CardTitle>
         <CardDescription>
-          Create a payment template that will be central in all of canny apps
+          {isUpdate ? "Update" : "Create"} a payment template that will be
+          central in all of canny apps
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
+          <input {...getInputProps(fields.id, { type: "hidden" })} />
           <Field
             inputProps={{
               ...getInputProps(fields.monthly_ctc, { type: "number" }),
@@ -97,11 +159,15 @@ export function CreatePaymentTemplateComponentDetails({
         </div>
         <div className='grid grid-cols-2 place-content-center justify-between gap-6 mb-4'>
           <PaymentFieldsSelect
+            key={resetKey}
+            defaultValue={paymentFieldDefaultValue}
             options={paymentFieldOptions}
             env={env}
             disabled={!fields.state.value || !fields.monthly_ctc.value}
           />
           <StatutoryFieldsSelect
+            key={resetKey ? resetKey + 1 : undefined}
+            defaultValue={statutoryFieldDefaultValue}
             options={transformStringArrayIntoOptions(
               statutoryFieldsArray as unknown as string[]
             )}
@@ -116,7 +182,7 @@ export function CreatePaymentTemplateComponentDetails({
           <p>Amount</p>
         </div>
         <div className='flex flex-col items-center justify-center py-1'>
-          {paymentTemplateComponentsField.map((field, index) => {
+          {paymentTemplateComponentsField.map((field) => {
             const fieldSet = field.getFieldset();
 
             const defaultTargetType = targetTypeDefaultValue([
@@ -128,7 +194,7 @@ export function CreatePaymentTemplateComponentDetails({
               fieldSet.bonus_id,
             ]);
 
-            const paymentField = selectedPaymentFields.find(
+            const paymentField = selectedPaymentFields?.find(
               (paymentField) =>
                 paymentField.id ===
                 (fieldSet.payment_field_id.value ??
@@ -138,10 +204,16 @@ export function CreatePaymentTemplateComponentDetails({
             if (defaultTargetType) {
               return (
                 <div
-                  key={index.toString()}
+                  key={
+                    (fieldSet as any)[`${defaultTargetType}_id`].value +
+                    fieldSet.id.value + resetKey
+                  }
                   className='w-full grid grid-cols-3 gap-3 justify-between items-center'
                 >
                   <input {...getInputProps(fieldSet.id, { type: "hidden" })} />
+                  <input
+                    {...getInputProps(fieldSet.template_id, { type: "hidden" })}
+                  />
 
                   {defaultTargetType === "payment_field" && (
                     <SelectedPaymentField

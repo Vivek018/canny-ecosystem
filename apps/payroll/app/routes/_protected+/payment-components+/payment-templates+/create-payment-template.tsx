@@ -38,7 +38,7 @@ import {
   getValueforEPF,
   getValueforESI,
 } from "@/utils/payment";
-import { createPaymentTemplate } from "@canny_ecosystem/supabase/mutations";
+import { createPaymentTemplateWithComponents } from "@canny_ecosystem/supabase/mutations";
 import { DEFAULT_ROUTE } from "@/constant";
 
 export const CREATE_PAYMENT_TEMPLATE = [
@@ -132,7 +132,7 @@ export async function action({ request }: ActionFunctionArgs) {
       };
 
       const { status, templateError, templateComponentsError } =
-        await createPaymentTemplate({
+        await createPaymentTemplateWithComponents({
           supabase,
           templateData: {
             ...paymentTemplateDetailsData,
@@ -272,8 +272,14 @@ export default function CreatePaymentTemplate() {
           ...getSelectedPaymentComponentFromField({
             field: paymentField,
             monthlyCtc: maxValue,
+            priortizedComponent: {
+              ...existingComponent,
+              calculation_value: null,
+            } as any,
+            existingComponent: {
+              calculation_value: existingComponent?.calculation_value,
+            } as any,
           }),
-          ...existingComponent,
         };
       }),
       getEPFComponentFromField({

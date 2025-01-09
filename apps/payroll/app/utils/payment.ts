@@ -6,6 +6,7 @@ import type {
 import type {
   EmployeeProvidentFundDatabaseRow,
   LabourWelfareFundDatabaseRow,
+  PaymentTemplateComponentDatabaseRow,
   ProfessionalTaxDatabaseRow,
 } from "@canny_ecosystem/supabase/types";
 import {
@@ -18,7 +19,23 @@ import { EMPLOYEE_EPF_PERCENTAGE } from "@canny_ecosystem/utils/constant";
 
 export function getSelectedPaymentComponentFromField<
   T extends PaymentFieldDataType,
->({ field, monthlyCtc }: { field: T | undefined | null; monthlyCtc: number }) {
+>({
+  field,
+  monthlyCtc,
+  priortizedComponent,
+  existingComponent,
+}: {
+  field: T | undefined | null;
+  monthlyCtc: number;
+  priortizedComponent?:
+    | Omit<PaymentTemplateComponentDatabaseRow, "created_at" | "updated_at">
+    | null
+    | undefined;
+  existingComponent?: Omit<
+    PaymentTemplateComponentDatabaseRow,
+    "created_at" | "updated_at"
+  >;
+}) {
   if (!field) return null;
 
   let calculationValue = null;
@@ -27,52 +44,88 @@ export function getSelectedPaymentComponentFromField<
     if (field.calculation_type === "fixed" && field.amount) {
       calculationValue = field.amount;
     }
-    if (field.calculation_type === "percentage_of_ctc" && monthlyCtc) {
+    if (field.calculation_type === "percentage_of_ctc") {
       calculationValue = (monthlyCtc * (field.amount ?? 0)) / 100;
-    }
-  } else if (field.payment_type === "variable") {
-    if (field.calculation_type === "fixed") {
-      calculationValue = field.amount;
     }
   }
 
   return {
-    payment_field_id: field.id,
-    target_type: "payment_field",
-    component_type: componentTypeArray[0],
-    calculation_value: calculationValue?.toFixed(2) ?? 0,
+    id: priortizedComponent?.id ?? existingComponent?.id,
+    template_id:
+      priortizedComponent?.template_id ?? existingComponent?.template_id,
+    payment_field_id:
+      priortizedComponent?.payment_field_id ??
+      field.id ??
+      existingComponent?.payment_field_id,
+    target_type: priortizedComponent?.target_type ?? "payment_field",
+    component_type:
+      priortizedComponent?.component_type ??
+      componentTypeArray[0] ??
+      existingComponent?.component_type,
+    calculation_value:
+      calculationValue?.toFixed(2) ??
+      priortizedComponent?.calculation_value ??
+      existingComponent?.calculation_value,
   };
 }
 
 export function getEPFComponentFromField<
   T extends Omit<EmployeeProvidentFundDatabaseRow, "created_at" | "updated_at">,
->({ field, value }: { field: T | undefined | null; value: number }) {
+>({
+  field,
+  value,
+  existingComponent,
+}: {
+  field: T | undefined | null;
+  value: number;
+  existingComponent?: Omit<
+    PaymentTemplateComponentDatabaseRow,
+    "created_at" | "updated_at"
+  >;
+}) {
   if (!field) return null;
 
   const calculationValue =
     value * (field.employee_contribution ?? EMPLOYEE_EPF_PERCENTAGE);
 
   return {
-    epf_id: field.id,
+    id: existingComponent?.id,
+    template_id: existingComponent?.template_id,
+    epf_id: field.id ?? existingComponent?.epf_id,
     target_type: "epf",
     component_type: "statutory_contribution",
-    calculation_value: calculationValue.toFixed(2),
+    calculation_value:
+      calculationValue?.toFixed(2) ?? existingComponent?.calculation_value,
   };
 }
 
 export function getESIComponentFromField<
   T extends EmployeeStateInsuranceDataType,
->({ field, value }: { field: T | null | undefined; value: number }) {
+>({
+  field,
+  value,
+  existingComponent,
+}: {
+  field: T | null | undefined;
+  value: number;
+  existingComponent?: Omit<
+    PaymentTemplateComponentDatabaseRow,
+    "created_at" | "updated_at"
+  >;
+}) {
   if (!field) return null;
 
   const calculationValue =
     value * (field.employees_contribution ?? ESI_EMPLOYEE_CONTRIBUTION);
 
   return {
-    esi_id: field.id,
+    id: existingComponent?.id,
+    template_id: existingComponent?.template_id,
+    esi_id: field.id ?? existingComponent?.esi_id,
     target_type: "esi",
     component_type: "statutory_contribution",
-    calculation_value: calculationValue.toFixed(2),
+    calculation_value:
+      calculationValue?.toFixed(2) ?? existingComponent?.calculation_value,
   };
 }
 
@@ -83,7 +136,18 @@ export function getPTComponentFromField<
   > & {
     gross_salary_range: any;
   },
->({ field, value }: { field: T | null | undefined; value: number }) {
+>({
+  field,
+  value,
+  existingComponent,
+}: {
+  field: T | null | undefined;
+  value: number;
+  existingComponent?: Omit<
+    PaymentTemplateComponentDatabaseRow,
+    "created_at" | "updated_at"
+  >;
+}) {
   if (!field) return null;
 
   if (!field.gross_salary_range?.length) return null;
@@ -98,16 +162,28 @@ export function getPTComponentFromField<
   }
 
   return {
-    pt_id: field.id,
+    id: existingComponent?.id,
+    template_id: existingComponent?.template_id,
+    pt_id: field.id ?? existingComponent?.pt_id,
     target_type: "pt",
     component_type: "statutory_contribution",
-    calculation_value: calculationValue,
+    calculation_value:
+      calculationValue?.toFixed(2) || existingComponent?.calculation_value,
   };
 }
 
 export function getLWFComponentFromField<
   T extends Omit<LabourWelfareFundDatabaseRow, "created_at" | "updated_at">,
->({ field }: { field: T | null | undefined }) {
+>({
+  field,
+  existingComponent,
+}: {
+  field: T | null | undefined;
+  existingComponent?: Omit<
+    PaymentTemplateComponentDatabaseRow,
+    "created_at" | "updated_at"
+  >;
+}) {
   if (!field) return null;
 
   let calculationValue = 0;
@@ -123,30 +199,44 @@ export function getLWFComponentFromField<
   }
 
   return {
-    lwf_id: field.id,
+    id: existingComponent?.id,
+    template_id: existingComponent?.template_id,
+    lwf_id: field.id ?? existingComponent?.lwf_id,
     target_type: "lwf",
     component_type: "statutory_contribution",
-    calculation_value: calculationValue,
+    calculation_value:
+      calculationValue?.toFixed(2) || existingComponent?.calculation_value,
   };
 }
 
 export function getBonusComponentFromField<T extends StatutoryBonusDataType>({
   field,
   value,
-}: { field: T | null | undefined; value: number }) {
+  existingComponent,
+}: {
+  field: T | null | undefined;
+  value: number;
+  existingComponent?: Omit<
+    PaymentTemplateComponentDatabaseRow,
+    "created_at" | "updated_at"
+  >;
+}) {
   if (!field) return null;
 
-  let calculationValue = 0;
+  let calculationValue = null;
 
   if (field.percentage) {
     calculationValue = (field.percentage * value) / 100;
   }
 
   return {
-    bonus_id: field.id,
+    id: existingComponent?.id,
+    template_id: existingComponent?.template_id,
+    bonus_id: field.id ?? existingComponent?.bonus_id,
     target_type: "bonus",
     component_type: "earning",
-    calculation_value: calculationValue.toFixed(2),
+    calculation_value:
+      calculationValue?.toFixed(2) ?? existingComponent?.calculation_value,
   };
 }
 

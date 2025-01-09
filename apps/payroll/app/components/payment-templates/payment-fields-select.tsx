@@ -10,6 +10,7 @@ import {
 import { usePaymentComponentsStore } from "@/store/payment-components";
 
 interface PaymentFieldsSelectProps {
+  defaultValue?: string[];
   className?: string;
   options: ComboboxSelectOption[];
   env: SupabaseEnv;
@@ -17,12 +18,15 @@ interface PaymentFieldsSelectProps {
 }
 
 export const PaymentFieldsSelect: FC<PaymentFieldsSelectProps> = ({
+  defaultValue,
   className,
   options,
   env,
   disabled,
 }) => {
-  const [selectedFields, setSelectedFields] = useState<string[]>([]);
+  const [selectedFields, setSelectedFields] = useState<string[]>(
+    defaultValue ?? []
+  );
   const { setSelectedPaymentFields } = usePaymentComponentsStore();
   const { supabase } = useSupabase({ env });
 
@@ -48,6 +52,10 @@ export const PaymentFieldsSelect: FC<PaymentFieldsSelectProps> = ({
   const handleFieldChange = (newSelectedFields: string[]) => {
     setSelectedFields(newSelectedFields);
   };
+
+  useEffect(() => {
+    setSelectedFields(defaultValue ?? []);
+  }, [defaultValue]);
 
   useEffect(() => {
     fetchData(selectedFields);

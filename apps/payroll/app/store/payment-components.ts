@@ -23,11 +23,11 @@ type StatutoryFieldsType = {
 
 interface PaymentComponentsState {
   valueForEPF: { [key: string]: number };
-  setValueForEPF: (valueForEPF: { [key: string]: number }) => void;
+  setValueForEPF: (fieldId: string, value: number) => void;
   valueForESI: { [key: string]: number };
-  setValueForESI: (valueForESI: { [key: string]: number }) => void;
+  setValueForESI: (fieldId: string, value: number) => void;
   grossValue: { [key: string]: number };
-  setGrossValue: (grossValue: { [key: string]: number }) => void;
+  setGrossValue: (fieldId: string, value: number) => void;
   basicValue: number;
   setBasicValue: (basicValue: number) => void;
   selectedPaymentFields: PaymentFieldDataType[];
@@ -43,11 +43,23 @@ interface PaymentComponentsState {
 export const usePaymentComponentsStore = create<PaymentComponentsState>()(
   (set) => ({
     valueForEPF: {},
-    setValueForEPF: (valueForEPF) => set({ valueForEPF }),
+    setValueForEPF: (fieldId, value) =>
+      set((state) => {
+        const updatedEPF = { ...state.valueForEPF, [fieldId]: value };
+        return { valueForEPF: updatedEPF };
+      }),
     valueForESI: {},
-    setValueForESI: (valueForESI) => set({ valueForESI }),
+    setValueForESI: (fieldId, value) =>
+      set((state) => {
+        const updatedESI = { ...state.valueForESI, [fieldId]: value };
+        return { valueForESI: updatedESI };
+      }),
     grossValue: {},
-    setGrossValue: (grossValue) => set({ grossValue }),
+    setGrossValue: (fieldId, value) =>
+      set((state) => {
+        const updatedGross = { ...state.grossValue, [fieldId]: value };
+        return { grossValue: updatedGross };
+      }),
     basicValue: 0,
     setBasicValue: (basicValue) => set({ basicValue }),
     selectedPaymentFields: [],

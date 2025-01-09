@@ -1,15 +1,17 @@
-import { DataTable } from "./table/data-table";
+
 import { useEffect, useState } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { columns } from "./table/columns";
-import type { PaymentFieldDataType } from "@canny_ecosystem/supabase/queries";
 
-export function PaymentFieldTableWrapper({
+import type { PaymentTemplateDatabaseRow } from "@canny_ecosystem/supabase/types";
+import { DataTable } from "./table/data-table";
+import { columns } from "./table/columns";
+
+export function PaymentTemplatesTableWrapper({
   data,
   error,
   searchString,
 }: {
-  data: Omit<PaymentFieldDataType, "created_at" | "updated_at">[] | null;
+  data: Omit<PaymentTemplateDatabaseRow, "created_at" | "updated_at">[] | null;
   error: Error | null | { message: string };
   searchString: string;
 }) {
@@ -26,8 +28,8 @@ export function PaymentFieldTableWrapper({
 
     const filteredData = data?.filter((item) =>
       Object.values(item).some((value) =>
-        String(value).toLowerCase().includes(searchString.toLowerCase()),
-      ),
+        String(value).toLowerCase().includes(searchString.toLowerCase())
+      )
     );
     setTableData(filteredData ?? []);
   }, [searchString, data]);

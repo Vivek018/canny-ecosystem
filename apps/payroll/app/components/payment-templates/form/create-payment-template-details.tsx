@@ -23,18 +23,21 @@ type FieldsType = {
 
 export function CreatePaymentTemplateDetails({
   fields,
+  isUpdate = false,
 }: {
   fields: FieldsType;
+  isUpdate?: boolean;
 }) {
   return (
     <Fragment>
       <CardHeader>
-        <CardTitle className="text-3xl">Create Payment Template</CardTitle>
+        <CardTitle className='text-3xl'>{isUpdate ? "Update" : "Create"} Payment Template</CardTitle>
         <CardDescription>
-          Create a payment template that will be central in all of canny apps
+          {isUpdate ? "Update" : "Create"} a payment template that will be central in all of canny apps
         </CardDescription>
-      </CardHeader>
+      </CardHeader> 
       <CardContent>
+        <input {...getInputProps(fields.id, { type: "hidden" })} />
         <input {...getInputProps(fields.company_id, { type: "hidden" })} />
         <Field
           inputProps={{
@@ -53,7 +56,7 @@ export function CreatePaymentTemplateDetails({
           labelProps={{ children: fields.description.name }}
           errors={fields.description.errors}
         />
-        <div className="grid grid-cols-2 place-content-center justify-between gap-x-4">
+        <div className='grid grid-cols-2 place-content-center justify-between gap-x-4'>
           <CheckboxField
             buttonProps={getInputProps(fields.is_active, {
               type: "checkbox",

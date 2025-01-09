@@ -605,20 +605,22 @@ export const componentTypeArray = [
 ] as const;
 
 export const PaymentTemplateComponentsSchema = z.object({
+  id: z.string().uuid().optional(),
   monthly_ctc: z.number().min(0).max(100000000),
   state: zString,
   payment_template_components: z.array(
     z.object({
       id: z.string().uuid().optional(),
-      target_type: z
-        .enum(["payment_field", ...statutoryFieldsArray])
-        .default("payment_field"),
+      template_id: z.string().uuid().optional(),
       payment_field_id: z.string().uuid().optional(),
       epf_id: z.string().uuid().optional(),
       esi_id: z.string().uuid().optional(),
-      bonus_id: z.string().uuid().optional(),
-      lwf_id: z.string().uuid().optional(),
       pt_id: z.string().uuid().optional(),
+      lwf_id: z.string().uuid().optional(),
+      bonus_id: z.string().uuid().optional(),
+      target_type: z
+        .enum(["payment_field", ...statutoryFieldsArray])
+        .default("payment_field"),
       component_type: z.enum(componentTypeArray).default("earning"),
       calculation_value: z.number().optional(),
       display_order: z.number().int().optional(),

@@ -15,6 +15,7 @@ import {
 import { statutoryFieldsArray } from "@canny_ecosystem/utils";
 
 interface StatutoryFieldsSelectProps {
+  defaultValue?: string[];
   className?: string;
   options: ComboboxSelectOption[];
   env: SupabaseEnv;
@@ -23,6 +24,7 @@ interface StatutoryFieldsSelectProps {
 }
 
 export const StatutoryFieldsSelect: FC<StatutoryFieldsSelectProps> = ({
+  defaultValue,
   className,
   options,
   env,
@@ -30,7 +32,7 @@ export const StatutoryFieldsSelect: FC<StatutoryFieldsSelectProps> = ({
   disabled,
 }) => {
   const { companyId } = useCompanyId();
-  const [selectedFields, setSelectedFields] = useState<string[]>([]);
+  const [selectedFields, setSelectedFields] = useState<string[]>(defaultValue ?? []);
   const { selectedStatutoryFields, setSelectedStatutoryFields } =
     usePaymentComponentsStore();
   const { supabase } = useSupabase({ env });
@@ -75,6 +77,11 @@ export const StatutoryFieldsSelect: FC<StatutoryFieldsSelectProps> = ({
   const handleFieldChange = (newSelectedFields: string[]) => {
     setSelectedFields(newSelectedFields);
   };
+
+    useEffect(() => {
+      setSelectedFields(defaultValue ?? []);
+    }, [defaultValue]);
+
 
   useEffect(() => {
     fetchStatutoryFieldData(selectedFields);

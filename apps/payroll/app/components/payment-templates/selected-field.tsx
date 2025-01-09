@@ -46,79 +46,52 @@ export const SelectedPaymentField = ({
   const componentType =
     field.component_type.value ?? field.component_type.initialValue ?? "";
 
-  const {
-    valueForEPF,
-    valueForESI,
-    grossValue,
-    setValueForEPF,
-    setValueForESI,
-    setGrossValue,
-    setBasicValue,
-  } = usePaymentComponentsStore();
+  const { setValueForEPF, setValueForESI, setGrossValue, setBasicValue } =
+    usePaymentComponentsStore();
 
   useEffect(() => {
-    // Update state when field is present
     if (fieldId) {
       if (considerForEPF) {
-        setValueForEPF({
-          ...valueForEPF,
-          [fieldId]: value || 0,
-        });
+        setValueForEPF(fieldId, value);
       }
 
       if (considerForESI) {
-        setValueForESI({
-          ...valueForESI,
-          [fieldId]: value,
-        });
+        setValueForESI(fieldId, value);
       }
 
-      if (componentType === "earning") {
-        setGrossValue({
-          ...grossValue,
-          [fieldId]: value,
-        });
-      } else {
-        setGrossValue({
-          ...grossValue,
-          [fieldId]: 0,
-        });
-      }
+      setGrossValue(fieldId, componentType === "earning" ? value : 0);
 
       if (fieldName === "basic") {
         setBasicValue(value);
       }
     }
 
-    // Cleanup state when field is removed
     return () => {
       if (considerForEPF) {
-        const updatedEPF = { ...valueForEPF };
-        delete updatedEPF[fieldId];
-        setValueForEPF(updatedEPF);
+        setValueForEPF(fieldId, 0);
       }
 
       if (considerForESI) {
-        const updatedESI = { ...valueForESI };
-        delete updatedESI[fieldId];
-        setValueForESI(updatedESI);
+        setValueForESI(fieldId, 0);
       }
 
-      const updatedGross = { ...grossValue };
-      delete updatedGross[fieldId];
-      setGrossValue(updatedGross);
+      setGrossValue(fieldId, 0);
 
       if (fieldName === "basic") {
-        setBasicValue(0); // Reset basic value if needed
+        setBasicValue(0);
       }
     };
   }, [
     fieldId,
-    componentType,
     value,
+    componentType,
     considerForEPF,
     considerForESI,
     fieldName,
+    setValueForEPF,
+    setValueForESI,
+    setGrossValue,
+    setBasicValue,
   ]);
 
   return (
