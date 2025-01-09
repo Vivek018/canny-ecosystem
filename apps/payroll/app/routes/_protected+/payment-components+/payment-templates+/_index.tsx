@@ -1,19 +1,25 @@
 import { ErrorBoundary } from "@/components/error-boundary";
+import { PaymentTemplateComponentsCard } from "@/components/payment-templates/payment-template-components-card";
 import { PaymentTemplatesTableWrapper } from "@/components/payment-templates/payment-templates-table-wrapper";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { getPaymentTemplatesByCompanyId } from "@canny_ecosystem/supabase/queries";
+import {
+  getPaymentTemplateComponentsByTemplateId,
+  getPaymentTemplatesByCompanyId,
+} from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
 import { defer, json, type LoaderFunctionArgs } from "@remix-run/node";
-import { Await, Link, useLoaderData } from "@remix-run/react";
+import { Await, Link, useLoaderData, useSearchParams } from "@remix-run/react";
 import { Suspense, useState } from "react";
-
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {
+    const url = new URL(request.url);
+    const searchParams = url.searchParams;
     const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
     const paymentTemplatesPromise = getPaymentTemplatesByCompanyId({
@@ -21,19 +27,44 @@ export async function loader({ request }: LoaderFunctionArgs) {
       companyId,
     });
 
+    let paymentTemplateComponentsPromise = null;
+    if (
+      searchParams.get("step") ===
+        modalSearchParamNames.view_template_components &&
+      searchParams.get("templateId")?.length
+    ) {
+      const templateId = searchParams.get("templateId");
+      paymentTemplateComponentsPromise =
+        getPaymentTemplateComponentsByTemplateId({
+          supabase,
+          templateId: templateId!,
+        });
+    }
+
     return defer({
       paymentTemplatesPromise,
+      paymentTemplateComponentsPromise,
       error: null,
     });
   } catch (error) {
-    return json({ paymentTemplatesPromise: null, error }, { status: 500 });
+    return json(
+      {
+        paymentTemplatesPromise: null,
+        paymentTemplateComponentsPromise: null,
+        error,
+      },
+      { status: 500 }
+    );
   }
 }
 
 export default function PaymentTemplatesIndex() {
-  const { paymentTemplatesPromise, error } = useLoaderData<typeof loader>();
+  const { paymentTemplatesPromise, paymentTemplateComponentsPromise, error } =
+    useLoaderData<typeof loader>();
 
   const [searchString, setSearchString] = useState("");
+  const [searchParams] = useSearchParams();
+  const step = searchParams.get("step");
 
   if (error)
     return (
@@ -68,7 +99,9 @@ export default function PaymentTemplatesIndex() {
               )}
             >
               <span>Add</span>
-              <span className='hidden md:flex justify-end'>Payment Template</span>
+              <span className='hidden md:flex justify-end'>
+                Payment Template
+              </span>
             </Link>
           </div>
         </div>
@@ -86,6 +119,20 @@ export default function PaymentTemplatesIndex() {
                   searchString={searchString}
                 />
               );
+            }}
+          </Await>
+          <Await resolve={paymentTemplateComponentsPromise}>
+            {(resolvedData) => {
+              if (
+                step === modalSearchParamNames.view_template_components &&
+                resolvedData?.data?.length
+              ) {
+                return (
+                  <PaymentTemplateComponentsCard
+                    paymentTemplateComponents={resolvedData?.data}
+                  />
+                );
+              }
             }}
           </Await>
         </Suspense>

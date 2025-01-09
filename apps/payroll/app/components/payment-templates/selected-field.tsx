@@ -281,7 +281,7 @@ export const SelectedPTField = ({
       />
 
       <input {...getInputProps(field.target_type, { type: "hidden" })} />
-      <div className='flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm  items-center shadow-sm'>
+      <div className='flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm items-center shadow-sm'>
         {ptName}
       </div>
       <SearchableSelectField
@@ -332,7 +332,7 @@ export const SelectedLWFField = ({
       />
 
       <input {...getInputProps(field.target_type, { type: "hidden" })} />
-      <div className='flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm  items-center shadow-sm'>
+      <div className='flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm items-center shadow-sm'>
         {lwfName}
       </div>
       <SearchableSelectField
@@ -384,7 +384,7 @@ export const SelectedBonusField = ({
       />
 
       <input {...getInputProps(field.target_type, { type: "hidden" })} />
-      <div className='flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm  items-center shadow-sm'>
+      <div className='flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm items-center shadow-sm'>
         {bonusName}
       </div>
       <SearchableSelectField

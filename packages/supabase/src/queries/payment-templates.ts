@@ -1,5 +1,6 @@
 import type {
   InferredType,
+  PaymentFieldDatabaseRow,
   PaymentTemplateComponentDatabaseRow,
   PaymentTemplateDatabaseRow,
   TypedSupabaseClient,
@@ -74,6 +75,16 @@ export async function getPaymentTemplateById({
   return { data, error };
 }
 
+export type PaymentTemplateComponentType = Omit<
+  PaymentTemplateComponentDatabaseRow,
+  "created_at" | "updated_at"
+> & {
+  payment_fields: {
+    id: Pick<PaymentFieldDatabaseRow, "id">;
+    name: Pick<PaymentFieldDatabaseRow, "name">;
+  };
+};
+
 export async function getPaymentTemplateComponentsByTemplateId({
   supabase,
   templateId,
@@ -98,16 +109,11 @@ export async function getPaymentTemplateComponentsByTemplateId({
 
   const { data, error } = await supabase
     .from("payment_template_components")
-    .select(columns.join(","))
+    .select(`${columns.join(",")}, payment_fields(id, name))`)
     .eq("template_id", templateId)
     .limit(HARD_QUERY_LIMIT)
     .order("created_at", { ascending: true })
-    .returns<
-      InferredType<
-        PaymentTemplateComponentDatabaseRow,
-        (typeof columns)[number]
-      >[]
-    >();
+    .returns<PaymentTemplateComponentType[]>();
 
   if (error) {
     console.error(error);
