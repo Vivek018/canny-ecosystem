@@ -99,7 +99,6 @@ export function SiteCard({
                 >
                   Link Template
                 </DropdownMenuItem>
-                {/* <SiteDialog env={env} site={site} companyId={companyId} /> */}
                 <DropdownMenuSeparator
                   className={cn(!site.latitude && !site.longitude && "hidden")}
                 />
@@ -121,7 +120,7 @@ export function SiteCard({
           <p>{`- ${site.pincode}`}</p>
         </div>
       </CardContent>
-      <CardFooter className={cn("p-0")}>
+      <CardFooter className="p-0 mt-auto">
         <div
           className={cn(
             "border-t border-r bg-secondary rounded-tr-md text-foreground px-2.5 py-1.5",
@@ -132,7 +131,7 @@ export function SiteCard({
         </div>
         <div
           className={cn(
-            "px-2.5 ml-auto bg-secondary text-foreground py-1.5 h-full items-center text-sm tracking-wide font-sem rounded-tl-md border-foreground flex gap-1 justify-center",
+            "px-2.5 py-1.5 ml-auto bg-secondary text-foreground h-full items-center text-sm tracking-wide font-sem rounded-tl-md border-foreground flex gap-1 justify-center",
             !site.is_active && "opacity-0",
           )}
         >

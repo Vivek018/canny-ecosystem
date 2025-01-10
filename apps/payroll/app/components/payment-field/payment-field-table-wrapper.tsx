@@ -24,7 +24,7 @@ export function PaymentFieldTableWrapper({
         variant: "destructive",
       });
 
-    const filteredData = data?.filter((item: PaymentFieldDataType) =>
+    const filteredData = data?.filter((item) =>
       Object.values(item).some((value) =>
         String(value).toLowerCase().includes(searchString.toLowerCase()),
       ),

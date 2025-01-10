@@ -97,7 +97,7 @@ export default function EmployeeIndex() {
     <div className="w-full py-6 flex flex-col gap-8">
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={employeePromise}>
-          {(resolvedData: { data: any; error: any } | null) => {
+          {(resolvedData) => {
             if (!resolvedData || !env)
               return <ErrorBoundary message="Failed to load employee" />;
             return (
@@ -106,7 +106,7 @@ export default function EmployeeIndex() {
                   error={resolvedData.error}
                   Component={
                     <EmployeePageHeader
-                      employee={resolvedData.data}
+                      employee={resolvedData.data!}
                       env={env}
                     />
                   }
@@ -114,7 +114,7 @@ export default function EmployeeIndex() {
                 <CommonWrapper
                   error={resolvedData.error}
                   Component={
-                    <EmployeeDetailsCard employee={resolvedData.data} />
+                    <EmployeeDetailsCard employee={resolvedData.data!} />
                   }
                 />
               </>
@@ -125,7 +125,7 @@ export default function EmployeeIndex() {
 
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={employeeStatutoryDetailsPromise}>
-          {(resolvedData: { data: any; error: any } | null) => {
+          {(resolvedData) => {
             if (!resolvedData)
               return (
                 <ErrorBoundary message="Failed to load employee statutory details" />
@@ -146,7 +146,7 @@ export default function EmployeeIndex() {
 
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={employeeBankDetailsPromise}>
-          {(resolvedData: { data: any; error: any } | null) => {
+          {(resolvedData) => {
             if (!resolvedData)
               return (
                 <ErrorBoundary message="Failed to load employee bank details" />
@@ -165,7 +165,7 @@ export default function EmployeeIndex() {
 
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={employeeAddressesPromise}>
-          {(resolvedData: { data: any; error: any } | null) => {
+          {(resolvedData) => {
             if (!resolvedData)
               return (
                 <ErrorBoundary message="Failed to load employee addresses" />
@@ -186,7 +186,7 @@ export default function EmployeeIndex() {
 
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={employeeGuardiansPromise}>
-          {(resolvedData: { data: any; error: any } | null) => {
+          {(resolvedData) => {
             if (!resolvedData)
               return (
                 <ErrorBoundary message="Failed to load employee guardians details" />
@@ -213,7 +213,7 @@ export function CommonWrapper({
   error,
 }: {
   Component: ReactNode;
-  error: Error | null;
+  error: any;
 }) {
   const { toast } = useToast();
 

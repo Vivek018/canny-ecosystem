@@ -1,8 +1,8 @@
-import { ColumnVisibility } from "@/components/gratuity-report/column-visibility";
-import { FilterList } from "@/components/gratuity-report/filter-list";
-import { GratuityReportSearchFilter } from "@/components/gratuity-report/report-search-filter";
-import { columns } from "@/components/gratuity-report/table/columns";
-import { DataTable } from "@/components/gratuity-report/table/data-table";
+import { ColumnVisibility } from "@/components/reports/column-visibility";
+import { FilterList } from "@/components/reports/gratuity-report/filter-list";
+import { GratuityReportSearchFilter } from "@/components/reports/gratuity-report/report-search-filter";
+import { columns } from "@/components/reports/gratuity-report/table/columns";
+import { DataTable } from "@/components/reports/gratuity-report/table/data-table";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { MAX_QUERY_LIMIT } from "@canny_ecosystem/supabase/constant";
 import {

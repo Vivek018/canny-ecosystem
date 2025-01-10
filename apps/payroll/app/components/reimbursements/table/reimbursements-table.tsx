@@ -106,7 +106,9 @@ export function ReimbursementsTable<TData, TValue>({
           },
         });
         if (data) {
-          setData((prevData) => [...prevData, ...data] as TData[]);
+          setData(
+            (prevData: any) => [...prevData, ...(data as any)] as TData[],
+          );
         }
         setFrom(to + 1);
         setHasNextPage(data?.length! > to);

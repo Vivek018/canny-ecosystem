@@ -71,6 +71,8 @@ export function ExitPaymentsSheet({
                     cell.column.id === "reason" ||
                     cell.column.id === "note") &&
                     "hidden md:table-cell",
+                  cell.column.id === "employee_name" &&
+                    "sticky left-12 bg-card z-10",
                 )}
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}

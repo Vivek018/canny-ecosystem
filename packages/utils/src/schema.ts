@@ -400,33 +400,36 @@ export const EmployeeWorkHistorySchema = z.object({
 });
 
 export const paymentTypeArray = ["fixed", "variable"] as const;
-export const calculationTypeArray = ["fixed", "percentage_of_basic"] as const;
+export const calculationTypeArray = ["fixed", "percentage_of_ctc"] as const;
 
-export const PaymentFieldSchema = z
-  .object({
-    id: z.string().uuid().optional(),
-    name: zString,
-    payment_type: z.enum(paymentTypeArray).default("fixed"),
-    calculation_type: z.enum(calculationTypeArray).default("fixed"),
-    amount: z.number().optional(),
-    is_active: z.boolean().default(false),
-    is_pro_rata: z.boolean().default(false),
-    consider_for_epf: z.boolean().default(false),
-    consider_for_esic: z.boolean().default(false),
-    company_id: z.string().uuid(),
-  })
-  .refine(
-    (data) =>
-      !(data.payment_type === "variable" && data.calculation_type !== "fixed"),
-    {
-      message: `When payment type is "variable", calculation type must be "fixed".`,
-      path: ["calculation_type"],
-    },
-  );
+export const PaymentFieldSchemaObject = z.object({
+  id: z.string().uuid().optional(),
+  name: zString,
+  payment_type: z.enum(paymentTypeArray).default("fixed"),
+  calculation_type: z.enum(calculationTypeArray).default("fixed"),
+  amount: z.number().optional(),
+  is_active: z.boolean().default(false),
+  is_pro_rata: z.boolean().default(false),
+  consider_for_epf: z.boolean().default(false),
+  consider_for_esic: z.boolean().default(false),
+  company_id: z.string().uuid(),
+});
+
+export const PaymentFieldSchema = PaymentFieldSchemaObject.refine(
+  (data) =>
+    !(data.payment_type === "variable" && data.calculation_type !== "fixed"),
+  {
+    message: `When payment type is "variable", calculation type must be "fixed".`,
+    path: ["calculation_type"],
+  },
+);
 
 export const deductionCycleArray = ["monthly"] as const;
 export const EMPLOYEE_RESTRICTED_VALUE = 15000;
-export const EMPLOYEE_RESTRICTED_RATE = 0.2;
+export const EMPLOYER_RESTRICTED_VALUE = 15000;
+export const EDLI_RESTRICTED_VALUE = 75;
+export const EMPLOYEE_RESTRICTED_RATE = 0.12;
+export const EMPLOYER_RESTRICTED_RATE = 0.12;
 
 export const EmployeeProvidentFundSchema = z.object({
   id: z.string().optional(),
@@ -434,26 +437,32 @@ export const EmployeeProvidentFundSchema = z.object({
   epf_number: z.string().max(20),
   deduction_cycle: z.enum(deductionCycleArray).default(deductionCycleArray[0]),
   employee_contribution: z.number().default(EMPLOYEE_RESTRICTED_RATE),
-  employer_contribution: z.number().default(EMPLOYEE_RESTRICTED_RATE),
+  employer_contribution: z.number().default(EMPLOYER_RESTRICTED_RATE),
   employee_restrict_value: z.number().default(EMPLOYEE_RESTRICTED_VALUE),
-  employer_restrict_value: z.number().default(EMPLOYEE_RESTRICTED_VALUE),
+  employer_restrict_value: z.number().default(EMPLOYER_RESTRICTED_VALUE),
   restrict_employer_contribution: z.boolean().default(false),
   restrict_employee_contribution: z.boolean().default(false),
   include_employer_contribution: z.boolean().default(false),
+  edli_restrict_value: z.number().default(EDLI_RESTRICTED_VALUE),
   include_employer_edli_contribution: z.boolean().default(false),
   include_admin_charges: z.boolean().default(false),
   is_default: z.boolean().default(true),
 });
+
+export const ESI_EMPLOYEE_CONTRIBUTION = 0.0075;
+export const ESI_EMPLOYER_CONTRIBUTION = 0.0325;
+export const ESI_MAX_LIMIT = 21000;
 
 export const EmployeeStateInsuranceSchema = z.object({
   id: z.string().optional(),
   company_id: z.string(),
   esi_number: zNumberString,
   deduction_cycle: z.enum(deductionCycleArray).default(deductionCycleArray[0]),
-  employees_contribution: z.number().default(0.0075),
-  employers_contribution: z.number().default(0.0325),
+  employees_contribution: z.number().default(ESI_EMPLOYEE_CONTRIBUTION),
+  employers_contribution: z.number().default(ESI_EMPLOYER_CONTRIBUTION),
   include_employer_contribution: z.boolean().default(false),
   is_default: z.boolean().default(true),
+  max_limit: z.number().default(ESI_MAX_LIMIT),
 });
 
 export const ProfessionalTaxSchema = z.object({
@@ -494,7 +503,6 @@ export const StatutoryBonusSchema = z
       .default(statutoryBonusPayFrequencyArray[0]),
     percentage: z.number().min(0).default(8.33),
     payout_month: z.number().optional(),
-    is_default: z.boolean().default(true),
   })
   .superRefine((data, ctx) => {
     if (data.payment_frequency === "yearly" && !data.payout_month) {
@@ -586,28 +594,60 @@ export const ExitPaymentPage2Schema = z.object({
   deduction: zNumber.optional(),
 });
 
+// Payment Templates
+export const PaymentTemplateSchema = z.object({
+  id: z.string().uuid().optional(),
+  name: zString.min(3).max(50),
+  description: zTextArea.max(500).optional(),
+  is_active: z.boolean().default(false),
+  is_default: z.boolean().default(false),
+  company_id: z.string().uuid(),
+});
+
+export const statutoryFieldsArray = [
+  "epf",
+  "esi",
+  "bonus",
+  "pt",
+  "lwf",
+] as const;
+
+export const componentTypeArray = [
+  "earning",
+  "deduction",
+  "statutory_contribution",
+] as const;
+
+export const PaymentTemplateComponentsSchema = z.object({
+  id: z.string().uuid().optional(),
+  monthly_ctc: z.number().min(0).max(100000000),
+  state: zString,
+  payment_template_components: z.array(
+    z.object({
+      id: z.string().uuid().optional(),
+      template_id: z.string().uuid().optional(),
+      payment_field_id: z.string().uuid().optional(),
+      epf_id: z.string().uuid().optional(),
+      esi_id: z.string().uuid().optional(),
+      pt_id: z.string().uuid().optional(),
+      lwf_id: z.string().uuid().optional(),
+      bonus_id: z.string().uuid().optional(),
+      target_type: z
+        .enum(["payment_field", ...statutoryFieldsArray])
+        .default("payment_field"),
+      component_type: z.enum(componentTypeArray).default("earning"),
+      calculation_value: z.number().optional(),
+      display_order: z.number().int().optional(),
+    }),
+  ),
+});
+
 // Payment Template Assignment
 export const paymentAssignmentTypesArray = ["employee", "site"] as const;
 export const eligibilityOptionsArray = ["position", "skill_level"] as const;
-export const PaymentTemplateAssignemntSchema = z.object({
-  id: z.string().uuid().optional(),
-  template_id: z.string().uuid(),
-  assignment_type: z.enum(paymentAssignmentTypesArray).default("employee"),
-  employee_id: z.string().uuid().optional(),
-  site_id: z.string().uuid().optional(),
-  eligibility_option: z.enum(eligibilityOptionsArray).default("position"),
-  position: z.string().optional(),
-  skill_level: z.string().optional(),
-  effective_from: z
-    .string()
-    .date()
-    .optional()
-    .default(new Date().toISOString().split("T")[0]),
-  effective_to: z.string().date().optional(),
-  is_active: z.boolean().optional().default(false),
-});
 
-export const PaymentTemplateFormEmployeeDialogSchema = z.object({
+// Payment Template Assignment
+export const EmployeeLinkSchema = z.object({
   name: z.string(),
   effective_from: z.string().default(new Date().toISOString().split("T")[0]),
   effective_to: z.string().optional(),
@@ -624,36 +664,12 @@ export const PaymentTemplateFormSiteDialogSchema = z.object({
   skill_level: z.string().optional(),
 });
 
-// Payment Template Assignment
-export const CreateEmployeeLinkSchema = z.object({
-  template_id: z.string().uuid(),
-  effective_from: z.string(),
-  effective_to: z.string().optional(),
-  name: z.string(),
-});
-
-export const UpdateEmployeeLinkSchema = z.object({
-  template_id: z.string().uuid(),
-  effective_from: z.string(),
-  effective_to: z.string().optional(),
-  name: z.string(),
-});
 
 export const DeleteEmployeeLinkSchema = z.object({
   is_active: z.enum(["true", "false"]).transform((val) => val === "true"),
 });
 
-export const CreateSiteLinkSchema = z.object({
-  name: z.string(),
-  effective_from: z.string().default(new Date().toISOString().split("T")[0]),
-  effective_to: z.string().optional(),
-  template_id: z.string(),
-  eligibility_option: z.enum(eligibilityOptionsArray).optional(),
-  position: z.string().optional(),
-  skill_level: z.string().optional(),
-});
-
-export const UpdateSiteLinkSchema = z.object({
+export const SiteLinkSchema = z.object({
   name: z.string(),
   effective_from: z.string().default(new Date().toISOString().split("T")[0]),
   effective_to: z.string().optional(),

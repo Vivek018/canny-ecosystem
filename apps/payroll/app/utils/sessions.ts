@@ -13,7 +13,7 @@ const { getSession, commitSession, destroySession } =
       //
       // expires: new Date(Date.now() + 60_000),
       httpOnly: true,
-      maxAge: 10 * 60, // 10 minutes
+      maxAge: 20 * 60, // 20 minutes
       path: "/",
       sameSite: "lax",
       secrets: [process.env.SESSION_SECRET!],

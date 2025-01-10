@@ -66,10 +66,29 @@ export function getAutoTimeDifference(
   }
 }
 
+export function formatMonthYearDate(date: Date | string | number) {
+  return format(new Date(date), "MMM yyyy");
+}
+
 export function formatDate(date: Date | string | number) {
   return format(new Date(date), "dd MMM yyyy");
 }
 
 export function formatDateTime(date: Date | string | number) {
   return format(new Date(date), "dd MMM yyyy, hh:mm a");
+}
+
+export function getYears(numberOfYears = 30) {
+  if (numberOfYears <= 0) {
+    throw new Error("Number of years must be greater than 0");
+  }
+
+  const currentYear = new Date().getFullYear();
+  const years: number[] = [];
+
+  for (let i = 0; i < numberOfYears; i++) {
+    years.push(currentYear + i);
+  }
+
+  return years;
 }

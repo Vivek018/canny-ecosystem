@@ -31,7 +31,7 @@ import { useEffect, useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { UPDATE_PAYMENT_FIELD } from "./$paymentFieldId.update-payment-field";
+import { UPDATE_PAYMENT_FIELD } from "./$paymentFieldId+/update-payment-field";
 import {
   Card,
   CardContent,
@@ -123,7 +123,9 @@ export async function action({
 
 export default function CreatePaymentField({
   updateValues,
-}: { updateValues?: PaymentFieldDatabaseUpdate | null }) {
+}: {
+  updateValues?: PaymentFieldDatabaseUpdate | null;
+}) {
   const { companyId } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const PAYMENT_FIELD_TAG = updateValues
@@ -174,7 +176,7 @@ export default function CreatePaymentField({
   }, [actionData]);
 
   return (
-    <section className="md:px-20 lg:px-52 2xl:px-80 py-4">
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
       <FormProvider context={form.context}>
         <Form method="POST" {...getFormProps(form)} className="flex flex-col">
           <Card>
@@ -213,7 +215,9 @@ export default function CreatePaymentField({
                 inputProps={{
                   ...getInputProps(fields.payment_type, { type: "text" }),
                 }}
-                placeholder={`Select ${replaceUnderscore(fields.payment_type.name)}`}
+                placeholder={`Select ${replaceUnderscore(
+                  fields.payment_type.name,
+                )}`}
                 labelProps={{
                   children: replaceUnderscore(fields.payment_type.name),
                 }}
@@ -229,7 +233,9 @@ export default function CreatePaymentField({
                 inputProps={{
                   ...getInputProps(fields.calculation_type, { type: "text" }),
                 }}
-                placeholder={`Select ${replaceUnderscore(fields.calculation_type.name)}`}
+                placeholder={`Select ${replaceUnderscore(
+                  fields.calculation_type.name,
+                )}`}
                 labelProps={{
                   children: replaceUnderscore(fields.calculation_type.name),
                 }}
@@ -240,7 +246,11 @@ export default function CreatePaymentField({
                 inputProps={{
                   ...getInputProps(fields.amount, { type: "number" }),
                   className: "capitalize",
-                  placeholder: `Enter ${replaceUnderscore(fields.calculation_type.value === calculationTypeArray[0] ? fields.amount.name : "Percentage")}`,
+                  placeholder: `Enter ${replaceUnderscore(
+                    fields.calculation_type.value === calculationTypeArray[0]
+                      ? fields.amount.name
+                      : "Percentage",
+                  )}`,
                   disabled: fields.payment_type.value === paymentTypeArray[1],
                 }}
                 labelProps={{

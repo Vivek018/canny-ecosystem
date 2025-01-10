@@ -12,7 +12,7 @@ import {
   replaceUnderscore,
   getValidDateForInput,
   getInitialValueFromZod,
-  PaymentTemplateFormEmployeeDialogSchema,
+  EmployeeLinkSchema,
 } from "@canny_ecosystem/utils";
 import {
   FormProvider,
@@ -62,15 +62,13 @@ export function EmployeeDialog({
 
   const [form, fields] = useForm({
     id: "payment-template-form",
-    constraint: getZodConstraint(PaymentTemplateFormEmployeeDialogSchema),
+    constraint: getZodConstraint(EmployeeLinkSchema),
     onValidate({ formData }) {
       return parseWithZod(formData, {
-        schema: PaymentTemplateFormEmployeeDialogSchema,
+        schema: EmployeeLinkSchema,
       });
     },
-    defaultValue:
-      initialValues ??
-      getInitialValueFromZod(PaymentTemplateFormEmployeeDialogSchema),
+    defaultValue: initialValues ?? getInitialValueFromZod(EmployeeLinkSchema),
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
   });

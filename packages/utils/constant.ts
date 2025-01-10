@@ -4,6 +4,7 @@ export const DELETE_TEXT = "permanently delete";
 
 export const modalSearchParamNames = {
   import_reimbursement: "import-reimbursement",
+  view_template_components: "view-template-components",
   view_link_template: "view-link-template",
   create_link_template: "create-link-template",
   update_link_template: "update-link-template",
@@ -226,6 +227,7 @@ export const EMPLOYER_EPF_PERCENTAGE = 0.12;
 export const EMPLOYER_EDLI_PERCENTAGE = 0.005;
 export const EMPLOYER_EPS_PERCENTAGE = 0.0833;
 export const EMPLOYER_ADMIN_CHARGES_PERCENTAGE = 0.005;
+
 
 export const exitPaymentFields = [
   "bonus",
