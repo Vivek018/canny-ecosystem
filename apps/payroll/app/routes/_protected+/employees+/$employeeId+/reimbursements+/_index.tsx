@@ -2,12 +2,15 @@ import { FilterList } from "@/components/reimbursements/filter-list";
 import { ReimbursementSearchFilter } from "@/components/reimbursements/reimbursement-search-filter";
 import { reimbursementsColumns } from "@/components/reimbursements/table/columns";
 import { ReimbursementsTable } from "@/components/reimbursements/table/reimbursements-table";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
   LAZY_LOADING_LIMIT,
   MAX_QUERY_LIMIT,
 } from "@canny_ecosystem/supabase/constant";
 import {
+  getProjectNamesByCompanyId,
   getReimbursementsByEmployeeId,
+  getSiteNamesByProjectName,
   getUsersEmail,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -23,6 +26,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const employeeId = params.employeeId;
   const { supabase } = getSupabaseWithHeaders({ request });
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   let reimbursementData = null;
   const searchParams = new URLSearchParams(url.searchParams);
   const sortParam = searchParams.get("sort");
@@ -36,6 +40,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     is_deductible: searchParams.get("is_deductible") ?? undefined,
     users: searchParams.get("users") ?? undefined,
     name: query,
+    project: searchParams.get("project") ?? undefined,
+    project_site: searchParams.get("project_site") ?? undefined,
   };
 
   const { data, error } = await getUsersEmail({ supabase });
@@ -80,6 +86,19 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const hasNextPage = Boolean(
     theMeta?.count && theMeta.count / (page + 1) > LAZY_LOADING_LIMIT,
   );
+  const { data: projectData } = await getProjectNamesByCompanyId({
+    supabase,
+    companyId,
+  });
+
+  let projectSiteData = null;
+  if (filters.project) {
+    const { data } = await getSiteNamesByProjectName({
+      supabase,
+      projectName: filters.project,
+    });
+    projectSiteData = data;
+  }
 
   return json({
     data: reimbursementData as any,
@@ -88,6 +107,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     hasNextPage,
     filters,
     query,
+    projectArray: projectData?.map((project) => project.name) ?? [],
+    projectSiteArray: projectSiteData?.map((site) => site.name) ?? [],
     userEmails: data?.map((user) => user.email) ?? [],
   });
 }
@@ -98,21 +119,27 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const prompt = formData.get("prompt") as string | null;
 
-  // Prepare search parameters
   const searchParams = new URLSearchParams();
   if (prompt && prompt.trim().length > 0) {
     searchParams.append("name", prompt.trim());
   }
 
-  // Update the URL with the search parameters
   url.search = searchParams.toString();
 
   return redirect(url.toString());
 }
 
 export default function ReimbursementsIndex() {
-  const { data, env, employeeId, filters, userEmails, hasNextPage } =
-    useLoaderData<typeof loader>();
+  const {
+    data,
+    env,
+    employeeId,
+    filters,
+    userEmails,
+    hasNextPage,
+    projectArray,
+    projectSiteArray,
+  } = useLoaderData<typeof loader>();
 
   const noFilters = Object.values(filters).every((value) => !value);
 
@@ -125,6 +152,8 @@ export default function ReimbursementsIndex() {
               disabled={!data?.length && noFilters}
               userEmails={userEmails}
               employeeId={employeeId}
+              projectArray={projectArray}
+              projectSiteArray={projectSiteArray}
             />
             <FilterList filters={filters} />
           </div>

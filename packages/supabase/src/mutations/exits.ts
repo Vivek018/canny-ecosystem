@@ -20,18 +20,17 @@ export const createExit = async ({
     }
   }
 
-  const {
-    error,
-    status,
-    data: exitsData,
-  } = await supabase.from("exits").insert(data).select().single();
+  const { error, status } = await supabase
+    .from("exits")
+    .insert(data)
+    .select()
+    .single();
 
   if (error) {
     console.error("error", error);
   }
 
   return {
-    exitsData,
     status,
     error,
   };

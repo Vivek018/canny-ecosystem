@@ -17,7 +17,6 @@ export function Header({
         className,
       )}
     >
-      {/* <MobileMenu /> */}
       <AssistantButton />
       <div className="flex gap-4 items-center no-drag">
         <CompanySwitch companies={companies} />

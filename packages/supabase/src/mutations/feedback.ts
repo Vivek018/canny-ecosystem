@@ -19,15 +19,15 @@ export async function createFeedback({
     }
   }
 
-  const {
-    error,
-    status,
-    data: feedbackData,
-  } = await supabase.from("feedback").insert(data).select().single();
+  const { error, status } = await supabase
+    .from("feedback")
+    .insert(data)
+    .select()
+    .single();
 
   if (error) {
     console.error(error);
   }
 
-  return { status, error, id: feedbackData?.id };
+  return { status, error };
 }

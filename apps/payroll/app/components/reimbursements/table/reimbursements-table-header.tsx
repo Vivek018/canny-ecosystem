@@ -13,12 +13,15 @@ type Props = {
 
 // make sure the order is same as header order
 export const ReimbursementsColumnIdArray = [
+  "employee_code",
   "employee_name",
   "submitted_date",
   "status",
   "amount",
   "is_deductible",
-  "user_id",
+  "email",
+  "project_name",
+  "project_site_name",
 ];
 
 export function ReimbursementsTableHeader({
@@ -53,14 +56,14 @@ export function ReimbursementsTableHeader({
   const isEnableSorting = (id: string) =>
     (
       loading ||
-      table?.getAllLeafColumns()?.find((col: any) => {
+      table?.getAllLeafColumns()?.find((col: { id: string }) => {
         return col.id === id;
       })
     )?.getCanSort();
 
   const columnName = (id: string) =>
     loading ||
-    table?.getAllLeafColumns()?.find((col: any) => {
+    table?.getAllLeafColumns()?.find((col: { id: string }) => {
       return col.id === id;
     })?.columnDef?.header;
 
@@ -81,13 +84,7 @@ export function ReimbursementsTableHeader({
         {ReimbursementsColumnIdArray?.map((id) => {
           return (
             isVisible(id) && (
-              <TableHead
-                key={id}
-                className={cn(
-                  "px-4 py-2",
-                  id === "employee_name" && "sticky left-12 bg-card z-10",
-                )}
-              >
+              <TableHead key={id} className={cn("px-4 py-2")}>
                 <Button
                   className="p-0 hover:bg-transparent space-x-2 disabled:opacity-100"
                   variant="ghost"

@@ -142,3 +142,25 @@ export async function getUserById({
     error: null,
   };
 }
+
+export async function getUserIdsByUserEmails({
+  supabase,
+  userEmails,
+}: {
+  supabase: TypedSupabaseClient;
+  userEmails: string[];
+}) {
+  const columns = ["email", "id"] as const;
+
+  const { data, error } = await supabase
+    .from("users")
+    .select(columns.join(","))
+    .in("email", userEmails)
+    .returns<InferredType<UserDatabaseRow, (typeof columns)[number]>[]>();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { data, error };
+}

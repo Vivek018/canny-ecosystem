@@ -82,7 +82,6 @@ export async function action({
     const { status, error } = await createEmployeeProvidentFund({
       supabase,
       data: submission.value as any,
-      bypassAuth: true,
     });
 
     if (isGoodStatus(status)) {
@@ -164,7 +163,7 @@ export default function CreateEmployeeProvidentFund({
       <Form method="POST" {...getFormProps(form)} className="flex flex-col">
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl pb-5">
+            <CardTitle className="text-2xl pb-5 capitalize">
               {replaceDash(EPF_TAG)}
             </CardTitle>
             <hr />
@@ -172,6 +171,7 @@ export default function CreateEmployeeProvidentFund({
           <CardContent>
             <input {...getInputProps(fields.id, { type: "hidden" })} />
             <input {...getInputProps(fields.company_id, { type: "hidden" })} />
+            <input {...getInputProps(fields.is_default, { type: "hidden" })} />
             <div className="flex flex-col justify-between">
               <Field
                 inputProps={{

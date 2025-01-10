@@ -3,6 +3,7 @@ export const SECONDS_IN_A_MONTH = 60 * 60 * 24 * 30;
 export const DELETE_TEXT = "permanently delete";
 
 export const modalSearchParamNames = {
+  import_reimbursement: "import-reimbursement",
   view_template_components: "view-template-components",
   view_link_template: "view-link-template",
   create_link_template: "create-link-template",
@@ -226,3 +227,17 @@ export const EMPLOYER_EPF_PERCENTAGE = 0.12;
 export const EMPLOYER_EDLI_PERCENTAGE = 0.005;
 export const EMPLOYER_EPS_PERCENTAGE = 0.0833;
 export const EMPLOYER_ADMIN_CHARGES_PERCENTAGE = 0.005;
+
+
+export const exitPaymentFields = [
+  "bonus",
+  "diwali_bonus",
+  "commission",
+  "joining_bonus",
+  "yearly_bonus",
+  "leave_encashment",
+  "gift_coupon",
+  "gratuity",
+  "computer_service_charges",
+  "deduction",
+];

@@ -59,7 +59,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const formData = await unstable_parseMultipartFormData(
     request,
-    unstable_createMemoryUploadHandler({ maxPartSize: SIZE_1MB })
+    unstable_createMemoryUploadHandler({ maxPartSize: SIZE_1MB }),
   );
   const action = formData.get("_action") as string;
 
@@ -89,7 +89,7 @@ export async function action({ request }: ActionFunctionArgs) {
       if (submission.status === "error") {
         return json(
           { result: submission.reply() },
-          { status: submission.status === "error" ? 400 : 200 }
+          { status: submission.status === "error" ? 400 : 200 },
         );
       }
     }

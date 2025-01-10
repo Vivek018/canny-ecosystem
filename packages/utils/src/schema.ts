@@ -38,7 +38,9 @@ export const zEmailSuffix = z
     "Must contain a dot with at least one character before and two after.",
   );
 
-export const SIZE_1MB = 1 * 1024 * 1024; // 1MB
+export const SIZE_1KB = 1 * 1024; //1KB
+export const SIZE_1MB = 1 * SIZE_1KB * SIZE_1KB; // 1MB
+
 const ACCEPTED_IMAGE_TYPES = [
   "image/jpeg",
   "image/jpg",
@@ -444,6 +446,7 @@ export const EmployeeProvidentFundSchema = z.object({
   edli_restrict_value: z.number().default(EDLI_RESTRICTED_VALUE),
   include_employer_edli_contribution: z.boolean().default(false),
   include_admin_charges: z.boolean().default(false),
+  is_default: z.boolean().default(true),
 });
 
 export const ESI_EMPLOYEE_CONTRIBUTION = 0.0075;
@@ -458,6 +461,7 @@ export const EmployeeStateInsuranceSchema = z.object({
   employees_contribution: z.number().default(ESI_EMPLOYEE_CONTRIBUTION),
   employers_contribution: z.number().default(ESI_EMPLOYER_CONTRIBUTION),
   include_employer_contribution: z.boolean().default(false),
+  is_default: z.boolean().default(true),
   max_limit: z.number().default(ESI_MAX_LIMIT),
 });
 
@@ -490,19 +494,17 @@ export const LabourWelfareFundSchema = z.object({
 });
 
 export const statutoryBonusPayFrequencyArray = ["monthly", "yearly"] as const;
-
-export const StatutoryBonusSchemaObject = z.object({
-  id: z.string().optional(),
-  company_id: z.string(),
-  payment_frequency: z
-    .enum(statutoryBonusPayFrequencyArray)
-    .default(statutoryBonusPayFrequencyArray[0]),
-  percentage: z.number().min(0).default(8.33),
-  payout_month: z.number().optional(),
-});
-
-export const StatutoryBonusSchema = StatutoryBonusSchemaObject.superRefine(
-  (data, ctx) => {
+export const StatutoryBonusSchema = z
+  .object({
+    id: z.string().optional(),
+    company_id: z.string(),
+    payment_frequency: z
+      .enum(statutoryBonusPayFrequencyArray)
+      .default(statutoryBonusPayFrequencyArray[0]),
+    percentage: z.number().min(0).default(8.33),
+    payout_month: z.number().optional(),
+  })
+  .superRefine((data, ctx) => {
     if (data.payment_frequency === "yearly" && !data.payout_month) {
       ctx.addIssue({
         path: ["payout_month"],
@@ -516,8 +518,18 @@ export const StatutoryBonusSchema = StatutoryBonusSchemaObject.superRefine(
         data.payout_month = undefined;
       }
     }
-  },
-);
+  });
+
+export const GratuitySchema = z.object({
+  id: z.string().optional(),
+  company_id: z.string(),
+  is_default: z.boolean().default(true),
+  eligibility_years: z.number().min(0).default(4.5),
+  present_day_per_year: z.number().min(1).max(365).default(240),
+  payment_days_per_year: z.number().min(1).max(365).default(15),
+  max_multiply_limit: z.number().min(0).default(20),
+  max_amount_limit: z.number().min(0).default(3000000),
+});
 
 export const categoryArray = ["suggestion", "bug", "complain"] as const;
 export const severityArray = ["low", "normal", "urgent"] as const;
@@ -552,10 +564,12 @@ export const UserSchema = z.object({
 });
 
 export const reasonForExitArray = [
-  "resigned",
-  "terminated",
-  "death",
-  "disability",
+  "resignation",
+  "termination",
+  "retirement",
+  "health_reasons",
+  "career_change",
+  "other",
 ] as const;
 
 export const ExitPaymentPage1Schema = z.object({
@@ -640,6 +654,21 @@ export const EmployeeLinkSchema = z.object({
   template_id: z.string(),
 });
 
+export const PaymentTemplateFormSiteDialogSchema = z.object({
+  name: z.string(),
+  effective_from: z.string().default(new Date().toISOString().split("T")[0]),
+  effective_to: z.string().optional(),
+  template_id: z.string(),
+  eligibility_option: z.enum(eligibilityOptionsArray).optional(),
+  position: z.string().optional(),
+  skill_level: z.string().optional(),
+});
+
+
+export const DeleteEmployeeLinkSchema = z.object({
+  is_active: z.enum(["true", "false"]).transform((val) => val === "true"),
+});
+
 export const SiteLinkSchema = z.object({
   name: z.string(),
   effective_from: z.string().default(new Date().toISOString().split("T")[0]),
@@ -650,7 +679,7 @@ export const SiteLinkSchema = z.object({
   skill_level: z.string().optional(),
 });
 
-export const ReimbursementStatusArray = ["pending", "approved"] as const;
+export const ReimbursementStatusArray = ["approved", "pending"] as const;
 export const ReimbursementDeductibleArray = ["true", "false"] as const;
 
 export const ReimbursementSchema = z.object({
@@ -658,11 +687,20 @@ export const ReimbursementSchema = z.object({
   last_name: zString.optional(),
   submitted_date: z.string(),
   status: z.enum(ReimbursementStatusArray),
-  amount: zNumber.min(1).max(100000000),
+  amount: z.number().min(1).max(100000000),
   user_id: z.string().optional(),
   is_deductible: z.boolean().optional().default(false),
   company_id: z.string(),
   employee_id: z.string(),
+});
+
+export const ImportReimbursementHeaderSchema = z.object({
+  submitted_date: z.string(),
+  employee_code: z.string(),
+  amount: z.string(),
+  email: z.string().optional(),
+  is_deductible: z.string().optional(),
+  status: z.string().optional(),
 });
 
 export const exitReasonArray = [
@@ -673,3 +711,26 @@ export const exitReasonArray = [
   "Medical",
   "Other",
 ] as const;
+
+export const ImportReimbursementDataSchema = z.object({
+  data: z.array(
+    z.object({
+      submitted_date: z.string(),
+      employee_code: zNumberString,
+      amount: z.preprocess(
+        (value) =>
+          typeof value === "string" ? Number.parseFloat(value) : value,
+        z.number(),
+      ),
+      email: zEmail.optional(),
+      is_deductible: z
+        .preprocess(
+          (value) =>
+            typeof value === "string" ? value.toLowerCase() === "true" : value,
+          z.boolean().default(false),
+        )
+        .default(false),
+      status: z.enum(ReimbursementStatusArray),
+    }),
+  ),
+});

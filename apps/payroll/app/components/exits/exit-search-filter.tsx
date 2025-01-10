@@ -28,8 +28,12 @@ import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
 
 export function ExitsSearchFilter({
   disabled,
+  projectArray,
+  projectSiteArray,
 }: {
   disabled?: boolean;
+  projectArray: string[] | null;
+  projectSiteArray: string[] | null;
 }) {
   const [prompt, setPrompt] = useState("");
   const navigation = useNavigation();
@@ -49,6 +53,8 @@ export function ExitsSearchFilter({
     final_settlement_date_start: "",
     final_settlement_date_end: "",
     reason: "",
+    project: "",
+    project_site: "",
   };
 
   const [filterParams, setFilterParams] = useState(initialFilterParams);
@@ -83,6 +89,8 @@ export function ExitsSearchFilter({
     ),
     final_settlement_date_end: searchParams.get("final_settlement_date_end"),
     reason: searchParams.get("reason"),
+    project: searchParams.get("project"),
+    project_site: searchParams.get("project_site"),
   };
 
   useEffect(() => {
@@ -145,7 +153,6 @@ export function ExitsSearchFilter({
       searchParams.set("name", prompt);
       setSearchParams(searchParams);
     }
-    // }
   };
 
   const hasValidFilters =
@@ -342,6 +349,77 @@ export function ExitsSearchFilter({
                     setFilterParams((prev) => ({ ...prev, ...newRange }));
                   }}
                 />
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+        </DropdownMenuGroup>
+
+        <DropdownMenuGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <span>Project</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent
+                sideOffset={14}
+                alignOffset={-4}
+                className="p-0"
+              >
+                {projectArray?.map((name, index) => (
+                  <DropdownMenuCheckboxItem
+                    key={name + index.toString()}
+                    className="capitalize"
+                    checked={filterParams?.project === name}
+                    onCheckedChange={() => {
+                      setFilterParams((prev) => ({
+                        ...prev,
+                        project: name,
+                      }));
+                    }}
+                  >
+                    {name}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+        </DropdownMenuGroup>
+
+        <DropdownMenuGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <span>Project Site</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent
+                sideOffset={14}
+                alignOffset={-4}
+                className="p-0"
+              >
+                {!searchParamsList.project ? (
+                  <DropdownMenuCheckboxItem
+                    disabled={true}
+                    className="p-8 items-center justify-center"
+                  >
+                    Select Project First
+                  </DropdownMenuCheckboxItem>
+                ) : (
+                  projectSiteArray?.map((name, index) => (
+                    <DropdownMenuCheckboxItem
+                      key={name + index.toString()}
+                      className="capitalize"
+                      checked={filterParams?.project_site === name}
+                      onCheckedChange={() => {
+                        setFilterParams((prev) => ({
+                          ...prev,
+                          project_site: name,
+                        }));
+                      }}
+                    >
+                      {name}
+                    </DropdownMenuCheckboxItem>
+                  ))
+                )}
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>

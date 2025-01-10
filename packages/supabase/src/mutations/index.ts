@@ -13,3 +13,4 @@ export * from "./payment-template-assignments";
 export * from "./payment-templates";
 export * from "./reimbursements";
 export * from "./exits";
+export * from "./gratuity";

@@ -71,7 +71,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await parseMultipartFormData(
     request,
-    createMemoryUploadHandler({ maxPartSize: SIZE_1MB })
+    createMemoryUploadHandler({ maxPartSize: SIZE_1MB }),
   );
   const action = formData.get("_action") as string;
 
@@ -136,7 +136,7 @@ export async function action({ request }: ActionFunctionArgs) {
       if (submission.status === "error") {
         return json(
           { result: submission.reply() },
-          { status: submission.status === "error" ? 400 : 200 }
+          { status: submission.status === "error" ? 400 : 200 },
         );
       }
     }
@@ -193,13 +193,13 @@ export default function CreateCompany() {
       </div>
       <FormProvider context={form.context}>
         <Form
-          method='POST'
-          encType='multipart/form-data'
+          method="POST"
+          encType="multipart/form-data"
           {...getFormProps(form)}
-          className='flex flex-col'
+          className="flex flex-col"
         >
           <Card>
-            <div className='h-[500px] overflow-scroll'>
+            <div className="h-[500px] overflow-scroll">
               {step === 1 ? (
                 <CreateCompanyDetails key={resetKey} fields={fields as any} />
               ) : null}
