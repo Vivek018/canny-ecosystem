@@ -60,8 +60,8 @@ export function getSelectedPaymentComponentFromField<
     target_type: priortizedComponent?.target_type ?? "payment_field",
     component_type:
       priortizedComponent?.component_type ??
-      componentTypeArray[0] ??
-      existingComponent?.component_type,
+      existingComponent?.component_type ??
+      componentTypeArray[0],
     calculation_value:
       calculationValue?.toFixed(2) ??
       priortizedComponent?.calculation_value ??

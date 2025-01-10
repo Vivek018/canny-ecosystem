@@ -206,7 +206,8 @@ export function CreatePaymentTemplateComponentDetails({
                 <div
                   key={
                     (fieldSet as any)[`${defaultTargetType}_id`].value +
-                    fieldSet.id.value 
+                    fieldSet.id.value +
+                    resetKey
                   }
                   className='w-full grid grid-cols-3 gap-3 justify-between items-center'
                 >
