@@ -110,7 +110,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
           });
 
           if (templateComponents) {
-
             await populateTemplateComponentData(payrollEntry, templateComponents);
             payrollEntry.rate = 1000; // it will come from payment_template_components
           }
@@ -122,9 +121,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         await getReimbursementsByEmployeeId({
           supabase,
           employeeId: e.employee_id,
+          params: {
+            from: 0,
+            to: Number.MAX_SAFE_INTEGER
+          }
         });
       if (reimbursementsData) {
-        payrollEntry.reimbursements = reimbursementsData?.reduce((total, r) => total + (r.amount ? r.amount : 0), 0);
+        payrollEntry.reimbursements = reimbursementsData?.reduce((total, r:any) => total + r.amount, 0);
       }
 
       // dynamic fields are now polulated -> now populate static fields here..

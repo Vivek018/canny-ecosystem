@@ -179,7 +179,7 @@ export default function CreatePaymentField({
         <Form method="POST" {...getFormProps(form)} className="flex flex-col">
           <Card>
             <CardHeader>
-              <CardTitle className="text-3xl">
+              <CardTitle className="text-3xl capitalize">
                 {replaceDash(PAYMENT_FIELD_TAG)}
               </CardTitle>
               <CardDescription>

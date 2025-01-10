@@ -1,21 +1,40 @@
-import { ProjectCard } from "@/components/projects/project-card";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { getProjectsByCompanyId } from "@canny_ecosystem/supabase/queries";
+import { getAllSitesByProjectId, getPendingPayrollCountBySiteId, getProjectsByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@canny_ecosystem/ui/command";
 import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json, Outlet, useLoaderData } from "@remix-run/react";
+import { PayrollProjectCard } from "@/components/payroll/payroll-project-card";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data, error } = await getProjectsByCompanyId({ supabase, companyId });
+  const { data: projectData, error: projectError } = await getProjectsByCompanyId({ supabase, companyId });
 
-  if (error) throw error;
+  await Promise.all(
+    (projectData ?? []).map(async (project: any) => {
+      // Setting totalSites in projectData
+      const { data: siteData } = await getAllSitesByProjectId({ supabase, projectId: project.id });
+      project.totalSites = siteData?.length || 0;
 
-  return json({ data });
+      // Calculate pending payroll for all sites
+      const payrollCounts = await Promise.all(
+        (siteData ?? []).map(async (site: any) => {
+          const { data } = await getPendingPayrollCountBySiteId({ supabase, siteId: site.id });
+          return data ?? 0;
+        })
+      );
+
+      // Sum up pending payroll counts
+      project.pendingPayroll = payrollCounts.reduce((sum, count) => sum + count, 0);
+    })
+  );
+
+  if (projectError) throw projectError;
+
+  return json({ data: projectData });
 }
 
 export default function ProjectsIndex() {
@@ -39,12 +58,12 @@ export default function ProjectsIndex() {
               !isDocument && "hidden",
             )}
           >
-            No project found.
+            No project found
           </CommandEmpty>
           <CommandList className="max-h-full py-6 overflow-x-visible overflow-y-visible">
             <CommandGroup className="p-0 overflow-visible">
               <div className="w-full grid gap-8 grid-cols-1">
-                {data?.map((project) => (
+                {data?.map((project: any) => (
                   <CommandItem
                     key={project.id}
                     value={
@@ -58,7 +77,7 @@ export default function ProjectsIndex() {
                     }
                     className="data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0"
                   >
-                    <ProjectCard project={project} />
+                    <PayrollProjectCard project={project} />
                   </CommandItem>
                 ))}
               </div>

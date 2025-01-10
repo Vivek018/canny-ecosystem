@@ -6,7 +6,7 @@ import type {
   PayrollEntriesDatabaseRow,
 } from "../types";
 
-export async function getPayrollBySiteId({
+export async function getPayrollsBySiteId({
   supabase,
   site_id,
 }: {

@@ -36,8 +36,9 @@ export function PayrollSheet({ row, rowData, editable }: { row: any, rowData: Pa
     reimbursements: rowData.reimbursements ?? 0,
   };
 
-  const templateComponents: { paymentTemplateComponentId: string; name: string }[] = []; // to keep track of which field is linked to which template
-  rowData.templateComponents.map((row:any) => {
+  // to keep track of which field is linked to which template
+  const templateComponents: { paymentTemplateComponentId: string; name: string }[] = [];
+  rowData.templateComponents.map((row) => {
     initialValues[row.name] = row.amount;
     const { paymentTemplateComponentId, name } = row;
     templateComponents.push({ paymentTemplateComponentId, name });
@@ -69,6 +70,7 @@ export function PayrollSheet({ row, rowData, editable }: { row: any, rowData: Pa
       value: fields.gross_pay.value
     }
   ];
+
   const deductions = [
     {
       title: "Reimbrushments",
@@ -79,7 +81,7 @@ export function PayrollSheet({ row, rowData, editable }: { row: any, rowData: Pa
     }
   ];
 
-  rowData.templateComponents.map((row:any) => {
+  rowData.templateComponents.map((row: any) => {
     const { name } = row;
     const paymentFieldData = {
       title: row[name].name ? row[name].name : getFullName(row.name),
@@ -99,13 +101,10 @@ export function PayrollSheet({ row, rowData, editable }: { row: any, rowData: Pa
     let newNetPay = 0;
     for (const earning of earnings) newNetPay += Number(earning.value);
     for (const deduction of deductions) newNetPay -= Number(deduction.value);
-
     setNetPay(newNetPay);
   }, [
     fields.gross_pay.value,
     fields.reimbursements.value,
-    ...rowData.templateComponents
-      .map((row: { name: string }) => fields[row.name].value)
   ]);
 
   return (
@@ -173,18 +172,15 @@ export function PayrollSheet({ row, rowData, editable }: { row: any, rowData: Pa
                       <h3 className="my-3 text-muted-foreground font-semibold capitalize">{earning.title}</h3>
                     </div>
                     <div className="text-end font-semibold">
-                      {editable ? (
-                        <Field
-                          inputProps={{
-                            ...getInputProps(earning.inputPropField, { type: "number" }),
-                            className: "capitalize",
-                            placeholder: earning.placeholder
-                          }}
-                          errors={earning.errors}
-                        />
-                      ) : (
-                        <p className="mt-3">{earning.value ? earning.value : '-'}</p>
-                      )}
+                      <Field
+                        inputProps={{
+                          ...getInputProps(earning.inputPropField, { type: "number" }),
+                          className: "capitalize",
+                          placeholder: earning.placeholder,
+                          readOnly: !editable
+                        }}
+                        errors={earning.errors}
+                      />
                     </div>
                   </div>
                 })
@@ -204,18 +200,15 @@ export function PayrollSheet({ row, rowData, editable }: { row: any, rowData: Pa
                       <h3 className="my-3 text-muted-foreground font-semibold capitalize">{deduction.title}</h3>
                     </div>
                     <div className="text-end font-semibold">
-                      {editable ? (
-                        <Field
-                          inputProps={{
-                            ...getInputProps(deduction.inputPropField, { type: "number" }),
-                            className: "capitalize",
-                            placeholder: deduction.placeholder
-                          }}
-                          errors={deduction.errors}
-                        />
-                      ) : (
-                        <p className="mt-3">{deduction.value ? deduction.value : "-"}</p>
-                      )}
+                      <Field
+                        inputProps={{
+                          ...getInputProps(deduction.inputPropField, { type: "number" }),
+                          className: "capitalize",
+                          placeholder: deduction.placeholder,
+                          readOnly: !editable
+                        }}
+                        errors={deduction.errors}
+                      />
                     </div>
                   </div>
                 })

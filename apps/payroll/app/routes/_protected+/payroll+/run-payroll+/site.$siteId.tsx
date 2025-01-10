@@ -19,59 +19,57 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const populateTemplateComponentData = async (payrollEntry: PayrollEmployeeData, templateComponents: PaymentTemplateComponentsDatabaseRow[]) => {
     (templateComponents ?? []).map(async (templateComponent) => {
       const templateEntry = { paymentTemplateComponentId: templateComponent.id } as any;
-      let name = null;
       if (templateComponent.payment_field_id) {
         const { data } = await getPaymentFieldById({ supabase, id: templateComponent.payment_field_id });
         if (data) {
-          name = toCamelCase(data.name);
-          templateEntry[name] = { ...data, componentType: templateComponent.component_type };
+          templateEntry.name = toCamelCase(data.name);
+          templateEntry[templateEntry.name] = { ...data, componentType: templateComponent.component_type };
         }
       }
       if (templateComponent.bonus_id) {
         const { data } = await getStatutoryBonusById({ supabase, id: templateComponent.bonus_id });
         if (data) {
-          name = "statutoryBonus";
-          templateEntry[name] = { ...data, componentType: templateComponent.component_type };
+          templateEntry.name = "statutoryBonus";
+          templateEntry[templateEntry.name] = { ...data, componentType: templateComponent.component_type };
         }
       }
       if (templateComponent.esi_id) {
         const { data } = await getEmployeeStateInsuranceById({ supabase, id: templateComponent.esi_id });
         if (data) {
-          name = "esi";
-          templateEntry[name] = { ...data, componentType: templateComponent.component_type };
+          templateEntry.name = "esi";
+          templateEntry[templateEntry.name] = { ...data, componentType: templateComponent.component_type };
         }
       }
       if (templateComponent.epf_id) {
         const { data } = await getEmployeeProvidentFundById({ supabase, id: templateComponent.epf_id });
         if (data) {
-          name = "epf";
-          templateEntry[name] = { ...data, componentType: templateComponent.component_type };
+          templateEntry.name = "epf";
+          templateEntry[templateEntry.name] = { ...data, componentType: templateComponent.component_type };
         }
       }
       if (templateComponent.pt_id) {
         const { data } = await getProfessionalTaxById({ supabase, id: templateComponent.pt_id });
         if (data) {
-          name = "pt";
-          templateEntry[name] = { ...data, componentType: templateComponent.component_type };
+          templateEntry.name = "pt";
+          templateEntry[templateEntry.name] = { ...data, componentType: templateComponent.component_type };
         }
       }
       if (templateComponent.lwf_id) {
         const { data } = await getLabourWelfareFundById({ supabase, id: templateComponent.lwf_id });
         if (data) {
-          name = "lwf";
-          templateEntry[name] = { ...data, componentType: templateComponent.component_type };
+          templateEntry.name = "lwf";
+          templateEntry[templateEntry.name] = { ...data, componentType: templateComponent.component_type };
         }
       }
-      templateEntry.name = name; // payment field !!
       payrollEntry.templateComponents.push(templateEntry);
     });
   }
   const calculateAmount = (templateComponent: any, gross_pay: number) => {
-    if (templateComponent.hasOwnProperty("statutoryBonus")) return calculateSB(templateComponent.statutoryBonus, gross_pay);
-    if (templateComponent.hasOwnProperty("epf")) return calculateEPF(templateComponent.epf, gross_pay);
-    if (templateComponent.hasOwnProperty("esi")) return calculateESI(templateComponent.esi, gross_pay);
-    if (templateComponent.hasOwnProperty("pt")) return calculatePT(templateComponent.pt, gross_pay);
-    if (templateComponent.hasOwnProperty("lwf")) return calculateLWF(templateComponent.lwf, gross_pay);
+    if (templateComponent?.statutoryBonus) return calculateSB(templateComponent.statutoryBonus, gross_pay);
+    if (templateComponent?.epf) return calculateEPF(templateComponent.epf, gross_pay);
+    if (templateComponent?.esi) return calculateESI(templateComponent.esi, gross_pay);
+    if (templateComponent?.pt) return calculatePT(templateComponent.pt, gross_pay);
+    if (templateComponent?.lwf) return calculateLWF(templateComponent.lwf, gross_pay);
     return calculatePaymentField(templateComponent[templateComponent.name]);
   }
 
@@ -100,6 +98,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       if (employeeProjectAssignmentData) payrollEntry.designation = employeeProjectAssignmentData?.position ?? "";
 
       // populating template components related data
+      // select default template if there's no template linked with the current employee/site
       const { data: employeeTemplateData } = await getPaymentTemplateByEmployeeId({ supabase, employeeId: e.employee_id });
       if (employeeTemplateData) // When the template is linked with the employee
       {
@@ -122,7 +121,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
           });
 
           if (templateComponents) {
-
             await populateTemplateComponentData(payrollEntry, templateComponents);
             payrollEntry.rate = 1000; // it will come from payment_template_components
           }
@@ -134,9 +132,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         await getReimbursementsByEmployeeId({
           supabase,
           employeeId: e.employee_id,
+          params: {
+            from: 0,
+            to: Number.MAX_SAFE_INTEGER
+          }
         });
       if (reimbursementsData)
-        payrollEntry.reimbursements = reimbursementsData?.reduce((total, r) => total + (r.amount ? r.amount : 0), 0);
+        payrollEntry.reimbursements = reimbursementsData?.reduce((total, r: any) => total + r.amount, 0);
 
       // dynamic fields are now polulated -> now populate static fields here..
       payrollEntry.gross_pay = payrollEntry.rate * payrollEntry.present_days;
@@ -160,6 +162,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       total_employees: payrollEntries.length,
       commission: 0
     }
+
+    // to calculate commission
     const { data: relationshipData } = await getRelationshipIdByParentIdAndChildId({
       supabase,
       parentCompanyId: CANNY_MANAGEMENT_SERVICES_COMPANY_ID,
@@ -171,7 +175,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         id: relationshipData?.id,
         companyId,
       }) as any;
-      dataToBeSaved.commission = (relationshipTermsData?.terms?.service_charge * dataToBeSaved?.total_net_amount) / 100;
+      dataToBeSaved.commission = (relationshipTermsData?.terms?.service_charge * (dataToBeSaved?.total_net_amount ?? 0)) / 100;
     }
 
     // saving payroll
@@ -179,26 +183,32 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     PAYROLL_ID = createdPayrollData?.id ? createdPayrollData?.id : "";
 
     // saving payroll entries
+    console.log("jbvsa41", payrollEntries);
+
     payrollEntries.map(async (payrollEntry) => {
+      const entry = {
+        employee_id: payrollEntry.employee_id,
+        payroll_id: PAYROLL_ID,
+        payment_template_components_id: null,
+        amount: payrollEntry.net_pay,
+        payment_status: "pending"
+      };
       for (const templateComponent of payrollEntry.templateComponents) {
-        const entry = {
-          employee_id: payrollEntry.employee_id,
-          payroll_id: PAYROLL_ID,
-          payment_template_components_id: templateComponent.paymentTemplateComponentId,
-          amount: calculateAmount(templateComponent, payrollEntry.gross_pay),
-          payment_status: "pending"
-        };
+        entry.payment_template_components_id = templateComponent.paymentTemplateComponentId;
+        entry.amount = calculateAmount(templateComponent, payrollEntry.gross_pay);
+        await createPayrollEntry({ supabase, data: entry as any });
+      }
+      if (payrollEntry.templateComponents.length === 0) {
         await createPayrollEntry({ supabase, data: entry as any });
       }
     });
   }
   else PAYROLL_ID = payrollData.id;
 
-  // prepare the data and return..
+  // prepare the data and return
   await Promise.all(
     payrollEntries.map(async (payrollEntry) => {
       payrollEntry.payrollId = PAYROLL_ID;
-
       await Promise.all(
         payrollEntry.templateComponents.map(async (templateComponent: any) => {
           const { data: amountData } = await getPayrollEnrtyAmountByEmployeeIdAndPayrollIdAndPaymentTemplateComponentId({

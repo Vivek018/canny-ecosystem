@@ -1,4 +1,4 @@
-import { getPayrollBySiteId, getSitesWithEmployeeCountByProjectId, type SitesWithLocation } from "@canny_ecosystem/supabase/queries";
+import { getPayrollsBySiteId, getSitesWithEmployeeCountByProjectId, type SitesWithLocation } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
   Command,
@@ -17,35 +17,35 @@ import { json } from "@remix-run/react";
 import { PayrollStatus } from "@/components/payroll/payroll-status";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const projectId = params.projectId;
-
+  const projectId = params.projectId as string;
   const { supabase } = getSupabaseWithHeaders({ request });
-
-  if (!projectId) throw new Error("No Project Id");
 
   const { data: siteData, error: siteError } = await getSitesWithEmployeeCountByProjectId({ supabase, projectId });
 
   const newSiteData: SitesWithLocation[] = [];
   await Promise.all(
     (siteData ?? []).map(async (site) => {
-      const tmp = { ...site };
-      const { data: payrolls } = await getPayrollBySiteId({ supabase, site_id: site.id });
+      const { data: payrolls } = await getPayrollsBySiteId({ supabase, site_id: site.id });
 
-      let add = true;
+      // addRecentPayroll -> boolean that indicates whether to add current months payroll or not
+      let addRecentPayroll = true; 
+
       const currentDate = new Date();
       const currentYearMonth = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+
       (payrolls ?? []).map((payroll) => {
-        if (payroll?.run_date?.startsWith(currentYearMonth)) add = false;
-        const payrollTmp = { ...tmp } as SitesWithLocation & { runDate: string | null, is_approved: boolean };
-        payrollTmp.runDate = payroll?.run_date;
-        payrollTmp.is_approved = (payroll.status === "approved");
-        newSiteData.push(payrollTmp);
+        if (payroll?.run_date?.startsWith(currentYearMonth)) addRecentPayroll = false;
+        const payrollData = site as SitesWithLocation & { runDate: string | null, is_approved: boolean };
+        payrollData.runDate = payroll?.run_date;
+        payrollData.is_approved = (payroll.status === "approved");
+        newSiteData.push(payrollData);
       });
-      if (add) {
-        const payrollTmp = { ...tmp } as SitesWithLocation & { runDate: string | null, is_approved: boolean };
-        payrollTmp.runDate = "";
-        payrollTmp.is_approved = false;
-        newSiteData.push(payrollTmp);
+
+      if (addRecentPayroll) {
+        const payrollData = site as SitesWithLocation & { runDate: string | null, is_approved: boolean };
+        payrollData.runDate = "";
+        payrollData.is_approved = false;
+        newSiteData.push(payrollData);
       }
     })
   );
