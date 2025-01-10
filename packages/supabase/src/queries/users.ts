@@ -37,16 +37,16 @@ export async function getUserByEmail({
     console.error(error);
   }
 
-  return { data, error };
-  // return {
-  //   data: {
-  //     id: "1",
-  //     email: "demo@gmail.com",
-  //     first_name: "Demo",
-  //     last_name: "User",
-  //   },
-  //   error: null,
-  // };
+  // return { data, error };
+  return {
+    data: {
+      id: "1",
+      email: "demo@gmail.com",
+      first_name: "Demo",
+      last_name: "User",
+    },
+    error: null,
+  };
 }
 
 export async function getUsers({
@@ -131,16 +131,16 @@ export async function getUserById({
     console.error(error);
   }
 
-  return { data, error };
-  // return {
-  //   data: {
-  //     id: "1",
-  //     email: "demo@gmail.com",
-  //     first_name: "Demo",
-  //     last_name: "User",
-  //   },
-  //   error: null,
-  // };
+  // return { data, error };
+  return {
+    data: {
+      id: "1",
+      email: "demo@gmail.com",
+      first_name: "Demo",
+      last_name: "User",
+    },
+    error: null,
+  };
 }
 
 export async function getUserIdsByUserEmails({

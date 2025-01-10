@@ -1,4 +1,4 @@
-import { HARD_QUERY_LIMIT } from "../constant";
+import { HARD_QUERY_LIMIT, SINGLE_QUERY_LIMIT } from "../constant";
 import type {
   InferredType,
   ProfessionalTaxDatabaseRow,
@@ -29,6 +29,42 @@ export async function getProfessionalTaxesByCompanyId({
     .order("created_at", { ascending: false })
     .returns<
       InferredType<ProfessionalTaxDatabaseRow, (typeof columns)[number]>[]
+    >();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { data, error };
+}
+
+export async function getProfessionalTaxByStateAndCompanyId({
+  supabase,
+  state,
+  companyId,
+}: {
+  supabase: TypedSupabaseClient;
+  state: string;
+  companyId: string;
+}) {
+  const columns = [
+    "id",
+    "company_id",
+    "state",
+    "pt_number",
+    "deduction_cycle",
+    "gross_salary_range",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("professional_tax")
+    .select(columns.join(","))
+    .eq("state", state)
+    .eq("company_id", companyId)
+    .limit(SINGLE_QUERY_LIMIT)
+    .order("created_at", { ascending: false })
+    .single<
+      InferredType<ProfessionalTaxDatabaseRow, (typeof columns)[number]>
     >();
 
   if (error) {

@@ -255,7 +255,7 @@ export type Database = {
           {
             foreignKeyName: "employee_addresses_employee_id_fkey"
             columns: ["employee_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "employees"
             referencedColumns: ["id"]
           },
@@ -598,6 +598,7 @@ export type Database = {
           id: string
           include_employer_contribution: boolean
           is_default: boolean | null
+          max_limit: number | null
           updated_at: string | null
         }
         Insert: {
@@ -610,6 +611,7 @@ export type Database = {
           id?: string
           include_employer_contribution?: boolean
           is_default?: boolean | null
+          max_limit?: number | null
           updated_at?: string | null
         }
         Update: {
@@ -622,6 +624,7 @@ export type Database = {
           id?: string
           include_employer_contribution?: boolean
           is_default?: boolean | null
+          max_limit?: number | null
           updated_at?: string | null
         }
         Relationships: [
@@ -1277,36 +1280,39 @@ export type Database = {
       }
       payment_templates: {
         Row: {
-          annual_ctc: number
           company_id: string
           created_at: string | null
           description: string | null
           id: string
           is_active: boolean | null
           is_default: boolean | null
+          monthly_ctc: number
           name: string
+          state: string | null
           updated_at: string | null
         }
         Insert: {
-          annual_ctc: number
           company_id: string
           created_at?: string | null
           description?: string | null
           id?: string
           is_active?: boolean | null
           is_default?: boolean | null
+          monthly_ctc: number
           name: string
+          state?: string | null
           updated_at?: string | null
         }
         Update: {
-          annual_ctc?: number
           company_id?: string
           created_at?: string | null
           description?: string | null
           id?: string
           is_active?: boolean | null
           is_default?: boolean | null
+          monthly_ctc?: number
           name?: string
+          state?: string | null
           updated_at?: string | null
         }
         Relationships: [

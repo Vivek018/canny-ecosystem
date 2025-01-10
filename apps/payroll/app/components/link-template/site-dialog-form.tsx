@@ -7,7 +7,7 @@ import {
   eligibilityOptionsArray,
   getInitialValueFromZod,
   getValidDateForInput,
-  PaymentTemplateFormSiteDialogSchema,
+  SiteLinkSchema,
   positionArray,
   replaceUnderscore,
   skillLevelArray,
@@ -97,16 +97,15 @@ export const SiteDialogForm = ({
       isUpdateAction && initialValues
         ? "update-payment-template"
         : "create-payment-template",
-    constraint: getZodConstraint(PaymentTemplateFormSiteDialogSchema),
+    constraint: getZodConstraint(SiteLinkSchema),
     onValidate({ formData }) {
       return parseWithZod(formData, {
-        schema: PaymentTemplateFormSiteDialogSchema,
+        schema: SiteLinkSchema,
       });
     },
     defaultValue: isUpdateAction
-      ? initialValues ??
-        getInitialValueFromZod(PaymentTemplateFormSiteDialogSchema)
-      : getInitialValueFromZod(PaymentTemplateFormSiteDialogSchema),
+      ? initialValues ?? getInitialValueFromZod(SiteLinkSchema)
+      : getInitialValueFromZod(SiteLinkSchema),
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
   });

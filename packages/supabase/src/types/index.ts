@@ -235,11 +235,11 @@ export type PaymentTemplateAssignmentsDatabaseUpdate =
   Database["public"]["Tables"]["payment_template_assignments"]["Update"];
 
 // Payment template components
-export type PaymentTemplateComponentsDatabaseRow =
+export type PaymentTemplateComponentDatabaseRow =
   Database["public"]["Tables"]["payment_template_components"]["Row"];
-export type PaymentTemplateComponentsDatabaseInsert =
+export type PaymentTemplateComponentDatabaseInsert =
   Database["public"]["Tables"]["payment_template_components"]["Insert"];
-export type PaymentTemplateComponentsDatabaseUpdate =
+export type PaymentTemplateComponentDatabaseUpdate =
   Database["public"]["Tables"]["payment_template_components"]["Update"];
 
 // Payroll

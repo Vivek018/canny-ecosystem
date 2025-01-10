@@ -57,10 +57,25 @@ export const PaymentFieldOptionsDropdown = ({
     );
   };
 
+  const handleReports = () => {
+    navigate(
+      `/payment-components/payment-fields/${paymentField.id}/reports`,
+    );
+  };
+
   return (
     <DropdownMenu>
       {triggerChild}
       <DropdownMenuContent sideOffset={10} align="end">
+        <DropdownMenuGroup>
+          <DropdownMenuItem
+          onClick={handleReports}>
+            View Report
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+
+        <DropdownMenuSeparator />
+
         <DropdownMenuGroup>
           <DropdownMenuItem
             className={cn(paymentField.is_active && "hidden")}

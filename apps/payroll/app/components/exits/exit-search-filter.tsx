@@ -147,6 +147,8 @@ export function ExitsSearchFilter({
         method: "POST",
       },
     );
+    // if (prompt.split(" ").length > 1) {
+    // } else {
     if (prompt.length) {
       searchParams.set("name", prompt);
       setSearchParams(searchParams);

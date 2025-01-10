@@ -1,4 +1,4 @@
-import { CreateSiteLinkSchema, isGoodStatus } from "@canny_ecosystem/utils";
+import { SiteLinkSchema, isGoodStatus } from "@canny_ecosystem/utils";
 import { parseWithZod } from "@conform-to/zod";
 import { json } from "@remix-run/react";
 import type { ActionFunctionArgs } from "@remix-run/node";
@@ -12,7 +12,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
   const { projectId, siteId } = params;
 
-  const submission = parseWithZod(formData, { schema: CreateSiteLinkSchema });
+  const submission = parseWithZod(formData, { schema: SiteLinkSchema });
 
   if (submission.status !== "success") {
     return json(

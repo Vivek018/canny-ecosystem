@@ -19,8 +19,8 @@ import { statesAndUTs } from "@canny_ecosystem/utils/constant";
 
 type FieldsType = {
   [K in keyof typeof EmployeeAddressesSchema.shape]: FieldMetadata<
-    typeof EmployeeAddressesSchema,
-    typeof EmployeeAddressesSchema,
+    (typeof EmployeeAddressesSchema.shape)[K]["_type"],
+    (typeof EmployeeAddressesSchema.shape)[K],
     string[]
   >;
 };
@@ -62,7 +62,6 @@ export function CreateEmployeeAddress({
             type: "checkbox",
           })}
           labelProps={{
-            htmlFor: fields.is_primary.id,
             children: "Is this your primary address?",
           }}
         />
