@@ -1,6 +1,7 @@
 import {
   ImportEmployeeBankingHeaderSchema,
   ImportEmployeeBankingDataSchema,
+  isGoodStatus,
 } from "@canny_ecosystem/utils";
 
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -20,7 +21,12 @@ import { useIsomorphicLayoutEffect } from "@canny_ecosystem/utils/hooks/isomorph
 
 import { EmployeeBankingImportHeader } from "@/components/employees/import-export/employee-banking-import-header";
 import { EmployeeBankingImportData } from "@/components/employees/import-export/employee-banking-import-data";
-import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import {
+  getAllEmployeeAccountNumbersFromBanking,
+  getEmployeeIdsByEmployeeCodes,
+} from "@canny_ecosystem/supabase/queries";
+import { createEmployeeBankingFromImportedData } from "@canny_ecosystem/supabase/mutations";
+import { safeRedirect } from "@/utils/server/http.server";
 
 export const IMPORT_EMPLOYEE_BANKING = [
   "banking-map-headers",
@@ -37,6 +43,7 @@ const schemas = [
 ];
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  const { supabase } = getSupabaseWithHeaders({ request });
   const url = new URL(request.url);
   const step = Number.parseInt(url.searchParams.get(STEP) || "1");
   const totalSteps = schemas.length;
@@ -56,7 +63,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return redirect(url.toString(), { status: 302 });
   }
 
-  return json({ step, totalSteps, stepData });
+  const { data, error } = await getAllEmployeeAccountNumbersFromBanking({
+    supabase,
+  });
+  if (error) {
+    console.error(error);
+  }
+
+  return json({ step, totalSteps, stepData, allAccountNumber: data });
   // return json({ step, totalSteps, stepData }, { headers });
 }
 
@@ -80,29 +94,57 @@ export async function action({ request }: ActionFunctionArgs) {
     const parsedData = ImportEmployeeBankingDataSchema.safeParse(
       JSON.parse(formData.get("stringified_data") as string)
     );
-    console.log("========>", parsedData.error);
+    const import_type = formData.get("import_type");
+
+   
     if (parsedData.success) {
       const importedData = parsedData.data?.data;
 
-      const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+      const employeeCodes = importedData!.map((value) => value.employee_code);
+      const { data: employees, error } = await getEmployeeIdsByEmployeeCodes({
+        supabase,
+        employeeCodes,
+      });
 
-      const updatedData = importedData.map((entry) => ({
-        ...entry,
-        company_id: companyId,
-      }));
+      if (error) {
+        throw error;
+      }
 
-      console.log("bankingData", updatedData);
+      const updatedData = importedData!.map((item: any) => {
+        const employeeId = employees?.find(
+          (e) => e.employee_code === item.employee_code
+        )?.id;
 
-      // const { status, error: dataEntryError } =
-      //   await createReimbursementsFromImportedData({
-      //     supabase,
-      //     data: updatedData,
-      //   });
-      // if (isGoodStatus(status))
-      //   return safeRedirect("/approvals/reimbursements", { status: 303 });
-      // if (dataEntryError) {
-      //   throw error;
-      // }
+        const { employee_code, ...rest } = item;
+        return {
+          ...rest,
+          ...(employeeId ? { employee_id: employeeId } : {}),
+        };
+      });
+
+      const { error: importError, status } =
+        await createEmployeeBankingFromImportedData({
+          supabase,
+          data: updatedData,
+          import_type: import_type as string,
+        });
+     
+
+      if (
+        status === "No new data to insert" ||
+        isGoodStatus(status as string)
+      ) {
+        return safeRedirect("/employees", { status: 303 });
+      }
+      if (
+        status === "Data processed successfully" ||
+        isGoodStatus(status as string)
+      ) {
+        return safeRedirect("/employees", { status: 303 });
+      }
+      if (importError) {
+        throw importError;
+      }
     }
   } else if (action === "next" || action === "back" || action === "skip") {
     if (action === "next") {
@@ -136,7 +178,8 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function EmployeeBankingImportFieldMapping() {
-  const { step, totalSteps, stepData } = useLoaderData<typeof loader>();
+  const { step, totalSteps, stepData, allAccountNumber } =
+    useLoaderData<typeof loader>();
   const stepOneData = stepData[0];
 
   const [resetKey, setResetKey] = useState(Date.now());
@@ -192,6 +235,7 @@ export default function EmployeeBankingImportFieldMapping() {
                 <EmployeeBankingImportData
                   fieldMapping={stepOneData}
                   file={file}
+                  allAccountNumber={allAccountNumber}
                 />
               ) : null}
             </div>

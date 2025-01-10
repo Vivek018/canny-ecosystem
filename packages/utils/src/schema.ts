@@ -729,6 +729,8 @@ export const ImportReimbursementDataSchema = z.object({
   data: z.array(ImportSingleReimbursementDataSchema),
 });
 
+export const duplicationTypeArray = ["overwrite", "skip"] as const;
+
 export const ImportEmployeePersonalsHeaderSchemaObject = z.object({
   employee_code: z.string(),
   first_name: z.string(),

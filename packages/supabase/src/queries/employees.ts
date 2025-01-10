@@ -759,3 +759,71 @@ export type ImportEmployeeGuardiansDataType = Pick<
 > & {
   employee_code: EmployeeDatabaseRow["employee_code"];
 };
+
+export async function getAllEmployeeAccountNumbersFromBanking({
+  supabase,
+}: {
+  supabase: TypedSupabaseClient;
+}) {
+  const { data, error } = await supabase
+    .from("employee_bank_details")
+    .select("account_number");
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { data, error };
+}
+
+export async function getAllEmployeeNonDuplicatingDetailsFromPersonals({
+  supabase,
+}: {
+  supabase: TypedSupabaseClient;
+}) {
+  const { data, error } = await supabase
+    .from("employees")
+    .select(
+      "employee_code,primary_mobile_number,secondary_mobile_number,personal_email"
+    );
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { data, error };
+}
+
+export async function getAllEmployeeNonDuplicatingDetailsFromStatutory({
+  supabase,
+}: {
+  supabase: TypedSupabaseClient;
+}) {
+  const { data, error } = await supabase
+    .from("employee_statutory_details")
+    .select(
+      "aadhaar_number,pan_number,uan_number,pf_number,esic_number,driving_license_number,passport_number"
+    );
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { data, error };
+}
+
+export async function getAllEmployeeNonDuplicatingDetailsFromGuardians({
+  supabase,
+}: {
+  supabase: TypedSupabaseClient;
+}) {
+  const { data, error } = await supabase
+    .from("employee_guardians")
+    .select("mobile_number,alternate_mobile_number,email");
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { data, error };
+}

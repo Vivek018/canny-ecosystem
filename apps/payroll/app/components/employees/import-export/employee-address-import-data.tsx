@@ -10,41 +10,46 @@ import { useState, useEffect } from "react";
 export function EmployeeAddressImportData({
   fieldMapping,
   file,
+
 }: {
   fieldMapping: Record<string, string>;
   file: any;
+  
 }) {
   const { importData, setImportData } = useImportStoreForEmployeeAddress();
-
+  
   const swappedFieldMapping = Object.fromEntries(
     Object.entries(fieldMapping).map(([key, value]) => [value, key])
   );
 
   useEffect(() => {
-      if (file) {
-        Papa.parse(file, {
-          header: true,
-          skipEmptyLines: true,
-          transformHeader: (header) => {
-            return swappedFieldMapping[header] || header;
-          },
-          complete: (results) => {
-            const finalTableData = results.data.filter((entry) =>
-              Object.values(entry!).filter((value) => String(value).trim()?.length)
-            );
-  
-            setImportData({
-              data: finalTableData as ImportEmployeeAddressDataType[],
-            });
-          },
-          error: (error) => {
-            console.error("Parsing error: ", error);
-          },
-        });
-      }
-    }, [file, fieldMapping]);
+    if (file) {
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        transformHeader: (header) => {
+          return swappedFieldMapping[header] || header;
+        },
+        complete: (results) => {
+          const finalTableData = results.data.filter((entry) =>
+            Object.values(entry!).some((value) => String(value).trim() !== "")
+          );
+
+          setImportData({
+            data: finalTableData as ImportEmployeeAddressDataType[],
+          });
+        },
+        error: (error) => {
+          console.error("Parsing error: ", error);
+        },
+      });
+    }
+  }, [file, fieldMapping]);
+
+ 
 
   const [searchString, setSearchString] = useState("");
+
   const [tableData, setTableData] = useState(importData.data);
 
   useEffect(() => {
@@ -77,14 +82,20 @@ export function EmployeeAddressImportData({
               className="pl-8 h-10 w-full focus-visible:ring-0"
             />
           </div>
+          
         </div>
       </div>
+    
       <input
         name="stringified_data"
         type="hidden"
         value={JSON.stringify(importData)}
       />
-      <ImportedDataTable data={tableData} columns={ImportedDataColumns} />
+      <ImportedDataTable
+        data={tableData}
+        columns={ImportedDataColumns}
+        
+      />
     </section>
   );
 }

@@ -90,6 +90,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
       const employeeCodes = importedData!.map((value) => value.employee_code);
 
+
       const { data: employees, error } = await getEmployeeIdsByEmployeeCodes({
         supabase,
         employeeCodes,

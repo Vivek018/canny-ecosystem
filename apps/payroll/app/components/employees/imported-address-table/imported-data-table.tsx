@@ -49,7 +49,9 @@ export function ImportedDataTable<TData, TValue>({
                 table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
-                    className="relative h-[40px] md:h-[45px] cursor-default select-text"
+                    className={cn(
+                      "relative h-[40px] md:h-[45px] cursor-default select-text"
+                    )}
                   >
                     {row.getVisibleCells().map((cell) => {
                       return (

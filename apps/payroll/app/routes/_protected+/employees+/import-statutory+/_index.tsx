@@ -1,6 +1,7 @@
 import {
   ImportEmployeeStatutoryHeaderSchema,
   ImportEmployeeStatutoryDataSchema,
+  isGoodStatus,
 } from "@canny_ecosystem/utils";
 
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -20,7 +21,14 @@ import { useIsomorphicLayoutEffect } from "@canny_ecosystem/utils/hooks/isomorph
 
 import { EmployeeStatutoryImportHeader } from "@/components/employees/import-export/employee-statutory-import-header";
 import { EmployeeStatutoryImportData } from "@/components/employees/import-export/employee-statutory-import-data";
-import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import {
+  getAllEmployeeNonDuplicatingDetailsFromStatutory,
+  getEmployeeIdsByEmployeeCodes,
+} from "@canny_ecosystem/supabase/queries";
+import { safeRedirect } from "@/utils/server/http.server";
+import {
+  createEmployeeStatutoryFromImportedData,
+} from "@canny_ecosystem/supabase/mutations";
 
 export const IMPORT_EMPLOYEE_STATUTORY = [
   "statutory-map-headers",
@@ -37,6 +45,7 @@ const schemas = [
 ];
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  const { supabase } = getSupabaseWithHeaders({ request });
   const url = new URL(request.url);
   const step = Number.parseInt(url.searchParams.get(STEP) || "1");
   const totalSteps = schemas.length;
@@ -55,8 +64,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
     url.searchParams.set(STEP, "1");
     return redirect(url.toString(), { status: 302 });
   }
+  const { data, error } =
+    await getAllEmployeeNonDuplicatingDetailsFromStatutory({
+      supabase,
+    });
+  if (error) {
+    console.error(error);
+  }
 
-  return json({ step, totalSteps, stepData });
+  return json({ step, totalSteps, stepData, allNonDuplicants: data });
   // return json({ step, totalSteps, stepData }, { headers });
 }
 
@@ -80,30 +96,56 @@ export async function action({ request }: ActionFunctionArgs) {
     const parsedData = ImportEmployeeStatutoryDataSchema.safeParse(
       JSON.parse(formData.get("stringified_data") as string)
     );
-    console.log("========>", parsedData.error);
+    const import_type = formData.get("import_type");
+
 
     if (parsedData.success) {
       const importedData = parsedData.data?.data;
+      const employeeCodes = importedData!.map((value) => value.employee_code);
+      const { data: employees, error } = await getEmployeeIdsByEmployeeCodes({
+        supabase,
+        employeeCodes,
+      });
 
-      const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+      if (error) {
+        throw error;
+      }
 
-      const updatedData = importedData.map((entry) => ({
-        ...entry,
-        company_id: companyId,
-      }));
+      const updatedData = importedData!.map((item: any) => {
+        const employeeId = employees?.find(
+          (e) => e.employee_code === item.employee_code
+        )?.id;
 
-      console.log("statutoryData:", updatedData);
+        const { employee_code, ...rest } = item;
+        return {
+          ...rest,
+          ...(employeeId ? { employee_id: employeeId } : {}),
+        };
+      });
 
-      // const { status, error: dataEntryError } =
-      //   await createReimbursementsFromImportedData({
-      //     supabase,
-      //     data: updatedData,
-      //   });
-      // if (isGoodStatus(status))
-      //   return safeRedirect("/approvals/reimbursements", { status: 303 });
-      // if (dataEntryError) {
-      //   throw error;
-      // }
+      const { error: importError, status } =
+        await createEmployeeStatutoryFromImportedData({
+          supabase,
+          data: updatedData,
+          import_type: import_type as string,
+        });
+    
+
+      if (
+        status === "No new data to insert" ||
+        isGoodStatus(status as string)
+      ) {
+        return safeRedirect("/employees", { status: 303 });
+      }
+      if (
+        status === "Data processed successfully" ||
+        isGoodStatus(status as string)
+      ) {
+        return safeRedirect("/employees", { status: 303 });
+      }
+      if (importError) {
+        throw importError;
+      }
     }
   } else if (action === "next" || action === "back" || action === "skip") {
     if (action === "next") {
@@ -137,7 +179,8 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function EmployeeStatutoryImportFieldMapping() {
-  const { step, totalSteps, stepData } = useLoaderData<typeof loader>();
+  const { step, totalSteps, stepData, allNonDuplicants } =
+    useLoaderData<typeof loader>();
   const stepOneData = stepData[0];
 
   const [resetKey, setResetKey] = useState(Date.now());
@@ -193,6 +236,7 @@ export default function EmployeeStatutoryImportFieldMapping() {
                 <EmployeeStatutoryImportData
                   fieldMapping={stepOneData}
                   file={file}
+                  allNonDuplicants={allNonDuplicants}
                 />
               ) : null}
             </div>

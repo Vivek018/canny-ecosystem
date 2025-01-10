@@ -16,11 +16,13 @@ import { ImportedDataTableHeader } from "./imported-data-table-headers";
 interface ImportedDataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  conflictingIndex: number[];
 }
 
 export function ImportedDataTable<TData, TValue>({
   columns,
   data,
+  conflictingIndex,
 }: ImportedDataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -46,30 +48,36 @@ export function ImportedDataTable<TData, TValue>({
             />
             <TableBody>
               {tableLength ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    className="relative h-[40px] md:h-[45px] cursor-default select-text"
-                  >
-                    {row.getVisibleCells().map((cell) => {
-                      return (
-                        <TableCell
-                          key={cell.id}
-                          className={cn(
-                            "h-[60px] px-3 md:px-4 py-2 hidden md:table-cell",
-                            cell.column.id === "actions" &&
-                              "sticky right-0 min-w-20 max-w-20 bg-card z-10"
-                          )}
-                        >
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                ))
+                table.getRowModel().rows.map((row, index) => {
+                  const isConflicting = conflictingIndex.includes(index);
+                  return (
+                    <TableRow
+                      key={row.id}
+                      className={cn(
+                        "relative h-[40px] md:h-[45px] cursor-default select-text",
+                        isConflicting && "bg-destructive/20"
+                      )}
+                    >
+                      {row.getVisibleCells().map((cell) => {
+                        return (
+                          <TableCell
+                            key={cell.id}
+                            className={cn(
+                              "h-[60px] px-3 md:px-4 py-2 hidden md:table-cell",
+                              cell.column.id === "actions" &&
+                                "sticky right-0 min-w-20 max-w-20 bg-card z-10"
+                            )}
+                          >
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </TableCell>
+                        );
+                      })}
+                    </TableRow>
+                  );
+                })
               ) : (
                 <TableRow className={cn(!tableLength && "border-none")}>
                   <TableCell

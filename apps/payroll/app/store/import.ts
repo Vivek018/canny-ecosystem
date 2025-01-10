@@ -19,7 +19,6 @@ export const useImportStoreForReimbursement =
     setImportData: (importData) => set({ importData }),
   }));
 
-
 type ImportStateForEmployeePersonals = {
   importData: { data: ImportEmployeePersonalsDataType[] };
   setImportData: (importData: {
@@ -32,7 +31,6 @@ export const useImportStoreForEmployeePersonals =
     importData: { data: [] },
     setImportData: (importData) => set({ importData }),
   }));
-
 
 type ImportStateForEmployeeStatutory = {
   importData: { data: ImportEmployeeStatutoryDataType[] };
@@ -47,7 +45,6 @@ export const useImportStoreForEmployeeStatutory =
     setImportData: (importData) => set({ importData }),
   }));
 
-
 type ImportStateForEmployeeForBanking = {
   importData: { data: ImportEmployeeBankingDataType[] };
   setImportData: (importData: {
@@ -60,7 +57,6 @@ export const useImportStoreForEmployeeBanking =
     importData: { data: [] },
     setImportData: (importData) => set({ importData }),
   }));
-
 
 type ImportStateForEmployeeForAddress = {
   importData: { data: ImportEmployeeAddressDataType[] };
@@ -75,7 +71,6 @@ export const useImportStoreForEmployeeAddress =
     setImportData: (importData) => set({ importData }),
   }));
 
-  
 type ImportStateForEmployeeForGuardians = {
   importData: { data: ImportEmployeeGuardiansDataType[] };
   setImportData: (importData: {
@@ -88,6 +83,3 @@ export const useImportStoreForEmployeeGuardians =
     importData: { data: [] },
     setImportData: (importData) => set({ importData }),
   }));
-
-
-  

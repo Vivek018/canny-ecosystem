@@ -2,49 +2,82 @@ import { ImportedDataColumns } from "@/components/employees/imported-personals-t
 import { ImportedDataTable } from "@/components/employees/imported-personals-table/imported-data-table";
 import { useImportStoreForEmployeePersonals } from "@/store/import";
 import type { ImportEmployeePersonalsDataType } from "@canny_ecosystem/supabase/queries";
+import { Combobox } from "@canny_ecosystem/ui/combobox";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
+import {
+  duplicationTypeArray,
+  transformStringArrayIntoOptions,
+} from "@canny_ecosystem/utils";
 import Papa from "papaparse";
 import { useState, useEffect } from "react";
 
 export function EmployeePersonalsImportData({
   fieldMapping,
   file,
+  allNonDuplicants,
 }: {
   fieldMapping: Record<string, string>;
   file: any;
+  allNonDuplicants: any;
 }) {
   const { importData, setImportData } = useImportStoreForEmployeePersonals();
-
+  const [conflictingIndices, setConflictingIndices] = useState<number[]>([]);
   const swappedFieldMapping = Object.fromEntries(
     Object.entries(fieldMapping).map(([key, value]) => [value, key])
   );
 
   useEffect(() => {
-      if (file) {
-        Papa.parse(file, {
-          header: true,
-          skipEmptyLines: true,
-          transformHeader: (header) => {
-            return swappedFieldMapping[header] || header;
-          },
-          complete: (results) => {
-            const finalTableData = results.data.filter((entry) =>
-              Object.values(entry!).filter((value) => String(value).trim()?.length)
-            );
-  
-            setImportData({
-              data: finalTableData as ImportEmployeePersonalsDataType[],
-            });
-          },
-          error: (error) => {
-            console.error("Parsing error: ", error);
-          },
-        });
+    if (file) {
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        transformHeader: (header) => {
+          return swappedFieldMapping[header] || header;
+        },
+        complete: (results) => {
+          const finalTableData = results.data.filter((entry) =>
+            Object.values(entry!).some((value) => String(value).trim() !== "")
+          );
+
+          setImportData({
+            data: finalTableData as ImportEmployeePersonalsDataType[],
+          });
+        },
+        error: (error) => {
+          console.error("Parsing error: ", error);
+        },
+      });
+    }
+  }, [file, fieldMapping]);
+
+  useEffect(() => {
+    const conflicts: number[] = [];
+
+    importData.data.forEach((entry, index) => {
+      const normalize = (value: any) => String(value).trim().toLowerCase();
+      const isConflict = allNonDuplicants.some(
+        (existing: any) =>
+          normalize(existing.employee_code) ===
+            normalize(entry.employee_code) ||
+          normalize(existing.primary_mobile_number) ===
+            normalize(entry.primary_mobile_number) ||
+          normalize(existing.secondary_mobile_number) ===
+            normalize(entry.secondary_mobile_number) ||
+          normalize(existing.personal_email) === normalize(entry.personal_email)
+      );
+
+      if (isConflict) {
+        conflicts.push(index);
       }
-    }, [file, fieldMapping]);
+    });
+
+    setConflictingIndices(conflicts);
+  }, [importData, allNonDuplicants]);
 
   const [searchString, setSearchString] = useState("");
+  const [importType, setImportType] = useState<string>("skip");
   const [tableData, setTableData] = useState(importData.data);
 
   useEffect(() => {
@@ -77,14 +110,33 @@ export function EmployeePersonalsImportData({
               className="pl-8 h-10 w-full focus-visible:ring-0"
             />
           </div>
+          <Combobox
+            className={cn(
+              "w-52 h-10",
+              conflictingIndices.length > 0 ? "flex" : "hidden"
+            )}
+            options={transformStringArrayIntoOptions(
+              duplicationTypeArray as unknown as string[]
+            )}
+            value={importType}
+            onChange={(value: string) => {
+              setImportType(value);
+            }}
+            placeholder={"Select Import Type"}
+          />
         </div>
       </div>
+      <input type="hidden" name="import_type" value={importType} />
       <input
         name="stringified_data"
         type="hidden"
         value={JSON.stringify(importData)}
       />
-      <ImportedDataTable data={tableData} columns={ImportedDataColumns} />
+      <ImportedDataTable
+        data={tableData}
+        columns={ImportedDataColumns}
+        conflictingIndex={conflictingIndices}
+      />
     </section>
   );
 }

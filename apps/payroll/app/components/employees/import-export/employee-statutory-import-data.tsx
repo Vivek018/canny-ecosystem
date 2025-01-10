@@ -2,20 +2,28 @@ import { ImportedDataColumns } from "@/components/employees/imported-statutory-t
 import { ImportedDataTable } from "@/components/employees/imported-statutory-table/imported-data-table";
 import { useImportStoreForEmployeeStatutory } from "@/store/import";
 import type { ImportEmployeeStatutoryDataType } from "@canny_ecosystem/supabase/queries";
+import { Combobox } from "@canny_ecosystem/ui/combobox";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
+import {
+  duplicationTypeArray,
+  transformStringArrayIntoOptions,
+} from "@canny_ecosystem/utils";
 import Papa from "papaparse";
 import { useState, useEffect } from "react";
 
 export function EmployeeStatutoryImportData({
   fieldMapping,
   file,
+  allNonDuplicants,
 }: {
   fieldMapping: Record<string, string>;
   file: any;
+  allNonDuplicants: any;
 }) {
   const { importData, setImportData } = useImportStoreForEmployeeStatutory();
-
+  const [conflictingIndices, setConflictingIndices] = useState<number[]>([]);
   const swappedFieldMapping = Object.fromEntries(
     Object.entries(fieldMapping).map(([key, value]) => [value, key])
   );
@@ -30,9 +38,7 @@ export function EmployeeStatutoryImportData({
         },
         complete: (results) => {
           const finalTableData = results.data.filter((entry) =>
-            Object.values(entry!).filter(
-              (value) => String(value).trim()?.length
-            )
+            Object.values(entry!).some((value) => String(value).trim() !== "")
           );
 
           setImportData({
@@ -46,7 +52,35 @@ export function EmployeeStatutoryImportData({
     }
   }, [file, fieldMapping]);
 
+  useEffect(() => {
+    const conflicts: number[] = [];
+
+    importData.data.forEach((entry, index) => {
+      const normalize = (value: any) => String(value).trim().toLowerCase();
+      const isConflict = allNonDuplicants.some(
+        (existing: any) =>
+          normalize(existing.aadhaar_number) ===
+            normalize(entry.aadhaar_number) ||
+          normalize(existing.pan_number) === normalize(entry.pan_number) ||
+          normalize(existing.uan_number) === normalize(entry.uan_number) ||
+          normalize(existing.pf_number) === normalize(entry.pf_number) ||
+          normalize(existing.esic_number) === normalize(entry.esic_number) ||
+          normalize(existing.driving_license_number) ===
+            normalize(entry.pf_number) ||
+          normalize(existing.passport_number) ===
+            normalize(entry.passport_number)
+      );
+
+      if (isConflict) {
+        conflicts.push(index);
+      }
+    });
+
+    setConflictingIndices(conflicts);
+  }, [importData, allNonDuplicants]);
+
   const [searchString, setSearchString] = useState("");
+  const [importType, setImportType] = useState<string>("skip");
   const [tableData, setTableData] = useState(importData.data);
 
   useEffect(() => {
@@ -79,14 +113,30 @@ export function EmployeeStatutoryImportData({
               className="pl-8 h-10 w-full focus-visible:ring-0"
             />
           </div>
+          <Combobox
+            className={cn("w-52 h-10")}
+            options={transformStringArrayIntoOptions(
+              duplicationTypeArray as unknown as string[]
+            )}
+            value={importType}
+            onChange={(value: string) => {
+              setImportType(value);
+            }}
+            placeholder={"Select Import Type"}
+          />
         </div>
       </div>
+      <input type="hidden" name="import_type" value={importType} />
       <input
         name="stringified_data"
         type="hidden"
         value={JSON.stringify(importData)}
       />
-      <ImportedDataTable data={tableData} columns={ImportedDataColumns} />
+      <ImportedDataTable
+        data={tableData}
+        columns={ImportedDataColumns}
+        conflictingIndex={conflictingIndices}
+      />
     </section>
   );
 }

@@ -1,6 +1,7 @@
 import {
   ImportEmployeeAddressHeaderSchema,
   ImportEmployeeAddressDataSchema,
+  isGoodStatus,
 } from "@canny_ecosystem/utils";
 
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -20,7 +21,11 @@ import { useIsomorphicLayoutEffect } from "@canny_ecosystem/utils/hooks/isomorph
 
 import { EmployeeAddressImportHeader } from "@/components/employees/import-export/employee-address-import-header";
 import { EmployeeAddressImportData } from "@/components/employees/import-export/employee-address-import-data";
-import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import { getEmployeeIdsByEmployeeCodes } from "@canny_ecosystem/supabase/queries";
+import { safeRedirect } from "@/utils/server/http.server";
+import {
+  createEmployeeAddressFromImportedData,
+} from "@canny_ecosystem/supabase/mutations";
 
 export const IMPORT_EMPLOYEE_ADDRESS = [
   "address-map-headers",
@@ -80,29 +85,42 @@ export async function action({ request }: ActionFunctionArgs) {
     const parsedData = ImportEmployeeAddressDataSchema.safeParse(
       JSON.parse(formData.get("stringified_data") as string)
     );
-    console.log("========>", parsedData.error);
     if (parsedData.success) {
       const importedData = parsedData.data?.data;
 
-      const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+      const employeeCodes = importedData!.map((value) => value.employee_code);
+      const { data: employees, error } = await getEmployeeIdsByEmployeeCodes({
+        supabase,
+        employeeCodes,
+      });
 
-      const updatedData = importedData.map((entry) => ({
-        ...entry,
-        company_id: companyId,
-      }));
+      if (error) {
+        throw error;
+      }
 
-      console.log("addressData:", updatedData);
+      const updatedData = importedData!.map((item: any) => {
+        const employeeId = employees?.find(
+          (e: any) => e.employee_code === item.employee_code
+        )?.id;
 
-      // const { status, error: dataEntryError } =
-      //   await createReimbursementsFromImportedData({
-      //     supabase,
-      //     data: updatedData,
-      //   });
-      // if (isGoodStatus(status))
-      //   return safeRedirect("/approvals/reimbursements", { status: 303 });
-      // if (dataEntryError) {
-      //   throw error;
-      // }
+        const { employee_code, ...rest } = item;
+        return {
+          ...rest,
+          ...(employeeId ? { employee_id: employeeId } : {}),
+        };
+      });
+    
+
+      const { status, error: dataEntryError } =
+        await createEmployeeAddressFromImportedData({
+          supabase,
+          data: updatedData,
+        });
+      if (isGoodStatus(status))
+        return safeRedirect("/employees", { status: 303 });
+      if (dataEntryError) {
+        throw error;
+      }
     }
   } else if (action === "next" || action === "back" || action === "skip") {
     if (action === "next") {

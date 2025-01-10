@@ -1,6 +1,7 @@
 import {
   ImportEmployeePersonalsHeaderSchema,
   ImportEmployeePersonalsDataSchema,
+  isGoodStatus,
 } from "@canny_ecosystem/utils";
 
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -21,6 +22,10 @@ import { useIsomorphicLayoutEffect } from "@canny_ecosystem/utils/hooks/isomorph
 import { EmployeePersonalsImportHeader } from "@/components/employees/import-export/employee-personals-import-header";
 import { EmployeePersonalsImportData } from "@/components/employees/import-export/employee-personals-import-data";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import { getAllEmployeeNonDuplicatingDetailsFromPersonals } from "@canny_ecosystem/supabase/queries";
+import { createEmployeePersonalsFromImportedData } from "@canny_ecosystem/supabase/mutations";
+import { safeRedirect } from "@/utils/server/http.server";
+import { EmployeeDatabaseInsert } from "@canny_ecosystem/supabase/types";
 
 export const IMPORT_EMPLOYEE_PERSONALS = [
   "personals-map-headers",
@@ -37,6 +42,7 @@ const schemas = [
 ];
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  const { supabase } = getSupabaseWithHeaders({ request });
   const url = new URL(request.url);
   const step = Number.parseInt(url.searchParams.get(STEP) || "1");
   const totalSteps = schemas.length;
@@ -55,8 +61,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
     url.searchParams.set(STEP, "1");
     return redirect(url.toString(), { status: 302 });
   }
-
-  return json({ step, totalSteps, stepData });
+  const { data, error } =
+    await getAllEmployeeNonDuplicatingDetailsFromPersonals({
+      supabase,
+    });
+  if (error) {
+    console.error(error);
+  }
+  return json({ step, totalSteps, stepData, allNonDuplicants: data });
   // return json({ step, totalSteps, stepData }, { headers });
 }
 
@@ -80,7 +92,9 @@ export async function action({ request }: ActionFunctionArgs) {
     const parsedData = ImportEmployeePersonalsDataSchema.safeParse(
       JSON.parse(formData.get("stringified_data") as string)
     );
-    console.log("========>", parsedData.error);
+    const import_type = formData.get("import_type");
+
+   
     if (parsedData.success) {
       const importedData = parsedData.data?.data;
 
@@ -91,18 +105,29 @@ export async function action({ request }: ActionFunctionArgs) {
         company_id: companyId,
       }));
 
-      console.log("personalsData", updatedData);
+      const { error: importError, status } =
+        await createEmployeePersonalsFromImportedData({
+          supabase,
+          data: updatedData,
+          import_type: import_type as string,
+        });
 
-      // const { status, error: dataEntryError } =
-      //   await createReimbursementsFromImportedData({
-      //     supabase,
-      //     data: updatedData,
-      //   });
-      // if (isGoodStatus(status))
-      //   return safeRedirect("/approvals/reimbursements", { status: 303 });
-      // if (dataEntryError) {
-      //   throw error;
-      // }
+
+      if (
+        status === "No new data to insert" ||
+        isGoodStatus(status as string)
+      ) {
+        return safeRedirect("/employees", { status: 303 });
+      }
+      if (
+        status === "Data processed successfully" ||
+        isGoodStatus(status as string)
+      ) {
+        return safeRedirect("/employees", { status: 303 });
+      }
+      if (importError) {
+        throw importError;
+      }
     }
   } else if (action === "next" || action === "back" || action === "skip") {
     if (action === "next") {
@@ -136,7 +161,8 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function EmployeePersonalsImportFieldMapping() {
-  const { step, totalSteps, stepData } = useLoaderData<typeof loader>();
+  const { step, totalSteps, stepData, allNonDuplicants } =
+    useLoaderData<typeof loader>();
   const stepOneData = stepData[0];
 
   const [resetKey, setResetKey] = useState(Date.now());
@@ -192,6 +218,7 @@ export default function EmployeePersonalsImportFieldMapping() {
                 <EmployeePersonalsImportData
                   fieldMapping={stepOneData}
                   file={file}
+                  allNonDuplicants={allNonDuplicants}
                 />
               ) : null}
             </div>

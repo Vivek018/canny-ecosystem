@@ -2,20 +2,28 @@ import { ImportedDataColumns } from "@/components/employees/imported-guardians-t
 import { ImportedDataTable } from "@/components/employees/imported-guardians-table/imported-data-table";
 import { useImportStoreForEmployeeGuardians } from "@/store/import";
 import type { ImportEmployeeGuardiansDataType } from "@canny_ecosystem/supabase/queries";
+import { Combobox } from "@canny_ecosystem/ui/combobox";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
+import {
+  duplicationTypeArray,
+  transformStringArrayIntoOptions,
+} from "@canny_ecosystem/utils";
 import Papa from "papaparse";
 import { useState, useEffect } from "react";
 
 export function EmployeeGuardiansImportData({
   fieldMapping,
   file,
+  allNonDuplicants,
 }: {
   fieldMapping: Record<string, string>;
   file: any;
+  allNonDuplicants: any;
 }) {
   const { importData, setImportData } = useImportStoreForEmployeeGuardians();
-
+  const [conflictingIndices, setConflictingIndices] = useState<number[]>([]);
   const swappedFieldMapping = Object.fromEntries(
     Object.entries(fieldMapping).map(([key, value]) => [value, key])
   );
@@ -30,7 +38,7 @@ export function EmployeeGuardiansImportData({
         },
         complete: (results) => {
           const finalTableData = results.data.filter((entry) =>
-            Object.values(entry!).filter((value) => String(value).trim()?.length)
+            Object.values(entry!).some((value) => String(value).trim() !== "")
           );
 
           setImportData({
@@ -44,7 +52,30 @@ export function EmployeeGuardiansImportData({
     }
   }, [file, fieldMapping]);
 
+  useEffect(() => {
+    const conflicts: number[] = [];
+
+    importData.data.forEach((entry, index) => {
+      const normalize = (value: any) => String(value).trim().toLowerCase();
+      const isConflict = allNonDuplicants.some(
+        (existing: any) =>
+          normalize(existing.mobile_number) ===
+            normalize(entry.mobile_number) ||
+          normalize(existing.alternate_mobile_number) ===
+            normalize(entry.alternate_mobile_number) ||
+          normalize(existing.email) === normalize(entry.email)
+      );
+
+      if (isConflict) {
+        conflicts.push(index);
+      }
+    });
+
+    setConflictingIndices(conflicts);
+  }, [importData, allNonDuplicants]);
+
   const [searchString, setSearchString] = useState("");
+  const [importType, setImportType] = useState<string>("skip");
   const [tableData, setTableData] = useState(importData.data);
 
   useEffect(() => {
@@ -77,14 +108,33 @@ export function EmployeeGuardiansImportData({
               className="pl-8 h-10 w-full focus-visible:ring-0"
             />
           </div>
+          <Combobox
+            className={cn(
+              "w-52 h-10",
+              conflictingIndices.length > 0 ? "flex" : "hidden"
+            )}
+            options={transformStringArrayIntoOptions(
+              duplicationTypeArray as unknown as string[]
+            )}
+            value={importType}
+            onChange={(value: string) => {
+              setImportType(value);
+            }}
+            placeholder={"Select Import Type"}
+          />
         </div>
       </div>
+      <input type="hidden" name="import_type" value={importType} />
       <input
         name="stringified_data"
         type="hidden"
         value={JSON.stringify(importData)}
       />
-      <ImportedDataTable data={tableData} columns={ImportedDataColumns} />
+      <ImportedDataTable
+        data={tableData}
+        columns={ImportedDataColumns}
+        conflictingIndex={conflictingIndices}
+      />
     </section>
   );
 }
