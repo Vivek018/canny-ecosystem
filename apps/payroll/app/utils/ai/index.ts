@@ -12,7 +12,7 @@ export async function AIChat4o({
   temperature?: number | null | undefined;
 }) {
   const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
+    model: "gpt-4o-mini-2024-07-18",
     messages: messages,
     temperature: temperature ?? 0.1,
   });

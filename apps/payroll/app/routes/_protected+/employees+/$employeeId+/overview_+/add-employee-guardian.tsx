@@ -2,20 +2,20 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Form, json, useActionData, useNavigate } from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { createEmployeeAddresses } from "@canny_ecosystem/supabase/mutations";
+import { createEmployeeGuardians } from "@canny_ecosystem/supabase/mutations";
 import {
   isGoodStatus,
-  EmployeeAddressesSchema,
+  EmployeeGuardiansSchema,
   getInitialValueFromZod,
 } from "@canny_ecosystem/utils";
-import { CreateEmployeeAddress } from "@/components/employees/form/create-employee-address";
+import { CreateEmployeeGuardianDetails } from "@/components/employees/form/create-employee-guardian-details";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
 import { Card } from "@canny_ecosystem/ui/card";
 import { useEffect, useState } from "react";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 
-export const ADD_EMPLOYEE_ADDRESS = "add-employee-address";
+export const ADD_EMPLOYEE_GUARDIAN = "update-employee-guardian";
 
 export async function action({
   request,
@@ -28,15 +28,18 @@ export async function action({
     const formData = await request.formData();
 
     if (!employeeId) {
-      return json({
-        status: "error",
-        message: "Invalid employee id",
-        returnTo: "/employees",
-      });
+      return json(
+        {
+          status: "error",
+          message: "Invalid employee id",
+          returnTo: "/employees",
+        },
+        { status: 400 },
+      );
     }
 
     const submission = parseWithZod(formData, {
-      schema: EmployeeAddressesSchema,
+      schema: EmployeeGuardiansSchema,
     });
 
     if (submission.status !== "success") {
@@ -46,7 +49,7 @@ export async function action({
       );
     }
 
-    const { status, error } = await createEmployeeAddresses({
+    const { status, error } = await createEmployeeGuardians({
       supabase,
       data: { ...submission.value, employee_id: employeeId },
     });
@@ -54,29 +57,38 @@ export async function action({
     if (isGoodStatus(status)) {
       return json({
         status: "success",
-        message: "Address added successfully",
+        message: "Guardian added successfully",
         error: null,
         returnTo: `/employees/${employeeId}`,
       });
     }
-    return json({ status, error });
+    return json(
+      {
+        status: "error",
+        message: "Failed to add guardian",
+        error,
+        returnTo: `/employees/${employeeId}`,
+      },
+      { status: 500 },
+    );
   } catch (error) {
     return json({
       status: "error",
-      message: "An unexpected error occurred",
+      message: "Failed to add guardian",
       error,
+      returnTo: `/employees/${employeeId}`,
     });
   }
 }
 
-export default function AddEmployeeAddress() {
+export default function AddEmployeeGuardian() {
   const [resetKey, setResetKey] = useState(Date.now());
-  const currentSchema = EmployeeAddressesSchema;
+  const currentSchema = EmployeeGuardiansSchema;
 
   const initialValues = getInitialValueFromZod(currentSchema);
 
   const [form, fields] = useForm({
-    id: ADD_EMPLOYEE_ADDRESS,
+    id: ADD_EMPLOYEE_GUARDIAN,
     constraint: getZodConstraint(currentSchema),
     onValidate: ({ formData }: { formData: FormData }) => {
       return parseWithZod(formData, { schema: currentSchema });
@@ -95,13 +107,13 @@ export default function AddEmployeeAddress() {
       if (actionData?.status === "success") {
         toast({
           title: "Success",
-          description: actionData?.message || "Address added",
+          description: actionData?.message,
           variant: "success",
         });
       } else {
         toast({
           title: "Error",
-          description: actionData?.error?.message || "Address add failed",
+          description: actionData?.message,
           variant: "destructive",
         });
       }
@@ -110,7 +122,7 @@ export default function AddEmployeeAddress() {
   }, [actionData]);
 
   return (
-    <section className="md:px-20 lg:px-28 2xl:px-40 py-4">
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
       <FormProvider context={form.context}>
         <Form
           method="POST"
@@ -119,7 +131,10 @@ export default function AddEmployeeAddress() {
           className="flex flex-col"
         >
           <Card>
-            <CreateEmployeeAddress key={resetKey} fields={fields as any} />
+            <CreateEmployeeGuardianDetails
+              key={resetKey}
+              fields={fields as any}
+            />
             <FormButtons
               form={form}
               setResetKey={setResetKey}

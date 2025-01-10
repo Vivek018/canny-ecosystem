@@ -156,7 +156,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await parseMultipartFormData(
     request,
-    createMemoryUploadHandler({ maxPartSize: SIZE_1MB }),
+    createMemoryUploadHandler({ maxPartSize: SIZE_1MB })
   );
   const action = formData.get("_action") as string;
 
@@ -168,11 +168,11 @@ export async function action({ request }: ActionFunctionArgs) {
     if (submission.status === "success") {
       const employeeData = session.get(`${SESSION_KEY_PREFIX}1`);
       const employeeStatutoryDetailsData = session.get(
-        `${SESSION_KEY_PREFIX}2`,
+        `${SESSION_KEY_PREFIX}2`
       );
       const employeeBankDetailsData = session.get(`${SESSION_KEY_PREFIX}3`);
       const employeeProjectAssignmentData = session.get(
-        `${SESSION_KEY_PREFIX}4`,
+        `${SESSION_KEY_PREFIX}4`
       );
       const employeeAddressesData = session.get(`${SESSION_KEY_PREFIX}5`);
       const employeeGuardiansData = submission.value as Omit<
@@ -244,7 +244,7 @@ export async function action({ request }: ActionFunctionArgs) {
       if (submission.status === "error") {
         return json(
           { result: submission.reply() },
-          { status: submission.status === "error" ? 400 : 200 },
+          { status: submission.status === "error" ? 400 : 200 }
         );
       }
     }
@@ -302,8 +302,8 @@ export default function CreateEmployee() {
   });
 
   return (
-    <section className="md:px-20 lg:px-28 2xl:px-40 py-4">
-      <div className="w-full mx-auto mb-8">
+    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
+      <div className='w-full mx-auto mb-4'>
         <FormStepHeader
           totalSteps={totalSteps}
           step={step}
@@ -312,13 +312,13 @@ export default function CreateEmployee() {
       </div>
       <FormProvider context={form.context}>
         <Form
-          method="POST"
-          encType="multipart/form-data"
+          method='POST'
+          encType='multipart/form-data'
           {...getFormProps(form)}
-          className="flex flex-col"
+          className='flex flex-col'
         >
           <Card>
-            <div className="h-[560px] overflow-scroll">
+            <div className='h-[560px] overflow-scroll'>
               {step === 1 ? (
                 <CreateEmployeeDetails key={resetKey} fields={fields as any} />
               ) : null}

@@ -106,7 +106,7 @@ export function LocationCard({
       </CardContent>
       <CardFooter
         className={cn(
-          "px-2.5 ml-auto bg-secondary text-foreground py-1.5 text-sm tracking-wide font-sem rounded-tl-md border-foreground flex gap-1 justify-center",
+          "px-2.5 ml-auto bg-secondary text-foreground py-1.5 text-sm tracking-wide font-sem rounded-tl-md border-foreground flex gap-1 justify-center mt-auto",
           !location.is_primary && "opacity-0",
         )}
       >

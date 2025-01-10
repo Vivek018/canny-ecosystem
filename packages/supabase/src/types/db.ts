@@ -483,59 +483,62 @@ export type Database = {
       };
       employee_provident_fund: {
         Row: {
-          company_id: string;
-          created_at: string | null;
-          deduction_cycle: string;
-          employee_contribution: number;
-          employee_restrict_value: number | null;
-          employer_contribution: number;
-          employer_restrict_value: number | null;
-          epf_number: string;
-          id: string;
-          include_admin_charges: boolean | null;
-          include_employer_contribution: boolean | null;
-          include_employer_edli_contribution: boolean | null;
-          is_default: boolean | null;
-          restrict_employee_contribution: boolean | null;
-          restrict_employer_contribution: boolean | null;
-          updated_at: string | null;
-        };
+          company_id: string
+          created_at: string | null
+          deduction_cycle: string
+          edli_restrict_value: number | null
+          employee_contribution: number
+          employee_restrict_value: number | null
+          employer_contribution: number
+          employer_restrict_value: number | null
+          epf_number: string
+          id: string
+          include_admin_charges: boolean | null
+          include_employer_contribution: boolean | null
+          include_employer_edli_contribution: boolean | null
+          is_default: boolean | null
+          restrict_employee_contribution: boolean | null
+          restrict_employer_contribution: boolean | null
+          updated_at: string | null
+        }
         Insert: {
-          company_id: string;
-          created_at?: string | null;
-          deduction_cycle?: string;
-          employee_contribution?: number;
-          employee_restrict_value?: number | null;
-          employer_contribution?: number;
-          employer_restrict_value?: number | null;
-          epf_number: string;
-          id?: string;
-          include_admin_charges?: boolean | null;
-          include_employer_contribution?: boolean | null;
-          include_employer_edli_contribution?: boolean | null;
-          is_default?: boolean | null;
-          restrict_employee_contribution?: boolean | null;
-          restrict_employer_contribution?: boolean | null;
-          updated_at?: string | null;
-        };
+          company_id: string
+          created_at?: string | null
+          deduction_cycle?: string
+          edli_restrict_value?: number | null
+          employee_contribution?: number
+          employee_restrict_value?: number | null
+          employer_contribution?: number
+          employer_restrict_value?: number | null
+          epf_number: string
+          id?: string
+          include_admin_charges?: boolean | null
+          include_employer_contribution?: boolean | null
+          include_employer_edli_contribution?: boolean | null
+          is_default?: boolean | null
+          restrict_employee_contribution?: boolean | null
+          restrict_employer_contribution?: boolean | null
+          updated_at?: string | null
+        }
         Update: {
-          company_id?: string;
-          created_at?: string | null;
-          deduction_cycle?: string;
-          employee_contribution?: number;
-          employee_restrict_value?: number | null;
-          employer_contribution?: number;
-          employer_restrict_value?: number | null;
-          epf_number?: string;
-          id?: string;
-          include_admin_charges?: boolean | null;
-          include_employer_contribution?: boolean | null;
-          include_employer_edli_contribution?: boolean | null;
-          is_default?: boolean | null;
-          restrict_employee_contribution?: boolean | null;
-          restrict_employer_contribution?: boolean | null;
-          updated_at?: string | null;
-        };
+          company_id?: string
+          created_at?: string | null
+          deduction_cycle?: string
+          edli_restrict_value?: number | null
+          employee_contribution?: number
+          employee_restrict_value?: number | null
+          employer_contribution?: number
+          employer_restrict_value?: number | null
+          epf_number?: string
+          id?: string
+          include_admin_charges?: boolean | null
+          include_employer_contribution?: boolean | null
+          include_employer_edli_contribution?: boolean | null
+          is_default?: boolean | null
+          restrict_employee_contribution?: boolean | null
+          restrict_employer_contribution?: boolean | null
+          updated_at?: string | null
+        }
         Relationships: [
           {
             foreignKeyName: "employee_provident_fund_company_id_fkey";
@@ -586,41 +589,44 @@ export type Database = {
       };
       employee_state_insurance: {
         Row: {
-          company_id: string;
-          created_at: string | null;
-          deduction_cycle: string;
-          employees_contribution: number;
-          employers_contribution: number;
-          esi_number: string;
-          id: string;
-          include_employer_contribution: boolean;
-          is_default: boolean | null;
-          updated_at: string | null;
-        };
+          company_id: string
+          created_at: string | null
+          deduction_cycle: string
+          employees_contribution: number
+          employers_contribution: number
+          esi_number: string
+          id: string
+          include_employer_contribution: boolean
+          is_default: boolean | null
+          max_limit: number | null
+          updated_at: string | null
+        }
         Insert: {
-          company_id: string;
-          created_at?: string | null;
-          deduction_cycle?: string;
-          employees_contribution?: number;
-          employers_contribution?: number;
-          esi_number: string;
-          id?: string;
-          include_employer_contribution?: boolean;
-          is_default?: boolean | null;
-          updated_at?: string | null;
-        };
+          company_id: string
+          created_at?: string | null
+          deduction_cycle?: string
+          employees_contribution?: number
+          employers_contribution?: number
+          esi_number: string
+          id?: string
+          include_employer_contribution?: boolean
+          is_default?: boolean | null
+          max_limit?: number | null
+          updated_at?: string | null
+        }
         Update: {
-          company_id?: string;
-          created_at?: string | null;
-          deduction_cycle?: string;
-          employees_contribution?: number;
-          employers_contribution?: number;
-          esi_number?: string;
-          id?: string;
-          include_employer_contribution?: boolean;
-          is_default?: boolean | null;
-          updated_at?: string | null;
-        };
+          company_id?: string
+          created_at?: string | null
+          deduction_cycle?: string
+          employees_contribution?: number
+          employers_contribution?: number
+          esi_number?: string
+          id?: string
+          include_employer_contribution?: boolean
+          is_default?: boolean | null
+          max_limit?: number | null
+          updated_at?: string | null
+        }
         Relationships: [
           {
             foreignKeyName: "employee_state_insurance_company_id_fkey";
@@ -813,14 +819,14 @@ export type Database = {
           updated_at: string | null;
         };
         Insert: {
-          amount: number;
-          created_at?: string | null;
-          exit_id: string;
-          id?: string;
-          payment_fields_id: string;
-          type?: string;
-          updated_at?: string | null;
-        };
+          amount: number
+          created_at?: string | null
+          exit_id: string
+          id?: string
+          payment_fields_id: string
+          type?: string
+          updated_at?: string | null
+        }
         Update: {
           amount?: number;
           created_at?: string | null;
@@ -849,51 +855,51 @@ export type Database = {
       };
       exits: {
         Row: {
-          created_at: string | null;
-          employee_id: string;
-          employee_payable_days: number;
-          final_settlement_date: string;
-          id: string;
-          last_working_day: string;
-          note: string | null;
-          organization_payable_days: number;
-          reason: string;
-          total: number | null;
-          updated_at: string | null;
-        };
+          created_at: string | null
+          employee_id: string
+          employee_payable_days: number
+          final_settlement_date: string
+          id: string
+          last_working_day: string
+          note: string | null
+          organization_payable_days: number
+          reason: string
+          total: number | null
+          updated_at: string | null
+        }
         Insert: {
-          created_at?: string | null;
-          employee_id: string;
-          employee_payable_days: number;
-          final_settlement_date: string;
-          id?: string;
-          last_working_day: string;
-          note?: string | null;
-          organization_payable_days: number;
-          reason: string;
-          total?: number | null;
-          updated_at?: string | null;
-        };
+          created_at?: string | null
+          employee_id: string
+          employee_payable_days: number
+          final_settlement_date: string
+          id?: string
+          last_working_day: string
+          note?: string | null
+          organization_payable_days: number
+          reason: string
+          total?: number | null
+          updated_at?: string | null
+        }
         Update: {
-          created_at?: string | null;
-          employee_id?: string;
-          employee_payable_days?: number;
-          final_settlement_date?: string;
-          id?: string;
-          last_working_day?: string;
-          note?: string | null;
-          organization_payable_days?: number;
-          reason?: string;
-          total?: number | null;
-          updated_at?: string | null;
-        };
+          created_at?: string | null
+          employee_id?: string
+          employee_payable_days?: number
+          final_settlement_date?: string
+          id?: string
+          last_working_day?: string
+          note?: string | null
+          organization_payable_days?: number
+          reason?: string
+          total?: number | null
+          updated_at?: string | null
+        }
         Relationships: [
           {
-            foreignKeyName: "exits_employee_id_fkey";
-            columns: ["employee_id"];
-            isOneToOne: true;
-            referencedRelation: "employees";
-            referencedColumns: ["id"];
+            foreignKeyName: "exits_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: true
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
           },
         ];
       };
@@ -946,55 +952,55 @@ export type Database = {
             referencedRelation: "users";
             referencedColumns: ["id"];
           },
-        ];
-      };
+        ]
+      }
       gratuity: {
         Row: {
-          company_id: string;
-          created_at: string | null;
-          eligibility_years: number | null;
-          id: string;
-          is_default: boolean | null;
-          max_amount_limit: number | null;
-          max_multiply_limit: number | null;
-          payment_days_per_year: number | null;
-          present_day_per_year: number | null;
-          updated_at: string | null;
-        };
+          company_id: string
+          created_at: string | null
+          eligibility_years: number | null
+          id: string
+          is_default: boolean | null
+          max_amount_limit: number | null
+          max_multiply_limit: number | null
+          payment_days_per_year: number | null
+          present_day_per_year: number | null
+          updated_at: string | null
+        }
         Insert: {
-          company_id: string;
-          created_at?: string | null;
-          eligibility_years?: number | null;
-          id?: string;
-          is_default?: boolean | null;
-          max_amount_limit?: number | null;
-          max_multiply_limit?: number | null;
-          payment_days_per_year?: number | null;
-          present_day_per_year?: number | null;
-          updated_at?: string | null;
-        };
+          company_id: string
+          created_at?: string | null
+          eligibility_years?: number | null
+          id?: string
+          is_default?: boolean | null
+          max_amount_limit?: number | null
+          max_multiply_limit?: number | null
+          payment_days_per_year?: number | null
+          present_day_per_year?: number | null
+          updated_at?: string | null
+        }
         Update: {
-          company_id?: string;
-          created_at?: string | null;
-          eligibility_years?: number | null;
-          id?: string;
-          is_default?: boolean | null;
-          max_amount_limit?: number | null;
-          max_multiply_limit?: number | null;
-          payment_days_per_year?: number | null;
-          present_day_per_year?: number | null;
-          updated_at?: string | null;
-        };
+          company_id?: string
+          created_at?: string | null
+          eligibility_years?: number | null
+          id?: string
+          is_default?: boolean | null
+          max_amount_limit?: number | null
+          max_multiply_limit?: number | null
+          payment_days_per_year?: number | null
+          present_day_per_year?: number | null
+          updated_at?: string | null
+        }
         Relationships: [
           {
-            foreignKeyName: "gratuity_company_id_fkey";
-            columns: ["company_id"];
-            isOneToOne: false;
-            referencedRelation: "companies";
-            referencedColumns: ["id"];
+            foreignKeyName: "gratuity_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       labour_welfare_fund: {
         Row: {
           company_id: string;
@@ -1173,62 +1179,53 @@ export type Database = {
       };
       payment_template_components: {
         Row: {
-          bonus_id: string | null;
-          calculation_type:
-            | Database["public"]["Enums"]["template_calculation_type"]
-            | null;
-          calculation_value: number | null;
-          component_type: Database["public"]["Enums"]["template_component_type"];
-          created_at: string | null;
-          display_order: number | null;
-          epf_id: string | null;
-          esi_id: string | null;
-          id: string;
-          lwf_id: string | null;
-          payment_field_id: string | null;
-          pt_id: string | null;
-          target_type: Database["public"]["Enums"]["assignment_target_type"];
-          template_id: string;
-          updated_at: string | null;
-        };
+          bonus_id: string | null
+          calculation_value: number | null
+          component_type: Database["public"]["Enums"]["template_component_type"]
+          created_at: string | null
+          display_order: number | null
+          epf_id: string | null
+          esi_id: string | null
+          id: string
+          lwf_id: string | null
+          payment_field_id: string | null
+          pt_id: string | null
+          target_type: Database["public"]["Enums"]["assignment_target_type"]
+          template_id: string
+          updated_at: string | null
+        }
         Insert: {
-          bonus_id?: string | null;
-          calculation_type?:
-            | Database["public"]["Enums"]["template_calculation_type"]
-            | null;
-          calculation_value?: number | null;
-          component_type: Database["public"]["Enums"]["template_component_type"];
-          created_at?: string | null;
-          display_order?: number | null;
-          epf_id?: string | null;
-          esi_id?: string | null;
-          id?: string;
-          lwf_id?: string | null;
-          payment_field_id?: string | null;
-          pt_id?: string | null;
-          target_type: Database["public"]["Enums"]["assignment_target_type"];
-          template_id: string;
-          updated_at?: string | null;
-        };
+          bonus_id?: string | null
+          calculation_value?: number | null
+          component_type: Database["public"]["Enums"]["template_component_type"]
+          created_at?: string | null
+          display_order?: number | null
+          epf_id?: string | null
+          esi_id?: string | null
+          id?: string
+          lwf_id?: string | null
+          payment_field_id?: string | null
+          pt_id?: string | null
+          target_type: Database["public"]["Enums"]["assignment_target_type"]
+          template_id: string
+          updated_at?: string | null
+        }
         Update: {
-          bonus_id?: string | null;
-          calculation_type?:
-            | Database["public"]["Enums"]["template_calculation_type"]
-            | null;
-          calculation_value?: number | null;
-          component_type?: Database["public"]["Enums"]["template_component_type"];
-          created_at?: string | null;
-          display_order?: number | null;
-          epf_id?: string | null;
-          esi_id?: string | null;
-          id?: string;
-          lwf_id?: string | null;
-          payment_field_id?: string | null;
-          pt_id?: string | null;
-          target_type?: Database["public"]["Enums"]["assignment_target_type"];
-          template_id?: string;
-          updated_at?: string | null;
-        };
+          bonus_id?: string | null
+          calculation_value?: number | null
+          component_type?: Database["public"]["Enums"]["template_component_type"]
+          created_at?: string | null
+          display_order?: number | null
+          epf_id?: string | null
+          esi_id?: string | null
+          id?: string
+          lwf_id?: string | null
+          payment_field_id?: string | null
+          pt_id?: string | null
+          target_type?: Database["public"]["Enums"]["assignment_target_type"]
+          template_id?: string
+          updated_at?: string | null
+        }
         Relationships: [
           {
             foreignKeyName: "payment_template_components_bonus_id_fkey";
@@ -1283,38 +1280,41 @@ export type Database = {
       };
       payment_templates: {
         Row: {
-          annual_ctc: number;
-          company_id: string;
-          created_at: string | null;
-          description: string | null;
-          id: string;
-          is_active: boolean | null;
-          is_default: boolean | null;
-          name: string;
-          updated_at: string | null;
-        };
+          company_id: string
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          is_default: boolean | null
+          monthly_ctc: number
+          name: string
+          state: string | null
+          updated_at: string | null
+        }
         Insert: {
-          annual_ctc: number;
-          company_id: string;
-          created_at?: string | null;
-          description?: string | null;
-          id?: string;
-          is_active?: boolean | null;
-          is_default?: boolean | null;
-          name: string;
-          updated_at?: string | null;
-        };
+          company_id: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_default?: boolean | null
+          monthly_ctc: number
+          name: string
+          state?: string | null
+          updated_at?: string | null
+        }
         Update: {
-          annual_ctc?: number;
-          company_id?: string;
-          created_at?: string | null;
-          description?: string | null;
-          id?: string;
-          is_active?: boolean | null;
-          is_default?: boolean | null;
-          name?: string;
-          updated_at?: string | null;
-        };
+          company_id?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_default?: boolean | null
+          monthly_ctc?: number
+          name?: string
+          state?: string | null
+          updated_at?: string | null
+        }
         Relationships: [
           {
             foreignKeyName: "payment_templates_company_id_fkey";
@@ -1361,11 +1361,11 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: "payroll_site_id_fkey";
-            columns: ["site_id"];
-            isOneToOne: false;
-            referencedRelation: "project_sites";
-            referencedColumns: ["id"];
+            foreignKeyName: "payroll_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "project_sites"
+            referencedColumns: ["id"]
           },
         ];
       };
@@ -1720,35 +1720,35 @@ export type Database = {
       };
       statutory_bonus: {
         Row: {
-          company_id: string;
-          created_at: string | null;
-          id: string;
-          is_default: boolean | null;
-          payment_frequency: string;
-          payout_month: number | null;
-          percentage: number;
-          updated_at: string | null;
-        };
+          company_id: string
+          created_at: string | null
+          id: string
+          is_default: boolean | null
+          payment_frequency: string
+          payout_month: number | null
+          percentage: number
+          updated_at: string | null
+        }
         Insert: {
-          company_id: string;
-          created_at?: string | null;
-          id?: string;
-          is_default?: boolean | null;
-          payment_frequency?: string;
-          payout_month?: number | null;
-          percentage?: number;
-          updated_at?: string | null;
-        };
+          company_id: string
+          created_at?: string | null
+          id?: string
+          is_default?: boolean | null
+          payment_frequency?: string
+          payout_month?: number | null
+          percentage?: number
+          updated_at?: string | null
+        }
         Update: {
-          company_id?: string;
-          created_at?: string | null;
-          id?: string;
-          is_default?: boolean | null;
-          payment_frequency?: string;
-          payout_month?: number | null;
-          percentage?: number;
-          updated_at?: string | null;
-        };
+          company_id?: string
+          created_at?: string | null
+          id?: string
+          is_default?: boolean | null
+          payment_frequency?: string
+          payout_month?: number | null
+          percentage?: number
+          updated_at?: string | null
+        }
         Relationships: [
           {
             foreignKeyName: "statutory_bonus_company_id_fkey";
@@ -1829,18 +1829,17 @@ export type Database = {
       assignment_target_type:
         | "payment_field"
         | "epf"
-        | "esic"
+        | "esi"
         | "bonus"
         | "pt"
-        | "lwf";
-      calculation_type: "fixed" | "percentage_of_basic";
-      eligibility_option_type: "position" | "skill_level";
-      feedback_category: "suggestion" | "bug" | "complain";
-      feedback_severity: "low" | "normal" | "urgent";
-      payment_type: "fixed" | "variable";
-      payroll_status: "pending" | "approved" | "created";
-      template_assignment_type: "employee" | "site";
-      template_calculation_type: "variable" | "percentage_of_ctc";
+        | "lwf"
+      calculation_type: "fixed" | "percentage_of_ctc"
+      eligibility_option_type: "position" | "skill_level"
+      feedback_category: "suggestion" | "bug" | "complain"
+      feedback_severity: "low" | "normal" | "urgent"
+      payment_type: "fixed" | "variable"
+      payroll_status: "pending" | "approved" | "created"
+      template_assignment_type: "employee" | "site"
       template_component_type:
         | "earning"
         | "deduction"

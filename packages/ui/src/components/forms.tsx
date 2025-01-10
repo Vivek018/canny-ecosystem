@@ -39,6 +39,7 @@ export function Field({
   inputProps,
   errors,
   className,
+  errorClassName,
   prefix,
   suffix,
 }: {
@@ -46,6 +47,7 @@ export function Field({
   inputProps: React.InputHTMLAttributes<HTMLInputElement>;
   errors?: ListOfErrors;
   className?: string;
+  errorClassName?: string;
   prefix?: React.ReactNode;
   suffix?: React.ReactNode;
 }) {
@@ -84,7 +86,7 @@ export function Field({
           <span className="absolute right-2 text-muted">{suffix}</span>
         )}
       </div>
-      <div className="min-h-[28px] px-4 pb-4 pt-1">
+      <div className={cn("min-h-6 px-4 pb-2", errorClassName)}>
         {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
       </div>
     </div>
@@ -96,11 +98,13 @@ export function TextareaField({
   textareaProps,
   errors,
   className,
+  errorClassName,
 }: {
   labelProps: React.LabelHTMLAttributes<HTMLLabelElement>;
   textareaProps: React.TextareaHTMLAttributes<HTMLTextAreaElement>;
   errors?: ListOfErrors;
   className?: string;
+  errorClassName?: string;
 }) {
   const fallbackId = useId();
   const id = textareaProps.id ?? textareaProps.name ?? fallbackId;
@@ -126,7 +130,7 @@ export function TextareaField({
         aria-describedby={errorId}
         {...textareaProps}
       />
-      <div className="min-h-[28px] px-4 pb-4 pt-1">
+      <div className={cn("min-h-6 px-4 pb-2", errorClassName)}>
         {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
       </div>
     </div>
@@ -140,6 +144,7 @@ export function CheckboxField({
   buttonProps,
   errors,
   className,
+  errorClassName,
 }: {
   labelProps: JSX.IntrinsicElements["label"];
   buttonProps: CheckboxProps & {
@@ -150,6 +155,7 @@ export function CheckboxField({
   };
   errors?: ListOfErrors;
   className?: string;
+  errorClassName?: string;
 }) {
   const { key, defaultChecked, ...checkboxProps } = buttonProps;
   const fallbackId = useId();
@@ -201,7 +207,7 @@ export function CheckboxField({
           *
         </sub>
       </div>
-      <div className="px-4 pb-6 pt-1">
+      <div className={cn("min-h-6 px-4 pb-2", errorClassName)}>
         {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
       </div>
     </div>
@@ -214,6 +220,7 @@ type SearchableSelectFieldProps = {
   inputProps: React.InputHTMLAttributes<HTMLInputElement>;
   errors?: ListOfErrors;
   className?: string;
+  errorClassName?: string;
   placeholder?: string;
   onChange?: (value: string) => void;
 };
@@ -224,6 +231,7 @@ export function SearchableSelectField({
   inputProps,
   errors,
   className,
+  errorClassName,
   placeholder,
   onChange,
 }: SearchableSelectFieldProps) {
@@ -268,9 +276,9 @@ export function SearchableSelectField({
           onChange?.(value);
         }}
         placeholder={placeholder ?? inputProps.placeholder}
-        disabled={inputProps.disabled}
+        disabled={inputProps.disabled || inputProps.readOnly}
       />
-      <div className="min-h-[32px] px-4 pb-3 pt-1">
+      <div className={cn("min-h-6 px-4 pb-2", errorClassName)}>
         {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
       </div>
     </div>
@@ -282,6 +290,7 @@ type JSONBFieldProps = {
   inputProps: React.InputHTMLAttributes<HTMLInputElement>;
   errors?: string[];
   className?: string;
+  errorClassName?: string;
 };
 
 export function JSONBField({
@@ -289,6 +298,7 @@ export function JSONBField({
   inputProps,
   errors,
   className,
+  errorClassName,
 }: JSONBFieldProps) {
   const fallbackId = useId();
   const id = inputProps.id ?? fallbackId;
@@ -424,7 +434,7 @@ export function JSONBField({
           ),
         )}
       />
-      <div className="min-h-[28px] px-4 pb-4 pt-1">
+      <div className={cn("min-h-6 px-4 pb-2", errorClassName)}>
         {errors && errors.length > 0 ? <ErrorList errors={errors} /> : null}
       </div>
     </div>
@@ -448,6 +458,7 @@ export type RangeFieldProps = {
   };
   errors?: string[];
   className?: string;
+  errorClassName?: string;
   fields: FieldConfig[];
 };
 
@@ -456,6 +467,7 @@ export const RangeField = ({
   inputProps,
   errors,
   className,
+  errorClassName,
   fields,
 }: RangeFieldProps) => {
   const fallbackId = useId();
@@ -589,7 +601,7 @@ export const RangeField = ({
         value={JSON.stringify(ranges)}
       />
 
-      <div className="min-h-[28px] px-4 pb-4 pt-1">
+      <div className={cn("min-h-6 px-4 pb-2", errorClassName)}>
         {errors && errors.length > 0 ? (
           <div className="text-destructive">
             {errors.map((error, index) => (

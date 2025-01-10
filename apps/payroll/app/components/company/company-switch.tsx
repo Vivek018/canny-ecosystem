@@ -31,7 +31,7 @@ export const CompanySwitch = ({
   const submit = useSubmit();
   const linkRef = useRef<HTMLAnchorElement | null>(null);
   const location = useLocation();
-  const companyId = useCompanyId();
+  const { companyId } = useCompanyId();
   const [open, setOpen] = useState(false);
 
   const currentCompany = companies.find((company) => company.id === companyId);
