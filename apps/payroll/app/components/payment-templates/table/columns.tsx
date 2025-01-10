@@ -13,14 +13,18 @@ export const columns: ColumnDef<
     accessorKey: "name",
     header: "Template Name",
     cell: ({ row }) => {
-      return <p className='truncate w-48'>{`${row.original?.name}`}</p>;
+      return <p className='truncate w-48'>{`${row.original?.name ?? "--"}`}</p>;
     },
   },
   {
     accessorKey: "description",
     header: "Description",
     cell: ({ row }) => {
-      return <p className='truncate w-96'>{`${row.original?.description}`}</p>;
+      return (
+        <p className='truncate w-96'>{`${
+          row.original?.description ?? "--"
+        }`}</p>
+      );
     },
   },
   {
@@ -28,7 +32,7 @@ export const columns: ColumnDef<
     header: "Monthly CTC",
     cell: ({ row }) => {
       return (
-        <p className='truncate w-20 capitalize'>{row.original?.monthly_ctc}</p>
+        <p className='truncate w-20 capitalize'>{row.original?.monthly_ctc ?? "--"}</p>
       );
     },
   },
