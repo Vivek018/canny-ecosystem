@@ -20,27 +20,32 @@ export const PaymentTemplateComponentsCard = ({
 
   return (
     <Dialog defaultOpen={true} onOpenChange={handleOpenChange}>
-      <DialogContent className="min-w-max">
+      <DialogContent className='min-w-max'>
         <DialogTitle>Payment Template Components</DialogTitle>
         <DialogDescription>
-          {paymentTemplateComponents.map((paymentTemplateComponent) => (
-            <div
-              key={paymentTemplateComponent?.id}
-              className='grid grid-cols-3 place-content-center justify-between gap-6 py-4'
-            >
-              <div className='flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm items-center shadow-sm'>
-                {String(paymentTemplateComponent?.payment_fields?.name) ??
-                  String(paymentTemplateComponent?.target_type) ??
-                  "Unknown"}
+          {paymentTemplateComponents.map((paymentTemplateComponent) => {
+            const name =
+              paymentTemplateComponent?.payment_fields?.name ??
+              paymentTemplateComponent?.target_type ??
+              "Unknown";
+
+            return (
+              <div
+                key={paymentTemplateComponent?.id}
+                className='grid grid-cols-3 place-content-center justify-between gap-6 py-4'
+              >
+                <div className='flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm items-center shadow-sm'>
+                  {String(name)}
+                </div>
+                <div className='flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm items-center shadow-sm'>
+                  {paymentTemplateComponent?.component_type}
+                </div>
+                <div className='flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm items-center shadow-sm'>
+                  {paymentTemplateComponent?.calculation_value}
+                </div>
               </div>
-              <div className='flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm items-center shadow-sm'>
-                {paymentTemplateComponent?.component_type}
-              </div>
-              <div className='flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm items-center shadow-sm'>
-                {paymentTemplateComponent?.calculation_value}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </DialogDescription>
       </DialogContent>
     </Dialog>
