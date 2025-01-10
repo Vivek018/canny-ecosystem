@@ -76,16 +76,6 @@ export async function getPaymentTemplateById({
   return { data, error };
 }
 
-export type PaymentTemplateComponentType = Omit<
-  PaymentTemplateComponentDatabaseRow,
-  "created_at" | "updated_at"
-> & {
-  payment_fields: {
-    id: Pick<PaymentFieldDatabaseRow, "id">;
-    name: Pick<PaymentFieldDatabaseRow, "name">;
-  };
-};
-
 export async function getPaymentTemplateComponentsByTemplateId({
   supabase,
   templateId,
@@ -122,16 +112,6 @@ export async function getPaymentTemplateComponentsByTemplateId({
 
   return { data, error };
 }
-
-export type PaymentTemplateWithComponentsType = Pick<
-  PaymentTemplateDatabaseRow,
-  "monthly_ctc" | "state" | "id"
-> & {
-  payment_template_components?: Omit<
-    PaymentTemplateComponentDatabaseRow,
-    "created_at" | "updated_at"
-  >[];
-};
 
 export async function getPaymentTemplateWithComponentsById({
   supabase,
@@ -210,3 +190,24 @@ export async function getPaymentTemplateBySiteId({
 
   return { data, error };
 }
+
+
+export type PaymentTemplateComponentType = Omit<
+  PaymentTemplateComponentDatabaseRow,
+  "created_at" | "updated_at"
+> & {
+  payment_fields: {
+    id: Pick<PaymentFieldDatabaseRow, "id">;
+    name: Pick<PaymentFieldDatabaseRow, "name">;
+  };
+};
+
+export type PaymentTemplateWithComponentsType = Pick<
+  PaymentTemplateDatabaseRow,
+  "monthly_ctc" | "state" | "id"
+> & {
+  payment_template_components?: Omit<
+    PaymentTemplateComponentDatabaseRow,
+    "created_at" | "updated_at"
+  >[];
+};
