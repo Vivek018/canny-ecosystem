@@ -1,4 +1,4 @@
-import { HARD_QUERY_LIMIT } from "../constant";
+import { HARD_QUERY_LIMIT, SINGLE_QUERY_LIMIT } from "../constant";
 import type {
   InferredType,
   ProfessionalTaxDatabaseRow,
