@@ -1,254 +1,386 @@
+import { useState, useEffect } from "react";
+import { json, useLoaderData, useLocation } from "@remix-run/react";
+import Papa from "papaparse";
+import { Combobox } from "@canny_ecosystem/ui/combobox";
+import { Button } from "@canny_ecosystem/ui/button";
 import {
-  ImportEmployeeStatutoryHeaderSchema,
-  ImportEmployeeStatutoryDataSchema,
-  isGoodStatus,
-} from "@canny_ecosystem/utils";
-
-import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { getInitialValueFromZod } from "@canny_ecosystem/utils";
-import { FormProvider, getFormProps, useForm } from "@conform-to/react";
-import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { Form, useLoaderData, useLocation } from "@remix-run/react";
-import { json, redirect } from "@remix-run/node";
-import { Card } from "@canny_ecosystem/ui/card";
-
-import { useState } from "react";
-import { commitSession, getSession } from "@/utils/sessions";
-import { FormButtons } from "@/components/form/form-buttons";
-import { FormStepHeader } from "@/components/form/form-step-header";
-import { useIsomorphicLayoutEffect } from "@canny_ecosystem/utils/hooks/isomorphic-layout-effect";
-
-import { EmployeeStatutoryImportHeader } from "@/components/employees/import-export/employee-statutory-import-header";
-import { EmployeeStatutoryImportData } from "@/components/employees/import-export/employee-statutory-import-data";
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@canny_ecosystem/ui/card";
+import type { ImportEmployeeStatutoryHeaderSchemaObject } from "@canny_ecosystem/utils";
 import {
-  getAllEmployeeNonDuplicatingDetailsFromStatutory,
   getEmployeeIdsByEmployeeCodes,
+  type ImportEmployeeStatutoryDataType,
 } from "@canny_ecosystem/supabase/queries";
-import { safeRedirect } from "@/utils/server/http.server";
 import {
-  createEmployeeStatutoryFromImportedData,
-} from "@canny_ecosystem/supabase/mutations";
-
-export const IMPORT_EMPLOYEE_STATUTORY = [
-  "statutory-map-headers",
-  "statutory-validate-imported-data",
-];
-
-export const STEP = "step";
-
-const SESSION_KEY_PREFIX = "multiStepEmployeeStatutoryImport_step_";
-
-const schemas = [
   ImportEmployeeStatutoryHeaderSchema,
   ImportEmployeeStatutoryDataSchema,
+  transformStringArrayIntoOptions,
+  replaceUnderscore,
+  pipe,
+  replaceDash,
+} from "@canny_ecosystem/utils";
+import type { z } from "zod";
+import { getEmployeeStatutoryConflicts } from "@canny_ecosystem/supabase/mutations";
+import { EmployeeStatutoryImportData } from "@/components/employees/import-export/employee-statutory-import-data";
+import { useSupabase } from "@canny_ecosystem/supabase/client";
+import { useImportStoreForEmployeeStatutory } from "@/store/import";
+import type { EmployeeStatutoryDetailsDatabaseInsert } from "@canny_ecosystem/supabase/types";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
+
+type FieldConfig = {
+  key: keyof z.infer<typeof ImportEmployeeStatutoryHeaderSchemaObject>;
+  required?: boolean;
+};
+
+const FIELD_CONFIGS: FieldConfig[] = [
+  {
+    key: "employee_code",
+    required: true,
+  },
+  {
+    key: "aadhaar_number",
+    required: true,
+  },
+  {
+    key: "pan_number",
+  },
+  {
+    key: "uan_number",
+    required: true,
+  },
+  { key: "pf_number", required: true },
+  {
+    key: "esic_number",
+    required: true,
+  },
+  {
+    key: "driving_license_number",
+  },
+  {
+    key: "driving_license_expiry",
+  },
+  {
+    key: "passport_number",
+  },
+  {
+    key: "passport_expiry",
+  },
 ];
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const url = new URL(request.url);
-  const step = Number.parseInt(url.searchParams.get(STEP) || "1");
-  const totalSteps = schemas.length;
-
-  const session = await getSession(request.headers.get("Cookie"));
-  const headers = {
-    "Set-Cookie": await commitSession(await getSession()),
+export async function loader() {
+  const env = {
+    SUPABASE_URL: process.env.SUPABASE_URL!,
+    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
-  const stepData: any[] = [];
 
-  for (let i = 1; i <= totalSteps; i++) {
-    stepData.push(await session.get(`${SESSION_KEY_PREFIX}${i}`));
-  }
-
-  if (step < 1 || step > totalSteps) {
-    url.searchParams.set(STEP, "1");
-    return redirect(url.toString(), { status: 302 });
-  }
-  const { data, error } =
-    await getAllEmployeeNonDuplicatingDetailsFromStatutory({
-      supabase,
-    });
-  if (error) {
-    console.error(error);
-  }
-
-  return json({ step, totalSteps, stepData, allNonDuplicants: data });
-  // return json({ step, totalSteps, stepData }, { headers });
-}
-
-export async function action({ request }: ActionFunctionArgs) {
-  const url = new URL(request.url);
-  const session = await getSession(request.headers.get("Cookie"));
-
-  const step = Number.parseInt(url.searchParams.get(STEP) || "1");
-  const currentSchema = schemas[step - 1];
-  const totalSteps = schemas.length;
-
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
-  const action = formData.get("_action") as string;
-
-  const submission = parseWithZod(formData, {
-    schema: currentSchema,
-  });
-
-  if (action === "submit") {
-    const parsedData = ImportEmployeeStatutoryDataSchema.safeParse(
-      JSON.parse(formData.get("stringified_data") as string)
-    );
-    const import_type = formData.get("import_type");
-
-
-    if (parsedData.success) {
-      const importedData = parsedData.data?.data;
-      const employeeCodes = importedData!.map((value) => value.employee_code);
-      const { data: employees, error } = await getEmployeeIdsByEmployeeCodes({
-        supabase,
-        employeeCodes,
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      const updatedData = importedData!.map((item: any) => {
-        const employeeId = employees?.find(
-          (e) => e.employee_code === item.employee_code
-        )?.id;
-
-        const { employee_code, ...rest } = item;
-        return {
-          ...rest,
-          ...(employeeId ? { employee_id: employeeId } : {}),
-        };
-      });
-
-      const { error: importError, status } =
-        await createEmployeeStatutoryFromImportedData({
-          supabase,
-          data: updatedData,
-          import_type: import_type as string,
-        });
-    
-
-      if (
-        status === "No new data to insert" ||
-        isGoodStatus(status as string)
-      ) {
-        return safeRedirect("/employees", { status: 303 });
-      }
-      if (
-        status === "Data processed successfully" ||
-        isGoodStatus(status as string)
-      ) {
-        return safeRedirect("/employees", { status: 303 });
-      }
-      if (importError) {
-        throw importError;
-      }
-    }
-  } else if (action === "next" || action === "back" || action === "skip") {
-    if (action === "next") {
-      if (submission.status === "success") {
-        session.set(`${SESSION_KEY_PREFIX}${step}`, submission.value);
-      }
-      if (submission.status === "error") {
-        return json(
-          { result: submission.reply() },
-          { status: submission.status === "error" ? 400 : 200 }
-        );
-      }
-    }
-
-    let nextStep = step;
-    if (action === "next" || action === "skip") {
-      nextStep = Math.min(step + 1, totalSteps);
-    } else if (action === "back") {
-      nextStep = Math.max(step - 1, 1);
-    }
-
-    url.searchParams.set(STEP, String(nextStep));
-    return redirect(url.toString(), {
-      headers: {
-        "Set-Cookie": await commitSession(session),
-      },
-    });
-  }
-
-  return json({});
+  return json({ env });
 }
 
 export default function EmployeeStatutoryImportFieldMapping() {
-  const { step, totalSteps, stepData, allNonDuplicants } =
-    useLoaderData<typeof loader>();
-  const stepOneData = stepData[0];
+  const { env } = useLoaderData<typeof loader>();
+  const { supabase } = useSupabase({ env });
 
-  const [resetKey, setResetKey] = useState(Date.now());
+  const { setImportData } = useImportStoreForEmployeeStatutory();
+
+  const [loadNext, setLoadNext] = useState(false);
+  const [hasConflict, setHasConflict] = useState<number[]>([]);
 
   const location = useLocation();
   const [file] = useState(location.state?.file);
+  const [headerArray, setHeaderArray] = useState<string[]>([]);
+  const [fieldMapping, setFieldMapping] = useState<Record<string, string>>({});
 
-  const IMPORT_TAG = IMPORT_EMPLOYEE_STATUTORY[step - 1];
-  const currentSchema = schemas[step - 1];
-  const initialValues = getInitialValueFromZod(currentSchema);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
-  useIsomorphicLayoutEffect(() => {
-    setResetKey(Date.now());
-  }, [step]);
+  useEffect(() => {
+    if (file) {
+      Papa.parse(file, {
+        skipEmptyLines: true,
+        complete: (results: Papa.ParseResult<string[]>) => {
+          const headers = results.data[0].filter(
+            (header) => header !== null && header.trim() !== ""
+          );
+          setHeaderArray(headers);
+        },
+        error: (error) => {
+          console.error("Header parsing error:", error);
+          setErrors((prev) => ({ ...prev, parsing: "Error parsing headers" }));
+        },
+      });
+    }
+  }, [file]);
 
-  const [form, fields] = useForm({
-    id: IMPORT_TAG,
-    constraint: getZodConstraint(currentSchema),
-    onValidate: ({ formData }: { formData: FormData }) => {
-      return parseWithZod(formData, { schema: currentSchema });
-    },
-    shouldValidate: "onInput",
-    shouldRevalidate: "onInput",
-    defaultValue: stepData[step - 1] ?? initialValues,
-  });
+   useEffect(() => {
+      if (headerArray.length > 0) {
+        const initialMapping = FIELD_CONFIGS.reduce((mapping, field) => {
+          const matchedHeader = headerArray.find(
+            (value) =>
+              pipe(replaceUnderscore, replaceDash)(value?.toLowerCase()) ===
+              pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase())
+          );
+  
+          if (matchedHeader) {
+            mapping[field.key] = matchedHeader; 
+          }
+  
+          return mapping;
+        }, {} as Record<string, string>);
+  
+        setFieldMapping(initialMapping);
+      }
+    }, [headerArray]);
+
+  const validateMapping = () => {
+    try {
+      const mappingResult = ImportEmployeeStatutoryHeaderSchema.safeParse(
+        Object.fromEntries(
+          Object.entries(fieldMapping).map(([key, value]) => [
+            key,
+            value || undefined,
+          ])
+        )
+      );
+
+      if (!mappingResult.success) {
+        const formattedErrors = mappingResult.error.errors.map(
+          (err) => err.message
+        );
+        setValidationErrors(formattedErrors);
+        return false;
+      }
+
+      setValidationErrors([]);
+      return true;
+    } catch (error) {
+      console.error("Validation error:", error);
+      setValidationErrors(["An unexpected error occurred during validation"]);
+      return false;
+    }
+  };
+
+  const validateImportData = (data: any[]) => {
+    try {
+      const result = ImportEmployeeStatutoryDataSchema.safeParse({ data });
+      if (!result.success) {
+        const formattedErrors = result.error.errors.map(
+          (err) => `${err.path[2]}: ${err.message}`
+        );
+        setValidationErrors(formattedErrors);
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error("Data validation error:", error);
+      setValidationErrors([
+        "An unexpected error occurred during data validation",
+      ]);
+      return false;
+    }
+  };
+
+  const handleMapping = (key: string, value: string) => {
+    setFieldMapping((prev) => ({ ...prev, [key]: value }));
+    if (errors[key]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[key];
+        return newErrors;
+      });
+    }
+    setValidationErrors([]);
+  };
+
+  const handleParsedData = async () => {
+    if (!validateMapping()) {
+      return;
+    }
+
+    const swappedFieldMapping = Object.fromEntries(
+      Object.entries(fieldMapping).map(([key, value]) => [value, key])
+    );
+
+    if (file) {
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        transformHeader: (header) => swappedFieldMapping[header] || header,
+        complete: async (results) => {
+          const finalData = results.data
+            .filter((entry) =>
+              Object.values(entry!).some((value) => String(value).trim() !== "")
+            )
+            .map((entry) => {
+              const cleanEntry = Object.fromEntries(
+                Object.entries(entry as Record<string, any>).filter(
+                  ([key, value]) =>
+                    key.trim() !== "" &&
+                    value !== null &&
+                    String(value).trim() !== ""
+                )
+              );
+              return cleanEntry;
+            });
+
+          if (validateImportData(finalData)) {
+            setImportData({
+              data: finalData as ImportEmployeeStatutoryDataType[],
+            });
+
+            const employeeCodes = finalData!.map(
+              (value) => value.employee_code
+            );
+            const { data: employees, error: idByCodeError } =
+              await getEmployeeIdsByEmployeeCodes({
+                supabase,
+                employeeCodes,
+              });
+
+            if (idByCodeError) {
+              throw idByCodeError;
+            }
+
+            const updatedData = finalData!.map((item: any) => {
+              const employeeId = employees?.find(
+                (e) => e.employee_code === item.employee_code
+              )?.id;
+
+              const { employee_code, ...rest } = item;
+              return {
+                ...rest,
+                ...(employeeId ? { employee_id: employeeId } : {}),
+              };
+            });
+
+            const { conflictingIndices, error } =
+              await getEmployeeStatutoryConflicts({
+                supabase,
+                importedData:
+                  updatedData as EmployeeStatutoryDetailsDatabaseInsert[],
+              });
+
+            if (error) {
+              throw error;
+            }
+
+            setHasConflict(conflictingIndices);
+            setLoadNext(true);
+          }
+        },
+        error: (error) => {
+          console.error("Data parsing error:", error);
+          setErrors((prev) => ({
+            ...prev,
+            parsing: "Error parsing file data",
+          }));
+        },
+      });
+    }
+  };
 
   return (
-    <section className="md:px-20 lg:px-28 2xl:px-40 py-4">
-      <div className="w-full mx-auto mb-8">
-        <FormStepHeader
-          totalSteps={totalSteps}
-          step={step}
-          stepData={stepData}
+    <section className="py-4 ">
+      {loadNext ? (
+        <EmployeeStatutoryImportData
+          conflictingIndices={hasConflict}
+          env={env}
         />
-      </div>
-      <FormProvider context={form.context}>
-        <Form
-          method="POST"
-          encType="multipart/form-data"
-          {...getFormProps(form)}
-          className="flex flex-col"
-        >
-          <Card>
-            <div className="h-[500px] overflow-scroll">
-              {step === 1 ? (
-                <EmployeeStatutoryImportHeader
-                  key={resetKey}
-                  file={file}
-                  fields={fields as any}
-                />
-              ) : null}
-              {step === 2 ? (
-                <EmployeeStatutoryImportData
-                  fieldMapping={stepOneData}
-                  file={file}
-                  allNonDuplicants={allNonDuplicants}
-                />
-              ) : null}
+      ) : (
+        <Card className="m-4 px-40">
+          <CardHeader>
+            <CardTitle>Map Fields</CardTitle>
+            <CardDescription>
+              Map your fields with the Employee fields
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {validationErrors.length > 0 && (
+              <div className="mb-4 p-4 border border-red-200 bg-red-50 rounded">
+                <h4 className="text-red-700 font-medium mb-2">
+                  Validation Errors:
+                </h4>
+                <ul className="grid grid-cols-3 gap-y-1">
+                  {validationErrors.map((error, index) => (
+                    <li
+                      key={error.toString() + index.toString()}
+                      className="text-red-600 text-sm"
+                    >
+                      {error}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 place-content-center justify-between gap-y-8 gap-x-10 mt-5">
+              {FIELD_CONFIGS.map((field) => (
+                <div key={field.key} className="flex flex-col">
+                  <div className="flex flex-row gap-1 pb-1">
+                    <label className="text-sm text-muted-foreground capitalize">
+                      {replaceUnderscore(field.key)}
+                    </label>
+                    <sub
+                      className={cn(
+                        "hidden text-primary mt-1",
+                        field.required && "inline"
+                      )}
+                    >
+                      *
+                    </sub>
+                  </div>
+                  <Combobox
+                    options={transformStringArrayIntoOptions(headerArray)}
+                    value={
+                      fieldMapping[field.key] ||
+                      headerArray?.find((value) => {
+                        return (
+                          pipe(
+                            replaceUnderscore,
+                            replaceDash
+                          )(value?.toLowerCase()) ===
+                          pipe(
+                            replaceUnderscore,
+                            replaceDash
+                          )(field.key?.toLowerCase())
+                        );
+                      }) ||
+                      ""
+                    }
+                    onChange={(value: string) =>
+                      handleMapping(field.key, value)
+                    }
+                    placeholder={`Select ${replaceUnderscore(field.key)}`}
+                    className={errors[field.key] ? "border-red-500" : ""}
+                  />
+                  {errors[field.key] && (
+                    <span className="text-red-500 text-sm mt-1">
+                      {errors[field.key]}
+                    </span>
+                  )}
+                </div>
+              ))}
+
+              <div />
+              <div className="flex flex-col items-end gap-2">
+                {errors.general && (
+                  <span className="text-red-500 text-sm">{errors.general}</span>
+                )}
+                <Button
+                  className="w-24"
+                  variant="default"
+                  onClick={handleParsedData}
+                >
+                  Submit
+                </Button>
+              </div>
             </div>
-            <FormButtons
-              form={form}
-              setResetKey={setResetKey}
-              step={step}
-              totalSteps={totalSteps}
-            />
-          </Card>
-        </Form>
-      </FormProvider>
+          </CardContent>
+        </Card>
+      )}
     </section>
   );
 }

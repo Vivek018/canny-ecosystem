@@ -18,11 +18,7 @@ import type {
   EmployeeWorkHistoryDatabaseUpdate,
   TypedSupabaseClient,
 } from "../types";
-import {
-  getAllEmployeeNonDuplicatingDetailsFromGuardians,
-  getAllEmployeeNonDuplicatingDetailsFromPersonals,
-  getAllEmployeeNonDuplicatingDetailsFromStatutory,
-} from "../queries";
+import type { ImportEmployeePersonalsDataType } from "../queries";
 
 export async function createEmployee({
   supabase,
@@ -793,6 +789,76 @@ export async function updateEmployeeProjectAssignment({
   return { status, error };
 }
 
+export async function getEmployeePersonalsConflicts({
+  supabase,
+  importedData,
+}: {
+  supabase: TypedSupabaseClient;
+  importedData: ImportEmployeePersonalsDataType[];
+}) {
+  const employeeCodes = [
+    ...new Set(importedData.map((emp) => emp.employee_code)),
+  ];
+  const primaryPhones = [
+    ...new Set(importedData.map((emp) => emp.primary_mobile_number)),
+  ];
+  const secondaryPhones = [
+    ...new Set(importedData.map((emp) => emp.secondary_mobile_number)),
+  ];
+  const emails = [...new Set(importedData.map((emp) => emp.personal_email))];
+
+  const query = supabase
+    .from("employees")
+    .select(
+      `
+      id,
+      employee_code,
+      primary_mobile_number,
+      secondary_mobile_number,
+      personal_email
+    `
+    )
+    .or(
+      [
+        `employee_code.in.(${employeeCodes.map((code) => code).join(",")})`,
+        `primary_mobile_number.in.(${primaryPhones
+          .map((phone) => phone)
+          .join(",")})`,
+        `secondary_mobile_number.in.(${secondaryPhones
+          .map((phone) => phone)
+          .join(",")})`,
+        `personal_email.in.(${emails.map((email) => email).join(",")})`,
+      ].join(",")
+    );
+
+  const { data: conflictingRecords, error } = await query;
+
+  if (error) {
+    console.error("Error fetching conflicts:", error);
+    return { conflictingIndices: [], error };
+  }
+
+  const conflictingIndices = importedData.reduce(
+    (indices: number[], record, index) => {
+      const hasConflict = conflictingRecords?.some(
+        (existing) =>
+          existing.employee_code === record.employee_code ||
+          existing.primary_mobile_number === record.primary_mobile_number ||
+          existing.secondary_mobile_number === record.secondary_mobile_number ||
+          existing.personal_email === record.personal_email
+      );
+
+      if (hasConflict) {
+        indices.push(index);
+      }
+      return indices;
+    },
+    []
+  );
+
+  return { conflictingIndices, error: null };
+}
+
 export async function createEmployeePersonalsFromImportedData({
   supabase,
   data,
@@ -802,156 +868,210 @@ export async function createEmployeePersonalsFromImportedData({
   data: EmployeeDatabaseInsert[];
   import_type?: string;
 }) {
-  const { data: existingRecords, error } =
-    await getAllEmployeeNonDuplicatingDetailsFromPersonals({
-      supabase,
-    });
+  if (!data || data.length === 0) {
+    return { status: "No data provided", error: null };
+  }
+
+  const employeeCodes = [...new Set(data.map((emp) => emp.employee_code))];
+  const primaryPhones = [
+    ...new Set(data.map((emp) => emp.primary_mobile_number)),
+  ];
+  const secondaryPhones = [
+    ...new Set(data.map((emp) => emp.secondary_mobile_number)),
+  ];
+  const emails = [...new Set(data.map((emp) => emp.personal_email))];
+
+  const query = supabase
+    .from("employees")
+    .select(
+      `id,
+      employee_code,
+      primary_mobile_number,
+      secondary_mobile_number,
+      personal_email`
+    )
+    .or(
+      [
+        `employee_code.in.(${employeeCodes.join(",")})`,
+        `primary_mobile_number.in.(${primaryPhones.join(",")})`,
+        `secondary_mobile_number.in.(${secondaryPhones.join(",")})`,
+        `personal_email.in.(${emails.join(",")})`,
+      ].join(",")
+    );
+
+  const { data: conflictingRecords, error } = await query;
+
   if (error) {
-    console.error(error);
+    console.error("Error fetching conflicts:", error);
+    return { status: "Error fetching conflicts", error };
   }
 
   if (import_type === "skip") {
-    const newData = data.filter((entry) => {
-      return !existingRecords?.some((existing) => {
-        const normalize = (value: any) => String(value).trim().toLowerCase();
-
-        return (
-          normalize(existing.employee_code) ===
-            normalize(entry.employee_code) ||
-          normalize(existing.primary_mobile_number) ===
-            normalize(entry.primary_mobile_number) ||
-          normalize(existing.secondary_mobile_number) ===
-            normalize(entry.secondary_mobile_number) ||
-          normalize(existing.personal_email) === normalize(entry.personal_email)
-        );
-      });
+    const newData = data.filter((record) => {
+      const hasConflict = conflictingRecords?.some(
+        (existing) =>
+          existing.employee_code === record.employee_code ||
+          existing.primary_mobile_number === record.primary_mobile_number ||
+          existing.secondary_mobile_number === record.secondary_mobile_number ||
+          existing.personal_email === record.personal_email
+      );
+      return !hasConflict;
     });
 
     if (newData.length === 0) {
-      return { status: "No new data to insert", error: null };
+      return {
+        status: "No new data to insert after filtering duplicates",
+        error: null,
+      };
     }
 
-    const { error, status } = await supabase.from("employees").upsert(newData, {
-      onConflict:
-        "employee_code,primary_mobile_number,secondary_mobile_number,personal_email",
-    });
+    const BATCH_SIZE = 50;
 
-    if (error) {
-      console.error("Error inserting employee personals data:", error);
-      return { status, error };
-    }
+    for (let i = 0; i < newData.length; i += BATCH_SIZE) {
+      const batch = newData.slice(i, Math.min(i + BATCH_SIZE, newData.length));
 
-    return { status, error: null };
-  }
-  if (import_type === "overwrite") {
-    const newData: EmployeeDatabaseInsert[] = [];
-    const conflictingData: EmployeeDatabaseInsert[] = [];
-
-    // biome-ignore lint/complexity/noForEach: <explanation>
-    data.forEach((entry) => {
-      const hasConflict = existingRecords?.some((existing) => {
-        const normalize = (value: any) => String(value).trim().toLowerCase();
-
-        return (
-          normalize(existing.employee_code) === normalize(entry.employee_code)
-        );
-      });
-
-      if (hasConflict) {
-        conflictingData.push(entry);
-      } else {
-        newData.push(entry);
-      }
-    });
-
-    for (const entry of conflictingData) {
-      const existing: EmployeeDatabaseInsert = existingRecords?.find(
-        (existing) => existing.employee_code === entry.employee_code
-      );
-
-      if (existing) {
-        const updateData: Partial<EmployeeDatabaseInsert> = {
-          primary_mobile_number:
-            entry.primary_mobile_number !== existing.primary_mobile_number
-              ? entry.primary_mobile_number
-              : existing.primary_mobile_number,
-          secondary_mobile_number:
-            entry.secondary_mobile_number !== existing.secondary_mobile_number
-              ? entry.secondary_mobile_number
-              : existing.secondary_mobile_number,
-          personal_email:
-            entry.personal_email !== existing.personal_email
-              ? entry.personal_email
-              : existing.personal_email,
-          first_name:
-            entry.first_name !== existing.first_name
-              ? entry.first_name
-              : existing.first_name,
-          middle_name:
-            entry.middle_name !== existing.middle_name
-              ? entry.middle_name
-              : existing.middle_name,
-          last_name:
-            entry.last_name !== existing.last_name
-              ? entry.last_name
-              : existing.last_name,
-          date_of_birth:
-            entry.date_of_birth !== existing.date_of_birth
-              ? entry.date_of_birth
-              : existing.date_of_birth,
-          gender:
-            entry.gender !== existing.gender ? entry.gender : existing.gender,
-          education:
-            entry.education !== existing.education
-              ? entry.education
-              : existing.education,
-          marital_status:
-            entry.marital_status !== existing.marital_status
-              ? entry.marital_status
-              : existing.marital_status,
-          nationality:
-            entry.nationality !== existing.nationality
-              ? entry.nationality
-              : existing.nationality,
-          is_active:
-            entry.is_active !== existing.is_active
-              ? entry.is_active
-              : existing.is_active,
-        };
-
-        const { error: updateError, status } = await supabase
-          .from("employees")
-          .update(updateData)
-          .eq("employee_code", existing.employee_code);
-
-        if (updateError) {
-          console.error(
-            "Error updating conflicting employee record:",
-            updateError
-          );
-          return {
-            status,
-            error: updateError,
-          };
-        }
-      }
-    }
-
-    if (newData.length > 0) {
-      const { error: insertError, status: insertStatus } = await supabase
+      const { error: insertError } = await supabase
         .from("employees")
-        .upsert(newData, {
-          onConflict: "employee_code",
-        });
+        .insert(batch)
+        .select();
 
       if (insertError) {
-        console.error("Error inserting new employee records:", insertError);
-        return { status: insertStatus, error: insertError };
+        console.error("Error inserting batch:", insertError);
       }
     }
 
-    return { status: "Data processed successfully", error: null };
+    return {
+      status: "Successfully inserted new records",
+      error: null,
+    };
   }
+
+  if (import_type === "overwrite") {
+    const results = await Promise.all(
+      data.map(async (record) => {
+        const conflictingRecord = conflictingRecords?.find(
+          (existing) =>
+            existing.employee_code === record.employee_code ||
+            existing.primary_mobile_number === record.primary_mobile_number ||
+            existing.secondary_mobile_number ===
+              record.secondary_mobile_number ||
+            existing.personal_email === record.personal_email
+        );
+
+        if (conflictingRecord) {
+          const { error: updateError } = await supabase
+            .from("employees")
+            .update(record)
+            .eq("employee_code", conflictingRecord.employee_code);
+
+          return { type: "update", error: updateError };
+        }
+
+        const { error: insertError } = await supabase
+          .from("employees")
+          .insert(record);
+
+        return { type: "insert", error: insertError };
+      })
+    );
+
+    const errors = results.filter((r) => r.error);
+
+    if (errors.length > 0) {
+      console.error("Errors during processing:", errors);
+    }
+
+    return {
+      status: "Successfully processed updates and new insertions",
+      error: null,
+    };
+  }
+
+  return {
+    status: "Invalid import_type specified",
+    error: new Error("Invalid import_type"),
+  };
+}
+
+export async function getEmployeeStatutoryConflicts({
+  supabase,
+  importedData,
+}: {
+  supabase: TypedSupabaseClient;
+  importedData: EmployeeStatutoryDetailsDatabaseInsert[];
+}) {
+  const employeeIds = [...new Set(importedData.map((emp) => emp.employee_id))];
+  const aadhaarNumbers = [
+    ...new Set(importedData.map((emp) => emp.aadhaar_number)),
+  ];
+  const panNumbers = [...new Set(importedData.map((emp) => emp.pan_number))];
+  const uanNumbers = [...new Set(importedData.map((emp) => emp.uan_number))];
+  const pfNumbers = [...new Set(importedData.map((emp) => emp.pf_number))];
+  const esicNumbers = [...new Set(importedData.map((emp) => emp.esic_number))];
+  const drivings = [
+    ...new Set(importedData.map((emp) => emp.driving_license_number)),
+  ];
+  const passports = [
+    ...new Set(importedData.map((emp) => emp.passport_number)),
+  ];
+
+  const query = supabase
+    .from("employee_statutory_details")
+    .select(
+      `
+      employee_id,
+      aadhaar_number,
+      pan_number,
+      uan_number,
+      pf_number,
+      esic_number,
+      driving_license_number,
+      passport_number
+    `
+    )
+    .or(
+      [
+        `employee_id.in.(${employeeIds.map((id) => id).join(",")})`,
+        `aadhaar_number.in.(${aadhaarNumbers.map((num) => num).join(",")})`,
+        `pan_number.in.(${panNumbers.map((num) => num).join(",")})`,
+        `uan_number.in.(${uanNumbers.map((num) => num).join(",")})`,
+        `pf_number.in.(${pfNumbers.map((num) => num).join(",")})`,
+        `esic_number.in.(${esicNumbers.map((num) => num).join(",")})`,
+        `driving_license_number.in.(${drivings.map((num) => num).join(",")})`,
+        `passport_number.in.(${passports.map((num) => num).join(",")})`,
+      ].join(",")
+    );
+
+  const { data: conflictingRecords, error } = await query;
+
+  if (error) {
+    console.error("Error fetching conflicts:", error);
+    return { conflictingIndices: [], error };
+  }
+
+  const conflictingIndices = importedData.reduce(
+    (indices: number[], record, index) => {
+      const hasConflict = conflictingRecords?.some(
+        (existing) =>
+          existing.employee_id === record.employee_id ||
+          existing.aadhaar_number === record.aadhaar_number ||
+          existing.pan_number === record.pan_number ||
+          existing.uan_number === record.uan_number ||
+          existing.pf_number === record.pf_number ||
+          existing.esic_number === record.esic_number ||
+          existing.driving_license_number === record.driving_license_number ||
+          existing.passport_number === record.passport_number
+      );
+
+      if (hasConflict) {
+        indices.push(index);
+      }
+      return indices;
+    },
+    []
+  );
+
+  return { conflictingIndices, error: null };
 }
 
 export async function createEmployeeStatutoryFromImportedData({
@@ -963,150 +1083,222 @@ export async function createEmployeeStatutoryFromImportedData({
   data: EmployeeStatutoryDetailsDatabaseInsert[];
   import_type?: string;
 }) {
-  const { data: existingRecords, error } =
-    await getAllEmployeeNonDuplicatingDetailsFromStatutory({
-      supabase,
-    });
-  if (error) {
-    console.error(error);
+  if (!data || data.length === 0) {
+    return { status: "No data provided", error: null };
   }
+
+  const identifiers = data.map((entry) => ({
+    employee_id: entry.employee_id,
+    aadhaar_number: entry.aadhaar_number,
+    pan_number: entry.pan_number,
+    uan_number: entry.uan_number,
+    pf_number: entry.pf_number,
+    esic_number: entry.esic_number,
+    driving_license_number: entry.driving_license_number,
+    passport_number: entry.passport_number,
+  }));
+
+  const { data: existingRecords, error: existingError } = await supabase
+    .from("employee_statutory_details")
+    .select(
+      "employee_id, aadhaar_number, pan_number, uan_number, pf_number, esic_number, driving_license_number, passport_number"
+    )
+    .in(
+      "employee_id",
+      identifiers.map((entry) => entry.employee_id).filter(Boolean)
+    );
+  if (existingError) {
+    console.error("Error fetching existing records:", existingError);
+    return { status: "Error fetching existing records", error: existingError };
+  }
+
+  const normalize = (value: any) =>
+    String(value || "")
+      .trim()
+      .toLowerCase();
+
+  const existingSets = {
+    ids: new Set(existingRecords?.map((e) => normalize(e.employee_id)) || []),
+    aadhaars: new Set(
+      existingRecords?.map((e) => normalize(e.aadhaar_number)) || []
+    ),
+    pans: new Set(existingRecords?.map((e) => normalize(e.pan_number)) || []),
+    uans: new Set(existingRecords?.map((e) => normalize(e.uan_number)) || []),
+    pfs: new Set(existingRecords?.map((e) => normalize(e.pf_number)) || []),
+    esics: new Set(existingRecords?.map((e) => normalize(e.esic_number)) || []),
+    drivingLicenses: new Set(
+      existingRecords?.map((e) => normalize(e.driving_license_number)) || []
+    ),
+    passports: new Set(
+      existingRecords?.map((e) => normalize(e.passport_number)) || []
+    ),
+  };
+
   if (import_type === "skip") {
     const newData = data.filter((entry) => {
-      return !existingRecords?.some((existing) => {
-        const normalize = (value: any) => String(value).trim().toLowerCase();
+      const hasConflict =
+        existingSets.ids.has(normalize(entry.employee_id)) ||
+        (entry.aadhaar_number &&
+          existingSets.aadhaars.has(normalize(entry.aadhaar_number))) ||
+        (entry.pan_number &&
+          existingSets.pans.has(normalize(entry.pan_number))) ||
+        (entry.uan_number &&
+          existingSets.uans.has(normalize(entry.uan_number))) ||
+        (entry.pf_number && existingSets.pfs.has(normalize(entry.pf_number))) ||
+        (entry.esic_number &&
+          existingSets.esics.has(normalize(entry.esic_number))) ||
+        (entry.driving_license_number &&
+          existingSets.drivingLicenses.has(
+            normalize(entry.driving_license_number)
+          )) ||
+        (entry.passport_number &&
+          existingSets.passports.has(normalize(entry.passport_number)));
 
-        return (
-          normalize(existing.employee_id) === normalize(entry.employee_id) ||
-          normalize(existing.aadhaar_number) ===
-            normalize(entry.aadhaar_number) ||
-          normalize(existing.pan_number) === normalize(entry.pan_number) ||
-          normalize(existing.uan_number) === normalize(entry.uan_number) ||
-          normalize(existing.pf_number) === normalize(entry.pf_number) ||
-          normalize(existing.esic_number) === normalize(entry.esic_number) ||
-          normalize(existing.driving_license_number) ===
-            normalize(entry.driving_license_number) ||
-          normalize(existing.passport_number) ===
-            normalize(entry.passport_number)
-        );
-      });
+      return !hasConflict;
     });
 
     if (newData.length === 0) {
-      return { status: "No new data to insert", error: null };
+      return {
+        status: "No new data to insert after filtering duplicates",
+        error: null,
+      };
     }
 
-    const { error, status } = await supabase
-      .from("employee_statutory_details")
-      .upsert(newData, {
-        onConflict:
-          "aadhaar_number,pan_number,uan_number,pf_number,esic_number,driving_license_number,passport_number",
-      });
+    const BATCH_SIZE = 50;
 
-    if (error) {
-      console.error("Error inserting employee statutory data:", error);
-      return { status, error };
-    }
+    for (let i = 0; i < newData.length; i += BATCH_SIZE) {
+      const batch = newData.slice(i, Math.min(i + BATCH_SIZE, newData.length));
 
-    return { status, error: null };
-  }
-  if (import_type === "overwrite") {
-    const newData: EmployeeStatutoryDetailsDatabaseInsert[] = [];
-    const conflictingData: EmployeeStatutoryDetailsDatabaseInsert[] = [];
-
-    // biome-ignore lint/complexity/noForEach: <explanation>
-    data.forEach((entry) => {
-      const hasConflict = existingRecords?.some((existing) => {
-        const normalize = (value: any) => String(value).trim().toLowerCase();
-
-        return normalize(existing.employee_id) === normalize(entry.employee_id);
-      });
-
-      if (hasConflict) {
-        conflictingData.push(entry);
-      } else {
-        newData.push(entry);
-      }
-    });
-
-    for (const entry of conflictingData) {
-      const existing: EmployeeStatutoryDetailsDatabaseInsert =
-        existingRecords?.find(
-          (existing) => existing.employee_id === entry.employee_id
-        );
-
-      if (existing) {
-        const updateData: Partial<EmployeeStatutoryDetailsDatabaseInsert> = {
-          aadhaar_number:
-            entry.aadhaar_number !== existing.aadhaar_number
-              ? entry.aadhaar_number
-              : existing.aadhaar_number,
-          pan_number:
-            entry.pan_number !== existing.pan_number
-              ? entry.pan_number
-              : existing.pan_number,
-          uan_number:
-            entry.uan_number !== existing.uan_number
-              ? entry.uan_number
-              : existing.uan_number,
-          pf_number:
-            entry.pf_number !== existing.pf_number
-              ? entry.pf_number
-              : existing.pf_number,
-          esic_number:
-            entry.esic_number !== existing.esic_number
-              ? entry.esic_number
-              : existing.esic_number,
-          driving_license_number:
-            entry.driving_license_number !== existing.driving_license_number
-              ? entry.driving_license_number
-              : existing.driving_license_number,
-          passport_number:
-            entry.passport_number !== existing.passport_number
-              ? entry.passport_number
-              : existing.passport_number,
-          driving_license_expiry:
-            entry.driving_license_expiry !== existing.driving_license_expiry
-              ? entry.driving_license_expiry
-              : existing.driving_license_expiry,
-          passport_expiry:
-            entry.passport_expiry !== existing.passport_expiry
-              ? entry.passport_expiry
-              : existing.passport_expiry,
-        };
-
-        const { error: updateError } = await supabase
-          .from("employee_statutory_details")
-          .update(updateData)
-          .eq("employee_id", existing.employee_id);
-
-        if (updateError) {
-          console.error(
-            "Error updating conflicting employee record:",
-            updateError
-          );
-          return {
-            status: "Error updating conflicting data",
-            error: updateError,
-          };
-        }
-      }
-    }
-
-    if (newData.length > 0) {
-      const { error: insertError, status: insertStatus } = await supabase
+      const { error: insertError } = await supabase
         .from("employee_statutory_details")
-        .upsert(newData, {
-          onConflict: "employee_id",
-        });
+        .insert(batch)
+        .select();
 
       if (insertError) {
-        console.error("Error inserting new employee records:", insertError);
-        return { status: insertStatus, error: insertError };
+        console.error("Error inserting batch:", insertError);
       }
     }
 
-    return { status: "Data processed successfully", error: null };
+    return {
+      status: "Successfully inserted new records",
+      error: null,
+    };
   }
+
+  if (import_type === "overwrite") {
+    const results = await Promise.all(
+      data.map(async (record) => {
+        const existingRecord = existingRecords?.find(
+          (existing) =>
+            normalize(existing.employee_id) === normalize(record.employee_id) ||
+            (record.aadhaar_number &&
+              normalize(existing.aadhaar_number) ===
+                normalize(record.aadhaar_number)) ||
+            (record.pan_number &&
+              normalize(existing.pan_number) ===
+                normalize(record.pan_number)) ||
+            (record.uan_number &&
+              normalize(existing.uan_number) ===
+                normalize(record.uan_number)) ||
+            (record.pf_number &&
+              normalize(existing.pf_number) === normalize(record.pf_number)) ||
+            (record.esic_number &&
+              normalize(existing.esic_number) ===
+                normalize(record.esic_number)) ||
+            (record.driving_license_number &&
+              normalize(existing.driving_license_number) ===
+                normalize(record.driving_license_number)) ||
+            (record.passport_number &&
+              normalize(existing.passport_number) ===
+                normalize(record.passport_number))
+        );
+
+        if (existingRecord) {
+          const { error: updateError } = await supabase
+            .from("employee_statutory_details")
+            .update(record)
+            .eq("employee_id", existingRecord.employee_id);
+
+          return { type: "update", error: updateError };
+        }
+
+        const { error: insertError } = await supabase
+          .from("employee_statutory_details")
+          .insert(record);
+
+        return { type: "insert", error: insertError };
+      })
+    );
+
+    const errors = results.filter((r) => r.error);
+
+    if (errors.length > 0) {
+      console.error("Errors during processing:", errors);
+    }
+
+    return {
+      status: "Successfully processed updates and new insertions",
+      error: null,
+    };
+  }
+
+  return {
+    status: "Invalid import_type specified",
+    error: new Error("Invalid import_type"),
+  };
+}
+
+export async function getEmployeeBankingConflicts({
+  supabase,
+  importedData,
+}: {
+  supabase: TypedSupabaseClient;
+  importedData: EmployeeBankDetailsDatabaseInsert[];
+}) {
+  const employeeIds = [...new Set(importedData.map((emp) => emp.employee_id))];
+  const accountNumbers = [
+    ...new Set(importedData.map((emp) => emp.account_number)),
+  ];
+
+  const query = supabase
+    .from("employee_bank_details")
+    .select(
+      `
+      employee_id,
+      account_number
+    `
+    )
+    .or(
+      [
+        `employee_id.in.(${employeeIds.map((id) => id).join(",")})`,
+        `account_number.in.(${accountNumbers.map((num) => num).join(",")})`,
+      ].join(",")
+    );
+
+  const { data: conflictingRecords, error } = await query;
+
+  if (error) {
+    console.error("Error fetching conflicts:", error);
+    return { conflictingIndices: [], error };
+  }
+
+  const conflictingIndices = importedData.reduce(
+    (indices: number[], record, index) => {
+      const hasConflict = conflictingRecords?.some(
+        (existing) =>
+          existing.employee_id === record.employee_id ||
+          existing.account_number === record.account_number
+      );
+
+      if (hasConflict) {
+        indices.push(index);
+      }
+      return indices;
+    },
+    []
+  );
+
+  return { conflictingIndices, error: null };
 }
 
 export async function createEmployeeBankingFromImportedData({
@@ -1118,129 +1310,121 @@ export async function createEmployeeBankingFromImportedData({
   data: EmployeeBankDetailsDatabaseInsert[];
   import_type?: string;
 }) {
-  const { data: existingRecords, error: fetchError } = await supabase
-    .from("employee_bank_details")
-    .select("account_number,employee_id");
-
-  if (fetchError) {
-    console.error("Error fetching existing records:", fetchError);
-    return { error: fetchError };
+  if (!data || data.length === 0) {
+    return { status: "No data provided", error: null };
   }
+
+  const identifiers = data.map((entry) => ({
+    employee_id: entry.employee_id,
+    accountnumber: entry.account_number,
+  }));
+
+  const { data: existingRecords, error: existingError } = await supabase
+    .from("employee_bank_details")
+    .select("employee_id, account_number")
+    .in(
+      "employee_id",
+      identifiers.map((entry) => entry.employee_id).filter(Boolean)
+    );
+  if (existingError) {
+    console.error("Error fetching existing records:", existingError);
+    return { status: "Error fetching existing records", error: existingError };
+  }
+
+  const normalize = (value: any) =>
+    String(value || "")
+      .trim()
+      .toLowerCase();
+
+  const existingSets = {
+    ids: new Set(existingRecords?.map((e) => normalize(e.employee_id)) || []),
+    accounts: new Set(
+      existingRecords?.map((e) => normalize(e.account_number)) || []
+    ),
+  };
+
   if (import_type === "skip") {
     const newData = data.filter((entry) => {
-      return !existingRecords?.some((existing) => {
-        const normalize = (value: any) => String(value).trim().toLowerCase();
+      const hasConflict =
+        existingSets.ids.has(normalize(entry.employee_id)) ||
+        (entry.account_number &&
+          existingSets.accounts.has(normalize(entry.account_number)));
 
-        return (
-          normalize(existing.account_number) ===
-            normalize(entry.account_number) ||
-          normalize(existing.employee_id) === normalize(entry.employee_id)
-        );
-      });
+      return !hasConflict;
     });
 
     if (newData.length === 0) {
-      return { status: "No new data to insert", error: null };
+      return {
+        status: "No new data to insert after filtering duplicates",
+        error: null,
+      };
     }
 
-    const { error, status } = await supabase
-      .from("employee_bank_details")
-      .upsert(newData, {
-        onConflict: "account_number",
-      });
+    const BATCH_SIZE = 50;
 
-    if (error) {
-      console.error("Error inserting employee banking data:", error);
-      return { status, error };
-    }
+    for (let i = 0; i < newData.length; i += BATCH_SIZE) {
+      const batch = newData.slice(i, Math.min(i + BATCH_SIZE, newData.length));
 
-    return { status, error: null };
-  }
-  if (import_type === "overwrite") {
-    const newData: EmployeeBankDetailsDatabaseInsert[] = [];
-    const conflictingData: EmployeeBankDetailsDatabaseInsert[] = [];
-
-    // biome-ignore lint/complexity/noForEach: <explanation>
-    data.forEach((entry) => {
-      const hasConflict = existingRecords?.some((existing) => {
-        const normalize = (value: any) => String(value).trim().toLowerCase();
-
-        return normalize(existing.employee_id) === normalize(entry.employee_id);
-      });
-
-      if (hasConflict) {
-        conflictingData.push(entry);
-      } else {
-        newData.push(entry);
-      }
-    });
-
-    for (const entry of conflictingData) {
-      const existing: EmployeeBankDetailsDatabaseInsert = existingRecords?.find(
-        (existing) => existing.employee_id === entry.employee_id
-      );
-
-      if (existing) {
-        const updateData: Partial<EmployeeBankDetailsDatabaseInsert> = {
-          account_holder_name:
-            entry.account_holder_name !== existing.account_holder_name
-              ? entry.account_holder_name
-              : existing.account_holder_name,
-          account_number:
-            entry.account_number !== existing.account_number
-              ? entry.account_number
-              : existing.account_number,
-          account_type:
-            entry.account_type !== existing.account_type
-              ? entry.account_type
-              : existing.account_type,
-          bank_name:
-            entry.bank_name !== existing.bank_name
-              ? entry.bank_name
-              : existing.bank_name,
-          branch_name:
-            entry.branch_name !== existing.branch_name
-              ? entry.branch_name
-              : existing.branch_name,
-          ifsc_code:
-            entry.ifsc_code !== existing.ifsc_code
-              ? entry.ifsc_code
-              : existing.ifsc_code,
-        };
-
-        const { error: updateError } = await supabase
-          .from("employee_bank_details")
-          .update(updateData)
-          .eq("employee_id", existing.employee_id);
-
-        if (updateError) {
-          console.error(
-            "Error updating conflicting employee record:",
-            updateError
-          );
-          return {
-            status: "Error updating conflicting data",
-            error: updateError,
-          };
-        }
-      }
-    }
-
-    if (newData.length > 0) {
-      const { error: insertError, status: insertStatus } = await supabase
+      const { error: insertError } = await supabase
         .from("employee_bank_details")
-        .upsert(newData, {
-          onConflict: "employee_id",
-        });
+        .insert(batch)
+        .select();
 
       if (insertError) {
-        console.error("Error inserting new employee records:", insertError);
-        return { status: insertStatus, error: insertError };
+        console.error("Error inserting batch:", insertError);
       }
     }
 
-    return { status: "Data processed successfully", error: null };
+    return {
+      status: "Successfully inserted new records",
+      error: null,
+    };
   }
+
+  if (import_type === "overwrite") {
+    const results = await Promise.all(
+      data.map(async (record) => {
+        const existingRecord = existingRecords?.find(
+          (existing) =>
+            normalize(existing.employee_id) === normalize(record.employee_id) ||
+            (record.account_number &&
+              normalize(existing.account_number) ===
+                normalize(record.account_number))
+        );
+
+        if (existingRecord) {
+          const { error: updateError } = await supabase
+            .from("employee_bank_details")
+            .update(record)
+            .eq("employee_id", existingRecord.employee_id);
+
+          return { type: "update", error: updateError };
+        }
+
+        const { error: insertError } = await supabase
+          .from("employee_bank_details")
+          .insert(record);
+
+        return { type: "insert", error: insertError };
+      })
+    );
+
+    const errors = results.filter((r) => r.error);
+
+    if (errors.length > 0) {
+      console.error("Errors during processing:", errors);
+    }
+
+    return {
+      status: "Successfully processed updates and new insertions",
+      error: null,
+    };
+  }
+
+  return {
+    status: "Invalid import_type specified",
+    error: new Error("Invalid import_type"),
+  };
 }
 
 export async function createEmployeeAddressFromImportedData({
@@ -1262,6 +1446,67 @@ export async function createEmployeeAddressFromImportedData({
   return { status, error };
 }
 
+export async function getEmployeeGuardiansConflicts({
+  supabase,
+  importedData,
+}: {
+  supabase: TypedSupabaseClient;
+  importedData: EmployeeGuardianDatabaseInsert[];
+}) {
+  const mobileNumbers = [
+    ...new Set(importedData.map((emp) => emp.mobile_number)),
+  ];
+  const alternateMobileNumbers = [
+    ...new Set(importedData.map((emp) => emp.alternate_mobile_number)),
+  ];
+  const emails = [...new Set(importedData.map((emp) => emp.email))];
+
+  const query = supabase
+    .from("employee_guardians")
+    .select(
+      `
+      mobile_number,
+      alternate_mobile_number,
+      email
+    `
+    )
+    .or(
+      [
+        `mobile_number.in.(${mobileNumbers.map((num) => num).join(",")})`,
+        `alternate_mobile_number.in.(${alternateMobileNumbers
+          .map((num) => num)
+          .join(",")})`,
+        `email.in.(${emails.map((email) => email).join(",")})`,
+      ].join(",")
+    );
+
+  const { data: conflictingRecords, error } = await query;
+
+  if (error) {
+    console.error("Error fetching conflicts:", error);
+    return { conflictingIndices: [], error };
+  }
+
+  const conflictingIndices = importedData.reduce(
+    (indices: number[], record, index) => {
+      const hasConflict = conflictingRecords?.some(
+        (existing) =>
+          existing.mobile_number === record.mobile_number ||
+          existing.alternate_mobile_number === record.alternate_mobile_number ||
+          existing.email === record.email
+      );
+
+      if (hasConflict) {
+        indices.push(index);
+      }
+      return indices;
+    },
+    []
+  );
+
+  return { conflictingIndices, error: null };
+}
+
 export async function createEmployeeGuardiansFromImportedData({
   supabase,
   data,
@@ -1271,26 +1516,57 @@ export async function createEmployeeGuardiansFromImportedData({
   data: EmployeeGuardianDatabaseInsert[];
   import_type?: string;
 }) {
-  const { data: existingRecords, error } =
-    await getAllEmployeeNonDuplicatingDetailsFromGuardians({
-      supabase,
-    });
-  if (error) {
-    console.error(error);
+  if (!data || data.length === 0) {
+    return { status: "No data provided", error: null };
   }
+
+  const normalize = (value: any) =>
+    String(value || "")
+      .trim()
+      .toLowerCase();
+
+  const orConditions = data.map((entry) =>
+    [
+      entry.mobile_number ? `mobile_number.eq.${entry.mobile_number}` : null,
+      entry.alternate_mobile_number
+        ? `alternate_mobile_number.eq.${entry.alternate_mobile_number}`
+        : null,
+      entry.email ? `email.eq.${entry.email}` : null,
+    ]
+      .filter(Boolean)
+      .join(",")
+  );
+
+  const { data: existingRecords, error: fetchError } = await supabase
+    .from("employee_guardians")
+    .select("*")
+    .or(orConditions.join(","));
+
+  if (fetchError) {
+    console.error("Error fetching existing records:", fetchError);
+    return { error: fetchError };
+  }
+
+  const existingSets = {
+    mobileNumbers: new Set(
+      existingRecords?.map((e) => normalize(e.mobile_number)) || []
+    ),
+    alternateMobileNumbers: new Set(
+      existingRecords?.map((e) => normalize(e.alternate_mobile_number)) || []
+    ),
+    emails: new Set(existingRecords?.map((e) => normalize(e.email)) || []),
+  };
+
   if (import_type === "skip") {
     const newData = data.filter((entry) => {
-      return !existingRecords?.some((existing) => {
-        const normalize = (value: any) => String(value).trim().toLowerCase();
+      const hasConflict =
+        existingSets.mobileNumbers.has(normalize(entry.mobile_number)) ||
+        existingSets.alternateMobileNumbers.has(
+          normalize(entry.alternate_mobile_number)
+        ) ||
+        existingSets.emails.has(normalize(entry.email));
 
-        return (
-          normalize(existing.mobile_number) ===
-            normalize(entry.mobile_number) ||
-          normalize(existing.alternate_mobile_number) ===
-            normalize(entry.alternate_mobile_number) ||
-          normalize(existing.email) === normalize(entry.email)
-        );
-      });
+      return !hasConflict;
     });
 
     if (newData.length === 0) {
@@ -1299,122 +1575,65 @@ export async function createEmployeeGuardiansFromImportedData({
 
     const { error, status } = await supabase
       .from("employee_guardians")
-      .upsert(newData, {
-        onConflict: "mobile_number,alternate_mobile_number,email",
-      });
+      .upsert(newData);
 
     if (error) {
       console.error("Error inserting employee guardians data:", error);
-      return { status, error };
+     
     }
 
     return { status, error: null };
   }
+
   if (import_type === "overwrite") {
-    const newData: EmployeeGuardianDatabaseInsert[] = [];
-    const conflictingData: EmployeeGuardianDatabaseInsert[] = [];
-
-    // biome-ignore lint/complexity/noForEach: <explanation>
-    data.forEach((entry) => {
-      const hasConflict = existingRecords?.some((existing) => {
-        const normalize = (value: any) => String(value).trim().toLowerCase();
-
-        return (
-          normalize(existing.mobile_number) ===
-            normalize(entry.mobile_number) ||
-          normalize(existing.alternate_mobile_number) ===
+    for (const entry of data) {
+      const existing = existingRecords?.find(
+        (record) =>
+          normalize(record.mobile_number) === normalize(entry.mobile_number) ||
+          normalize(record.alternate_mobile_number) ===
             normalize(entry.alternate_mobile_number) ||
-          normalize(existing.email) === normalize(entry.email)
-        );
-      });
-
-      if (hasConflict) {
-        conflictingData.push(entry);
-      } else {
-        newData.push(entry);
-      }
-    });
-
-    for (const entry of conflictingData) {
-      const existing: EmployeeGuardianDatabaseInsert = existingRecords?.find(
-        (existing) =>
-          existing.mobile_number === entry.mobile_number ||
-          existing.alternate_mobile_number === entry.alternate_mobile_number ||
-          existing.email === entry.email
+          normalize(record.email) === normalize(entry.email)
       );
 
       if (existing) {
-        const updateData: Partial<EmployeeGuardianDatabaseInsert> = {
-          first_name:
-            entry.first_name !== existing.first_name
-              ? entry.first_name
-              : existing.first_name,
-          last_name:
-            entry.last_name !== existing.last_name
-              ? entry.last_name
-              : existing.last_name,
-          relationship:
-            entry.relationship !== existing.relationship
-              ? entry.relationship
-              : existing.relationship,
-          date_of_birth:
-            entry.date_of_birth !== existing.date_of_birth
-              ? entry.date_of_birth
-              : existing.date_of_birth,
-          gender:
-            entry.gender !== existing.gender ? entry.gender : existing.gender,
-          mobile_number:
-            entry.mobile_number !== existing.mobile_number
-              ? entry.mobile_number
-              : existing.mobile_number,
-          alternate_mobile_number:
-            entry.alternate_mobile_number !== existing.alternate_mobile_number
-              ? entry.alternate_mobile_number
-              : existing.alternate_mobile_number,
-          email: entry.email !== existing.email ? entry.email : existing.email,
-          address_same_as_employee:
-            entry.address_same_as_employee !== existing.address_same_as_employee
-              ? entry.address_same_as_employee
-              : existing.address_same_as_employee,
-          is_emergency_contact:
-            entry.is_emergency_contact !== existing.is_emergency_contact
-              ? entry.is_emergency_contact
-              : existing.is_emergency_contact,
-        };
+        const updateData: EmployeeAddressDatabaseUpdate = {};
 
-        const { error: updateError } = await supabase
-          .from("employee_guardians")
-          .update(updateData)
-          .or(
-            `mobile_number.eq.${existing.mobile_number},alternate_mobile_number.eq.${existing.alternate_mobile_number},email.eq.${existing.email}`
-          );
-
-        if (updateError) {
-          console.error(
-            "Error updating conflicting employee record:",
-            updateError
-          );
-          return {
-            status: "Error updating conflicting data",
-            error: updateError,
-          };
+        const keys = Object.keys(entry);
+        for (let i = 0; i < keys.length; i++) {
+          const key = keys[i] as keyof typeof entry;
+          if (entry[key] !== existing[key]) {
+            (updateData as any)[key] = entry[key];
+          }
         }
-      }
-    }
 
-    if (newData.length > 0) {
-      const { error: insertError, status: insertStatus } = await supabase
-        .from("employee_bank_details")
-        .upsert(newData, {
-          onConflict: "employee_id",
-        });
+        if (Object.keys(updateData).length > 0) {
+          const { error: updateError } = await supabase
+            .from("employee_guardians")
+            .update(updateData)
+            .eq("id", existing.id);
 
-      if (insertError) {
-        console.error("Error inserting new employee records:", insertError);
-        return { status: insertStatus, error: insertError };
+          if (updateError) {
+            console.error("Error updating record:", updateError);
+            
+          }
+        }
+      } else {
+        const { error: insertError } = await supabase
+          .from("employee_guardians")
+          .insert(entry);
+
+        if (insertError) {
+          console.error("Error inserting new record:", insertError);
+          
+        }
       }
     }
 
     return { status: "Data processed successfully", error: null };
   }
+
+  return {
+    status: "Invalid import_type specified",
+    error: new Error("Invalid import_type"),
+  };
 }

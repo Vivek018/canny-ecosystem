@@ -731,6 +731,8 @@ export const ImportReimbursementDataSchema = z.object({
 
 export const duplicationTypeArray = ["overwrite", "skip"] as const;
 
+
+
 export const ImportEmployeePersonalsHeaderSchemaObject = z.object({
   employee_code: z.string(),
   first_name: z.string(),
@@ -745,6 +747,7 @@ export const ImportEmployeePersonalsHeaderSchemaObject = z.object({
   primary_mobile_number: z.string(),
   secondary_mobile_number: z.string().optional(),
 });
+
 export const ImportEmployeePersonalsHeaderSchema =
   ImportEmployeePersonalsHeaderSchemaObject.refine(
     (data) => {

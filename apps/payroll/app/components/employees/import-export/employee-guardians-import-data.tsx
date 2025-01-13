@@ -1,85 +1,116 @@
 import { ImportedDataColumns } from "@/components/employees/imported-guardians-table/columns";
 import { ImportedDataTable } from "@/components/employees/imported-guardians-table/imported-data-table";
 import { useImportStoreForEmployeeGuardians } from "@/store/import";
-import type { ImportEmployeeGuardiansDataType } from "@canny_ecosystem/supabase/queries";
+import { useSupabase } from "@canny_ecosystem/supabase/client";
+import {
+  createEmployeeGuardiansFromImportedData,
+  getEmployeeGuardiansConflicts,
+} from "@canny_ecosystem/supabase/mutations";
+import { getEmployeeIdsByEmployeeCodes } from "@canny_ecosystem/supabase/queries";
+import type {
+  EmployeeBankDetailsDatabaseInsert,
+  SupabaseEnv,
+} from "@canny_ecosystem/supabase/types";
+import { Button } from "@canny_ecosystem/ui/button";
 import { Combobox } from "@canny_ecosystem/ui/combobox";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import {
   duplicationTypeArray,
+  ImportEmployeeGuardiansDataSchema,
   transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
-import Papa from "papaparse";
+import { useNavigate } from "@remix-run/react";
+
 import { useState, useEffect } from "react";
 
 export function EmployeeGuardiansImportData({
-  fieldMapping,
-  file,
-  allNonDuplicants,
+  env,
+  conflictingIndices,
 }: {
-  fieldMapping: Record<string, string>;
-  file: any;
-  allNonDuplicants: any;
+  env: SupabaseEnv;
+  conflictingIndices: number[];
 }) {
-  const { importData, setImportData } = useImportStoreForEmployeeGuardians();
-  const [conflictingIndices, setConflictingIndices] = useState<number[]>([]);
-  const swappedFieldMapping = Object.fromEntries(
-    Object.entries(fieldMapping).map(([key, value]) => [value, key])
-  );
-
-  useEffect(() => {
-    if (file) {
-      Papa.parse(file, {
-        header: true,
-        skipEmptyLines: true,
-        transformHeader: (header) => {
-          return swappedFieldMapping[header] || header;
-        },
-        complete: (results) => {
-          const finalTableData = results.data.filter((entry) =>
-            Object.values(entry!).some((value) => String(value).trim() !== "")
-          );
-
-          setImportData({
-            data: finalTableData as ImportEmployeeGuardiansDataType[],
-          });
-        },
-        error: (error) => {
-          console.error("Parsing error: ", error);
-        },
-      });
-    }
-  }, [file, fieldMapping]);
-
-  useEffect(() => {
-    const conflicts: number[] = [];
-
-    importData.data.forEach((entry, index) => {
-      const normalize = (value: any) => String(value).trim().toLowerCase();
-      const isConflict = allNonDuplicants.some(
-        (existing: any) =>
-          normalize(existing.mobile_number) ===
-            normalize(entry.mobile_number) ||
-          normalize(existing.alternate_mobile_number) ===
-            normalize(entry.alternate_mobile_number) ||
-          normalize(existing.email) === normalize(entry.email)
-      );
-
-      if (isConflict) {
-        conflicts.push(index);
-      }
-    });
-
-    setConflictingIndices(conflicts);
-  }, [importData, allNonDuplicants]);
-
+  const navigate = useNavigate();
+  const { supabase } = useSupabase({ env });
+  const { importData } = useImportStoreForEmployeeGuardians();
+  const [conflictingIndex, setConflictingIndex] =
+    useState<number[]>(conflictingIndices);
   const [searchString, setSearchString] = useState("");
   const [importType, setImportType] = useState<string>("skip");
   const [tableData, setTableData] = useState(importData.data);
+  const [finalData, setFinalData] =
+    useState<EmployeeBankDetailsDatabaseInsert[]>();
+
+  const validateImportData = (data: any[]) => {
+    try {
+      const result = ImportEmployeeGuardiansDataSchema.safeParse({ data });
+      if (!result.success) {
+        console.error("Data validation error");
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error("Data validation error:", error);
+
+      return false;
+    }
+  };
+
+  const fetchConflicts = async () => {
+    try {
+      const employeeCodes = importData.data!.map(
+        (value: { employee_code: any }) => value.employee_code
+      );
+      const { data: employees, error: idByCodeError } =
+        await getEmployeeIdsByEmployeeCodes({
+          supabase,
+          employeeCodes,
+        });
+
+      if (idByCodeError) {
+        throw idByCodeError;
+      }
+
+      const updatedData = importData.data!.map((item: any) => {
+        const employeeId = employees?.find(
+          (e: { employee_code: any }) => e.employee_code === item.employee_code
+        )?.id;
+
+        const { employee_code, ...rest } = item;
+        return {
+          ...rest,
+          ...(employeeId ? { employee_id: employeeId } : {}),
+        };
+      });
+
+      setFinalData(updatedData);
+      const { conflictingIndices, error } = await getEmployeeGuardiansConflicts(
+        {
+          supabase,
+          importedData: updatedData as EmployeeBankDetailsDatabaseInsert[],
+        }
+      );
+
+      if (error) {
+        throw error;
+      }
+
+      setConflictingIndex(conflictingIndices);
+    } catch (err) {
+      console.error("Error fetching conflicts:", err);
+    }
+  };
 
   useEffect(() => {
-    const filteredData = importData.data.filter((item) =>
+    if (importData) {
+      fetchConflicts();
+    }
+  }, [importData]);
+
+  useEffect(() => {
+    const filteredData = importData?.data.filter((item) =>
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
@@ -89,11 +120,31 @@ export function EmployeeGuardiansImportData({
     setTableData(filteredData);
   }, [searchString, importData]);
 
+  const handleFinalImport = async () => {
+    if (validateImportData(importData.data)) {
+      const { error, status } = await createEmployeeGuardiansFromImportedData({
+        data: finalData as EmployeeBankDetailsDatabaseInsert[],
+        import_type: importType,
+        supabase,
+      });
+
+      if (error) {
+        console.error(error);
+      }
+      if (
+        status === "No new data to insert" ||
+        status === "Data processed successfully"
+      ) {
+        navigate("/employees");
+      }
+    }
+  };
+
   return (
     <section className="m-4">
       <div className="w-full flex items-center justify-between pb-4">
-        <div className="w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4">
-          <div className="relative w-full">
+        <div className="w-full  flex justify-between items-center">
+          <div className="relative w-[30rem] ">
             <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
               <Icon
                 name="magnifying-glass"
@@ -108,20 +159,25 @@ export function EmployeeGuardiansImportData({
               className="pl-8 h-10 w-full focus-visible:ring-0"
             />
           </div>
-          <Combobox
-            className={cn(
-              "w-52 h-10",
-              conflictingIndices.length > 0 ? "flex" : "hidden"
-            )}
-            options={transformStringArrayIntoOptions(
-              duplicationTypeArray as unknown as string[]
-            )}
-            value={importType}
-            onChange={(value: string) => {
-              setImportType(value);
-            }}
-            placeholder={"Select Import Type"}
-          />
+          <div className="flex items-center gap-3">
+            <Combobox
+              className={cn(
+                "w-52 h-10",
+                conflictingIndex?.length > 0 ? "flex" : "hidden"
+              )}
+              options={transformStringArrayIntoOptions(
+                duplicationTypeArray as unknown as string[]
+              )}
+              value={importType}
+              onChange={(value: string) => {
+                setImportType(value);
+              }}
+              placeholder={"Select Import Type"}
+            />
+            <Button variant={"default"} onClick={handleFinalImport}>
+              Import
+            </Button>
+          </div>
         </div>
       </div>
       <input type="hidden" name="import_type" value={importType} />
@@ -133,7 +189,7 @@ export function EmployeeGuardiansImportData({
       <ImportedDataTable
         data={tableData}
         columns={ImportedDataColumns}
-        conflictingIndex={conflictingIndices}
+        conflictingIndex={conflictingIndex as any}
       />
     </section>
   );

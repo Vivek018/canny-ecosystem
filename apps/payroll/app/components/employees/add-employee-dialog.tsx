@@ -93,7 +93,7 @@ export function AddEmployeeDialog() {
           className="space-x-2 flex items-center"
         >
           <Icon name="import" size="sm" className="mb-0.5" />
-          <span>Import Guardian's</span>
+          <span>Import Guardians</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -96,9 +96,7 @@ export function Combobox({
                         : "opacity-0"
                     )}
                   />
-                  <p className="truncate">
-                    {replaceUnderscore(option?.label)}
-                  </p>
+                  <p className="truncate">{replaceUnderscore(option?.label)}</p>
                 </CommandItem>
               ))}
             </CommandGroup>

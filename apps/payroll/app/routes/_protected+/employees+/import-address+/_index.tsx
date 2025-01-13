@@ -23,9 +23,7 @@ import { EmployeeAddressImportHeader } from "@/components/employees/import-expor
 import { EmployeeAddressImportData } from "@/components/employees/import-export/employee-address-import-data";
 import { getEmployeeIdsByEmployeeCodes } from "@canny_ecosystem/supabase/queries";
 import { safeRedirect } from "@/utils/server/http.server";
-import {
-  createEmployeeAddressFromImportedData,
-} from "@canny_ecosystem/supabase/mutations";
+import { createEmployeeAddressFromImportedData } from "@canny_ecosystem/supabase/mutations";
 
 export const IMPORT_EMPLOYEE_ADDRESS = [
   "address-map-headers",
@@ -61,8 +59,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return redirect(url.toString(), { status: 302 });
   }
 
-  return json({ step, totalSteps, stepData });
-  // return json({ step, totalSteps, stepData }, { headers });
+  return json({ step, totalSteps, stepData }, { headers });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -109,7 +106,6 @@ export async function action({ request }: ActionFunctionArgs) {
           ...(employeeId ? { employee_id: employeeId } : {}),
         };
       });
-    
 
       const { status, error: dataEntryError } =
         await createEmployeeAddressFromImportedData({
