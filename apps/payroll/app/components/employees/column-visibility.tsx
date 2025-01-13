@@ -8,7 +8,7 @@ import {
   PopoverTrigger,
 } from "@canny_ecosystem/ui/popover";
 
-export function ColumnVisibility({ disabled }: { disabled?: boolean}) {
+export function ColumnVisibility({ disabled }: { disabled?: boolean }) {
   const { columns } = useEmployeesStore();
 
   return (

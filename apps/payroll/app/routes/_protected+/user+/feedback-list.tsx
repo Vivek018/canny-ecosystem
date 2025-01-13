@@ -78,8 +78,8 @@ export default function FeedbackList() {
                     feedback.severity === "urgent"
                       ? "text-destructive"
                       : feedback.severity === "normal"
-                      ? "text-purple-500"
-                      : "text-yellow-400"
+                        ? "text-purple-500"
+                        : "text-yellow-400",
                   )}
                 >
                   {feedback.severity}
@@ -128,7 +128,6 @@ export default function FeedbackList() {
             </Card>
           ))}
         </div>
-
         <PaginationButton
           page={page}
           totalCount={totalCount}

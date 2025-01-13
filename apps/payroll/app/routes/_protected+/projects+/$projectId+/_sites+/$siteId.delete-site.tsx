@@ -6,7 +6,10 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { json, useActionData, useNavigate } from "@remix-run/react";
 import { useEffect } from "react";
 
-export async function action({ request, params }: ActionFunctionArgs): Promise<Response> {
+export async function action({
+  request,
+  params,
+}: ActionFunctionArgs): Promise<Response> {
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
     const siteId = params.siteId;

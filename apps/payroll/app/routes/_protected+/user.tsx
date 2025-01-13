@@ -23,23 +23,23 @@ export default function Account() {
   const { pathname } = useLocation();
 
   return (
-    <section className='flex flex-col h-full'>
-      <div className='py-[18px] px-4 border-b'>
-      <SecondaryMenu
-        items={[
-          { label: "Account", path: "/user/account" },
-          { label: "Help", path: "/user/help" },
-          { label: "Feedback Form", path: "/user/feedback-form" },
-          data.company_type === "app_creator"
-            ? { label: "Feedback List", path: "/user/feedback-list" }
-            : {},
-        ]}
-        pathname={pathname}
-        Link={Link}
-      />
+    <section className="flex flex-col h-full">
+      <div className="py-[18px] px-4 border-b">
+        <SecondaryMenu
+          items={[
+            { label: "Account", path: "/user/account" },
+            { label: "Help", path: "/user/help" },
+            { label: "Feedback Form", path: "/user/feedback-form" },
+            data.company_type === "app_creator"
+              ? { label: "Feedback List", path: "/user/feedback-list" }
+              : {},
+          ]}
+          pathname={pathname}
+          Link={Link}
+        />
       </div>
       <div className="px-4 h-full">
-      <Outlet />
+        <Outlet />
       </div>
     </section>
   );

@@ -35,7 +35,7 @@ export function UserDataTable<TData, TValue>({
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
-          !tableLength && "border-none"
+          !tableLength && "border-none",
         )}
       >
         <div className="relative">
@@ -56,12 +56,12 @@ export function UserDataTable<TData, TValue>({
                         <TableCell
                           key={cell.id}
                           className={cn(
-                            "h-[60px] px-3 md:px-4 py-2 hidden md:table-cell"
+                            "h-[60px] px-3 md:px-4 py-2 hidden md:table-cell",
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                         </TableCell>
                       );

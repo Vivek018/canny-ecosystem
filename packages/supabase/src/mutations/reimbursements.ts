@@ -29,12 +29,12 @@ export async function createReimbursementsFromImportedData({
   data,
 }: {
   supabase: TypedSupabaseClient;
-  data: ReimbursementInsert[]; 
+  data: ReimbursementInsert[];
 }) {
-  const { error, status} = await supabase
+  const { error, status } = await supabase
     .from("reimbursements")
     .insert(data)
-    .select(); 
+    .select();
 
   if (error) {
     console.error(error);
@@ -42,7 +42,6 @@ export async function createReimbursementsFromImportedData({
 
   return { status, error };
 }
-
 
 export async function updateReimbursementsById({
   reimbursementId,

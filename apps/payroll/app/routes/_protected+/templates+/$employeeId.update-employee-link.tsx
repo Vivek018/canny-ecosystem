@@ -1,4 +1,4 @@
-import { isGoodStatus, UpdateEmployeeLinkSchema } from "@canny_ecosystem/utils";
+import { isGoodStatus, EmployeeLinkSchema } from "@canny_ecosystem/utils";
 import { parseWithZod } from "@conform-to/zod";
 import { json } from "@remix-run/react";
 import type { ActionFunctionArgs } from "@remix-run/node";
@@ -13,13 +13,13 @@ export async function action({ request, params }: ActionFunctionArgs) {
   const formData = await request.formData();
 
   const submission = parseWithZod(formData, {
-    schema: UpdateEmployeeLinkSchema,
+    schema: EmployeeLinkSchema,
   });
 
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 

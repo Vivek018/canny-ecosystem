@@ -8,11 +8,11 @@ import { Field } from "@canny_ecosystem/ui/forms";
 import { replaceUnderscore } from "@canny_ecosystem/utils";
 import { getInputProps } from "@conform-to/react";
 
-export function Step2({ fields }: { fields: any }) {
+export function ExitPaymentStep2({ fields }: { fields: any }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Employee's Exit Details Page-2</CardTitle>
+        <CardTitle>Employee's Exit Details Page 2</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 gap-10 my-4">
@@ -24,7 +24,7 @@ export function Step2({ fields }: { fields: any }) {
             }}
             labelProps={{
               children: replaceUnderscore(
-                fields.organization_payable_days.name
+                fields.organization_payable_days.name,
               ),
             }}
             errors={fields.organization_payable_days.errors}

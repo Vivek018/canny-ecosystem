@@ -31,7 +31,7 @@ export const reimbursementsColumns = ({
     cell: ({ row }) => {
       return (
         <p className="truncate">
-          {row.original?.employee_name?.employee_code ?? "--"}
+          {row.original?.employees?.employee_code ?? "--"}
         </p>
       );
     },
@@ -42,10 +42,10 @@ export const reimbursementsColumns = ({
     header: "Employee Name",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-48 group-hover:text-primary">{`${
-          row.original.employee_name?.first_name
-        } ${row.original.employee_name?.middle_name ?? ""} ${
-          row.original.employee_name?.last_name ?? ""
+        <p className="truncate text-primary/80 w-48 group-hover:text-primary">{`${
+          row.original.employees?.first_name
+        } ${row.original.employees?.middle_name ?? ""} ${
+          row.original.employees?.last_name ?? ""
         }`}</p>
       );
     },
@@ -112,8 +112,8 @@ export const reimbursementsColumns = ({
       return (
         <p className="truncate ">
           {
-            row.original.employee_name?.employee_project_assignment
-              .project_sites.projects.name
+            row.original.employees?.employee_project_assignment.project_sites
+              .projects.name
           }
         </p>
       );
@@ -127,8 +127,8 @@ export const reimbursementsColumns = ({
       return (
         <p className="truncate ">
           {
-            row.original.employee_name?.employee_project_assignment
-              .project_sites.name
+            row.original.employees?.employee_project_assignment.project_sites
+              .name
           }
         </p>
       );
@@ -145,7 +145,7 @@ export const reimbursementsColumns = ({
         <ReimbursementOptionsDropdown
           key={row.original.id}
           reimbursementId={row.original.id}
-          employeeId={row.original?.employee_name.id}
+          employeeId={row.original?.employees.id}
           isEmployeeRoute={isEmployeeRoute}
           triggerChild={
             <DropdownMenuTrigger asChild>

@@ -34,7 +34,6 @@ export function ProfessionalTaxWrapper({
       });
     }
   }, [error]);
-  
 
   return (
     <section className="p-4">

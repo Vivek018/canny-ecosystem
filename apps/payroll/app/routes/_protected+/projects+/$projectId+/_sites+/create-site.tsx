@@ -155,16 +155,16 @@ export default function CreateSite({
 }) {
   const { projectId, locationOptionsPromise, error } =
     useLoaderData<typeof loader>();
-    const actionData = useActionData<typeof action>();
-    const SITE_TAG = updateValues ? UPDATE_SITE : CREATE_SITE;
-    
-    const initialValues = updateValues ?? getInitialValueFromZod(SiteSchema);
-    const [resetKey, setResetKey] = useState(Date.now());
-    
-    const [form, fields] = useForm({
-      id: SITE_TAG,
-      constraint: getZodConstraint(SiteSchema),
-      onValidate({ formData }) {
+  const actionData = useActionData<typeof action>();
+  const SITE_TAG = updateValues ? UPDATE_SITE : CREATE_SITE;
+
+  const initialValues = updateValues ?? getInitialValueFromZod(SiteSchema);
+  const [resetKey, setResetKey] = useState(Date.now());
+
+  const [form, fields] = useForm({
+    id: SITE_TAG,
+    constraint: getZodConstraint(SiteSchema),
+    onValidate({ formData }) {
       return parseWithZod(formData, { schema: SiteSchema });
     },
     shouldValidate: "onInput",
@@ -176,7 +176,7 @@ export default function CreateSite({
   });
   const { toast } = useToast();
   const navigate = useNavigate();
-  
+
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
@@ -200,7 +200,7 @@ export default function CreateSite({
     return <ErrorBoundary error={error} message="Failed to create site" />;
 
   return (
-    <section className="md:px-20 lg:px-28 2xl:px-40 py-4">
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
       <FormProvider context={form.context}>
         <Form method="POST" {...getFormProps(form)} className="flex flex-col">
           <Card>
@@ -247,15 +247,19 @@ export default function CreateSite({
                 <Suspense fallback={<div>Loading...</div>}>
                   <Await resolve={locationOptionsPromise}>
                     {(resolvedData) => {
-                      if(!resolvedData) return <ErrorBoundary message="Failed to load locations" />
-                      return(
-                      <LocationsListWrapper
-                        data={resolvedData.data}
-                        error={resolvedData.error}
-                        fields={fields}
-                        resetKey={resetKey}
-                      />
-                    )}}
+                      if (!resolvedData)
+                        return (
+                          <ErrorBoundary message="Failed to load locations" />
+                        );
+                      return (
+                        <LocationsListWrapper
+                          data={resolvedData.data}
+                          error={resolvedData.error}
+                          fields={fields}
+                          resetKey={resetKey}
+                        />
+                      );
+                    }}
                   </Await>
                 </Suspense>
               </div>

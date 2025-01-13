@@ -5,8 +5,8 @@ export default function PaymentComponents() {
   const { pathname } = useLocation();
 
   return (
-    <section className='flex flex-col h-full'>
-      <div className='py-[18px] px-4 border-b'>
+    <section className="flex flex-col h-full">
+      <div className="py-[18px] px-4 border-b">
         <SecondaryMenu
           items={[
             {
@@ -16,6 +16,10 @@ export default function PaymentComponents() {
             {
               label: "Statutory fields",
               path: "/payment-components/statutory-fields",
+            },
+            {
+              label: "Payment Templates",
+              path: "/payment-components/payment-templates",
             },
           ]}
           pathname={pathname}

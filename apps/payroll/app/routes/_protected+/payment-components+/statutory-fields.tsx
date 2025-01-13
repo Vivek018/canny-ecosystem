@@ -3,7 +3,6 @@ import { SecondarySidebar } from "@canny_ecosystem/ui/secondary-sidebar";
 import { Outlet } from "@remix-run/react";
 
 export default function StatutoryFields() {
-
   return (
     <div className="flex h-full">
       <SecondarySidebar
@@ -11,7 +10,7 @@ export default function StatutoryFields() {
         className="flex-shrink-0"
       />
       <div className="h-full w-full">
-          <Outlet />
+        <Outlet />
       </div>
     </div>
   );

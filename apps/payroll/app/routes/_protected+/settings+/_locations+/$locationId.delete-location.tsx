@@ -47,21 +47,21 @@ export default function DeleteLocation() {
 
   useEffect(() => {
     if (!actionData) return;
-      if (actionData?.status === "success") {
-        toast({
-          title: "Success",
-          description: actionData?.message,
-          variant: "success",
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: actionData?.error?.message || "Location delete failed",
-          variant: "destructive",
-        });
-      }
+    if (actionData?.status === "success") {
+      toast({
+        title: "Success",
+        description: actionData?.message,
+        variant: "success",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: actionData?.error?.message || "Location delete failed",
+        variant: "destructive",
+      });
+    }
     navigate("/settings/locations", { replace: true });
   }, [actionData]);
-  
+
   return null;
 }

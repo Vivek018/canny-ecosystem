@@ -1,6 +1,5 @@
 import { SecondaryMenu } from "@canny_ecosystem/ui/secondary-menu";
-import { Outlet, useLocation,Link} from "@remix-run/react";
-
+import { Outlet, useLocation, Link } from "@remix-run/react";
 
 export default function Payroll() {
   const { pathname } = useLocation();

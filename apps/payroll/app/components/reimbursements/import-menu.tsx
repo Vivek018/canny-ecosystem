@@ -24,7 +24,7 @@ export function ImportReimbursementMenu() {
           onClick={() => {
             searchParams.set(
               "step",
-              modalSearchParamNames.import_reimbursement
+              modalSearchParamNames.import_reimbursement,
             );
             setSearchParams(searchParams);
           }}

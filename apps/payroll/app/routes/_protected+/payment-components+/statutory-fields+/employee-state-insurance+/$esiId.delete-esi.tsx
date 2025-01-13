@@ -17,7 +17,6 @@ export async function action({
     const { status, error } = await deleteStateInsurence({
       supabase,
       id: esiId ?? "",
-      bypassAuth: true,
     });
 
     if (isGoodStatus(status)) {
@@ -34,11 +33,14 @@ export async function action({
       error,
     });
   } catch (error) {
-    return json({
-      status: "error",
-      message: "An unexpected error occurred",
-      error,
-    }, { status: 500 });
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 },
+    );
   }
 }
 

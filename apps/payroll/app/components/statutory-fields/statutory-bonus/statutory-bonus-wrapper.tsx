@@ -28,9 +28,9 @@ export function StatutoryBonusWrapper({
   data: Omit<StatutoryBonusDatabaseRow, "created_at" | "updated_at"> | null;
   error: Error | null | { message: string };
 }) {
-
-  if (error) return <ErrorBoundary error={error} message="Failed to load data" />
-  if(!data) return <StatutoryBonusNoData />
+  if (error)
+    return <ErrorBoundary error={error} message="Failed to load data" />;
+  if (!data) return <StatutoryBonusNoData />;
 
   return (
     <section className="p-4 w-full">

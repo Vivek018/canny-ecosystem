@@ -51,7 +51,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         error,
         data: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

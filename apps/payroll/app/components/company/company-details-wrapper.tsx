@@ -12,7 +12,6 @@ export function CompanyDetailsWrapper({
   data: CompanyDatabaseUpdate | null;
   error: Error | null | { message: string };
 }) {
-
   useEffect(() => {
     if (error) {
       toast({

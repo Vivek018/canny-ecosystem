@@ -1,4 +1,4 @@
-import { isGoodStatus, UpdateSiteLinkSchema } from "@canny_ecosystem/utils";
+import { isGoodStatus, SiteLinkSchema } from "@canny_ecosystem/utils";
 import { parseWithZod } from "@conform-to/zod";
 import { json } from "@remix-run/react";
 import type { ActionFunctionArgs } from "@remix-run/node";
@@ -11,12 +11,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
   const { templateAssignmentId, siteId: site_id, projectId } = params;
   const formData = await request.formData();
 
-  const submission = parseWithZod(formData, { schema: UpdateSiteLinkSchema });
+  const submission = parseWithZod(formData, { schema: SiteLinkSchema });
 
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 
@@ -29,7 +29,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     } as any,
     id: templateAssignmentId as string,
   });
-  
+
   if (isGoodStatus(status)) {
     return safeRedirect(`/projects/${projectId}/sites`, { status: 303 });
   }

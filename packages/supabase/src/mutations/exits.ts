@@ -1,9 +1,5 @@
 import { convertToNull } from "@canny_ecosystem/utils";
-import type {
-  ExitsInsert,
-  ExitsUpdate,
-  TypedSupabaseClient,
-} from "../types";
+import type { ExitsInsert, ExitsUpdate, TypedSupabaseClient } from "../types";
 
 export const createExit = async ({
   supabase,
@@ -24,11 +20,7 @@ export const createExit = async ({
     }
   }
 
-  const {
-    error,
-    status,
-    data: exitsData,
-  } = await supabase
+  const { error, status } = await supabase
     .from("exits")
     .insert(data)
     .select()
@@ -39,7 +31,6 @@ export const createExit = async ({
   }
 
   return {
-    exitsData,
     status,
     error,
   };
@@ -102,10 +93,7 @@ export const deleteExit = async ({
     }
   }
 
-  const { error, status } = await supabase
-    .from("exits")
-    .delete()
-    .eq("id", id);
+  const { error, status } = await supabase.from("exits").delete().eq("id", id);
 
   if (error) {
     console.error(error);

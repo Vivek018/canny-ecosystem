@@ -54,7 +54,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
           (paymentTemplate) => ({
             label: paymentTemplate.name,
             value: paymentTemplate.id ?? "",
-          })
+          }),
         );
       }
 
@@ -86,7 +86,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         paymentTemplatesOptions,
         linkTemplates,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -106,7 +106,7 @@ export default function EditPaySequence() {
 
   if (step === modalSearchParamNames.view_link_template) {
     return (
-    <SiteDialog
+      <SiteDialog
         siteId={siteId!}
         projectId={projectId!}
         paymentTemplateOptions={paymentTemplatesOptions}

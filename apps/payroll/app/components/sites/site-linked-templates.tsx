@@ -21,8 +21,8 @@ export function SiteLinkedTemplates({
   useEffect(() => {
     const filteredData = linkedTemplates?.filter((item) =>
       Object.values(item).some((value) =>
-        String(value).toLowerCase().includes(searchString.toLowerCase())
-      )
+        String(value).toLowerCase().includes(searchString.toLowerCase()),
+      ),
     );
     setTableData(filteredData ?? []);
   }, [searchString, linkedTemplates]);
@@ -34,28 +34,28 @@ export function SiteLinkedTemplates({
   };
 
   return (
-    <section className='py-4 px-4'>
-      <div className='w-full flex items-center justify-between pb-4'>
-        <div className='w-full flex items-center gap-4'>
-          <div className='relative w-full'>
-            <div className='absolute inset-y-0 left-3 flex items-center pointer-events-none'>
+    <section className="py-4 px-4">
+      <div className="w-full flex items-center justify-between pb-4">
+        <div className="w-full flex items-center gap-4">
+          <div className="relative w-full">
+            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
               <Icon
-                name='magnifying-glass'
-                size='sm'
-                className='text-gray-400'
+                name="magnifying-glass"
+                size="sm"
+                className="text-gray-400"
               />
             </div>
             <Input
-              placeholder='Search linked templates'
+              placeholder="Search linked templates"
               value={searchString}
               onChange={(e) => setSearchString(e.target.value)}
-              className='pl-8 h-10 w-full focus-visible:ring-0'
+              className="pl-8 h-10 w-full focus-visible:ring-0"
             />
           </div>
           <Button
             className={cn(
               buttonVariants({ variant: "primary-outline" }),
-              "flex items-center gap-1 capitalize"
+              "flex items-center gap-1 capitalize",
             )}
             onClick={(e) => linkNewTemplate(e)}
           >

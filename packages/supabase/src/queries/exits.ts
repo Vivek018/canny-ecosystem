@@ -14,6 +14,8 @@ export type ExitFilterType = {
   final_settlement_date_start?: string | undefined | null;
   final_settlement_date_end?: string | undefined | null;
   reason?: string | undefined | null;
+  project?: string | undefined | null;
+  project_site?: string | undefined | null;
 } | null;
 
 export type ExitDataType = Pick<
@@ -26,11 +28,19 @@ export type ExitDataType = Pick<
   | "note"
   | "organization_payable_days"
   | "reason"
+  | "total"
 > & {
-  employee_name: Pick<
+  employees: Pick<
     EmployeeDatabaseRow,
-    "first_name" | "middle_name" | "last_name"
-  >;
+    "first_name" | "middle_name" | "last_name" | "employee_code"
+  > & {
+    employee_project_assignment: {
+      project_sites: {
+        name: string;
+        projects: { name: string };
+      };
+    };
+  };
 } & {
   exit_payments: (Pick<ExitPaymentsRow, "amount" | "type"> & {
     payment_fields: {
@@ -63,17 +73,16 @@ export const getExits = async ({
     "final_settlement_date",
     "reason",
     "note",
+    "total",
   ] as const;
 
   const query = supabase
     .from("exits")
     .select(
-      `
-      ${columns.join(",")},
-          employee_name:employees!inner(first_name, middle_name, last_name),
-          exit_payments(amount, type, payment_fields!payment_fields_id(name))
-    `,
-      { count: "exact" }
+      `${columns.join(",")},
+          employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(project_sites!inner(id, name, projects!inner(id, name)))),
+          exit_payments(amount, type, payment_fields!payment_fields_id(name))`,
+      { count: "exact" },
     )
     .limit(HARD_QUERY_LIMIT);
 
@@ -91,18 +100,18 @@ export const getExits = async ({
     if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
       for (const searchQueryElement of searchQueryArray) {
         query.or(
-          `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*`,
+          `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*,employee_code.ilike.*${searchQueryElement}*`,
           {
             referencedTable: "employees",
-          }
+          },
         );
       }
     } else {
       query.or(
-        `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*`,
+        `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`,
         {
           referencedTable: "employees",
-        }
+        },
       );
     }
   }
@@ -115,6 +124,8 @@ export const getExits = async ({
       final_settlement_date_start,
       final_settlement_date_end,
       reason,
+      project,
+      project_site,
     } = filters;
 
     const dateFilters = [
@@ -137,6 +148,19 @@ export const getExits = async ({
 
     if (reason) {
       query.eq("reason", reason);
+    }
+
+    if (project) {
+      query.eq(
+        "employees.employee_project_assignment.project_sites.projects.name",
+        project,
+      );
+    }
+    if (project_site) {
+      query.eq(
+        "employees.employee_project_assignment.project_sites.name",
+        project_site,
+      );
     }
   }
 
@@ -172,8 +196,6 @@ export const getExitsById = async ({
     .from("exits")
     .select(columns.join(","))
     .eq("id", id)
-    .order("created_at", { ascending: false })
-    .limit(SINGLE_QUERY_LIMIT)
     .single<InferredType<ExitsRow, (typeof columns)[number]>>();
 
   if (error) {

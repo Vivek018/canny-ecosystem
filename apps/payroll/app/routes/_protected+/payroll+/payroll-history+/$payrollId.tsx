@@ -324,32 +324,40 @@ const headings = {
   employees: "TOTAL EMPLOYEES",
 };
 
-
-const calculatePercentageChange = (current:number , previous:number) => {
+const calculatePercentageChange = (current: number, previous: number) => {
   return ((current - previous) / previous) * 100;
 };
 
 const netPayrollCost = calculatePercentageChange(
   Number(currentDemo.payroll_cost),
-  Number(lastMonthDemo.payroll_cost)
+  Number(lastMonthDemo.payroll_cost),
 );
 const netEmployeeNetPay = calculatePercentageChange(
   Number(currentDemo.employeess_net_pay),
-  Number(lastMonthDemo.employeess_net_pay)
+  Number(lastMonthDemo.employeess_net_pay),
 );
 const netPendingPayments = calculatePercentageChange(
   Number(currentDemo.pending_payments),
-  Number(lastMonthDemo.pending_payments)
+  Number(lastMonthDemo.pending_payments),
 );
-const employeediff = Number(currentDemo.employees) - Number(lastMonthDemo.employees);
+const employeediff =
+  Number(currentDemo.employees) - Number(lastMonthDemo.employees);
 
-const netDiff={
+const netDiff = {
   payroll_cost: netPayrollCost,
   employeess_net_pay: netEmployeeNetPay,
   pending_payments: netPendingPayments,
   employees: employeediff,
-}
+};
 
 export default function PayrollId() {
-  return <PayrollComponent data={employeesDemo} demo={currentDemo} netDiff={netDiff} heading={headings} lastMonthDemo={lastMonthDemo} />;
+  return (
+    <PayrollComponent
+      data={employeesDemo}
+      demo={currentDemo}
+      netDiff={netDiff}
+      heading={headings}
+      lastMonthDemo={lastMonthDemo}
+    />
+  );
 }

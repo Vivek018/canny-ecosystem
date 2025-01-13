@@ -3,7 +3,12 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getInputProps } from "@conform-to/react";
 import { useEffect } from "react";
 
-export function LocationsListWrapper({ data: locationOptions, error, resetKey, fields }: any) {
+export function LocationsListWrapper({
+  data: locationOptions,
+  error,
+  resetKey,
+  fields,
+}: any) {
   const { toast } = useToast();
 
   useEffect(() => {

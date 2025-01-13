@@ -18,7 +18,8 @@ export const ViewRelationshipTermsDialog = ({
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const isParamRelationshipTerms = searchParams.get("step") === modalSearchParamNames.view_relationship_terms;
+  const isParamRelationshipTerms =
+    searchParams.get("step") === modalSearchParamNames.view_relationship_terms;
 
   const handleOpenChange = () => {
     navigate(-1);
@@ -32,10 +33,10 @@ export const ViewRelationshipTermsDialog = ({
       <DialogContent
         className={cn(
           "max-w-max pl-5 pr-40",
-          !objectKeys.length && "pr-4 pl-4"
+          !objectKeys.length && "pr-4 pl-4",
         )}
       >
-        <DialogHeader className='mb-4'>
+        <DialogHeader className="mb-4">
           <DialogTitle>Term Details</DialogTitle>
         </DialogHeader>
         <div
@@ -44,10 +45,10 @@ export const ViewRelationshipTermsDialog = ({
           {objectKeys.map((key, index) => (
             <div
               key={key.toString() + index.toString()}
-              className='flex items-center gap-2'
+              className="flex items-center gap-2"
             >
-              <Label className='font-bold'>{replaceUnderscore(key)}:</Label>
-              <p className='text-base'>{objectValues[index]}</p>
+              <Label className="font-bold">{replaceUnderscore(key)}:</Label>
+              <p className="text-base">{objectValues[index]}</p>
             </div>
           ))}
         </div>

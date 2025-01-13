@@ -21,7 +21,7 @@ export const ImportReimbursementDataArray = [
 export function ImportedDataTableHeader({ table, className, loading }: Props) {
   const columnName = (id: string) =>
     loading ||
-    table?.getAllLeafColumns()?.find((col: { id: string; }) => {
+    table?.getAllLeafColumns()?.find((col: { id: string }) => {
       return col.id === id;
     })?.columnDef?.header;
 

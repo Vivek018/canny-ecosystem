@@ -9,7 +9,8 @@ export const modalSearchParamNames = {
   import_employee_address:"import-employee-address",
   import_employee_guardians:"import-employee-guardians",
   import_reimbursement: "import-reimbursement",
-  view_link_template: "view-link-template", 
+  view_template_components: "view-template-components",
+  view_link_template: "view-link-template",
   create_link_template: "create-link-template",
   update_link_template: "update-link-template",
   view_relationship_terms: "view-relationship-terms",
@@ -231,3 +232,17 @@ export const EMPLOYER_EPF_PERCENTAGE = 0.12;
 export const EMPLOYER_EDLI_PERCENTAGE = 0.005;
 export const EMPLOYER_EPS_PERCENTAGE = 0.0833;
 export const EMPLOYER_ADMIN_CHARGES_PERCENTAGE = 0.005;
+
+
+export const exitPaymentFields = [
+  "bonus",
+  "diwali_bonus",
+  "commission",
+  "joining_bonus",
+  "yearly_bonus",
+  "leave_encashment",
+  "gift_coupon",
+  "gratuity",
+  "computer_service_charges",
+  "deduction",
+];

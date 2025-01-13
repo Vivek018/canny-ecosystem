@@ -35,7 +35,7 @@ PaginationItem.displayName = "PaginationItem";
 
 type PaginationLinkProps = {
   isActive?: boolean;
-} & Partial<Pick<ButtonProps, "size">>&
+} & Partial<Pick<ButtonProps, "size">> &
   React.ComponentProps<"a">;
 
 const PaginationLink = ({
@@ -53,7 +53,7 @@ const PaginationLink = ({
       }),
       isActive ? "cursor-default" : "cursor-pointer",
       "h-8 w-8",
-      className
+      className,
     )}
     {...props}
   />

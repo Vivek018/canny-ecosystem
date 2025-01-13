@@ -131,12 +131,15 @@ export async function action({
       returnTo: `/employees/${employeeId}/work-portfolio`,
     });
   } catch (error) {
-    return json({
-      status: "error",
-      message: "An unexpected error occurred",
-      error,
-      returnTo: `/employees/${employeeId}/work-portfolio`,
-    }, { status: 500 });
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+        returnTo: `/employees/${employeeId}/work-portfolio`,
+      },
+      { status: 500 },
+    );
   }
 }
 
@@ -193,7 +196,7 @@ export default function AddEmployeeWorkHistory({
   }, [actionData]);
 
   return (
-    <section className="md:px-20 lg:px-28 2xl:px-40 py-4">
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
       <FormProvider context={form.context}>
         <Form
           method="POST"

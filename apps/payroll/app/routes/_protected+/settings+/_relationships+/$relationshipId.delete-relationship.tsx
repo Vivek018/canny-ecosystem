@@ -51,22 +51,21 @@ export default function DeleteRelationship() {
 
   useEffect(() => {
     if (!actionData) return;
-      if (actionData?.status === "success") {
-        toast({
-          title: "Success",
-          description: actionData?.message,
-          variant: "success",
-        });
-      } else {
-        toast({
-          title: "Error",
-          description:
-            actionData?.error?.message || "Relationship delete failed",
-          variant: "destructive",
-        });
-      }
+    if (actionData?.status === "success") {
+      toast({
+        title: "Success",
+        description: actionData?.message,
+        variant: "success",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: actionData?.error?.message || "Relationship delete failed",
+        variant: "destructive",
+      });
+    }
     navigate("/settings/relationships", { replace: true });
   }, [actionData]);
-  
+
   return null;
 }

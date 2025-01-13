@@ -30,7 +30,7 @@ export function ReimbursementImportData({
         },
         complete: (results) => {
           const finalTableData = results.data.filter((entry) =>
-            Object.values(entry!).some((value) => String(value).trim() !== "")
+            Object.values(entry!).some((value) => String(value).trim() !== ""),
           );
 
           setImportData({
@@ -52,8 +52,8 @@ export function ReimbursementImportData({
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase())
-      )
+          String(value).toLowerCase().includes(searchString.toLowerCase()),
+      ),
     );
     setTableData(filteredData);
   }, [searchString, importData]);

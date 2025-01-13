@@ -10,17 +10,17 @@ import {
   TextareaField,
 } from "@canny_ecosystem/ui/forms";
 import {
-  reasonforexitArray,
+  reasonForExitArray,
   replaceUnderscore,
   transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
 import { getInputProps, getTextareaProps } from "@conform-to/react";
 
-export function Step1({ fields }: { fields: any }) {
+export function ExitPaymentStep1({ fields }: { fields: any }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Employee's Exit Details Page-1</CardTitle>
+        <CardTitle>Employee's Exit Details Page 1</CardTitle>
       </CardHeader>
       <CardContent>
         <Field
@@ -32,12 +32,11 @@ export function Step1({ fields }: { fields: any }) {
           }}
           errors={fields.last_working_day.errors}
         />
-        
 
         <SearchableSelectField
           className="capitalize"
           options={transformStringArrayIntoOptions(
-            reasonforexitArray as unknown as string[]
+            reasonForExitArray as unknown as string[],
           )}
           inputProps={{
             ...getInputProps(fields.reason_for_exit, { type: "text" }),
@@ -59,7 +58,6 @@ export function Step1({ fields }: { fields: any }) {
           }}
           errors={fields.final_settlement_date.errors}
         />
-        
 
         <TextareaField
           textareaProps={{

@@ -16,7 +16,6 @@ import {
 } from "@canny_ecosystem/ui/forms";
 import {
   deductionCycleArray,
-  EmployeeProvidentFundSchema,
   EmployeeStateInsuranceSchema,
   getInitialValueFromZod,
   isGoodStatus,
@@ -56,7 +55,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         error,
         companyId: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -75,14 +74,13 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
     const { status, error } = await createEmployeeStateInsurance({
       supabase,
       data: submission.value as any,
-      bypassAuth: true,
     });
 
     if (isGoodStatus(status)) {
@@ -105,7 +103,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -128,7 +126,7 @@ export default function CreateEmployeeStateInsurance({
 
   const [form, fields] = useForm({
     id: EPF_TAG,
-    constraint: getZodConstraint(EmployeeProvidentFundSchema),
+    constraint: getZodConstraint(EmployeeStateInsuranceSchema),
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: EmployeeStateInsuranceSchema });
     },
@@ -161,11 +159,11 @@ export default function CreateEmployeeStateInsurance({
   }, [actionData]);
 
   return (
-    <section className="p-4 w-full">
-      <Form method="POST" {...getFormProps(form)} className="flex flex-col">
+    <section className='p-4 w-full'>
+      <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl mb-4">
+            <CardTitle className="text-2xl mb-4 capitalize">
               {replaceDash(EPF_TAG)}
             </CardTitle>
             <hr />
@@ -173,7 +171,7 @@ export default function CreateEmployeeStateInsurance({
           <CardContent>
             <input {...getInputProps(fields.id, { type: "hidden" })} />
             <input {...getInputProps(fields.company_id, { type: "hidden" })} />
-            <div className="flex flex-col justify-between">
+            <div className='flex flex-col justify-between'>
               <Field
                 inputProps={{
                   ...getInputProps(fields.esi_number, { type: "text" }),
@@ -190,24 +188,24 @@ export default function CreateEmployeeStateInsurance({
 
               <SearchableSelectField
                 key={resetKey}
-                className="capitalize"
+                className='capitalize'
                 options={transformStringArrayIntoOptions(
-                  deductionCycleArray as unknown as string[],
+                  deductionCycleArray as unknown as string[]
                 )}
                 inputProps={{
                   ...getInputProps(fields.deduction_cycle, { type: "text" }),
                 }}
-                placeholder="Select an option"
+                placeholder='Select an option'
                 labelProps={{
                   children: replaceUnderscore(fields.deduction_cycle.name),
                 }}
                 errors={fields.deduction_cycle.errors}
               />
             </div>
-            <div className="flex flex-col justify-between">
-              <div className="flex items-center justify-between gap-4">
+            <div className='flex flex-col justify-between'>
+              <div className='flex items-center justify-between gap-4'>
                 <Field
-                  className=""
+                  className=''
                   inputProps={{
                     ...getInputProps(fields.employees_contribution, {
                       type: "number",
@@ -220,16 +218,16 @@ export default function CreateEmployeeStateInsurance({
                   labelProps={{
                     className: "capitalize",
                     children: replaceUnderscore(
-                      fields.employees_contribution.name,
+                      fields.employees_contribution.name
                     ),
                   }}
                   errors={fields.employees_contribution.errors}
                 />
-                <p className="mb-5 w-1/2 font-light text-sm">of Gross Pay</p>
+                <p className='mb-5 w-1/2 font-light text-sm'>of Gross Pay</p>
               </div>
-              <div className="flex items-center justify-between gap-4">
+              <div className='flex items-center justify-between gap-4'>
                 <Field
-                  className=""
+                  className=''
                   inputProps={{
                     ...getInputProps(fields.employers_contribution, {
                       type: "number",
@@ -242,14 +240,31 @@ export default function CreateEmployeeStateInsurance({
                   labelProps={{
                     className: "capitalize",
                     children: replaceUnderscore(
-                      fields.employers_contribution.name,
+                      fields.employers_contribution.name
                     ),
                   }}
                   errors={fields.employers_contribution.errors}
                 />
-                <p className="w-1/2 mb-5 font-light text-sm">of Gross Pay</p>
+                <p className='w-1/2 mb-5 font-light text-sm'>of Gross Pay</p>
               </div>
             </div>
+            <Field
+              className=''
+              inputProps={{
+                ...getInputProps(fields.max_limit, {
+                  type: "number",
+                }),
+                disabled: true,
+                autoFocus: true,
+                placeholder: "Enter number",
+                className: "capitalize",
+              }}
+              labelProps={{
+                className: "capitalize",
+                children: replaceUnderscore(fields.max_limit.name),
+              }}
+              errors={fields.max_limit.errors}
+            />
 
             <CheckboxField
               buttonProps={getInputProps(fields.include_employer_contribution, {
@@ -259,7 +274,7 @@ export default function CreateEmployeeStateInsurance({
                 htmlFor: fields.include_employer_contribution.id,
                 children: "Include employer's contribution in the CTC",
               }}
-              className="items-center"
+              className='items-center'
             />
           </CardContent>
           <FormButtons form={form} setResetKey={setResetKey} isSingle={true} />

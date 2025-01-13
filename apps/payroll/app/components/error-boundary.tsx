@@ -17,7 +17,9 @@ export function ErrorBoundary({ error, message }: ErrorBoundaryProps) {
     toast({
       title: "Error",
       description:
-        (error as { message: string })?.message || message || "Something went wrong",
+        (error as { message: string })?.message ||
+        message ||
+        "Something went wrong",
       variant: "destructive",
     });
   }, [error]);

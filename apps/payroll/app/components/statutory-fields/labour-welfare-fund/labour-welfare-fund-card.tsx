@@ -1,4 +1,4 @@
- import type { LabourWelfareFundDatabaseRow } from "@canny_ecosystem/supabase/types";
+import type { LabourWelfareFundDatabaseRow } from "@canny_ecosystem/supabase/types";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,7 +45,10 @@ const DetailItem: React.FC<DetailItemProps> = ({ label, value, formatter }) => {
 export function LabourWelfareFundCard({
   labourWelfareFund,
 }: {
-  labourWelfareFund: Omit<LabourWelfareFundDatabaseRow, "created_at" | "updated_at">;
+  labourWelfareFund: Omit<
+    LabourWelfareFundDatabaseRow,
+    "created_at" | "updated_at"
+  >;
 }) {
   return (
     <Card
@@ -53,7 +56,9 @@ export function LabourWelfareFundCard({
       className="w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start"
     >
       <CardHeader className="flex flex-row space-y-0 items-center justify-between p-4">
-        <CardTitle className="text-lg tracking-wide">{replaceUnderscore(labourWelfareFund.state)}</CardTitle>
+        <CardTitle className="text-lg tracking-wide">
+          {replaceUnderscore(labourWelfareFund.state)}
+        </CardTitle>
         <div className="flex items-center gap-3">
           <TooltipProvider>
             <Tooltip delayDuration={100}>
@@ -75,24 +80,34 @@ export function LabourWelfareFundCard({
             </DropdownMenuTrigger>
             <DropdownMenuContent sideOffset={10} align="end">
               <DropdownMenuGroup>
-                <DeleteLabourWelfareFund labourWelfareFundId={labourWelfareFund.id} />
+                <DeleteLabourWelfareFund
+                  labourWelfareFundId={labourWelfareFund.id}
+                />
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
-        <DetailItem label="Employee Contribution" value={labourWelfareFund.employee_contribution}/>
-        <DetailItem label="Employer Contribution" value={labourWelfareFund.employer_contribution}/>
-        <DetailItem label="Deduction Cycle" value={labourWelfareFund.deduction_cycle}/>
+        <DetailItem
+          label="Employee Contribution"
+          value={labourWelfareFund.employee_contribution}
+        />
+        <DetailItem
+          label="Employer Contribution"
+          value={labourWelfareFund.employer_contribution}
+        />
+        <DetailItem
+          label="Deduction Cycle"
+          value={labourWelfareFund.deduction_cycle}
+        />
       </CardContent>
-      {
-        labourWelfareFund.status && <CardFooter
-          className="px-2.5 ml-auto bg-secondary text-foreground py-1.5 text-sm tracking-wide font-sem rounded-tl-md border-foreground flex gap-1 justify-center"
-        >
-          <Icon name="dot-filled" size="xs" />Active
+      {labourWelfareFund.status && (
+        <CardFooter className="px-2.5 ml-auto bg-secondary text-foreground py-1.5 text-sm tracking-wide font-sem rounded-tl-md border-foreground flex gap-1 justify-center">
+          <Icon name="dot-filled" size="xs" />
+          Active
         </CardFooter>
-      }
+      )}
     </Card>
   );
 }

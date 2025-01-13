@@ -7,7 +7,10 @@ import type { ProjectsWithCompany } from "@canny_ecosystem/supabase/queries";
 export function ProjectsWrapper({
   data,
   error,
-}: { data: Omit<ProjectsWithCompany, "created_at" | "updated_at">[] | null; error: Error | null | { message: string } }) {
+}: {
+  data: Omit<ProjectsWithCompany, "created_at" | "updated_at">[] | null;
+  error: Error | null | { message: string };
+}) {
   const { toast } = useToast();
 
   useEffect(() => {

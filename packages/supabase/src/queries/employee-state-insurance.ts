@@ -14,6 +14,7 @@ export type EmployeeStateInsuranceDataType = Pick<
   | "employees_contribution"
   | "employers_contribution"
   | "include_employer_contribution"
+  | "max_limit"
 >;
 
 export const getEmployeeStateInsuranceById = async ({
@@ -63,13 +64,17 @@ export const getEmployeeStateInsuranceByCompanyId = async ({
     "employees_contribution",
     "employers_contribution",
     "include_employer_contribution",
+    "max_limit",
+    "is_default",
   ] as const;
 
   const { data, error } = await supabase
     .from("employee_state_insurance")
     .select(columns.join(","))
     .eq("company_id", companyId)
+    .eq("is_default", true)
     .limit(SINGLE_QUERY_LIMIT)
+    .order("created_at", { ascending: false })
     .maybeSingle<
       InferredType<EmployeeStateInsuranceDatabaseRow, (typeof columns)[number]>
     >();

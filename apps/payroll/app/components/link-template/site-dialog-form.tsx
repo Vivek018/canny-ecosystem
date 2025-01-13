@@ -1,6 +1,4 @@
-import type {
-  PaymentTemplateAssignmentsType,
-} from "@canny_ecosystem/supabase/queries";
+import type { PaymentTemplateAssignmentsType } from "@canny_ecosystem/supabase/queries";
 import type { PaymentTemplateAssignmentsDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { Button } from "@canny_ecosystem/ui/button";
 import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
@@ -9,7 +7,7 @@ import {
   eligibilityOptionsArray,
   getInitialValueFromZod,
   getValidDateForInput,
-  PaymentTemplateFormSiteDialogSchema,
+  SiteLinkSchema,
   positionArray,
   replaceUnderscore,
   skillLevelArray,
@@ -47,7 +45,7 @@ export const SiteDialogForm = ({
 
   const [searchParams] = useSearchParams();
   const currentPaymentTemplateAssignmentId = searchParams.get(
-    "currentPaymentTemplateAssignmentId"
+    "currentPaymentTemplateAssignmentId",
   );
 
   const navigation = useNavigation();
@@ -69,7 +67,7 @@ export const SiteDialogForm = ({
       if (linkTemplates) {
         const currentPaymentTemplate = linkTemplates.find(
           (linkedTemplate: { id: string }) =>
-            linkedTemplate.id === currentPaymentTemplateAssignmentId
+            linkedTemplate.id === currentPaymentTemplateAssignmentId,
         );
 
         if (currentPaymentTemplate) {
@@ -99,16 +97,15 @@ export const SiteDialogForm = ({
       isUpdateAction && initialValues
         ? "update-payment-template"
         : "create-payment-template",
-    constraint: getZodConstraint(PaymentTemplateFormSiteDialogSchema),
+    constraint: getZodConstraint(SiteLinkSchema),
     onValidate({ formData }) {
       return parseWithZod(formData, {
-        schema: PaymentTemplateFormSiteDialogSchema,
+        schema: SiteLinkSchema,
       });
     },
     defaultValue: isUpdateAction
-      ? initialValues ??
-        getInitialValueFromZod(PaymentTemplateFormSiteDialogSchema)
-      : getInitialValueFromZod(PaymentTemplateFormSiteDialogSchema),
+      ? initialValues ?? getInitialValueFromZod(SiteLinkSchema)
+      : getInitialValueFromZod(SiteLinkSchema),
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
   });
@@ -116,7 +113,7 @@ export const SiteDialogForm = ({
   return (
     <FormProvider context={form.context}>
       <Form
-        method='POST'
+        method="POST"
         {...getFormProps(form)}
         action={
           action === modalSearchParamNames.update_link_template
@@ -125,7 +122,7 @@ export const SiteDialogForm = ({
         }
       >
         <Field
-          className='w-full'
+          className="w-full"
           inputProps={{
             ...getInputProps(fields.name, { type: "text" }),
             placeholder: "Name",
@@ -136,15 +133,15 @@ export const SiteDialogForm = ({
           }}
           errors={fields.name.errors}
         />
-        <div className='grid grid-cols-2 gap-4'>
+        <div className="grid grid-cols-2 gap-4">
           <Field
-            className='w-full'
+            className="w-full"
             inputProps={{
               ...getInputProps(fields.effective_from, { type: "date" }),
               placeholder: replaceUnderscore(fields.effective_from.name),
               max: getValidDateForInput(new Date().toISOString()),
               defaultValue: getValidDateForInput(
-                fields.effective_from.initialValue as string
+                fields.effective_from.initialValue as string,
               ),
             }}
             labelProps={{
@@ -153,13 +150,13 @@ export const SiteDialogForm = ({
             errors={fields.effective_from.errors}
           />
           <Field
-            className='w-full'
+            className="w-full"
             inputProps={{
               ...getInputProps(fields.effective_to, { type: "date" }),
               placeholder: replaceUnderscore(fields.effective_to.name),
               min: getValidDateForInput(fields.effective_from.value as string),
               defaultValue: getValidDateForInput(
-                fields.effective_to.initialValue as string
+                fields.effective_to.initialValue as string,
               ),
             }}
             labelProps={{
@@ -168,10 +165,10 @@ export const SiteDialogForm = ({
             errors={fields.effective_to.errors}
           />
         </div>
-        <div className='grid grid-cols-2 gap-4'>
+        <div className="grid grid-cols-2 gap-4">
           <SearchableSelectField
             key={resetKey}
-            className='capitalize'
+            className="capitalize"
             options={paymentTemplateOptions}
             inputProps={{
               ...getInputProps(fields.template_id, { type: "text" }),
@@ -185,9 +182,9 @@ export const SiteDialogForm = ({
           />
           <SearchableSelectField
             key={resetKey + 1}
-            className='capitalize'
+            className="capitalize"
             options={transformStringArrayIntoOptions(
-              eligibilityOptionsArray as unknown as string[]
+              eligibilityOptionsArray as unknown as string[],
             )}
             inputProps={{
               ...getInputProps(fields.eligibility_option, {
@@ -202,12 +199,12 @@ export const SiteDialogForm = ({
             errors={fields.eligibility_option.errors}
           />
         </div>
-        <div className='grid grid-cols-2 gap-4'>
+        <div className="grid grid-cols-2 gap-4">
           <SearchableSelectField
             key={resetKey + 2}
-            className='capitalize'
+            className="capitalize"
             options={transformStringArrayIntoOptions(
-              positionArray as unknown as string[]
+              positionArray as unknown as string[],
             )}
             inputProps={{
               ...getInputProps(fields.position, { type: "text" }),
@@ -222,9 +219,9 @@ export const SiteDialogForm = ({
           />
           <SearchableSelectField
             key={resetKey + 3}
-            className='capitalize'
+            className="capitalize"
             options={transformStringArrayIntoOptions(
-              skillLevelArray as unknown as string[]
+              skillLevelArray as unknown as string[],
             )}
             inputProps={{
               ...getInputProps(fields.skill_level, { type: "text" }),
@@ -239,8 +236,8 @@ export const SiteDialogForm = ({
           />
         </div>
         <Button
-          variant='default'
-          className='w-full'
+          variant="default"
+          className="w-full"
           disabled={!form.valid || disableAll}
         >
           {isUpdateAction ? "Update" : "Create"} link template
