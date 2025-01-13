@@ -10,28 +10,29 @@ import {
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
-import type { ImportEmployeePersonalsHeaderSchemaObject } from "@canny_ecosystem/utils";
-import type { ImportEmployeePersonalsDataType } from "@canny_ecosystem/supabase/queries";
+import type { ImportEmployeeBankDetailsHeaderSchemaObject } from "@canny_ecosystem/utils";
 import {
-  ImportEmployeePersonalsHeaderSchema,
-  ImportEmployeePersonalsDataSchema,
+  getEmployeeIdsByEmployeeCodes,
+  type ImportEmployeeBankDetailsDataType,
+} from "@canny_ecosystem/supabase/queries";
+import {
+  ImportEmployeeBankDetailsHeaderSchema,
+  ImportEmployeeBankDetailsDataSchema,
   transformStringArrayIntoOptions,
   replaceUnderscore,
   pipe,
   replaceDash,
 } from "@canny_ecosystem/utils";
 import type { z } from "zod";
-import { getEmployeePersonalsConflicts } from "@canny_ecosystem/supabase/mutations";
-import { EmployeePersonalsImportData } from "@/components/employees/import-export/employee-personals-import-data";
+import { getEmployeeBankDetailsConflicts } from "@canny_ecosystem/supabase/mutations";
+import { EmployeeBankDetailsImportData } from "@/components/employees/import-export/employee-bank-details-import-data";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
-import { useImportStoreForEmployeePersonals } from "@/store/import";
-import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
+import { useImportStoreForEmployeeBankDetails } from "@/store/import";
+import type { EmployeeBankDetailsDatabaseInsert } from "@canny_ecosystem/supabase/types";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 
 type FieldConfig = {
-  key: keyof z.infer<typeof ImportEmployeePersonalsHeaderSchemaObject>;
+  key: keyof z.infer<typeof ImportEmployeeBankDetailsHeaderSchemaObject>;
   required?: boolean;
 };
 
@@ -41,54 +42,39 @@ const FIELD_CONFIGS: FieldConfig[] = [
     required: true,
   },
   {
-    key: "first_name",
+    key: "account_holder_name",
+  },
+  {
+    key: "account_number",
     required: true,
   },
   {
-    key: "middle_name",
-  },
-  {
-    key: "last_name",
-    required: true,
-  },
-  { key: "gender" },
-  {
-    key: "marital_status",
-  },
-  {
-    key: "date_of_birth",
-    required: true,
-  },
-  { key: "education" },
-  { key: "is_active" },
-  {
-    key: "personal_email",
-  },
-  {
-    key: "primary_mobile_number",
+    key: "ifsc_code",
     required: true,
   },
   {
-    key: "secondary_mobile_number",
+    key: "account_type",
+  },
+  { key: "bank_name", required: true },
+  {
+    key: "branch_name",
   },
 ];
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
+export async function loader() {
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
 
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  return json({ env, companyId });
+  return json({ env });
 }
 
-export default function EmployeePersonalsImportFieldMapping() {
-  const { env, companyId } = useLoaderData<typeof loader>();
+export default function EmployeeBankDetailsImportFieldMapping() {
+  const { env } = useLoaderData<typeof loader>();
   const { supabase } = useSupabase({ env });
 
-  const { setImportData } = useImportStoreForEmployeePersonals();
+  const { setImportData } = useImportStoreForEmployeeBankDetails();
 
   const [loadNext, setLoadNext] = useState(false);
   const [hasConflict, setHasConflict] = useState<number[]>([]);
@@ -129,7 +115,7 @@ export default function EmployeePersonalsImportFieldMapping() {
         );
 
         if (matchedHeader) {
-          mapping[field.key] = matchedHeader; 
+          mapping[field.key] = matchedHeader;
         }
 
         return mapping;
@@ -141,7 +127,7 @@ export default function EmployeePersonalsImportFieldMapping() {
 
   const validateMapping = () => {
     try {
-      const mappingResult = ImportEmployeePersonalsHeaderSchema.safeParse(
+      const mappingResult = ImportEmployeeBankDetailsHeaderSchema.safeParse(
         Object.fromEntries(
           Object.entries(fieldMapping).map(([key, value]) => [
             key,
@@ -169,7 +155,7 @@ export default function EmployeePersonalsImportFieldMapping() {
 
   const validateImportData = (data: any[]) => {
     try {
-      const result = ImportEmployeePersonalsDataSchema.safeParse({ data });
+      const result = ImportEmployeeBankDetailsDataSchema.safeParse({ data });
       if (!result.success) {
         const formattedErrors = result.error.errors.map(
           (err) => `${err.path[2]}: ${err.message}`
@@ -232,12 +218,39 @@ export default function EmployeePersonalsImportFieldMapping() {
 
           if (validateImportData(finalData)) {
             setImportData({
-              data: finalData as ImportEmployeePersonalsDataType[],
+              data: finalData as ImportEmployeeBankDetailsDataType[],
             });
-            const { conflictingIndices, error } =
-              await getEmployeePersonalsConflicts({
+
+            const employeeCodes = finalData!.map(
+              (value) => value.employee_code
+            );
+            const { data: employees, error: idByCodeError } =
+              await getEmployeeIdsByEmployeeCodes({
                 supabase,
-                importedData: finalData as any,
+                employeeCodes,
+              });
+
+            if (idByCodeError) {
+              throw idByCodeError;
+            }
+
+            const updatedData = finalData!.map((item: any) => {
+              const employeeId = employees?.find(
+                (e) => e.employee_code === item.employee_code
+              )?.id;
+
+              const { employee_code, ...rest } = item;
+              return {
+                ...rest,
+                ...(employeeId ? { employee_id: employeeId } : {}),
+              };
+            });
+
+            const { conflictingIndices, error } =
+              await getEmployeeBankDetailsConflicts({
+                supabase,
+                importedData:
+                  updatedData as EmployeeBankDetailsDatabaseInsert[],
               });
 
             if (error) {
@@ -262,10 +275,9 @@ export default function EmployeePersonalsImportFieldMapping() {
   return (
     <section className="py-4 ">
       {loadNext ? (
-        <EmployeePersonalsImportData
+        <EmployeeBankDetailsImportData
           conflictingIndices={hasConflict}
           env={env}
-          companyId={companyId}
         />
       ) : (
         <Card className="m-4 px-40">

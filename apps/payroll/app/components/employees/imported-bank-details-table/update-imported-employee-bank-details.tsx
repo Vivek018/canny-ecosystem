@@ -1,5 +1,5 @@
-import { useImportStoreForEmployeeBanking } from "@/store/import";
-import type { ImportEmployeeBankingDataType } from "@canny_ecosystem/supabase/queries";
+import { useImportStoreForEmployeeBankDetails } from "@/store/import";
+import type { ImportEmployeeBankDetailsDataType } from "@canny_ecosystem/supabase/queries";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,7 +16,7 @@ import { Field } from "@canny_ecosystem/ui/forms";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import {
   accountTypeArray,
-  ImportSingleEmployeeBankingDataSchema,
+  ImportSingleEmployeeBankDetailsDataSchema,
   transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
 import { useState } from "react";
@@ -26,9 +26,9 @@ export const UpdateImportedEmployee = ({
   dataToUpdate,
 }: {
   indexToUpdate: number;
-  dataToUpdate: ImportEmployeeBankingDataType;
+  dataToUpdate: ImportEmployeeBankDetailsDataType;
 }) => {
-  const { importData, setImportData } = useImportStoreForEmployeeBanking();
+  const { importData, setImportData } = useImportStoreForEmployeeBankDetails();
   const [data, setData] = useState(dataToUpdate);
 
   const onChange = (key: keyof typeof dataToUpdate, value: string) => {
@@ -36,7 +36,8 @@ export const UpdateImportedEmployee = ({
   };
 
   const handleUpdate = () => {
-    const parsedResult = ImportSingleEmployeeBankingDataSchema.safeParse(data);
+    const parsedResult =
+      ImportSingleEmployeeBankDetailsDataSchema.safeParse(data);
 
     if (parsedResult.success) {
       setImportData({

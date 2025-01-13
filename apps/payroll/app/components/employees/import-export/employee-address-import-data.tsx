@@ -1,59 +1,54 @@
 import { ImportedDataColumns } from "@/components/employees/imported-address-table/columns";
 import { ImportedDataTable } from "@/components/employees/imported-address-table/imported-data-table";
 import { useImportStoreForEmployeeAddress } from "@/store/import";
-import type { ImportEmployeeAddressDataType } from "@canny_ecosystem/supabase/queries";
+import { useSupabase } from "@canny_ecosystem/supabase/client";
+import { createEmployeeAddressFromImportedData } from "@canny_ecosystem/supabase/mutations";
+import { getEmployeeIdsByEmployeeCodes } from "@canny_ecosystem/supabase/queries";
+import type {
+  EmployeeAddressDatabaseInsert,
+  SupabaseEnv,
+} from "@canny_ecosystem/supabase/types";
+import { Button } from "@canny_ecosystem/ui/button";
+import { Combobox } from "@canny_ecosystem/ui/combobox";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
-import Papa from "papaparse";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
+import {
+  duplicationTypeArray,
+  ImportEmployeeAddressDataSchema,
+  isGoodStatus,
+  transformStringArrayIntoOptions,
+} from "@canny_ecosystem/utils";
+import { useNavigate } from "@remix-run/react";
+
 import { useState, useEffect } from "react";
 
-export function EmployeeAddressImportData({
-  fieldMapping,
-  file,
-
-}: {
-  fieldMapping: Record<string, string>;
-  file: any;
-  
-}) {
-  const { importData, setImportData } = useImportStoreForEmployeeAddress();
-  
-  const swappedFieldMapping = Object.fromEntries(
-    Object.entries(fieldMapping).map(([key, value]) => [value, key])
-  );
-
-  useEffect(() => {
-    if (file) {
-      Papa.parse(file, {
-        header: true,
-        skipEmptyLines: true,
-        transformHeader: (header) => {
-          return swappedFieldMapping[header] || header;
-        },
-        complete: (results) => {
-          const finalTableData = results.data.filter((entry) =>
-            Object.values(entry!).some((value) => String(value).trim() !== "")
-          );
-
-          setImportData({
-            data: finalTableData as ImportEmployeeAddressDataType[],
-          });
-        },
-        error: (error) => {
-          console.error("Parsing error: ", error);
-        },
-      });
-    }
-  }, [file, fieldMapping]);
-
- 
+export function EmployeeAddressImportData({ env }: { env: SupabaseEnv }) {
+  const navigate = useNavigate();
+  const { supabase } = useSupabase({ env });
+  const { importData } = useImportStoreForEmployeeAddress();
 
   const [searchString, setSearchString] = useState("");
-
+  const [importType, setImportType] = useState<string>("skip");
   const [tableData, setTableData] = useState(importData.data);
 
+  const validateImportData = (data: any[]) => {
+    try {
+      const result = ImportEmployeeAddressDataSchema.safeParse({ data });
+      if (!result.success) {
+        console.error("Data validation error");
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error("Data validation error:", error);
+
+      return false;
+    }
+  };
+
   useEffect(() => {
-    const filteredData = importData.data.filter((item) =>
+    const filteredData = importData?.data.filter((item) =>
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
@@ -63,11 +58,54 @@ export function EmployeeAddressImportData({
     setTableData(filteredData);
   }, [searchString, importData]);
 
+  const handleFinalImport = async () => {
+    if (validateImportData(importData.data)) {
+      const employeeCodes = importData.data!.map(
+        (value: { employee_code: any }) => value.employee_code
+      );
+
+      const { data: employees, error: idByCodeError } =
+        await getEmployeeIdsByEmployeeCodes({
+          supabase,
+          employeeCodes,
+        });
+
+      if (idByCodeError) {
+        throw idByCodeError;
+      }
+
+      const updatedData = importData.data!.map((item: any) => {
+        const employeeId = employees?.find(
+          (e: { employee_code: any }) => e.employee_code === item.employee_code
+        )?.id;
+
+        const { employee_code, ...rest } = item;
+        return {
+          ...rest,
+          ...(employeeId ? { employee_id: employeeId } : {}),
+        };
+      });
+
+      const { error, status } = await createEmployeeAddressFromImportedData({
+        data: updatedData as EmployeeAddressDatabaseInsert[],
+
+        supabase,
+      });
+
+      if (error) {
+        console.error(error);
+      }
+      if (isGoodStatus(status)) {
+        navigate("/employees");
+      }
+    }
+  };
+
   return (
     <section className="m-4">
       <div className="w-full flex items-center justify-between pb-4">
-        <div className="w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4">
-          <div className="relative w-full">
+        <div className="w-full  flex justify-between items-center">
+          <div className="relative w-[30rem] ">
             <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
               <Icon
                 name="magnifying-glass"
@@ -82,20 +120,31 @@ export function EmployeeAddressImportData({
               className="pl-8 h-10 w-full focus-visible:ring-0"
             />
           </div>
-          
+          <div className="flex items-center gap-3">
+            <Combobox
+              className={cn("w-52 h-10")}
+              options={transformStringArrayIntoOptions(
+                duplicationTypeArray as unknown as string[]
+              )}
+              value={importType}
+              onChange={(value: string) => {
+                setImportType(value);
+              }}
+              placeholder={"Select Import Type"}
+            />
+            <Button variant={"default"} onClick={handleFinalImport}>
+              Import
+            </Button>
+          </div>
         </div>
       </div>
-    
+      <input type="hidden" name="import_type" value={importType} />
       <input
         name="stringified_data"
         type="hidden"
         value={JSON.stringify(importData)}
       />
-      <ImportedDataTable
-        data={tableData}
-        columns={ImportedDataColumns}
-        
-      />
+      <ImportedDataTable data={tableData} columns={ImportedDataColumns} />
     </section>
   );
 }

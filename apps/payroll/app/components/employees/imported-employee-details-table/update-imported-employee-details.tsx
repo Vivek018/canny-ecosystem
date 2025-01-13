@@ -1,5 +1,5 @@
-import { useImportStoreForEmployeePersonals } from "@/store/import";
-import type { ImportEmployeePersonalsDataType } from "@canny_ecosystem/supabase/queries";
+import { useImportStoreForEmployeeDetails } from "@/store/import";
+import type { ImportEmployeeDetailsDataType } from "@canny_ecosystem/supabase/queries";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,7 +17,7 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import {
   educationArray,
   genderArray,
-  ImportSingleEmployeePersonalsDataSchema,
+  ImportSingleEmployeeDetailsDataSchema,
   maritalStatusArray,
   transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
@@ -28,9 +28,9 @@ export const UpdateImportedEmployee = ({
   dataToUpdate,
 }: {
   indexToUpdate: number;
-  dataToUpdate: ImportEmployeePersonalsDataType;
+  dataToUpdate: ImportEmployeeDetailsDataType;
 }) => {
-  const { importData, setImportData } = useImportStoreForEmployeePersonals();
+  const { importData, setImportData } = useImportStoreForEmployeeDetails();
   const [data, setData] = useState(dataToUpdate);
 
   const onChange = (key: keyof typeof dataToUpdate, value: string) => {
@@ -38,8 +38,7 @@ export const UpdateImportedEmployee = ({
   };
 
   const handleUpdate = () => {
-    const parsedResult =
-      ImportSingleEmployeePersonalsDataSchema.safeParse(data);
+    const parsedResult = ImportSingleEmployeeDetailsDataSchema.safeParse(data);
 
     if (parsedResult.success) {
       setImportData({

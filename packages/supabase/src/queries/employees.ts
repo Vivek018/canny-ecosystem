@@ -106,7 +106,7 @@ export async function getEmployeesByCompanyId({
         employee_id, assignment_type, skill_level, position, start_date, end_date,
         project_sites!inner(id, name, projects!inner(id, name))
       )`,
-      { count: "exact" },
+      { count: "exact" }
     )
     .eq("company_id", companyId);
 
@@ -173,7 +173,7 @@ export async function getEmployeesByCompanyId({
     if (project) {
       query.eq(
         "employee_project_assignment.project_sites.projects.name",
-        project,
+        project
       );
     }
     if (project_site) {
@@ -220,8 +220,8 @@ export async function getEmployeesByPositionAndProjectSiteId({
     .from("employees")
     .select(
       `${columns.join(
-        ",",
-      )},employee_project_assignment!employee_project_assignment_employee_id_fkey!inner(*)`,
+        ","
+      )},employee_project_assignment!employee_project_assignment_employee_id_fkey!inner(*)`
     )
     .eq("employee_project_assignment.is_current", true)
     .eq("employee_project_assignment.project_site_id", projectSiteId)
@@ -672,8 +672,8 @@ export async function getEmployeeProjectAssignmentByEmployeeId({
     .from("employee_project_assignment")
     .select(
       `${columns.join(
-        ",",
-      )}, project_sites(id, name, projects(name)), supervisor:employees!employee_project_assignments_supervisor_id_fkey(id, employee_code)`,
+        ","
+      )}, project_sites(id, name, projects(name)), supervisor:employees!employee_project_assignments_supervisor_id_fkey(id, employee_code)`
     )
     .eq("employee_id", employeeId)
     .single<EmployeeProjectAssignmentDataType>();
@@ -685,7 +685,7 @@ export async function getEmployeeProjectAssignmentByEmployeeId({
   return { data, error };
 }
 
-export type ImportEmployeePersonalsDataType = Pick<
+export type ImportEmployeeDetailsDataType = Pick<
   EmployeeDatabaseRow,
   | "employee_code"
   | "first_name"
@@ -716,7 +716,7 @@ export type ImportEmployeeStatutoryDataType = Pick<
   employee_code: EmployeeDatabaseRow["employee_code"];
 };
 
-export type ImportEmployeeBankingDataType = Pick<
+export type ImportEmployeeBankDetailsDataType = Pick<
   EmployeeBankDetailsDatabaseRow,
   | "account_holder_name"
   | "account_number"
@@ -759,10 +759,3 @@ export type ImportEmployeeGuardiansDataType = Pick<
 > & {
   employee_code: EmployeeDatabaseRow["employee_code"];
 };
-
-
-
-
-
-
-

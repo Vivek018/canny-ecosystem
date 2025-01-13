@@ -1,68 +1,127 @@
-import { ImportedDataColumns } from "@/components/reimbursements/imported-table/columns";
-import { ImportedDataTable } from "@/components/reimbursements/imported-table/imported-data-table";
 import { useImportStoreForReimbursement } from "@/store/import";
-import type { ImportReimbursementDataType } from "@canny_ecosystem/supabase/queries";
+import { useSupabase } from "@canny_ecosystem/supabase/client";
+import { createReimbursementsFromImportedData } from "@canny_ecosystem/supabase/mutations";
+import {
+  getEmployeeIdsByEmployeeCodes,
+  getUserIdsByUserEmails,
+} from "@canny_ecosystem/supabase/queries";
+import type {
+  ReimbursementInsert,
+  SupabaseEnv,
+} from "@canny_ecosystem/supabase/types";
+import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
-import Papa from "papaparse";
+import {
+  ImportReimbursementDataSchema,
+  isGoodStatus,
+} from "@canny_ecosystem/utils";
+import { useNavigate } from "@remix-run/react";
+
 import { useState, useEffect } from "react";
+import { ImportedDataTable } from "../imported-table/imported-data-table";
+import { ImportedDataColumns } from "../imported-table/columns";
 
 export function ReimbursementImportData({
-  fieldMapping,
-  file,
+  env,
+  companyId,
 }: {
-  fieldMapping: Record<string, string>;
-  file: any;
+  env: SupabaseEnv;
+  companyId: string;
 }) {
-  const { importData, setImportData } = useImportStoreForReimbursement();
-
-  const swappedFieldMapping = Object.fromEntries(
-    Object.entries(fieldMapping).map(([key, value]) => [value, key])
-  );
-
-  useEffect(() => {
-    if (file) {
-      Papa.parse(file, {
-        header: true,
-        skipEmptyLines: true,
-        transformHeader: (header) => {
-          return swappedFieldMapping[header] || header;
-        },
-        complete: (results) => {
-          const finalTableData = results.data.filter((entry) =>
-            Object.values(entry!).some((value) => String(value).trim() !== ""),
-          );
-
-          setImportData({
-            data: finalTableData as ImportReimbursementDataType[],
-          });
-        },
-        error: (error) => {
-          console.error("Parsing error: ", error);
-        },
-      });
-    }
-  }, []);
+  const navigate = useNavigate();
+  const { supabase } = useSupabase({ env });
+  const { importData } = useImportStoreForReimbursement();
 
   const [searchString, setSearchString] = useState("");
   const [tableData, setTableData] = useState(importData.data);
 
+  const validateImportData = (data: any[]) => {
+    try {
+      const result = ImportReimbursementDataSchema.safeParse({ data });
+      if (!result.success) {
+        console.error("Data validation error");
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error("Data validation error:", error);
+
+      return false;
+    }
+  };
+
   useEffect(() => {
-    const filteredData = importData.data.filter((item) =>
+    const filteredData = importData?.data.filter((item) =>
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase()),
-      ),
+          String(value).toLowerCase().includes(searchString.toLowerCase())
+      )
     );
     setTableData(filteredData);
   }, [searchString, importData]);
 
+  const handleFinalImport = async () => {
+    if (validateImportData(importData.data)) {
+      const userEmails = importData.data!.map((value) => value.email!);
+
+      const employeeCodes = importData.data!.map(
+        (value) => value.employee_code
+      );
+
+      const { data: employees, error: codeError } =
+        await getEmployeeIdsByEmployeeCodes({
+          supabase,
+          employeeCodes,
+        });
+
+      if (codeError) {
+        throw codeError;
+      }
+      const { data: users, error: userError } = await getUserIdsByUserEmails({
+        supabase,
+        userEmails,
+      });
+
+      if (userError) {
+        throw userError;
+      }
+
+      const updatedData = importData.data!.map((item: any) => {
+        const employeeId = employees?.find(
+          (e) => e.employee_code === item.employee_code
+        )?.id;
+        const userId = users?.find((u) => u.email === item.email)?.id;
+
+        const { email, employee_code, ...rest } = item;
+        return {
+          ...rest,
+          ...(employeeId ? { employee_id: employeeId } : {}),
+          ...(userId ? { user_id: userId } : {}),
+          company_id: companyId,
+        };
+      });
+      const { error, status } = await createReimbursementsFromImportedData({
+        data: updatedData as ReimbursementInsert[],
+
+        supabase,
+      });
+
+      if (error) {
+        console.error(error);
+      }
+      if (isGoodStatus(status)) {
+        navigate("/approvals/reimbursements");
+      }
+    }
+  };
+
   return (
     <section className="m-4">
       <div className="w-full flex items-center justify-between pb-4">
-        <div className="w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4">
-          <div className="relative w-full">
+        <div className="w-full  flex justify-between items-center">
+          <div className="relative w-[30rem] ">
             <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
               <Icon
                 name="magnifying-glass"
@@ -77,13 +136,14 @@ export function ReimbursementImportData({
               className="pl-8 h-10 w-full focus-visible:ring-0"
             />
           </div>
+          <div className="flex items-center gap-3">
+            <Button variant={"default"} onClick={handleFinalImport}>
+              Import
+            </Button>
+          </div>
         </div>
       </div>
-      <input
-        name="stringified_data"
-        type="hidden"
-        value={JSON.stringify(importData)}
-      />
+
       <ImportedDataTable data={tableData} columns={ImportedDataColumns} />
     </section>
   );

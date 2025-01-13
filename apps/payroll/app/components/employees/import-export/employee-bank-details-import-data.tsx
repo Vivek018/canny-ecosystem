@@ -1,10 +1,10 @@
-import { ImportedDataColumns } from "@/components/employees/imported-banking-table/columns";
-import { ImportedDataTable } from "@/components/employees/imported-banking-table/imported-data-table";
-import { useImportStoreForEmployeeBanking } from "@/store/import";
+import { ImportedDataColumns } from "@/components/employees/imported-bank-details-table/columns";
+import { ImportedDataTable } from "@/components/employees/imported-bank-details-table/imported-data-table";
+import { useImportStoreForEmployeeBankDetails } from "@/store/import";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
 import {
-  createEmployeeBankingFromImportedData,
-  getEmployeeBankingConflicts,
+  createEmployeeBankDetailsFromImportedData,
+  getEmployeeBankDetailsConflicts,
 } from "@canny_ecosystem/supabase/mutations";
 import { getEmployeeIdsByEmployeeCodes } from "@canny_ecosystem/supabase/queries";
 import type {
@@ -18,14 +18,14 @@ import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import {
   duplicationTypeArray,
-  ImportEmployeeBankingDataSchema,
+  ImportEmployeeBankDetailsDataSchema,
   transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
 import { useNavigate } from "@remix-run/react";
 
 import { useState, useEffect } from "react";
 
-export function EmployeeBankingImportData({
+export function EmployeeBankDetailsImportData({
   env,
   conflictingIndices,
 }: {
@@ -34,7 +34,7 @@ export function EmployeeBankingImportData({
 }) {
   const navigate = useNavigate();
   const { supabase } = useSupabase({ env });
-  const { importData } = useImportStoreForEmployeeBanking();
+  const { importData } = useImportStoreForEmployeeBankDetails();
   const [conflictingIndex, setConflictingIndex] =
     useState<number[]>(conflictingIndices);
   const [searchString, setSearchString] = useState("");
@@ -45,7 +45,7 @@ export function EmployeeBankingImportData({
 
   const validateImportData = (data: any[]) => {
     try {
-      const result = ImportEmployeeBankingDataSchema.safeParse({ data });
+      const result = ImportEmployeeBankDetailsDataSchema.safeParse({ data });
       if (!result.success) {
         console.error("Data validation error");
         return false;
@@ -86,10 +86,11 @@ export function EmployeeBankingImportData({
       });
 
       setFinalData(updatedData);
-      const { conflictingIndices, error } = await getEmployeeBankingConflicts({
-        supabase,
-        importedData: updatedData as EmployeeBankDetailsDatabaseInsert[],
-      });
+      const { conflictingIndices, error } =
+        await getEmployeeBankDetailsConflicts({
+          supabase,
+          importedData: updatedData as EmployeeBankDetailsDatabaseInsert[],
+        });
 
       if (error) {
         throw error;
@@ -120,11 +121,13 @@ export function EmployeeBankingImportData({
 
   const handleFinalImport = async () => {
     if (validateImportData(importData.data)) {
-      const { error, status } = await createEmployeeBankingFromImportedData({
-        data: finalData as EmployeeBankDetailsDatabaseInsert[],
-        import_type: importType,
-        supabase,
-      });
+      const { error, status } = await createEmployeeBankDetailsFromImportedData(
+        {
+          data: finalData as EmployeeBankDetailsDatabaseInsert[],
+          import_type: importType,
+          supabase,
+        }
+      );
 
       if (error) {
         console.error(error);

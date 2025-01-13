@@ -35,7 +35,7 @@ export const zEmailSuffix = z
   .max(20)
   .regex(
     /^[A-Za-z0-9]+\.[A-Za-z]{2,}$/,
-    "Must contain a dot with at least one character before and two after.",
+    "Must contain a dot with at least one character before and two after."
   );
 
 export const SIZE_1KB = 1 * 1024; //1KB
@@ -52,21 +52,21 @@ export const zImage = z
   .any()
   .refine(
     (file) => (typeof file !== "string" ? file.size < SIZE_1MB : true),
-    "File size must be less than 1MB",
+    "File size must be less than 1MB"
   )
   .refine(
     (file) =>
       typeof file !== "string"
         ? ACCEPTED_IMAGE_TYPES.includes(file?.type)
         : true,
-    "Only .jpg, .jpeg, .png and .webp formats are supported.",
+    "Only .jpg, .jpeg, .png and .webp formats are supported."
   );
 
 export const zFile = z
   .any()
   .refine(
     (file) => (typeof file !== "string" ? file.size < SIZE_1MB * 5 : true),
-    "File size must be less than 5MB",
+    "File size must be less than 5MB"
   )
   .refine(
     (file) =>
@@ -81,7 +81,7 @@ export const zFile = z
             "application/docx",
           ].includes(file?.type)
         : true,
-    "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .docx formats are supported.",
+    "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .docx formats are supported."
   );
 
 export const parseDateSchema = z
@@ -423,7 +423,7 @@ export const PaymentFieldSchema = PaymentFieldSchemaObject.refine(
   {
     message: `When payment type is "variable", calculation type must be "fixed".`,
     path: ["calculation_type"],
-  },
+  }
 );
 
 export const deductionCycleArray = ["monthly"] as const;
@@ -640,7 +640,7 @@ export const PaymentTemplateComponentsSchema = z.object({
       component_type: z.enum(componentTypeArray).default("earning"),
       calculation_value: z.number().optional(),
       display_order: z.number().int().optional(),
-    }),
+    })
   ),
 });
 
@@ -665,7 +665,6 @@ export const PaymentTemplateFormSiteDialogSchema = z.object({
   position: z.string().optional(),
   skill_level: z.string().optional(),
 });
-
 
 export const DeleteEmployeeLinkSchema = z.object({
   is_active: z.enum(booleanArray).transform((val) => val === "true"),
@@ -763,9 +762,7 @@ export const ImportReimbursementDataSchema = z.object({
 
 export const duplicationTypeArray = ["overwrite", "skip"] as const;
 
-
-
-export const ImportEmployeePersonalsHeaderSchemaObject = z.object({
+export const ImportEmployeeDetailsHeaderSchemaObject = z.object({
   employee_code: z.string(),
   first_name: z.string(),
   middle_name: z.string().optional(),
@@ -780,8 +777,8 @@ export const ImportEmployeePersonalsHeaderSchemaObject = z.object({
   secondary_mobile_number: z.string().optional(),
 });
 
-export const ImportEmployeePersonalsHeaderSchema =
-  ImportEmployeePersonalsHeaderSchemaObject.refine(
+export const ImportEmployeeDetailsHeaderSchema =
+  ImportEmployeeDetailsHeaderSchemaObject.refine(
     (data) => {
       const values = [
         data.employee_code,
@@ -821,7 +818,7 @@ export const ImportEmployeePersonalsHeaderSchema =
     }
   );
 
-export const ImportSingleEmployeePersonalsDataSchema = z.object({
+export const ImportSingleEmployeeDetailsDataSchema = z.object({
   first_name: zString.min(3),
   middle_name: zString.min(3).optional(),
   last_name: zString.min(3),
@@ -848,8 +845,8 @@ export const ImportSingleEmployeePersonalsDataSchema = z.object({
   personal_email: zEmail.optional(),
 });
 
-export const ImportEmployeePersonalsDataSchema = z.object({
-  data: z.array(ImportSingleEmployeePersonalsDataSchema),
+export const ImportEmployeeDetailsDataSchema = z.object({
+  data: z.array(ImportSingleEmployeeDetailsDataSchema),
 });
 
 export const ImportEmployeeStatutoryHeaderSchemaObject = z.object({
@@ -925,7 +922,7 @@ export const ImportEmployeeStatutoryDataSchema = z.object({
   data: z.array(ImportSingleEmployeeStatutoryDataSchema),
 });
 
-export const ImportEmployeeBankingHeaderSchemaObject = z.object({
+export const ImportEmployeeBankDetailsHeaderSchemaObject = z.object({
   employee_code: z.string(),
   account_holder_name: z.string().optional(),
   account_number: z.string(),
@@ -935,8 +932,8 @@ export const ImportEmployeeBankingHeaderSchemaObject = z.object({
   branch_name: z.string().optional(),
 });
 
-export const ImportEmployeeBankingHeaderSchema =
-  ImportEmployeeBankingHeaderSchemaObject.refine(
+export const ImportEmployeeBankDetailsHeaderSchema =
+  ImportEmployeeBankDetailsHeaderSchemaObject.refine(
     (data) => {
       const values = [
         data.employee_code,
@@ -966,7 +963,7 @@ export const ImportEmployeeBankingHeaderSchema =
     }
   );
 
-export const ImportSingleEmployeeBankingDataSchema = z.object({
+export const ImportSingleEmployeeBankDetailsDataSchema = z.object({
   employee_code: zNumberString.min(3),
   account_number: zNumber.min(10).max(20),
   ifsc_code: zNumberString.min(3).max(11),
@@ -976,8 +973,8 @@ export const ImportSingleEmployeeBankingDataSchema = z.object({
   branch_name: zNumberString.min(3).optional(),
 });
 
-export const ImportEmployeeBankingDataSchema = z.object({
-  data: z.array(ImportSingleEmployeeBankingDataSchema),
+export const ImportEmployeeBankDetailsDataSchema = z.object({
+  data: z.array(ImportSingleEmployeeBankDetailsDataSchema),
 });
 
 export const ImportEmployeeAddressHeaderSchemaObject = z.object({

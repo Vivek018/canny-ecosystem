@@ -2,9 +2,10 @@ import { EmployeesActions } from "@/components/employees/employee-actions";
 import { EmployeesSearchFilter } from "@/components/employees/employee-search-filter";
 import { FilterList } from "@/components/employees/filter-list";
 import { ImportEmployeeAddressModal } from "@/components/employees/import-export/import-modal-address";
-import { ImportEmployeeBankingModal } from "@/components/employees/import-export/import-modal-banking";
+import { ImportEmployeeBankDetailsModal } from "@/components/employees/import-export/import-modal-bank-details";
+import { ImportEmployeeDetailsModal } from "@/components/employees/import-export/import-modal-employee-details";
 import { ImportEmployeeGuardiansModal } from "@/components/employees/import-export/import-modal-guardians";
-import { ImportEmployeePersonalsModal } from "@/components/employees/import-export/import-modal-personals";
+
 import { ImportEmployeeStatutoryModal } from "@/components/employees/import-export/import-modal-statutory";
 import { columns } from "@/components/employees/table/columns";
 import { DataTable } from "@/components/employees/table/data-table";
@@ -231,9 +232,9 @@ export default function EmployeesIndex() {
         companyId={companyId}
         env={env}
       />
-      <ImportEmployeePersonalsModal />
+      <ImportEmployeeDetailsModal />
       <ImportEmployeeStatutoryModal />
-      <ImportEmployeeBankingModal />
+      <ImportEmployeeBankDetailsModal />
       <ImportEmployeeAddressModal />
       <ImportEmployeeGuardiansModal />
       <Outlet />

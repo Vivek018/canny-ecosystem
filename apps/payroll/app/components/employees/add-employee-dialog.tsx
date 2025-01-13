@@ -34,14 +34,14 @@ export function AddEmployeeDialog() {
           onClick={() => {
             searchParams.set(
               "step",
-              modalSearchParamNames.import_employee_personals
+              modalSearchParamNames.import_employee_details
             );
             setSearchParams(searchParams);
           }}
           className="space-x-2 flex items-center"
         >
           <Icon name="import" size="sm" className="mb-0.5" />
-          <span>Import Personals</span>
+          <span>Import Employee</span>
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
@@ -60,14 +60,14 @@ export function AddEmployeeDialog() {
           onClick={() => {
             searchParams.set(
               "step",
-              modalSearchParamNames.import_employee_banking
+              modalSearchParamNames.import_employee_bank_details
             );
             setSearchParams(searchParams);
           }}
           className="space-x-2 flex items-center"
         >
           <Icon name="import" size="sm" className="mb-0.5" />
-          <span>Import Banking</span>
+          <span>Import Bank Details</span>
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {

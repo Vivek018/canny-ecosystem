@@ -5,9 +5,9 @@ import {
   DropdownMenuSeparator,
 } from "@canny_ecosystem/ui/dropdown-menu";
 
-import type { ImportEmployeePersonalsDataType } from "@canny_ecosystem/supabase/queries";
-import { DeleteImportedEmployee } from "./delete-imported-employee-personals";
-import { UpdateImportedEmployee } from "./update-imported-employee-personals";
+import type { ImportEmployeeDetailsDataType } from "@canny_ecosystem/supabase/queries";
+import { DeleteImportedEmployee } from "./delete-imported-employee-details";
+import { UpdateImportedEmployee } from "./update-imported-employee-details";
 
 export const ImportedEmployeeOptionsDropdown = ({
   index,
@@ -15,7 +15,7 @@ export const ImportedEmployeeOptionsDropdown = ({
   triggerChild,
 }: {
   index: number;
-  data: ImportEmployeePersonalsDataType;
+  data: ImportEmployeeDetailsDataType;
   triggerChild: React.ReactElement;
 }) => {
   return (

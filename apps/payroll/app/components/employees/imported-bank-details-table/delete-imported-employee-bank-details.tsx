@@ -1,4 +1,4 @@
-import { useImportStoreForEmployeePersonals } from "@/store/import";
+import { useImportStoreForEmployeeBankDetails } from "@/store/import";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,7 +18,7 @@ export const DeleteImportedEmployee = ({
 }: {
   indexToDelete: number;
 }) => {
-  const { importData, setImportData } = useImportStoreForEmployeePersonals();
+  const { importData, setImportData } = useImportStoreForEmployeeBankDetails();
 
   const handleDelete = () => {
     setImportData({

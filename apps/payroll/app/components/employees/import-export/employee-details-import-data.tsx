@@ -1,10 +1,10 @@
-import { ImportedDataColumns } from "@/components/employees/imported-personals-table/columns";
-import { ImportedDataTable } from "@/components/employees/imported-personals-table/imported-data-table";
-import { useImportStoreForEmployeePersonals } from "@/store/import";
+import { ImportedDataColumns } from "@/components/employees/imported-employee-details-table/columns";
+import { ImportedDataTable } from "@/components/employees/imported-employee-details-table/imported-data-table";
+import { useImportStoreForEmployeeDetails } from "@/store/import";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
 import {
-  createEmployeePersonalsFromImportedData,
-  getEmployeePersonalsConflicts,
+  createEmployeeDetailsFromImportedData,
+  getEmployeeDetailsConflicts,
 } from "@canny_ecosystem/supabase/mutations";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { Button } from "@canny_ecosystem/ui/button";
@@ -14,14 +14,14 @@ import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import {
   duplicationTypeArray,
-  ImportEmployeePersonalsDataSchema,
+  ImportEmployeeDetailsDataSchema,
   transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
 import { useNavigate } from "@remix-run/react";
 
 import { useState, useEffect } from "react";
 
-export function EmployeePersonalsImportData({
+export function EmployeeDetailsImportData({
   env,
   conflictingIndices,
   companyId,
@@ -32,7 +32,7 @@ export function EmployeePersonalsImportData({
 }) {
   const navigate = useNavigate();
   const { supabase } = useSupabase({ env });
-  const { importData } = useImportStoreForEmployeePersonals();
+  const { importData } = useImportStoreForEmployeeDetails();
   const [conflictingIndex, setConflictingIndex] =
     useState<number[]>(conflictingIndices);
   const [searchString, setSearchString] = useState("");
@@ -41,7 +41,7 @@ export function EmployeePersonalsImportData({
 
   const validateImportData = (data: any[]) => {
     try {
-      const result = ImportEmployeePersonalsDataSchema.safeParse({ data });
+      const result = ImportEmployeeDetailsDataSchema.safeParse({ data });
       if (!result.success) {
         console.error("Data validation error");
         return false;
@@ -56,12 +56,10 @@ export function EmployeePersonalsImportData({
 
   const fetchConflicts = async () => {
     try {
-      const { conflictingIndices, error } = await getEmployeePersonalsConflicts(
-        {
-          supabase,
-          importedData: importData.data as any,
-        }
-      );
+      const { conflictingIndices, error } = await getEmployeeDetailsConflicts({
+        supabase,
+        importedData: importData.data as any,
+      });
 
       if (error) {
         throw error;
@@ -97,7 +95,7 @@ export function EmployeePersonalsImportData({
         company_id: companyId,
       }));
 
-      const { error, status } = await createEmployeePersonalsFromImportedData({
+      const { error, status } = await createEmployeeDetailsFromImportedData({
         data: updatedData,
         import_type: importType,
         supabase,
@@ -108,7 +106,7 @@ export function EmployeePersonalsImportData({
       }
 
       if (
-        status==="No new data to insert after filtering duplicates"||
+        status === "No new data to insert after filtering duplicates" ||
         status === "Successfully inserted new records" ||
         status === "Successfully processed updates and new insertions"
       ) {

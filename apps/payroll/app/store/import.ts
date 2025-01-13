@@ -1,7 +1,7 @@
 import type {
-  ImportEmployeePersonalsDataType,
+  ImportEmployeeDetailsDataType,
   ImportEmployeeStatutoryDataType,
-  ImportEmployeeBankingDataType,
+  ImportEmployeeBankDetailsDataType,
   ImportEmployeeAddressDataType,
   ImportEmployeeGuardiansDataType,
   ImportReimbursementDataType,
@@ -19,15 +19,15 @@ export const useImportStoreForReimbursement =
     setImportData: (importData) => set({ importData }),
   }));
 
-type ImportStateForEmployeePersonals = {
-  importData: { data: ImportEmployeePersonalsDataType[] };
+type ImportStateForEmployeeDetails = {
+  importData: { data: ImportEmployeeDetailsDataType[] };
   setImportData: (importData: {
-    data: ImportEmployeePersonalsDataType[];
+    data: ImportEmployeeDetailsDataType[];
   }) => void;
 };
 
-export const useImportStoreForEmployeePersonals =
-  create<ImportStateForEmployeePersonals>()((set) => ({
+export const useImportStoreForEmployeeDetails =
+  create<ImportStateForEmployeeDetails>()((set) => ({
     importData: { data: [] },
     setImportData: (importData) => set({ importData }),
   }));
@@ -45,15 +45,15 @@ export const useImportStoreForEmployeeStatutory =
     setImportData: (importData) => set({ importData }),
   }));
 
-type ImportStateForEmployeeForBanking = {
-  importData: { data: ImportEmployeeBankingDataType[] };
+type ImportStateForEmployeeForBankDetails = {
+  importData: { data: ImportEmployeeBankDetailsDataType[] };
   setImportData: (importData: {
-    data: ImportEmployeeBankingDataType[];
+    data: ImportEmployeeBankDetailsDataType[];
   }) => void;
 };
 
-export const useImportStoreForEmployeeBanking =
-  create<ImportStateForEmployeeForBanking>()((set) => ({
+export const useImportStoreForEmployeeBankDetails =
+  create<ImportStateForEmployeeForBankDetails>()((set) => ({
     importData: { data: [] },
     setImportData: (importData) => set({ importData }),
   }));

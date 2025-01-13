@@ -18,7 +18,7 @@ import type {
   EmployeeWorkHistoryDatabaseUpdate,
   TypedSupabaseClient,
 } from "../types";
-import type { ImportEmployeePersonalsDataType } from "../queries";
+import type { ImportEmployeeDetailsDataType } from "../queries";
 
 export async function createEmployee({
   supabase,
@@ -789,12 +789,12 @@ export async function updateEmployeeProjectAssignment({
   return { status, error };
 }
 
-export async function getEmployeePersonalsConflicts({
+export async function getEmployeeDetailsConflicts({
   supabase,
   importedData,
 }: {
   supabase: TypedSupabaseClient;
-  importedData: ImportEmployeePersonalsDataType[];
+  importedData: ImportEmployeeDetailsDataType[];
 }) {
   const employeeCodes = [
     ...new Set(importedData.map((emp) => emp.employee_code)),
@@ -859,7 +859,7 @@ export async function getEmployeePersonalsConflicts({
   return { conflictingIndices, error: null };
 }
 
-export async function createEmployeePersonalsFromImportedData({
+export async function createEmployeeDetailsFromImportedData({
   supabase,
   data,
   import_type,
@@ -1248,7 +1248,7 @@ export async function createEmployeeStatutoryFromImportedData({
   };
 }
 
-export async function getEmployeeBankingConflicts({
+export async function getEmployeeBankDetailsConflicts({
   supabase,
   importedData,
 }: {
@@ -1301,7 +1301,7 @@ export async function getEmployeeBankingConflicts({
   return { conflictingIndices, error: null };
 }
 
-export async function createEmployeeBankingFromImportedData({
+export async function createEmployeeBankDetailsFromImportedData({
   supabase,
   data,
   import_type,
@@ -1579,7 +1579,6 @@ export async function createEmployeeGuardiansFromImportedData({
 
     if (error) {
       console.error("Error inserting employee guardians data:", error);
-     
     }
 
     return { status, error: null };
@@ -1614,7 +1613,6 @@ export async function createEmployeeGuardiansFromImportedData({
 
           if (updateError) {
             console.error("Error updating record:", updateError);
-            
           }
         }
       } else {
@@ -1624,7 +1622,6 @@ export async function createEmployeeGuardiansFromImportedData({
 
         if (insertError) {
           console.error("Error inserting new record:", insertError);
-          
         }
       }
     }

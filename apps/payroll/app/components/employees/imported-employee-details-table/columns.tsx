@@ -1,11 +1,11 @@
-import type { ImportEmployeePersonalsDataType } from "@canny_ecosystem/supabase/queries";
+import type { ImportEmployeeDetailsDataType } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ImportedEmployeeOptionsDropdown } from "./imported-table-options";
 
-export const ImportedDataColumns: ColumnDef<ImportEmployeePersonalsDataType>[] =
+export const ImportedDataColumns: ColumnDef<ImportEmployeeDetailsDataType>[] =
   [
     {
       accessorKey: "employee_code",
