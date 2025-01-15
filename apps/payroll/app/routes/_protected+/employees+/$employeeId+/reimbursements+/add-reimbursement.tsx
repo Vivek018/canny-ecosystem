@@ -7,7 +7,7 @@ import {
   getInitialValueFromZod,
   isGoodStatus,
   ReimbursementSchema,
-  ReimbursementStatusArray,
+  reimbursementStatusArray,
   replaceUnderscore,
   transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
@@ -160,7 +160,7 @@ export default function AddReimbursements({
                   key={resetKey}
                   className="w-full capitalize flex-1 "
                   options={transformStringArrayIntoOptions(
-                    ReimbursementStatusArray as unknown as string[],
+                    reimbursementStatusArray as unknown as string[]
                   )}
                   inputProps={{
                     ...getInputProps(fields.status, { type: "text" }),

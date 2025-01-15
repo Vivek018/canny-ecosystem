@@ -13,6 +13,7 @@ import type {
   SiteDatabaseRow,
   TypedSupabaseClient,
 } from "../types";
+
 import { HARD_QUERY_LIMIT, MID_QUERY_LIMIT } from "../constant";
 
 export type EmployeeFilters = {
@@ -105,7 +106,7 @@ export async function getEmployeesByCompanyId({
         employee_id, assignment_type, skill_level, position, start_date, end_date,
         project_sites!inner(id, name, projects!inner(id, name))
       )`,
-      { count: "exact" },
+      { count: "exact" }
     )
     .eq("company_id", companyId);
 
@@ -172,7 +173,7 @@ export async function getEmployeesByCompanyId({
     if (project) {
       query.eq(
         "employee_project_assignment.project_sites.projects.name",
-        project,
+        project
       );
     }
     if (project_site) {
@@ -219,8 +220,8 @@ export async function getEmployeesByPositionAndProjectSiteId({
     .from("employees")
     .select(
       `${columns.join(
-        ",",
-      )},employee_project_assignment!employee_project_assignment_employee_id_fkey!inner(*)`,
+        ","
+      )},employee_project_assignment!employee_project_assignment_employee_id_fkey!inner(*)`
     )
     .eq("employee_project_assignment.is_current", true)
     .eq("employee_project_assignment.project_site_id", projectSiteId)
@@ -671,8 +672,8 @@ export async function getEmployeeProjectAssignmentByEmployeeId({
     .from("employee_project_assignment")
     .select(
       `${columns.join(
-        ",",
-      )}, project_sites(id, name, projects(name)), supervisor:employees!employee_project_assignments_supervisor_id_fkey(id, employee_code)`,
+        ","
+      )}, project_sites(id, name, projects(name)), supervisor:employees!employee_project_assignments_supervisor_id_fkey(id, employee_code)`
     )
     .eq("employee_id", employeeId)
     .single<EmployeeProjectAssignmentDataType>();
@@ -684,128 +685,77 @@ export async function getEmployeeProjectAssignmentByEmployeeId({
   return { data, error };
 }
 
-export type EmployeeReportDataType = Pick<
+export type ImportEmployeeDetailsDataType = Pick<
   EmployeeDatabaseRow,
-  "id" | "employee_code" | "first_name" | "middle_name" | "last_name"
+  | "employee_code"
+  | "first_name"
+  | "middle_name"
+  | "last_name"
+  | "gender"
+  | "education"
+  | "marital_status"
+  | "is_active"
+  | "date_of_birth"
+  | "personal_email"
+  | "primary_mobile_number"
+  | "secondary_mobile_number"
+>;
+
+export type ImportEmployeeStatutoryDataType = Pick<
+  EmployeeStatutoryDetailsDatabaseRow,
+  | "aadhaar_number"
+  | "pan_number"
+  | "uan_number"
+  | "pf_number"
+  | "esic_number"
+  | "driving_license_number"
+  | "driving_license_expiry"
+  | "passport_number"
+  | "passport_expiry"
 > & {
-  employee_project_assignment: Pick<
-    EmployeeProjectAssignmentDatabaseRow,
-    "employee_id" | "position" | "skill_level" | "start_date" | "end_date"
-  > & {
-    project_sites: {
-      id: SiteDatabaseRow["id"];
-      name: SiteDatabaseRow["name"];
-      projects: {
-        id: ProjectDatabaseRow["id"];
-        name: ProjectDatabaseRow["name"];
-      };
-    };
-  };
+  employee_code: EmployeeDatabaseRow["employee_code"];
 };
 
-export async function getEmployeesReportByCompanyId({
-  supabase,
-  companyId,
-  params,
-}: {
-  supabase: TypedSupabaseClient;
-  companyId: string;
-  params: GetEmployeesByCompanyIdParams;
-}) {
-  const { sort, from, to, filters, searchQuery } = params;
+export type ImportEmployeeBankDetailsDataType = Pick<
+  EmployeeBankDetailsDatabaseRow,
+  | "account_holder_name"
+  | "account_number"
+  | "ifsc_code"
+  | "account_type"
+  | "bank_name"
+  | "branch_name"
+> & {
+  employee_code: EmployeeDatabaseRow["employee_code"];
+};
 
-  const columns = [
-    "id",
-    "employee_code",
-    "first_name",
-    "middle_name",
-    "last_name",
-  ] as const;
+export type ImportEmployeeAddressDataType = Pick<
+  EmployeeAddressDatabaseRow,
+  | "address_type"
+  | "address_line_1"
+  | "address_line_2"
+  | "city"
+  | "pincode"
+  | "state"
+  | "country"
+  | "latitude"
+  | "longitude"
+  | "is_primary"
+> & {
+  employee_code: EmployeeDatabaseRow["employee_code"];
+};
 
-  const query = supabase
-    .from("employees")
-    .select(
-      `${columns.join(",")},
-        employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(
-        employee_id, assignment_type, skill_level, position, start_date, end_date,
-        project_sites!inner(id, name, projects!inner(id, name))
-      )`,
-      { count: "exact" },
-    )
-    .eq("company_id", companyId);
-
-  // Sorting
-  if (sort) {
-    const [column, direction] = sort;
-    if (column === "employee_name") {
-      query.order("first_name", { ascending: direction === "asc" });
-    } else {
-      query.order(column, { ascending: direction === "asc" });
-    }
-  } else {
-    query.order("created_at", { ascending: false });
-  }
-
-  if (searchQuery) {
-    const searchQueryArray = searchQuery.split(" ");
-    if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
-      for (const searchQueryElement of searchQueryArray) {
-        query.or(
-          `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*,employee_code.ilike.*${searchQueryElement}*`,
-        );
-      }
-    } else {
-      query.or(
-        `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`,
-      );
-    }
-  }
-
-  // Filters
-  if (filters) {
-    const { project, project_site, doj_start, doj_end, dol_start, dol_end } =
-      filters;
-
-    const dateFilters = [
-      {
-        field: "employee_project_assignment.start_date",
-        start: doj_start,
-        end: doj_end,
-      },
-      {
-        field: "employee_project_assignment.end_date",
-        start: dol_start,
-        end: dol_end,
-      },
-    ];
-
-    for (const { field, start, end } of dateFilters) {
-      if (start) query.gte(field, formatUTCDate(start));
-      if (end) query.lte(field, formatUTCDate(end));
-    }
-
-    if (project) {
-      query.eq(
-        "employee_project_assignment.project_sites.projects.name",
-        project,
-      );
-    }
-    if (project_site) {
-      query.eq("employee_project_assignment.project_sites.name", project_site);
-    }
-  }
-
-  // Fetch Data
-  const { data, count, error } = await query.range(from, to);
-
-  if (error) {
-    console.error("Error fetching employees:", error);
-    return { data: null, error };
-  }
-
-  return {
-    data,
-    meta: { count: count ?? data?.length },
-    error: null,
-  };
-}
+export type ImportEmployeeGuardiansDataType = Pick<
+  EmployeeGuardianDatabaseRow,
+  | "relationship"
+  | "first_name"
+  | "last_name"
+  | "date_of_birth"
+  | "gender"
+  | "mobile_number"
+  | "alternate_mobile_number"
+  | "email"
+  | "is_emergency_contact"
+  | "address_same_as_employee"
+> & {
+  employee_code: EmployeeDatabaseRow["employee_code"];
+};

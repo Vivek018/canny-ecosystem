@@ -1,6 +1,12 @@
 import { EmployeesActions } from "@/components/employees/employee-actions";
 import { EmployeesSearchFilter } from "@/components/employees/employee-search-filter";
 import { FilterList } from "@/components/employees/filter-list";
+import { ImportEmployeeAddressModal } from "@/components/employees/import-export/import-modal-address";
+import { ImportEmployeeBankDetailsModal } from "@/components/employees/import-export/import-modal-bank-details";
+import { ImportEmployeeDetailsModal } from "@/components/employees/import-export/import-modal-employee-details";
+import { ImportEmployeeGuardiansModal } from "@/components/employees/import-export/import-modal-guardians";
+
+import { ImportEmployeeStatutoryModal } from "@/components/employees/import-export/import-modal-statutory";
 import { columns } from "@/components/employees/table/columns";
 import { DataTable } from "@/components/employees/table/data-table";
 import { VALID_FILTERS } from "@/constant";
@@ -51,7 +57,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const hasFilters =
     filters &&
     Object.values(filters).some(
-      (value) => value !== null && value !== undefined,
+      (value) => value !== null && value !== undefined
     );
 
   const { data, meta, error } = await getEmployeesByCompanyId({
@@ -67,7 +73,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   });
 
   const hasNextPage = Boolean(
-    meta?.count && meta.count / (page + 1) > pageSize,
+    meta?.count && meta.count / (page + 1) > pageSize
   );
 
   if (error) {
@@ -124,7 +130,7 @@ ${VALID_FILTERS.map(
   (filter) =>
     `name: "${filter.name}", type: "${filter.valueType}", description: "${
       filter.description
-    }", example: ${JSON.stringify(filter.example)}`,
+    }", example: ${JSON.stringify(filter.example)}`
 ).join("\n")}
 
 ### RULES
@@ -226,6 +232,11 @@ export default function EmployeesIndex() {
         companyId={companyId}
         env={env}
       />
+      <ImportEmployeeDetailsModal />
+      <ImportEmployeeStatutoryModal />
+      <ImportEmployeeBankDetailsModal />
+      <ImportEmployeeAddressModal />
+      <ImportEmployeeGuardiansModal />
       <Outlet />
     </section>
   );

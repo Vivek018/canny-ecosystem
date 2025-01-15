@@ -13,7 +13,10 @@ import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 export const columns = ({
   env,
   companyId,
-}: { env: SupabaseEnv; companyId: string }): ColumnDef<EmployeeDataType>[] => [
+}: {
+  env: SupabaseEnv;
+  companyId: string;
+}): ColumnDef<EmployeeDataType>[] => [
   {
     id: "select",
     cell: ({ row }) => (
@@ -55,7 +58,7 @@ export const columns = ({
     },
   },
   {
-    accessorKey: "primary_mobile_number",
+    accessorKey: "mobile_number",
     header: "Mobile Number",
     cell: ({ row }) => {
       return row.original?.primary_mobile_number;
@@ -87,7 +90,7 @@ export const columns = ({
     },
   },
   {
-    accessorKey: "is_active",
+    accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
       return (
@@ -99,7 +102,7 @@ export const columns = ({
   },
   {
     enableSorting: false,
-    accessorKey: "employee_project_assignment_project_site_project_name",
+    accessorKey: "project_name",
     header: "Project",
     cell: ({ row }) => {
       return (
@@ -114,7 +117,7 @@ export const columns = ({
   },
   {
     enableSorting: false,
-    accessorKey: "employee_project_assignment_project_site_name",
+    accessorKey: "project_site_name",
     header: "Project Site",
     cell: ({ row }) => {
       return (
@@ -126,13 +129,13 @@ export const columns = ({
   },
   {
     enableSorting: false,
-    accessorKey: "employee_project_assignment_assignment_type",
+    accessorKey: "assignment_type",
     header: "Assignment Type",
     cell: ({ row }) => {
       return (
         <p className="capitalize">
           {replaceUnderscore(
-            row.original?.employee_project_assignment?.assignment_type ?? "",
+            row.original?.employee_project_assignment?.assignment_type ?? ""
           )}
         </p>
       );
@@ -140,13 +143,13 @@ export const columns = ({
   },
   {
     enableSorting: false,
-    accessorKey: "employee_project_assignment_position",
+    accessorKey: "position",
     header: "Position",
     cell: ({ row }) => {
       return (
         <p className="w-40 truncate capitalize">
           {replaceUnderscore(
-            row.original?.employee_project_assignment?.position,
+            row.original?.employee_project_assignment?.position
           )}
         </p>
       );
@@ -154,13 +157,13 @@ export const columns = ({
   },
   {
     enableSorting: false,
-    accessorKey: "employee_project_assignment_skill_level",
+    accessorKey: "skill_level",
     header: "Skill Level",
     cell: ({ row }) => {
       return (
         <p className="w-max capitalize">
           {replaceUnderscore(
-            row.original?.employee_project_assignment?.skill_level ?? "",
+            row.original?.employee_project_assignment?.skill_level ?? ""
           )}
         </p>
       );
@@ -168,7 +171,7 @@ export const columns = ({
   },
   {
     enableSorting: false,
-    accessorKey: "employee_project_assignment_start_date",
+    accessorKey: "start_date",
     header: "Date of joining",
     cell: ({ row }) => {
       return (
@@ -181,7 +184,7 @@ export const columns = ({
   },
   {
     enableSorting: false,
-    accessorKey: "employee_project_assignment_end_date",
+    accessorKey: "end_date",
     header: "Date of leaving",
     cell: ({ row }) => {
       return (

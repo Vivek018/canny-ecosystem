@@ -1,7 +1,7 @@
 import { ColumnVisibility } from "@/components/reimbursements/column-visibility";
 import { FilterList } from "@/components/reimbursements/filter-list";
 import { ImportReimbursementMenu } from "@/components/reimbursements/import-menu";
-import { ImportReimbursementModal } from "@/components/reimbursements/import-modal";
+import { ImportReimbursementModal } from "@/components/reimbursements/import-export/import-modal-reimbursements";
 import { ReimbursementSearchFilter } from "@/components/reimbursements/reimbursement-search-filter";
 import { reimbursementsColumns } from "@/components/reimbursements/table/columns";
 import { ReimbursementsTable } from "@/components/reimbursements/table/reimbursements-table";

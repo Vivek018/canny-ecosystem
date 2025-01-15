@@ -7,7 +7,7 @@ import {
 } from "@canny_ecosystem/ui/dropdown-menu";
 
 import { useNavigate } from "@remix-run/react";
-import { DeleteReimbursement } from "./delete_reimbursement";
+import { DeleteReimbursement } from "./delete-reimbursement";
 
 export const ReimbursementOptionsDropdown = ({
   reimbursementId,
