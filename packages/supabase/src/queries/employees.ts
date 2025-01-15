@@ -685,6 +685,114 @@ export async function getEmployeeProjectAssignmentByEmployeeId({
   return { data, error };
 }
 
+
+export async function getEmployeesReportByCompanyId({
+  supabase,
+  companyId,
+  params,
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+  params: GetEmployeesByCompanyIdParams;
+}) {
+  const { sort, from, to, filters, searchQuery } = params;
+
+  const columns = [
+    "id",
+    "employee_code",
+    "first_name",
+    "middle_name",
+    "last_name",
+  ] as const;
+
+  const query = supabase
+    .from("employees")
+    .select(
+      `${columns.join(",")},
+        employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(
+        employee_id, assignment_type, skill_level, position, start_date, end_date,
+        project_sites!inner(id, name, projects!inner(id, name))
+      )`,
+      { count: "exact" },
+    )
+    .eq("company_id", companyId);
+
+  // Sorting
+  if (sort) {
+    const [column, direction] = sort;
+    if (column === "employee_name") {
+      query.order("first_name", { ascending: direction === "asc" });
+    } else {
+      query.order(column, { ascending: direction === "asc" });
+    }
+  } else {
+    query.order("created_at", { ascending: false });
+  }
+
+  if (searchQuery) {
+    const searchQueryArray = searchQuery.split(" ");
+    if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
+      for (const searchQueryElement of searchQueryArray) {
+        query.or(
+          `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*,employee_code.ilike.*${searchQueryElement}*`,
+        );
+      }
+    } else {
+      query.or(
+        `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`,
+      );
+    }
+  }
+
+  // Filters
+  if (filters) {
+    const { project, project_site, doj_start, doj_end, dol_start, dol_end } =
+      filters;
+
+    const dateFilters = [
+      {
+        field: "employee_project_assignment.start_date",
+        start: doj_start,
+        end: doj_end,
+      },
+      {
+        field: "employee_project_assignment.end_date",
+        start: dol_start,
+        end: dol_end,
+      },
+    ];
+
+    for (const { field, start, end } of dateFilters) {
+      if (start) query.gte(field, formatUTCDate(start));
+      if (end) query.lte(field, formatUTCDate(end));
+    }
+
+    if (project) {
+      query.eq(
+        "employee_project_assignment.project_sites.projects.name",
+        project,
+      );
+    }
+    if (project_site) {
+      query.eq("employee_project_assignment.project_sites.name", project_site);
+    }
+  }
+
+  // Fetch Data
+  const { data, count, error } = await query.range(from, to);
+
+  if (error) {
+    console.error("Error fetching employees:", error);
+    return { data: null, error };
+  }
+
+  return {
+    data,
+    meta: { count: count ?? data?.length },
+    error: null,
+  };
+}
+
 export type ImportEmployeeDetailsDataType = Pick<
   EmployeeDatabaseRow,
   | "employee_code"
