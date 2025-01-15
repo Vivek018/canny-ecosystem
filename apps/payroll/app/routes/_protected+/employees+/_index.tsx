@@ -22,7 +22,7 @@ import {
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { extractJsonFromString } from "@canny_ecosystem/utils";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { json, Outlet, redirect, useLoaderData } from "@remix-run/react";
+import { type ClientLoaderFunctionArgs, json, Outlet, redirect, useLoaderData } from "@remix-run/react";
 
 const pageSize = 20;
 
@@ -111,6 +111,21 @@ export async function loader({ request }: LoaderFunctionArgs) {
     env,
   });
 }
+
+export type LoaderData = Awaited<
+  ReturnType<Awaited<ReturnType<typeof loader>>["json"]>
+>;
+
+let cache: LoaderData | null = null;
+export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
+  if (cache) return json(cache);
+
+  const loaderData = await serverLoader();
+  cache = (await loaderData) as typeof cache;
+  return json(cache);
+}
+
+clientLoader.hydrate = true;
 
 export async function action({ request }: ActionFunctionArgs) {
   const url = new URL(request.url);

@@ -14,8 +14,12 @@ import {
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { defer, json, type LoaderFunctionArgs } from "@remix-run/node";
-import { Await, useLoaderData } from "@remix-run/react";
+import { defer, type LoaderFunctionArgs } from "@remix-run/node";
+import {
+  Await,
+  type ClientLoaderFunctionArgs,
+  useLoaderData,
+} from "@remix-run/react";
 import { type ReactNode, Suspense, useEffect } from "react";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
@@ -64,7 +68,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       error: null,
     });
   } catch (error) {
-    return json({
+    return defer({
       error,
       env: null,
       employeePromise: null,
@@ -75,6 +79,39 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     });
   }
 }
+
+export type LoaderData = Awaited<ReturnType<typeof loader>>["data"];
+
+export async function clientLoader({
+  serverLoader,
+  params,
+}: ClientLoaderFunctionArgs) {
+  const cacheKey = `employee-${params.employeeId}`;
+  const cachedData = sessionStorage.getItem(cacheKey);
+
+  if (cachedData) {
+    const parsedData = JSON.parse(cachedData) as LoaderData | null;
+    if (parsedData) {
+      return parsedData;
+    }
+  }
+
+  const serverData = (await serverLoader()) as LoaderData;
+  const resolvedData: Record<string, unknown> = {};
+
+  for (const [key, promise] of Object.entries(serverData)) {
+    try {
+      resolvedData[key] = await promise;
+    } catch {
+      resolvedData[key] = null;
+    }
+  }
+  sessionStorage.setItem(cacheKey, JSON.stringify(resolvedData));
+
+  return resolvedData;
+}
+
+clientLoader.hydrate = true;
 
 export default function EmployeeIndex() {
   const {
@@ -89,17 +126,17 @@ export default function EmployeeIndex() {
 
   if (error) {
     return (
-      <ErrorBoundary error={error} message="Failed to load employee details" />
+      <ErrorBoundary error={error} message='Failed to load employee details' />
     );
   }
 
   return (
-    <div className="w-full py-6 flex flex-col gap-8">
+    <div className='w-full py-6 flex flex-col gap-8'>
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={employeePromise}>
           {(resolvedData) => {
             if (!resolvedData || !env)
-              return <ErrorBoundary message="Failed to load employee" />;
+              return <ErrorBoundary message='Failed to load employee' />;
             return (
               <>
                 <CommonWrapper
@@ -128,7 +165,7 @@ export default function EmployeeIndex() {
           {(resolvedData) => {
             if (!resolvedData)
               return (
-                <ErrorBoundary message="Failed to load employee statutory details" />
+                <ErrorBoundary message='Failed to load employee statutory details' />
               );
             return (
               <CommonWrapper
@@ -149,7 +186,7 @@ export default function EmployeeIndex() {
           {(resolvedData) => {
             if (!resolvedData)
               return (
-                <ErrorBoundary message="Failed to load employee bank details" />
+                <ErrorBoundary message='Failed to load employee bank details' />
               );
             return (
               <CommonWrapper
@@ -168,7 +205,7 @@ export default function EmployeeIndex() {
           {(resolvedData) => {
             if (!resolvedData)
               return (
-                <ErrorBoundary message="Failed to load employee addresses" />
+                <ErrorBoundary message='Failed to load employee addresses' />
               );
             return (
               <CommonWrapper
@@ -189,7 +226,7 @@ export default function EmployeeIndex() {
           {(resolvedData) => {
             if (!resolvedData)
               return (
-                <ErrorBoundary message="Failed to load employee guardians details" />
+                <ErrorBoundary message='Failed to load employee guardians details' />
               );
             return (
               <CommonWrapper
