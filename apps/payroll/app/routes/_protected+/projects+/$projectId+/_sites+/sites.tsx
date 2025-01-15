@@ -10,8 +10,7 @@ import {
 import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Await, defer, Link, Outlet, useLoaderData } from "@remix-run/react";
-import { json } from "@remix-run/react";
+import { Await, type ClientLoaderFunctionArgs, defer, Link, Outlet, useLoaderData } from "@remix-run/react";
 import { Suspense } from "react";
 import { SitesWrapper } from "@/components/projects/sites/sites-wrapper";
 import { ErrorBoundary } from "@/components/error-boundary";
@@ -35,7 +34,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       projectId,
     });
   } catch (error) {
-    return json(
+    return defer(
       {
         error,
         projectId,
@@ -46,9 +45,35 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 }
 
-export async function action() {
-  return null;
+export type LoaderData = Awaited<ReturnType<typeof loader>>["data"];
+
+export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
+  const cacheKey = "sites";
+  const cachedData = sessionStorage.getItem(cacheKey);
+
+  if (cachedData) {
+    const parsedData = JSON.parse(cachedData) as LoaderData | null;
+    if (parsedData) {
+      return parsedData;
+    }
+  }
+
+  const serverData = (await serverLoader()) as LoaderData;
+  const resolvedData: Record<string, unknown> = {};
+
+  for (const [key, promise] of Object.entries(serverData)) {
+    try {
+      resolvedData[key] = await promise;
+    } catch {
+      resolvedData[key] = null;
+    }
+  }
+  sessionStorage.setItem(cacheKey, JSON.stringify(resolvedData));
+
+  return resolvedData;
 }
+
+clientLoader.hydrate = true;
 
 export default function SitesIndex() {
   const { sitesPromise, projectId, error } = useLoaderData<typeof loader>();

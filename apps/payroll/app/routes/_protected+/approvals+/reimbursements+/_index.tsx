@@ -23,7 +23,7 @@ import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { json, redirect, useLoaderData, useNavigate } from "@remix-run/react";
+import { type ClientLoaderFunctionArgs, json, redirect, useLoaderData, useNavigate } from "@remix-run/react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -111,6 +111,21 @@ export async function loader({ request }: LoaderFunctionArgs) {
     userEmails: data?.map((user) => user.email) ?? [],
   });
 }
+
+export type LoaderData = Awaited<
+  ReturnType<Awaited<ReturnType<typeof loader>>["json"]>
+>;
+
+let cache: LoaderData | null = null;
+export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
+  if (cache) return json(cache);
+
+  const loaderData = await serverLoader();
+  cache = (await loaderData) as typeof cache;
+  return json(cache);
+}
+
+clientLoader.hydrate = true;
 
 export async function action({ request }: ActionFunctionArgs) {
   const url = new URL(request.url);

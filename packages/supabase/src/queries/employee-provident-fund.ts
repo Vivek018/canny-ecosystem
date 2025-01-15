@@ -64,6 +64,7 @@ export const getEmployeeProvidentFundByCompanyId = async ({
     "include_employer_contribution",
     "include_employer_edli_contribution",
     "include_admin_charges",
+    "edli_restrict_value",
     "is_default",
   ] as const;
 

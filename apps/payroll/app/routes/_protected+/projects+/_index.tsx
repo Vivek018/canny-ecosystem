@@ -14,8 +14,8 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import {
   Await,
+  type ClientLoaderFunctionArgs,
   defer,
-  json,
   Link,
   Outlet,
   useLoaderData,
@@ -41,7 +41,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       projectsPromise,
     });
   } catch (error) {
-    return json(
+    return defer(
       {
         status: "error",
         message: "Failed to load projects",
@@ -52,6 +52,36 @@ export async function loader({ request }: LoaderFunctionArgs) {
     );
   }
 }
+
+export type LoaderData = Awaited<ReturnType<typeof loader>>["data"];
+
+export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
+  const cacheKey = "projects";
+  const cachedData = sessionStorage.getItem(cacheKey);
+
+  if (cachedData) {
+    const parsedData = JSON.parse(cachedData) as LoaderData | null;
+    if (parsedData) {
+      return parsedData;
+    }
+  }
+
+  const serverData = (await serverLoader()) as LoaderData;
+  const resolvedData: Record<string, unknown> = {};
+
+  for (const [key, promise] of Object.entries(serverData)) {
+    try {
+      resolvedData[key] = await promise;
+    } catch {
+      resolvedData[key] = null;
+    }
+  }
+  sessionStorage.setItem(cacheKey, JSON.stringify(resolvedData));
+
+  return resolvedData;
+}
+
+clientLoader.hydrate = true;
 
 export default function ProjectsIndex() {
   const { projectsPromise, error } = useLoaderData<typeof loader>();

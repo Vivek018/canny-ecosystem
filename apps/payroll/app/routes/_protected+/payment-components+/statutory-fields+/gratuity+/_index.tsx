@@ -3,8 +3,8 @@ import { GratuityWrapper } from "@/components/statutory-fields/gratuity/gratuity
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getGratuityByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { defer, json, type LoaderFunctionArgs } from "@remix-run/node";
-import { Await, useLoaderData } from "@remix-run/react";
+import { defer, type LoaderFunctionArgs } from "@remix-run/node";
+import { Await, type ClientLoaderFunctionArgs, useLoaderData } from "@remix-run/react";
 import { Suspense } from "react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -22,7 +22,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       error: null,
     });
   } catch (error) {
-    return json(
+    return defer(
       {
         error,
         gratuityPromise: null,
@@ -31,6 +31,36 @@ export async function loader({ request }: LoaderFunctionArgs) {
     );
   }
 }
+
+export type LoaderData = Awaited<ReturnType<typeof loader>>["data"];
+
+export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
+  const cacheKey = "gratuity";
+  const cachedData = sessionStorage.getItem(cacheKey);
+
+  if (cachedData) {
+    const parsedData = JSON.parse(cachedData) as LoaderData | null;
+    if (parsedData) {
+      return parsedData;
+    }
+  }
+
+  const serverData = (await serverLoader()) as LoaderData;
+  const resolvedData: Record<string, unknown> = {};
+
+  for (const [key, promise] of Object.entries(serverData)) {
+    try {
+      resolvedData[key] = await promise;
+    } catch {
+      resolvedData[key] = null;
+    }
+  }
+  sessionStorage.setItem(cacheKey, JSON.stringify(resolvedData));
+
+  return resolvedData;
+}
+
+clientLoader.hydrate = true;
 
 export default function GratuityIndex() {
   const { gratuityPromise, error } = useLoaderData<typeof loader>();

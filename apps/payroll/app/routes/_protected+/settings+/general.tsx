@@ -8,7 +8,7 @@ import {
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Await, defer, json, useLoaderData } from "@remix-run/react";
+import { Await, type ClientLoaderFunctionArgs, defer, useLoaderData } from "@remix-run/react";
 import { Suspense, useEffect, useState } from "react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -35,7 +35,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       companyRegistrationDetailsPromise,
     });
   } catch (error) {
-    return json({
+    return defer({
       status: "error",
       message: "Failed to get company",
       error,
@@ -44,6 +44,36 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
   }
 }
+
+export type LoaderData = Awaited<ReturnType<typeof loader>>["data"];
+
+export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
+  const cacheKey = "setting-general";
+  const cachedData = sessionStorage.getItem(cacheKey);
+
+  if (cachedData) {
+    const parsedData = JSON.parse(cachedData) as LoaderData | null;
+    if (parsedData) {
+      return parsedData;
+    }
+  }
+
+  const serverData = (await serverLoader()) as LoaderData;
+  const resolvedData: Record<string, unknown> = {};
+
+  for (const [key, promise] of Object.entries(serverData)) {
+    try {
+      resolvedData[key] = await promise;
+    } catch {
+      resolvedData[key] = null;
+    }
+  }
+  sessionStorage.setItem(cacheKey, JSON.stringify(resolvedData));
+
+  return resolvedData;
+}
+
+clientLoader.hydrate = true;
 
 export default function SettingGeneral() {
   const { companyDetailsPromise, companyRegistrationDetailsPromise, error } =

@@ -12,8 +12,14 @@ import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
-import { defer, json, type LoaderFunctionArgs } from "@remix-run/node";
-import { Await, Link, useLoaderData, useSearchParams } from "@remix-run/react";
+import { defer, type LoaderFunctionArgs } from "@remix-run/node";
+import {
+  Await,
+  type ClientLoaderFunctionArgs,
+  Link,
+  useLoaderData,
+  useSearchParams,
+} from "@remix-run/react";
 import { Suspense, useState } from "react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -47,7 +53,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       error: null,
     });
   } catch (error) {
-    return json(
+    return defer(
       {
         paymentTemplatesPromise: null,
         paymentTemplateComponentsPromise: null,
@@ -57,6 +63,36 @@ export async function loader({ request }: LoaderFunctionArgs) {
     );
   }
 }
+
+export type LoaderData = Awaited<ReturnType<typeof loader>>["data"];
+
+export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
+  const cacheKey = "payment-templates";
+  const cachedData = sessionStorage.getItem(cacheKey);
+
+  if (cachedData) {
+    const parsedData = JSON.parse(cachedData) as LoaderData | null;
+    if (parsedData) {
+      return parsedData;
+    }
+  }
+
+  const serverData = (await serverLoader()) as LoaderData;
+  const resolvedData: Record<string, unknown> = {};
+
+  for (const [key, promise] of Object.entries(serverData)) {
+    try {
+      resolvedData[key] = await promise;
+    } catch {
+      resolvedData[key] = null;
+    }
+  }
+  sessionStorage.setItem(cacheKey, JSON.stringify(resolvedData));
+
+  return resolvedData;
+}
+
+clientLoader.hydrate = true;
 
 export default function PaymentTemplatesIndex() {
   const { paymentTemplatesPromise, paymentTemplateComponentsPromise, error } =

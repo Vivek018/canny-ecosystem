@@ -16,7 +16,7 @@ import {
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { json, redirect, useLoaderData } from "@remix-run/react";
+import { type ClientLoaderFunctionArgs, json, redirect, useLoaderData } from "@remix-run/react";
 
 const pageSize = 20;
 
@@ -115,6 +115,21 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
   }
 }
+
+export type LoaderData = Awaited<
+  ReturnType<Awaited<ReturnType<typeof loader>>["json"]>
+>;
+
+let cache: LoaderData | null = null;
+export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
+  if (cache) return json(cache);
+
+  const loaderData = await serverLoader();
+  cache = (await loaderData) as typeof cache;
+  return json(cache);
+}
+
+clientLoader.hydrate = true;
 
 export async function action({ request }: ActionFunctionArgs) {
   const url = new URL(request.url);

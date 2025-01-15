@@ -3,7 +3,7 @@ import { getRelationshipsByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
 import { defer, type LoaderFunctionArgs } from "@remix-run/node";
-import { Await, Link, Outlet, useLoaderData } from "@remix-run/react";
+import { Await, type ClientLoaderFunctionArgs, Link, Outlet, useLoaderData } from "@remix-run/react";
 import {
   Command,
   CommandEmpty,
@@ -39,6 +39,36 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
   }
 }
+
+export type LoaderData = Awaited<ReturnType<typeof loader>>["data"];
+
+export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
+  const cacheKey = "relationships";
+  const cachedData = sessionStorage.getItem(cacheKey);
+
+  if (cachedData) {
+    const parsedData = JSON.parse(cachedData) as LoaderData | null;
+    if (parsedData) {
+      return parsedData;
+    }
+  }
+
+  const serverData = (await serverLoader()) as LoaderData;
+  const resolvedData: Record<string, unknown> = {};
+
+  for (const [key, promise] of Object.entries(serverData)) {
+    try {
+      resolvedData[key] = await promise;
+    } catch {
+      resolvedData[key] = null;
+    }
+  }
+  sessionStorage.setItem(cacheKey, JSON.stringify(resolvedData));
+
+  return resolvedData;
+}
+
+clientLoader.hydrate = true;
 
 export default function Relationships() {
   const { relationshipsPromise, error } = useLoaderData<typeof loader>();

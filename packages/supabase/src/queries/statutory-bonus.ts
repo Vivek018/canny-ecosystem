@@ -53,6 +53,7 @@ export const getStatutoryBonusByCompanyId = async ({
     "payment_frequency",
     "percentage",
     "payout_month",
+    "is_default",
   ] as const;
 
   const { data, error } = await supabase

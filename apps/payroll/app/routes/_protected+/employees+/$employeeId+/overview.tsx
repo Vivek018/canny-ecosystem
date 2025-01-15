@@ -86,7 +86,7 @@ export async function clientLoader({
   serverLoader,
   params,
 }: ClientLoaderFunctionArgs) {
-  const cacheKey = `employee-${params.employeeId}`;
+  const cacheKey = `employee-${params.employeeId}-overview`;
   const cachedData = sessionStorage.getItem(cacheKey);
 
   if (cachedData) {
