@@ -14,6 +14,7 @@ import { Await, type ClientLoaderFunctionArgs, defer, Link, Outlet, useLoaderDat
 import { Suspense } from "react";
 import { SitesWrapper } from "@/components/projects/sites/sites-wrapper";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { cacheDeferDataInSession } from "@/utils/cache";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const projectId = params.projectId;
@@ -47,33 +48,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export type LoaderData = Awaited<ReturnType<typeof loader>>["data"];
 
-export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
-  const cacheKey = "sites";
-  const cachedData = sessionStorage.getItem(cacheKey);
-
-  if (cachedData) {
-    const parsedData = JSON.parse(cachedData) as LoaderData | null;
-    if (parsedData) {
-      return parsedData;
-    }
-  }
-
-  const serverData = (await serverLoader()) as LoaderData;
-  const resolvedData: Record<string, unknown> = {};
-
-  for (const [key, promise] of Object.entries(serverData)) {
-    try {
-      resolvedData[key] = await promise;
-    } catch {
-      resolvedData[key] = null;
-    }
-  }
-  sessionStorage.setItem(cacheKey, JSON.stringify(resolvedData));
-
-  return resolvedData;
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+  const cacheKey = `project-${args.params.projectId}-sites`;
+  return cacheDeferDataInSession<LoaderData>(cacheKey, args);
 }
 
 clientLoader.hydrate = true;
+
 
 export default function SitesIndex() {
   const { sitesPromise, projectId, error } = useLoaderData<typeof loader>();

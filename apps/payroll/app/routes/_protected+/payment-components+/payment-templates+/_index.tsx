@@ -1,6 +1,7 @@
 import { ErrorBoundary } from "@/components/error-boundary";
 import { PaymentTemplateComponentsCard } from "@/components/payment-templates/payment-template-components-card";
 import { PaymentTemplatesTableWrapper } from "@/components/payment-templates/payment-templates-table-wrapper";
+import { cacheDeferDataInSession } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
   getPaymentTemplateComponentsByTemplateId,
@@ -66,33 +67,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export type LoaderData = Awaited<ReturnType<typeof loader>>["data"];
 
-export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const cacheKey = "payment-templates";
-  const cachedData = sessionStorage.getItem(cacheKey);
-
-  if (cachedData) {
-    const parsedData = JSON.parse(cachedData) as LoaderData | null;
-    if (parsedData) {
-      return parsedData;
-    }
-  }
-
-  const serverData = (await serverLoader()) as LoaderData;
-  const resolvedData: Record<string, unknown> = {};
-
-  for (const [key, promise] of Object.entries(serverData)) {
-    try {
-      resolvedData[key] = await promise;
-    } catch {
-      resolvedData[key] = null;
-    }
-  }
-  sessionStorage.setItem(cacheKey, JSON.stringify(resolvedData));
-
-  return resolvedData;
+  return cacheDeferDataInSession<LoaderData>(cacheKey, args);
 }
 
 clientLoader.hydrate = true;
+
 
 export default function PaymentTemplatesIndex() {
   const { paymentTemplatesPromise, paymentTemplateComponentsPromise, error } =

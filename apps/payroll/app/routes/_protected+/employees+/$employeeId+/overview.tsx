@@ -5,6 +5,7 @@ import { EmployeeGuardiansCard } from "@/components/employees/employee/guardians
 import { EmployeePageHeader } from "@/components/employees/employee/page-header";
 import { EmployeeStatutoryCard } from "@/components/employees/employee/statutory-card";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { cacheDeferDataInSession } from "@/utils/cache";
 import {
   getEmployeeAddressesByEmployeeId,
   getEmployeeBankDetailsById,
@@ -82,36 +83,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export type LoaderData = Awaited<ReturnType<typeof loader>>["data"];
 
-export async function clientLoader({
-  serverLoader,
-  params,
-}: ClientLoaderFunctionArgs) {
-  const cacheKey = `employee-${params.employeeId}-overview`;
-  const cachedData = sessionStorage.getItem(cacheKey);
-
-  if (cachedData) {
-    const parsedData = JSON.parse(cachedData) as LoaderData | null;
-    if (parsedData) {
-      return parsedData;
-    }
-  }
-
-  const serverData = (await serverLoader()) as LoaderData;
-  const resolvedData: Record<string, unknown> = {};
-
-  for (const [key, promise] of Object.entries(serverData)) {
-    try {
-      resolvedData[key] = await promise;
-    } catch {
-      resolvedData[key] = null;
-    }
-  }
-  sessionStorage.setItem(cacheKey, JSON.stringify(resolvedData));
-
-  return resolvedData;
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+  const cacheKey = `employee-${args.params.employeeId}-overview`;
+  return cacheDeferDataInSession<LoaderData>(cacheKey, args);
 }
 
 clientLoader.hydrate = true;
+
 
 export default function EmployeeIndex() {
   const {

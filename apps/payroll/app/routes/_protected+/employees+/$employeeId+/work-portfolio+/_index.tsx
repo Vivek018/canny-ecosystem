@@ -2,6 +2,7 @@ import { EmployeeProjectAssignmentCard } from "@/components/employees/work-portf
 import { EmployeeSkillsCard } from "@/components/employees/work-portfolio/skills-card";
 import { EmployeeWorkHistoriesCard } from "@/components/employees/work-portfolio/work-history-card";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { cacheDeferDataInSession } from "@/utils/cache";
 import {
   getEmployeeProjectAssignmentByEmployeeId,
   getEmployeeSkillsByEmployeeId,
@@ -9,7 +10,11 @@ import {
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { defer, type LoaderFunctionArgs } from "@remix-run/node";
-import { Await, type ClientLoaderFunctionArgs, useLoaderData } from "@remix-run/react";
+import {
+  Await,
+  type ClientLoaderFunctionArgs,
+  useLoaderData,
+} from "@remix-run/react";
 import { type ReactNode, Suspense } from "react";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
@@ -53,33 +58,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export type LoaderData = Awaited<ReturnType<typeof loader>>["data"];
 
-export async function clientLoader({
-  serverLoader,
-  params,
-}: ClientLoaderFunctionArgs) {
-  const cacheKey = `employee-${params.employeeId}-work-portfolio`;
-  const cachedData = sessionStorage.getItem(cacheKey);
-
-  if (cachedData) {
-    const parsedData = JSON.parse(cachedData) as LoaderData | null;
-    if (parsedData) {
-      return parsedData;
-    }
-  }
-
-  const serverData = (await serverLoader()) as LoaderData;
-  const resolvedData: Record<string, unknown> = {};
-
-  for (const [key, promise] of Object.entries(serverData)) {
-    try {
-      resolvedData[key] = await promise;
-    } catch {
-      resolvedData[key] = null;
-    }
-  }
-  sessionStorage.setItem(cacheKey, JSON.stringify(resolvedData));
-
-  return resolvedData;
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+  const cacheKey = `employee-${args.params.employeeId}-work-portfolio`;
+  return cacheDeferDataInSession<LoaderData>(cacheKey, args);
 }
 
 clientLoader.hydrate = true;
@@ -93,16 +74,16 @@ export default function WorkPortfolio() {
   } = useLoaderData<typeof loader>();
 
   if (error)
-    return <ErrorBoundary error={error} message="Failed to load data" />;
+    return <ErrorBoundary error={error} message='Failed to load data' />;
 
   return (
-    <div className="w-full py-4 flex flex-col gap-8">
+    <div className='w-full py-4 flex flex-col gap-8'>
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={employeeProjectAssignmentPromise}>
           {(resolvedData) => {
             if (!resolvedData)
               return (
-                <ErrorBoundary message="Failed to load employee project assignment" />
+                <ErrorBoundary message='Failed to load employee project assignment' />
               );
             return (
               <CommonWrapper
@@ -123,7 +104,7 @@ export default function WorkPortfolio() {
           {(resolvedData) => {
             if (!resolvedData)
               return (
-                <ErrorBoundary message="Failed to load employee work history" />
+                <ErrorBoundary message='Failed to load employee work history' />
               );
             return (
               <CommonWrapper
@@ -143,7 +124,7 @@ export default function WorkPortfolio() {
         <Await resolve={employeeSkillsPromise}>
           {(resolvedData) => {
             if (!resolvedData)
-              return <ErrorBoundary message="Failed to load employee skills" />;
+              return <ErrorBoundary message='Failed to load employee skills' />;
             return (
               <CommonWrapper
                 Component={
@@ -162,12 +143,15 @@ export default function WorkPortfolio() {
 export function CommonWrapper({
   Component,
   error,
-}: { Component: ReactNode; error: Error | null }) {
+}: {
+  Component: ReactNode;
+  error: Error | null;
+}) {
   if (error)
     return (
       <ErrorBoundary
         error={error}
-        message="Failed to load employee work portfolio"
+        message='Failed to load employee work portfolio'
       />
     );
 
