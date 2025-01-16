@@ -20,7 +20,7 @@ export function ExportBar({
 }) {
   const totalAmount = data.reduce(
     (sum: number, { total }) => sum + (total ?? 0),
-    0,
+    0
   );
 
   const toBeExportedData = data.map((element) => {
@@ -51,7 +51,7 @@ export function ExportBar({
 
     for (const field of exitPaymentFields) {
       const payment = element.exit_payments.find(
-        (p) => p.payment_fields.name === field,
+        (p) => p.payment_fields.name === field
       );
 
       const mappedKey = field.replace(/\s/g, "_").toLowerCase();
@@ -79,22 +79,22 @@ export function ExportBar({
   return (
     <div
       className={cn(
-        "z-40 fixed bottom-8 left-0 right-0 mx-auto h-14 w-max shadow-md rounded-full flex gap-10 justify-between items-center px-3 text-sm border dark:border-muted-foreground/30 bg-card text-card-foreground",
-        className,
+        "z-40 fixed bottom-8 left-0 right-0 mx-auto h-14 w-max shadow-md rounded-full flex gap-10 justify-between items-center p-2 text-sm border dark:border-muted-foreground/30 bg-card text-card-foreground",
+        className
       )}
     >
       <div className="ml-2 flex items-center space-x-1 rounded-md">
         <p className="font-semibold">{rows} Selected</p>
       </div>
-      <div className="flex justify-center items-center gap-2">
-        <div className="h-10 text-[16px] tracking-wide font-medium rounded-full flex justify-between items-center px-6 border bg-card text-card-foreground">
+      <div className="h-full flex justify-center items-center gap-2">
+        <div className="h-full tracking-wide font-medium rounded-full flex justify-between items-center px-6 border dark:border-muted-foreground/30 ">
           Amount: <span className="ml-1.5">{totalAmount}</span>
         </div>
         <Button
           onClick={handleExport}
           variant="default"
           size="lg"
-          className="rounded-full"
+          className="h-full rounded-full"
         >
           Export
         </Button>
