@@ -14,6 +14,25 @@ export type ProjectsWithCompany = ProjectDatabaseRow & {
   primary_contractor: { id: string; name: string; logo: string };
 };
 
+export async function getProjectsCountByCompanyId({
+  supabase,
+  companyId,
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+}) {
+  const { data, error } = await supabase
+    .from("projects")
+    .select("", { count: "exact" })
+    .eq("project_client_id", companyId);
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { count: data?.length, error };
+}
+
 export async function getProjectsByCompanyId({
   supabase,
   companyId,
@@ -192,7 +211,14 @@ export async function getSiteNamesByProjectName({
 }
 
 export type SitesWithProjects = Pick<SiteDatabaseRow, "id"> & {
-  projects: Pick<ProjectDatabaseRow, "id" | "name" | "project_client_id" | "end_client_id" | "primary_contractor_id">;
+  projects: Pick<
+    ProjectDatabaseRow,
+    | "id"
+    | "name"
+    | "project_client_id"
+    | "end_client_id"
+    | "primary_contractor_id"
+  >;
 };
 
 export async function getSitesByCompanyId({
@@ -202,14 +228,16 @@ export async function getSitesByCompanyId({
   supabase: TypedSupabaseClient;
   companyId: string;
 }) {
-
   const { data, error } = await supabase
     .from("project_sites")
-    .select(`id,  projects!inner(
+    .select(
+      `id,  projects!inner(
         project_client_id,
         end_client_id,
         primary_contractor_id
-      )`, { count: "exact" })   
+      )`,
+      { count: "exact" },
+    )
     .or(
       `project_client_id.eq.${companyId},end_client_id.eq.${companyId},primary_contractor_id.eq.${companyId}`,
       {
@@ -223,7 +251,6 @@ export async function getSitesByCompanyId({
   if (error) {
     console.error(error);
   }
-
 
   return { data, count: data?.length, error };
 }

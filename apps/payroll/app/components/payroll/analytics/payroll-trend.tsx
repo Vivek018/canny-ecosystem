@@ -14,7 +14,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@canny_ecosystem/ui/chart";
-import { PayrollDatabaseRow } from "@canny_ecosystem/supabase/types";
+import type { PayrollDatabaseRow } from "@canny_ecosystem/supabase/types";
 
 const chartConfig = {
   date: {
@@ -27,33 +27,53 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function PayrollTrend({ chartData }: { chartData: Omit<PayrollDatabaseRow, "created_at" | "updated_at">[] | null }) {
+export function PayrollTrend({
+  chartData,
+}: {
+  chartData: Omit<PayrollDatabaseRow, "created_at" | "updated_at">[] | null;
+}) {
   const [activeChart, setActiveChart] =
     React.useState<keyof typeof chartConfig>("amount");
 
   const years = new Set(
-    chartData?.map((item) => new Date(item.run_date).getFullYear()),
+    chartData
+      ?.map((item) =>
+        item.run_date ? new Date(item.run_date).getFullYear() : null,
+      )
+      ?.filter((year): year is number => year !== null) ?? [],
   );
 
-  let trendData: { date: string; amount: number }[] = [];
+  let trendData = [];
 
   if (years.size > 1) {
     trendData = Object.values(
-      chartData?.reduce((acc, { run_date, total_net_amount }) => {
-        const year = new Date(run_date).getFullYear();
-        if (!acc[year]) {
-          acc[year] = { date: year.toString(), amount: 0 };
-        }
-        acc[year].amount += total_net_amount;
-        return acc;
-      }, {}),
-    );
+      chartData?.reduce<{ [year: number]: { date: string; amount: number } }>(
+        (acc, { run_date, total_net_amount }) => {
+          if (!run_date) return acc;
+
+          const date = new Date(run_date);
+          if (Number.isNaN(date.getTime())) return acc;
+
+          const year = date.getFullYear();
+          if (!acc[year]) {
+            acc[year] = {
+              date: year.toString(),
+              amount: 0,
+            };
+          }
+
+          acc[year].amount += total_net_amount ?? 0;
+          return acc;
+        },
+        {},
+      ) ?? {},
+    ).sort((a, b) => Number.parseInt(a.date) - Number.parseInt(b.date));
   } else {
     trendData =
       chartData?.map((row) => ({
         date: row.run_date,
-        amount: row.total_net_amount || 0,
-      })) || [];
+        amount: row.total_net_amount ?? 0,
+      })) ?? [];
   }
 
   const total = React.useMemo(

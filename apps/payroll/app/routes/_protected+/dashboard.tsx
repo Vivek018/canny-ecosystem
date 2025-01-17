@@ -11,9 +11,9 @@ import {
   getLocationsCountByCompanyId,
   getPayrollEntriesWithTemplateComponentsByPayrollId,
   getPayrollWithSiteBySiteId,
+  getProjectsCountByCompanyId,
   getSitesByCompanyId,
   getUsersCount,
-  type SitesWithProjects,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
@@ -61,6 +61,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     if (sitesError) throw sitesError;
 
+    const { count: projectsCount } = await getProjectsCountByCompanyId({
+      supabase,
+      companyId
+    })
+
     const { count: usersCount } = await getUsersCount({ supabase });
     const { count: locationsCount } = await getLocationsCountByCompanyId({
       supabase,
@@ -96,6 +101,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       sitesData,
       payrollData,
       payrollEntriesData,
+      projectsCount,
       sitesCount,
       usersCount,
       locationsCount,
@@ -108,6 +114,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       sitesData: null,
       payrollData: null,
       payrollEntriesData: null as any,
+      projectsCount: 0,
       sitesCount: 0,
       usersCount: 0,
       locationsCount: 0,
@@ -123,6 +130,7 @@ export default function Dashboard() {
     sitesData,
     payrollData,
     payrollEntriesData,
+    projectsCount,
     sitesCount,
     usersCount,
     locationsCount,
@@ -131,22 +139,10 @@ export default function Dashboard() {
     error,
   } = useLoaderData<typeof loader>();
 
-  const projectsData = sitesData
-    ?.map((site) => site.projects)
-    .reduce(
-      (acc, project) => {
-        if (!acc.some((existingProject) => existingProject.id === project.id)) {
-          acc.push(project);
-        }
-        return acc;
-      },
-      [] as SitesWithProjects["projects"][],
-    );
-
   const cardData: CardInfoData = {
     totalEmployees: employeesCount,
     totalSites: sitesCount,
-    totalProjects: projectsData?.length,
+    totalProjects: projectsCount,
     totalLocations: locationsCount,
     totalUsers: usersCount,
   };
