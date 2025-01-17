@@ -15,6 +15,11 @@ type Props = {
 export const gratuityReportColumnIdArray = [
   "employee_code",
   "employee_name",
+  "first_year",
+  "second_year",
+  "third_year",
+  "fourth_year",
+  "fifth_year",
   "employee_eligible_date",
   "is_eligible_for_gratuity",
   "project",

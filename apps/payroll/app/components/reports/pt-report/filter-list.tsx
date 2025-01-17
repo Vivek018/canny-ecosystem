@@ -1,15 +1,10 @@
-import type { EmployeeFilters } from "@canny_ecosystem/supabase/queries";
+import type { EmployeeReportFilters } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import { formatDate, formatDateRange } from "@canny_ecosystem/utils";
 import { useSearchParams } from "@remix-run/react";
 
-export type EmployeeFilterList = EmployeeFilters & {
-  name?: string;
-};
-
 type Props = {
-  filterList: EmployeeFilterList | undefined;
+  filterList: EmployeeReportFilters | undefined;
 };
 
 export function FilterList({ filterList }: Props) {
@@ -17,41 +12,15 @@ export function FilterList({ filterList }: Props) {
 
   const renderFilter = ({ key, value }: { key: string; value: string }) => {
     switch (key) {
-      case "project":
-        return value;
+      case "start_year":
+        return `${filterList?.start_month?.slice(0, 3)} ${value}`;
 
-      case "project_site":
-        return value;
-
-      case "doj_start": {
-        if (key === "doj_start" && value && filterList?.doj_end) {
-          return formatDateRange(
-            new Date(value),
-            new Date(filterList.doj_end),
-            {
-              includeTime: false,
-            },
-          );
-        }
-
-        return key === "doj_start" && value && formatDate(new Date(value));
-      }
-
-      case "dol_start": {
-        if (key === "dol_start" && value && filterList?.dol_end) {
-          return formatDateRange(
-            new Date(value),
-            new Date(filterList.dol_end),
-            {
-              includeTime: false,
-            },
-          );
-        }
-
-        return key === "dol_start" && value && formatDate(new Date(value));
-      }
+      case "end_year":
+        return `${filterList?.end_month?.slice(0, 3)} ${value}`;
 
       case "name":
+      case "project":
+      case "project_site":
         return value;
 
       default:
@@ -60,11 +29,12 @@ export function FilterList({ filterList }: Props) {
   };
 
   const handleOnRemove = (key: string) => {
-    if (key === "doj_start" && filterList?.doj_end) {
-      searchParams.delete("doj_end");
-    }
-    if (key === "dol_start" && filterList?.dol_end) {
-      searchParams.delete("dol_end");
+    if (key === "start_year" && filterList?.start_month) {
+      searchParams.delete("start_month");
+      searchParams.delete("start_year");
+    } else if (key === "end_year" && filterList?.end_month) {
+      searchParams.delete("end_month");
+      searchParams.delete("end_year");
     }
     searchParams.delete(key);
     setSearchParams(searchParams);
@@ -76,7 +46,7 @@ export function FilterList({ filterList }: Props) {
         Object.entries(filterList)
           .filter(
             ([key, value]) =>
-              value !== null && value !== undefined && !key.endsWith("end"),
+              value !== null && value !== undefined && !key.endsWith("month"),
           )
           .map(([key, value]) => {
             return (

@@ -10,6 +10,11 @@ export type GratuityReportType = {
   first_name: string;
   middle_name: string;
   last_name: string;
+  first_year: number;
+  second_year: number;
+  third_year: number;
+  fourth_year: number;
+  fifth_year: number;
   is_eligible_for_gratuity: boolean;
   employee_eligible_date: string;
   employee_project_assignment: {
@@ -60,6 +65,66 @@ export const columns = (): ColumnDef<GratuityReportType>[] => [
             row.original?.last_name ?? ""
           }`}</p>
         </Link>
+      );
+    },
+  },
+  {
+    enableSorting: false,
+    accessorKey: "first_year",
+    header: "First Year",
+    cell: ({ row }) => {
+      return (
+        <p className="w-max capitalize">
+          {row.original?.first_year ? row.original?.first_year : "N/A"}
+        </p>
+      );
+    },
+  },
+  {
+    enableSorting: false,
+    accessorKey: "second_year",
+    header: "Second Year",
+    cell: ({ row }) => {
+      return (
+        <p className="w-max capitalize">
+          {row.original?.second_year ? row.original?.second_year : "N/A"}
+        </p>
+      );
+    },
+  },
+  {
+    enableSorting: false,
+    accessorKey: "third_year",
+    header: "Third Year",
+    cell: ({ row }) => {
+      return (
+        <p className="w-max capitalize">
+          {row.original?.third_year ? row.original?.third_year : "N/A"}
+        </p>
+      );
+    },
+  },
+  {
+    enableSorting: false,
+    accessorKey: "fourth_year",
+    header: "Fourth Year",
+    cell: ({ row }) => {
+      return (
+        <p className="w-max capitalize">
+          {row.original?.fourth_year ? row.original?.fourth_year : "N/A"}
+        </p>
+      );
+    },
+  },
+  {
+    enableSorting: false,
+    accessorKey: "fifth_year",
+    header: "Fifth Year",
+    cell: ({ row }) => {
+      return (
+        <p className="w-max capitalize">
+          {row.original?.fifth_year ? row.original?.fifth_year : "N/A"}
+        </p>
       );
     },
   },

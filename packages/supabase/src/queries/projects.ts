@@ -5,7 +5,7 @@ import type {
   SitePaySequenceDatabaseRow,
   TypedSupabaseClient,
 } from "../types";
-import { HARD_QUERY_LIMIT } from "../constant";
+import { HARD_QUERY_LIMIT, MID_QUERY_LIMIT } from "../constant";
 
 // Projects
 export type ProjectsWithCompany = ProjectDatabaseRow & {
@@ -61,13 +61,13 @@ export async function getProjectNamesByCompanyId({
 }) {
   const { data, error } = await supabase
     .from("projects")
-    .select("name")
+    .select("id, name")
     .or(
       `project_client_id.eq.${companyId},end_client_id.eq.${companyId},primary_contractor_id.eq.${companyId}`,
     )
     .limit(HARD_QUERY_LIMIT)
     .order("created_at", { ascending: false })
-    .returns<{ name: string }[]>();
+    .returns<{ id: string; name: string }[]>();
 
   if (error) {
     console.error(error);
@@ -189,6 +189,43 @@ export async function getSiteNamesByProjectName({
   }
 
   return { data, error };
+}
+
+export type SitesWithProjects = Pick<SiteDatabaseRow, "id"> & {
+  projects: Pick<ProjectDatabaseRow, "id" | "name" | "project_client_id" | "end_client_id" | "primary_contractor_id">;
+};
+
+export async function getSitesByCompanyId({
+  supabase,
+  companyId,
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+}) {
+
+  const { data, error } = await supabase
+    .from("project_sites")
+    .select(`id,  projects!inner(
+        project_client_id,
+        end_client_id,
+        primary_contractor_id
+      )`, { count: "exact" })   
+    .or(
+      `project_client_id.eq.${companyId},end_client_id.eq.${companyId},primary_contractor_id.eq.${companyId}`,
+      {
+        foreignTable: "projects",
+      },
+    )
+    .limit(MID_QUERY_LIMIT)
+    .order("created_at", { ascending: false })
+    .returns<SitesWithProjects[]>();
+
+  if (error) {
+    console.error(error);
+  }
+
+
+  return { data, count: data?.length, error };
 }
 
 export async function getSiteById({

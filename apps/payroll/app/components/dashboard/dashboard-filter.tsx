@@ -11,52 +11,35 @@ import {
   DropdownMenuTrigger,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import { Input } from "@canny_ecosystem/ui/input";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import {
   type SubmitOptions,
-  useNavigation,
   useSearchParams,
   useSubmit,
 } from "@remix-run/react";
 import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
 import { payoutMonths } from "@canny_ecosystem/utils/constant";
 import { getYears } from "@canny_ecosystem/utils";
-import type { EmployeeReportFilters } from "@canny_ecosystem/supabase/queries";
+import type { PayrollFilterType } from "@/routes/_protected+/dashboard";
 
-export function PTReportSearchFilter({
+export function DashboardFilter({
   disabled,
-  projectArray,
-  projectSiteArray,
 }: {
   disabled?: boolean;
-  projectArray: string[] | null;
-  projectSiteArray: string[] | null;
 }) {
   const [prompt, setPrompt] = useState("");
-  const navigation = useNavigation();
-  const isSubmitting =
-    navigation.state === "submitting" ||
-    (navigation.state === "loading" &&
-      navigation.location.pathname === "/reports/pt" &&
-      navigation.location.search.length);
   const inputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
 
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const initialFilterParams: EmployeeReportFilters = {
-    project: "",
-    project_site: "",
+  const initialFilterParams: PayrollFilterType = {
     start_month: "",
     start_year: "",
     end_year: "",
     end_month: "",
   };
-
-  const startYear = Number.parseInt(searchParams.get("start_year") ?? "");
-  const endYear = Number.parseInt(searchParams.get("end_year") ?? "") ;
 
   const [filterParams, setFilterParams] = useState(initialFilterParams);
 
@@ -90,20 +73,19 @@ export function PTReportSearchFilter({
   }, [filterParams]);
 
   const searchParamsList: {
-    project: string | null;
-    project_site: string | null;
     start_month: string | null;
     start_year: string | null;
     end_month: string | null;
     end_year: string | null;
   } = {
-    project: searchParams.get("project"),
-    project_site: searchParams.get("project_site"),
     start_month: searchParams.get("start_month"),
     start_year: searchParams.get("start_year"),
     end_month: searchParams.get("end_month"),
     end_year: searchParams.get("end_year"),
   };
+
+  const startYear = Number.parseInt(searchParams.get("start_year") ?? "");
+  const endYear = Number.parseInt(searchParams.get("end_year") ?? "");
 
   useEffect(() => {
     for (const [key, value] of Object.entries(searchParamsList)) {
@@ -140,40 +122,19 @@ export function PTReportSearchFilter({
     }
   });
 
-  const handleSearch = (evt: React.ChangeEvent<HTMLInputElement>) => {
-    const value = evt.target.value;
-    if (value) {
-      setPrompt(value);
-    } else {
-      deleteAllSearchParams();
-      setFilterParams(initialFilterParams);
-      setPrompt("");
-    }
-  };
-
   const handleSubmit = () => {
     debounceSubmit(
       { prompt: prompt },
       {
-        action: "/reports/pt?index",
+        action: "/dashboard",
         method: "POST",
       },
     );
-    if (prompt.length) {
-      searchParams.set("name", prompt);
-      setSearchParams(searchParams);
-    }
   };
-
-  const hasValidFilters =
-    Object.entries(filterParams).filter(
-      ([key, value]) =>
-        typeof value === "string" && value.length && key !== "name",
-    ).length > 0;
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-      <div className="flex space-x-4 w-full md:w-auto items-center">
+      <div className="border flex p-2 space-x-4 w-full md:w-auto items-center">
         <form
           className="relative w-full md:w-auto"
           onSubmit={(e) => {
@@ -181,41 +142,13 @@ export function PTReportSearchFilter({
             handleSubmit();
           }}
         >
-          <Icon
-            name={isSubmitting ? "update" : "search"}
-            className={cn(
-              "absolute pointer-events-none left-3 top-[12.5px]",
-              isSubmitting && "animate-spin",
-            )}
-          />
-          <Input
-            tabIndex={-1}
-            ref={inputRef}
-            placeholder={
-              disabled
-                ? "No Employee Data to Search And Filter"
-                : "Search employee report"
-            }
-            disabled={disabled}
-            className="pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70"
-            value={prompt}
-            onChange={handleSearch}
-            autoComplete="on"
-            autoCapitalize="none"
-            autoCorrect="off"
-            spellCheck="false"
-          />
-
           <DropdownMenuTrigger disabled={disabled} asChild>
             <button
               onClick={() => setIsOpen((prev) => !prev)}
               type="button"
               disabled={disabled}
               className={cn(
-                "absolute z-10 right-3 top-[6px] opacity-70",
-                !disabled &&
-                  "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
-                hasValidFilters && "opacity-100",
+                "flex items-center justify-center opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 isOpen && "opacity-100",
               )}
             >
@@ -322,20 +255,22 @@ export function PTReportSearchFilter({
                 alignOffset={-4}
                 className="p-0"
               >
-                {getYears(10)?.map((name, index) => (
+                {getYears(10)?.map((year, index) => (
                   <DropdownMenuCheckboxItem
-                    key={name + index.toString()}
+                    key={year + index.toString()}
                     className="capitalize"
-                    checked={filterParams?.end_year === name.toString()}
-                    disabled={startYear > name}
+                    checked={filterParams?.end_year === year.toString()}
+                    disabled={
+                      startYear > year
+                    }
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
                         ...prev,
-                        end_year: name.toString(),
+                        end_year: year.toString(),
                       }));
                     }}
                   >
-                    {name}
+                    {year}
                   </DropdownMenuCheckboxItem>
                 ))}
               </DropdownMenuSubContent>
@@ -380,77 +315,6 @@ export function PTReportSearchFilter({
                         {name}
                       </DropdownMenuCheckboxItem>
                     ))
-                )}
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-        </DropdownMenuGroup>
-
-        <DropdownMenuGroup>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-              <span>Project</span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent
-                sideOffset={14}
-                alignOffset={-4}
-                className="p-0"
-              >
-                {projectArray?.map((name, index) => (
-                  <DropdownMenuCheckboxItem
-                    key={name + index.toString()}
-                    className="capitalize"
-                    checked={filterParams?.project === name}
-                    onCheckedChange={() => {
-                      setFilterParams((prev) => ({
-                        ...prev,
-                        project: name,
-                      }));
-                    }}
-                  >
-                    {name}
-                  </DropdownMenuCheckboxItem>
-                ))}
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-        </DropdownMenuGroup>
-
-        <DropdownMenuGroup>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-              <span>Project Site</span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent
-                sideOffset={14}
-                alignOffset={-4}
-                className="p-0"
-              >
-                {!searchParamsList.project ? (
-                  <DropdownMenuCheckboxItem
-                    disabled={true}
-                    className="p-8 items-center justify-center"
-                  >
-                    Select Project First
-                  </DropdownMenuCheckboxItem>
-                ) : (
-                  projectSiteArray?.map((name, index) => (
-                    <DropdownMenuCheckboxItem
-                      key={name + index.toString()}
-                      className="capitalize"
-                      checked={filterParams?.project_site === name}
-                      onCheckedChange={() => {
-                        setFilterParams((prev) => ({
-                          ...prev,
-                          project_site: name,
-                        }));
-                      }}
-                    >
-                      {name}
-                    </DropdownMenuCheckboxItem>
-                  ))
                 )}
               </DropdownMenuSubContent>
             </DropdownMenuPortal>

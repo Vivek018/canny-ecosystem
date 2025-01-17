@@ -6,7 +6,8 @@ import { DataTable } from "@/components/reports/gratuity-report/table/data-table
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { MAX_QUERY_LIMIT } from "@canny_ecosystem/supabase/constant";
 import {
-  type EmployeeFilters,
+  type EmployeeReportDataType,
+  type EmployeeReportFilters,
   getEmployeesReportByCompanyId,
   getGratuityByCompanyId,
   getProjectNamesByCompanyId,
@@ -29,11 +30,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const query = searchParams.get("name") ?? undefined;
 
-  const filters: EmployeeFilters = {
-    doj_start: searchParams.get("doj_start") ?? undefined,
-    doj_end: searchParams.get("doj_end") ?? undefined,
-    dol_start: searchParams.get("dol_start") ?? undefined,
-    dol_end: searchParams.get("dol_end") ?? undefined,
+  const filters: EmployeeReportFilters = {
+    start_month: searchParams.get("start_month") ?? undefined,
+    end_month: searchParams.get("end_month") ?? undefined,
+    start_year: searchParams.get("start_year") ?? undefined,
+    end_year: searchParams.get("end_year") ?? undefined,
     project: searchParams.get("project") ?? undefined,
     project_site: searchParams.get("project_site") ?? undefined,
   };
@@ -89,7 +90,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
 
-  const gratuityReportData = data.map((employee: any) => {
+  const gratuityReportData = data.map((employee: EmployeeReportDataType) => {
     const gratuityEligibleYears: number = gratuityData?.eligibility_years ?? 5;
     const joining_date = new Date(
       employee.employee_project_assignment.start_date,
@@ -99,8 +100,17 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const employeeWorkingYears =
       new Date().getFullYear() - joining_date.getFullYear();
 
+    const presentDaysInYears = {
+      first_year: 230,
+      second_year: 240,
+      third_year: 250,
+      fourth_year: 260,
+      fifth_year: 250,
+    };
+
     return {
       ...employee,
+      ...presentDaysInYears,
       is_eligible_for_gratuity: employeeWorkingYears >= gratuityEligibleYears,
       employee_eligible_date: new Date(
         joining_date.setDate(joining_date.getDate() + totalDays),

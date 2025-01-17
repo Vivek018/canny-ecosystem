@@ -21,9 +21,9 @@ import {
   useSubmit,
 } from "@remix-run/react";
 import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
-import type { SBReportFilters } from "@/routes/_protected+/reports+/statutory-bonus-yearly+/_index";
 import { payoutMonths } from "@canny_ecosystem/utils/constant";
 import { getYears } from "@canny_ecosystem/utils";
+import type { EmployeeReportFilters } from "@canny_ecosystem/supabase/queries";
 
 export function SBReportSearchFilter({
   disabled,
@@ -39,22 +39,24 @@ export function SBReportSearchFilter({
   const isSubmitting =
     navigation.state === "submitting" ||
     (navigation.state === "loading" &&
-      navigation.location.pathname === "/reports/esi" &&
+      navigation.location.pathname === "/reports/statutory-bonus-yearly" &&
       navigation.location.search.length);
   const inputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
 
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const initialFilterParams: SBReportFilters = {
+  const initialFilterParams: EmployeeReportFilters = {
     project: "",
     project_site: "",
     start_month: "",
     start_year: "",
     end_year: "",
     end_month: "",
-    payout_month: "",
   };
+
+  const startYear = Number.parseInt(searchParams.get("start_year") ?? "");
+  const endYear = Number.parseInt(searchParams.get("end_year") ?? "") ;
 
   const [filterParams, setFilterParams] = useState(initialFilterParams);
 
@@ -75,6 +77,13 @@ export function SBReportSearchFilter({
     for (const [key, value] of Object.entries(filterParams)) {
       if (value !== null && value !== undefined && String(value)?.length) {
         searchParams.set(key, value);
+
+        if (key === "start_year" && !searchParams.get("start_month")) {
+          searchParams.set("start_month", "January");
+        }
+        if (key === "end_year" && !searchParams.get("end_month")) {
+          searchParams.set("end_month", "December");
+        }
       }
       setSearchParams(searchParams);
     }
@@ -146,7 +155,7 @@ export function SBReportSearchFilter({
     debounceSubmit(
       { prompt: prompt },
       {
-        action: "/reports/statutory-bonus?index",
+        action: "/reports/statutory-bonus-yearly?index",
         method: "POST",
       },
     );
@@ -226,7 +235,7 @@ export function SBReportSearchFilter({
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
-              <span>Payout Month</span>
+              <span>Start Year</span>
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent
@@ -234,17 +243,20 @@ export function SBReportSearchFilter({
                 alignOffset={-4}
                 className="p-0"
               >
-                {payoutMonths
-                  .map((item) => item.label)
-                  ?.map((name, index) => (
+                {getYears(
+                  10,
+                  endYear ? Number(endYear) : new Date().getFullYear(),
+                )
+                  ?.sort((a, b) => b - a)
+                  .map((name, index) => (
                     <DropdownMenuCheckboxItem
                       key={name + index.toString()}
                       className="capitalize"
-                      checked={filterParams?.payout_month === name}
+                      checked={filterParams?.start_year === name.toString()}
                       onCheckedChange={() => {
                         setFilterParams((prev) => ({
                           ...prev,
-                          payout_month: name,
+                          start_year: name.toString(),
                         }));
                       }}
                     >
@@ -267,91 +279,38 @@ export function SBReportSearchFilter({
                 alignOffset={-4}
                 className="p-0"
               >
-                {payoutMonths
-                  .map((item) => item.label)
-                  ?.map((name, index) => (
-                    <DropdownMenuCheckboxItem
-                      key={name + index.toString()}
-                      className="capitalize"
-                      checked={filterParams?.start_month === name}
-                      onCheckedChange={() => {
-                        setFilterParams((prev) => ({
-                          ...prev,
-                          start_month: name,
-                        }));
-                      }}
-                    >
-                      {name}
-                    </DropdownMenuCheckboxItem>
-                  ))}
+                {!searchParamsList.start_year ? (
+                  <DropdownMenuCheckboxItem
+                    disabled={true}
+                    className="p-8 items-center justify-center"
+                  >
+                    Select Start Year First
+                  </DropdownMenuCheckboxItem>
+                ) : (
+                  payoutMonths
+                    .slice(1)
+                    .map((item) => item.label)
+                    ?.map((name, index) => (
+                      <DropdownMenuCheckboxItem
+                        key={name + index.toString()}
+                        className="capitalize"
+                        checked={filterParams?.start_month === name}
+                        onCheckedChange={() => {
+                          setFilterParams((prev) => ({
+                            ...prev,
+                            start_month: name,
+                          }));
+                        }}
+                      >
+                        {name}
+                      </DropdownMenuCheckboxItem>
+                    ))
+                )}
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>
         </DropdownMenuGroup>
 
-        <DropdownMenuGroup>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-              <span>Start Year</span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent
-                sideOffset={14}
-                alignOffset={-4}
-                className="p-0"
-              >
-                {getYears(10)?.map((name, index) => (
-                  <DropdownMenuCheckboxItem
-                    key={name + index.toString()}
-                    className="capitalize"
-                    checked={filterParams?.start_year === name.toString()}
-                    onCheckedChange={() => {
-                      setFilterParams((prev) => ({
-                        ...prev,
-                        start_year: name.toString(),
-                      }));
-                    }}
-                  >
-                    {name}
-                  </DropdownMenuCheckboxItem>
-                ))}
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-        </DropdownMenuGroup>
-
-        
-        <DropdownMenuGroup>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-              <span>End Month</span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent
-                sideOffset={14}
-                alignOffset={-4}
-                className="p-0"
-              >
-                {payoutMonths.map(item=>item.label)?.map((name, index) => (
-                  <DropdownMenuCheckboxItem
-                    key={name + index.toString()}
-                    className="capitalize"
-                    checked={filterParams?.end_month === name}
-                    onCheckedChange={() => {
-                      setFilterParams((prev) => ({
-                        ...prev,
-                        end_month: name,
-                      }));
-                    }}
-                  >
-                    {name}
-                  </DropdownMenuCheckboxItem>
-                ))}
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-        </DropdownMenuGroup>
-        
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
@@ -367,17 +326,61 @@ export function SBReportSearchFilter({
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
                     className="capitalize"
-                    checked={filterParams?.project === name.toString()}
+                    checked={filterParams?.end_year === name.toString()}
+                    disabled={startYear > name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
                         ...prev,
-                        project: name.toString(),
+                        end_year: name.toString(),
                       }));
                     }}
                   >
                     {name}
                   </DropdownMenuCheckboxItem>
                 ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+        </DropdownMenuGroup>
+
+        <DropdownMenuGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <span>End Month</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent
+                sideOffset={14}
+                alignOffset={-4}
+                className="p-0"
+              >
+                {!searchParamsList.end_year ? (
+                  <DropdownMenuCheckboxItem
+                    disabled={true}
+                    className="p-8 items-center justify-center"
+                  >
+                    Select End Year First
+                  </DropdownMenuCheckboxItem>
+                ) : (
+                  payoutMonths
+                    .slice(0, payoutMonths.length - 1)
+                    .map((item) => item.label)
+                    ?.map((name, index) => (
+                      <DropdownMenuCheckboxItem
+                        key={name + index.toString()}
+                        className="capitalize"
+                        checked={filterParams?.end_month === name}
+                        onCheckedChange={() => {
+                          setFilterParams((prev) => ({
+                            ...prev,
+                            end_month: name,
+                          }));
+                        }}
+                      >
+                        {name}
+                      </DropdownMenuCheckboxItem>
+                    ))
+                )}
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>

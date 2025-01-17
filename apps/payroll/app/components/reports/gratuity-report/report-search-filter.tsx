@@ -12,7 +12,6 @@ import {
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
-import { formatISO } from "date-fns";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import {
@@ -21,9 +20,10 @@ import {
   useSearchParams,
   useSubmit,
 } from "@remix-run/react";
-import { Calendar } from "@canny_ecosystem/ui/calendar";
-import type { EmployeeFilters } from "@canny_ecosystem/supabase/queries";
 import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
+import { payoutMonths } from "@canny_ecosystem/utils/constant";
+import { getYears } from "@canny_ecosystem/utils";
+import type { EmployeeReportFilters } from "@canny_ecosystem/supabase/queries";
 
 export function GratuityReportSearchFilter({
   disabled,
@@ -46,14 +46,17 @@ export function GratuityReportSearchFilter({
 
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const initialFilterParams: EmployeeFilters = {
+  const initialFilterParams: EmployeeReportFilters = {
     project: "",
     project_site: "",
-    doj_start: "",
-    doj_end: "",
-    dol_start: "",
-    dol_end: "",
+    start_month: "",
+    start_year: "",
+    end_year: "",
+    end_month: "",
   };
+
+  const startYear = Number.parseInt(searchParams.get("start_year") ?? "");
+  const endYear = Number.parseInt(searchParams.get("end_year") ?? "") ;
 
   const [filterParams, setFilterParams] = useState(initialFilterParams);
 
@@ -74,6 +77,13 @@ export function GratuityReportSearchFilter({
     for (const [key, value] of Object.entries(filterParams)) {
       if (value !== null && value !== undefined && String(value)?.length) {
         searchParams.set(key, value);
+
+        if (key === "start_year" && !searchParams.get("start_month")) {
+          searchParams.set("start_month", "January");
+        }
+        if (key === "end_year" && !searchParams.get("end_month")) {
+          searchParams.set("end_month", "December");
+        }
       }
       setSearchParams(searchParams);
     }
@@ -82,17 +92,17 @@ export function GratuityReportSearchFilter({
   const searchParamsList: {
     project: string | null;
     project_site: string | null;
-    doj_start: string | null;
-    doj_end: string | null;
-    dol_start: string | null;
-    dol_end: string | null;
+    start_month: string | null;
+    start_year: string | null;
+    end_month: string | null;
+    end_year: string | null;
   } = {
     project: searchParams.get("project"),
     project_site: searchParams.get("project_site"),
-    doj_start: searchParams.get("doj_start"),
-    doj_end: searchParams.get("doj_end"),
-    dol_start: searchParams.get("dol_start"),
-    dol_end: searchParams.get("dol_end"),
+    start_month: searchParams.get("start_month"),
+    start_year: searchParams.get("start_year"),
+    end_month: searchParams.get("end_month"),
+    end_year: searchParams.get("end_year"),
   };
 
   useEffect(() => {
@@ -225,7 +235,7 @@ export function GratuityReportSearchFilter({
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
-              <span>Date of joining</span>
+              <span>Start Year</span>
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent
@@ -233,38 +243,26 @@ export function GratuityReportSearchFilter({
                 alignOffset={-4}
                 className="p-0"
               >
-                <Calendar
-                  mode="range"
-                  initialFocus
-                  today={
-                    filterParams.doj_start
-                      ? new Date(filterParams.doj_start)
-                      : new Date()
-                  }
-                  toDate={new Date()}
-                  selected={
-                    {
-                      from:
-                        filterParams.doj_start &&
-                        new Date(filterParams.doj_start).toISOString(),
-                      to:
-                        filterParams.doj_end && new Date(filterParams.doj_end),
-                    } as any
-                  }
-                  onSelect={(range) => {
-                    if (!range) return;
-
-                    const newRange = {
-                      doj_start: range.from
-                        ? formatISO(range.from, { representation: "date" })
-                        : String(filterParams.doj_start),
-                      doj_end: range.to
-                        ? formatISO(range.to, { representation: "date" })
-                        : "",
-                    };
-                    setFilterParams((prev) => ({ ...prev, ...newRange }));
-                  }}
-                />
+                {getYears(
+                  10,
+                  endYear ? Number(endYear) : new Date().getFullYear(),
+                )
+                  ?.sort((a, b) => b - a)
+                  .map((name, index) => (
+                    <DropdownMenuCheckboxItem
+                      key={name + index.toString()}
+                      className="capitalize"
+                      checked={filterParams?.start_year === name.toString()}
+                      onCheckedChange={() => {
+                        setFilterParams((prev) => ({
+                          ...prev,
+                          start_year: name.toString(),
+                        }));
+                      }}
+                    >
+                      {name}
+                    </DropdownMenuCheckboxItem>
+                  ))}
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>
@@ -273,7 +271,7 @@ export function GratuityReportSearchFilter({
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
-              <span>Date of leaving</span>
+              <span>Start Month</span>
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent
@@ -281,38 +279,108 @@ export function GratuityReportSearchFilter({
                 alignOffset={-4}
                 className="p-0"
               >
-                <Calendar
-                  mode="range"
-                  initialFocus
-                  today={
-                    filterParams.dol_start
-                      ? new Date(filterParams.dol_start)
-                      : new Date()
-                  }
-                  toDate={new Date()}
-                  selected={
-                    {
-                      from:
-                        filterParams.dol_start &&
-                        new Date(filterParams.dol_start).toISOString(),
-                      to:
-                        filterParams.dol_end && new Date(filterParams.dol_end),
-                    } as any
-                  }
-                  onSelect={(range) => {
-                    if (!range) return;
+                {!searchParamsList.start_year ? (
+                  <DropdownMenuCheckboxItem
+                    disabled={true}
+                    className="p-8 items-center justify-center"
+                  >
+                    Select Start Year First
+                  </DropdownMenuCheckboxItem>
+                ) : (
+                  payoutMonths
+                    .slice(1)
+                    .map((item) => item.label)
+                    ?.map((name, index) => (
+                      <DropdownMenuCheckboxItem
+                        key={name + index.toString()}
+                        className="capitalize"
+                        checked={filterParams?.start_month === name}
+                        onCheckedChange={() => {
+                          setFilterParams((prev) => ({
+                            ...prev,
+                            start_month: name,
+                          }));
+                        }}
+                      >
+                        {name}
+                      </DropdownMenuCheckboxItem>
+                    ))
+                )}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+        </DropdownMenuGroup>
 
-                    const newRange = {
-                      dol_start: range.from
-                        ? formatISO(range.from, { representation: "date" })
-                        : String(filterParams.dol_start),
-                      dol_end: range.to
-                        ? formatISO(range.to, { representation: "date" })
-                        : "",
-                    };
-                    setFilterParams((prev) => ({ ...prev, ...newRange }));
-                  }}
-                />
+        <DropdownMenuGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <span>End Year</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent
+                sideOffset={14}
+                alignOffset={-4}
+                className="p-0"
+              >
+                {getYears(10)?.map((name, index) => (
+                  <DropdownMenuCheckboxItem
+                    key={name + index.toString()}
+                    className="capitalize"
+                    checked={filterParams?.end_year === name.toString()}
+                    disabled={startYear > name}
+                    onCheckedChange={() => {
+                      setFilterParams((prev) => ({
+                        ...prev,
+                        end_year: name.toString(),
+                      }));
+                    }}
+                  >
+                    {name}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+        </DropdownMenuGroup>
+
+        <DropdownMenuGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <span>End Month</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent
+                sideOffset={14}
+                alignOffset={-4}
+                className="p-0"
+              >
+                {!searchParamsList.end_year ? (
+                  <DropdownMenuCheckboxItem
+                    disabled={true}
+                    className="p-8 items-center justify-center"
+                  >
+                    Select End Year First
+                  </DropdownMenuCheckboxItem>
+                ) : (
+                  payoutMonths
+                    .slice(0, payoutMonths.length - 1)
+                    .map((item) => item.label)
+                    ?.map((name, index) => (
+                      <DropdownMenuCheckboxItem
+                        key={name + index.toString()}
+                        className="capitalize"
+                        checked={filterParams?.end_month === name}
+                        onCheckedChange={() => {
+                          setFilterParams((prev) => ({
+                            ...prev,
+                            end_month: name,
+                          }));
+                        }}
+                      >
+                        {name}
+                      </DropdownMenuCheckboxItem>
+                    ))
+                )}
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>
