@@ -33,6 +33,7 @@ export type IconName =
   | "project"
   | "report"
   | "search"
+  | "select-drop"
   | "setting"
   | "sun"
   | "table"

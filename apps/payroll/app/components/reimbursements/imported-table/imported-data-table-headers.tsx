@@ -9,7 +9,7 @@ type Props = {
 };
 
 // make sure the order is same as header order
-export const userDataArray = [
+export const ImportReimbursementDataArray = [
   "employee_code",
   "submitted_date",
   "amount",
@@ -28,7 +28,7 @@ export function ImportedDataTableHeader({ table, className, loading }: Props) {
   return (
     <TableHeader className={className}>
       <TableRow className="h-[45px] hover:bg-transparent">
-        {userDataArray?.map((id) => {
+        {ImportReimbursementDataArray?.map((id) => {
           return (
             <TableHead key={id} className={cn("px-4 py-2")}>
               <Button

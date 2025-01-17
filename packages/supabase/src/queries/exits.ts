@@ -196,8 +196,6 @@ export const getExitsById = async ({
     .from("exits")
     .select(columns.join(","))
     .eq("id", id)
-    .order("created_at", { ascending: false })
-    .limit(SINGLE_QUERY_LIMIT)
     .single<InferredType<ExitsRow, (typeof columns)[number]>>();
 
   if (error) {

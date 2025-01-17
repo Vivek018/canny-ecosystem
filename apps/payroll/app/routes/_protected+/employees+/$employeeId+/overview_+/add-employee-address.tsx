@@ -2,20 +2,20 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Form, json, useActionData, useNavigate } from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { createEmployeeGuardians } from "@canny_ecosystem/supabase/mutations";
+import { createEmployeeAddresses } from "@canny_ecosystem/supabase/mutations";
 import {
   isGoodStatus,
-  EmployeeGuardiansSchema,
+  EmployeeAddressesSchema,
   getInitialValueFromZod,
 } from "@canny_ecosystem/utils";
-import { CreateEmployeeGuardianDetails } from "@/components/employees/form/create-employee-guardian-details";
+import { CreateEmployeeAddress } from "@/components/employees/form/create-employee-address";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
 import { Card } from "@canny_ecosystem/ui/card";
 import { useEffect, useState } from "react";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 
-export const ADD_EMPLOYEE_GUARDIAN = "update-employee-guardian";
+export const ADD_EMPLOYEE_ADDRESS = "add-employee-address";
 
 export async function action({
   request,
@@ -28,18 +28,15 @@ export async function action({
     const formData = await request.formData();
 
     if (!employeeId) {
-      return json(
-        {
-          status: "error",
-          message: "Invalid employee id",
-          returnTo: "/employees",
-        },
-        { status: 400 },
-      );
+      return json({
+        status: "error",
+        message: "Invalid employee id",
+        returnTo: "/employees",
+      });
     }
 
     const submission = parseWithZod(formData, {
-      schema: EmployeeGuardiansSchema,
+      schema: EmployeeAddressesSchema,
     });
 
     if (submission.status !== "success") {
@@ -49,7 +46,7 @@ export async function action({
       );
     }
 
-    const { status, error } = await createEmployeeGuardians({
+    const { status, error } = await createEmployeeAddresses({
       supabase,
       data: { ...submission.value, employee_id: employeeId },
     });
@@ -57,38 +54,29 @@ export async function action({
     if (isGoodStatus(status)) {
       return json({
         status: "success",
-        message: "Guardian added successfully",
+        message: "Address added successfully",
         error: null,
         returnTo: `/employees/${employeeId}`,
       });
     }
-    return json(
-      {
-        status: "error",
-        message: "Failed to add guardian",
-        error,
-        returnTo: `/employees/${employeeId}`,
-      },
-      { status: 500 },
-    );
+    return json({ status, error });
   } catch (error) {
     return json({
       status: "error",
-      message: "Failed to add guardian",
+      message: "An unexpected error occurred",
       error,
-      returnTo: `/employees/${employeeId}`,
     });
   }
 }
 
-export default function AddEmployeeGuardian() {
+export default function AddEmployeeAddress() {
   const [resetKey, setResetKey] = useState(Date.now());
-  const currentSchema = EmployeeGuardiansSchema;
+  const currentSchema = EmployeeAddressesSchema;
 
   const initialValues = getInitialValueFromZod(currentSchema);
 
   const [form, fields] = useForm({
-    id: ADD_EMPLOYEE_GUARDIAN,
+    id: ADD_EMPLOYEE_ADDRESS,
     constraint: getZodConstraint(currentSchema),
     onValidate: ({ formData }: { formData: FormData }) => {
       return parseWithZod(formData, { schema: currentSchema });
@@ -103,24 +91,26 @@ export default function AddEmployeeGuardian() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (actionData?.status === "success") {
-      toast({
-        title: "Success",
-        description: actionData?.message,
-        variant: "success",
-      });
-    } else {
-      toast({
-        title: "Error",
-        description: actionData?.message,
-        variant: "destructive",
-      });
+    if (actionData) {
+      if (actionData?.status === "success") {
+        toast({
+          title: "Success",
+          description: actionData?.message || "Address added",
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: actionData?.error?.message || "Address add failed",
+          variant: "destructive",
+        });
+      }
+      navigate(actionData?.returnTo ?? -1);
     }
-    navigate(actionData?.returnTo ?? -1);
   }, [actionData]);
 
   return (
-    <section className="md:px-20 lg:px-28 2xl:px-40 py-4">
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
       <FormProvider context={form.context}>
         <Form
           method="POST"
@@ -129,10 +119,7 @@ export default function AddEmployeeGuardian() {
           className="flex flex-col"
         >
           <Card>
-            <CreateEmployeeGuardianDetails
-              key={resetKey}
-              fields={fields as any}
-            />
+            <CreateEmployeeAddress key={resetKey} fields={fields as any} />
             <FormButtons
               form={form}
               setResetKey={setResetKey}

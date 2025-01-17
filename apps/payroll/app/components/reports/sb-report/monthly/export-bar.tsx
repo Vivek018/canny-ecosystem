@@ -20,13 +20,9 @@ export function ExportBar({
   className: string;
   columnVisibility: VisibilityState;
 }) {
-//   const totalEligibleCount = data.length;
   const toBeExportedData = data.map((element) => {
     const exportedData: {
-      [key: (typeof sbReportColumnIdArray)[number]]:
-        | string
-        | number
-        | boolean;
+      [key: (typeof sbReportColumnIdArray)[number]]: string | number | boolean;
     } = {};
 
     for (const key of sbReportColumnIdArray) {
@@ -36,8 +32,9 @@ export function ExportBar({
       if (key === "employee_code") {
         exportedData[key] = element.employee_code;
       } else if (key === "employee_name") {
-        exportedData[key] =
-          `${element.first_name} ${element.middle_name} ${element.last_name}`;
+        exportedData[
+          key
+        ] = `${element.first_name} ${element.middle_name} ${element.last_name}`;
       } else if (key === "project") {
         exportedData[key] =
           element.employee_project_assignment.project_sites.projects.name;
@@ -66,7 +63,7 @@ export function ExportBar({
 
     link.setAttribute(
       "download",
-      `Statutory Bonus Monthly Report - ${formatDateTime(Date.now())}`,
+      `Statutory Bonus Monthly Report - ${formatDateTime(Date.now())}`
     );
 
     document.body.appendChild(link);
@@ -78,22 +75,19 @@ export function ExportBar({
   return (
     <div
       className={cn(
-        "z-40 fixed bottom-8 left-0 right-0 mx-auto h-14 w-max shadow-md rounded-full flex gap-10 justify-between items-center px-3 text-sm border dark:border-muted-foreground/30 bg-card text-card-foreground",
-        className,
+        "z-40 fixed bottom-8 left-0 right-0 mx-auto h-14 w-max shadow-md rounded-full flex gap-10 justify-between items-center p-2 text-sm border dark:border-muted-foreground/30 bg-card text-card-foreground",
+        className
       )}
     >
       <div className="ml-2 flex items-center space-x-1 rounded-md">
         <p className="font-semibold">{rows} Selected</p>
       </div>
-      <div className="flex justify-center items-center gap-2">
-        {/* <div className="h-10 text-[16px] tracking-wide font-medium rounded-full flex justify-between items-center px-6 border bg-card text-card-foreground">
-          Total Eligible: <span className="ml-1.5">{totalEligibleCount}</span>
-        </div> */}
+      <div className="h-full flex justify-center items-center gap-2">
         <Button
           onClick={handleExport}
           variant="default"
           size="lg"
-          className="rounded-full"
+          className="h-full rounded-full"
         >
           Export
         </Button>

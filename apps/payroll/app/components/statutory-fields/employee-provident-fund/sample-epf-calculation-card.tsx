@@ -1,6 +1,11 @@
 import type { EmployeeProvidentFundDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { Card } from "@canny_ecosystem/ui/card";
 import {
+  EDLI_RESTRICTED_VALUE,
+  EMPLOYEE_RESTRICTED_VALUE,
+  EMPLOYER_RESTRICTED_VALUE,
+} from "@canny_ecosystem/utils";
+import {
   EMPLOYEE_EPF_PERCENTAGE,
   EMPLOYER_ADMIN_CHARGES_PERCENTAGE,
   EMPLOYER_EDLI_PERCENTAGE,
@@ -45,19 +50,24 @@ export function SampleEPFCalculationCard({
     data?.employer_contribution ?? EMPLOYER_EPF_PERCENTAGE;
 
   const currentEmployeeRate = data?.restrict_employee_contribution
-    ? data?.employee_restrict_value ?? 15000
+    ? data?.employee_restrict_value ?? EMPLOYEE_RESTRICTED_VALUE
     : 20000;
   const currentEmployerRate = data?.restrict_employer_contribution
-    ? data?.employer_restrict_value ?? 15000
+    ? data?.employer_restrict_value ?? EMPLOYER_RESTRICTED_VALUE
     : 20000;
 
   const employeeEPF = currentEmployeeRate * employeeEPFPercentage;
 
-  const epsSubTotal = currentEmployerRate * EMPLOYER_EPS_PERCENTAGE;
+  const epsSubTotal = Math.round(
+    EMPLOYEE_RESTRICTED_VALUE * EMPLOYER_EPS_PERCENTAGE,
+  );
 
   const epfSubTotal = currentEmployerRate * employeeEPFPercentage - epsSubTotal;
 
-  const edliSubTotal = currentEmployerRate * EMPLOYER_EDLI_PERCENTAGE;
+  const edliSubTotal = Math.min(
+    currentEmployerRate * EMPLOYER_EDLI_PERCENTAGE,
+    EDLI_RESTRICTED_VALUE,
+  );
 
   const adminChargesSubTotal =
     currentEmployerRate * EMPLOYER_ADMIN_CHARGES_PERCENTAGE;

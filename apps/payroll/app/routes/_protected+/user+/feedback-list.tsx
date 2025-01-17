@@ -128,7 +128,6 @@ export default function FeedbackList() {
             </Card>
           ))}
         </div>
-
         <PaginationButton
           page={page}
           totalCount={totalCount}

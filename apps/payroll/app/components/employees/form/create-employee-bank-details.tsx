@@ -16,8 +16,8 @@ import { type FieldMetadata, getInputProps } from "@conform-to/react";
 
 type FieldsType = {
   [K in keyof typeof EmployeeBankDetailsSchema.shape]: FieldMetadata<
-    typeof EmployeeBankDetailsSchema,
-    typeof EmployeeBankDetailsSchema,
+    (typeof EmployeeBankDetailsSchema.shape)[K]["_type"],
+    (typeof EmployeeBankDetailsSchema.shape)[K],
     string[]
   >;
 };

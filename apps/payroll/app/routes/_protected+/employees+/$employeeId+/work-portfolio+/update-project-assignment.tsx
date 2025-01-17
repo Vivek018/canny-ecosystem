@@ -224,7 +224,7 @@ export default function UpdateEmployeeProjectAssignment() {
   }, [actionData]);
 
   return (
-    <section className="md:px-20 lg:px-28 2xl:px-40 py-4">
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
       <FormProvider context={form.context}>
         <Form
           method="POST"

@@ -1,7 +1,11 @@
 {
   "name": "canny_ecosystem",
   "private": true,
-  "workspaces": ["tooling/*", "packages/*", "apps/*"],
+  "workspaces": [
+    "tooling/*",
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
     "build": "turbo build",
     "clean": "git clean -xdf .turbo node_modules",

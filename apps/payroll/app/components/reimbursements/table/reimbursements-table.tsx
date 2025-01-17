@@ -26,7 +26,7 @@ import { Spinner } from "@canny_ecosystem/ui/spinner";
 import { useSearchParams } from "@remix-run/react";
 import { Button } from "@canny_ecosystem/ui/button";
 import { useReimbursementStore } from "@/store/reimbursements";
-import { ExportBar } from "../imported-table/export-bar";
+import { ExportBar } from "../import-export/export-bar";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];

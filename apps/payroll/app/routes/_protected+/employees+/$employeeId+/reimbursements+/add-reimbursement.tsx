@@ -7,7 +7,7 @@ import {
   getInitialValueFromZod,
   isGoodStatus,
   ReimbursementSchema,
-  ReimbursementStatusArray,
+  reimbursementStatusArray,
   replaceUnderscore,
   transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
@@ -119,7 +119,7 @@ export default function AddReimbursements({
   });
 
   return (
-    <section className="md:px-20 lg:px-52 2xl:px-80 py-4">
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
       <FormProvider context={form.context}>
         <Form method="POST" {...getFormProps(form)} className="flex flex-col">
           <Card>
@@ -160,7 +160,7 @@ export default function AddReimbursements({
                   key={resetKey}
                   className="w-full capitalize flex-1 "
                   options={transformStringArrayIntoOptions(
-                    ReimbursementStatusArray as unknown as string[],
+                    reimbursementStatusArray as unknown as string[]
                   )}
                   inputProps={{
                     ...getInputProps(fields.status, { type: "text" }),

@@ -17,6 +17,10 @@ export default function PaymentComponents() {
               label: "Statutory fields",
               path: "/payment-components/statutory-fields",
             },
+            {
+              label: "Payment Templates",
+              path: "/payment-components/payment-templates",
+            },
           ]}
           pathname={pathname}
           Link={Link}
