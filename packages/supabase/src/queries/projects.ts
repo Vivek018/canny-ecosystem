@@ -21,16 +21,17 @@ export async function getProjectsCountByCompanyId({
   supabase: TypedSupabaseClient;
   companyId: string;
 }) {
-  const { data, error } = await supabase
+  const { count, error }= await supabase
     .from("projects")
-    .select("", { count: "exact" })
+    .select("", { count: "exact", head: true })
     .eq("project_client_id", companyId);
+
 
   if (error) {
     console.error(error);
   }
 
-  return { count: data?.length, error };
+  return { count, error };
 }
 
 export async function getProjectsByCompanyId({

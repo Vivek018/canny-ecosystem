@@ -134,7 +134,7 @@ export function DashboardFilter({
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-      <div className="border flex p-2 space-x-4 w-full md:w-auto items-center">
+      <div className="border rounded-md flex p-2 space-x-4 w-full md:w-auto items-center">
         <form
           className="relative w-full md:w-auto"
           onSubmit={(e) => {

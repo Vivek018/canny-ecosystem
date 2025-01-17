@@ -83,7 +83,7 @@ export async function getEmployeesCountByCompanyId({
 }) {
   const { count, error } = await supabase
     .from("employees")
-    .select("", { count: "exact" })
+    .select("", { count: "exact", head: true })
     .eq("company_id", companyId);
 
   if (error) {

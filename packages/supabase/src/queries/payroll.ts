@@ -5,7 +5,7 @@ import type {
   InferredType,
   TypedSupabaseClient,
   PayrollEntriesDatabaseRow,
-  PaymentTemplateComponentsDatabaseRow,
+  PaymentTemplateComponentDatabaseRow,
 } from "../types";
 
 export async function getPayrollWithSiteBySiteId({
@@ -185,7 +185,7 @@ PayrollEntriesDatabaseRow,
 "id" | "employee_id" | "payment_status" | "amount"
 > & {
 payment_template_components: Pick<
-  PaymentTemplateComponentsDatabaseRow,
+  PaymentTemplateComponentDatabaseRow,
   "id" | "target_type" | "calculation_value"
 >;
 };

@@ -109,7 +109,7 @@ export async function getLocationsCountByCompanyId({
 }: { supabase: TypedSupabaseClient; companyId: string }) {
   const { count, error } = await supabase
     .from("company_locations")
-    .select("", { count: "exact" })
+    .select("", { count: "exact", head: true })
     .eq("company_id", companyId);
 
   if (error) {

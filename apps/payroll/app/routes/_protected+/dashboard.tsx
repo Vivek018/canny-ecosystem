@@ -98,7 +98,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
     if (payrollEntriesError) throw new Error(payrollEntriesError.message);
 
     return json({
-      sitesData,
       payrollData,
       payrollEntriesData,
       projectsCount,
@@ -111,7 +110,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
   } catch (error) {
     return json({
-      sitesData: null,
       payrollData: null,
       payrollEntriesData: null as any,
       projectsCount: 0,
@@ -127,7 +125,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function Dashboard() {
   const {
-    sitesData,
     payrollData,
     payrollEntriesData,
     projectsCount,
