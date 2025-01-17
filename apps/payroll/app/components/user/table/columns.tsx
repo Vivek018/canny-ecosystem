@@ -24,6 +24,7 @@ export type UsersType = {
 export const columns: ColumnDef<UsersType>[] = [
   {
     accessorKey: "avatar",
+    header: "",
     cell: ({ row }) => {
       return (
         <Avatar className="rounded-full w-7 h-7 flex items-center justify-center bg-accent">

@@ -27,21 +27,21 @@ export function DataTableHeader({ table, className, loading }: Props) {
 
   return (
     <TableHeader className={className}>
-      <TableRow className="h-[45px] hover:bg-transparent">
+      <TableRow className='h-[45px] hover:bg-transparent'>
         {userDataArray?.map((id) => {
           return (
             <TableHead key={id} className={cn("px-4 py-2")}>
               <Button
-                className="p-0 hover:bg-transparent space-x-2 disabled:opacity-100"
-                variant="ghost"
+                className='p-0 hover:bg-transparent space-x-2 disabled:opacity-100'
+                variant='ghost'
                 disabled={true}
               >
-                <span className="capitalize">{columnName(id)}</span>
+                <span className='capitalize'>{columnName(id)}</span>
               </Button>
             </TableHead>
           );
         })}
-        <TableHead className="sticky right-0 min-w-20 max-w-20 bg-card z-10" />
+        <TableHead className='sticky right-0 min-w-20 max-w-20 bg-card z-10' />
       </TableRow>
     </TableHeader>
   );
