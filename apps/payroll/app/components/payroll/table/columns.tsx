@@ -4,7 +4,7 @@ export const payrollColumns = [
     accessorKey: "name",
     header: "Employee Name",
     cell: ({ row }) => {
-      return <p className="truncate capitalize w-48">{`${row.original?.name ?? "--"}`}</p>;
+      return <p className="truncate capitalize w-28">{`${row.original?.name ?? "--"}`}</p>;
     }
   },
   {
@@ -26,20 +26,6 @@ export const payrollColumns = [
     header: "Designation",
     cell: ({ row }) => {
       return <p className="truncate capitalize w-48">{`${row.original?.designation ?? "--"}`}</p>;
-    }
-  },
-  {
-    accessorKey: "rate",
-    header: "Rate",
-    cell: ({ row }) => {
-      return <p className="truncate capitalize w-48">{`${row.original?.rate ?? "--"}`}</p>;
-    }
-  },
-  {
-    accessorKey: "reimbursements",
-    header: "Reimbursements",
-    cell: ({ row }) => {
-      return <p className="truncate capitalize w-48">{`${row.original?.reimbursements ?? "--"}`}</p>;
     }
   },
   {

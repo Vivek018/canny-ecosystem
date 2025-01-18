@@ -2,85 +2,85 @@ import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { TableHead, TableHeader, TableRow } from "@canny_ecosystem/ui/table";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import {useState } from "react";
+import { useState, useMemo } from "react";
+import { type ColumnDef } from "@tanstack/react-table";
 
-type Props = {
+interface Props {
   table?: any;
   className?: string;
   loading?: boolean;
-};
+  dynamicHeaders: string[];
+  allColumns: ColumnDef<any, any>[];
+}
 
-// make sure the order is same as header order
-export const payrollFieldsColumnIdArray = [
-  "name",
-  "employee_code",
-  "present_days",
-  "designation",
-  "rate",
-  "reimbursements",
-  "gross_pay",
-  "deductions",
-  "net_pay",
-];
+export function PayrollTableHeader({ table, className, loading, dynamicHeaders, allColumns }: Props) {
+  const columnName = (id: string) => {
+    if (loading) return id;
+    const column = allColumns.find((col: any) => col.accessorKey === id);
+    return column?.header || id;
+  };
 
-export function PayrollTableHeader({ table, className, loading }: Props) {
-  const columnName = (id: string) =>
-    loading ||
-    table?.getAllLeafColumns()?.find((col: any) => {
-      return col.id === id;
-    })?.columnDef?.header;
+  // Combine static and dynamic headers
+  const payrollFieldsColumnIdArray = useMemo(() => {
+    const staticHeaders = [
+      "name",
+      "employee_code",
+      "present_days",
+      "designation",
+      "gross_pay",
+      "deductions",
+      "net_pay",
+    ];
+    return [...staticHeaders, ...dynamicHeaders];
+  }, [dynamicHeaders]);
 
-  // Sorting..
   const [sortingOrder, setSortingOrder] = useState("");
   const [sortingId, setSortingId] = useState("");
+
   const sort = (id: string) => {
-    table?.getAllLeafColumns()?.find((col: any) => { return col.id === id })?.toggleSorting();
+    const column = table?.getAllLeafColumns()?.find((col: any) => col.accessorKey === id);
+    column?.toggleSorting();
+
     if (sortingOrder === "") {
       setSortingOrder("desc");
       setSortingId(id);
-    }
-    else if (sortingOrder === "desc") {
+    } else if (sortingOrder === "desc") {
       setSortingOrder("asc");
       setSortingId(id);
-    }
-    else {
+    } else {
       setSortingOrder("");
       setSortingId("");
     }
-  }
+  };
 
   return (
     <TableHeader className={className}>
       <TableRow className="h-[45px] hover:bg-transparent">
-        {
-          payrollFieldsColumnIdArray?.map((id) => {
-            return (
-              <TableHead
-                key={id}
-                className={cn(
-                  "px-4 py-2",
-                  id === "name" && "sticky left-0 bg-card z-10"
-                )}
-              >
-                <Button
-                  className="p-0 hover:bg-transparent space-x-2 disabled:opacity-100"
-                  variant="ghost"
-                  onClick={() => sort(id)}
-                >
-                  <span className="capitalize">{columnName(id)}</span>
-                  <Icon
-                    name="chevron-down"
-                    className={cn("hidden", sortingId === id && sortingOrder === "desc" && "flex")}
-                  />
-                  <Icon
-                    name="chevron-up"
-                    className={cn("hidden", sortingId === id && sortingOrder === "asc" && "flex")}
-                  />
-                </Button>
-              </TableHead>
-            );
-          })
-        }
+        {payrollFieldsColumnIdArray.map((id) => (
+          <TableHead
+            key={id}
+            className={cn(
+              "px-4 py-2",
+              id === "name" && "sticky left-0 bg-card z-10"
+            )}
+          >
+            <Button
+              className="p-0 hover:bg-transparent space-x-2 disabled:opacity-100"
+              variant="ghost"
+              onClick={() => sort(id)}
+            >
+              <span className="capitalize">{columnName(id)}</span>
+              <Icon
+                name="chevron-down"
+                className={cn("hidden", sortingId === id && sortingOrder === "desc" && "flex")}
+              />
+              <Icon
+                name="chevron-up"
+                className={cn("hidden", sortingId === id && sortingOrder === "asc" && "flex")}
+              />
+            </Button>
+          </TableHead>
+        ))}
       </TableRow>
     </TableHeader>
   );

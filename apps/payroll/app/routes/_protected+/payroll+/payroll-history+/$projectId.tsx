@@ -27,7 +27,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     (siteData ?? []).map(async (site) => {
       const { data: payrolls } = await getPayrollsBySiteId({ supabase, site_id: site.id });
 
-      // addRecentPayroll -> boolean that indicates whether to add current months payroll or not
       (payrolls ?? []).map((payroll) => {
         const payrollData = site as SitesWithLocation & { runDate: string | null, is_approved: boolean,payrollId:string };
         payrollData.runDate = payroll?.run_date;

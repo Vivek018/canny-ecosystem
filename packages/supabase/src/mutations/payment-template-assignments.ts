@@ -15,6 +15,7 @@ export async function createPaymentTemplateAssignment({
   data: PaymentTemplateAssignmentsDatabaseInsert;
   bypassAuth?: boolean;
 }) {
+
   if (!bypassAuth) {
     const {
       data: { user },

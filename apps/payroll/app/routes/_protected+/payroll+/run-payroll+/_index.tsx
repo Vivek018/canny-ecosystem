@@ -21,7 +21,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
       // Calculate pending payroll for all sites
       const payrollCounts = await Promise.all(
-        (siteData ?? []).map(async (site: any) => {
+        (siteData ?? []).map(async (site) => {
           const { data } = await getPendingPayrollCountBySiteId({ supabase, siteId: site.id });
           return data ?? 0;
         })
@@ -63,7 +63,7 @@ export default function ProjectsIndex() {
           <CommandList className="max-h-full py-6 overflow-x-visible overflow-y-visible">
             <CommandGroup className="p-0 overflow-visible">
               <div className="w-full grid gap-8 grid-cols-1">
-                {data?.map((project: any) => (
+                {data?.map((project:any) => (
                   <CommandItem
                     key={project.id}
                     value={

@@ -743,7 +743,6 @@ export const PayrollSchema = z
     payrollId: z.string().optional(),
     gross_pay: z.number().optional(),
     statutoryBonus: z.number().optional(),
-    reimbursements: z.number().optional(),
     epf: z.number().optional(),
     esi: z.number().optional(),
     pt: z.number().optional(),
@@ -760,8 +759,6 @@ export type PayrollEmployeeData = {
   name: string;
   net_pay: number;
   present_days: number;
-  rate: number;
-  reimbursements: number;
   site_id: string;
   status: string;
   designation: string;

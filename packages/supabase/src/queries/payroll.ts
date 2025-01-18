@@ -100,14 +100,15 @@ export async function getPendingPayrollCountBySiteId({
   const { data, error } = await supabase
     .from("payroll")
     .select("id",{count:"exact"})
-    .eq("site_id", siteId);
+    .eq("site_id", siteId)
+    .eq("status","pending");
 
   if (error) console.error(error);
 
   return { data:data?.length, error };
 }
 
-export async function getPayrollEnrtyAmountByEmployeeIdAndPayrollIdAndPaymentTemplateComponentId({
+export async function getPayrollEntryAmountByEmployeeIdAndPayrollIdAndPaymentTemplateComponentId({
   supabase,
   employeeId,
   payrollId,

@@ -1,9 +1,24 @@
 import { Button } from "@canny_ecosystem/ui/button";
 import { Card, CardContent } from "@canny_ecosystem/ui/card";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { Link } from "@remix-run/react";
+import { useNavigation, useSubmit } from "@remix-run/react";
 
-export function PayrollStatus({ data, disable }: { data:any, disable: boolean }) {
+export function PayrollStatus({ data, disable }: { data: any, disable: boolean }) {
+  const submit = useSubmit();
+  const navigation = useNavigation();
+
+  const handleClick = () => {
+    submit(
+      {
+      },
+      {
+        method: "post",
+        action: data.is_approved ? `/payroll/payroll-history/site/${data.id}/${data.payrollId}` : `/payroll/run-payroll/site/${data.id}`,
+        navigate: true
+      },
+    );
+  }
+
   return (
     <Card className="w-full m-4 select-text cursor-auto dark:border-[1.5px] h-40 flex flex-col justify-between">
       <CardContent className="flex flex-row gap-0.5 justify-start items-center py-2 px-2">
@@ -29,11 +44,9 @@ export function PayrollStatus({ data, disable }: { data:any, disable: boolean })
             </p>
           </div>
         </div>
-        <Link to={data.is_approved ? `/payroll/payroll-history/site/${data.id}/${data.payrollId}` : `/payroll/run-payroll/site/${data.id}`}>
-          <Button disabled={disable} className="px-4 mt-8 mx-7" >
-            {(data.is_approved || data.runDate) ? "View" : "Create"} Pay Run
-          </Button>
-        </Link>
+        <Button disabled={disable || navigation.state === "loading" || navigation.state === "submitting"} className="px-4 mt-8 mx-7" onClick={handleClick}>
+          {(data.is_approved || data.runDate) ? "View" : "Create"} Pay Run
+        </Button>
       </CardContent>
       <div className={cn("my-2 mx-9 text-muted-foreground", data.is_approved ? "hidden" : "")} >You haven't processed this pay run yet !</div>
     </Card>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { type PayrollEmployeeData, PayrollSchema } from "@canny_ecosystem/utils";
 import { FormProvider, getFormProps, getInputProps, useForm } from "@conform-to/react";
-import { Field } from "@canny_ecosystem/ui/forms";
+import { Field, type ListOfErrors } from "@canny_ecosystem/ui/forms";
 import { Form } from "@remix-run/react";
 import {
   Sheet,
@@ -18,12 +18,12 @@ import { flexRender } from "@tanstack/react-table";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { FormButtons } from "../form/form-buttons";
 
-const getFullName = (name: string) => {
-  if (name === "epf") return "employee provident fund";
-  if (name === "esi") return "employee state insurance";
-  if (name === "pt") return "professional tax";
-  if (name === "statutoryBonus") return "statutory bonus";
-  if (name === "lwf") return "labour welfare fund";
+type deductionAndEarning = {
+  title: string,
+  inputPropField: any,
+  placeholder: string,
+  errors: ListOfErrors,
+  value: any
 }
 
 export function PayrollSheet({ row, rowData, editable }: { row: any, rowData: PayrollEmployeeData, editable: boolean }) {
@@ -31,16 +31,13 @@ export function PayrollSheet({ row, rowData, editable }: { row: any, rowData: Pa
   const [netPay, setNetPay] = useState(0);
 
   // initial values
-  const initialValues = {
-    gross_pay: rowData.gross_pay ?? 0,
-    reimbursements: rowData.reimbursements ?? 0,
-  };
+  const initialValues = { gross_pay: rowData.gross_pay ?? 0 };
 
-  // to keep track of which field is linked to which template
+  // keeping track of which particular field is linked to which template
   const templateComponents: { paymentTemplateComponentId: string; name: string }[] = [];
-  rowData.templateComponents.map((row) => {
-    initialValues[row.name] = row.amount;
+  rowData.templateComponents.map((row: { amount: number; paymentTemplateComponentId: string; name: string }) => {
     const { paymentTemplateComponentId, name } = row;
+    initialValues[paymentTemplateComponentId] = row.amount;
     templateComponents.push({ paymentTemplateComponentId, name });
   });
 
@@ -61,7 +58,7 @@ export function PayrollSheet({ row, rowData, editable }: { row: any, rowData: Pa
     },
   });
 
-  const earnings = [
+  const earnings:deductionAndEarning[] = [
     {
       title: "Gross Pay",
       inputPropField: fields.gross_pay,
@@ -71,27 +68,20 @@ export function PayrollSheet({ row, rowData, editable }: { row: any, rowData: Pa
     }
   ];
 
-  const deductions = [
-    {
-      title: "Reimbrushments",
-      inputPropField: fields.reimbursements,
-      placeholder: "Enter reimbursements",
-      errors: fields.reimbursements.errors,
-      value: fields.reimbursements.value
-    }
-  ];
+  const deductions: deductionAndEarning[] = [];
 
+  // populating earnings and deductions from templateComponents
   rowData.templateComponents.map((row: any) => {
-    const { name } = row;
+    const { paymentTemplateComponentId, name } = row;
     const paymentFieldData = {
-      title: row[name].name ? row[name].name : getFullName(row.name),
-      inputPropField: fields[name],
-      placeholder: `Enter ${row[name].name}`,
-      errors: fields[name].errors,
-      value: fields[name].value
+      title: name,
+      inputPropField: fields[paymentTemplateComponentId],
+      placeholder: `Enter ${name}`,
+      errors: fields[paymentTemplateComponentId].errors,
+      value: fields[paymentTemplateComponentId].value
     } as any;
 
-    if (row[name].componentType === "deductions" || row[name].componentType === "statutory_contribution")
+    if (row.componentType === "deductions" || row.componentType === "statutory_contribution")
       deductions.push(paymentFieldData);
     else
       earnings.push(paymentFieldData)
@@ -104,7 +94,8 @@ export function PayrollSheet({ row, rowData, editable }: { row: any, rowData: Pa
     setNetPay(newNetPay);
   }, [
     fields.gross_pay.value,
-    fields.reimbursements.value,
+    ...rowData.templateComponents
+      .map((row: { paymentTemplateComponentId: string }) => fields[row.paymentTemplateComponentId].value)
   ]);
 
   return (
@@ -194,7 +185,7 @@ export function PayrollSheet({ row, rowData, editable }: { row: any, rowData: Pa
               </div>
               <hr />
               {
-                deductions.map((deduction, key) => {
+                deductions.map((deduction:deductionAndEarning, key) => {
                   return <div className="flex justify-between" key={key as any}>
                     <div>
                       <h3 className="my-3 text-muted-foreground font-semibold capitalize">{deduction.title}</h3>

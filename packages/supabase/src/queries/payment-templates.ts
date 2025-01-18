@@ -191,6 +191,25 @@ export async function getPaymentTemplateBySiteId({
   return { data, error };
 }
 
+export async function getDefaultTemplateIdByCompanyId({
+  supabase,
+  companyId,
+}: { supabase: TypedSupabaseClient; companyId: string }) {
+  const columns = ["id"] as const;
+
+  const { data, error } = await supabase
+    .from("payment_templates")
+    .select(columns.join(","))
+    .eq("company_id", companyId)
+    .eq("is_default", true)
+    .single<
+      InferredType<PaymentTemplateDatabaseRow, (typeof columns)[number]>
+    >();
+
+  if (error) console.error(error);
+
+  return { data, error };
+}
 
 export type PaymentTemplateComponentType = Omit<
   PaymentTemplateComponentDatabaseRow,

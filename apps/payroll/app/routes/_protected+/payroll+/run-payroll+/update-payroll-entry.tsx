@@ -14,7 +14,7 @@ export async function action({ request }: ActionFunctionArgs) {
     templateComponents.map(async (templateComponent: { name: string; paymentTemplateComponentId: string }) => {
         await updatePayrollEntryByEmployeeIdAndPayrollIdAndPaymentTemplateComponentId({
             supabase,
-            data: { amount: Number(formData.get(templateComponent.name)) },
+            data: { amount: Number(formData.get(templateComponent.paymentTemplateComponentId)) },
             employeeId,
             payrollId,
             paymentTemplateComponentId: templateComponent.paymentTemplateComponentId

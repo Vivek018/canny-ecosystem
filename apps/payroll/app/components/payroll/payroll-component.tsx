@@ -20,9 +20,7 @@ export function PayrollComponent({ data, editable }: {
   const [tableData, setTableData] = useState(data);
   useEffect(() => {
     const filteredData = data?.filter((item: { [s: string]: unknown; } | ArrayLike<unknown>) =>
-      Object.values(item).some((value) =>
-        String(value).toLowerCase().includes(searchString.toLowerCase()),
-      ),
+      Object.values(item).some((value) => String(value).toLowerCase().includes(searchString.toLowerCase())),
     );
     setTableData(filteredData);
   }, [searchString, data]);
