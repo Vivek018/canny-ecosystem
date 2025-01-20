@@ -6,6 +6,7 @@ import { ColumnVisibility } from "@/components/reports/column-visibility";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { MAX_QUERY_LIMIT } from "@canny_ecosystem/supabase/constant";
 import {
+  type EmployeeReportDataType,
   getEmployeesReportByCompanyId,
   getPaymentFieldById,
   getProjectNamesByCompanyId,
@@ -103,7 +104,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
 
-  const paymentFieldsReportData = data.map((employee: any) => {
+  const paymentFieldsReportData = data.map((employee: EmployeeReportDataType) => {
     return {
       ...employee,
       field_name: paymentFieldData?.name,

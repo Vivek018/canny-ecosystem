@@ -6,6 +6,8 @@ import { ColumnVisibility } from "@/components/reports/column-visibility";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { MAX_QUERY_LIMIT } from "@canny_ecosystem/supabase/constant";
 import {
+  type EmployeeReportDataType,
+  type EmployeeReportFilters,
   getEmployeesReportByCompanyId,
   getProjectNamesByCompanyId,
   getSiteNamesByProjectName,
@@ -15,15 +17,6 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json, Outlet, redirect, useLoaderData } from "@remix-run/react";
 
 const pageSize = 20;
-
-export type PTReportFilters = {
-  start_month: string | undefined;
-  end_month: string | undefined;
-  start_year: string | undefined;
-  end_year: string | undefined;
-  project: string | undefined;
-  project_site: string | undefined;
-};
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -36,7 +29,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const query = searchParams.get("name") ?? undefined;
 
-  const filters: PTReportFilters = {
+  const filters: EmployeeReportFilters = {
     start_month: searchParams.get("start_month") ?? undefined,
     end_month: searchParams.get("end_month") ?? undefined,
     start_year: searchParams.get("start_year") ?? undefined,
@@ -67,9 +60,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     meta?.count && meta.count / (page + 1) > pageSize,
   );
 
-  if (error) {
-    throw error;
-  }
+  if (error) throw error;
 
   const { data: projectData } = await getProjectNamesByCompanyId({
     supabase,
@@ -90,7 +81,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
 
-  const ptReportData = data.map((employee: any) => {
+  const ptReportData = data.map((employee: EmployeeReportDataType) => {
     return {
       ...employee,
       pt_amount: 423,

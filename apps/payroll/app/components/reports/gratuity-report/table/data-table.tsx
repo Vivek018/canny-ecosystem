@@ -22,6 +22,7 @@ import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
 import {
   type EmployeeFilters,
+  type EmployeeReportDataType,
   getEmployeesReportByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
@@ -88,7 +89,7 @@ export function DataTable<TData, TValue>({
         },
       });
 
-      const gratuityReportData = data?.map((employee: any) => {
+      const gratuityReportData = data?.map((employee: EmployeeReportDataType) => {
         const joining_date = new Date(
           employee.employee_project_assignment.start_date,
         );
@@ -97,8 +98,11 @@ export function DataTable<TData, TValue>({
         const employeeWorkingYears =
           new Date().getFullYear() - joining_date.getFullYear();
 
+          const presentDaysInYears = { first_year: 230, second_year: 240, third_year: 250, fourth_year: 260, fifth_year: 250 };
+
         return {
           ...employee,
+          ...presentDaysInYears,
           is_eligible_for_gratuity:
             employeeWorkingYears >= gratuityEligibleYears,
           employee_eligible_date: joining_date.setDate(
