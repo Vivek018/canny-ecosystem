@@ -5,6 +5,12 @@ import type {
   UserDatabaseRow,
 } from "../types";
 
+export async function getUsersCount({ supabase }: { supabase: TypedSupabaseClient }) {
+  const { count, error } = await supabase.from("users").select("", { count: "exact", head: true });
+
+  return { count, error };
+}
+
 export async function getUserByEmail({
   supabase,
   email,

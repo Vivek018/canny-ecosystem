@@ -1,3 +1,4 @@
+import * as React from "react";
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
 
 import {
@@ -13,30 +14,71 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@canny_ecosystem/ui/chart";
-import { useMemo, useState } from "react";
-import type { ReimbursementDataType } from "@canny_ecosystem/supabase/queries";
+import type { PayrollDatabaseRow } from "@canny_ecosystem/supabase/types";
 
 const chartConfig = {
+  date: {
+    label: "Date",
+    color: "hsl(var(--chart-0))",
+  },
   amount: {
     label: "Total Amount",
     color: "hsl(var(--chart-1))",
   },
 } satisfies ChartConfig;
 
-export function ReimbursementTrend({
+export function PayrollTrend({
   chartData,
-}: { chartData: ReimbursementDataType[] }) {
+}: {
+  chartData: Omit<PayrollDatabaseRow, "created_at" | "updated_at">[] | null;
+}) {
   const [activeChart, setActiveChart] =
-    useState<keyof typeof chartConfig>("amount");
+    React.useState<keyof typeof chartConfig>("amount");
 
-  const trendData = chartData.map((row) => ({
-    date: row.submitted_date,
-    amount: row.amount,
-  }));
+  const years = new Set(
+    chartData
+      ?.map((item) =>
+        item.run_date ? new Date(item.run_date).getFullYear() : null,
+      )
+      ?.filter((year): year is number => year !== null) ?? [],
+  );
 
-  const total = useMemo(
+  let trendData = [];
+
+  if (years.size > 1) {
+    trendData = Object.values(
+      chartData?.reduce<{ [year: number]: { date: string; amount: number } }>(
+        (acc, { run_date, total_net_amount }) => {
+          if (!run_date) return acc;
+
+          const date = new Date(run_date);
+          if (Number.isNaN(date.getTime())) return acc;
+
+          const year = date.getFullYear();
+          if (!acc[year]) {
+            acc[year] = {
+              date: year.toString(),
+              amount: 0,
+            };
+          }
+
+          acc[year].amount += total_net_amount ?? 0;
+          return acc;
+        },
+        {},
+      ) ?? {},
+    ).sort((a, b) => Number.parseInt(a.date) - Number.parseInt(b.date));
+  } else {
+    trendData =
+      chartData?.map((row) => ({
+        date: row.run_date,
+        amount: row.total_net_amount ?? 0,
+      })) ?? [];
+  }
+
+  const total = React.useMemo(
     () => ({
-      amount: trendData.reduce((acc, curr) => acc + (curr.amount || 0), 0),
+      amount: trendData?.reduce((acc, curr) => acc + curr.amount, 0),
     }),
     [],
   );
@@ -44,10 +86,10 @@ export function ReimbursementTrend({
   return (
     <Card className="overflow-hidden">
       <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
-        <div className="flex flex-1 flex-col justify-center gap-1 px-6">
-          <CardTitle>Reimbursement Trend Over Time</CardTitle>
+        <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
+          <CardTitle>Payroll Over Time</CardTitle>
           <CardDescription>
-            Showing total reimbursements over the period.
+            Showing trend of payrolls for the period.
           </CardDescription>
         </div>
         <div className="flex">
@@ -96,7 +138,7 @@ export function ReimbursementTrend({
                 const date = new Date(value);
                 return date.toLocaleDateString("en-US", {
                   month: "short",
-                  day: "numeric",
+                  year: "numeric",
                 });
               }}
             />
@@ -108,7 +150,6 @@ export function ReimbursementTrend({
                   labelFormatter={(value) => {
                     return new Date(value).toLocaleDateString("en-US", {
                       month: "short",
-                      day: "numeric",
                       year: "numeric",
                     });
                   }}

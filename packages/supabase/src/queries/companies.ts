@@ -103,6 +103,22 @@ export async function getCompanyRegistrationDetailsByCompanyId({
   return { data, error };
 }
 
+export async function getLocationsCountByCompanyId({
+  supabase,
+  companyId,
+}: { supabase: TypedSupabaseClient; companyId: string }) {
+  const { count, error } = await supabase
+    .from("company_locations")
+    .select("", { count: "exact", head: true })
+    .eq("company_id", companyId);
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { count, error };
+}
+
 // Company Locations
 export async function getLocationsForSelectByCompanyId({
   supabase,

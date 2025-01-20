@@ -74,6 +74,25 @@ export type EmployeeDataType = Pick<
   };
 };
 
+export async function getEmployeesCountByCompanyId({
+  supabase,
+  companyId,
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+}) {
+  const { count, error } = await supabase
+    .from("employees")
+    .select("", { count: "exact", head: true })
+    .eq("company_id", companyId);
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { count, error };
+}
+
 export async function getEmployeesByCompanyId({
   supabase,
   companyId,
@@ -730,6 +749,23 @@ export type EmployeeReportDataType = Pick<
   };
 };
 
+export type EmployeeReportFilters = {
+  start_month?: string | undefined | null;
+  end_month?: string | undefined | null;
+  start_year?: string | undefined | null;
+  end_year?: string | undefined | null;
+  project?: string | undefined | null;
+  project_site?: string | undefined | null;
+};
+
+export type GetEmployeesReportByCompanyIdParams = {
+  to: number;
+  from: number;
+  sort?: [string, "asc" | "desc"];
+  searchQuery?: string;
+  filters?: EmployeeReportFilters;
+};
+
 export async function getEmployeesReportByCompanyId({
   supabase,
   companyId,
@@ -737,7 +773,7 @@ export async function getEmployeesReportByCompanyId({
 }: {
   supabase: TypedSupabaseClient;
   companyId: string;
-  params: GetEmployeesByCompanyIdParams;
+  params: GetEmployeesReportByCompanyIdParams;
 }) {
   const { sort, from, to, filters, searchQuery } = params;
 
@@ -790,25 +826,38 @@ export async function getEmployeesReportByCompanyId({
 
   // Filters
   if (filters) {
-    const { project, project_site, doj_start, doj_end, dol_start, dol_end } =
-      filters;
+    const {
+      project,
+      project_site,
+      start_year,
+      start_month,
+      end_year,
+      end_month,
+    } = filters;
 
-    const dateFilters = [
-      {
-        field: "employee_project_assignment.start_date",
-        start: doj_start,
-        end: doj_end,
-      },
-      {
-        field: "employee_project_assignment.end_date",
-        start: dol_start,
-        end: dol_end,
-      },
-    ];
+    if (start_year || end_year) {
+      let endDateLastDay = 30;
 
-    for (const { field, start, end } of dateFilters) {
-      if (start) query.gte(field, formatUTCDate(start));
-      if (end) query.lte(field, formatUTCDate(end));
+      if (end_year) {
+        const year = Number.parseInt(end_year, 10);
+        const month = new Date(`${end_month} 1, ${end_year}`).getMonth();
+
+        endDateLastDay = new Date(year, month + 1, 0).getDate();
+      }
+
+      const start_date = new Date(`${start_month} 1, ${start_year}`);
+      const end_date = new Date(`${end_month} ${endDateLastDay}, ${end_year}`);
+
+      if (start_year)
+        query.gte(
+          "employee_project_assignment.start_date",
+          formatUTCDate(start_date.toISOString().split("T")[0]),
+        );
+      if (end_year)
+        query.lte(
+          "employee_project_assignment.end_date",
+          formatUTCDate(end_date.toISOString().split("T")[0]),
+        );
     }
 
     if (project) {
@@ -823,7 +872,11 @@ export async function getEmployeesReportByCompanyId({
   }
 
   // Fetch Data
-  const { data, count, error } = await query.range(from, to);
+  const { data, count, error } = await query
+    .range(from, to)
+    .returns<
+      EmployeeReportDataType[]
+    >();
 
   if (error) {
     console.error("Error fetching employees:", error);
