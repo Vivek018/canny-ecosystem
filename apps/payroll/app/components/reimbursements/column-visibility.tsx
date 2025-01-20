@@ -9,16 +9,6 @@ import {
 } from "@canny_ecosystem/ui/popover";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 
-type ColumnType = {
-  id: string;
-  columnDef: {
-    enableHiding?: boolean;
-    header: string;
-  };
-  getIsVisible: () => boolean;
-  toggleVisibility: (checked: boolean) => void;
-};
-
 export function ColumnVisibility({
   disabled,
   hidden,

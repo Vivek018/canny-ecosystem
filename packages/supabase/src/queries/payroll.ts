@@ -150,6 +150,72 @@ export async function getPendingPayrollCountBySiteId({
   return { data: data?.length, error };
 }
 
+export type PayrollEntriesWithTemplateComponents = Pick<
+  PayrollEntriesDatabaseRow,
+  "id" | "employee_id" | "payment_status" | "amount"
+> & {
+  payment_template_components: Pick<
+    PaymentTemplateComponentDatabaseRow,
+    "id" | "target_type" | "calculation_value"
+  >;
+};
+
+export async function getPayrollEntriesWithTemplateComponentsByPayrollId({
+  supabase,
+  payrollIds,
+}: {
+  supabase: TypedSupabaseClient;
+  payrollIds: string[];
+}) {
+  const columns = ["id", "employee_id", "payment_status", "amount"] as const;
+
+  const { data, error } = await supabase
+    .from("payroll_entries")
+    .select(
+      `${columns.join(",")}, payment_template_components!inner(id, target_type, calculation_value)`,
+    )
+    .in("payroll_id", payrollIds)
+    .returns<
+      InferredType<
+        PayrollEntriesWithTemplateComponents,
+        (typeof columns)[number]
+      >[]
+    >();
+
+  if (error) console.error(error);
+
+  return { data, error };
+}
+
+export async function getPayrollsBySiteId({
+  supabase,
+  site_id,
+}: {
+  supabase: TypedSupabaseClient;
+  site_id: string;
+}) {
+  const columns = [
+    "id",
+    "commission",
+    "run_date",
+    "site_id",
+    "status",
+    "total_employees",
+    "total_net_amount",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("payroll")
+    .select(columns.join(","))
+    .eq("site_id", site_id)
+    .order("created_at", { ascending: false })
+    .returns<PayrollDatabaseRow[]>();
+
+  if (error) console.error(error);
+
+  return { data, error };
+}
+
 export async function getPayrollEntryAmountByEmployeeIdAndPayrollIdAndPaymentTemplateComponentId({
   supabase,
   employeeId,
@@ -173,43 +239,6 @@ export async function getPayrollEntryAmountByEmployeeIdAndPayrollIdAndPaymentTem
     .limit(SINGLE_QUERY_LIMIT)
     .single<
       InferredType<PayrollEntriesDatabaseRow, (typeof columns)[number]>
-    >();
-
-  if (error) console.error(error);
-
-  return { data, error };
-}
-
-export type PayrollEntriesWithTemplateComponents =  Pick<
-PayrollEntriesDatabaseRow,
-"id" | "employee_id" | "payment_status" | "amount"
-> & {
-payment_template_components: Pick<
-  PaymentTemplateComponentDatabaseRow,
-  "id" | "target_type" | "calculation_value"
->;
-};
-
-export async function getPayrollEntriesWithTemplateComponentsByPayrollId({
-  supabase,
-  payrollIds,
-}: {
-  supabase: TypedSupabaseClient;
-  payrollIds: string[];
-}) {
-  const columns = ["id", "employee_id", "payment_status", "amount"] as const;
-
-  const { data, error } = await supabase
-    .from("payroll_entries")
-    .select(
-      `${columns.join(",")}, payment_template_components!inner(id, target_type, calculation_value)`,
-    )
-    .in("payroll_id", payrollIds)
-    .returns<
-      InferredType<
-       PayrollEntriesWithTemplateComponents,
-        (typeof columns)[number]
-      >[]
     >();
 
   if (error) console.error(error);
