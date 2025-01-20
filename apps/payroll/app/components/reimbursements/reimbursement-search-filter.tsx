@@ -23,8 +23,8 @@ import {
 } from "@remix-run/react";
 import { Calendar } from "@canny_ecosystem/ui/calendar";
 import {
-  ReimbursementDeductibleArray,
-  ReimbursementStatusArray,
+  booleanArray,
+  reimbursementStatusArray,
   replaceUnderscore,
 } from "@canny_ecosystem/utils";
 
@@ -196,7 +196,7 @@ export function ReimbursementSearchFilter({
             ref={inputRef}
             placeholder={
               disabled
-                ? "No Employee Data to Search And Filter"
+                ? "No Reimbursement Data to Search And Filter"
                 : "Search Reimbursements"
             }
             disabled={disabled}
@@ -297,7 +297,7 @@ export function ReimbursementSearchFilter({
                 alignOffset={-4}
                 className="p-0"
               >
-                {ReimbursementStatusArray.map((name, index) => (
+                {reimbursementStatusArray.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
                     className="capitalize"
@@ -328,7 +328,7 @@ export function ReimbursementSearchFilter({
                 alignOffset={-4}
                 className="p-0"
               >
-                {ReimbursementDeductibleArray.map((name, index) => (
+                {booleanArray.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
                     className="capitalize"

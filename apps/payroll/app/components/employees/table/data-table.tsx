@@ -23,6 +23,7 @@ import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
 import { type EmployeeFilters,getEmployeesByCompanyId} from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
+import { ExportBar } from "@/components/employees/import-export/export-bar";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -102,6 +103,10 @@ export function DataTable<TData, TValue>({
       columnVisibility,
     },
   });
+
+  const selectedRowsData = table
+    .getSelectedRowModel()
+    .rows?.map((row) => row.original);
 
   useEffect(() => {
     setColumns(table.getAllLeafColumns());
@@ -226,6 +231,12 @@ export function DataTable<TData, TValue>({
           </div>
         </div>
       )}
+      <ExportBar
+        className={cn(!table.getSelectedRowModel().rows.length && "hidden")}
+        rows={table.getSelectedRowModel().rows.length}
+        data={selectedRowsData as any}
+        columnVisibility={columnVisibility}
+      />
     </div>
   );
 }

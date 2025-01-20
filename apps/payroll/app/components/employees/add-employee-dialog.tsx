@@ -3,9 +3,11 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
+import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
 import { useNavigate, useSearchParams } from "@remix-run/react";
 
 export function AddEmployeeDialog() {
@@ -21,22 +23,77 @@ export function AddEmployeeDialog() {
       </DropdownMenuTrigger>
       <DropdownMenuContent sideOffset={10} align="end">
         <DropdownMenuItem
-          onClick={() => {
-            searchParams.set("step", "import");
-            searchParams.set("hide", "true");
-            setSearchParams(searchParams);
-          }}
-          className="space-x-2 flex items-center"
-        >
-          <Icon name="import" size="sm" className="mb-0.5" />
-          <span>Import/backfill</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem
           onClick={() => navigate("/employees/create-employee")}
           className="space-x-2"
         >
           <Icon name="plus-circled" size="sm" />
           <span>Create employee</span>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={() => {
+            searchParams.set(
+              "step",
+              modalSearchParamNames.import_employee_details
+            );
+            setSearchParams(searchParams);
+          }}
+          className="space-x-2 flex items-center"
+        >
+          <Icon name="import" size="sm" className="mb-0.5" />
+          <span>Import Employee</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            searchParams.set(
+              "step",
+              modalSearchParamNames.import_employee_statutory
+            );
+            setSearchParams(searchParams);
+          }}
+          className="space-x-2 flex items-center"
+        >
+          <Icon name="import" size="sm" className="mb-0.5" />
+          <span>Import Statutory</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            searchParams.set(
+              "step",
+              modalSearchParamNames.import_employee_bank_details
+            );
+            setSearchParams(searchParams);
+          }}
+          className="space-x-2 flex items-center"
+        >
+          <Icon name="import" size="sm" className="mb-0.5" />
+          <span>Import Bank Details</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            searchParams.set(
+              "step",
+              modalSearchParamNames.import_employee_address
+            );
+            setSearchParams(searchParams);
+          }}
+          className="space-x-2 flex items-center"
+        >
+          <Icon name="import" size="sm" className="mb-0.5" />
+          <span>Import Address</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            searchParams.set(
+              "step",
+              modalSearchParamNames.import_employee_guardians
+            );
+            setSearchParams(searchParams);
+          }}
+          className="space-x-2 flex items-center"
+        >
+          <Icon name="import" size="sm" className="mb-0.5" />
+          <span>Import Guardians</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

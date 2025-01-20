@@ -19,7 +19,7 @@ export function ExportBar({
 }) {
   const totalAmount = data.reduce(
     (sum: number, { amount }) => sum + (amount ?? 0),
-    0,
+    0
   );
   const toBeExportedData = data.map((element) => {
     const exportedData: {
@@ -36,8 +36,9 @@ export function ExportBar({
       if (key === "employee_code") {
         exportedData[key] = element.employees.employee_code;
       } else if (key === "employee_name") {
-        exportedData[key] =
-          `${element.employees.first_name} ${element.employees.middle_name} ${element.employees.last_name}`;
+        exportedData[
+          key
+        ] = `${element.employees.first_name} ${element.employees.middle_name} ${element.employees.last_name}`;
       } else if (key === "email") {
         exportedData[key] = element.users.email ?? "";
       } else if (key === "project_name") {
@@ -64,7 +65,7 @@ export function ExportBar({
 
     link.setAttribute(
       "download",
-      `Reimbursements - ${formatDateTime(Date.now())}`,
+      `Reimbursements - ${formatDateTime(Date.now())}`
     );
 
     document.body.appendChild(link);
@@ -76,22 +77,22 @@ export function ExportBar({
   return (
     <div
       className={cn(
-        "z-40 fixed bottom-8 left-0 right-0 mx-auto h-14 w-max shadow-md rounded-full flex gap-10 justify-between items-center px-3 text-sm border dark:border-muted-foreground/30 bg-card text-card-foreground",
-        className,
+        "z-40 fixed bottom-8 left-0 right-0 mx-auto h-14 w-max shadow-md rounded-full flex gap-10 justify-between items-center p-2 text-sm border dark:border-muted-foreground/30 bg-card text-card-foreground",
+        className
       )}
     >
       <div className="ml-2 flex items-center space-x-1 rounded-md">
         <p className="font-semibold">{rows} Selected</p>
       </div>
-      <div className="flex justify-center items-center gap-2">
-        <div className="h-10 tracking-wide font-medium rounded-full flex justify-between items-center px-6 border dark:border-muted-foreground/30 ">
+      <div className="h-full flex justify-center items-center gap-2">
+        <div className="h-full tracking-wide font-medium rounded-full flex justify-between items-center px-6 border dark:border-muted-foreground/30 ">
           Amount: <span className="ml-1.5">{totalAmount}</span>
         </div>
         <Button
           onClick={handleExport}
           variant="default"
           size="lg"
-          className="rounded-full"
+          className="h-full rounded-full"
         >
           Export
         </Button>
