@@ -9,8 +9,7 @@ export const PayrollEntryDropdown = ({ payrollId, employeeId, triggerChild }: { 
 
   const navigate = useNavigate();
 
-  const handleSalarySlip = (e) => {
-    e.preventDefault();
+  const handleSalarySlip = () => {
     navigate(`/payroll/payroll-history/${payrollId}/${employeeId}/salary-slip`);
   };
 
@@ -20,10 +19,10 @@ export const PayrollEntryDropdown = ({ payrollId, employeeId, triggerChild }: { 
       {triggerChild}
       <DropdownMenuContent sideOffset={10} align="end">
         <DropdownMenuGroup>
-          <DropdownMenuItem onClick={(e) => handleSalarySlip(e)}>
+          <DropdownMenuItem onClick={handleSalarySlip}>
             Preview Salary Slip
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={(e) => handleSalarySlip(e)}>
+          <DropdownMenuItem onClick={handleSalarySlip}>
             Preview
           </DropdownMenuItem>
         </DropdownMenuGroup>
