@@ -4,6 +4,10 @@ import { type ColumnDef, getCoreRowModel, getSortedRowModel, type SortingState, 
 import { PayrollTableHeader } from "./data-table-headers";
 import { PayrollSheet } from "../payroll-sheet";
 import { useState, useMemo } from "react";
+import { PayrollEntryDropdown } from "../payroll-entry-dropdown";
+import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
+import { Button } from "@canny_ecosystem/ui/button";
+import { Icon } from "@canny_ecosystem/ui/icon";
 
 interface PayrollTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -41,6 +45,30 @@ export function PayrollDataTable<TData, TValue>({ columns, data, editable }: Pay
 
     return { processedData: newData, processedColumns: newColumns, dynamicHeaders };
   }, [data, columns]);
+
+
+  // 3 dot actions
+  processedColumns.push({
+    id: "actions",
+    enableSorting: false,
+    enableHiding: false,
+    cell: ({ row }) => {
+      return (
+        <PayrollEntryDropdown
+          payrollId={row.original.payrollId}
+          employeeId={row.original.employee_id}
+          triggerChild={
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <Icon name="dots-vertical" />
+              </Button>
+            </DropdownMenuTrigger>
+          }
+        />
+      );
+    },
+  });
 
   const [sorting, setSorting] = useState<SortingState>([]);
 
