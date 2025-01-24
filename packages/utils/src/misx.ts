@@ -166,3 +166,43 @@ export function debounce<
     }, delay);
   };
 }
+
+export function getCurrentMonthIndex() {
+  const date = new Date();
+  return date.getMonth() + 1;
+}
+
+export function toCamelCase(str: string) {
+  return str
+    .toLowerCase()
+    .split(" ")
+    .map((word, index) =>
+      index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1),
+    )
+    .join("");
+}
+
+export function getWorkingDaysInCurrentMonth(working_days) {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  let workingDayCount = 0;
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const date = new Date(year, month, day);
+    const dayOfWeek = date.getDay();
+    if (working_days.includes(dayOfWeek)) workingDayCount++;
+  }
+
+  return workingDayCount;
+}
+
+export const newAmount = (
+  amount: number,
+  presentDays: number,
+  totalWorkingDaysOfCurrentMonth: number,
+) => {
+  // new amount according to working days
+  return (amount * presentDays) / totalWorkingDaysOfCurrentMonth;
+};

@@ -1,47 +1,51 @@
 import { PayrollDataTable } from "@/components/payroll/table/data-table";
 import { Button } from "@canny_ecosystem/ui/button";
-
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
 import { payrollColumns } from "@/components/payroll/table/columns";
+import { Outlet, useNavigation, useSubmit } from "@remix-run/react";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { useState, useEffect } from "react";
+import type { PayrollEmployeeData } from "@canny_ecosystem/utils";
 
-import { InfoCard } from "./info-card";
+export function PayrollComponent({ data, editable }: {
+  data: PayrollEmployeeData[],
+  editable: boolean
+}) {
+  const navigation = useNavigation();
+  const disable = navigation.state === "submitting" || navigation.state === "loading";
 
-export function PayrollComponent({ data, demo, heading, netDiff }: any) {
+  // searching functionality
+  const [searchString, setSearchString] = useState("");
+  const [tableData, setTableData] = useState(data);
+  useEffect(() => {
+    const filteredData = data?.filter((item: { [s: string]: unknown; } | ArrayLike<unknown>) =>
+      Object.values(item).some((value) => String(value).toLowerCase().includes(searchString.toLowerCase())),
+    );
+    setTableData(filteredData);
+  }, [searchString, data]);
+
+  // approve payroll
+  const submit = useSubmit();
+  const approvePayroll = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    submit(
+      {
+        data: JSON.stringify({
+          payrollId: data[0].payrollId,
+          siteId: data[0].site_id
+        }),
+        returnTo: "/payroll/run-payroll/site/",
+      },
+      {
+        method: "POST",
+        action: "/payroll/run-payroll/approve-payroll"
+      },
+    );
+  }
+
   return (
     <section className="m-4">
-      <div className="flex justify-between items-center p-2">
-        <div>
-          Please check the data below. If data is correst aprrove and make
-          payment to employees.
-        </div>
-        <div>
-          <Button>Submit & Approve</Button>
-        </div>
-      </div>
-      <div className="grid gap-6 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-4 my-4">
-        <InfoCard
-          heading={heading.payroll_cost}
-          value={demo.payroll_cost}
-          netDiff={netDiff.payroll_cost}
-        />
-        <InfoCard
-          heading={heading.employeess_net_pay}
-          value={demo.employeess_net_pay}
-          netDiff={netDiff.employeess_net_pay}
-        />
-        <InfoCard
-          heading={heading.pending_payments}
-          value={demo.pending_payments}
-          netDiff={netDiff.pending_payments}
-        />
-        <InfoCard
-          heading={heading.employees}
-          value={demo.employees}
-          netDiff={netDiff.employees}
-          isPercentage={false}
-        />
-      </div>
       <div className="py-4">
         <div className="w-full flex items-center justify-between pb-4">
           <div className="w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4">
@@ -55,15 +59,19 @@ export function PayrollComponent({ data, demo, heading, netDiff }: any) {
               </div>
               <Input
                 placeholder="Search Users"
-                // value={searchString}
-                // onChange={(e) => setSearchString(e.target.value)}
+                value={searchString}
+                onChange={(e) => setSearchString(e.target.value)}
                 className="pl-8 h-10 w-full focus-visible:ring-0"
               />
             </div>
+            <div className={cn(editable ? "" : "hidden")}>
+              <Button onClick={(e) => approvePayroll(e)} disabled={disable}>Submit & Approve</Button>
+            </div>
           </div>
         </div>
-        <PayrollDataTable data={data as any} columns={payrollColumns} />
+        <PayrollDataTable data={tableData ?? []} columns={payrollColumns} editable={editable} />
       </div>
+      <Outlet />
     </section>
   );
-}
+};

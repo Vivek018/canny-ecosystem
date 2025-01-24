@@ -1,11 +1,6 @@
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@canny_ecosystem/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@canny_ecosystem/ui/tooltip";
 import { Link } from "@remix-run/react";
 import { Card, CardContent, CardTitle } from "@canny_ecosystem/ui/card";
 import type { ProjectsWithCompany } from "@canny_ecosystem/supabase/queries";
@@ -70,9 +65,7 @@ export function ProjectCard({
                             index !== 0 && "-ml-[18px]"
                           )}
                         >
-                          {company?.logo && (
-                            <img src={company?.logo} alt={company?.name} />
-                          )}
+                          {company?.logo && (<img src={company?.logo} alt={company?.name} />)}
                           <AvatarFallback>
                             <span className="tracking-widest text-sm">
                               {company?.name.charAt(0)}
@@ -85,14 +78,10 @@ export function ProjectCard({
                   ) : null
                 )}
               </div>
-              <p className="text-xs text-muted-foreground">
-                Companies Involved
-              </p>
+              <p className="text-xs text-muted-foreground">Companies Involved</p>
             </TooltipProvider>
           </div>
-          <div
-            className={cn("flex flex-col", project.actual_end_date && "hidden")}
-          >
+          <div className={cn("flex flex-col", project.actual_end_date && "hidden")}>
             <Progress
               value={
                 (getAutoTimeDifference(project.start_date, new Date())! /
@@ -108,7 +97,7 @@ export function ProjectCard({
               className={cn(
                 "text-xs text-muted-foreground ml-auto mt-1",
                 getAutoTimeDifference(new Date(), project.estimated_end_date)! <
-                  0 && "hidden"
+                0 && "hidden",
               )}
             >
               {getAutoTimeDifference(new Date(), project.estimated_end_date)}{" "}

@@ -22,6 +22,7 @@ import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
 import {
   type EmployeeFilters,
+  type EmployeeReportDataType,
   getEmployeesReportByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
@@ -87,7 +88,7 @@ export function DataTable<TData, TValue>({
         },
       });
 
-      const sbReportData = data?.map((employee: any) => {
+      const sbReportData = data?.map((employee: EmployeeReportDataType) => {
         return {
           ...employee,
           bonus_amount: 4324,

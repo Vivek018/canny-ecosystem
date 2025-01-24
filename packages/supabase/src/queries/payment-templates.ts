@@ -1,6 +1,7 @@
 import type {
   InferredType,
   PaymentFieldDatabaseRow,
+  PaymentTemplateAssignmentsDatabaseRow,
   PaymentTemplateComponentDatabaseRow,
   PaymentTemplateDatabaseRow,
   TypedSupabaseClient,
@@ -75,16 +76,6 @@ export async function getPaymentTemplateById({
   return { data, error };
 }
 
-export type PaymentTemplateComponentType = Omit<
-  PaymentTemplateComponentDatabaseRow,
-  "created_at" | "updated_at"
-> & {
-  payment_fields: {
-    id: Pick<PaymentFieldDatabaseRow, "id">;
-    name: Pick<PaymentFieldDatabaseRow, "name">;
-  };
-};
-
 export async function getPaymentTemplateComponentsByTemplateId({
   supabase,
   templateId,
@@ -122,16 +113,6 @@ export async function getPaymentTemplateComponentsByTemplateId({
   return { data, error };
 }
 
-export type PaymentTemplateWithComponentsType = Pick<
-  PaymentTemplateDatabaseRow,
-  "monthly_ctc" | "state" | "id"
-> & {
-  payment_template_components?: Omit<
-    PaymentTemplateComponentDatabaseRow,
-    "created_at" | "updated_at"
-  >[];
-};
-
 export async function getPaymentTemplateWithComponentsById({
   supabase,
   id,
@@ -165,3 +146,87 @@ export async function getPaymentTemplateWithComponentsById({
 
   return { data: returnData, error, componentsError };
 }
+
+export async function getPaymentTemplateByEmployeeId({
+  supabase,
+  employeeId,
+}: { supabase: TypedSupabaseClient; employeeId: string }) {
+  const columns = ["template_id"] as const;
+
+  const { data, error } = await supabase
+    .from("payment_template_assignments")
+    .select(columns.join(","))
+    .eq("employee_id", employeeId)
+    .single<
+      InferredType<
+        PaymentTemplateAssignmentsDatabaseRow,
+        (typeof columns)[number]
+      >
+    >();
+
+  if (error) console.error(error);
+
+  return { data, error };
+}
+
+export async function getPaymentTemplateBySiteId({
+  supabase,
+  site_id,
+}: { supabase: TypedSupabaseClient; site_id: string }) {
+  const columns = ["template_id"] as const;
+
+  const { data, error } = await supabase
+    .from("payment_template_assignments")
+    .select(columns.join(","))
+    .eq("site_id", site_id)
+    .single<
+      InferredType<
+        PaymentTemplateAssignmentsDatabaseRow,
+        (typeof columns)[number]
+      >
+    >();
+
+  if (error) console.error(error);
+
+  return { data, error };
+}
+
+export async function getDefaultTemplateIdByCompanyId({
+  supabase,
+  companyId,
+}: { supabase: TypedSupabaseClient; companyId: string }) {
+  const columns = ["id"] as const;
+
+  const { data, error } = await supabase
+    .from("payment_templates")
+    .select(columns.join(","))
+    .eq("company_id", companyId)
+    .eq("is_default", true)
+    .single<
+      InferredType<PaymentTemplateDatabaseRow, (typeof columns)[number]>
+    >();
+
+  if (error) console.error(error);
+
+  return { data, error };
+}
+
+export type PaymentTemplateComponentType = Omit<
+  PaymentTemplateComponentDatabaseRow,
+  "created_at" | "updated_at"
+> & {
+  payment_fields: {
+    id: Pick<PaymentFieldDatabaseRow, "id">;
+    name: Pick<PaymentFieldDatabaseRow, "name">;
+  };
+};
+
+export type PaymentTemplateWithComponentsType = Pick<
+  PaymentTemplateDatabaseRow,
+  "monthly_ctc" | "state" | "id"
+> & {
+  payment_template_components?: Omit<
+    PaymentTemplateComponentDatabaseRow,
+    "created_at" | "updated_at"
+  >[];
+};

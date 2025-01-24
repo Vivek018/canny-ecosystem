@@ -42,7 +42,7 @@ export function ReimbursementPerEmployer({
     },
     {} as Record<string, { employer: string; amount: number }>,
   );
-
+  
   const topUsersData = Object.values(totalEmployerAmountData)
     .sort((a, b) => b.amount - a.amount)
     .slice(0, 4);

@@ -42,7 +42,7 @@ export function ReimbursementTrend({
   );
 
   return (
-    <Card>
+    <Card className="overflow-hidden">
       <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
         <div className="flex flex-1 flex-col justify-center gap-1 px-6">
           <CardTitle>Reimbursement Trend Over Time</CardTitle>

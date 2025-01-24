@@ -108,6 +108,7 @@ export default function SitesIndex() {
             </Suspense>
           </CommandList>
         </Command>
+        <Outlet/>
       </div>
       <Outlet />
     </section>

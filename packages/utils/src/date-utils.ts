@@ -78,16 +78,15 @@ export function formatDateTime(date: Date | string | number) {
   return format(new Date(date), "dd MMM yyyy, hh:mm a");
 }
 
-export function getYears(numberOfYears = 30) {
+export function getYears(numberOfYears = 30, currentYear: number | null = new Date().getFullYear()) {
   if (numberOfYears <= 0) {
     throw new Error("Number of years must be greater than 0");
   }
 
-  const currentYear = new Date().getFullYear();
   const years: number[] = [];
 
   for (let i = 0; i < numberOfYears; i++) {
-    years.push(currentYear + i);
+    years.push((currentYear ?? new Date().getFullYear()) - i);
   }
 
   return years;

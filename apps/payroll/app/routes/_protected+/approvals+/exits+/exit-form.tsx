@@ -68,11 +68,10 @@ export async function action({ request }: ActionFunctionArgs) {
   });
   if (action === "submit") {
     if (submission.status === "success") {
-      const page1Data = session.get(`${SESSION_KEY_PREFIX}1`);
-      const page2Data = submission.value;
+      // const page1Data = session.get(`${SESSION_KEY_PREFIX}1`);
+      // const page2Data = submission.value;
 
-      const data = { ...page1Data, ...page2Data };
-
+      // const data = { ...page1Data, ...page2Data };
       for (let i = 1; i <= totalSteps; i++) {
         session.unset(`${SESSION_KEY_PREFIX}${i}`);
       }

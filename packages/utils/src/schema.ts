@@ -1155,3 +1155,35 @@ export const ImportSingleEmployeeGuardiansDataSchema = z.object({
 export const ImportEmployeeGuardiansDataSchema = z.object({
   data: z.array(ImportSingleEmployeeGuardiansDataSchema),
 });
+
+// Payroll
+export const PayrollSchema = z
+  .object({
+    employee_id: z.string().optional(),
+    site_id: z.string().optional(),
+    payrollId: z.string().optional(),
+    gross_pay: z.number().optional(),
+    statutoryBonus: z.number().optional(),
+    epf: z.number().optional(),
+    esi: z.number().optional(),
+    pt: z.number().optional(),
+    lwf: z.number().optional(),
+    templateComponents: z.any(),
+  })
+  .catchall(z.any());
+
+export type PayrollEmployeeData = {
+  deductions: number;
+  employee_code: string;
+  employee_id: string;
+  gross_pay: number;
+  name: string;
+  net_pay: number;
+  present_days: number;
+  site_id: string;
+  status: string;
+  designation: string;
+  payment_template_components_id: string;
+  templateComponents:any;
+  payrollId:string;
+};
