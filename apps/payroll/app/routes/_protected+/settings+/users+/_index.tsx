@@ -32,7 +32,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export default function Users() {
   const { role } = useUserRole();
   const { data } = useLoaderData<typeof loader>();
-  console.log(data);
 
   const [searchString, setSearchString] = useState("");
   const [tableData, setTableData] = useState(data);

@@ -1,10 +1,7 @@
 import { ErrorBoundary } from "@/components/error-boundary";
 import { PaymentTemplateComponentsCard } from "@/components/payment-templates/payment-template-components-card";
 import { PaymentTemplatesTableWrapper } from "@/components/payment-templates/payment-templates-table-wrapper";
-import { DEFAULT_ROUTE } from "@/constant";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { safeRedirect } from "@/utils/server/http.server";
-import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { useUserRole } from "@/utils/user";
 import {
   getPaymentTemplateComponentsByTemplateId,
@@ -15,7 +12,7 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { hasPermission, readRole, updateRole } from "@canny_ecosystem/utils";
+import { hasPermission, updateRole } from "@canny_ecosystem/utils";
 import {
   attribute,
   modalSearchParamNames,
@@ -25,15 +22,9 @@ import { Await, Link, useLoaderData, useSearchParams } from "@remix-run/react";
 import { Suspense, useState } from "react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase, headers } = getSupabaseWithHeaders({ request });
+  const { supabase } = getSupabaseWithHeaders({ request });
 
-  const { user } = await getUserCookieOrFetchUser(request, supabase);
-
-  if (
-    !hasPermission(user?.role!, `${readRole}:${attribute.paymentTemplates}`)
-  ) {
-    return safeRedirect(DEFAULT_ROUTE, { headers });
-  }
+  
   try {
     const url = new URL(request.url);
     const searchParams = url.searchParams;

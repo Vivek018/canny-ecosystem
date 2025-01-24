@@ -23,21 +23,14 @@ import {
 import { Suspense } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { ProjectsWrapper } from "@/components/projects/projects-wrapper";
-import { hasPermission, readRole, updateRole } from "@canny_ecosystem/utils";
+import { hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
-import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
-import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase, headers } = getSupabaseWithHeaders({ request });
+  const { supabase} = getSupabaseWithHeaders({ request });
 
-  const { user } = await getUserCookieOrFetchUser(request, supabase);
-
-  if (!hasPermission(user?.role!, `${readRole}:${attribute.projects}`)) {
-    return safeRedirect(DEFAULT_ROUTE, { headers });
-  }
+  
   try {
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 

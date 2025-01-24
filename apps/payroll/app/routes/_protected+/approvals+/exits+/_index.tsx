@@ -3,10 +3,7 @@ import { ExitsSearchFilter } from "@/components/exits/exit-search-filter";
 import { FilterList } from "@/components/exits/filter-list";
 import { ExitPaymentColumns } from "@/components/exits/table/columns";
 import { ExitPaymentTable } from "@/components/exits/table/data-table";
-import { DEFAULT_ROUTE } from "@/constant";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { safeRedirect } from "@/utils/server/http.server";
-import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import {
   LAZY_LOADING_LIMIT,
   MAX_QUERY_LIMIT,
@@ -18,21 +15,15 @@ import {
   getSiteNamesByProjectName,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { hasPermission, readRole } from "@canny_ecosystem/utils";
-import { attribute } from "@canny_ecosystem/utils/constant";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect, useLoaderData } from "@remix-run/react";
 
 const pageSize = 20;
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase, headers } = getSupabaseWithHeaders({ request });
+  const { supabase } = getSupabaseWithHeaders({ request });
 
-  const { user } = await getUserCookieOrFetchUser(request, supabase);
-
-  if (!hasPermission(user?.role!, `${readRole}:${attribute.exits}`)) {
-    return safeRedirect(DEFAULT_ROUTE, { headers });
-  }
+  
 
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,

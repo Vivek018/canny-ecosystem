@@ -141,4 +141,7 @@ export const attribute = {
   reports: "reports",
   approvals: "approvals",
   paymentComponent: "payment_component",
+  settings: "settings",
+  users: "users",
+  payroll: "payroll",
 };

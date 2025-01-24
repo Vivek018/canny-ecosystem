@@ -24,20 +24,11 @@ import { Icon } from "@canny_ecosystem/ui/icon";
 
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect, useLoaderData, useNavigate } from "@remix-run/react";
-import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
-import { hasPermission, readRole } from "@canny_ecosystem/utils";
-import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
-import { attribute } from "@canny_ecosystem/utils/constant";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
-  const { supabase, headers } = getSupabaseWithHeaders({ request });
-  const { user } = await getUserCookieOrFetchUser(request, supabase);
-
-  if (!hasPermission(user?.role!, `${readRole}:${attribute.reimbursements}`)) {
-    return safeRedirect(DEFAULT_ROUTE, { headers });
-  }
+  const { supabase } = getSupabaseWithHeaders({ request });
+ 
 
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   const searchParams = new URLSearchParams(url.searchParams);
