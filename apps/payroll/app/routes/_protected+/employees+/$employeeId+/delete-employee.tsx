@@ -20,7 +20,7 @@ export async function action({
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(`${user?.role!}`, `${deleteRole}:employees`)) {
+  if (!hasPermission(user?.role!, `${deleteRole}:employees`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   const employeeId = params.employeeId;

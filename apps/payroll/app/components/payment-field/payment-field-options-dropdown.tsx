@@ -76,8 +76,8 @@ export const PaymentFieldOptionsDropdown = ({
 
         <DropdownMenuSeparator
           className={cn(
-            !hasPermission(`${role}`, `${updateRole}:payment_fields`) &&
-              !hasPermission(`${role}`, `${deleteRole}:payment_fields`) &&
+            !hasPermission(role, `${updateRole}:payment_fields`) &&
+              !hasPermission(role, `${deleteRole}:payment_fields`) &&
               "hidden"
           )}
         />
@@ -86,7 +86,7 @@ export const PaymentFieldOptionsDropdown = ({
           <DropdownMenuItem
             className={cn(
               paymentField.is_active && "hidden",
-              !hasPermission(`${role}`, `${updateRole}:payment_fields`) &&
+              !hasPermission(role, `${updateRole}:payment_fields`) &&
                 "hidden"
             )}
             onClick={handleMarkAsActive}
@@ -96,7 +96,7 @@ export const PaymentFieldOptionsDropdown = ({
           <DropdownMenuItem
             className={cn(
               !paymentField.is_active && "hidden",
-              !hasPermission(`${role}`, `${updateRole}:payment_fields`) &&
+              !hasPermission(role, `${updateRole}:payment_fields`) &&
                 "hidden"
             )}
             onClick={handleMarkAsInactive}
@@ -107,7 +107,7 @@ export const PaymentFieldOptionsDropdown = ({
             onClick={handleEdit}
             className={cn(
               "hidden",
-              hasPermission(`${role}`, `${updateRole}:payment_fields`) && "flex"
+              hasPermission(role, `${updateRole}:payment_fields`) && "flex"
             )}
           >
             Edit payment field
@@ -115,7 +115,7 @@ export const PaymentFieldOptionsDropdown = ({
           <DropdownMenuSeparator
             className={cn(
               "hidden",
-              hasPermission(`${role}`, `${deleteRole}:payment_fields`) && "flex"
+              hasPermission(role, `${deleteRole}:payment_fields`) && "flex"
             )}
           />
           <DeletePaymentField paymentFieldId={paymentField.id} />

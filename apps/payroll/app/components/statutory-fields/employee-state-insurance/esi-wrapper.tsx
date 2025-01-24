@@ -52,7 +52,7 @@ export function ESIWrapper({
             to={`/payment-components/statutory-fields/employee-state-insurance/${data?.id}/update-esi`}
             className={cn(
               "p-2 rounded-full bg-secondary grid place-items-center",
-              !hasPermission(`${role}`, `${updateRole}:statutory_fields_esi`) &&
+              !hasPermission(role, `${updateRole}:statutory_fields_esi`) &&
                 "hidden"
             )}
           >

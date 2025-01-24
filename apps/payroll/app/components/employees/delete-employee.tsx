@@ -57,7 +57,7 @@ export const DeleteEmployee = ({ employeeId }: { employeeId: string }) => {
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "text-[13px] h-9 hidden",
-          hasPermission(`${role}`, `${deleteRole}:employees`) && "flex"
+          hasPermission(role, `${deleteRole}:employees`) && "flex"
         )}
       >
         Delete Employee

@@ -20,7 +20,7 @@ export async function action({
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(`${user?.role!}`, `${deleteRole}:employee_work_history`)) {
+  if (!hasPermission(user?.role!, `${deleteRole}:employee_work_history`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   const workHistoryId = params.workHistoryId;

@@ -51,7 +51,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(`${user?.role!}`, `${updateRole}:setting_users`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:setting_users`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);

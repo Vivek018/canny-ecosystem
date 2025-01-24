@@ -134,7 +134,7 @@ export function ProjectCard({
                   to={`/projects/${project.id}/update-project`}
                   className={cn(
                     "p-2 rounded-md bg-secondary grid place-items-center border-foreground ",
-                    !hasPermission(`${role}`, `${deleteRole}:projects`) &&
+                    !hasPermission(role, `${deleteRole}:projects`) &&
                       "hidden"
                   )}
                 >
@@ -153,8 +153,8 @@ export function ProjectCard({
               <DropdownMenuTrigger
                 className={cn(
                   "p-2 py-2 rounded-md bg-secondary grid place-items-center border-foreground",
-                  !hasPermission(`${role}`, `${deleteRole}:projects`) &&
-                    !hasPermission(`${role}`, `${updateRole}:projects`) &&
+                  !hasPermission(role, `${deleteRole}:projects`) &&
+                    !hasPermission(role, `${updateRole}:projects`) &&
                     "hidden"
                 )}
               >

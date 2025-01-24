@@ -63,7 +63,7 @@ export const DeleteAddress = ({
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "text-[13px] h-9 hidden",
-          hasPermission(`${role}`, `${deleteRole}:employee_addresses`) &&
+          hasPermission(role, `${deleteRole}:employee_addresses`) &&
             "flex"
         )}
       >

@@ -67,7 +67,7 @@ export const ProjectOptionsDropdown = ({
           <DropdownMenuItem
             className={cn(
               project.actual_end_date && "hidden",
-              !hasPermission(`${role}`, `${updateRole}:projects`) && "hidden"
+              !hasPermission(role, `${updateRole}:projects`) && "hidden"
             )}
             onClick={handleMarkAsCompleted}
           >
@@ -76,7 +76,7 @@ export const ProjectOptionsDropdown = ({
           <DropdownMenuItem
             className={cn(
               !project.actual_end_date && "hidden",
-              !hasPermission(`${role}`, `${updateRole}:projects`) && "hidden"
+              !hasPermission(role, `${updateRole}:projects`) && "hidden"
             )}
             onClick={handleMarkAsActive}
           >
@@ -85,7 +85,7 @@ export const ProjectOptionsDropdown = ({
           <DropdownMenuSeparator
             className={cn(
               "hidden",
-              hasPermission(`${role}`, `${deleteRole}:projects`) && "flex"
+              hasPermission(role, `${deleteRole}:projects`) && "flex"
             )}
           />
           <DeleteProject projectId={project.id} />

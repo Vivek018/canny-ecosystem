@@ -58,10 +58,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
-  const { supabase ,headers} = getSupabaseWithHeaders({ request });
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(`${user?.role!}`, `${updateRole}:payment_templates`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:payment_templates`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 

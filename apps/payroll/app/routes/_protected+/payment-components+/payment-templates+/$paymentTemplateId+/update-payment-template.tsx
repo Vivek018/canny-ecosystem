@@ -39,7 +39,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(`${user?.role!}`, `${updateRole}:payment_templates`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:payment_templates`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 

@@ -75,7 +75,7 @@ export const CompanyDetails = ({
 
                   placeholder: `Enter ${fields.name.name}`,
                   readOnly: !hasPermission(
-                    `${role}`,
+                    role,
                     `${updateRole}:setting_general`
                   ),
                 }}
@@ -88,7 +88,7 @@ export const CompanyDetails = ({
                     fields.email_suffix.name
                   )}`,
                   readOnly: !hasPermission(
-                    `${role}`,
+                    role,
                     `${updateRole}:setting_general`
                   ),
                 }}
@@ -103,7 +103,7 @@ export const CompanyDetails = ({
                 inputProps={{
                   ...getInputProps(fields.company_type, { type: "text" }),
                   readOnly: !hasPermission(
-                    `${role}`,
+                    role,
                     `${updateRole}:setting_general`
                   ),
                 }}
@@ -121,7 +121,7 @@ export const CompanyDetails = ({
                 inputProps={{
                   ...getInputProps(fields.company_size, { type: "text" }),
                   readOnly: !hasPermission(
-                    `${role}`,
+                    role,
                     `${updateRole}:setting_general`
                   ),
                 }}
@@ -136,7 +136,7 @@ export const CompanyDetails = ({
           <CardFooter
             className={cn(
               "border-t pt-6 flex justify-between  ",
-              !hasPermission(`${role}`, `${updateRole}:setting_general`) &&
+              !hasPermission(role, `${updateRole}:setting_general`) &&
                 "hidden"
             )}
           >

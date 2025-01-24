@@ -62,7 +62,7 @@ export const DeleteUser = ({
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "hidden text-[13px] h-9",
-          hasPermission(`${role}`, `${deleteRole}:setting_users`) && "flex"
+          hasPermission(role, `${deleteRole}:setting_users`) && "flex"
         )}
       >
         Delete User

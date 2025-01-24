@@ -52,8 +52,8 @@ export const PaymentTemplateOptionsDropdown = ({
           </DropdownMenuItem>
           <DropdownMenuSeparator
             className={cn(
-              !hasPermission(`${role}`, `${updateRole}:payment_templates`) &&
-                !hasPermission(`${role}`, `${deleteRole}:payment_templates`) &&
+              !hasPermission(role, `${updateRole}:payment_templates`) &&
+                !hasPermission(role, `${deleteRole}:payment_templates`) &&
                 "hidden"
             )}
           />
@@ -61,7 +61,7 @@ export const PaymentTemplateOptionsDropdown = ({
             onClick={handleEdit}
             className={cn(
               "hidden",
-              hasPermission(`${role}`, `${updateRole}:payment_templates`) &&
+              hasPermission(role, `${updateRole}:payment_templates`) &&
                 "flex"
             )}
           >
@@ -71,7 +71,7 @@ export const PaymentTemplateOptionsDropdown = ({
             onClick={handleEditComponents}
             className={cn(
               "hidden",
-              hasPermission(`${role}`, `${updateRole}:payment_templates`) &&
+              hasPermission(role, `${updateRole}:payment_templates`) &&
                 "flex"
             )}
           >
@@ -80,7 +80,7 @@ export const PaymentTemplateOptionsDropdown = ({
           <DropdownMenuSeparator
             className={cn(
               "hidden",
-              hasPermission(`${role}`, `${deleteRole}:payment_templates`) &&
+              hasPermission(role, `${deleteRole}:payment_templates`) &&
                 "flex"
             )}
           />

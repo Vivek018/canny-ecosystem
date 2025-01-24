@@ -72,7 +72,7 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
                     buttonVariants({ variant: "muted" }),
                     "px-2.5 h-min",
                     !hasPermission(
-                      `${role}`,
+                      role,
                       `${updateRole}:employee_guardians`
                     ) && "hidden"
                   )}
@@ -88,7 +88,7 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
               className={cn(
                 buttonVariants({ variant: "muted" }),
                 "px-2.5 h-min hidden",
-                hasPermission(`${role}`, `${deleteRole}:employee_guardians`) &&
+                hasPermission(role, `${deleteRole}:employee_guardians`) &&
                   "flex"
               )}
             >
@@ -169,14 +169,14 @@ export const EmployeeGuardiansCard = ({
         <div>
           <Link
             to={
-              hasPermission(`${role}`, `${updateRole}:employee_addresses`)
+              hasPermission(role, `${updateRole}:employee_addresses`)
                 ? "add-employee-address"
                 : DEFAULT_ROUTE
             }
             className={cn(
               buttonVariants({ variant: "outline" }),
               "bg-card",
-              !hasPermission(`${role}`, `${updateRole}:employee_addresses`) &&
+              !hasPermission(role, `${updateRole}:employee_addresses`) &&
                 "hidden"
             )}
           >

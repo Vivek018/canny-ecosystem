@@ -21,7 +21,7 @@ export async function action({
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(`${user?.role!}`, `${deleteRole}:employee_guardians`)) {
+  if (!hasPermission(user?.role!, `${deleteRole}:employee_guardians`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   const addressId = params.addressId;

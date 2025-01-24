@@ -45,11 +45,11 @@ import { DEFAULT_ROUTE } from "@/constant";
 export const ADD_REIMBURSEMENTS_TAG = "Add Reimbursements";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const { supabase ,headers} = getSupabaseWithHeaders({ request });
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(`${user?.role!}`, `${updateRole}:reimbursements`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:reimbursements`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   const employeeId = params.employeeId;

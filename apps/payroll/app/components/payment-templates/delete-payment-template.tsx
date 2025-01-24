@@ -61,7 +61,7 @@ export const DeletePaymentTemplate = ({
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "text-[13px] h-9 hidden",
-          hasPermission(`${role}`, `${deleteRole}:payment_templates`) && "flex"
+          hasPermission(role, `${deleteRole}:payment_templates`) && "flex"
         )}
       >
         Delete Payment Template

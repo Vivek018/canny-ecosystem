@@ -31,7 +31,7 @@ export function EPFNoData() {
             to="/payment-components/statutory-fields/employee-provident-fund/create-employee-provident-fund"
             className={cn(
               buttonVariants({ variant: "primary-outline" }),
-              !hasPermission(`${role}`, `${updateRole}:statutory_fields_epf`) &&
+              !hasPermission(role, `${updateRole}:statutory_fields_epf`) &&
                 "hidden"
             )}
           >

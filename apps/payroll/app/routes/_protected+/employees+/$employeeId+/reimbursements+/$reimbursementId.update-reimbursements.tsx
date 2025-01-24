@@ -26,7 +26,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(`${user?.role!}`, `${updateRole}:reimbursements`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:reimbursements`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   let reimbursementData = null;

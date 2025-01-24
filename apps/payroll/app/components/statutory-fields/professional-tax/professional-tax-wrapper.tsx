@@ -53,7 +53,7 @@ export function ProfessionalTaxWrapper({
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
                 "flex items-center gap-1",
-                !hasPermission(`${role}`, `${updateRole}:statutory_fields_pf`) &&
+                !hasPermission(role, `${updateRole}:statutory_fields_pf`) &&
                   "hidden"
               )}
             >

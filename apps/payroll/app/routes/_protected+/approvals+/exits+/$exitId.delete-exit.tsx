@@ -16,7 +16,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(`${user?.role!}`, `${deleteRole}:exits`)) {
+  if (!hasPermission(user?.role!, `${deleteRole}:exits`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   const exitId = params.exitId;

@@ -65,7 +65,7 @@ export const EmployeeOptionsDropdown = ({
           <DropdownMenuItem
             className={cn(
               employee.is_active && "hidden",
-              hasPermission(`${role}`, `${updateRole}:employees`) && "hidden"
+              hasPermission(role, `${updateRole}:employees`) && "hidden"
             )}
             onClick={handleMarkAsActive}
           >
@@ -74,7 +74,7 @@ export const EmployeeOptionsDropdown = ({
           <DropdownMenuItem
             className={cn(
               !employee.is_active && "hidden",
-              !hasPermission(`${role}`, `${updateRole}:employees`) && "hidden"
+              !hasPermission(role, `${updateRole}:employees`) && "hidden"
             )}
             onClick={handleMarkAsInactive}
           >
@@ -82,8 +82,8 @@ export const EmployeeOptionsDropdown = ({
           </DropdownMenuItem>
           <DropdownMenuSeparator
             className={cn(
-              !hasPermission(`${role}`, `${updateRole}:employees`) &&
-                !hasPermission(`${role}`, `${deleteRole}:employees`) &&
+              !hasPermission(role, `${updateRole}:employees`) &&
+                !hasPermission(role, `${deleteRole}:employees`) &&
                 "hidden"
             )}
           />
@@ -91,7 +91,7 @@ export const EmployeeOptionsDropdown = ({
           <DropdownMenuSeparator
             className={cn(
               "hidden",
-              hasPermission(`${role}`, `${deleteRole}:employees`) && "flex"
+              hasPermission(role, `${deleteRole}:employees`) && "flex"
             )}
           />
           <DeleteEmployee employeeId={employee.id} />

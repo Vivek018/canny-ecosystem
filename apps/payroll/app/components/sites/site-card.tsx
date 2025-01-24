@@ -66,7 +66,7 @@ export function SiteCard({
                   to={`/projects/${site.project_id}/${site.id}/update-site`}
                   className={cn(
                     "p-2 rounded-md bg-secondary grid place-items-center ",
-                    !hasPermission(`${role}`, `${updateRole}:project_sites`) &&
+                    !hasPermission(role, `${updateRole}:project_sites`) &&
                       "hidden"
                   )}
                 >
@@ -93,7 +93,7 @@ export function SiteCard({
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className={cn(
-                    !hasPermission(`${role}`, `${updateRole}:project_sites`) &&
+                    !hasPermission(role, `${updateRole}:project_sites`) &&
                       "hidden"
                   )}
                   onClick={() => {
@@ -104,13 +104,15 @@ export function SiteCard({
                 >
                   Edit Pay Sequence
                 </DropdownMenuItem>
-                <DropdownMenuSeparator className={cn(
-                    !hasPermission(`${role}`, `${updateRole}:project_sites`) &&
+                <DropdownMenuSeparator
+                  className={cn(
+                    !hasPermission(role, `${updateRole}:project_sites`) &&
                       "hidden"
-                  )} />
+                  )}
+                />
                 <DropdownMenuItem
                   className={cn(
-                    !hasPermission(`${role}`, `${updateRole}:project_sites`) &&
+                    !hasPermission(role, `${updateRole}:project_sites`) &&
                       "hidden"
                   )}
                   onClick={() => {
@@ -124,10 +126,7 @@ export function SiteCard({
                 <DropdownMenuSeparator
                   className={cn(
                     (!site.latitude && !site.longitude) ||
-                      (!hasPermission(
-                        `${role}`,
-                        `${deleteRole}:project_sites`
-                      ) &&
+                      (!hasPermission(role, `${deleteRole}:project_sites`) &&
                         "hidden")
                   )}
                 />

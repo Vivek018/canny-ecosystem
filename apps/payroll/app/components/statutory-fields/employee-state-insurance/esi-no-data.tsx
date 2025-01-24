@@ -32,7 +32,7 @@ export function ESINoData() {
             to="/payment-components/statutory-fields/employee-state-insurance/create-employee-state-insurance"
             className={cn(
               buttonVariants({ variant: "primary-outline" }),
-              !hasPermission(`${role}`, `${updateRole}:statutory_fields_esi`) &&
+              !hasPermission(role, `${updateRole}:statutory_fields_esi`) &&
                 "hidden"
             )}
           >

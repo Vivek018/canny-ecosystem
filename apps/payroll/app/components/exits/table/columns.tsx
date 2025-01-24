@@ -282,8 +282,8 @@ export const ExitPaymentColumns: ColumnDef<ExitDataType>[] = [
             <DropdownMenuTrigger
               asChild
               className={cn(
-                !hasPermission(`${role}`, `${updateRole}:exits`) &&
-                  !hasPermission(`${role}`, `${deleteRole}:exits`) &&
+                !hasPermission(role, `${updateRole}:exits`) &&
+                  !hasPermission(role, `${deleteRole}:exits`) &&
                   "hidden"
               )}
             >

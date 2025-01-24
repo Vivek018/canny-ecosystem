@@ -62,7 +62,7 @@ export function RelationshipCard({
                   to={`/settings/${relationship.id}/update-relationship`}
                   className={cn(
                     "p-2 rounded-md bg-secondary grid place-items-center",
-                    !hasPermission(`${role}`, `${updateRole}:setting_users`) &&
+                    !hasPermission(role, `${updateRole}:setting_users`) &&
                       "hidden"
                   )}
                 >
@@ -94,7 +94,7 @@ export function RelationshipCard({
                 <DropdownMenuSeparator
                   className={cn(
                     !hasPermission(
-                      `${role}`,
+                      role,
                       `${deleteRole}:setting_relationships`
                     ) || !relationship?.terms
                       ? "hidden"

@@ -32,10 +32,10 @@ export const UPDATE_EMPLOYEE_STATE_INSURANCE =
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const esiId = params.esiId;
-  const { supabase,headers } = getSupabaseWithHeaders({ request });
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(`${user?.role!}`, `${updateRole}:statutory_fields_esi`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:statutory_fields_esi`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 

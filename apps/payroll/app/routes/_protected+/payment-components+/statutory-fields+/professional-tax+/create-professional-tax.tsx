@@ -53,11 +53,11 @@ import { DEFAULT_ROUTE } from "@/constant";
 export const CREATE_PROFESSIONAL_TAX = "create-professional-tax";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase,headers } = getSupabaseWithHeaders({ request });
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(`${user?.role!}`, `${updateRole}:statutory_fields_pf`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:statutory_fields_pf`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   try {

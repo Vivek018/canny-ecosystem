@@ -37,7 +37,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(`${user?.role!}`, `${updateRole}:employee_work_history`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:employee_work_history`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
@@ -72,7 +72,7 @@ export async function action({
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(`${user?.role!}`, `${updateRole}:employee_work_history`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:employee_work_history`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 

@@ -157,8 +157,8 @@ export const reimbursementsColumns = ({
           triggerChild={
             <DropdownMenuTrigger
               className={cn(
-                !hasPermission(`${role}`, `${updateRole}:reimbursements`) &&
-                  !hasPermission(`${role}`, `${deleteRole}:reimbursements`) &&
+                !hasPermission(role, `${updateRole}:reimbursements`) &&
+                  !hasPermission(role, `${deleteRole}:reimbursements`) &&
                   "hidden"
               )}
               asChild

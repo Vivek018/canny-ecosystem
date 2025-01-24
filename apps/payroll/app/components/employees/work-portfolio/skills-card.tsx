@@ -71,7 +71,7 @@ export const SkillItem = ({ skill }: { skill: EmployeeSkill }) => {
                     buttonVariants({ variant: "muted" }),
                     "px-2.5 h-min",
                     !hasPermission(
-                      `${role}`,
+                      role,
                       `${updateRole}:employee_skills`
                     ) && "hidden"
                   )}
@@ -87,7 +87,7 @@ export const SkillItem = ({ skill }: { skill: EmployeeSkill }) => {
               className={cn(
                 buttonVariants({ variant: "muted" }),
                 "px-2.5 h-min hidden",
-                hasPermission(`${role}`, `${deleteRole}:employee_skills`) &&
+                hasPermission(role, `${deleteRole}:employee_skills`) &&
                   "flex"
               )}
             >
@@ -131,7 +131,7 @@ export const EmployeeSkillsCard = ({
             className={cn(
               buttonVariants({ variant: "outline" }),
               "bg-card",
-              !hasPermission(`${role}`, `${updateRole}:employee_skills`) &&
+              !hasPermission(role, `${updateRole}:employee_skills`) &&
                 "hidden"
             )}
           >

@@ -221,8 +221,8 @@ export const columns = ({
             <DropdownMenuTrigger
               asChild
               className={cn(
-                !hasPermission(`${role}`, `${updateRole}:employees`) &&
-                  !hasPermission(`${role}`, `${deleteRole}:employees`) &&
+                !hasPermission(role, `${updateRole}:employees`) &&
+                  !hasPermission(role, `${deleteRole}:employees`) &&
                   "hidden"
               )}
             >

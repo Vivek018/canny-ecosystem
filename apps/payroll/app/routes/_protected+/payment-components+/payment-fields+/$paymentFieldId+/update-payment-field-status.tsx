@@ -27,7 +27,7 @@ export async function action({
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(`${user?.role!}`, `${updateRole}:payment_fields`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:payment_fields`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   try {

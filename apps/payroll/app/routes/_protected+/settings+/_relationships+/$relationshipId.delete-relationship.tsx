@@ -22,7 +22,7 @@ export async function action({
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(`${user?.role!}`, `${deleteRole}:setting_relationships`)) {
+  if (!hasPermission(user?.role!, `${deleteRole}:setting_relationships`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 

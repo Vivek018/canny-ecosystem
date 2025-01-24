@@ -23,7 +23,7 @@ export function AddEmployeeDialog() {
       <DropdownMenuTrigger
         asChild
         className={cn(
-          !hasPermission(`${role}`, `${updateRole}:employees`) && "hidden"
+          !hasPermission(role, `${updateRole}:employees`) && "hidden"
         )}
       >
         <Button variant="outline" size="icon" className="h-10 w-10">

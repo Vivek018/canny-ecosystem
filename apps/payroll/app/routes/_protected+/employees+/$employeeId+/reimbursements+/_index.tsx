@@ -166,8 +166,7 @@ export default function ReimbursementsIndex() {
             className={cn(
               buttonVariants({ variant: "primary-outline" }),
               "flex items-center gap-1",
-              !hasPermission(`${role}`, `${updateRole}:reimbursements`) &&
-                "hidden"
+              !hasPermission(role, `${updateRole}:reimbursements`) && "hidden"
             )}
           >
             <span>Add</span>

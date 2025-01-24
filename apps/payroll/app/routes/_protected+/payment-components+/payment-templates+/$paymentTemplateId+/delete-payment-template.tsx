@@ -20,7 +20,7 @@ export async function action({
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(`${user?.role!}`, `${deleteRole}:payment_templates`)) {
+  if (!hasPermission(user?.role!, `${deleteRole}:payment_templates`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 

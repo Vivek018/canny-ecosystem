@@ -117,7 +117,7 @@ export function EmployeeDialog({
           variant="ghost"
           className={cn(
             "item-start justify-start px-2 font-normal w-full hidden",
-            hasPermission(`${role}`, `${updateRole}:employees`) && "flex"
+            hasPermission(role, `${updateRole}:employees`) && "flex"
           )}
           onClick={openPaymentTemplateDialog}
         >

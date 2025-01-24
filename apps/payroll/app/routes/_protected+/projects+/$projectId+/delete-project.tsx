@@ -17,7 +17,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(`${user?.role!}`, `${deleteRole}:projects`)) {
+  if (!hasPermission(user?.role!, `${deleteRole}:projects`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   const projectId = params.projectId;

@@ -34,7 +34,7 @@ export const UserOptionsDropdown = ({
           <DropdownMenuItem
             className={cn(
               "hidden",
-              hasPermission(`${role}`, `${updateRole}:setting_users`) && "flex"
+              hasPermission(role, `${updateRole}:setting_users`) && "flex"
             )}
             onClick={handleEdit}
           >
@@ -43,7 +43,7 @@ export const UserOptionsDropdown = ({
           <DropdownMenuSeparator
             className={cn(
               "hidden",
-              hasPermission(`${role}`, `${deleteRole}:setting_users`) && "flex"
+              hasPermission(role, `${deleteRole}:setting_users`) && "flex"
             )}
           />
           <DeleteUser id={id} role={role} />

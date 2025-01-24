@@ -12,7 +12,12 @@ import {
 } from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { updateEmployee } from "@canny_ecosystem/supabase/mutations";
-import { isGoodStatus, EmployeeSchema, updateRole, hasPermission } from "@canny_ecosystem/utils";
+import {
+  isGoodStatus,
+  EmployeeSchema,
+  updateRole,
+  hasPermission,
+} from "@canny_ecosystem/utils";
 import { CreateEmployeeDetails } from "@/components/employees/form/create-employee-details";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
 import { Card } from "@canny_ecosystem/ui/card";
@@ -29,16 +34,15 @@ export const UPDATE_EMPLOYEE = "update-employee";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const employeeId = params.employeeId;
-  const { supabase,headers } = getSupabaseWithHeaders({ request });
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
-  
-    if (!hasPermission(`${user?.role!}`, `${updateRole}:employee_details`)) {
-      return safeRedirect(DEFAULT_ROUTE, { headers });
-    }
+
+  if (!hasPermission(user?.role!, `${updateRole}:employee_details`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
 
   try {
-
     let employeePromise = null;
 
     if (employeeId) {
@@ -75,7 +79,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -94,7 +98,7 @@ export async function action({
 
     return json(
       { status: "error", message: "Failed to update employee", error },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json({

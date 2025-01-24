@@ -81,7 +81,7 @@ export function EmployeePageHeader({
             className={cn(
               buttonVariants({ variant: "outline" }),
               "w-full bg-card",
-              !hasPermission(`${role}`, `${updateRole}:employee_details`) &&
+              !hasPermission(role, `${updateRole}:employee_details`) &&
                 "hidden"
             )}
           >
@@ -101,7 +101,7 @@ export function EmployeePageHeader({
                 className={cn(
                   buttonVariants({ variant: "outline" }),
                   "bg-card",
-                  !hasPermission(`${role}`, `${updateRole}:employees`) &&
+                  !hasPermission(role, `${updateRole}:employees`) &&
                     "hidden"
                 )}
               >

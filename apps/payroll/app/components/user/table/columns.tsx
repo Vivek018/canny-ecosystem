@@ -123,8 +123,8 @@ export const columns: ColumnDef<UsersType>[] = [
                 variant="ghost"
                 className={cn(
                   "h-8 w-8 p-0",
-                  !hasPermission(`${role}`, `${updateRole}:setting_users`) &&
-                    !hasPermission(`${role}`, `${deleteRole}:setting_users`) &&
+                  !hasPermission(role, `${updateRole}:setting_users`) &&
+                    !hasPermission(role, `${deleteRole}:setting_users`) &&
                     "hidden"
                 )}
               >

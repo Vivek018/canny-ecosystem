@@ -62,7 +62,7 @@ export const DeleteEmployeeProvidentFund = ({
         className={cn(
           buttonVariants({ variant: "destructive-outline" }),
           "text-sm h-9 flex gap-1 items-center",
-          !hasPermission(`${role}`, `${deleteRole}:statutory_fields_epf`) &&
+          !hasPermission(role, `${deleteRole}:statutory_fields_epf`) &&
             "hidden"
         )}
       >

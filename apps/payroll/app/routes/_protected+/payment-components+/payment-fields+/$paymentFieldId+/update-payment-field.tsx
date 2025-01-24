@@ -31,10 +31,10 @@ export const UPDATE_PAYMENT_FIELD = "update-payment-field";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const paymentFieldId = params.paymentFieldId;
-  const { supabase,headers } = getSupabaseWithHeaders({ request });
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(`${user?.role!}`, `${updateRole}:payment_fields`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:payment_fields`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 

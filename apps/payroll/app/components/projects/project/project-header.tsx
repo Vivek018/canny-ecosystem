@@ -36,7 +36,7 @@ export const ProjectHeader = ({
           to={`/projects/${project.id}/update-project`}
           className={cn(
             buttonVariants({ variant: "outline" }),
-            !hasPermission(`${role}`, `${updateRole}:project`) && "hidden"
+            !hasPermission(role, `${updateRole}:project`) && "hidden"
           )}
         >
           <Icon name="edit" size="xs" className="mr-1.5 " />
@@ -52,8 +52,8 @@ export const ProjectHeader = ({
             <DropdownMenuTrigger
               className={cn(
                 buttonVariants({ variant: "outline" }),
-                !hasPermission(`${role}`, `${deleteRole}:projects`) &&
-                  !hasPermission(`${role}`, `${updateRole}:projects`) &&
+                !hasPermission(role, `${deleteRole}:projects`) &&
+                  !hasPermission(role, `${updateRole}:projects`) &&
                   "hidden"
               )}
             >

@@ -26,7 +26,7 @@ export const ExitOptionsDropdown = ({
           <DropdownMenuItem
             className={cn(
               "hidden",
-              hasPermission(`${role}`, `${updateRole}:exits`) && "flex"
+              hasPermission(role, `${updateRole}:exits`) && "flex"
             )}
           >
             Edit Exit
@@ -34,7 +34,7 @@ export const ExitOptionsDropdown = ({
           <DropdownMenuSeparator
             className={cn(
               "hidden",
-              hasPermission(`${role}`, `${deleteRole}:exits`) && "flex"
+              hasPermission(role, `${deleteRole}:exits`) && "flex"
             )}
           />
           <DeleteExit exitId={exitId} />

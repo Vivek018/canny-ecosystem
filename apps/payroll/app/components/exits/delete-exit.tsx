@@ -57,7 +57,7 @@ export const DeleteExit = ({ exitId }: { exitId: string }) => {
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "text-[13px] h-9 hidden",
-          hasPermission(`${role}`, `${deleteRole}:exits`) && "flex"
+          hasPermission(role, `${deleteRole}:exits`) && "flex"
         )}
       >
         Delete Exit

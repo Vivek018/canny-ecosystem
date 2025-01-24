@@ -9,7 +9,12 @@ import {
   useNavigate,
 } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
-import { GratuitySchema, hasPermission, isGoodStatus, updateRole } from "@canny_ecosystem/utils";
+import {
+  GratuitySchema,
+  hasPermission,
+  isGoodStatus,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import { getGratuityById } from "@canny_ecosystem/supabase/queries";
 import { updateGratuity } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
@@ -26,10 +31,10 @@ export const UPDATE_GRATUITY = "update-gratuity";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const gratuityId = params.gratuityId;
-  const { supabase,headers } = getSupabaseWithHeaders({ request });
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(`${user?.role!}`, `${updateRole}:statutory_fields_graduity`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:statutory_fields_graduity`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 

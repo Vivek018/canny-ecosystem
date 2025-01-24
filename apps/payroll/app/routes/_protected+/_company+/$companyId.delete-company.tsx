@@ -17,7 +17,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(`${user?.role!}`, `${deleteRole}:setting_general`)) {
+  if (!hasPermission(user?.role!, `${deleteRole}:setting_general`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 

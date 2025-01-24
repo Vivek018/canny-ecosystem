@@ -43,7 +43,7 @@ export const ReimbursementOptionsDropdown = ({
             onClick={handleEdit}
             className={cn(
               "hidden",
-              hasPermission(`${role}`, `${updateRole}:reimbursements`) && "flex"
+              hasPermission(role, `${updateRole}:reimbursements`) && "flex"
             )}
           >
             Update Reimbursement
@@ -51,7 +51,7 @@ export const ReimbursementOptionsDropdown = ({
           <DropdownMenuSeparator
             className={cn(
               "hidden",
-              hasPermission(`${role}`, `${deleteRole}:reimbursements`) && "flex"
+              hasPermission(role, `${deleteRole}:reimbursements`) && "flex"
             )}
           />
           <DeleteReimbursement

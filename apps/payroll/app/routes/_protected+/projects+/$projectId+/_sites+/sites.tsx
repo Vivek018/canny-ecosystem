@@ -75,8 +75,7 @@ export default function SitesIndex() {
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
                 "flex items-center gap-1",
-                !hasPermission(`${role}`, `${updateRole}:project_sites`) &&
-                  "hidden"
+                !hasPermission(role, `${updateRole}:project_sites`) && "hidden"
               )}
             >
               <span>Add</span>
@@ -108,7 +107,7 @@ export default function SitesIndex() {
             </Suspense>
           </CommandList>
         </Command>
-        <Outlet/>
+        <Outlet />
       </div>
       <Outlet />
     </section>

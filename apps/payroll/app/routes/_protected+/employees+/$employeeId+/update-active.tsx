@@ -4,7 +4,12 @@ import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { updateEmployee } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { hasPermission, isGoodStatus, updateRole, z } from "@canny_ecosystem/utils";
+import {
+  hasPermission,
+  isGoodStatus,
+  updateRole,
+  z,
+} from "@canny_ecosystem/utils";
 import { parseWithZod } from "@conform-to/zod";
 import { json, type ActionFunctionArgs } from "@remix-run/node";
 import { useActionData, useNavigate } from "@remix-run/react";
@@ -18,11 +23,11 @@ const UpdateActiveSchema = z.object({
 export async function action({
   request,
 }: ActionFunctionArgs): Promise<Response> {
-  const { supabase ,headers} = getSupabaseWithHeaders({ request });
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(`${user?.role!}`, `${updateRole}:employees`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:employees`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   try {

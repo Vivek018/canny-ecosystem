@@ -63,7 +63,7 @@ export function EPFWrapper({
             to={`/payment-components/statutory-fields/employee-provident-fund/${data?.id}/update-epf`}
             className={cn(
               "p-2 rounded-full bg-secondary grid place-items-center",
-              !hasPermission(`${role}`, `${updateRole}:statutory_fields_epf`) &&
+              !hasPermission(role, `${updateRole}:statutory_fields_epf`) &&
                 "hidden"
             )}
           >

@@ -62,7 +62,7 @@ export const DeleteEmployeeStateInsurance = ({
         className={cn(
           buttonVariants({ variant: "destructive-outline" }),
           "text-sm h-9 flex gap-1 items-center",
-          !hasPermission(`${role}`, `${deleteRole}:statutory_fields_esi`) &&
+          !hasPermission(role, `${deleteRole}:statutory_fields_esi`) &&
             "hidden"
         )}
       >

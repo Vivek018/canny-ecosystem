@@ -16,7 +16,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(`${user?.role!}`, `${updateRole}:setting_general`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:setting_general`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 

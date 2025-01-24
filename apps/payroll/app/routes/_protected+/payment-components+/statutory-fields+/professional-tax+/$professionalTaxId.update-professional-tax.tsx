@@ -9,7 +9,12 @@ import {
   useNavigate,
 } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
-import { hasPermission, isGoodStatus, ProfessionalTaxSchema, updateRole } from "@canny_ecosystem/utils";
+import {
+  hasPermission,
+  isGoodStatus,
+  ProfessionalTaxSchema,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import { getProfessionalTaxById } from "@canny_ecosystem/supabase/queries";
 import { updateProfessionalTax } from "@canny_ecosystem/supabase/mutations";
 import CreateProfessionalTax from "./create-professional-tax";
@@ -24,11 +29,11 @@ import { DEFAULT_ROUTE } from "@/constant";
 export const UPDATE_PROFESSIONAL_TAX = "update-professional-tax";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const { supabase,headers } = getSupabaseWithHeaders({ request });
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(`${user?.role!}`, `${updateRole}:statutory_fields_pf`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:statutory_fields_pf`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   try {

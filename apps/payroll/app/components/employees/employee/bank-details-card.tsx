@@ -52,7 +52,7 @@ export const EmployeeBankDetailsCard = ({
             buttonVariants({ variant: "outline" }),
             "bg-card",
             !bankDetails && "hidden",
-            !hasPermission(`${role}`, `${updateRole}:employee_bank_details`) &&
+            !hasPermission(role, `${updateRole}:employee_bank_details`) &&
               "hidden"
           )}
         >

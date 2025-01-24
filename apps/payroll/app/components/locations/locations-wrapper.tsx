@@ -57,7 +57,7 @@ export function LocationsWrapper({
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
                 "flex items-center gap-1",
-                !hasPermission(`${role}`, `${updateRole}:setting_locations`) &&
+                !hasPermission(role, `${updateRole}:setting_locations`) &&
                   "hidden"
               )}
             >

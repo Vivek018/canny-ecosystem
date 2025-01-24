@@ -67,7 +67,7 @@ export default function Relationships() {
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
                 "flex items-center gap-1",
-                !hasPermission(`${role}`, `${updateRole}:setting_relationships`) &&
+                !hasPermission(role, `${updateRole}:setting_relationships`) &&
                   "hidden"
               )}
             >

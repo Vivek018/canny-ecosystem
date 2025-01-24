@@ -55,7 +55,7 @@ export function LWFWrapper({
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
                 "flex items-center gap-1",
-                !hasPermission(`${role}`, `${updateRole}:statutory_fields_lwf`) &&
+                !hasPermission(role, `${updateRole}:statutory_fields_lwf`) &&
                   "hidden"
               )}
             >

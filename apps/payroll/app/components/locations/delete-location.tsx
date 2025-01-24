@@ -57,7 +57,7 @@ export const DeleteLocation = ({ locationId }: { locationId: string }) => {
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "text-[13px] h-9 hidden",
-          hasPermission(`${role}`, `${deleteRole}:setting_locations`) && "flex"
+          hasPermission(role, `${deleteRole}:setting_locations`) && "flex"
         )}
       >
         Delete Location

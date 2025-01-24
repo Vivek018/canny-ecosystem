@@ -46,7 +46,7 @@ export const EmployeeStatutoryCard: React.FC<{
             buttonVariants({ variant: "outline" }),
             "bg-card",
             !employeeStatutory && "hidden",
-            !hasPermission(`${role}`, `${updateRole}:employee_statutory`) &&
+            !hasPermission(role, `${updateRole}:employee_statutory`) &&
               "hidden"
           )}
         >

@@ -80,7 +80,7 @@ export const CompanyRegistrationDetails = ({
                     fields.registration_number.name
                   )}`,
                   readOnly: !hasPermission(
-                    `${role}`,
+                    role,
                     `${updateRole}:setting_general`
                   ),
                 }}
@@ -93,7 +93,7 @@ export const CompanyRegistrationDetails = ({
                     fields.gst_number.name
                   )}`,
                   readOnly: !hasPermission(
-                    `${role}`,
+                    role,
                     `${updateRole}:setting_general`
                   ),
                 }}
@@ -106,7 +106,7 @@ export const CompanyRegistrationDetails = ({
                     fields.pan_number.name
                   )}`,
                   readOnly: !hasPermission(
-                    `${role}`,
+                    role,
                     `${updateRole}:setting_general`
                   ),
                 }}
@@ -119,7 +119,7 @@ export const CompanyRegistrationDetails = ({
                     fields.pf_number.name
                   )}`,
                   readOnly: !hasPermission(
-                    `${role}`,
+                    role,
                     `${updateRole}:setting_general`
                   ),
                 }}
@@ -132,7 +132,7 @@ export const CompanyRegistrationDetails = ({
                     fields.esic_number.name
                   )}`,
                   readOnly: !hasPermission(
-                    `${role}`,
+                    role,
                     `${updateRole}:setting_general`
                   ),
                 }}
@@ -145,7 +145,7 @@ export const CompanyRegistrationDetails = ({
                     fields.lwf_number.name
                   )}`,
                   readOnly: !hasPermission(
-                    `${role}`,
+                    role,
                     `${updateRole}:setting_general`
                   ),
                 }}
@@ -158,7 +158,7 @@ export const CompanyRegistrationDetails = ({
                     fields.pt_number.name
                   )}`,
                   readOnly: !hasPermission(
-                    `${role}`,
+                    role,
                     `${updateRole}:setting_general`
                   ),
                 }}
@@ -170,8 +170,7 @@ export const CompanyRegistrationDetails = ({
           <CardFooter
             className={cn(
               "border-t pt-6 flex justify-between",
-              !hasPermission(`${role}`, `${updateRole}:setting_general`) &&
-                "hidden"
+              !hasPermission(role, `${updateRole}:setting_general`) && "hidden"
             )}
           >
             <div>Please use 15 characters at maximum.</div>

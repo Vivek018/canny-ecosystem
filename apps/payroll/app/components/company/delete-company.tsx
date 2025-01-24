@@ -61,7 +61,7 @@ export const DeleteCompany = ({ companyId }: { companyId: string }) => {
   return (
     <Card
       className={cn(
-        hasPermission(`${role}`, `${deleteRole}:setting_general`)
+        hasPermission(role, `${deleteRole}:setting_general`)
           ? "border-destructive"
           : " hidden"
       )}

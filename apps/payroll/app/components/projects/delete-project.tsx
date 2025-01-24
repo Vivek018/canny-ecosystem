@@ -57,7 +57,7 @@ export const DeleteProject = ({ projectId }: { projectId: string }) => {
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "text-[13px] h-9 hidden",
-          hasPermission(`${role}`, `${deleteRole}:projects`) && "flex"
+          hasPermission(role, `${deleteRole}:projects`) && "flex"
         )}
       >
         Delete Project

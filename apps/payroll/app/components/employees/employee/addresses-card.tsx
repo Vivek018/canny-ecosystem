@@ -61,7 +61,7 @@ export const AddressItem = ({ address }: { address: EmployeeAddress }) => {
                     buttonVariants({ variant: "muted" }),
                     "px-2.5 h-min",
                     !hasPermission(
-                      `${role}`,
+                      role,
                       `${updateRole}:employee_addresses`
                     ) && "hidden"
                   )}
@@ -80,7 +80,7 @@ export const AddressItem = ({ address }: { address: EmployeeAddress }) => {
                 !address.latitude &&
                   !address.longitude &&
                   !hasPermission(
-                    `${role}`,
+                    role,
                     `${deleteRole}:employee_addresses`
                   ) &&
                   "hidden"
@@ -116,7 +116,7 @@ export const AddressItem = ({ address }: { address: EmployeeAddress }) => {
                   className={cn(
                     (!address.latitude && !address.longitude) ||
                       (!hasPermission(
-                        `${role}`,
+                        role,
                         `${deleteRole}:employee_addresses`
                       ) &&
                         "hidden")
@@ -169,14 +169,14 @@ export const EmployeeAddressesCard = ({
         <div>
           <Link
             to={
-              hasPermission(`${role}`, `${updateRole}:employee_addresses`)
+              hasPermission(role, `${updateRole}:employee_addresses`)
                 ? "add-employee-address"
                 : DEFAULT_ROUTE
             }
             className={cn(
               buttonVariants({ variant: "outline" }),
               "bg-card",
-              !hasPermission(`${role}`, `${updateRole}:employee_addresses`) &&
+              !hasPermission(role, `${updateRole}:employee_addresses`) &&
                 "hidden"
             )}
           >

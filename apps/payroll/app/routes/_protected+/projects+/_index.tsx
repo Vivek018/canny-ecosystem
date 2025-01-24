@@ -79,7 +79,7 @@ export default function ProjectsIndex() {
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
                 "flex items-center gap-1",
-                !hasPermission(`${role}`, `${updateRole}:projects`) && "hidden"
+                !hasPermission(role, `${updateRole}:projects`) && "hidden"
               )}
             >
               <span>Add</span>

@@ -70,8 +70,7 @@ export default function Users() {
             className={cn(
               buttonVariants({ variant: "primary-outline" }),
               "flex items-center gap-1",
-              !hasPermission(`${role}`, `${updateRole}:setting_users`) &&
-                "hidden"
+              !hasPermission(role, `${updateRole}:setting_users`) && "hidden"
             )}
           >
             <span>Add</span>

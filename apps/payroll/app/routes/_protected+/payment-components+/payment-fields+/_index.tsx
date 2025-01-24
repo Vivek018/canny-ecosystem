@@ -67,8 +67,7 @@ export default function PaymentFieldsIndex() {
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
                 "flex items-center gap-1",
-                !hasPermission(`${role}`, `${updateRole}:payment_fields`) &&
-                  "hidden"
+                !hasPermission(role, `${updateRole}:payment_fields`) && "hidden"
               )}
             >
               <span>Add</span>
