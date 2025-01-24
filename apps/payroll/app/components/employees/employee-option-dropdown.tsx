@@ -65,7 +65,7 @@ export const EmployeeOptionsDropdown = ({
           <DropdownMenuItem
             className={cn(
               employee.is_active && "hidden",
-              hasPermission(role, `${updateRole}:employees`) && "hidden"
+              !hasPermission(role, `${updateRole}:employees`) && "hidden"
             )}
             onClick={handleMarkAsActive}
           >
