@@ -1,9 +1,11 @@
 import {
   getValidDateForInput,
+  hasPermission,
   isGoodStatus,
   ProjectSchema,
   statusArray,
   transformStringArrayIntoOptions,
+  updateRole,
 } from "@canny_ecosystem/utils";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
@@ -51,12 +53,21 @@ import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { CompanyListsWrapper } from "@/components/projects/company-lists-wrapper";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { DEFAULT_ROUTE } from "@/constant";
 
 export const CREATE_PROJECT = "create-project";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(`${user?.role!}`, `${updateRole}:projects`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
     const companyOptionsPromise = getCompanies({ supabase }).then(
       ({ data, error }) => {
@@ -67,7 +78,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
           return { data: companyOptions, error };
         }
         return { data: null, error };
-      },
+      }
     );
 
     return defer({
@@ -82,7 +93,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         companyId: null,
         companyOptionsPromise: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -101,7 +112,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -119,7 +130,7 @@ export async function action({
     }
     return json(
       { status: "error", message: "Project creation failed", error },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json(
@@ -128,7 +139,7 @@ export async function action({
         message: "An error occurred",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -230,7 +241,7 @@ export default function CreateProject({
                       type: "text",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.project_code.name,
+                      fields.project_code.name
                     )}`,
                   }}
                   labelProps={{
@@ -244,7 +255,7 @@ export default function CreateProject({
                       type: "text",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.project_type.name,
+                      fields.project_type.name
                     )}`,
                   }}
                   labelProps={{
@@ -261,7 +272,7 @@ export default function CreateProject({
                     placeholder: `Select ${fields.status.name}`,
                   }}
                   options={transformStringArrayIntoOptions(
-                    statusArray as unknown as string[],
+                    statusArray as unknown as string[]
                   )}
                   labelProps={{
                     children: fields.status.name,
@@ -301,11 +312,11 @@ export default function CreateProject({
                   inputProps={{
                     ...getInputProps(fields.start_date, { type: "date" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.start_date.name,
+                      fields.start_date.name
                     )}`,
                     max: getValidDateForInput(new Date().toISOString()),
                     defaultValue: getValidDateForInput(
-                      fields.start_date.initialValue,
+                      fields.start_date.initialValue
                     ),
                   }}
                   labelProps={{
@@ -319,11 +330,11 @@ export default function CreateProject({
                       type: "date",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.estimated_end_date.name,
+                      fields.estimated_end_date.name
                     )}`,
                     min: getValidDateForInput(fields.start_date.value),
                     defaultValue: getValidDateForInput(
-                      fields.estimated_end_date.initialValue,
+                      fields.estimated_end_date.initialValue
                     ),
                   }}
                   labelProps={{
@@ -336,7 +347,7 @@ export default function CreateProject({
                 textareaProps={{
                   ...getTextareaProps(fields.risk_assessment),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.risk_assessment.name,
+                    fields.risk_assessment.name
                   )}`,
                 }}
                 labelProps={{
@@ -348,7 +359,7 @@ export default function CreateProject({
                 textareaProps={{
                   ...getTextareaProps(fields.quality_standards),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.quality_standards.name,
+                    fields.quality_standards.name
                   )}`,
                 }}
                 labelProps={{
@@ -360,12 +371,12 @@ export default function CreateProject({
                 textareaProps={{
                   ...getTextareaProps(fields.health_safety_requirements),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.health_safety_requirements.name,
+                    fields.health_safety_requirements.name
                   )}`,
                 }}
                 labelProps={{
                   children: replaceUnderscore(
-                    fields.health_safety_requirements.name,
+                    fields.health_safety_requirements.name
                   ),
                 }}
                 errors={fields.health_safety_requirements.errors}
@@ -374,12 +385,12 @@ export default function CreateProject({
                 textareaProps={{
                   ...getTextareaProps(fields.environmental_considerations),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.environmental_considerations.name,
+                    fields.environmental_considerations.name
                   )}`,
                 }}
                 labelProps={{
                   children: replaceUnderscore(
-                    fields.environmental_considerations.name,
+                    fields.environmental_considerations.name
                   ),
                 }}
                 errors={fields.environmental_considerations.errors}

@@ -1,3 +1,4 @@
+import { useUserRole } from "@/utils/user";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,6 +14,7 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { ErrorList } from "@canny_ecosystem/ui/forms";
 import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { deleteRole, hasPermission } from "@canny_ecosystem/utils";
 import { DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
@@ -24,6 +26,7 @@ export const DeleteAddress = ({
   employeeId: string;
   addressId: string;
 }) => {
+  const { role } = useUserRole();
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [inputError, setInputError] = useState<string[]>([]);
@@ -36,7 +39,7 @@ export const DeleteAddress = ({
   };
 
   const handleDeleteAddress = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -46,7 +49,7 @@ export const DeleteAddress = ({
           method: "post",
           action: `/employees/${employeeId}/${addressId}/delete-employee-address`,
           replace: true,
-        },
+        }
       );
     } else {
       e.preventDefault();
@@ -59,7 +62,9 @@ export const DeleteAddress = ({
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
-          "text-[13px] h-9",
+          "text-[13px] h-9 hidden",
+          hasPermission(`${role}`, `${deleteRole}:employee_addresses`) &&
+            "flex"
         )}
       >
         Delete Address

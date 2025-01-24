@@ -13,6 +13,8 @@ import {
   getValidDateForInput,
   getInitialValueFromZod,
   EmployeeLinkSchema,
+  hasPermission,
+  updateRole,
 } from "@canny_ecosystem/utils";
 import {
   FormProvider,
@@ -34,6 +36,7 @@ import {
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { useState } from "react";
 import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
+import { useUserRole } from "@/utils/user";
 
 export function EmployeeDialog({
   employee,
@@ -47,6 +50,7 @@ export function EmployeeDialog({
   };
   env: SupabaseEnv;
 }) {
+  const { role } = useUserRole();
   const { supabase } = useSupabase({ env });
   const navigation = useNavigation();
 
@@ -111,7 +115,10 @@ export function EmployeeDialog({
       <DialogTrigger asChild>
         <Button
           variant="ghost"
-          className="item-start justify-start px-2 font-normal w-full"
+          className={cn(
+            "item-start justify-start px-2 font-normal w-full hidden",
+            hasPermission(`${role}`, `${updateRole}:employees`) && "flex"
+          )}
           onClick={openPaymentTemplateDialog}
         >
           Link template
@@ -148,7 +155,7 @@ export function EmployeeDialog({
                   placeholder: replaceUnderscore(fields.effective_from.name),
                   max: getValidDateForInput(new Date().toISOString()),
                   defaultValue: getValidDateForInput(
-                    fields.effective_from.initialValue,
+                    fields.effective_from.initialValue
                   ),
                 }}
                 labelProps={{
@@ -163,7 +170,7 @@ export function EmployeeDialog({
                   placeholder: replaceUnderscore(fields.effective_to.name),
                   min: getValidDateForInput(fields.effective_from.value),
                   defaultValue: getValidDateForInput(
-                    fields.effective_to.initialValue,
+                    fields.effective_to.initialValue
                   ),
                 }}
                 labelProps={{

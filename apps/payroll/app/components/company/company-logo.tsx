@@ -50,6 +50,7 @@ export const CompanyLogo = ({
             style={{ display: "none" }}
             multiple={false}
             onChange={handleUpload}
+            
           />
         </Avatar>
       </div>

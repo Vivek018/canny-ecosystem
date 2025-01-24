@@ -1,3 +1,4 @@
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,7 +20,9 @@ import { useState } from "react";
 
 export const DeleteProfessionalTax = ({
   professionalTaxId,
-}: { professionalTaxId: string }) => {
+}: {
+  professionalTaxId: string;
+}) => {
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [inputError, setInputError] = useState<string[]>([]);
@@ -32,7 +35,7 @@ export const DeleteProfessionalTax = ({
   };
 
   const handleDeleteProfessionalTax = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -42,7 +45,7 @@ export const DeleteProfessionalTax = ({
           method: "post",
           action: `${professionalTaxId}/delete-professional-tax`,
           replace: true,
-        },
+        }
       );
     } else {
       e.preventDefault();
@@ -55,7 +58,7 @@ export const DeleteProfessionalTax = ({
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
-          "text-[13px] h-9",
+          "text-[13px] h-9"
         )}
       >
         Delete Professional Tax

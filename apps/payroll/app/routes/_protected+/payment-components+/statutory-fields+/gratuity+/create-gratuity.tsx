@@ -13,9 +13,11 @@ import { Field } from "@canny_ecosystem/ui/forms";
 import {
   getInitialValueFromZod,
   GratuitySchema,
+  hasPermission,
   isGoodStatus,
   replaceDash,
   replaceUnderscore,
+  updateRole,
 } from "@canny_ecosystem/utils";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
@@ -33,12 +35,23 @@ import {
 import { useEffect, useState } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { UPDATE_GRATUITY } from "./$gratuityId.update-gratuity";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { DEFAULT_ROUTE } from "@/constant";
 
 export const CREATE_GRATUITY = "create-gratuity";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (
+    !hasPermission(`${user?.role!}`, `${updateRole}:statutory_fields_graduity`)
+  ) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
     return json({
       companyId,
@@ -50,7 +63,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         error,
         companyId: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -69,7 +82,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -98,7 +111,7 @@ export async function action({
         message: "Failed to create Gratuity",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -187,7 +200,7 @@ export default function CreateGratuity({
                   }),
                   autoFocus: true,
                   placeholder: replaceUnderscore(
-                    fields.present_day_per_year.name,
+                    fields.present_day_per_year.name
                   ),
                   className: "capitalize",
                 }}
@@ -205,14 +218,14 @@ export default function CreateGratuity({
                   }),
                   autoFocus: true,
                   placeholder: replaceUnderscore(
-                    fields.payment_days_per_year.name,
+                    fields.payment_days_per_year.name
                   ),
                   className: "capitalize",
                 }}
                 labelProps={{
                   className: "capitalize",
                   children: replaceUnderscore(
-                    fields.payment_days_per_year.name,
+                    fields.payment_days_per_year.name
                   ),
                 }}
                 errors={fields.payment_days_per_year.errors}
@@ -225,7 +238,7 @@ export default function CreateGratuity({
                   }),
                   autoFocus: true,
                   placeholder: replaceUnderscore(
-                    fields.max_multiply_limit.name,
+                    fields.max_multiply_limit.name
                   ),
                   className: "capitalize",
                 }}

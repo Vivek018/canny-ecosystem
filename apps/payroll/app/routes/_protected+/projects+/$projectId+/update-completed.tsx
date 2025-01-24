@@ -1,7 +1,15 @@
+import { DEFAULT_ROUTE } from "@/constant";
+import { safeRedirect } from "@/utils/server/http.server";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { updateProject } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { isGoodStatus, z } from "@canny_ecosystem/utils";
+import {
+  hasPermission,
+  isGoodStatus,
+  updateRole,
+  z,
+} from "@canny_ecosystem/utils";
 import { parseWithZod } from "@conform-to/zod";
 import { json, type ActionFunctionArgs } from "@remix-run/node";
 import { useActionData, useNavigate } from "@remix-run/react";
@@ -17,7 +25,14 @@ export async function action({
   request,
 }: ActionFunctionArgs): Promise<Response> {
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
+    const { supabase, headers } = getSupabaseWithHeaders({ request });
+
+    const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+    if (!hasPermission(`${user?.role!}`, `${updateRole}:projects`)) {
+      return safeRedirect(DEFAULT_ROUTE, { headers });
+    }
+
     const formData = await request.formData();
 
     const submission = parseWithZod(formData, {
@@ -27,7 +42,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -59,7 +74,7 @@ export async function action({
         returnTo: "/projects",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

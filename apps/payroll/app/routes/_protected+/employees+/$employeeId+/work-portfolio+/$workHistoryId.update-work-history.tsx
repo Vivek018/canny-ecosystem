@@ -11,7 +11,9 @@ import {
 import { parseWithZod } from "@conform-to/zod";
 import {
   EmployeeWorkHistorySchema,
+  hasPermission,
   isGoodStatus,
+  updateRole,
 } from "@canny_ecosystem/utils";
 import { getEmployeeWorkHistoryById } from "@canny_ecosystem/supabase/queries";
 import { updateEmployeeWorkHistory } from "@canny_ecosystem/supabase/mutations";
@@ -20,6 +22,9 @@ import { Suspense, useEffect } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import type { EmployeeWorkHistoryDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { DEFAULT_ROUTE } from "@/constant";
 
 export const UPDATE_EMPLOYEE_WORK_HISTORY = "update-employee-work-history";
 
@@ -28,11 +33,17 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const employeeId = params.employeeId;
 
   let workHistoryPromise = null;
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(`${user?.role!}`, `${updateRole}:employee_work_history`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
 
   try {
     if (!employeeId) throw new Error("No employeeId provided");
 
-    const { supabase } = getSupabaseWithHeaders({ request });
     if (workHistoryId) {
       workHistoryPromise = getEmployeeWorkHistoryById({
         supabase,
@@ -57,9 +68,15 @@ export async function action({
   params,
 }: ActionFunctionArgs): Promise<Response> {
   const employeeId = params.employeeId;
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(`${user?.role!}`, `${updateRole}:employee_work_history`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
 
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
     const formData = await request.formData();
 
     const submission = parseWithZod(formData, {
@@ -69,7 +86,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -104,7 +121,7 @@ export async function action({
 }
 
 export default function UpdateEmployeeWorkHistory() {
-  const { workHistoryPromise, error } = useLoaderData<typeof loader>();
+  const { workHistoryPromise } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();

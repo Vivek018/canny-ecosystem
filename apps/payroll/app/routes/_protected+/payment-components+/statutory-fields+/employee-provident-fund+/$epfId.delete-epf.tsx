@@ -1,7 +1,14 @@
+import { DEFAULT_ROUTE } from "@/constant";
+import { safeRedirect } from "@/utils/server/http.server";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { deleteEmployeeProvidentFund } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { isGoodStatus } from "@canny_ecosystem/utils";
+import {
+  deleteRole,
+  hasPermission,
+  isGoodStatus,
+} from "@canny_ecosystem/utils";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { json, useActionData, useNavigate } from "@remix-run/react";
 import { useEffect } from "react";
@@ -10,11 +17,22 @@ export async function action({
   request,
   params,
 }: ActionFunctionArgs): Promise<Response> {
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (
+    !hasPermission(
+      `${user?.role!}`,
+      `${deleteRole}:  "statutory_fields_epf",
+`
+    )
+  ) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
+
   const epfId = params.epfId;
 
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
-
     const { status, error } = await deleteEmployeeProvidentFund({
       supabase,
       id: epfId ?? "",
@@ -34,7 +52,7 @@ export async function action({
         message: "Failed to delete EPF",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json(
@@ -43,7 +61,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

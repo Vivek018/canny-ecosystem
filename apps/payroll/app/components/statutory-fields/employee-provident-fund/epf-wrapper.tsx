@@ -7,6 +7,9 @@ import { EPFNoData } from "./epf-no-data";
 import { DeleteEmployeeProvidentFund } from "./delete-employee-provident-fund";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { EMPLOYEE_EPF_PERCENTAGE } from "@canny_ecosystem/utils/constant";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { useUserRole } from "@/utils/user";
 
 type DetailItemProps = {
   label: string;
@@ -32,13 +35,18 @@ export function EPFWrapper({
   > | null;
   error: Error | null | { message: string };
 }) {
+  const { role } = useUserRole();
   const employeeContributionRateText = data?.restrict_employee_contribution
     ? "Restrict Contribution to ₹15,000 of PF Wage"
-    : `${(data?.employee_contribution ?? EMPLOYEE_EPF_PERCENTAGE) * 100}% of Actual Wage`;
+    : `${
+        (data?.employee_contribution ?? EMPLOYEE_EPF_PERCENTAGE) * 100
+      }% of Actual Wage`;
 
   const employerContributionRateText = data?.restrict_employer_contribution
     ? "Restrict Contribution to ₹15,000 of PF Wage"
-    : `${(data?.employer_contribution ?? EMPLOYEE_EPF_PERCENTAGE) * 100}% of Actual Wage`;
+    : `${
+        (data?.employer_contribution ?? EMPLOYEE_EPF_PERCENTAGE) * 100
+      }% of Actual Wage`;
 
   if (error)
     return <ErrorBoundary error={error} message="Failed to load data" />;
@@ -53,7 +61,11 @@ export function EPFWrapper({
           <Link
             prefetch="intent"
             to={`/payment-components/statutory-fields/employee-provident-fund/${data?.id}/update-epf`}
-            className="p-2 rounded-full bg-secondary grid place-items-center"
+            className={cn(
+              "p-2 rounded-full bg-secondary grid place-items-center",
+              !hasPermission(`${role}`, `${updateRole}:statutory_fields_epf`) &&
+                "hidden"
+            )}
           >
             <Icon name="edit" size="sm" />
           </Link>

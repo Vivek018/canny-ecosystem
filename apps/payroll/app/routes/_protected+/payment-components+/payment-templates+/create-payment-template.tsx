@@ -11,9 +11,11 @@ import type { PaymentTemplateComponentDatabaseInsert } from "@canny_ecosystem/su
 import { Card } from "@canny_ecosystem/ui/card";
 import {
   getInitialValueFromZod,
+  hasPermission,
   isGoodStatus,
   PaymentTemplateComponentsSchema,
   PaymentTemplateSchema,
+  updateRole,
   z,
 } from "@canny_ecosystem/utils";
 import { useIsomorphicLayoutEffect } from "@canny_ecosystem/utils/hooks/isomorphic-layout-effect";
@@ -40,6 +42,8 @@ import {
 } from "@/utils/payment";
 import { createPaymentTemplateWithComponents } from "@canny_ecosystem/supabase/mutations";
 import { DEFAULT_ROUTE } from "@/constant";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
 
 export const CREATE_PAYMENT_TEMPLATE = [
   "create-payment-template",
@@ -53,7 +57,14 @@ const SESSION_KEY_PREFIX = "multiStepPaymentTemplateForm_step_";
 const schemas = [PaymentTemplateSchema, PaymentTemplateComponentsSchema];
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(`${user?.role!}`, `${updateRole}:payment_templates`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
+
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
   const url = new URL(request.url);
@@ -331,8 +342,8 @@ export default function CreatePaymentTemplate() {
   }, [step]);
 
   return (
-    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
-      <div className='w-full mx-auto mb-4'>
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
+      <div className="w-full mx-auto mb-4">
         <FormStepHeader
           totalSteps={totalSteps}
           step={step}
@@ -341,13 +352,13 @@ export default function CreatePaymentTemplate() {
       </div>
       <FormProvider context={form.context}>
         <Form
-          method='POST'
-          encType='multipart/form-data'
+          method="POST"
+          encType="multipart/form-data"
           {...getFormProps(form)}
-          className='flex flex-col'
+          className="flex flex-col"
         >
           <Card>
-            <div className='h-[500px] overflow-scroll'>
+            <div className="h-[500px] overflow-scroll">
               {step === 1 ? (
                 <CreatePaymentTemplateDetails
                   key={resetKey}

@@ -11,7 +11,9 @@ import {
 import { parseWithZod } from "@conform-to/zod";
 import {
   EmployeeProvidentFundSchema,
+  hasPermission,
   isGoodStatus,
+  updateRole,
 } from "@canny_ecosystem/utils";
 import { getEmployeeProvidentFundById } from "@canny_ecosystem/supabase/queries";
 import { updateEmployeeProvidentFund } from "@canny_ecosystem/supabase/mutations";
@@ -21,14 +23,22 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { Suspense, useEffect } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import type { EmployeeAddressDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { DEFAULT_ROUTE } from "@/constant";
 
 export const UPDATE_EMPLOYEE_PROVIDENT_FUND = "update-employee-provident-fund";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const epfId = params.epfId;
+  const { supabase,headers } = getSupabaseWithHeaders({ request });
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+  
+    if (!hasPermission(`${user?.role!}`, `${updateRole}:statutory_fields_epf`)) {
+      return safeRedirect(DEFAULT_ROUTE, { headers });
+    }
 
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
 
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 

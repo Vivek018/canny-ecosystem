@@ -4,7 +4,13 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Link } from "@remix-run/react";
 import type { EmployeeProjectAssignmentDataType } from "@canny_ecosystem/supabase/queries";
-import { formatDate, replaceUnderscore } from "@canny_ecosystem/utils";
+import {
+  formatDate,
+  hasPermission,
+  replaceUnderscore,
+  updateRole,
+} from "@canny_ecosystem/utils";
+import { useUserRole } from "@/utils/user";
 
 type DetailItemProps = {
   label: string;
@@ -39,6 +45,7 @@ export const EmployeeProjectAssignmentCard = ({
 }: {
   projectAssignment: EmployeeProjectAssignment | null;
 }) => {
+  const { role } = useUserRole();
   return (
     <Card className="rounded w-full h-full p-4 flex flex-col gap-6">
       <div className="flex justify-between items-center">
@@ -49,7 +56,11 @@ export const EmployeeProjectAssignmentCard = ({
           className={cn(
             buttonVariants({ variant: "outline" }),
             "bg-card",
-            !projectAssignment && "hidden",
+            !hasPermission(
+              `${role}`,
+              `${updateRole}:employee_project_assignment`
+            ) && "hidden",
+            !projectAssignment && "hidden"
           )}
         >
           <Icon name="edit" className="mr-2" />

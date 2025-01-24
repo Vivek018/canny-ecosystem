@@ -4,16 +4,29 @@ import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { json, useLoaderData } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
 import { safeRedirect } from "@/utils/server/http.server";
-import { isGoodStatus, UserSchema } from "@canny_ecosystem/utils";
+import {
+  hasPermission,
+  isGoodStatus,
+  updateRole,
+  UserSchema,
+} from "@canny_ecosystem/utils";
 import { updateUserById } from "@canny_ecosystem/supabase/mutations";
 import { getUserById } from "@canny_ecosystem/supabase/queries";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { DEFAULT_ROUTE } from "@/constant";
 
 export const UPDATE_USER_TAG = "Update User";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const userId = params.userId;
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(`${user?.role!}`, `${updateRole}:setting_users`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
     let userData = null;
 
     if (userId) {
@@ -47,7 +60,7 @@ export async function action({ request }: ActionFunctionArgs) {
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 

@@ -1,7 +1,14 @@
+import { DEFAULT_ROUTE } from "@/constant";
+import { safeRedirect } from "@/utils/server/http.server";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { deleteEmployeeWorkHistory } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { isGoodStatus } from "@canny_ecosystem/utils";
+import {
+  deleteRole,
+  hasPermission,
+  isGoodStatus,
+} from "@canny_ecosystem/utils";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { json, useActionData, useNavigate } from "@remix-run/react";
 import { useEffect } from "react";
@@ -10,11 +17,16 @@ export async function action({
   request,
   params,
 }: ActionFunctionArgs): Promise<Response> {
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(`${user?.role!}`, `${deleteRole}:employee_work_history`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
   const workHistoryId = params.workHistoryId;
   const employeeId = params.employeeId;
 
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
     const { status, error } = await deleteEmployeeWorkHistory({
       supabase,
       id: workHistoryId ?? "",
@@ -36,7 +48,7 @@ export async function action({
         error,
         employeeId,
       },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json({

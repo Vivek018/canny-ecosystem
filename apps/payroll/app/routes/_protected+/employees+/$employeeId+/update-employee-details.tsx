@@ -12,7 +12,7 @@ import {
 } from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { updateEmployee } from "@canny_ecosystem/supabase/mutations";
-import { isGoodStatus, EmployeeSchema } from "@canny_ecosystem/utils";
+import { isGoodStatus, EmployeeSchema, updateRole, hasPermission } from "@canny_ecosystem/utils";
 import { CreateEmployeeDetails } from "@/components/employees/form/create-employee-details";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
 import { Card } from "@canny_ecosystem/ui/card";
@@ -21,14 +21,23 @@ import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import type { EmployeeDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { DEFAULT_ROUTE } from "@/constant";
 
 export const UPDATE_EMPLOYEE = "update-employee";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const employeeId = params.employeeId;
+  const { supabase,headers } = getSupabaseWithHeaders({ request });
+
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+  
+    if (!hasPermission(`${user?.role!}`, `${updateRole}:employee_details`)) {
+      return safeRedirect(DEFAULT_ROUTE, { headers });
+    }
 
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
 
     let employeePromise = null;
 

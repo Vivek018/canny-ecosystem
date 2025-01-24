@@ -4,6 +4,8 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Link } from "@remix-run/react";
 import type { EmployeeBankDetailsDatabaseRow } from "@canny_ecosystem/supabase/types";
+import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { useUserRole } from "@/utils/user";
 
 type DetailItemProps = {
   label: string;
@@ -38,6 +40,7 @@ export const EmployeeBankDetailsCard = ({
 }: {
   bankDetails: EmployeeBankDetails | null;
 }) => {
+  const { role } = useUserRole();
   return (
     <Card className="rounded w-full h-full p-4 flex flex-col gap-6">
       <div className="flex justify-between items-center">
@@ -49,6 +52,8 @@ export const EmployeeBankDetailsCard = ({
             buttonVariants({ variant: "outline" }),
             "bg-card",
             !bankDetails && "hidden",
+            !hasPermission(`${role}`, `${updateRole}:employee_bank_details`) &&
+              "hidden"
           )}
         >
           <Icon name="edit" className="mr-2" />

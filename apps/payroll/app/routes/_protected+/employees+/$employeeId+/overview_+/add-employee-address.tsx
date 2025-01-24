@@ -7,6 +7,8 @@ import {
   isGoodStatus,
   EmployeeAddressesSchema,
   getInitialValueFromZod,
+  hasPermission,
+  updateRole,
 } from "@canny_ecosystem/utils";
 import { CreateEmployeeAddress } from "@/components/employees/form/create-employee-address";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
@@ -14,6 +16,9 @@ import { Card } from "@canny_ecosystem/ui/card";
 import { useEffect, useState } from "react";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { DEFAULT_ROUTE } from "@/constant";
 
 export const ADD_EMPLOYEE_ADDRESS = "add-employee-address";
 
@@ -22,9 +27,15 @@ export async function action({
   params,
 }: ActionFunctionArgs): Promise<Response> {
   const employeeId = params.employeeId;
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(`${user?.role!}`, `${updateRole}:employee_addresses`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
 
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
     const formData = await request.formData();
 
     if (!employeeId) {
@@ -42,7 +53,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 

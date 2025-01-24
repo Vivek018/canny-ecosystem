@@ -5,11 +5,13 @@ import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { safeRedirect } from "@/utils/server/http.server";
 import {
   getInitialValueFromZod,
+  hasPermission,
   isGoodStatus,
   ReimbursementSchema,
   reimbursementStatusArray,
   replaceUnderscore,
   transformStringArrayIntoOptions,
+  updateRole,
 } from "@canny_ecosystem/utils";
 
 import {
@@ -37,11 +39,19 @@ import { UPDATE_REIMBURSEMENTS_TAG } from "../../../approvals+/reimbursements+/$
 import { getUsers } from "@canny_ecosystem/supabase/queries";
 import { useState } from "react";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { DEFAULT_ROUTE } from "@/constant";
 
 export const ADD_REIMBURSEMENTS_TAG = "Add Reimbursements";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
+  const { supabase ,headers} = getSupabaseWithHeaders({ request });
+
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(`${user?.role!}`, `${updateRole}:reimbursements`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
   const employeeId = params.employeeId;
 
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
@@ -67,7 +77,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: submission.status === "error" ? 400 : 200 }
     );
   }
   const reimbursementData = submission.value;
@@ -166,7 +176,7 @@ export default function AddReimbursements({
                     ...getInputProps(fields.status, { type: "text" }),
                   }}
                   placeholder={`Select ${replaceUnderscore(
-                    fields.status.name,
+                    fields.status.name
                   )}`}
                   labelProps={{
                     children: "Status",
@@ -181,7 +191,7 @@ export default function AddReimbursements({
                       type: "number",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.amount.name,
+                      fields.amount.name
                     )}`,
                     className: "",
                   }}

@@ -14,6 +14,8 @@ import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import type { LabourWelfareFundDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { useEffect } from "react";
+import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { useUserRole } from "@/utils/user";
 
 export function LWFWrapper({
   data,
@@ -24,6 +26,7 @@ export function LWFWrapper({
     | null;
   error: Error | null | { message: string };
 }) {
+  const { role } = useUserRole();
   const { isDocument } = useIsDocument();
   const { toast } = useToast();
 
@@ -52,6 +55,8 @@ export function LWFWrapper({
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
                 "flex items-center gap-1",
+                !hasPermission(`${role}`, `${updateRole}:statutory_fields_lwf`) &&
+                  "hidden"
               )}
             >
               <span>Add</span>
@@ -63,7 +68,7 @@ export function LWFWrapper({
           <CommandEmpty
             className={cn(
               "w-full py-40 capitalize text-lg tracking-wide text-center",
-              !isDocument && "hidden",
+              !isDocument && "hidden"
             )}
           >
             No labour welfare fund found.

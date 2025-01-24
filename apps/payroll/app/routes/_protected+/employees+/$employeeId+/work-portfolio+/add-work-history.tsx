@@ -12,11 +12,13 @@ import {
   EmployeeWorkHistorySchema,
   getInitialValueFromZod,
   getValidDateForInput,
+  hasPermission,
   isGoodStatus,
   positionArray,
   replaceDash,
   replaceUnderscore,
   transformStringArrayIntoOptions,
+  updateRole,
 } from "@canny_ecosystem/utils";
 import {
   FormProvider,
@@ -43,11 +45,20 @@ import { useEffect, useState } from "react";
 import { UPDATE_EMPLOYEE_WORK_HISTORY } from "./$workHistoryId.update-work-history";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { DEFAULT_ROUTE } from "@/constant";
 
 export const ADD_EMPLOYEE_WORK_HISTORY = "add-employee-work-history";
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params, request }: LoaderFunctionArgs) {
   const employeeId = params.employeeId;
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(`${user?.role!}`, `${updateRole}:employee_work_history`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
 
   try {
     if (!employeeId) {
@@ -57,7 +68,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
           message: "Invalid employee id",
           employeeId: null,
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -74,7 +85,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
         error,
         employeeId: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -96,7 +107,7 @@ export async function action({
           message: "Invalid employee id",
           returnTo: "/employees",
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -107,7 +118,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -138,7 +149,7 @@ export async function action({
         error,
         returnTo: `/employees/${employeeId}/work-portfolio`,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -223,7 +234,7 @@ export default function AddEmployeeWorkHistory({
                 key={resetKey}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  positionArray as unknown as string[],
+                  positionArray as unknown as string[]
                 )}
                 inputProps={{
                   ...getInputProps(fields.position, { type: "text" }),
@@ -239,7 +250,7 @@ export default function AddEmployeeWorkHistory({
                   ...getInputProps(fields.company_name, { type: "text" }),
                   autoFocus: true,
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.company_name.name,
+                    fields.company_name.name
                   )}`,
                   className: "capitalize",
                 }}
@@ -264,11 +275,11 @@ export default function AddEmployeeWorkHistory({
                   inputProps={{
                     ...getInputProps(fields.start_date, { type: "date" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.start_date.name,
+                      fields.start_date.name
                     )}`,
                     max: getValidDateForInput(new Date().toISOString()),
                     defaultValue: getValidDateForInput(
-                      fields.start_date.initialValue,
+                      fields.start_date.initialValue
                     ),
                   }}
                   labelProps={{
@@ -282,11 +293,11 @@ export default function AddEmployeeWorkHistory({
                       type: "date",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.end_date.name,
+                      fields.end_date.name
                     )}`,
                     min: getValidDateForInput(fields.start_date.value),
                     defaultValue: getValidDateForInput(
-                      fields.end_date.initialValue,
+                      fields.end_date.initialValue
                     ),
                   }}
                   labelProps={{

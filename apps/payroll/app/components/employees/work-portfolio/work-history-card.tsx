@@ -22,7 +22,14 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import type { EmployeeWorkHistoryDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { DeleteWorkHistory } from "./delete-work-history";
-import { formatDate, replaceUnderscore } from "@canny_ecosystem/utils";
+import {
+  deleteRole,
+  formatDate,
+  hasPermission,
+  replaceUnderscore,
+  updateRole,
+} from "@canny_ecosystem/utils";
+import { useUserRole } from "@/utils/user";
 
 type DetailItemProps = {
   label: string;
@@ -50,7 +57,10 @@ type EmployeeWorkHistory = Omit<
 
 export const WorkHistoryItem = ({
   workHistory,
-}: { workHistory: EmployeeWorkHistory }) => {
+}: {
+  workHistory: EmployeeWorkHistory;
+}) => {
+  const { role } = useUserRole();
   return (
     <Card
       key={workHistory.id}
@@ -70,6 +80,10 @@ export const WorkHistoryItem = ({
                   className={cn(
                     buttonVariants({ variant: "muted" }),
                     "px-2.5 h-min",
+                    !hasPermission(
+                      `${role}`,
+                      `${updateRole}:employee_work_history`
+                    ) && "hidden"
                   )}
                 >
                   <Icon name="edit" size="xs" />
@@ -82,7 +96,11 @@ export const WorkHistoryItem = ({
             <DropdownMenuTrigger
               className={cn(
                 buttonVariants({ variant: "muted" }),
-                "px-2.5 h-min",
+                "px-2.5 h-min hidden",
+                hasPermission(
+                  `${role}`,
+                  `${deleteRole}:employee_work_history`
+                ) && "flex"
               )}
             >
               <Icon name="dots-vertical" size="xs" />
@@ -128,6 +146,7 @@ export const EmployeeWorkHistoriesCard = ({
 }: {
   employeeWorkHistories: EmployeeWorkHistory[] | null;
 }) => {
+  const { role } = useUserRole();
   return (
     <Card className="rounded w-full h-full p-4">
       <div className="flex justify-between items-center mb-6">
@@ -135,7 +154,14 @@ export const EmployeeWorkHistoriesCard = ({
         <div>
           <Link
             to="add-work-history"
-            className={cn(buttonVariants({ variant: "outline" }), "bg-card")}
+            className={cn(
+              buttonVariants({ variant: "outline" }),
+              "bg-card",
+              !hasPermission(
+                `${role}`,
+                `${updateRole}:employee_work_history`
+              ) && "hidden"
+            )}
           >
             <Icon name="plus-circled" className="mr-2" />
             Add

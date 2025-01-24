@@ -22,6 +22,9 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import type { EmployeeGuardianDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { DeleteGuardian } from "./delete-guardian";
+import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { useUserRole } from "@/utils/user";
+import { DEFAULT_ROUTE } from "@/constant";
 
 type DetailItemProps = {
   label: string;
@@ -48,6 +51,7 @@ type EmployeeGuardian = Omit<
 >;
 
 export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
+  const { role } = useUserRole();
   return (
     <Card
       key={guardian.id}
@@ -67,6 +71,10 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
                   className={cn(
                     buttonVariants({ variant: "muted" }),
                     "px-2.5 h-min",
+                    !hasPermission(
+                      `${role}`,
+                      `${updateRole}:employee_guardians`
+                    ) && "hidden"
                   )}
                 >
                   <Icon name="edit" size="xs" />
@@ -79,7 +87,9 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
             <DropdownMenuTrigger
               className={cn(
                 buttonVariants({ variant: "muted" }),
-                "px-2.5 h-min",
+                "px-2.5 h-min hidden",
+                hasPermission(`${role}`, `${deleteRole}:employee_guardians`) &&
+                  "flex"
               )}
             >
               <Icon name="dots-vertical" size="xs" />
@@ -122,7 +132,7 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
                 "dark:mt-[1px]",
                 guardian.is_emergency_contact
                   ? "text-green"
-                  : "text-destructive",
+                  : "text-destructive"
               )}
             />
             <p>Is emergency contact</p>
@@ -135,7 +145,7 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
                 "dark:mt-[1px]",
                 guardian.address_same_as_employee
                   ? "text-green"
-                  : "text-destructive",
+                  : "text-destructive"
               )}
             />
             <p>Address same as employee</p>
@@ -151,14 +161,24 @@ export const EmployeeGuardiansCard = ({
 }: {
   employeeGuardians: EmployeeGuardian[] | null;
 }) => {
+  const { role } = useUserRole();
   return (
     <Card className="rounded w-full h-full p-4">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold">Guardians Details</h2>
         <div>
           <Link
-            to="add-employee-guardian"
-            className={cn(buttonVariants({ variant: "outline" }), "bg-card")}
+            to={
+              hasPermission(`${role}`, `${updateRole}:employee_addresses`)
+                ? "add-employee-address"
+                : DEFAULT_ROUTE
+            }
+            className={cn(
+              buttonVariants({ variant: "outline" }),
+              "bg-card",
+              !hasPermission(`${role}`, `${updateRole}:employee_addresses`) &&
+                "hidden"
+            )}
           >
             <Icon name="plus-circled" className="mr-2" />
             Add

@@ -11,9 +11,11 @@ import {
 } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
 import {
+  hasPermission,
   isGoodStatus,
   PaymentFieldSchema,
   paymentTypeArray,
+  updateRole,
 } from "@canny_ecosystem/utils";
 import { getPaymentFieldById } from "@canny_ecosystem/supabase/queries";
 import { updatePaymentField } from "@canny_ecosystem/supabase/mutations";
@@ -21,15 +23,22 @@ import { Suspense, useEffect } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { ErrorBoundary } from "@/components/error-boundary";
 import type { PaymentFieldDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { DEFAULT_ROUTE } from "@/constant";
 
 export const UPDATE_PAYMENT_FIELD = "update-payment-field";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const paymentFieldId = params.paymentFieldId;
+  const { supabase,headers } = getSupabaseWithHeaders({ request });
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(`${user?.role!}`, `${updateRole}:payment_fields`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
 
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
-
     let paymentFieldPromise = null;
 
     if (paymentFieldId) {
@@ -49,7 +58,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         error,
         paymentFieldPromise: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -65,7 +74,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -93,7 +102,7 @@ export async function action({
         message: "Payment Field update failed",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json(
@@ -102,7 +111,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

@@ -1,25 +1,10 @@
-import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { getCompanyById } from "@canny_ecosystem/supabase/queries";
-import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
+import { useUserRole } from "@/utils/user";
 import { SecondaryMenu } from "@canny_ecosystem/ui/secondary-menu";
-import { json, type LoaderFunctionArgs } from "@remix-run/node";
-import { Link, Outlet, useLoaderData, useLocation } from "@remix-run/react";
-
-export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data, error } = await getCompanyById({ supabase, id: companyId });
-
-  if (error || !data) {
-    throw new Error(`Company not found${error}`);
-  }
-
-  return json({ data });
-}
+import { hasPermission, readRole } from "@canny_ecosystem/utils";
+import { Link, Outlet, useLocation } from "@remix-run/react";
 
 export default function Account() {
-  const { data } = useLoaderData<typeof loader>();
-
+  const { role } = useUserRole();
   const { pathname } = useLocation();
 
   return (
@@ -30,7 +15,7 @@ export default function Account() {
             { label: "Account", path: "/user/account" },
             { label: "Help", path: "/user/help" },
             { label: "Feedback Form", path: "/user/feedback-form" },
-            data.company_type === "app_creator"
+            hasPermission(role, `${readRole}:feedback_list`)
               ? { label: "Feedback List", path: "/user/feedback-list" }
               : {},
           ]}

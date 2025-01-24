@@ -1,3 +1,4 @@
+import { useUserRole } from "@/utils/user";
 import { Button } from "@canny_ecosystem/ui/button";
 import {
   DropdownMenu,
@@ -6,15 +7,23 @@ import {
   DropdownMenuTrigger,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
 import { useSearchParams } from "@remix-run/react";
 
 export function ImportReimbursementMenu() {
+  const { role } = useUserRole();
   const [searchParams, setSearchParams] = useSearchParams();
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger
+        asChild
+        className={cn(
+          !hasPermission(`${role}`, `${updateRole}:reimbursements`) && "hidden"
+        )}
+      >
         <Button variant="outline" size="icon" className="h-10 w-[2.5rem]">
           <Icon name="plus" className="h-[18px] w-[18px]" />
         </Button>
@@ -24,7 +33,7 @@ export function ImportReimbursementMenu() {
           onClick={() => {
             searchParams.set(
               "step",
-              modalSearchParamNames.import_reimbursement,
+              modalSearchParamNames.import_reimbursement
             );
             setSearchParams(searchParams);
           }}

@@ -1,3 +1,4 @@
+import { useUserRole } from "@/utils/user";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,13 +15,17 @@ import { ErrorList } from "@canny_ecosystem/ui/forms";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { deleteRole, hasPermission } from "@canny_ecosystem/utils";
 import { DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
 export const DeleteEmployeeProvidentFund = ({
   employeeProvidentFundId,
-}: { employeeProvidentFundId: string }) => {
+}: {
+  employeeProvidentFundId: string;
+}) => {
+  const { role } = useUserRole();
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [inputError, setInputError] = useState<string[]>([]);
@@ -33,7 +38,7 @@ export const DeleteEmployeeProvidentFund = ({
   };
 
   const handleDeleteEPF = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -43,7 +48,7 @@ export const DeleteEmployeeProvidentFund = ({
           method: "post",
           action: `${employeeProvidentFundId}/delete-epf`,
           replace: true,
-        },
+        }
       );
     } else {
       e.preventDefault();
@@ -57,6 +62,8 @@ export const DeleteEmployeeProvidentFund = ({
         className={cn(
           buttonVariants({ variant: "destructive-outline" }),
           "text-sm h-9 flex gap-1 items-center",
+          !hasPermission(`${role}`, `${deleteRole}:statutory_fields_epf`) &&
+            "hidden"
         )}
       >
         <Icon name="trash" size="md" />

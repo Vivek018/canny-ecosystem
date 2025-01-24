@@ -35,7 +35,7 @@ export function ProjectOverviewWrapper({
         <div className="flex flex-col w-full gap-6">
           <ProjectHeader project={data} />
           <div className="flex flex-col w-full justify-between lg:flex-row gap-6">
-            <ProjectDetails project={data} />
+            <ProjectDetails project={data as any} />
             <ProjectInformationCard project={data} />
           </div>
         </div>

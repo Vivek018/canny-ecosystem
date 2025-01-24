@@ -8,6 +8,8 @@ import {
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useNavigate, useSubmit } from "@remix-run/react";
 import { DeletePaymentField } from "./delete-payment-field";
+import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { useUserRole } from "@/utils/user";
 
 export const PaymentFieldOptionsDropdown = ({
   paymentField,
@@ -20,6 +22,7 @@ export const PaymentFieldOptionsDropdown = ({
   };
   triggerChild: React.ReactElement;
 }) => {
+  const { role } = useUserRole();
   const submit = useSubmit();
   const navigate = useNavigate();
 
@@ -33,7 +36,7 @@ export const PaymentFieldOptionsDropdown = ({
       {
         method: "POST",
         action: `/payment-components/payment-fields/${paymentField.id}/update-payment-field-status`,
-      },
+      }
     );
   };
 
@@ -47,20 +50,18 @@ export const PaymentFieldOptionsDropdown = ({
       {
         method: "POST",
         action: `/payment-components/payment-fields/${paymentField.id}/update-payment-field-status`,
-      },
+      }
     );
   };
 
   const handleEdit = () => {
     navigate(
-      `/payment-components/payment-fields/${paymentField.id}/update-payment-field`,
+      `/payment-components/payment-fields/${paymentField.id}/update-payment-field`
     );
   };
 
   const handleReports = () => {
-    navigate(
-      `/payment-components/payment-fields/${paymentField.id}/reports`,
-    );
+    navigate(`/payment-components/payment-fields/${paymentField.id}/reports`);
   };
 
   return (
@@ -68,31 +69,55 @@ export const PaymentFieldOptionsDropdown = ({
       {triggerChild}
       <DropdownMenuContent sideOffset={10} align="end">
         <DropdownMenuGroup>
-          <DropdownMenuItem
-          onClick={handleReports}>
+          <DropdownMenuItem onClick={handleReports}>
             View Report
           </DropdownMenuItem>
         </DropdownMenuGroup>
 
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator
+          className={cn(
+            !hasPermission(`${role}`, `${updateRole}:payment_fields`) &&
+              !hasPermission(`${role}`, `${deleteRole}:payment_fields`) &&
+              "hidden"
+          )}
+        />
 
         <DropdownMenuGroup>
           <DropdownMenuItem
-            className={cn(paymentField.is_active && "hidden")}
+            className={cn(
+              paymentField.is_active && "hidden",
+              !hasPermission(`${role}`, `${updateRole}:payment_fields`) &&
+                "hidden"
+            )}
             onClick={handleMarkAsActive}
           >
             Make as Active
           </DropdownMenuItem>
           <DropdownMenuItem
-            className={cn(!paymentField.is_active && "hidden")}
+            className={cn(
+              !paymentField.is_active && "hidden",
+              !hasPermission(`${role}`, `${updateRole}:payment_fields`) &&
+                "hidden"
+            )}
             onClick={handleMarkAsInactive}
           >
             Make as Inactive
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleEdit}>
+          <DropdownMenuItem
+            onClick={handleEdit}
+            className={cn(
+              "hidden",
+              hasPermission(`${role}`, `${updateRole}:payment_fields`) && "flex"
+            )}
+          >
             Edit payment field
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
+          <DropdownMenuSeparator
+            className={cn(
+              "hidden",
+              hasPermission(`${role}`, `${deleteRole}:payment_fields`) && "flex"
+            )}
+          />
           <DeletePaymentField paymentFieldId={paymentField.id} />
         </DropdownMenuGroup>
       </DropdownMenuContent>

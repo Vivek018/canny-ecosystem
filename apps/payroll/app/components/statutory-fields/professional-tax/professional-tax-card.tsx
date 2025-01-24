@@ -23,7 +23,12 @@ import type {
   ProfessionalTaxGrossSalaryRangeType,
 } from "@canny_ecosystem/supabase/types";
 import { DeleteProfessionalTax } from "./delete-professional-tax";
-import { replaceUnderscore } from "@canny_ecosystem/utils";
+import {
+  deleteRole,
+  hasPermission,
+  replaceUnderscore,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import { Button } from "@canny_ecosystem/ui/button";
 import {
   Dialog,
@@ -34,6 +39,8 @@ import {
 } from "@canny_ecosystem/ui/dialog";
 import { Input } from "@canny_ecosystem/ui/input";
 import { Fragment } from "react";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { useUserRole } from "@/utils/user";
 
 type DetailItemProps = {
   label: string;
@@ -62,8 +69,9 @@ export function ProfessionalTaxCard({
     "created_at" | "updated_at"
   >;
 }) {
+  const { role } = useUserRole();
   const grossSalaryRangeJson = JSON.parse(
-    String(professionalTax?.gross_salary_range) ?? "",
+    String(professionalTax?.gross_salary_range) ?? ""
   ) as ProfessionalTaxGrossSalaryRangeType;
 
   return (
@@ -82,7 +90,13 @@ export function ProfessionalTaxCard({
                 <Link
                   prefetch="intent"
                   to={`${professionalTax.id}/update-professional-tax`}
-                  className="p-2 rounded-md bg-secondary grid place-items-center"
+                  className={cn(
+                    "p-2 rounded-md bg-secondary grid place-items-center",
+                    !hasPermission(
+                      `${role}`,
+                      `${updateRole}:statutory_fields_pf`
+                    ) && "hidden"
+                  )}
                 >
                   <Icon name="edit" size="xs" />
                 </Link>
@@ -91,7 +105,15 @@ export function ProfessionalTaxCard({
             </Tooltip>
           </TooltipProvider>
           <DropdownMenu>
-            <DropdownMenuTrigger className="p-2 py-2 rounded-md bg-secondary grid place-items-center">
+            <DropdownMenuTrigger
+              className={cn(
+                "p-2 py-2 rounded-md bg-secondary grid place-items-center",
+                !hasPermission(
+                  `${role}`,
+                  `${deleteRole}:statutory_fields_pf`
+                ) && "hidden"
+              )}
+            >
               <Icon name="dots-vertical" size="xs" />
             </DropdownMenuTrigger>
             <DropdownMenuContent sideOffset={10} align="end">

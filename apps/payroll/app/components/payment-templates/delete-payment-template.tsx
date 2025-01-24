@@ -1,3 +1,4 @@
+import { useUserRole } from "@/utils/user";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,6 +14,7 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { ErrorList } from "@canny_ecosystem/ui/forms";
 import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { deleteRole, hasPermission } from "@canny_ecosystem/utils";
 import { DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
@@ -22,6 +24,7 @@ export const DeletePaymentTemplate = ({
 }: {
   paymentTemplateId: string;
 }) => {
+  const { role } = useUserRole();
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [inputError, setInputError] = useState<string[]>([]);
@@ -57,7 +60,8 @@ export const DeletePaymentTemplate = ({
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
-          "text-[13px] h-9"
+          "text-[13px] h-9 hidden",
+          hasPermission(`${role}`, `${deleteRole}:payment_templates`) && "flex"
         )}
       >
         Delete Payment Template
@@ -70,21 +74,21 @@ export const DeletePaymentTemplate = ({
             payment template and remove it's data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <div className='py-4'>
-          <p className='text-sm text-foreground/80'>
+        <div className="py-4">
+          <p className="text-sm text-foreground/80">
             Please type{" "}
-            <i className='text-foreground font-medium'>{DELETE_TEXT}</i> to
+            <i className="text-foreground font-medium">{DELETE_TEXT}</i> to
             confirm.
           </p>
           <Input
-            type='text'
+            type="text"
             value={inputValue}
             onChange={(e) => {
               setInputValue(e.target.value);
               setInputError([]);
             }}
-            className='border border-input rounded-md h-10 w-full'
-            placeholder='Confirm your action'
+            className="border border-input rounded-md h-10 w-full"
+            placeholder="Confirm your action"
             onPaste={(e) => {
               e.preventDefault();
               return false;

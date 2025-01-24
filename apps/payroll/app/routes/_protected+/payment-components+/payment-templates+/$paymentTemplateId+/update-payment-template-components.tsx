@@ -11,8 +11,10 @@ import {
 } from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import {
+  hasPermission,
   isGoodStatus,
   PaymentTemplateComponentsSchema,
+  updateRole,
 } from "@canny_ecosystem/utils";
 import { Suspense, useEffect, useState } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
@@ -42,6 +44,9 @@ import {
   getValueforESI,
 } from "@/utils/payment";
 import { usePaymentComponentsStore } from "@/store/payment-components";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { DEFAULT_ROUTE } from "@/constant";
 
 export const UPDATE_PAYMENT_TEMPLATE_COMPONENTS =
   "update-payment-template-componetns";
@@ -53,10 +58,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
+  const { supabase ,headers} = getSupabaseWithHeaders({ request });
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(`${user?.role!}`, `${updateRole}:payment_templates`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
 
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
-
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
     const { data: paymentFieldNamesData } =
@@ -186,7 +195,7 @@ export default function UpdatePaymentTemplateComonents() {
       <Await resolve={paymentTemplateWithComponentsPromise}>
         {(resolvedData) => {
           if (!resolvedData)
-            return <ErrorBoundary message='Failed to load payment template' />;
+            return <ErrorBoundary message="Failed to load payment template" />;
           return (
             <UpdatePaymentTemplateComponentsWrapper
               data={resolvedData?.data}
@@ -216,7 +225,7 @@ export function UpdatePaymentTemplateComponentsWrapper({
 
   const { toast } = useToast();
   const navigate = useNavigate();
-  
+
   const [resetKey, setResetKey] = useState(Date.now());
 
   useEffect(() => {
@@ -357,13 +366,13 @@ export function UpdatePaymentTemplateComponentsWrapper({
   ]);
 
   return (
-    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
       <FormProvider context={form.context}>
         <Form
-          method='POST'
-          encType='multipart/form-data'
+          method="POST"
+          encType="multipart/form-data"
           {...getFormProps(form)}
-          className='flex flex-col'
+          className="flex flex-col"
         >
           <Card>
             <CreatePaymentTemplateComponentDetails
@@ -373,7 +382,11 @@ export function UpdatePaymentTemplateComponentsWrapper({
               env={env}
               isUpdate={true}
             />
-            <FormButtons form={form} setResetKey={setResetKey} isSingle={true} />
+            <FormButtons
+              form={form}
+              setResetKey={setResetKey}
+              isSingle={true}
+            />
           </Card>
         </Form>
       </FormProvider>

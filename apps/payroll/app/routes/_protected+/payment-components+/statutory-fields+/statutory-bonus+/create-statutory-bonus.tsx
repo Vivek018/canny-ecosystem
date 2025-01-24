@@ -12,12 +12,14 @@ import {
 import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import {
   getInitialValueFromZod,
+  hasPermission,
   isGoodStatus,
   replaceDash,
   replaceUnderscore,
   statutoryBonusPayFrequencyArray,
   StatutoryBonusSchema,
   transformStringArrayIntoOptions,
+  updateRole,
 } from "@canny_ecosystem/utils";
 import { payoutMonths } from "@canny_ecosystem/utils/constant";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
@@ -36,14 +38,47 @@ import {
 import { useEffect, useState } from "react";
 import { UPDATE_STATUTORY_BONUS } from "./$sbId.update-statutory-bonus";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { DEFAULT_ROUTE } from "@/constant";
+import { safeRedirect } from "@/utils/server/http.server";
 
 export const CREATE_STATUTORY_BONUS = "create-statutory-bonus";
+
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (
+    !hasPermission(
+      `${user?.role!}`,
+      `${updateRole}:statutory_fields_statutory_bonus `
+    )
+  ) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
+
+  try {
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    return json({ status: "success", message: "Company ID found", companyId });
+  } catch (error) {
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 }
+    );
+  }
+};
 
 export const action = async ({
   request,
 }: ActionFunctionArgs): Promise<Response> => {
+  const { supabase } = getSupabaseWithHeaders({ request });
+
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
     const formData = await request.formData();
 
     const submission = parseWithZod(formData, {
@@ -53,7 +88,7 @@ export const action = async ({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -82,24 +117,7 @@ export const action = async ({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 },
-    );
-  }
-};
-
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-  try {
-    const { supabase } = getSupabaseWithHeaders({ request });
-    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-    return json({ status: "success", message: "Company ID found", companyId });
-  } catch (error) {
-    return json(
-      {
-        status: "error",
-        message: "An unexpected error occurred",
-        error,
-      },
-      { status: 500 },
+      { status: 500 }
     );
   }
 };
@@ -176,7 +194,7 @@ export default function CreateStatutoryBonus({
                 key={resetKey}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  statutoryBonusPayFrequencyArray as unknown as string[],
+                  statutoryBonusPayFrequencyArray as unknown as string[]
                 )}
                 inputProps={{
                   ...getInputProps(fields.payment_frequency, { type: "text" }),

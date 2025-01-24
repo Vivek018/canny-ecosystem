@@ -2,6 +2,8 @@ import {
   isGoodStatus,
   SiteSchema,
   replaceUnderscore,
+  hasPermission,
+  updateRole,
 } from "@canny_ecosystem/utils";
 import {
   CheckboxField,
@@ -43,21 +45,29 @@ import { statesAndUTs } from "@canny_ecosystem/utils/constant";
 import { UPDATE_SITE } from "./$siteId.update-site";
 import { getLocationsForSelectByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { LocationsListWrapper } from "@/components/projects/sites/locations-list-wrapper";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { DEFAULT_ROUTE } from "@/constant";
 
 export const CREATE_SITE = "create-site";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const projectId = params.projectId;
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(`${user?.role!}`, `${updateRole}:project_sites`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
 
   try {
     if (!projectId) throw new Error("No projectId provided");
 
-    const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
     const locationOptionsPromise = getLocationsForSelectByCompanyId({
       supabase,
@@ -85,7 +95,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         projectId,
         locationOptionsPromise: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -109,7 +119,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -133,7 +143,7 @@ export async function action({
         error,
         returnTo: `/projects/${projectId}/sites`,
       },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json(
@@ -143,7 +153,7 @@ export async function action({
         error,
         returnTo: `/projects/${projectId}/sites`,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -235,7 +245,7 @@ export default function CreateSite({
                   inputProps={{
                     ...getInputProps(fields.site_code, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.site_code.name,
+                      fields.site_code.name
                     )}`,
                     className: "capitalize",
                   }}
@@ -322,7 +332,7 @@ export default function CreateSite({
                     ...getInputProps(fields.pincode, { type: "text" }),
                     className: "capitalize",
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.pincode.name,
+                      fields.pincode.name
                     )}`,
                   }}
                   labelProps={{
@@ -348,7 +358,7 @@ export default function CreateSite({
                     ...getInputProps(fields.longitude, { type: "number" }),
                     className: "capitalize",
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.longitude.name,
+                      fields.longitude.name
                     )}`,
                   }}
                   labelProps={{

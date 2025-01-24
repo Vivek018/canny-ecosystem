@@ -24,13 +24,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
-import { replaceUnderscore } from "@canny_ecosystem/utils";
+import {
+  deleteRole,
+  hasPermission,
+  replaceUnderscore,
+  updateRole,
+} from "@canny_ecosystem/utils";
+import { useUserRole } from "@/utils/user";
 
 export function LocationCard({
   location,
 }: {
   location: Omit<LocationDatabaseRow, "created_at" | "updated_at">;
 }) {
+  const { role } = useUserRole();
   return (
     <Card
       key={location.id}
@@ -45,7 +52,13 @@ export function LocationCard({
                 <Link
                   prefetch="intent"
                   to={`/settings/${location.id}/update-location`}
-                  className="p-2 rounded-md bg-secondary grid place-items-center"
+                  className={cn(
+                    "p-2 rounded-md bg-secondary grid place-items-center ",
+                    !hasPermission(
+                      `${role}`,
+                      `${updateRole}:setting_locations`
+                    ) && "hidden"
+                  )}
                 >
                   <Icon name="edit" size="xs" />
                 </Link>
@@ -54,7 +67,18 @@ export function LocationCard({
             </Tooltip>
           </TooltipProvider>
           <DropdownMenu>
-            <DropdownMenuTrigger className="p-2 py-2 rounded-md bg-secondary grid place-items-center">
+            <DropdownMenuTrigger
+              className={cn(
+                "p-2 py-2 rounded-md bg-secondary grid place-items-center ",
+                !location.latitude &&
+                  !location.longitude &&
+                  !hasPermission(
+                    `${role}`,
+                    `${deleteRole}:setting_locations`
+                  ) &&
+                  "hidden"
+              )}
+            >
               <Icon name="dots-vertical" size="xs" />
             </DropdownMenuTrigger>
             <DropdownMenuContent sideOffset={10} align="end">
@@ -62,7 +86,7 @@ export function LocationCard({
                 <DropdownMenuItem
                   className={cn(
                     "py-2 text-[13px]",
-                    !location.latitude && "hidden",
+                    !location.latitude && "hidden"
                   )}
                   onClick={() => {
                     navigator.clipboard.writeText(String(location.latitude));
@@ -73,7 +97,7 @@ export function LocationCard({
                 <DropdownMenuItem
                   className={cn(
                     "py-2 text-[13px]",
-                    !location.longitude && "hidden",
+                    !location.longitude && "hidden"
                   )}
                   onClick={() => {
                     navigator.clipboard.writeText(String(location.longitude));
@@ -83,7 +107,12 @@ export function LocationCard({
                 </DropdownMenuItem>
                 <DropdownMenuSeparator
                   className={cn(
-                    !location.latitude && !location.longitude && "hidden",
+                    (!location.latitude && !location.longitude) ||
+                      (!hasPermission(
+                        `${role}`,
+                        `${deleteRole}:setting_locations`
+                      ) &&
+                        "hidden")
                   )}
                 />
                 <DeleteLocation locationId={location.id} />
@@ -107,7 +136,7 @@ export function LocationCard({
       <CardFooter
         className={cn(
           "px-2.5 ml-auto bg-secondary text-foreground py-1.5 text-sm tracking-wide font-sem rounded-tl-md border-foreground flex gap-1 justify-center mt-auto",
-          !location.is_primary && "opacity-0",
+          !location.is_primary && "opacity-0"
         )}
       >
         <Icon name="dot-filled" size="xs" />

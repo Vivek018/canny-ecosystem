@@ -3,19 +3,32 @@ import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { json, useLoaderData } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
 import { safeRedirect } from "@/utils/server/http.server";
-import { isGoodStatus, ReimbursementSchema } from "@canny_ecosystem/utils";
+import {
+  hasPermission,
+  isGoodStatus,
+  ReimbursementSchema,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import { updateReimbursementsById } from "@canny_ecosystem/supabase/mutations";
 import {
   getReimbursementsById,
   getUsers,
 } from "@canny_ecosystem/supabase/queries";
 import AddReimbursements from "./add-reimbursement";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { DEFAULT_ROUTE } from "@/constant";
 
 export const UPDATE_REIMBURSEMENTS_TAG = "Update Reimbursements";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const reimbursementId = params.reimbursementId;
-  const { supabase } = getSupabaseWithHeaders({ request });
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(`${user?.role!}`, `${updateRole}:reimbursements`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
   let reimbursementData = null;
 
   const { data: userData, error: userError } = await getUsers({ supabase });
@@ -53,7 +66,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: submission.status === "error" ? 400 : 200 }
     );
   }
 

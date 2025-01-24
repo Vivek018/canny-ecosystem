@@ -21,7 +21,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
-import { replaceUnderscore } from "@canny_ecosystem/utils";
+import {
+  deleteRole,
+  hasPermission,
+  replaceUnderscore,
+  updateRole,
+} from "@canny_ecosystem/utils";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { useUserRole } from "@/utils/user";
 
 type DetailItemProps = {
   label: string;
@@ -50,10 +57,13 @@ export function LabourWelfareFundCard({
     "created_at" | "updated_at"
   >;
 }) {
+  const { role } = useUserRole();
   return (
     <Card
       key={labourWelfareFund.id}
-      className="w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start"
+      className={cn(
+        "w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start"
+      )}
     >
       <CardHeader className="flex flex-row space-y-0 items-center justify-between p-4">
         <CardTitle className="text-lg tracking-wide">
@@ -66,7 +76,13 @@ export function LabourWelfareFundCard({
                 <Link
                   prefetch="intent"
                   to={`${labourWelfareFund.id}/update-labour-welfare-fund`}
-                  className="p-2 rounded-md bg-secondary grid place-items-center"
+                  className={cn(
+                    "p-2 rounded-md bg-secondary grid place-items-center",
+                    !hasPermission(
+                      `${role}`,
+                      `${updateRole}:statutory_fields_lwf`
+                    ) && "hidden"
+                  )}
                 >
                   <Icon name="edit" size="xs" />
                 </Link>
@@ -75,7 +91,15 @@ export function LabourWelfareFundCard({
             </Tooltip>
           </TooltipProvider>
           <DropdownMenu>
-            <DropdownMenuTrigger className="p-2 py-2 rounded-md bg-secondary grid place-items-center">
+            <DropdownMenuTrigger
+              className={cn(
+                "p-2 py-2 rounded-md bg-secondary grid place-items-center",
+                !hasPermission(
+                  `${role}`,
+                  `${deleteRole}:statutory_fields_lwf`
+                ) && "hidden"
+              )}
+            >
               <Icon name="dots-vertical" size="xs" />
             </DropdownMenuTrigger>
             <DropdownMenuContent sideOffset={10} align="end">

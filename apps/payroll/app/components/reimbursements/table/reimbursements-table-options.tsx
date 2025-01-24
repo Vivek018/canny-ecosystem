@@ -8,6 +8,9 @@ import {
 
 import { useNavigate } from "@remix-run/react";
 import { DeleteReimbursement } from "./delete-reimbursement";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { useUserRole } from "@/utils/user";
 
 export const ReimbursementOptionsDropdown = ({
   reimbursementId,
@@ -20,13 +23,14 @@ export const ReimbursementOptionsDropdown = ({
   triggerChild: React.ReactElement;
   isEmployeeRoute?: boolean;
 }) => {
+  const { role } = useUserRole();
   const navigate = useNavigate();
 
   const handleEdit = () => {
     navigate(
       isEmployeeRoute
         ? `/employees/${employeeId}/reimbursements/${reimbursementId}/update-reimbursements`
-        : `/approvals/reimbursements/${reimbursementId}/update-reimbursements`,
+        : `/approvals/reimbursements/${reimbursementId}/update-reimbursements`
     );
   };
 
@@ -35,10 +39,21 @@ export const ReimbursementOptionsDropdown = ({
       {triggerChild}
       <DropdownMenuContent sideOffset={10} align="end">
         <DropdownMenuGroup>
-          <DropdownMenuItem onClick={handleEdit}>
+          <DropdownMenuItem
+            onClick={handleEdit}
+            className={cn(
+              "hidden",
+              hasPermission(`${role}`, `${updateRole}:reimbursements`) && "flex"
+            )}
+          >
             Update Reimbursement
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
+          <DropdownMenuSeparator
+            className={cn(
+              "hidden",
+              hasPermission(`${role}`, `${deleteRole}:reimbursements`) && "flex"
+            )}
+          />
           <DeleteReimbursement
             isEmployeeRoute={isEmployeeRoute}
             id={reimbursementId}
