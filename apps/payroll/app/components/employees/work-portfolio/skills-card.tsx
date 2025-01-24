@@ -24,6 +24,7 @@ import type { EmployeeSkillDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { DeleteSkill } from "./delete-skill";
 import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 type DetailItemProps = {
   label: string;
@@ -72,7 +73,7 @@ export const SkillItem = ({ skill }: { skill: EmployeeSkill }) => {
                     "px-2.5 h-min",
                     !hasPermission(
                       role,
-                      `${updateRole}:employee_skills`
+                      `${updateRole}:${attribute.employeeSkills}`
                     ) && "hidden"
                   )}
                 >
@@ -87,7 +88,7 @@ export const SkillItem = ({ skill }: { skill: EmployeeSkill }) => {
               className={cn(
                 buttonVariants({ variant: "muted" }),
                 "px-2.5 h-min hidden",
-                hasPermission(role, `${deleteRole}:employee_skills`) &&
+                hasPermission(role, `${deleteRole}:${attribute.employeeSkills}`) &&
                   "flex"
               )}
             >
@@ -131,7 +132,7 @@ export const EmployeeSkillsCard = ({
             className={cn(
               buttonVariants({ variant: "outline" }),
               "bg-card",
-              !hasPermission(role, `${updateRole}:employee_skills`) &&
+              !hasPermission(role, `${updateRole}:${attribute.employeeSkills}`) &&
                 "hidden"
             )}
           >

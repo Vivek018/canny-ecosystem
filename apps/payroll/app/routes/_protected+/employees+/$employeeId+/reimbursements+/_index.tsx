@@ -2,7 +2,10 @@ import { FilterList } from "@/components/reimbursements/filter-list";
 import { ReimbursementSearchFilter } from "@/components/reimbursements/reimbursement-search-filter";
 import { reimbursementsColumns } from "@/components/reimbursements/table/columns";
 import { ReimbursementsTable } from "@/components/reimbursements/table/reimbursements-table";
+import { DEFAULT_ROUTE } from "@/constant";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { useUserRole } from "@/utils/user";
 import {
   LAZY_LOADING_LIMIT,
@@ -18,16 +21,23 @@ import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { hasPermission, readRole, updateRole } from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json, Link, redirect, useLoaderData } from "@remix-run/react";
 
 export const UPDATE_REIMBURSEMENTS_TAG = "Update Reimbursements";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(user?.role!, `${readRole}:${attribute.reimbursements}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
   const url = new URL(request.url);
   const employeeId = params.employeeId;
-  const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   let reimbursementData = null;
   const searchParams = new URLSearchParams(url.searchParams);
@@ -166,7 +176,7 @@ export default function ReimbursementsIndex() {
             className={cn(
               buttonVariants({ variant: "primary-outline" }),
               "flex items-center gap-1",
-              !hasPermission(role, `${updateRole}:reimbursements`) && "hidden"
+              !hasPermission(role, `${updateRole}:${attribute.reimbursements}`) && "hidden"
             )}
           >
             <span>Add</span>

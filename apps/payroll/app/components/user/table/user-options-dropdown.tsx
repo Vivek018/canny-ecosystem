@@ -10,6 +10,7 @@ import { useNavigate } from "@remix-run/react";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const UserOptionsDropdown = ({
   id,
@@ -34,7 +35,10 @@ export const UserOptionsDropdown = ({
           <DropdownMenuItem
             className={cn(
               "hidden",
-              hasPermission(role, `${updateRole}:setting_users`) && "flex"
+              hasPermission(
+                role,
+                `${updateRole}:${attribute.settingUsers}`
+              ) && "flex"
             )}
             onClick={handleEdit}
           >
@@ -43,7 +47,10 @@ export const UserOptionsDropdown = ({
           <DropdownMenuSeparator
             className={cn(
               "hidden",
-              hasPermission(role, `${deleteRole}:setting_users`) && "flex"
+              hasPermission(
+                role,
+                `${deleteRole}:${attribute.settingUsers}`
+              ) && "flex"
             )}
           />
           <DeleteUser id={id} role={role} />

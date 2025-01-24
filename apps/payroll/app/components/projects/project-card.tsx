@@ -1,6 +1,11 @@
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@canny_ecosystem/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@canny_ecosystem/ui/tooltip";
 import { Link } from "@remix-run/react";
 import { Card, CardContent, CardTitle } from "@canny_ecosystem/ui/card";
 import type { ProjectsWithCompany } from "@canny_ecosystem/supabase/queries";
@@ -15,6 +20,7 @@ import {
 } from "@canny_ecosystem/utils";
 import { ProjectOptionsDropdown } from "./project-options-dropdown";
 import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export function ProjectCard({
   project,
@@ -65,7 +71,9 @@ export function ProjectCard({
                             index !== 0 && "-ml-[18px]"
                           )}
                         >
-                          {company?.logo && (<img src={company?.logo} alt={company?.name} />)}
+                          {company?.logo && (
+                            <img src={company?.logo} alt={company?.name} />
+                          )}
                           <AvatarFallback>
                             <span className="tracking-widest text-sm">
                               {company?.name.charAt(0)}
@@ -78,10 +86,14 @@ export function ProjectCard({
                   ) : null
                 )}
               </div>
-              <p className="text-xs text-muted-foreground">Companies Involved</p>
+              <p className="text-xs text-muted-foreground">
+                Companies Involved
+              </p>
             </TooltipProvider>
           </div>
-          <div className={cn("flex flex-col", project.actual_end_date && "hidden")}>
+          <div
+            className={cn("flex flex-col", project.actual_end_date && "hidden")}
+          >
             <Progress
               value={
                 (getAutoTimeDifference(project.start_date, new Date())! /
@@ -97,7 +109,7 @@ export function ProjectCard({
               className={cn(
                 "text-xs text-muted-foreground ml-auto mt-1",
                 getAutoTimeDifference(new Date(), project.estimated_end_date)! <
-                0 && "hidden",
+                  0 && "hidden"
               )}
             >
               {getAutoTimeDifference(new Date(), project.estimated_end_date)}{" "}
@@ -134,8 +146,10 @@ export function ProjectCard({
                   to={`/projects/${project.id}/update-project`}
                   className={cn(
                     "p-2 rounded-md bg-secondary grid place-items-center border-foreground ",
-                    !hasPermission(role, `${deleteRole}:projects`) &&
-                      "hidden"
+                    !hasPermission(
+                      role,
+                      `${deleteRole}:${attribute.projects}`
+                    ) && "hidden"
                   )}
                 >
                   <Icon name="edit" size="xs" />
@@ -153,8 +167,11 @@ export function ProjectCard({
               <DropdownMenuTrigger
                 className={cn(
                   "p-2 py-2 rounded-md bg-secondary grid place-items-center border-foreground",
-                  !hasPermission(role, `${deleteRole}:projects`) &&
-                    !hasPermission(role, `${updateRole}:projects`) &&
+                  !hasPermission(role, `${deleteRole}:${attribute.projects}`) &&
+                    !hasPermission(
+                      role,
+                      `${updateRole}:${attribute.projects}`
+                    ) &&
                     "hidden"
                 )}
               >

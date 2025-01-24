@@ -43,6 +43,7 @@ import { UPDATE_USER_TAG } from "./$userId.update-user";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const CREATE_USER_TAG = "Create User";
 
@@ -51,7 +52,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:setting_users`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.settingUsers}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);

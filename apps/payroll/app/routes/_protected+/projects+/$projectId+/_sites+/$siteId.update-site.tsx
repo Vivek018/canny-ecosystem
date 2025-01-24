@@ -29,6 +29,7 @@ import type { SiteDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const UPDATE_SITE = "update-site";
 
@@ -39,7 +40,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:project_sites`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.projectSite}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 

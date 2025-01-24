@@ -20,6 +20,7 @@ import { useEffect } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import type { LocationDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export function LocationsWrapper({
   data,
@@ -57,7 +58,7 @@ export function LocationsWrapper({
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
                 "flex items-center gap-1",
-                !hasPermission(role, `${updateRole}:setting_locations`) &&
+                !hasPermission(role, `${updateRole}:${attribute.settingLocations}`) &&
                   "hidden"
               )}
             >

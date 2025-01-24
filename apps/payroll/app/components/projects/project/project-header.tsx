@@ -7,6 +7,7 @@ import { ProjectOptionsDropdown } from "../project-options-dropdown";
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
 import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const ProjectHeader = ({
   project,
@@ -36,7 +37,7 @@ export const ProjectHeader = ({
           to={`/projects/${project.id}/update-project`}
           className={cn(
             buttonVariants({ variant: "outline" }),
-            !hasPermission(role, `${updateRole}:project`) && "hidden"
+            !hasPermission(role, `${updateRole}:${attribute.project}`) && "hidden"
           )}
         >
           <Icon name="edit" size="xs" className="mr-1.5 " />
@@ -52,8 +53,8 @@ export const ProjectHeader = ({
             <DropdownMenuTrigger
               className={cn(
                 buttonVariants({ variant: "outline" }),
-                !hasPermission(role, `${deleteRole}:projects`) &&
-                  !hasPermission(role, `${updateRole}:projects`) &&
+                !hasPermission(role, `${deleteRole}:${attribute.project}`) &&
+                  !hasPermission(role, `${updateRole}:${attribute.project}`) &&
                   "hidden"
               )}
             >

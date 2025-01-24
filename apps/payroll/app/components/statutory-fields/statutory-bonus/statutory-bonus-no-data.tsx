@@ -9,6 +9,7 @@ import {
 } from "@canny_ecosystem/ui/card";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
 import { Link } from "@remix-run/react";
 
 export function StatutoryBonusNoData() {
@@ -36,7 +37,7 @@ export function StatutoryBonusNoData() {
               buttonVariants({ variant: "primary-outline" }),
               !hasPermission(
                 `${role}`,
-                `${updateRole}:statutory_fields_statutory_bonus`
+                `${updateRole}:${attribute.statutoryFieldsStatutoryBonus}`
               ) && "hidden"
             )}
           >

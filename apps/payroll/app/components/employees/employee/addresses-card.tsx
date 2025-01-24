@@ -33,6 +33,7 @@ import {
 } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
 import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 type EmployeeAddress = Omit<
   EmployeeAddressDatabaseRow,
@@ -62,7 +63,7 @@ export const AddressItem = ({ address }: { address: EmployeeAddress }) => {
                     "px-2.5 h-min",
                     !hasPermission(
                       role,
-                      `${updateRole}:employee_addresses`
+                      `${updateRole}:${attribute.employeeAddresses}`
                     ) && "hidden"
                   )}
                 >
@@ -81,7 +82,7 @@ export const AddressItem = ({ address }: { address: EmployeeAddress }) => {
                   !address.longitude &&
                   !hasPermission(
                     role,
-                    `${deleteRole}:employee_addresses`
+                    `${deleteRole}:${attribute.employeeAddresses}`
                   ) &&
                   "hidden"
               )}
@@ -117,7 +118,7 @@ export const AddressItem = ({ address }: { address: EmployeeAddress }) => {
                     (!address.latitude && !address.longitude) ||
                       (!hasPermission(
                         role,
-                        `${deleteRole}:employee_addresses`
+                        `${deleteRole}:${attribute.employeeAddresses}`
                       ) &&
                         "hidden")
                   )}
@@ -169,14 +170,14 @@ export const EmployeeAddressesCard = ({
         <div>
           <Link
             to={
-              hasPermission(role, `${updateRole}:employee_addresses`)
+              hasPermission(role, `${updateRole}:${attribute.employeeAddresses}`)
                 ? "add-employee-address"
                 : DEFAULT_ROUTE
             }
             className={cn(
               buttonVariants({ variant: "outline" }),
               "bg-card",
-              !hasPermission(role, `${updateRole}:employee_addresses`) &&
+              !hasPermission(role, `${updateRole}:${attribute.employeeAddresses}`) &&
                 "hidden"
             )}
           >

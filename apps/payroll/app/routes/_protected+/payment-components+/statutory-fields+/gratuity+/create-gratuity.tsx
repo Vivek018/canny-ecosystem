@@ -38,6 +38,7 @@ import { UPDATE_GRATUITY } from "./$gratuityId.update-gratuity";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const CREATE_GRATUITY = "create-gratuity";
 
@@ -47,7 +48,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
   if (
-    !hasPermission(user?.role!, `${updateRole}:statutory_fields_graduity`)
+    !hasPermission(user?.role!, `${updateRole}:${attribute.statutoryFieldsGraduity}`)
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }

@@ -16,6 +16,7 @@ import type { LabourWelfareFundDatabaseRow } from "@canny_ecosystem/supabase/typ
 import { useEffect } from "react";
 import { hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export function LWFWrapper({
   data,
@@ -55,8 +56,10 @@ export function LWFWrapper({
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
                 "flex items-center gap-1",
-                !hasPermission(role, `${updateRole}:statutory_fields_lwf`) &&
-                  "hidden"
+                !hasPermission(
+                  role,
+                  `${updateRole}:${attribute.statutoryFieldsLwf}`
+                ) && "hidden"
               )}
             >
               <span>Add</span>

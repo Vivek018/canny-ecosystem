@@ -14,6 +14,7 @@ import {
 } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const reimbursementsColumns = ({
   isEmployeeRoute = false,
@@ -157,8 +158,14 @@ export const reimbursementsColumns = ({
           triggerChild={
             <DropdownMenuTrigger
               className={cn(
-                !hasPermission(role, `${updateRole}:reimbursements`) &&
-                  !hasPermission(role, `${deleteRole}:reimbursements`) &&
+                !hasPermission(
+                  role,
+                  `${updateRole}:${attribute.reimbursements}`
+                ) &&
+                  !hasPermission(
+                    role,
+                    `${deleteRole}:${attribute.reimbursements}`
+                  ) &&
                   "hidden"
               )}
               asChild

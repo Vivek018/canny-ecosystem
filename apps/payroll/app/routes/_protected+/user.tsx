@@ -1,6 +1,7 @@
 import { useUserRole } from "@/utils/user";
 import { SecondaryMenu } from "@canny_ecosystem/ui/secondary-menu";
 import { hasPermission, readRole } from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
 import { Link, Outlet, useLocation } from "@remix-run/react";
 
 export default function Account() {
@@ -15,7 +16,7 @@ export default function Account() {
             { label: "Account", path: "/user/account" },
             { label: "Help", path: "/user/help" },
             { label: "Feedback Form", path: "/user/feedback-form" },
-            hasPermission(role, `${readRole}:feedback_list`)
+            hasPermission(role, `${readRole}:${attribute.feedbackList}`)
               ? { label: "Feedback List", path: "/user/feedback-list" }
               : {},
           ]}

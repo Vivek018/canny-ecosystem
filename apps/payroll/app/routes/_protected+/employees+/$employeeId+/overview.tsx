@@ -5,6 +5,9 @@ import { EmployeeGuardiansCard } from "@/components/employees/employee/guardians
 import { EmployeePageHeader } from "@/components/employees/employee/page-header";
 import { EmployeeStatutoryCard } from "@/components/employees/employee/statutory-card";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { DEFAULT_ROUTE } from "@/constant";
+import { safeRedirect } from "@/utils/server/http.server";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import {
   getEmployeeAddressesByEmployeeId,
   getEmployeeBankDetailsById,
@@ -14,16 +17,23 @@ import {
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { hasPermission, readRole } from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
 import { defer, json, type LoaderFunctionArgs } from "@remix-run/node";
 import { Await, useLoaderData } from "@remix-run/react";
 import { type ReactNode, Suspense, useEffect } from "react";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(user?.role!, `${readRole}:${attribute.employees}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
   const employeeId = params.employeeId;
 
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
-
     const employeePromise = getEmployeeById({
       supabase,
       id: employeeId ?? "",

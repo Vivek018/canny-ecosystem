@@ -29,6 +29,7 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { DEFAULT_ROUTE } from "@/constant";
 import { safeRedirect } from "@/utils/server/http.server";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const UPDATE_EMPLOYEE_STATUTORY = "update-employee-statutory";
 
@@ -38,7 +39,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:employee_statutory`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.employeeStatutory}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 

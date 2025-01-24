@@ -8,6 +8,7 @@ import { ExitOptionsDropdown } from "../exit-option-dropdown";
 import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const ExitPaymentColumns: ColumnDef<ExitDataType>[] = [
   {
@@ -282,8 +283,8 @@ export const ExitPaymentColumns: ColumnDef<ExitDataType>[] = [
             <DropdownMenuTrigger
               asChild
               className={cn(
-                !hasPermission(role, `${updateRole}:exits`) &&
-                  !hasPermission(role, `${deleteRole}:exits`) &&
+                !hasPermission(role, `${updateRole}:${attribute.exits}`) &&
+                  !hasPermission(role, `${deleteRole}:${attribute.exits}`) &&
                   "hidden"
               )}
             >

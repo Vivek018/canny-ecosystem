@@ -37,6 +37,7 @@ import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { useState } from "react";
 import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export function EmployeeDialog({
   employee,
@@ -117,7 +118,7 @@ export function EmployeeDialog({
           variant="ghost"
           className={cn(
             "item-start justify-start px-2 font-normal w-full hidden",
-            hasPermission(role, `${updateRole}:employees`) && "flex"
+            hasPermission(role, `${updateRole}:${attribute.employees}`) && "flex"
           )}
           onClick={openPaymentTemplateDialog}
         >

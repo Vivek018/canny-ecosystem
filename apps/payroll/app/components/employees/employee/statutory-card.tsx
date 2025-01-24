@@ -5,6 +5,7 @@ import { Card } from "@canny_ecosystem/ui/card";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { formatDate, hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
 import { Link } from "@remix-run/react";
 
 type DetailItemProps = {
@@ -46,7 +47,7 @@ export const EmployeeStatutoryCard: React.FC<{
             buttonVariants({ variant: "outline" }),
             "bg-card",
             !employeeStatutory && "hidden",
-            !hasPermission(role, `${updateRole}:employee_statutory`) &&
+            !hasPermission(role, `${updateRole}:${attribute.employeeStatutory}`) &&
               "hidden"
           )}
         >

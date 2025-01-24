@@ -41,7 +41,7 @@ import {
 
 import { createSite } from "@canny_ecosystem/supabase/mutations";
 import type { SiteDatabaseUpdate } from "@canny_ecosystem/supabase/types";
-import { statesAndUTs } from "@canny_ecosystem/utils/constant";
+import { attribute, statesAndUTs } from "@canny_ecosystem/utils/constant";
 import { UPDATE_SITE } from "./$siteId.update-site";
 import { getLocationsForSelectByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
@@ -61,7 +61,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:project_sites`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.projectSite}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 

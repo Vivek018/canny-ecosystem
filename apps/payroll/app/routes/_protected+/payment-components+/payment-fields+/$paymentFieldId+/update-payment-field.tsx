@@ -26,6 +26,7 @@ import type { PaymentFieldDatabaseUpdate } from "@canny_ecosystem/supabase/types
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const UPDATE_PAYMENT_FIELD = "update-payment-field";
 
@@ -34,7 +35,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:payment_fields`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.paymentFields}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 

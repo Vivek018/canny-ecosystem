@@ -26,6 +26,7 @@ import type { EmployeeAddressDatabaseUpdate } from "@canny_ecosystem/supabase/ty
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const UPDATE_EMPLOYEE_PROVIDENT_FUND = "update-employee-provident-fund";
 
@@ -34,7 +35,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:statutory_fields_epf`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.statutoryFieldsEpf}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 

@@ -9,6 +9,7 @@ import {
   isGoodStatus,
   updateRole,
 } from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
 import { parseWithZod } from "@conform-to/zod";
 import { type ActionFunctionArgs, json } from "@remix-run/node";
 
@@ -17,7 +18,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:setting_general`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.company}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   const formData = await request.formData();

@@ -27,6 +27,7 @@ import {
   updateRole,
 } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const CompanySwitch = ({
   companies,
@@ -60,7 +61,7 @@ export const CompanySwitch = ({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          disabled={!hasPermission(role, `${updateRole}:company`)}
+          disabled={!hasPermission(role, `${updateRole}:${attribute.company}`)}
           className={cn(
             "bg-card truncate justify-between capitalize rounded pl-1.5 pr-3 w-64 h-12 disabled:opacity-100",
             !currentCompany && "text-muted-foreground"
@@ -83,7 +84,7 @@ export const CompanySwitch = ({
             size="md"
             className={cn(
               "ml-2 shrink-0 opacity-75",
-              !hasPermission(role, `${updateRole}:company`) && "hidden"
+              !hasPermission(role, `${updateRole}:${attribute.company}`) && "hidden"
             )}
           />
         </Button>

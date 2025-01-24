@@ -25,6 +25,7 @@ import type { EmployeeSkillDatabaseUpdate } from "@canny_ecosystem/supabase/type
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { DEFAULT_ROUTE } from "@/constant";
 import { safeRedirect } from "@/utils/server/http.server";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const UPDATE_EMPLOYEE_SKILL = "update-employee-skill";
 
@@ -34,7 +35,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:employee_skills`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.employeeSkills}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 

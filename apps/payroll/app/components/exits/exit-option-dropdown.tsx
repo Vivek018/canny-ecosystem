@@ -9,6 +9,7 @@ import { DeleteExit } from "../exits/delete-exit";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const ExitOptionsDropdown = ({
   exitId,
@@ -26,7 +27,7 @@ export const ExitOptionsDropdown = ({
           <DropdownMenuItem
             className={cn(
               "hidden",
-              hasPermission(role, `${updateRole}:exits`) && "flex"
+              hasPermission(role, `${updateRole}:${attribute.exits}`) && "flex"
             )}
           >
             Edit Exit
@@ -34,7 +35,7 @@ export const ExitOptionsDropdown = ({
           <DropdownMenuSeparator
             className={cn(
               "hidden",
-              hasPermission(role, `${deleteRole}:exits`) && "flex"
+              hasPermission(role, `${deleteRole}:${attribute.exits}`) && "flex"
             )}
           />
           <DeleteExit exitId={exitId} />

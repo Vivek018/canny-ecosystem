@@ -21,7 +21,7 @@ import {
   transformStringArrayIntoOptions,
   updateRole,
 } from "@canny_ecosystem/utils";
-import { payoutMonths } from "@canny_ecosystem/utils/constant";
+import { attribute, payoutMonths } from "@canny_ecosystem/utils/constant";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import {
@@ -52,7 +52,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   if (
     !hasPermission(
       `${user?.role!}`,
-      `${updateRole}:statutory_fields_statutory_bonus `
+      `${updateRole}:${attribute.statutoryFieldsStatutoryBonus} `
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });

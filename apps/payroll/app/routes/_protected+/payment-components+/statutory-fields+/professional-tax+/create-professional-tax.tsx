@@ -42,7 +42,7 @@ import {
 
 import { createProfessionalTax } from "@canny_ecosystem/supabase/mutations";
 import type { ProfessionalTaxDatabaseUpdate } from "@canny_ecosystem/supabase/types";
-import { statesAndUTs } from "@canny_ecosystem/utils/constant";
+import { attribute, statesAndUTs } from "@canny_ecosystem/utils/constant";
 import { FormButtons } from "@/components/form/form-buttons";
 import { UPDATE_PROFESSIONAL_TAX } from "./$professionalTaxId.update-professional-tax";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
@@ -57,7 +57,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:statutory_fields_pf`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.statutoryFieldsPf}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   try {

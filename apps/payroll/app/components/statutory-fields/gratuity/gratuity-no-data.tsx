@@ -9,6 +9,7 @@ import {
 } from "@canny_ecosystem/ui/card";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
 import { Link } from "@remix-run/react";
 
 export function GratuityNoData() {
@@ -33,7 +34,7 @@ export function GratuityNoData() {
               buttonVariants({ variant: "primary-outline" }),
               !hasPermission(
                 `${role}`,
-                `${updateRole}:statutory_fields_graduity`
+                `${updateRole}:${attribute.statutoryFieldsGraduity}`
               ) && "hidden"
             )}
           >

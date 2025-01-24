@@ -9,6 +9,7 @@ import {
   hasPermission,
   isGoodStatus,
 } from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { json, useActionData, useNavigate } from "@remix-run/react";
 import { useEffect } from "react";
@@ -22,7 +23,7 @@ export async function action({
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${deleteRole}:setting_relationships`)) {
+  if (!hasPermission(user?.role!, `${deleteRole}:${attribute.settingRelationships}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 

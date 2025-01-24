@@ -17,6 +17,7 @@ import { EmployeeOptionsDropdown } from "../employee-option-dropdown";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const columns = ({
   env,
@@ -221,8 +222,8 @@ export const columns = ({
             <DropdownMenuTrigger
               asChild
               className={cn(
-                !hasPermission(role, `${updateRole}:employees`) &&
-                  !hasPermission(role, `${deleteRole}:employees`) &&
+                !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
+                  !hasPermission(role, `${deleteRole}:${attribute.employees}`) &&
                   "hidden"
               )}
             >

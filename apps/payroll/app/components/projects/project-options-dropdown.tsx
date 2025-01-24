@@ -15,6 +15,7 @@ import {
   updateRole,
 } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const ProjectOptionsDropdown = ({
   project,
@@ -67,7 +68,8 @@ export const ProjectOptionsDropdown = ({
           <DropdownMenuItem
             className={cn(
               project.actual_end_date && "hidden",
-              !hasPermission(role, `${updateRole}:projects`) && "hidden"
+              !hasPermission(role, `${updateRole}:${attribute.projects}`) &&
+                "hidden"
             )}
             onClick={handleMarkAsCompleted}
           >
@@ -76,7 +78,8 @@ export const ProjectOptionsDropdown = ({
           <DropdownMenuItem
             className={cn(
               !project.actual_end_date && "hidden",
-              !hasPermission(role, `${updateRole}:projects`) && "hidden"
+              !hasPermission(role, `${updateRole}:${attribute.projects}`) &&
+                "hidden"
             )}
             onClick={handleMarkAsActive}
           >
@@ -85,7 +88,8 @@ export const ProjectOptionsDropdown = ({
           <DropdownMenuSeparator
             className={cn(
               "hidden",
-              hasPermission(role, `${deleteRole}:projects`) && "flex"
+              hasPermission(role, `${deleteRole}:${attribute.projects}`) &&
+                "flex"
             )}
           />
           <DeleteProject projectId={project.id} />

@@ -25,6 +25,7 @@ import type { ProfessionalTaxDatabaseUpdate } from "@canny_ecosystem/supabase/ty
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const UPDATE_PROFESSIONAL_TAX = "update-professional-tax";
 
@@ -33,7 +34,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:statutory_fields_pf`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.statutoryFieldsPf}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   try {

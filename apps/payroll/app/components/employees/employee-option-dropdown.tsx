@@ -12,6 +12,7 @@ import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { EmployeeDialog } from "../link-template/employee-dialog";
 import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const EmployeeOptionsDropdown = ({
   employee,
@@ -65,7 +66,8 @@ export const EmployeeOptionsDropdown = ({
           <DropdownMenuItem
             className={cn(
               employee.is_active && "hidden",
-              !hasPermission(role, `${updateRole}:employees`) && "hidden"
+              !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
+                "hidden"
             )}
             onClick={handleMarkAsActive}
           >
@@ -74,7 +76,8 @@ export const EmployeeOptionsDropdown = ({
           <DropdownMenuItem
             className={cn(
               !employee.is_active && "hidden",
-              !hasPermission(role, `${updateRole}:employees`) && "hidden"
+              !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
+                "hidden"
             )}
             onClick={handleMarkAsInactive}
           >
@@ -82,8 +85,8 @@ export const EmployeeOptionsDropdown = ({
           </DropdownMenuItem>
           <DropdownMenuSeparator
             className={cn(
-              !hasPermission(role, `${updateRole}:employees`) &&
-                !hasPermission(role, `${deleteRole}:employees`) &&
+              !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
+                !hasPermission(role, `${deleteRole}:${attribute.employees}`) &&
                 "hidden"
             )}
           />
@@ -91,7 +94,8 @@ export const EmployeeOptionsDropdown = ({
           <DropdownMenuSeparator
             className={cn(
               "hidden",
-              hasPermission(role, `${deleteRole}:employees`) && "flex"
+              hasPermission(role, `${deleteRole}:${attribute.employees}`) &&
+                "flex"
             )}
           />
           <DeleteEmployee employeeId={employee.id} />

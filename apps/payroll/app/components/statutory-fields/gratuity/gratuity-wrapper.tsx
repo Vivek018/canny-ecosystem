@@ -7,6 +7,7 @@ import { DeleteGratuity } from "./delete-gratuity";
 import { hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 type DetailItemProps = {
   label: string;
@@ -47,7 +48,7 @@ export function GratuityWrapper({
               "p-2 rounded-full bg-secondary grid place-items-center",
               !hasPermission(
                 `${role}`,
-                `${updateRole}:statutory_fields_graduity`
+                `${updateRole}:${attribute.statutoryFieldsGraduity}`
               ) && "hidden"
             )}
           >

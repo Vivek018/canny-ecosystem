@@ -9,6 +9,7 @@ import {
 } from "@canny_ecosystem/ui/card";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
 import { Link } from "@remix-run/react";
 
 export function EPFNoData() {
@@ -31,7 +32,7 @@ export function EPFNoData() {
             to="/payment-components/statutory-fields/employee-provident-fund/create-employee-provident-fund"
             className={cn(
               buttonVariants({ variant: "primary-outline" }),
-              !hasPermission(role, `${updateRole}:statutory_fields_epf`) &&
+              !hasPermission(role, `${updateRole}:${attribute.statutoryFieldsEpf}`) &&
                 "hidden"
             )}
           >

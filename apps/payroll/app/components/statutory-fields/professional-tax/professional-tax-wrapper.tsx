@@ -16,6 +16,7 @@ import { useEffect } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export function ProfessionalTaxWrapper({
   data,
@@ -53,7 +54,7 @@ export function ProfessionalTaxWrapper({
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
                 "flex items-center gap-1",
-                !hasPermission(role, `${updateRole}:statutory_fields_pf`) &&
+                !hasPermission(role, `${updateRole}:${attribute.statutoryFieldsPf}`) &&
                   "hidden"
               )}
             >

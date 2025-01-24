@@ -25,6 +25,7 @@ import { DeleteGuardian } from "./delete-guardian";
 import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
 import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 type DetailItemProps = {
   label: string;
@@ -73,7 +74,7 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
                     "px-2.5 h-min",
                     !hasPermission(
                       role,
-                      `${updateRole}:employee_guardians`
+                      `${updateRole}:${attribute.employeeGuardians}`
                     ) && "hidden"
                   )}
                 >
@@ -88,7 +89,7 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
               className={cn(
                 buttonVariants({ variant: "muted" }),
                 "px-2.5 h-min hidden",
-                hasPermission(role, `${deleteRole}:employee_guardians`) &&
+                hasPermission(role, `${deleteRole}:${attribute.employeeGuardians}`) &&
                   "flex"
               )}
             >
@@ -169,14 +170,14 @@ export const EmployeeGuardiansCard = ({
         <div>
           <Link
             to={
-              hasPermission(role, `${updateRole}:employee_addresses`)
+              hasPermission(role, `${updateRole}:${attribute.employeeGuardians}`)
                 ? "add-employee-address"
                 : DEFAULT_ROUTE
             }
             className={cn(
               buttonVariants({ variant: "outline" }),
               "bg-card",
-              !hasPermission(role, `${updateRole}:employee_addresses`) &&
+              !hasPermission(role, `${updateRole}:${attribute.employeeGuardians}`) &&
                 "hidden"
             )}
           >

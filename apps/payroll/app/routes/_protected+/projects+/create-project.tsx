@@ -56,6 +56,7 @@ import { CompanyListsWrapper } from "@/components/projects/company-lists-wrapper
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const CREATE_PROJECT = "create-project";
 
@@ -64,7 +65,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:projects`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.project}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   try {

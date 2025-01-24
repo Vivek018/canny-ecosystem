@@ -35,8 +35,9 @@ export type CardInfoData = {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const url = new URL(request.url);
   const { supabase } = getSupabaseWithHeaders({ request });
+
+  const url = new URL(request.url);
 
   const searchParams = new URLSearchParams(url.searchParams);
 
@@ -63,8 +64,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     const { count: projectsCount } = await getProjectsCountByCompanyId({
       supabase,
-      companyId
-    })
+      companyId,
+    });
 
     const { count: usersCount } = await getUsersCount({ supabase });
     const { count: locationsCount } = await getLocationsCountByCompanyId({

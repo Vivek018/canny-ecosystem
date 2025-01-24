@@ -17,6 +17,7 @@ import {
 import type { UserDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export type UsersType = {
   role: string;
@@ -123,8 +124,14 @@ export const columns: ColumnDef<UsersType>[] = [
                 variant="ghost"
                 className={cn(
                   "h-8 w-8 p-0",
-                  !hasPermission(role, `${updateRole}:setting_users`) &&
-                    !hasPermission(role, `${deleteRole}:setting_users`) &&
+                  !hasPermission(
+                    role,
+                    `${updateRole}:${attribute.settingUsers}`
+                  ) &&
+                    !hasPermission(
+                      role,
+                      `${deleteRole}:${attribute.settingUsers}`
+                    ) &&
                     "hidden"
                 )}
               >

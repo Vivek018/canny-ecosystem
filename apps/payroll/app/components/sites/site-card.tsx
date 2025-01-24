@@ -24,7 +24,10 @@ import {
   CardTitle,
 } from "@canny_ecosystem/ui/card";
 import type { SitesWithLocation } from "@canny_ecosystem/supabase/queries";
-import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
+import {
+  attribute,
+  modalSearchParamNames,
+} from "@canny_ecosystem/utils/constant";
 import {
   deleteRole,
   hasPermission,
@@ -66,8 +69,10 @@ export function SiteCard({
                   to={`/projects/${site.project_id}/${site.id}/update-site`}
                   className={cn(
                     "p-2 rounded-md bg-secondary grid place-items-center ",
-                    !hasPermission(role, `${updateRole}:project_sites`) &&
-                      "hidden"
+                    !hasPermission(
+                      role,
+                      `${updateRole}:${attribute.projectSites}`
+                    ) && "hidden"
                   )}
                 >
                   <Icon name="edit" size="xs" />
@@ -93,8 +98,10 @@ export function SiteCard({
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className={cn(
-                    !hasPermission(role, `${updateRole}:project_sites`) &&
-                      "hidden"
+                    !hasPermission(
+                      role,
+                      `${updateRole}:${attribute.projectSites}`
+                    ) && "hidden"
                   )}
                   onClick={() => {
                     navigate(
@@ -106,14 +113,18 @@ export function SiteCard({
                 </DropdownMenuItem>
                 <DropdownMenuSeparator
                   className={cn(
-                    !hasPermission(role, `${updateRole}:project_sites`) &&
-                      "hidden"
+                    !hasPermission(
+                      role,
+                      `${updateRole}:${attribute.projectSites}`
+                    ) && "hidden"
                   )}
                 />
                 <DropdownMenuItem
                   className={cn(
-                    !hasPermission(role, `${updateRole}:project_sites`) &&
-                      "hidden"
+                    !hasPermission(
+                      role,
+                      `${updateRole}:${attribute.projectSites}`
+                    ) && "hidden"
                   )}
                   onClick={() => {
                     navigate(
@@ -126,7 +137,10 @@ export function SiteCard({
                 <DropdownMenuSeparator
                   className={cn(
                     (!site.latitude && !site.longitude) ||
-                      (!hasPermission(role, `${deleteRole}:project_sites`) &&
+                      (!hasPermission(
+                        role,
+                        `${deleteRole}:${attribute.projectSites}`
+                      ) &&
                         "hidden")
                   )}
                 />

@@ -21,6 +21,7 @@ import {
   transformStringArrayIntoOptions,
   updateRole,
 } from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
 import {
   FormProvider,
   getFormProps,
@@ -76,7 +77,7 @@ export const CompanyDetails = ({
                   placeholder: `Enter ${fields.name.name}`,
                   readOnly: !hasPermission(
                     role,
-                    `${updateRole}:setting_general`
+                    `${updateRole}:${attribute.settingGeneral}`
                   ),
                 }}
                 errors={fields.name.errors}
@@ -89,7 +90,7 @@ export const CompanyDetails = ({
                   )}`,
                   readOnly: !hasPermission(
                     role,
-                    `${updateRole}:setting_general`
+                    `${updateRole}:${attribute.settingGeneral}`
                   ),
                 }}
                 errors={fields.email_suffix.errors}
@@ -104,7 +105,7 @@ export const CompanyDetails = ({
                   ...getInputProps(fields.company_type, { type: "text" }),
                   readOnly: !hasPermission(
                     role,
-                    `${updateRole}:setting_general`
+                    `${updateRole}:${attribute.settingGeneral}`
                   ),
                 }}
                 placeholder={`Select ${replaceUnderscore(
@@ -122,7 +123,7 @@ export const CompanyDetails = ({
                   ...getInputProps(fields.company_size, { type: "text" }),
                   readOnly: !hasPermission(
                     role,
-                    `${updateRole}:setting_general`
+                    `${updateRole}:${attribute.settingGeneral}`
                   ),
                 }}
                 placeholder={`Select ${replaceUnderscore(
@@ -136,8 +137,10 @@ export const CompanyDetails = ({
           <CardFooter
             className={cn(
               "border-t pt-6 flex justify-between  ",
-              !hasPermission(role, `${updateRole}:setting_general`) &&
-                "hidden"
+              !hasPermission(
+                role,
+                `${updateRole}:${attribute.settingGeneral}`
+              ) && "hidden"
             )}
           >
             <div>Please use 32 characters at maximum.</div>

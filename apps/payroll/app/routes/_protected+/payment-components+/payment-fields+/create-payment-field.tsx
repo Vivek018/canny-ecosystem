@@ -49,6 +49,7 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const CREATE_PAYMENT_FIELD = "create-payment-field";
 
@@ -57,7 +58,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:payment_fields`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.paymentFields}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 

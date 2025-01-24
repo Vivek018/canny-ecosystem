@@ -18,6 +18,7 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { RelationshipWrapper } from "@/components/relationships/relationship-wrapper";
 import { hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {
@@ -67,8 +68,10 @@ export default function Relationships() {
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
                 "flex items-center gap-1",
-                !hasPermission(role, `${updateRole}:setting_relationships`) &&
-                  "hidden"
+                !hasPermission(
+                  role,
+                  `${updateRole}:${attribute.settingRelationships}`
+                ) && "hidden"
               )}
             >
               <span>Add</span>

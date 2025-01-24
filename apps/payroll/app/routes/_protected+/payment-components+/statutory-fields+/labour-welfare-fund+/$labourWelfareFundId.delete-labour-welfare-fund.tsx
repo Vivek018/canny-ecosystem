@@ -9,6 +9,7 @@ import {
   hasPermission,
   isGoodStatus,
 } from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { json, useActionData, useNavigate } from "@remix-run/react";
 import { useEffect } from "react";
@@ -23,7 +24,7 @@ export async function action({
   if (
     !hasPermission(
       `${user?.role!}`,
-      `${deleteRole}:  "statutory_fields_lwf",
+      `${deleteRole}:  "${attribute.statutoryFieldsLwf}",
 `
     )
   ) {

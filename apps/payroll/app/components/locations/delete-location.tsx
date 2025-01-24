@@ -15,7 +15,7 @@ import { ErrorList } from "@canny_ecosystem/ui/forms";
 import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { deleteRole, hasPermission } from "@canny_ecosystem/utils";
-import { DELETE_TEXT } from "@canny_ecosystem/utils/constant";
+import { attribute, DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
@@ -57,7 +57,7 @@ export const DeleteLocation = ({ locationId }: { locationId: string }) => {
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "text-[13px] h-9 hidden",
-          hasPermission(role, `${deleteRole}:setting_locations`) && "flex"
+          hasPermission(role, `${deleteRole}:${attribute.settingLocations}`) && "flex"
         )}
       >
         Delete Location

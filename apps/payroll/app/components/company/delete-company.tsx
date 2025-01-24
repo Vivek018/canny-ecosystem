@@ -22,7 +22,7 @@ import { ErrorList } from "@canny_ecosystem/ui/forms";
 import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { deleteRole, hasPermission } from "@canny_ecosystem/utils";
-import { DELETE_TEXT } from "@canny_ecosystem/utils/constant";
+import { attribute, DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
@@ -61,7 +61,7 @@ export const DeleteCompany = ({ companyId }: { companyId: string }) => {
   return (
     <Card
       className={cn(
-        hasPermission(role, `${deleteRole}:setting_general`)
+        hasPermission(role, `${deleteRole}:${attribute.settingGeneral}`)
           ? "border-destructive"
           : " hidden"
       )}

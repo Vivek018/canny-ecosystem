@@ -14,6 +14,7 @@ import { updateUserById } from "@canny_ecosystem/supabase/mutations";
 import { getUserById } from "@canny_ecosystem/supabase/queries";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const UPDATE_USER_TAG = "Update User";
 
@@ -23,7 +24,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:setting_users`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.settingUsers}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   try {

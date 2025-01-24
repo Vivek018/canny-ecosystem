@@ -31,6 +31,7 @@ import {
   updateRole,
 } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export function LocationCard({
   location,
@@ -56,7 +57,7 @@ export function LocationCard({
                     "p-2 rounded-md bg-secondary grid place-items-center ",
                     !hasPermission(
                       `${role}`,
-                      `${updateRole}:setting_locations`
+                      `${updateRole}:${attribute.settingLocations}`
                     ) && "hidden"
                   )}
                 >
@@ -74,7 +75,7 @@ export function LocationCard({
                   !location.longitude &&
                   !hasPermission(
                     `${role}`,
-                    `${deleteRole}:setting_locations`
+                    `${deleteRole}:${attribute.settingLocations}`
                   ) &&
                   "hidden"
               )}
@@ -110,7 +111,7 @@ export function LocationCard({
                     (!location.latitude && !location.longitude) ||
                       (!hasPermission(
                         `${role}`,
-                        `${deleteRole}:setting_locations`
+                        `${deleteRole}:${attribute.settingLocations}`
                       ) &&
                         "hidden")
                   )}

@@ -16,7 +16,7 @@ import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { deleteRole, hasPermission } from "@canny_ecosystem/utils";
-import { DELETE_TEXT } from "@canny_ecosystem/utils/constant";
+import { attribute, DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
@@ -64,7 +64,7 @@ export const DeleteStatutoryBonus = ({
           "text-sm h-9 flex gap-1 items-center",
           !hasPermission(
             `${role}`,
-            `${deleteRole}:  "statutory_fields_statutory_bonus",
+            `${deleteRole}:  ${attribute.statutoryFieldsStatutoryBonus},
 `
           ) && "hidden"
         )}

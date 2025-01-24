@@ -26,6 +26,7 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const UPDATE_STATUTORY_BONUS = "update-statutory-bonus";
 
@@ -37,7 +38,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   if (
     !hasPermission(
       `${user?.role!}`,
-      `${updateRole}:statutory_fields_statutory_bonus`
+      `${updateRole}:${attribute.statutoryFieldsStatutoryBonus}`
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });

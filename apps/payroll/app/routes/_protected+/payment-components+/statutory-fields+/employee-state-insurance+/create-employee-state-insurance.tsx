@@ -44,6 +44,7 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { DEFAULT_ROUTE } from "@/constant";
 import { safeRedirect } from "@/utils/server/http.server";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const CREATE_EMPLOYEE_STATE_INSURANCE =
   "create-employee-state-insurance";
@@ -53,7 +54,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:statutory_fields_esi`)) {
+  if (
+    !hasPermission(user?.role!, `${updateRole}:${attribute.statutoryFieldsEsi}`)
+  ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 

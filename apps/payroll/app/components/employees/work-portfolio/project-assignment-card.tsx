@@ -11,6 +11,7 @@ import {
   updateRole,
 } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 type DetailItemProps = {
   label: string;
@@ -58,7 +59,7 @@ export const EmployeeProjectAssignmentCard = ({
             "bg-card",
             !hasPermission(
               `${role}`,
-              `${updateRole}:employee_project_assignment`
+              `${updateRole}:${attribute.employeeProjectAssignment}`
             ) && "hidden",
             !projectAssignment && "hidden"
           )}

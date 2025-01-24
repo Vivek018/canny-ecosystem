@@ -6,7 +6,10 @@ import { SampleEPFCalculationCard } from "./sample-epf-calculation-card";
 import { EPFNoData } from "./epf-no-data";
 import { DeleteEmployeeProvidentFund } from "./delete-employee-provident-fund";
 import { ErrorBoundary } from "@/components/error-boundary";
-import { EMPLOYEE_EPF_PERCENTAGE } from "@canny_ecosystem/utils/constant";
+import {
+  attribute,
+  EMPLOYEE_EPF_PERCENTAGE,
+} from "@canny_ecosystem/utils/constant";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
@@ -63,8 +66,10 @@ export function EPFWrapper({
             to={`/payment-components/statutory-fields/employee-provident-fund/${data?.id}/update-epf`}
             className={cn(
               "p-2 rounded-full bg-secondary grid place-items-center",
-              !hasPermission(role, `${updateRole}:statutory_fields_epf`) &&
-                "hidden"
+              !hasPermission(
+                role,
+                `${updateRole}:${attribute.statutoryFieldsEpf}`
+              ) && "hidden"
             )}
           >
             <Icon name="edit" size="sm" />

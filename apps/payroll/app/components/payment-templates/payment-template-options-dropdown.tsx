@@ -7,7 +7,7 @@ import {
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { useNavigate } from "@remix-run/react";
 import { DeletePaymentTemplate } from "./delete-payment-template";
-import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
+import { attribute, modalSearchParamNames } from "@canny_ecosystem/utils/constant";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
@@ -52,8 +52,8 @@ export const PaymentTemplateOptionsDropdown = ({
           </DropdownMenuItem>
           <DropdownMenuSeparator
             className={cn(
-              !hasPermission(role, `${updateRole}:payment_templates`) &&
-                !hasPermission(role, `${deleteRole}:payment_templates`) &&
+              !hasPermission(role, `${updateRole}:${attribute.paymentTemplates}`) &&
+                !hasPermission(role, `${deleteRole}:${attribute.paymentTemplates}`) &&
                 "hidden"
             )}
           />
@@ -61,7 +61,7 @@ export const PaymentTemplateOptionsDropdown = ({
             onClick={handleEdit}
             className={cn(
               "hidden",
-              hasPermission(role, `${updateRole}:payment_templates`) &&
+              hasPermission(role, `${updateRole}:${attribute.paymentTemplates}`) &&
                 "flex"
             )}
           >
@@ -71,7 +71,7 @@ export const PaymentTemplateOptionsDropdown = ({
             onClick={handleEditComponents}
             className={cn(
               "hidden",
-              hasPermission(role, `${updateRole}:payment_templates`) &&
+              hasPermission(role, `${updateRole}:${attribute.paymentTemplates}`) &&
                 "flex"
             )}
           >
@@ -80,7 +80,7 @@ export const PaymentTemplateOptionsDropdown = ({
           <DropdownMenuSeparator
             className={cn(
               "hidden",
-              hasPermission(role, `${deleteRole}:payment_templates`) &&
+              hasPermission(role, `${deleteRole}:${attribute.paymentTemplates}`) &&
                 "flex"
             )}
           />

@@ -41,7 +41,7 @@ import {
 } from "@canny_ecosystem/ui/card";
 import { createLabourWelfareFund } from "@canny_ecosystem/supabase/mutations";
 import type { LabourWelfareFundDatabaseUpdate } from "@canny_ecosystem/supabase/types";
-import { statesAndUTs } from "@canny_ecosystem/utils/constant";
+import { attribute, statesAndUTs } from "@canny_ecosystem/utils/constant";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
@@ -55,7 +55,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:statutory_fields_lwf`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.statutoryFieldsLwf}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   try {

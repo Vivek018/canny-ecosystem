@@ -10,7 +10,7 @@ import {
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { hasPermission, updateRole } from "@canny_ecosystem/utils";
-import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
+import { attribute, modalSearchParamNames } from "@canny_ecosystem/utils/constant";
 import { useNavigate, useSearchParams } from "@remix-run/react";
 
 export function AddEmployeeDialog() {
@@ -23,7 +23,7 @@ export function AddEmployeeDialog() {
       <DropdownMenuTrigger
         asChild
         className={cn(
-          !hasPermission(role, `${updateRole}:employees`) && "hidden"
+          !hasPermission(role, `${updateRole}:${attribute.employees}`) && "hidden"
         )}
       >
         <Button variant="outline" size="icon" className="h-10 w-10">

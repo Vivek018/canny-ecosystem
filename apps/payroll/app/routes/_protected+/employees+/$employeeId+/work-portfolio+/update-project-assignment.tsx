@@ -35,6 +35,7 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const UPDATE_EMPLOYEE_PROJECT_ASSIGNMENT =
   "update-employee-project-assignment";
@@ -51,7 +52,7 @@ export async function loader({
   if (
     !hasPermission(
       `${user?.role!}`,
-      `${updateRole}:employee_project_assignment`
+      `${updateRole}:${attribute.employeeProjectAssignment}`
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });

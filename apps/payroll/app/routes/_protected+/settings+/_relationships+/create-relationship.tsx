@@ -50,6 +50,7 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const CREATE_RELATIONSHIP = "create-relationship";
 
@@ -60,7 +61,12 @@ export async function loader({
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:setting_relationships`)) {
+  if (
+    !hasPermission(
+      user?.role!,
+      `${updateRole}:${attribute.settingRelationships}`
+    )
+  ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   try {

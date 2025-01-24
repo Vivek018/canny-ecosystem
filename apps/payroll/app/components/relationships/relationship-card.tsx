@@ -31,7 +31,10 @@ import {
   updateRole,
 } from "@canny_ecosystem/utils";
 import type { RelationshipWithCompany } from "@canny_ecosystem/supabase/queries";
-import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
+import {
+  attribute,
+  modalSearchParamNames,
+} from "@canny_ecosystem/utils/constant";
 import { useUserRole } from "@/utils/user";
 
 export function RelationshipCard({
@@ -62,8 +65,10 @@ export function RelationshipCard({
                   to={`/settings/${relationship.id}/update-relationship`}
                   className={cn(
                     "p-2 rounded-md bg-secondary grid place-items-center",
-                    !hasPermission(role, `${updateRole}:setting_users`) &&
-                      "hidden"
+                    !hasPermission(
+                      role,
+                      `${updateRole}:${attribute.settingRelationships}`
+                    ) && "hidden"
                   )}
                 >
                   <Icon name="edit" size="xs" />
@@ -95,7 +100,7 @@ export function RelationshipCard({
                   className={cn(
                     !hasPermission(
                       role,
-                      `${deleteRole}:setting_relationships`
+                      `${deleteRole}:${attribute.settingRelationships}`
                     ) || !relationship?.terms
                       ? "hidden"
                       : "flex"

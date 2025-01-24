@@ -11,6 +11,7 @@ import type {
 } from "@canny_ecosystem/supabase/types";
 import { hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export function EmployeePageHeader({
   employee,
@@ -81,7 +82,7 @@ export function EmployeePageHeader({
             className={cn(
               buttonVariants({ variant: "outline" }),
               "w-full bg-card",
-              !hasPermission(role, `${updateRole}:employee_details`) &&
+              !hasPermission(role, `${updateRole}:${attribute.employeeDetails}`) &&
                 "hidden"
             )}
           >
@@ -101,7 +102,7 @@ export function EmployeePageHeader({
                 className={cn(
                   buttonVariants({ variant: "outline" }),
                   "bg-card",
-                  !hasPermission(role, `${updateRole}:employees`) &&
+                  !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
                     "hidden"
                 )}
               >

@@ -10,6 +10,7 @@ import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json, Link, useLoaderData } from "@remix-run/react";
 import { useEffect, useState } from "react";
@@ -31,6 +32,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export default function Users() {
   const { role } = useUserRole();
   const { data } = useLoaderData<typeof loader>();
+  console.log(data);
+
   const [searchString, setSearchString] = useState("");
   const [tableData, setTableData] = useState(data);
 
@@ -70,7 +73,8 @@ export default function Users() {
             className={cn(
               buttonVariants({ variant: "primary-outline" }),
               "flex items-center gap-1",
-              !hasPermission(role, `${updateRole}:setting_users`) && "hidden"
+              !hasPermission(role, `${updateRole}:${attribute.settingUsers}`) &&
+                "hidden"
             )}
           >
             <span>Add</span>

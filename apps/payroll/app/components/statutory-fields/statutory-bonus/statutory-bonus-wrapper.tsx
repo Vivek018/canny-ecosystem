@@ -1,6 +1,6 @@
 import type { StatutoryBonusDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import { payoutMonths } from "@canny_ecosystem/utils/constant";
+import { attribute, payoutMonths } from "@canny_ecosystem/utils/constant";
 import { Link } from "@remix-run/react";
 import { DeleteStatutoryBonus } from "@/components/statutory-fields/statutory-bonus/delete-statutory-bonus";
 import { StatutoryBonusNoData } from "./statutory-bonus-no-data";
@@ -48,7 +48,7 @@ export function StatutoryBonusWrapper({
               "p-2 rounded-full bg-secondary grid place-items-center",
               !hasPermission(
                 `${role}`,
-                `${updateRole}:statutory_fields_statutory_bonus`
+                `${updateRole}:${attribute.statutoryFieldsStatutoryBonus}`
               ) && "hidden"
             )}
           >

@@ -6,26 +6,27 @@ export const readRole = "read";
 export const updateRole = "update";
 export const deleteRole = "delete";
 
+const attributeValues = Object.values(attribute);
 export const ROLES: { [key in (typeof userRoles)[number]]: readonly string[] } =
   {
-    master: attribute.flatMap((value) => [
+    master: attributeValues.flatMap((value) => [
       `${createRole}:${value}`,
       `${readRole}:${value}`,
       `${updateRole}:${value}`,
       `${deleteRole}:${value}`,
     ]),
-    admin: attribute.flatMap((value) => [
+    admin: attributeValues.flatMap((value) => [
       `${createRole}:${value}`,
       `${readRole}:${value}`,
       `${updateRole}:${value}`,
     ]),
-    operation_manager: attribute.flatMap((value) => [
+    operation_manager: attributeValues.flatMap((value) => [
       `${createRole}:${value}`,
       `${readRole}:${value}`,
       `${updateRole}:${value}`,
     ]),
-    executive: attribute
-      .filter((value) => !value.includes("feedback_list"))
+    executive: attributeValues
+      .filter((value) => !value.includes(attribute.feedbackList))
       .flatMap((value) => [`${readRole}:${value}`]),
   } as const;
 

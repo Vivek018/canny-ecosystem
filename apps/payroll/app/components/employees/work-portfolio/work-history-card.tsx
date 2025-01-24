@@ -30,6 +30,7 @@ import {
   updateRole,
 } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 type DetailItemProps = {
   label: string;
@@ -82,7 +83,7 @@ export const WorkHistoryItem = ({
                     "px-2.5 h-min",
                     !hasPermission(
                       `${role}`,
-                      `${updateRole}:employee_work_history`
+                      `${updateRole}:${attribute.employeeWorkHistory}`
                     ) && "hidden"
                   )}
                 >
@@ -99,7 +100,7 @@ export const WorkHistoryItem = ({
                 "px-2.5 h-min hidden",
                 hasPermission(
                   `${role}`,
-                  `${deleteRole}:employee_work_history`
+                  `${deleteRole}:${attribute.employeeWorkHistory}`
                 ) && "flex"
               )}
             >
@@ -159,7 +160,7 @@ export const EmployeeWorkHistoriesCard = ({
               "bg-card",
               !hasPermission(
                 `${role}`,
-                `${updateRole}:employee_work_history`
+                `${updateRole}:${attribute.employeeWorkHistory}`
               ) && "hidden"
             )}
           >

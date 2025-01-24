@@ -10,13 +10,14 @@ import {
   hasPermission,
   isGoodStatus,
 } from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
 import { type ActionFunctionArgs, json } from "@remix-run/node";
 
 export async function action({ params, request }: ActionFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${deleteRole}:setting_users`)) {
+  if (!hasPermission(user?.role!, `${deleteRole}:${attribute.settingUsers}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 

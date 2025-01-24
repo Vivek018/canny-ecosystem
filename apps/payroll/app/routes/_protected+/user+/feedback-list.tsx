@@ -28,6 +28,7 @@ import {
   hasPermission,
   readRole,
 } from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
@@ -39,7 +40,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role, `${readRole}:feedback_list`)) {
+  if (!hasPermission(user?.role!, `${readRole}:${attribute.feedbackList}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);

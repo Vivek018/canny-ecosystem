@@ -3,7 +3,10 @@ import { ExitsSearchFilter } from "@/components/exits/exit-search-filter";
 import { FilterList } from "@/components/exits/filter-list";
 import { ExitPaymentColumns } from "@/components/exits/table/columns";
 import { ExitPaymentTable } from "@/components/exits/table/data-table";
+import { DEFAULT_ROUTE } from "@/constant";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import {
   LAZY_LOADING_LIMIT,
   MAX_QUERY_LIMIT,
@@ -15,12 +18,22 @@ import {
   getSiteNamesByProjectName,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
+import { hasPermission, readRole } from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect, useLoaderData } from "@remix-run/react";
 
 const pageSize = 20;
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(user?.role!, `${readRole}:${attribute.exits}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
+
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
@@ -29,7 +42,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const page = 0;
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
     const searchParams = new URLSearchParams(url.searchParams);
@@ -54,7 +66,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined,
+        (value) => value !== null && value !== undefined
       );
 
     const { data, meta, error } = await getExits({
@@ -69,7 +81,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
 
     const hasNextPage = Boolean(
-      meta?.count && meta.count / (page + 1) > LAZY_LOADING_LIMIT,
+      meta?.count && meta.count / (page + 1) > LAZY_LOADING_LIMIT
     );
 
     if (error) {

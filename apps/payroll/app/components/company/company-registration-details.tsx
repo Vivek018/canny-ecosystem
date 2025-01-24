@@ -18,6 +18,7 @@ import {
   replaceUnderscore,
   updateRole,
 } from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
 import {
   FormProvider,
   getFormProps,
@@ -81,7 +82,7 @@ export const CompanyRegistrationDetails = ({
                   )}`,
                   readOnly: !hasPermission(
                     role,
-                    `${updateRole}:setting_general`
+                    `${updateRole}:${attribute.settingGeneral}`
                   ),
                 }}
                 errors={fields.registration_number.errors}
@@ -94,7 +95,7 @@ export const CompanyRegistrationDetails = ({
                   )}`,
                   readOnly: !hasPermission(
                     role,
-                    `${updateRole}:setting_general`
+                    `${updateRole}:${attribute.settingGeneral}`
                   ),
                 }}
                 errors={fields.gst_number.errors}
@@ -107,7 +108,7 @@ export const CompanyRegistrationDetails = ({
                   )}`,
                   readOnly: !hasPermission(
                     role,
-                    `${updateRole}:setting_general`
+                    `${updateRole}:${attribute.settingGeneral}`
                   ),
                 }}
                 errors={fields.pan_number.errors}
@@ -120,7 +121,7 @@ export const CompanyRegistrationDetails = ({
                   )}`,
                   readOnly: !hasPermission(
                     role,
-                    `${updateRole}:setting_general`
+                    `${updateRole}:${attribute.settingGeneral}`
                   ),
                 }}
                 errors={fields.pf_number.errors}
@@ -133,7 +134,7 @@ export const CompanyRegistrationDetails = ({
                   )}`,
                   readOnly: !hasPermission(
                     role,
-                    `${updateRole}:setting_general`
+                    `${updateRole}:${attribute.settingGeneral}`
                   ),
                 }}
                 errors={fields.esic_number.errors}
@@ -146,7 +147,7 @@ export const CompanyRegistrationDetails = ({
                   )}`,
                   readOnly: !hasPermission(
                     role,
-                    `${updateRole}:setting_general`
+                    `${updateRole}:${attribute.settingGeneral}`
                   ),
                 }}
                 errors={fields.lwf_number.errors}
@@ -159,7 +160,7 @@ export const CompanyRegistrationDetails = ({
                   )}`,
                   readOnly: !hasPermission(
                     role,
-                    `${updateRole}:setting_general`
+                    `${updateRole}:${attribute.settingGeneral}`
                   ),
                 }}
                 errors={fields.pt_number.errors}
@@ -170,7 +171,7 @@ export const CompanyRegistrationDetails = ({
           <CardFooter
             className={cn(
               "border-t pt-6 flex justify-between",
-              !hasPermission(role, `${updateRole}:setting_general`) && "hidden"
+              !hasPermission(role, `${updateRole}:${attribute.settingGeneral}`) && "hidden"
             )}
           >
             <div>Please use 15 characters at maximum.</div>

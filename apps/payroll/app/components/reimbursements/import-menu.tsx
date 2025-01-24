@@ -9,7 +9,7 @@ import {
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { hasPermission, updateRole } from "@canny_ecosystem/utils";
-import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
+import { attribute, modalSearchParamNames } from "@canny_ecosystem/utils/constant";
 import { useSearchParams } from "@remix-run/react";
 
 export function ImportReimbursementMenu() {
@@ -21,7 +21,7 @@ export function ImportReimbursementMenu() {
       <DropdownMenuTrigger
         asChild
         className={cn(
-          !hasPermission(role, `${updateRole}:reimbursements`) && "hidden"
+          !hasPermission(role, `${updateRole}:${attribute.reimbursements}`) && "hidden"
         )}
       >
         <Button variant="outline" size="icon" className="h-10 w-[2.5rem]">

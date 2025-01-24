@@ -44,6 +44,7 @@ import { createPaymentTemplateWithComponents } from "@canny_ecosystem/supabase/m
 import { DEFAULT_ROUTE } from "@/constant";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const CREATE_PAYMENT_TEMPLATE = [
   "create-payment-template",
@@ -61,7 +62,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:payment_templates`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.paymentTemplates}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 

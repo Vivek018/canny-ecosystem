@@ -6,6 +6,7 @@ import { Link } from "@remix-run/react";
 import type { EmployeeBankDetailsDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 type DetailItemProps = {
   label: string;
@@ -52,7 +53,7 @@ export const EmployeeBankDetailsCard = ({
             buttonVariants({ variant: "outline" }),
             "bg-card",
             !bankDetails && "hidden",
-            !hasPermission(role, `${updateRole}:employee_bank_details`) &&
+            !hasPermission(role, `${updateRole}:${attribute.employeeBankDetails}`) &&
               "hidden"
           )}
         >

@@ -20,6 +20,7 @@ import type { LabourWelfareFundDatabaseUpdate } from "@canny_ecosystem/supabase/
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const UPDATE_LABOUR_WELFARE_FUND = "update-labour-welfare-fund";
 
@@ -29,7 +30,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
   if (
-    !hasPermission(user?.role!, `${updateRole}:statutory_fields_lwf`)
+    !hasPermission(user?.role!, `${updateRole}:${attribute.statutoryFieldsLwf}`)
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }

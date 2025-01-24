@@ -29,6 +29,7 @@ import {
 } from "@canny_ecosystem/utils";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 type DetailItemProps = {
   label: string;
@@ -80,7 +81,7 @@ export function LabourWelfareFundCard({
                     "p-2 rounded-md bg-secondary grid place-items-center",
                     !hasPermission(
                       `${role}`,
-                      `${updateRole}:statutory_fields_lwf`
+                      `${updateRole}:${attribute.statutoryFieldsLwf}`
                     ) && "hidden"
                   )}
                 >
@@ -96,7 +97,7 @@ export function LabourWelfareFundCard({
                 "p-2 py-2 rounded-md bg-secondary grid place-items-center",
                 !hasPermission(
                   `${role}`,
-                  `${deleteRole}:statutory_fields_lwf`
+                  `${deleteRole}:${attribute.statutoryFieldsLwf}`
                 ) && "hidden"
               )}
             >

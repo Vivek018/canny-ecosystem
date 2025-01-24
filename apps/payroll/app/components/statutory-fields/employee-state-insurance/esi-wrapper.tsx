@@ -11,6 +11,7 @@ import { ESINoData } from "./esi-no-data";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { useUserRole } from "@/utils/user";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 type DetailItemProps = {
   label: string;
@@ -52,8 +53,10 @@ export function ESIWrapper({
             to={`/payment-components/statutory-fields/employee-state-insurance/${data?.id}/update-esi`}
             className={cn(
               "p-2 rounded-full bg-secondary grid place-items-center",
-              !hasPermission(role, `${updateRole}:statutory_fields_esi`) &&
-                "hidden"
+              !hasPermission(
+                role,
+                `${updateRole}:${attribute.statutoryFieldsEsi}`
+              ) && "hidden"
             )}
           >
             <Icon name="edit" size="sm" />

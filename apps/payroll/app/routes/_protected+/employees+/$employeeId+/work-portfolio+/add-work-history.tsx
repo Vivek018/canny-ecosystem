@@ -48,6 +48,7 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const ADD_EMPLOYEE_WORK_HISTORY = "add-employee-work-history";
 
@@ -56,7 +57,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:employee_work_history`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.employeeWorkHistory}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 

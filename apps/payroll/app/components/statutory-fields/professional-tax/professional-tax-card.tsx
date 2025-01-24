@@ -41,6 +41,7 @@ import { Input } from "@canny_ecosystem/ui/input";
 import { Fragment } from "react";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 type DetailItemProps = {
   label: string;
@@ -94,7 +95,7 @@ export function ProfessionalTaxCard({
                     "p-2 rounded-md bg-secondary grid place-items-center",
                     !hasPermission(
                       `${role}`,
-                      `${updateRole}:statutory_fields_pf`
+                      `${updateRole}:${attribute.statutoryFieldsPf}`
                     ) && "hidden"
                   )}
                 >
@@ -110,7 +111,7 @@ export function ProfessionalTaxCard({
                 "p-2 py-2 rounded-md bg-secondary grid place-items-center",
                 !hasPermission(
                   `${role}`,
-                  `${deleteRole}:statutory_fields_pf`
+                  `${deleteRole}:${attribute.statutoryFieldsPf}`
                 ) && "hidden"
               )}
             >

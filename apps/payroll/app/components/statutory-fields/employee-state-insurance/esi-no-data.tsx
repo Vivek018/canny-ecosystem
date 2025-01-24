@@ -9,6 +9,7 @@ import {
 } from "@canny_ecosystem/ui/card";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
 import { Link } from "@remix-run/react";
 
 export function ESINoData() {
@@ -32,8 +33,10 @@ export function ESINoData() {
             to="/payment-components/statutory-fields/employee-state-insurance/create-employee-state-insurance"
             className={cn(
               buttonVariants({ variant: "primary-outline" }),
-              !hasPermission(role, `${updateRole}:statutory_fields_esi`) &&
-                "hidden"
+              !hasPermission(
+                role,
+                `${updateRole}:${attribute.statutoryFieldsEsi}`
+              ) && "hidden"
             )}
           >
             Enable ESI

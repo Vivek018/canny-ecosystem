@@ -4,6 +4,7 @@ import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { updateUserLastLogin } from "@canny_ecosystem/supabase/mutations";
 import { DEFAULT_ROUTE } from "@/constant";
 import { setUserCookie } from "@/utils/server/user.server";
+import { setCompanyId } from "@/utils/server/company.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const requestUrl = new URL(request.url);
@@ -34,6 +35,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
     }
 
     headers.append("Set-Cookie", setUserCookie(userData));
+    if (userData?.company_id?.length) {
+      headers.append("Set-Cookie", setCompanyId(userData?.company_id));
+    }
 
     return safeRedirect(next, {
       headers: headers,

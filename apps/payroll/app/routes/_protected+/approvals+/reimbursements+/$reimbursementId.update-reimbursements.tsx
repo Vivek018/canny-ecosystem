@@ -17,6 +17,7 @@ import {
 import AddReimbursements from "../../employees+/$employeeId+/reimbursements+/add-reimbursement";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const UPDATE_REIMBURSEMENTS_TAG = "Update Reimbursements";
 
@@ -26,7 +27,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:reimbursements`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.reimbursements}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   let reimbursementData = null;
