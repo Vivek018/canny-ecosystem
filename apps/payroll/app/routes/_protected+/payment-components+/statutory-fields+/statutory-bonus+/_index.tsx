@@ -48,7 +48,7 @@ export default function StatutoryBonusIndex() {
             return <ErrorBoundary message="Failed to load Statutory Bonus" />;
           return (
             <StatutoryBonusWrapper
-              data={resolvedData.data}
+              data={resolvedData.data as any}
               error={resolvedData.error}
             />
           );

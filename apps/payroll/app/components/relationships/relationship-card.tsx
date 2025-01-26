@@ -24,17 +24,26 @@ import {
 } from "@canny_ecosystem/ui/card";
 import { DeleteRelationship } from "./delete-relationship";
 import {
+  deleteRole,
   getAutoTimeDifference,
+  hasPermission,
   replaceUnderscore,
+  updateRole,
 } from "@canny_ecosystem/utils";
 import type { RelationshipWithCompany } from "@canny_ecosystem/supabase/queries";
-import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
+import {
+  attribute,
+  modalSearchParamNames,
+} from "@canny_ecosystem/utils/constant";
+import { useUserRole } from "@/utils/user";
 
 export function RelationshipCard({
   relationship,
 }: {
   relationship: Omit<RelationshipWithCompany, "created_at" | "updated_at">;
 }) {
+  const { role } = useUserRole();
+
   const navigate = useNavigate();
   const viewRelationshipTermsParam = `step=${modalSearchParamNames.view_relationship_terms}`;
 
@@ -54,7 +63,13 @@ export function RelationshipCard({
                 <Link
                   prefetch="intent"
                   to={`/settings/${relationship.id}/update-relationship`}
-                  className="p-2 rounded-md bg-secondary grid place-items-center"
+                  className={cn(
+                    "p-2 rounded-md bg-secondary grid place-items-center",
+                    !hasPermission(
+                      role,
+                      `${updateRole}:${attribute.settingRelationships}`
+                    ) && "hidden"
+                  )}
                 >
                   <Icon name="edit" size="xs" />
                 </Link>
@@ -71,20 +86,30 @@ export function RelationshipCard({
                 <DropdownMenuItem
                   className={cn(
                     "py-2 text-[13px]",
-                    !relationship.terms && "hidden",
+                    !relationship.terms && "hidden"
                   )}
                   onClick={() => {
                     navigate(
-                      `/settings/relationships/${relationship.id}?${viewRelationshipTermsParam}`,
+                      `/settings/relationships/${relationship.id}?${viewRelationshipTermsParam}`
                     );
                   }}
                 >
                   View Terms
                 </DropdownMenuItem>
                 <DropdownMenuSeparator
-                  className={cn(!relationship?.terms && "hidden")}
+                  className={cn(
+                    !hasPermission(
+                      role,
+                      `${deleteRole}:${attribute.settingRelationships}`
+                    ) || !relationship?.terms
+                      ? "hidden"
+                      : "flex"
+                  )}
                 />
-                <DeleteRelationship relationshipId={relationship.id} />
+                <DeleteRelationship
+                  relationshipId={relationship.id}
+                  role={role}
+                />
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -98,7 +123,7 @@ export function RelationshipCard({
           <div
             className={cn(
               "bg-input flex-1 h-[1px]",
-              relationship?.is_active && "bg-primary",
+              relationship?.is_active && "bg-primary"
             )}
           >
             &nbsp;
@@ -109,7 +134,7 @@ export function RelationshipCard({
                 <div
                   className={cn(
                     "w-2 h-2 rounded-full bg-primary/75",
-                    !relationship?.is_active && "hidden",
+                    !relationship?.is_active && "hidden"
                   )}
                 >
                   &nbsp;
@@ -121,7 +146,7 @@ export function RelationshipCard({
           <div
             className={cn(
               "bg-input flex-1 h-[1px]",
-              relationship?.is_active && "bg-primary",
+              relationship?.is_active && "bg-primary"
             )}
           >
             &nbsp;
@@ -130,7 +155,7 @@ export function RelationshipCard({
             className={cn(
               "capitalize p-2 border border-input rounded-md bg-muted/75 max-w-32 truncate",
               !relationship?.child_company?.name &&
-                "bg-background text-muted-foreground",
+                "bg-background text-muted-foreground"
             )}
           >
             {relationship?.child_company?.name ?? "Add Company"}
@@ -139,18 +164,18 @@ export function RelationshipCard({
       </CardContent>
       <CardFooter
         className={cn(
-          "mx-4 mb-1.5 mt-auto p-0 py-1.5 text-foreground text-xs flex gap-1 justify-between font-semibold",
+          "mx-4 mb-1.5 mt-auto p-0 py-1.5 text-foreground text-xs flex gap-1 justify-between font-semibold"
         )}
       >
         <p
           className={cn(
-            "text-green bg-green/25 rounded-md p-1 flex items-center gap-1 capitalize",
+            "text-green bg-green/25 rounded-md p-1 flex items-center gap-1 capitalize"
           )}
         >
           <Icon name="clock" size="xs" className=" scale-x-[-1]" />
           {getAutoTimeDifference(
             relationship.start_date,
-            new Date().toISOString(),
+            new Date().toISOString()
           )}{" "}
           days ago
         </p>
@@ -159,22 +184,22 @@ export function RelationshipCard({
             "text-destructive bg-destructive/25 rounded-md flex items-center gap-1 p-1 capitalize",
             !getAutoTimeDifference(
               new Date().toISOString(),
-              relationship.end_date,
-            ) && "hidden",
+              relationship.end_date
+            ) && "hidden"
           )}
         >
           <Icon name="clock" size="xs" />
           {getAutoTimeDifference(
             new Date().toISOString(),
-            relationship.end_date,
+            relationship.end_date
           )! > 0
             ? ` In ${getAutoTimeDifference(
                 new Date().toISOString(),
-                relationship.end_date,
+                relationship.end_date
               )} Days`
             : `${getAutoTimeDifference(
                 relationship.start_date,
-                new Date().toISOString(),
+                new Date().toISOString()
               )} days ago`}
         </p>
       </CardFooter>

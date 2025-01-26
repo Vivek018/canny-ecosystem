@@ -1,16 +1,33 @@
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@canny_ecosystem/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@canny_ecosystem/ui/tooltip";
 import { Link } from "@remix-run/react";
 import { Card, CardContent, CardTitle } from "@canny_ecosystem/ui/card";
 import type { ProjectsWithCompany } from "@canny_ecosystem/supabase/queries";
 import { Avatar, AvatarFallback } from "@canny_ecosystem/ui/avatar";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Progress } from "@canny_ecosystem/ui/progress";
-import { getAutoTimeDifference } from "@canny_ecosystem/utils";
+import {
+  deleteRole,
+  getAutoTimeDifference,
+  hasPermission,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import { ProjectOptionsDropdown } from "./project-options-dropdown";
+import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
-export function ProjectCard({ project }: { project: Omit<ProjectsWithCompany, "created_at" | "updated_at"> }) {
+export function ProjectCard({
+  project,
+}: {
+  project: Omit<ProjectsWithCompany, "created_at" | "updated_at">;
+}) {
+  const { role } = useUserRole();
   const companies = [
     project?.project_client,
     project?.primary_contractor,
@@ -51,10 +68,12 @@ export function ProjectCard({ project }: { project: Omit<ProjectsWithCompany, "c
                         <Avatar
                           className={cn(
                             "w-12 h-12 border border-muted-foreground/30 shadow-sm hover:z-40",
-                            index !== 0 && "-ml-[18px]",
+                            index !== 0 && "-ml-[18px]"
                           )}
                         >
-                          {company?.logo && (<img src={company?.logo} alt={company?.name} />)}
+                          {company?.logo && (
+                            <img src={company?.logo} alt={company?.name} />
+                          )}
                           <AvatarFallback>
                             <span className="tracking-widest text-sm">
                               {company?.name.charAt(0)}
@@ -64,19 +83,23 @@ export function ProjectCard({ project }: { project: Omit<ProjectsWithCompany, "c
                       </TooltipTrigger>
                       <TooltipContent>{company?.name}</TooltipContent>
                     </Tooltip>
-                  ) : null,
+                  ) : null
                 )}
               </div>
-              <p className="text-xs text-muted-foreground">Companies Involved</p>
+              <p className="text-xs text-muted-foreground">
+                Companies Involved
+              </p>
             </TooltipProvider>
           </div>
-          <div className={cn("flex flex-col", project.actual_end_date && "hidden")}>
+          <div
+            className={cn("flex flex-col", project.actual_end_date && "hidden")}
+          >
             <Progress
               value={
                 (getAutoTimeDifference(project.start_date, new Date())! /
                   getAutoTimeDifference(
                     project.start_date,
-                    project.estimated_end_date,
+                    project.estimated_end_date
                   )!) *
                 100
               }
@@ -86,7 +109,7 @@ export function ProjectCard({ project }: { project: Omit<ProjectsWithCompany, "c
               className={cn(
                 "text-xs text-muted-foreground ml-auto mt-1",
                 getAutoTimeDifference(new Date(), project.estimated_end_date)! <
-                0 && "hidden",
+                  0 && "hidden"
               )}
             >
               {getAutoTimeDifference(new Date(), project.estimated_end_date)}{" "}
@@ -96,18 +119,21 @@ export function ProjectCard({ project }: { project: Omit<ProjectsWithCompany, "c
           <div
             className={cn(
               "flex flex-col",
-              !project.actual_end_date && "hidden",
+              !project.actual_end_date && "hidden"
             )}
           >
             <Progress value={100} className="w-80" />
             <p
               className={cn(
                 "text-xs text-muted-foreground ml-auto mt-1",
-                !project.actual_end_date && "hidden",
+                !project.actual_end_date && "hidden"
               )}
             >
               Took{" "}
-              {getAutoTimeDifference(project.start_date, project.actual_end_date)}{" "}
+              {getAutoTimeDifference(
+                project.start_date,
+                project.actual_end_date
+              )}{" "}
               days
             </p>
           </div>
@@ -118,7 +144,13 @@ export function ProjectCard({ project }: { project: Omit<ProjectsWithCompany, "c
               <TooltipTrigger asChild>
                 <Link
                   to={`/projects/${project.id}/update-project`}
-                  className="p-2 rounded-md bg-secondary grid place-items-center border-foreground"
+                  className={cn(
+                    "p-2 rounded-md bg-secondary grid place-items-center border-foreground ",
+                    !hasPermission(
+                      role,
+                      `${deleteRole}:${attribute.projects}`
+                    ) && "hidden"
+                  )}
                 >
                   <Icon name="edit" size="xs" />
                 </Link>
@@ -132,7 +164,17 @@ export function ProjectCard({ project }: { project: Omit<ProjectsWithCompany, "c
               actual_end_date: project.actual_end_date,
             }}
             triggerChild={
-              <DropdownMenuTrigger className="p-2 py-2 rounded-md bg-secondary grid place-items-center border-foreground">
+              <DropdownMenuTrigger
+                className={cn(
+                  "p-2 py-2 rounded-md bg-secondary grid place-items-center border-foreground",
+                  !hasPermission(role, `${deleteRole}:${attribute.projects}`) &&
+                    !hasPermission(
+                      role,
+                      `${updateRole}:${attribute.projects}`
+                    ) &&
+                    "hidden"
+                )}
+              >
                 <Icon name="dots-vertical" size="xs" />
               </DropdownMenuTrigger>
             }

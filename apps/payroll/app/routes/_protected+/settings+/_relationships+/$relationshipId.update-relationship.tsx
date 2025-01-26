@@ -10,7 +10,12 @@ import {
   useNavigate,
 } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
-import { isGoodStatus, RelationshipSchema } from "@canny_ecosystem/utils";
+import {
+  hasPermission,
+  isGoodStatus,
+  RelationshipSchema,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import {
   getCompanies,
   getRelationshipById,
@@ -24,14 +29,28 @@ import type {
   RelationshipDatabaseUpdate,
 } from "@canny_ecosystem/supabase/types";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const UPDATE_RELATIONSHIP = "update-relationship";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const relationshipId = params.relationshipId;
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (
+    !hasPermission(
+      user?.role!,
+      `${updateRole}:${attribute.settingRelationships}`
+    )
+  ) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
 
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
     let relationshipPromise = null;
 
@@ -61,7 +80,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         relationshipPromise: null,
         companiesData: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -80,7 +99,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -108,7 +127,7 @@ export async function action({
         message: "Failed to update relationship",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

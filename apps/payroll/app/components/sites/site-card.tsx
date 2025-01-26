@@ -24,14 +24,24 @@ import {
   CardTitle,
 } from "@canny_ecosystem/ui/card";
 import type { SitesWithLocation } from "@canny_ecosystem/supabase/queries";
-import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
-import { replaceUnderscore } from "@canny_ecosystem/utils";
+import {
+  attribute,
+  modalSearchParamNames,
+} from "@canny_ecosystem/utils/constant";
+import {
+  deleteRole,
+  hasPermission,
+  replaceUnderscore,
+  updateRole,
+} from "@canny_ecosystem/utils";
+import { useUserRole } from "@/utils/user";
 
 export function SiteCard({
   site,
 }: {
   site: Omit<SitesWithLocation, "created_at" | "updated_at">;
 }) {
+  const { role } = useUserRole();
   const navigate = useNavigate();
 
   const viewLinkTemplateSearchParam = `step=${modalSearchParamNames.view_link_template}`;
@@ -57,7 +67,13 @@ export function SiteCard({
                 <Link
                   prefetch="intent"
                   to={`/projects/${site.project_id}/${site.id}/update-site`}
-                  className="p-2 rounded-md bg-secondary grid place-items-center"
+                  className={cn(
+                    "p-2 rounded-md bg-secondary grid place-items-center ",
+                    !hasPermission(
+                      role,
+                      `${updateRole}:${attribute.projectSites}`
+                    ) && "hidden"
+                  )}
                 >
                   <Icon name="edit" size="xs" />
                 </Link>
@@ -74,33 +90,59 @@ export function SiteCard({
                 <DropdownMenuItem
                   onClick={() => {
                     navigate(
-                      `/projects/${site.project_id}/sites/${site.id}?${viewPaySequenceSearchParam}`,
+                      `/projects/${site.project_id}/sites/${site.id}?${viewPaySequenceSearchParam}`
                     );
                   }}
                 >
                   View Pay Sequence
                 </DropdownMenuItem>
                 <DropdownMenuItem
+                  className={cn(
+                    !hasPermission(
+                      role,
+                      `${updateRole}:${attribute.projectSites}`
+                    ) && "hidden"
+                  )}
                   onClick={() => {
                     navigate(
-                      `/projects/${site.project_id}/sites/${site.id}?${editPaySequenceSearchParam}`,
+                      `/projects/${site.project_id}/sites/${site.id}?${editPaySequenceSearchParam}`
                     );
                   }}
                 >
                   Edit Pay Sequence
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
+                <DropdownMenuSeparator
+                  className={cn(
+                    !hasPermission(
+                      role,
+                      `${updateRole}:${attribute.projectSites}`
+                    ) && "hidden"
+                  )}
+                />
                 <DropdownMenuItem
+                  className={cn(
+                    !hasPermission(
+                      role,
+                      `${updateRole}:${attribute.projectSites}`
+                    ) && "hidden"
+                  )}
                   onClick={() => {
                     navigate(
-                      `/projects/${site.project_id}/sites/${site.id}?${viewLinkTemplateSearchParam}`,
+                      `/projects/${site.project_id}/sites/${site.id}?${viewLinkTemplateSearchParam}`
                     );
                   }}
                 >
                   Link Template
                 </DropdownMenuItem>
                 <DropdownMenuSeparator
-                  className={cn(!site.latitude && !site.longitude && "hidden")}
+                  className={cn(
+                    (!site.latitude && !site.longitude) ||
+                      (!hasPermission(
+                        role,
+                        `${deleteRole}:${attribute.projectSites}`
+                      ) &&
+                        "hidden")
+                  )}
                 />
                 <DeleteSite projectId={site.project_id} siteId={site.id} />
               </DropdownMenuGroup>
@@ -124,7 +166,7 @@ export function SiteCard({
         <div
           className={cn(
             "border-t border-r bg-secondary rounded-tr-md text-foreground px-2.5 py-1.5",
-            !site.company_location?.name && "opacity-0",
+            !site.company_location?.name && "opacity-0"
           )}
         >
           {site.company_location?.name}
@@ -132,7 +174,7 @@ export function SiteCard({
         <div
           className={cn(
             "px-2.5 py-1.5 ml-auto bg-secondary text-foreground h-full items-center text-sm tracking-wide font-sem rounded-tl-md border-foreground flex gap-1 justify-center",
-            !site.is_active && "opacity-0",
+            !site.is_active && "opacity-0"
           )}
         >
           <Icon name="dot-filled" size="xs" />

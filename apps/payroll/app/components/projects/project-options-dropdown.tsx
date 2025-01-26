@@ -8,7 +8,14 @@ import {
 import { DeleteProject } from "./delete-project";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useSubmit } from "@remix-run/react";
-import { getValidDateForInput } from "@canny_ecosystem/utils";
+import {
+  deleteRole,
+  getValidDateForInput,
+  hasPermission,
+  updateRole,
+} from "@canny_ecosystem/utils";
+import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const ProjectOptionsDropdown = ({
   project,
@@ -22,7 +29,7 @@ export const ProjectOptionsDropdown = ({
   triggerChild: React.ReactElement;
 }) => {
   const submit = useSubmit();
-
+  const { role } = useUserRole();
   const handleMarkAsCompleted = () => {
     submit(
       {
@@ -34,7 +41,7 @@ export const ProjectOptionsDropdown = ({
       {
         method: "POST",
         action: `/projects/${project.id}/update-completed`,
-      },
+      }
     );
   };
 
@@ -49,7 +56,7 @@ export const ProjectOptionsDropdown = ({
       {
         method: "POST",
         action: `/projects/${project.id}/update-completed`,
-      },
+      }
     );
   };
 
@@ -59,18 +66,32 @@ export const ProjectOptionsDropdown = ({
       <DropdownMenuContent sideOffset={10} align="end">
         <DropdownMenuGroup>
           <DropdownMenuItem
-            className={cn(project.actual_end_date && "hidden")}
+            className={cn(
+              project.actual_end_date && "hidden",
+              !hasPermission(role, `${updateRole}:${attribute.projects}`) &&
+                "hidden"
+            )}
             onClick={handleMarkAsCompleted}
           >
             Make as Completed
           </DropdownMenuItem>
           <DropdownMenuItem
-            className={cn(!project.actual_end_date && "hidden")}
+            className={cn(
+              !project.actual_end_date && "hidden",
+              !hasPermission(role, `${updateRole}:${attribute.projects}`) &&
+                "hidden"
+            )}
             onClick={handleMarkAsActive}
           >
             Make as Active
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
+          <DropdownMenuSeparator
+            className={cn(
+              "hidden",
+              hasPermission(role, `${deleteRole}:${attribute.projects}`) &&
+                "flex"
+            )}
+          />
           <DeleteProject projectId={project.id} />
         </DropdownMenuGroup>
       </DropdownMenuContent>

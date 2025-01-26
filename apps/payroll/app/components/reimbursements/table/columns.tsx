@@ -6,7 +6,15 @@ import { ReimbursementOptionsDropdown } from "./reimbursements-table-options";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 import type { ReimbursementDataType } from "@canny_ecosystem/supabase/queries";
-import { formatDate } from "@canny_ecosystem/utils";
+import {
+  deleteRole,
+  formatDate,
+  hasPermission,
+  updateRole,
+} from "@canny_ecosystem/utils";
+import { useUserRole } from "@/utils/user";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const reimbursementsColumns = ({
   isEmployeeRoute = false,
@@ -42,7 +50,7 @@ export const reimbursementsColumns = ({
     header: "Employee Name",
     cell: ({ row }) => {
       return (
-        <p className="truncate text-primary/80 w-48 group-hover:text-primary">{`${
+        <p className="truncate w-48 group-hover:text-primary">{`${
           row.original.employees?.first_name
         } ${row.original.employees?.middle_name ?? ""} ${
           row.original.employees?.last_name ?? ""
@@ -140,7 +148,7 @@ export const reimbursementsColumns = ({
     enableSorting: false,
     enableHiding: false,
     cell: ({ row }) => {
-      
+      const { role } = useUserRole();
       return (
         <ReimbursementOptionsDropdown
           key={row.original.id}
@@ -148,7 +156,20 @@ export const reimbursementsColumns = ({
           employeeId={row.original?.employees.id}
           isEmployeeRoute={isEmployeeRoute}
           triggerChild={
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger
+              className={cn(
+                !hasPermission(
+                  role,
+                  `${updateRole}:${attribute.reimbursements}`
+                ) &&
+                  !hasPermission(
+                    role,
+                    `${deleteRole}:${attribute.reimbursements}`
+                  ) &&
+                  "hidden"
+              )}
+              asChild
+            >
               <Button variant="ghost" className="h-8 w-8 p-0">
                 <span className="sr-only">Open menu</span>
                 <Icon name="dots-vertical" />

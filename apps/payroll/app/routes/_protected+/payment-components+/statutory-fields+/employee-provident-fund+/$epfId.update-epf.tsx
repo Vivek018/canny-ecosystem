@@ -11,7 +11,9 @@ import {
 import { parseWithZod } from "@conform-to/zod";
 import {
   EmployeeProvidentFundSchema,
+  hasPermission,
   isGoodStatus,
+  updateRole,
 } from "@canny_ecosystem/utils";
 import { getEmployeeProvidentFundById } from "@canny_ecosystem/supabase/queries";
 import { updateEmployeeProvidentFund } from "@canny_ecosystem/supabase/mutations";
@@ -21,15 +23,23 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { Suspense, useEffect } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import type { EmployeeAddressDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const UPDATE_EMPLOYEE_PROVIDENT_FUND = "update-employee-provident-fund";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const epfId = params.epfId;
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.statutoryFieldsEpf}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
 
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
-
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
     let epfPromise = null;
@@ -53,7 +63,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         epfPromise: null,
         companyId: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -72,7 +82,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -101,7 +111,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

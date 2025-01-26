@@ -10,11 +10,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
-import { CheckboxField, Field } from "@canny_ecosystem/ui/forms";
+import {
+  CheckboxField,
+  Field,
+  SearchableSelectField,
+} from "@canny_ecosystem/ui/forms";
 import {
   getInitialValueFromZod,
+  hasPermission,
   isGoodStatus,
   replaceUnderscore,
+  transformStringArrayIntoOptions,
+  updateRole,
+  userRoles,
   UserSchema,
 } from "@canny_ecosystem/utils";
 
@@ -25,11 +33,31 @@ import {
   useForm,
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { type ActionFunctionArgs, json } from "@remix-run/node";
-import { Form } from "@remix-run/react";
+import {
+  type ActionFunctionArgs,
+  json,
+  type LoaderFunctionArgs,
+} from "@remix-run/node";
+import { Form, useLoaderData } from "@remix-run/react";
 import { UPDATE_USER_TAG } from "./$userId.update-user";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const CREATE_USER_TAG = "Create User";
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.settingUsers}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+  return { companyId };
+}
 
 export async function action({ request }: ActionFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -40,7 +68,7 @@ export async function action({ request }: ActionFunctionArgs) {
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: submission.status === "error" ? 400 : 200 }
     );
   }
 
@@ -60,6 +88,7 @@ export default function CreateUser({
 }: {
   updateValues?: UserDatabaseUpdate | null;
 }) {
+  const { companyId } = useLoaderData<typeof loader>();
   const USER_TAG = updateValues ? UPDATE_USER_TAG : CREATE_USER_TAG;
   const initialValues = updateValues ?? getInitialValueFromZod(UserSchema);
 
@@ -71,7 +100,10 @@ export default function CreateUser({
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
-    defaultValue: initialValues,
+    defaultValue: {
+      ...initialValues,
+      company_id: initialValues.company_id ?? companyId,
+    },
   });
 
   return (
@@ -86,6 +118,9 @@ export default function CreateUser({
               </CardDescription>
             </CardHeader>
             <CardContent>
+              <input
+                {...getInputProps(fields.company_id, { type: "hidden" })}
+              />
               <input {...getInputProps(fields.id, { type: "hidden" })} />
               <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mb-10">
                 <Field
@@ -93,7 +128,7 @@ export default function CreateUser({
                     ...getInputProps(fields.first_name, { type: "text" }),
                     autoFocus: true,
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.first_name.name,
+                      fields.first_name.name
                     )}`,
                     className: "capitalize",
                   }}
@@ -107,7 +142,7 @@ export default function CreateUser({
                     ...getInputProps(fields.last_name, { type: "text" }),
 
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.last_name.name,
+                      fields.last_name.name
                     )}`,
                     className: "capitalize",
                   }}
@@ -123,7 +158,7 @@ export default function CreateUser({
                     ...getInputProps(fields.email, { type: "text" }),
 
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.email.name,
+                      fields.email.name
                     )}`,
                   }}
                   labelProps={{
@@ -136,7 +171,7 @@ export default function CreateUser({
                     ...getInputProps(fields.mobile_number, { type: "text" }),
 
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.mobile_number.name,
+                      fields.mobile_number.name
                     )}`,
                   }}
                   labelProps={{
@@ -145,7 +180,19 @@ export default function CreateUser({
                   errors={fields.mobile_number.errors}
                 />
               </div>
-
+              <SearchableSelectField
+                options={transformStringArrayIntoOptions(
+                  userRoles as unknown as string[]
+                )}
+                inputProps={{
+                  ...getInputProps(fields.role, { type: "text" }),
+                }}
+                placeholder={`Select ${replaceUnderscore(fields.role.name)}`}
+                labelProps={{
+                  children: replaceUnderscore(fields.role.name),
+                }}
+                errors={fields.role.errors}
+              />
               <CheckboxField
                 className="mt-8"
                 buttonProps={getInputProps(fields.is_active, {

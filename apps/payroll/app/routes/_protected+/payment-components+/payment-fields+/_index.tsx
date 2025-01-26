@@ -10,10 +10,15 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { PaymentFieldTableWrapper } from "@/components/payment-field/payment-field-table-wrapper";
+import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  const { supabase } = getSupabaseWithHeaders({ request });
+
+ 
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
     const paymentFieldPromise = getPaymentFieldsByCompanyId({
       supabase,
@@ -30,6 +35,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function PaymentFieldsIndex() {
+  const { role } = useUserRole();
   const { paymentFieldPromise, error } = useLoaderData<typeof loader>();
 
   const [searchString, setSearchString] = useState("");
@@ -64,6 +70,10 @@ export default function PaymentFieldsIndex() {
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
                 "flex items-center gap-1",
+                !hasPermission(
+                  role,
+                  `${updateRole}:${attribute.paymentFields}`
+                ) && "hidden"
               )}
             >
               <span>Add</span>

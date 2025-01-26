@@ -1,4 +1,10 @@
-import { formatDate, replaceUnderscore } from "@canny_ecosystem/utils";
+import {
+  deleteRole,
+  formatDate,
+  hasPermission,
+  replaceUnderscore,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
@@ -9,6 +15,9 @@ import { Link } from "@remix-run/react";
 import type { EmployeeDataType } from "@canny_ecosystem/supabase/queries";
 import { EmployeeOptionsDropdown } from "../employee-option-dropdown";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const columns = ({
   env,
@@ -200,6 +209,7 @@ export const columns = ({
     enableSorting: false,
     enableHiding: false,
     cell: ({ row }) => {
+      const { role } = useUserRole();
       return (
         <EmployeeOptionsDropdown
           key={row.original.id}
@@ -209,7 +219,14 @@ export const columns = ({
             companyId,
           }}
           triggerChild={
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger
+              asChild
+              className={cn(
+                !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
+                  !hasPermission(role, `${deleteRole}:${attribute.employees}`) &&
+                  "hidden"
+              )}
+            >
               <Button variant="ghost" className="h-8 w-8 p-0">
                 <span className="sr-only">Open menu</span>
                 <Icon name="dots-vertical" />

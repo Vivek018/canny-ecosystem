@@ -1,3 +1,4 @@
+import { useUserRole } from "@/utils/user";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import {
   Card,
@@ -6,9 +7,13 @@ import {
   CardFooter,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
 import { Link } from "@remix-run/react";
 
 export function StatutoryBonusNoData() {
+  const { role } = useUserRole();
   return (
     <div className="flex flex-col items-center justify-end m-auto">
       <div className="p-14" />
@@ -28,7 +33,13 @@ export function StatutoryBonusNoData() {
         <CardFooter>
           <Link
             to="/payment-components/statutory-fields/statutory-bonus/create-statutory-bonus"
-            className={buttonVariants({ variant: "primary-outline" })}
+            className={cn(
+              buttonVariants({ variant: "primary-outline" }),
+              !hasPermission(
+                `${role}`,
+                `${updateRole}:${attribute.statutoryFieldsStatutoryBonus}`
+              ) && "hidden"
+            )}
           >
             Enable Statutory Bonus
           </Link>

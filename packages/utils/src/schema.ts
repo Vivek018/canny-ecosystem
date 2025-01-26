@@ -555,6 +555,13 @@ export const UpdateUserContactSchema = z.object({
   mobile_number: zNumber.min(10).max(10),
 });
 
+export const userRoles = [
+  "master",
+  "admin",
+  "operation_manager",
+  "executive",
+] as const;
+
 export const UserSchema = z.object({
   id: z.string().uuid().optional(),
   first_name: zString.max(20),
@@ -563,6 +570,8 @@ export const UserSchema = z.object({
   mobile_number: zNumber.min(10).max(10).optional(),
   avatar: zImage.optional(),
   is_active: z.boolean().default(false),
+  company_id: z.string(),
+  role: z.enum(userRoles),
 });
 
 export const reasonForExitArray = [

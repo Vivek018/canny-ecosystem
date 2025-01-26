@@ -11,6 +11,35 @@ export async function getUsersCount({ supabase }: { supabase: TypedSupabaseClien
   return { count, error };
 }
 
+export async function getUsers({
+  supabase,
+}: {
+  supabase: TypedSupabaseClient;
+}) {
+  const columns = [
+    "id",
+    "avatar",
+    "first_name",
+    "last_name",
+    "email",
+    "mobile_number",
+    "is_active",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("users")
+    .select(columns.join(","))
+    .order("created_at", { ascending: false })
+    .limit(HARD_QUERY_LIMIT)
+    .returns<InferredType<UserDatabaseRow, (typeof columns)[number]>[]>();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { data, error };
+}
+
 export async function getUserByEmail({
   supabase,
   email,
@@ -24,6 +53,7 @@ export async function getUserByEmail({
     "last_name",
     "email",
     "mobile_number",
+    "role",
     "avatar",
     "is_email_verified",
     "is_mobile_verified",
@@ -43,22 +73,24 @@ export async function getUserByEmail({
     console.error(error);
   }
 
-  // return { data, error };
-  return {
-    data: {
-      id: "1",
-      email: "demo@gmail.com",
-      first_name: "Demo",
-      last_name: "User",
-    },
-    error: null,
-  };
+  return { data, error };
+  // return {
+  //   data: {
+  //     id: "1",
+  //     email: "demo@gmail.com",
+  //     first_name: "Demo",
+  //     last_name: "User",
+  //   },
+  //   error: null,
+  // };
 }
 
-export async function getUsers({
+export async function getUsersByCompanyId({
   supabase,
+  companyId,
 }: {
   supabase: TypedSupabaseClient;
+  companyId: string;
 }) {
   const columns = [
     "id",
@@ -66,13 +98,16 @@ export async function getUsers({
     "first_name",
     "last_name",
     "email",
+    "role",
     "mobile_number",
     "is_active",
+    "company_id",
   ] as const;
 
   const { data, error } = await supabase
     .from("users")
     .select(columns.join(","))
+    .eq("company_id", companyId)
     .order("created_at", { ascending: false })
     .limit(HARD_QUERY_LIMIT)
     .returns<InferredType<UserDatabaseRow, (typeof columns)[number]>[]>();
@@ -118,6 +153,7 @@ export async function getUserById({
     "last_name",
     "email",
     "mobile_number",
+    "role",
     "avatar",
     "is_email_verified",
     "is_mobile_verified",
@@ -137,16 +173,16 @@ export async function getUserById({
     console.error(error);
   }
 
-  // return { data, error };
-  return {
-    data: {
-      id: "1",
-      email: "demo@gmail.com",
-      first_name: "Demo",
-      last_name: "User",
-    },
-    error: null,
-  };
+  return { data, error };
+  // return {
+  //   data: {
+  //     id: "1",
+  //     email: "demo@gmail.com",
+  //     first_name: "Demo",
+  //     last_name: "User",
+  //   },
+  //   error: null,
+  // };
 }
 
 export async function getUserIdsByUserEmails({

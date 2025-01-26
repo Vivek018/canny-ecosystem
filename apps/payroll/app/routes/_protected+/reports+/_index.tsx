@@ -2,6 +2,8 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Link } from "@remix-run/react";
 
+
+
 export default function ReportsIndex() {
   return (
     <section className="grid grid-cols-3 gap-10 py-6 px-6">
@@ -57,8 +59,10 @@ export default function ReportsIndex() {
             Statutory Bonus (Yearly)
           </Link>
 
-          <Link to={"/reports/statutory-bonus-monthly"}
-          className={cn(buttonVariants({ variant: "link" }), "px-0")}>
+          <Link
+            to={"/reports/statutory-bonus-monthly"}
+            className={cn(buttonVariants({ variant: "link" }), "px-0")}
+          >
             Statutory Bonus (Monthly)
           </Link>
         </div>

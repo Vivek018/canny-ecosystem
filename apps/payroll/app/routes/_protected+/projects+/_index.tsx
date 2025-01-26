@@ -23,10 +23,15 @@ import {
 import { Suspense } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { ProjectsWrapper } from "@/components/projects/projects-wrapper";
+import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  const { supabase} = getSupabaseWithHeaders({ request });
+
+  
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
     const projectsPromise = getProjectsByCompanyId({
@@ -48,12 +53,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
         error,
         projectsPromise: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
 
 export default function ProjectsIndex() {
+  const { role } = useUserRole();
   const { projectsPromise, error } = useLoaderData<typeof loader>();
   const { isDocument } = useIsDocument();
 
@@ -76,6 +82,8 @@ export default function ProjectsIndex() {
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
                 "flex items-center gap-1",
+                !hasPermission(role, `${updateRole}:${attribute.projects}`) &&
+                  "hidden"
               )}
             >
               <span>Add</span>
@@ -85,7 +93,7 @@ export default function ProjectsIndex() {
           <CommandEmpty
             className={cn(
               "w-full py-40 capitalize text-lg tracking-wide text-center",
-              !isDocument && "hidden",
+              !isDocument && "hidden"
             )}
           >
             No project found.

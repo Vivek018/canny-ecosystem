@@ -46,7 +46,7 @@ export default function EmployeeProvidentFundIndex() {
             if (!resolvedData)
               return <ErrorBoundary message="Failed to load data" />;
             return (
-              <EPFWrapper data={resolvedData.data} error={resolvedData.error} />
+              <EPFWrapper data={resolvedData.data as any} error={resolvedData.error} />
             );
           }}
         </Await>

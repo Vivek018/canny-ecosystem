@@ -18,10 +18,12 @@ import {
   deductionCycleArray,
   EmployeeStateInsuranceSchema,
   getInitialValueFromZod,
+  hasPermission,
   isGoodStatus,
   replaceDash,
   replaceUnderscore,
   transformStringArrayIntoOptions,
+  updateRole,
 } from "@canny_ecosystem/utils";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
@@ -39,13 +41,26 @@ import {
 import { useEffect, useState } from "react";
 import { UPDATE_EMPLOYEE_STATE_INSURANCE } from "./$esiId.update-esi";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { DEFAULT_ROUTE } from "@/constant";
+import { safeRedirect } from "@/utils/server/http.server";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const CREATE_EMPLOYEE_STATE_INSURANCE =
   "create-employee-state-insurance";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (
+    !hasPermission(user?.role!, `${updateRole}:${attribute.statutoryFieldsEsi}`)
+  ) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
+
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
     return json({ companyId, error: null });
@@ -159,8 +174,8 @@ export default function CreateEmployeeStateInsurance({
   }, [actionData]);
 
   return (
-    <section className='p-4 w-full'>
-      <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
+    <section className="p-4 w-full">
+      <Form method="POST" {...getFormProps(form)} className="flex flex-col">
         <Card>
           <CardHeader>
             <CardTitle className="text-2xl mb-4 capitalize">
@@ -171,7 +186,7 @@ export default function CreateEmployeeStateInsurance({
           <CardContent>
             <input {...getInputProps(fields.id, { type: "hidden" })} />
             <input {...getInputProps(fields.company_id, { type: "hidden" })} />
-            <div className='flex flex-col justify-between'>
+            <div className="flex flex-col justify-between">
               <Field
                 inputProps={{
                   ...getInputProps(fields.esi_number, { type: "text" }),
@@ -188,24 +203,24 @@ export default function CreateEmployeeStateInsurance({
 
               <SearchableSelectField
                 key={resetKey}
-                className='capitalize'
+                className="capitalize"
                 options={transformStringArrayIntoOptions(
                   deductionCycleArray as unknown as string[]
                 )}
                 inputProps={{
                   ...getInputProps(fields.deduction_cycle, { type: "text" }),
                 }}
-                placeholder='Select an option'
+                placeholder="Select an option"
                 labelProps={{
                   children: replaceUnderscore(fields.deduction_cycle.name),
                 }}
                 errors={fields.deduction_cycle.errors}
               />
             </div>
-            <div className='flex flex-col justify-between'>
-              <div className='flex items-center justify-between gap-4'>
+            <div className="flex flex-col justify-between">
+              <div className="flex items-center justify-between gap-4">
                 <Field
-                  className=''
+                  className=""
                   inputProps={{
                     ...getInputProps(fields.employees_contribution, {
                       type: "number",
@@ -223,11 +238,11 @@ export default function CreateEmployeeStateInsurance({
                   }}
                   errors={fields.employees_contribution.errors}
                 />
-                <p className='mb-5 w-1/2 font-light text-sm'>of Gross Pay</p>
+                <p className="mb-5 w-1/2 font-light text-sm">of Gross Pay</p>
               </div>
-              <div className='flex items-center justify-between gap-4'>
+              <div className="flex items-center justify-between gap-4">
                 <Field
-                  className=''
+                  className=""
                   inputProps={{
                     ...getInputProps(fields.employers_contribution, {
                       type: "number",
@@ -245,11 +260,11 @@ export default function CreateEmployeeStateInsurance({
                   }}
                   errors={fields.employers_contribution.errors}
                 />
-                <p className='w-1/2 mb-5 font-light text-sm'>of Gross Pay</p>
+                <p className="w-1/2 mb-5 font-light text-sm">of Gross Pay</p>
               </div>
             </div>
             <Field
-              className=''
+              className=""
               inputProps={{
                 ...getInputProps(fields.max_limit, {
                   type: "number",
@@ -274,7 +289,7 @@ export default function CreateEmployeeStateInsurance({
                 htmlFor: fields.include_employer_contribution.id,
                 children: "Include employer's contribution in the CTC",
               }}
-              className='items-center'
+              className="items-center"
             />
           </CardContent>
           <FormButtons form={form} setResetKey={setResetKey} isSingle={true} />

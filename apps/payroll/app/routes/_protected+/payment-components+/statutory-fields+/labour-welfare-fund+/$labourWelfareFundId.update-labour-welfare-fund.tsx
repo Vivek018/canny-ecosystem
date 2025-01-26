@@ -10,22 +10,32 @@ import {
   useNavigate,
 } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
-import { isGoodStatus, LabourWelfareFundSchema } from "@canny_ecosystem/utils";
+import { hasPermission, isGoodStatus, LabourWelfareFundSchema, updateRole } from "@canny_ecosystem/utils";
 import { getLabourWelfareFundById } from "@canny_ecosystem/supabase/queries";
 import { updateLabourWelfareFund } from "@canny_ecosystem/supabase/mutations";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { Suspense, useEffect } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import type { LabourWelfareFundDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const UPDATE_LABOUR_WELFARE_FUND = "update-labour-welfare-fund";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const labourWelfareFundId = params.labourWelfareFundId;
+  const { supabase,headers } = getSupabaseWithHeaders({ request });
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (
+    !hasPermission(user?.role!, `${updateRole}:${attribute.statutoryFieldsLwf}`)
+  ) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
 
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
-
     let labourWelfareFundPromise = null;
 
     if (labourWelfareFundId) {
@@ -47,7 +57,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         error,
         labourWelfareFundPromise: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -66,7 +76,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -94,7 +104,7 @@ export async function action({
         message: "Failed to update Labour Welfare Fund",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

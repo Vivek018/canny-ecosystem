@@ -1,25 +1,26 @@
-import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { getCompanyById } from "@canny_ecosystem/supabase/queries";
+import { DEFAULT_ROUTE } from "@/constant";
+import { safeRedirect } from "@/utils/server/http.server";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { useUserRole } from "@/utils/user";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { SecondaryMenu } from "@canny_ecosystem/ui/secondary-menu";
-import { json, type LoaderFunctionArgs } from "@remix-run/node";
-import { Link, Outlet, useLoaderData, useLocation } from "@remix-run/react";
+import { hasPermission, readRole } from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { Link, Outlet, useLocation } from "@remix-run/react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data, error } = await getCompanyById({ supabase, id: companyId });
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (error || !data) {
-    throw new Error(`Company not found${error}`);
+  if (!hasPermission(user?.role!, `${readRole}:${attribute.users}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
   }
-
-  return json({ data });
+  return {};
 }
 
 export default function Account() {
-  const { data } = useLoaderData<typeof loader>();
-
+  const { role } = useUserRole();
   const { pathname } = useLocation();
 
   return (
@@ -30,7 +31,7 @@ export default function Account() {
             { label: "Account", path: "/user/account" },
             { label: "Help", path: "/user/help" },
             { label: "Feedback Form", path: "/user/feedback-form" },
-            data.company_type === "app_creator"
+            hasPermission(role, `${readRole}:${attribute.feedbackList}`)
               ? { label: "Feedback List", path: "/user/feedback-list" }
               : {},
           ]}

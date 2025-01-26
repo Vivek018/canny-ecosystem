@@ -9,7 +9,12 @@ import {
   useNavigate,
 } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
-import { isGoodStatus, ProfessionalTaxSchema } from "@canny_ecosystem/utils";
+import {
+  hasPermission,
+  isGoodStatus,
+  ProfessionalTaxSchema,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import { getProfessionalTaxById } from "@canny_ecosystem/supabase/queries";
 import { updateProfessionalTax } from "@canny_ecosystem/supabase/mutations";
 import CreateProfessionalTax from "./create-professional-tax";
@@ -17,13 +22,23 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { Suspense, useEffect } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import type { ProfessionalTaxDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const UPDATE_PROFESSIONAL_TAX = "update-professional-tax";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.statutoryFieldsPf}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
   try {
     const professionalTaxId = params.professionalTaxId;
-    const { supabase } = getSupabaseWithHeaders({ request });
 
     let professionalTaxPromise = null;
 
@@ -44,7 +59,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         error,
         professionalTaxPromise: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -62,7 +77,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: submission.status === "error" ? 400 : 200 }
     );
   }
 

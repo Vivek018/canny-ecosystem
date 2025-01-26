@@ -22,7 +22,6 @@ import { ClientHintCheck, getHints } from "./utils/client-hints";
 import { useNonce } from "./utils/providers/nonce-provider";
 import { Logo } from "@canny_ecosystem/ui/logo";
 import { ThemeSwitch } from "./components/theme-switch";
-import { getSessionUser } from "@canny_ecosystem/supabase/cached-queries";
 import { safeRedirect } from "./utils/server/http.server";
 import {
   getCompanyIdOrFirstCompany,
@@ -32,6 +31,10 @@ import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { DEFAULT_ROUTE } from "./constant";
 import { Toaster } from "@canny_ecosystem/ui/toaster";
 import { ErrorBoundary } from "./components/error-boundary";
+import {
+  getUserCookieOrFetchUser,
+  setUserCookie,
+} from "./utils/server/user.server";
 
 export const links: LinksFunction = () => {
   return [
@@ -48,28 +51,40 @@ export const headers: HeadersFunction = ({ loaderHeaders }) => {
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {
-    const { user: sessionUser } = await getSessionUser({ request });
     const { supabase } = getSupabaseWithHeaders({ request });
 
-    const { companyId, setCookie } = await getCompanyIdOrFirstCompany(
+    const { user, setCookie } = await getUserCookieOrFetchUser(
       request,
-      supabase,
+      supabase
     );
 
+    const headers = new Headers();
     if (setCookie) {
-      const headers = new Headers();
+      headers.append("Set-Cookie", setUserCookie(user));
+    }
+
+    let companyId = null;
+
+    if (companyId) {
+      headers.append("Set-Cookie", setCompanyId(companyId));
+      return safeRedirect(DEFAULT_ROUTE, { headers });
+    }
+    const companyResult = await getCompanyIdOrFirstCompany(request, supabase);
+    companyId = companyResult.companyId;
+
+    if (companyResult.setCookie) {
       headers.append("Set-Cookie", setCompanyId(companyId));
       return safeRedirect(DEFAULT_ROUTE, { headers });
     }
 
     return json({
-      sessionUser,
       requestInfo: {
         hints: getHints(request),
         path: new URL(request.url).pathname,
         userPrefs: {
           theme: getTheme(request),
-          companyId: companyId,
+          companyId,
+          user,
         },
       },
       error: null,
@@ -77,13 +92,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
   } catch (error) {
     return json({
       error,
-      sessionUser: null,
       requestInfo: {
         hints: null,
         path: new URL(request.url).pathname,
         userPrefs: {
           theme: null,
           companyId: null,
+          user: null,
         },
       },
     });
@@ -120,9 +135,8 @@ function Document({
 function App() {
   const {
     error,
-    sessionUser,
     requestInfo: {
-      userPrefs: { theme: initialTheme },
+      userPrefs: { theme: initialTheme, user },
     },
   } = useLoaderData<typeof loader>();
 
@@ -134,7 +148,7 @@ function App() {
   return (
     <Document nonce={nonce} theme={theme}>
       <main className="flex h-full w-full bg-background text-foreground ">
-        {!sessionUser ? (
+        {!user?.email ? (
           <div className="w-full h-full">
             <header className="flex justify-between items-center mx-5 mt-4 md:mx-10 md:mt-10">
               <div>

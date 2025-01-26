@@ -18,10 +18,12 @@ import {
   deductionCycleArray,
   EmployeeProvidentFundSchema,
   getInitialValueFromZod,
+  hasPermission,
   isGoodStatus,
   replaceDash,
   replaceUnderscore,
   transformStringArrayIntoOptions,
+  updateRole,
 } from "@canny_ecosystem/utils";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
@@ -39,12 +41,22 @@ import {
 import { useEffect, useState } from "react";
 import { UPDATE_EMPLOYEE_PROVIDENT_FUND } from "./$epfId.update-epf";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const CREATE_EMPLOYEE_PROVIDENT_FUND = "create-employee-provident-fund";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.statutoryFieldsEpf}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
     return json({
       companyId,
@@ -56,7 +68,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         error,
         companyId: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -75,7 +87,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -104,7 +116,7 @@ export async function action({
         message: "Failed to create Employee Provident Fund",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -191,7 +203,7 @@ export default function CreateEmployeeProvidentFund({
                 key={resetKey}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  deductionCycleArray as unknown as string[],
+                  deductionCycleArray as unknown as string[]
                 )}
                 inputProps={{
                   ...getInputProps(fields.deduction_cycle, { type: "text" }),
@@ -209,7 +221,7 @@ export default function CreateEmployeeProvidentFund({
                   fields.restrict_employee_contribution,
                   {
                     type: "checkbox",
-                  },
+                  }
                 )}
                 labelProps={{
                   htmlFor: fields.restrict_employee_contribution.id,
@@ -223,7 +235,7 @@ export default function CreateEmployeeProvidentFund({
                   fields.restrict_employer_contribution,
                   {
                     type: "checkbox",
-                  },
+                  }
                 )}
                 labelProps={{
                   htmlFor: fields.restrict_employer_contribution.id,
@@ -239,7 +251,7 @@ export default function CreateEmployeeProvidentFund({
                   fields.include_employer_contribution,
                   {
                     type: "checkbox",
-                  },
+                  }
                 )}
                 labelProps={{
                   htmlFor: fields.include_employer_contribution.id,
@@ -256,7 +268,7 @@ export default function CreateEmployeeProvidentFund({
                           fields.include_employer_edli_contribution,
                           {
                             type: "checkbox",
-                          },
+                          }
                         ),
                         disabled: !form.value?.include_employer_contribution,
                       }}

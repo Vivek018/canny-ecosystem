@@ -10,7 +10,12 @@ import {
   useNavigate,
 } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
-import { isGoodStatus, SiteSchema } from "@canny_ecosystem/utils";
+import {
+  hasPermission,
+  isGoodStatus,
+  SiteSchema,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import {
   getLocationsForSelectByCompanyId,
   getSiteById,
@@ -21,17 +26,26 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { Suspense, useEffect } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import type { SiteDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const UPDATE_SITE = "update-site";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const siteId = params.siteId;
   const projectId = params.projectId;
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.projectSite}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
 
   try {
     if (!projectId) throw new Error("No projectId provided");
-
-    const { supabase } = getSupabaseWithHeaders({ request });
 
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
@@ -72,7 +86,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         locationOptionsPromise: null,
         projectId,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -94,7 +108,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -124,7 +138,7 @@ export async function action({
         message: "Failed to update site",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

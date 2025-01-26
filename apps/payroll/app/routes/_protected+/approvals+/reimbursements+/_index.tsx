@@ -28,6 +28,8 @@ import { json, redirect, useLoaderData, useNavigate } from "@remix-run/react";
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const { supabase } = getSupabaseWithHeaders({ request });
+ 
+
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   const searchParams = new URLSearchParams(url.searchParams);
   const query = searchParams.get("name") ?? undefined;
@@ -52,7 +54,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const hasFilters =
     filters &&
     Object.values(filters).some(
-      (value) => value !== null && value !== undefined,
+      (value) => value !== null && value !== undefined
     );
 
   const {
@@ -67,8 +69,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
       to: hasFilters
         ? MAX_QUERY_LIMIT
         : page > 0
-          ? LAZY_LOADING_LIMIT
-          : LAZY_LOADING_LIMIT - 1,
+        ? LAZY_LOADING_LIMIT
+        : LAZY_LOADING_LIMIT - 1,
       filters,
       searchQuery: query ?? undefined,
       sort: sortParam?.split(":") as [string, "asc" | "desc"],
@@ -84,7 +86,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   };
 
   const hasNextPage = Boolean(
-    meta?.count && meta.count / (page + 1) > LAZY_LOADING_LIMIT,
+    meta?.count && meta.count / (page + 1) > LAZY_LOADING_LIMIT
   );
   const { data: projectData } = await getProjectNamesByCompanyId({
     supabase,

@@ -16,6 +16,9 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Suspense } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { RelationshipWrapper } from "@/components/relationships/relationship-wrapper";
+import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {
@@ -41,6 +44,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function Relationships() {
+  const { role } = useUserRole();
   const { relationshipsPromise, error } = useLoaderData<typeof loader>();
   const { isDocument } = useIsDocument();
 
@@ -64,6 +68,10 @@ export default function Relationships() {
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
                 "flex items-center gap-1",
+                !hasPermission(
+                  role,
+                  `${updateRole}:${attribute.settingRelationships}`
+                ) && "hidden"
               )}
             >
               <span>Add</span>
@@ -73,7 +81,7 @@ export default function Relationships() {
           <CommandEmpty
             className={cn(
               "w-full py-40 capitalize text-lg tracking-wide text-center",
-              !isDocument && "hidden",
+              !isDocument && "hidden"
             )}
           >
             No relationships found.

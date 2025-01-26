@@ -8,13 +8,19 @@ import {
   CommandList,
 } from "@canny_ecosystem/ui/command";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { replaceUnderscore } from "@canny_ecosystem/utils";
+import {
+  hasPermission,
+  replaceUnderscore,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import { Link } from "@remix-run/react";
 import { LocationCard } from "./location-card";
 import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
 import { useEffect } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import type { LocationDatabaseRow } from "@canny_ecosystem/supabase/types";
+import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export function LocationsWrapper({
   data,
@@ -23,6 +29,7 @@ export function LocationsWrapper({
   data: Omit<LocationDatabaseRow, "created_at" | "updated_at">[] | null;
   error: Error | null | { message: string };
 }) {
+  const { role } = useUserRole();
   const { isDocument } = useIsDocument();
   const { toast } = useToast();
 
@@ -51,6 +58,8 @@ export function LocationsWrapper({
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
                 "flex items-center gap-1",
+                !hasPermission(role, `${updateRole}:${attribute.settingLocations}`) &&
+                  "hidden"
               )}
             >
               <span>Add</span>
@@ -60,7 +69,7 @@ export function LocationsWrapper({
           <CommandEmpty
             className={cn(
               "w-full py-40 capitalize text-lg tracking-wide text-center",
-              !isDocument && "hidden",
+              !isDocument && "hidden"
             )}
           >
             No location found.

@@ -1,6 +1,8 @@
 import PaginationButton from "@/components/form/pagination-button";
+import { DEFAULT_ROUTE } from "@/constant";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { LIST_LIMIT } from "@canny_ecosystem/supabase/constant";
 import {
   getCompanyById,
@@ -21,7 +23,12 @@ import {
 } from "@canny_ecosystem/ui/card";
 
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { formatDateTime } from "@canny_ecosystem/utils";
+import {
+  formatDateTime,
+  hasPermission,
+  readRole,
+} from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
@@ -30,7 +37,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const page = Number.parseInt(url.searchParams.get("page") ?? "1");
 
-  const { supabase } = getSupabaseWithHeaders({ request });
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(user?.role!, `${readRole}:${attribute.feedbackList}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   const { data: companyData, error: companyError } = await getCompanyById({
     supabase,
@@ -39,10 +51,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   if (companyError || !companyData) {
     throw new Error(`Company not found${companyError}`);
-  }
-
-  if (companyData.company_type !== "app_creator") {
-    return safeRedirect("/user/feedback-form");
   }
 
   const { data, error, totalCount } = await getFeedbacksByCompanyId({
@@ -78,8 +86,8 @@ export default function FeedbackList() {
                     feedback.severity === "urgent"
                       ? "text-destructive"
                       : feedback.severity === "normal"
-                        ? "text-purple-500"
-                        : "text-yellow-400",
+                      ? "text-purple-500"
+                      : "text-yellow-400"
                   )}
                 >
                   {feedback.severity}

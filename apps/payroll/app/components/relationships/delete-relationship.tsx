@@ -1,3 +1,4 @@
+import type { UserDatabaseRow } from "@canny_ecosystem/supabase/types";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,13 +14,18 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { ErrorList } from "@canny_ecosystem/ui/forms";
 import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { DELETE_TEXT } from "@canny_ecosystem/utils/constant";
+import { deleteRole, hasPermission } from "@canny_ecosystem/utils";
+import { attribute, DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
 export const DeleteRelationship = ({
+  role,
   relationshipId,
-}: { relationshipId: string }) => {
+}: {
+  relationshipId: string;
+  role: UserDatabaseRow["role"];
+}) => {
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [inputError, setInputError] = useState<string[]>([]);
@@ -32,7 +38,7 @@ export const DeleteRelationship = ({
   };
 
   const handleDeleteRelationship = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -42,7 +48,7 @@ export const DeleteRelationship = ({
           method: "post",
           action: `/settings/${relationshipId}/delete-relationship`,
           replace: true,
-        },
+        }
       );
     } else {
       e.preventDefault();
@@ -55,7 +61,9 @@ export const DeleteRelationship = ({
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
-          "text-[13px] h-9",
+          "text-[13px] h-9 hidden",
+          hasPermission(role, `${deleteRole}:${attribute.settingRelationships}`) &&
+            "flex"
         )}
       >
         Delete Relationship

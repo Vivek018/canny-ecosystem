@@ -1,10 +1,13 @@
 import type { StatutoryBonusDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import { payoutMonths } from "@canny_ecosystem/utils/constant";
+import { attribute, payoutMonths } from "@canny_ecosystem/utils/constant";
 import { Link } from "@remix-run/react";
 import { DeleteStatutoryBonus } from "@/components/statutory-fields/statutory-bonus/delete-statutory-bonus";
 import { StatutoryBonusNoData } from "./statutory-bonus-no-data";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { useUserRole } from "@/utils/user";
 
 type DetailItemProps = {
   label: string;
@@ -28,6 +31,7 @@ export function StatutoryBonusWrapper({
   data: Omit<StatutoryBonusDatabaseRow, "created_at" | "updated_at"> | null;
   error: Error | null | { message: string };
 }) {
+  const { role } = useUserRole();
   if (error)
     return <ErrorBoundary error={error} message="Failed to load data" />;
   if (!data) return <StatutoryBonusNoData />;
@@ -40,7 +44,13 @@ export function StatutoryBonusWrapper({
           <Link
             prefetch="intent"
             to={`/payment-components/statutory-fields/statutory-bonus/${data?.id}/update-statutory-bonus`}
-            className="p-2 rounded-full bg-secondary grid place-items-center"
+            className={cn(
+              "p-2 rounded-full bg-secondary grid place-items-center",
+              !hasPermission(
+                `${role}`,
+                `${updateRole}:${attribute.statutoryFieldsStatutoryBonus}`
+              ) && "hidden"
+            )}
           >
             <Icon name="edit" size="sm" />
           </Link>

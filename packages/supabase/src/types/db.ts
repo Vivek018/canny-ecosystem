@@ -9,6 +9,53 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      attendance: {
+        Row: {
+          created_at: string | null
+          date: string | null
+          employee_id: string | null
+          holiday: boolean | null
+          holiday_type: Database["public"]["Enums"]["holiday_type"] | null
+          id: string
+          no_of_hours: number | null
+          present: boolean | null
+          updated_at: string | null
+          working_shift: Database["public"]["Enums"]["working_shift"] | null
+        }
+        Insert: {
+          created_at?: string | null
+          date?: string | null
+          employee_id?: string | null
+          holiday?: boolean | null
+          holiday_type?: Database["public"]["Enums"]["holiday_type"] | null
+          id?: string
+          no_of_hours?: number | null
+          present?: boolean | null
+          updated_at?: string | null
+          working_shift?: Database["public"]["Enums"]["working_shift"] | null
+        }
+        Update: {
+          created_at?: string | null
+          date?: string | null
+          employee_id?: string | null
+          holiday?: boolean | null
+          holiday_type?: Database["public"]["Enums"]["holiday_type"] | null
+          id?: string
+          no_of_hours?: number | null
+          present?: boolean | null
+          updated_at?: string | null
+          working_shift?: Database["public"]["Enums"]["working_shift"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_attendance_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       companies: {
         Row: {
           company_size: string
@@ -257,56 +304,6 @@ export type Database = {
             columns: ["employee_id"]
             isOneToOne: false
             referencedRelation: "employees"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      employee_attendance: {
-        Row: {
-          created_at: string | null
-          date: string | null
-          employee_id: string | null
-          holiday: boolean | null
-          id: string
-          no_of_hours: number | null
-          present: boolean | null
-          site_id: string | null
-          total_working_days: number | null
-          updated_at: string | null
-          working_shift: Database["public"]["Enums"]["working_shift"] | null
-        }
-        Insert: {
-          created_at?: string | null
-          date?: string | null
-          employee_id?: string | null
-          holiday?: boolean | null
-          id?: string
-          no_of_hours?: number | null
-          present?: boolean | null
-          site_id?: string | null
-          total_working_days?: number | null
-          updated_at?: string | null
-          working_shift?: Database["public"]["Enums"]["working_shift"] | null
-        }
-        Update: {
-          created_at?: string | null
-          date?: string | null
-          employee_id?: string | null
-          holiday?: boolean | null
-          id?: string
-          no_of_hours?: number | null
-          present?: boolean | null
-          site_id?: string | null
-          total_working_days?: number | null
-          updated_at?: string | null
-          working_shift?: Database["public"]["Enums"]["working_shift"] | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "employee_attendance_site_id_fkey"
-            columns: ["site_id"]
-            isOneToOne: false
-            referencedRelation: "project_sites"
             referencedColumns: ["id"]
           },
         ]
@@ -1774,6 +1771,7 @@ export type Database = {
           last_name: string
           mobile_number: string | null
           preferred_language: string | null
+          role: Database["public"]["Enums"]["user_role"]
           updated_at: string | null
         }
         Insert: {
@@ -1790,6 +1788,7 @@ export type Database = {
           last_name: string
           mobile_number?: string | null
           preferred_language?: string | null
+          role: Database["public"]["Enums"]["user_role"]
           updated_at?: string | null
         }
         Update: {
@@ -1806,6 +1805,7 @@ export type Database = {
           last_name?: string
           mobile_number?: string | null
           preferred_language?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string | null
         }
         Relationships: [
@@ -1823,7 +1823,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      insert_employee_skip_conflicts: {
+        Args: {
+          records: Json
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       assignment_target_type:
@@ -1837,6 +1842,7 @@ export type Database = {
       eligibility_option_type: "position" | "skill_level"
       feedback_category: "suggestion" | "bug" | "complain"
       feedback_severity: "low" | "normal" | "urgent"
+      holiday_type: "state" | "national"
       payment_type: "fixed" | "variable"
       payroll_status: "pending" | "approved" | "created"
       template_assignment_type: "employee" | "site"
@@ -1846,6 +1852,7 @@ export type Database = {
         | "statutory_contribution"
         | "bonus"
         | "other"
+      user_role: "master" | "admin" | "operation_manager" | "executive"
       working_shift: "day" | "afternoon" | "night"
     }
     CompositeTypes: {

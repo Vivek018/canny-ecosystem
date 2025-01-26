@@ -13,11 +13,12 @@ import { Await, useLoaderData } from "@remix-run/react";
 import { type ReactNode, Suspense } from "react";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
+  const { supabase } = getSupabaseWithHeaders({ request });
+
+  
   const employeeId = params.employeeId;
 
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
-
     const employeeProjectAssignmentPromise =
       await getEmployeeProjectAssignmentByEmployeeId({
         supabase,
@@ -129,7 +130,10 @@ export default function WorkPortfolio() {
 export function CommonWrapper({
   Component,
   error,
-}: { Component: ReactNode; error: Error | null }) {
+}: {
+  Component: ReactNode;
+  error: Error | null;
+}) {
   if (error)
     return (
       <ErrorBoundary

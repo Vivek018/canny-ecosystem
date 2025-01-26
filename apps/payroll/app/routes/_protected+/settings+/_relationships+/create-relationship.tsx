@@ -1,8 +1,10 @@
 import {
   getValidDateForInput,
+  hasPermission,
   isGoodStatus,
   RelationshipSchema,
   replaceUnderscore,
+  updateRole,
 } from "@canny_ecosystem/utils";
 import {
   CheckboxField,
@@ -45,14 +47,29 @@ import { getCompanies } from "@canny_ecosystem/supabase/queries";
 import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const CREATE_RELATIONSHIP = "create-relationship";
 
 export async function loader({
   request,
 }: LoaderFunctionArgs): Promise<Response> {
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (
+    !hasPermission(
+      user?.role!,
+      `${updateRole}:${attribute.settingRelationships}`
+    )
+  ) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
     const { data: companies, error } = await getCompanies({ supabase });
 
@@ -66,7 +83,7 @@ export async function loader({
         },
         {
           status: 500,
-        },
+        }
       );
     }
 
@@ -78,7 +95,7 @@ export async function loader({
           data: null,
           error: "No companies found",
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -100,7 +117,7 @@ export async function loader({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -119,7 +136,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -228,7 +245,7 @@ export default function CreateRelationship({
                   ...getInputProps(fields.relationship_type, { type: "text" }),
                   autoFocus: true,
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.relationship_type.name,
+                    fields.relationship_type.name
                   )}`,
                   className: "capitalize",
                 }}
@@ -265,11 +282,11 @@ export default function CreateRelationship({
                   inputProps={{
                     ...getInputProps(fields.start_date, { type: "date" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.start_date.name,
+                      fields.start_date.name
                     )}`,
                     max: getValidDateForInput(new Date().toISOString()),
                     defaultValue: getValidDateForInput(
-                      fields.start_date.initialValue,
+                      fields.start_date.initialValue
                     ),
                   }}
                   labelProps={{
@@ -281,11 +298,11 @@ export default function CreateRelationship({
                   inputProps={{
                     ...getInputProps(fields.end_date, { type: "date" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.end_date.name,
+                      fields.end_date.name
                     )}`,
                     min: getValidDateForInput(fields.start_date.value),
                     defaultValue: getValidDateForInput(
-                      fields.end_date.initialValue,
+                      fields.end_date.initialValue
                     ),
                   }}
                   labelProps={{
