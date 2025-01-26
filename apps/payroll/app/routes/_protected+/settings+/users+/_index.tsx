@@ -1,19 +1,26 @@
-import { columns, type UsersType } from "@/components/user/table/columns";
+import { columns } from "@/components/user/table/columns";
 import { UserDataTable } from "@/components/user/table/data-table";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import { useUserRole } from "@/utils/user";
 
-import { getUsers } from "@canny_ecosystem/supabase/queries";
+import { getUsersByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json, Link, useLoaderData } from "@remix-run/react";
 import { useEffect, useState } from "react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
-  const { data, error } = await getUsers({ supabase });
+
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+
+  const { data, error } = await getUsersByCompanyId({ supabase, companyId });
 
   if (error || !data) {
     throw error;
@@ -23,16 +30,21 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function Users() {
+  const { role } = useUserRole();
   const { data } = useLoaderData<typeof loader>();
+
   const [searchString, setSearchString] = useState("");
   const [tableData, setTableData] = useState(data);
 
   useEffect(() => {
-    const filteredData = data?.filter((item: UsersType) =>
-      Object.values(item).some((value) =>
-        String(value).toLowerCase().includes(searchString.toLowerCase())
+    const filteredData = data?.filter((item) =>
+      Object.entries(item).some(
+        ([key, value]) =>
+          key !== "avatar" &&
+          String(value).toLowerCase().includes(searchString.toLowerCase())
       )
     );
+
     setTableData(filteredData);
   }, [searchString, data]);
 
@@ -59,7 +71,9 @@ export default function Users() {
             to="/settings/users/create-user"
             className={cn(
               buttonVariants({ variant: "primary-outline" }),
-              "flex items-center gap-1"
+              "flex items-center gap-1",
+              !hasPermission(role, `${updateRole}:${attribute.settingUsers}`) &&
+                "hidden"
             )}
           >
             <span>Add</span>

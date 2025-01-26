@@ -1,4 +1,3 @@
-import { ProjectCard } from "@/components/projects/project-card";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getProjectsByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -8,32 +7,65 @@ import {
   CommandEmpty,
   CommandGroup,
   CommandInput,
-  CommandItem,
   CommandList,
 } from "@canny_ecosystem/ui/command";
 import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json, Link, Outlet, useLoaderData } from "@remix-run/react";
+import {
+  Await,
+  defer,
+  json,
+  Link,
+  Outlet,
+  useLoaderData,
+} from "@remix-run/react";
+import { Suspense } from "react";
+import { ErrorBoundary } from "@/components/error-boundary";
+import { ProjectsWrapper } from "@/components/projects/projects-wrapper";
+import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data, error } = await getProjectsByCompanyId({
-    supabase,
-    companyId,
-  });
+  const { supabase} = getSupabaseWithHeaders({ request });
 
-  if (error) {
-    throw error;
+  
+  try {
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+
+    const projectsPromise = getProjectsByCompanyId({
+      supabase,
+      companyId,
+    });
+
+    return defer({
+      status: "success",
+      message: "Projects found",
+      error: null,
+      projectsPromise,
+    });
+  } catch (error) {
+    return json(
+      {
+        status: "error",
+        message: "Failed to load projects",
+        error,
+        projectsPromise: null,
+      },
+      { status: 500 }
+    );
   }
-
-  return json({ data });
 }
 
 export default function ProjectsIndex() {
-  const { data } = useLoaderData<typeof loader>();
+  const { role } = useUserRole();
+  const { projectsPromise, error } = useLoaderData<typeof loader>();
   const { isDocument } = useIsDocument();
+
+  if (error) {
+    return <ErrorBoundary error={error} message="Failed to load projects" />;
+  }
 
   return (
     <section className="py-4 px-4">
@@ -50,6 +82,8 @@ export default function ProjectsIndex() {
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
                 "flex items-center gap-1",
+                !hasPermission(role, `${updateRole}:${attribute.projects}`) &&
+                  "hidden"
               )}
             >
               <span>Add</span>
@@ -59,32 +93,29 @@ export default function ProjectsIndex() {
           <CommandEmpty
             className={cn(
               "w-full py-40 capitalize text-lg tracking-wide text-center",
-              !isDocument && "hidden",
+              !isDocument && "hidden"
             )}
           >
             No project found.
           </CommandEmpty>
           <CommandList className="max-h-full py-6 overflow-x-visible overflow-y-visible">
             <CommandGroup className="p-0 overflow-visible">
-              <div className="w-full grid gap-8 grid-cols-1">
-                {data?.map((project) => (
-                  <CommandItem
-                    key={project.id}
-                    value={
-                      project?.name +
-                      project?.status +
-                      project?.project_type +
-                      project?.project_code +
-                      project?.primary_contractor?.name +
-                      project?.project_client?.name +
-                      project?.end_client?.name
-                    }
-                    className="data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0"
-                  >
-                    <ProjectCard project={project} />
-                  </CommandItem>
-                ))}
-              </div>
+              <Suspense fallback={<div>Loading...</div>}>
+                <Await resolve={projectsPromise}>
+                  {(resolvedData) => {
+                    if (!resolvedData)
+                      return (
+                        <ErrorBoundary message="Failed to load projects" />
+                      );
+                    return (
+                      <ProjectsWrapper
+                        data={resolvedData.data}
+                        error={resolvedData.error}
+                      />
+                    );
+                  }}
+                </Await>
+              </Suspense>
             </CommandGroup>
           </CommandList>
         </Command>

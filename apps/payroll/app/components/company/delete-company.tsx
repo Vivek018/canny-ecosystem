@@ -1,3 +1,4 @@
+import { useUserRole } from "@/utils/user";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,11 +21,13 @@ import {
 import { ErrorList } from "@canny_ecosystem/ui/forms";
 import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { DELETE_TEXT } from "@canny_ecosystem/utils/constant";
+import { deleteRole, hasPermission } from "@canny_ecosystem/utils";
+import { attribute, DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
 export const DeleteCompany = ({ companyId }: { companyId: string }) => {
+  const { role } = useUserRole();
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [inputError, setInputError] = useState<string[]>([]);
@@ -37,7 +40,7 @@ export const DeleteCompany = ({ companyId }: { companyId: string }) => {
   };
 
   const handleDeleteCompany = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -47,7 +50,7 @@ export const DeleteCompany = ({ companyId }: { companyId: string }) => {
           method: "post",
           action: `/${companyId}/delete-company`,
           replace: true,
-        },
+        }
       );
     } else {
       e.preventDefault();
@@ -56,7 +59,13 @@ export const DeleteCompany = ({ companyId }: { companyId: string }) => {
   };
 
   return (
-    <Card className="border-destructive">
+    <Card
+      className={cn(
+        hasPermission(role, `${deleteRole}:${attribute.settingGeneral}`)
+          ? "border-destructive"
+          : " hidden"
+      )}
+    >
       <CardHeader>
         <CardTitle>Delete Company</CardTitle>
         <CardDescription>

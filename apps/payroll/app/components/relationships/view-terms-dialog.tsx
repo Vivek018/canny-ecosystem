@@ -7,7 +7,8 @@ import {
 import { Label } from "@canny_ecosystem/ui/label";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { replaceUnderscore } from "@canny_ecosystem/utils";
-import { useNavigate } from "@remix-run/react";
+import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
+import { useNavigate, useSearchParams } from "@remix-run/react";
 
 export const ViewRelationshipTermsDialog = ({
   values,
@@ -15,6 +16,10 @@ export const ViewRelationshipTermsDialog = ({
   values: any;
 }) => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const isParamRelationshipTerms =
+    searchParams.get("step") === modalSearchParamNames.view_relationship_terms;
 
   const handleOpenChange = () => {
     navigate(-1);
@@ -24,7 +29,7 @@ export const ViewRelationshipTermsDialog = ({
   const objectValues: string[] = Object.values(values);
 
   return (
-    <Dialog defaultOpen={true} onOpenChange={handleOpenChange}>
+    <Dialog open={isParamRelationshipTerms} onOpenChange={handleOpenChange}>
       <DialogContent
         className={cn(
           "max-w-max pl-5 pr-40",

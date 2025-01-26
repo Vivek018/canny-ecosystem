@@ -2,44 +2,56 @@ import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getRelationshipsByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
-import { json, type LoaderFunctionArgs } from "@remix-run/node";
-import { Link, Outlet, useLoaderData } from "@remix-run/react";
+import { defer, type LoaderFunctionArgs } from "@remix-run/node";
+import { Await, Link, Outlet, useLoaderData } from "@remix-run/react";
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
-  CommandItem,
   CommandList,
 } from "@canny_ecosystem/ui/command";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
-import { RelationshipCard } from "@/components/relationships/relationship-card";
+import { Suspense } from "react";
+import { ErrorBoundary } from "@/components/error-boundary";
+import { RelationshipWrapper } from "@/components/relationships/relationship-wrapper";
+import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
 
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-  const { data, error } = await getRelationshipsByCompanyId({
-    supabase,
-    companyId,
-  });
+    const relationshipsPromise = getRelationshipsByCompanyId({
+      supabase,
+      companyId,
+    });
 
-  if (error) {
-    throw error;
+    return defer({
+      relationshipsPromise,
+      error: null,
+    });
+  } catch (error) {
+    return defer({
+      error,
+      relationshipsPromise: null,
+    });
   }
-
-  if (!data) {
-    throw new Error("No data found");
-  }
-
-  return json({ data });
 }
 
 export default function Relationships() {
-  const { data } = useLoaderData<typeof loader>();
+  const { role } = useUserRole();
+  const { relationshipsPromise, error } = useLoaderData<typeof loader>();
   const { isDocument } = useIsDocument();
+
+  if (error)
+    return (
+      <ErrorBoundary error={error} message="Failed to load relationships" />
+    );
 
   return (
     <section className="py-4">
@@ -56,6 +68,10 @@ export default function Relationships() {
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
                 "flex items-center gap-1",
+                !hasPermission(
+                  role,
+                  `${updateRole}:${attribute.settingRelationships}`
+                ) && "hidden"
               )}
             >
               <span>Add</span>
@@ -65,28 +81,29 @@ export default function Relationships() {
           <CommandEmpty
             className={cn(
               "w-full py-40 capitalize text-lg tracking-wide text-center",
-              !isDocument && "hidden",
+              !isDocument && "hidden"
             )}
           >
             No relationships found.
           </CommandEmpty>
           <CommandList className="max-h-full py-6 overflow-x-visible overflow-y-visible">
             <CommandGroup className="p-0 overflow-visible">
-              <div className="w-full grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-                {data?.map((relationship) => (
-                  <CommandItem
-                    key={relationship?.id}
-                    value={
-                      relationship?.relationship_type +
-                      relationship?.parent_company?.name +
-                      relationship?.child_company?.name
-                    }
-                    className="data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0"
-                  >
-                    <RelationshipCard relationship={relationship} />
-                  </CommandItem>
-                ))}
-              </div>
+              <Suspense fallback={<div>Loading...</div>}>
+                <Await resolve={relationshipsPromise}>
+                  {(resolvedData) => {
+                    if (!resolvedData)
+                      return (
+                        <ErrorBoundary message="Failed to load relationships" />
+                      );
+                    return (
+                      <RelationshipWrapper
+                        data={resolvedData.data}
+                        error={resolvedData.error}
+                      />
+                    );
+                  }}
+                </Await>
+              </Suspense>
             </CommandGroup>
           </CommandList>
         </Command>

@@ -1,4 +1,10 @@
-import { formatDate, replaceUnderscore } from "@canny_ecosystem/utils";
+import {
+  deleteRole,
+  formatDate,
+  hasPermission,
+  replaceUnderscore,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
@@ -8,8 +14,18 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { Link } from "@remix-run/react";
 import type { EmployeeDataType } from "@canny_ecosystem/supabase/queries";
 import { EmployeeOptionsDropdown } from "../employee-option-dropdown";
+import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
-export const columns: ColumnDef<EmployeeDataType>[] = [
+export const columns = ({
+  env,
+  companyId,
+}: {
+  env: SupabaseEnv;
+  companyId: string;
+}): ColumnDef<EmployeeDataType>[] => [
   {
     id: "select",
     cell: ({ row }) => (
@@ -51,7 +67,7 @@ export const columns: ColumnDef<EmployeeDataType>[] = [
     },
   },
   {
-    accessorKey: "primary_mobile_number",
+    accessorKey: "mobile_number",
     header: "Mobile Number",
     cell: ({ row }) => {
       return row.original?.primary_mobile_number;
@@ -83,7 +99,7 @@ export const columns: ColumnDef<EmployeeDataType>[] = [
     },
   },
   {
-    accessorKey: "is_active",
+    accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
       return (
@@ -95,7 +111,7 @@ export const columns: ColumnDef<EmployeeDataType>[] = [
   },
   {
     enableSorting: false,
-    accessorKey: "employee_project_assignment_project_site_project_name",
+    accessorKey: "project_name",
     header: "Project",
     cell: ({ row }) => {
       return (
@@ -110,7 +126,7 @@ export const columns: ColumnDef<EmployeeDataType>[] = [
   },
   {
     enableSorting: false,
-    accessorKey: "employee_project_assignment_project_site_name",
+    accessorKey: "project_site_name",
     header: "Project Site",
     cell: ({ row }) => {
       return (
@@ -122,13 +138,13 @@ export const columns: ColumnDef<EmployeeDataType>[] = [
   },
   {
     enableSorting: false,
-    accessorKey: "employee_project_assignment_assignment_type",
+    accessorKey: "assignment_type",
     header: "Assignment Type",
     cell: ({ row }) => {
       return (
         <p className="capitalize">
           {replaceUnderscore(
-            row.original?.employee_project_assignment?.assignment_type ?? "",
+            row.original?.employee_project_assignment?.assignment_type ?? ""
           )}
         </p>
       );
@@ -136,13 +152,13 @@ export const columns: ColumnDef<EmployeeDataType>[] = [
   },
   {
     enableSorting: false,
-    accessorKey: "employee_project_assignment_position",
+    accessorKey: "position",
     header: "Position",
     cell: ({ row }) => {
       return (
         <p className="w-40 truncate capitalize">
           {replaceUnderscore(
-            row.original?.employee_project_assignment?.position,
+            row.original?.employee_project_assignment?.position
           )}
         </p>
       );
@@ -150,13 +166,13 @@ export const columns: ColumnDef<EmployeeDataType>[] = [
   },
   {
     enableSorting: false,
-    accessorKey: "employee_project_assignment_skill_level",
+    accessorKey: "skill_level",
     header: "Skill Level",
     cell: ({ row }) => {
       return (
         <p className="w-max capitalize">
           {replaceUnderscore(
-            row.original?.employee_project_assignment?.skill_level ?? "",
+            row.original?.employee_project_assignment?.skill_level ?? ""
           )}
         </p>
       );
@@ -164,7 +180,7 @@ export const columns: ColumnDef<EmployeeDataType>[] = [
   },
   {
     enableSorting: false,
-    accessorKey: "employee_project_assignment_start_date",
+    accessorKey: "start_date",
     header: "Date of joining",
     cell: ({ row }) => {
       return (
@@ -177,7 +193,7 @@ export const columns: ColumnDef<EmployeeDataType>[] = [
   },
   {
     enableSorting: false,
-    accessorKey: "employee_project_assignment_end_date",
+    accessorKey: "end_date",
     header: "Date of leaving",
     cell: ({ row }) => {
       return (
@@ -193,21 +209,31 @@ export const columns: ColumnDef<EmployeeDataType>[] = [
     enableSorting: false,
     enableHiding: false,
     cell: ({ row }) => {
+      const { role } = useUserRole();
       return (
         <EmployeeOptionsDropdown
           key={row.original.id}
           employee={{
             id: row.original.id,
             is_active: row.original.is_active ?? false,
+            companyId,
           }}
           triggerChild={
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger
+              asChild
+              className={cn(
+                !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
+                  !hasPermission(role, `${deleteRole}:${attribute.employees}`) &&
+                  "hidden"
+              )}
+            >
               <Button variant="ghost" className="h-8 w-8 p-0">
                 <span className="sr-only">Open menu</span>
                 <Icon name="dots-vertical" />
               </Button>
             </DropdownMenuTrigger>
           }
+          env={env}
         />
       );
     },

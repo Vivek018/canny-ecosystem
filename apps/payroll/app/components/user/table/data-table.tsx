@@ -56,7 +56,9 @@ export function UserDataTable<TData, TValue>({
                         <TableCell
                           key={cell.id}
                           className={cn(
-                            "h-[60px] px-3 md:px-4 py-2 hidden md:table-cell"
+                            "h-[60px] px-3 md:px-4 py-2 hidden md:table-cell",
+                            cell.column.id === "actions" &&
+                              "sticky right-0 min-w-20 max-w-20 bg-card z-10"
                           )}
                         >
                           {flexRender(

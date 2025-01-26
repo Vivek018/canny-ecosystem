@@ -1,5 +1,6 @@
 import { DEFAULT_ROUTE } from "@/constant";
 import { safeRedirect } from "@/utils/server/http.server";
+import { setUserCookie } from "@/utils/server/user.server";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { type ActionFunctionArgs, json } from "@remix-run/node";
 
@@ -12,6 +13,6 @@ export async function action({ request }: ActionFunctionArgs) {
     console.error("Error logging out:", error);
     return json({ error: error.message }, { status: 500 });
   }
-
+  headers.append("Set-Cookie", setUserCookie(null, true));
   return safeRedirect(DEFAULT_ROUTE, { headers });
 }

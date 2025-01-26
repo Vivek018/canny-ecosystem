@@ -10,6 +10,9 @@ import {
 
 export const DEFAULT_ROUTE = "/";
 
+export const CANNY_MANAGEMENT_SERVICES_COMPANY_ID =
+  "0638799b-6608-4326-8da0-8ac1fa38f0e7";
+
 export const workingDaysOptions = [
   { value: "0", label: "Sun" },
   { value: "1", label: "Mon" },
@@ -25,17 +28,20 @@ export const sideNavList = [
   { name: "management" },
   { name: "Employees", link: "/employees", icon: "employee" },
   { name: "Finance" },
-  { name: "Advances", link: "/advances", icon: "lab-timer" },
   {
-    name: "Payment Components",
-    link: "/payment-components/payment-fields",
-    icon: "input",
-  },
-  {
-    name: "Payment Data",
-    link: "/payment_data",
+    name: "Payroll",
+    link: "/payroll",
     icon: "table",
   },
+  { name: "Approvals", link: "/approvals", icon: "lab-timer" },
+  {
+    name: "Payment Components",
+    link: "/payment-components",
+    icon: "input",
+  },
+  { name: "Stats" },
+  { name: "Reports", link: "/reports", icon: "report" },
+
   { name: "General" },
   { name: "Projects", link: "/projects", icon: "project" },
   {
@@ -48,6 +54,7 @@ export const sideNavList = [
 export const navList = [
   ...sideNavList,
   { name: "Analytics", link: "/analytics", icon: "chart" },
+
   { name: "Users", link: "/users", icon: "avatar" },
   {
     name: "Profile",
@@ -216,26 +223,34 @@ export const statutorySideNavList = [
   {
     name: "EPF",
     link: "/payment-components/statutory-fields/employee-provident-fund",
-    icon: ""
+    icon: "",
   },
   {
     name: "ESI",
     link: "/payment-components/statutory-fields/employee-state-insurance",
-    icon: ""
+    icon: "",
   },
   {
     name: "Professional Tax",
     link: "/payment-components/statutory-fields/professional-tax",
-    icon: ""
+    icon: "",
   },
   {
     name: "Labour welfare fund",
     link: "/payment-components/statutory-fields/labour-welfare-fund",
-    icon: ""
+    icon: "",
   },
   {
     name: "Statutory Bonus",
     link: "/payment-components/statutory-fields/statutory-bonus",
-    icon: ""
-  }
-]
+    icon: "",
+  },
+  {
+    name: "Gratuity",
+    link: "/payment-components/statutory-fields/gratuity",
+    icon: "",
+  },
+];
+
+
+

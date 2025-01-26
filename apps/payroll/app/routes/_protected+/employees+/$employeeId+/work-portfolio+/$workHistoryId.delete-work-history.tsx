@@ -1,23 +1,90 @@
+import { DEFAULT_ROUTE } from "@/constant";
 import { safeRedirect } from "@/utils/server/http.server";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { deleteEmployeeWorkHistory } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { isGoodStatus } from "@canny_ecosystem/utils";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
+import {
+  deleteRole,
+  hasPermission,
+  isGoodStatus,
+} from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
 import type { ActionFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/react";
+import { json, useActionData, useNavigate } from "@remix-run/react";
+import { useEffect } from "react";
 
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({
+  request,
+  params,
+}: ActionFunctionArgs): Promise<Response> {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
-  const employeeId = params.employeeId;
-  const workHistoryId = params.workHistoryId;
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  const { status, error } = await deleteEmployeeWorkHistory({
-    supabase,
-    id: workHistoryId ?? "",
-  });
-
-  if (isGoodStatus(status)) {
-    return safeRedirect(`/employees/${employeeId}/work-portfolio`, { headers });
+  if (!hasPermission(user?.role!, `${deleteRole}:${attribute.employeeWorkHistory}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
   }
+  const workHistoryId = params.workHistoryId;
+  const employeeId = params.employeeId;
 
-  return json({ error: error?.toString() }, { status: 500 });
+  try {
+    const { status, error } = await deleteEmployeeWorkHistory({
+      supabase,
+      id: workHistoryId ?? "",
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Employee work history deleted successfully",
+        error: null,
+        employeeId,
+      });
+    }
+
+    return json(
+      {
+        status: "error",
+        message: "Failed to delete employee work history",
+        error,
+        employeeId,
+      },
+      { status: 500 }
+    );
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+      employeeId,
+    });
+  }
+}
+
+export default function DeleteWorkHistory() {
+  const actionData = useActionData<typeof action>();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (actionData) {
+      if (actionData?.status === "success") {
+        toast({
+          title: "Success",
+          description: actionData?.message || "Employee work history deleted",
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description:
+            actionData?.error?.message || "Employee work history delete failed",
+          variant: "destructive",
+        });
+      }
+      navigate(`/employees/${actionData?.employeeId}/work-portfolio`);
+    }
+  }, [actionData]);
+
+  return null;
 }

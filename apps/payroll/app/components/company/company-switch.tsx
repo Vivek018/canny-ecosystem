@@ -21,17 +21,24 @@ import {
   CommandList,
 } from "@canny_ecosystem/ui/command";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import { replaceUnderscore } from "@canny_ecosystem/utils";
+import {
+  hasPermission,
+  replaceUnderscore,
+  updateRole,
+} from "@canny_ecosystem/utils";
+import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const CompanySwitch = ({
   companies,
 }: {
   companies: CompaniesDatabaseRow;
 }) => {
+  const { role } = useUserRole();
   const submit = useSubmit();
   const linkRef = useRef<HTMLAnchorElement | null>(null);
   const location = useLocation();
-  const companyId = useCompanyId();
+  const { companyId } = useCompanyId();
   const [open, setOpen] = useState(false);
 
   const currentCompany = companies.find((company) => company.id === companyId);
@@ -42,7 +49,7 @@ export const CompanySwitch = ({
       {
         method: "POST",
         action: "/cookie",
-      },
+      }
     );
     setOpen(false);
   };
@@ -54,9 +61,10 @@ export const CompanySwitch = ({
           variant="outline"
           role="combobox"
           aria-expanded={open}
+          disabled={!hasPermission(role, `${updateRole}:${attribute.company}`)}
           className={cn(
-            "bg-card truncate justify-between capitalize rounded pl-1.5 pr-3 w-64 h-12",
-            !currentCompany && "text-muted-foreground",
+            "bg-card truncate justify-between capitalize rounded pl-1.5 pr-3 w-64 h-12 disabled:opacity-100",
+            !currentCompany && "text-muted-foreground"
           )}
         >
           <div className="flex items-center gap-2">
@@ -74,7 +82,10 @@ export const CompanySwitch = ({
           <Icon
             name="caret-sort"
             size="md"
-            className={cn("ml-2 shrink-0 opacity-75")}
+            className={cn(
+              "ml-2 shrink-0 opacity-75",
+              !hasPermission(role, `${updateRole}:${attribute.company}`) && "hidden"
+            )}
           />
         </Button>
       </PopoverTrigger>
@@ -117,7 +128,7 @@ export const CompanySwitch = ({
             to="/create-company"
             className={cn(
               buttonVariants({ variant: "primary-ghost" }),
-              "w-full cursor-pointer capitalize",
+              "w-full cursor-pointer capitalize"
             )}
             onClick={() => setOpen(false)}
           >

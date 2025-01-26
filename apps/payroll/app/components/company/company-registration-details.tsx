@@ -1,3 +1,4 @@
+import { useUserRole } from "@/utils/user";
 import type { CompanyRegistrationDetailsUpdate } from "@canny_ecosystem/supabase/types";
 import { Button } from "@canny_ecosystem/ui/button";
 import {
@@ -9,11 +10,15 @@ import {
   CardTitle,
 } from "@canny_ecosystem/ui/card";
 import { Field } from "@canny_ecosystem/ui/forms";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
 import {
   CompanyRegistrationDetailsSchema,
   deepEqualCheck,
+  hasPermission,
   replaceUnderscore,
+  updateRole,
 } from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
 import {
   FormProvider,
   getFormProps,
@@ -33,6 +38,7 @@ export const CompanyRegistrationDetails = ({
     "created_at" | "updated_at"
   >;
 }) => {
+  const { role } = useUserRole();
   const [form, fields] = useForm({
     id: COMPANY_REGISTRATION_DETAILS,
     constraint: getZodConstraint(CompanyRegistrationDetailsSchema),
@@ -72,8 +78,12 @@ export const CompanyRegistrationDetails = ({
                     type: "text",
                   }),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.registration_number.name,
+                    fields.registration_number.name
                   )}`,
+                  readOnly: !hasPermission(
+                    role,
+                    `${updateRole}:${attribute.settingGeneral}`
+                  ),
                 }}
                 errors={fields.registration_number.errors}
               />
@@ -81,8 +91,12 @@ export const CompanyRegistrationDetails = ({
                 inputProps={{
                   ...getInputProps(fields.gst_number, { type: "text" }),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.gst_number.name,
+                    fields.gst_number.name
                   )}`,
+                  readOnly: !hasPermission(
+                    role,
+                    `${updateRole}:${attribute.settingGeneral}`
+                  ),
                 }}
                 errors={fields.gst_number.errors}
               />
@@ -90,8 +104,12 @@ export const CompanyRegistrationDetails = ({
                 inputProps={{
                   ...getInputProps(fields.pan_number, { type: "text" }),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.pan_number.name,
+                    fields.pan_number.name
                   )}`,
+                  readOnly: !hasPermission(
+                    role,
+                    `${updateRole}:${attribute.settingGeneral}`
+                  ),
                 }}
                 errors={fields.pan_number.errors}
               />
@@ -99,8 +117,12 @@ export const CompanyRegistrationDetails = ({
                 inputProps={{
                   ...getInputProps(fields.pf_number, { type: "text" }),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.pf_number.name,
+                    fields.pf_number.name
                   )}`,
+                  readOnly: !hasPermission(
+                    role,
+                    `${updateRole}:${attribute.settingGeneral}`
+                  ),
                 }}
                 errors={fields.pf_number.errors}
               />
@@ -108,8 +130,12 @@ export const CompanyRegistrationDetails = ({
                 inputProps={{
                   ...getInputProps(fields.esic_number, { type: "text" }),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.esic_number.name,
+                    fields.esic_number.name
                   )}`,
+                  readOnly: !hasPermission(
+                    role,
+                    `${updateRole}:${attribute.settingGeneral}`
+                  ),
                 }}
                 errors={fields.esic_number.errors}
               />
@@ -117,8 +143,12 @@ export const CompanyRegistrationDetails = ({
                 inputProps={{
                   ...getInputProps(fields.lwf_number, { type: "text" }),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.lwf_number.name,
+                    fields.lwf_number.name
                   )}`,
+                  readOnly: !hasPermission(
+                    role,
+                    `${updateRole}:${attribute.settingGeneral}`
+                  ),
                 }}
                 errors={fields.lwf_number.errors}
               />
@@ -126,15 +156,24 @@ export const CompanyRegistrationDetails = ({
                 inputProps={{
                   ...getInputProps(fields.pt_number, { type: "text" }),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.pt_number.name,
+                    fields.pt_number.name
                   )}`,
+                  readOnly: !hasPermission(
+                    role,
+                    `${updateRole}:${attribute.settingGeneral}`
+                  ),
                 }}
                 errors={fields.pt_number.errors}
               />
             </div>
           </CardContent>
 
-          <CardFooter className="border-t pt-6 flex justify-between">
+          <CardFooter
+            className={cn(
+              "border-t pt-6 flex justify-between",
+              !hasPermission(role, `${updateRole}:${attribute.settingGeneral}`) && "hidden"
+            )}
+          >
             <div>Please use 15 characters at maximum.</div>
             <div className="flex gap-4">
               <Button

@@ -1,5 +1,8 @@
+import PaginationButton from "@/components/form/pagination-button";
+import { DEFAULT_ROUTE } from "@/constant";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { LIST_LIMIT } from "@canny_ecosystem/supabase/constant";
 import {
   getCompanyById,
@@ -18,26 +21,28 @@ import {
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@canny_ecosystem/ui/pagination";
+
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { formatDateTime } from "@canny_ecosystem/utils";
+import {
+  formatDateTime,
+  hasPermission,
+  readRole,
+} from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData, useSearchParams } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const page = Number.parseInt(url.searchParams.get("page") ?? "1");
 
-  const { supabase } = getSupabaseWithHeaders({ request });
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(user?.role!, `${readRole}:${attribute.feedbackList}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   const { data: companyData, error: companyError } = await getCompanyById({
     supabase,
@@ -46,10 +51,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   if (companyError || !companyData) {
     throw new Error(`Company not found${companyError}`);
-  }
-
-  if (companyData.company_type !== "app_creator") {
-    return safeRedirect("/user/feedback-form");
   }
 
   const { data, error, totalCount } = await getFeedbacksByCompanyId({
@@ -68,53 +69,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export default function FeedbackList() {
   const { data, page, totalCount } = useLoaderData<typeof loader>();
 
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  const currentPage = page ?? 1;
-  const totalPages = Math.ceil(totalCount / LIST_LIMIT);
-
-  const handlePrevious = () => {
-    if (currentPage > 1) {
-      searchParams.set("page", `${currentPage - 1}`);
-      setSearchParams(searchParams);
-    }
-  };
-
-  const goToPage = (pageNum: number) => {
-    searchParams.set("page", `${pageNum}`);
-    setSearchParams(searchParams);
-  };
-
-  const getPaginationRange = (currentPage: number, totalPages: number) => {
-    const range: (number | "...")[] = [];
-    const maxVisiblePages = 3;
-
-    range.push(1);
-
-    if (totalPages <= maxVisiblePages + 2) {
-      for (let i = 2; i < totalPages; i++) range.push(i);
-    } else {
-      if (currentPage > 3) range.push("..."); // CHANGED
-
-      const startPage = Math.max(2, currentPage - 1);
-      const endPage = Math.min(totalPages - 1, currentPage + 1);
-
-      for (let i = startPage; i <= endPage; i++) range.push(i);
-
-      if (currentPage < totalPages - 2) range.push("..."); //CHANGED
-    }
-    if (totalPages > 1) range.push(totalPages);
-
-    return range;
-  };
-
-  const handleNext = () => {
-    if (currentPage < totalPages) {
-      searchParams.set("page", `${currentPage + 1}`);
-      setSearchParams(searchParams);
-    }
-  };
-
   return (
     <section className="pt-4 flex flex-col h-full">
       <div className="h-full flex flex-col w-full flex-grow justify-between items-end">
@@ -127,13 +81,14 @@ export default function FeedbackList() {
               <CardHeader className="flex flex-row space-y-0 items-center justify-between py-4">
                 <CardTitle className="font-bold">{feedback.category}</CardTitle>
                 <CardTitle
-                  className={cn("px-1" ,
+                  className={cn(
+                    "px-1",
                     feedback.severity === "urgent"
                       ? "text-destructive"
                       : feedback.severity === "normal"
                       ? "text-purple-500"
                       : "text-yellow-400"
-          )}
+                  )}
                 >
                   {feedback.severity}
                 </CardTitle>
@@ -181,55 +136,11 @@ export default function FeedbackList() {
             </Card>
           ))}
         </div>
-
-        <Pagination className="mb-8 pt-6 mt-auto">
-          <PaginationContent>
-            <PaginationItem className="mx-2">
-              <PaginationPrevious
-                className={cn(
-                  "px-3",
-                  currentPage === 1 && "opacity-50 cursor-not-allowed"
-                )}
-                onClick={handlePrevious}
-              />
-            </PaginationItem>
-            {getPaginationRange(currentPage, totalPages).map(
-              (pageNum, index) => {
-                if (pageNum === "...") {
-                  return (
-                    <PaginationItem key={`ellipsis-${index.toString()}`}>
-                      <PaginationEllipsis />
-                    </PaginationItem>
-                  );
-                }
-                return (
-                  <PaginationItem key={pageNum} className="mx-0.5">
-                    <PaginationLink
-                      onClick={() => {
-                        if (typeof pageNum === "number") {
-                          goToPage(pageNum);
-                        }
-                      }}
-                      isActive={currentPage === pageNum}
-                    >
-                      {pageNum}
-                    </PaginationLink>
-                  </PaginationItem>
-                );
-              }
-            )}
-
-            <PaginationItem className="mx-2">
-              <PaginationNext
-                className={cn(
-                  " px-3",
-                  currentPage === totalPages && "opacity-50 cursor-not-allowed"
-                )}
-                onClick={handleNext}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+        <PaginationButton
+          page={page}
+          totalCount={totalCount}
+          limit={LIST_LIMIT}
+        />
       </div>
     </section>
   );

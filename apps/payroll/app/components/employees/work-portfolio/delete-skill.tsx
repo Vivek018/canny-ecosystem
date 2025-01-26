@@ -1,3 +1,4 @@
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -36,7 +37,7 @@ export const DeleteSkill = ({
   };
 
   const handleDeleteSkill = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -46,7 +47,7 @@ export const DeleteSkill = ({
           method: "post",
           action: `/employees/${employeeId}/work-portfolio/${skillId}/delete-employee-skill`,
           replace: true,
-        },
+        }
       );
     } else {
       e.preventDefault();
@@ -59,7 +60,7 @@ export const DeleteSkill = ({
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
-          "text-[13px] h-9",
+          "text-[13px] h-9 "
         )}
       >
         Delete Skill

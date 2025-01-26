@@ -38,7 +38,9 @@ export const zEmailSuffix = z
     "Must contain a dot with at least one character before and two after."
   );
 
-export const SIZE_1MB = 1 * 1024 * 1024; // 1MB
+export const SIZE_1KB = 1 * 1024; //1KB
+export const SIZE_1MB = 1 * SIZE_1KB * SIZE_1KB; // 1MB
+
 const ACCEPTED_IMAGE_TYPES = [
   "image/jpeg",
   "image/jpg",
@@ -87,6 +89,8 @@ export const parseDateSchema = z
   .transform((value) => new Date(value))
   .transform((v: any) => isValid(v))
   .refine((v) => !!v, { message: "Invalid date" });
+
+export const booleanArray = ["true", "false"] as const;
 
 // Theme
 export const themes = ["light", "dark", "system"] as const;
@@ -398,33 +402,36 @@ export const EmployeeWorkHistorySchema = z.object({
 });
 
 export const paymentTypeArray = ["fixed", "variable"] as const;
-export const calculationTypeArray = ["fixed", "percentage_of_basic"] as const;
+export const calculationTypeArray = ["fixed", "percentage_of_ctc"] as const;
 
-export const PaymentFieldSchema = z
-  .object({
-    id: z.string().uuid().optional(),
-    name: zString,
-    payment_type: z.enum(paymentTypeArray).default("fixed"),
-    calculation_type: z.enum(calculationTypeArray).default("fixed"),
-    amount: z.number().optional(),
-    is_active: z.boolean().default(false),
-    is_pro_rata: z.boolean().default(false),
-    consider_for_epf: z.boolean().default(false),
-    consider_for_esic: z.boolean().default(false),
-    company_id: z.string().uuid(),
-  })
-  .refine(
-    (data) =>
-      !(data.payment_type === "variable" && data.calculation_type !== "fixed"),
-    {
-      message: `When payment type is "variable", calculation type must be "fixed".`,
-      path: ["calculation_type"],
-    }
-  );
+export const PaymentFieldSchemaObject = z.object({
+  id: z.string().uuid().optional(),
+  name: zString,
+  payment_type: z.enum(paymentTypeArray).default("fixed"),
+  calculation_type: z.enum(calculationTypeArray).default("fixed"),
+  amount: z.number().optional(),
+  is_active: z.boolean().default(false),
+  is_pro_rata: z.boolean().default(false),
+  consider_for_epf: z.boolean().default(false),
+  consider_for_esic: z.boolean().default(false),
+  company_id: z.string().uuid(),
+});
+
+export const PaymentFieldSchema = PaymentFieldSchemaObject.refine(
+  (data) =>
+    !(data.payment_type === "variable" && data.calculation_type !== "fixed"),
+  {
+    message: `When payment type is "variable", calculation type must be "fixed".`,
+    path: ["calculation_type"],
+  }
+);
 
 export const deductionCycleArray = ["monthly"] as const;
 export const EMPLOYEE_RESTRICTED_VALUE = 15000;
-export const EMPLOYEE_RESTRICTED_RATE = 0.2;
+export const EMPLOYER_RESTRICTED_VALUE = 15000;
+export const EDLI_RESTRICTED_VALUE = 75;
+export const EMPLOYEE_RESTRICTED_RATE = 0.12;
+export const EMPLOYER_RESTRICTED_RATE = 0.12;
 
 export const EmployeeProvidentFundSchema = z.object({
   id: z.string().optional(),
@@ -432,24 +439,32 @@ export const EmployeeProvidentFundSchema = z.object({
   epf_number: z.string().max(20),
   deduction_cycle: z.enum(deductionCycleArray).default(deductionCycleArray[0]),
   employee_contribution: z.number().default(EMPLOYEE_RESTRICTED_RATE),
-  employer_contribution: z.number().default(EMPLOYEE_RESTRICTED_RATE),
+  employer_contribution: z.number().default(EMPLOYER_RESTRICTED_RATE),
   employee_restrict_value: z.number().default(EMPLOYEE_RESTRICTED_VALUE),
-  employer_restrict_value: z.number().default(EMPLOYEE_RESTRICTED_VALUE),
+  employer_restrict_value: z.number().default(EMPLOYER_RESTRICTED_VALUE),
   restrict_employer_contribution: z.boolean().default(false),
   restrict_employee_contribution: z.boolean().default(false),
   include_employer_contribution: z.boolean().default(false),
+  edli_restrict_value: z.number().default(EDLI_RESTRICTED_VALUE),
   include_employer_edli_contribution: z.boolean().default(false),
   include_admin_charges: z.boolean().default(false),
+  is_default: z.boolean().default(true),
 });
+
+export const ESI_EMPLOYEE_CONTRIBUTION = 0.0075;
+export const ESI_EMPLOYER_CONTRIBUTION = 0.0325;
+export const ESI_MAX_LIMIT = 21000;
 
 export const EmployeeStateInsuranceSchema = z.object({
   id: z.string().optional(),
   company_id: z.string(),
   esi_number: zNumberString,
   deduction_cycle: z.enum(deductionCycleArray).default(deductionCycleArray[0]),
-  employees_contribution: z.number().default(0.0075),
-  employers_contribution: z.number().default(0.0325),
+  employees_contribution: z.number().default(ESI_EMPLOYEE_CONTRIBUTION),
+  employers_contribution: z.number().default(ESI_EMPLOYER_CONTRIBUTION),
   include_employer_contribution: z.boolean().default(false),
+  is_default: z.boolean().default(true),
+  max_limit: z.number().default(ESI_MAX_LIMIT),
 });
 
 export const ProfessionalTaxSchema = z.object({
@@ -507,6 +522,17 @@ export const StatutoryBonusSchema = z
     }
   });
 
+export const GratuitySchema = z.object({
+  id: z.string().optional(),
+  company_id: z.string(),
+  is_default: z.boolean().default(true),
+  eligibility_years: z.number().min(0).default(4.5),
+  present_day_per_year: z.number().min(1).max(365).default(240),
+  payment_days_per_year: z.number().min(1).max(365).default(15),
+  max_multiply_limit: z.number().min(0).default(20),
+  max_amount_limit: z.number().min(0).default(3000000),
+});
+
 export const categoryArray = ["suggestion", "bug", "complain"] as const;
 export const severityArray = ["low", "normal", "urgent"] as const;
 
@@ -529,6 +555,13 @@ export const UpdateUserContactSchema = z.object({
   mobile_number: zNumber.min(10).max(10),
 });
 
+export const userRoles = [
+  "master",
+  "admin",
+  "operation_manager",
+  "executive",
+] as const;
+
 export const UserSchema = z.object({
   id: z.string().uuid().optional(),
   first_name: zString.max(20),
@@ -537,4 +570,620 @@ export const UserSchema = z.object({
   mobile_number: zNumber.min(10).max(10).optional(),
   avatar: zImage.optional(),
   is_active: z.boolean().default(false),
+  company_id: z.string(),
+  role: z.enum(userRoles),
 });
+
+export const reasonForExitArray = [
+  "resignation",
+  "termination",
+  "retirement",
+  "health_reasons",
+  "career_change",
+  "other",
+] as const;
+
+export const ExitPaymentPage1Schema = z.object({
+  last_working_day: z.string(),
+  reason_for_exit: z.enum(reasonForExitArray),
+  final_settlement_date: z.string(),
+  note: zTextArea.max(100).optional(),
+});
+
+export const ExitPaymentPage2Schema = z.object({
+  organization_payable_days: zNumber,
+  employee_payable_days: zNumber,
+  bonus: zNumber.optional(),
+  diwali_bonus: zNumber.optional(),
+  commission: zNumber.optional(),
+  joining_bonus: zNumber.optional(),
+  yearly_bonus: zNumber.optional(),
+  leave_encashment: zNumber.optional(),
+  gift_coupon: zNumber.optional(),
+  computer_servive_charges: zNumber.optional(),
+  gratuity: zNumber.optional(),
+  deduction: zNumber.optional(),
+});
+
+// Payment Templates
+export const PaymentTemplateSchema = z.object({
+  id: z.string().uuid().optional(),
+  name: zString.min(3).max(50),
+  description: zTextArea.max(500).optional(),
+  is_active: z.boolean().default(false),
+  is_default: z.boolean().default(false),
+  company_id: z.string().uuid(),
+});
+
+export const statutoryFieldsArray = [
+  "epf",
+  "esi",
+  "bonus",
+  "pt",
+  "lwf",
+] as const;
+
+export const componentTypeArray = [
+  "earning",
+  "deduction",
+  "statutory_contribution",
+] as const;
+
+export const PaymentTemplateComponentsSchema = z.object({
+  id: z.string().uuid().optional(),
+  monthly_ctc: z.number().min(0).max(100000000),
+  state: zString,
+  payment_template_components: z.array(
+    z.object({
+      id: z.string().uuid().optional(),
+      template_id: z.string().uuid().optional(),
+      payment_field_id: z.string().uuid().optional(),
+      epf_id: z.string().uuid().optional(),
+      esi_id: z.string().uuid().optional(),
+      pt_id: z.string().uuid().optional(),
+      lwf_id: z.string().uuid().optional(),
+      bonus_id: z.string().uuid().optional(),
+      target_type: z
+        .enum(["payment_field", ...statutoryFieldsArray])
+        .default("payment_field"),
+      component_type: z.enum(componentTypeArray).default("earning"),
+      calculation_value: z.number().optional(),
+      display_order: z.number().int().optional(),
+    })
+  ),
+});
+
+// Payment Template Assignment
+export const paymentAssignmentTypesArray = ["employee", "site"] as const;
+export const eligibilityOptionsArray = ["position", "skill_level"] as const;
+
+// Payment Template Assignment
+export const EmployeeLinkSchema = z.object({
+  name: z.string(),
+  effective_from: z.string().default(new Date().toISOString().split("T")[0]),
+  effective_to: z.string().optional(),
+  template_id: z.string(),
+});
+
+export const PaymentTemplateFormSiteDialogSchema = z.object({
+  name: z.string(),
+  effective_from: z.string().default(new Date().toISOString().split("T")[0]),
+  effective_to: z.string().optional(),
+  template_id: z.string(),
+  eligibility_option: z.enum(eligibilityOptionsArray).optional(),
+  position: z.string().optional(),
+  skill_level: z.string().optional(),
+});
+
+export const DeleteEmployeeLinkSchema = z.object({
+  is_active: z.enum(booleanArray).transform((val) => val === "true"),
+});
+
+export const SiteLinkSchema = z.object({
+  name: z.string(),
+  effective_from: z.string().default(new Date().toISOString().split("T")[0]),
+  effective_to: z.string().optional(),
+  template_id: z.string(),
+  eligibility_option: z.enum(eligibilityOptionsArray).optional(),
+  position: z.string().optional(),
+  skill_level: z.string().optional(),
+});
+
+export const reimbursementStatusArray = ["approved", "pending"] as const;
+
+export const ReimbursementSchema = z.object({
+  submitted_date: z.string(),
+  status: z.enum(reimbursementStatusArray),
+  amount: z.number().min(1).max(100000000),
+  user_id: z.string().optional(),
+  is_deductible: z.boolean().optional().default(false),
+  company_id: z.string(),
+  employee_id: z.string(),
+});
+
+export const ImportReimbursementHeaderSchema = z
+  .object({
+    submitted_date: z.string(),
+    employee_code: z.string(),
+    amount: z.string(),
+    email: z.string().optional(),
+    is_deductible: z.string().optional(),
+    status: z.string(),
+  })
+  .refine(
+    (data) => {
+      const values = [
+        data.submitted_date,
+        data.employee_code,
+        data.amount,
+        data.email,
+        data.is_deductible,
+        data.status,
+      ].filter(Boolean);
+
+      const uniqueValues = new Set(values);
+      return uniqueValues.size === values.length;
+    },
+    {
+      message:
+        "Some fields have the same value. Please select different options.",
+      path: [
+        "employee_code",
+        "amount",
+        "submitted_date",
+        "email",
+        "is_deductible",
+        "status",
+      ],
+    }
+  );
+
+export const exitReasonArray = [
+  "Resignation",
+  "Retirement",
+  "Transfer",
+  "Termination",
+  "Medical",
+  "Other",
+] as const;
+
+export const ImportSingleReimbursementDataSchema = z.object({
+  submitted_date: z.string(),
+  employee_code: zNumberString,
+  amount: z.preprocess(
+    (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
+    z.number()
+  ),
+  email: zEmail.optional(),
+  is_deductible: z
+    .preprocess(
+      (value) =>
+        typeof value === "string" ? value.toLowerCase() === "true" : value,
+      z.boolean().default(false)
+    )
+    .default(false),
+  status: z.enum(reimbursementStatusArray),
+});
+
+export const ImportReimbursementDataSchema = z.object({
+  data: z.array(ImportSingleReimbursementDataSchema),
+});
+
+export const duplicationTypeArray = ["overwrite", "skip"] as const;
+
+export const ImportEmployeeDetailsHeaderSchemaObject = z.object({
+  employee_code: z.string(),
+  first_name: z.string(),
+  middle_name: z.string().optional(),
+  last_name: z.string(),
+  gender: z.string().optional(),
+  education: z.string().optional(),
+  marital_status: z.string().optional(),
+  is_active: z.string().optional(),
+  date_of_birth: z.string(),
+  personal_email: z.string().optional(),
+  primary_mobile_number: z.string(),
+  secondary_mobile_number: z.string().optional(),
+});
+
+export const ImportEmployeeDetailsHeaderSchema =
+  ImportEmployeeDetailsHeaderSchemaObject.refine(
+    (data) => {
+      const values = [
+        data.employee_code,
+        data.first_name,
+        data.middle_name,
+        data.last_name,
+        data.gender,
+        data.education,
+        data.marital_status,
+        data.is_active,
+        data.date_of_birth,
+        data.personal_email,
+        data.primary_mobile_number,
+        data.secondary_mobile_number,
+      ].filter(Boolean);
+
+      const uniqueValues = new Set(values);
+      return uniqueValues.size === values.length;
+    },
+    {
+      message:
+        "Some fields have the same value. Please select different options.",
+      path: [
+        "employee_code",
+        "first_name",
+        "middle_name",
+        "last_name",
+        "gender",
+        "education",
+        "marital_status",
+        "is_active",
+        "date_of_birth",
+        "personal_email",
+        "primary_mobile_number",
+        "secondary_mobile_number",
+      ],
+    }
+  );
+
+export const ImportSingleEmployeeDetailsDataSchema = z.object({
+  first_name: zString.min(3),
+  middle_name: zString.min(3).optional(),
+  last_name: zString.min(3),
+  employee_code: zNumberString.min(3),
+  marital_status: z.enum(maritalStatusArray).default("unmarried"),
+  date_of_birth: z.string(),
+  gender: z.enum(genderArray).default("male"),
+  education: z.enum(educationArray).optional(),
+  is_active: z
+    .preprocess(
+      (value) =>
+        typeof value === "string" ? value.toLowerCase() === "true" : value,
+      z.boolean().default(false)
+    )
+    .default(false),
+  primary_mobile_number: z.preprocess((value) => {
+    const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
+    return Number.isNaN(parsed) ? undefined : parsed;
+  }, z.number()),
+  secondary_mobile_number: z.preprocess((value) => {
+    const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
+    return Number.isNaN(parsed) ? undefined : parsed;
+  }, z.number().optional()),
+  personal_email: zEmail.optional(),
+});
+
+export const ImportEmployeeDetailsDataSchema = z.object({
+  data: z.array(ImportSingleEmployeeDetailsDataSchema),
+});
+
+export const ImportEmployeeStatutoryHeaderSchemaObject = z.object({
+  employee_code: z.string(),
+  aadhaar_number: z.string(),
+  pan_number: z.string().optional(),
+  uan_number: z.string(),
+  pf_number: z.string(),
+  esic_number: z.string(),
+  driving_license_number: z.string().optional(),
+  driving_license_expiry: z.string().optional(),
+  passport_number: z.string().optional(),
+  passport_expiry: z.string().optional(),
+});
+
+export const ImportEmployeeStatutoryHeaderSchema =
+  ImportEmployeeStatutoryHeaderSchemaObject.refine(
+    (data) => {
+      const values = [
+        data.employee_code,
+        data.aadhaar_number,
+        data.pan_number,
+        data.uan_number,
+        data.pf_number,
+        data.esic_number,
+        data.driving_license_number,
+        data.driving_license_expiry,
+        data.passport_number,
+        data.passport_expiry,
+      ].filter(Boolean);
+
+      const uniqueValues = new Set(values);
+      return uniqueValues.size === values.length;
+    },
+    {
+      message:
+        "Some fields have the same value. Please select different options.",
+      path: [
+        "employee_code",
+        "aadhaar_number",
+        "pan_number",
+        "uan_number",
+        "pf_number",
+        "esic_number",
+        "driving_license_number",
+        "driving_license_expiry",
+        "passport_number",
+        "passport_expiry",
+      ],
+    }
+  );
+
+export const ImportSingleEmployeeStatutoryDataSchema = z.object({
+  employee_code: zNumberString.min(3),
+  aadhaar_number: zNumber.min(12).max(12),
+  pan_number: z.preprocess(
+    (value) => (value === "" ? undefined : value),
+    z.string().max(10).optional()
+  ),
+  uan_number: zNumberString.max(12),
+  pf_number: zNumberString.max(20),
+  esic_number: zNumberString.max(20),
+  driving_license_number: z.preprocess(
+    (value) => (value === "" ? undefined : value),
+    z.string().max(20).optional()
+  ),
+  driving_license_expiry: z.string().optional(),
+  passport_number: zNumberString.max(20).optional(),
+  passport_expiry: z.string().optional(),
+});
+
+export const ImportEmployeeStatutoryDataSchema = z.object({
+  data: z.array(ImportSingleEmployeeStatutoryDataSchema),
+});
+
+export const ImportEmployeeBankDetailsHeaderSchemaObject = z.object({
+  employee_code: z.string(),
+  account_holder_name: z.string().optional(),
+  account_number: z.string(),
+  ifsc_code: z.string(),
+  account_type: z.string().optional(),
+  bank_name: z.string(),
+  branch_name: z.string().optional(),
+});
+
+export const ImportEmployeeBankDetailsHeaderSchema =
+  ImportEmployeeBankDetailsHeaderSchemaObject.refine(
+    (data) => {
+      const values = [
+        data.employee_code,
+        data.account_holder_name,
+        data.account_number,
+        data.ifsc_code,
+        data.account_type,
+        data.bank_name,
+        data.branch_name,
+      ].filter(Boolean);
+
+      const uniqueValues = new Set(values);
+      return uniqueValues.size === values.length;
+    },
+    {
+      message:
+        "Some fields have the same value. Please select different options.",
+      path: [
+        "employee_code",
+        "account_holder_name",
+        "account_number",
+        "ifsc_code",
+        "account_type",
+        "bank_name",
+        "branch_name",
+      ],
+    }
+  );
+
+export const ImportSingleEmployeeBankDetailsDataSchema = z.object({
+  employee_code: zNumberString.min(3),
+  account_number: zNumber.min(10).max(20),
+  ifsc_code: zNumberString.min(3).max(11),
+  account_holder_name: zString.min(3).optional(),
+  account_type: z.enum(accountTypeArray).default("savings"),
+  bank_name: zString.min(3),
+  branch_name: zNumberString.min(3).optional(),
+});
+
+export const ImportEmployeeBankDetailsDataSchema = z.object({
+  data: z.array(ImportSingleEmployeeBankDetailsDataSchema),
+});
+
+export const ImportEmployeeAddressHeaderSchemaObject = z.object({
+  employee_code: z.string(),
+  address_type: z.string(),
+  address_line_1: z.string(),
+  address_line_2: z.string(),
+  city: z.string(),
+  pincode: z.string(),
+  state: z.string(),
+  country: z.string(),
+  latitude: z.string().optional(),
+  longitude: z.string().optional(),
+  is_primary: z.string().optional(),
+});
+
+export const ImportEmployeeAddressHeaderSchema =
+  ImportEmployeeAddressHeaderSchemaObject.refine(
+    (data) => {
+      const values = [
+        data.employee_code,
+        data.address_type,
+        data.address_line_1,
+        data.address_line_2,
+        data.city,
+        data.pincode,
+        data.state,
+        data.country,
+        data.latitude,
+        data.longitude,
+        data.is_primary,
+      ].filter(Boolean);
+
+      const uniqueValues = new Set(values);
+      return uniqueValues.size === values.length;
+    },
+    {
+      message:
+        "Some fields have the same value. Please select different options.",
+      path: [
+        "employee_code",
+        "address_type",
+        "address_line_1",
+        "address_line_2",
+        "city",
+        "pincode",
+        "state",
+        "country",
+        "latitude",
+        "longitude",
+        "is_primary",
+      ],
+    }
+  );
+
+export const ImportSingleEmployeeAddressDataSchema = z.object({
+  employee_code: zNumberString.min(3),
+  address_type: zString.min(3).max(20),
+  is_primary: z.preprocess(
+    (value) =>
+      typeof value === "string" ? value.toLowerCase() === "true" : value,
+    z.boolean().default(false)
+  ),
+  address_line_1: z
+    .string()
+    .min(3)
+    .max(textMaxLength * 2),
+  address_line_2: z
+    .string()
+    .max(textMaxLength * 2)
+    .optional(),
+  state: zString,
+  city: zString.min(3),
+  pincode: zNumber.min(6).max(6),
+  latitude: z.preprocess(
+    (value) => (value === "" ? undefined : value),
+    z.string().max(180).min(-180).optional()
+  ),
+  longitude: z.preprocess(
+    (value) => (value === "" ? undefined : value),
+    z.string().max(180).min(-180).optional()
+  ),
+});
+
+export const ImportEmployeeAddressDataSchema = z.object({
+  data: z.array(ImportSingleEmployeeAddressDataSchema),
+});
+
+export const ImportEmployeeGuardiansHeaderSchemaObject = z.object({
+  employee_code: z.string().optional(),
+  relationship: z.string().optional(),
+  first_name: z.string().optional(),
+  last_name: z.string().optional(),
+  date_of_birth: z.string().optional(),
+  gender: z.string().optional(),
+  mobile_number: z.string().optional(),
+  alternate_mobile_number: z.string().optional(),
+  email: z.string().optional(),
+  is_emergency_contact: z.string().optional(),
+  address_same_as_employee: z.string().optional(),
+});
+export const ImportEmployeeGuardiansHeaderSchema =
+  ImportEmployeeGuardiansHeaderSchemaObject.refine(
+    (data) => {
+      const values = [
+        data.employee_code,
+        data.relationship,
+        data.first_name,
+        data.last_name,
+        data.date_of_birth,
+        data.gender,
+        data.mobile_number,
+        data.alternate_mobile_number,
+        data.email,
+        data.is_emergency_contact,
+        data.address_same_as_employee,
+      ].filter(Boolean);
+
+      const uniqueValues = new Set(values);
+      return uniqueValues.size === values.length;
+    },
+    {
+      message:
+        "Some fields have the same value. Please select different options.",
+      path: [
+        "employee_code",
+        "relationship",
+        "first_name",
+        "last_name",
+        "date_of_birth",
+        "gender",
+        "mobile_number",
+        "alternate_mobile_number",
+        "email",
+        "is_emergency_contact",
+        "address_same_as_employee",
+      ],
+    }
+  );
+
+export const ImportSingleEmployeeGuardiansDataSchema = z.object({
+  employee_code: zNumberString.min(3),
+  relationship: z.enum(relationshipArray).optional(),
+  first_name: zString.min(3).max(50).optional(),
+  last_name: zString.min(3).max(50).optional(),
+  date_of_birth: z.string().optional(),
+  gender: z.enum(genderArray).optional(),
+  is_emergency_contact: z.preprocess(
+    (value) =>
+      typeof value === "string" ? value.toLowerCase() === "true" : value,
+    z.boolean().default(false)
+  ),
+  address_same_as_employee: z.preprocess(
+    (value) =>
+      typeof value === "string" ? value.toLowerCase() === "true" : value,
+    z.boolean().default(false)
+  ),
+  mobile_number: z.preprocess(
+    (value) => (value === "" ? undefined : value),
+    z.string().max(10).min(10).optional()
+  ),
+  alternate_mobile_number: z.preprocess(
+    (value) => (value === "" ? undefined : value),
+    z.string().max(10).min(10).optional()
+  ),
+  email: zEmail.optional(),
+});
+
+export const ImportEmployeeGuardiansDataSchema = z.object({
+  data: z.array(ImportSingleEmployeeGuardiansDataSchema),
+});
+
+// Payroll
+export const PayrollSchema = z
+  .object({
+    employee_id: z.string().optional(),
+    site_id: z.string().optional(),
+    payrollId: z.string().optional(),
+    gross_pay: z.number().optional(),
+    statutoryBonus: z.number().optional(),
+    epf: z.number().optional(),
+    esi: z.number().optional(),
+    pt: z.number().optional(),
+    lwf: z.number().optional(),
+    templateComponents: z.any(),
+  })
+  .catchall(z.any());
+
+export type PayrollEmployeeData = {
+  deductions: number;
+  employee_code: string;
+  employee_id: string;
+  gross_pay: number;
+  name: string;
+  net_pay: number;
+  present_days: number;
+  site_id: string;
+  status: string;
+  designation: string;
+  payment_template_components_id: string;
+  templateComponents:any;
+  payrollId:string;
+};

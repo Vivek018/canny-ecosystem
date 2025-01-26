@@ -53,7 +53,7 @@ export async function getFeedbacksByCompanyId({
     .from("feedback")
     .select(
       `${columns.join(",")}, users(id, first_name, last_name, email, avatar)`,
-      { count: "exact" }
+      { count: "exact" },
     )
     .eq("company_id", companyId)
     .range(start, end)

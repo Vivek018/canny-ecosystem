@@ -1,9 +1,11 @@
 import {
   getValidDateForInput,
+  hasPermission,
   isGoodStatus,
   ProjectSchema,
   statusArray,
   transformStringArrayIntoOptions,
+  updateRole,
 } from "@canny_ecosystem/utils";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
@@ -25,9 +27,14 @@ import {
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { Form, useLoaderData } from "@remix-run/react";
-import { json } from "@remix-run/node";
-import { safeRedirect } from "@/utils/server/http.server";
+import {
+  Await,
+  Form,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
+import { defer, json } from "@remix-run/node";
 import {
   Card,
   CardContent,
@@ -41,55 +48,101 @@ import type { ProjectDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { UPDATE_PROJECT } from "./$projectId+/update-project";
 import { getCompanies } from "@canny_ecosystem/supabase/queries";
 import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { FormButtons } from "@/components/form/form-buttons";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { ErrorBoundary } from "@/components/error-boundary";
+import { CompanyListsWrapper } from "@/components/projects/company-lists-wrapper";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const CREATE_PROJECT = "create-project";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data: companies, error } = await getCompanies({ supabase });
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
 
-  if (error) {
-    throw error;
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.project}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
   }
+  try {
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    const companyOptionsPromise = getCompanies({ supabase }).then(
+      ({ data, error }) => {
+        if (data) {
+          const companyOptions = data
+            ?.filter((company) => company.id !== companyId)
+            .map((company) => ({ label: company.name, value: company.id }));
+          return { data: companyOptions, error };
+        }
+        return { data: null, error };
+      }
+    );
 
-  if (!companies) {
-    throw new Error("No companies found");
-  }
-
-  const companyOptions = companies
-    .filter((company) => company.id !== companyId)
-    .map((company) => ({ label: company.name, value: company.id }));
-
-  return json({ companyId, companyOptions });
-}
-
-export async function action({ request }: ActionFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
-
-  const submission = parseWithZod(formData, {
-    schema: ProjectSchema,
-  });
-
-  if (submission.status !== "success") {
+    return defer({
+      error: null,
+      companyId,
+      companyOptionsPromise,
+    });
+  } catch (error) {
     return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      {
+        error,
+        companyId: null,
+        companyOptionsPromise: null,
+      },
+      { status: 500 }
     );
   }
+}
 
-  const { status, error } = await createProject({
-    supabase,
-    data: submission.value,
-  });
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
 
-  if (isGoodStatus(status)) {
-    return safeRedirect("/projects");
+    const submission = parseWithZod(formData, {
+      schema: ProjectSchema,
+    });
+
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 }
+      );
+    }
+
+    const { status, error } = await createProject({
+      supabase,
+      data: submission.value,
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Project created",
+        error: null,
+      });
+    }
+    return json(
+      { status: "error", message: "Project creation failed", error },
+      { status: 500 }
+    );
+  } catch (error) {
+    return json(
+      {
+        status: "error",
+        message: "An error occurred",
+        error,
+      },
+      { status: 500 }
+    );
   }
-  return json({ status, error });
 }
 
 export default function CreateProject({
@@ -99,7 +152,9 @@ export default function CreateProject({
   updateValues?: ProjectDatabaseUpdate | null;
   companyOptionsFromUpdate?: ComboboxSelectOption[];
 }) {
-  const { companyId, companyOptions } = useLoaderData<typeof loader>();
+  const { companyId, companyOptionsPromise, error } =
+    useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
   const PROJECT_TAG = updateValues ? UPDATE_PROJECT : CREATE_PROJECT;
 
   const initialValues = updateValues ?? getInitialValueFromZod(ProjectSchema);
@@ -119,8 +174,34 @@ export default function CreateProject({
     },
   });
 
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (actionData) {
+      if (actionData?.status === "success") {
+        toast({
+          title: "Success",
+          description: actionData?.message,
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: actionData?.error?.message || "Project creation failed",
+          variant: "destructive",
+        });
+      }
+      navigate("/projects", { replace: true });
+    }
+  }, [actionData]);
+
+  if (error) {
+    return <ErrorBoundary error={error} message="Failed to load projects" />;
+  }
+
   return (
-    <section className="md:px-20 lg:px-28 2xl:px-40 py-4">
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
       <FormProvider context={form.context}>
         <Form
           method="POST"
@@ -141,7 +222,9 @@ export default function CreateProject({
             <CardContent>
               <input {...getInputProps(fields.id, { type: "hidden" })} />
               <input
-                {...getInputProps(fields.project_client_id, { type: "hidden" })}
+                {...getInputProps(fields.project_client_id, {
+                  type: "hidden",
+                })}
               />
               <Field
                 inputProps={{
@@ -155,9 +238,11 @@ export default function CreateProject({
               <div className="grid grid-cols-3 place-content-center justify-between gap-6">
                 <Field
                   inputProps={{
-                    ...getInputProps(fields.project_code, { type: "text" }),
+                    ...getInputProps(fields.project_code, {
+                      type: "text",
+                    }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.project_code.name,
+                      fields.project_code.name
                     )}`,
                   }}
                   labelProps={{
@@ -167,9 +252,11 @@ export default function CreateProject({
                 />
                 <Field
                   inputProps={{
-                    ...getInputProps(fields.project_type, { type: "text" }),
+                    ...getInputProps(fields.project_type, {
+                      type: "text",
+                    }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.project_type.name,
+                      fields.project_type.name
                     )}`,
                   }}
                   labelProps={{
@@ -186,7 +273,7 @@ export default function CreateProject({
                     placeholder: `Select ${fields.status.name}`,
                   }}
                   options={transformStringArrayIntoOptions(
-                    statusArray as unknown as string[],
+                    statusArray as unknown as string[]
                   )}
                   labelProps={{
                     children: fields.status.name,
@@ -202,46 +289,35 @@ export default function CreateProject({
                 labelProps={{ children: fields.description.name }}
                 errors={fields.description.errors}
               />
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
-                <SearchableSelectField
-                  key={resetKey + 1}
-                  inputProps={{
-                    ...getInputProps(fields.primary_contractor_id, {
-                      type: "text",
-                    }),
-                    placeholder: "Select Primary Contractor",
+              <Suspense fallback={<div>Loading...</div>}>
+                <Await resolve={companyOptionsPromise}>
+                  {(resolvedData) => {
+                    if (!resolvedData)
+                      return (
+                        <ErrorBoundary message="Failed to load company options" />
+                      );
+                    return (
+                      <CompanyListsWrapper
+                        data={resolvedData.data}
+                        error={resolvedData.error}
+                        fields={fields}
+                        resetKey={resetKey}
+                        companyOptionsFromUpdate={companyOptionsFromUpdate}
+                      />
+                    );
                   }}
-                  options={companyOptionsFromUpdate ?? companyOptions}
-                  labelProps={{
-                    children: "Primary Contactor",
-                  }}
-                  errors={fields.primary_contractor_id.errors}
-                />
-                <SearchableSelectField
-                  key={resetKey + 2}
-                  inputProps={{
-                    ...getInputProps(fields.end_client_id, {
-                      type: "text",
-                    }),
-                    placeholder: "Select End Client",
-                  }}
-                  options={companyOptionsFromUpdate ?? companyOptions}
-                  labelProps={{
-                    children: "End Client",
-                  }}
-                  errors={fields.end_client_id.errors}
-                />
-              </div>
+                </Await>
+              </Suspense>
               <div className="grid grid-cols-2 place-content-center justify-between gap-6">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.start_date, { type: "date" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.start_date.name,
+                      fields.start_date.name
                     )}`,
                     max: getValidDateForInput(new Date().toISOString()),
                     defaultValue: getValidDateForInput(
-                      fields.start_date.initialValue,
+                      fields.start_date.initialValue
                     ),
                   }}
                   labelProps={{
@@ -255,11 +331,11 @@ export default function CreateProject({
                       type: "date",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.estimated_end_date.name,
+                      fields.estimated_end_date.name
                     )}`,
                     min: getValidDateForInput(fields.start_date.value),
                     defaultValue: getValidDateForInput(
-                      fields.estimated_end_date.initialValue,
+                      fields.estimated_end_date.initialValue
                     ),
                   }}
                   labelProps={{
@@ -272,7 +348,7 @@ export default function CreateProject({
                 textareaProps={{
                   ...getTextareaProps(fields.risk_assessment),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.risk_assessment.name,
+                    fields.risk_assessment.name
                   )}`,
                 }}
                 labelProps={{
@@ -284,7 +360,7 @@ export default function CreateProject({
                 textareaProps={{
                   ...getTextareaProps(fields.quality_standards),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.quality_standards.name,
+                    fields.quality_standards.name
                   )}`,
                 }}
                 labelProps={{
@@ -296,12 +372,12 @@ export default function CreateProject({
                 textareaProps={{
                   ...getTextareaProps(fields.health_safety_requirements),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.health_safety_requirements.name,
+                    fields.health_safety_requirements.name
                   )}`,
                 }}
                 labelProps={{
                   children: replaceUnderscore(
-                    fields.health_safety_requirements.name,
+                    fields.health_safety_requirements.name
                   ),
                 }}
                 errors={fields.health_safety_requirements.errors}
@@ -310,12 +386,12 @@ export default function CreateProject({
                 textareaProps={{
                   ...getTextareaProps(fields.environmental_considerations),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.environmental_considerations.name,
+                    fields.environmental_considerations.name
                   )}`,
                 }}
                 labelProps={{
                   children: replaceUnderscore(
-                    fields.environmental_considerations.name,
+                    fields.environmental_considerations.name
                   ),
                 }}
                 errors={fields.environmental_considerations.errors}

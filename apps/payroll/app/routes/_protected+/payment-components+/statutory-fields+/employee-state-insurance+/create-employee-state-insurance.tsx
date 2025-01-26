@@ -1,11 +1,8 @@
 import { FormButtons } from "@/components/form/form-buttons";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { safeRedirect } from "@/utils/server/http.server";
 import { createEmployeeStateInsurance } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import type {
-  EmployeeStateInsuranceDatabaseUpdate,
-} from "@canny_ecosystem/supabase/types";
+import type { EmployeeStateInsuranceDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import {
   Card,
   CardContent,
@@ -19,13 +16,14 @@ import {
 } from "@canny_ecosystem/ui/forms";
 import {
   deductionCycleArray,
-  EmployeeProvidentFundSchema,
   EmployeeStateInsuranceSchema,
   getInitialValueFromZod,
+  hasPermission,
   isGoodStatus,
   replaceDash,
   replaceUnderscore,
   transformStringArrayIntoOptions,
+  updateRole,
 } from "@canny_ecosystem/utils";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
@@ -34,57 +32,104 @@ import {
   json,
   type LoaderFunctionArgs,
 } from "@remix-run/node";
-import { Form, useLoaderData } from "@remix-run/react";
-import { useState } from "react";
+import {
+  Form,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
+import { useEffect, useState } from "react";
 import { UPDATE_EMPLOYEE_STATE_INSURANCE } from "./$esiId.update-esi";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { DEFAULT_ROUTE } from "@/constant";
+import { safeRedirect } from "@/utils/server/http.server";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const CREATE_EMPLOYEE_STATE_INSURANCE =
   "create-employee-state-insurance";
 
-export const action = async ({ request }: ActionFunctionArgs) => {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
+export async function loader({ request }: LoaderFunctionArgs) {
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
 
-  const submission = parseWithZod(formData, {
-    schema: EmployeeStateInsuranceSchema,
-  });
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (submission.status !== "success") {
+  if (
+    !hasPermission(user?.role!, `${updateRole}:${attribute.statutoryFieldsEsi}`)
+  ) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
+
+  try {
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+
+    return json({ companyId, error: null });
+  } catch (error) {
     return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
-    );
-  }
-
-  const { status, error } = await createEmployeeStateInsurance({
-    supabase,
-    data: submission.value as any,
-    bypassAuth: true,
-  });
-
-  if (isGoodStatus(status)) {
-    return safeRedirect(
-      "/payment-components/statutory-fields/employee-state-insurance",
       {
-        status: 303,
-      }
+        error,
+        companyId: null,
+      },
+      { status: 500 }
     );
   }
+}
 
-  return json({ status, error });
-};
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  return json({ companyId });
-};
+    const submission = parseWithZod(formData, {
+      schema: EmployeeStateInsuranceSchema,
+    });
+
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 }
+      );
+    }
+
+    const { status, error } = await createEmployeeStateInsurance({
+      supabase,
+      data: submission.value as any,
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Employee State Insurance created successfully",
+        error: null,
+      });
+    }
+
+    return json({
+      status: "error",
+      message: "Failed to create Employee State Insurance",
+      error,
+    });
+  } catch (error) {
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 }
+    );
+  }
+}
 
 export default function CreateEmployeeStateInsurance({
   updateValues,
 }: {
   updateValues?: EmployeeStateInsuranceDatabaseUpdate | null;
 }) {
+  const { companyId } = useLoaderData<{ companyId: string }>();
+  const actionData = useActionData<typeof action>();
   const EPF_TAG = updateValues
     ? UPDATE_EMPLOYEE_STATE_INSURANCE
     : CREATE_EMPLOYEE_STATE_INSURANCE;
@@ -92,12 +137,11 @@ export default function CreateEmployeeStateInsurance({
   const initialValues =
     updateValues ?? getInitialValueFromZod(EmployeeStateInsuranceSchema);
 
-  const { companyId } = useLoaderData<{ companyId: string }>();
   const [resetKey, setResetKey] = useState(Date.now());
 
   const [form, fields] = useForm({
     id: EPF_TAG,
-    constraint: getZodConstraint(EmployeeProvidentFundSchema),
+    constraint: getZodConstraint(EmployeeStateInsuranceSchema),
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: EmployeeStateInsuranceSchema });
     },
@@ -108,13 +152,33 @@ export default function CreateEmployeeStateInsurance({
       company_id: companyId,
     },
   });
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!actionData) return;
+    if (actionData?.status === "success") {
+      toast({
+        title: "Success",
+        description: actionData?.message,
+        variant: "success",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: actionData?.message,
+        variant: "destructive",
+      });
+    }
+    navigate("/payment-components/statutory-fields/employee-state-insurance");
+  }, [actionData]);
 
   return (
     <section className="p-4 w-full">
       <Form method="POST" {...getFormProps(form)} className="flex flex-col">
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl mb-4">
+            <CardTitle className="text-2xl mb-4 capitalize">
               {replaceDash(EPF_TAG)}
             </CardTitle>
             <hr />
@@ -199,6 +263,23 @@ export default function CreateEmployeeStateInsurance({
                 <p className="w-1/2 mb-5 font-light text-sm">of Gross Pay</p>
               </div>
             </div>
+            <Field
+              className=""
+              inputProps={{
+                ...getInputProps(fields.max_limit, {
+                  type: "number",
+                }),
+                disabled: true,
+                autoFocus: true,
+                placeholder: "Enter number",
+                className: "capitalize",
+              }}
+              labelProps={{
+                className: "capitalize",
+                children: replaceUnderscore(fields.max_limit.name),
+              }}
+              errors={fields.max_limit.errors}
+            />
 
             <CheckboxField
               buttonProps={getInputProps(fields.include_employer_contribution, {

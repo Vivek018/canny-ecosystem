@@ -1,8 +1,10 @@
 import {
   getValidDateForInput,
+  hasPermission,
   isGoodStatus,
   RelationshipSchema,
   replaceUnderscore,
+  updateRole,
 } from "@canny_ecosystem/utils";
 import {
   CheckboxField,
@@ -18,11 +20,16 @@ import {
   useForm,
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { Form, json, useLoaderData } from "@remix-run/react";
-import { useState } from "react";
+import {
+  Form,
+  json,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
+import { useEffect, useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { safeRedirect } from "@/utils/server/http.server";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
 import { UPDATE_RELATIONSHIP } from "./$relationshipId.update-relationship";
@@ -39,53 +46,124 @@ import type { RelationshipDatabaseUpdate } from "@canny_ecosystem/supabase/types
 import { getCompanies } from "@canny_ecosystem/supabase/queries";
 import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 import { FormButtons } from "@/components/form/form-buttons";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const CREATE_RELATIONSHIP = "create-relationship";
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data: companies, error } = await getCompanies({ supabase });
+export async function loader({
+  request,
+}: LoaderFunctionArgs): Promise<Response> {
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
 
-  if (error) {
-    throw error;
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (
+    !hasPermission(
+      user?.role!,
+      `${updateRole}:${attribute.settingRelationships}`
+    )
+  ) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
   }
+  try {
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    const { data: companies, error } = await getCompanies({ supabase });
 
-  if (!companies) {
-    throw new Error("No companies found");
-  }
+    if (error) {
+      return json(
+        {
+          status: "error",
+          message: error.message,
+          error,
+          data: null,
+        },
+        {
+          status: 500,
+        }
+      );
+    }
 
-  const companyOptions = companies
-    .filter((company) => company.id !== companyId)
-    .map((company) => ({ label: company.name, value: company.id }));
+    if (!companies) {
+      return json(
+        {
+          status: "error",
+          message: "Company ID is missing or invalid",
+          data: null,
+          error: "No companies found",
+        },
+        { status: 400 }
+      );
+    }
 
-  return json({ companyId, companyOptions });
-}
+    const companyOptions = companies
+      .filter((company) => company.id !== companyId)
+      .map((company) => ({ label: company.name, value: company.id }));
 
-export async function action({ request }: ActionFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
-
-  const submission = parseWithZod(formData, {
-    schema: RelationshipSchema,
-  });
-
-  if (submission.status !== "success") {
+    return json({
+      status: "success",
+      message: "Relationship created",
+      companyId,
+      companyOptions,
+      error: null,
+    });
+  } catch (error) {
     return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 }
     );
   }
+}
 
-  const { status, error } = await createRelationship({
-    supabase,
-    data: submission.value as any,
-  });
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
 
-  if (isGoodStatus(status)) {
-    return safeRedirect("/settings/relationships", { status: 303 });
+    const submission = parseWithZod(formData, {
+      schema: RelationshipSchema,
+    });
+
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 }
+      );
+    }
+
+    const { status, error } = await createRelationship({
+      supabase,
+      data: submission.value as any,
+    });
+
+    if (isGoodStatus(status))
+      return json({
+        status: "success",
+        message: "Relationship created",
+        error: null,
+      });
+
+    return json({
+      status: "error",
+      message: "Failed to create relationship",
+      error,
+    });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+    });
   }
-  return json({ status, error });
 }
 
 export default function CreateRelationship({
@@ -96,6 +174,7 @@ export default function CreateRelationship({
   companyOptionsFromUpdate?: ComboboxSelectOption[];
 }) {
   const { companyId, companyOptions } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
   const RELATIONSHIP_TAG = updateValues
     ? UPDATE_RELATIONSHIP
     : CREATE_RELATIONSHIP;
@@ -118,14 +197,37 @@ export default function CreateRelationship({
       terms: JSON.stringify(initialValues.terms),
     },
   });
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!actionData) return;
+
+    if (actionData?.status === "success") {
+      toast({
+        title: "Success",
+        description: actionData.message,
+        variant: "success",
+      });
+      setResetKey(Date.now());
+    } else {
+      toast({
+        title: "Error",
+        description:
+          actionData.error?.message || "Relationship creation failed",
+        variant: "destructive",
+      });
+    }
+    navigate("/settings/relationships", { replace: true });
+  }, [actionData]);
 
   return (
-    <section className='md:px-20 lg:px-52 2xl:px-80 py-4'>
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
       <FormProvider context={form.context}>
-        <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
+        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
           <Card>
             <CardHeader>
-              <CardTitle className='text-3xl'>
+              <CardTitle className="text-3xl">
                 {replaceDash(RELATIONSHIP_TAG)}
               </CardTitle>
               <CardDescription>
@@ -175,7 +277,7 @@ export default function CreateRelationship({
                   children: "Is this currently active?",
                 }}
               />
-              <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
+              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.start_date, { type: "date" }),

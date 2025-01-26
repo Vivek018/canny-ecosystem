@@ -1,6 +1,12 @@
 import { EmployeesActions } from "@/components/employees/employee-actions";
 import { EmployeesSearchFilter } from "@/components/employees/employee-search-filter";
 import { FilterList } from "@/components/employees/filter-list";
+import { ImportEmployeeAddressModal } from "@/components/employees/import-export/import-modal-address";
+import { ImportEmployeeBankDetailsModal } from "@/components/employees/import-export/import-modal-bank-details";
+import { ImportEmployeeDetailsModal } from "@/components/employees/import-export/import-modal-employee-details";
+import { ImportEmployeeGuardiansModal } from "@/components/employees/import-export/import-modal-guardians";
+
+import { ImportEmployeeStatutoryModal } from "@/components/employees/import-export/import-modal-statutory";
 import { columns } from "@/components/employees/table/columns";
 import { DataTable } from "@/components/employees/table/data-table";
 import { VALID_FILTERS } from "@/constant";
@@ -11,7 +17,7 @@ import {
   type EmployeeFilters,
   getEmployeesByCompanyId,
   getProjectNamesByCompanyId,
-  getSiteNamesByProjectNameAndCompanyId,
+  getSiteNamesByProjectName,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { extractJsonFromString } from "@canny_ecosystem/utils";
@@ -51,7 +57,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const hasFilters =
     filters &&
     Object.values(filters).some(
-      (value) => value !== null && value !== undefined,
+      (value) => value !== null && value !== undefined
     );
 
   const { data, meta, error } = await getEmployeesByCompanyId({
@@ -67,7 +73,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   });
 
   const hasNextPage = Boolean(
-    meta?.count && meta.count / (page + 1) > pageSize,
+    meta?.count && meta.count / (page + 1) > pageSize
   );
 
   if (error) {
@@ -81,10 +87,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   let projectSiteData = null;
   if (filters.project) {
-    const { data } = await getSiteNamesByProjectNameAndCompanyId({
+    const { data } = await getSiteNamesByProjectName({
       supabase,
       projectName: filters.project,
-      companyId,
     });
     projectSiteData = data;
   }
@@ -125,7 +130,7 @@ ${VALID_FILTERS.map(
   (filter) =>
     `name: "${filter.name}", type: "${filter.valueType}", description: "${
       filter.description
-    }", example: ${JSON.stringify(filter.example)}`,
+    }", example: ${JSON.stringify(filter.example)}`
 ).join("\n")}
 
 ### RULES
@@ -217,7 +222,7 @@ export default function EmployeesIndex() {
       </div>
       <DataTable
         data={data ?? []}
-        columns={columns}
+        columns={columns({ env, companyId })}
         count={count ?? data?.length ?? 0}
         query={query}
         filters={filters}
@@ -227,6 +232,11 @@ export default function EmployeesIndex() {
         companyId={companyId}
         env={env}
       />
+      <ImportEmployeeDetailsModal />
+      <ImportEmployeeStatutoryModal />
+      <ImportEmployeeBankDetailsModal />
+      <ImportEmployeeAddressModal />
+      <ImportEmployeeGuardiansModal />
       <Outlet />
     </section>
   );

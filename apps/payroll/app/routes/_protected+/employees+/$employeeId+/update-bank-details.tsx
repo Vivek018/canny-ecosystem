@@ -1,41 +1,76 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { getEmployeeBankDetailsById } from "@canny_ecosystem/supabase/queries";
-import { Form, json, useLoaderData } from "@remix-run/react";
+import {
+  Await,
+  defer,
+  Form,
+  json,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { safeRedirect } from "@/utils/server/http.server";
 import { updateEmployeeBankDetails } from "@canny_ecosystem/supabase/mutations";
 import {
   isGoodStatus,
   EmployeeBankDetailsSchema,
+  updateRole,
+  hasPermission,
 } from "@canny_ecosystem/utils";
 import { CreateEmployeeBankDetails } from "@/components/employees/form/create-employee-bank-details";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
 import { Card } from "@canny_ecosystem/ui/card";
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { FormButtons } from "@/components/form/form-buttons";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
+import type { EmployeeBankDetailsDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import { ErrorBoundary } from "@/components/error-boundary";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const UPDATE_BANK_DETAILS = "update-employee-bank-details";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const employeeId = params.employeeId;
-  const { supabase } = getSupabaseWithHeaders({ request });
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  let data = null;
-
-  if (employeeId) {
-    data = (
-      await getEmployeeBankDetailsById({
-        supabase,
-        id: employeeId,
-      })
-    ).data;
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.employeeBankDetails}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
-  return json({ data });
+  try {
+    let employeeBankDetailsPromise = null;
+
+    if (employeeId) {
+      employeeBankDetailsPromise = getEmployeeBankDetailsById({
+        supabase,
+        id: employeeId,
+      });
+    } else {
+      throw new Error("No employeeId provided");
+    }
+
+    return defer({
+      employeeBankDetailsPromise,
+      error: null,
+      employeeId,
+    });
+  } catch (error) {
+    return json({
+      error,
+      employeeId,
+      employeeBankDetailsPromise: null,
+    });
+  }
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
 
@@ -46,7 +81,7 @@ export async function action({ request }: ActionFunctionArgs) {
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: submission.status === "error" ? 400 : 200 }
     );
   }
 
@@ -56,15 +91,62 @@ export async function action({ request }: ActionFunctionArgs) {
   });
 
   if (isGoodStatus(status)) {
-    return safeRedirect(`/employees/${submission.value?.employee_id}`, {
-      status: 303,
+    return json({
+      status: "success",
+      message: "Employee bank details updated successfully",
+      error: null,
     });
   }
-  return json({ status, error });
+  return json({
+    status: "error",
+    message: "Employee bank details update failed",
+    error,
+  });
 }
 
 export default function UpdateEmployeeBankDetails() {
-  const { data } = useLoaderData<typeof loader>();
+  const { employeeBankDetailsPromise, employeeId, error } =
+    useLoaderData<typeof loader>();
+
+  if (error)
+    return (
+      <ErrorBoundary
+        error={error}
+        message="Failed to load employee bank details"
+      />
+    );
+
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Await resolve={employeeBankDetailsPromise}>
+        {(resolvedData) => {
+          if (!resolvedData)
+            return (
+              <ErrorBoundary message="Failed to load employee bank details" />
+            );
+          return (
+            <UpdateEmployeeBankDetailsWrapper
+              data={resolvedData.data}
+              error={resolvedData.error}
+              employeeId={employeeId}
+            />
+          );
+        }}
+      </Await>
+    </Suspense>
+  );
+}
+
+export function UpdateEmployeeBankDetailsWrapper({
+  data,
+  error,
+  employeeId,
+}: {
+  data: EmployeeBankDetailsDatabaseUpdate | null;
+  error: Error | null | { message: string };
+  employeeId: string | undefined;
+}) {
+  const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
   const currentSchema = EmployeeBankDetailsSchema;
 
@@ -79,8 +161,38 @@ export default function UpdateEmployeeBankDetails() {
     defaultValue: data,
   });
 
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+    if (actionData) {
+      if (actionData?.status === "success") {
+        toast({
+          title: "Success",
+          description: actionData?.message || "Employee bank details updated",
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description:
+            actionData?.error?.message || "Employee bank details update failed",
+          variant: "destructive",
+        });
+      }
+      navigate(`/employees/${employeeId}/work-portfolio`);
+    }
+  }, [actionData]);
+
   return (
-    <section className="md:px-20 lg:px-28 2xl:px-40 py-4">
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
       <FormProvider context={form.context}>
         <Form
           method="POST"

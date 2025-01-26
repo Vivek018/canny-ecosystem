@@ -1,70 +1,86 @@
-import { SiteCard } from "@/components/sites/site-card";
 import { getSitesByProjectId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import {
   Command,
   CommandEmpty,
-  CommandGroup,
   CommandInput,
-  CommandItem,
   CommandList,
 } from "@canny_ecosystem/ui/command";
 import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { replaceUnderscore } from "@canny_ecosystem/utils";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Link, Outlet, useLoaderData } from "@remix-run/react";
+import { Await, defer, Link, Outlet, useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/react";
+import { Suspense } from "react";
+import { SitesWrapper } from "@/components/projects/sites/sites-wrapper";
+import { ErrorBoundary } from "@/components/error-boundary";
+import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const projectId = params.projectId;
 
-  const { supabase } = getSupabaseWithHeaders({ request });
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
 
-  if (!projectId) {
-    throw new Error("No Project Id");
+    if (!projectId) throw new Error("No projectId provided");
+
+    const sitesPromise = getSitesByProjectId({
+      supabase,
+      projectId,
+    });
+
+    return defer({
+      error: null,
+      sitesPromise,
+      projectId,
+    });
+  } catch (error) {
+    return json(
+      {
+        error,
+        projectId,
+        sitesPromise: null,
+      },
+      { status: 500 }
+    );
   }
+}
 
-  const { data, error } = await getSitesByProjectId({
-    supabase,
-    projectId,
-  });
-
-  if (error) {
-    throw error;
-  }
-
-  if (!data) {
-    throw new Error("No data found");
-  }
-
-  return json({ data, projectId });
+export async function action() {
+  return null;
 }
 
 export default function SitesIndex() {
-  const { data, projectId } = useLoaderData<typeof loader>();
+  const { role } = useUserRole();
+  const { sitesPromise, projectId, error } = useLoaderData<typeof loader>();
   const { isDocument } = useIsDocument();
 
+  if (error)
+    return <ErrorBoundary error={error} message="Failed to load sites" />;
+
   return (
-    <section className='pb-4'>
-      <div className='w-full flex items-end justify-between'>
-        <Command className='overflow-visible'>
-          <div className='w-full md:w-3/4 lg:w-1/2 2xl:w-1/3 py-4 flex items-center gap-4'>
+    <section className="pb-4">
+      <div className="w-full flex items-end justify-between">
+        <Command className="overflow-visible">
+          <div className="w-full md:w-3/4 lg:w-1/2 2xl:w-1/3 py-4 flex items-center gap-4">
             <CommandInput
-              divClassName='border border-input rounded-md h-10 flex-1'
-              placeholder='Search Sites'
+              divClassName="border border-input rounded-md h-10 flex-1"
+              placeholder="Search Sites"
               autoFocus={true}
             />
             <Link
               to={`/projects/${projectId}/create-site`}
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
-                "flex items-center gap-1"
+                "flex items-center gap-1",
+                !hasPermission(role, `${updateRole}:${attribute.projectSites}`) && "hidden"
               )}
             >
               <span>Add</span>
-              <span className='hidden md:flex justify-end'>Site</span>
+              <span className="hidden md:flex justify-end">Site</span>
             </Link>
           </div>
           <CommandEmpty
@@ -75,31 +91,24 @@ export default function SitesIndex() {
           >
             No site found.
           </CommandEmpty>
-          <CommandList className='max-h-full py-2 overflow-x-visible overflow-y-visible'>
-            <CommandGroup className='p-0 overflow-visible'>
-              <div className='w-full grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4'>
-                {data?.map((site) => (
-                  <CommandItem
-                    key={site.id}
-                    value={
-                      site.name +
-                      site.site_code +
-                      site.company_location?.name +
-                      site.address_line_1 +
-                      site.address_line_2 +
-                      site.city +
-                      replaceUnderscore(site.state) +
-                      site.pincode
-                    }
-                    className='data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0'
-                  >
-                    <SiteCard site={site} />
-                  </CommandItem>
-                ))}
-              </div>
-            </CommandGroup>
+          <CommandList className="max-h-full py-2 overflow-x-visible overflow-y-visible">
+            <Suspense fallback={<div>Loading...</div>}>
+              <Await resolve={sitesPromise}>
+                {(resolvedData) => {
+                  if (!resolvedData)
+                    return <ErrorBoundary message="Failed to load sites" />;
+                  return (
+                    <SitesWrapper
+                      data={resolvedData.data}
+                      error={resolvedData.error}
+                    />
+                  );
+                }}
+              </Await>
+            </Suspense>
           </CommandList>
         </Command>
+        <Outlet />
       </div>
       <Outlet />
     </section>

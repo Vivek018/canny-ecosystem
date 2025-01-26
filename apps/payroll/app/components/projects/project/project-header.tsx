@@ -5,12 +5,16 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Link } from "@remix-run/react";
 import { ProjectOptionsDropdown } from "../project-options-dropdown";
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
+import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const ProjectHeader = ({
   project,
 }: {
   project: Pick<ProjectDatabaseRow, "status" | "id" | "actual_end_date">;
 }) => {
+  const { role } = useUserRole();
   return (
     <div className="flex flex-row items-center justify-between">
       <div
@@ -19,7 +23,7 @@ export const ProjectHeader = ({
           ["completed", "active"].includes(project.status) && "text-green",
           ["cancelled", "inactive"].includes(project.status) &&
             "text-destructive",
-          ["pending"].includes(project.status) && "text-yellow-500",
+          ["pending"].includes(project.status) && "text-yellow-500"
         )}
       >
         <Icon name="dot-filled" className="mt-[1px]" />
@@ -31,9 +35,12 @@ export const ProjectHeader = ({
         <Link
           prefetch="intent"
           to={`/projects/${project.id}/update-project`}
-          className={cn(buttonVariants({ variant: "outline" }))}
+          className={cn(
+            buttonVariants({ variant: "outline" }),
+            !hasPermission(role, `${updateRole}:${attribute.project}`) && "hidden"
+          )}
         >
-          <Icon name="edit" size="xs" className="mr-1.5" />
+          <Icon name="edit" size="xs" className="mr-1.5 " />
           <p>Edit</p>
         </Link>
         <ProjectOptionsDropdown
@@ -44,7 +51,12 @@ export const ProjectHeader = ({
           }}
           triggerChild={
             <DropdownMenuTrigger
-              className={cn(buttonVariants({ variant: "outline" }))}
+              className={cn(
+                buttonVariants({ variant: "outline" }),
+                !hasPermission(role, `${deleteRole}:${attribute.project}`) &&
+                  !hasPermission(role, `${updateRole}:${attribute.project}`) &&
+                  "hidden"
+              )}
             >
               <Icon name="dots-vertical" size="xs" className="mr-1.5" />
               <p>More Options</p>

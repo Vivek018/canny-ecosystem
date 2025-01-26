@@ -5,10 +5,17 @@ import { Link } from "@remix-run/react";
 import { EmployeeOptionsDropdown } from "../employee-option-dropdown";
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@canny_ecosystem/ui/avatar";
-import type { EmployeeDatabaseRow } from "@canny_ecosystem/supabase/types";
+import type {
+  EmployeeDatabaseRow,
+  SupabaseEnv,
+} from "@canny_ecosystem/supabase/types";
+import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export function EmployeePageHeader({
   employee,
+  env,
 }: {
   employee: Pick<
     EmployeeDatabaseRow,
@@ -19,8 +26,11 @@ export function EmployeePageHeader({
     | "middle_name"
     | "last_name"
     | "employee_code"
+    | "company_id"
   >;
+  env: SupabaseEnv;
 }) {
+  const { role } = useUserRole();
   return (
     <div className="flex w-full flex-col gap-6">
       <div className="w-full flex flex-row gap-6 justify-between">
@@ -28,7 +38,7 @@ export function EmployeePageHeader({
           <div>
             <Avatar
               className={cn(
-                "w-28 h-28 border border-muted-foreground/30 shadow-sm hover:z-40",
+                "w-28 h-28 border border-muted-foreground/30 shadow-sm hover:z-40"
               )}
             >
               {employee?.photo && (
@@ -45,7 +55,7 @@ export function EmployeePageHeader({
             <div
               className={cn(
                 "rounded-sm flex items-center",
-                employee.is_active ? "text-green" : "text-yellow-500",
+                employee.is_active ? "text-green" : "text-yellow-500"
               )}
             >
               <Icon name="dot-filled" className="mt-[1px]" />
@@ -72,6 +82,8 @@ export function EmployeePageHeader({
             className={cn(
               buttonVariants({ variant: "outline" }),
               "w-full bg-card",
+              !hasPermission(role, `${updateRole}:${attribute.employeeDetails}`) &&
+                "hidden"
             )}
           >
             <Icon name="edit" size="xs" className="mr-1.5" />
@@ -82,12 +94,16 @@ export function EmployeePageHeader({
               id: employee.id,
               is_active: employee.is_active ?? false,
               returnTo: `/employees/${employee.id}/overview`,
+              companyId: employee.company_id,
             }}
+            env={env}
             triggerChild={
               <DropdownMenuTrigger
                 className={cn(
                   buttonVariants({ variant: "outline" }),
                   "bg-card",
+                  !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
+                    "hidden"
                 )}
               >
                 <Icon name="dots-vertical" size="xs" className="mr-1.5" />

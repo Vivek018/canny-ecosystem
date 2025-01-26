@@ -4,77 +4,164 @@ import {
   getCompanies,
   getProjectById,
 } from "@canny_ecosystem/supabase/queries";
-import { json, useLoaderData } from "@remix-run/react";
+import {
+  Await,
+  defer,
+  json,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
-import { safeRedirect } from "@/utils/server/http.server";
 import { updateProject } from "@canny_ecosystem/supabase/mutations";
-import { isGoodStatus, ProjectSchema } from "@canny_ecosystem/utils";
+import {
+  hasPermission,
+  isGoodStatus,
+  ProjectSchema,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import CreateProject from "../create-project";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { Suspense, useEffect } from "react";
+import { ErrorBoundary } from "@/components/error-boundary";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const UPDATE_PROJECT = "update-project";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const projectId = params.projectId;
-  const { supabase } = getSupabaseWithHeaders({ request });
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-
-  let data = null;
-
-  if (projectId) {
-    data = (await getProjectById({ supabase, id: projectId, companyId })).data;
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.projects}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
-  const { data: companies, error } = await getCompanies({ supabase });
+  try {
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-  if (error) {
-    throw error;
-  }
+    let projectPromise = null;
+    if (projectId)
+      projectPromise = getProjectById({ supabase, id: projectId, companyId });
 
-  if (!companies) {
-    throw new Error("No companies found");
-  }
+    const companyOptionsPromise = getCompanies({ supabase }).then(
+      ({ data, error }) => {
+        if (data) {
+          const companyOptions = data
+            .filter((company) => company.id !== companyId)
+            .map((company) => ({ label: company.name, value: company.id }));
+          return { data: companyOptions, error };
+        }
+        return { data: null, error };
+      }
+    );
 
-  const companyOptions = companies
-    .filter((company) => company.id !== companyId)
-    .map((company) => ({ label: company.name, value: company.id }));
-
-  return json({ data, companyOptions });
-}
-
-export async function action({ request }: ActionFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
-
-  const submission = parseWithZod(formData, {
-    schema: ProjectSchema,
-  });
-
-  if (submission.status !== "success") {
+    return defer({
+      projectPromise,
+      companyOptionsPromise,
+      companyId,
+      error: null,
+    });
+  } catch (error) {
     return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      {
+        error,
+        companyId: null,
+        projectPromise: null,
+        companyOptionsPromise: null,
+      },
+      { status: 500 }
     );
   }
+}
 
-  const { status, error } = await updateProject({
-    supabase,
-    data: submission.value,
-  });
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
 
-  if (isGoodStatus(status)) {
-    return safeRedirect("/projects", { status: 303 });
+    const submission = parseWithZod(formData, {
+      schema: ProjectSchema,
+    });
+
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 }
+      );
+    }
+
+    const { status, error } = await updateProject({
+      supabase,
+      data: submission.value,
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Project updated successfully",
+        error: null,
+      });
+    }
+    return json(
+      { status: "error", message: "Project update failed", error },
+      { status: 500 }
+    );
+  } catch (error) {
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+        data: null,
+      },
+      { status: 500 }
+    );
   }
-  return json({ status, error });
 }
 
 export default function UpdateProject() {
-  const { data, companyOptions } = useLoaderData<typeof loader>();
+  const { projectPromise, error } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
+
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (actionData) {
+      if (actionData?.status === "success") {
+        toast({
+          title: "Success",
+          description: actionData?.message || "Project updated",
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: actionData?.message || "Project update failed",
+          variant: "destructive",
+        });
+      }
+      navigate("/projects", {
+        replace: true,
+      });
+    }
+  }, [actionData]);
+
+  if (error)
+    return <ErrorBoundary error={error} message="Failed to load project" />;
+
   return (
-    <CreateProject
-      updateValues={data}
-      companyOptionsFromUpdate={companyOptions}
-    />
+    <Suspense fallback={<div>Loading...</div>}>
+      <Await resolve={projectPromise}>
+        {(projectData) => <CreateProject updateValues={projectData?.data} />}
+      </Await>
+    </Suspense>
   );
 }

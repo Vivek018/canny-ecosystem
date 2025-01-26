@@ -1,3 +1,4 @@
+import { useUserRole } from "@/utils/user";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,13 +14,17 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { ErrorList } from "@canny_ecosystem/ui/forms";
 import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { DELETE_TEXT } from "@canny_ecosystem/utils/constant";
+import { deleteRole, hasPermission } from "@canny_ecosystem/utils";
+import { attribute, DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
 export const DeletePaymentField = ({
   paymentFieldId,
-}: { paymentFieldId: string }) => {
+}: {
+  paymentFieldId: string;
+}) => {
+  const { role } = useUserRole();
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [inputError, setInputError] = useState<string[]>([]);
@@ -32,7 +37,7 @@ export const DeletePaymentField = ({
   };
 
   const handleDeletePaymentField = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -42,7 +47,7 @@ export const DeletePaymentField = ({
           method: "post",
           action: `/payment-components/payment-fields/${paymentFieldId}/delete-payment-field`,
           replace: true,
-        },
+        }
       );
     } else {
       e.preventDefault();
@@ -55,7 +60,8 @@ export const DeletePaymentField = ({
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
-          "text-[13px] h-9",
+          "text-[13px] h-9 hidden",
+          hasPermission(role, `${deleteRole}:${attribute.paymentFields}`) && "flex"
         )}
       >
         Delete Payment Field

@@ -1,17 +1,24 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { Form, json, useLoaderData } from "@remix-run/react";
+import {
+  Form,
+  json,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { safeRedirect } from "@/utils/server/http.server";
 import {
   EmployeeWorkHistorySchema,
   getInitialValueFromZod,
   getValidDateForInput,
+  hasPermission,
   isGoodStatus,
   positionArray,
   replaceDash,
   replaceUnderscore,
   transformStringArrayIntoOptions,
+  updateRole,
 } from "@canny_ecosystem/utils";
 import {
   FormProvider,
@@ -34,49 +41,118 @@ import {
   TextareaField,
 } from "@canny_ecosystem/ui/forms";
 import type { EmployeeWorkHistoryDatabaseUpdate } from "@canny_ecosystem/supabase/types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { UPDATE_EMPLOYEE_WORK_HISTORY } from "./$workHistoryId.update-work-history";
 import { FormButtons } from "@/components/form/form-buttons";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const ADD_EMPLOYEE_WORK_HISTORY = "add-employee-work-history";
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params, request }: LoaderFunctionArgs) {
   const employeeId = params.employeeId;
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  return json({ employeeId });
-}
-
-export async function action({ request, params }: ActionFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
-
-  const employeeId = params.employeeId;
-  if (!employeeId) {
-    return safeRedirect("/employees");
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.employeeWorkHistory}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
-  const submission = parseWithZod(formData, {
-    schema: EmployeeWorkHistorySchema,
-  });
+  try {
+    if (!employeeId) {
+      return json(
+        {
+          status: "error",
+          message: "Invalid employee id",
+          employeeId: null,
+        },
+        { status: 400 }
+      );
+    }
 
-  if (submission.status !== "success") {
+    return json({
+      status: "success",
+      message: "Employee id found",
+      employeeId,
+    });
+  } catch (error) {
     return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+        employeeId: null,
+      },
+      { status: 500 }
     );
   }
+}
 
-  const { status, error } = await createEmployeeWorkHistory({
-    supabase,
-    data: { ...submission.value, employee_id: employeeId },
-  });
+export async function action({
+  request,
+  params,
+}: ActionFunctionArgs): Promise<Response> {
+  const employeeId = params.employeeId;
 
-  if (isGoodStatus(status)) {
-    return safeRedirect(`/employees/${employeeId}/work-portfolio`, {
-      status: 303,
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
+
+    if (!employeeId) {
+      return json(
+        {
+          status: "error",
+          message: "Invalid employee id",
+          returnTo: "/employees",
+        },
+        { status: 400 }
+      );
+    }
+
+    const submission = parseWithZod(formData, {
+      schema: EmployeeWorkHistorySchema,
     });
+
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 }
+      );
+    }
+
+    const { status, error } = await createEmployeeWorkHistory({
+      supabase,
+      data: { ...submission.value, employee_id: employeeId },
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Employee work history created",
+        error: null,
+        returnTo: `/employees/${employeeId}/work-portfolio`,
+      });
+    }
+    return json({
+      status: "error",
+      message: "",
+      error,
+      returnTo: `/employees/${employeeId}/work-portfolio`,
+    });
+  } catch (error) {
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+        returnTo: `/employees/${employeeId}/work-portfolio`,
+      },
+      { status: 500 }
+    );
   }
-  return json({ status, error });
 }
 
 export default function AddEmployeeWorkHistory({
@@ -85,6 +161,7 @@ export default function AddEmployeeWorkHistory({
   updateValues?: EmployeeWorkHistoryDatabaseUpdate | null;
 }) {
   const { employeeId } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
 
   const EMPLOYEE_WORK_HISTORY_TAG = updateValues
@@ -107,9 +184,31 @@ export default function AddEmployeeWorkHistory({
       employee_id: initialValues.employee_id ?? employeeId,
     },
   });
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (actionData) {
+      if (actionData?.status === "success") {
+        toast({
+          title: "Success",
+          description: actionData?.message || "Employee work history created",
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description:
+            actionData?.error?.message || "Employee work history failed",
+          variant: "destructive",
+        });
+      }
+      navigate(actionData.returnTo ?? -1);
+    }
+  }, [actionData]);
 
   return (
-    <section className="md:px-20 lg:px-28 2xl:px-40 py-4">
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
       <FormProvider context={form.context}>
         <Form
           method="POST"
@@ -136,7 +235,7 @@ export default function AddEmployeeWorkHistory({
                 key={resetKey}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  positionArray as unknown as string[],
+                  positionArray as unknown as string[]
                 )}
                 inputProps={{
                   ...getInputProps(fields.position, { type: "text" }),
@@ -152,7 +251,7 @@ export default function AddEmployeeWorkHistory({
                   ...getInputProps(fields.company_name, { type: "text" }),
                   autoFocus: true,
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.company_name.name,
+                    fields.company_name.name
                   )}`,
                   className: "capitalize",
                 }}
@@ -177,11 +276,11 @@ export default function AddEmployeeWorkHistory({
                   inputProps={{
                     ...getInputProps(fields.start_date, { type: "date" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.start_date.name,
+                      fields.start_date.name
                     )}`,
                     max: getValidDateForInput(new Date().toISOString()),
                     defaultValue: getValidDateForInput(
-                      fields.start_date.initialValue,
+                      fields.start_date.initialValue
                     ),
                   }}
                   labelProps={{
@@ -195,11 +294,11 @@ export default function AddEmployeeWorkHistory({
                       type: "date",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.end_date.name,
+                      fields.end_date.name
                     )}`,
                     min: getValidDateForInput(fields.start_date.value),
                     defaultValue: getValidDateForInput(
-                      fields.end_date.initialValue,
+                      fields.end_date.initialValue
                     ),
                   }}
                   labelProps={{

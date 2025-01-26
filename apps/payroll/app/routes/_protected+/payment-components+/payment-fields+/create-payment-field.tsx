@@ -7,6 +7,8 @@ import {
   paymentTypeArray,
   transformStringArrayIntoOptions,
   calculationTypeArray,
+  hasPermission,
+  updateRole,
 } from "@canny_ecosystem/utils";
 import {
   CheckboxField,
@@ -20,13 +22,18 @@ import {
   useForm,
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { Form, json, useLoaderData } from "@remix-run/react";
-import { useState } from "react";
+import {
+  Form,
+  json,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
+import { useEffect, useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { safeRedirect } from "@/utils/server/http.server";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { UPDATE_PAYMENT_FIELD } from "./$paymentFieldId.update-payment-field";
+import { UPDATE_PAYMENT_FIELD } from "./$paymentFieldId+/update-payment-field";
 import {
   Card,
   CardContent,
@@ -38,45 +45,102 @@ import { createPaymentField } from "@canny_ecosystem/supabase/mutations";
 import type { PaymentFieldDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { FormButtons } from "@/components/form/form-buttons";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const CREATE_PAYMENT_FIELD = "create-payment-field";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
 
-  return json({ companyId });
-}
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-export async function action({ request }: ActionFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
-  const submission = parseWithZod(formData, {
-    schema: PaymentFieldSchema,
-  });
-
-  if (submission.status !== "success") {
-    return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
-    );
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.paymentFields}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
-  const { status, error } = await createPaymentField({
-    supabase,
-    data: submission.value as any,
-  });
+  try {
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-  if (isGoodStatus(status))
-    return safeRedirect("/payment-components/payment-fields", { status: 303 });
+    return json({
+      companyId,
+      error: null,
+    });
+  } catch (error) {
+    return json(
+      {
+        error,
+        companyId: null,
+      },
+      { status: 500 }
+    );
+  }
+}
 
-  return json({ status, error });
+export type ActionResponse = {
+  status: number;
+  error?: string;
+};
+
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
+    const submission = parseWithZod(formData, {
+      schema: PaymentFieldSchema,
+    });
+
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 }
+      );
+    }
+
+    const { status, error } = await createPaymentField({
+      supabase,
+      data: submission.value as any,
+    });
+
+    if (isGoodStatus(status))
+      return json({
+        status: "success",
+        message: "Payment Field created",
+        error: null,
+      });
+
+    return json(
+      {
+        status: "error",
+        message: "Payment Field creation failed",
+        error,
+      },
+      { status: 500 }
+    );
+  } catch (error) {
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 }
+    );
+  }
 }
 
 export default function CreatePaymentField({
   updateValues,
-}: { updateValues?: PaymentFieldDatabaseUpdate | null }) {
+}: {
+  updateValues?: PaymentFieldDatabaseUpdate | null;
+}) {
   const { companyId } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
   const PAYMENT_FIELD_TAG = updateValues
     ? UPDATE_PAYMENT_FIELD
     : CREATE_PAYMENT_FIELD;
@@ -99,14 +163,38 @@ export default function CreatePaymentField({
       company_id: initialValues.company_id ?? companyId,
     },
   });
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!actionData) return;
+
+    if (actionData?.status === "success") {
+      toast({
+        title: "Success",
+        description: actionData?.message,
+        variant: "success",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description:
+          actionData?.error?.message || "Payment Field creation failed",
+        variant: "destructive",
+      });
+    }
+    navigate("/payment-components/payment-fields", {
+      replace: true,
+    });
+  }, [actionData]);
 
   return (
-    <section className="md:px-20 lg:px-52 2xl:px-80 py-4">
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
       <FormProvider context={form.context}>
         <Form method="POST" {...getFormProps(form)} className="flex flex-col">
           <Card>
             <CardHeader>
-              <CardTitle className="text-3xl">
+              <CardTitle className="text-3xl capitalize">
                 {replaceDash(PAYMENT_FIELD_TAG)}
               </CardTitle>
               <CardDescription>
@@ -135,12 +223,14 @@ export default function CreatePaymentField({
                 key={resetKey}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  paymentTypeArray as unknown as string[],
+                  paymentTypeArray as unknown as string[]
                 )}
                 inputProps={{
                   ...getInputProps(fields.payment_type, { type: "text" }),
                 }}
-                placeholder={`Select ${replaceUnderscore(fields.payment_type.name)}`}
+                placeholder={`Select ${replaceUnderscore(
+                  fields.payment_type.name
+                )}`}
                 labelProps={{
                   children: replaceUnderscore(fields.payment_type.name),
                 }}
@@ -151,12 +241,14 @@ export default function CreatePaymentField({
                 key={resetKey + 1}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  calculationTypeArray as unknown as string[],
+                  calculationTypeArray as unknown as string[]
                 )}
                 inputProps={{
                   ...getInputProps(fields.calculation_type, { type: "text" }),
                 }}
-                placeholder={`Select ${replaceUnderscore(fields.calculation_type.name)}`}
+                placeholder={`Select ${replaceUnderscore(
+                  fields.calculation_type.name
+                )}`}
                 labelProps={{
                   children: replaceUnderscore(fields.calculation_type.name),
                 }}
@@ -167,14 +259,18 @@ export default function CreatePaymentField({
                 inputProps={{
                   ...getInputProps(fields.amount, { type: "number" }),
                   className: "capitalize",
-                  placeholder: `Enter ${replaceUnderscore(fields.calculation_type.value === calculationTypeArray[0] ? fields.amount.name : "Percentage")}`,
+                  placeholder: `Enter ${replaceUnderscore(
+                    fields.calculation_type.value === calculationTypeArray[0]
+                      ? fields.amount.name
+                      : "Percentage"
+                  )}`,
                   disabled: fields.payment_type.value === paymentTypeArray[1],
                 }}
                 labelProps={{
                   children: replaceUnderscore(
                     fields.calculation_type.value === calculationTypeArray[0]
                       ? fields.amount.name
-                      : "percentage",
+                      : "percentage"
                   ),
                 }}
                 errors={fields.amount.errors}
@@ -190,7 +286,7 @@ export default function CreatePaymentField({
                     : undefined
                 }
                 className={cn(
-                  fields.payment_type.value === paymentTypeArray[1] && "hidden",
+                  fields.payment_type.value === paymentTypeArray[1] && "hidden"
                 )}
               />
 

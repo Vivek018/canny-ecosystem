@@ -87,6 +87,14 @@ export type EmployeeDatabaseInsert =
 export type EmployeeDatabaseUpdate =
   Database["public"]["Tables"]["employees"]["Update"];
 
+// Employees attendance
+export type EmployeeAttendanceDatabaseRow =
+  Database["public"]["Tables"]["employee_attendance"]["Row"];
+export type EmployeeAttendanceDatabaseInsert =
+  Database["public"]["Tables"]["employee_attendance"]["Insert"];
+export type EmployeeAttendanceDatabaseUpdate =
+  Database["public"]["Tables"]["employee_attendance"]["Update"];
+
 // Employee Statutory Details
 export type EmployeeStatutoryDetailsDatabaseRow =
   Database["public"]["Tables"]["employee_statutory_details"]["Row"];
@@ -165,36 +173,36 @@ export type StatutoryBonusDatabaseRow =
 
 export type StatutoryBonusDatabaseInsert =
   Database["public"]["Tables"]["statutory_bonus"]["Insert"];
-  
+
 export type StatutoryBonusDatabaseUpdate =
   Database["public"]["Tables"]["statutory_bonus"]["Update"];
 
-export type EmployeeProvidentFundDatabaseRow = 
-  Database["public"]["Tables"]["employee_provident_fund"]["Row"]
+export type EmployeeProvidentFundDatabaseRow =
+  Database["public"]["Tables"]["employee_provident_fund"]["Row"];
 
-export type EmployeeProvidentFundDatabaseInsert = 
-  Database["public"]["Tables"]["employee_provident_fund"]["Insert"]
+export type EmployeeProvidentFundDatabaseInsert =
+  Database["public"]["Tables"]["employee_provident_fund"]["Insert"];
 
-export type EmployeeProvidentFundDatabaseUpdate = 
-  Database["public"]["Tables"]["employee_provident_fund"]["Update"]
-  
-export type EmployeeStateInsuranceDatabaseRow = 
-  Database["public"]["Tables"]["employee_state_insurance"]["Row"]
+export type EmployeeProvidentFundDatabaseUpdate =
+  Database["public"]["Tables"]["employee_provident_fund"]["Update"];
+
+export type EmployeeStateInsuranceDatabaseRow =
+  Database["public"]["Tables"]["employee_state_insurance"]["Row"];
 
 export type EmployeeStateInsuranceDatabaseInsert =
-  Database["public"]["Tables"]["employee_state_insurance"]["Insert"]
+  Database["public"]["Tables"]["employee_state_insurance"]["Insert"];
 
 export type EmployeeStateInsuranceDatabaseUpdate =
-  Database["public"]["Tables"]["employee_state_insurance"]["Update"]
+  Database["public"]["Tables"]["employee_state_insurance"]["Update"];
 
-export type ProfessionalTaxDatabaseRow = 
-  Database["public"]["Tables"]["professional_tax"]["Row"]
+export type ProfessionalTaxDatabaseRow =
+  Database["public"]["Tables"]["professional_tax"]["Row"];
 
 export type ProfessionalTaxDatabaseInsert =
-  Database["public"]["Tables"]["professional_tax"]["Insert"]
+  Database["public"]["Tables"]["professional_tax"]["Insert"];
 
 export type ProfessionalTaxDatabaseUpdate =
-  Database["public"]["Tables"]["professional_tax"]["Update"]
+  Database["public"]["Tables"]["professional_tax"]["Update"];
 
 export type ProfessionalTaxGrossSalaryRangeType = {
   start: number;
@@ -202,11 +210,88 @@ export type ProfessionalTaxGrossSalaryRangeType = {
   value: number;
 }[];
 
-export type LabourWelfareFundDatabaseRow = 
-  Database["public"]["Tables"]["labour_welfare_fund"]["Row"]
+// Labour welfare funds
+export type LabourWelfareFundDatabaseRow =
+  Database["public"]["Tables"]["labour_welfare_fund"]["Row"];
+export type LabourWelfareFundDatabaseInsert =
+  Database["public"]["Tables"]["labour_welfare_fund"]["Insert"];
+export type LabourWelfareFundDatabaseUpdate =
+  Database["public"]["Tables"]["labour_welfare_fund"]["Update"];
 
-export type LabourWelfareFundDatabaseInsert = 
-  Database["public"]["Tables"]["labour_welfare_fund"]["Insert"]
+// Payment templates
+export type PaymentTemplateDatabaseRow =
+  Database["public"]["Tables"]["payment_templates"]["Row"];
+export type PaymentTemplateDatabaseInsert =
+  Database["public"]["Tables"]["payment_templates"]["Insert"];
+export type PaymentTemplateDatabaseUpdate =
+  Database["public"]["Tables"]["payment_templates"]["Update"];
 
-export type LabourWelfareFundDatabaseUpdate = 
-  Database["public"]["Tables"]["labour_welfare_fund"]["Update"]
+// Payment template assignment
+export type PaymentTemplateAssignmentsDatabaseRow =
+  Database["public"]["Tables"]["payment_template_assignments"]["Row"];
+export type PaymentTemplateAssignmentsDatabaseInsert =
+  Database["public"]["Tables"]["payment_template_assignments"]["Insert"];
+export type PaymentTemplateAssignmentsDatabaseUpdate =
+  Database["public"]["Tables"]["payment_template_assignments"]["Update"];
+
+// Payment template components
+export type PaymentTemplateComponentDatabaseRow =
+  Database["public"]["Tables"]["payment_template_components"]["Row"];
+export type PaymentTemplateComponentDatabaseInsert =
+  Database["public"]["Tables"]["payment_template_components"]["Insert"];
+export type PaymentTemplateComponentDatabaseUpdate =
+  Database["public"]["Tables"]["payment_template_components"]["Update"];
+
+// Payroll
+export type PayrollDatabaseRow = Database["public"]["Tables"]["payroll"]["Row"];
+export type PayrollDatabaseInsert =
+  Database["public"]["Tables"]["payroll"]["Insert"];
+export type PayrollDatabaseUpdate =
+  Database["public"]["Tables"]["payroll"]["Update"];
+
+// Payroll Entries
+export type PayrollEntriesDatabaseRow =
+  Database["public"]["Tables"]["payroll_entries"]["Row"];
+export type PayrollEntriesDatabaseInsert =
+  Database["public"]["Tables"]["payroll_entries"]["Insert"];
+export type PayrollEntriesDatabaseUpdate =
+  Database["public"]["Tables"]["payroll_entries"]["Update"];
+
+// Reimbursement
+export type ReimbursementInsert =
+  Database["public"]["Tables"]["reimbursements"]["Insert"];
+export type ReimbursementRow =
+  Database["public"]["Tables"]["reimbursements"]["Row"];
+export type ReimbursementsUpdate =
+  Database["public"]["Tables"]["reimbursements"]["Update"];
+
+export type ExitsRow = Database["public"]["Tables"]["exits"]["Row"];
+export type ExitsInsert = Database["public"]["Tables"]["exits"]["Insert"];
+export type ExitsUpdate = Database["public"]["Tables"]["exits"]["Update"];
+
+export type ExitPaymentsRow =
+  Database["public"]["Tables"]["exit_payments"]["Row"];
+export type ExitPaymentsInsert =
+  Database["public"]["Tables"]["exit_payments"]["Insert"];
+export type ExitPaymentsUpdate =
+  Database["public"]["Tables"]["exit_payments"]["Update"];
+
+export type GratuityDatabaseRow =
+  Database["public"]["Tables"]["gratuity"]["Row"];
+export type GratuityDatabaseInsert =
+  Database["public"]["Tables"]["gratuity"]["Insert"];
+export type GratuityDatabaseUpdate =
+  Database["public"]["Tables"]["gratuity"]["Update"];
+
+export type PayrollDatabaseRow = Database["public"]["Tables"]["payroll"]["Row"];
+export type PayrollDatabaseInsert =
+  Database["public"]["Tables"]["payroll"]["Insert"];
+export type PayrollDatabaseUpdate =
+  Database["public"]["Tables"]["payroll"]["Update"];
+
+export type PayrollEntriesDatabaseRow =
+  Database["public"]["Tables"]["payroll_entries"]["Row"];
+export type PayrollEntriesDatabaseInsert =
+  Database["public"]["Tables"]["payroll_entries"]["Insert"];
+export type PayrollEntriesDatabaseUpdate =
+  Database["public"]["Tables"]["payroll_entries"]["Update"];

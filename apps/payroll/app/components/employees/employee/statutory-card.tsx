@@ -1,9 +1,11 @@
+import { useUserRole } from "@/utils/user";
 import type { EmployeeStatutoryDetailsDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Card } from "@canny_ecosystem/ui/card";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { formatDate } from "@canny_ecosystem/utils";
+import { formatDate, hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
 import { Link } from "@remix-run/react";
 
 type DetailItemProps = {
@@ -33,6 +35,7 @@ type EmployeeStatutoryDetails = Omit<
 export const EmployeeStatutoryCard: React.FC<{
   employeeStatutory: EmployeeStatutoryDetails | null;
 }> = ({ employeeStatutory }) => {
+  const { role } = useUserRole();
   return (
     <Card className="rounded w-full h-full p-4 flex flex-col gap-6">
       <div className="w-full flex items-center justify-between">
@@ -44,6 +47,8 @@ export const EmployeeStatutoryCard: React.FC<{
             buttonVariants({ variant: "outline" }),
             "bg-card",
             !employeeStatutory && "hidden",
+            !hasPermission(role, `${updateRole}:${attribute.employeeStatutory}`) &&
+              "hidden"
           )}
         >
           <Icon name="edit" className="mr-2" />

@@ -13,6 +13,7 @@ export const userDataArray = [
   "avatar",
   "first_name",
   "last_name",
+  "role",
   "email",
   "mobile_number",
   "is_active",

@@ -24,9 +24,9 @@ export function ErrorList({
   const errorsToRender = errors?.filter(Boolean);
   if (!errorsToRender?.length) return null;
   return (
-    <ul id={id} className='flex flex-col gap-1'>
+    <ul id={id} className="flex flex-col gap-1">
       {errorsToRender.map((e) => (
-        <li key={e} className='text-[10px] text-destructive'>
+        <li key={e} className="text-[10px] text-destructive">
           {e}
         </li>
       ))}
@@ -39,6 +39,7 @@ export function Field({
   inputProps,
   errors,
   className,
+  errorClassName,
   prefix,
   suffix,
 }: {
@@ -46,6 +47,7 @@ export function Field({
   inputProps: React.InputHTMLAttributes<HTMLInputElement>;
   errors?: ListOfErrors;
   className?: string;
+  errorClassName?: string;
   prefix?: React.ReactNode;
   suffix?: React.ReactNode;
 }) {
@@ -56,19 +58,19 @@ export function Field({
 
   return (
     <div className={cn("w-full flex flex-col gap-1.5", className)}>
-      <div className='flex flex-row gap-[1px]'>
+      <div className="flex flex-row gap-[1px]">
         <Label htmlFor={id} {...labelProps} />
         <sub
           className={cn(
             "hidden text-primary",
-            labelProps?.children && isRequired && "inline"
+            labelProps?.children && isRequired && "inline",
           )}
         >
           *
         </sub>
       </div>
-      <div className='relative flex items-center'>
-        {prefix && <span className='absolute left-2 text-muted'>{prefix}</span>}
+      <div className="relative flex items-center">
+        {prefix && <span className="absolute left-2 text-muted">{prefix}</span>}
         <Input
           id={id}
           aria-invalid={errorId ? true : undefined}
@@ -77,14 +79,14 @@ export function Field({
           className={cn(
             prefix && "pl-8",
             suffix && "pr-8",
-            inputProps.className
+            inputProps.className,
           )}
         />
         {suffix && (
-          <span className='absolute right-2 text-muted'>{suffix}</span>
+          <span className="absolute right-2 text-muted">{suffix}</span>
         )}
       </div>
-      <div className='min-h-[28px] px-4 pb-4 pt-1'>
+      <div className={cn("min-h-6 px-4 pb-2", errorClassName)}>
         {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
       </div>
     </div>
@@ -96,11 +98,13 @@ export function TextareaField({
   textareaProps,
   errors,
   className,
+  errorClassName,
 }: {
   labelProps: React.LabelHTMLAttributes<HTMLLabelElement>;
   textareaProps: React.TextareaHTMLAttributes<HTMLTextAreaElement>;
   errors?: ListOfErrors;
   className?: string;
+  errorClassName?: string;
 }) {
   const fallbackId = useId();
   const id = textareaProps.id ?? textareaProps.name ?? fallbackId;
@@ -109,12 +113,12 @@ export function TextareaField({
 
   return (
     <div className={cn("w-full flex flex-col gap-1.5", className)}>
-      <div className='flex flex-row gap-[1px]'>
+      <div className="flex flex-row gap-[1px]">
         <Label htmlFor={id} {...labelProps} />
         <sub
           className={cn(
             "hidden text-primary",
-            labelProps?.children && isRequired && "inline"
+            labelProps?.children && isRequired && "inline",
           )}
         >
           *
@@ -126,7 +130,7 @@ export function TextareaField({
         aria-describedby={errorId}
         {...textareaProps}
       />
-      <div className='min-h-[28px] px-4 pb-4 pt-1'>
+      <div className={cn("min-h-6 px-4 pb-2", errorClassName)}>
         {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
       </div>
     </div>
@@ -140,6 +144,7 @@ export function CheckboxField({
   buttonProps,
   errors,
   className,
+  errorClassName,
 }: {
   labelProps: JSX.IntrinsicElements["label"];
   buttonProps: CheckboxProps & {
@@ -150,6 +155,7 @@ export function CheckboxField({
   };
   errors?: ListOfErrors;
   className?: string;
+  errorClassName?: string;
 }) {
   const { key, defaultChecked, ...checkboxProps } = buttonProps;
   const fallbackId = useId();
@@ -166,7 +172,7 @@ export function CheckboxField({
 
   return (
     <div className={className}>
-      <div className='flex items-center gap-2'>
+      <div className="flex items-center gap-2">
         <Checkbox
           {...checkboxProps}
           id={id}
@@ -185,23 +191,23 @@ export function CheckboxField({
             input.blur();
             buttonProps.onBlur?.(event);
           }}
-          type='button'
+          type="button"
         />
         <Label
           htmlFor={id}
           {...labelProps}
-          className='self-center text-foreground'
+          className="self-center text-foreground"
         />
         <sub
           className={cn(
             "hidden text-primary",
-            labelProps?.children && isRequired && "inline"
+            labelProps?.children && isRequired && "inline",
           )}
         >
           *
         </sub>
       </div>
-      <div className='px-4 pb-6 pt-1'>
+      <div className={cn("min-h-6 px-4 pb-2", errorClassName)}>
         {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
       </div>
     </div>
@@ -214,6 +220,7 @@ type SearchableSelectFieldProps = {
   inputProps: React.InputHTMLAttributes<HTMLInputElement>;
   errors?: ListOfErrors;
   className?: string;
+  errorClassName?: string;
   placeholder?: string;
   onChange?: (value: string) => void;
 };
@@ -224,6 +231,7 @@ export function SearchableSelectField({
   inputProps,
   errors,
   className,
+  errorClassName,
   placeholder,
   onChange,
 }: SearchableSelectFieldProps) {
@@ -240,19 +248,19 @@ export function SearchableSelectField({
 
   return (
     <div className={cn("w-full flex flex-col gap-1.5", className)}>
-      <div className='flex'>
+      <div className="flex">
         <Label {...labelProps} />
         <sub
           className={cn(
             "hidden text-primary",
-            labelProps?.children && isRequired && "inline"
+            labelProps?.children && isRequired && "inline",
           )}
         >
           *
         </sub>
       </div>
       <input
-        type='hidden'
+        type="hidden"
         id={id}
         name={inputProps.name}
         value={input.value ?? ""}
@@ -268,9 +276,9 @@ export function SearchableSelectField({
           onChange?.(value);
         }}
         placeholder={placeholder ?? inputProps.placeholder}
-        disabled={inputProps.disabled}
+        disabled={inputProps.disabled || inputProps.readOnly}
       />
-      <div className='min-h-[32px] px-4 pb-3 pt-1'>
+      <div className={cn("min-h-6 px-4 pb-2", errorClassName)}>
         {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
       </div>
     </div>
@@ -282,6 +290,7 @@ type JSONBFieldProps = {
   inputProps: React.InputHTMLAttributes<HTMLInputElement>;
   errors?: string[];
   className?: string;
+  errorClassName?: string;
 };
 
 export function JSONBField({
@@ -289,6 +298,7 @@ export function JSONBField({
   inputProps,
   errors,
   className,
+  errorClassName,
 }: JSONBFieldProps) {
   const fallbackId = useId();
   const id = inputProps.id ?? fallbackId;
@@ -301,14 +311,14 @@ export function JSONBField({
   useIsomorphicLayoutEffect(() => {
     try {
       const parsedValue = JSON.parse(
-        inputProps.defaultValue?.toString() || "{}"
+        inputProps.defaultValue?.toString() || "{}",
       );
       const initialPairs = Object.entries(parsedValue).map(([key, value]) => ({
         key,
         value: String(value),
       }));
       setPairs(
-        initialPairs.length > 0 ? initialPairs : [{ key: "", value: "" }]
+        initialPairs.length > 0 ? initialPairs : [{ key: "", value: "" }],
       );
     } catch (error) {
       console.error("Failed to parse JSONB value:", error);
@@ -316,16 +326,19 @@ export function JSONBField({
   }, [inputProps.defaultValue]);
 
   const updateJSONBValue = (newPairs: { key: string; value: string }[]) => {
-    const jsonbValue = newPairs.reduce((acc, { key, value }) => {
-      if (key) {
-        try {
-          acc[key] = parseStringValue(value);
-        } catch {
-          acc[key] = value;
+    const jsonbValue = newPairs.reduce(
+      (acc, { key, value }) => {
+        if (key) {
+          try {
+            acc[key] = parseStringValue(value);
+          } catch {
+            acc[key] = value;
+          }
         }
-      }
-      return acc;
-    }, {} as Record<string, any>);
+        return acc;
+      },
+      {} as Record<string, any>,
+    );
     const event = {
       target: {
         name: inputProps.name,
@@ -363,62 +376,65 @@ export function JSONBField({
 
   return (
     <div className={cn("w-full flex flex-col gap-1.5", className)}>
-      <div className='flex'>
+      <div className="flex">
         <Label htmlFor={inputProps.id} {...labelProps} />
         <sub
           className={cn(
             "hidden text-primary",
-            labelProps?.children && isRequired && "inline"
+            labelProps?.children && isRequired && "inline",
           )}
         >
           *
         </sub>
       </div>
       {pairs.map((pair, index) => (
-        <div key={index.toString()} className='flex gap-2 mb-2'>
+        <div key={index.toString()} className="flex gap-2 mb-2">
           <Input
-            placeholder='Key'
+            placeholder="Key"
             value={pair.key}
             onChange={(e) => handleKeyChange(index, e.target.value)}
-            className='flex-1'
+            className="flex-1"
           />
           <Input
-            placeholder='Value'
+            placeholder="Value"
             value={pair.value}
             onChange={(e) => handleValueChange(index, e.target.value)}
-            className='flex-1'
+            className="flex-1"
           />
           <Button
-            type='button'
+            type="button"
             onClick={() => removePair(index)}
-            variant='destructive-outline'
-            className='px-3'
+            variant="destructive-outline"
+            className="px-3"
           >
-            <Icon name='cross' size='md' />
+            <Icon name="cross" size="md" />
           </Button>
         </div>
       ))}
       <Button
-        type='button'
+        type="button"
         onClick={addPair}
-        variant='primary-outline'
-        className='mt-2'
+        variant="primary-outline"
+        className="mt-2"
       >
         Add Key-Value Pair
       </Button>
       <input
         {...inputProps}
-        type='hidden'
+        type="hidden"
         id={id}
         defaultValue={undefined}
         value={JSON.stringify(
-          pairs.reduce((acc, { key, value }) => {
-            if (key) acc[key] = parseStringValue(value);
-            return acc;
-          }, {} as Record<string, string>)
+          pairs.reduce(
+            (acc, { key, value }) => {
+              if (key) acc[key] = parseStringValue(value);
+              return acc;
+            },
+            {} as Record<string, string>,
+          ),
         )}
       />
-      <div className='min-h-[28px] px-4 pb-4 pt-1'>
+      <div className={cn("min-h-6 px-4 pb-2", errorClassName)}>
         {errors && errors.length > 0 ? <ErrorList errors={errors} /> : null}
       </div>
     </div>
@@ -442,6 +458,7 @@ export type RangeFieldProps = {
   };
   errors?: string[];
   className?: string;
+  errorClassName?: string;
   fields: FieldConfig[];
 };
 
@@ -450,6 +467,7 @@ export const RangeField = ({
   inputProps,
   errors,
   className,
+  errorClassName,
   fields,
 }: RangeFieldProps) => {
   const fallbackId = useId();
@@ -493,7 +511,7 @@ export const RangeField = ({
   const handleFieldChange = (
     index: number,
     fieldKey: string,
-    value: string
+    value: string,
   ) => {
     const newRanges = [...ranges];
     newRanges[index] = {
@@ -508,10 +526,13 @@ export const RangeField = ({
   };
 
   const addRange = () => {
-    const newRange = fields.reduce((acc: Record<string, any>, field) => {
-      acc[field.key] = field.type === "number" ? 0 : "";
-      return acc;
-    }, {} as Record<string, any>);
+    const newRange = fields.reduce(
+      (acc: Record<string, any>, field) => {
+        acc[field.key] = field.type === "number" ? 0 : "";
+        return acc;
+      },
+      {} as Record<string, any>,
+    );
 
     const newRanges = [...ranges, newRange];
     setRanges(newRanges);
@@ -526,12 +547,12 @@ export const RangeField = ({
 
   return (
     <div className={cn("w-full flex flex-col gap-1.5", className)}>
-      <div className='flex'>
+      <div className="flex">
         <Label htmlFor={inputProps.id} {...labelProps} />
         <sub
           className={cn(
             "hidden text-primary",
-            labelProps?.children && isRequired && "inline"
+            labelProps?.children && isRequired && "inline",
           )}
         >
           *
@@ -539,7 +560,7 @@ export const RangeField = ({
       </div>
 
       {ranges.map((range, index) => (
-        <div key={String(index)} className='flex gap-2 mb-2'>
+        <div key={String(index)} className="flex gap-2 mb-2">
           {fields.map((field) => (
             <Input
               key={field.key}
@@ -549,40 +570,40 @@ export const RangeField = ({
               onChange={(e) =>
                 handleFieldChange(index, field.key, e.target.value)
               }
-              className='flex-1'
+              className="flex-1"
             />
           ))}
           <Button
-            type='button'
+            type="button"
             onClick={() => removeRange(index)}
-            variant='destructive-outline'
-            className='px-3'
+            variant="destructive-outline"
+            className="px-3"
           >
-            <Icon name='cross' />
+            <Icon name="cross" />
           </Button>
         </div>
       ))}
 
       <Button
-        type='button'
+        type="button"
         onClick={addRange}
-        variant='primary-outline'
-        className='mt-2'
+        variant="primary-outline"
+        className="mt-2"
       >
         Add Range
       </Button>
 
       <input
         {...inputProps}
-        type='hidden'
+        type="hidden"
         id={id}
         defaultValue={undefined}
         value={JSON.stringify(ranges)}
       />
 
-      <div className='min-h-[28px] px-4 pb-4 pt-1'>
+      <div className={cn("min-h-6 px-4 pb-2", errorClassName)}>
         {errors && errors.length > 0 ? (
-          <div className='text-destructive'>
+          <div className="text-destructive">
             {errors.map((error, index) => (
               <div key={String(index)}>{error}</div>
             ))}

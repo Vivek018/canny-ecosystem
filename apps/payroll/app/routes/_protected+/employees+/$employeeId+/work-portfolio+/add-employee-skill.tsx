@@ -1,16 +1,23 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { Form, json, useLoaderData } from "@remix-run/react";
+import {
+  Form,
+  json,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { safeRedirect } from "@/utils/server/http.server";
 import {
   EmployeeSkillsSchema,
   getInitialValueFromZod,
+  hasPermission,
   isGoodStatus,
   proficiencyArray,
   replaceDash,
   replaceUnderscore,
   transformStringArrayIntoOptions,
+  updateRole,
 } from "@canny_ecosystem/utils";
 import {
   FormProvider,
@@ -28,49 +35,106 @@ import {
 import { createEmployeeSkill } from "@canny_ecosystem/supabase/mutations";
 import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import type { EmployeeSkillDatabaseUpdate } from "@canny_ecosystem/supabase/types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { UPDATE_EMPLOYEE_SKILL } from "./$skillId.update-employee-skill";
 import { FormButtons } from "@/components/form/form-buttons";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { DEFAULT_ROUTE } from "@/constant";
+import { safeRedirect } from "@/utils/server/http.server";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const ADD_EMPLOYEE_SKILL = "add-employee-skill";
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params, request }: LoaderFunctionArgs) {
   const employeeId = params.employeeId;
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
 
-  return json({ employeeId });
-}
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-export async function action({ request, params }: ActionFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
-
-  const employeeId = params.employeeId;
-  if (!employeeId) {
-    return safeRedirect("/employees");
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.employeeSkills}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
   }
+  try {
+    if (!employeeId)
+      return json({
+        status: "error",
+        message: "No employee id found",
+        employeeId,
+      });
 
-  const submission = parseWithZod(formData, {
-    schema: EmployeeSkillsSchema,
-  });
-
-  if (submission.status !== "success") {
-    return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
-    );
-  }
-
-  const { status, error } = await createEmployeeSkill({
-    supabase,
-    data: { ...submission.value, employee_id: employeeId },
-  });
-
-  if (isGoodStatus(status)) {
-    return safeRedirect(`/employees/${employeeId}/work-portfolio`, {
-      status: 303,
+    return json({
+      status: "success",
+      message: "Employee id found",
+      employeeId,
+    });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "Failed to get employee id",
+      error,
+      employeeId,
     });
   }
-  return json({ status, error });
+}
+
+export async function action({
+  request,
+  params,
+}: ActionFunctionArgs): Promise<Response> {
+  const employeeId = params.employeeId;
+
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
+
+    if (!employeeId) {
+      return json({
+        status: "error",
+        message: "Invalid employee id",
+        returnTo: "/employees",
+      });
+    }
+
+    const submission = parseWithZod(formData, {
+      schema: EmployeeSkillsSchema,
+    });
+
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 }
+      );
+    }
+
+    const { status, error } = await createEmployeeSkill({
+      supabase,
+      data: { ...submission.value, employee_id: employeeId },
+    });
+
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Successfully created employee skill",
+        error: null,
+        returnTo: `/employees/${employeeId}/work-portfolio`,
+      });
+    }
+
+    return json({
+      status: "error",
+      message: "Failed to create employee skill",
+      error,
+      returnTo: `/employees/${employeeId}/work-portfolio`,
+    });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "Failed to create employee skill",
+      error,
+      returnTo: `/employees/${employeeId}/work-portfolio`,
+    });
+  }
 }
 
 export default function AddEmployeeSkill({
@@ -78,7 +142,8 @@ export default function AddEmployeeSkill({
 }: {
   updateValues?: EmployeeSkillDatabaseUpdate | null;
 }) {
-  const { employeeId } = useLoaderData<typeof loader>();
+  const { employeeId, message, status } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
 
   const EMPLOYEE_SKILL_TAG = updateValues
@@ -102,8 +167,39 @@ export default function AddEmployeeSkill({
     },
   });
 
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (status === "error") {
+      toast({
+        title: "Error",
+        description: message || "Failed to load",
+        variant: "destructive",
+      });
+      navigate(`/employees/${employeeId}/work-portfolio`);
+    }
+    if (actionData) {
+      if (actionData.status === "success") {
+        toast({
+          title: "Success",
+          description: actionData.message,
+          variant: "success",
+        });
+        navigate(actionData.returnTo);
+      } else {
+        toast({
+          title: "Error",
+          description: actionData.message,
+          variant: "destructive",
+        });
+      }
+      navigate(actionData.returnTo ?? -1);
+    }
+  }, [actionData]);
+
   return (
-    <section className="md:px-20 lg:px-28 2xl:px-40 py-4">
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
       <FormProvider context={form.context}>
         <Form
           method="POST"
@@ -130,7 +226,7 @@ export default function AddEmployeeSkill({
                   ...getInputProps(fields.skill_name, { type: "text" }),
                   autoFocus: true,
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.skill_name.name,
+                    fields.skill_name.name
                   )}`,
                   className: "capitalize",
                 }}
@@ -143,7 +239,7 @@ export default function AddEmployeeSkill({
                 key={resetKey}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  proficiencyArray as unknown as string[],
+                  proficiencyArray as unknown as string[]
                 )}
                 inputProps={{
                   ...getInputProps(fields.proficiency, { type: "text" }),
@@ -161,7 +257,7 @@ export default function AddEmployeeSkill({
                   }),
                   autoFocus: true,
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.years_of_experience.name,
+                    fields.years_of_experience.name
                   )}`,
                   className: "capitalize",
                 }}
