@@ -59,7 +59,7 @@ export function UserMenu({
       </DropdownMenuTrigger>
       <DropdownMenuContent
         ref={dropdownContentRef}
-        className="w-[240px]"
+        className="w-[280px]"
         align="start"
       >
         <>
