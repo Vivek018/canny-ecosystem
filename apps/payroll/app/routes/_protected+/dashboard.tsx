@@ -149,7 +149,7 @@ export default function Dashboard() {
     return <ErrorBoundary error={error} message="Failed to load data" />;
 
   return (
-    <section className="w-full h-full p-4 flex flex-col gap-4">
+    <section className="w-full p-4 flex flex-col gap-4">
       <div className="flex justify-end">
         <div className="flex justify-between gap-3">
           <FilterList filterList={filters} />
