@@ -133,6 +133,26 @@ export async function getPayrollEntriesByPayrollId({
   return { data, error };
 }
 
+export async function getUniqueEmployeeIdsByPayrollId({
+  supabase,
+  payrollId,
+}: {
+  supabase: TypedSupabaseClient;
+  payrollId: string;
+}) {
+  const { data, error } = await supabase
+    .from("payroll_entries")
+    .select("employee_id")
+    .eq("payroll_id", payrollId)
+    .then(result => ({
+      ...result,
+      data: result.data ? [...new Set(result.data.map(item => item.employee_id))] : null
+    }));
+  
+  if (error) console.error(error);
+  return { data, error };
+}
+
 export async function getPendingPayrollCountBySiteId({
   supabase,
   siteId,
@@ -216,6 +236,33 @@ export async function getPayrollsBySiteId({
   return { data, error };
 }
 
+export async function getPayrollById({
+  supabase,
+  payrollId,
+}: {
+  supabase: TypedSupabaseClient;
+  payrollId: string;
+}) {
+  const columns = [
+    "site_id",
+    "total_employees",
+    "status",
+    "run_date",
+    "total_net_amount",
+    "commission",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("payroll")
+    .select(columns.join(","))
+    .eq("id", payrollId)
+    .single<InferredType<PayrollDatabaseRow, (typeof columns)[number]>>();
+
+  if (error) console.error(error);
+
+  return { data, error };
+}
+
 export async function getPayrollEntryAmountByEmployeeIdAndPayrollIdAndPaymentTemplateComponentId({
   supabase,
   employeeId,
@@ -240,6 +287,30 @@ export async function getPayrollEntryAmountByEmployeeIdAndPayrollIdAndPaymentTem
     .single<
       InferredType<PayrollEntriesDatabaseRow, (typeof columns)[number]>
     >();
+
+  if (error) console.error(error);
+
+  return { data, error };
+}
+
+export async function getPaymentTemplateComponentIdsAndAmountByPayrollIdAndEmployeeId({
+  supabase,
+  employeeId,
+  payrollId,
+}: {
+  supabase: TypedSupabaseClient;
+  employeeId: string;
+  payrollId: string;
+}) {
+  const columns = ["payment_template_components_id", "amount"] as const;
+
+  const { data, error } = await supabase
+    .from("payroll_entries")
+    .select(columns.join(","))
+    .eq("employee_id", employeeId)
+    .eq("payroll_id", payrollId)
+    .order("created_at", { ascending: false })
+    .returns<PayrollEntriesDatabaseRow[]>();
 
   if (error) console.error(error);
 

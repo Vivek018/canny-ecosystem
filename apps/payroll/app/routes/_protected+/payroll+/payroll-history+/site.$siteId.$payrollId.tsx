@@ -12,7 +12,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const siteId = params.siteId as string;
   const payrollId = params.payrollId as string;
 
-  // helper functions
+  // helper function
   const populateTemplateComponentData = async (payrollEntry: PayrollEmployeeData, templateComponents: PaymentTemplateComponentType[]) => {
     (templateComponents ?? []).map(async (templateComponent) => {
       const templateEntry = { paymentTemplateComponentId: templateComponent.id } as any;
@@ -128,6 +128,5 @@ export async function action() { return null; }
 
 export default function PayrollId() {
   const { payrollEntries } = useLoaderData<typeof loader>();
-
   return <PayrollComponent data={payrollEntries as any} editable={false} />
 }

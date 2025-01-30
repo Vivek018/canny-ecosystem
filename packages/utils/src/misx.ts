@@ -206,3 +206,10 @@ export const newAmount = (
   // new amount according to working days
   return (amount * presentDays) / totalWorkingDaysOfCurrentMonth;
 };
+
+export const formatDateToMonthYear = (dateString) => {
+  return new Date(dateString).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+  });
+};
