@@ -1184,6 +1184,91 @@ export type PayrollEmployeeData = {
   status: string;
   designation: string;
   payment_template_components_id: string;
-  templateComponents:any;
-  payrollId:string;
+  templateComponents: any;
+  payrollId: string;
 };
+
+export const attendanceWorkShiftArray = ["day", "afternoon", "night"] as const;
+export const attendanceHolidayTypeArray = [
+  "weekly",
+  "paid",
+  "state",
+  "national",
+] as const;
+
+export const AttendanceDataSchema = z.object({
+  type: z.enum(["add", "update"]),
+  date: z.string(),
+  no_of_hours: z.number().min(0).max(24).default(8),
+  employee_id: z.string(),
+  present: z.boolean().default(false),
+  holiday: z.boolean().default(false),
+  working_shift: z.enum(attendanceWorkShiftArray).default("day"),
+  holiday_type: z.enum(attendanceHolidayTypeArray).default("weekly"),
+});
+
+// export const ImportEmployeeAttendanceHeaderSchemaObject = z.object({
+//   employee_code: z.string(),
+//   date: z.string(),
+//   no_of_hours: z.string(),
+//   present: z.string(),
+//   holiday: z.string(),
+//   working_shift: z.string().optional(),
+//   holiday_type: z.string().optional(),
+// });
+
+// export const ImportEmployeeAttendanceHeaderSchema =
+//   ImportEmployeeAttendanceHeaderSchemaObject.refine(
+//     (data) => {
+//       const values = [
+//         data.employee_code,
+//         data.date,
+//         data.no_of_hours,
+//         data.present,
+//         data.holiday,
+//         data.working_shift,
+//         data.holiday_type,
+//       ].filter(Boolean);
+
+//       const uniqueValues = new Set(values);
+//       return uniqueValues.size === values.length;
+//     },
+//     {
+//       message:
+//         "Some fields have the same value. Please select different options.",
+//       path: [
+//         "employee_code",
+//         "date",
+//         "no_of_hours",
+//         "present",
+//         "holiday",
+//         "working_shift",
+//         "holiday_type",
+//       ],
+//     }
+//   );
+
+export const ImportSingleEmployeeAttendanceDataSchema = z.object({
+  employee_code: zNumberString.min(3),
+  date: z.string(),
+  no_of_hours: z.preprocess(
+    (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
+    z.number().min(0).max(24).default(8)
+  ),
+  present: z.preprocess(
+    (value) =>
+      typeof value === "string" ? value.toLowerCase() === "true" : value,
+    z.boolean().default(false)
+  ),
+  holiday: z.preprocess(
+    (value) =>
+      typeof value === "string" ? value.toLowerCase() === "true" : value,
+    z.boolean().default(false)
+  ),
+  working_shift: z.enum(attendanceWorkShiftArray).default("day"),
+  holiday_type: z.enum(attendanceHolidayTypeArray).default("weekly"),
+});
+
+export const ImportEmployeeAttendanceDataSchema = z.object({
+  data: z.array(ImportSingleEmployeeAttendanceDataSchema),
+});

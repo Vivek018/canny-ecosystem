@@ -1,14 +1,10 @@
-import type { PayrollFilterType } from "@/routes/_protected+/dashboard";
+import type { AttendanceFilterType } from "@/routes/_protected+/dashboard";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { useSearchParams } from "@remix-run/react";
 
-export type PayrollFilterList = PayrollFilterType & {
-  name?: string;
-};
-
 type Props = {
-  filterList: PayrollFilterType | undefined;
+  filterList: AttendanceFilterType | undefined;
 };
 
 export function FilterList({ filterList }: Props) {
@@ -16,11 +12,9 @@ export function FilterList({ filterList }: Props) {
 
   const renderFilter = ({ key, value }: { key: string; value: string }) => {
     switch (key) {
-      case "start_year":
-        return `${filterList?.start_month?.slice(0, 3)} ${value}`;
-        
-      case "end_year":
-        return `${filterList?.end_month?.slice(0, 3)} ${value}`;
+      case "month":
+      case "year":
+        return value;
 
       default:
         return null;
@@ -28,22 +22,15 @@ export function FilterList({ filterList }: Props) {
   };
 
   const handleOnRemove = (key: string) => {
-    if (key === "start_year" && filterList?.start_month) {
-      searchParams.delete("start_month");
-      searchParams.delete("start_year");
-    } else if (key === "end_year" && filterList?.end_month) {
-      searchParams.delete("end_month");
-      searchParams.delete("end_year");
-    }
     searchParams.delete(key);
     setSearchParams(searchParams);
   };
 
   return (
-    <ul className="flex flex-0 space-x-2 w-full overflow-scroll no-scrollbar">
+    <ul className="flex justify-end  mr-4 flex-0 space-x-2 w-full overflow-scroll no-scrollbar">
       {filterList &&
         Object.entries(filterList)
-          .filter(([key, value]) => value !== null && value !== undefined && !key.endsWith("month"))
+          .filter(([_, value]) => value !== null && value !== undefined)
           .map(([key, value]) => {
             return (
               <li key={key}>

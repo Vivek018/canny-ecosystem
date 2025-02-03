@@ -157,15 +157,8 @@ export function CheckboxField({
   className?: string;
   errorClassName?: string;
 }) {
-  const { key, defaultChecked, ...checkboxProps } = buttonProps;
+  const { key, ...checkboxProps } = buttonProps;
   const fallbackId = useId();
-  const checkedValue = buttonProps.value ?? "on";
-  const input = useInputControl({
-    key,
-    name: buttonProps.name,
-    formId: buttonProps.form,
-    initialValue: defaultChecked ? checkedValue : undefined,
-  });
   const id = buttonProps.id ?? fallbackId;
   const errorId = errors?.length ? `${id}-error` : undefined;
   const isRequired = buttonProps.required;
@@ -178,19 +171,8 @@ export function CheckboxField({
           id={id}
           aria-invalid={errorId ? true : undefined}
           aria-describedby={errorId}
-          checked={input.value === checkedValue}
-          onCheckedChange={(state) => {
-            input.change(state.valueOf() ? checkedValue : "");
-            buttonProps.onCheckedChange?.(state);
-          }}
-          onFocus={(event) => {
-            input.focus();
-            buttonProps.onFocus?.(event);
-          }}
-          onBlur={(event) => {
-            input.blur();
-            buttonProps.onBlur?.(event);
-          }}
+          checked={buttonProps.checked}
+          onCheckedChange={buttonProps.onCheckedChange}
           type="button"
         />
         <Label

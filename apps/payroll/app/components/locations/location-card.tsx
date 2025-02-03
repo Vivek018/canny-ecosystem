@@ -108,12 +108,11 @@ export function LocationCard({
                 </DropdownMenuItem>
                 <DropdownMenuSeparator
                   className={cn(
-                    (!location.latitude && !location.longitude) ||
-                      (!hasPermission(
-                        `${role}`,
-                        `${deleteRole}:${attribute.settingLocations}`
-                      ) &&
-                        "hidden")
+                    !location.latitude && !location.longitude && "hidden",
+                    !hasPermission(
+                      `${role}`,
+                      `${deleteRole}:${attribute.settingLocations}`
+                    ) && "hidden"
                   )}
                 />
                 <DeleteLocation locationId={location.id} />

@@ -89,11 +89,11 @@ export type EmployeeDatabaseUpdate =
 
 // Employees attendance
 export type EmployeeAttendanceDatabaseRow =
-  Database["public"]["Tables"]["employee_attendance"]["Row"];
+  Database["public"]["Tables"]["attendance"]["Row"];
 export type EmployeeAttendanceDatabaseInsert =
-  Database["public"]["Tables"]["employee_attendance"]["Insert"];
+  Database["public"]["Tables"]["attendance"]["Insert"];
 export type EmployeeAttendanceDatabaseUpdate =
-  Database["public"]["Tables"]["employee_attendance"]["Update"];
+  Database["public"]["Tables"]["attendance"]["Update"];
 
 // Employee Statutory Details
 export type EmployeeStatutoryDetailsDatabaseRow =

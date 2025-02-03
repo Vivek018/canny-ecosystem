@@ -1,6 +1,7 @@
 import { formatUTCDate } from "@canny_ecosystem/utils";
 import type {
   EmployeeAddressDatabaseRow,
+  EmployeeAttendanceDatabaseRow,
   EmployeeBankDetailsDatabaseRow,
   EmployeeDatabaseRow,
   EmployeeGuardianDatabaseRow,
@@ -851,12 +852,12 @@ export async function getEmployeesReportByCompanyId({
       if (start_year)
         query.gte(
           "employee_project_assignment.start_date",
-          formatUTCDate(start_date.toISOString().split("T")[0]),
+          formatUTCDate(start_date.toISOString().split("T")[0])
         );
       if (end_year)
         query.lte(
           "employee_project_assignment.end_date",
-          formatUTCDate(end_date.toISOString().split("T")[0]),
+          formatUTCDate(end_date.toISOString().split("T")[0])
         );
     }
 
@@ -874,9 +875,7 @@ export async function getEmployeesReportByCompanyId({
   // Fetch Data
   const { data, count, error } = await query
     .range(from, to)
-    .returns<
-      EmployeeReportDataType[]
-    >();
+    .returns<EmployeeReportDataType[]>();
 
   if (error) {
     console.error("Error fetching employees:", error);
@@ -961,6 +960,18 @@ export type ImportEmployeeGuardiansDataType = Pick<
   | "email"
   | "is_emergency_contact"
   | "address_same_as_employee"
+> & {
+  employee_code: EmployeeDatabaseRow["employee_code"];
+};
+
+export type ImportEmployeeAttendanceDataType = Pick<
+  EmployeeAttendanceDatabaseRow,
+  | "date"
+  | "no_of_hours"
+  | "present"
+  | "holiday"
+  | "working_shift"
+  | "holiday_type"
 > & {
   employee_code: EmployeeDatabaseRow["employee_code"];
 };

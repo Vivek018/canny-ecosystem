@@ -8,6 +8,7 @@ export const modalSearchParamNames = {
   import_employee_bank_details: "import-employee-bank-details",
   import_employee_address: "import-employee-address",
   import_employee_guardians: "import-employee-guardians",
+  import_employee_attendance: "import-employee-attendance",
   import_reimbursement: "import-reimbursement",
   view_template_components: "view-template-components",
   view_link_template: "view-link-template",
@@ -145,3 +146,18 @@ export const attribute = {
   users: "users",
   payroll: "payroll",
 };
+
+export const Months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];

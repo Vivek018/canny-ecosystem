@@ -1,7 +1,7 @@
 import type {
   EmployeeAttendanceDatabaseRow,
-  TypedSupabaseClient,
   InferredType,
+  TypedSupabaseClient,
 } from "../types";
 
 export async function getAttendanceByEmployeeId({
@@ -18,19 +18,47 @@ export async function getAttendanceByEmployeeId({
     "id",
     "no_of_hours",
     "present",
-    "site_id",
-    "total_working_days",
     "working_shift",
+    "holiday_type",
   ] as const;
 
   const { data, error } = await supabase
-    .from("employee_attendance")
+    .from("attendance")
     .select(columns.join(","))
     .eq("employee_id", employeeId)
+    .order("date", { ascending: true });
+  if (error) console.error(error);
+
+  return { data, error };
+}
+
+export async function getAttendanceByEmployeeIdAndDate({
+  supabase,
+  employeeId,
+  date,
+}: {
+  supabase: TypedSupabaseClient;
+  employeeId: string;
+  date: string;
+}) {
+  const columns = [
+    "date",
+    "employee_id",
+    "holiday",
+    "no_of_hours",
+    "present",
+    "working_shift",
+    "holiday_type",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("attendance")
+    .select(columns.join(","))
+    .eq("employee_id", employeeId)
+    .eq("date", date)
     .single<
       InferredType<EmployeeAttendanceDatabaseRow, (typeof columns)[number]>
     >();
-
   if (error) console.error(error);
 
   return { data, error };

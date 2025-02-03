@@ -10,7 +10,10 @@ import {
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { hasPermission, updateRole } from "@canny_ecosystem/utils";
-import { attribute, modalSearchParamNames } from "@canny_ecosystem/utils/constant";
+import {
+  attribute,
+  modalSearchParamNames,
+} from "@canny_ecosystem/utils/constant";
 import { useNavigate, useSearchParams } from "@remix-run/react";
 
 export function AddEmployeeDialog() {
@@ -23,7 +26,8 @@ export function AddEmployeeDialog() {
       <DropdownMenuTrigger
         asChild
         className={cn(
-          !hasPermission(role, `${updateRole}:${attribute.employees}`) && "hidden"
+          !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
+            "hidden"
         )}
       >
         <Button variant="outline" size="icon" className="h-10 w-10">
@@ -103,6 +107,19 @@ export function AddEmployeeDialog() {
         >
           <Icon name="import" size="sm" className="mb-0.5" />
           <span>Import Guardians</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            searchParams.set(
+              "step",
+              modalSearchParamNames.import_employee_attendance
+            );
+            setSearchParams(searchParams);
+          }}
+          className="space-x-2 flex items-center"
+        >
+          <Icon name="import" size="sm" className="mb-0.5" />
+          <span>Import Attendance</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

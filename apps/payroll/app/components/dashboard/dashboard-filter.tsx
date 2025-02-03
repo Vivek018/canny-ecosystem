@@ -23,11 +23,7 @@ import { payoutMonths } from "@canny_ecosystem/utils/constant";
 import { getYears } from "@canny_ecosystem/utils";
 import type { PayrollFilterType } from "@/routes/_protected+/dashboard";
 
-export function DashboardFilter({
-  disabled,
-}: {
-  disabled?: boolean;
-}) {
+export function DashboardFilter({ disabled }: { disabled?: boolean }) {
   const [prompt, setPrompt] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -105,7 +101,7 @@ export function DashboardFilter({
     },
     {
       enableOnFormTags: true,
-    },
+    }
   );
 
   useHotkeys(["meta+s", "ctrl+s"], (evt) => {
@@ -128,7 +124,7 @@ export function DashboardFilter({
       {
         action: "/dashboard",
         method: "POST",
-      },
+      }
     );
   };
 
@@ -149,7 +145,7 @@ export function DashboardFilter({
               disabled={disabled}
               className={cn(
                 "flex items-center justify-center opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
-                isOpen && "opacity-100",
+                isOpen && "opacity-100"
               )}
             >
               <Icon name="mixer" />
@@ -178,24 +174,22 @@ export function DashboardFilter({
               >
                 {getYears(
                   10,
-                  endYear ? Number(endYear) : new Date().getFullYear(),
-                )
-                  ?.sort((a, b) => b - a)
-                  .map((name, index) => (
-                    <DropdownMenuCheckboxItem
-                      key={name + index.toString()}
-                      className="capitalize"
-                      checked={filterParams?.start_year === name.toString()}
-                      onCheckedChange={() => {
-                        setFilterParams((prev) => ({
-                          ...prev,
-                          start_year: name.toString(),
-                        }));
-                      }}
-                    >
-                      {name}
-                    </DropdownMenuCheckboxItem>
-                  ))}
+                  endYear ? Number(endYear) : new Date().getFullYear()
+                ).map((name, index) => (
+                  <DropdownMenuCheckboxItem
+                    key={name + index.toString()}
+                    className="capitalize"
+                    checked={filterParams?.start_year === name.toString()}
+                    onCheckedChange={() => {
+                      setFilterParams((prev) => ({
+                        ...prev,
+                        start_year: name.toString(),
+                      }));
+                    }}
+                  >
+                    {name}
+                  </DropdownMenuCheckboxItem>
+                ))}
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>
@@ -260,9 +254,7 @@ export function DashboardFilter({
                     key={year + index.toString()}
                     className="capitalize"
                     checked={filterParams?.end_year === year.toString()}
-                    disabled={
-                      startYear > year
-                    }
+                    disabled={startYear > year}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
                         ...prev,

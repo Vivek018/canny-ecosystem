@@ -26,6 +26,11 @@ export type PayrollFilterType = {
   end_year?: string | undefined | null;
 };
 
+export type AttendanceFilterType = {
+  year?: string | undefined | null;
+  month?: string | undefined | null;
+};
+
 export type CardInfoData = {
   totalEmployees: number | undefined | null;
   totalProjects: number | undefined | null;

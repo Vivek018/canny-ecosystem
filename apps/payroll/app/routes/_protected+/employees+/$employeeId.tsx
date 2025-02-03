@@ -39,6 +39,10 @@ export default function Employee() {
               label: "Reimbursements",
               path: `/employees/${employeeId}/reimbursements`,
             },
+            {
+              label: "Attendance",
+              path: `/employees/${employeeId}/attendance`,
+            },
           ]}
           pathname={pathname}
           Link={Link}

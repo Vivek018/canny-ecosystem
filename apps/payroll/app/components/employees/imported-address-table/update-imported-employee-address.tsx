@@ -163,14 +163,14 @@ export const UpdateImportedEmployee = ({
               buttonProps={{
                 form: "",
                 type: "button",
-                name: "is_active",
+                name: "is_primary",
                 checked: data.is_primary ?? false,
                 onCheckedChange: (state) => {
                   onChange("is_primary", String(state));
                 },
               }}
               labelProps={{
-                children: "IS Active?",
+                children: "Is Primary?",
               }}
             />
           </div>
