@@ -71,9 +71,9 @@ export const AttendanceComponent = ({
             ))}
 
             {days.map((date) => (
-              // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
               <div
                 onClick={() => handleUpdate(date.fullDate)}
+                onKeyDown={() => handleUpdate(date.fullDate)}
                 key={date.fullDate}
                 className={cn(
                   "h-32 border p-2 bg-card flex flex-col justify-between cursor-pointer"

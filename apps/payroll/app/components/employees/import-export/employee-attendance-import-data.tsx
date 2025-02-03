@@ -121,6 +121,7 @@ export function EmployeeAttendanceImportData({
 
   const handleFinalImport = async () => {
     if (validateImportData(importData.data)) {
+
       const { error, status } = await createEmployeeAttendanceFromImportedData({
         data: finalData as EmployeeAttendanceDatabaseInsert[],
         import_type: importType,

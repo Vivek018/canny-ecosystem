@@ -1203,8 +1203,8 @@ export const AttendanceDataSchema = z.object({
   employee_id: z.string(),
   present: z.boolean().default(false),
   holiday: z.boolean().default(false),
-  working_shift: z.enum(attendanceWorkShiftArray).default("day"),
-  holiday_type: z.enum(attendanceHolidayTypeArray).default("weekly"),
+  working_shift: z.enum(attendanceWorkShiftArray).optional(),
+  holiday_type: z.enum(attendanceHolidayTypeArray).optional(),
 });
 
 // export const ImportEmployeeAttendanceHeaderSchemaObject = z.object({
@@ -1265,8 +1265,16 @@ export const ImportSingleEmployeeAttendanceDataSchema = z.object({
       typeof value === "string" ? value.toLowerCase() === "true" : value,
     z.boolean().default(false)
   ),
-  working_shift: z.enum(attendanceWorkShiftArray).default("day"),
-  holiday_type: z.enum(attendanceHolidayTypeArray).default("weekly"),
+  working_shift: z.preprocess(
+    (value) =>
+      value === "" || value === undefined || value === null ? undefined : value,
+    z.enum(attendanceWorkShiftArray).optional()
+  ),
+  holiday_type: z.preprocess(
+    (value) =>
+      value === "" || value === undefined || value === null ? undefined : value,
+    z.enum(attendanceHolidayTypeArray).optional()
+  ),
 });
 
 export const ImportEmployeeAttendanceDataSchema = z.object({

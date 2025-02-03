@@ -30,16 +30,30 @@ export const UpdateImportedEmployee = ({
   dataToUpdate: ImportEmployeeAttendanceDataType;
 }) => {
   const { importData, setImportData } = useImportStoreForEmployeeAttendance();
-  const [data, setData] = useState(dataToUpdate);
+  const convertToBoolean = (value: unknown): boolean => {
+    if (typeof value === 'string') {
+      return value.toLowerCase() === 'true';
+    }
+    return Boolean(value);
+  };
 
-  const onChange = (key: keyof typeof dataToUpdate, value: string) => {
+  
+  const initialData = {
+    ...dataToUpdate,
+    present: convertToBoolean(dataToUpdate.present),
+    holiday: convertToBoolean(dataToUpdate.holiday)
+  };
+
+  
+  const [data, setData] = useState(initialData);
+
+  const onChange = (key: keyof typeof dataToUpdate, value: string | boolean) => {
     setData((prevData) => ({ ...prevData, [key]: value }));
   };
 
   const handleUpdate = () => {
     const parsedResult =
       ImportSingleEmployeeAttendanceDataSchema.safeParse(data);
-
 
     if (parsedResult.success) {
       setImportData({
@@ -69,7 +83,7 @@ export const UpdateImportedEmployee = ({
             <Field
               inputProps={{
                 type: "text",
-                value: data.employee_code ?? 0,
+                value: data.employee_code ?? "",
                 onChange: (e) => onChange("employee_code", e.target.value),
                 placeholder: "Employee Code",
               }}
@@ -85,7 +99,6 @@ export const UpdateImportedEmployee = ({
               }}
             />
             <Field
-              className="gap-0 -mt-1"
               inputProps={{
                 type: "number",
                 value: data.no_of_hours!,
@@ -100,9 +113,9 @@ export const UpdateImportedEmployee = ({
                 form: "",
                 type: "button",
                 name: "present",
-                checked: data.present ?? false,
+                checked: Boolean(data.present),
                 onCheckedChange: (state) => {
-                  onChange("present", String(state));
+                  onChange("present", Boolean(state));
                 },
               }}
               labelProps={{
@@ -114,9 +127,9 @@ export const UpdateImportedEmployee = ({
                 form: "",
                 type: "button",
                 name: "holiday",
-                checked: Boolean(data.holiday) ?? false,
+                checked: Boolean(data.holiday),
                 onCheckedChange: (state) => {
-                  onChange("holiday", String(state));
+                  onChange("holiday", Boolean(state));
                 },
               }}
               labelProps={{

@@ -283,15 +283,3 @@ export type GratuityDatabaseInsert =
 export type GratuityDatabaseUpdate =
   Database["public"]["Tables"]["gratuity"]["Update"];
 
-export type PayrollDatabaseRow = Database["public"]["Tables"]["payroll"]["Row"];
-export type PayrollDatabaseInsert =
-  Database["public"]["Tables"]["payroll"]["Insert"];
-export type PayrollDatabaseUpdate =
-  Database["public"]["Tables"]["payroll"]["Update"];
-
-export type PayrollEntriesDatabaseRow =
-  Database["public"]["Tables"]["payroll_entries"]["Row"];
-export type PayrollEntriesDatabaseInsert =
-  Database["public"]["Tables"]["payroll_entries"]["Insert"];
-export type PayrollEntriesDatabaseUpdate =
-  Database["public"]["Tables"]["payroll_entries"]["Update"];

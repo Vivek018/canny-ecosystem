@@ -6,13 +6,23 @@ import {
   getEmployeeIdsByEmployeeCodes,
   type ImportEmployeeAttendanceDataType,
 } from "@canny_ecosystem/supabase/queries";
-import { ImportEmployeeAttendanceDataSchema } from "@canny_ecosystem/utils";
+import {
+  ImportEmployeeAttendanceDataSchema,
+  transformStringArrayIntoOptions,
+} from "@canny_ecosystem/utils";
 
 import { EmployeeAttendanceImportData } from "@/components/employees/import-export/employee-attendance-import-data";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
 import { useImportStoreForEmployeeAttendance } from "@/store/import";
-import type { EmployeeAttendanceDatabaseInsert } from "@canny_ecosystem/supabase/types";
+import type {
+  EmployeeAttendanceDatabaseInsert,
+  EmployeeAttendanceDatabaseRow,
+} from "@canny_ecosystem/supabase/types";
 import { getEmployeeAttendanceConflicts } from "@canny_ecosystem/supabase/mutations";
+import { Combobox } from "@canny_ecosystem/ui/combobox";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
+
+const formatTypeArray = ["normal", "shift"] as const;
 
 export async function loader() {
   const env = {
@@ -24,6 +34,7 @@ export async function loader() {
 }
 
 export default function EmployeeAttendanceImportFieldMapping() {
+  const [formatType, setFormatType] = useState<string>("normal");
   const { env } = useLoaderData<typeof loader>();
   const { supabase } = useSupabase({ env });
 
@@ -65,7 +76,7 @@ export default function EmployeeAttendanceImportFieldMapping() {
         skipEmptyLines: true,
         transformHeader: (header) => header,
         complete: async (results) => {
-          const finalData = results.data
+          const cleanedData = results.data
             .filter((entry) =>
               Object.values(entry!).some((value) => String(value).trim() !== "")
             )
@@ -81,12 +92,95 @@ export default function EmployeeAttendanceImportFieldMapping() {
               return cleanEntry;
             });
 
-          if (validateImportData(finalData)) {
+          const transformedData: ImportEmployeeAttendanceDataType[] = [];
+
+          // biome-ignore lint/complexity/noForEach: <explanation>
+          cleanedData.forEach((row) => {
+            const employeeCode: string = row["EMPLOYEE CODE"];
+
+            // biome-ignore lint/complexity/noForEach: <explanation>
+            Object.entries(row).forEach(([key, value]) => {
+              const [day, month, year] = key.split("-");
+              if (!day || !month || !year) return;
+
+              const monthMap: Record<string, string> = {
+                Jan: "01",
+                Feb: "02",
+                Mar: "03",
+                Apr: "04",
+                May: "05",
+                Jun: "06",
+                Jul: "07",
+                Aug: "08",
+                Sep: "09",
+                Oct: "10",
+                Nov: "11",
+                Dec: "12",
+              };
+
+              const date = `20${year}-${monthMap[month]}-${day.padStart(
+                2,
+                "0"
+              )}`;
+              const status = value?.toString().toUpperCase();
+
+              let present = false;
+              let holiday = false;
+              let holidayType = null;
+              let shift = null;
+
+              if (formatType === "normal") {
+                if (status === "P") {
+                  present = true;
+                } else if (status === "A") {
+                  present = false;
+                }
+              }
+              if (formatType === "shift") {
+                if (status === "A") {
+                  present = true;
+                  shift = "day";
+                } else if (status === "B") {
+                  present = true;
+                  shift = "afternoon";
+                } else if (status === "C") {
+                  present = true;
+                  shift = "night";
+                } else if (status === "AB") {
+                  present = false;
+                }
+              }
+              if (status === "(WOF)") {
+                present = false;
+                holiday = true;
+                holidayType = "weekly";
+              }
+              if (status === "L") {
+                present = false;
+                holiday = true;
+                holidayType = "paid";
+              }
+
+              transformedData.push({
+                employee_code: employeeCode,
+                date: date,
+                present: present,
+                holiday: holiday,
+                holiday_type:
+                  holidayType as EmployeeAttendanceDatabaseRow["holiday_type"],
+                no_of_hours: 8,
+                working_shift:
+                  shift as EmployeeAttendanceDatabaseRow["working_shift"],
+              });
+            });
+          });
+
+          if (validateImportData(transformedData)) {
             setImportData({
-              data: finalData as ImportEmployeeAttendanceDataType[],
+              data: transformedData as ImportEmployeeAttendanceDataType[],
             });
 
-            const employeeCodes = finalData!.map(
+            const employeeCodes = transformedData!.map(
               (value) => value.employee_code
             );
             const { data: employees, error: idByCodeError } =
@@ -99,7 +193,7 @@ export default function EmployeeAttendanceImportFieldMapping() {
               throw idByCodeError;
             }
 
-            const updatedData = finalData!.map((item: any) => {
+            const updatedData = transformedData!.map((item: any) => {
               const employeeId = employees?.find(
                 (e) => e.employee_code === item.employee_code
               )?.id;
@@ -145,6 +239,17 @@ export default function EmployeeAttendanceImportFieldMapping() {
         />
       ) : (
         <>
+          <Combobox
+            className={cn("w-52 h-10")}
+            options={transformStringArrayIntoOptions(
+              formatTypeArray as unknown as string[]
+            )}
+            value={formatType}
+            onChange={(value: string) => {
+              setFormatType(value);
+            }}
+            placeholder={"Select Import Type"}
+          />
           <Button onClick={handleParsedData}>Sure</Button>
           <div className="flex flex-col items-end gap-2">
             <span className="text-red-500 text-sm">

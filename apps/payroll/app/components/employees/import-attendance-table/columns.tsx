@@ -4,7 +4,6 @@ import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ImportedEmployeeOptionsDropdown } from "./imported-table-options";
-
 export const ImportedDataColumns: ColumnDef<ImportEmployeeAttendanceDataType>[] =
   [
     {
@@ -41,7 +40,11 @@ export const ImportedDataColumns: ColumnDef<ImportEmployeeAttendanceDataType>[] 
       accessorKey: "present",
       header: "Present",
       cell: ({ row }) => {
-        return <p className=" truncate">{row.original?.present ?? "--"}</p>;
+        return (
+          <p className=" truncate">
+            {row.original?.present ? "True" : "False"}
+          </p>
+        );
       },
     },
 
@@ -49,7 +52,11 @@ export const ImportedDataColumns: ColumnDef<ImportEmployeeAttendanceDataType>[] 
       accessorKey: "holiday",
       header: "Holiday",
       cell: ({ row }) => {
-        return <p className=" truncate">{row.original?.holiday ?? "--"}</p>;
+        return (
+          <p className=" truncate">
+            {row.original?.holiday ? "True" : "False"}
+          </p>
+        );
       },
     },
     {
