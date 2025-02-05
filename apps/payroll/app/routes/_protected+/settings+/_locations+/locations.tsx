@@ -2,11 +2,15 @@ import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getLocationsByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Await, type ClientLoaderFunctionArgs, defer, useLoaderData } from "@remix-run/react";
+import {
+  Await,
+  type ClientLoaderFunctionArgs,
+  defer,
+  useLoaderData,
+} from "@remix-run/react";
 import { Suspense } from "react";
 import { LocationsWrapper } from "@/components/locations/locations-wrapper";
 import { ErrorBoundary } from "@/components/error-boundary";
-import { cacheDeferDataInSession } from "@/utils/cache";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {
@@ -31,19 +35,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export type LoaderData = Awaited<ReturnType<typeof loader>>["data"];
 
-export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  const cacheKey = "locations";
-  return cacheDeferDataInSession<LoaderData>(cacheKey, args);
-}
-
-clientLoader.hydrate = true;
-
 
 export default function Locations() {
   const { locationsPromise, error } = useLoaderData<typeof loader>();
 
   if (error) {
-    return <ErrorBoundary error={error} message="Failed to load locations" />;
+    return <ErrorBoundary error={error} message='Failed to load locations' />;
   }
 
   return (
@@ -51,7 +48,7 @@ export default function Locations() {
       <Await resolve={locationsPromise}>
         {(resolvedData) => {
           if (!resolvedData)
-            return <ErrorBoundary message="Failed to load locations" />;
+            return <ErrorBoundary message='Failed to load locations' />;
           return (
             <LocationsWrapper
               data={resolvedData.data}

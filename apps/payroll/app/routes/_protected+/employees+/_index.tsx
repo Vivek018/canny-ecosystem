@@ -5,12 +5,12 @@ import { ImportEmployeeAddressModal } from "@/components/employees/import-export
 import { ImportEmployeeBankDetailsModal } from "@/components/employees/import-export/import-modal-bank-details";
 import { ImportEmployeeDetailsModal } from "@/components/employees/import-export/import-modal-employee-details";
 import { ImportEmployeeGuardiansModal } from "@/components/employees/import-export/import-modal-guardians";
-
 import { ImportEmployeeStatutoryModal } from "@/components/employees/import-export/import-modal-statutory";
 import { columns } from "@/components/employees/table/columns";
 import { DataTable } from "@/components/employees/table/data-table";
 import { VALID_FILTERS } from "@/constant";
 import { AIChat4o } from "@/utils/ai";
+import { clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { MAX_QUERY_LIMIT } from "@canny_ecosystem/supabase/constant";
 import {
@@ -22,107 +22,107 @@ import {
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { extractJsonFromString } from "@canny_ecosystem/utils";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { type ClientLoaderFunctionArgs, json, Outlet, redirect, useLoaderData } from "@remix-run/react";
+import {
+  Await,
+  type ClientLoaderFunctionArgs,
+  defer,
+  Outlet,
+  redirect,
+  useLoaderData,
+} from "@remix-run/react";
+import { Suspense } from "react";
 
 const pageSize = 20;
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const url = new URL(request.url);
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const page = 0;
+  try {
+    const url = new URL(request.url);
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    const page = 0;
 
-  const searchParams = new URLSearchParams(url.searchParams);
-  const sortParam = searchParams.get("sort");
+    const searchParams = new URLSearchParams(url.searchParams);
+    const sortParam = searchParams.get("sort");
+    const query = searchParams.get("name") ?? undefined;
 
-  const query = searchParams.get("name") ?? undefined;
+    const filters: EmployeeFilters = {
+      dob_start: searchParams.get("dob_start") ?? undefined,
+      dob_end: searchParams.get("dob_end") ?? undefined,
+      education: searchParams.get("education") ?? undefined,
+      gender: searchParams.get("gender") ?? undefined,
+      status: searchParams.get("status") ?? undefined,
+      project: searchParams.get("project") ?? undefined,
+      project_site: searchParams.get("project_site") ?? undefined,
+      assignment_type: searchParams.get("assignment_type") ?? undefined,
+      position: searchParams.get("position") ?? undefined,
+      skill_level: searchParams.get("skill_level") ?? undefined,
+      doj_start: searchParams.get("doj_start") ?? undefined,
+      doj_end: searchParams.get("doj_end") ?? undefined,
+      dol_start: searchParams.get("dol_start") ?? undefined,
+      dol_end: searchParams.get("dol_end") ?? undefined,
+    };
 
-  const filters: EmployeeFilters = {
-    dob_start: searchParams.get("dob_start") ?? undefined,
-    dob_end: searchParams.get("dob_end") ?? undefined,
-    education: searchParams.get("education") ?? undefined,
-    gender: searchParams.get("gender") ?? undefined,
-    status: searchParams.get("status") ?? undefined,
-    project: searchParams.get("project") ?? undefined,
-    project_site: searchParams.get("project_site") ?? undefined,
-    assignment_type: searchParams.get("assignment_type") ?? undefined,
-    position: searchParams.get("position") ?? undefined,
-    skill_level: searchParams.get("skill_level") ?? undefined,
-    doj_start: searchParams.get("doj_start") ?? undefined,
-    doj_end: searchParams.get("doj_end") ?? undefined,
-    dol_start: searchParams.get("dol_start") ?? undefined,
-    dol_end: searchParams.get("dol_end") ?? undefined,
-  };
-
-  const hasFilters =
-    filters &&
-    Object.values(filters).some(
+    const hasFilters = Object.values(filters).some(
       (value) => value !== null && value !== undefined
     );
 
-  const { data, meta, error } = await getEmployeesByCompanyId({
-    supabase,
-    companyId,
-    params: {
-      from: 0,
-      to: hasFilters ? MAX_QUERY_LIMIT : page > 0 ? pageSize : pageSize - 1,
-      filters,
-      searchQuery: query ?? undefined,
-      sort: sortParam?.split(":") as [string, "asc" | "desc"],
-    },
-  });
-
-  const hasNextPage = Boolean(
-    meta?.count && meta.count / (page + 1) > pageSize
-  );
-
-  if (error) {
-    throw error;
-  }
-
-  const { data: projectData } = await getProjectNamesByCompanyId({
-    supabase,
-    companyId,
-  });
-
-  let projectSiteData = null;
-  if (filters.project) {
-    const { data } = await getSiteNamesByProjectName({
+    const employeesPromise = getEmployeesByCompanyId({
       supabase,
-      projectName: filters.project,
+      companyId,
+      params: {
+        from: 0,
+        to: hasFilters ? MAX_QUERY_LIMIT : page > 0 ? pageSize : pageSize - 1,
+        filters,
+        searchQuery: query ?? undefined,
+        sort: sortParam?.split(":") as [string, "asc" | "desc"],
+      },
     });
-    projectSiteData = data;
+
+    const projectPromise = getProjectNamesByCompanyId({ supabase, companyId });
+
+    let projectSitePromise = null;
+    if (filters.project) {
+      projectSitePromise = getSiteNamesByProjectName({
+        supabase,
+        projectName: filters.project,
+      });
+    }
+
+    const env = {
+      SUPABASE_URL: process.env.SUPABASE_URL!,
+      SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
+    };
+
+    return defer({
+      employeesPromise: employeesPromise as any,
+      projectPromise,
+      projectSitePromise,
+      query,
+      filters,
+      companyId,
+      env,
+    });
+  } catch {
+    return defer({
+      employeesPromise: Promise.resolve({ data: null, meta: null }),
+      projectPromise: Promise.resolve(null),
+      projectSitePromise: Promise.resolve(null),
+      query: "",
+      filters: {},
+      companyId: "",
+      env: {
+        SUPABASE_URL: process.env.SUPABASE_URL!,
+        SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
+      },
+    });
   }
-
-  const env = {
-    SUPABASE_URL: process.env.SUPABASE_URL!,
-    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
-  };
-
-  return json({
-    data: data as any,
-    count: meta?.count,
-    query,
-    filters,
-    hasNextPage,
-    companyId,
-    projectArray: projectData?.map((project) => project.name) ?? [],
-    projectSiteArray: projectSiteData?.map((site) => site.name) ?? [],
-    env,
-  });
 }
 
-export type LoaderData = Awaited<
-  ReturnType<Awaited<ReturnType<typeof loader>>["json"]>
->;
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+  const url = new URL(args.request.url);
+  const cacheKey = `/employees${url.searchParams.toString()}`;
 
-let cache: LoaderData | null = null;
-export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
-  if (cache) return json(cache);
-
-  const loaderData = await serverLoader();
-  cache = (await loaderData) as typeof cache;
-  return json(cache);
+  return clientCaching(cacheKey, args);
 }
 
 clientLoader.hydrate = true;
@@ -184,6 +184,7 @@ Output: {
       },
     ],
   });
+
   const content = completion.choices[0]?.message?.content;
   if (!content) {
     throw new Error("No content received from OpenAI");
@@ -202,20 +203,17 @@ Output: {
   }
 
   url.search = searchParams.toString();
-
   return redirect(url.toString());
 }
 
 export default function EmployeesIndex() {
   const {
-    data,
-    count,
+    employeesPromise,
+    projectPromise,
+    projectSitePromise,
     query,
     filters,
-    hasNextPage,
     companyId,
-    projectArray,
-    projectSiteArray,
     env,
   } = useLoaderData<typeof loader>();
 
@@ -223,30 +221,56 @@ export default function EmployeesIndex() {
   const noFilters = Object.values(filterList).every((value) => !value);
 
   return (
-    <section className="py-6 px-4">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
-          <EmployeesSearchFilter
-            disabled={!data?.length && noFilters}
-            projectArray={projectArray}
-            projectSiteArray={projectSiteArray}
-          />
+    <section className='py-6 px-4'>
+      <div className='w-full flex items-center justify-between pb-4'>
+        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4'>
+          <Suspense fallback={<div>Loading...</div>}>
+            <Await resolve={projectPromise}>
+              {(projectData) => (
+                <Await resolve={projectSitePromise}>
+                  {(projectSiteData) => (
+                    <EmployeesSearchFilter
+                      disabled={!projectData?.data?.length && noFilters}
+                      projectArray={
+                        projectData?.data?.map((project) => project.name) ?? []
+                      }
+                      projectSiteArray={
+                        projectSiteData?.data?.map((project) => project.name) ??
+                        []
+                      }
+                    />
+                  )}
+                </Await>
+              )}
+            </Await>
+          </Suspense>
           <FilterList filterList={filterList} />
         </div>
-        <EmployeesActions isEmpty={!data?.length} />
+        <EmployeesActions isEmpty={!projectPromise} />
       </div>
-      <DataTable
-        data={data ?? []}
-        columns={columns({ env, companyId })}
-        count={count ?? data?.length ?? 0}
-        query={query}
-        filters={filters}
-        noFilters={noFilters}
-        hasNextPage={hasNextPage}
-        pageSize={pageSize}
-        companyId={companyId}
-        env={env}
-      />
+      <Suspense fallback={<div>Loading...</div>}>
+        <Await resolve={employeesPromise}>
+          {(resolvedData) => (
+            <DataTable
+              data={resolvedData?.data ?? ([] as any)}
+              columns={columns({ env, companyId })}
+              count={
+                resolvedData?.meta?.count ?? resolvedData?.data?.length ?? 0
+              }
+              query={query}
+              filters={filters}
+              noFilters={noFilters}
+              hasNextPage={Boolean(
+                resolvedData?.meta?.count &&
+                  resolvedData.meta.count / (0 + 1) > pageSize
+              )}
+              pageSize={pageSize}
+              companyId={companyId}
+              env={env}
+            />
+          )}
+        </Await>
+      </Suspense>
       <ImportEmployeeDetailsModal />
       <ImportEmployeeStatutoryModal />
       <ImportEmployeeBankDetailsModal />

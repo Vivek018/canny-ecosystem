@@ -53,7 +53,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     const { companyId, setCookie } = await getCompanyIdOrFirstCompany(
       request,
-      supabase,
+      supabase
     );
 
     if (setCookie) {
@@ -100,15 +100,15 @@ function Document({
   theme?: string;
 }) {
   return (
-    <html lang="en" className={`${theme} h-full overflow-x-hidden`}>
+    <html lang='en' className={`${theme} h-full overflow-x-hidden`}>
       <head>
         <ClientHintCheck nonce={nonce} />
         <Meta />
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <meta charSet='utf-8' />
+        <meta name='viewport' content='width=device-width,initial-scale=1' />
         <Links />
       </head>
-      <body className="h-full w-full bg-background text-foreground">
+      <body className='h-full w-full bg-background text-foreground'>
         {children}
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />
@@ -133,10 +133,10 @@ function App() {
 
   return (
     <Document nonce={nonce} theme={theme}>
-      <main className="flex h-full w-full bg-background text-foreground ">
+      <main className='flex h-full w-full bg-background text-foreground '>
         {!sessionUser ? (
-          <div className="w-full h-full">
-            <header className="flex justify-between items-center mx-5 mt-4 md:mx-10 md:mt-10">
+          <div className='w-full h-full'>
+            <header className='flex justify-between items-center mx-5 mt-4 md:mx-10 md:mt-10'>
               <div>
                 <Link to={DEFAULT_ROUTE}>
                   <Logo />

@@ -2,7 +2,6 @@ import { EmployeeProjectAssignmentCard } from "@/components/employees/work-portf
 import { EmployeeSkillsCard } from "@/components/employees/work-portfolio/skills-card";
 import { EmployeeWorkHistoriesCard } from "@/components/employees/work-portfolio/work-history-card";
 import { ErrorBoundary } from "@/components/error-boundary";
-import { cacheDeferDataInSession } from "@/utils/cache";
 import {
   getEmployeeProjectAssignmentByEmployeeId,
   getEmployeeSkillsByEmployeeId,
@@ -58,12 +57,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export type LoaderData = Awaited<ReturnType<typeof loader>>["data"];
 
-export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  const cacheKey = `employee-${args.params.employeeId}-work-portfolio`;
-  return cacheDeferDataInSession<LoaderData>(cacheKey, args);
-}
-
-clientLoader.hydrate = true;
 
 export default function WorkPortfolio() {
   const {

@@ -10,11 +10,17 @@ import {
 import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Await, type ClientLoaderFunctionArgs, defer, Link, Outlet, useLoaderData } from "@remix-run/react";
+import {
+  Await,
+  type ClientLoaderFunctionArgs,
+  defer,
+  Link,
+  Outlet,
+  useLoaderData,
+} from "@remix-run/react";
 import { Suspense } from "react";
 import { SitesWrapper } from "@/components/projects/sites/sites-wrapper";
 import { ErrorBoundary } from "@/components/error-boundary";
-import { cacheDeferDataInSession } from "@/utils/cache";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const projectId = params.projectId;
@@ -41,19 +47,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         projectId,
         sitesPromise: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
 
 export type LoaderData = Awaited<ReturnType<typeof loader>>["data"];
-
-export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  const cacheKey = `project-${args.params.projectId}-sites`;
-  return cacheDeferDataInSession<LoaderData>(cacheKey, args);
-}
-
-clientLoader.hydrate = true;
 
 
 export default function SitesIndex() {
@@ -61,43 +60,43 @@ export default function SitesIndex() {
   const { isDocument } = useIsDocument();
 
   if (error)
-    return <ErrorBoundary error={error} message="Failed to load sites" />;
+    return <ErrorBoundary error={error} message='Failed to load sites' />;
 
   return (
-    <section className="pb-4">
-      <div className="w-full flex items-end justify-between">
-        <Command className="overflow-visible">
-          <div className="w-full md:w-3/4 lg:w-1/2 2xl:w-1/3 py-4 flex items-center gap-4">
+    <section className='pb-4'>
+      <div className='w-full flex items-end justify-between'>
+        <Command className='overflow-visible'>
+          <div className='w-full md:w-3/4 lg:w-1/2 2xl:w-1/3 py-4 flex items-center gap-4'>
             <CommandInput
-              divClassName="border border-input rounded-md h-10 flex-1"
-              placeholder="Search Sites"
+              divClassName='border border-input rounded-md h-10 flex-1'
+              placeholder='Search Sites'
               autoFocus={true}
             />
             <Link
               to={`/projects/${projectId}/create-site`}
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
-                "flex items-center gap-1",
+                "flex items-center gap-1"
               )}
             >
               <span>Add</span>
-              <span className="hidden md:flex justify-end">Site</span>
+              <span className='hidden md:flex justify-end'>Site</span>
             </Link>
           </div>
           <CommandEmpty
             className={cn(
               "w-full py-40 capitalize text-lg tracking-wide text-center",
-              !isDocument && "hidden",
+              !isDocument && "hidden"
             )}
           >
             No site found.
           </CommandEmpty>
-          <CommandList className="max-h-full py-2 overflow-x-visible overflow-y-visible">
+          <CommandList className='max-h-full py-2 overflow-x-visible overflow-y-visible'>
             <Suspense fallback={<div>Loading...</div>}>
               <Await resolve={sitesPromise}>
                 {(resolvedData) => {
                   if (!resolvedData)
-                    return <ErrorBoundary message="Failed to load sites" />;
+                    return <ErrorBoundary message='Failed to load sites' />;
                   return (
                     <SitesWrapper
                       data={resolvedData.data}

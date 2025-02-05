@@ -1,3 +1,4 @@
+import { clearCacheEntry } from "@/utils/cache";
 import { deleteEmployee } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
@@ -29,7 +30,7 @@ export async function action({
 
     return json(
       { status: "error", message: "Failed to delete employee", error },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json({
@@ -48,6 +49,7 @@ export default function DeleteEmployee() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
+        clearCacheEntry("/employees");
         toast({
           title: "Success",
           description: actionData?.message || "Employee deleted",

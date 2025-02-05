@@ -1,6 +1,5 @@
 import { ErrorBoundary } from "@/components/error-boundary";
 import { EPFWrapper } from "@/components/statutory-fields/employee-provident-fund/epf-wrapper";
-import { cacheDeferDataInSession } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getEmployeeProvidentFundByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -34,14 +33,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   }
 };
 
-export type LoaderData = Awaited<ReturnType<typeof loader>>["data"];
 
-export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  const cacheKey = "employee-provident-fund";
-  return cacheDeferDataInSession<LoaderData>(cacheKey, args);
-}
-
-clientLoader.hydrate = true;
 
 export default function EmployeeProvidentFundIndex() {
   const { epfPromise, error } = useLoaderData<typeof loader>();

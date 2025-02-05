@@ -1,3 +1,4 @@
+export const MILLISECONDS_IN_A_MIN = 60 * 1000;
 export const SECONDS_IN_A_MONTH = 60 * 60 * 24 * 30;
 
 export const DELETE_TEXT = "permanently delete";

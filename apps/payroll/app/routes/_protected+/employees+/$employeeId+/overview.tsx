@@ -5,7 +5,6 @@ import { EmployeeGuardiansCard } from "@/components/employees/employee/guardians
 import { EmployeePageHeader } from "@/components/employees/employee/page-header";
 import { EmployeeStatutoryCard } from "@/components/employees/employee/statutory-card";
 import { ErrorBoundary } from "@/components/error-boundary";
-import { cacheDeferDataInSession } from "@/utils/cache";
 import {
   getEmployeeAddressesByEmployeeId,
   getEmployeeBankDetailsById,
@@ -18,7 +17,6 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { defer, type LoaderFunctionArgs } from "@remix-run/node";
 import {
   Await,
-  type ClientLoaderFunctionArgs,
   useLoaderData,
 } from "@remix-run/react";
 import { type ReactNode, Suspense, useEffect } from "react";
@@ -82,14 +80,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export type LoaderData = Awaited<ReturnType<typeof loader>>["data"];
-
-export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  const cacheKey = `employee-${args.params.employeeId}-overview`;
-  return cacheDeferDataInSession<LoaderData>(cacheKey, args);
-}
-
-clientLoader.hydrate = true;
-
 
 export default function EmployeeIndex() {
   const {

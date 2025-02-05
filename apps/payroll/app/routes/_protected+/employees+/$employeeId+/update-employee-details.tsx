@@ -66,7 +66,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -85,7 +85,7 @@ export async function action({
 
     return json(
       { status: "error", message: "Failed to update employee", error },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json({
@@ -101,14 +101,14 @@ export default function UpdateEmployeeDetails() {
 
   if (error)
     return (
-      <ErrorBoundary error={error} message="Failed to load employee details" />
+      <ErrorBoundary error={error} message='Failed to load employee details' />
     );
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <Await resolve={employeePromise}>
         {(resolvedData) => {
           if (!resolvedData)
-            return <ErrorBoundary message="Failed to load employee details" />;
+            return <ErrorBoundary message='Failed to load employee details' />;
           return (
             <UpdateEmployeeDetailsWrapper
               data={resolvedData.data}
@@ -176,13 +176,13 @@ export function UpdateEmployeeDetailsWrapper({
   }, [actionData]);
 
   return (
-    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
+    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
       <FormProvider context={form.context}>
         <Form
-          method="POST"
-          encType="multipart/form-data"
+          method='POST'
+          encType='multipart/form-data'
           {...getFormProps(form)}
-          className="flex flex-col"
+          className='flex flex-col'
         >
           <Card>
             <CreateEmployeeDetails

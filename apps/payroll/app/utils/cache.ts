@@ -1,31 +1,66 @@
+import { MILLISECONDS_IN_A_MIN } from "@canny_ecosystem/utils/constant";
 import type { ClientLoaderFunctionArgs } from "@remix-run/react";
+import { LRUCache } from "lru-cache";
 
-export async function cacheDeferDataInSession<
-  T extends Record<string, unknown>,
->(cacheKey: string, { serverLoader }: ClientLoaderFunctionArgs): Promise<T> {
-  const cachedData = sessionStorage.getItem(cacheKey);
-  if (cachedData) {
-    const parsedData = JSON.parse(cachedData) as T | null;
-    if (parsedData) {
-      return parsedData;
+
+const lruCache = new LRUCache<string, any>({
+  max: 50,
+  ttl: MILLISECONDS_IN_A_MIN * 5,
+  allowStale: false,
+});
+
+export function clearCacheEntry(cacheKey: string) {
+  for (const [key] of lruCache.dump()) {
+    if (key.startsWith(cacheKey)) {
+      lruCache.delete(key);
     }
   }
+}
 
-  const serverData = (await serverLoader()) as T;
-  const resolvedData: Record<string, unknown> = {};
+export function clearAllCache() {
+  lruCache.clear();
+}
+
+
+export async function setDeferCache<T extends Record<string, unknown>>(
+  cacheKey: string,
+  serverData: Record<keyof T, Promise<any> | any>
+) {
+  const resolvedData: Record<keyof T, any> = {} as Record<keyof T, any>;
+  let hasError = false;
 
   for (const [key, promise] of Object.entries(serverData)) {
     try {
-      resolvedData[key] = await promise;
+      resolvedData[key as keyof T] = await promise;
     } catch (error) {
       console.error(`Failed to resolve ${key} promise:`, error);
-      resolvedData[key] = "error";
+      resolvedData[key as keyof T] = "error";
+      hasError = true;
     }
   }
 
-  if (!Object.values(resolvedData).some((data) => data === "error")) {
-    sessionStorage.setItem(cacheKey, JSON.stringify(resolvedData));
+  if (!hasError) {
+    lruCache.set(cacheKey, resolvedData);
   }
 
   return resolvedData as T;
 }
+
+export function getDeferCache<T extends Record<string, unknown>>(
+  cacheKey: string
+): T | undefined {
+  return lruCache.has(cacheKey) ? (lruCache.get(cacheKey) as T) : undefined;
+}
+
+export async function clientCaching<
+  T extends Record<string, unknown>,
+>(cacheKey: string, { serverLoader }: ClientLoaderFunctionArgs): Promise<T> {
+  if (lruCache.has(cacheKey)) {
+    return lruCache.get(cacheKey)! as T;
+  }
+
+  const serverData = (await serverLoader()) as T;
+  const resolvedData = await setDeferCache(cacheKey, serverData);
+
+  return resolvedData as T;
+} 

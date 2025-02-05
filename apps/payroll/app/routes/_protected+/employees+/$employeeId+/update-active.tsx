@@ -28,7 +28,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -40,7 +40,9 @@ export async function action({
     if (isGoodStatus(status)) {
       return json({
         status: "success",
-        message: `Employee marked as ${submission.value.is_active ? "active" : "inactive"}`,
+        message: `Employee marked as ${
+          submission.value.is_active ? "active" : "inactive"
+        }`,
         returnTo,
         error: null,
       });

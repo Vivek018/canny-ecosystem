@@ -1,5 +1,5 @@
 import { json, redirect, type LoaderFunctionArgs } from "@remix-run/node";
-import { Outlet, useLoaderData } from "@remix-run/react";
+import { type ClientLoaderFunctionArgs, Outlet, useLoaderData } from "@remix-run/react";
 import { getSessionUser } from "@canny_ecosystem/supabase/cached-queries";
 import {
   getUserByEmail,
@@ -41,6 +41,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     companies: companiesData,
   });
 }
+
 
 export default function ProtectedRoute() {
   const { companies, user } = useLoaderData<typeof loader>();
