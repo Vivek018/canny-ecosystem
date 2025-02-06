@@ -3,6 +3,7 @@ import { ReimbursementSearchFilter } from "@/components/reimbursements/reimburse
 import { reimbursementsColumns } from "@/components/reimbursements/table/columns";
 import { ReimbursementsTable } from "@/components/reimbursements/table/reimbursements-table";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import { useUserRole } from "@/utils/user";
 import {
   LAZY_LOADING_LIMIT,
   MAX_QUERY_LIMIT,
@@ -17,15 +18,18 @@ import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 
 import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json, Link, redirect, useLoaderData } from "@remix-run/react";
 
 export const UPDATE_REIMBURSEMENTS_TAG = "Update Reimbursements";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
+  const { supabase } = getSupabaseWithHeaders({ request });
+
   const url = new URL(request.url);
   const employeeId = params.employeeId;
-  const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   let reimbursementData = null;
   const searchParams = new URLSearchParams(url.searchParams);
@@ -51,7 +55,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const hasFilters =
     filters &&
     Object.values(filters).some(
-      (value) => value !== null && value !== undefined,
+      (value) => value !== null && value !== undefined
     );
 
   let theMeta = null;
@@ -64,8 +68,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         to: hasFilters
           ? MAX_QUERY_LIMIT
           : page > 0
-            ? LAZY_LOADING_LIMIT
-            : LAZY_LOADING_LIMIT - 1,
+          ? LAZY_LOADING_LIMIT
+          : LAZY_LOADING_LIMIT - 1,
         filters,
         searchQuery: query ?? undefined,
         sort: sortParam?.split(":") as [string, "asc" | "desc"],
@@ -84,7 +88,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
   const hasNextPage = Boolean(
-    theMeta?.count && theMeta.count / (page + 1) > LAZY_LOADING_LIMIT,
+    theMeta?.count && theMeta.count / (page + 1) > LAZY_LOADING_LIMIT
   );
   const { data: projectData } = await getProjectNamesByCompanyId({
     supabase,
@@ -130,6 +134,7 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function ReimbursementsIndex() {
+  const { role } = useUserRole();
   const {
     data,
     env,
@@ -163,6 +168,10 @@ export default function ReimbursementsIndex() {
             className={cn(
               buttonVariants({ variant: "primary-outline" }),
               "flex items-center gap-1",
+              !hasPermission(
+                role,
+                `${updateRole}:${attribute.reimbursements}`
+              ) && "hidden"
             )}
           >
             <span>Add</span>

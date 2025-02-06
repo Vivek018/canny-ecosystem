@@ -9,7 +9,12 @@ import {
   useNavigate,
 } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
-import { GratuitySchema, isGoodStatus } from "@canny_ecosystem/utils";
+import {
+  GratuitySchema,
+  hasPermission,
+  isGoodStatus,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import { getGratuityById } from "@canny_ecosystem/supabase/queries";
 import { updateGratuity } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
@@ -18,15 +23,23 @@ import { Suspense, useEffect } from "react";
 import type { GratuityDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { ErrorBoundary } from "@/components/error-boundary";
 import CreateGratuity from "./create-gratuity";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const UPDATE_GRATUITY = "update-gratuity";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const gratuityId = params.gratuityId;
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.statutoryFieldsGraduity}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
 
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
-
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
     let gratuityPromise = null;
 
@@ -49,7 +62,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         gratuityPromise: null,
         companyId: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -68,7 +81,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -97,7 +110,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

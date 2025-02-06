@@ -1,3 +1,4 @@
+import type { UserDatabaseRow } from "@canny_ecosystem/supabase/types";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,11 +14,18 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { ErrorList } from "@canny_ecosystem/ui/forms";
 import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { DELETE_TEXT } from "@canny_ecosystem/utils/constant";
+import { deleteRole, hasPermission } from "@canny_ecosystem/utils";
+import { attribute, DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
-export const DeleteUser = ({ id }: { id: string }) => {
+export const DeleteUser = ({
+  id,
+  role,
+}: {
+  id: string;
+  role: UserDatabaseRow["role"];
+}) => {
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [inputError, setInputError] = useState<string[]>([]);
@@ -30,7 +38,7 @@ export const DeleteUser = ({ id }: { id: string }) => {
   };
 
   const handleDeleteUser = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -40,7 +48,7 @@ export const DeleteUser = ({ id }: { id: string }) => {
           method: "post",
           action: `${id}/delete-user`,
           replace: true,
-        },
+        }
       );
     } else {
       e.preventDefault();
@@ -53,7 +61,11 @@ export const DeleteUser = ({ id }: { id: string }) => {
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
-          "text-[13px] h-9",
+          "hidden text-[13px] h-9",
+          hasPermission(
+            role,
+            `${deleteRole}:${attribute.settingUsers}`
+          ) && "flex"
         )}
       >
         Delete User

@@ -19,11 +19,12 @@ import { Await, useLoaderData } from "@remix-run/react";
 import { type ReactNode, Suspense, useEffect } from "react";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
+  const { supabase } = getSupabaseWithHeaders({ request });
+
+ 
   const employeeId = params.employeeId;
 
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
-
     const employeePromise = getEmployeeById({
       supabase,
       id: employeeId ?? "",

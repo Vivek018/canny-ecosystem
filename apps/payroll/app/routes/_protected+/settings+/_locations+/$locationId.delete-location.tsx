@@ -1,7 +1,15 @@
+import { DEFAULT_ROUTE } from "@/constant";
+import { safeRedirect } from "@/utils/server/http.server";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { deleteLocation } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { isGoodStatus } from "@canny_ecosystem/utils";
+import {
+  deleteRole,
+  hasPermission,
+  isGoodStatus,
+} from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { json, useActionData, useNavigate } from "@remix-run/react";
 import { useEffect } from "react";
@@ -11,7 +19,13 @@ export async function action({
   params,
 }: ActionFunctionArgs): Promise<Response> {
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
+    const { supabase, headers } = getSupabaseWithHeaders({ request });
+    const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+    if (!hasPermission(user?.role!, `${deleteRole}:${attribute.settingLocations}`)) {
+      return safeRedirect(DEFAULT_ROUTE, { headers });
+    }
+
     const locationId = params.locationId;
 
     const { status, error } = await deleteLocation({
@@ -28,7 +42,7 @@ export async function action({
 
     return json(
       { status: "error", message: "Location delete failed", error },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json({

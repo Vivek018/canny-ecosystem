@@ -12,7 +12,12 @@ import {
 } from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { updateEmployeeStatutoryDetails } from "@canny_ecosystem/supabase/mutations";
-import { isGoodStatus, EmployeeStatutorySchema } from "@canny_ecosystem/utils";
+import {
+  isGoodStatus,
+  EmployeeStatutorySchema,
+  hasPermission,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import { CreateEmployeeStatutoryDetails } from "@/components/employees/form/create-employee-statutory-details";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
 import { Card } from "@canny_ecosystem/ui/card";
@@ -21,15 +26,24 @@ import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import type { EmployeeStatutoryDetailsDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { DEFAULT_ROUTE } from "@/constant";
+import { safeRedirect } from "@/utils/server/http.server";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const UPDATE_EMPLOYEE_STATUTORY = "update-employee-statutory";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const employeeId = params.employeeId;
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.employeeStatutory}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
 
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
-
     let employeeStatutoryDetailsPromise = null;
 
     if (employeeId) {
@@ -69,7 +83,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -87,7 +101,7 @@ export async function action({
     }
     return json(
       { status: "error", message: "Statutory update failed", error },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json({

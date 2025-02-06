@@ -10,7 +10,12 @@ import {
   useNavigate,
 } from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { isGoodStatus, PaymentTemplateSchema } from "@canny_ecosystem/utils";
+import {
+  hasPermission,
+  isGoodStatus,
+  PaymentTemplateSchema,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import { Suspense, useEffect } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { ErrorBoundary } from "@/components/error-boundary";
@@ -22,15 +27,24 @@ import { Card } from "@canny_ecosystem/ui/card";
 import { CreatePaymentTemplateDetails } from "@/components/payment-templates/form/create-payment-template-details";
 import { FormButtons } from "@/components/form/form-buttons";
 import { updatePaymentTemplate } from "@canny_ecosystem/supabase/mutations";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const UPDATE_PAYMENT_TEMPLATE = "update-payment-template";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const paymentTemplateId = params.paymentTemplateId;
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.paymentTemplates}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
 
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
-
     let paymentTemplatePromise = null;
 
     if (paymentTemplateId) {
@@ -141,7 +155,7 @@ export default function UpdatePaymentTemplate() {
       <Await resolve={paymentTemplatePromise}>
         {(resolvedData) => {
           if (!resolvedData)
-            return <ErrorBoundary message='Failed to load payment template' />;
+            return <ErrorBoundary message="Failed to load payment template" />;
           return (
             <UpdatePaymentTemplateWrapper
               data={resolvedData?.data}
@@ -205,13 +219,13 @@ export function UpdatePaymentTemplateWrapper({
   }, [actionData]);
 
   return (
-    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
       <FormProvider context={form.context}>
         <Form
-          method='POST'
-          encType='multipart/form-data'
+          method="POST"
+          encType="multipart/form-data"
           {...getFormProps(form)}
-          className='flex flex-col'
+          className="flex flex-col"
         >
           <Card>
             <CreatePaymentTemplateDetails

@@ -4,6 +4,10 @@ import type { GratuityDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { GratuityNoData } from "./gratuity-no-data";
 import { DeleteGratuity } from "./delete-gratuity";
+import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 type DetailItemProps = {
   label: string;
@@ -26,6 +30,7 @@ export function GratuityWrapper({
   data: Omit<GratuityDatabaseRow, "created_at" | "updated_at"> | null;
   error: Error | null | { message: string };
 }) {
+  const { role } = useUserRole();
   if (error)
     return <ErrorBoundary error={error} message="Failed to load data" />;
   if (!data) return <GratuityNoData />;
@@ -39,7 +44,13 @@ export function GratuityWrapper({
           <Link
             prefetch="intent"
             to={`/payment-components/statutory-fields/gratuity/${data?.id}/update-gratuity`}
-            className="p-2 rounded-full bg-secondary grid place-items-center"
+            className={cn(
+              "p-2 rounded-full bg-secondary grid place-items-center",
+              !hasPermission(
+                `${role}`,
+                `${updateRole}:${attribute.statutoryFieldsGraduity}`
+              ) && "hidden"
+            )}
           >
             <Icon name="edit" size="sm" />
           </Link>

@@ -9,7 +9,12 @@ import {
   useNavigate,
 } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
-import { EmployeeSkillsSchema, isGoodStatus } from "@canny_ecosystem/utils";
+import {
+  EmployeeSkillsSchema,
+  hasPermission,
+  isGoodStatus,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import { getEmployeeSkillById } from "@canny_ecosystem/supabase/queries";
 import { updateEmployeeSkill } from "@canny_ecosystem/supabase/mutations";
 import AddEmployeeSkill from "./add-employee-skill";
@@ -17,16 +22,24 @@ import { Suspense, useEffect } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { ErrorBoundary } from "@/components/error-boundary";
 import type { EmployeeSkillDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { DEFAULT_ROUTE } from "@/constant";
+import { safeRedirect } from "@/utils/server/http.server";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const UPDATE_EMPLOYEE_SKILL = "update-employee-skill";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const skillId = params.skillId;
   const employeeId = params.employeeId;
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.employeeSkills}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
 
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
-
     let skillPromise = null;
 
     if (skillId) {
@@ -65,7 +78,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: submission.status === "error" ? 400 : 200 }
     );
   }
 

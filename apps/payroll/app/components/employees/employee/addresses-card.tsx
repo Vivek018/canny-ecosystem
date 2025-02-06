@@ -25,7 +25,15 @@ import {
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { DeleteAddress } from "./delete-address";
-import { replaceUnderscore } from "@canny_ecosystem/utils";
+import {
+  deleteRole,
+  hasPermission,
+  replaceUnderscore,
+  updateRole,
+} from "@canny_ecosystem/utils";
+import { useUserRole } from "@/utils/user";
+import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 type EmployeeAddress = Omit<
   EmployeeAddressDatabaseRow,
@@ -33,6 +41,7 @@ type EmployeeAddress = Omit<
 >;
 
 export const AddressItem = ({ address }: { address: EmployeeAddress }) => {
+  const { role } = useUserRole();
   return (
     <Card
       key={address.id}
@@ -52,6 +61,10 @@ export const AddressItem = ({ address }: { address: EmployeeAddress }) => {
                   className={cn(
                     buttonVariants({ variant: "muted" }),
                     "px-2.5 h-min",
+                    !hasPermission(
+                      role,
+                      `${updateRole}:${attribute.employeeAddresses}`
+                    ) && "hidden"
                   )}
                 >
                   <Icon name="edit" size="xs" />
@@ -65,6 +78,13 @@ export const AddressItem = ({ address }: { address: EmployeeAddress }) => {
               className={cn(
                 buttonVariants({ variant: "muted" }),
                 "px-2.5 h-min",
+                !address.latitude &&
+                  !address.longitude &&
+                  !hasPermission(
+                    role,
+                    `${deleteRole}:${attribute.employeeAddresses}`
+                  ) &&
+                  "hidden"
               )}
             >
               <Icon name="dots-vertical" size="xs" />
@@ -74,7 +94,7 @@ export const AddressItem = ({ address }: { address: EmployeeAddress }) => {
                 <DropdownMenuItem
                   className={cn(
                     "py-2 text-[13px]",
-                    !address.latitude && "hidden",
+                    !address.latitude && "hidden"
                   )}
                   onClick={() => {
                     navigator.clipboard.writeText(String(address.latitude));
@@ -85,7 +105,7 @@ export const AddressItem = ({ address }: { address: EmployeeAddress }) => {
                 <DropdownMenuItem
                   className={cn(
                     "py-2 text-[13px]",
-                    !address.longitude && "hidden",
+                    !address.longitude && "hidden"
                   )}
                   onClick={() => {
                     navigator.clipboard.writeText(String(address.longitude));
@@ -95,7 +115,12 @@ export const AddressItem = ({ address }: { address: EmployeeAddress }) => {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator
                   className={cn(
-                    !address.latitude && !address.longitude && "hidden",
+                    (!address.latitude && !address.longitude) ||
+                      (!hasPermission(
+                        role,
+                        `${deleteRole}:${attribute.employeeAddresses}`
+                      ) &&
+                        "hidden")
                   )}
                 />
                 <DeleteAddress
@@ -122,7 +147,7 @@ export const AddressItem = ({ address }: { address: EmployeeAddress }) => {
       <CardFooter
         className={cn(
           "px-2.5 ml-auto bg-secondary text-foreground py-1.5 text-sm tracking-wide font-sem rounded-tl-md border-foreground flex gap-1 justify-center",
-          !address.is_primary && "opacity-0",
+          !address.is_primary && "opacity-0"
         )}
       >
         <Icon name="dot-filled" size="xs" />
@@ -137,14 +162,24 @@ export const EmployeeAddressesCard = ({
 }: {
   employeeAddresses: EmployeeAddress[] | null;
 }) => {
+  const { role } = useUserRole();
   return (
     <Card className="rounded w-full h-full p-4">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold">Employee Addresses</h2>
         <div>
           <Link
-            to="add-employee-address"
-            className={cn(buttonVariants({ variant: "outline" }), "bg-card")}
+            to={
+              hasPermission(role, `${updateRole}:${attribute.employeeAddresses}`)
+                ? "add-employee-address"
+                : DEFAULT_ROUTE
+            }
+            className={cn(
+              buttonVariants({ variant: "outline" }),
+              "bg-card",
+              !hasPermission(role, `${updateRole}:${attribute.employeeAddresses}`) &&
+                "hidden"
+            )}
           >
             <Icon name="plus-circled" className="mr-2" />
             Add

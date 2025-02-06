@@ -1,9 +1,11 @@
 import {
+  hasPermission,
   isGoodStatus,
   LabourWelfareFundSchema,
   lwfDeductionCycleArray,
   replaceUnderscore,
   transformStringArrayIntoOptions,
+  updateRole,
 } from "@canny_ecosystem/utils";
 import {
   CheckboxField,
@@ -39,15 +41,24 @@ import {
 } from "@canny_ecosystem/ui/card";
 import { createLabourWelfareFund } from "@canny_ecosystem/supabase/mutations";
 import type { LabourWelfareFundDatabaseUpdate } from "@canny_ecosystem/supabase/types";
-import { statesAndUTs } from "@canny_ecosystem/utils/constant";
+import { attribute, statesAndUTs } from "@canny_ecosystem/utils/constant";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { DEFAULT_ROUTE } from "@/constant";
 
 export const CREATE_LABOUR_WELFARE_FUND = "create-labour-welfare-fund";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.statutoryFieldsLwf}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
     return json({ companyId, error: null });
@@ -57,7 +68,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         error,
         companyId: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -75,7 +86,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -104,7 +115,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -207,7 +218,7 @@ export default function CreateLabourWelfareFund({
                 }}
                 labelProps={{
                   children: replaceUnderscore(
-                    fields.employee_contribution.name,
+                    fields.employee_contribution.name
                   ),
                 }}
                 errors={fields.employee_contribution.errors}
@@ -222,7 +233,7 @@ export default function CreateLabourWelfareFund({
                 }}
                 labelProps={{
                   children: replaceUnderscore(
-                    fields.employer_contribution.name,
+                    fields.employer_contribution.name
                   ),
                 }}
                 errors={fields.employer_contribution.errors}
@@ -231,7 +242,7 @@ export default function CreateLabourWelfareFund({
                 key={resetKey + 1}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  lwfDeductionCycleArray as unknown as string[],
+                  lwfDeductionCycleArray as unknown as string[]
                 )}
                 inputProps={{
                   ...getInputProps(fields.deduction_cycle, { type: "text" }),

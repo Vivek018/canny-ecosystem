@@ -22,6 +22,9 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import type { EmployeeSkillDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { DeleteSkill } from "./delete-skill";
+import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 type DetailItemProps = {
   label: string;
@@ -48,6 +51,7 @@ type EmployeeSkill = Omit<
 >;
 
 export const SkillItem = ({ skill }: { skill: EmployeeSkill }) => {
+  const { role } = useUserRole();
   return (
     <Card
       key={skill.id}
@@ -67,6 +71,10 @@ export const SkillItem = ({ skill }: { skill: EmployeeSkill }) => {
                   className={cn(
                     buttonVariants({ variant: "muted" }),
                     "px-2.5 h-min",
+                    !hasPermission(
+                      role,
+                      `${updateRole}:${attribute.employeeSkills}`
+                    ) && "hidden"
                   )}
                 >
                   <Icon name="edit" size="xs" />
@@ -79,7 +87,9 @@ export const SkillItem = ({ skill }: { skill: EmployeeSkill }) => {
             <DropdownMenuTrigger
               className={cn(
                 buttonVariants({ variant: "muted" }),
-                "px-2.5 h-min",
+                "px-2.5 h-min hidden",
+                hasPermission(role, `${deleteRole}:${attribute.employeeSkills}`) &&
+                  "flex"
               )}
             >
               <Icon name="dots-vertical" size="xs" />
@@ -111,6 +121,7 @@ export const EmployeeSkillsCard = ({
 }: {
   employeeSkills: EmployeeSkill[] | null;
 }) => {
+  const { role } = useUserRole();
   return (
     <Card className="rounded w-full h-full p-4">
       <div className="flex justify-between items-center mb-6">
@@ -118,7 +129,12 @@ export const EmployeeSkillsCard = ({
         <div>
           <Link
             to="add-employee-skill"
-            className={cn(buttonVariants({ variant: "outline" }), "bg-card")}
+            className={cn(
+              buttonVariants({ variant: "outline" }),
+              "bg-card",
+              !hasPermission(role, `${updateRole}:${attribute.employeeSkills}`) &&
+                "hidden"
+            )}
           >
             <Icon name="plus-circled" className="mr-2" />
             Add

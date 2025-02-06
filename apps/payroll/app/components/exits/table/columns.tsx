@@ -5,6 +5,10 @@ import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { ExitOptionsDropdown } from "../exit-option-dropdown";
+import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const ExitPaymentColumns: ColumnDef<ExitDataType>[] = [
   {
@@ -125,7 +129,7 @@ export const ExitPaymentColumns: ColumnDef<ExitDataType>[] = [
     header: "Bonus",
     cell: ({ row }) => {
       const bonus = row.original.exit_payments.find(
-        (p) => p.payment_fields.name === "bonus",
+        (p) => p.payment_fields.name === "bonus"
       );
 
       return <p className="capitalize truncate">{bonus?.amount ?? "--"}</p>;
@@ -136,7 +140,7 @@ export const ExitPaymentColumns: ColumnDef<ExitDataType>[] = [
     header: "Diwali Bonus",
     cell: ({ row }) => {
       const diwali_bonus = row.original.exit_payments.find(
-        (p) => p.payment_fields.name === "diwali_bonus",
+        (p) => p.payment_fields.name === "diwali_bonus"
       );
 
       return (
@@ -149,7 +153,7 @@ export const ExitPaymentColumns: ColumnDef<ExitDataType>[] = [
     header: "Commision",
     cell: ({ row }) => {
       const commision = row.original.exit_payments.find(
-        (p) => p.payment_fields.name === "commision",
+        (p) => p.payment_fields.name === "commision"
       );
 
       return <p className="capitalize truncate">{commision?.amount ?? "--"}</p>;
@@ -160,7 +164,7 @@ export const ExitPaymentColumns: ColumnDef<ExitDataType>[] = [
     header: "Joining Bonus",
     cell: ({ row }) => {
       const joining_bonus = row.original.exit_payments.find(
-        (p) => p.payment_fields.name === "joining_bonus",
+        (p) => p.payment_fields.name === "joining_bonus"
       );
 
       return (
@@ -173,7 +177,7 @@ export const ExitPaymentColumns: ColumnDef<ExitDataType>[] = [
     header: "Yearly Bonus",
     cell: ({ row }) => {
       const yearly_bonus = row.original.exit_payments.find(
-        (p) => p.payment_fields.name === "yearly_bonus",
+        (p) => p.payment_fields.name === "yearly_bonus"
       );
 
       return (
@@ -186,7 +190,7 @@ export const ExitPaymentColumns: ColumnDef<ExitDataType>[] = [
     header: "Leave Encashment",
     cell: ({ row }) => {
       const leave_encashment = row.original.exit_payments.find(
-        (p) => p.payment_fields.name === "leave_encashment",
+        (p) => p.payment_fields.name === "leave_encashment"
       );
 
       return (
@@ -201,7 +205,7 @@ export const ExitPaymentColumns: ColumnDef<ExitDataType>[] = [
     header: "Gift Coupon",
     cell: ({ row }) => {
       const gift_coupon = row.original.exit_payments.find(
-        (p) => p.payment_fields.name === "gift_coupon",
+        (p) => p.payment_fields.name === "gift_coupon"
       );
 
       return (
@@ -214,7 +218,7 @@ export const ExitPaymentColumns: ColumnDef<ExitDataType>[] = [
     header: "Gratuity",
     cell: ({ row }) => {
       const gratuity = row.original.exit_payments.find(
-        (p) => p.payment_fields.name === "gratuity",
+        (p) => p.payment_fields.name === "gratuity"
       );
 
       return <p className="capitalize truncate">{gratuity?.amount ?? "--"}</p>;
@@ -225,7 +229,7 @@ export const ExitPaymentColumns: ColumnDef<ExitDataType>[] = [
     header: "Computer Service Charges",
     cell: ({ row }) => {
       const computer_service_charges = row.original.exit_payments.find(
-        (p) => p.payment_fields.name === "computer-service-charges",
+        (p) => p.payment_fields.name === "computer-service-charges"
       );
 
       return (
@@ -240,7 +244,7 @@ export const ExitPaymentColumns: ColumnDef<ExitDataType>[] = [
     header: "Deduction",
     cell: ({ row }) => {
       const deduction = row.original.exit_payments.find(
-        (p) => p.payment_fields.name === "deduction",
+        (p) => p.payment_fields.name === "deduction"
       );
 
       return <p className="capitalize truncate">{deduction?.amount ?? "--"}</p>;
@@ -270,12 +274,20 @@ export const ExitPaymentColumns: ColumnDef<ExitDataType>[] = [
     enableSorting: false,
     enableHiding: false,
     cell: ({ row }) => {
+      const { role } = useUserRole();
       return (
         <ExitOptionsDropdown
           key={row.original.id}
           exitId={row.original.id}
           triggerChild={
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger
+              asChild
+              className={cn(
+                !hasPermission(role, `${updateRole}:${attribute.exits}`) &&
+                  !hasPermission(role, `${deleteRole}:${attribute.exits}`) &&
+                  "hidden"
+              )}
+            >
               <Button variant="ghost" className="h-8 w-8 p-0">
                 <span className="sr-only">Open menu</span>
                 <Icon name="dots-vertical" />

@@ -9,7 +9,12 @@ import {
   useNavigate,
 } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
-import { isGoodStatus, StatutoryBonusSchema } from "@canny_ecosystem/utils";
+import {
+  hasPermission,
+  isGoodStatus,
+  StatutoryBonusSchema,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import { getStatutoryBonusById } from "@canny_ecosystem/supabase/queries";
 import { updateStatutoryBonus } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
@@ -18,15 +23,28 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { Suspense, useEffect } from "react";
 import type { StatutoryBonusDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const UPDATE_STATUTORY_BONUS = "update-statutory-bonus";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const sbId = params.sbId;
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (
+    !hasPermission(
+      `${user?.role!}`,
+      `${updateRole}:${attribute.statutoryFieldsStatutoryBonus}`
+    )
+  ) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
 
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
-
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
     let sbPromise = null;
 
@@ -49,7 +67,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         companyId: null,
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -68,7 +86,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -96,7 +114,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

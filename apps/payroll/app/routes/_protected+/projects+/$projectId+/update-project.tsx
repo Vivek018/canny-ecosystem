@@ -14,21 +14,34 @@ import {
 } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
 import { updateProject } from "@canny_ecosystem/supabase/mutations";
-import { isGoodStatus, ProjectSchema } from "@canny_ecosystem/utils";
+import {
+  hasPermission,
+  isGoodStatus,
+  ProjectSchema,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import CreateProject from "../create-project";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { Suspense, useEffect } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { DEFAULT_ROUTE } from "@/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const UPDATE_PROJECT = "update-project";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const projectId = params.projectId;
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.projects}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
 
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
-
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
     let projectPromise = null;
@@ -44,7 +57,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
           return { data: companyOptions, error };
         }
         return { data: null, error };
-      },
+      }
     );
 
     return defer({
@@ -61,7 +74,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         projectPromise: null,
         companyOptionsPromise: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -80,7 +93,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -98,7 +111,7 @@ export async function action({
     }
     return json(
       { status: "error", message: "Project update failed", error },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json(
@@ -108,7 +121,7 @@ export async function action({
         error,
         data: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

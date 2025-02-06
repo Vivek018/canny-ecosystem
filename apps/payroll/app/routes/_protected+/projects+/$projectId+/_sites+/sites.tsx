@@ -15,6 +15,9 @@ import { json } from "@remix-run/react";
 import { Suspense } from "react";
 import { SitesWrapper } from "@/components/projects/sites/sites-wrapper";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const projectId = params.projectId;
@@ -41,7 +44,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         projectId,
         sitesPromise: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -51,6 +54,7 @@ export async function action() {
 }
 
 export default function SitesIndex() {
+  const { role } = useUserRole();
   const { sitesPromise, projectId, error } = useLoaderData<typeof loader>();
   const { isDocument } = useIsDocument();
 
@@ -72,6 +76,7 @@ export default function SitesIndex() {
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
                 "flex items-center gap-1",
+                !hasPermission(role, `${updateRole}:${attribute.projectSites}`) && "hidden"
               )}
             >
               <span>Add</span>
@@ -81,7 +86,7 @@ export default function SitesIndex() {
           <CommandEmpty
             className={cn(
               "w-full py-40 capitalize text-lg tracking-wide text-center",
-              !isDocument && "hidden",
+              !isDocument && "hidden"
             )}
           >
             No site found.
@@ -103,7 +108,7 @@ export default function SitesIndex() {
             </Suspense>
           </CommandList>
         </Command>
-        <Outlet/>
+        <Outlet />
       </div>
       <Outlet />
     </section>

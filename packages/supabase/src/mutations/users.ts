@@ -35,22 +35,28 @@ export async function updateUserLastLogin({
   } = await supabase.auth.getUser();
 
   if (!user?.email) {
-    return;
+    return {
+      data: null,
+      error: "No Email Found",
+      status: 404,
+    };
   }
 
-  const { error, status } = await supabase
+  const { data, error, status } = await supabase
     .from("users")
     .update({
       avatar: user?.user_metadata?.avatar_url,
       last_login: new Date().toISOString(),
     })
-    .eq("email", user.email);
+    .eq("email", user.email)
+    .select()
+    .single();
 
   if (error) {
     console.error(error);
   }
 
-  return { error, status };
+  return { data, error, status };
 }
 
 export async function updateUserById({

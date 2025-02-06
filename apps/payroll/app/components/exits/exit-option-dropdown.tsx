@@ -6,6 +6,10 @@ import {
   DropdownMenuSeparator,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { DeleteExit } from "../exits/delete-exit";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const ExitOptionsDropdown = ({
   exitId,
@@ -14,13 +18,26 @@ export const ExitOptionsDropdown = ({
   exitId: string;
   triggerChild: React.ReactElement;
 }) => {
+  const { role } = useUserRole();
   return (
     <DropdownMenu>
       {triggerChild}
       <DropdownMenuContent sideOffset={10} align="end">
         <DropdownMenuGroup>
-          <DropdownMenuItem>Edit Exit</DropdownMenuItem>
-          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            className={cn(
+              "hidden",
+              hasPermission(role, `${updateRole}:${attribute.exits}`) && "flex"
+            )}
+          >
+            Edit Exit
+          </DropdownMenuItem>
+          <DropdownMenuSeparator
+            className={cn(
+              "hidden",
+              hasPermission(role, `${deleteRole}:${attribute.exits}`) && "flex"
+            )}
+          />
           <DeleteExit exitId={exitId} />
         </DropdownMenuGroup>
       </DropdownMenuContent>

@@ -35,8 +35,9 @@ export type CardInfoData = {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const url = new URL(request.url);
   const { supabase } = getSupabaseWithHeaders({ request });
+
+  const url = new URL(request.url);
 
   const searchParams = new URLSearchParams(url.searchParams);
 
@@ -63,8 +64,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     const { count: projectsCount } = await getProjectsCountByCompanyId({
       supabase,
-      companyId
-    })
+      companyId,
+    });
 
     const { count: usersCount } = await getUsersCount({ supabase });
     const { count: locationsCount } = await getLocationsCountByCompanyId({
@@ -148,7 +149,7 @@ export default function Dashboard() {
     return <ErrorBoundary error={error} message="Failed to load data" />;
 
   return (
-    <section className="w-full h-full p-4 flex flex-col gap-4">
+    <section className="w-full p-4 flex flex-col gap-4">
       <div className="flex justify-end">
         <div className="flex justify-between gap-3">
           <FilterList filterList={filters} />

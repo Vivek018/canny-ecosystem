@@ -29,6 +29,7 @@ export default function CompanyRegistrationDetailsWrapper({
           ...data,
           company_id: data?.company_id ?? companyId,
         }}
+    
       />
       <DeleteCompany companyId={companyId} />
     </>

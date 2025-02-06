@@ -14,6 +14,9 @@ import type { ProfessionalTaxDatabaseRow } from "@canny_ecosystem/supabase/types
 import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
 import { useEffect } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { useUserRole } from "@/utils/user";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export function ProfessionalTaxWrapper({
   data,
@@ -22,6 +25,7 @@ export function ProfessionalTaxWrapper({
   data: Omit<ProfessionalTaxDatabaseRow, "created_at" | "updated_at">[] | null;
   error: Error | null | { message: string };
 }) {
+  const { role } = useUserRole();
   const { isDocument } = useIsDocument();
   const { toast } = useToast();
 
@@ -50,6 +54,8 @@ export function ProfessionalTaxWrapper({
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
                 "flex items-center gap-1",
+                !hasPermission(role, `${updateRole}:${attribute.statutoryFieldsPf}`) &&
+                  "hidden"
               )}
             >
               <span>Add</span>
@@ -61,7 +67,7 @@ export function ProfessionalTaxWrapper({
           <CommandEmpty
             className={cn(
               "w-full py-40 capitalize text-lg tracking-wide text-center",
-              !isDocument && "hidden",
+              !isDocument && "hidden"
             )}
           >
             No professional taxes found.

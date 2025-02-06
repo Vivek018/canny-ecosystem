@@ -1,7 +1,9 @@
 import {
+  hasPermission,
   isGoodStatus,
   LocationSchema,
   replaceUnderscore,
+  updateRole,
 } from "@canny_ecosystem/utils";
 import {
   CheckboxField,
@@ -39,15 +41,25 @@ import {
 
 import { createLocation } from "@canny_ecosystem/supabase/mutations";
 import type { LocationDatabaseUpdate } from "@canny_ecosystem/supabase/types";
-import { statesAndUTs } from "@canny_ecosystem/utils/constant";
+import { attribute, statesAndUTs } from "@canny_ecosystem/utils/constant";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { DEFAULT_ROUTE } from "@/constant";
 
 export const CREATE_LOCATION = "create-location";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.settingLocations}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
+
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
     return json({
@@ -80,7 +92,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -98,7 +110,7 @@ export async function action({
 
     return json(
       { status: "error", message: "Location creation failed", error },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json(
@@ -107,7 +119,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -251,7 +263,7 @@ export default function CreateLocation({
                     ...getInputProps(fields.pincode, { type: "text" }),
                     className: "capitalize",
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.pincode.name,
+                      fields.pincode.name
                     )}`,
                   }}
                   labelProps={{
@@ -277,7 +289,7 @@ export default function CreateLocation({
                     ...getInputProps(fields.longitude, { type: "number" }),
                     className: "capitalize",
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.longitude.name,
+                      fields.longitude.name
                     )}`,
                   }}
                   labelProps={{
