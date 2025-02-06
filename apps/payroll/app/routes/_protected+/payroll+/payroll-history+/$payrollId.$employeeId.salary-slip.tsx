@@ -7,7 +7,7 @@ import { getSupabaseWithHeaders } from '@canny_ecosystem/supabase/server';
 import { getCompanyIdOrFirstCompany } from '@/utils/server/company.server';
 import { type EmployeeProjectAssignmentDataType, getCompanyById, getEmployeeById, getEmployeeProjectAssignmentByEmployeeId, getEmployeeStatutoryDetailsById, getPaymentFieldById, getPaymentTemplateComponentById, getPaymentTemplateComponentIdsAndAmountByPayrollIdAndEmployeeId, getPayrollById, getPrimaryCompanyLocationById } from '@canny_ecosystem/supabase/queries';
 import { CANNY_MANAGEMENT_SERVICES_ADDRESS, CANNY_MANAGEMENT_SERVICES_NAME, numberToWordsIndian, SALARY_SLIP_TITLE } from '@/constant';
-import { formatDateToMonthYear } from '@canny_ecosystem/utils';
+import { formatDateTime, formatDateToMonthYear } from '@canny_ecosystem/utils';
 import type { CompanyDatabaseRow, EmployeeDatabaseRow, EmployeeStatutoryDetailsDatabaseRow, LocationDatabaseRow, PayrollDatabaseRow } from '@canny_ecosystem/supabase/types';
 
 // Define styles for PDF
@@ -192,7 +192,7 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
         data.earnings.reduce((sum, earning) => sum + earning.amount, 0) -
         data.deductions.reduce((sum, deduction) => sum + deduction.amount, 0)
     ).toFixed(2));
-    return <Document>
+    return <Document title={`Salary Slip - ${formatDateTime(Date.now())}`}>
         <Page size="A4" style={styles.page}>
             {/* Company Header */}
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -333,7 +333,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const { data: employeeCompanyLocationData } = await getPrimaryCompanyLocationById({ supabase, id: companyId });
     const { data: employeeStatutoryDetails } = await getEmployeeStatutoryDetailsById({ supabase, id: employeeId });
 
-    const workingDetails = [];
+    // const workingDetails = []; 
     const earnings: { amount: number, name: string }[] = [];
     const deductions: { amount: number, name: string }[] = [];
 

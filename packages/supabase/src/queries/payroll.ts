@@ -207,6 +207,29 @@ export async function getPayrollEntriesWithTemplateComponentsByPayrollId({
   return { data, error };
 }
 
+export async function getPaymentTemplateComponentIdsByPayrollIdAndEmployeeId({
+  supabase,
+  payrollId,
+  employeeId
+}: {
+  supabase: TypedSupabaseClient;
+  payrollId: string;
+  employeeId: string;
+}) {
+  const columns = ["payment_template_components_id"] as const;
+
+  const { data, error } = await supabase
+    .from("payroll_entries")
+    .select(columns.join(","))
+    .eq("payroll_id", payrollId)
+    .eq("employee_id",employeeId)
+    .returns<PayrollEntriesDatabaseRow[]>();
+
+  if (error) console.error(error);
+
+  return { data, error };
+}
+
 export async function getPayrollsBySiteId({
   supabase,
   site_id,

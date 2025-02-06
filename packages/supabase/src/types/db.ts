@@ -13,7 +13,7 @@ export type Database = {
         Row: {
           created_at: string | null
           date: string | null
-          employee_id: string | null
+          employee_id: string
           holiday: boolean | null
           holiday_type: Database["public"]["Enums"]["holiday_type"] | null
           id: string
@@ -25,7 +25,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           date?: string | null
-          employee_id?: string | null
+          employee_id: string
           holiday?: boolean | null
           holiday_type?: Database["public"]["Enums"]["holiday_type"] | null
           id?: string
@@ -37,7 +37,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           date?: string | null
-          employee_id?: string | null
+          employee_id?: string
           holiday?: boolean | null
           holiday_type?: Database["public"]["Enums"]["holiday_type"] | null
           id?: string
@@ -404,6 +404,62 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "employee_guardians_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employee_letter: {
+        Row: {
+          content: string | null
+          created_at: string
+          date: string
+          employee_id: string
+          id: string
+          include_client_address: boolean | null
+          include_employee_address: boolean | null
+          include_letter_head: boolean | null
+          include_our_address: boolean | null
+          include_signatuory: boolean | null
+          letter_type: Database["public"]["Enums"]["letter_type"]
+          subject: string | null
+          updated_at: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          date: string
+          employee_id: string
+          id?: string
+          include_client_address?: boolean | null
+          include_employee_address?: boolean | null
+          include_letter_head?: boolean | null
+          include_our_address?: boolean | null
+          include_signatuory?: boolean | null
+          letter_type: Database["public"]["Enums"]["letter_type"]
+          subject?: string | null
+          updated_at?: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          date?: string
+          employee_id?: string
+          id?: string
+          include_client_address?: boolean | null
+          include_employee_address?: boolean | null
+          include_letter_head?: boolean | null
+          include_our_address?: boolean | null
+          include_signatuory?: boolean | null
+          letter_type?: Database["public"]["Enums"]["letter_type"]
+          subject?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_letter_employee_id_fkey"
             columns: ["employee_id"]
             isOneToOne: false
             referencedRelation: "employees"
@@ -1842,7 +1898,14 @@ export type Database = {
       eligibility_option_type: "position" | "skill_level"
       feedback_category: "suggestion" | "bug" | "complain"
       feedback_severity: "low" | "normal" | "urgent"
-      holiday_type: "state" | "national"
+      holiday_type: "weekly" | "paid" | "state" | "national"
+      letter_type:
+        | "appointment_letter"
+        | "experience_letter"
+        | "noc_letter"
+        | "offer_letter"
+        | "relieving_letter"
+        | "termination_letter"
       payment_type: "fixed" | "variable"
       payroll_status: "pending" | "approved" | "created"
       template_assignment_type: "employee" | "site"
