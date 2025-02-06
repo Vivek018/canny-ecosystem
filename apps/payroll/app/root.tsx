@@ -5,6 +5,7 @@ import {
   type HeadersFunction,
 } from "@remix-run/node";
 import {
+  type ClientLoaderFunctionArgs,
   Link,
   Links,
   Meta,
@@ -13,6 +14,7 @@ import {
   ScrollRestoration,
   useLoaderData,
 } from "@remix-run/react";
+import { clientCaching } from "./utils/cache";
 
 import tailwindStyleSheetUrl from "@/styles/tailwind.css?url";
 import { getTheme } from "./utils/server/theme.server";
@@ -28,7 +30,7 @@ import {
   setCompanyId,
 } from "./utils/server/company.server";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { DEFAULT_ROUTE } from "./constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "./constant";
 import { Toaster } from "@canny_ecosystem/ui/toaster";
 import { ErrorBoundary } from "./components/error-boundary";
 import {
@@ -104,6 +106,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
   }
 }
+
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+  return await clientCaching(cacheKeyPrefix.root, args);
+}
+
+clientLoader.hydrate = true;
 
 function Document({
   children,

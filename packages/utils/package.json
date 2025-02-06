@@ -20,6 +20,7 @@
     "./hooks/is-document": "./src/hooks/is-document.ts",
     "./hooks/debounce": "./src/hooks/debounce.ts",
     "./hooks/local-storage": "./src/hooks/local-storage.ts",
+    "./cache": "./src/cache.ts",
     "./constant": "./constant.ts"
   },
   "dependencies": {

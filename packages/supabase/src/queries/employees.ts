@@ -104,6 +104,18 @@ export async function getEmployeesByCompanyId({
 }) {
   const { sort, from, to, filters, searchQuery } = params;
 
+  const hasProjectAssignmentFilter = Object.values({
+    project: filters?.project,
+    project_site: filters?.project_site,
+    assignment_type: filters?.assignment_type,
+    position: filters?.position,
+    skill_level: filters?.skill_level,
+    doj_start: filters?.doj_start,
+    doj_end: filters?.doj_end,
+    dol_start: filters?.dol_start,
+    dol_end: filters?.dol_end,
+  }).some((value) => value);
+
   const columns = [
     "id",
     "employee_code",
@@ -121,9 +133,9 @@ export async function getEmployeesByCompanyId({
     .from("employees")
     .select(
       `${columns.join(",")},
-        employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(
+        employee_project_assignment!employee_project_assignments_employee_id_fkey!${hasProjectAssignmentFilter ? 'inner' : 'left'}(
         employee_id, assignment_type, skill_level, position, start_date, end_date,
-        project_sites!inner(id, name, projects!inner(id, name))
+        project_sites!${hasProjectAssignmentFilter ? 'inner' : 'left'}(id, name, projects!${hasProjectAssignmentFilter ? 'inner' : 'left'}(id, name))
       )`,
       { count: "exact" }
     )

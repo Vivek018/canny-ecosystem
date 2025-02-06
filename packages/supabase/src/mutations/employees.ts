@@ -79,39 +79,59 @@ export async function createEmployee({
   }
 
   if (data?.id) {
-    const { error: employeeStatutoryDetailsError, status } =
-      await createEmployeeStatutoryDetails({
+    let employeeStatutoryDetailsError = null;
+    if (employeeStatutoryDetailsData && Object.keys(employeeStatutoryDetailsData)?.length) {
+      const { error } =
+        await createEmployeeStatutoryDetails({
+          supabase,
+          data: { ...employeeStatutoryDetailsData, employee_id: data.id },
+          bypassAuth,
+        });
+      employeeStatutoryDetailsError = error;
+    }
+
+    let employeeBankDetailsError = null;
+    if (employeeBankDetailsData && Object.keys(employeeBankDetailsData)?.length) {
+      const { error } = await createEmployeeBankDetails(
+        {
+          supabase,
+          data: { ...employeeBankDetailsData, employee_id: data.id },
+          bypassAuth,
+        }
+      );
+      employeeBankDetailsError = error;
+    }
+
+    let employeeProjectAssignmentError = null;
+    if (employeeProjectAssignmentData && Object.keys(employeeProjectAssignmentData)?.length) {
+      const { error } =
+        await createEmployeeProjectAssignment({
+          supabase,
+          data: { ...employeeProjectAssignmentData, employee_id: data.id },
+          bypassAuth,
+        });
+      employeeProjectAssignmentError = error;
+    }
+
+    let employeeAddressesError = null;
+    if (employeeAddressesData && Object.keys(employeeAddressesData)?.length) {
+      const { error } = await createEmployeeAddresses({
         supabase,
-        data: { ...employeeStatutoryDetailsData, employee_id: data.id },
+        data: { ...employeeAddressesData, employee_id: data.id },
         bypassAuth,
       });
+      employeeAddressesError = error;
+    }
 
-    const { error: employeeBankDetailsError } = await createEmployeeBankDetails(
-      {
-        supabase,
-        data: { ...employeeBankDetailsData, employee_id: data.id },
-        bypassAuth,
-      }
-    );
-
-    const { error: employeeProjectAssignmentError } =
-      await createEmployeeProjectAssignment({
-        supabase,
-        data: { ...employeeProjectAssignmentData, employee_id: data.id },
-        bypassAuth,
-      });
-
-    const { error: employeeAddressesError } = await createEmployeeAddresses({
-      supabase,
-      data: { ...employeeAddressesData, employee_id: data.id },
-      bypassAuth,
-    });
-
-    const { error: employeeGuardiansError } = await createEmployeeGuardians({
+    let employeeGuardiansError = null;
+    if (employeeGuardiansData && Object.keys(employeeGuardiansData)?.length) {
+    const { error } = await createEmployeeGuardians({
       supabase,
       data: { ...employeeGuardiansData, employee_id: data.id },
       bypassAuth,
     });
+    employeeGuardiansError = error;
+  }
 
     return {
       data,
@@ -954,7 +974,7 @@ export async function createEmployeeDetailsFromImportedData({
             existing.employee_code === record.employee_code ||
             existing.primary_mobile_number === record.primary_mobile_number ||
             existing.secondary_mobile_number ===
-              record.secondary_mobile_number ||
+            record.secondary_mobile_number ||
             existing.personal_email === record.personal_email
         );
 
@@ -1193,24 +1213,24 @@ export async function createEmployeeStatutoryFromImportedData({
             normalize(existing.employee_id) === normalize(record.employee_id) ||
             (record.aadhaar_number &&
               normalize(existing.aadhaar_number) ===
-                normalize(record.aadhaar_number)) ||
+              normalize(record.aadhaar_number)) ||
             (record.pan_number &&
               normalize(existing.pan_number) ===
-                normalize(record.pan_number)) ||
+              normalize(record.pan_number)) ||
             (record.uan_number &&
               normalize(existing.uan_number) ===
-                normalize(record.uan_number)) ||
+              normalize(record.uan_number)) ||
             (record.pf_number &&
               normalize(existing.pf_number) === normalize(record.pf_number)) ||
             (record.esic_number &&
               normalize(existing.esic_number) ===
-                normalize(record.esic_number)) ||
+              normalize(record.esic_number)) ||
             (record.driving_license_number &&
               normalize(existing.driving_license_number) ===
-                normalize(record.driving_license_number)) ||
+              normalize(record.driving_license_number)) ||
             (record.passport_number &&
               normalize(existing.passport_number) ===
-                normalize(record.passport_number))
+              normalize(record.passport_number))
         );
 
         if (existingRecord) {
@@ -1389,7 +1409,7 @@ export async function createEmployeeBankDetailsFromImportedData({
             normalize(existing.employee_id) === normalize(record.employee_id) ||
             (record.account_number &&
               normalize(existing.account_number) ===
-                normalize(record.account_number))
+              normalize(record.account_number))
         );
 
         if (existingRecord) {
@@ -1590,7 +1610,7 @@ export async function createEmployeeGuardiansFromImportedData({
         (record) =>
           normalize(record.mobile_number) === normalize(entry.mobile_number) ||
           normalize(record.alternate_mobile_number) ===
-            normalize(entry.alternate_mobile_number) ||
+          normalize(entry.alternate_mobile_number) ||
           normalize(record.email) === normalize(entry.email)
       );
 

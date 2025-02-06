@@ -252,5 +252,13 @@ export const statutorySideNavList = [
   },
 ];
 
+export const cacheKeyPrefix = {
+  root: "root",
+  index: "index",
+  protected: "protected",
+  dashboard: "dashboard",
+  employees_main: "employees-main",
+  employees: "employees",
+}
 
 

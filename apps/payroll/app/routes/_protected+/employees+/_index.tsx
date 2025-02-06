@@ -5,12 +5,12 @@ import { ImportEmployeeAddressModal } from "@/components/employees/import-export
 import { ImportEmployeeBankDetailsModal } from "@/components/employees/import-export/import-modal-bank-details";
 import { ImportEmployeeDetailsModal } from "@/components/employees/import-export/import-modal-employee-details";
 import { ImportEmployeeGuardiansModal } from "@/components/employees/import-export/import-modal-guardians";
-
 import { ImportEmployeeStatutoryModal } from "@/components/employees/import-export/import-modal-statutory";
 import { columns } from "@/components/employees/table/columns";
 import { DataTable } from "@/components/employees/table/data-table";
-import { VALID_FILTERS } from "@/constant";
+import { cacheKeyPrefix, VALID_FILTERS } from "@/constant";
 import { AIChat4o } from "@/utils/ai";
+import { clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { MAX_QUERY_LIMIT } from "@canny_ecosystem/supabase/constant";
 import {
@@ -22,7 +22,15 @@ import {
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { extractJsonFromString } from "@canny_ecosystem/utils";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { json, Outlet, redirect, useLoaderData } from "@remix-run/react";
+import {
+  Await,
+  type ClientLoaderFunctionArgs,
+  defer,
+  Outlet,
+  redirect,
+  useLoaderData,
+} from "@remix-run/react";
+import { Suspense } from "react";
 
 const pageSize = 20;
 
@@ -60,7 +68,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       (value) => value !== null && value !== undefined
     );
 
-  const { data, meta, error } = await getEmployeesByCompanyId({
+  const employeesPromise = getEmployeesByCompanyId({
     supabase,
     companyId,
     params: {
@@ -72,26 +80,17 @@ export async function loader({ request }: LoaderFunctionArgs) {
     },
   });
 
-  const hasNextPage = Boolean(
-    meta?.count && meta.count / (page + 1) > pageSize
-  );
-
-  if (error) {
-    throw error;
-  }
-
-  const { data: projectData } = await getProjectNamesByCompanyId({
+  const projectPromise = getProjectNamesByCompanyId({
     supabase,
     companyId,
   });
 
-  let projectSiteData = null;
+  let projectSitePromise = null;
   if (filters.project) {
-    const { data } = await getSiteNamesByProjectName({
+    projectSitePromise = getSiteNamesByProjectName({
       supabase,
       projectName: filters.project,
     });
-    projectSiteData = data;
   }
 
   const env = {
@@ -99,18 +98,27 @@ export async function loader({ request }: LoaderFunctionArgs) {
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
 
-  return json({
-    data: data as any,
-    count: meta?.count,
+  return defer({
+    employeesPromise: employeesPromise as any,
+    projectPromise,
+    projectSitePromise,
     query,
     filters,
-    hasNextPage,
     companyId,
-    projectArray: projectData?.map((project) => project.name) ?? [],
-    projectSiteArray: projectSiteData?.map((site) => site.name) ?? [],
     env,
   });
 }
+
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+  const url = new URL(args.request.url);
+
+  return await clientCaching(
+    `${cacheKeyPrefix.employees}${url.searchParams.toString()}`,
+    args
+  );
+}
+
+clientLoader.hydrate = true;
 
 export async function action({ request }: ActionFunctionArgs) {
   const url = new URL(request.url);
@@ -193,14 +201,12 @@ Output: {
 
 export default function EmployeesIndex() {
   const {
-    data,
-    count,
+    employeesPromise,
+    projectPromise,
+    projectSitePromise,
     query,
     filters,
-    hasNextPage,
     companyId,
-    projectArray,
-    projectSiteArray,
     env,
   } = useLoaderData<typeof loader>();
 
@@ -208,30 +214,58 @@ export default function EmployeesIndex() {
   const noFilters = Object.values(filterList).every((value) => !value);
 
   return (
-    <section className="py-6 px-4">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
-          <EmployeesSearchFilter
-            disabled={!data?.length && noFilters}
-            projectArray={projectArray}
-            projectSiteArray={projectSiteArray}
-          />
+    <section className='py-6 px-4'>
+      <div className='w-full flex items-center justify-between pb-4'>
+        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4'>
+          <Suspense fallback={<div>Loading...</div>}>
+            <Await resolve={projectPromise}>
+              {(projectData) => (
+                <Await resolve={projectSitePromise}>
+                  {(projectSiteData) => (
+                    <EmployeesSearchFilter
+                      disabled={!projectData?.data?.length && noFilters}
+                      projectArray={
+                        projectData?.data?.map((project) => project.name) ?? []
+                      }
+                      projectSiteArray={
+                        projectSiteData?.data?.map((site) => site.name) ?? []
+                      }
+                    />
+                  )}
+                </Await>
+              )}
+            </Await>
+          </Suspense>
           <FilterList filterList={filterList} />
         </div>
-        <EmployeesActions isEmpty={!data?.length} />
+        <EmployeesActions isEmpty={!projectPromise} />
       </div>
-      <DataTable
-        data={data ?? []}
-        columns={columns({ env, companyId })}
-        count={count ?? data?.length ?? 0}
-        query={query}
-        filters={filters}
-        noFilters={noFilters}
-        hasNextPage={hasNextPage}
-        pageSize={pageSize}
-        companyId={companyId}
-        env={env}
-      />
+      <Suspense fallback={<div>Loading...</div>}>
+        <Await resolve={employeesPromise}>
+          {({ data, meta, error }) => {
+            if (error) {
+              throw error;
+            }
+
+            const hasNextPage = Boolean(meta?.count > pageSize);
+
+            return (
+              <DataTable
+                data={data ?? []}
+                columns={columns({ env, companyId })}
+                count={meta?.count ?? data?.length ?? 0}
+                query={query}
+                filters={filters}
+                noFilters={noFilters}
+                hasNextPage={hasNextPage}
+                pageSize={pageSize}
+                companyId={companyId}
+                env={env}
+              />
+            );
+          }}
+        </Await>
+      </Suspense>
       <ImportEmployeeDetailsModal />
       <ImportEmployeeStatutoryModal />
       <ImportEmployeeBankDetailsModal />
