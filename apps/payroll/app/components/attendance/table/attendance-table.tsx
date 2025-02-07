@@ -18,6 +18,7 @@ import { useAttendanceStore } from "@/store/attendance";
 import type { AttendanceFilterType } from "@/routes/_protected+/dashboard";
 import { ExportBar } from "../export-bar";
 import type { TransformedAteendanceDataType } from "@/routes/_protected+/time-tracking+/attendance+/_index";
+import { useSearchParams } from "@remix-run/react";
 
 interface DataTableProps {
   days: { day: number; fullDate: string };
@@ -34,6 +35,7 @@ export function AttendanceTable({
   noFilters,
   filters,
 }: DataTableProps) {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [data, setData] =
     useState<TransformedAteendanceDataType[]>(initialData);
 
@@ -136,6 +138,9 @@ export function AttendanceTable({
                           "mt-4",
                           !data?.length && noFilters && "hidden"
                         )}
+                        onClick={() => {
+                          setSearchParams();
+                        }}
                       >
                         Clear Filters
                       </Button>
