@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { Form, json, useLoaderData } from "@remix-run/react";
+import { Form, json, useActionData, useLoaderData, useNavigate } from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { safeRedirect } from "@/utils/server/http.server";
 import {
@@ -37,20 +37,24 @@ import { createReimbursementsFromData } from "@canny_ecosystem/supabase/mutation
 import type { ReimbursementsUpdate } from "@canny_ecosystem/supabase/types";
 import { UPDATE_REIMBURSEMENTS_TAG } from "../../../approvals+/reimbursements+/$reimbursementId.update-reimbursements";
 import { getUsers } from "@canny_ecosystem/supabase/queries";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { clearCacheEntry } from "@/utils/cache";
 
-export const ADD_REIMBURSEMENTS_TAG = "Add Reimbursements";
+export const ADD_REIMBURSEMENTS_TAG = "Add_Reimbursement";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.reimbursements}`)) {
+  if (
+    !hasPermission(user?.role!, `${updateRole}:${attribute.reimbursements}`)
+  ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   const employeeId = params.employeeId;
@@ -69,9 +73,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   return json({ userOptions, companyId, employeeId });
 }
 
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({ request }: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
-  const employeeId = params.employeeId;
   const formData = await request.formData();
   const submission = parseWithZod(formData, { schema: ReimbursementSchema });
 
@@ -81,19 +84,24 @@ export async function action({ request, params }: ActionFunctionArgs) {
       { status: submission.status === "error" ? 400 : 200 }
     );
   }
-  const reimbursementData = submission.value;
 
   const { status, error } = await createReimbursementsFromData({
     supabase,
-    data: reimbursementData as any,
+    data: submission.value,
   });
 
-  if (isGoodStatus(status))
-    return safeRedirect(`/employees/${employeeId}/reimbursements`, {
-      status: 303,
+  if (isGoodStatus(status)) {
+    return json({
+      status: "success",
+      message: "Employee reimbursement create successfully",
+      error: null,
     });
-
-  return json({ status, error });
+  }
+  return json({
+    status: "error",
+    message: "Employee reimbursement create failed",
+    error,
+  });
 }
 
 export default function AddReimbursements({
@@ -104,8 +112,33 @@ export default function AddReimbursements({
   updateValues?: ReimbursementsUpdate | null;
   userOptionsFromUpdate?: any;
 }) {
-  const [resetKey, setResetKey] = useState(Date.now());
   const { userOptions, employeeId, companyId } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
+  const [resetKey, setResetKey] = useState(Date.now());
+
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (actionData) {
+      if (actionData?.status === "success") {
+        clearCacheEntry(`${cacheKeyPrefix.employee_reimbursements}${employeeId}`);
+        toast({
+          title: "Success",
+          description: actionData?.message || "Employee bank details created",
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description:
+            actionData?.error?.message || "Employee bank details create failed",
+          variant: "destructive",
+        });
+      }
+      navigate(`/employees/${employeeId}/reimbursements`);
+    }
+  }, [actionData]);
 
   const REIMBURSEMENTS_TAG = updateValues
     ? UPDATE_REIMBURSEMENTS_TAG
@@ -130,20 +163,16 @@ export default function AddReimbursements({
   });
 
   return (
-    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
+    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
       <FormProvider context={form.context}>
-        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
+        <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
           <Card>
             <CardHeader>
-              <CardTitle>
-                {REIMBURSEMENTS_TAG === "Add Reimbursements"
-                  ? "Add Reimbursement"
-                  : "Update Reimbursement"}
-              </CardTitle>
-              <CardDescription className="">
-                {REIMBURSEMENTS_TAG === "Add Reimbursements"
-                  ? "You can add reimbursements by filling this form"
-                  : "You can update reimbursements by filling this form"}
+              <CardTitle className="capitalize">{replaceUnderscore(REIMBURSEMENTS_TAG)}</CardTitle>
+              <CardDescription className='lowercase'>
+                {`${replaceUnderscore(
+                  REIMBURSEMENTS_TAG
+                )} by filling this form`}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -153,7 +182,7 @@ export default function AddReimbursements({
               <input
                 {...getInputProps(fields.employee_id, { type: "hidden" })}
               />
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10">
+              <div className='grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10'>
                 <Field
                   inputProps={{
                     ...getInputProps(fields.submitted_date, {
@@ -169,7 +198,7 @@ export default function AddReimbursements({
                 />
                 <SearchableSelectField
                   key={resetKey}
-                  className="w-full capitalize flex-1 "
+                  className='w-full capitalize flex-1 '
                   options={transformStringArrayIntoOptions(
                     reimbursementStatusArray as unknown as string[]
                   )}
@@ -185,7 +214,7 @@ export default function AddReimbursements({
                   errors={fields.status.errors}
                 />
               </div>
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10">
+              <div className='grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10'>
                 <Field
                   inputProps={{
                     ...getInputProps(fields.amount, {
@@ -209,7 +238,7 @@ export default function AddReimbursements({
                     }),
                     placeholder: "Select an authority that approved",
                   }}
-                  className="lowercase"
+                  className='lowercase'
                   options={(userOptions as any) ?? userOptionsFromUpdate}
                   labelProps={{
                     children: "Approved By",
@@ -219,7 +248,7 @@ export default function AddReimbursements({
               </div>
 
               <CheckboxField
-                className="mt-8"
+                className='mt-8'
                 buttonProps={getInputProps(fields.is_deductible, {
                   type: "checkbox",
                 })}

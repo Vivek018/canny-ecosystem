@@ -1,8 +1,10 @@
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
+import { clearCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { deleteReimbursementById } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 import {
   deleteRole,
   hasPermission,
@@ -10,8 +12,13 @@ import {
 } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { json, type ActionFunctionArgs } from "@remix-run/node";
+import { useActionData, useNavigate } from "@remix-run/react";
+import { useEffect } from "react";
 
-export async function action({ params, request }: ActionFunctionArgs) {
+export async function action({
+  params,
+  request,
+}: ActionFunctionArgs): Promise<Response> {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
@@ -22,18 +29,75 @@ export async function action({ params, request }: ActionFunctionArgs) {
   }
 
   const reimbursementId = params.reimbursementId;
+  try {
+    const formData = await request.formData();
+    const employeeId = formData.get("employeeId");
+    const returnTo = formData.get("returnTo") as string;
+    const { error, status } = await deleteReimbursementById({
+      supabase,
+      id: reimbursementId ?? "",
+    });
 
-  const formData = await request.formData();
-  const employeeId = formData.get("employeeId");
-  const returnTo = formData.get("returnTo");
-  const { error, status } = await deleteReimbursementById({
-    supabase,
-    id: reimbursementId as string,
-  });
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Employee deleted successfully",
+        employeeId,
+        returnTo,
+        error,
+      });
+    }
 
-  if (isGoodStatus(status)) {
-    return safeRedirect(returnTo ?? `/employees/${employeeId}/reimbursements`);
+    return json(
+      {
+        status: "error",
+        message: "Failed to delete employee",
+        employeeId,
+        returnTo,
+        error,
+      },
+      { status: 500 }
+    );
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      employeeId: "",
+      returnTo: "",
+      error,
+    });
   }
+}
 
-  return json({ error: error?.toString() }, { status: 500 });
+export default function DeleteEmployee() {
+  const actionData = useActionData<typeof action>();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (actionData) {
+      if (actionData?.status === "success") {
+        clearCacheEntry(
+          `${cacheKeyPrefix.employee_reimbursements}${actionData.employeeId}`
+        );
+        toast({
+          title: "Success",
+          description: actionData?.message || "Employee deleted",
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description:
+            actionData?.error ??
+            actionData?.message ??
+            "Employee delete failed",
+          variant: "destructive",
+        });
+      }
+      navigate(actionData?.returnTo ?? "/approvals/reimbursements");
+    }
+  }, [actionData]);
+
+  return null;
 }

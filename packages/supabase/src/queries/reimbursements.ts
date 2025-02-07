@@ -66,6 +66,17 @@ export async function getReimbursementsByCompanyId({
   };
 }) {
   const { from, to, sort, searchQuery, filters } = params;
+
+  const {
+    submitted_date_start,
+    submitted_date_end,
+    status,
+    is_deductible,
+    users,
+    project,
+    project_site,
+  } = filters ?? {};
+
   const columns = [
     "id",
     "company_id",
@@ -79,8 +90,8 @@ export async function getReimbursementsByCompanyId({
     .from("reimbursements")
     .select(
       `${columns.join(",")},
-          employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(project_sites!inner(id, name, projects!inner(id, name)))),
-          users!inner(id,email)`,
+          employees!left(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? 'inner' : 'left'}(project_sites!${project_site ? 'inner' : 'left'}(id, name, projects!${project_site ? 'inner' : 'left'}(id, name)))),
+          users!${users ? 'inner' : 'left'}(id,email)`,
       { count: "exact" },
     )
     .eq("company_id", companyId);
@@ -113,49 +124,40 @@ export async function getReimbursementsByCompanyId({
     }
   }
 
-  if (filters) {
-    const {
-      submitted_date_start,
-      submitted_date_end,
-      status,
-      is_deductible,
-      users,
-      project,
-      project_site,
-    } = filters;
 
-    const dateFilters = [
-      {
-        field: "submitted_date",
-        start: submitted_date_start,
-        end: submitted_date_end,
-      },
-    ];
-    for (const { field, start, end } of dateFilters) {
-      if (start) query.gte(field, formatUTCDate(start));
-      if (end) query.lte(field, formatUTCDate(end));
-    }
-    if (status) {
-      query.eq("status", status.toLowerCase());
-    }
-    if (is_deductible) {
-      query.eq("is_deductible", is_deductible.toLowerCase());
-    }
-    if (users) {
-      query.eq("users.email", users);
-    }
-    if (project) {
-      query.eq(
-        "employees.employee_project_assignment.project_sites.projects.name",
-        project,
-      );
-    }
-    if (project_site) {
-      query.eq(
-        "employees.employee_project_assignment.project_sites.name",
-        project_site,
-      );
-    }
+
+  const dateFilters = [
+    {
+      field: "submitted_date",
+      start: submitted_date_start,
+      end: submitted_date_end,
+    },
+  ];
+  for (const { field, start, end } of dateFilters) {
+    if (start) query.gte(field, formatUTCDate(start));
+    if (end) query.lte(field, formatUTCDate(end));
+  }
+  if (status) {
+    query.eq("status", status.toLowerCase());
+  }
+  if (is_deductible) {
+    query.eq("is_deductible", is_deductible.toLowerCase());
+  }
+  if (users) {
+    query.eq("users.email", users);
+  }
+  if (project) {
+    query.eq(
+      "employees.employee_project_assignment.project_sites.projects.name",
+      project,
+    );
+  }
+  if (project_site) {
+    query.eq(
+      "employees.employee_project_assignment.project_sites.name",
+      project_site,
+    );
+
   }
 
   const { data, count, error } = await query.range(from, to);
@@ -223,6 +225,16 @@ export async function getReimbursementsByEmployeeId({
   };
 }) {
   const { from, to, sort, filters } = params;
+
+
+  const {
+    submitted_date_start,
+    submitted_date_end,
+    status,
+    is_deductible,
+    users,
+  } = filters ?? {};
+
   const columns = [
     "id",
     "company_id",
@@ -237,8 +249,8 @@ export async function getReimbursementsByEmployeeId({
     .select(
       `
         ${columns.join(",")},
-          employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(project_sites!inner(id, name, projects!inner(id, name)))),
-          users!inner(id,email)`,
+          employees!inner(id, first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!left(project_sites!left(id, name, projects!left(id, name)))),
+          users!${users ? 'inner' : 'left'}(id,email)`,
       { count: "exact" },
     )
     .eq("employee_id", employeeId);
@@ -251,13 +263,7 @@ export async function getReimbursementsByEmployeeId({
   }
 
   if (filters) {
-    const {
-      submitted_date_start,
-      submitted_date_end,
-      status,
-      is_deductible,
-      users,
-    } = filters;
+
 
     const dateFilters = [
       {
