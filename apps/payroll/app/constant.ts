@@ -112,109 +112,76 @@ export const VALID_FILTERS = [
   {
     name: "name",
     valueType: "string",
-    description:
-      "Filter by the name, project name, site name, employee code and mobile number of the individual",
-    example: [
-      "John Doe",
-      "Synthentica",
-      "UABEADX",
-      "Main Site",
-      "Kota Site",
-      "EMP123",
-      "9876543210",
-      "...",
-    ],
+    example: ["John Doe", "Synthentica", "EMP123"],
   },
   {
     name: "dob_start",
     valueType: "date",
-    description:
-      "Filter for dates of birth on or after the specified date. Format: YYYY-MM-DD.",
     example: "1990-01-01",
   },
   {
     name: "dob_end",
     valueType: "date",
-    description:
-      "Filter for dates of birth on or before the specified date. Format: YYYY-MM-DD.",
     example: "2000-12-31",
   },
   {
     name: "gender",
     valueType: genderArray,
-    description: "Filter by gender",
     example: "male",
   },
   {
     name: "education",
     valueType: educationArray,
-    description: "Filter by the highest level of education.",
     example: "Bachelor's",
   },
   {
     name: "status",
     valueType: statusArray,
-    description:
-      "Filter by employment status. Example: 'active', 'inactive', 'terminated'.",
     example: "active",
   },
   {
     name: "project",
     valueType: "string",
-    description: "Filter by project name or identifier.",
     example: "Project A",
   },
   {
     name: "project_site",
     valueType: "string",
-    description: "Filter by the project site location or name.",
     example: "Site B",
   },
   {
     name: "assignment_type",
     valueType: assignmentTypeArray,
-    description:
-      "Filter by type of assignment. Example: 'full-time', 'part-time', 'contract'.",
     example: "full-time",
   },
   {
     name: "position",
     valueType: positionArray,
-    description: "Filter by job position or title.",
     example: "Software Engineer",
   },
   {
     name: "skill_level",
     valueType: skillLevelArray,
-    description: "Filter by skill level. Example: 'junior', 'mid', 'senior'.",
     example: "senior",
   },
   {
     name: "doj_start",
     valueType: "date",
-    description:
-      "Filter for dates of joining on or after the specified date. Format: YYYY-MM-DD.",
     example: "2020-01-01",
   },
   {
     name: "doj_end",
     valueType: "date",
-    description:
-      "Filter for dates of joining on or before the specified date. Format: YYYY-MM-DD.",
     example: "2023-12-31",
   },
   {
     name: "dol_start",
     valueType: "date",
-    description:
-      "Filter for dates of leaving on or after the specified date. Format: YYYY-MM-DD.",
     example: "2022-01-01",
   },
   {
     name: "dol_end",
     valueType: "date",
-    description:
-      "Filter for dates of leaving on or before the specified date. Format: YYYY-MM-DD.",
     example: "2024-11-30",
   },
 ];

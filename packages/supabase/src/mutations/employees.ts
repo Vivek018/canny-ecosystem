@@ -79,59 +79,41 @@ export async function createEmployee({
   }
 
   if (data?.id) {
-    let employeeStatutoryDetailsError = null;
-    if (employeeStatutoryDetailsData && Object.keys(employeeStatutoryDetailsData)?.length) {
-      const { error } =
-        await createEmployeeStatutoryDetails({
-          supabase,
-          data: { ...employeeStatutoryDetailsData, employee_id: data.id },
-          bypassAuth,
-        });
-      employeeStatutoryDetailsError = error;
-    }
-
-    let employeeBankDetailsError = null;
-    if (employeeBankDetailsData && Object.keys(employeeBankDetailsData)?.length) {
-      const { error } = await createEmployeeBankDetails(
-        {
-          supabase,
-          data: { ...employeeBankDetailsData, employee_id: data.id },
-          bypassAuth,
-        }
-      );
-      employeeBankDetailsError = error;
-    }
-
-    let employeeProjectAssignmentError = null;
-    if (employeeProjectAssignmentData && Object.keys(employeeProjectAssignmentData)?.length) {
-      const { error } =
-        await createEmployeeProjectAssignment({
-          supabase,
-          data: { ...employeeProjectAssignmentData, employee_id: data.id },
-          bypassAuth,
-        });
-      employeeProjectAssignmentError = error;
-    }
-
-    let employeeAddressesError = null;
-    if (employeeAddressesData && Object.keys(employeeAddressesData)?.length) {
-      const { error } = await createEmployeeAddresses({
+    const { error: employeeStatutoryDetailsError, status } =
+      await createEmployeeStatutoryDetails({
         supabase,
-        data: { ...employeeAddressesData, employee_id: data.id },
+        data: { ...employeeStatutoryDetailsData, employee_id: data.id },
         bypassAuth,
       });
-      employeeAddressesError = error;
-    }
 
-    let employeeGuardiansError = null;
-    if (employeeGuardiansData && Object.keys(employeeGuardiansData)?.length) {
-    const { error } = await createEmployeeGuardians({
+
+    const { error: employeeBankDetailsError } = await createEmployeeBankDetails(
+      {
+        supabase,
+        data: { ...employeeBankDetailsData, employee_id: data.id },
+        bypassAuth,
+      }
+    );
+
+
+    const { error: employeeProjectAssignmentError } =
+      await createEmployeeProjectAssignment({
+        supabase,
+        data: { ...employeeProjectAssignmentData, employee_id: data.id },
+        bypassAuth,
+      });
+
+    const { error: employeeAddressesError } = await createEmployeeAddresses({
+      supabase,
+      data: { ...employeeAddressesData, employee_id: data.id },
+      bypassAuth,
+    });
+
+    const { error: employeeGuardiansError } = await createEmployeeGuardians({
       supabase,
       data: { ...employeeGuardiansData, employee_id: data.id },
       bypassAuth,
     });
-    employeeGuardiansError = error;
-  }
 
     return {
       data,

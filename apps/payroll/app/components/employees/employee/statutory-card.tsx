@@ -6,7 +6,7 @@ import { Icon } from "@canny_ecosystem/ui/icon";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { formatDate, hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
-import { Link } from "@remix-run/react";
+import { Link, useParams } from "@remix-run/react";
 
 type DetailItemProps = {
   label: string;
@@ -36,60 +36,63 @@ export const EmployeeStatutoryCard: React.FC<{
   employeeStatutory: EmployeeStatutoryDetails | null;
 }> = ({ employeeStatutory }) => {
   const { role } = useUserRole();
+  const {employeeId} = useParams();
+
   return (
-    <Card className="rounded w-full h-full p-4 flex flex-col gap-6">
-      <div className="w-full flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Statutory Details</h2>
+    <Card className='rounded w-full h-full p-4 flex flex-col gap-6'>
+      <div className='w-full flex items-center justify-between'>
+        <h2 className='text-xl font-semibold'>Statutory Details</h2>
         <Link
-          prefetch="intent"
-          to={`/employees/${employeeStatutory?.employee_id}/update-statutory-details`}
+          prefetch='intent'
+          to={`/employees/${employeeId}/update-statutory-details`}
           className={cn(
             buttonVariants({ variant: "outline" }),
             "bg-card",
-            !employeeStatutory && "hidden",
-            !hasPermission(role, `${updateRole}:${attribute.employeeStatutory}`) &&
-              "hidden"
+            !hasPermission(
+              role,
+              `${updateRole}:${attribute.employeeStatutory}`
+            ) && "hidden"
           )}
         >
-          <Icon name="edit" className="mr-2" />
+          <Icon name='edit' className='mr-2' />
           Edit
         </Link>
       </div>
 
       {employeeStatutory ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5'>
           <DetailItem
-            label="Aadhaar Number"
+            label='Aadhaar Number'
             value={employeeStatutory.aadhaar_number}
           />
-          <DetailItem label="PAN Number" value={employeeStatutory.pan_number} />
-          <DetailItem label="UAN Number" value={employeeStatutory.uan_number} />
-          <DetailItem label="PF Number" value={employeeStatutory.pf_number} />
+          <DetailItem label='PAN Number' value={employeeStatutory.pan_number} />
+          <DetailItem label='UAN Number' value={employeeStatutory.uan_number} />
+          <DetailItem label='PF Number' value={employeeStatutory.pf_number} />
           <DetailItem
-            label="ESIC Number"
+            label='ESIC Number'
             value={employeeStatutory.esic_number}
           />
           <DetailItem
-            label="Driving License Number"
+            label='Driving License Number'
             value={employeeStatutory.driving_license_number}
           />
           <DetailItem
-            label="Driving License Expiry"
+            label='Driving License Expiry'
             value={employeeStatutory.driving_license_expiry}
             formatter={formatDate}
           />
           <DetailItem
-            label="Passport Number"
+            label='Passport Number'
             value={employeeStatutory.passport_number}
           />
           <DetailItem
-            label="Passport Expiry"
+            label='Passport Expiry'
             value={employeeStatutory.passport_expiry}
             formatter={formatDate}
           />
         </div>
       ) : (
-        <div className="text-center py-8">
+        <div className='text-center py-8'>
           <p>No statutory data available.</p>
         </div>
       )}

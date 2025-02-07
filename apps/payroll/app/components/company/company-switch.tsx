@@ -45,6 +45,7 @@ export const CompanySwitch = ({
   const currentCompany = companies.find((company) => company.id === companyId);
 
   const onValueChange = (value: string) => {
+    clearAllCache();
     submit(
       { companyId: value, returnTo: DEFAULT_ROUTE },
       {
@@ -52,7 +53,6 @@ export const CompanySwitch = ({
         action: "/cookie",
       }
     );
-    clearAllCache();
     setOpen(false);
   };
 
@@ -65,7 +65,7 @@ export const CompanySwitch = ({
           aria-expanded={open}
           disabled={!hasPermission(role, `${updateRole}:${attribute.company}`)}
           className={cn(
-            "bg-card truncate justify-between capitalize rounded pl-1.5 pr-3 w-64 h-12 disabled:opacity-100",
+            "bg-card truncate justify-between capitalize rounded pl-1.5 pr-3 w-72 h-12 disabled:opacity-100",
             !currentCompany && "text-muted-foreground"
           )}
         >
@@ -77,8 +77,8 @@ export const CompanySwitch = ({
                 </span>
               </AvatarFallback>
             </Avatar>
-            <p className='w-40 text-start truncate'>
-              {currentCompany ? currentCompany.name : "Select a company"}
+            <p className='w-48 text-start truncate'>
+              {currentCompany ? currentCompany?.name : "Select a company"}
             </p>
           </div>
           <Icon
@@ -92,7 +92,7 @@ export const CompanySwitch = ({
           />
         </Button>
       </PopoverTrigger>
-      <PopoverContent sideOffset={10} align='end' className='p-0 w-64'>
+      <PopoverContent sideOffset={10} align='end' className='p-0 w-72'>
         <Command>
           <CommandInput placeholder='Search companies...' />
           <CommandEmpty className='w-full py-6 text-center'>
@@ -116,7 +116,7 @@ export const CompanySwitch = ({
                         </span>
                       </AvatarFallback>
                     </Avatar>
-                    <p className='font-medium tracking-wide ml-1 truncate w-40'>
+                    <p className='font-medium tracking-wide ml-1 truncate w-48'>
                       {replaceUnderscore(company.name)}
                     </p>
                   </div>

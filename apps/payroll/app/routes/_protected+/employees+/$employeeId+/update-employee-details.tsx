@@ -28,8 +28,9 @@ import type { EmployeeDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearCacheEntry } from "@/utils/cache";
 
 export const UPDATE_EMPLOYEE = "update-employee";
 
@@ -58,7 +59,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       error: null,
     });
   } catch (error) {
-    return json({
+    return defer({
       error,
       employeeId,
       employeePromise: null,
@@ -173,6 +174,7 @@ export function UpdateEmployeeDetailsWrapper({
     }
     if (actionData) {
       if (actionData?.status === "success") {
+        clearCacheEntry(cacheKeyPrefix.employees);
         toast({
           title: "Success",
           description: actionData?.message || "Employee updated",

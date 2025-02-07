@@ -34,8 +34,9 @@ import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearCacheEntry } from "@/utils/cache";
 
 export const UPDATE_EMPLOYEE_PROJECT_ASSIGNMENT =
   "update-employee-project-assignment";
@@ -220,10 +221,10 @@ export default function UpdateEmployeeProjectAssignment() {
         description: error?.message || "Failed to load",
         variant: "destructive",
       });
-      navigate(`/employees/${data?.employee_id}/work-portfolio`);
     }
     if (actionData) {
       if (actionData?.status === "success") {
+        clearCacheEntry(cacheKeyPrefix.employees);
         toast({
           title: "Success",
           description: actionData?.message || "Employee updated",

@@ -187,7 +187,7 @@ export function UpdateEmployeeBankDetailsWrapper({
           variant: "destructive",
         });
       }
-      navigate(`/employees/${employeeId}/work-portfolio`);
+      navigate(`/employees/${employeeId}/overview`);
     }
   }, [actionData]);
 

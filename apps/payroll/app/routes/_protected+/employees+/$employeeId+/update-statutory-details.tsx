@@ -39,7 +39,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.employeeStatutory}`)) {
+  if (
+    !hasPermission(user?.role!, `${updateRole}:${attribute.employeeStatutory}`)
+  ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
@@ -118,7 +120,7 @@ export default function UpdateStatutoryDetails() {
 
   if (error)
     return (
-      <ErrorBoundary error={error} message="Failed to load statutory details" />
+      <ErrorBoundary error={error} message='Failed to load statutory details' />
     );
 
   return (
@@ -126,7 +128,7 @@ export default function UpdateStatutoryDetails() {
       <Await resolve={employeeStatutoryDetailsPromise}>
         {(resolvedData) => {
           if (!resolvedData)
-            return <ErrorBoundary message="Failed to load statutory details" />;
+            return <ErrorBoundary message='Failed to load statutory details' />;
           return (
             <UpdateStatutoryDetailsWrapper
               data={resolvedData.data}
@@ -174,7 +176,6 @@ export function UpdateStatutoryDetailsWrapper({
         description: error.message || "Failed to get statutory details",
         variant: "destructive",
       });
-      navigate(`/employees/${data?.employee_id}/work-portfolio`);
     }
     if (actionData) {
       if (actionData?.status === "success") {
@@ -190,18 +191,18 @@ export function UpdateStatutoryDetailsWrapper({
           variant: "destructive",
         });
       }
-      navigate(`/employees/${employeeId}/work-portfolio`);
+      navigate(`/employees/${employeeId}/overview`);
     }
   }, [actionData]);
 
   return (
-    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
+    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
       <FormProvider context={form.context}>
         <Form
-          method="POST"
-          encType="multipart/form-data"
+          method='POST'
+          encType='multipart/form-data'
           {...getFormProps(form)}
-          className="flex flex-col"
+          className='flex flex-col'
         >
           <Card>
             <CreateEmployeeStatutoryDetails

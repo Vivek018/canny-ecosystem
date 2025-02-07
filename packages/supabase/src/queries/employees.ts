@@ -38,7 +38,7 @@ export type GetEmployeesByCompanyIdParams = {
   from: number;
   sort?: [string, "asc" | "desc"];
   searchQuery?: string;
-  filters?: EmployeeFilters;
+  filters?: EmployeeFilters | null;
 };
 
 export type EmployeeDataType = Pick<
@@ -104,16 +104,33 @@ export async function getEmployeesByCompanyId({
 }) {
   const { sort, from, to, filters, searchQuery } = params;
 
+  const {
+    dob_start,
+    dob_end,
+    education,
+    gender,
+    status,
+    project,
+    project_site,
+    assignment_type,
+    position,
+    skill_level,
+    doj_start,
+    doj_end,
+    dol_start,
+    dol_end,
+  } = filters ?? {};
+
   const hasProjectAssignmentFilter = Object.values({
-    project: filters?.project,
-    project_site: filters?.project_site,
-    assignment_type: filters?.assignment_type,
-    position: filters?.position,
-    skill_level: filters?.skill_level,
-    doj_start: filters?.doj_start,
-    doj_end: filters?.doj_end,
-    dol_start: filters?.dol_start,
-    dol_end: filters?.dol_end,
+    project: project,
+    project_site: project_site,
+    assignment_type: assignment_type,
+    position: position,
+    skill_level: skill_level,
+    doj_start: doj_start,
+    doj_end: doj_end,
+    dol_start: dol_start,
+    dol_end: dol_end,
   }).some((value) => value);
 
   const columns = [
@@ -141,7 +158,6 @@ export async function getEmployeesByCompanyId({
     )
     .eq("company_id", companyId);
 
-  // Sorting
   if (sort) {
     const [column, direction] = sort;
     query.order(column, { ascending: direction === "asc" });
@@ -149,79 +165,57 @@ export async function getEmployeesByCompanyId({
     query.order("created_at", { ascending: false });
   }
 
-  // Full-text search
   if (searchQuery) {
     query.textSearch("fts_vector", `'${searchQuery}'`, { type: "plain" });
   }
 
-  // Filters
-  if (filters) {
-    const {
-      dob_start,
-      dob_end,
-      education,
-      gender,
-      status,
-      project,
-      project_site,
-      assignment_type,
-      position,
-      skill_level,
-      doj_start,
-      doj_end,
-      dol_start,
-      dol_end,
-    } = filters;
+  const dateFilters = [
+    { field: "date_of_birth", start: dob_start, end: dob_end },
+    {
+      field: "employee_project_assignment.start_date",
+      start: doj_start,
+      end: doj_end,
+    },
+    {
+      field: "employee_project_assignment.end_date",
+      start: dol_start,
+      end: dol_end,
+    },
+  ];
 
-    const dateFilters = [
-      { field: "date_of_birth", start: dob_start, end: dob_end },
-      {
-        field: "employee_project_assignment.start_date",
-        start: doj_start,
-        end: doj_end,
-      },
-      {
-        field: "employee_project_assignment.end_date",
-        start: dol_start,
-        end: dol_end,
-      },
-    ];
-
-    for (const { field, start, end } of dateFilters) {
-      if (start) query.gte(field, formatUTCDate(start));
-      if (end) query.lte(field, formatUTCDate(end));
-    }
-
-    if (status) {
-      query.eq("is_active", status === "active");
-    }
-    if (gender) {
-      query.eq("gender", gender.toLowerCase());
-    }
-    if (education) {
-      query.eq("education", education.toLowerCase());
-    }
-    if (project) {
-      query.eq(
-        "employee_project_assignment.project_sites.projects.name",
-        project
-      );
-    }
-    if (project_site) {
-      query.eq("employee_project_assignment.project_sites.name", project_site);
-    }
-    if (assignment_type) {
-      query.eq("employee_project_assignment.assignment_type", assignment_type);
-    }
-    if (position) {
-      query.eq("employee_project_assignment.position", position);
-    }
-    if (skill_level) {
-      query.eq("employee_project_assignment.skill_level", skill_level);
-    }
+  for (const { field, start, end } of dateFilters) {
+    if (start) query.gte(field, formatUTCDate(start));
+    if (end) query.lte(field, formatUTCDate(end));
   }
 
-  // Fetch Data
+  if (status) {
+    query.eq("is_active", status === "active");
+  }
+  if (gender) {
+    query.eq("gender", gender.toLowerCase());
+  }
+  if (education) {
+    query.eq("education", education.toLowerCase());
+  }
+  if (project) {
+    query.eq(
+      "employee_project_assignment.project_sites.projects.name",
+      project
+    );
+  }
+  if (project_site) {
+    query.eq("employee_project_assignment.project_sites.name", project_site);
+  }
+  if (assignment_type) {
+    query.eq("employee_project_assignment.assignment_type", assignment_type);
+  }
+  if (position) {
+    query.eq("employee_project_assignment.position", position);
+  }
+  if (skill_level) {
+    query.eq("employee_project_assignment.skill_level", skill_level);
+  }
+
   const { data, count, error } = await query.range(from, to);
 
   if (error) {
@@ -379,7 +373,7 @@ export async function getEmployeeStatutoryDetailsById({
     .from("employee_statutory_details")
     .select(columns.join(","))
     .eq("employee_id", id)
-    .single<
+    .maybeSingle<
       InferredType<
         EmployeeStatutoryDetailsDatabaseRow,
         (typeof columns)[number]
@@ -414,7 +408,7 @@ export async function getEmployeeBankDetailsById({
     .from("employee_bank_details")
     .select(columns.join(","))
     .eq("employee_id", id)
-    .single<
+    .maybeSingle<
       InferredType<EmployeeBankDetailsDatabaseRow, (typeof columns)[number]>
     >();
 
@@ -733,7 +727,7 @@ export async function getEmployeeProjectAssignmentByEmployeeId({
       )}, project_sites(id, name, projects(name)), supervisor:employees!employee_project_assignments_supervisor_id_fkey(id, employee_code)`
     )
     .eq("employee_id", employeeId)
-    .single<EmployeeProjectAssignmentDataType>();
+    .maybeSingle<EmployeeProjectAssignmentDataType>();
 
   if (error) {
     console.error(error);

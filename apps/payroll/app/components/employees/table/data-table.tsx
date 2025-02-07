@@ -31,7 +31,7 @@ interface DataTableProps<TData, TValue> {
   count: number;
   hasNextPage: boolean;
   query?: string | null;
-  filters?: EmployeeFilters;
+  filters?: EmployeeFilters | null;
   noFilters?: boolean;
   pageSize: number;
   initialColumnVisibility?: VisibilityState;
