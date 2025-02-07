@@ -2,8 +2,8 @@ import { MILLISECONDS_IN_A_MIN } from "@canny_ecosystem/utils/constant";
 import { LRUCache } from "lru-cache";
 
 const lruCache = new LRUCache<string, any>({
-  max: 100,
-  ttl: MILLISECONDS_IN_A_MIN * 60,
+  max: 200,
+  ttl: MILLISECONDS_IN_A_MIN * 60 * 10, // 10 hours
   allowStale: false,
 });
 
@@ -47,14 +47,14 @@ export async function setDeferCache<T extends Record<string, unknown>>(
 export function getDeferCache<T extends Record<string, unknown>>(
   cacheKey: string
 ): T | undefined {
-  return lruCache.has(cacheKey) ? (lruCache.get(cacheKey) as T) : undefined;
+  return (lruCache.get(cacheKey) as T);
 }
 
 export async function clientCaching<
   T extends Record<string, unknown>,
 >(cacheKey: string, { serverLoader }: any): Promise<T> {
   if (lruCache.has(cacheKey)) {
-    return lruCache.get(cacheKey)! as T;
+    return getDeferCache(cacheKey) as T;
   }
 
   const serverData = (await serverLoader()) as T;

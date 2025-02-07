@@ -6,22 +6,21 @@ import {
   useActionData,
   useLoaderData,
   useNavigate,
-  useParams,
 } from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import {
+  createRole,
   EmployeeProjectAssignmentSchema,
+  getInitialValueFromZod,
   hasPermission,
   isGoodStatus,
-  updateRole,
 } from "@canny_ecosystem/utils";
 import {
-  getEmployeeProjectAssignmentByEmployeeId,
   getEmployeesByPositionAndProjectSiteId,
   getProjectsByCompanyId,
   getSitesByProjectId,
 } from "@canny_ecosystem/supabase/queries";
-import { updateEmployeeProjectAssignment } from "@canny_ecosystem/supabase/mutations";
+import { createEmployeeProjectAssignment } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { useEffect, useState } from "react";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
@@ -39,8 +38,8 @@ import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { clearCacheEntry } from "@/utils/cache";
 
-export const UPDATE_EMPLOYEE_PROJECT_ASSIGNMENT =
-  "update-employee-project-assignment";
+export const ADD_EMPLOYEE_PROJECT_ASSIGNMENT =
+  "add-employee-project-assignment";
 
 export async function loader({
   request,
@@ -54,7 +53,7 @@ export async function loader({
   if (
     !hasPermission(
       `${user?.role!}`,
-      `${updateRole}:${attribute.employeeProjectAssignment}`
+      `${createRole}:${attribute.employeeProjectAssignment}`
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -63,23 +62,6 @@ export async function loader({
   try {
     const url = new URL(request.url);
     const urlSearchParams = new URLSearchParams(url.searchParams);
-
-    let projectAssignmentData = null;
-
-    if (employeeId) {
-      projectAssignmentData = await getEmployeeProjectAssignmentByEmployeeId({
-        supabase,
-        employeeId: employeeId,
-      });
-    }
-
-    if (projectAssignmentData?.error) {
-      return json({
-        status: "error",
-        message: "Failed to get employee project assignment",
-        error: projectAssignmentData.error,
-      });
-    }
 
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
     const { data: projects } = await getProjectsByCompanyId({
@@ -130,8 +112,7 @@ export async function loader({
 
     return json({
       status: "success",
-      message: "Employee project assignment found",
-      data: projectAssignmentData?.data,
+      employeeId,
       projectOptions,
       projectSiteOptions,
       siteEmployeeOptions,
@@ -139,6 +120,7 @@ export async function loader({
   } catch (error) {
     return json({
       status: "error",
+      employeeId,
       message: "An unexpected error occurred",
       error,
     });
@@ -147,8 +129,10 @@ export async function loader({
 
 export async function action({
   request,
+  params,
 }: ActionFunctionArgs): Promise<Response> {
   try {
+    const employeeId = params.employeeId;
     const { supabase } = getSupabaseWithHeaders({ request });
     const formData = await request.formData();
 
@@ -163,21 +147,24 @@ export async function action({
       );
     }
 
-    const { status, error } = await updateEmployeeProjectAssignment({
+    const { status, error } = await createEmployeeProjectAssignment({
       supabase,
-      data: submission.value,
+      data: {
+        ...submission.value,
+        employee_id: submission.value.employee_id ?? employeeId ?? "",
+      },
     });
 
     if (isGoodStatus(status)) {
       return json({
         status: "success",
-        message: "Employee project assignment updated successfully",
+        message: "Employee project assignment created successfully",
         error: null,
       });
     }
     return json({
       status: "error",
-      message: "Failed to update employee project assignment",
+      message: "Failed to create employee project assignment",
       error,
     });
   } catch (error) {
@@ -189,9 +176,9 @@ export async function action({
   }
 }
 
-export default function UpdateEmployeeProjectAssignment() {
+export default function CreateEmployeeProjectAssignmentRoute() {
   const {
-    data,
+    employeeId,
     projectOptions,
     projectSiteOptions,
     siteEmployeeOptions,
@@ -202,19 +189,20 @@ export default function UpdateEmployeeProjectAssignment() {
   const [resetKey, setResetKey] = useState(Date.now());
   const currentSchema = EmployeeProjectAssignmentSchema;
 
+  const initialValues = getInitialValueFromZod(currentSchema);
+
   const [form, fields] = useForm({
-    id: UPDATE_EMPLOYEE_PROJECT_ASSIGNMENT,
+    id: ADD_EMPLOYEE_PROJECT_ASSIGNMENT,
     constraint: getZodConstraint(currentSchema),
     onValidate: ({ formData }: { formData: FormData }) => {
       return parseWithZod(formData, { schema: currentSchema });
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
-    defaultValue: data,
+    defaultValue: { ...initialValues, employee_id: employeeId },
   });
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { employeeId } = useParams();
 
   useEffect(() => {
     if (status === "error") {
@@ -232,17 +220,20 @@ export default function UpdateEmployeeProjectAssignment() {
         );
         toast({
           title: "Success",
-          description: actionData?.message || "Employee updated",
+          description:
+            actionData?.message || "Employee project assignment created",
           variant: "success",
         });
       } else {
         toast({
           title: "Error",
-          description: actionData?.error?.message || "Employee update failed",
+          description:
+            actionData?.error?.message ||
+            "Creating employee project assignmment failed",
           variant: "destructive",
         });
       }
-      navigate(`/employees/${data?.employee_id}/work-portfolio`);
+      navigate(`/employees/${employeeId}/work-portfolio`);
     }
   }, [actionData]);
 
@@ -259,7 +250,6 @@ export default function UpdateEmployeeProjectAssignment() {
             <CreateEmployeeProjectAssignment
               key={resetKey}
               fields={fields as any}
-              isUpdate={true}
               projectOptions={projectOptions}
               projectSiteOptions={projectSiteOptions}
               siteEmployeeOptions={siteEmployeeOptions}

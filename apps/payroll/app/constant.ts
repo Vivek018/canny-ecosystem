@@ -226,6 +226,9 @@ export const cacheKeyPrefix = {
   dashboard: "dashboard",
   employees_main: "employees-main",
   employees: "employees",
+  employee_overview: "employee-overview",
+  employee_work_portfolio: "employee-work-portfolio",
+  employee_reimbursements: "employee-reimbursements",
 }
 
 

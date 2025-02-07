@@ -47,8 +47,9 @@ import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearCacheEntry } from "@/utils/cache";
 
 export const ADD_EMPLOYEE_WORK_HISTORY = "add-employee-work-history";
 
@@ -190,6 +191,7 @@ export default function AddEmployeeWorkHistory({
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
+        clearCacheEntry(`${cacheKeyPrefix.employee_work_portfolio}${employeeId}`);
         toast({
           title: "Success",
           description: actionData?.message || "Employee work history created",

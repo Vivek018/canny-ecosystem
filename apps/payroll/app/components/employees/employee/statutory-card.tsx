@@ -4,7 +4,12 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Card } from "@canny_ecosystem/ui/card";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { formatDate, hasPermission, updateRole } from "@canny_ecosystem/utils";
+import {
+  createRole,
+  formatDate,
+  hasPermission,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { Link, useParams } from "@remix-run/react";
 
@@ -18,8 +23,8 @@ const DetailItem: React.FC<DetailItemProps> = ({ label, value, formatter }) => {
   const formattedValue = value ? (formatter ? formatter(value) : value) : "--";
 
   return (
-    <div className="flex flex-col items-start">
-      <h3 className="text-muted-foreground text-[13px] tracking-wide capitalize">
+    <div className='flex flex-col items-start'>
+      <h3 className='text-muted-foreground text-[13px] tracking-wide capitalize'>
         {label}
       </h3>
       <p>{formattedValue}</p>
@@ -36,7 +41,7 @@ export const EmployeeStatutoryCard: React.FC<{
   employeeStatutory: EmployeeStatutoryDetails | null;
 }> = ({ employeeStatutory }) => {
   const { role } = useUserRole();
-  const {employeeId} = useParams();
+  const { employeeId } = useParams();
 
   return (
     <Card className='rounded w-full h-full p-4 flex flex-col gap-6'>
@@ -51,11 +56,28 @@ export const EmployeeStatutoryCard: React.FC<{
             !hasPermission(
               role,
               `${updateRole}:${attribute.employeeStatutory}`
-            ) && "hidden"
+            ) && "hidden",
+            !employeeStatutory?.employee_id && "hidden"
           )}
         >
           <Icon name='edit' className='mr-2' />
           Edit
+        </Link>
+        <Link
+          prefetch='intent'
+          to={`/employees/${employeeId}/overview/add-statutory-details`}
+          className={cn(
+            buttonVariants({ variant: "outline" }),
+            "bg-card",
+            !hasPermission(
+              `${role}`,
+              `${createRole}:${attribute.employeeStatutory}`
+            ) && "hidden",
+            employeeStatutory?.employee_id && "hidden"
+          )}
+        >
+          <Icon name='plus-circled' className='mr-2' />
+          Add
         </Link>
       </div>
 

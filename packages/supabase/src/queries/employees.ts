@@ -252,7 +252,7 @@ export async function getEmployeesByPositionAndProjectSiteId({
     .eq("employee_project_assignment.project_site_id", projectSiteId)
     .eq("employee_project_assignment.position", position ?? "")
     .limit(MID_QUERY_LIMIT)
-    .returns<InferredType<EmployeeDatabaseRow, (typeof columns)[number]>[]>();
+    .returns<InferredType<EmployeeDatabaseRow, (typeof columns)[number]>[] | null>();
 
   if (error) {
     console.error(error);
@@ -446,7 +446,7 @@ export async function getEmployeeAddressesByEmployeeId({
     .eq("employee_id", employeeId)
     .limit(HARD_QUERY_LIMIT)
     .returns<
-      InferredType<EmployeeAddressDatabaseRow, (typeof columns)[number]>[]
+      InferredType<EmployeeAddressDatabaseRow, (typeof columns)[number]>[] | null
     >();
 
   if (error) {
@@ -484,7 +484,7 @@ export async function getEmployeeGuardiansByEmployeeId({
     .eq("employee_id", employeeId)
     .limit(HARD_QUERY_LIMIT)
     .returns<
-      InferredType<EmployeeGuardianDatabaseRow, (typeof columns)[number]>[]
+      InferredType<EmployeeGuardianDatabaseRow, (typeof columns)[number]>[] | null
     >();
 
   if (error) {
@@ -588,7 +588,7 @@ export async function getEmployeeSkillsByEmployeeId({
     .eq("employee_id", employeeId)
     .limit(HARD_QUERY_LIMIT)
     .returns<
-      InferredType<EmployeeSkillDatabaseRow, (typeof columns)[number]>[]
+      InferredType<EmployeeSkillDatabaseRow, (typeof columns)[number]>[] | null
     >();
 
   if (error) {
@@ -649,7 +649,7 @@ export async function getEmployeeWorkHistoriesByEmployeeId({
     .eq("employee_id", employeeId)
     .limit(HARD_QUERY_LIMIT)
     .returns<
-      InferredType<EmployeeWorkHistoryDatabaseRow, (typeof columns)[number]>[]
+      InferredType<EmployeeWorkHistoryDatabaseRow, (typeof columns)[number]>[] | null
     >();
 
   if (error) {

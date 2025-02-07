@@ -1,81 +1,55 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { getEmployeeStatutoryDetailsById } from "@canny_ecosystem/supabase/queries";
 import {
-  Await,
-  defer,
   Form,
   json,
   useActionData,
-  useLoaderData,
   useNavigate,
+  useParams,
 } from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { updateEmployeeStatutoryDetails } from "@canny_ecosystem/supabase/mutations";
+import { createEmployeeStatutoryDetails } from "@canny_ecosystem/supabase/mutations";
 import {
   isGoodStatus,
   EmployeeStatutorySchema,
   hasPermission,
-  updateRole,
+  createRole,
+  getInitialValueFromZod,
 } from "@canny_ecosystem/utils";
 import { CreateEmployeeStatutoryDetails } from "@/components/employees/form/create-employee-statutory-details";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
 import { Card } from "@canny_ecosystem/ui/card";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import type { EmployeeStatutoryDetailsDatabaseUpdate } from "@canny_ecosystem/supabase/types";
-import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { safeRedirect } from "@/utils/server/http.server";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { clearCacheEntry } from "@/utils/cache";
 
-export const UPDATE_EMPLOYEE_STATUTORY = "update-employee-statutory";
+export const ADD_EMPLOYEE_STATUTORY = "add-employee-statutory";
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
-  const employeeId = params.employeeId;
+export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
   if (
-    !hasPermission(user?.role!, `${updateRole}:${attribute.employeeStatutory}`)
+    !hasPermission(user?.role!, `${createRole}:${attribute.employeeStatutory}`)
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
-  try {
-    let employeeStatutoryDetailsPromise = null;
-
-    if (employeeId) {
-      employeeStatutoryDetailsPromise = getEmployeeStatutoryDetailsById({
-        supabase,
-        id: employeeId,
-      });
-    } else {
-      throw new Error("No employeeId provided");
-    }
-
-    return defer({
-      employeeStatutoryDetailsPromise,
-      employeeId,
-      error: null,
-    });
-  } catch (error) {
-    return json({
-      error,
-      employeeId,
-      employeeStatutoryDetailsPromise: null,
-    });
-  }
+  return {};
 }
 
 export async function action({
   request,
+  params,
 }: ActionFunctionArgs): Promise<Response> {
   try {
+    const employeeId = params.employeeId;
     const { supabase } = getSupabaseWithHeaders({ request });
     const formData = await request.formData();
 
@@ -90,106 +64,72 @@ export async function action({
       );
     }
 
-    const { status, error } = await updateEmployeeStatutoryDetails({
+    const { status, error } = await createEmployeeStatutoryDetails({
       supabase,
-      data: submission.value,
+      data: {
+        ...submission.value,
+        employee_id: submission.value.employee_id ?? employeeId ?? "",
+      },
     });
 
     if (isGoodStatus(status)) {
       return json({
         status: "success",
-        message: "Statutory updated successfully",
+        message: "Statutory created successfully",
         error: null,
       });
     }
     return json(
-      { status: "error", message: "Statutory update failed", error },
+      { status: "error", message: "Statutory create failed", error },
       { status: 500 }
     );
   } catch (error) {
     return json({
       status: "error",
-      message: "Statutory update failed",
+      message: "Statutory create failed",
       error,
     });
   }
 }
 
-export default function UpdateStatutoryDetails() {
-  const { employeeStatutoryDetailsPromise, error, employeeId } =
-    useLoaderData<typeof loader>();
-
-  if (error)
-    return (
-      <ErrorBoundary error={error} message='Failed to load statutory details' />
-    );
-
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Await resolve={employeeStatutoryDetailsPromise}>
-        {(resolvedData) => {
-          if (!resolvedData)
-            return <ErrorBoundary message='Failed to load statutory details' />;
-          return (
-            <UpdateStatutoryDetailsWrapper
-              data={resolvedData.data}
-              error={resolvedData.error}
-              employeeId={employeeId}
-            />
-          );
-        }}
-      </Await>
-    </Suspense>
-  );
-}
-
-export function UpdateStatutoryDetailsWrapper({
-  data,
-  error,
-  employeeId,
-}: {
-  data: EmployeeStatutoryDetailsDatabaseUpdate | null;
-  error: Error | null | { message: string };
-  employeeId: string | undefined;
-}) {
+export default function CreateStatutoryDetailsRoute() {
+  const { employeeId } = useParams();
   const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
+
   const currentSchema = EmployeeStatutorySchema;
+  const initialData = getInitialValueFromZod(currentSchema);
 
   const [form, fields] = useForm({
-    id: UPDATE_EMPLOYEE_STATUTORY,
+    id: ADD_EMPLOYEE_STATUTORY,
     constraint: getZodConstraint(currentSchema),
     onValidate: ({ formData }: { formData: FormData }) => {
       return parseWithZod(formData, { schema: currentSchema });
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
-    defaultValue: data,
+    defaultValue: { ...initialData, employee_id: employeeId },
   });
 
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (error) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to get statutory details",
-        variant: "destructive",
-      });
-    }
     if (actionData) {
       if (actionData?.status === "success") {
         clearCacheEntry(`${cacheKeyPrefix.employee_overview}${employeeId}`);
         toast({
           title: "Success",
-          description: actionData?.message || "Employee updated",
+          description:
+            actionData?.message || "Employee statutory details created",
           variant: "success",
         });
       } else {
         toast({
           title: "Error",
-          description: actionData?.error?.message || "Employee update failed",
+          description:
+            actionData?.error?.message ||
+            "Employee statutory details create failed",
           variant: "destructive",
         });
       }
@@ -210,7 +150,6 @@ export function UpdateStatutoryDetailsWrapper({
             <CreateEmployeeStatutoryDetails
               key={resetKey}
               fields={fields as any}
-              isUpdate={true}
             />
             <FormButtons
               form={form}

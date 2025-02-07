@@ -14,7 +14,7 @@ import {
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { parseWithZod } from "@conform-to/zod";
 import { json, type ActionFunctionArgs } from "@remix-run/node";
-import { useActionData, useNavigate } from "@remix-run/react";
+import { useActionData, useNavigate, useParams } from "@remix-run/react";
 import { useEffect } from "react";
 
 const UpdateActiveSchema = z.object({
@@ -81,11 +81,13 @@ export default function UpdateActive() {
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { employeeId } = useParams();
 
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
         clearCacheEntry(cacheKeyPrefix.employees);
+        clearCacheEntry(`${cacheKeyPrefix.employee_overview}${employeeId}`);
         toast({
           title: "Success",
           description: actionData?.message || "Employee updated",

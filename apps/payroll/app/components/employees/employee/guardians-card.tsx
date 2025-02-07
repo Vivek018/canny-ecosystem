@@ -171,7 +171,7 @@ export const EmployeeGuardiansCard = ({
           <Link
             to={
               hasPermission(role, `${updateRole}:${attribute.employeeGuardians}`)
-                ? "add-employee-address"
+                ? "add-employee-guardian"
                 : DEFAULT_ROUTE
             }
             className={cn(

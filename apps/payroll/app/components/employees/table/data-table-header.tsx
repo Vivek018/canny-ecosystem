@@ -15,7 +15,7 @@ type Props = {
 export const employeeColumnIdArray = [
   "employee_code",
   "full_name",
-  "mobile_number",
+  "primary_mobile_number",
   "date_of_birth",
   "education",
   "gender",

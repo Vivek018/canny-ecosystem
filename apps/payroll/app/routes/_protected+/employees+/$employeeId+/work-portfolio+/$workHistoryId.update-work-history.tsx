@@ -7,6 +7,7 @@ import {
   useActionData,
   useLoaderData,
   useNavigate,
+  useParams,
 } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
 import {
@@ -24,8 +25,9 @@ import type { EmployeeWorkHistoryDatabaseUpdate } from "@canny_ecosystem/supabas
 import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearCacheEntry } from "@/utils/cache";
 
 export const UPDATE_EMPLOYEE_WORK_HISTORY = "update-employee-work-history";
 
@@ -126,10 +128,12 @@ export default function UpdateEmployeeWorkHistory() {
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const {employeeId} = useParams();
 
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
+        clearCacheEntry(`${cacheKeyPrefix.employee_work_portfolio}${employeeId}`);
         toast({
           title: "Success",
           description: actionData?.message || "Employee work history updated",

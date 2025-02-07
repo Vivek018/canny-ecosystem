@@ -40,9 +40,10 @@ import { UPDATE_EMPLOYEE_SKILL } from "./$skillId.update-employee-skill";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { safeRedirect } from "@/utils/server/http.server";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearCacheEntry } from "@/utils/cache";
 
 export const ADD_EMPLOYEE_SKILL = "add-employee-skill";
 
@@ -180,6 +181,7 @@ export default function AddEmployeeSkill({
       navigate(`/employees/${employeeId}/work-portfolio`);
     }
     if (actionData) {
+      clearCacheEntry(`${cacheKeyPrefix.employee_work_portfolio}${employeeId}`);
       if (actionData.status === "success") {
         toast({
           title: "Success",

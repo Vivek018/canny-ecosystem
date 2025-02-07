@@ -1,82 +1,56 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { getEmployeeBankDetailsById } from "@canny_ecosystem/supabase/queries";
 import {
-  Await,
-  defer,
   Form,
   json,
   useActionData,
-  useLoaderData,
   useNavigate,
+  useParams,
 } from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { updateEmployeeBankDetails } from "@canny_ecosystem/supabase/mutations";
+import { createEmployeeBankDetails } from "@canny_ecosystem/supabase/mutations";
 import {
   isGoodStatus,
   EmployeeBankDetailsSchema,
-  updateRole,
   hasPermission,
+  createRole,
+  getInitialValueFromZod,
 } from "@canny_ecosystem/utils";
 import { CreateEmployeeBankDetails } from "@/components/employees/form/create-employee-bank-details";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
 import { Card } from "@canny_ecosystem/ui/card";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import type { EmployeeBankDetailsDatabaseUpdate } from "@canny_ecosystem/supabase/types";
-import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { clearCacheEntry } from "@/utils/cache";
 
-export const UPDATE_BANK_DETAILS = "update-employee-bank-details";
+export const ADD_BANK_DETAILS = "add-employee-bank-details";
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
-  const employeeId = params.employeeId;
+export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
   if (
     !hasPermission(
       user?.role!,
-      `${updateRole}:${attribute.employeeBankDetails}`
+      `${createRole}:${attribute.employeeBankDetails}`
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
-  try {
-    let employeeBankDetailsPromise = null;
-
-    if (employeeId) {
-      employeeBankDetailsPromise = getEmployeeBankDetailsById({
-        supabase,
-        id: employeeId,
-      });
-    } else {
-      throw new Error("No employeeId provided");
-    }
-
-    return defer({
-      employeeBankDetailsPromise,
-      error: null,
-      employeeId,
-    });
-  } catch (error) {
-    return json({
-      error,
-      employeeId,
-      employeeBankDetailsPromise: null,
-    });
-  }
+  return {};
 }
 
 export async function action({
   request,
+  params,
 }: ActionFunctionArgs): Promise<Response> {
+  const employeeId = params.employeeId;
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
 
@@ -91,106 +65,64 @@ export async function action({
     );
   }
 
-  const { status, error } = await updateEmployeeBankDetails({
+  const { status, error } = await createEmployeeBankDetails({
     supabase,
-    data: submission.value,
+    data: {
+      ...submission.value,
+      employee_id: submission.value.employee_id ?? employeeId ?? "",
+    },
   });
 
   if (isGoodStatus(status)) {
     return json({
       status: "success",
-      message: "Employee bank details updated successfully",
+      message: "Employee bank details create successfully",
       error: null,
     });
   }
   return json({
     status: "error",
-    message: "Employee bank details update failed",
+    message: "Employee bank details create failed",
     error,
   });
 }
 
-export default function UpdateEmployeeBankDetails() {
-  const { employeeBankDetailsPromise, employeeId, error } =
-    useLoaderData<typeof loader>();
-
-  if (error)
-    return (
-      <ErrorBoundary
-        error={error}
-        message='Failed to load employee bank details'
-      />
-    );
-
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Await resolve={employeeBankDetailsPromise}>
-        {(resolvedData) => {
-          if (!resolvedData)
-            return (
-              <ErrorBoundary message='Failed to load employee bank details' />
-            );
-          return (
-            <UpdateEmployeeBankDetailsWrapper
-              data={resolvedData.data}
-              error={resolvedData.error}
-              employeeId={employeeId}
-            />
-          );
-        }}
-      </Await>
-    </Suspense>
-  );
-}
-
-export function UpdateEmployeeBankDetailsWrapper({
-  data,
-  error,
-  employeeId,
-}: {
-  data: EmployeeBankDetailsDatabaseUpdate | null;
-  error: Error | null | { message: string };
-  employeeId: string | undefined;
-}) {
+export default function CreateEmployeeBankDetailsRoute() {
+  const { employeeId } = useParams();
   const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
   const currentSchema = EmployeeBankDetailsSchema;
 
+  const initialData = getInitialValueFromZod(currentSchema);
+
   const [form, fields] = useForm({
-    id: UPDATE_BANK_DETAILS,
+    id: ADD_BANK_DETAILS,
     constraint: getZodConstraint(currentSchema),
     onValidate: ({ formData }: { formData: FormData }) => {
       return parseWithZod(formData, { schema: currentSchema });
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
-    defaultValue: data,
+    defaultValue: { ...initialData, employee_id: employeeId },
   });
 
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (error) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
     if (actionData) {
       if (actionData?.status === "success") {
         clearCacheEntry(`${cacheKeyPrefix.employee_overview}${employeeId}`);
         toast({
           title: "Success",
-          description: actionData?.message || "Employee bank details updated",
+          description: actionData?.message || "Employee bank details created",
           variant: "success",
         });
       } else {
         toast({
           title: "Error",
           description:
-            actionData?.error?.message || "Employee bank details update failed",
+            actionData?.error?.message || "Employee bank details create failed",
           variant: "destructive",
         });
       }
@@ -208,11 +140,7 @@ export function UpdateEmployeeBankDetailsWrapper({
           className='flex flex-col'
         >
           <Card>
-            <CreateEmployeeBankDetails
-              key={resetKey}
-              fields={fields as any}
-              isUpdate={true}
-            />
+            <CreateEmployeeBankDetails key={resetKey} fields={fields as any} />
             <FormButtons
               form={form}
               setResetKey={setResetKey}

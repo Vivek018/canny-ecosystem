@@ -5,6 +5,7 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Link, useParams } from "@remix-run/react";
 import type { EmployeeProjectAssignmentDataType } from "@canny_ecosystem/supabase/queries";
 import {
+  createRole,
   formatDate,
   hasPermission,
   replaceUnderscore,
@@ -62,11 +63,28 @@ export const EmployeeProjectAssignmentCard = ({
             !hasPermission(
               `${role}`,
               `${updateRole}:${attribute.employeeProjectAssignment}`
-            ) && "hidden"
+            ) && "hidden",
+            !projectAssignment?.employee_id && "hidden"
           )}
         >
           <Icon name='edit' className='mr-2' />
           Edit
+        </Link>
+        <Link
+          prefetch='intent'
+          to={`/employees/${employeeId}/work-portfolio/add-project-assignment`}
+          className={cn(
+            buttonVariants({ variant: "outline" }),
+            "bg-card",
+            !hasPermission(
+              `${role}`,
+              `${createRole}:${attribute.employeeProjectAssignment}`
+            ) && "hidden",
+            projectAssignment?.employee_id && "hidden"
+          )}
+        >
+          <Icon name='plus-circled' className='mr-2' />
+          Add
         </Link>
       </div>
 

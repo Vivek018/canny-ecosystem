@@ -5,6 +5,8 @@ import { EmployeeGuardiansCard } from "@/components/employees/employee/guardians
 import { EmployeePageHeader } from "@/components/employees/employee/page-header";
 import { EmployeeStatutoryCard } from "@/components/employees/employee/statutory-card";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { cacheKeyPrefix } from "@/constant";
+import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import {
   getEmployeeAddressesByEmployeeId,
   getEmployeeBankDetailsById,
@@ -14,14 +16,18 @@ import {
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { defer, json, type LoaderFunctionArgs } from "@remix-run/node";
-import { Await, useLoaderData } from "@remix-run/react";
+import { defer, type LoaderFunctionArgs } from "@remix-run/node";
+import {
+  Await,
+  type ClientLoaderFunctionArgs,
+  useLoaderData,
+  useParams,
+} from "@remix-run/react";
 import { type ReactNode, Suspense, useEffect } from "react";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
 
- 
   const employeeId = params.employeeId;
 
   try {
@@ -65,7 +71,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       error: null,
     });
   } catch (error) {
-    return json({
+    return defer({
       error,
       env: null,
       employeePromise: null,
@@ -77,6 +83,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 }
 
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+  return await clientCaching(
+    `${cacheKeyPrefix.employee_overview}${args.params.employeeId}`,
+    args
+  );
+}
+
+clientLoader.hydrate = true;
+
 export default function EmployeeIndex() {
   const {
     error,
@@ -87,20 +102,25 @@ export default function EmployeeIndex() {
     employeeAddressesPromise,
     employeeGuardiansPromise,
   } = useLoaderData<typeof loader>();
+  const { employeeId } = useParams();
 
   if (error) {
+    clearCacheEntry(`${cacheKeyPrefix.employee_overview}${employeeId}`);
     return (
-      <ErrorBoundary error={error} message="Failed to load employee details" />
+      <ErrorBoundary error={error} message='Failed to load employee details' />
     );
   }
 
   return (
-    <div className="w-full py-6 flex flex-col gap-8">
+    <div className='w-full py-6 flex flex-col gap-8'>
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={employeePromise}>
           {(resolvedData) => {
-            if (!resolvedData || !env)
-              return <ErrorBoundary message="Failed to load employee" />;
+            if (!resolvedData || !env){
+              clearCacheEntry(
+                `${cacheKeyPrefix.employee_overview}${employeeId}`
+              );
+              return <ErrorBoundary message='Failed to load employee' />;}
             return (
               <>
                 <CommonWrapper
@@ -127,10 +147,13 @@ export default function EmployeeIndex() {
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={employeeStatutoryDetailsPromise}>
           {(resolvedData) => {
-            if (!resolvedData)
-              return (
-                <ErrorBoundary message="Failed to load employee statutory details" />
+            if (!resolvedData){
+              clearCacheEntry(
+                `${cacheKeyPrefix.employee_overview}${employeeId}`
               );
+              return (
+                <ErrorBoundary message='Failed to load employee statutory details' />
+              );}
             return (
               <CommonWrapper
                 error={resolvedData.error}
@@ -148,10 +171,13 @@ export default function EmployeeIndex() {
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={employeeBankDetailsPromise}>
           {(resolvedData) => {
-            if (!resolvedData)
-              return (
-                <ErrorBoundary message="Failed to load employee bank details" />
+            if (!resolvedData){
+              clearCacheEntry(
+                `${cacheKeyPrefix.employee_overview}${employeeId}`
               );
+              return (
+                <ErrorBoundary message='Failed to load employee bank details' />
+              );}
             return (
               <CommonWrapper
                 error={resolvedData.error}
@@ -167,10 +193,13 @@ export default function EmployeeIndex() {
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={employeeAddressesPromise}>
           {(resolvedData) => {
-            if (!resolvedData)
-              return (
-                <ErrorBoundary message="Failed to load employee addresses" />
+            if (!resolvedData){
+              clearCacheEntry(
+                `${cacheKeyPrefix.employee_overview}${employeeId}`
               );
+              return (
+                <ErrorBoundary message='Failed to load employee addresses' />
+              );}
             return (
               <CommonWrapper
                 error={resolvedData.error}
@@ -188,10 +217,14 @@ export default function EmployeeIndex() {
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={employeeGuardiansPromise}>
           {(resolvedData) => {
-            if (!resolvedData)
-              return (
-                <ErrorBoundary message="Failed to load employee guardians details" />
+            if (!resolvedData) {
+              clearCacheEntry(
+                `${cacheKeyPrefix.employee_overview}${employeeId}`
               );
+              return (
+                <ErrorBoundary message='Failed to load employee guardians details' />
+              );
+            }
             return (
               <CommonWrapper
                 error={resolvedData.error}
@@ -217,9 +250,11 @@ export function CommonWrapper({
   error: any;
 }) {
   const { toast } = useToast();
+  const { employeeId } = useParams();
 
   useEffect(() => {
     if (error) {
+      clearCacheEntry(`${cacheKeyPrefix.employee_overview}${employeeId}`);
       toast({
         title: "Error",
         description: error?.message || "Failed to load employee details",

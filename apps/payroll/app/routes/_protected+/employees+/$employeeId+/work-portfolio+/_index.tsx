@@ -2,34 +2,40 @@ import { EmployeeProjectAssignmentCard } from "@/components/employees/work-portf
 import { EmployeeSkillsCard } from "@/components/employees/work-portfolio/skills-card";
 import { EmployeeWorkHistoriesCard } from "@/components/employees/work-portfolio/work-history-card";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { cacheKeyPrefix } from "@/constant";
+import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import {
   getEmployeeProjectAssignmentByEmployeeId,
   getEmployeeSkillsByEmployeeId,
   getEmployeeWorkHistoriesByEmployeeId,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { defer, json, type LoaderFunctionArgs } from "@remix-run/node";
-import { Await, useLoaderData } from "@remix-run/react";
-import { type ReactNode, Suspense } from "react";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { defer, type LoaderFunctionArgs } from "@remix-run/node";
+import {
+  Await,
+  type ClientLoaderFunctionArgs,
+  useLoaderData,
+  useParams,
+} from "@remix-run/react";
+import { type ReactNode, Suspense, useEffect } from "react";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
 
-  
   const employeeId = params.employeeId;
 
   try {
     const employeeProjectAssignmentPromise =
-      await getEmployeeProjectAssignmentByEmployeeId({
+      getEmployeeProjectAssignmentByEmployeeId({
         supabase,
         employeeId: employeeId ?? "",
       });
 
-    const employeeWorkHistoriesPromise =
-      await getEmployeeWorkHistoriesByEmployeeId({
-        supabase,
-        employeeId: employeeId ?? "",
-      });
+    const employeeWorkHistoriesPromise = getEmployeeWorkHistoriesByEmployeeId({
+      supabase,
+      employeeId: employeeId ?? "",
+    });
 
     const employeeSkillsPromise = getEmployeeSkillsByEmployeeId({
       supabase,
@@ -43,7 +49,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       error: null,
     });
   } catch (error) {
-    return json({
+    return defer({
       error,
       employeeProjectAssignmentPromise: null,
       employeeWorkHistoriesPromise: null,
@@ -52,6 +58,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 }
 
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+  return await clientCaching(
+    `${cacheKeyPrefix.employee_work_portfolio}${args.params.employeeId}`,
+    args
+  );
+}
+
+clientLoader.hydrate = true;
+
 export default function WorkPortfolio() {
   const {
     employeeProjectAssignmentPromise,
@@ -59,19 +74,26 @@ export default function WorkPortfolio() {
     employeeSkillsPromise,
     error,
   } = useLoaderData<typeof loader>();
+  const { employeeId } = useParams();
 
-  if (error)
-    return <ErrorBoundary error={error} message="Failed to load data" />;
+  if (error) {
+    clearCacheEntry(`${cacheKeyPrefix.employee_work_portfolio}${employeeId}`);
+    return <ErrorBoundary error={error} message='Failed to load data' />;
+  }
 
   return (
-    <div className="w-full py-4 flex flex-col gap-8">
+    <div className='w-full py-4 flex flex-col gap-8'>
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={employeeProjectAssignmentPromise}>
           {(resolvedData) => {
-            if (!resolvedData)
-              return (
-                <ErrorBoundary message="Failed to load employee project assignment" />
+            if (!resolvedData) {
+              clearCacheEntry(
+                `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
               );
+              return (
+                <ErrorBoundary message='Failed to load employee project assignment' />
+              );
+            }
             return (
               <CommonWrapper
                 Component={
@@ -79,7 +101,7 @@ export default function WorkPortfolio() {
                     projectAssignment={resolvedData.data}
                   />
                 }
-                error={null}
+                error={resolvedData.error}
               />
             );
           }}
@@ -89,10 +111,14 @@ export default function WorkPortfolio() {
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={employeeWorkHistoriesPromise}>
           {(resolvedData) => {
-            if (!resolvedData)
-              return (
-                <ErrorBoundary message="Failed to load employee work history" />
+            if (!resolvedData) {
+              clearCacheEntry(
+                `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
               );
+              return (
+                <ErrorBoundary message='Failed to load employee work history' />
+              );
+            }
             return (
               <CommonWrapper
                 Component={
@@ -100,7 +126,7 @@ export default function WorkPortfolio() {
                     employeeWorkHistories={resolvedData.data}
                   />
                 }
-                error={null}
+                error={resolvedData.error}
               />
             );
           }}
@@ -110,14 +136,18 @@ export default function WorkPortfolio() {
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={employeeSkillsPromise}>
           {(resolvedData) => {
-            if (!resolvedData)
-              return <ErrorBoundary message="Failed to load employee skills" />;
+            if (!resolvedData) {
+              clearCacheEntry(
+                `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
+              );
+              return <ErrorBoundary message='Failed to load employee skills' />;
+            }
             return (
               <CommonWrapper
                 Component={
                   <EmployeeSkillsCard employeeSkills={resolvedData.data} />
                 }
-                error={null}
+                error={resolvedData.error}
               />
             );
           }}
@@ -132,15 +162,22 @@ export function CommonWrapper({
   error,
 }: {
   Component: ReactNode;
-  error: Error | null;
+  error: any;
 }) {
-  if (error)
-    return (
-      <ErrorBoundary
-        error={error}
-        message="Failed to load employee work portfolio"
-      />
-    );
+  const { toast } = useToast();
+  const { employeeId } = useParams();
+
+  useEffect(() => {
+    if (error) {
+      clearCacheEntry(`${cacheKeyPrefix.employee_work_portfolio}${employeeId}`);
+      toast({
+        title: "Error",
+        description:
+          error?.message || "Failed to load employee work portfolio details",
+        variant: "destructive",
+      });
+    }
+  }, [error]);
 
   return Component;
 }
