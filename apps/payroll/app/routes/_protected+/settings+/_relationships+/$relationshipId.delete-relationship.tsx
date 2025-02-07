@@ -1,4 +1,5 @@
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
+import { clearCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { deleteRelationship } from "@canny_ecosystem/supabase/mutations";
@@ -67,6 +68,7 @@ export default function DeleteRelationship() {
   useEffect(() => {
     if (!actionData) return;
     if (actionData?.status === "success") {
+      clearCacheEntry(cacheKeyPrefix.relationships);
       toast({
         title: "Success",
         description: actionData?.message,

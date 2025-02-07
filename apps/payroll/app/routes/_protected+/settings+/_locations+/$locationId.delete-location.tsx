@@ -1,4 +1,5 @@
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
+import { clearCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { deleteLocation } from "@canny_ecosystem/supabase/mutations";
@@ -62,6 +63,7 @@ export default function DeleteLocation() {
   useEffect(() => {
     if (!actionData) return;
     if (actionData?.status === "success") {
+      clearCacheEntry(cacheKeyPrefix.locations);
       toast({
         title: "Success",
         description: actionData?.message,

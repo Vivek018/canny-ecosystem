@@ -1,6 +1,8 @@
 import { CompanyDetailsWrapper } from "@/components/company/company-details-wrapper";
 import CompanyRegistrationDetailsWrapper from "@/components/company/company-registration-details-wrapper";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { cacheKeyPrefix } from "@/constant";
+import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
   getCompanyById,
@@ -8,7 +10,12 @@ import {
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Await, defer, json, useLoaderData } from "@remix-run/react";
+import {
+  Await,
+  type ClientLoaderFunctionArgs,
+  defer,
+  useLoaderData,
+} from "@remix-run/react";
 import { Suspense, useEffect, useState } from "react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -35,7 +42,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       companyRegistrationDetailsPromise,
     });
   } catch (error) {
-    return json({
+    return defer({
       status: "error",
       message: "Failed to get company",
       error,
@@ -44,6 +51,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
   }
 }
+
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+  return await clientCaching(cacheKeyPrefix.general, args);
+}
+
+clientLoader.hydrate = true;
 
 export default function SettingGeneral() {
   const { companyDetailsPromise, companyRegistrationDetailsPromise, error } =
@@ -56,21 +69,24 @@ export default function SettingGeneral() {
   }, [companyDetailsPromise, companyRegistrationDetailsPromise]);
 
   if (error) {
+    clearCacheEntry(cacheKeyPrefix.general);
     return (
-      <ErrorBoundary error={error} message="Failed to load company details" />
+      <ErrorBoundary error={error} message='Failed to load company details' />
     );
   }
 
   return (
     <section key={resetKey}>
-      <div className="flex flex-col gap-6 w-full lg:w-2/3 py-4">
+      <div className='flex flex-col gap-6 w-full lg:w-2/3 py-4'>
         <Suspense fallback={<div>Loading...</div>}>
           <Await resolve={companyDetailsPromise}>
             {(resolvedData) => {
-              if (!resolvedData)
+              if (!resolvedData) {
+                clearCacheEntry(cacheKeyPrefix.general);
                 return (
-                  <ErrorBoundary message="Failed to load company details" />
+                  <ErrorBoundary message='Failed to load company details' />
                 );
+              }
               return (
                 <CompanyDetailsWrapper
                   data={resolvedData.data}
@@ -82,14 +98,16 @@ export default function SettingGeneral() {
         </Suspense>
       </div>
 
-      <div className="flex flex-col gap-6 w-full lg:w-2/3 py-4">
+      <div className='flex flex-col gap-6 w-full lg:w-2/3 py-4'>
         <Suspense fallback={<div>Loading...</div>}>
           <Await resolve={companyRegistrationDetailsPromise}>
             {(resolvedData) => {
-              if (!resolvedData)
+              if (!resolvedData) {
+                clearCacheEntry(cacheKeyPrefix.general);
                 return (
-                  <ErrorBoundary message="Failed to load company registration details" />
+                  <ErrorBoundary message='Failed to load company registration details' />
                 );
+              }
               return (
                 <CompanyRegistrationDetailsWrapper
                   data={resolvedData.data}

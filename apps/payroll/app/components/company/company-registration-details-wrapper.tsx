@@ -3,6 +3,8 @@ import { CompanyRegistrationDetails } from "./company-registration-details";
 import { DeleteCompany } from "./delete-company";
 import { toast } from "@canny_ecosystem/ui/use-toast";
 import type { CompanyRegistrationDetailsRow } from "@canny_ecosystem/supabase/types";
+import { clearCacheEntry } from "@/utils/cache";
+import { cacheKeyPrefix } from "@/constant";
 
 export default function CompanyRegistrationDetailsWrapper({
   data,
@@ -14,12 +16,14 @@ export default function CompanyRegistrationDetailsWrapper({
   const companyId = data?.company_id ?? "";
 
   useEffect(() => {
-    if (error)
+    if (error) {
+      clearCacheEntry(cacheKeyPrefix.general);
       toast({
         title: "Error",
         description: error.message || "Failed to load",
         variant: "destructive",
       });
+    }
   }, [error]);
 
   return (
@@ -29,7 +33,6 @@ export default function CompanyRegistrationDetailsWrapper({
           ...data,
           company_id: data?.company_id ?? companyId,
         }}
-    
       />
       <DeleteCompany companyId={companyId} />
     </>

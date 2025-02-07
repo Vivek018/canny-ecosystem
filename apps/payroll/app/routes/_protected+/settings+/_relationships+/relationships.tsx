@@ -3,7 +3,13 @@ import { getRelationshipsByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
 import { defer, type LoaderFunctionArgs } from "@remix-run/node";
-import { Await, Link, Outlet, useLoaderData } from "@remix-run/react";
+import {
+  Await,
+  type ClientLoaderFunctionArgs,
+  Link,
+  Outlet,
+  useLoaderData,
+} from "@remix-run/react";
 import {
   Command,
   CommandEmpty,
@@ -19,6 +25,8 @@ import { RelationshipWrapper } from "@/components/relationships/relationship-wra
 import { hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearCacheEntry, clientCaching } from "@/utils/cache";
+import { cacheKeyPrefix } from "@/constant";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {
@@ -43,28 +51,36 @@ export async function loader({ request }: LoaderFunctionArgs) {
   }
 }
 
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+  return await clientCaching(cacheKeyPrefix.relationships, args);
+}
+
+clientLoader.hydrate = true;
+
 export default function Relationships() {
   const { role } = useUserRole();
   const { relationshipsPromise, error } = useLoaderData<typeof loader>();
   const { isDocument } = useIsDocument();
 
-  if (error)
+  if (error) {
+    clearCacheEntry(cacheKeyPrefix.relationships);
     return (
-      <ErrorBoundary error={error} message="Failed to load relationships" />
+      <ErrorBoundary error={error} message='Failed to load relationships' />
     );
+  }
 
   return (
-    <section className="py-4">
-      <div className="w-full flex items-end justify-between">
-        <Command className="overflow-visible">
-          <div className="w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4">
+    <section className='py-4'>
+      <div className='w-full flex items-end justify-between'>
+        <Command className='overflow-visible'>
+          <div className='w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4'>
             <CommandInput
-              divClassName="border border-input rounded-md h-10 flex-1"
-              placeholder="Search Relationships"
+              divClassName='border border-input rounded-md h-10 flex-1'
+              placeholder='Search Relationships'
               autoFocus={true}
             />
             <Link
-              to="/settings/create-relationship"
+              to='/settings/create-relationship'
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
                 "flex items-center gap-1",
@@ -75,7 +91,7 @@ export default function Relationships() {
               )}
             >
               <span>Add</span>
-              <span className="hidden md:flex justify-end">Relationship</span>
+              <span className='hidden md:flex justify-end'>Relationship</span>
             </Link>
           </div>
           <CommandEmpty
@@ -86,15 +102,17 @@ export default function Relationships() {
           >
             No relationships found.
           </CommandEmpty>
-          <CommandList className="max-h-full py-6 overflow-x-visible overflow-y-visible">
-            <CommandGroup className="p-0 overflow-visible">
+          <CommandList className='max-h-full py-6 overflow-x-visible overflow-y-visible'>
+            <CommandGroup className='p-0 overflow-visible'>
               <Suspense fallback={<div>Loading...</div>}>
                 <Await resolve={relationshipsPromise}>
                   {(resolvedData) => {
-                    if (!resolvedData)
+                    if (!resolvedData) {
+                      clearCacheEntry(cacheKeyPrefix.relationships);
                       return (
-                        <ErrorBoundary message="Failed to load relationships" />
+                        <ErrorBoundary message='Failed to load relationships' />
                       );
+                    }
                     return (
                       <RelationshipWrapper
                         data={resolvedData.data}

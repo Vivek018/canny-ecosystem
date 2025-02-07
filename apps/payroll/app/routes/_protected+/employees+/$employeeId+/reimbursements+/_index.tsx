@@ -137,7 +137,7 @@ export default function ReimbursementsIndex() {
   const noFilters = Object.values(filters).every((value) => !value);
 
   return (
-    <section className='m-4'>
+    <section className='py-4'>
       <Suspense>
         <Await
           resolve={Promise.all([reimbursementPromise, usersPromise])}

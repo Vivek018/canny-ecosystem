@@ -23,8 +23,9 @@ import { Suspense, useEffect } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearCacheEntry } from "@/utils/cache";
 
 export const UPDATE_LOCATION = "update-location";
 
@@ -113,6 +114,7 @@ export default function UpdateLocation() {
   useEffect(() => {
     if (!actionData) return;
     if (actionData?.status === "success") {
+      clearCacheEntry(cacheKeyPrefix.locations);
       toast({
         title: "Success",
         description: actionData?.message,

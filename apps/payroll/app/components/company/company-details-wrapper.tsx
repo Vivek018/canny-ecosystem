@@ -4,6 +4,8 @@ import { CompanyLogo } from "./company-logo";
 import { toast } from "@canny_ecosystem/ui/use-toast";
 import type { CompanyDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { ErrorBoundary } from "../error-boundary";
+import { clearCacheEntry } from "@/utils/cache";
+import { cacheKeyPrefix } from "@/constant";
 
 export function CompanyDetailsWrapper({
   data,
@@ -14,6 +16,7 @@ export function CompanyDetailsWrapper({
 }) {
   useEffect(() => {
     if (error) {
+      clearCacheEntry(cacheKeyPrefix.general);
       toast({
         title: "Error",
         description: error.message || "Failed to load",
@@ -22,10 +25,11 @@ export function CompanyDetailsWrapper({
     }
   }, [error]);
 
-  if (!data)
+  if (!data){
+    clearCacheEntry(cacheKeyPrefix.general);
     return (
       <ErrorBoundary error={error} message="Failed to load company details" />
-    );
+    );}
 
   return (
     <>

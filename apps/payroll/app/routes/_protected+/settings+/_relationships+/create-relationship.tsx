@@ -49,8 +49,9 @@ import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearCacheEntry } from "@/utils/cache";
 
 export const CREATE_RELATIONSHIP = "create-relationship";
 
@@ -204,6 +205,7 @@ export default function CreateRelationship({
     if (!actionData) return;
 
     if (actionData?.status === "success") {
+      clearCacheEntry(cacheKeyPrefix.relationships);
       toast({
         title: "Success",
         description: actionData.message,

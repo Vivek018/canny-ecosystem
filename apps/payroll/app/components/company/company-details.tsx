@@ -1,3 +1,5 @@
+import { cacheKeyPrefix } from "@/constant";
+import { clearCacheEntry } from "@/utils/cache";
 import { useUserRole } from "@/utils/user";
 import type { CompanyDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { Button } from "@canny_ecosystem/ui/button";
@@ -46,6 +48,9 @@ export const CompanyDetails = ({
     id: COMPANY_DETAILS,
     constraint: getZodConstraint(CompanyDetailsSchema),
     onValidate({ formData }) {
+      if(!deepEqualCheck(form.initialValue, form.value)){
+        clearCacheEntry(cacheKeyPrefix.general);
+      }
       return parseWithZod(formData, { schema: CompanyDetailsSchema });
     },
     shouldValidate: "onInput",
@@ -56,7 +61,7 @@ export const CompanyDetails = ({
   return (
     <FormProvider context={form.context}>
       <Form
-        method="POST"
+        method='POST'
         {...getFormProps(form)}
         action={`/${updateValues.id}/update-company`}
       >
@@ -67,8 +72,8 @@ export const CompanyDetails = ({
               This is your company's visible details within canny.
             </CardDescription>
           </CardHeader>
-          <CardContent className="pb-2">
-            <div className="grid grid-cols-1 md:grid-cols-2 items-center justify-center md:gap-x-8">
+          <CardContent className='pb-2'>
+            <div className='grid grid-cols-1 md:grid-cols-2 items-center justify-center md:gap-x-8'>
               <input {...getInputProps(fields.id, { type: "hidden" })} />
               <Field
                 inputProps={{
@@ -97,7 +102,7 @@ export const CompanyDetails = ({
               />
               <SearchableSelectField
                 key={resetKey}
-                className="w-full capitalize flex-1"
+                className='w-full capitalize flex-1'
                 options={transformStringArrayIntoOptions(
                   company_type as unknown as string[]
                 )}
@@ -115,7 +120,7 @@ export const CompanyDetails = ({
               />
               <SearchableSelectField
                 key={resetKey + 1}
-                className="w-full capitalize flex-1"
+                className='w-full capitalize flex-1'
                 options={transformStringArrayIntoOptions(
                   company_size as unknown as string[]
                 )}
@@ -144,10 +149,10 @@ export const CompanyDetails = ({
             )}
           >
             <div>Please use 32 characters at maximum.</div>
-            <div className="flex gap-4">
+            <div className='flex gap-4'>
               <Button
-                variant="secondary"
-                type="reset"
+                variant='secondary'
+                type='reset'
                 {...form.reset.getButtonProps()}
                 onClick={() => setResetKey(Date.now())}
               >
@@ -158,8 +163,8 @@ export const CompanyDetails = ({
                 disabled={
                   !form.valid || deepEqualCheck(form.initialValue, form.value)
                 }
-                variant="default"
-                type="submit"
+                variant='default'
+                type='submit'
               >
                 Save
               </Button>

@@ -46,7 +46,8 @@ import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
+import { clearCacheEntry } from "@/utils/cache";
 
 export const CREATE_LOCATION = "create-location";
 
@@ -156,6 +157,7 @@ export default function CreateLocation({
   useEffect(() => {
     if (!actionData) return;
     if (actionData?.status === "success") {
+      clearCacheEntry(cacheKeyPrefix.locations);
       toast({
         title: "Success",
         description: actionData?.message,
