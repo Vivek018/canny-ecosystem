@@ -108,19 +108,7 @@ export function AddEmployeeDialog() {
           <Icon name="import" size="sm" className="mb-0.5" />
           <span>Import Guardians</span>
         </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => {
-            searchParams.set(
-              "step",
-              modalSearchParamNames.import_employee_attendance
-            );
-            setSearchParams(searchParams);
-          }}
-          className="space-x-2 flex items-center"
-        >
-          <Icon name="import" size="sm" className="mb-0.5" />
-          <span>Import Attendance</span>
-        </DropdownMenuItem>
+        
       </DropdownMenuContent>
     </DropdownMenu>
   );

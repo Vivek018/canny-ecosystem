@@ -1,13 +1,13 @@
+import type { AttendanceFilters } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { useSearchParams } from "@remix-run/react";
 
 type Props = {
-  filters: { month?: string | undefined; year?: string | undefined };
+  filters: AttendanceFilters | undefined;
 };
 
 export function FilterList({ filters }: Props) {
-
   const [searchParams, setSearchParams] = useSearchParams();
 
   const renderFilter = ({
@@ -20,8 +20,11 @@ export function FilterList({ filters }: Props) {
     if (!value) return null;
 
     switch (key) {
+      case "name":
       case "month":
       case "year":
+      case "project":
+      case "project_site":
         return value;
       default:
         return null;
@@ -36,7 +39,7 @@ export function FilterList({ filters }: Props) {
   };
 
   return (
-    <ul className="flex justify-end space-x-2 w-full overflow-scroll no-scrollbar ">
+    <ul className="flex flex-0 space-x-2 w-full overflow-scroll no-scrollbar">
       {filters &&
         Object.entries(filters)
           .filter(([key, value]) => value != null && !key.endsWith("end"))

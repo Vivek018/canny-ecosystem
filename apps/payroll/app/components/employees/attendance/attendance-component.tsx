@@ -3,20 +3,23 @@ import { useState } from "react";
 import type { EmployeeAttendanceDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { AttendanceFilter } from "./attendance-filter";
 import { useNavigate } from "@remix-run/react";
+import { FilterList } from "./filter-list";
 
 export const AttendanceComponent = ({
   attendanceData,
   employeeId,
+  filters,
 }: {
   employeeId: string;
   attendanceData: EmployeeAttendanceDatabaseRow[];
   disabled?: boolean;
+  filters: {
+    month?: string | undefined;
+    year?: string | undefined;
+  };
 }) => {
+  
   const navigate = useNavigate();
-  // const filters: AttendanceFilterType = {
-  //   year: searchParams.get("year") ?? undefined,
-  //   month: searchParams.get("month") ?? undefined,
-  // };
 
   const [month, setMonth] = useState<number>(new Date().getMonth());
   const [year, setYear] = useState<number>(new Date().getFullYear());
@@ -44,8 +47,8 @@ export const AttendanceComponent = ({
 
   return (
     <div className="m-4">
-      <div className="flex justify-end items-center mb-4">
-        {/* <FilterList filterList={filters} /> */}
+      <div className="flex justify-end items-center mb-4 gap-x-2">
+        <FilterList filters={filters} />
         <AttendanceFilter setMonth={setMonth} setYear={setYear} />
       </div>
 

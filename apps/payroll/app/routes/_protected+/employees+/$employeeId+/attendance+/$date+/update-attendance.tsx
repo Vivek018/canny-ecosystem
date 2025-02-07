@@ -120,7 +120,6 @@ export default function UpdateAttendance() {
     shouldRevalidate: "onInput",
   });
 
-  // console.log(form.allErrors);
 
   const handleDelete = () => {
     submit(

@@ -121,7 +121,6 @@ export function EmployeeAttendanceImportData({
 
   const handleFinalImport = async () => {
     if (validateImportData(importData.data)) {
-
       const { error, status } = await createEmployeeAttendanceFromImportedData({
         data: finalData as EmployeeAttendanceDatabaseInsert[],
         import_type: importType,
@@ -136,7 +135,7 @@ export function EmployeeAttendanceImportData({
         status === "Successfully inserted new records" ||
         status === "Successfully processed updates and new insertions"
       ) {
-        navigate("/employees");
+        navigate("/time-tracking/attendance");
       }
     }
   };

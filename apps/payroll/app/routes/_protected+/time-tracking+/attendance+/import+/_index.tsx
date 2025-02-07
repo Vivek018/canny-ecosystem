@@ -21,8 +21,23 @@ import type {
 import { getEmployeeAttendanceConflicts } from "@canny_ecosystem/supabase/mutations";
 import { Combobox } from "@canny_ecosystem/ui/combobox";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { Field } from "@canny_ecosystem/ui/forms";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@canny_ecosystem/ui/card";
 
-const formatTypeArray = ["normal", "shift"] as const;
+const formatTypeArray = [
+  "normal",
+  "shift",
+  "hours",
+  "custom(normal)",
+  "custom(shift)",
+] as const;
 
 export async function loader() {
   const env = {
@@ -35,6 +50,12 @@ export async function loader() {
 
 export default function EmployeeAttendanceImportFieldMapping() {
   const [formatType, setFormatType] = useState<string>("normal");
+  const [presentMap, setPresentMap] = useState<string>();
+  const [absentMap, setAbsentMap] = useState<string>();
+  const [dayShift, setDayShift] = useState<string>();
+  const [noonShift, setNoonShift] = useState<string>();
+  const [nightShift, setNightShift] = useState<string>();
+
   const { env } = useLoaderData<typeof loader>();
   const { supabase } = useSupabase({ env });
 
@@ -128,12 +149,14 @@ export default function EmployeeAttendanceImportFieldMapping() {
               let holiday = false;
               let holidayType = null;
               let shift = null;
+              let noOfHours = 8;
 
               if (formatType === "normal") {
                 if (status === "P") {
                   present = true;
                 } else if (status === "A") {
                   present = false;
+                  noOfHours = 0;
                 }
               }
               if (formatType === "shift") {
@@ -148,17 +171,61 @@ export default function EmployeeAttendanceImportFieldMapping() {
                   shift = "night";
                 } else if (status === "AB") {
                   present = false;
+                  noOfHours = 0;
                 }
               }
+              if (formatType === "hours") {
+                if (Number(status) > 0) {
+                  present = true;
+                  noOfHours = Number(status);
+                } else if (Number(status) === 0) {
+                  present = false;
+                  noOfHours = Number(status);
+                }
+              }
+              if (formatType === "custom(normal)") {
+                if (status.toLowerCase() === `${presentMap?.toLowerCase()}`) {
+                  present = true;
+                } else if (
+                  status.toLowerCase() === `${absentMap?.toLowerCase()}`
+                ) {
+                  present = false;
+                  noOfHours = 0;
+                }
+              }
+              if (formatType === "custom(shift)") {
+                if (status.toLowerCase() === `${dayShift?.toLowerCase()}`) {
+                  present = true;
+                  shift = "day";
+                } else if (
+                  status.toLowerCase() === `${noonShift?.toLowerCase()}`
+                ) {
+                  present = true;
+                  shift = "afternoon";
+                } else if (
+                  status.toLowerCase() === `${nightShift?.toLowerCase()}`
+                ) {
+                  present = true;
+                  shift = "night";
+                } else if (
+                  status.toLowerCase() === `${absentMap?.toLowerCase()}`
+                ) {
+                  present = false;
+                  noOfHours = 0;
+                }
+              }
+
               if (status === "(WOF)") {
                 present = false;
                 holiday = true;
                 holidayType = "weekly";
+                noOfHours = 0;
               }
               if (status === "L") {
                 present = false;
                 holiday = true;
                 holidayType = "paid";
+                noOfHours = 0;
               }
 
               transformedData.push({
@@ -168,7 +235,7 @@ export default function EmployeeAttendanceImportFieldMapping() {
                 holiday: holiday,
                 holiday_type:
                   holidayType as EmployeeAttendanceDatabaseRow["holiday_type"],
-                no_of_hours: 8,
+                no_of_hours: noOfHours,
                 working_shift:
                   shift as EmployeeAttendanceDatabaseRow["working_shift"],
               });
@@ -238,26 +305,109 @@ export default function EmployeeAttendanceImportFieldMapping() {
           env={env}
         />
       ) : (
-        <>
-          <Combobox
-            className={cn("w-52 h-10")}
-            options={transformStringArrayIntoOptions(
-              formatTypeArray as unknown as string[]
+        <Card className="m-4 mx-auto w-1/3 flex flex-col items-center">
+          <CardHeader>
+            <CardTitle>Attendance Import Format</CardTitle>
+            <CardDescription>
+              Select your import-format for Attendace
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Combobox
+              className={cn("w-80 h-10 mr-4")}
+              options={transformStringArrayIntoOptions(
+                formatTypeArray as unknown as string[]
+              )}
+              value={formatType}
+              onChange={(value: string) => {
+                setFormatType(value);
+              }}
+              placeholder={"Select Import Format"}
+            />
+            <Button onClick={handleParsedData}>Sure</Button>
+
+            {formatType === "custom(normal)" && (
+              <div
+                className="grid mt-10
+ grid-cols-2 place-content-center justify-between gap-3"
+              >
+                <Field
+                  inputProps={{
+                    type: "text",
+                    value: presentMap!,
+                    onChange: (e) => setPresentMap(e.target.value),
+                    placeholder: "Enter for present",
+                  }}
+                />
+                <Field
+                  inputProps={{
+                    type: "text",
+                    value: absentMap!,
+                    onChange: (e) => setAbsentMap(e.target.value),
+                    placeholder: "Enter for Absent",
+                  }}
+                />
+              </div>
             )}
-            value={formatType}
-            onChange={(value: string) => {
-              setFormatType(value);
-            }}
-            placeholder={"Select Import Type"}
-          />
-          <Button onClick={handleParsedData}>Sure</Button>
-          <div className="flex flex-col items-end gap-2">
-            <span className="text-red-500 text-sm">
-              {errors.general}
-              {validationErrors}
-            </span>
-          </div>
-        </>
+            {formatType === "custom(shift)" && (
+              <>
+                <div
+                  className="grid mt-10
+grid-cols-2 place-content-center gap-3"
+                >
+                  <Field
+                    inputProps={{
+                      type: "text",
+                      value: dayShift!,
+                      onChange: (e) => setDayShift(e.target.value),
+                      placeholder: "Enter for Day-Shift",
+                    }}
+                  />
+                  <Field
+                    inputProps={{
+                      type: "text",
+                      value: noonShift!,
+                      onChange: (e) => setNoonShift(e.target.value),
+                      placeholder: "Enter for Afternoon-Shift",
+                    }}
+                  />
+                </div>
+                <div
+                  className="grid mt-4
+grid-cols-2 place-content-center justify-between gap-3"
+                >
+                  <Field
+                    inputProps={{
+                      type: "text",
+                      value: nightShift!,
+                      onChange: (e) => setNightShift(e.target.value),
+                      placeholder: "Enter for Night-shift",
+                    }}
+                  />
+                  <Field
+                    inputProps={{
+                      type: "text",
+                      value: absentMap!,
+                      onChange: (e) => setAbsentMap(e.target.value),
+                      placeholder: "Enter for Absent",
+                    }}
+                  />
+                </div>
+              </>
+            )}
+          </CardContent>
+          <CardFooter>
+            <div
+              className="grid
+grid-cols-1 gap-2"
+            >
+              <span className="text-red-500 text-sm">
+                {errors.errors}
+                {validationErrors[0]}
+              </span>
+            </div>
+          </CardFooter>
+        </Card>
       )}
     </section>
   );

@@ -1207,46 +1207,7 @@ export const AttendanceDataSchema = z.object({
   holiday_type: z.enum(attendanceHolidayTypeArray).optional(),
 });
 
-// export const ImportEmployeeAttendanceHeaderSchemaObject = z.object({
-//   employee_code: z.string(),
-//   date: z.string(),
-//   no_of_hours: z.string(),
-//   present: z.string(),
-//   holiday: z.string(),
-//   working_shift: z.string().optional(),
-//   holiday_type: z.string().optional(),
-// });
 
-// export const ImportEmployeeAttendanceHeaderSchema =
-//   ImportEmployeeAttendanceHeaderSchemaObject.refine(
-//     (data) => {
-//       const values = [
-//         data.employee_code,
-//         data.date,
-//         data.no_of_hours,
-//         data.present,
-//         data.holiday,
-//         data.working_shift,
-//         data.holiday_type,
-//       ].filter(Boolean);
-
-//       const uniqueValues = new Set(values);
-//       return uniqueValues.size === values.length;
-//     },
-//     {
-//       message:
-//         "Some fields have the same value. Please select different options.",
-//       path: [
-//         "employee_code",
-//         "date",
-//         "no_of_hours",
-//         "present",
-//         "holiday",
-//         "working_shift",
-//         "holiday_type",
-//       ],
-//     }
-//   );
 
 export const ImportSingleEmployeeAttendanceDataSchema = z.object({
   employee_code: zNumberString.min(3),

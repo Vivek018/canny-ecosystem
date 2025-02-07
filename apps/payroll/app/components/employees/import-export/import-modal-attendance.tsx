@@ -22,7 +22,8 @@ export const ImportEmployeeAttendanceModal = () => {
   const MAX_FILE_SIZE_LIMIT = SIZE_1MB * 3;
 
   const isOpen =
-    searchParams.get("step") === modalSearchParamNames.import_employee_attendance;
+    searchParams.get("step") ===
+    modalSearchParamNames.import_employee_attendance;
 
   const onClose = () => {
     searchParams.delete("step");
@@ -49,7 +50,7 @@ export const ImportEmployeeAttendanceModal = () => {
 
   const handleFileSubmit = () => {
     if (eligibleFileSize && selectedFile) {
-      navigate("/employees/import-attendance", {
+      navigate("/time-tracking/attendance/import", {
         state: { file: selectedFile },
       });
     }
