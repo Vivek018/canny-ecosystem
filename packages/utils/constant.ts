@@ -119,6 +119,7 @@ export const attribute = {
   employeeProjectAssignment: "employee_project_assignment",
   employeeWorkHistory: "employee_work_history",
   employeeSkills: "employee_skills",
+  employeeLetters: "employee_letters",
   reimbursements: "reimbursements",
   exits: "exits",
   paymentFields: "payment_fields",

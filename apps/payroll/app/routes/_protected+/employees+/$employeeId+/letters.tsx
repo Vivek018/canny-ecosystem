@@ -1,41 +1,45 @@
-import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { getPaymentFieldsByCompanyId } from "@canny_ecosystem/supabase/queries";
+import { EmployeeLetterTableWrapper } from "@/components/employees/employee/letters/employee-letter-table-wrapper";
+import { ErrorBoundary } from "@/components/error-boundary";
+import { useUserRole } from "@/utils/user";
+import { getEmployeeLettersByEmployeeId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Await, defer, json, Link, useLoaderData } from "@remix-run/react";
-import { Input } from "@canny_ecosystem/ui/input";
-import { Suspense, useState } from "react";
-import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import { ErrorBoundary } from "@/components/error-boundary";
-import { PaymentFieldTableWrapper } from "@/components/payment-field/payment-field-table-wrapper";
+import { Input } from "@canny_ecosystem/ui/input";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { hasPermission, updateRole } from "@canny_ecosystem/utils";
-import { useUserRole } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { defer, json, type LoaderFunctionArgs } from "@remix-run/node";
+import { Await, Link, Outlet, useLoaderData } from "@remix-run/react";
+import { Suspense, useState } from "react";
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  const { employeeId } = params;
   const { supabase } = getSupabaseWithHeaders({ request });
 
   try {
-    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-    const paymentFieldPromise = getPaymentFieldsByCompanyId({
+    const employeeLettersPromise = getEmployeeLettersByEmployeeId({
       supabase,
-      companyId,
+      employeeId: employeeId ?? "",
     });
 
     return defer({
-      paymentFieldPromise,
+      employeeLettersPromise,
+      employeeId,
       error: null,
     });
   } catch (error) {
-    return json({ paymentFieldPromise: null, error }, { status: 500 });
+    return json(
+      { employeeLettersPromise: null, employeeId, error },
+      { status: 500 },
+    );
   }
 }
 
-export default function PaymentFieldsIndex() {
+export default function Letters() {
   const { role } = useUserRole();
-  const { paymentFieldPromise, error } = useLoaderData<typeof loader>();
+  const { employeeLettersPromise, employeeId, error } =
+    useLoaderData<typeof loader>();
 
   const [searchString, setSearchString] = useState("");
 
@@ -57,14 +61,14 @@ export default function PaymentFieldsIndex() {
               />
             </div>
             <Input
-              placeholder="Search Payment Fields"
+              placeholder="Search Letters"
               value={searchString}
               onChange={(e) => setSearchString(e.target.value)}
               className="pl-8 h-10 w-full focus-visible:ring-0"
             />
           </div>
           <Link
-            to="/payment-components/payment-fields/create-payment-field"
+            to={`/employees/${employeeId}/letters/create-letter`}
             className={cn(
               buttonVariants({ variant: "primary-outline" }),
               "flex items-center gap-1",
@@ -75,17 +79,17 @@ export default function PaymentFieldsIndex() {
             )}
           >
             <span>Add</span>
-            <span className="hidden md:flex justify-end">Payment Field</span>
+            <span className="hidden md:flex justify-end">Letter</span>
           </Link>
         </div>
       </div>
       <Suspense fallback={<div>Loading...</div>}>
-        <Await resolve={paymentFieldPromise}>
+        <Await resolve={employeeLettersPromise}>
           {(resolvedData) => {
             if (!resolvedData)
-              return <ErrorBoundary message="Failed to load payment fields" />;
+              return <ErrorBoundary message="Failed to load letters" />;
             return (
-              <PaymentFieldTableWrapper
+              <EmployeeLetterTableWrapper
                 data={resolvedData?.data}
                 error={resolvedData?.error}
                 searchString={searchString}
@@ -94,6 +98,7 @@ export default function PaymentFieldsIndex() {
           }}
         </Await>
       </Suspense>
+      <Outlet />
     </section>
   );
 }

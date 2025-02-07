@@ -1,6 +1,12 @@
 import { useInputControl } from "@conform-to/react";
 import type React from "react";
-import { useEffect, useId, useState } from "react";
+import {
+  type LabelHTMLAttributes,
+  type TextareaHTMLAttributes,
+  useEffect,
+  useId,
+  useState,
+} from "react";
 import { Checkbox, type CheckboxProps } from "./checkbox";
 import { Input } from "./input";
 import { Label } from "./label";
@@ -11,6 +17,25 @@ import { Button } from "./button";
 import { parseStringValue } from "@canny_ecosystem/utils";
 import { useIsomorphicLayoutEffect } from "@canny_ecosystem/utils/hooks/isomorphic-layout-effect";
 import { Icon } from "./icon";
+import {
+  KitchenSinkToolbar,
+  MDXEditor,
+  codeBlockPlugin,
+  codeMirrorPlugin,
+  diffSourcePlugin,
+  frontmatterPlugin,
+  headingsPlugin,
+  imagePlugin,
+  linkDialogPlugin,
+  linkPlugin,
+  listsPlugin,
+  markdownShortcutPlugin,
+  quotePlugin,
+  tablePlugin,
+  thematicBreakPlugin,
+  toolbarPlugin,
+} from "@mdxeditor/editor";
+import "@mdxeditor/editor/style.css";
 
 export type ListOfErrors = Array<string | null | undefined> | null | undefined;
 
@@ -613,3 +638,86 @@ export const RangeField = ({
     </div>
   );
 };
+
+export function MarkdownField({
+  labelProps,
+  textareaProps,
+  errors,
+  className,
+  errorClassName,
+}: {
+  labelProps: LabelHTMLAttributes<HTMLLabelElement>;
+  textareaProps: TextareaHTMLAttributes<HTMLTextAreaElement>;
+  errors?: string[];
+  className?: string;
+  errorClassName?: string;
+}) {
+  const fallbackId = useId();
+  const id = textareaProps.id ?? fallbackId;
+  const errorId = errors?.length ? `${id}-error` : undefined;
+  const input = useInputControl({
+    name: textareaProps.name!,
+    formId: textareaProps.form!,
+    initialValue: textareaProps.defaultValue as string,
+  });
+
+  return (
+    <div className={className}>
+      {/* Label */}
+      <Label htmlFor={id} {...labelProps} />
+      <sub
+        className={cn(
+          "hidden text-primary",
+          textareaProps?.children && textareaProps.required && "inline",
+        )}
+      >
+        *
+      </sub>
+      <input
+        type="hidden"
+        id={id}
+        name={textareaProps.name}
+        value={input.value ?? ""}
+        onChange={input.change as any}
+        onBlur={input.blur}
+      />
+      {/* Markdown Editor */}
+      <MDXEditor
+        placeholder={textareaProps.placeholder}
+        markdown={input.value ?? ""}
+        onChange={(value) => {
+          input.change(value ?? ("" as string));
+        }}
+        plugins={[
+          toolbarPlugin({ toolbarContents: () => <KitchenSinkToolbar /> }),
+          listsPlugin(),
+          quotePlugin(),
+          headingsPlugin(),
+          linkPlugin(),
+          linkDialogPlugin(),
+          imagePlugin(),
+          tablePlugin(),
+          thematicBreakPlugin(),
+          frontmatterPlugin(),
+          codeBlockPlugin({ defaultCodeBlockLanguage: "txt" }),
+          codeMirrorPlugin({
+            codeBlockLanguages: {
+              js: "JavaScript",
+              css: "CSS",
+              txt: "text",
+              tsx: "TypeScript",
+            },
+          }),
+          diffSourcePlugin({ viewMode: "rich-text", diffMarkdown: "" }),
+          markdownShortcutPlugin(),
+        ]}
+        className="min-h-[200px] border rounded dark-theme dark-editor"
+      />
+
+      {/* Errors */}
+      <div className={cn("min-h-6 px-4 pb-2", errorClassName)}>
+        {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
+      </div>
+    </div>
+  );
+}

@@ -209,6 +209,39 @@ export async function getLocationById({
   return { data, error };
 }
 
+export async function getPrimaryLocationByCompanyId({
+  supabase,
+  companyId,
+}: { supabase: TypedSupabaseClient; companyId: string }) {
+  const columns = [
+    "id",
+    "company_id",
+    "name",
+    "address_line_1",
+    "address_line_2",
+    "city",
+    "state",
+    "pincode",
+    "latitude",
+    "longitude",
+    "is_primary",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("company_locations")
+    .select(columns.join(","))
+    .eq("company_id", companyId)
+    .eq("is_primary", true)
+    .limit(SINGLE_QUERY_LIMIT)
+    .single<InferredType<LocationDatabaseRow, (typeof columns)[number]>>();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { data, error };
+}
+
 export type RelationshipWithCompany = RelationshipDatabaseRow & {
   parent_company: { id: string; name: string };
   child_company: { id: string; name: string };
@@ -283,17 +316,18 @@ export async function getRelationshipIdByParentIdAndChildId({
   supabase,
   parentCompanyId,
   childCompanyId,
-}: { 
-  supabase: TypedSupabaseClient; 
+}: {
+  supabase: TypedSupabaseClient;
   parentCompanyId: string;
-  childCompanyId:string }) {
+  childCompanyId: string;
+}) {
   const columns = ["id"] as const;
 
   const { data, error } = await supabase
     .from("company_relationships")
     .select(columns.join(","))
     .eq("parent_company_id", parentCompanyId)
-    .eq("child_company_id",childCompanyId)
+    .eq("child_company_id", childCompanyId)
     .single<Omit<RelationshipWithCompany, "created_at" | "updated_at">>();
 
   if (error) console.error(error);

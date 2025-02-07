@@ -1,7 +1,7 @@
 import { DEFAULT_ROUTE } from "@/constant";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
-import { deleteProject } from "@canny_ecosystem/supabase/mutations";
+import { deleteEmployeeLetter } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import {
@@ -14,33 +14,43 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { json, useActionData, useNavigate } from "@remix-run/react";
 import { useEffect } from "react";
 
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({
+  request,
+  params,
+}: ActionFunctionArgs): Promise<Response> {
+  const employeeId = params.employeeId;
+  const letterId = params.letterId;
   const { supabase, headers } = getSupabaseWithHeaders({ request });
+
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${deleteRole}:${attribute.projects}`)) {
+  if (
+    !hasPermission(user?.role!, `${deleteRole}:${attribute.employeeLetters}`)
+  ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
-  const projectId = params.projectId;
-
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
-
-    const { status, error } = await deleteProject({
+    const { status, error } = await deleteEmployeeLetter({
       supabase,
-      id: projectId ?? "",
+      id: letterId ?? "",
     });
 
-    if (isGoodStatus(status)) {
+    if (isGoodStatus(status))
       return json({
         status: "success",
-        message: "Project deleted",
+        message: "Employee Letter deleted",
+        employeeId,
         error: null,
       });
-    }
 
     return json(
-      { status: "error", message: "Failed to delete project", error },
+      {
+        status: "error",
+        message: "Employee Letter delete failed",
+        employeeId,
+        letterId,
+        error,
+      },
       { status: 500 },
     );
   } catch (error) {
@@ -48,6 +58,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
       {
         status: "error",
         message: "An unexpected error occurred",
+        employeeId,
         error,
       },
       { status: 500 },
@@ -55,8 +66,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
   }
 }
 
-export default function DeleteProject() {
+export default function DeleteLetter() {
   const actionData = useActionData<typeof action>();
+
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -65,19 +77,18 @@ export default function DeleteProject() {
       if (actionData?.status === "success") {
         toast({
           title: "Success",
-          description: actionData.message,
+          description: actionData?.message,
           variant: "success",
         });
       } else {
         toast({
           title: "Error",
-          description: actionData.error,
+          description: actionData?.error?.message,
           variant: "destructive",
         });
       }
-      navigate("/projects", { replace: true });
     }
-  }, [actionData]);
-
+    navigate(`/employees/${actionData?.employeeId}/letters`, { replace: true });
+  }, [actionData, toast, navigate]);
   return null;
 }
