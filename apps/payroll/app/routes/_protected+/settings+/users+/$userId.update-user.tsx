@@ -144,7 +144,6 @@ export default function UpdateUser() {
       <Await resolve={userPromise}>
         {(resolvedData) => {
           if (!resolvedData) {
-            clearCacheEntry(cacheKeyPrefix.users);
             return <ErrorBoundary message='Failed to load user' />;
           }
           return (
@@ -167,7 +166,6 @@ export function UpdateUserWrapper({
   error: Error | null | { message: string };
 }) {
   if (error) {
-    clearCacheEntry(cacheKeyPrefix.users);
     return <ErrorBoundary error={error} message='Failed to load user' />;
   }
 

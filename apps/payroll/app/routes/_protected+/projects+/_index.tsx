@@ -14,6 +14,7 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import {
   Await,
+  type ClientLoaderFunctionArgs,
   defer,
   json,
   Link,
@@ -26,6 +27,8 @@ import { ProjectsWrapper } from "@/components/projects/projects-wrapper";
 import { hasPermission, createRole } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clientCaching } from "@/utils/cache";
+import { cacheKeyPrefix } from "@/constant";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase} = getSupabaseWithHeaders({ request });
@@ -57,6 +60,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
     );
   }
 }
+
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+  return await clientCaching(cacheKeyPrefix.projects, args);
+}
+
+clientLoader.hydrate = true;
 
 export default function ProjectsIndex() {
   const { role } = useUserRole();

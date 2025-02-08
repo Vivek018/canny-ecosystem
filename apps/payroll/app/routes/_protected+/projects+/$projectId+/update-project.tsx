@@ -27,8 +27,9 @@ import { Suspense, useEffect } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearCacheEntry } from "@/utils/cache";
 
 export const UPDATE_PROJECT = "update-project";
 
@@ -136,6 +137,7 @@ export default function UpdateProject() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
+        clearCacheEntry(cacheKeyPrefix.projects);
         toast({
           title: "Success",
           description: actionData?.message || "Project updated",
