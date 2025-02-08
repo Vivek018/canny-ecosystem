@@ -23,7 +23,7 @@ import {
 import { Suspense } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { ProjectsWrapper } from "@/components/projects/projects-wrapper";
-import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { hasPermission, createRole } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
@@ -82,7 +82,7 @@ export default function ProjectsIndex() {
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
                 "flex items-center gap-1",
-                !hasPermission(role, `${updateRole}:${attribute.projects}`) &&
+                !hasPermission(role, `${createRole}:${attribute.projects}`) &&
                   "hidden"
               )}
             >

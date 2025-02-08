@@ -5,7 +5,7 @@ import {
   lwfDeductionCycleArray,
   replaceUnderscore,
   transformStringArrayIntoOptions,
-  updateRole,
+  createRole,
 } from "@canny_ecosystem/utils";
 import {
   CheckboxField,
@@ -55,7 +55,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.statutoryFieldsLwf}`)) {
+  if (!hasPermission(user?.role!, `${createRole}:${attribute.statutoryFieldsLwf}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   try {

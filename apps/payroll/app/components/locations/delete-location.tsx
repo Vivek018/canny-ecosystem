@@ -41,7 +41,7 @@ export const DeleteLocation = ({ locationId }: { locationId: string }) => {
         {},
         {
           method: "post",
-          action: `/settings/${locationId}/delete-location`,
+          action: `/settings/locations/${locationId}/delete-location`,
           replace: true,
         }
       );

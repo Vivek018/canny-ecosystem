@@ -22,7 +22,7 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Suspense } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { RelationshipWrapper } from "@/components/relationships/relationship-wrapper";
-import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { hasPermission, createRole } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";
@@ -80,13 +80,13 @@ export default function Relationships() {
               autoFocus={true}
             />
             <Link
-              to='/settings/create-relationship'
+              to='/settings/relationships/create-relationship'
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
                 "flex items-center gap-1",
                 !hasPermission(
                   role,
-                  `${updateRole}:${attribute.settingRelationships}`
+                  `${createRole}:${attribute.settingRelationships}`
                 ) && "hidden"
               )}
             >

@@ -12,7 +12,7 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { hasPermission, createRole } from "@canny_ecosystem/utils";
 import {
   attribute,
   modalSearchParamNames,
@@ -107,7 +107,7 @@ export default function PaymentTemplatesIndex() {
 
                 !hasPermission(
                   role,
-                  `${updateRole}:${attribute.paymentTemplates}`
+                  `${createRole}:${attribute.paymentTemplates}`
                 ) && "hidden"
               )}
             >

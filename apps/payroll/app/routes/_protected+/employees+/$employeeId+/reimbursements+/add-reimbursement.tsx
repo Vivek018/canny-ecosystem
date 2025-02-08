@@ -11,7 +11,7 @@ import {
   reimbursementStatusArray,
   replaceUnderscore,
   transformStringArrayIntoOptions,
-  updateRole,
+  createRole,
 } from "@canny_ecosystem/utils";
 
 import {
@@ -53,7 +53,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
   if (
-    !hasPermission(user?.role!, `${updateRole}:${attribute.reimbursements}`)
+    !hasPermission(user?.role!, `${createRole}:${attribute.reimbursements}`)
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }

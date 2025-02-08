@@ -22,7 +22,7 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import type { EmployeeSkillDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { DeleteSkill } from "./delete-skill";
-import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { createRole, deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
@@ -132,7 +132,7 @@ export const EmployeeSkillsCard = ({
             className={cn(
               buttonVariants({ variant: "outline" }),
               "bg-card",
-              !hasPermission(role, `${updateRole}:${attribute.employeeSkills}`) &&
+              !hasPermission(role, `${createRole}:${attribute.employeeSkills}`) &&
                 "hidden"
             )}
           >

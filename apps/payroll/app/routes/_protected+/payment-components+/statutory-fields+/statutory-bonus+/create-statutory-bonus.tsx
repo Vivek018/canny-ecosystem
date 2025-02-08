@@ -19,7 +19,7 @@ import {
   statutoryBonusPayFrequencyArray,
   StatutoryBonusSchema,
   transformStringArrayIntoOptions,
-  updateRole,
+  createRole,
 } from "@canny_ecosystem/utils";
 import { attribute, payoutMonths } from "@canny_ecosystem/utils/constant";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
@@ -52,7 +52,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   if (
     !hasPermission(
       `${user?.role!}`,
-      `${updateRole}:${attribute.statutoryFieldsStatutoryBonus} `
+      `${createRole}:${attribute.statutoryFieldsStatutoryBonus} `
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });

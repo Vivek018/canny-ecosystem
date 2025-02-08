@@ -4,7 +4,7 @@ import {
   isGoodStatus,
   RelationshipSchema,
   replaceUnderscore,
-  updateRole,
+  createRole,
 } from "@canny_ecosystem/utils";
 import {
   CheckboxField,
@@ -65,7 +65,7 @@ export async function loader({
   if (
     !hasPermission(
       user?.role!,
-      `${updateRole}:${attribute.settingRelationships}`
+      `${createRole}:${attribute.settingRelationships}`
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -229,7 +229,7 @@ export default function CreateRelationship({
         <Form method="POST" {...getFormProps(form)} className="flex flex-col">
           <Card>
             <CardHeader>
-              <CardTitle className="text-3xl">
+              <CardTitle className="text-3xl capitalize">
                 {replaceDash(RELATIONSHIP_TAG)}
               </CardTitle>
               <CardDescription>

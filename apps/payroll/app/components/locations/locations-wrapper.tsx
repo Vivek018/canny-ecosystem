@@ -54,7 +54,7 @@ export function LocationsWrapper({
               autoFocus={true}
             />
             <Link
-              to="/settings/create-location"
+              to="/settings/locations/create-location"
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
                 "flex items-center gap-1",

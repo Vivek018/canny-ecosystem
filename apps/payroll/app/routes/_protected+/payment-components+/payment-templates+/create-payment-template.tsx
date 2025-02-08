@@ -15,7 +15,7 @@ import {
   isGoodStatus,
   PaymentTemplateComponentsSchema,
   PaymentTemplateSchema,
-  updateRole,
+  createRole,
   z,
 } from "@canny_ecosystem/utils";
 import { useIsomorphicLayoutEffect } from "@canny_ecosystem/utils/hooks/isomorphic-layout-effect";
@@ -62,7 +62,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.paymentTemplates}`)) {
+  if (!hasPermission(user?.role!, `${createRole}:${attribute.paymentTemplates}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 

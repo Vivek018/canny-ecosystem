@@ -62,7 +62,7 @@ export function RelationshipCard({
               <TooltipTrigger asChild>
                 <Link
                   prefetch="intent"
-                  to={`/settings/${relationship.id}/update-relationship`}
+                  to={`/settings/relationships/${relationship.id}/update-relationship`}
                   className={cn(
                     "p-2 rounded-md bg-secondary grid place-items-center",
                     !hasPermission(

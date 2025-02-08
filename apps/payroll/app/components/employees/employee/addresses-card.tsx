@@ -26,6 +26,7 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { DeleteAddress } from "./delete-address";
 import {
+  createRole,
   deleteRole,
   hasPermission,
   replaceUnderscore,
@@ -170,14 +171,14 @@ export const EmployeeAddressesCard = ({
         <div>
           <Link
             to={
-              hasPermission(role, `${updateRole}:${attribute.employeeAddresses}`)
+              hasPermission(role, `${createRole}:${attribute.employeeAddresses}`)
                 ? "add-employee-address"
                 : DEFAULT_ROUTE
             }
             className={cn(
               buttonVariants({ variant: "outline" }),
               "bg-card",
-              !hasPermission(role, `${updateRole}:${attribute.employeeAddresses}`) &&
+              !hasPermission(role, `${createRole}:${attribute.employeeAddresses}`) &&
                 "hidden"
             )}
           >

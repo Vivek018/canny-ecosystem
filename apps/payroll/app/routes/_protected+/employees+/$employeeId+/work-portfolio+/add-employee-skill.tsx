@@ -17,7 +17,7 @@ import {
   replaceDash,
   replaceUnderscore,
   transformStringArrayIntoOptions,
-  updateRole,
+  createRole,
 } from "@canny_ecosystem/utils";
 import {
   FormProvider,
@@ -53,7 +53,9 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.employeeSkills}`)) {
+  if (
+    !hasPermission(user?.role!, `${createRole}:${attribute.employeeSkills}`)
+  ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   try {
@@ -201,17 +203,17 @@ export default function AddEmployeeSkill({
   }, [actionData]);
 
   return (
-    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
+    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
       <FormProvider context={form.context}>
         <Form
-          method="POST"
-          encType="multipart/form-data"
+          method='POST'
+          encType='multipart/form-data'
           {...getFormProps(form)}
-          className="flex flex-col"
+          className='flex flex-col'
         >
           <Card>
             <CardHeader>
-              <CardTitle className="text-3xl">
+              <CardTitle className='text-3xl capitalize'>
                 {replaceDash(EMPLOYEE_SKILL_TAG)}
               </CardTitle>
               <CardDescription>
@@ -239,7 +241,7 @@ export default function AddEmployeeSkill({
               />
               <SearchableSelectField
                 key={resetKey}
-                className="capitalize"
+                className='capitalize'
                 options={transformStringArrayIntoOptions(
                   proficiencyArray as unknown as string[]
                 )}

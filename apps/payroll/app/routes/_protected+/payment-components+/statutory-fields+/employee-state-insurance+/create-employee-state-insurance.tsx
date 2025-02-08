@@ -23,7 +23,7 @@ import {
   replaceDash,
   replaceUnderscore,
   transformStringArrayIntoOptions,
-  updateRole,
+  createRole,
 } from "@canny_ecosystem/utils";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
@@ -55,7 +55,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
   if (
-    !hasPermission(user?.role!, `${updateRole}:${attribute.statutoryFieldsEsi}`)
+    !hasPermission(user?.role!, `${createRole}:${attribute.statutoryFieldsEsi}`)
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }

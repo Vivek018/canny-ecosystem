@@ -231,7 +231,8 @@ export const cacheKeyPrefix = {
   employee_reimbursements: "employee-reimbursements",
   general: "general",
   locations: "locations",
-  relationships: "relationships"
+  relationships: "relationships",
+  users: "users"
 }
 
 

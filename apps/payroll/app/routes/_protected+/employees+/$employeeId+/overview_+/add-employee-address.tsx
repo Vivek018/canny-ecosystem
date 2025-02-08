@@ -8,7 +8,7 @@ import {
   EmployeeAddressesSchema,
   getInitialValueFromZod,
   hasPermission,
-  updateRole,
+  createRole,
 } from "@canny_ecosystem/utils";
 import { CreateEmployeeAddress } from "@/components/employees/form/create-employee-address";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
@@ -34,7 +34,7 @@ export async function action({
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
   if (
-    !hasPermission(user?.role!, `${updateRole}:${attribute.employeeAddresses}`)
+    !hasPermission(user?.role!, `${createRole}:${attribute.employeeAddresses}`)
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }

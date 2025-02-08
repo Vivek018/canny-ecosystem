@@ -1,5 +1,7 @@
 import { columns } from "@/components/user/table/columns";
 import { UserDataTable } from "@/components/user/table/data-table";
+import { cacheKeyPrefix } from "@/constant";
+import { clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { useUserRole } from "@/utils/user";
 
@@ -9,10 +11,10 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { hasPermission, createRole } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json, Link, useLoaderData } from "@remix-run/react";
+import { type ClientLoaderFunctionArgs, json, Link, useLoaderData } from "@remix-run/react";
 import { useEffect, useState } from "react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -28,6 +30,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   return json({ data });
 }
+
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+  return await clientCaching(cacheKeyPrefix.users, args);
+}
+
+clientLoader.hydrate = true;
 
 export default function Users() {
   const { role } = useUserRole();
@@ -72,7 +80,7 @@ export default function Users() {
             className={cn(
               buttonVariants({ variant: "primary-outline" }),
               "flex items-center gap-1",
-              !hasPermission(role, `${updateRole}:${attribute.settingUsers}`) &&
+              !hasPermission(role, `${createRole}:${attribute.settingUsers}`) &&
                 "hidden"
             )}
           >

@@ -17,7 +17,7 @@ import {
   isGoodStatus,
   replaceDash,
   replaceUnderscore,
-  updateRole,
+  createRole,
 } from "@canny_ecosystem/utils";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
@@ -32,7 +32,7 @@ import {
   useLoaderData,
   useNavigate,
 } from "@remix-run/react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { UPDATE_GRATUITY } from "./$gratuityId.update-gratuity";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
@@ -48,7 +48,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
   if (
-    !hasPermission(user?.role!, `${updateRole}:${attribute.statutoryFieldsGraduity}`)
+    !hasPermission(user?.role!, `${createRole}:${attribute.statutoryFieldsGraduity}`)
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
@@ -127,7 +127,6 @@ export default function CreateGratuity({
   const GRATUITY_TAG = updateValues ? UPDATE_GRATUITY : CREATE_GRATUITY;
 
   const initialValues = updateValues ?? getInitialValueFromZod(GratuitySchema);
-  const [resetKey, setResetKey] = useState(Date.now());
 
   const [form, fields] = useForm({
     id: GRATUITY_TAG,
@@ -265,7 +264,7 @@ export default function CreateGratuity({
               />
             </div>
           </CardContent>
-          <FormButtons form={form} setResetKey={setResetKey} isSingle={true} />
+          <FormButtons form={form} isSingle={true} />
         </Card>
       </Form>
     </section>

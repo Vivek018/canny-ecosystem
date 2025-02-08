@@ -8,7 +8,7 @@ import {
   transformStringArrayIntoOptions,
   calculationTypeArray,
   hasPermission,
-  updateRole,
+  createRole,
 } from "@canny_ecosystem/utils";
 import {
   CheckboxField,
@@ -58,7 +58,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.paymentFields}`)) {
+  if (!hasPermission(user?.role!, `${createRole}:${attribute.paymentFields}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 

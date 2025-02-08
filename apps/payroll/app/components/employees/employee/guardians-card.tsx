@@ -22,7 +22,7 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import type { EmployeeGuardianDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { DeleteGuardian } from "./delete-guardian";
-import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { createRole, deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
 import { DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
@@ -164,32 +164,37 @@ export const EmployeeGuardiansCard = ({
 }) => {
   const { role } = useUserRole();
   return (
-    <Card className="rounded w-full h-full p-4">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold">Guardians Details</h2>
+    <Card className='rounded w-full h-full p-4'>
+      <div className='flex justify-between items-center mb-6'>
+        <h2 className='text-xl font-semibold'>Guardians Details</h2>
         <div>
           <Link
             to={
-              hasPermission(role, `${updateRole}:${attribute.employeeGuardians}`)
+              hasPermission(
+                role,
+                `${createRole}:${attribute.employeeGuardians}`
+              )
                 ? "add-employee-guardian"
                 : DEFAULT_ROUTE
             }
             className={cn(
               buttonVariants({ variant: "outline" }),
               "bg-card",
-              !hasPermission(role, `${updateRole}:${attribute.employeeGuardians}`) &&
-                "hidden"
+              !hasPermission(
+                role,
+                `${createRole}:${attribute.employeeGuardians}`
+              ) && "hidden"
             )}
           >
-            <Icon name="plus-circled" className="mr-2" />
+            <Icon name='plus-circled' className='mr-2' />
             Add
           </Link>
         </div>
       </div>
 
-      <div className="w-full overflow-scroll no-scrollbar">
+      <div className='w-full overflow-scroll no-scrollbar'>
         {employeeGuardians?.length ? (
-          <div className="flex items-center gap-4 min-w-max">
+          <div className='flex items-center gap-4 min-w-max'>
             {employeeGuardians.map((guardian, index) => (
               <GuardianItem
                 key={guardian?.id + index.toString()}
@@ -198,7 +203,7 @@ export const EmployeeGuardiansCard = ({
             ))}
           </div>
         ) : (
-          <div className="text-center py-8">
+          <div className='text-center py-8'>
             <p>No guardians details available.</p>
           </div>
         )}

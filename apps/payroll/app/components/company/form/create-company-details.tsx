@@ -23,15 +23,11 @@ type FieldsType = {
   >;
 };
 
-export function CreateCompanyDetails({
-  fields,
-}: {
-  fields: FieldsType;
-}) {
+export function CreateCompanyDetails({ fields }: { fields: FieldsType }) {
   return (
     <Fragment>
       <CardHeader>
-        <CardTitle className="text-3xl">Create Company</CardTitle>
+        <CardTitle className='text-3xl capitalize'>Create Company</CardTitle>
         <CardDescription>
           Create a company that will be central in all of canny apps
         </CardDescription>
@@ -64,30 +60,34 @@ export function CreateCompanyDetails({
           }}
           errors={fields.email_suffix.errors}
         />
-        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+        <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
           <SearchableSelectField
-            className="w-full capitalize flex-1"
+            className='w-full capitalize flex-1'
             options={transformStringArrayIntoOptions(
-              company_type as unknown as string[],
+              company_type as unknown as string[]
             )}
             inputProps={{
               ...getInputProps(fields.company_type, { type: "text" }),
             }}
-            placeholder={`Select ${replaceUnderscore(fields.company_type.name)}`}
+            placeholder={`Select ${replaceUnderscore(
+              fields.company_type.name
+            )}`}
             labelProps={{
               children: replaceUnderscore(fields.company_type.name),
             }}
             errors={fields.company_type.errors}
           />
           <SearchableSelectField
-            className="w-full capitalize flex-1"
+            className='w-full capitalize flex-1'
             options={transformStringArrayIntoOptions(
-              company_size as unknown as string[],
+              company_size as unknown as string[]
             )}
             inputProps={{
               ...getInputProps(fields.company_size, { type: "text" }),
             }}
-            placeholder={`Select ${replaceUnderscore(fields.company_size.name)}`}
+            placeholder={`Select ${replaceUnderscore(
+              fields.company_size.name
+            )}`}
             labelProps={{
               children: replaceUnderscore(fields.company_size.name),
             }}

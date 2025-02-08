@@ -10,7 +10,7 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { PaymentFieldTableWrapper } from "@/components/payment-field/payment-field-table-wrapper";
-import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { hasPermission, createRole } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
@@ -72,7 +72,7 @@ export default function PaymentFieldsIndex() {
                 "flex items-center gap-1",
                 !hasPermission(
                   role,
-                  `${updateRole}:${attribute.paymentFields}`
+                  `${createRole}:${attribute.paymentFields}`
                 ) && "hidden"
               )}
             >

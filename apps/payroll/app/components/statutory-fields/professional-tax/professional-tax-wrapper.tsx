@@ -14,7 +14,7 @@ import type { ProfessionalTaxDatabaseRow } from "@canny_ecosystem/supabase/types
 import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
 import { useEffect } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { hasPermission, createRole } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
@@ -54,7 +54,7 @@ export function ProfessionalTaxWrapper({
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
                 "flex items-center gap-1",
-                !hasPermission(role, `${updateRole}:${attribute.statutoryFieldsPf}`) &&
+                !hasPermission(role, `${createRole}:${attribute.statutoryFieldsPf}`) &&
                   "hidden"
               )}
             >

@@ -1,9 +1,9 @@
 import {
-  isGoodStatus,
-  SiteSchema,
-  replaceUnderscore,
   hasPermission,
-  updateRole,
+  isGoodStatus,
+  LocationSchema,
+  replaceUnderscore,
+  createRole,
 } from "@canny_ecosystem/utils";
 import {
   CheckboxField,
@@ -19,18 +19,18 @@ import {
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import {
-  Await,
-  defer,
   Form,
   json,
   useActionData,
   useLoaderData,
   useNavigate,
 } from "@remix-run/react";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
+import { UPDATE_LOCATION } from "./$locationId.update-location";
 import {
   Card,
   CardContent,
@@ -39,81 +39,55 @@ import {
   CardTitle,
 } from "@canny_ecosystem/ui/card";
 
-import { createSite } from "@canny_ecosystem/supabase/mutations";
-import type { SiteDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import { createLocation } from "@canny_ecosystem/supabase/mutations";
+import type { LocationDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { attribute, statesAndUTs } from "@canny_ecosystem/utils/constant";
-import { UPDATE_SITE } from "./$siteId.update-site";
-import { getLocationsForSelectByCompanyId } from "@canny_ecosystem/supabase/queries";
-import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { LocationsListWrapper } from "@/components/projects/sites/locations-list-wrapper";
-import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
+import { clearCacheEntry } from "@/utils/cache";
 
-export const CREATE_SITE = "create-site";
+export const CREATE_LOCATION = "create-location";
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
-  const projectId = params.projectId;
+export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.projectSite}`)) {
+  if (!hasPermission(user?.role!, `${createRole}:${attribute.settingLocations}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
   try {
-    if (!projectId) throw new Error("No projectId provided");
-
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-    const locationOptionsPromise = getLocationsForSelectByCompanyId({
-      supabase,
-      companyId,
-    }).then(({ data, error }) => {
-      if (data) {
-        const locationOptions = data.map((location) => ({
-          label: location.name,
-          value: location.id,
-        }));
-        return { data: locationOptions, error };
-      }
-      return { data, error };
-    });
 
-    return defer({
+    return json({
+      status: "success",
+      message: "CompanyId found",
+      companyId,
       error: null,
-      projectId,
-      locationOptionsPromise,
     });
   } catch (error) {
-    return json(
-      {
-        error,
-        projectId,
-        locationOptionsPromise: null,
-      },
-      { status: 500 }
-    );
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+      companyId: null,
+    });
   }
 }
 
 export async function action({
   request,
-  params,
 }: ActionFunctionArgs): Promise<Response> {
-  const projectId = params.projectId;
-
   try {
-    if (!projectId) throw new Error("No projectId provided");
-
     const { supabase } = getSupabaseWithHeaders({ request });
     const formData = await request.formData();
 
     const submission = parseWithZod(formData, {
-      schema: SiteSchema,
+      schema: LocationSchema,
     });
 
     if (submission.status !== "success") {
@@ -123,26 +97,20 @@ export async function action({
       );
     }
 
-    const { status, error } = await createSite({
+    const { status, error } = await createLocation({
       supabase,
       data: submission.value as any,
     });
 
-    if (isGoodStatus(status)) {
+    if (isGoodStatus(status))
       return json({
         status: "success",
-        message: "Site created successfully",
+        message: "Location created",
         error: null,
-        returnTo: `/projects/${projectId}/sites`,
       });
-    }
+
     return json(
-      {
-        status: "error",
-        message: "Site creation failed",
-        error,
-        returnTo: `/projects/${projectId}/sites`,
-      },
+      { status: "error", message: "Location creation failed", error },
       { status: 500 }
     );
   } catch (error) {
@@ -151,63 +119,61 @@ export async function action({
         status: "error",
         message: "An unexpected error occurred",
         error,
-        returnTo: `/projects/${projectId}/sites`,
       },
       { status: 500 }
     );
   }
 }
 
-export default function CreateSite({
+export default function CreateLocation({
   updateValues,
 }: {
-  updateValues?: SiteDatabaseUpdate | null;
+  updateValues?: LocationDatabaseUpdate | null;
 }) {
-  const { projectId, locationOptionsPromise, error } =
-    useLoaderData<typeof loader>();
+  const { companyId } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
-  const SITE_TAG = updateValues ? UPDATE_SITE : CREATE_SITE;
+  const LOCATION_TAG = updateValues ? UPDATE_LOCATION : CREATE_LOCATION;
 
-  const initialValues = updateValues ?? getInitialValueFromZod(SiteSchema);
+  const initialValues = updateValues ?? getInitialValueFromZod(LocationSchema);
   const [resetKey, setResetKey] = useState(Date.now());
 
   const [form, fields] = useForm({
-    id: SITE_TAG,
-    constraint: getZodConstraint(SiteSchema),
+    id: LOCATION_TAG,
+    constraint: getZodConstraint(LocationSchema),
     onValidate({ formData }) {
-      return parseWithZod(formData, { schema: SiteSchema });
+      return parseWithZod(formData, { schema: LocationSchema });
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
     defaultValue: {
       ...initialValues,
-      project_id: initialValues.project_id ?? projectId,
+      company_id: initialValues.company_id ?? companyId,
     },
   });
+
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (actionData) {
-      if (actionData?.status === "success") {
-        toast({
-          title: "Success",
-          description: actionData.message,
-          variant: "success",
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: actionData.error,
-          variant: "destructive",
-        });
-      }
-      navigate(actionData.returnTo);
+    if (!actionData) return;
+    if (actionData?.status === "success") {
+      clearCacheEntry(cacheKeyPrefix.locations);
+      toast({
+        title: "Success",
+        description: actionData?.message,
+        variant: "success",
+      });
+      navigate("/settings/locations", {
+        replace: true,
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: actionData?.error?.message || "Location creation failed",
+        variant: "destructive",
+      });
     }
-  }, [actionData]);
-
-  if (error)
-    return <ErrorBoundary error={error} message="Failed to create site" />;
+  }, [actionData, toast, navigate]);
 
   return (
     <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
@@ -215,18 +181,18 @@ export default function CreateSite({
         <Form method="POST" {...getFormProps(form)} className="flex flex-col">
           <Card>
             <CardHeader>
-              <CardTitle className="text-3xl">
-                {replaceDash(SITE_TAG)}
+            <CardTitle className="text-3xl capitalize">
+                {replaceDash(LOCATION_TAG)}
               </CardTitle>
               <CardDescription>
-                {SITE_TAG.split("-")[0]} site of a project that will be central
-                in all of canny apps
+                {LOCATION_TAG.split("-")[0]} location of a company that will be
+                central in all of canny apps
               </CardDescription>
             </CardHeader>
             <CardContent>
               <input {...getInputProps(fields.id, { type: "hidden" })} />
               <input
-                {...getInputProps(fields.project_id, { type: "hidden" })}
+                {...getInputProps(fields.company_id, { type: "hidden" })}
               />
               <Field
                 inputProps={{
@@ -240,46 +206,13 @@ export default function CreateSite({
                 }}
                 errors={fields.name.errors}
               />
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
-                <Field
-                  inputProps={{
-                    ...getInputProps(fields.site_code, { type: "text" }),
-                    placeholder: `Enter ${replaceUnderscore(
-                      fields.site_code.name
-                    )}`,
-                    className: "capitalize",
-                  }}
-                  labelProps={{
-                    children: replaceUnderscore(fields.site_code.name),
-                  }}
-                  errors={fields.site_code.errors}
-                />
-                <Suspense fallback={<div>Loading...</div>}>
-                  <Await resolve={locationOptionsPromise}>
-                    {(resolvedData) => {
-                      if (!resolvedData)
-                        return (
-                          <ErrorBoundary message="Failed to load locations" />
-                        );
-                      return (
-                        <LocationsListWrapper
-                          data={resolvedData.data}
-                          error={resolvedData.error}
-                          fields={fields}
-                          resetKey={resetKey}
-                        />
-                      );
-                    }}
-                  </Await>
-                </Suspense>
-              </div>
               <CheckboxField
-                buttonProps={getInputProps(fields.is_active, {
+                buttonProps={getInputProps(fields.is_primary, {
                   type: "checkbox",
                 })}
                 labelProps={{
-                  htmlFor: fields.is_active.id,
-                  children: "Is this site active?",
+                  htmlFor: fields.is_primary.id,
+                  children: "Is this your primary address?",
                 }}
               />
               <Field

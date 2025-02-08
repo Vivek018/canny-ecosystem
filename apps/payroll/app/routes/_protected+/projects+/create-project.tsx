@@ -5,7 +5,7 @@ import {
   ProjectSchema,
   statusArray,
   transformStringArrayIntoOptions,
-  updateRole,
+  createRole,
 } from "@canny_ecosystem/utils";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
@@ -65,7 +65,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.project}`)) {
+  if (!hasPermission(user?.role!, `${createRole}:${attribute.project}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   try {
@@ -197,21 +197,21 @@ export default function CreateProject({
   }, [actionData]);
 
   if (error) {
-    return <ErrorBoundary error={error} message="Failed to load projects" />;
+    return <ErrorBoundary error={error} message='Failed to load projects' />;
   }
 
   return (
-    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
+    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
       <FormProvider context={form.context}>
         <Form
-          method="POST"
-          encType="multipart/form-data"
+          method='POST'
+          encType='multipart/form-data'
           {...getFormProps(form)}
-          className="flex flex-col"
+          className='flex flex-col'
         >
           <Card>
             <CardHeader>
-              <CardTitle className="text-3xl">
+              <CardTitle className='text-3xl capitalize'>
                 {replaceDash(PROJECT_TAG)}
               </CardTitle>
               <CardDescription>
@@ -235,7 +235,7 @@ export default function CreateProject({
                 labelProps={{ children: fields.name.name }}
                 errors={fields.name.errors}
               />
-              <div className="grid grid-cols-3 place-content-center justify-between gap-6">
+              <div className='grid grid-cols-3 place-content-center justify-between gap-6'>
                 <Field
                   inputProps={{
                     ...getInputProps(fields.project_code, {
@@ -294,7 +294,7 @@ export default function CreateProject({
                   {(resolvedData) => {
                     if (!resolvedData)
                       return (
-                        <ErrorBoundary message="Failed to load company options" />
+                        <ErrorBoundary message='Failed to load company options' />
                       );
                     return (
                       <CompanyListsWrapper
@@ -308,7 +308,7 @@ export default function CreateProject({
                   }}
                 </Await>
               </Suspense>
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+              <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
                 <Field
                   inputProps={{
                     ...getInputProps(fields.start_date, { type: "date" }),

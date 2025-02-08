@@ -14,7 +14,7 @@ import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import type { LabourWelfareFundDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { useEffect } from "react";
-import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { hasPermission, createRole } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
@@ -58,7 +58,7 @@ export function LWFWrapper({
                 "flex items-center gap-1",
                 !hasPermission(
                   role,
-                  `${updateRole}:${attribute.statutoryFieldsLwf}`
+                  `${createRole}:${attribute.statutoryFieldsLwf}`
                 ) && "hidden"
               )}
             >

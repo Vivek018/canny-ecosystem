@@ -15,6 +15,7 @@ import {
   EmployeeLinkSchema,
   hasPermission,
   updateRole,
+  createRole,
 } from "@canny_ecosystem/utils";
 import {
   FormProvider,
@@ -115,30 +116,32 @@ export function EmployeeDialog({
     <Dialog>
       <DialogTrigger asChild>
         <Button
-          variant="ghost"
+          variant='ghost'
           className={cn(
             "item-start justify-start px-2 font-normal w-full hidden",
-            hasPermission(role, `${updateRole}:${attribute.employees}`) && "flex"
+            hasPermission(role, `${updateRole}:${attribute.employees}`) &&
+              hasPermission(role, `${createRole}:${attribute.employees}`) &&
+              "flex"
           )}
           onClick={openPaymentTemplateDialog}
         >
           Link template
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
-        <DialogTitle className="text-xl font-semibold mb-4">
+      <DialogContent className='sm:max-w-[600px]'>
+        <DialogTitle className='text-xl font-semibold mb-4'>
           {initialValues ? "Update" : "Create"} Link Payment Template
         </DialogTitle>
         <FormProvider context={form.context}>
           <Form
-            method="POST"
+            method='POST'
             {...getFormProps(form)}
             action={`/templates/${employee.id}/${
               initialValues ? "update" : "create"
             }-employee-link`}
           >
             <Field
-              className="w-full"
+              className='w-full'
               inputProps={{
                 ...getInputProps(fields.name, { type: "text" }),
                 placeholder: "Name",
@@ -148,9 +151,9 @@ export function EmployeeDialog({
               }}
               errors={fields.name.errors}
             />
-            <div className="grid grid-cols-2 gap-4">
+            <div className='grid grid-cols-2 gap-4'>
               <Field
-                className="w-full"
+                className='w-full'
                 inputProps={{
                   ...getInputProps(fields.effective_from, { type: "date" }),
                   placeholder: replaceUnderscore(fields.effective_from.name),
@@ -165,7 +168,7 @@ export function EmployeeDialog({
                 errors={fields.effective_from.errors}
               />
               <Field
-                className="w-full"
+                className='w-full'
                 inputProps={{
                   ...getInputProps(fields.effective_to, { type: "date" }),
                   placeholder: replaceUnderscore(fields.effective_to.name),
@@ -182,7 +185,7 @@ export function EmployeeDialog({
             </div>
             <SearchableSelectField
               key={resetKey}
-              className="capitalize"
+              className='capitalize'
               options={paymentTemplatesOptions}
               inputProps={{
                 ...getInputProps(fields.template_id, { type: "text" }),
@@ -195,8 +198,8 @@ export function EmployeeDialog({
             />
             <StatusButton
               status={navigation.state === "submitting" ? "pending" : "idle"}
-              variant="default"
-              className="w-full capitalize"
+              variant='default'
+              className='w-full capitalize'
               disabled={!form.valid || disableAll}
             >
               {initialValues ? "Update" : "Create"} link template

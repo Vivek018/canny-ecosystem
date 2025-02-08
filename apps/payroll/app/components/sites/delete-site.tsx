@@ -47,7 +47,7 @@ export const DeleteSite = ({
         {},
         {
           method: "post",
-          action: `/projects/${projectId}/${siteId}/delete-site`,
+          action: `/projects/${projectId}/sites/${siteId}/delete-site`,
           replace: true,
         }
       );

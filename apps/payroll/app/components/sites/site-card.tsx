@@ -51,22 +51,22 @@ export function SiteCard({
   return (
     <Card
       key={site.id}
-      className="w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start"
+      className='w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start'
     >
-      <CardHeader className="flex flex-row space-y-0 items-start justify-between p-4">
-        <div className="flex flex-col items-start">
-          <CardTitle className="text-lg tracking-wide">{site.name}</CardTitle>
-          <p className="text-[12px] w-max text-muted-foreground -mt-1 rounded-md">
+      <CardHeader className='flex flex-row space-y-0 items-start justify-between p-4'>
+        <div className='flex flex-col items-start'>
+          <CardTitle className='text-lg tracking-wide'>{site.name}</CardTitle>
+          <p className='text-[12px] w-max text-muted-foreground -mt-1 rounded-md'>
             {site.site_code}
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className='flex items-center gap-3'>
           <TooltipProvider>
             <Tooltip delayDuration={100}>
               <TooltipTrigger asChild>
                 <Link
-                  prefetch="intent"
-                  to={`/projects/${site.project_id}/${site.id}/update-site`}
+                  prefetch='intent'
+                  to={`/projects/${site.project_id}/sites/${site.id}/update-site`}
                   className={cn(
                     "p-2 rounded-md bg-secondary grid place-items-center ",
                     !hasPermission(
@@ -75,17 +75,17 @@ export function SiteCard({
                     ) && "hidden"
                   )}
                 >
-                  <Icon name="edit" size="xs" />
+                  <Icon name='edit' size='xs' />
                 </Link>
               </TooltipTrigger>
               <TooltipContent>Edit</TooltipContent>
             </Tooltip>
           </TooltipProvider>
           <DropdownMenu>
-            <DropdownMenuTrigger className="p-2 py-2 rounded-md bg-secondary grid place-items-center">
-              <Icon name="dots-vertical" size="xs" />
+            <DropdownMenuTrigger className='p-2 py-2 rounded-md bg-secondary grid place-items-center'>
+              <Icon name='dots-vertical' size='xs' />
             </DropdownMenuTrigger>
-            <DropdownMenuContent sideOffset={10} align="end">
+            <DropdownMenuContent sideOffset={10} align='end'>
               <DropdownMenuGroup>
                 <DropdownMenuItem
                   onClick={() => {
@@ -150,19 +150,19 @@ export function SiteCard({
           </DropdownMenu>
         </div>
       </CardHeader>
-      <CardContent className="flex flex-col gap-0.5 px-4">
-        <address className="not-italic line-clamp-3">
+      <CardContent className='flex flex-col gap-0.5 px-4'>
+        <address className='not-italic line-clamp-3'>
           {`${site.address_line_1} ${
             site.address_line_2 ? site.address_line_2 : ""
           }`}
         </address>
-        <div className="flex items-center capitalize gap-2">
+        <div className='flex items-center capitalize gap-2'>
           <p>{`${site.city},`}</p>
           <p>{`${replaceUnderscore(site.state)}`}</p>
           <p>{`- ${site.pincode}`}</p>
         </div>
       </CardContent>
-      <CardFooter className="p-0 mt-auto">
+      <CardFooter className='p-0 mt-auto'>
         <div
           className={cn(
             "border-t border-r bg-secondary rounded-tr-md text-foreground px-2.5 py-1.5",
@@ -177,7 +177,7 @@ export function SiteCard({
             !site.is_active && "opacity-0"
           )}
         >
-          <Icon name="dot-filled" size="xs" />
+          <Icon name='dot-filled' size='xs' />
           Active
         </div>
       </CardFooter>

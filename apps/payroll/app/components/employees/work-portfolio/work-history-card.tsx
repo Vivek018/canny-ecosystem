@@ -23,6 +23,7 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import type { EmployeeWorkHistoryDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { DeleteWorkHistory } from "./delete-work-history";
 import {
+  createRole,
   deleteRole,
   formatDate,
   hasPermission,
@@ -160,7 +161,7 @@ export const EmployeeWorkHistoriesCard = ({
               "bg-card",
               !hasPermission(
                 `${role}`,
-                `${updateRole}:${attribute.employeeWorkHistory}`
+                `${createRole}:${attribute.employeeWorkHistory}`
               ) && "hidden"
             )}
           >
