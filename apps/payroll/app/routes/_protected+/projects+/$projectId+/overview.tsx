@@ -5,7 +5,7 @@ import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getProjectById } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { defer, json, type LoaderFunctionArgs } from "@remix-run/node";
+import { defer, type LoaderFunctionArgs } from "@remix-run/node";
 import {
   Await,
   type ClientLoaderFunctionArgs,
@@ -32,7 +32,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       projectPromise,
     });
   } catch (error) {
-    return json(
+    return defer(
       {
         error,
         projectPromise: null,

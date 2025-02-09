@@ -25,8 +25,9 @@ import type { EmployeeStateInsuranceDatabaseUpdate } from "@canny_ecosystem/supa
 import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const UPDATE_EMPLOYEE_STATE_INSURANCE =
   "update-employee-state-insurance";
@@ -127,6 +128,7 @@ export default function UpdateEmployeeStateInsurance() {
   useEffect(() => {
     if (!actionData) return;
     if (actionData?.status === "success") {
+      clearExactCacheEntry(cacheKeyPrefix.statutory_field_esi);
       toast({
         title: "Success",
         description: actionData?.message || "Employee State Insurance updated",

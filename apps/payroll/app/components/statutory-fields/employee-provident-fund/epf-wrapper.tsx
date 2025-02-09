@@ -13,6 +13,8 @@ import {
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
+import { clearExactCacheEntry } from "@/utils/cache";
+import { cacheKeyPrefix } from "@/constant";
 
 type DetailItemProps = {
   label: string;
@@ -51,8 +53,9 @@ export function EPFWrapper({
         (data?.employer_contribution ?? EMPLOYEE_EPF_PERCENTAGE) * 100
       }% of Actual Wage`;
 
-  if (error)
-    return <ErrorBoundary error={error} message="Failed to load data" />;
+  if (error){
+    clearExactCacheEntry(cacheKeyPrefix.statutory_field_epf);
+    return <ErrorBoundary error={error} message="Failed to load data" />;}
   if (!data) return <EPFNoData />;
 
   return (

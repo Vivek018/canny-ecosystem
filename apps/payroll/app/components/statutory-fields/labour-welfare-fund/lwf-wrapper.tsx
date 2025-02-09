@@ -17,6 +17,8 @@ import { useEffect } from "react";
 import { hasPermission, createRole } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
+import { cacheKeyPrefix } from "@/constant";
 
 export function LWFWrapper({
   data,
@@ -33,6 +35,7 @@ export function LWFWrapper({
 
   useEffect(() => {
     if (error) {
+      clearExactCacheEntry(cacheKeyPrefix.labour_welfare_fund);
       toast({
         title: "Error",
         description: error.message || "Failed to load",

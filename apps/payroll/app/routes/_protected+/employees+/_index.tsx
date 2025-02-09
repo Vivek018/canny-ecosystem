@@ -8,6 +8,7 @@ import { ImportEmployeeGuardiansModal } from "@/components/employees/import-expo
 import { ImportEmployeeStatutoryModal } from "@/components/employees/import-export/import-modal-statutory";
 import { columns } from "@/components/employees/table/columns";
 import { DataTable } from "@/components/employees/table/data-table";
+import { ErrorBoundary } from "@/components/error-boundary";
 import { cacheKeyPrefix, VALID_FILTERS } from "@/constant";
 import { AIChat4o } from "@/utils/ai";
 import { clientCaching } from "@/utils/cache";
@@ -239,7 +240,7 @@ export default function EmployeesIndex() {
         <Await resolve={employeesPromise}>
           {({ data, meta, error }) => {
             if (error) {
-              throw error;
+              <ErrorBoundary error={error} message='Failed to load employees' />
             }
 
             const hasNextPage = Boolean(meta?.count > pageSize);

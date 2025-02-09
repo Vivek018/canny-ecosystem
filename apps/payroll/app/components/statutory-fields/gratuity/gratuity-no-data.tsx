@@ -15,21 +15,23 @@ import { Link } from "@remix-run/react";
 export function GratuityNoData() {
   const { role } = useUserRole();
   return (
-    <div className="flex flex-col items-center justify-end m-auto">
-      <div className="p-14" />
-      <Card className="flex flex-col items-center justify-between gap-5 w-1/2 pt-6 px-2">
-        <CardContent className="flex flex-col items-center justify-between gap-5">
+    <div className='flex flex-col items-center justify-end m-auto'>
+      <div className='p-14' />
+      <Card className='flex flex-col items-center justify-between gap-5 w-1/2 pt-6 px-2'>
+        <CardContent className='flex flex-col items-center justify-between gap-5'>
           <CardTitle>Are you registered for Gratuity?</CardTitle>
-          <CardDescription className="text-center text-[14px]">
-            Any organisation with 20 or more employees must register for the
-            Gratuity scheme, a retirement benefit plan for all salaried
-            employees.
+          <CardDescription className='text-center text-[14px]'>
+            Gratuity is a statutory benefit under the Payment of Gratuity Act,
+            1972, provided by employers to employees who have completed at least
+            five years of continuous service. Organizations with 10 or more
+            employees must register for the scheme, ensuring financial support
+            for employees upon retirement, resignation, disability, or death.
           </CardDescription>
         </CardContent>
 
         <CardFooter>
           <Link
-            to="/payment-components/statutory-fields/gratuity/create-gratuity"
+            to='/payment-components/statutory-fields/gratuity/create-gratuity'
             className={cn(
               buttonVariants({ variant: "primary-outline" }),
               !hasPermission(

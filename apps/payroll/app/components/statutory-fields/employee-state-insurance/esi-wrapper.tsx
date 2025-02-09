@@ -12,6 +12,8 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { useUserRole } from "@/utils/user";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
+import { cacheKeyPrefix } from "@/constant";
 
 type DetailItemProps = {
   label: string;
@@ -22,8 +24,8 @@ type DetailItemProps = {
 const DetailItem: React.FC<DetailItemProps> = ({ label, value, className }) => {
   return (
     <div className={`flex gap-1 max-md:flex-col ${className ?? ""}`}>
-      <div className="w-60 text-muted-foreground">{label}</div>
-      <div className="w-96 self-start">{value || "-"}</div>
+      <div className='w-60 text-muted-foreground'>{label}</div>
+      <div className='w-96 self-start'>{value || "-"}</div>
     </div>
   );
 };
@@ -39,17 +41,21 @@ export function ESIWrapper({
   error: Error | null | { message: string };
 }) {
   const { role } = useUserRole();
-  if (error)
-    return <ErrorBoundary error={error} message="Failed to load ESI" />;
-  if (!data) return <ESINoData />;
+  if (error) {
+    clearExactCacheEntry(cacheKeyPrefix.statutory_field_esi);
+    return <ErrorBoundary error={error} message='Failed to load ESI' />;
+  }
+  if (!data) {
+    return <ESINoData />;
+  }
 
   return (
-    <div className="p-4 w-full">
+    <div className='p-4 w-full'>
       <div>
-        <div className="flex items-center gap-5 mb-8">
-          <h4 className="text-lg font-semibold">Employees' State Insurance</h4>
+        <div className='flex items-center gap-5 mb-8'>
+          <h4 className='text-lg font-semibold'>Employees' State Insurance</h4>
           <Link
-            prefetch="intent"
+            prefetch='intent'
             to={`/payment-components/statutory-fields/employee-state-insurance/${data?.id}/update-esi`}
             className={cn(
               "p-2 rounded-full bg-secondary grid place-items-center",
@@ -59,15 +65,15 @@ export function ESIWrapper({
               ) && "hidden"
             )}
           >
-            <Icon name="edit" size="sm" />
+            <Icon name='edit' size='sm' />
           </Link>
         </div>
-        <div className="flex flex-col mb-2 justify-between gap-6 w-full">
-          <DetailItem label="ESI Number" value={data?.esi_number || "-"} />
+        <div className='flex flex-col mb-2 justify-between gap-6 w-full'>
+          <DetailItem label='ESI Number' value={data?.esi_number || "-"} />
           <DetailItem
-            label="Deduction Cycle"
+            label='Deduction Cycle'
             value={replaceUnderscore(data?.deduction_cycle) || "-"}
-            className="capitalize"
+            className='capitalize'
           />
           <DetailItem
             label="Employees' Contribution"
@@ -77,9 +83,9 @@ export function ESIWrapper({
             label="Employer's Contribution"
             value={`${data?.employers_contribution * 100}% of Gross Pay`}
           />
-          <DetailItem label="Max Limit" value={data?.max_limit} />
+          <DetailItem label='Max Limit' value={data?.max_limit} />
         </div>
-        <hr className="my-6" />
+        <hr className='my-6' />
         <div>
           <DeleteEmployeeStateInsurance employeeStateInsuranceId={data?.id} />
         </div>

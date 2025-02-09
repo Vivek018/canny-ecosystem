@@ -1,4 +1,5 @@
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { deletePaymentTemplate } from "@canny_ecosystem/supabase/mutations";
@@ -69,6 +70,7 @@ export default function DeletePaymentTemplate() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
+        clearExactCacheEntry(cacheKeyPrefix.payment_templates);
         toast({
           title: "Success",
           description: actionData?.message,

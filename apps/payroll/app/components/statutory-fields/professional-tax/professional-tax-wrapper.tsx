@@ -17,6 +17,8 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { hasPermission, createRole } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
+import { cacheKeyPrefix } from "@/constant";
 
 export function ProfessionalTaxWrapper({
   data,
@@ -31,6 +33,7 @@ export function ProfessionalTaxWrapper({
 
   useEffect(() => {
     if (error) {
+      clearExactCacheEntry(cacheKeyPrefix.professional_tax);
       toast({
         title: "Error",
         description: error.message || "Failed to load",
@@ -77,12 +80,12 @@ export function ProfessionalTaxWrapper({
               <div className="w-full grid gap-8 grid-cols-1 md:grid-cols-2 2xl:grid-cols-3">
                 {data?.map((professionalTax) => (
                   <CommandItem
-                    key={professionalTax.id}
+                    key={professionalTax?.id}
                     value={
-                      professionalTax.state +
-                      professionalTax.pt_number +
-                      professionalTax.deduction_cycle +
-                      professionalTax.gross_salary_range?.toString()
+                      professionalTax?.state +
+                      professionalTax?.pt_number +
+                      professionalTax?.deduction_cycle +
+                      professionalTax?.gross_salary_range?.toString()
                     }
                     className="data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0"
                   >

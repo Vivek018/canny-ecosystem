@@ -46,7 +46,8 @@ import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const CREATE_LABOUR_WELFARE_FUND = "create-labour-welfare-fund";
 
@@ -157,6 +158,7 @@ export default function CreateLabourWelfareFund({
     if (!actionData) return;
 
     if (actionData?.status === "success") {
+      clearExactCacheEntry(cacheKeyPrefix.labour_welfare_fund);
       toast({
         title: "Success",
         description: actionData?.message || "Labour Welfare Fund created",

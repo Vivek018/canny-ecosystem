@@ -26,7 +26,7 @@ export const PaymentTemplateOptionsDropdown = ({
 
   const handleViewComponents = () => {
     navigate(
-      `/payment-components/payment-templates?step=${modalSearchParamNames.view_template_components}&templateId=${paymentTemplate.id}`
+      `/payment-components/payment-templates/${paymentTemplate.id}?step=${modalSearchParamNames.view_template_components}`
     );
   };
 

@@ -1,11 +1,8 @@
 import type { PaymentTemplateComponentType } from "@canny_ecosystem/supabase/queries";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@canny_ecosystem/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@canny_ecosystem/ui/dialog";
 import { replaceUnderscore } from "@canny_ecosystem/utils";
-import { useNavigate } from "@remix-run/react";
+import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
+import { useNavigate, useSearchParams } from "@remix-run/react";
 
 export const PaymentTemplateComponentsCard = ({
   paymentTemplateComponents,
@@ -13,16 +10,20 @@ export const PaymentTemplateComponentsCard = ({
   paymentTemplateComponents: PaymentTemplateComponentType[];
 }) => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const isOpen =
+    searchParams.get("step") === modalSearchParamNames.view_template_components;
 
   const handleOpenChange = () => {
     navigate("/payment-components/payment-templates");
   };
 
   return (
-    <Dialog defaultOpen={true} onOpenChange={handleOpenChange}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent className='min-w-max'>
         <DialogTitle>Payment Template Components</DialogTitle>
-        <div className="flex flex-col w-full h-full">
+        <div className='flex flex-col w-full h-full'>
           <div className='grid grid-cols-3 place-content-center justify-between gap-4 py-4 text-foreground text-base font-semibold'>
             <span>Component Name</span>
             <span>Component Type</span>

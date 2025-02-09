@@ -37,8 +37,9 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { UPDATE_GRATUITY } from "./$gratuityId.update-gratuity";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const CREATE_GRATUITY = "create-gratuity";
 
@@ -147,6 +148,7 @@ export default function CreateGratuity({
   useEffect(() => {
     if (!actionData) return;
     if (actionData?.status === "success") {
+      clearExactCacheEntry(cacheKeyPrefix.gratuity);
       toast({
         title: "Success",
         description: actionData?.message,

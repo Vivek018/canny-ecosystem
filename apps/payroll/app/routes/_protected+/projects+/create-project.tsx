@@ -89,7 +89,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       companyOptionsPromise,
     });
   } catch (error) {
-    return json(
+    return defer(
       {
         error,
         companyId: null,
