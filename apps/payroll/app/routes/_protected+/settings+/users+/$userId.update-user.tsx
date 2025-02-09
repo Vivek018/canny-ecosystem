@@ -26,7 +26,7 @@ import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
-import { clearCacheEntry } from "@/utils/cache";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const UPDATE_USER_TAG = "update-user";
 
@@ -120,7 +120,7 @@ export default function UpdateUser() {
   useEffect(() => {
     if (!actionData) return;
     if (actionData?.status === "success") {
-      clearCacheEntry(cacheKeyPrefix.users);
+      clearExactCacheEntry(cacheKeyPrefix.users);
       toast({
         title: "Success",
         description: actionData?.message,

@@ -25,7 +25,7 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { hasPermission, createRole } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
-import { clearCacheEntry, clientCaching } from "@/utils/cache";
+import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
@@ -73,7 +73,7 @@ export default function Sites() {
   const { isDocument } = useIsDocument();
 
   if (error) {
-    clearCacheEntry(`${cacheKeyPrefix.sites}${projectId}`);
+    clearExactCacheEntry(`${cacheKeyPrefix.sites}${projectId}`);
     return <ErrorBoundary error={error} message='Failed to load sites' />;
   }
 
@@ -115,7 +115,7 @@ export default function Sites() {
               <Await resolve={sitesPromise}>
                 {(resolvedData) => {
                   if (!resolvedData) {
-                    clearCacheEntry(`${cacheKeyPrefix.sites}${projectId}`);
+                    clearExactCacheEntry(`${cacheKeyPrefix.sites}${projectId}`);
                     return <ErrorBoundary message='Failed to load sites' />;
                   }
                   return (

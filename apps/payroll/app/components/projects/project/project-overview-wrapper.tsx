@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 import { ErrorBoundary } from "@/components/error-boundary";
-import { clearCacheEntry } from "@/utils/cache";
+import { clearExactCacheEntry } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
 import { useParams } from "@remix-run/react";
 import type { ProjectsWithCompany } from "@canny_ecosystem/supabase/queries";
@@ -23,7 +23,7 @@ export function ProjectOverviewWrapper({
 
   useEffect(() => {
     if (error) {
-      clearCacheEntry(`${cacheKeyPrefix.project_overview}${projectId}`);
+      clearExactCacheEntry(`${cacheKeyPrefix.project_overview}${projectId}`);
       toast({
         title: "Error",
         description: error?.message || "Failed to load project",
@@ -33,7 +33,7 @@ export function ProjectOverviewWrapper({
   }, [error]);
 
   if (!data) {
-    clearCacheEntry(`${cacheKeyPrefix.project_overview}${projectId}`);
+    clearExactCacheEntry(`${cacheKeyPrefix.project_overview}${projectId}`);
     return <ErrorBoundary error={error} message='Failed to load project' />;
   }
 

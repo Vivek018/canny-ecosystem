@@ -1,6 +1,6 @@
 import { SiteCard } from "@/components/sites/site-card";
 import { cacheKeyPrefix } from "@/constant";
-import { clearCacheEntry } from "@/utils/cache";
+import { clearExactCacheEntry } from "@/utils/cache";
 import type { SitesWithLocation } from "@canny_ecosystem/supabase/queries";
 import { CommandGroup, CommandItem } from "@canny_ecosystem/ui/command";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
@@ -20,7 +20,7 @@ export function SitesWrapper({
 
   useEffect(() => {
     if (error) {
-      clearCacheEntry(`${cacheKeyPrefix.sites}${projectId}`);
+      clearExactCacheEntry(`${cacheKeyPrefix.sites}${projectId}`);
       toast({
         title: "Error",
         description: error?.message || "Failed to load sites",

@@ -11,7 +11,7 @@ import {
 import { Suspense } from "react";
 import { LocationsWrapper } from "@/components/locations/locations-wrapper";
 import { ErrorBoundary } from "@/components/error-boundary";
-import { clearCacheEntry, clientCaching } from "@/utils/cache";
+import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -45,7 +45,7 @@ export default function Locations() {
   const { locationsPromise, error } = useLoaderData<typeof loader>();
 
   if (error) {
-    clearCacheEntry(cacheKeyPrefix.locations);
+    clearExactCacheEntry(cacheKeyPrefix.locations);
     return <ErrorBoundary error={error} message='Failed to load locations' />;
   }
 
@@ -54,7 +54,7 @@ export default function Locations() {
       <Await resolve={locationsPromise}>
         {(resolvedData) => {
           if (!resolvedData) {
-            clearCacheEntry(cacheKeyPrefix.locations);
+            clearExactCacheEntry(cacheKeyPrefix.locations);
             return <ErrorBoundary message='Failed to load locations' />;
           }
           return (

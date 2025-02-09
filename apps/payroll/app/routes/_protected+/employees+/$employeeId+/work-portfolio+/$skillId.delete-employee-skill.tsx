@@ -1,5 +1,5 @@
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
-import { clearCacheEntry } from "@/utils/cache";
+import { clearExactCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { deleteEmployeeSkill } from "@canny_ecosystem/supabase/mutations";
@@ -22,7 +22,9 @@ export async function action({
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${deleteRole}:${attribute.employeeSkills}`)) {
+  if (
+    !hasPermission(user?.role!, `${deleteRole}:${attribute.employeeSkills}`)
+  ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
@@ -67,12 +69,14 @@ export default function DeleteEmployeeSkill() {
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const {employeeId} = useParams();
+  const { employeeId } = useParams();
 
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(`${cacheKeyPrefix.employee_work_portfolio}${employeeId}`);
+        clearExactCacheEntry(
+          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
+        );
         toast({
           title: "Success",
           description: actionData?.message || "Employee skill deleted",

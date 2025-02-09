@@ -30,7 +30,7 @@ import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
-import { clearCacheEntry } from "@/utils/cache";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const UPDATE_SITE = "update-site";
 
@@ -154,7 +154,7 @@ export default function UpdateSite() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(`${cacheKeyPrefix.sites}${projectId}`);
+        clearExactCacheEntry(`${cacheKeyPrefix.sites}${projectId}`);
         toast({
           title: "Success",
           description: actionData?.message || "Site updated",
@@ -174,14 +174,14 @@ export default function UpdateSite() {
   }, [actionData]);
 
   if (error)
-    return <ErrorBoundary error={error} message="Failed to load site" />;
+    return <ErrorBoundary error={error} message='Failed to load site' />;
 
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <Await resolve={sitePromise}>
         {(resolvedData) => {
           if (!resolvedData)
-            return <ErrorBoundary message="Failed to load site" />;
+            return <ErrorBoundary message='Failed to load site' />;
           return (
             <UpdateSiteWrapper
               data={resolvedData.data}

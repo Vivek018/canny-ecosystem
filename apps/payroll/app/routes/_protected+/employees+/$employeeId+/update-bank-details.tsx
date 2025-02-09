@@ -30,7 +30,7 @@ import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
-import { clearCacheEntry } from "@/utils/cache";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const UPDATE_BANK_DETAILS = "update-employee-bank-details";
 
@@ -180,7 +180,9 @@ export function UpdateEmployeeBankDetailsWrapper({
     }
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(`${cacheKeyPrefix.employee_overview}${employeeId}`);
+        clearExactCacheEntry(
+          `${cacheKeyPrefix.employee_overview}${employeeId}`
+        );
         toast({
           title: "Success",
           description: actionData?.message || "Employee bank details updated",

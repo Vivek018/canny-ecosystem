@@ -3,7 +3,7 @@ import { EmployeeSkillsCard } from "@/components/employees/work-portfolio/skills
 import { EmployeeWorkHistoriesCard } from "@/components/employees/work-portfolio/work-history-card";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { cacheKeyPrefix } from "@/constant";
-import { clearCacheEntry, clientCaching } from "@/utils/cache";
+import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import {
   getEmployeeProjectAssignmentByEmployeeId,
   getEmployeeSkillsByEmployeeId,
@@ -77,7 +77,9 @@ export default function WorkPortfolio() {
   const { employeeId } = useParams();
 
   if (error) {
-    clearCacheEntry(`${cacheKeyPrefix.employee_work_portfolio}${employeeId}`);
+    clearExactCacheEntry(
+      `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
+    );
     return <ErrorBoundary error={error} message='Failed to load data' />;
   }
 
@@ -87,7 +89,7 @@ export default function WorkPortfolio() {
         <Await resolve={employeeProjectAssignmentPromise}>
           {(resolvedData) => {
             if (!resolvedData) {
-              clearCacheEntry(
+              clearExactCacheEntry(
                 `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
               );
               return (
@@ -112,7 +114,7 @@ export default function WorkPortfolio() {
         <Await resolve={employeeWorkHistoriesPromise}>
           {(resolvedData) => {
             if (!resolvedData) {
-              clearCacheEntry(
+              clearExactCacheEntry(
                 `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
               );
               return (
@@ -137,7 +139,7 @@ export default function WorkPortfolio() {
         <Await resolve={employeeSkillsPromise}>
           {(resolvedData) => {
             if (!resolvedData) {
-              clearCacheEntry(
+              clearExactCacheEntry(
                 `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
               );
               return <ErrorBoundary message='Failed to load employee skills' />;
@@ -169,7 +171,9 @@ export function CommonWrapper({
 
   useEffect(() => {
     if (error) {
-      clearCacheEntry(`${cacheKeyPrefix.employee_work_portfolio}${employeeId}`);
+      clearExactCacheEntry(
+        `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
+      );
       toast({
         title: "Error",
         description:

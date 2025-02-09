@@ -1,5 +1,5 @@
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
-import { clearCacheEntry } from "@/utils/cache";
+import { clearCacheEntry, clearExactCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { deleteEmployee } from "@canny_ecosystem/supabase/mutations";
@@ -63,8 +63,10 @@ export default function DeleteEmployee() {
     if (actionData) {
       if (actionData?.status === "success") {
         clearCacheEntry(cacheKeyPrefix.employees);
-        clearCacheEntry(`${cacheKeyPrefix.employee_overview}${employeeId}`);
-        clearCacheEntry(
+        clearExactCacheEntry(
+          `${cacheKeyPrefix.employee_overview}${employeeId}`
+        );
+        clearExactCacheEntry(
           `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
         );
         toast({

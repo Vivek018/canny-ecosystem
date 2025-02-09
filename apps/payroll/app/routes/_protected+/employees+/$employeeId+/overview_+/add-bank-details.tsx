@@ -26,7 +26,7 @@ import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
-import { clearCacheEntry } from "@/utils/cache";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const ADD_BANK_DETAILS = "add-employee-bank-details";
 
@@ -112,7 +112,9 @@ export default function CreateEmployeeBankDetailsRoute() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(`${cacheKeyPrefix.employee_overview}${employeeId}`);
+        clearExactCacheEntry(
+          `${cacheKeyPrefix.employee_overview}${employeeId}`
+        );
         toast({
           title: "Success",
           description: actionData?.message || "Employee bank details created",

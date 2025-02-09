@@ -1,7 +1,5 @@
-import { Outlet } from "@remix-run/react"
+import { Outlet } from "@remix-run/react";
 
-export const $paymentFieldId = () => {
-  return (
-    <Outlet />
-  )
+export default function PaymentFieldId() {
+  return <Outlet />;
 }

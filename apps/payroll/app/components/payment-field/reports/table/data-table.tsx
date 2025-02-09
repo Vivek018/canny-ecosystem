@@ -28,7 +28,6 @@ import {
 import { Button } from "@canny_ecosystem/ui/button";
 import { ExportBar } from "../export-bar";
 import { useReportsStore } from "@/store/reports";
-import { payoutMonths } from "@canny_ecosystem/utils/constant";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -36,7 +35,7 @@ interface DataTableProps<TData, TValue> {
   count: number;
   hasNextPage: boolean;
   query?: string | null;
-  filters?: EmployeeFilters;
+  filters?: EmployeeFilters | null;
   noFilters?: boolean;
   pageSize: number;
   initialColumnVisibility?: VisibilityState;

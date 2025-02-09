@@ -30,7 +30,7 @@ import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { safeRedirect } from "@/utils/server/http.server";
 import { attribute } from "@canny_ecosystem/utils/constant";
-import { clearCacheEntry } from "@/utils/cache";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const UPDATE_EMPLOYEE_STATUTORY = "update-employee-statutory";
 
@@ -180,7 +180,9 @@ export function UpdateStatutoryDetailsWrapper({
     }
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(`${cacheKeyPrefix.employee_overview}${employeeId}`);
+        clearExactCacheEntry(
+          `${cacheKeyPrefix.employee_overview}${employeeId}`
+        );
         toast({
           title: "Success",
           description: actionData?.message || "Employee updated",

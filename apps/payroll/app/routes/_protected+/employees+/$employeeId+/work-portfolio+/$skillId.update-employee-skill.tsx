@@ -26,7 +26,7 @@ import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { safeRedirect } from "@/utils/server/http.server";
 import { attribute } from "@canny_ecosystem/utils/constant";
-import { clearCacheEntry } from "@/utils/cache";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const UPDATE_EMPLOYEE_SKILL = "update-employee-skill";
 
@@ -36,7 +36,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.employeeSkills}`)) {
+  if (
+    !hasPermission(user?.role!, `${updateRole}:${attribute.employeeSkills}`)
+  ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
@@ -113,7 +115,9 @@ export default function UpdateEmployeeSkill() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(`${cacheKeyPrefix.employee_work_portfolio}${employeeId}`);
+        clearExactCacheEntry(
+          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
+        );
         toast({
           title: "Success",
           description: actionData?.message,
@@ -134,7 +138,7 @@ export default function UpdateEmployeeSkill() {
     return (
       <ErrorBoundary
         error={error}
-        message="Failed to load employee skills data"
+        message='Failed to load employee skills data'
       />
     );
 
@@ -144,7 +148,7 @@ export default function UpdateEmployeeSkill() {
         {(resolvedData) => {
           if (!resolvedData)
             return (
-              <ErrorBoundary message="Failed to load employee skills data" />
+              <ErrorBoundary message='Failed to load employee skills data' />
             );
           return (
             <UpdateEmployeeSkillWrapper
@@ -169,7 +173,7 @@ export function UpdateEmployeeSkillWrapper({
     return (
       <ErrorBoundary
         error={error}
-        message="Failed to load employee skills data"
+        message='Failed to load employee skills data'
       />
     );
   return <AddEmployeeSkill updateValues={data} />;

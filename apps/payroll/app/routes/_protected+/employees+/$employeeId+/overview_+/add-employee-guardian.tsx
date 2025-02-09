@@ -1,6 +1,12 @@
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { Form, json, useActionData, useNavigate, useParams } from "@remix-run/react";
+import {
+  Form,
+  json,
+  useActionData,
+  useNavigate,
+  useParams,
+} from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { createEmployeeGuardians } from "@canny_ecosystem/supabase/mutations";
 import {
@@ -20,7 +26,7 @@ import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
-import { clearCacheEntry } from "@/utils/cache";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const ADD_EMPLOYEE_GUARDIAN = "update-employee-guardian";
 
@@ -121,7 +127,9 @@ export default function AddEmployeeGuardian() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(`${cacheKeyPrefix.employee_overview}${employeeId}`);
+        clearExactCacheEntry(
+          `${cacheKeyPrefix.employee_overview}${employeeId}`
+        );
         toast({
           title: "Success",
           description: actionData?.message,

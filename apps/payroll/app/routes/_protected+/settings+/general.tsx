@@ -2,7 +2,7 @@ import { CompanyDetailsWrapper } from "@/components/company/company-details-wrap
 import CompanyRegistrationDetailsWrapper from "@/components/company/company-registration-details-wrapper";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { cacheKeyPrefix } from "@/constant";
-import { clearCacheEntry, clientCaching } from "@/utils/cache";
+import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
   getCompanyById,
@@ -69,7 +69,7 @@ export default function SettingGeneral() {
   }, [companyDetailsPromise, companyRegistrationDetailsPromise]);
 
   if (error) {
-    clearCacheEntry(cacheKeyPrefix.general);
+    clearExactCacheEntry(cacheKeyPrefix.general);
     return (
       <ErrorBoundary error={error} message='Failed to load company details' />
     );
@@ -82,7 +82,7 @@ export default function SettingGeneral() {
           <Await resolve={companyDetailsPromise}>
             {(resolvedData) => {
               if (!resolvedData) {
-                clearCacheEntry(cacheKeyPrefix.general);
+                clearExactCacheEntry(cacheKeyPrefix.general);
                 return (
                   <ErrorBoundary message='Failed to load company details' />
                 );
@@ -103,7 +103,7 @@ export default function SettingGeneral() {
           <Await resolve={companyRegistrationDetailsPromise}>
             {(resolvedData) => {
               if (!resolvedData) {
-                clearCacheEntry(cacheKeyPrefix.general);
+                clearExactCacheEntry(cacheKeyPrefix.general);
                 return (
                   <ErrorBoundary message='Failed to load company registration details' />
                 );

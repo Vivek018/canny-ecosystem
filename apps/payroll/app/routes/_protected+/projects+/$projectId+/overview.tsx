@@ -1,7 +1,7 @@
 import { ErrorBoundary } from "@/components/error-boundary";
 import { ProjectOverviewWrapper } from "@/components/projects/project/project-overview-wrapper";
 import { cacheKeyPrefix } from "@/constant";
-import { clearCacheEntry, clientCaching } from "@/utils/cache";
+import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getProjectById } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -56,7 +56,7 @@ export default function ProjectIndex() {
   const { projectId } = useParams();
 
   if (error) {
-    clearCacheEntry(`${cacheKeyPrefix.project_overview}${projectId}`);
+    clearExactCacheEntry(`${cacheKeyPrefix.project_overview}${projectId}`);
     return <ErrorBoundary error={error} message='Failed to load projects' />;
   }
 
@@ -65,7 +65,9 @@ export default function ProjectIndex() {
       <Await resolve={projectPromise}>
         {(resolvedData) => {
           if (!resolvedData) {
-            clearCacheEntry(`${cacheKeyPrefix.project_overview}${projectId}`);
+            clearExactCacheEntry(
+              `${cacheKeyPrefix.project_overview}${projectId}`
+            );
             return <ErrorBoundary message='Failed to load project' />;
           }
           return (

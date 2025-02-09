@@ -49,7 +49,7 @@ import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
-import { clearCacheEntry } from "@/utils/cache";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const ADD_EMPLOYEE_WORK_HISTORY = "add-employee-work-history";
 
@@ -196,7 +196,7 @@ export default function AddEmployeeWorkHistory({
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(
+        clearExactCacheEntry(
           `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
         );
         toast({

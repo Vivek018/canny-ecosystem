@@ -11,7 +11,7 @@ import type { Theme } from "@canny_ecosystem/types";
 import { useLocation, useSubmit } from "@remix-run/react";
 import { themes } from "@canny_ecosystem/utils";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { clearCacheEntry } from "@/utils/cache";
+import { clearExactCacheEntry } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
 
 type Props = {
@@ -48,7 +48,7 @@ export const ThemeSwitch = ({
       <Select
         defaultValue={theme}
         onValueChange={(value) => {
-          clearCacheEntry(cacheKeyPrefix.root);
+          clearExactCacheEntry(cacheKeyPrefix.root);
           submit(
             { theme: value, returnTo: location.pathname + location.search },
             {

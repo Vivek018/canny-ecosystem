@@ -8,6 +8,7 @@ import {
   useActionData,
   useLoaderData,
   useNavigate,
+  useParams,
 } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
 import {
@@ -25,8 +26,9 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import type { PaymentFieldDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearCacheEntry, clearExactCacheEntry } from "@/utils/cache";
 
 export const UPDATE_PAYMENT_FIELD = "update-payment-field";
 
@@ -121,6 +123,7 @@ export default function UpdatePaymentField() {
   const { paymentFieldPromise } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
+  const { paymentFieldId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -128,6 +131,10 @@ export default function UpdatePaymentField() {
     if (!actionData) return;
 
     if (actionData?.status === "success") {
+      clearExactCacheEntry(cacheKeyPrefix.payment_fields);
+      clearCacheEntry(
+        `${cacheKeyPrefix.payment_field_report}${paymentFieldId}`
+      );
       toast({
         title: "Success",
         description: actionData?.message,
@@ -152,7 +159,7 @@ export default function UpdatePaymentField() {
       <Await resolve={paymentFieldPromise}>
         {(resolvedData) => {
           if (!resolvedData)
-            return <ErrorBoundary message="Failed to load payment field" />;
+            return <ErrorBoundary message='Failed to load payment field' />;
           return (
             <UpdatePaymentFieldWrapper
               data={resolvedData?.data}

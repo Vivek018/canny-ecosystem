@@ -33,7 +33,7 @@ import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
-import { clearCacheEntry } from "@/utils/cache";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const UPDATE_RELATIONSHIP = "update-relationship";
 
@@ -142,7 +142,7 @@ export default function UpdateRelationship() {
   useEffect(() => {
     if (!actionData) return;
     if (actionData?.status === "success") {
-      clearCacheEntry(cacheKeyPrefix.relationships);
+      clearExactCacheEntry(cacheKeyPrefix.relationships);
       toast({
         title: "Success",
         description: actionData?.message,
@@ -166,7 +166,7 @@ export default function UpdateRelationship() {
       <Await resolve={relationshipPromise}>
         {(resolvedData) => {
           if (!resolvedData)
-            return <ErrorBoundary message="Failed to load relationship" />;
+            return <ErrorBoundary message='Failed to load relationship' />;
           return (
             <UpdateRelationshipWrapper
               data={resolvedData.data}
@@ -196,7 +196,7 @@ export function UpdateRelationshipWrapper({
 
   if (error) {
     return (
-      <ErrorBoundary error={error} message="Failed to load relationship" />
+      <ErrorBoundary error={error} message='Failed to load relationship' />
     );
   }
 

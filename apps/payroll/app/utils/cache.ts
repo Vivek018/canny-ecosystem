@@ -7,6 +7,12 @@ const lruCache = new LRUCache<string, any>({
   allowStale: false,
 });
 
+export function clearExactCacheEntry(cacheKey: string) {
+  if (lruCache.has(cacheKey)) {
+    lruCache.delete(cacheKey);
+  }
+}
+
 export function clearCacheEntry(cacheKey: string) {
   for (const [key] of lruCache.dump()) {
     if (key.startsWith(cacheKey)) {

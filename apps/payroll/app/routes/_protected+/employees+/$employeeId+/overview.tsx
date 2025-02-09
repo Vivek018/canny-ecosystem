@@ -6,7 +6,7 @@ import { EmployeePageHeader } from "@/components/employees/employee/page-header"
 import { EmployeeStatutoryCard } from "@/components/employees/employee/statutory-card";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { cacheKeyPrefix } from "@/constant";
-import { clearCacheEntry, clientCaching } from "@/utils/cache";
+import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import {
   getEmployeeAddressesByEmployeeId,
   getEmployeeBankDetailsById,
@@ -105,7 +105,7 @@ export default function EmployeeIndex() {
   const { employeeId } = useParams();
 
   if (error) {
-    clearCacheEntry(`${cacheKeyPrefix.employee_overview}${employeeId}`);
+    clearExactCacheEntry(`${cacheKeyPrefix.employee_overview}${employeeId}`);
     return (
       <ErrorBoundary error={error} message='Failed to load employee details' />
     );
@@ -116,11 +116,12 @@ export default function EmployeeIndex() {
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={employeePromise}>
           {(resolvedData) => {
-            if (!resolvedData || !env){
-              clearCacheEntry(
+            if (!resolvedData || !env) {
+              clearExactCacheEntry(
                 `${cacheKeyPrefix.employee_overview}${employeeId}`
               );
-              return <ErrorBoundary message='Failed to load employee' />;}
+              return <ErrorBoundary message='Failed to load employee' />;
+            }
             return (
               <>
                 <CommonWrapper
@@ -147,13 +148,14 @@ export default function EmployeeIndex() {
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={employeeStatutoryDetailsPromise}>
           {(resolvedData) => {
-            if (!resolvedData){
-              clearCacheEntry(
+            if (!resolvedData) {
+              clearExactCacheEntry(
                 `${cacheKeyPrefix.employee_overview}${employeeId}`
               );
               return (
                 <ErrorBoundary message='Failed to load employee statutory details' />
-              );}
+              );
+            }
             return (
               <CommonWrapper
                 error={resolvedData.error}
@@ -171,13 +173,14 @@ export default function EmployeeIndex() {
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={employeeBankDetailsPromise}>
           {(resolvedData) => {
-            if (!resolvedData){
-              clearCacheEntry(
+            if (!resolvedData) {
+              clearExactCacheEntry(
                 `${cacheKeyPrefix.employee_overview}${employeeId}`
               );
               return (
                 <ErrorBoundary message='Failed to load employee bank details' />
-              );}
+              );
+            }
             return (
               <CommonWrapper
                 error={resolvedData.error}
@@ -193,13 +196,14 @@ export default function EmployeeIndex() {
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={employeeAddressesPromise}>
           {(resolvedData) => {
-            if (!resolvedData){
-              clearCacheEntry(
+            if (!resolvedData) {
+              clearExactCacheEntry(
                 `${cacheKeyPrefix.employee_overview}${employeeId}`
               );
               return (
                 <ErrorBoundary message='Failed to load employee addresses' />
-              );}
+              );
+            }
             return (
               <CommonWrapper
                 error={resolvedData.error}
@@ -218,7 +222,7 @@ export default function EmployeeIndex() {
         <Await resolve={employeeGuardiansPromise}>
           {(resolvedData) => {
             if (!resolvedData) {
-              clearCacheEntry(
+              clearExactCacheEntry(
                 `${cacheKeyPrefix.employee_overview}${employeeId}`
               );
               return (
@@ -254,7 +258,7 @@ export function CommonWrapper({
 
   useEffect(() => {
     if (error) {
-      clearCacheEntry(`${cacheKeyPrefix.employee_overview}${employeeId}`);
+      clearExactCacheEntry(`${cacheKeyPrefix.employee_overview}${employeeId}`);
       toast({
         title: "Error",
         description: error?.message || "Failed to load employee details",

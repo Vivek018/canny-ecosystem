@@ -1,5 +1,5 @@
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
-import { clearCacheEntry } from "@/utils/cache";
+import { clearExactCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { deleteLocation } from "@canny_ecosystem/supabase/mutations";
@@ -23,7 +23,9 @@ export async function action({
     const { supabase, headers } = getSupabaseWithHeaders({ request });
     const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-    if (!hasPermission(user?.role!, `${deleteRole}:${attribute.settingLocations}`)) {
+    if (
+      !hasPermission(user?.role!, `${deleteRole}:${attribute.settingLocations}`)
+    ) {
       return safeRedirect(DEFAULT_ROUTE, { headers });
     }
 
@@ -63,7 +65,7 @@ export default function DeleteLocation() {
   useEffect(() => {
     if (!actionData) return;
     if (actionData?.status === "success") {
-      clearCacheEntry(cacheKeyPrefix.locations);
+      clearExactCacheEntry(cacheKeyPrefix.locations);
       toast({
         title: "Success",
         description: actionData?.message,

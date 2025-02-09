@@ -1,5 +1,5 @@
 import { cacheKeyPrefix } from "@/constant";
-import { clearCacheEntry } from "@/utils/cache";
+import { clearExactCacheEntry } from "@/utils/cache";
 import { useUserRole } from "@/utils/user";
 import {
   AlertDialog,
@@ -46,7 +46,7 @@ export const DeleteCompany = ({ companyId }: { companyId: string }) => {
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
-      clearCacheEntry(cacheKeyPrefix.general);
+      clearExactCacheEntry(cacheKeyPrefix.general);
       submit(
         {},
         {

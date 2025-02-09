@@ -769,7 +769,7 @@ export type GetEmployeesReportByCompanyIdParams = {
   from: number;
   sort?: [string, "asc" | "desc"];
   searchQuery?: string;
-  filters?: EmployeeReportFilters;
+  filters?: EmployeeReportFilters | null;
 };
 
 export async function getEmployeesReportByCompanyId({
@@ -783,6 +783,15 @@ export async function getEmployeesReportByCompanyId({
 }) {
   const { sort, from, to, filters, searchQuery } = params;
 
+  const {
+    project,
+    project_site,
+    start_year,
+    start_month,
+    end_year,
+    end_month,
+  } = filters ?? {};
+
   const columns = [
     "id",
     "employee_code",
@@ -795,9 +804,9 @@ export async function getEmployeesReportByCompanyId({
     .from("employees")
     .select(
       `${columns.join(",")},
-        employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(
+        employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? 'inner' : 'left'}(
         employee_id, assignment_type, skill_level, position, start_date, end_date,
-        project_sites!inner(id, name, projects!inner(id, name))
+        project_sites!${project_site ? 'inner' : 'left'}(id, name, projects!${project ? 'inner' : 'left'}(id, name))
       )`,
       { count: "exact" }
     )
@@ -830,52 +839,42 @@ export async function getEmployeesReportByCompanyId({
     }
   }
 
-  // Filters
-  if (filters) {
-    const {
-      project,
-      project_site,
-      start_year,
-      start_month,
-      end_year,
-      end_month,
-    } = filters;
 
-    if (start_year || end_year) {
-      let endDateLastDay = 30;
+  if (start_year || end_year) {
+    let endDateLastDay = 30;
 
-      if (end_year) {
-        const year = Number.parseInt(end_year, 10);
-        const month = new Date(`${end_month} 1, ${end_year}`).getMonth();
+    if (end_year) {
+      const year = Number.parseInt(end_year, 10);
+      const month = new Date(`${end_month} 1, ${end_year}`).getMonth();
 
-        endDateLastDay = new Date(year, month + 1, 0).getDate();
-      }
-
-      const start_date = new Date(`${start_month} 1, ${start_year}`);
-      const end_date = new Date(`${end_month} ${endDateLastDay}, ${end_year}`);
-
-      if (start_year)
-        query.gte(
-          "employee_project_assignment.start_date",
-          formatUTCDate(start_date.toISOString().split("T")[0]),
-        );
-      if (end_year)
-        query.lte(
-          "employee_project_assignment.end_date",
-          formatUTCDate(end_date.toISOString().split("T")[0]),
-        );
+      endDateLastDay = new Date(year, month + 1, 0).getDate();
     }
 
-    if (project) {
-      query.eq(
-        "employee_project_assignment.project_sites.projects.name",
-        project
+    const start_date = new Date(`${start_month} 1, ${start_year}`);
+    const end_date = new Date(`${end_month} ${endDateLastDay}, ${end_year}`);
+
+    if (start_year)
+      query.gte(
+        "employee_project_assignment.start_date",
+        formatUTCDate(start_date.toISOString().split("T")[0]),
       );
-    }
-    if (project_site) {
-      query.eq("employee_project_assignment.project_sites.name", project_site);
-    }
+    if (end_year)
+      query.lte(
+        "employee_project_assignment.end_date",
+        formatUTCDate(end_date.toISOString().split("T")[0]),
+      );
   }
+
+  if (project) {
+    query.eq(
+      "employee_project_assignment.project_sites.projects.name",
+      project
+    );
+  }
+  if (project_site) {
+    query.eq("employee_project_assignment.project_sites.name", project_site);
+  }
+
 
   // Fetch Data
   const { data, count, error } = await query

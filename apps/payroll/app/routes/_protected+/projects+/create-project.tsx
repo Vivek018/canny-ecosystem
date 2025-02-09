@@ -57,7 +57,7 @@ import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
-import { clearCacheEntry } from "@/utils/cache";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const CREATE_PROJECT = "create-project";
 
@@ -181,7 +181,7 @@ export default function CreateProject({
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(cacheKeyPrefix.projects);
+        clearExactCacheEntry(cacheKeyPrefix.projects);
         toast({
           title: "Success",
           description: actionData?.message,
@@ -199,7 +199,7 @@ export default function CreateProject({
   }, [actionData]);
 
   if (error) {
-    clearCacheEntry(cacheKeyPrefix.projects);
+    clearExactCacheEntry(cacheKeyPrefix.projects);
     return <ErrorBoundary error={error} message='Failed to load projects' />;
   }
 
@@ -295,10 +295,11 @@ export default function CreateProject({
               <Suspense fallback={<div>Loading...</div>}>
                 <Await resolve={companyOptionsPromise}>
                   {(resolvedData) => {
-                    if (!resolvedData){
+                    if (!resolvedData) {
                       return (
                         <ErrorBoundary message='Failed to load company options' />
-                      );}
+                      );
+                    }
                     return (
                       <CompanyListsWrapper
                         data={resolvedData.data}

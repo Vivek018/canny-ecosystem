@@ -123,6 +123,7 @@ export const attribute = {
   reimbursements: "reimbursements",
   exits: "exits",
   paymentFields: "payment_fields",
+  statutoryFields: "statutory_fields",
   statutoryFieldsEpf: "statutory_fields_epf",
   statutoryFieldsEsi: "statutory_fields_esi",
   statutoryFieldsPf: "statutory_fields_pf",

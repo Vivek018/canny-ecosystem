@@ -1,5 +1,5 @@
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
-import { clearCacheEntry } from "@/utils/cache";
+import { clearExactCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { updateProject } from "@canny_ecosystem/supabase/mutations";
@@ -91,8 +91,8 @@ export default function UpdateCompleted() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(cacheKeyPrefix.projects);
-        clearCacheEntry(`${cacheKeyPrefix.project_overview}${projectId}`);
+        clearExactCacheEntry(cacheKeyPrefix.projects);
+        clearExactCacheEntry(`${cacheKeyPrefix.project_overview}${projectId}`);
         toast({
           title: "Success",
           description: actionData?.message,

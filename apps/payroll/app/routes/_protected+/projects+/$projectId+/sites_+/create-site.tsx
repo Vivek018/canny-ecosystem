@@ -52,7 +52,7 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
-import { clearCacheEntry } from "@/utils/cache";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const CREATE_SITE = "create-site";
 
@@ -191,7 +191,7 @@ export default function CreateSite({
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(`${cacheKeyPrefix.sites}${projectId}`);
+        clearExactCacheEntry(`${cacheKeyPrefix.sites}${projectId}`);
         toast({
           title: "Success",
           description: actionData.message,

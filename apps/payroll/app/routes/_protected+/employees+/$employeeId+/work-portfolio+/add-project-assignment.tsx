@@ -36,7 +36,7 @@ import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
-import { clearCacheEntry } from "@/utils/cache";
+import { clearCacheEntry, clearExactCacheEntry } from "@/utils/cache";
 
 export const ADD_EMPLOYEE_PROJECT_ASSIGNMENT =
   "add-employee-project-assignment";
@@ -215,7 +215,7 @@ export default function CreateEmployeeProjectAssignmentRoute() {
     if (actionData) {
       if (actionData?.status === "success") {
         clearCacheEntry(cacheKeyPrefix.employees);
-        clearCacheEntry(
+        clearExactCacheEntry(
           `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
         );
         toast({

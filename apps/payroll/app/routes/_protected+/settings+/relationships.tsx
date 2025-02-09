@@ -25,7 +25,7 @@ import { RelationshipWrapper } from "@/components/relationships/relationship-wra
 import { hasPermission, createRole } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
-import { clearCacheEntry, clientCaching } from "@/utils/cache";
+import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -63,7 +63,7 @@ export default function Relationships() {
   const { isDocument } = useIsDocument();
 
   if (error) {
-    clearCacheEntry(cacheKeyPrefix.relationships);
+    clearExactCacheEntry(cacheKeyPrefix.relationships);
     return (
       <ErrorBoundary error={error} message='Failed to load relationships' />
     );
@@ -108,7 +108,7 @@ export default function Relationships() {
                 <Await resolve={relationshipsPromise}>
                   {(resolvedData) => {
                     if (!resolvedData) {
-                      clearCacheEntry(cacheKeyPrefix.relationships);
+                      clearExactCacheEntry(cacheKeyPrefix.relationships);
                       return (
                         <ErrorBoundary message='Failed to load relationships' />
                       );

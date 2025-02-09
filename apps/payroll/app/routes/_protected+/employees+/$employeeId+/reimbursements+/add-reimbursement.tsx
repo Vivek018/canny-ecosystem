@@ -1,6 +1,12 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { Form, json, useActionData, useLoaderData, useNavigate } from "@remix-run/react";
+import {
+  Form,
+  json,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { safeRedirect } from "@/utils/server/http.server";
 import {
@@ -73,7 +79,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   return json({ userOptions, companyId, employeeId });
 }
 
-export async function action({ request }: ActionFunctionArgs): Promise<Response> {
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
   const submission = parseWithZod(formData, { schema: ReimbursementSchema });
@@ -122,7 +130,9 @@ export default function AddReimbursements({
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(`${cacheKeyPrefix.employee_reimbursements}${employeeId}`);
+        clearCacheEntry(
+          `${cacheKeyPrefix.employee_reimbursements}${employeeId}`
+        );
         toast({
           title: "Success",
           description: actionData?.message || "Employee bank details created",
@@ -168,7 +178,9 @@ export default function AddReimbursements({
         <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
           <Card>
             <CardHeader>
-              <CardTitle className="capitalize">{replaceUnderscore(REIMBURSEMENTS_TAG)}</CardTitle>
+              <CardTitle className='capitalize'>
+                {replaceUnderscore(REIMBURSEMENTS_TAG)}
+              </CardTitle>
               <CardDescription className='lowercase'>
                 {`${replaceUnderscore(
                   REIMBURSEMENTS_TAG

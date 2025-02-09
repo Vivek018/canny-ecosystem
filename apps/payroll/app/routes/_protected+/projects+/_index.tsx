@@ -27,7 +27,7 @@ import { ProjectsWrapper } from "@/components/projects/projects-wrapper";
 import { hasPermission, createRole } from "@canny_ecosystem/utils";
 import { useUserRole } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
-import { clearCacheEntry, clientCaching } from "@/utils/cache";
+import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -72,7 +72,7 @@ export default function ProjectsIndex() {
   const { isDocument } = useIsDocument();
 
   if (error) {
-    clearCacheEntry(cacheKeyPrefix.projects);
+    clearExactCacheEntry(cacheKeyPrefix.projects);
     return <ErrorBoundary error={error} message='Failed to load projects' />;
   }
 
@@ -113,7 +113,7 @@ export default function ProjectsIndex() {
                 <Await resolve={projectsPromise}>
                   {(resolvedData) => {
                     if (!resolvedData) {
-                      clearCacheEntry(cacheKeyPrefix.projects);
+                      clearExactCacheEntry(cacheKeyPrefix.projects);
                       return (
                         <ErrorBoundary message='Failed to load projects' />
                       );

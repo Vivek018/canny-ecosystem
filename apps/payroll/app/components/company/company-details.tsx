@@ -1,5 +1,5 @@
 import { cacheKeyPrefix } from "@/constant";
-import { clearCacheEntry } from "@/utils/cache";
+import { clearExactCacheEntry } from "@/utils/cache";
 import { useUserRole } from "@/utils/user";
 import type { CompanyDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { Button } from "@canny_ecosystem/ui/button";
@@ -49,7 +49,7 @@ export const CompanyDetails = ({
     constraint: getZodConstraint(CompanyDetailsSchema),
     onValidate({ formData }) {
       if(!deepEqualCheck(form.initialValue, form.value)){
-        clearCacheEntry(cacheKeyPrefix.general);
+        clearExactCacheEntry(cacheKeyPrefix.general);
       }
       return parseWithZod(formData, { schema: CompanyDetailsSchema });
     },

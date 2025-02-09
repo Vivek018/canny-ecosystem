@@ -43,7 +43,7 @@ import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { safeRedirect } from "@/utils/server/http.server";
 import { attribute } from "@canny_ecosystem/utils/constant";
-import { clearCacheEntry } from "@/utils/cache";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const ADD_EMPLOYEE_SKILL = "add-employee-skill";
 
@@ -183,7 +183,9 @@ export default function AddEmployeeSkill({
       navigate(`/employees/${employeeId}/work-portfolio`);
     }
     if (actionData) {
-      clearCacheEntry(`${cacheKeyPrefix.employee_work_portfolio}${employeeId}`);
+      clearExactCacheEntry(
+        `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
+      );
       if (actionData.status === "success") {
         toast({
           title: "Success",

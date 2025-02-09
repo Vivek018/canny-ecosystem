@@ -47,7 +47,7 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
-import { clearCacheEntry } from "@/utils/cache";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const CREATE_LOCATION = "create-location";
 
@@ -56,7 +56,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${createRole}:${attribute.settingLocations}`)) {
+  if (
+    !hasPermission(user?.role!, `${createRole}:${attribute.settingLocations}`)
+  ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
@@ -157,7 +159,7 @@ export default function CreateLocation({
   useEffect(() => {
     if (!actionData) return;
     if (actionData?.status === "success") {
-      clearCacheEntry(cacheKeyPrefix.locations);
+      clearExactCacheEntry(cacheKeyPrefix.locations);
       toast({
         title: "Success",
         description: actionData?.message,
@@ -176,12 +178,12 @@ export default function CreateLocation({
   }, [actionData, toast, navigate]);
 
   return (
-    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
+    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
       <FormProvider context={form.context}>
-        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
+        <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
           <Card>
             <CardHeader>
-            <CardTitle className="text-3xl capitalize">
+              <CardTitle className='text-3xl capitalize'>
                 {replaceDash(LOCATION_TAG)}
               </CardTitle>
               <CardDescription>
@@ -227,7 +229,7 @@ export default function CreateLocation({
                 errors={fields.address_line_1.errors}
               />
               <Field
-                className="-mt-4"
+                className='-mt-4'
                 inputProps={{
                   ...getInputProps(fields.address_line_2, { type: "text" }),
                   placeholder: replaceUnderscore(fields.address_line_2.name),
@@ -235,7 +237,7 @@ export default function CreateLocation({
                 }}
                 errors={fields.address_line_2.errors}
               />
-              <div className="grid grid-cols-3 place-content-center justify-between gap-6">
+              <div className='grid grid-cols-3 place-content-center justify-between gap-6'>
                 <Field
                   inputProps={{
                     ...getInputProps(fields.city, { type: "text" }),
@@ -249,7 +251,7 @@ export default function CreateLocation({
                 />
                 <SearchableSelectField
                   key={resetKey}
-                  className="capitalize"
+                  className='capitalize'
                   options={statesAndUTs}
                   inputProps={{
                     ...getInputProps(fields.state, { type: "text" }),
@@ -274,7 +276,7 @@ export default function CreateLocation({
                   errors={fields.pincode.errors}
                 />
               </div>
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+              <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
                 <Field
                   inputProps={{
                     ...getInputProps(fields.latitude, { type: "number" }),

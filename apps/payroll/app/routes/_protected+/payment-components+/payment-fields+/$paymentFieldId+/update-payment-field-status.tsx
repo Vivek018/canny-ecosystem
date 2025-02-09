@@ -1,4 +1,5 @@
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { updatePaymentField } from "@canny_ecosystem/supabase/mutations";
@@ -84,6 +85,7 @@ export default function UpdatePaymentFieldStatus() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
+        clearExactCacheEntry(cacheKeyPrefix.payment_fields);
         toast({
           title: "Success",
           description: actionData?.message,

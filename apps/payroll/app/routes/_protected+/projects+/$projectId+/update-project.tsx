@@ -30,7 +30,7 @@ import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
-import { clearCacheEntry } from "@/utils/cache";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const UPDATE_PROJECT = "update-project";
 
@@ -139,8 +139,8 @@ export default function UpdateProject() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(cacheKeyPrefix.projects);
-        clearCacheEntry(`${cacheKeyPrefix.project_overview}${projectId}`);
+        clearExactCacheEntry(cacheKeyPrefix.projects);
+        clearExactCacheEntry(`${cacheKeyPrefix.project_overview}${projectId}`);
         toast({
           title: "Success",
           description: actionData?.message || "Project updated",

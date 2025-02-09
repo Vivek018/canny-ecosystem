@@ -1,5 +1,5 @@
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
-import { clearCacheEntry } from "@/utils/cache";
+import { clearExactCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { deleteSite } from "@canny_ecosystem/supabase/mutations";
@@ -73,7 +73,7 @@ export default function DeleteSite() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(`${cacheKeyPrefix.sites}${projectId}`);
+        clearExactCacheEntry(`${cacheKeyPrefix.sites}${projectId}`);
         toast({
           title: "Success",
           description: actionData?.message,

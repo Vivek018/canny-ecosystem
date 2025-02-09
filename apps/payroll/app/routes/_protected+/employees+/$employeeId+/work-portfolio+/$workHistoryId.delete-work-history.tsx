@@ -1,5 +1,5 @@
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
-import { clearCacheEntry } from "@/utils/cache";
+import { clearExactCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { deleteEmployeeWorkHistory } from "@canny_ecosystem/supabase/mutations";
@@ -76,7 +76,7 @@ export default function DeleteWorkHistory() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(
+        clearExactCacheEntry(
           `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
         );
         toast({
