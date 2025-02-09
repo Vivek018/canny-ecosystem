@@ -16,7 +16,7 @@ import { useUser } from "@/utils/user";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
-export const reimbursementsColumns = ({
+export const columns = ({
   isEmployeeRoute = false,
 }: {
   isEmployeeRoute?: boolean;

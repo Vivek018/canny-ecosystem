@@ -62,7 +62,7 @@ export async function getReimbursementsByCompanyId({
     to: number;
     sort?: [string, "asc" | "desc"];
     searchQuery?: string;
-    filters?: ReimbursementFilters;
+    filters?: ReimbursementFilters | null;
   };
 }) {
   const { from, to, sort, searchQuery, filters } = params;
@@ -90,7 +90,7 @@ export async function getReimbursementsByCompanyId({
     .from("reimbursements")
     .select(
       `${columns.join(",")},
-          employees!${project ? 'inner' : 'left'}(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? 'inner' : 'left'}(project_sites!${project_site ? 'inner' : 'left'}(id, name, projects!${project ? 'inner' : 'left'}(id, name)))),
+          employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? 'inner' : 'left'}(project_sites!${project_site ? 'inner' : 'left'}(id, name, projects!${project ? 'inner' : 'left'}(id, name)))),
           users!${users ? 'inner' : 'left'}(id,email)`,
       { count: "exact" },
     )
@@ -205,6 +205,7 @@ export type ReimbursementFilters = {
   status?: string | undefined | null;
   is_deductible?: string | undefined | null;
   users?: string | undefined | null;
+  name?: string | undefined | null;
   project?: string | undefined | null;
   project_site?: string | undefined | null;
 };
@@ -221,7 +222,7 @@ export async function getReimbursementsByEmployeeId({
     to: number;
     sort?: [string, "asc" | "desc"];
     searchQuery?: string;
-    filters?: ReimbursementFilters;
+    filters?: ReimbursementFilters | null;
   };
 }) {
   const { from, to, sort, filters } = params;

@@ -13,13 +13,11 @@ import {
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
 import { formatISO } from "date-fns";
-import { useEffect, useRef, useState } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import {
-  type SubmitOptions,
   useNavigation,
   useSearchParams,
-  useSubmit,
 } from "@remix-run/react";
 import { Calendar } from "@canny_ecosystem/ui/calendar";
 import {
@@ -29,7 +27,6 @@ import {
 } from "@canny_ecosystem/utils";
 
 import type { ReimbursementFilters } from "@canny_ecosystem/supabase/queries";
-import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
 
 export function ReimbursementSearchFilter({
   disabled,
@@ -66,22 +63,17 @@ export function ReimbursementSearchFilter({
     status: "",
     is_deductible: "",
     users: "",
+    name: "",
     project: "",
     project_site: "",
   };
 
   const [filterParams, setFilterParams] = useState(initialFilterParams);
 
-  const submit = useSubmit();
-  const debounceSubmit = useDebounce((target: any, options?: SubmitOptions) => {
-    submit(target, options);
-  }, 300);
-
   const deleteAllSearchParams = () => {
     for (const [key, _val] of Object.entries(filterParams)) {
       searchParams.delete(key);
     }
-    searchParams.delete("name");
     setSearchParams(searchParams);
   };
 
@@ -150,22 +142,11 @@ export function ReimbursementSearchFilter({
     }
   };
 
-  const handleSubmit = () => {
-    if (prompt.split(" ").length > 1) {
-      debounceSubmit(
-        { prompt: prompt },
-        {
-          action: employeeId
-            ? `/employees/${employeeId}/reimbursements?index`
-            : "/approvals/reimbursements?index",
-          method: "POST",
-        }
-      );
-    } else {
-      if (prompt.length) {
-        searchParams.set("name", prompt);
-        setSearchParams(searchParams);
-      }
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (prompt.length) {
+      searchParams.set("name", prompt);
+      setSearchParams(searchParams);
     }
   };
 
@@ -181,7 +162,7 @@ export function ReimbursementSearchFilter({
           className='relative w-full md:w-auto'
           onSubmit={(e) => {
             e.preventDefault();
-            handleSubmit();
+            handleSubmit(e);
           }}
         >
           <Icon
@@ -408,7 +389,9 @@ export function ReimbursementSearchFilter({
           </DropdownMenuSub>
         </DropdownMenuGroup>
 
-        <DropdownMenuGroup className={cn(!projectSiteArray?.length && "hidden")}>
+        <DropdownMenuGroup
+          className={cn(!projectSiteArray?.length && "hidden")}
+        >
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
               <span>Project Site</span>
