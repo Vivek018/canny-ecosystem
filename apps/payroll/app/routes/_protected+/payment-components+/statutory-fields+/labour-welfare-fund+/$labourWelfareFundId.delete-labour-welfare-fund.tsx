@@ -1,4 +1,5 @@
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { deleteLabourWelfareFund } from "@canny_ecosystem/supabase/mutations";
@@ -72,6 +73,7 @@ export default function DeleteLabourWelfareFund() {
   useEffect(() => {
     if (!actionData) return;
     if (actionData?.status === "success") {
+      clearExactCacheEntry(cacheKeyPrefix.labour_welfare_fund);
       toast({
         title: "Success",
         description: actionData?.message || "Labour Welfare Fund deleted",

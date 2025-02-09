@@ -2,22 +2,10 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { SecondaryMenu } from "@canny_ecosystem/ui/secondary-menu";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { json, type LoaderFunctionArgs } from "@remix-run/node";
-import { Link, Outlet, useLoaderData, useLocation } from "@remix-run/react";
-
-export async function loader({ params }: LoaderFunctionArgs) {
-  const projectId = params.projectId;
-
-  return json({
-    status: "success",
-    message: "Project loaded",
-    projectId,
-    error: null,
-  });
-}
+import { Link, Outlet, useLocation, useParams } from "@remix-run/react";
 
 export default function Project() {
-  const { projectId } = useLoaderData<typeof loader>();
+  const { projectId } = useParams();
   const { pathname } = useLocation();
   return (
     <section>

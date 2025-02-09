@@ -25,8 +25,9 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import CreateGratuity from "./create-gratuity";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const UPDATE_GRATUITY = "update-gratuity";
 
@@ -124,6 +125,7 @@ export default function UpdateEmployeeStateInsurance() {
   useEffect(() => {
     if (!actionData) return;
     if (actionData?.status === "success") {
+      clearExactCacheEntry(cacheKeyPrefix.gratuity);
       toast({
         title: "Success",
         description: actionData?.message || "Gratuity updated",

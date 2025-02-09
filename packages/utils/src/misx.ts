@@ -15,8 +15,8 @@ export function replaceUnderscore(str: string) {
 
 export const pipe =
   (...fns: any[]) =>
-  (val: any) =>
-    fns.reduce((prev, fn) => fn(prev), val);
+    (val: any) =>
+      fns.reduce((prev, fn) => fn(prev), val);
 
 export function getInitialValueFromZod<T extends z.ZodTypeAny>(
   schema: T,
@@ -91,7 +91,7 @@ export function deepEqualCheck(
   return true;
 }
 
-export function convertToNull(obj: { [x: string]: any }) {
+export function convertToNull<T extends Record<any, any> | null>(obj: T) {
   for (const key in obj) {
     if (obj[key] === undefined) {
       obj[key] = null;
@@ -100,7 +100,7 @@ export function convertToNull(obj: { [x: string]: any }) {
       obj[key] = null;
     }
   }
-  return obj;
+  return obj as T;
 }
 
 export const parseStringValue = (value: string) => {

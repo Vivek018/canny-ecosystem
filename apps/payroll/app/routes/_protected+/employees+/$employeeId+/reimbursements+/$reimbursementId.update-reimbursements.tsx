@@ -1,6 +1,12 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { json, useLoaderData } from "@remix-run/react";
+import {
+  json,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+  useParams,
+} from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
 import { safeRedirect } from "@/utils/server/http.server";
 import {
@@ -16,10 +22,13 @@ import {
 } from "@canny_ecosystem/supabase/queries";
 import AddReimbursements from "./add-reimbursement";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { useEffect } from "react";
+import { clearCacheEntry } from "@/utils/cache";
 
-export const UPDATE_REIMBURSEMENTS_TAG = "Update Reimbursements";
+export const UPDATE_REIMBURSEMENTS_TAG = "Update_Reimbursement";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const reimbursementId = params.reimbursementId;
@@ -39,28 +48,28 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     throw userError;
   }
 
+  let error = null;
   if (reimbursementId) {
-    const { data, error } = await getReimbursementsById({
+    const { data, error: reimbursementError } = await getReimbursementsById({
       supabase,
-      reimbursementId: reimbursementId,
+      reimbursementId,
     });
 
-    if (error) {
-      throw error;
-    }
-
     reimbursementData = data;
+    error = reimbursementError;
   }
   const userOptions = userData.map((userData) => ({
     label: userData.email?.toLowerCase(),
     value: userData.id,
   }));
 
-  return json({ data: reimbursementData, userOptions, reimbursementId });
+  return json({ data: reimbursementData, userOptions, reimbursementId, error });
 }
 
-export async function action({ request, params }: ActionFunctionArgs) {
-  const employeeId = params.employeeId;
+export async function action({
+  request,
+  params,
+}: ActionFunctionArgs): Promise<Response> {
   const reimbursementId = params.reimbursementId;
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
@@ -76,20 +85,62 @@ export async function action({ request, params }: ActionFunctionArgs) {
   const { status, error } = await updateReimbursementsById({
     reimbursementId: reimbursementId!,
     supabase,
-    data: submission.value as any,
+    data: submission.value,
   });
 
-  if (isGoodStatus(status))
-    return safeRedirect(`/employees/${employeeId}/reimbursements`, {
-      status: 303,
+  if (isGoodStatus(status)) {
+    return json({
+      status: "success",
+      message: "Employee reimbursement update successfully",
+      error: null,
     });
-
-  return json({ status, error });
+  }
+  return json({
+    status: "error",
+    message: "Employee reimbursement update failed",
+    error,
+  });
 }
 
 export default function UpdateReimbursememts() {
-  const { data, userOptions, reimbursementId } = useLoaderData<typeof loader>();
+  const { data, userOptions, reimbursementId, error } =
+    useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
   const updatableData = data;
+
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  const { employeeId } = useParams();
+
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: "Error",
+        description: error?.message || "Employee address update failed",
+        variant: "destructive",
+      });
+    }
+    if (actionData) {
+      if (actionData?.status === "success") {
+        clearCacheEntry(
+          `${cacheKeyPrefix.employee_reimbursements}${employeeId}`
+        );
+        toast({
+          title: "Success",
+          description: actionData?.message || "Employee address updated",
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description:
+            actionData?.error?.message || "Employee address update failed",
+          variant: "destructive",
+        });
+      }
+      navigate(`/employees/${employeeId}/reimbursements`);
+    }
+  }, [actionData]);
 
   return (
     <AddReimbursements

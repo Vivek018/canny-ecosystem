@@ -5,7 +5,7 @@ import {
   ProfessionalTaxSchema,
   replaceUnderscore,
   transformStringArrayIntoOptions,
-  updateRole,
+  createRole,
 } from "@canny_ecosystem/utils";
 import {
   Field,
@@ -48,7 +48,8 @@ import { UPDATE_PROFESSIONAL_TAX } from "./$professionalTaxId.update-professiona
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const CREATE_PROFESSIONAL_TAX = "create-professional-tax";
 
@@ -57,7 +58,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.statutoryFieldsPf}`)) {
+  if (!hasPermission(user?.role!, `${createRole}:${attribute.statutoryFieldsPf}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   try {
@@ -154,6 +155,7 @@ export default function CreateProfessionalTax({
   useEffect(() => {
     if (!actionData) return;
     if (actionData.status === "success") {
+      clearExactCacheEntry(cacheKeyPrefix.professional_tax);
       toast({
         title: "Success",
         description: actionData.message || "Professional Tax created",

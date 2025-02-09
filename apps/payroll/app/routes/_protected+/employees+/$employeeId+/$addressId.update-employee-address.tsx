@@ -28,8 +28,9 @@ import type { EmployeeAddressDatabaseUpdate } from "@canny_ecosystem/supabase/ty
 import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const UPDATE_EMPLOYEE_ADDRESS = "update-employee-address";
 
@@ -39,7 +40,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.employeeAddresses}`)) {
+  if (
+    !hasPermission(user?.role!, `${updateRole}:${attribute.employeeAddresses}`)
+  ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
@@ -124,7 +127,7 @@ export default function UpdateEmployeeAddress() {
 
   if (error)
     return (
-      <ErrorBoundary error={error} message="Failed to load employee details" />
+      <ErrorBoundary error={error} message='Failed to load employee details' />
     );
 
   return (
@@ -132,7 +135,7 @@ export default function UpdateEmployeeAddress() {
       <Await resolve={employeeAddressPromise}>
         {(resolvedData) => {
           if (!resolvedData)
-            return <ErrorBoundary message="Failed to load employee details" />;
+            return <ErrorBoundary message='Failed to load employee details' />;
           return (
             <UpdateEmployeeAddressWrapper
               data={resolvedData.data}
@@ -183,6 +186,9 @@ export function UpdateEmployeeAddressWrapper({
     }
     if (actionData) {
       if (actionData?.status === "success") {
+        clearExactCacheEntry(
+          `${cacheKeyPrefix.employee_overview}${employeeId}`
+        );
         toast({
           title: "Success",
           description: actionData?.message || "Employee address updated",
@@ -201,13 +207,13 @@ export function UpdateEmployeeAddressWrapper({
   }, [actionData]);
 
   return (
-    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
+    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
       <FormProvider context={form.context}>
         <Form
-          method="POST"
-          encType="multipart/form-data"
+          method='POST'
+          encType='multipart/form-data'
           {...getFormProps(form)}
-          className="flex flex-col"
+          className='flex flex-col'
         >
           <Card>
             <CreateEmployeeAddress

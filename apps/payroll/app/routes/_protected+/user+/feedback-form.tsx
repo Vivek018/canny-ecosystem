@@ -1,4 +1,4 @@
-import { Form, json, useLoaderData } from "@remix-run/react";
+import { Form, json, useActionData, useNavigate } from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import {
   FormProvider,
@@ -7,8 +7,7 @@ import {
   getTextareaProps,
   useForm,
 } from "@conform-to/react";
-import { DEFAULT_ROUTE } from "@/constant";
-import { safeRedirect } from "@/utils/server/http.server";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import {
   categoryArray,
   FeedbackSchema,
@@ -24,12 +23,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
-import { useState } from "react";
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { useState, useEffect } from "react";
+import type { ActionFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { getAuthUser } from "@canny_ecosystem/supabase/cached-queries";
-import { getUserByEmail } from "@canny_ecosystem/supabase/queries";
 import {
   Field,
   SearchableSelectField,
@@ -37,54 +33,93 @@ import {
 } from "@canny_ecosystem/ui/forms";
 import { createFeedback } from "@canny_ecosystem/supabase/mutations";
 import { FormButtons } from "@/components/form/form-buttons";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { useCompanyId } from "@/utils/company";
+import { useUser } from "@/utils/user";
+import { clearCacheEntry } from "@/utils/cache";
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
+    const submission = parseWithZod(formData, { schema: FeedbackSchema });
 
-  const { user } = await getAuthUser({ request });
-  let userData = null;
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 }
+      );
+    }
 
-  if (user?.email) {
-    const { data } = await getUserByEmail({ supabase, email: user?.email });
-    userData = data;
-  }
+    const { status, error } = await createFeedback({
+      supabase,
+      data: submission.value,
+    });
 
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Feedback submitted successfully",
+        error: null,
+        returnTo: DEFAULT_ROUTE,
+      });
+    }
 
-  return json({ userId: userData?.id, companyId });
-}
-
-export async function action({ request }: ActionFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
-
-  const submission = parseWithZod(formData, { schema: FeedbackSchema });
-
-  if (submission.status !== "success") {
     return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      {
+        status: "error",
+        message: "Failed to submit feedback",
+        error,
+        returnTo: DEFAULT_ROUTE,
+      },
+      { status: 500 }
+    );
+  } catch (error) {
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+        returnTo: DEFAULT_ROUTE,
+      },
+      { status: 500 }
     );
   }
-
-  const { status, error } = await createFeedback({
-    supabase,
-    data: submission.value,
-  });
-
-  if (isGoodStatus(status)) {
-    return safeRedirect(DEFAULT_ROUTE);
-  }
-  return json({ status, error });
 }
 
-export default function Feedback() {
-  const { userId, companyId } = useLoaderData<typeof loader>();
-
-  const initialValues = getInitialValueFromZod(FeedbackSchema);
+export default function FeedbackForm() {
+  const actionData = useActionData<typeof action>();
+  const { companyId } = useCompanyId();
+  const { id: userId } = useUser();
 
   const [resetKey, setResetKey] = useState(Date.now());
 
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (actionData) {
+      if (actionData.status === "success") {
+        clearCacheEntry(cacheKeyPrefix.feedback_list);
+        toast({
+          title: "Success",
+          description: actionData.message,
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: actionData.message,
+          variant: "destructive",
+        });
+      }
+      navigate(actionData.returnTo);
+    }
+  }, [actionData, navigate, toast]);
+
+  const initialValues = getInitialValueFromZod(FeedbackSchema);
   const [form, fields] = useForm({
     id: "create-feedback",
     constraint: getZodConstraint(FeedbackSchema),
@@ -101,9 +136,9 @@ export default function Feedback() {
   });
 
   return (
-    <section className="flex flex-col gap-6 w-full lg:w-2/3 my-4">
+    <section className='flex flex-col gap-6 w-full lg:w-2/3 my-4'>
       <FormProvider context={form.context}>
-        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
+        <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
           <Card>
             <CardHeader>
               <CardTitle>Feedback</CardTitle>
@@ -128,12 +163,12 @@ export default function Feedback() {
                 }}
                 errors={fields.subject.errors}
               />
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+              <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
                 <SearchableSelectField
                   key={resetKey}
-                  className="capitalize"
+                  className='capitalize'
                   options={transformStringArrayIntoOptions(
-                    categoryArray as unknown as string[],
+                    categoryArray as unknown as string[]
                   )}
                   inputProps={{
                     ...getInputProps(fields.category, { type: "text" }),
@@ -146,9 +181,9 @@ export default function Feedback() {
                 />
                 <SearchableSelectField
                   key={resetKey + 1}
-                  className="capitalize"
+                  className='capitalize'
                   options={transformStringArrayIntoOptions(
-                    severityArray as unknown as string[],
+                    severityArray as unknown as string[]
                   )}
                   inputProps={{
                     ...getInputProps(fields.severity, { type: "text" }),

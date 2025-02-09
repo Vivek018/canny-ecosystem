@@ -1,4 +1,4 @@
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,7 +20,7 @@ import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
 export const DeleteExit = ({ exitId }: { exitId: string }) => {
-  const { role } = useUserRole();
+  const { role } = useUser();
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [inputError, setInputError] = useState<string[]>([]);
@@ -70,21 +70,21 @@ export const DeleteExit = ({ exitId }: { exitId: string }) => {
             and remove it's data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <div className="py-4">
-          <p className="text-sm text-foreground/80">
+        <div className='py-4'>
+          <p className='text-sm text-foreground/80'>
             Please type{" "}
-            <i className="text-foreground font-medium">{DELETE_TEXT}</i> to
+            <i className='text-foreground font-medium'>{DELETE_TEXT}</i> to
             confirm.
           </p>
           <Input
-            type="text"
+            type='text'
             value={inputValue}
             onChange={(e) => {
               setInputValue(e.target.value);
               setInputError([]);
             }}
-            className="border border-input rounded-md h-10 w-full"
-            placeholder="Confirm your action"
+            className='border border-input rounded-md h-10 w-full'
+            placeholder='Confirm your action'
             onPaste={(e) => {
               e.preventDefault();
               return false;

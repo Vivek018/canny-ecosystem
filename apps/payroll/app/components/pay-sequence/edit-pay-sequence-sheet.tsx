@@ -5,36 +5,36 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@canny_ecosystem/ui/sheet";
-import { useNavigate, useSearchParams } from "@remix-run/react";
+import { useNavigate, useParams, useSearchParams } from "@remix-run/react";
 import { EditPaySequenceForm } from "./form/edit-pay-sequence-form";
 import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
 
 export const EditPaySequenceSheet = ({
   updateValues,
-  projectId,
 }: {
   updateValues: SitePaySequenceDatabaseUpdate;
-  projectId: string;
 }) => {
-  const navigate = useNavigate();
+  const { projectId } = useParams();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
-  const isParamEditPaySequence =
+  const isOpen =
     searchParams.get("step") === modalSearchParamNames.edit_pay_sequence;
 
   const handleOpenChange = () => {
-    navigate(-1);
+    navigate(`/projects/${projectId}/sites`);
   };
+
   return (
-    <Sheet open={isParamEditPaySequence} onOpenChange={handleOpenChange}>
-      <SheetContent className="w-[460px]">
-        <SheetHeader className="mb-8">
+    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
+      <SheetContent className='w-[460px]'>
+        <SheetHeader className='mb-8'>
           <SheetTitle>Edit Pay Sequence</SheetTitle>
         </SheetHeader>
 
         <EditPaySequenceForm
           updateValues={updateValues}
-          projectId={projectId}
+          projectId={projectId!}
         />
       </SheetContent>
     </Sheet>

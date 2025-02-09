@@ -10,7 +10,7 @@ import { useNavigate } from "@remix-run/react";
 import { DeleteReimbursement } from "./delete-reimbursement";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const ReimbursementOptionsDropdown = ({
@@ -24,7 +24,7 @@ export const ReimbursementOptionsDropdown = ({
   triggerChild: React.ReactElement;
   isEmployeeRoute?: boolean;
 }) => {
-  const { role } = useUserRole();
+  const { role } = useUser();
   const navigate = useNavigate();
 
   const handleEdit = () => {

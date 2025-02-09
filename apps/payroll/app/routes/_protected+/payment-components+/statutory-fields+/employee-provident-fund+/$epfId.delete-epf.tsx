@@ -1,4 +1,5 @@
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { deleteEmployeeProvidentFund } from "@canny_ecosystem/supabase/mutations";
@@ -75,6 +76,7 @@ export default function DeleteEmployeeProvidentFund() {
   useEffect(() => {
     if (!actionData) return;
     if (actionData?.status === "success") {
+      clearExactCacheEntry(cacheKeyPrefix.statutory_field_epf);
       toast({
         title: "Success",
         description: actionData?.message,

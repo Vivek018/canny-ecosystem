@@ -1,4 +1,5 @@
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { updateProject } from "@canny_ecosystem/supabase/mutations";
@@ -13,7 +14,7 @@ import {
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { parseWithZod } from "@conform-to/zod";
 import { json, type ActionFunctionArgs } from "@remix-run/node";
-import { useActionData, useNavigate } from "@remix-run/react";
+import { useActionData, useNavigate, useParams } from "@remix-run/react";
 import { useEffect } from "react";
 
 const UpdateCompletedSchema = z.object({
@@ -83,12 +84,15 @@ export async function action({
 export default function UpdateCompleted() {
   const actionData = useActionData<typeof action>();
 
+  const { projectId } = useParams();
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
+        clearExactCacheEntry(cacheKeyPrefix.projects);
+        clearExactCacheEntry(`${cacheKeyPrefix.project_overview}${projectId}`);
         toast({
           title: "Success",
           description: actionData?.message,

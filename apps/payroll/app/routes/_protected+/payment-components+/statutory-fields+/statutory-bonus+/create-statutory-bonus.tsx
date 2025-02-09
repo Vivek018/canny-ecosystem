@@ -1,5 +1,4 @@
 import { FormButtons } from "@/components/form/form-buttons";
-import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { createStatutoryBonus } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { StatutoryBonusDatabaseUpdate } from "@canny_ecosystem/supabase/types";
@@ -19,7 +18,7 @@ import {
   statutoryBonusPayFrequencyArray,
   StatutoryBonusSchema,
   transformStringArrayIntoOptions,
-  updateRole,
+  createRole,
 } from "@canny_ecosystem/utils";
 import { attribute, payoutMonths } from "@canny_ecosystem/utils/constant";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
@@ -32,15 +31,16 @@ import {
 import {
   Form,
   useActionData,
-  useLoaderData,
   useNavigate,
 } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { UPDATE_STATUTORY_BONUS } from "./$sbId.update-statutory-bonus";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { safeRedirect } from "@/utils/server/http.server";
+import { useCompanyId } from "@/utils/company";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const CREATE_STATUTORY_BONUS = "create-statutory-bonus";
 
@@ -52,25 +52,13 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   if (
     !hasPermission(
       `${user?.role!}`,
-      `${updateRole}:${attribute.statutoryFieldsStatutoryBonus} `
+      `${createRole}:${attribute.statutoryFieldsStatutoryBonus} `
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
-  try {
-    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-    return json({ status: "success", message: "Company ID found", companyId });
-  } catch (error) {
-    return json(
-      {
-        status: "error",
-        message: "An unexpected error occurred",
-        error,
-      },
-      { status: 500 }
-    );
-  }
+  return {};
 };
 
 export const action = async ({
@@ -127,14 +115,16 @@ export default function CreateStatutoryBonus({
 }: {
   updateValues?: StatutoryBonusDatabaseUpdate | null;
 }) {
-  const { companyId } = useLoaderData<{ companyId: string }>();
   const actionData = useActionData<typeof action>();
-  const STATUTORY_BONUS_TAG = updateValues
-    ? UPDATE_STATUTORY_BONUS
-    : CREATE_STATUTORY_BONUS;
 
+  const { companyId } = useCompanyId();
+  
+  const STATUTORY_BONUS_TAG = updateValues
+  ? UPDATE_STATUTORY_BONUS
+  : CREATE_STATUTORY_BONUS;
+  
   const initialValues =
-    updateValues ?? getInitialValueFromZod(StatutoryBonusSchema);
+  updateValues ?? getInitialValueFromZod(StatutoryBonusSchema);
 
   const [resetKey, setResetKey] = useState(Date.now());
 
@@ -158,6 +148,7 @@ export default function CreateStatutoryBonus({
     if (!actionData) return;
 
     if (actionData.status === "success") {
+      clearExactCacheEntry(cacheKeyPrefix.statutory_bonus);
       toast({
         title: "Success",
         description: actionData?.message || "Statutory Bonus created",
@@ -177,11 +168,11 @@ export default function CreateStatutoryBonus({
   }, [actionData]);
 
   return (
-    <section className="p-4 w-full">
-      <Form method="POST" {...getFormProps(form)} className="flex flex-col">
+    <section className='p-4 w-full'>
+      <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl mb-6 capitalize">
+            <CardTitle className='text-2xl mb-6 capitalize'>
               {replaceDash(STATUTORY_BONUS_TAG)}
             </CardTitle>
             <hr />
@@ -189,17 +180,17 @@ export default function CreateStatutoryBonus({
           <CardContent>
             <input {...getInputProps(fields.id, { type: "hidden" })} />
             <input {...getInputProps(fields.company_id, { type: "hidden" })} />
-            <div className="flex flex-col items-start justify-between gap-2">
+            <div className='flex flex-col items-start justify-between gap-2'>
               <SearchableSelectField
                 key={resetKey}
-                className="capitalize"
+                className='capitalize'
                 options={transformStringArrayIntoOptions(
                   statutoryBonusPayFrequencyArray as unknown as string[]
                 )}
                 inputProps={{
                   ...getInputProps(fields.payment_frequency, { type: "text" }),
                 }}
-                placeholder="Select an option"
+                placeholder='Select an option'
                 labelProps={{
                   children: replaceUnderscore(fields.payment_frequency.name),
                 }}
@@ -221,13 +212,13 @@ export default function CreateStatutoryBonus({
               />
               <SearchableSelectField
                 key={resetKey + 1}
-                className="capitalize"
+                className='capitalize'
                 options={payoutMonths}
                 inputProps={{
                   disabled: form.value?.payment_frequency === "monthly",
                   ...getInputProps(fields.payout_month, { type: "text" }),
                 }}
-                placeholder="Select an option"
+                placeholder='Select an option'
                 labelProps={{
                   children: replaceUnderscore(fields.payout_month.name),
                 }}

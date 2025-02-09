@@ -30,7 +30,7 @@ export function CreateEmployeeStatutoryDetails({
   return (
     <Fragment>
       <CardHeader>
-        <CardTitle className="text-3xl">
+        <CardTitle className='text-3xl capitalize'>
           {isUpdate ? "Update" : "Add"} Employee Statutory Details
         </CardTitle>
         <CardDescription>
@@ -39,12 +39,14 @@ export function CreateEmployeeStatutoryDetails({
       </CardHeader>
       <CardContent>
         <input {...getInputProps(fields.employee_id, { type: "hidden" })} />
-        <div className="grid grid-cols-3 place-content-center justify-between gap-6">
+        <div className='grid grid-cols-3 place-content-center justify-between gap-6'>
           <Field
             inputProps={{
               ...getInputProps(fields.aadhaar_number, { type: "text" }),
               autoFocus: true,
-              placeholder: `Enter ${replaceUnderscore(fields.aadhaar_number.name)}`,
+              placeholder: `Enter ${replaceUnderscore(
+                fields.aadhaar_number.name
+              )}`,
             }}
             labelProps={{
               children: replaceUnderscore(fields.aadhaar_number.name),
@@ -70,7 +72,7 @@ export function CreateEmployeeStatutoryDetails({
             errors={fields.uan_number.errors}
           />
         </div>
-        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+        <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
           <Field
             inputProps={{
               ...getInputProps(fields.pf_number, { type: "text" }),
@@ -82,7 +84,9 @@ export function CreateEmployeeStatutoryDetails({
           <Field
             inputProps={{
               ...getInputProps(fields.esic_number, { type: "text" }),
-              placeholder: `Enter ${replaceUnderscore(fields.esic_number.name)}`,
+              placeholder: `Enter ${replaceUnderscore(
+                fields.esic_number.name
+              )}`,
             }}
             labelProps={{
               children: replaceUnderscore(fields.esic_number.name),
@@ -90,11 +94,13 @@ export function CreateEmployeeStatutoryDetails({
             errors={fields.esic_number.errors}
           />
         </div>
-        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+        <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
           <Field
             inputProps={{
               ...getInputProps(fields.driving_license_number, { type: "text" }),
-              placeholder: `Enter ${replaceUnderscore(fields.driving_license_number.name)}`,
+              placeholder: `Enter ${replaceUnderscore(
+                fields.driving_license_number.name
+              )}`,
             }}
             labelProps={{
               children: replaceUnderscore(fields.driving_license_number.name),
@@ -104,7 +110,9 @@ export function CreateEmployeeStatutoryDetails({
           <Field
             inputProps={{
               ...getInputProps(fields.driving_license_expiry, { type: "date" }),
-              placeholder: `Enter ${replaceUnderscore(fields.driving_license_expiry.name)}`,
+              placeholder: `Enter ${replaceUnderscore(
+                fields.driving_license_expiry.name
+              )}`,
             }}
             labelProps={{
               children: replaceUnderscore(fields.driving_license_expiry.name),
@@ -112,11 +120,13 @@ export function CreateEmployeeStatutoryDetails({
             errors={fields.driving_license_expiry.errors}
           />
         </div>
-        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+        <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
           <Field
             inputProps={{
               ...getInputProps(fields.passport_number, { type: "text" }),
-              placeholder: `Enter ${replaceUnderscore(fields.passport_number.name)}`,
+              placeholder: `Enter ${replaceUnderscore(
+                fields.passport_number.name
+              )}`,
             }}
             labelProps={{
               children: replaceUnderscore(fields.passport_number.name),
@@ -126,7 +136,9 @@ export function CreateEmployeeStatutoryDetails({
           <Field
             inputProps={{
               ...getInputProps(fields.passport_expiry, { type: "date" }),
-              placeholder: `Enter ${replaceUnderscore(fields.passport_expiry.name)}`,
+              placeholder: `Enter ${replaceUnderscore(
+                fields.passport_expiry.name
+              )}`,
             }}
             labelProps={{
               children: replaceUnderscore(fields.passport_expiry.name),

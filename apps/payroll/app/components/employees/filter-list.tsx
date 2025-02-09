@@ -1,6 +1,7 @@
 import type { EmployeeFilters } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
 import {
   formatDate,
   formatDateRange,
@@ -13,7 +14,7 @@ export type EmployeeFilterList = EmployeeFilters & {
 };
 
 type Props = {
-  filterList: EmployeeFilterList | undefined;
+  filterList: EmployeeFilterList | undefined | null;
 };
 
 export function FilterList({ filterList }: Props) {
@@ -22,18 +23,20 @@ export function FilterList({ filterList }: Props) {
   const renderFilter = ({ key, value }: { key: string; value: string }) => {
     switch (key) {
       case "dob_start": {
-        if (key === "dob_start" && value && filterList?.dob_end) {
+        if (value && filterList?.dob_end) {
           return formatDateRange(
             new Date(value),
             new Date(filterList.dob_end),
             {
               includeTime: false,
-            },
+            }
           );
         }
 
-        return key === "dob_start" && value && formatDate(new Date(value));
+        return value && formatDate(new Date(value));
       }
+      case "dob_end":
+        return !filterList?.dob_start && value && formatDate(new Date(value));
 
       case "gender":
         return value;
@@ -60,32 +63,38 @@ export function FilterList({ filterList }: Props) {
         return replaceUnderscore(value);
 
       case "doj_start": {
-        if (key === "doj_start" && value && filterList?.doj_end) {
+        if (value && filterList?.doj_end) {
           return formatDateRange(
             new Date(value),
             new Date(filterList.doj_end),
             {
               includeTime: false,
-            },
+            }
           );
         }
 
-        return key === "doj_start" && value && formatDate(new Date(value));
+        return value && formatDate(new Date(value));
       }
 
+      case "doj_end":
+        return !filterList?.doj_start && value && formatDate(new Date(value));
+
       case "dol_start": {
-        if (key === "dol_start" && value && filterList?.dol_end) {
+        if (value && filterList?.dol_end) {
           return formatDateRange(
             new Date(value),
             new Date(filterList.dol_end),
             {
               includeTime: false,
-            },
+            }
           );
         }
 
-        return key === "dol_start" && value && formatDate(new Date(value));
+        return value && formatDate(new Date(value));
       }
+
+      case "dol_end":
+        return !filterList?.dol_start && value && formatDate(new Date(value));
 
       case "name":
         return value;
@@ -110,30 +119,26 @@ export function FilterList({ filterList }: Props) {
   };
 
   return (
-    <ul className="flex flex-0 space-x-2 w-full overflow-scroll no-scrollbar">
+    <ul className='flex flex-0 space-x-2 w-full overflow-scroll no-scrollbar'>
       {filterList &&
         Object.entries(filterList)
-          .filter(
-            ([key, value]) =>
-              value !== null && value !== undefined && !key.endsWith("end"),
-          )
+          .filter(([value]) => value !== null && value !== undefined)
           .map(([key, value]) => {
+            const renderValue = renderFilter({
+              key,
+              value: value ?? "",
+            });
             return (
-              <li key={key}>
+              <li key={key} className={cn(!renderValue && "hidden")}>
                 <Button
-                  className="rounded-full h-9 px-3 bg-secondary hover:bg-secondary font-normal text-[#878787] flex space-x-1 items-center group"
+                  className='rounded-full h-9 px-3 bg-secondary hover:bg-secondary font-normal text-[#878787] flex space-x-1 items-center group'
                   onClick={() => handleOnRemove(key)}
                 >
                   <Icon
-                    name="cross"
-                    className="scale-0 group-hover:scale-100 transition-all w-0 group-hover:w-4"
+                    name='cross'
+                    className='scale-0 group-hover:scale-100 transition-all w-0 group-hover:w-4'
                   />
-                  <span className="capitalize">
-                    {renderFilter({
-                      key,
-                      value: value ?? "",
-                    })}
-                  </span>
+                  <span className='capitalize'>{renderValue}</span>
                 </Button>
               </li>
             );

@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { Form, json, useActionData, useNavigate } from "@remix-run/react";
+import { Form, json, useActionData, useNavigate, useParams } from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { createEmployeeAddresses } from "@canny_ecosystem/supabase/mutations";
 import {
@@ -8,7 +8,7 @@ import {
   EmployeeAddressesSchema,
   getInitialValueFromZod,
   hasPermission,
-  updateRole,
+  createRole,
 } from "@canny_ecosystem/utils";
 import { CreateEmployeeAddress } from "@/components/employees/form/create-employee-address";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
@@ -18,8 +18,9 @@ import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const ADD_EMPLOYEE_ADDRESS = "add-employee-address";
 
@@ -32,7 +33,9 @@ export async function action({
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.employeeAddresses}`)) {
+  if (
+    !hasPermission(user?.role!, `${createRole}:${attribute.employeeAddresses}`)
+  ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
@@ -101,10 +104,12 @@ export default function AddEmployeeAddress() {
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { employeeId } = useParams();
 
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
+        clearExactCacheEntry(`${cacheKeyPrefix.employee_overview}${employeeId}`);
         toast({
           title: "Success",
           description: actionData?.message || "Address added",
@@ -122,13 +127,13 @@ export default function AddEmployeeAddress() {
   }, [actionData]);
 
   return (
-    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
+    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
       <FormProvider context={form.context}>
         <Form
-          method="POST"
-          encType="multipart/form-data"
+          method='POST'
+          encType='multipart/form-data'
           {...getFormProps(form)}
-          className="flex flex-col"
+          className='flex flex-col'
         >
           <Card>
             <CreateEmployeeAddress key={resetKey} fields={fields as any} />

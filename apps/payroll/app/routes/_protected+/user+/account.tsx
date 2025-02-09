@@ -1,52 +1,107 @@
+import { ErrorBoundary } from "@/components/error-boundary";
+import { cacheKeyPrefix } from "@/constant";
+import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { getSessionUser } from "@canny_ecosystem/supabase/cached-queries";
 import { getUserByEmail } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json, useLoaderData } from "@remix-run/react";
+import {
+  Await,
+  type ClientLoaderFunctionArgs,
+  defer,
+  useLoaderData,
+} from "@remix-run/react";
+import { Suspense, useEffect, useState } from "react";
+import { UserAvatar } from "@/components/accounts/user-avatar";
 import { UserName } from "@/components/accounts/user-name";
 import { UserContact } from "@/components/accounts/user-contact";
-import { useEffect, useState } from "react";
-import { UserAvatar } from "@/components/accounts/user-avatar";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { user } = await getSessionUser({ request });
-  const userEmail = user?.email;
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const { user } = await getSessionUser({ request });
+    const userEmail = user?.email;
 
-  let userData = null;
-  if (userEmail) {
-    const { data, error } = await getUserByEmail({
+    if (!userEmail) {
+      throw new Error("No user email found");
+    }
+
+    const userDataPromise = getUserByEmail({
       supabase,
       email: userEmail,
     });
 
-    if (error || !data) {
-      throw error;
-    }
-
-    userData = data;
+    return defer({
+      status: "success",
+      message: "User data found",
+      error: null,
+      userDataPromise,
+    });
+  } catch (error) {
+    return defer({
+      status: "error",
+      message: "Failed to get user data",
+      error,
+      userDataPromise: null,
+    });
   }
-
-  return json({ data: userData });
 }
 
-export default function Accountindex() {
-  const { data } = useLoaderData<typeof loader>();
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+  return await clientCaching(cacheKeyPrefix.account, args);
+}
+
+clientLoader.hydrate = true;
+
+export default function AccountSettings() {
+  const { userDataPromise, error } = useLoaderData<typeof loader>();
   const [resetKey, setResetKey] = useState(Date.now());
-  const userId = data?.id!;
 
   useEffect(() => {
     setResetKey(Date.now());
-  }, [data]);
+  }, [userDataPromise]);
+
+  if (error) {
+    clearExactCacheEntry(cacheKeyPrefix.account);
+    return (
+      <ErrorBoundary error={error} message='Failed to load user details' />
+    );
+  }
 
   return (
-    <section className="flex flex-col gap-6 w-full lg:w-2/3 my-4">
-      <UserAvatar
-        avatar={data?.avatar ?? ""}
-        first_name={data?.first_name ?? ""}
-      />
-      <UserName key={userId + resetKey} updateValues={data} />
-      <UserContact key={userId + resetKey + 1} updateValues={data} />
+    <section key={resetKey}>
+      <div className='flex flex-col gap-6 w-full lg:w-2/3 py-4'>
+        <Suspense fallback={<div>Loading...</div>}>
+          <Await resolve={userDataPromise}>
+            {(resolvedData) => {
+              if (!resolvedData || resolvedData.error) {
+                clearExactCacheEntry(cacheKeyPrefix.account);
+                return <ErrorBoundary message='Failed to load user details' />;
+              }
+
+              const userData = resolvedData.data;
+              const userId = userData?.id;
+
+              return (
+                <>
+                  <UserAvatar
+                    avatar={userData?.avatar ?? ""}
+                    first_name={userData?.first_name ?? ""}
+                  />
+                  <UserName
+                    key={`${userId}-${resetKey}`}
+                    updateValues={userData}
+                  />
+                  <UserContact
+                    key={`${userId}-${resetKey}-1`}
+                    updateValues={userData}
+                  />
+                </>
+              );
+            }}
+          </Await>
+        </Suspense>
+      </div>
     </section>
   );
 }

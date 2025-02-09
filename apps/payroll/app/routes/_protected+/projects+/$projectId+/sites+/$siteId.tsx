@@ -11,9 +11,8 @@ import {
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { SitePaySequenceDatabaseRow } from "@canny_ecosystem/supabase/types";
 import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
-import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData, useSearchParams } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -54,7 +53,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
           (paymentTemplate) => ({
             label: paymentTemplate.name,
             value: paymentTemplate.id ?? "",
-          }),
+          })
         );
       }
 
@@ -86,7 +85,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         paymentTemplatesOptions,
         linkTemplates,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -100,33 +99,18 @@ export default function EditPaySequence() {
     paymentTemplatesOptions,
   } = useLoaderData<typeof loader>();
 
-  const [searchParams] = useSearchParams();
-
-  const step = searchParams.get("step");
-
-  if (step === modalSearchParamNames.view_link_template) {
-    return (
+  return (
+    <>
       <SiteDialog
         siteId={siteId!}
         projectId={projectId!}
         paymentTemplateOptions={paymentTemplatesOptions}
         linkTemplates={linkTemplates}
       />
-    );
-  }
-
-  if (step === modalSearchParamNames.view_pay_sequence && paySequenceData) {
-    return <ViewPaySequenceDialog values={paySequenceData} />;
-  }
-
-  if (step === modalSearchParamNames.edit_pay_sequence && paySequenceData) {
-    return (
-      <EditPaySequenceSheet
-        updateValues={paySequenceData}
-        projectId={projectId!}
-      />
-    );
-  }
-
-  return null;
+      {paySequenceData && <ViewPaySequenceDialog values={paySequenceData} />}
+      {paySequenceData && (
+        <EditPaySequenceSheet updateValues={paySequenceData} />
+      )}
+    </>
+  );
 }
