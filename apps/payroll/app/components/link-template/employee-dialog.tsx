@@ -37,7 +37,7 @@ import {
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { useState } from "react";
 import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
 export function EmployeeDialog({
@@ -52,7 +52,7 @@ export function EmployeeDialog({
   };
   env: SupabaseEnv;
 }) {
-  const { role } = useUserRole();
+  const { role } = useUser();
   const { supabase } = useSupabase({ env });
   const navigation = useNavigation();
 

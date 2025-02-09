@@ -6,7 +6,7 @@ import { GratuityNoData } from "./gratuity-no-data";
 import { DeleteGratuity } from "./delete-gratuity";
 import { hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
@@ -32,7 +32,7 @@ export function GratuityWrapper({
   data: Omit<GratuityDatabaseRow, "created_at" | "updated_at"> | null;
   error: Error | null | { message: string };
 }) {
-  const { role } = useUserRole();
+  const { role } = useUser();
   if (error) {
     clearExactCacheEntry(cacheKeyPrefix.gratuity);
     return <ErrorBoundary error={error} message='Failed to load data' />;

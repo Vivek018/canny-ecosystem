@@ -10,7 +10,7 @@ import type {
   SupabaseEnv,
 } from "@canny_ecosystem/supabase/types";
 import { hasPermission, updateRole } from "@canny_ecosystem/utils";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
 export function EmployeePageHeader({
@@ -30,7 +30,7 @@ export function EmployeePageHeader({
   >;
   env: SupabaseEnv;
 }) {
-  const { role } = useUserRole();
+  const { role } = useUser();
   return (
     <div className="flex w-full flex-col gap-6">
       <div className="w-full flex flex-row gap-6 justify-between">

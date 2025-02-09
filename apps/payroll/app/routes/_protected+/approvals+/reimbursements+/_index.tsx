@@ -23,12 +23,19 @@ import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { json, redirect, useLoaderData, useNavigate } from "@remix-run/react";
+import {
+  type ClientLoaderFunctionArgs,
+  json,
+  redirect,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
+import { clientCaching } from "@/utils/cache";
+import { cacheKeyPrefix } from "@/constant";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const { supabase } = getSupabaseWithHeaders({ request });
- 
 
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   const searchParams = new URLSearchParams(url.searchParams);
@@ -114,6 +121,17 @@ export async function loader({ request }: LoaderFunctionArgs) {
   });
 }
 
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+  const url = new URL(args.request.url);
+
+  return await clientCaching(
+    `${cacheKeyPrefix.reimbursements}${url.searchParams.toString()}`,
+    args
+  );
+}
+
+clientLoader.hydrate = true;
+
 export async function action({ request }: ActionFunctionArgs) {
   const url = new URL(request.url);
   const formData = await request.formData();
@@ -148,9 +166,9 @@ export default function Reimbursements() {
   const noFilters = Object.values(filters).every((value) => !value);
 
   return (
-    <section className="m-4">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
+    <section className='m-4'>
+      <div className='w-full flex items-center justify-between pb-4'>
+        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4'>
           <ReimbursementSearchFilter
             disabled={!reimbursementData?.length && noFilters}
             userEmails={userEmails}
@@ -159,7 +177,7 @@ export default function Reimbursements() {
           />
           <FilterList filters={filters} />
         </div>
-        <div className="space-x-2 hidden md:flex">
+        <div className='space-x-2 hidden md:flex'>
           {!selectedRows.length ? (
             <>
               <ColumnVisibility disabled={!reimbursementData?.length} />
@@ -167,13 +185,13 @@ export default function Reimbursements() {
             </>
           ) : (
             <Button
-              variant="outline"
-              size="icon"
-              className="h-10 w-10"
+              variant='outline'
+              size='icon'
+              className='h-10 w-10'
               disabled={!selectedRows.length}
               onClick={() => navigate("/approvals/reimbursements/analytics")}
             >
-              <Icon name="chart" className="h-[18px] w-[18px]" />
+              <Icon name='chart' className='h-[18px] w-[18px]' />
             </Button>
           )}
         </div>

@@ -23,7 +23,7 @@ import { Suspense } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { RelationshipWrapper } from "@/components/relationships/relationship-wrapper";
 import { hasPermission, createRole } from "@canny_ecosystem/utils";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
@@ -58,7 +58,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 clientLoader.hydrate = true;
 
 export default function Relationships() {
-  const { role } = useUserRole();
+  const { role } = useUser();
   const { relationshipsPromise, error } = useLoaderData<typeof loader>();
   const { isDocument } = useIsDocument();
 

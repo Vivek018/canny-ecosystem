@@ -30,7 +30,7 @@ import {
   replaceUnderscore,
   updateRole,
 } from "@canny_ecosystem/utils";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
 type DetailItemProps = {
@@ -62,7 +62,7 @@ export const WorkHistoryItem = ({
 }: {
   workHistory: EmployeeWorkHistory;
 }) => {
-  const { role } = useUserRole();
+  const { role } = useUser();
   return (
     <Card
       key={workHistory.id}
@@ -148,7 +148,7 @@ export const EmployeeWorkHistoriesCard = ({
 }: {
   employeeWorkHistories: EmployeeWorkHistory[] | null;
 }) => {
-  const { role } = useUserRole();
+  const { role } = useUser();
   return (
     <Card className="rounded w-full h-full p-4">
       <div className="flex justify-between items-center mb-6">

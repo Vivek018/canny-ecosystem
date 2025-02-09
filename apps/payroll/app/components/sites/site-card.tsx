@@ -34,14 +34,14 @@ import {
   replaceUnderscore,
   updateRole,
 } from "@canny_ecosystem/utils";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 
 export function SiteCard({
   site,
 }: {
   site: Omit<SitesWithLocation, "created_at" | "updated_at">;
 }) {
-  const { role } = useUserRole();
+  const { role } = useUser();
   const navigate = useNavigate();
 
   const viewLinkTemplateSearchParam = `step=${modalSearchParamNames.view_link_template}`;

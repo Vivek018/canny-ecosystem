@@ -12,7 +12,7 @@ import {
   hasPermission,
   updateRole,
 } from "@canny_ecosystem/utils";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
@@ -148,13 +148,13 @@ export const reimbursementsColumns = ({
     enableSorting: false,
     enableHiding: false,
     cell: ({ row }) => {
-      const { role } = useUserRole();
+      const { role } = useUser();
 
       return (
         <ReimbursementOptionsDropdown
-          key={row.original.id}
-          reimbursementId={row.original.id}
-          employeeId={row.original?.employees.id}
+          key={row?.original?.id}
+          reimbursementId={row?.original?.id}
+          employeeId={row.original?.employees?.id}
           isEmployeeRoute={isEmployeeRoute}
           triggerChild={
             <DropdownMenuTrigger

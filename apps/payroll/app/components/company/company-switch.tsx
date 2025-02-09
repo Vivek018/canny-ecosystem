@@ -26,7 +26,7 @@ import {
   replaceUnderscore,
   updateRole,
 } from "@canny_ecosystem/utils";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { clearAllCache } from "@/utils/cache";
 
@@ -35,7 +35,7 @@ export const CompanySwitch = ({
 }: {
   companies: CompaniesDatabaseRow;
 }) => {
-  const { role } = useUserRole();
+  const { role } = useUser();
   const submit = useSubmit();
   const linkRef = useRef<HTMLAnchorElement | null>(null);
   const location = useLocation();

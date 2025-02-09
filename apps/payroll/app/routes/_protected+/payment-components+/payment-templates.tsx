@@ -5,7 +5,7 @@ import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { getPaymentTemplatesByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
@@ -64,7 +64,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 clientLoader.hydrate = true;
 
 export default function PaymentTemplates() {
-  const { role } = useUserRole();
+  const { role } = useUser();
   const { paymentTemplatesPromise, error } = useLoaderData<typeof loader>();
 
   const [searchString, setSearchString] = useState("");

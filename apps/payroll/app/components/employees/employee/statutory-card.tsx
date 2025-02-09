@@ -1,4 +1,4 @@
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import type { EmployeeStatutoryDetailsDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Card } from "@canny_ecosystem/ui/card";
@@ -40,7 +40,7 @@ type EmployeeStatutoryDetails = Omit<
 export const EmployeeStatutoryCard: React.FC<{
   employeeStatutory: EmployeeStatutoryDetails | null;
 }> = ({ employeeStatutory }) => {
-  const { role } = useUserRole();
+  const { role } = useUser();
   const { employeeId } = useParams();
 
   return (

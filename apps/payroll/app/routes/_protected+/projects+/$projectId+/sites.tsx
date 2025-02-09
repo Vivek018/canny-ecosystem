@@ -23,7 +23,7 @@ import { Suspense } from "react";
 import { SitesWrapper } from "@/components/projects/sites/sites-wrapper";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { hasPermission, createRole } from "@canny_ecosystem/utils";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
@@ -68,7 +68,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 clientLoader.hydrate = true;
 
 export default function Sites() {
-  const { role } = useUserRole();
+  const { role } = useUser();
   const { sitesPromise, projectId, error } = useLoaderData<typeof loader>();
   const { isDocument } = useIsDocument();
 

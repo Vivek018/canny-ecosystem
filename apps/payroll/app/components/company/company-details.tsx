@@ -1,6 +1,6 @@
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import type { CompanyDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { Button } from "@canny_ecosystem/ui/button";
 import {
@@ -41,14 +41,14 @@ export const CompanyDetails = ({
 }: {
   updateValues: CompanyDatabaseUpdate;
 }) => {
-  const { role } = useUserRole();
+  const { role } = useUser();
   const [resetKey, setResetKey] = useState(Date.now());
 
   const [form, fields] = useForm({
     id: COMPANY_DETAILS,
     constraint: getZodConstraint(CompanyDetailsSchema),
     onValidate({ formData }) {
-      if(!deepEqualCheck(form.initialValue, form.value)){
+      if (!deepEqualCheck(form.initialValue, form.value)) {
         clearExactCacheEntry(cacheKeyPrefix.general);
       }
       return parseWithZod(formData, { schema: CompanyDetailsSchema });

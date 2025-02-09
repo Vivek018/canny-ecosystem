@@ -23,7 +23,7 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import type { EmployeeGuardianDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { DeleteGuardian } from "./delete-guardian";
 import { createRole, deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
@@ -52,7 +52,7 @@ type EmployeeGuardian = Omit<
 >;
 
 export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
-  const { role } = useUserRole();
+  const { role } = useUser();
   return (
     <Card
       key={guardian.id}
@@ -162,7 +162,7 @@ export const EmployeeGuardiansCard = ({
 }: {
   employeeGuardians: EmployeeGuardian[] | null;
 }) => {
-  const { role } = useUserRole();
+  const { role } = useUser();
   return (
     <Card className='rounded w-full h-full p-4'>
       <div className='flex justify-between items-center mb-6'>

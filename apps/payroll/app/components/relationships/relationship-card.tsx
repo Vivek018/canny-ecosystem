@@ -35,14 +35,14 @@ import {
   attribute,
   modalSearchParamNames,
 } from "@canny_ecosystem/utils/constant";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 
 export function RelationshipCard({
   relationship,
 }: {
   relationship: Omit<RelationshipWithCompany, "created_at" | "updated_at">;
 }) {
-  const { role } = useUserRole();
+  const { role } = useUser();
 
   const navigate = useNavigate();
   const viewRelationshipTermsParam = `step=${modalSearchParamNames.view_relationship_terms}`;
@@ -50,18 +50,18 @@ export function RelationshipCard({
   return (
     <Card
       key={relationship.id}
-      className="w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start"
+      className='w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start'
     >
-      <CardHeader className="flex flex-row space-y-0 items-center justify-between p-4">
-        <CardTitle className="text-lg tracking-wide">
+      <CardHeader className='flex flex-row space-y-0 items-center justify-between p-4'>
+        <CardTitle className='text-lg tracking-wide'>
           {replaceUnderscore(relationship.relationship_type ?? "")}
         </CardTitle>
-        <div className="flex items-center gap-3">
+        <div className='flex items-center gap-3'>
           <TooltipProvider>
             <Tooltip delayDuration={100}>
               <TooltipTrigger asChild>
                 <Link
-                  prefetch="intent"
+                  prefetch='intent'
                   to={`/settings/relationships/${relationship.id}/update-relationship`}
                   className={cn(
                     "p-2 rounded-md bg-secondary grid place-items-center",
@@ -71,17 +71,17 @@ export function RelationshipCard({
                     ) && "hidden"
                   )}
                 >
-                  <Icon name="edit" size="xs" />
+                  <Icon name='edit' size='xs' />
                 </Link>
               </TooltipTrigger>
               <TooltipContent>Edit</TooltipContent>
             </Tooltip>
           </TooltipProvider>
           <DropdownMenu>
-            <DropdownMenuTrigger className="p-2 py-2 rounded-md bg-secondary grid place-items-center">
-              <Icon name="dots-vertical" size="xs" />
+            <DropdownMenuTrigger className='p-2 py-2 rounded-md bg-secondary grid place-items-center'>
+              <Icon name='dots-vertical' size='xs' />
             </DropdownMenuTrigger>
-            <DropdownMenuContent sideOffset={10} align="end">
+            <DropdownMenuContent sideOffset={10} align='end'>
               <DropdownMenuGroup>
                 <DropdownMenuItem
                   className={cn(
@@ -115,9 +115,9 @@ export function RelationshipCard({
           </DropdownMenu>
         </div>
       </CardHeader>
-      <CardContent className="flex flex-col gap-0.5 px-4 mt-4">
-        <div className="flex flex-row w-full items-center justify-between">
-          <h2 className="capitalize p-2 border border-input rounded-md bg-muted/75 truncate w-32">
+      <CardContent className='flex flex-col gap-0.5 px-4 mt-4'>
+        <div className='flex flex-row w-full items-center justify-between'>
+          <h2 className='capitalize p-2 border border-input rounded-md bg-muted/75 truncate w-32'>
             {relationship?.parent_company?.name}
           </h2>
           <div
@@ -172,7 +172,7 @@ export function RelationshipCard({
             "text-green bg-green/25 rounded-md p-1 flex items-center gap-1 capitalize"
           )}
         >
-          <Icon name="clock" size="xs" className=" scale-x-[-1]" />
+          <Icon name='clock' size='xs' className=' scale-x-[-1]' />
           {getAutoTimeDifference(
             relationship.start_date,
             new Date().toISOString()
@@ -188,7 +188,7 @@ export function RelationshipCard({
             ) && "hidden"
           )}
         >
-          <Icon name="clock" size="xs" />
+          <Icon name='clock' size='xs' />
           {getAutoTimeDifference(
             new Date().toISOString(),
             relationship.end_date

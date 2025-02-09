@@ -5,7 +5,7 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Link, useParams } from "@remix-run/react";
 import type { EmployeeBankDetailsDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { createRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
 type DetailItemProps = {
@@ -41,7 +41,7 @@ export const EmployeeBankDetailsCard = ({
 }: {
   bankDetails: EmployeeBankDetails | null;
 }) => {
-  const { role } = useUserRole();
+  const { role } = useUser();
   const { employeeId } = useParams();
 
   return (

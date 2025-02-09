@@ -18,7 +18,7 @@ import { Icon } from "@canny_ecosystem/ui/icon";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { PaymentFieldTableWrapper } from "@/components/payment-field/payment-field-table-wrapper";
 import { hasPermission, createRole } from "@canny_ecosystem/utils";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
@@ -49,7 +49,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 clientLoader.hydrate = true;
 
 export default function PaymentFieldsIndex() {
-  const { role } = useUserRole();
+  const { role } = useUser();
   const { paymentFieldPromise, error } = useLoaderData<typeof loader>();
 
   const [searchString, setSearchString] = useState("");

@@ -1,6 +1,6 @@
 import { useRequestInfo } from "./request-info";
 
-export function useUserRole(){
+export function useUser() {
   const requestInfo = useRequestInfo();
-  return { role: requestInfo?.userPrefs.user?.role ?? "executive" };
+  return { role: requestInfo?.userPrefs?.user?.role ?? "executive", id: requestInfo?.userPrefs?.user?.id };
 }

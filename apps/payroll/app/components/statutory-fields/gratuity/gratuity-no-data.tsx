@@ -1,4 +1,4 @@
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import {
   Card,
@@ -13,7 +13,7 @@ import { attribute } from "@canny_ecosystem/utils/constant";
 import { Link } from "@remix-run/react";
 
 export function GratuityNoData() {
-  const { role } = useUserRole();
+  const { role } = useUser();
   return (
     <div className='flex flex-col items-center justify-end m-auto'>
       <div className='p-14' />

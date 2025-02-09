@@ -229,6 +229,7 @@ export const cacheKeyPrefix = {
   employee_overview: "employee-overview",
   employee_work_portfolio: "employee-work-portfolio",
   employee_reimbursements: "employee-reimbursements",
+  reimbursements: "reimbursements",
   payment_fields: "payment-fields",
   payment_field_report: "payment-field-report",
   statutory_field_epf: "statutory-field-epf",
@@ -244,7 +245,9 @@ export const cacheKeyPrefix = {
   general: "general",
   locations: "locations",
   relationships: "relationships",
-  users: "users"
+  users: "users",
+  account: "account",
+  feedback_list: "feedback-list"
 }
 
 

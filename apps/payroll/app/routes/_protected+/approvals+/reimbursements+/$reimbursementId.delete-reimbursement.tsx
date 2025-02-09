@@ -80,6 +80,7 @@ export default function DeleteEmployee() {
         clearCacheEntry(
           `${cacheKeyPrefix.employee_reimbursements}${actionData.employeeId}`
         );
+        clearCacheEntry(cacheKeyPrefix.reimbursements)
         toast({
           title: "Success",
           description: actionData?.message || "Employee deleted",

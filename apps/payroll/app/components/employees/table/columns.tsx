@@ -16,7 +16,7 @@ import type { EmployeeDataType } from "@canny_ecosystem/supabase/queries";
 import { EmployeeOptionsDropdown } from "../employee-option-dropdown";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const columns = ({
@@ -209,7 +209,7 @@ export const columns = ({
     enableSorting: false,
     enableHiding: false,
     cell: ({ row }) => {
-      const { role } = useUserRole();
+      const { role } = useUser();
       return (
         <EmployeeOptionsDropdown
           key={row.original.id}

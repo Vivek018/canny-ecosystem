@@ -2,7 +2,7 @@ import { FilterList } from "@/components/reimbursements/filter-list";
 import { ReimbursementSearchFilter } from "@/components/reimbursements/reimbursement-search-filter";
 import { reimbursementsColumns } from "@/components/reimbursements/table/columns";
 import { ReimbursementsTable } from "@/components/reimbursements/table/reimbursements-table";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { cacheKeyPrefix } from "@/constant";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import {
@@ -129,7 +129,7 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function ReimbursementsIndex() {
-  const { role } = useUserRole();
+  const { role } = useUser();
   const { toast } = useToast();
   const { reimbursementPromise, usersPromise, employeeId, filters, env } =
     useLoaderData<typeof loader>();

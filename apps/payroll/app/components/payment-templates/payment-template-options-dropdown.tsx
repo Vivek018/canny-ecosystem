@@ -7,10 +7,13 @@ import {
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { useNavigate } from "@remix-run/react";
 import { DeletePaymentTemplate } from "./delete-payment-template";
-import { attribute, modalSearchParamNames } from "@canny_ecosystem/utils/constant";
+import {
+  attribute,
+  modalSearchParamNames,
+} from "@canny_ecosystem/utils/constant";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 
 export const PaymentTemplateOptionsDropdown = ({
   paymentTemplate,
@@ -21,7 +24,7 @@ export const PaymentTemplateOptionsDropdown = ({
   };
   triggerChild: React.ReactElement;
 }) => {
-  const { role } = useUserRole();
+  const { role } = useUser();
   const navigate = useNavigate();
 
   const handleViewComponents = () => {
@@ -45,15 +48,21 @@ export const PaymentTemplateOptionsDropdown = ({
   return (
     <DropdownMenu>
       {triggerChild}
-      <DropdownMenuContent sideOffset={10} align="end">
+      <DropdownMenuContent sideOffset={10} align='end'>
         <DropdownMenuGroup>
           <DropdownMenuItem onClick={handleViewComponents}>
             View Template Components
           </DropdownMenuItem>
           <DropdownMenuSeparator
             className={cn(
-              !hasPermission(role, `${updateRole}:${attribute.paymentTemplates}`) &&
-                !hasPermission(role, `${deleteRole}:${attribute.paymentTemplates}`) &&
+              !hasPermission(
+                role,
+                `${updateRole}:${attribute.paymentTemplates}`
+              ) &&
+                !hasPermission(
+                  role,
+                  `${deleteRole}:${attribute.paymentTemplates}`
+                ) &&
                 "hidden"
             )}
           />
@@ -61,8 +70,10 @@ export const PaymentTemplateOptionsDropdown = ({
             onClick={handleEdit}
             className={cn(
               "hidden",
-              hasPermission(role, `${updateRole}:${attribute.paymentTemplates}`) &&
-                "flex"
+              hasPermission(
+                role,
+                `${updateRole}:${attribute.paymentTemplates}`
+              ) && "flex"
             )}
           >
             Edit Payment Template
@@ -71,8 +82,10 @@ export const PaymentTemplateOptionsDropdown = ({
             onClick={handleEditComponents}
             className={cn(
               "hidden",
-              hasPermission(role, `${updateRole}:${attribute.paymentTemplates}`) &&
-                "flex"
+              hasPermission(
+                role,
+                `${updateRole}:${attribute.paymentTemplates}`
+              ) && "flex"
             )}
           >
             Edit Template Components
@@ -80,8 +93,10 @@ export const PaymentTemplateOptionsDropdown = ({
           <DropdownMenuSeparator
             className={cn(
               "hidden",
-              hasPermission(role, `${deleteRole}:${attribute.paymentTemplates}`) &&
-                "flex"
+              hasPermission(
+                role,
+                `${deleteRole}:${attribute.paymentTemplates}`
+              ) && "flex"
             )}
           />
           <DeletePaymentTemplate paymentTemplateId={paymentTemplate.id} />

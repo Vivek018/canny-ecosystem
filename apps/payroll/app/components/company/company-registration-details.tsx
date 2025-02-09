@@ -1,6 +1,6 @@
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import type { CompanyRegistrationDetailsUpdate } from "@canny_ecosystem/supabase/types";
 import { Button } from "@canny_ecosystem/ui/button";
 import {
@@ -40,7 +40,7 @@ export const CompanyRegistrationDetails = ({
     "created_at" | "updated_at"
   >;
 }) => {
-  const { role } = useUserRole();
+  const { role } = useUser();
   const [form, fields] = useForm({
     id: COMPANY_REGISTRATION_DETAILS,
     constraint: getZodConstraint(CompanyRegistrationDetailsSchema),

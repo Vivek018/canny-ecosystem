@@ -30,7 +30,7 @@ import {
   replaceUnderscore,
   updateRole,
 } from "@canny_ecosystem/utils";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
 export function LocationCard({
@@ -38,7 +38,7 @@ export function LocationCard({
 }: {
   location: Omit<LocationDatabaseRow, "created_at" | "updated_at">;
 }) {
-  const { role } = useUserRole();
+  const { role } = useUser();
   return (
     <Card
       key={location.id}

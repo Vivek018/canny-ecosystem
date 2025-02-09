@@ -9,7 +9,7 @@ import { DeleteEmployeeStateInsurance } from "./delete-employee-state-insurance"
 import type { EmployeeStateInsuranceDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { ESINoData } from "./esi-no-data";
 import { ErrorBoundary } from "@/components/error-boundary";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
@@ -40,7 +40,7 @@ export function ESIWrapper({
   > | null;
   error: Error | null | { message: string };
 }) {
-  const { role } = useUserRole();
+  const { role } = useUser();
   if (error) {
     clearExactCacheEntry(cacheKeyPrefix.statutory_field_esi);
     return <ErrorBoundary error={error} message='Failed to load ESI' />;

@@ -11,7 +11,7 @@ import {
   replaceUnderscore,
   updateRole,
 } from "@canny_ecosystem/utils";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
 type DetailItemProps = {
@@ -47,7 +47,7 @@ export const EmployeeProjectAssignmentCard = ({
 }: {
   projectAssignment: EmployeeProjectAssignment | null;
 }) => {
-  const { role } = useUserRole();
+  const { role } = useUser();
   const { employeeId } = useParams();
 
   return (
