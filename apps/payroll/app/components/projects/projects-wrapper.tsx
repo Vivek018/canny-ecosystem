@@ -3,6 +3,8 @@ import { ProjectCard } from "./project-card";
 import { useEffect } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import type { ProjectsWithCompany } from "@canny_ecosystem/supabase/queries";
+import { clearCacheEntry } from "@/utils/cache";
+import { cacheKeyPrefix } from "@/constant";
 
 export function ProjectsWrapper({
   data,
@@ -15,6 +17,7 @@ export function ProjectsWrapper({
 
   useEffect(() => {
     if (error) {
+      clearCacheEntry(cacheKeyPrefix.projects);
       toast({
         title: "Error",
         description: error?.message || "Failed to load",

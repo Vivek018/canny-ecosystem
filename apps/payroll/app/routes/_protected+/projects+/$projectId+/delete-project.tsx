@@ -12,7 +12,7 @@ import {
 } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import type { ActionFunctionArgs } from "@remix-run/node";
-import { json, useActionData, useNavigate } from "@remix-run/react";
+import { json, useActionData, useNavigate, useParams } from "@remix-run/react";
 import { useEffect } from "react";
 
 export async function action({ request, params }: ActionFunctionArgs) {
@@ -58,6 +58,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
 export default function DeleteProject() {
   const actionData = useActionData<typeof action>();
+  const { projectId } = useParams();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -65,6 +66,7 @@ export default function DeleteProject() {
     if (actionData) {
       if (actionData?.status === "success") {
         clearCacheEntry(cacheKeyPrefix.projects);
+        clearCacheEntry(`${cacheKeyPrefix.project_overview}${projectId}`);
         toast({
           title: "Success",
           description: actionData.message,

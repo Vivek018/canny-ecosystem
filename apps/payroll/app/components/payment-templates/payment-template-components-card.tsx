@@ -15,7 +15,7 @@ export const PaymentTemplateComponentsCard = ({
   const navigate = useNavigate();
 
   const handleOpenChange = () => {
-    navigate(-1);
+    navigate("/payment-components/payment-templates");
   };
 
   return (

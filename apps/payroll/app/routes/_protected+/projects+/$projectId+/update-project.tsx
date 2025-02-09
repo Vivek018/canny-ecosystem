@@ -11,6 +11,7 @@ import {
   useActionData,
   useLoaderData,
   useNavigate,
+  useParams,
 } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
 import { updateProject } from "@canny_ecosystem/supabase/mutations";
@@ -131,6 +132,7 @@ export default function UpdateProject() {
   const { projectPromise, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
+  const { projectId } = useParams();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -138,6 +140,7 @@ export default function UpdateProject() {
     if (actionData) {
       if (actionData?.status === "success") {
         clearCacheEntry(cacheKeyPrefix.projects);
+        clearCacheEntry(`${cacheKeyPrefix.project_overview}${projectId}`);
         toast({
           title: "Success",
           description: actionData?.message || "Project updated",
@@ -157,7 +160,7 @@ export default function UpdateProject() {
   }, [actionData]);
 
   if (error)
-    return <ErrorBoundary error={error} message="Failed to load project" />;
+    return <ErrorBoundary error={error} message='Failed to load project' />;
 
   return (
     <Suspense fallback={<div>Loading...</div>}>

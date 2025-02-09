@@ -14,7 +14,7 @@ import {
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { parseWithZod } from "@conform-to/zod";
 import { json, type ActionFunctionArgs } from "@remix-run/node";
-import { useActionData, useNavigate } from "@remix-run/react";
+import { useActionData, useNavigate, useParams } from "@remix-run/react";
 import { useEffect } from "react";
 
 const UpdateCompletedSchema = z.object({
@@ -84,6 +84,7 @@ export async function action({
 export default function UpdateCompleted() {
   const actionData = useActionData<typeof action>();
 
+  const { projectId } = useParams();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -91,6 +92,7 @@ export default function UpdateCompleted() {
     if (actionData) {
       if (actionData?.status === "success") {
         clearCacheEntry(cacheKeyPrefix.projects);
+        clearCacheEntry(`${cacheKeyPrefix.project_overview}${projectId}`);
         toast({
           title: "Success",
           description: actionData?.message,

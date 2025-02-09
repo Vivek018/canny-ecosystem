@@ -24,7 +24,7 @@ export const ProjectDetails = ({
   ];
 
   return (
-    <div className="">
+    <div>
       <div className="mt-1 flex flex-col items-start">
         <h1 className="text-3xl tracking-wide font-bold">{project.name}</h1>
         <div className="flex items-center gap-1.5 -mt-1">
