@@ -8,7 +8,7 @@ import {
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useNavigate } from "@remix-run/react";
 import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { DeleteEmployeeLetter } from "./delete-letter";
 
@@ -22,7 +22,7 @@ export const EmployeeLetterOptionsDropdown = ({
   };
   triggerChild: React.ReactElement;
 }) => {
-  const { role } = useUserRole();
+  const { role } = useUser();
   const navigate = useNavigate();
 
   const handleViewLetter = () => {

@@ -282,7 +282,7 @@ export type SitesWithProjects = Pick<SiteDatabaseRow, "id"> & {
 export async function getSitesByCompanyId({
   supabase,
   companyId,
-}: {
+}: { 
   supabase: TypedSupabaseClient;
   companyId: string;
 }) {

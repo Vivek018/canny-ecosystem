@@ -1,18 +1,21 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { Form, json, useLoaderData } from "@remix-run/react";
+import {
+  Form,
+  json,
+  useActionData,
+  useNavigate,
+  useParams,
+} from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { safeRedirect } from "@/utils/server/http.server";
 import {
   EmployeeLetterSchema,
   EmployeeLetterTypesArray,
   getInitialValueFromZod,
-  hasPermission,
   isGoodStatus,
   replaceDash,
   replaceUnderscore,
   transformStringArrayIntoOptions,
-  updateRole,
 } from "@canny_ecosystem/utils";
 
 import {
@@ -38,62 +41,60 @@ import {
 import { FormButtons } from "@/components/form/form-buttons";
 import { createEmployeeLetter } from "@canny_ecosystem/supabase/mutations";
 import type { ReimbursementsUpdate } from "@canny_ecosystem/supabase/types";
-import { getUsers } from "@canny_ecosystem/supabase/queries";
-import { useState } from "react";
-import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
-import { DEFAULT_ROUTE } from "@/constant";
-import { attribute } from "@canny_ecosystem/utils/constant";
+import { useEffect, useState } from "react";
+import { cacheKeyPrefix } from "@/constant";
 import { UPDATE_LETTER_TAG } from "./$letterId_+/update-letter";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { clearCacheEntry } from "@/utils/cache";
 
 export const CREATE_LETTER_TAG = "create-letter";
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
-  const { supabase, headers } = getSupabaseWithHeaders({ request });
+export async function action({ request }: ActionFunctionArgs): Promise<Response> {
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
+    const submission = parseWithZod(formData, { schema: EmployeeLetterSchema });
 
-  const { user } = await getUserCookieOrFetchUser(request, supabase);
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+    const employeeLetterData = submission.value;
 
-  if (
-    !hasPermission(user?.role!, `${updateRole}:${attribute.reimbursements}`)
-  ) {
-    return safeRedirect(DEFAULT_ROUTE, { headers });
-  }
-  const employeeId = params.employeeId;
-
-  const { data: userData, error: userError } = await getUsers({ supabase });
-  if (userError || !userData) {
-    throw userError;
-  }
-
-  return json({ employeeId });
-}
-
-export async function action({ request, params }: ActionFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const employeeId = params.employeeId;
-  const formData = await request.formData();
-  const submission = parseWithZod(formData, { schema: EmployeeLetterSchema });
-
-  if (submission.status !== "success") {
-    return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
-    );
-  }
-  const employeeLetterData = submission.value;
-
-  const { status, error } = await createEmployeeLetter({
-    supabase,
-    letterData: employeeLetterData as any,
-  });
-
-  if (isGoodStatus(status))
-    return safeRedirect(`/employees/${employeeId}/letters`, {
-      status: 303,
+    const { status, error } = await createEmployeeLetter({
+      supabase,
+      letterData: employeeLetterData as any,
     });
 
-  return json({ status, error });
+    if (isGoodStatus(status))
+      return json({
+        status: "success",
+        message: "Employee Letter created",
+        error: null,
+      });
+
+    return json(
+      {
+        status: "error",
+        message: "Employee Letter creation failed",
+        error,
+      },
+      { status: 500 },
+    );
+  } catch (error) {
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 },
+    );
+  }
 }
 
 export default function CreateEmployeeLetter({
@@ -104,13 +105,36 @@ export default function CreateEmployeeLetter({
   userOptionsFromUpdate?: any;
 }) {
   const [resetKey, setResetKey] = useState(Date.now());
-  const { employeeId } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
+  const { employeeId } = useParams();
+  const { toast } = useToast();
+  const navigate = useNavigate();
   const { isDocument } = useIsDocument();
 
   const LETTERS_TAG = updateValues ? UPDATE_LETTER_TAG : CREATE_LETTER_TAG;
 
   const initialValues =
     updateValues ?? getInitialValueFromZod(EmployeeLetterSchema);
+
+  useEffect(() => {
+    if (!actionData) return;
+
+    if (actionData?.status === "success") {
+      clearCacheEntry(`${cacheKeyPrefix.employee_letters}${employeeId}`);
+      toast({
+        title: "Success",
+        description: "Employee created successfully",
+        variant: "success",
+      });
+      navigate(`/employees/${employeeId}/letters`);
+    } else {
+      toast({
+        title: "Error",
+        description: "Failed to create employee",
+        variant: "destructive",
+      });
+    }
+  }, [actionData]);
 
   const [form, fields] = useForm({
     id: LETTERS_TAG,

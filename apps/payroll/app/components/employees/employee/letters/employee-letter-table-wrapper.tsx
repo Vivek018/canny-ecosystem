@@ -1,9 +1,40 @@
-import { DataTable } from "./table/data-table";
 import { useEffect, useMemo, useState } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { columns } from "./table/columns";
 import type { EmployeeLetterDataType } from "@canny_ecosystem/supabase/queries";
-import { useSearchParams } from "@remix-run/react";
+import { useParams } from "@remix-run/react";
+import { clearExactCacheEntry } from "@/utils/cache";
+import { cacheKeyPrefix } from "@/constant";
+import { DataTable } from "./table/data-table";
+
+const sortData = (
+  data: Omit<EmployeeLetterDataType, "created_at" | "updated_at">[],
+  sortType: string,
+) => {
+  if (!sortType) return data;
+
+  const sortedData = [...data];
+  switch (sortType) {
+    case "date:desc":
+      return sortedData.sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+      );
+    case "letter_type:desc":
+      return sortedData.sort((a, b) =>
+        b.letter_type.localeCompare(a.letter_type),
+      );
+    case "date:asc":
+      return sortedData.sort(
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+      );
+    case "letter_type:asc":
+      return sortedData.sort((a, b) =>
+        a.letter_type.localeCompare(b.letter_type),
+      );
+    default:
+      return sortedData;
+  }
+};
 
 export function EmployeeLetterTableWrapper({
   data,
@@ -14,18 +45,20 @@ export function EmployeeLetterTableWrapper({
   error: Error | null | { message: string };
   searchString: string;
 }) {
-  const [searchParams] = useSearchParams();
-
+  const { employeeId } = useParams();
   const { toast } = useToast();
+  const [sortType, setSortType] = useState("");
 
   useEffect(() => {
-    if (error)
+    if (error) {
+      clearExactCacheEntry(`${cacheKeyPrefix.employee_letters}${employeeId}`);
       toast({
         title: "Error",
         description: error?.message || "Failed to load",
         variant: "destructive",
       });
-  }, [searchString, data]);
+    }
+  }, [error]);
 
   const filterData = (
     data: Omit<EmployeeLetterDataType, "created_at" | "updated_at">[],
@@ -37,45 +70,22 @@ export function EmployeeLetterTableWrapper({
     );
   };
 
-  const sortData = (
-    data: Omit<EmployeeLetterDataType, "created_at" | "updated_at">[],
-  ) => {
-    const sortParam = searchParams.get("sort");
-    if (!sortParam) return data;
-
-    const sortedData = [...data];
-    switch (sortParam) {
-      case "date:desc":
-        return sortedData.sort(
-          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-        );
-      case "letter_type:desc":
-        return sortedData.sort((a, b) =>
-          b.letter_type.localeCompare(a.letter_type),
-        );
-      case "date:asc":
-        return sortedData.sort(
-          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
-        );
-      case "letter_type:asc":
-        return sortedData.sort((a, b) =>
-          a.letter_type.localeCompare(b.letter_type),
-        );
-      default:
-        return sortedData;
-    }
-  };
-
-  // Process table data: filter first, then sort
   const tableData = useMemo(() => {
     if (!data) return [];
+
     const filteredData = filterData(data);
-    return sortData(filteredData);
-  }, [data, searchString, searchParams]);
+
+    return sortData(filteredData, sortType);
+  }, [data, searchString, sortType]);
 
   return (
     <>
-      <DataTable columns={columns} data={tableData ?? []} />
+      <DataTable
+        columns={columns}
+        data={tableData}
+        sortType={sortType}
+        handleSortType={setSortType}
+      />
     </>
   );
 }

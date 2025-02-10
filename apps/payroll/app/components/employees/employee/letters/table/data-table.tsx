@@ -16,11 +16,15 @@ import { DataTableHeader } from "./data-table-header";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  sortType: string;
+  handleSortType: (type: string) => void;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  sortType,
+  handleSortType,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -43,6 +47,8 @@ export function DataTable<TData, TValue>({
             <DataTableHeader
               table={table}
               className={cn(!tableLength && "hidden")}
+              sort={sortType}
+              handleSort={handleSortType}
             />
             <TableBody>
               {tableLength ? (

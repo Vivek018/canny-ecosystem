@@ -29,7 +29,12 @@ import {
 import { EmployeeLetterTypesArray } from "@canny_ecosystem/utils";
 import { PDFViewer } from "@react-pdf/renderer";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json, useLoaderData, useNavigate, useParams } from "@remix-run/react";
+import {
+  json,
+  useLoaderData,
+  useNavigate,
+  useParams,
+} from "@remix-run/react";
 
 export type CompanyInfoDataType = {
   data: Omit<CompanyDatabaseUpdate, "created_at" | "updated_at"> | null;

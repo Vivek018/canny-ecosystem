@@ -2,21 +2,26 @@ import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { TableHead, TableHeader, TableRow } from "@canny_ecosystem/ui/table";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { useSearchParams } from "@remix-run/react";
 
 type Props = {
   table?: any;
   className?: string;
   loading?: boolean;
+  sort?: string;
+  handleSort?: any;
 };
 
 // make sure the order is same as header order
 export const emplyoeeLettersColumnIdArray = ["letter_type", "date", "subject"];
 
-export function DataTableHeader({ table, className, loading }: Props) {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const sortParam = searchParams.get("sort");
-  const [column, value] = sortParam ? sortParam.split(":") : [];
+export function DataTableHeader({
+  table,
+  className,
+  loading,
+  sort,
+  handleSort,
+}: Props) {
+  const [column, value] = sort ? sort.split(":") : [];
 
   const columnName = (id: string) =>
     loading ||
@@ -25,14 +30,13 @@ export function DataTableHeader({ table, className, loading }: Props) {
     })?.columnDef?.header;
 
   const createSortQuery = (name: string) => {
-    if (`${name}:asc` === sortParam) {
-      searchParams.set("sort", `${name}:desc`);
-    } else if (`${name}:desc` === sortParam) {
-      searchParams.delete("sort");
+    if (`${name}:asc` === sort) {
+      handleSort(`${name}:desc`);
+    } else if (`${name}:desc` === sort) {
+      handleSort("");
     } else {
-      searchParams.set("sort", `${name}:asc`);
+      handleSort(`${name}:asc`);
     }
-    setSearchParams(searchParams);
   };
 
   const isEnableSorting = (id: string) =>

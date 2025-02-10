@@ -72,7 +72,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined
+        (value) => value !== null && value !== undefined,
       );
 
     const employeesPromise = getEmployeesByCompanyId({
@@ -129,7 +129,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 
   return await clientCaching(
     `${cacheKeyPrefix.employees}${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 
@@ -152,7 +152,7 @@ ${VALID_FILTERS.map(
   (filter) =>
     `name: "${filter.name}", type: "${
       filter.valueType
-    }", example: ${JSON.stringify(filter.example)}`
+    }", example: ${JSON.stringify(filter.example)}`,
 ).join(".")}`,
         },
         {
@@ -206,9 +206,9 @@ export default function EmployeesIndex() {
   const noFilters = Object.values(filterList).every((value) => !value);
 
   return (
-    <section className='py-6 px-4'>
-      <div className='w-full flex items-center justify-between pb-4'>
-        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4'>
+    <section className="py-6 px-4">
+      <div className="w-full flex items-center justify-between pb-4">
+        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
           <Suspense fallback={<div>Loading...</div>}>
             <Await resolve={projectPromise}>
               {(projectData) => (
@@ -240,7 +240,10 @@ export default function EmployeesIndex() {
         <Await resolve={employeesPromise}>
           {({ data, meta, error }) => {
             if (error) {
-              <ErrorBoundary error={error} message='Failed to load employees' />
+              <ErrorBoundary
+                error={error}
+                message="Failed to load employees"
+              />;
             }
 
             const hasNextPage = Boolean(meta?.count > pageSize);

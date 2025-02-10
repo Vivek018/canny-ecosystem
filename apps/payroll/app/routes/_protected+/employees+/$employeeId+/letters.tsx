@@ -1,6 +1,8 @@
 import { EmployeeLetterTableWrapper } from "@/components/employees/employee/letters/employee-letter-table-wrapper";
 import { ErrorBoundary } from "@/components/error-boundary";
-import { useUserRole } from "@/utils/user";
+import { cacheKeyPrefix } from "@/constant";
+import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
+import { useUser } from "@/utils/user";
 import { getEmployeeLettersByEmployeeId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
@@ -10,7 +12,13 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { defer, json, type LoaderFunctionArgs } from "@remix-run/node";
-import { Await, Link, Outlet, useLoaderData } from "@remix-run/react";
+import {
+  Await,
+  type ClientLoaderFunctionArgs,
+  Link,
+  Outlet,
+  useLoaderData,
+} from "@remix-run/react";
 import { Suspense, useState } from "react";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
@@ -36,17 +44,26 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 }
 
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+  return await clientCaching(
+    `${cacheKeyPrefix.employee_letters}${args.params.employeeId}`,
+    args,
+  );
+}
+
+clientLoader.hydrate = true;
+
 export default function Letters() {
-  const { role } = useUserRole();
+  const { role } = useUser();
   const { employeeLettersPromise, employeeId, error } =
     useLoaderData<typeof loader>();
 
   const [searchString, setSearchString] = useState("");
 
-  if (error)
+  if (error){
     return (
       <ErrorBoundary error={error} message="Failed to load payment fields" />
-    );
+    );}
 
   return (
     <section className="p-4">
@@ -86,8 +103,12 @@ export default function Letters() {
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={employeeLettersPromise}>
           {(resolvedData) => {
-            if (!resolvedData)
+            if (!resolvedData) {
+              clearExactCacheEntry(
+                `${cacheKeyPrefix.employee_letters}${employeeId}`,
+              );
               return <ErrorBoundary message="Failed to load letters" />;
+            }
             return (
               <EmployeeLetterTableWrapper
                 data={resolvedData?.data}

@@ -23,9 +23,10 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import type { EmployeeLetterDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import CreateEmployeeLetter from "../create-letter";
+import {  clearExactCacheEntry } from "@/utils/cache";
 
 export const UPDATE_LETTER_TAG = "update-letter";
 
@@ -55,6 +56,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return defer({
       employeeLetterPromise,
       employeeId,
+      letterId,
       error: null,
     });
   } catch (error) {
@@ -62,6 +64,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       {
         error,
         employeeId,
+        letterId,
         employeeLetterPromise: null,
       },
       { status: 500 },
@@ -119,20 +122,25 @@ export async function action({
 }
 
 export default function UpdateEmployeeLetter() {
-  const { employeeLetterPromise, employeeId } = useLoaderData<typeof loader>();
+  const { employeeLetterPromise, employeeId } =
+    useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
-
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
     if (!actionData) return;
-
+    clearExactCacheEntry(
+      `${cacheKeyPrefix.employee_letters}${employeeId}`,
+    );
     if (actionData?.status === "success") {
       toast({
         title: "Success",
         description: actionData?.message,
         variant: "success",
+      });
+      navigate(`/employees/${employeeId}/letters`, {
+        replace: true,
       });
     } else {
       toast({
@@ -141,10 +149,6 @@ export default function UpdateEmployeeLetter() {
         variant: "destructive",
       });
     }
-
-    navigate(`/employees/${employeeId}/letters`, {
-      replace: true,
-    });
   }, [actionData]);
 
   return (
