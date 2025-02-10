@@ -26,6 +26,7 @@
     "@tanstack/react-table": "^8.20.5",
     "clear": "^0.1.0",
     "isbot": "^4.1.0",
+    "lru-cache": "^10.4.3",
     "openai": "^4.67.3",
     "papaparse": "^5.4.1",
     "react": "^18.3.1",

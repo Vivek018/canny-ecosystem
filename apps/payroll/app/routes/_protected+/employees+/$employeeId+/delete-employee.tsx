@@ -1,4 +1,5 @@
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
+import { clearCacheEntry, clearExactCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { deleteEmployee } from "@canny_ecosystem/supabase/mutations";
@@ -11,7 +12,7 @@ import {
 } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import type { ActionFunctionArgs } from "@remix-run/node";
-import { json, useActionData, useNavigate } from "@remix-run/react";
+import { json, useActionData, useNavigate, useParams } from "@remix-run/react";
 import { useEffect } from "react";
 
 export async function action({
@@ -56,10 +57,18 @@ export default function DeleteEmployee() {
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { employeeId } = useParams();
 
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
+        clearCacheEntry(cacheKeyPrefix.employees);
+        clearExactCacheEntry(
+          `${cacheKeyPrefix.employee_overview}${employeeId}`
+        );
+        clearExactCacheEntry(
+          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
+        );
         toast({
           title: "Success",
           description: actionData?.message || "Employee deleted",

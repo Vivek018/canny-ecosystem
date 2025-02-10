@@ -31,11 +31,14 @@ export function CreatePaymentTemplateDetails({
   return (
     <Fragment>
       <CardHeader>
-        <CardTitle className='text-3xl'>{isUpdate ? "Update" : "Create"} Payment Template</CardTitle>
+        <CardTitle className='text-3xl capitalize'>
+          {isUpdate ? "Update" : "Create"} Payment Template
+        </CardTitle>
         <CardDescription>
-          {isUpdate ? "Update" : "Create"} a payment template that will be central in all of canny apps
+          {isUpdate ? "Update" : "Create"} a payment template that will be
+          central in all of canny apps
         </CardDescription>
-      </CardHeader> 
+      </CardHeader>
       <CardContent>
         <input {...getInputProps(fields.id, { type: "hidden" })} />
         <input {...getInputProps(fields.company_id, { type: "hidden" })} />

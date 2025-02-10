@@ -34,21 +34,23 @@ export function ExportBar({
         continue;
       }
       if (key === "employee_code") {
-        exportedData[key] = element.employees.employee_code;
+        exportedData[key] = element?.employees?.employee_code;
       } else if (key === "employee_name") {
         exportedData[
           key
-        ] = `${element.employees.first_name} ${element.employees.middle_name} ${element.employees.last_name}`;
+        ] = `${element?.employees?.first_name} ${element?.employees?.middle_name} ${element?.employees?.last_name}`;
       } else if (key === "email") {
-        exportedData[key] = element.users.email ?? "";
+        exportedData[key] = element?.users?.email ?? "";
       } else if (key === "project_name") {
         exportedData[key] =
-          element.employees.employee_project_assignment.project_sites.projects.name;
+          element?.employees?.employee_project_assignment?.project_sites?.projects.name;
       } else if (key === "project_site_name") {
         exportedData[key] =
-          element.employees.employee_project_assignment.project_sites.name;
+          element?.employees?.employee_project_assignment?.project_sites?.name;
       } else {
-        exportedData[key] = element[key as keyof ReimbursementDataType] as any;
+        exportedData[key] = element?.[
+          key as keyof ReimbursementDataType
+        ] as any;
       }
     }
 
@@ -81,18 +83,18 @@ export function ExportBar({
         className
       )}
     >
-      <div className="ml-2 flex items-center space-x-1 rounded-md">
-        <p className="font-semibold">{rows} Selected</p>
+      <div className='ml-2 flex items-center space-x-1 rounded-md'>
+        <p className='font-semibold'>{rows} Selected</p>
       </div>
-      <div className="h-full flex justify-center items-center gap-2">
-        <div className="h-full tracking-wide font-medium rounded-full flex justify-between items-center px-6 border dark:border-muted-foreground/30 ">
-          Amount: <span className="ml-1.5">{totalAmount}</span>
+      <div className='h-full flex justify-center items-center gap-2'>
+        <div className='h-full tracking-wide font-medium rounded-full flex justify-between items-center px-6 border dark:border-muted-foreground/30 '>
+          Amount: <span className='ml-1.5'>{totalAmount}</span>
         </div>
         <Button
           onClick={handleExport}
-          variant="default"
-          size="lg"
-          className="h-full rounded-full"
+          variant='default'
+          size='lg'
+          className='h-full rounded-full'
         >
           Export
         </Button>

@@ -8,7 +8,7 @@ import {
   transformStringArrayIntoOptions,
   calculationTypeArray,
   hasPermission,
-  updateRole,
+  createRole,
 } from "@canny_ecosystem/utils";
 import {
   CheckboxField,
@@ -48,8 +48,9 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const CREATE_PAYMENT_FIELD = "create-payment-field";
 
@@ -58,7 +59,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.paymentFields}`)) {
+  if (!hasPermission(user?.role!, `${createRole}:${attribute.paymentFields}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
@@ -170,6 +171,7 @@ export default function CreatePaymentField({
     if (!actionData) return;
 
     if (actionData?.status === "success") {
+      clearExactCacheEntry(cacheKeyPrefix.payment_fields);
       toast({
         title: "Success",
         description: actionData?.message,
@@ -189,12 +191,12 @@ export default function CreatePaymentField({
   }, [actionData]);
 
   return (
-    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
+    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
       <FormProvider context={form.context}>
-        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
+        <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
           <Card>
             <CardHeader>
-              <CardTitle className="text-3xl capitalize">
+              <CardTitle className='text-3xl capitalize'>
                 {replaceDash(PAYMENT_FIELD_TAG)}
               </CardTitle>
               <CardDescription>
@@ -221,7 +223,7 @@ export default function CreatePaymentField({
               />
               <SearchableSelectField
                 key={resetKey}
-                className="capitalize"
+                className='capitalize'
                 options={transformStringArrayIntoOptions(
                   paymentTypeArray as unknown as string[]
                 )}
@@ -239,7 +241,7 @@ export default function CreatePaymentField({
 
               <SearchableSelectField
                 key={resetKey + 1}
-                className="capitalize"
+                className='capitalize'
                 options={transformStringArrayIntoOptions(
                   calculationTypeArray as unknown as string[]
                 )}
@@ -290,7 +292,7 @@ export default function CreatePaymentField({
                 )}
               />
 
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-4">
+              <div className='grid grid-cols-2 place-content-center justify-between gap-x-4'>
                 <CheckboxField
                   buttonProps={getInputProps(fields.is_active, {
                     type: "checkbox",

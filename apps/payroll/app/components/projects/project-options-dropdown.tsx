@@ -14,7 +14,7 @@ import {
   hasPermission,
   updateRole,
 } from "@canny_ecosystem/utils";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const ProjectOptionsDropdown = ({
@@ -29,7 +29,7 @@ export const ProjectOptionsDropdown = ({
   triggerChild: React.ReactElement;
 }) => {
   const submit = useSubmit();
-  const { role } = useUserRole();
+  const { role } = useUser();
   const handleMarkAsCompleted = () => {
     submit(
       {
@@ -63,7 +63,7 @@ export const ProjectOptionsDropdown = ({
   return (
     <DropdownMenu>
       {triggerChild}
-      <DropdownMenuContent sideOffset={10} align="end">
+      <DropdownMenuContent sideOffset={10} align='end'>
         <DropdownMenuGroup>
           <DropdownMenuItem
             className={cn(

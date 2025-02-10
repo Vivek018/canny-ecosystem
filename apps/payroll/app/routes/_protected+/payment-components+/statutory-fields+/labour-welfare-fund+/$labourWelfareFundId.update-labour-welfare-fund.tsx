@@ -19,8 +19,9 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import type { LabourWelfareFundDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const UPDATE_LABOUR_WELFARE_FUND = "update-labour-welfare-fund";
 
@@ -119,6 +120,7 @@ export default function UpdateLabourWelfareFund() {
     if (!actionData) return;
 
     if (actionData?.status === "success") {
+      clearExactCacheEntry(cacheKeyPrefix.labour_welfare_fund);
       toast({
         title: "Success",
         description: actionData?.message || "Labour Welfare Fund updated",

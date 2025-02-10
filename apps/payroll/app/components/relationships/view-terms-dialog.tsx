@@ -18,18 +18,18 @@ export const ViewRelationshipTermsDialog = ({
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const isParamRelationshipTerms =
+  const isOpen =
     searchParams.get("step") === modalSearchParamNames.view_relationship_terms;
 
   const handleOpenChange = () => {
-    navigate(-1);
+    navigate("/settings/relationships");
   };
 
   const objectKeys = Object.keys(values);
   const objectValues: string[] = Object.values(values);
 
   return (
-    <Dialog open={isParamRelationshipTerms} onOpenChange={handleOpenChange}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent
         className={cn(
           "max-w-max pl-5 pr-40",

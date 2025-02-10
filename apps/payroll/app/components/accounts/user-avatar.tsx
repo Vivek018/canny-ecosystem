@@ -1,3 +1,5 @@
+import { cacheKeyPrefix } from "@/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 import {
   Avatar,
   AvatarFallback,
@@ -22,6 +24,7 @@ export const UserAvatar = ({
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleUpload = async (evt: React.ChangeEvent<HTMLInputElement>) => {
+    clearExactCacheEntry(cacheKeyPrefix.account);
     console.log(evt.target.files);
   };
   return (

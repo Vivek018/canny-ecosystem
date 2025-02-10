@@ -1,10 +1,11 @@
-
 import { useEffect, useState } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 import type { PaymentTemplateDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { DataTable } from "./table/data-table";
 import { columns } from "./table/columns";
+import { clearExactCacheEntry } from "@/utils/cache";
+import { cacheKeyPrefix } from "@/constant";
 
 export function PaymentTemplatesTableWrapper({
   data,
@@ -19,12 +20,14 @@ export function PaymentTemplatesTableWrapper({
   const { toast } = useToast();
 
   useEffect(() => {
-    if (error)
+    if (error) {
+      clearExactCacheEntry(cacheKeyPrefix.payment_templates);
       toast({
         title: "Error",
         description: error?.message || "Failed to load",
         variant: "destructive",
       });
+    }
 
     const filteredData = data?.filter((item) =>
       Object.values(item).some((value) =>
@@ -34,9 +37,5 @@ export function PaymentTemplatesTableWrapper({
     setTableData(filteredData ?? []);
   }, [searchString, data]);
 
-  return (
-    <>
-      <DataTable columns={columns} data={tableData ?? []} />
-    </>
-  );
+  return <DataTable columns={columns} data={tableData ?? []} />;
 }

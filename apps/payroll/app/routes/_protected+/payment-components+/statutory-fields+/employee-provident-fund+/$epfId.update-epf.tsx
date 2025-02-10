@@ -25,8 +25,9 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import type { EmployeeAddressDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const UPDATE_EMPLOYEE_PROVIDENT_FUND = "update-employee-provident-fund";
 
@@ -125,6 +126,7 @@ export default function UpdateEmployeeProvidentFund() {
   useEffect(() => {
     if (!actionData) return;
     if (actionData?.status === "success") {
+      clearExactCacheEntry(cacheKeyPrefix.statutory_field_epf);
       toast({
         title: "Success",
         description: actionData?.message || "Employee Provident Fund updated",

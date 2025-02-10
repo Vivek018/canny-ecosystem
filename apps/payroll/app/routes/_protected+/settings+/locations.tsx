@@ -2,10 +2,17 @@ import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getLocationsByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Await, defer, useLoaderData } from "@remix-run/react";
+import {
+  Await,
+  type ClientLoaderFunctionArgs,
+  defer,
+  useLoaderData,
+} from "@remix-run/react";
 import { Suspense } from "react";
 import { LocationsWrapper } from "@/components/locations/locations-wrapper";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
+import { cacheKeyPrefix } from "@/constant";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {
@@ -28,19 +35,28 @@ export async function loader({ request }: LoaderFunctionArgs) {
   }
 }
 
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+  return await clientCaching(cacheKeyPrefix.locations, args);
+}
+
+clientLoader.hydrate = true;
+
 export default function Locations() {
   const { locationsPromise, error } = useLoaderData<typeof loader>();
 
   if (error) {
-    return <ErrorBoundary error={error} message="Failed to load locations" />;
+    clearExactCacheEntry(cacheKeyPrefix.locations);
+    return <ErrorBoundary error={error} message='Failed to load locations' />;
   }
 
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <Await resolve={locationsPromise}>
         {(resolvedData) => {
-          if (!resolvedData)
-            return <ErrorBoundary message="Failed to load locations" />;
+          if (!resolvedData) {
+            clearExactCacheEntry(cacheKeyPrefix.locations);
+            return <ErrorBoundary message='Failed to load locations' />;
+          }
           return (
             <LocationsWrapper
               data={resolvedData.data}

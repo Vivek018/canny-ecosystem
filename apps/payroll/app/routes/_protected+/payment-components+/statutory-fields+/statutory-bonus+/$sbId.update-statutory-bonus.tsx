@@ -25,8 +25,9 @@ import type { StatutoryBonusDatabaseUpdate } from "@canny_ecosystem/supabase/typ
 import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const UPDATE_STATUTORY_BONUS = "update-statutory-bonus";
 
@@ -61,7 +62,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       error: null,
     });
   } catch (error) {
-    return json(
+    return defer(
       {
         sbPromise: null,
         companyId: null,
@@ -128,6 +129,7 @@ export default function UpdateStatutoryBonus() {
   useEffect(() => {
     if (!actionData) return;
     if (actionData?.status === "success") {
+      clearExactCacheEntry(cacheKeyPrefix.statutory_bonus);
       toast({
         title: "Success",
         description: actionData?.message || "Statutory Bonus updated",

@@ -1,4 +1,4 @@
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import {
   Card,
@@ -8,21 +8,21 @@ import {
   CardTitle,
 } from "@canny_ecosystem/ui/card";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { hasPermission, createRole } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { Link } from "@remix-run/react";
 
 export function StatutoryBonusNoData() {
-  const { role } = useUserRole();
+  const { role } = useUser();
   return (
-    <div className="flex flex-col items-center justify-end m-auto">
-      <div className="p-14" />
-      <Card className="flex flex-col items-center justify-between gap-5 w-1/2 pt-6 px-2">
-        <CardContent className="flex flex-col items-center justify-between gap-5">
+    <div className='flex flex-col items-center justify-end m-auto'>
+      <div className='p-14' />
+      <Card className='flex flex-col items-center justify-between gap-5 w-1/2 pt-6 px-2'>
+        <CardContent className='flex flex-col items-center justify-between gap-5'>
           <CardTitle>
             Are your employees eligible to receive statutory bonus?
           </CardTitle>
-          <CardDescription className="text-center text-[14px]">
+          <CardDescription className='text-center text-[14px]'>
             According to the Payment of Bonus Act, 1965, an eligible employee
             can receive a statutory bonus of 8.33% (min) to 20% (max) of their
             salary earned during a financial year. Configure statutory bonus of
@@ -32,12 +32,12 @@ export function StatutoryBonusNoData() {
 
         <CardFooter>
           <Link
-            to="/payment-components/statutory-fields/statutory-bonus/create-statutory-bonus"
+            to='/payment-components/statutory-fields/statutory-bonus/create-statutory-bonus'
             className={cn(
               buttonVariants({ variant: "primary-outline" }),
               !hasPermission(
                 `${role}`,
-                `${updateRole}:${attribute.statutoryFieldsStatutoryBonus}`
+                `${createRole}:${attribute.statutoryFieldsStatutoryBonus}`
               ) && "hidden"
             )}
           >

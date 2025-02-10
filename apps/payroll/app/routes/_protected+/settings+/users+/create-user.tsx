@@ -1,31 +1,16 @@
-import { FormButtons } from "@/components/form/form-buttons";
-import { safeRedirect } from "@/utils/server/http.server";
-import { createUserById } from "@canny_ecosystem/supabase/mutations";
-import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import type { UserDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@canny_ecosystem/ui/card";
+  hasPermission,
+  isGoodStatus,
+  UserSchema,
+  replaceUnderscore,
+  createRole,
+} from "@canny_ecosystem/utils";
 import {
   CheckboxField,
   Field,
   SearchableSelectField,
 } from "@canny_ecosystem/ui/forms";
-import {
-  getInitialValueFromZod,
-  hasPermission,
-  isGoodStatus,
-  replaceUnderscore,
-  transformStringArrayIntoOptions,
-  updateRole,
-  userRoles,
-  UserSchema,
-} from "@canny_ecosystem/utils";
-
+import { getInitialValueFromZod, replaceDash } from "@canny_ecosystem/utils";
 import {
   FormProvider,
   getFormProps,
@@ -34,53 +19,116 @@ import {
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import {
-  type ActionFunctionArgs,
+  Form,
   json,
-  type LoaderFunctionArgs,
-} from "@remix-run/node";
-import { Form, useLoaderData } from "@remix-run/react";
-import { UPDATE_USER_TAG } from "./$userId.update-user";
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
+import { useEffect, useState } from "react";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@canny_ecosystem/ui/card";
+
+import { createUserById } from "@canny_ecosystem/supabase/mutations";
+import type { UserDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import { FormButtons } from "@/components/form/form-buttons";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { safeRedirect } from "@/utils/server/http.server";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
+import { UPDATE_USER_TAG } from "./$userId.update-user";
+import {
+  transformStringArrayIntoOptions,
+  userRoles,
+} from "@canny_ecosystem/utils";
 
-export const CREATE_USER_TAG = "Create User";
+export const CREATE_USER_TAG = "create-user";
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({
+  request,
+}: LoaderFunctionArgs): Promise<Response> {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.settingUsers}`)) {
+  if (!hasPermission(user?.role!, `${createRole}:${attribute.settingUsers}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  return { companyId };
-}
 
-export async function action({ request }: ActionFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
+  try {
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-  const submission = parseWithZod(formData, { schema: UserSchema });
-
-  if (submission.status !== "success") {
+    return json({
+      status: "success",
+      message: "User form loaded",
+      companyId,
+      error: null,
+    });
+  } catch (error) {
     return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 }
     );
   }
+}
 
-  const { error, status } = await createUserById({
-    supabase,
-    data: submission.value,
-  });
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
 
-  if (isGoodStatus(status)) {
-    return safeRedirect("/settings/users");
+    const submission = parseWithZod(formData, {
+      schema: UserSchema,
+    });
+
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 }
+      );
+    }
+
+    const { status, error } = await createUserById({
+      supabase,
+      data: submission.value,
+    });
+
+    if (isGoodStatus(status))
+      return json({
+        status: "success",
+        message: "User created successfully",
+        error: null,
+      });
+
+    return json({
+      status: "error",
+      message: "Failed to create user",
+      error,
+    });
+  } catch (error) {
+    return json({
+      status: "error",
+      message: "An unexpected error occurred",
+      error,
+    });
   }
-  return json({ status, error });
 }
 
 export default function CreateUser({
@@ -89,7 +137,10 @@ export default function CreateUser({
   updateValues?: UserDatabaseUpdate | null;
 }) {
   const { companyId } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
   const USER_TAG = updateValues ? UPDATE_USER_TAG : CREATE_USER_TAG;
+  const [resetKey, setResetKey] = useState(Date.now());
+
   const initialValues = updateValues ?? getInitialValueFromZod(UserSchema);
 
   const [form, fields] = useForm({
@@ -106,15 +157,42 @@ export default function CreateUser({
     },
   });
 
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!actionData) return;
+
+    if (actionData?.status === "success") {
+      clearExactCacheEntry(cacheKeyPrefix.users);
+      toast({
+        title: "Success",
+        description: actionData.message,
+        variant: "success",
+      });
+      setResetKey(Date.now());
+    } else {
+      toast({
+        title: "Error",
+        description: actionData.error?.message || "User creation failed",
+        variant: "destructive",
+      });
+    }
+    navigate("/settings/users", { replace: true });
+  }, [actionData]);
+
   return (
-    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
+    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
       <FormProvider context={form.context}>
-        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
+        <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
           <Card>
             <CardHeader>
-              <CardTitle>{USER_TAG}</CardTitle>
-              <CardDescription className="lowercase">
-                You can {USER_TAG} by filling this form
+              <CardTitle className='text-3xl capitalize'>
+                {replaceDash(USER_TAG)}
+              </CardTitle>
+              <CardDescription>
+                {USER_TAG.split("-")[0]} user that will have access to canny
+                apps
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -122,7 +200,8 @@ export default function CreateUser({
                 {...getInputProps(fields.company_id, { type: "hidden" })}
               />
               <input {...getInputProps(fields.id, { type: "hidden" })} />
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mb-10">
+
+              <div className='grid grid-cols-2 place-content-center justify-between gap-x-8'>
                 <Field
                   inputProps={{
                     ...getInputProps(fields.first_name, { type: "text" }),
@@ -140,7 +219,6 @@ export default function CreateUser({
                 <Field
                   inputProps={{
                     ...getInputProps(fields.last_name, { type: "text" }),
-
                     placeholder: `Enter ${replaceUnderscore(
                       fields.last_name.name
                     )}`,
@@ -152,11 +230,11 @@ export default function CreateUser({
                   errors={fields.last_name.errors}
                 />
               </div>
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10">
+
+              <div className='grid grid-cols-2 place-content-center justify-between gap-x-8'>
                 <Field
                   inputProps={{
                     ...getInputProps(fields.email, { type: "text" }),
-
                     placeholder: `Enter ${replaceUnderscore(
                       fields.email.name
                     )}`,
@@ -169,7 +247,6 @@ export default function CreateUser({
                 <Field
                   inputProps={{
                     ...getInputProps(fields.mobile_number, { type: "text" }),
-
                     placeholder: `Enter ${replaceUnderscore(
                       fields.mobile_number.name
                     )}`,
@@ -180,7 +257,10 @@ export default function CreateUser({
                   errors={fields.mobile_number.errors}
                 />
               </div>
+
               <SearchableSelectField
+                key={resetKey}
+                className='mb-4'
                 options={transformStringArrayIntoOptions(
                   userRoles as unknown as string[]
                 )}
@@ -193,17 +273,22 @@ export default function CreateUser({
                 }}
                 errors={fields.role.errors}
               />
+
               <CheckboxField
-                className="mt-8"
                 buttonProps={getInputProps(fields.is_active, {
                   type: "checkbox",
                 })}
                 labelProps={{
-                  children: "Mark this as Active",
+                  htmlFor: fields.is_active.id,
+                  children: "Is this user currently active?",
                 }}
               />
             </CardContent>
-            <FormButtons form={form} isSingle={true} />
+            <FormButtons
+              form={form}
+              setResetKey={setResetKey}
+              isSingle={true}
+            />
           </Card>
         </Form>
       </FormProvider>
