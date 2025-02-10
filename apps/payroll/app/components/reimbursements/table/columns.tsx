@@ -12,11 +12,11 @@ import {
   hasPermission,
   updateRole,
 } from "@canny_ecosystem/utils";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
-export const reimbursementsColumns = ({
+export const columns = ({
   isEmployeeRoute = false,
 }: {
   isEmployeeRoute?: boolean;
@@ -38,7 +38,7 @@ export const reimbursementsColumns = ({
     header: "Employee Code",
     cell: ({ row }) => {
       return (
-        <p className="truncate">
+        <p className='truncate'>
           {row.original?.employees?.employee_code ?? "--"}
         </p>
       );
@@ -50,7 +50,7 @@ export const reimbursementsColumns = ({
     header: "Employee Name",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-48 group-hover:text-primary">{`${
+        <p className='truncate w-48 group-hover:text-primary'>{`${
           row.original.employees?.first_name
         } ${row.original.employees?.middle_name ?? ""} ${
           row.original.employees?.last_name ?? ""
@@ -64,7 +64,7 @@ export const reimbursementsColumns = ({
     header: "Submitted Date",
     cell: ({ row }) => {
       return (
-        <p className="truncate ">
+        <p className='truncate '>
           {formatDate(row.original?.submitted_date ?? "") ?? "--"}
         </p>
       );
@@ -75,7 +75,7 @@ export const reimbursementsColumns = ({
     header: "Status",
     cell: ({ row }) => {
       return (
-        <p className="truncate capitalize ">
+        <p className='truncate capitalize '>
           {row.original?.status
             ? row.original.status.toLowerCase() === "pending"
               ? `${row.original.status}`
@@ -89,7 +89,7 @@ export const reimbursementsColumns = ({
     accessorKey: "amount",
     header: "Amount",
     cell: ({ row }) => {
-      return <p className=" truncate">{row.original?.amount ?? "--"}</p>;
+      return <p className=' truncate'>{row.original?.amount ?? "--"}</p>;
     },
   },
 
@@ -98,7 +98,7 @@ export const reimbursementsColumns = ({
     header: "Is Deductible",
     cell: ({ row }) => {
       return (
-        <p className="truncate capitalize">
+        <p className='truncate capitalize'>
           {String(row.original?.is_deductible) ?? "--"}
         </p>
       );
@@ -109,7 +109,7 @@ export const reimbursementsColumns = ({
     accessorKey: "email",
     header: "Approved By",
     cell: ({ row }) => {
-      return <p className=" truncate">{row.original?.users?.email ?? "--"}</p>;
+      return <p className=' truncate'>{row.original?.users?.email ?? "--"}</p>;
     },
   },
   {
@@ -118,10 +118,10 @@ export const reimbursementsColumns = ({
     header: "Project",
     cell: ({ row }) => {
       return (
-        <p className="truncate ">
+        <p className='truncate '>
           {
-            row.original.employees?.employee_project_assignment.project_sites
-              .projects.name
+            row.original.employees?.employee_project_assignment?.project_sites
+              ?.projects?.name
           }
         </p>
       );
@@ -133,10 +133,10 @@ export const reimbursementsColumns = ({
     header: "Project Site",
     cell: ({ row }) => {
       return (
-        <p className="truncate ">
+        <p className='truncate '>
           {
-            row.original.employees?.employee_project_assignment.project_sites
-              .name
+            row.original.employees?.employee_project_assignment?.project_sites
+              ?.name
           }
         </p>
       );
@@ -148,12 +148,13 @@ export const reimbursementsColumns = ({
     enableSorting: false,
     enableHiding: false,
     cell: ({ row }) => {
-      const { role } = useUserRole();
+      const { role } = useUser();
+
       return (
         <ReimbursementOptionsDropdown
-          key={row.original.id}
-          reimbursementId={row.original.id}
-          employeeId={row.original?.employees.id}
+          key={row?.original?.id}
+          reimbursementId={row?.original?.id}
+          employeeId={row.original?.employees?.id}
           isEmployeeRoute={isEmployeeRoute}
           triggerChild={
             <DropdownMenuTrigger
@@ -170,9 +171,9 @@ export const reimbursementsColumns = ({
               )}
               asChild
             >
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <Icon name="dots-vertical" />
+              <Button variant='ghost' className='h-8 w-8 p-0'>
+                <span className='sr-only'>Open menu</span>
+                <Icon name='dots-vertical' />
               </Button>
             </DropdownMenuTrigger>
           }

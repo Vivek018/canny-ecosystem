@@ -5,7 +5,7 @@ import {
   lwfDeductionCycleArray,
   replaceUnderscore,
   transformStringArrayIntoOptions,
-  updateRole,
+  createRole,
 } from "@canny_ecosystem/utils";
 import {
   CheckboxField,
@@ -46,7 +46,8 @@ import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const CREATE_LABOUR_WELFARE_FUND = "create-labour-welfare-fund";
 
@@ -55,7 +56,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.statutoryFieldsLwf}`)) {
+  if (!hasPermission(user?.role!, `${createRole}:${attribute.statutoryFieldsLwf}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   try {
@@ -157,6 +158,7 @@ export default function CreateLabourWelfareFund({
     if (!actionData) return;
 
     if (actionData?.status === "success") {
+      clearExactCacheEntry(cacheKeyPrefix.labour_welfare_fund);
       toast({
         title: "Success",
         description: actionData?.message || "Labour Welfare Fund created",

@@ -28,8 +28,9 @@ import type { EmployeeDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearCacheEntry, clearExactCacheEntry } from "@/utils/cache";
 
 export const UPDATE_EMPLOYEE = "update-employee";
 
@@ -39,7 +40,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.employeeDetails}`)) {
+  if (
+    !hasPermission(user?.role!, `${updateRole}:${attribute.employeeDetails}`)
+  ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
@@ -58,7 +61,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       error: null,
     });
   } catch (error) {
-    return json({
+    return defer({
       error,
       employeeId,
       employeePromise: null,
@@ -115,14 +118,14 @@ export default function UpdateEmployeeDetails() {
 
   if (error)
     return (
-      <ErrorBoundary error={error} message="Failed to load employee details" />
+      <ErrorBoundary error={error} message='Failed to load employee details' />
     );
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <Await resolve={employeePromise}>
         {(resolvedData) => {
           if (!resolvedData)
-            return <ErrorBoundary message="Failed to load employee details" />;
+            return <ErrorBoundary message='Failed to load employee details' />;
           return (
             <UpdateEmployeeDetailsWrapper
               data={resolvedData.data}
@@ -173,6 +176,10 @@ export function UpdateEmployeeDetailsWrapper({
     }
     if (actionData) {
       if (actionData?.status === "success") {
+        clearCacheEntry(cacheKeyPrefix.employees);
+        clearExactCacheEntry(
+          `${cacheKeyPrefix.employee_overview}${employeeId}`
+        );
         toast({
           title: "Success",
           description: actionData?.message || "Employee updated",
@@ -190,13 +197,13 @@ export function UpdateEmployeeDetailsWrapper({
   }, [actionData]);
 
   return (
-    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
+    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
       <FormProvider context={form.context}>
         <Form
-          method="POST"
-          encType="multipart/form-data"
+          method='POST'
+          encType='multipart/form-data'
           {...getFormProps(form)}
-          className="flex flex-col"
+          className='flex flex-col'
         >
           <Card>
             <CreateEmployeeDetails

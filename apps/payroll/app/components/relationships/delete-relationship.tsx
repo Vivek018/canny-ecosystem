@@ -46,7 +46,7 @@ export const DeleteRelationship = ({
         {},
         {
           method: "post",
-          action: `/settings/${relationshipId}/delete-relationship`,
+          action: `/settings/relationships/${relationshipId}/delete-relationship`,
           replace: true,
         }
       );

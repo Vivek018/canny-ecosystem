@@ -36,19 +36,19 @@ import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
 
 const PLACEHOLDERS = [
   "Employees joined after Jan 2020 with a supervisor position",
-  "Active employees with a bachelor's degree at Site B",
+  "Active employees with a bachelor's degree at Project Site 'B'",
   "Skilled employees left between 2022-2024 as a contractor",
   "Male employees born after 1990 working as Sampler",
   "Inactive employees in Project A who left before 2023",
   "Semi Skilled Employees born 1990-2000 in full time",
   "Employees joined before 2015",
-  "Active employees in part time roles at Site C",
+  "Active employees in part time roles at Site 'C'",
   "Employees left after 2022 with semi skilled skills",
-  "Employees in 'Project X' born before 1985",
+  "Employees in Project 'X' born before 1985",
   "Employees joined before 2018 in Sampler role",
-  "Employees born before 1995 who worked at Site B",
+  "Employees born before 1995 who worked at Site 'B'",
   "Employees joined in 2019 in supervisor role",
-  "Full-time employees at Project Site B",
+  "Full-time employees at Project Site 'B'",
 ];
 
 export function EmployeesSearchFilter({

@@ -1,4 +1,5 @@
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { deleteGratuity } from "@canny_ecosystem/supabase/mutations";
@@ -24,9 +25,8 @@ export async function action({
 
   if (
     !hasPermission(
-      `${user?.role!}`,
-      `${deleteRole}:  ${attribute.statutoryFieldsGraduity},
-`
+      user?.role!,
+      `${deleteRole}:${attribute.statutoryFieldsGraduity}`
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -73,6 +73,7 @@ export default function DeleteGratuity() {
   useEffect(() => {
     if (!actionData) return;
     if (actionData?.status === "success") {
+      clearExactCacheEntry(cacheKeyPrefix.gratuity);
       toast({
         title: "Success",
         description: actionData.message || "Gratuity deleted",

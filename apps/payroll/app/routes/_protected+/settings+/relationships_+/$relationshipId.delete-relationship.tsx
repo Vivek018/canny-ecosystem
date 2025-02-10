@@ -1,7 +1,8 @@
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
-import { deleteLocation } from "@canny_ecosystem/supabase/mutations";
+import { deleteRelationship } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import {
@@ -18,50 +19,61 @@ export async function action({
   request,
   params,
 }: ActionFunctionArgs): Promise<Response> {
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+  const relationshipId = params.relationshipId;
+
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (
+    !hasPermission(
+      user?.role!,
+      `${deleteRole}:${attribute.settingRelationships}`
+    )
+  ) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
+
   try {
-    const { supabase, headers } = getSupabaseWithHeaders({ request });
-    const { user } = await getUserCookieOrFetchUser(request, supabase);
+    const { supabase } = getSupabaseWithHeaders({ request });
 
-    if (!hasPermission(user?.role!, `${deleteRole}:${attribute.settingLocations}`)) {
-      return safeRedirect(DEFAULT_ROUTE, { headers });
-    }
-
-    const locationId = params.locationId;
-
-    const { status, error } = await deleteLocation({
+    const { status, error } = await deleteRelationship({
       supabase,
-      id: locationId ?? "",
+      id: relationshipId ?? "",
     });
 
-    if (isGoodStatus(status))
+    if (isGoodStatus(status)) {
       return json({
         status: "success",
-        message: "Location deleted",
+        message: "Relationship deleted",
         error: null,
       });
+    }
 
     return json(
-      { status: "error", message: "Location delete failed", error },
+      { status: "error", message: "Failed to delete relationship", error },
       { status: 500 }
     );
   } catch (error) {
-    return json({
-      status: "error",
-      message: "An unexpected error occurred",
-      error,
-    });
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+      },
+      { status: 500 }
+    );
   }
 }
 
-export default function DeleteLocation() {
+export default function DeleteRelationship() {
   const actionData = useActionData<typeof action>();
-
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!actionData) return;
     if (actionData?.status === "success") {
+      clearExactCacheEntry(cacheKeyPrefix.relationships);
       toast({
         title: "Success",
         description: actionData?.message,
@@ -70,11 +82,11 @@ export default function DeleteLocation() {
     } else {
       toast({
         title: "Error",
-        description: actionData?.error?.message || "Location delete failed",
+        description: actionData?.error?.message || "Relationship delete failed",
         variant: "destructive",
       });
     }
-    navigate("/settings/locations", { replace: true });
+    navigate("/settings/relationships", { replace: true });
   }, [actionData]);
 
   return null;

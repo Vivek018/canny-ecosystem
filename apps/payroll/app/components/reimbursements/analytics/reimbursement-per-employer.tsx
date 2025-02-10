@@ -31,7 +31,7 @@ export function ReimbursementPerEmployer({
 }: { chartData: ReimbursementDataType[] }) {
   const totalEmployerAmountData = chartData.reduce(
     (acc, row) => {
-      const email = row.users.email;
+      const email = row?.users?.email;
       if (email) {
         if (!acc[email]) {
           acc[email] = { employer: email, amount: 0 };
