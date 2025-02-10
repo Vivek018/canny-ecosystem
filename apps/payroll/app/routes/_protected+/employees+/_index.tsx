@@ -11,7 +11,7 @@ import { DataTable } from "@/components/employees/table/data-table";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { cacheKeyPrefix, VALID_FILTERS } from "@/constant";
 import { AIChat4o } from "@/utils/ai";
-import { clientCaching } from "@/utils/cache";
+import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { MAX_QUERY_LIMIT } from "@canny_ecosystem/supabase/constant";
 import {
@@ -50,23 +50,23 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const searchParams = new URLSearchParams(url.searchParams);
     const sortParam = searchParams.get("sort");
 
-    const query = searchParams.get("name") ?? undefined;
+    const query = searchParams.get("name") ?? null;
 
     const filters: EmployeeFilters = {
-      dob_start: searchParams.get("dob_start") ?? undefined,
-      dob_end: searchParams.get("dob_end") ?? undefined,
-      education: searchParams.get("education") ?? undefined,
-      gender: searchParams.get("gender") ?? undefined,
-      status: searchParams.get("status") ?? undefined,
-      project: searchParams.get("project") ?? undefined,
-      project_site: searchParams.get("project_site") ?? undefined,
-      assignment_type: searchParams.get("assignment_type") ?? undefined,
-      position: searchParams.get("position") ?? undefined,
-      skill_level: searchParams.get("skill_level") ?? undefined,
-      doj_start: searchParams.get("doj_start") ?? undefined,
-      doj_end: searchParams.get("doj_end") ?? undefined,
-      dol_start: searchParams.get("dol_start") ?? undefined,
-      dol_end: searchParams.get("dol_end") ?? undefined,
+      dob_start: searchParams.get("dob_start") ?? null,
+      dob_end: searchParams.get("dob_end") ?? null,
+      education: searchParams.get("education") ?? null,
+      gender: searchParams.get("gender") ?? null,
+      status: searchParams.get("status") ?? null,
+      project: searchParams.get("project") ?? null,
+      project_site: searchParams.get("project_site") ?? null,
+      assignment_type: searchParams.get("assignment_type") ?? null,
+      position: searchParams.get("position") ?? null,
+      skill_level: searchParams.get("skill_level") ?? null,
+      doj_start: searchParams.get("doj_start") ?? null,
+      doj_end: searchParams.get("doj_end") ?? null,
+      dol_start: searchParams.get("dol_start") ?? null,
+      dol_end: searchParams.get("dol_end") ?? null,
     };
 
     const hasFilters =
@@ -214,25 +214,27 @@ export default function EmployeesIndex() {
               {(projectData) => (
                 <Await resolve={projectSitePromise}>
                   {(projectSiteData) => (
-                    <EmployeesSearchFilter
-                      disabled={!projectData?.data?.length && noFilters}
-                      projectArray={
-                        projectData?.data?.length
-                          ? projectData?.data?.map((project) => project!.name)
-                          : []
-                      }
-                      projectSiteArray={
-                        projectSiteData?.data?.length
-                          ? projectSiteData?.data?.map((site) => site!.name)
-                          : []
-                      }
-                    />
+                    <>
+                      <EmployeesSearchFilter
+                        disabled={!projectData?.data?.length && noFilters}
+                        projectArray={
+                          projectData?.data?.length
+                            ? projectData?.data?.map((project) => project!.name)
+                            : []
+                        }
+                        projectSiteArray={
+                          projectSiteData?.data?.length
+                            ? projectSiteData?.data?.map((site) => site!.name)
+                            : []
+                        }
+                      />
+                      <FilterList filterList={filterList} />
+                    </>
                   )}
                 </Await>
               )}
             </Await>
           </Suspense>
-          <FilterList filterList={filterList} />
         </div>
         <EmployeesActions isEmpty={!projectPromise} />
       </div>
@@ -240,10 +242,13 @@ export default function EmployeesIndex() {
         <Await resolve={employeesPromise}>
           {({ data, meta, error }) => {
             if (error) {
-              <ErrorBoundary
-                error={error}
-                message="Failed to load employees"
-              />;
+              clearCacheEntry(cacheKeyPrefix.employees);
+              return (
+                <ErrorBoundary
+                  error={error}
+                  message='Failed to load employees'
+                />
+              );
             }
 
             const hasNextPage = Boolean(meta?.count > pageSize);
@@ -264,13 +269,13 @@ export default function EmployeesIndex() {
             );
           }}
         </Await>
+        <ImportEmployeeDetailsModal />
+        <ImportEmployeeStatutoryModal />
+        <ImportEmployeeBankDetailsModal />
+        <ImportEmployeeAddressModal />
+        <ImportEmployeeGuardiansModal />
+        <Outlet />
       </Suspense>
-      <ImportEmployeeDetailsModal />
-      <ImportEmployeeStatutoryModal />
-      <ImportEmployeeBankDetailsModal />
-      <ImportEmployeeAddressModal />
-      <ImportEmployeeGuardiansModal />
-      <Outlet />
     </section>
   );
 }

@@ -1,5 +1,5 @@
-import { Step1 } from "@/components/exit-payment/exit-payment-step-1";
-import { Step2 } from "@/components/exit-payment/exit-payment-step-2";
+// import { Step1 } from "@/components/exit-payment/exit-payment-step-1";
+// import { Step2 } from "@/components/exit-payment/exit-payment-step-2";
 import { FormButtons } from "@/components/form/form-buttons";
 import { FormStepHeader } from "@/components/form/form-step-header";
 import { safeRedirect } from "@/utils/server/http.server";
@@ -152,12 +152,12 @@ export default function ExitForm() {
         >
           <Card>
             <div className='h-[650px] overflow-scroll'>
-              {step === 1 ? (
+              {/* {step === 1 ? (
                 <Step1 key={resetKey} fields={fields as any} />
               ) : null}
               {step === 2 ? (
                 <Step2 key={resetKey} fields={fields as any} />
-              ) : null}
+              ) : null} */}
             </div>
             <FormButtons
               form={form}

@@ -10,11 +10,11 @@ import {
 import { useSearchParams } from "@remix-run/react";
 
 export type EmployeeFilterList = EmployeeFilters & {
-  name?: string;
+  name?: string | null;
 };
 
 type Props = {
-  filterList: EmployeeFilterList | undefined | null;
+  filterList: EmployeeFilterList | null;
 };
 
 export function FilterList({ filterList }: Props) {
