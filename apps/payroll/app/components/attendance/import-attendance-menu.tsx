@@ -1,4 +1,4 @@
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { Button } from "@canny_ecosystem/ui/button";
 import {
   DropdownMenu,
@@ -16,15 +16,16 @@ import {
 import { useSearchParams } from "@remix-run/react";
 
 export function ImportAttendanceMenu() {
-  const { role } = useUserRole();
+  const { role } = useUser();
   const [searchParams, setSearchParams] = useSearchParams();
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
         asChild
-        className={cn()
-        //   !hasPermission(role, `${updateRole}:${attribute.reimbursements}`) && "hidden"
+        className={
+          cn()
+          //   !hasPermission(role, `${updateRole}:${attribute.reimbursements}`) && "hidden"
         }
       >
         <Button variant="outline" size="icon" className="h-10 w-[2.5rem]">

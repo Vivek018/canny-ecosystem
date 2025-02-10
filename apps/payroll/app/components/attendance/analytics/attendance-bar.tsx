@@ -13,9 +13,7 @@ import {
   ChartTooltipContent,
 } from "@canny_ecosystem/ui/chart";
 import { useMemo } from "react";
-import type{ TransformedAteendanceDataType } from "@/routes/_protected+/time-tracking+/attendance+/_index";
-
-
+import type { TransformedAteendanceDataType } from "@/routes/_protected+/time-tracking+/attendance+/_index";
 
 const chartConfig = {
   presents: {
