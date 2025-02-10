@@ -107,7 +107,7 @@ export const EmployeeOptionsDropdown = ({
             )}
             onClick={handleExit}
           >
-            Exit
+            Exit employee
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DeleteEmployee employeeId={employee.id} />
