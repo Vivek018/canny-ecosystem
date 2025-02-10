@@ -22,6 +22,9 @@ import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 
 export type TransformedAteendanceDataType = {
+  projectName: any;
+  attendance: never[];
+
   employee_id: string;
   employee_code: string;
   employee_name: string;
@@ -194,22 +197,19 @@ export default function Attendance() {
           <FilterList filters={filters} />
         </div>
         <div className="space-x-2 hidden md:flex">
-          {!selectedRows.length && (
+          {!selectedRows.length ? (
             <ImportAttendanceMenu />
-          ) 
-          // : 
-          // (
-          //   <Button
-          //     variant="outline"
-          //     size="icon"
-          //     className="h-10 w-10"
-          //     disabled={!selectedRows.length}
-          //     onClick={() => navigate("/approvals/reimbursements/analytics")}
-          //   >
-          //     <Icon name="chart" className="h-[18px] w-[18px]" />
-          //   </Button>
-          // )
-          }
+          ) : (
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-10 w-10"
+              disabled={!selectedRows.length}
+              onClick={() => navigate("/time-tracking/attendance/analytics")}
+            >
+              <Icon name="chart" className="h-[18px] w-[18px]" />
+            </Button>
+          )}
         </div>
       </div>
       <AttendanceTable

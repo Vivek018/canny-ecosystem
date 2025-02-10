@@ -12,7 +12,6 @@ import {
 } from "@tanstack/react-table";
 import { AttendanceTableHeader } from "./attendance-table-header";
 import { useEffect, useState } from "react";
-import type { AttendanceDataType } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
 import { useAttendanceStore } from "@/store/attendance";
 import type { AttendanceFilterType } from "@/routes/_protected+/dashboard";
@@ -61,7 +60,7 @@ export function AttendanceTable({
     for (const row of table.getSelectedRowModel().rows) {
       rowArray.push(row.original);
     }
-    setSelectedRows(rowArray as unknown as AttendanceDataType[]);
+    setSelectedRows(rowArray as unknown as TransformedAteendanceDataType[]);
   }, [rowSelection]);
 
   useEffect(() => {

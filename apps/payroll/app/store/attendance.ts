@@ -1,4 +1,4 @@
-import type { AttendanceDataType } from "@canny_ecosystem/supabase/queries";
+import type{ TransformedAteendanceDataType } from "@/routes/_protected+/time-tracking+/attendance+/_index";
 import type { RowSelectionState, Updater } from "@tanstack/react-table";
 import { create } from "zustand";
 
@@ -7,8 +7,8 @@ interface AttendanceState {
   setColumns: (columns?: any[]) => void;
   setRowSelection: (updater: Updater<RowSelectionState>) => void;
   rowSelection: Record<string, boolean>;
-  selectedRows: AttendanceDataType[];
-  setSelectedRows: (updater: Updater<AttendanceDataType[]>) => void;
+  selectedRows: TransformedAteendanceDataType[];
+  setSelectedRows: (updater: Updater<TransformedAteendanceDataType[]>) => void;
 }
 
 export const useAttendanceStore = create<AttendanceState>()((set) => ({

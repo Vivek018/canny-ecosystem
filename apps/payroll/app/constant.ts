@@ -31,14 +31,14 @@ export const sideNavList = [
   {
     name: "Time Tracking",
     link: "/time-tracking",
-    icon: "chart",
+    icon: "lab-timer",
   },
   {
     name: "Payroll",
     link: "/payroll",
     icon: "table",
   },
-  { name: "Approvals", link: "/approvals", icon: "lab-timer" },
+  { name: "Approvals", link: "/approvals", icon: "check-circle" },
   {
     name: "Payment Components",
     link: "/payment-components",
@@ -256,6 +256,3 @@ export const statutorySideNavList = [
     icon: "",
   },
 ];
-
-
-
