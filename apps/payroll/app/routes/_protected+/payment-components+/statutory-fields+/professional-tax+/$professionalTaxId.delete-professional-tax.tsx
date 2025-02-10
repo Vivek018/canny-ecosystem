@@ -1,4 +1,5 @@
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { deleteProfessionalTax } from "@canny_ecosystem/supabase/mutations";
@@ -72,6 +73,7 @@ export default function DeleteProfessionalTax() {
   useEffect(() => {
     if (!actionData) return;
     if (actionData?.status === "success") {
+      clearExactCacheEntry(cacheKeyPrefix.professional_tax);
       toast({
         title: "Success",
         description: actionData?.message || "Professional Tax deleted",

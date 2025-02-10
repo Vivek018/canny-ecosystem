@@ -3,7 +3,7 @@ import {
   SiteSchema,
   replaceUnderscore,
   hasPermission,
-  updateRole,
+  createRole,
 } from "@canny_ecosystem/utils";
 import {
   CheckboxField,
@@ -51,7 +51,8 @@ import { LocationsListWrapper } from "@/components/projects/sites/locations-list
 import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const CREATE_SITE = "create-site";
 
@@ -61,7 +62,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.projectSite}`)) {
+  if (!hasPermission(user?.role!, `${createRole}:${attribute.projectSite}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
@@ -190,6 +191,7 @@ export default function CreateSite({
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
+        clearExactCacheEntry(`${cacheKeyPrefix.sites}${projectId}`);
         toast({
           title: "Success",
           description: actionData.message,
@@ -207,15 +209,15 @@ export default function CreateSite({
   }, [actionData]);
 
   if (error)
-    return <ErrorBoundary error={error} message="Failed to create site" />;
+    return <ErrorBoundary error={error} message='Failed to create site' />;
 
   return (
-    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
+    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
       <FormProvider context={form.context}>
-        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
+        <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
           <Card>
             <CardHeader>
-              <CardTitle className="text-3xl">
+              <CardTitle className='text-3xl capitalize'>
                 {replaceDash(SITE_TAG)}
               </CardTitle>
               <CardDescription>
@@ -240,7 +242,7 @@ export default function CreateSite({
                 }}
                 errors={fields.name.errors}
               />
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+              <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
                 <Field
                   inputProps={{
                     ...getInputProps(fields.site_code, { type: "text" }),
@@ -259,7 +261,7 @@ export default function CreateSite({
                     {(resolvedData) => {
                       if (!resolvedData)
                         return (
-                          <ErrorBoundary message="Failed to load locations" />
+                          <ErrorBoundary message='Failed to load locations' />
                         );
                       return (
                         <LocationsListWrapper
@@ -294,7 +296,7 @@ export default function CreateSite({
                 errors={fields.address_line_1.errors}
               />
               <Field
-                className="-mt-4"
+                className='-mt-4'
                 inputProps={{
                   ...getInputProps(fields.address_line_2, { type: "text" }),
                   placeholder: replaceUnderscore(fields.address_line_2.name),
@@ -302,7 +304,7 @@ export default function CreateSite({
                 }}
                 errors={fields.address_line_2.errors}
               />
-              <div className="grid grid-cols-3 place-content-center justify-between gap-6">
+              <div className='grid grid-cols-3 place-content-center justify-between gap-6'>
                 <Field
                   inputProps={{
                     ...getInputProps(fields.city, { type: "text" }),
@@ -316,7 +318,7 @@ export default function CreateSite({
                 />
                 <SearchableSelectField
                   key={resetKey}
-                  className="capitalize"
+                  className='capitalize'
                   options={statesAndUTs}
                   inputProps={{
                     ...getInputProps(fields.state, { type: "text" }),
@@ -341,7 +343,7 @@ export default function CreateSite({
                   errors={fields.pincode.errors}
                 />
               </div>
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+              <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
                 <Field
                   inputProps={{
                     ...getInputProps(fields.latitude, { type: "number" }),

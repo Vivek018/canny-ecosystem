@@ -32,20 +32,20 @@ export async function createEmployee({
 }: {
   supabase: TypedSupabaseClient;
   employeeData: EmployeeDatabaseInsert;
-  employeeStatutoryDetailsData: Omit<
+  employeeStatutoryDetailsData?: Omit<
     EmployeeStatutoryDetailsDatabaseInsert,
     "employee_id"
   >;
-  employeeBankDetailsData: Omit<
+  employeeBankDetailsData?: Omit<
     EmployeeBankDetailsDatabaseInsert,
     "employee_id"
   >;
-  employeeProjectAssignmentData: Omit<
+  employeeProjectAssignmentData?: Omit<
     EmployeeProjectAssignmentDatabaseInsert,
     "employee_id"
   >;
-  employeeAddressesData: Omit<EmployeeAddressDatabaseInsert, "employee_id">;
-  employeeGuardiansData: Omit<EmployeeGuardianDatabaseInsert, "employee_id">;
+  employeeAddressesData?: Omit<EmployeeAddressDatabaseInsert, "employee_id">;
+  employeeGuardiansData?: Omit<EmployeeGuardianDatabaseInsert, "employee_id">;
   bypassAuth?: boolean;
 }) {
   if (!bypassAuth) {
@@ -78,62 +78,79 @@ export async function createEmployee({
     };
   }
 
-  if (data?.id) {
-    const { error: employeeStatutoryDetailsError, status } =
-      await createEmployeeStatutoryDetails({
-        supabase,
-        data: { ...employeeStatutoryDetailsData, employee_id: data.id },
-        bypassAuth,
-      });
-
-    const { error: employeeBankDetailsError } = await createEmployeeBankDetails(
-      {
-        supabase,
-        data: { ...employeeBankDetailsData, employee_id: data.id },
-        bypassAuth,
-      }
-    );
-
-    const { error: employeeProjectAssignmentError } =
-      await createEmployeeProjectAssignment({
-        supabase,
-        data: { ...employeeProjectAssignmentData, employee_id: data.id },
-        bypassAuth,
-      });
-
-    const { error: employeeAddressesError } = await createEmployeeAddresses({
-      supabase,
-      data: { ...employeeAddressesData, employee_id: data.id },
-      bypassAuth,
-    });
-
-    const { error: employeeGuardiansError } = await createEmployeeGuardians({
-      supabase,
-      data: { ...employeeGuardiansData, employee_id: data.id },
-      bypassAuth,
-    });
-
+  if (!data?.id) {
     return {
       data,
       status,
       employeeError: null,
-      employeeStatutoryDetailsError,
-      employeeBankDetailsError,
-      employeeProjectAssignmentError,
-      employeeAddressesError,
-      employeeGuardiansError,
+      employeeStatutoryDetailsError: null,
+      employeeBankDetailsError: null,
+      employeeProjectAssignmentError: null,
+      employeeAddressesError: null,
+      employeeGuardiansError: null,
     };
   }
 
+  const [
+    { error: statutoryError, status: statutoryStatus },
+    { error: bankError, status: bankStatus },
+    { error: projectError, status: projectStatus },
+    { error: addressError, status: addressStatus },
+    { error: guardianError, status: guardianStatus },
+  ] = await Promise.all([
+    employeeStatutoryDetailsData
+      ? createEmployeeStatutoryDetails({
+        supabase,
+        data: { ...employeeStatutoryDetailsData, employee_id: data.id },
+        bypassAuth,
+      })
+      : { error: null, status: null },
+    employeeBankDetailsData
+      ? createEmployeeBankDetails({
+        supabase,
+        data: { ...employeeBankDetailsData, employee_id: data.id },
+        bypassAuth,
+      })
+      : { error: null, status: null },
+    employeeProjectAssignmentData
+      ? createEmployeeProjectAssignment({
+        supabase,
+        data: { ...employeeProjectAssignmentData, employee_id: data.id },
+        bypassAuth,
+      })
+      : { error: null, status: null },
+    employeeAddressesData
+      ? createEmployeeAddresses({
+        supabase,
+        data: { ...employeeAddressesData, employee_id: data.id },
+        bypassAuth,
+      })
+      : { error: null, status: null },
+    employeeGuardiansData
+      ? createEmployeeGuardians({
+        supabase,
+        data: { ...employeeGuardiansData, employee_id: data.id },
+        bypassAuth,
+      })
+      : { error: null, status: null },
+  ]);
+
+  const latestStatus = guardianStatus ||
+    addressStatus ||
+    projectStatus ||
+    bankStatus ||
+    statutoryStatus ||
+    status;
+
   return {
     data,
-    status,
+    status: latestStatus,
     employeeError: null,
-    employeeStatutoryDetailsError: null,
-    employeeBankDetailsError: null,
-    employeeProjectAssignmentError: null,
-    employeeAddressesError: null,
-    employeeGuardiansError: null,
+    employeeStatutoryDetailsError: statutoryError,
+    employeeBankDetailsError: bankError,
+    employeeProjectAssignmentError: projectError,
+    employeeAddressesError: addressError,
+    employeeGuardiansError: guardianError,
   };
 }
 
@@ -954,7 +971,7 @@ export async function createEmployeeDetailsFromImportedData({
             existing.employee_code === record.employee_code ||
             existing.primary_mobile_number === record.primary_mobile_number ||
             existing.secondary_mobile_number ===
-              record.secondary_mobile_number ||
+            record.secondary_mobile_number ||
             existing.personal_email === record.personal_email
         );
 
@@ -1193,24 +1210,24 @@ export async function createEmployeeStatutoryFromImportedData({
             normalize(existing.employee_id) === normalize(record.employee_id) ||
             (record.aadhaar_number &&
               normalize(existing.aadhaar_number) ===
-                normalize(record.aadhaar_number)) ||
+              normalize(record.aadhaar_number)) ||
             (record.pan_number &&
               normalize(existing.pan_number) ===
-                normalize(record.pan_number)) ||
+              normalize(record.pan_number)) ||
             (record.uan_number &&
               normalize(existing.uan_number) ===
-                normalize(record.uan_number)) ||
+              normalize(record.uan_number)) ||
             (record.pf_number &&
               normalize(existing.pf_number) === normalize(record.pf_number)) ||
             (record.esic_number &&
               normalize(existing.esic_number) ===
-                normalize(record.esic_number)) ||
+              normalize(record.esic_number)) ||
             (record.driving_license_number &&
               normalize(existing.driving_license_number) ===
-                normalize(record.driving_license_number)) ||
+              normalize(record.driving_license_number)) ||
             (record.passport_number &&
               normalize(existing.passport_number) ===
-                normalize(record.passport_number))
+              normalize(record.passport_number))
         );
 
         if (existingRecord) {
@@ -1389,7 +1406,7 @@ export async function createEmployeeBankDetailsFromImportedData({
             normalize(existing.employee_id) === normalize(record.employee_id) ||
             (record.account_number &&
               normalize(existing.account_number) ===
-                normalize(record.account_number))
+              normalize(record.account_number))
         );
 
         if (existingRecord) {
@@ -1590,7 +1607,7 @@ export async function createEmployeeGuardiansFromImportedData({
         (record) =>
           normalize(record.mobile_number) === normalize(entry.mobile_number) ||
           normalize(record.alternate_mobile_number) ===
-            normalize(entry.alternate_mobile_number) ||
+          normalize(entry.alternate_mobile_number) ||
           normalize(record.email) === normalize(entry.email)
       );
 

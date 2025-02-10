@@ -6,7 +6,7 @@ import { Link } from "@remix-run/react";
 import { ProjectOptionsDropdown } from "../project-options-dropdown";
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
 import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const ProjectHeader = ({
@@ -14,9 +14,9 @@ export const ProjectHeader = ({
 }: {
   project: Pick<ProjectDatabaseRow, "status" | "id" | "actual_end_date">;
 }) => {
-  const { role } = useUserRole();
+  const { role } = useUser();
   return (
-    <div className="flex flex-row items-center justify-between">
+    <div className='flex flex-row items-center justify-between'>
       <div
         className={cn(
           "rounded-sm flex items-center",
@@ -26,21 +26,22 @@ export const ProjectHeader = ({
           ["pending"].includes(project.status) && "text-yellow-500"
         )}
       >
-        <Icon name="dot-filled" className="mt-[1px]" />
+        <Icon name='dot-filled' className='mt-[1px]' />
         <p className={cn("ml-0.5 text-sm font-medium capitalize")}>
           {project.status}
         </p>
       </div>
-      <div className="flex items-center gap-3">
+      <div className='flex items-center gap-3'>
         <Link
-          prefetch="intent"
+          prefetch='intent'
           to={`/projects/${project.id}/update-project`}
           className={cn(
             buttonVariants({ variant: "outline" }),
-            !hasPermission(role, `${updateRole}:${attribute.project}`) && "hidden"
+            !hasPermission(role, `${updateRole}:${attribute.project}`) &&
+              "hidden"
           )}
         >
-          <Icon name="edit" size="xs" className="mr-1.5 " />
+          <Icon name='edit' size='xs' className='mr-1.5 ' />
           <p>Edit</p>
         </Link>
         <ProjectOptionsDropdown
@@ -58,7 +59,7 @@ export const ProjectHeader = ({
                   "hidden"
               )}
             >
-              <Icon name="dots-vertical" size="xs" className="mr-1.5" />
+              <Icon name='dots-vertical' size='xs' className='mr-1.5' />
               <p>More Options</p>
             </DropdownMenuTrigger>
           }

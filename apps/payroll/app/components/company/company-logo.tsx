@@ -1,3 +1,5 @@
+import { cacheKeyPrefix } from "@/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 import {
   Avatar,
   AvatarFallback,
@@ -20,6 +22,7 @@ export const CompanyLogo = ({
 
   const handleUpload = async (evt: React.ChangeEvent<HTMLInputElement>) => {
     console.log(evt.target.files);
+    clearExactCacheEntry(cacheKeyPrefix.general);
   };
 
   return (

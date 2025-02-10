@@ -9,7 +9,7 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useNavigate, useSubmit } from "@remix-run/react";
 import { DeletePaymentField } from "./delete-payment-field";
 import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const PaymentFieldOptionsDropdown = ({
@@ -23,7 +23,7 @@ export const PaymentFieldOptionsDropdown = ({
   };
   triggerChild: React.ReactElement;
 }) => {
-  const { role } = useUserRole();
+  const { role } = useUser();
   const submit = useSubmit();
   const navigate = useNavigate();
 
@@ -66,7 +66,7 @@ export const PaymentFieldOptionsDropdown = ({
   return (
     <DropdownMenu>
       {triggerChild}
-      <DropdownMenuContent sideOffset={10} align="end">
+      <DropdownMenuContent sideOffset={10} align='end'>
         <DropdownMenuGroup>
           <DropdownMenuItem onClick={handleReports}>
             View Report
@@ -76,7 +76,10 @@ export const PaymentFieldOptionsDropdown = ({
         <DropdownMenuSeparator
           className={cn(
             !hasPermission(role, `${updateRole}:${attribute.paymentFields}`) &&
-              !hasPermission(role, `${deleteRole}:${attribute.paymentFields}`) &&
+              !hasPermission(
+                role,
+                `${deleteRole}:${attribute.paymentFields}`
+              ) &&
               "hidden"
           )}
         />
@@ -85,8 +88,10 @@ export const PaymentFieldOptionsDropdown = ({
           <DropdownMenuItem
             className={cn(
               paymentField.is_active && "hidden",
-              !hasPermission(role, `${updateRole}:${attribute.paymentFields}`) &&
-                "hidden"
+              !hasPermission(
+                role,
+                `${updateRole}:${attribute.paymentFields}`
+              ) && "hidden"
             )}
             onClick={handleMarkAsActive}
           >
@@ -95,8 +100,10 @@ export const PaymentFieldOptionsDropdown = ({
           <DropdownMenuItem
             className={cn(
               !paymentField.is_active && "hidden",
-              !hasPermission(role, `${updateRole}:${attribute.paymentFields}`) &&
-                "hidden"
+              !hasPermission(
+                role,
+                `${updateRole}:${attribute.paymentFields}`
+              ) && "hidden"
             )}
             onClick={handleMarkAsInactive}
           >
@@ -106,7 +113,8 @@ export const PaymentFieldOptionsDropdown = ({
             onClick={handleEdit}
             className={cn(
               "hidden",
-              hasPermission(role, `${updateRole}:${attribute.paymentFields}`) && "flex"
+              hasPermission(role, `${updateRole}:${attribute.paymentFields}`) &&
+                "flex"
             )}
           >
             Edit payment field
@@ -114,7 +122,8 @@ export const PaymentFieldOptionsDropdown = ({
           <DropdownMenuSeparator
             className={cn(
               "hidden",
-              hasPermission(role, `${deleteRole}:${attribute.paymentFields}`) && "flex"
+              hasPermission(role, `${deleteRole}:${attribute.paymentFields}`) &&
+                "flex"
             )}
           />
           <DeletePaymentField paymentFieldId={paymentField.id} />

@@ -122,7 +122,7 @@ export function CreatePaymentTemplateComponentDetails({
   return (
     <Fragment>
       <CardHeader>
-        <CardTitle className='text-3xl'>
+        <CardTitle className='text-3xl capitalize'>
           {isUpdate ? "Update" : "Create"} Payment Template
         </CardTitle>
         <CardDescription>

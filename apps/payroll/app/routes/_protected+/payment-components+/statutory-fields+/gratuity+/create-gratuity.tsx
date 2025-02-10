@@ -17,7 +17,7 @@ import {
   isGoodStatus,
   replaceDash,
   replaceUnderscore,
-  updateRole,
+  createRole,
 } from "@canny_ecosystem/utils";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
@@ -32,13 +32,14 @@ import {
   useLoaderData,
   useNavigate,
 } from "@remix-run/react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { UPDATE_GRATUITY } from "./$gratuityId.update-gratuity";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const CREATE_GRATUITY = "create-gratuity";
 
@@ -48,7 +49,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
   if (
-    !hasPermission(user?.role!, `${updateRole}:${attribute.statutoryFieldsGraduity}`)
+    !hasPermission(user?.role!, `${createRole}:${attribute.statutoryFieldsGraduity}`)
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
@@ -127,7 +128,6 @@ export default function CreateGratuity({
   const GRATUITY_TAG = updateValues ? UPDATE_GRATUITY : CREATE_GRATUITY;
 
   const initialValues = updateValues ?? getInitialValueFromZod(GratuitySchema);
-  const [resetKey, setResetKey] = useState(Date.now());
 
   const [form, fields] = useForm({
     id: GRATUITY_TAG,
@@ -148,6 +148,7 @@ export default function CreateGratuity({
   useEffect(() => {
     if (!actionData) return;
     if (actionData?.status === "success") {
+      clearExactCacheEntry(cacheKeyPrefix.gratuity);
       toast({
         title: "Success",
         description: actionData?.message,
@@ -265,7 +266,7 @@ export default function CreateGratuity({
               />
             </div>
           </CardContent>
-          <FormButtons form={form} setResetKey={setResetKey} isSingle={true} />
+          <FormButtons form={form} isSingle={true} />
         </Card>
       </Form>
     </section>

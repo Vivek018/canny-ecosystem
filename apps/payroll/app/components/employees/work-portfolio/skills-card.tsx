@@ -22,8 +22,8 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import type { EmployeeSkillDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { DeleteSkill } from "./delete-skill";
-import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
-import { useUserRole } from "@/utils/user";
+import { createRole, deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
 type DetailItemProps = {
@@ -51,7 +51,7 @@ type EmployeeSkill = Omit<
 >;
 
 export const SkillItem = ({ skill }: { skill: EmployeeSkill }) => {
-  const { role } = useUserRole();
+  const { role } = useUser();
   return (
     <Card
       key={skill.id}
@@ -121,7 +121,7 @@ export const EmployeeSkillsCard = ({
 }: {
   employeeSkills: EmployeeSkill[] | null;
 }) => {
-  const { role } = useUserRole();
+  const { role } = useUser();
   return (
     <Card className="rounded w-full h-full p-4">
       <div className="flex justify-between items-center mb-6">
@@ -132,7 +132,7 @@ export const EmployeeSkillsCard = ({
             className={cn(
               buttonVariants({ variant: "outline" }),
               "bg-card",
-              !hasPermission(role, `${updateRole}:${attribute.employeeSkills}`) &&
+              !hasPermission(role, `${createRole}:${attribute.employeeSkills}`) &&
                 "hidden"
             )}
           >

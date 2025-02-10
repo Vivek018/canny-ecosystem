@@ -4,7 +4,7 @@ import {
   isGoodStatus,
   RelationshipSchema,
   replaceUnderscore,
-  updateRole,
+  createRole,
 } from "@canny_ecosystem/utils";
 import {
   CheckboxField,
@@ -49,8 +49,9 @@ import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const CREATE_RELATIONSHIP = "create-relationship";
 
@@ -64,7 +65,7 @@ export async function loader({
   if (
     !hasPermission(
       user?.role!,
-      `${updateRole}:${attribute.settingRelationships}`
+      `${createRole}:${attribute.settingRelationships}`
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -204,6 +205,7 @@ export default function CreateRelationship({
     if (!actionData) return;
 
     if (actionData?.status === "success") {
+      clearExactCacheEntry(cacheKeyPrefix.relationships);
       toast({
         title: "Success",
         description: actionData.message,
@@ -222,12 +224,12 @@ export default function CreateRelationship({
   }, [actionData]);
 
   return (
-    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
+    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
       <FormProvider context={form.context}>
-        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
+        <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
           <Card>
             <CardHeader>
-              <CardTitle className="text-3xl">
+              <CardTitle className='text-3xl capitalize'>
                 {replaceDash(RELATIONSHIP_TAG)}
               </CardTitle>
               <CardDescription>
@@ -277,7 +279,7 @@ export default function CreateRelationship({
                   children: "Is this currently active?",
                 }}
               />
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+              <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
                 <Field
                   inputProps={{
                     ...getInputProps(fields.start_date, { type: "date" }),

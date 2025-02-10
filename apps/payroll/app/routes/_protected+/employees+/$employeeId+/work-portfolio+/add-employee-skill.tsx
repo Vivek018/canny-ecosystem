@@ -17,7 +17,7 @@ import {
   replaceDash,
   replaceUnderscore,
   transformStringArrayIntoOptions,
-  updateRole,
+  createRole,
 } from "@canny_ecosystem/utils";
 import {
   FormProvider,
@@ -40,9 +40,10 @@ import { UPDATE_EMPLOYEE_SKILL } from "./$skillId.update-employee-skill";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { safeRedirect } from "@/utils/server/http.server";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const ADD_EMPLOYEE_SKILL = "add-employee-skill";
 
@@ -52,7 +53,9 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.employeeSkills}`)) {
+  if (
+    !hasPermission(user?.role!, `${createRole}:${attribute.employeeSkills}`)
+  ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   try {
@@ -180,6 +183,9 @@ export default function AddEmployeeSkill({
       navigate(`/employees/${employeeId}/work-portfolio`);
     }
     if (actionData) {
+      clearExactCacheEntry(
+        `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
+      );
       if (actionData.status === "success") {
         toast({
           title: "Success",
@@ -199,17 +205,17 @@ export default function AddEmployeeSkill({
   }, [actionData]);
 
   return (
-    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
+    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
       <FormProvider context={form.context}>
         <Form
-          method="POST"
-          encType="multipart/form-data"
+          method='POST'
+          encType='multipart/form-data'
           {...getFormProps(form)}
-          className="flex flex-col"
+          className='flex flex-col'
         >
           <Card>
             <CardHeader>
-              <CardTitle className="text-3xl">
+              <CardTitle className='text-3xl capitalize'>
                 {replaceDash(EMPLOYEE_SKILL_TAG)}
               </CardTitle>
               <CardDescription>
@@ -237,7 +243,7 @@ export default function AddEmployeeSkill({
               />
               <SearchableSelectField
                 key={resetKey}
-                className="capitalize"
+                className='capitalize'
                 options={transformStringArrayIntoOptions(
                   proficiencyArray as unknown as string[]
                 )}

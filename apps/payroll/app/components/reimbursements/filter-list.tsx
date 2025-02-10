@@ -5,7 +5,7 @@ import { formatDate, formatDateRange } from "@canny_ecosystem/utils";
 import { useSearchParams } from "@remix-run/react";
 
 type Props = {
-  filters: ReimbursementFilters | undefined;
+  filters: ReimbursementFilters | undefined | null;
 };
 
 export function FilterList({ filters }: Props) {

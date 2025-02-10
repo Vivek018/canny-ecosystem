@@ -27,9 +27,10 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import type { EmployeeGuardianDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { safeRedirect } from "@/utils/server/http.server";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const UPDATE_EMPLOYEE_GUARDIAN = "update-employee-guardian";
 
@@ -39,7 +40,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.employeeGuardians}`)) {
+  if (
+    !hasPermission(user?.role!, `${updateRole}:${attribute.employeeGuardians}`)
+  ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
@@ -125,7 +128,7 @@ export default function UpdateEmployeeGuardian() {
       <Await resolve={employeeGuardian}>
         {(resolvedData) => {
           if (!resolvedData)
-            return <ErrorBoundary message="Failed to load employee details" />;
+            return <ErrorBoundary message='Failed to load employee details' />;
           return (
             <UpdateEmployeeGuardianWrapper
               data={resolvedData.data}
@@ -176,6 +179,9 @@ export function UpdateEmployeeGuardianWrapper({
     }
     if (actionData) {
       if (actionData?.status === "success") {
+        clearExactCacheEntry(
+          `${cacheKeyPrefix.employee_overview}${employeeId}`
+        );
         toast({
           title: "Success",
           description: actionData?.message || "Guardian updated",
@@ -193,13 +199,13 @@ export function UpdateEmployeeGuardianWrapper({
   }, [actionData]);
 
   return (
-    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
+    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
       <FormProvider context={form.context}>
         <Form
-          method="POST"
-          encType="multipart/form-data"
+          method='POST'
+          encType='multipart/form-data'
           {...getFormProps(form)}
-          className="flex flex-col"
+          className='flex flex-col'
         >
           <Card>
             <CreateEmployeeGuardianDetails

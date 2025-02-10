@@ -7,7 +7,7 @@ import { Icon } from "@canny_ecosystem/ui/icon";
 import { ExitOptionsDropdown } from "../exit-option-dropdown";
 import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import type { ExitsRow } from "@canny_ecosystem/supabase/types";
 
@@ -144,7 +144,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     enableSorting: false,
     enableHiding: false,
     cell: ({ row }) => {
-      const { role } = useUserRole();
+      const { role } = useUser();
       return (
         <ExitOptionsDropdown
           key={row.original.id}

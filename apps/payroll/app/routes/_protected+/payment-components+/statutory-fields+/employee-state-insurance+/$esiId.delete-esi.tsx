@@ -1,4 +1,5 @@
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { deleteStateInsurence } from "@canny_ecosystem/supabase/mutations";
@@ -24,7 +25,7 @@ export async function action({
   if (
     !hasPermission(
       `${user?.role!}`,
-      `${deleteRole}:  ${attribute.statutoryFieldsEsi},
+      `${deleteRole}:${attribute.statutoryFieldsEsi},
 `
     )
   ) {
@@ -72,6 +73,7 @@ export default function DeleteEmployeeStateInsurance() {
   useEffect(() => {
     if (!actionData) return;
     if (actionData?.status === "success") {
+      clearExactCacheEntry(cacheKeyPrefix.statutory_field_esi);
       toast({
         title: "Success",
         description: actionData.message || "Employee State Insurance deleted",

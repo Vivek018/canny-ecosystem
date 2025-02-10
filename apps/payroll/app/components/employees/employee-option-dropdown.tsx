@@ -11,7 +11,7 @@ import { DeleteEmployee } from "./delete-employee";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { EmployeeDialog } from "../link-template/employee-dialog";
 import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const EmployeeOptionsDropdown = ({
@@ -30,8 +30,7 @@ export const EmployeeOptionsDropdown = ({
 }) => {
   const submit = useSubmit();
   const navigate = useNavigate();
-  const { role } = useUserRole();
-
+  const { role } = useUser();
   const handleMarkAsActive = () => {
     submit(
       {
@@ -67,7 +66,7 @@ export const EmployeeOptionsDropdown = ({
   return (
     <DropdownMenu>
       {triggerChild}
-      <DropdownMenuContent sideOffset={10} align="end">
+      <DropdownMenuContent sideOffset={10} align='end'>
         <DropdownMenuGroup>
           <DropdownMenuItem
             className={cn(
@@ -98,11 +97,7 @@ export const EmployeeOptionsDropdown = ({
           />
           <EmployeeDialog employee={employee} env={env} />
           <DropdownMenuSeparator
-            className={cn(
-              "hidden",
-              hasPermission(role, `${deleteRole}:${attribute.employees}`) &&
-              "flex"
-            )}
+            className={cn("hidden", hasPermission(role, `${deleteRole}:${attribute.employees}`) && "flex")}
           />
           <DropdownMenuItem
             className={cn(

@@ -32,41 +32,41 @@ export function ExportBar({
         continue;
       }
       if (key === "employee_code") {
-        exportedData[key] = element.employee_code;
+        exportedData[key] = element?.employee_code;
       } else if (key === "full_name") {
         exportedData[
           key
-        ] = `${element.first_name} ${element.middle_name} ${element.last_name}`;
+        ] = `${element?.first_name} ${element?.middle_name} ${element?.last_name}`;
       } else if (key === "mobile_number") {
-        exportedData[key] = element.primary_mobile_number;
+        exportedData[key] = element?.primary_mobile_number;
       } else if (key === "date_of_birth") {
-        exportedData[key] = element.date_of_birth;
+        exportedData[key] = element?.date_of_birth;
       } else if (key === "education") {
-        exportedData[key] = element.education ?? "";
+        exportedData[key] = element?.education ?? "";
       } else if (key === "gender") {
-        exportedData[key] = element.gender;
+        exportedData[key] = element?.gender;
       } else if (key === "status") {
-        exportedData[key] = element.is_active ? "Active" : "Inactive";
+        exportedData[key] = element?.is_active ? "Active" : "Inactive";
       } else if (key === "project_name") {
         exportedData[key] =
-          element.employee_project_assignment.project_sites.projects.name;
+          element?.employee_project_assignment?.project_sites.projects.name;
       } else if (key === "project_site_name") {
         exportedData[key] =
-          element.employee_project_assignment.project_sites.name;
+          element?.employee_project_assignment?.project_sites?.name;
       } else if (key === "assignment_type") {
         exportedData[key] =
-          element.employee_project_assignment.assignment_type ?? "";
+          element?.employee_project_assignment?.assignment_type ?? "";
       } else if (key === "position") {
-        exportedData[key] = element.employee_project_assignment.position;
+        exportedData[key] = element?.employee_project_assignment?.position;
       } else if (key === "skill_level") {
         exportedData[key] =
-          element.employee_project_assignment.skill_level ?? "";
+          element?.employee_project_assignment?.skill_level ?? "";
       } else if (key === "start_date") {
-        exportedData[key] = element.employee_project_assignment.start_date;
+        exportedData[key] = element?.employee_project_assignment?.start_date;
       } else if (key === "end_date") {
-        exportedData[key] = element.employee_project_assignment.end_date ?? "";
+        exportedData[key] = element?.employee_project_assignment?.end_date ?? "";
       } else {
-        exportedData[key] = element[key as keyof EmployeeDataType] as any;
+        exportedData[key] = element?.[key as keyof EmployeeDataType] as any;
       }
     }
 

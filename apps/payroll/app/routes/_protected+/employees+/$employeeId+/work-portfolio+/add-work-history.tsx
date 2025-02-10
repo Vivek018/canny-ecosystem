@@ -18,7 +18,7 @@ import {
   replaceDash,
   replaceUnderscore,
   transformStringArrayIntoOptions,
-  updateRole,
+  createRole,
 } from "@canny_ecosystem/utils";
 import {
   FormProvider,
@@ -47,8 +47,9 @@ import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const ADD_EMPLOYEE_WORK_HISTORY = "add-employee-work-history";
 
@@ -57,7 +58,12 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.employeeWorkHistory}`)) {
+  if (
+    !hasPermission(
+      user?.role!,
+      `${createRole}:${attribute.employeeWorkHistory}`
+    )
+  ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
@@ -190,6 +196,9 @@ export default function AddEmployeeWorkHistory({
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
+        clearExactCacheEntry(
+          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
+        );
         toast({
           title: "Success",
           description: actionData?.message || "Employee work history created",
@@ -208,17 +217,17 @@ export default function AddEmployeeWorkHistory({
   }, [actionData]);
 
   return (
-    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
+    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
       <FormProvider context={form.context}>
         <Form
-          method="POST"
-          encType="multipart/form-data"
+          method='POST'
+          encType='multipart/form-data'
           {...getFormProps(form)}
-          className="flex flex-col"
+          className='flex flex-col'
         >
           <Card>
             <CardHeader>
-              <CardTitle className="text-3xl">
+              <CardTitle className='text-3xl capitalize'>
                 {replaceDash(EMPLOYEE_WORK_HISTORY_TAG)}
               </CardTitle>
               <CardDescription>
@@ -233,7 +242,7 @@ export default function AddEmployeeWorkHistory({
               />
               <SearchableSelectField
                 key={resetKey}
-                className="capitalize"
+                className='capitalize'
                 options={transformStringArrayIntoOptions(
                   positionArray as unknown as string[]
                 )}
@@ -271,7 +280,7 @@ export default function AddEmployeeWorkHistory({
                 }}
                 errors={fields.responsibilities.errors}
               />
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+              <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
                 <Field
                   inputProps={{
                     ...getInputProps(fields.start_date, { type: "date" }),
