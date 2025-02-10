@@ -285,8 +285,6 @@ export function EmployeesSearchFilter({
                       ? new Date(filterParams.dob_start)
                       : new Date()
                   }
-                  
-                  max={new Date().getDate()}
                   selected={
                     {
                       from:

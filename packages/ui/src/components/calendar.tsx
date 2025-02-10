@@ -28,7 +28,7 @@ function Calendar({
           "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
         week: "flex w-full mt-2",
         day_button: cn(
-          "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20"
+          "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].range-end)]:rounded-r-md [&:has([aria-selected].outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20"
         ),
         day: cn(
           buttonVariants({ variant: "ghost" }),
@@ -41,8 +41,8 @@ function Calendar({
           "text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30",
         disabled: "text-muted-foreground opacity-50",
         hidden: "invisible",
-        range_start: "day-range-start",
-        range_end: "day-range-end",
+        range_start: "range-start",
+        range_end: "range-end",
         range_middle:
           "aria-selected:bg-accent aria-selected:text-accent-foreground",
         ...classNames,
@@ -51,7 +51,12 @@ function Calendar({
         Chevron: ({ orientation, className, size, ...props }) => {
           if (orientation === "left") {
             return (
-              <Button variant='outline' size='icon' className={cn("left-2", className)} {...props}>
+              <Button
+                variant='outline'
+                size='icon'
+                className={cn("left-2", className)}
+                {...props}
+              >
                 <Icon name='chevron-left' size='sm' />
               </Button>
             );
