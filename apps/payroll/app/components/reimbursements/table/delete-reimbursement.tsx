@@ -1,4 +1,4 @@
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,7 +28,7 @@ export const DeleteReimbursement = ({
   employeeId: string;
   isEmployeeRoute: boolean;
 }) => {
-  const { role } = useUserRole();
+  const { role } = useUser();
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [inputError, setInputError] = useState<string[]>([]);

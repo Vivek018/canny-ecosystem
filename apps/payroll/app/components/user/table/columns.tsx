@@ -16,7 +16,7 @@ import {
 } from "@canny_ecosystem/ui/avatar";
 import type { UserDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
 export type UsersType = {
@@ -113,7 +113,7 @@ export const columns: ColumnDef<UsersType>[] = [
     enableSorting: false,
     enableHiding: false,
     cell: ({ row }) => {
-      const { role } = useUserRole();
+      const { role } = useUser();
       return (
         <UserOptionsDropdown
           key={row.original.id}

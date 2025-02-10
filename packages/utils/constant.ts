@@ -1,3 +1,4 @@
+export const MILLISECONDS_IN_A_MIN = 60 * 1000;
 export const SECONDS_IN_A_MONTH = 60 * 60 * 24 * 30;
 
 export const DELETE_TEXT = "permanently delete";
@@ -123,6 +124,7 @@ export const attribute = {
   reimbursements: "reimbursements",
   exits: "exits",
   paymentFields: "payment_fields",
+  statutoryFields: "statutory_fields",
   statutoryFieldsEpf: "statutory_fields_epf",
   statutoryFieldsEsi: "statutory_fields_esi",
   statutoryFieldsPf: "statutory_fields_pf",

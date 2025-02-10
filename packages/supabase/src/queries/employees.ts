@@ -39,7 +39,7 @@ export type GetEmployeesByCompanyIdParams = {
   from: number;
   sort?: [string, "asc" | "desc"];
   searchQuery?: string;
-  filters?: EmployeeFilters;
+  filters?: EmployeeFilters | null;
 };
 
 export type EmployeeDataType = Pick<
@@ -105,6 +105,35 @@ export async function getEmployeesByCompanyId({
 }) {
   const { sort, from, to, filters, searchQuery } = params;
 
+  const {
+    dob_start,
+    dob_end,
+    education,
+    gender,
+    status,
+    project,
+    project_site,
+    assignment_type,
+    position,
+    skill_level,
+    doj_start,
+    doj_end,
+    dol_start,
+    dol_end,
+  } = filters ?? {};
+
+  const hasProjectAssignmentFilter = Object.values({
+    project: project,
+    project_site: project_site,
+    assignment_type: assignment_type,
+    position: position,
+    skill_level: skill_level,
+    doj_start: doj_start,
+    doj_end: doj_end,
+    dol_start: dol_start,
+    dol_end: dol_end,
+  }).some((value) => value);
+
   const columns = [
     "id",
     "employee_code",
@@ -122,15 +151,14 @@ export async function getEmployeesByCompanyId({
     .from("employees")
     .select(
       `${columns.join(",")},
-        employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(
+        employee_project_assignment!employee_project_assignments_employee_id_fkey!${hasProjectAssignmentFilter ? 'inner' : 'left'}(
         employee_id, assignment_type, skill_level, position, start_date, end_date,
-        project_sites!inner(id, name, projects!inner(id, name))
+        project_sites!${hasProjectAssignmentFilter ? 'inner' : 'left'}(id, name, projects!${hasProjectAssignmentFilter ? 'inner' : 'left'}(id, name))
       )`,
       { count: "exact" }
     )
     .eq("company_id", companyId);
 
-  // Sorting
   if (sort) {
     const [column, direction] = sort;
     query.order(column, { ascending: direction === "asc" });
@@ -138,79 +166,57 @@ export async function getEmployeesByCompanyId({
     query.order("created_at", { ascending: false });
   }
 
-  // Full-text search
   if (searchQuery) {
     query.textSearch("fts_vector", `'${searchQuery}'`, { type: "plain" });
   }
 
-  // Filters
-  if (filters) {
-    const {
-      dob_start,
-      dob_end,
-      education,
-      gender,
-      status,
-      project,
-      project_site,
-      assignment_type,
-      position,
-      skill_level,
-      doj_start,
-      doj_end,
-      dol_start,
-      dol_end,
-    } = filters;
+  const dateFilters = [
+    { field: "date_of_birth", start: dob_start, end: dob_end },
+    {
+      field: "employee_project_assignment.start_date",
+      start: doj_start,
+      end: doj_end,
+    },
+    {
+      field: "employee_project_assignment.end_date",
+      start: dol_start,
+      end: dol_end,
+    },
+  ];
 
-    const dateFilters = [
-      { field: "date_of_birth", start: dob_start, end: dob_end },
-      {
-        field: "employee_project_assignment.start_date",
-        start: doj_start,
-        end: doj_end,
-      },
-      {
-        field: "employee_project_assignment.end_date",
-        start: dol_start,
-        end: dol_end,
-      },
-    ];
-
-    for (const { field, start, end } of dateFilters) {
-      if (start) query.gte(field, formatUTCDate(start));
-      if (end) query.lte(field, formatUTCDate(end));
-    }
-
-    if (status) {
-      query.eq("is_active", status === "active");
-    }
-    if (gender) {
-      query.eq("gender", gender.toLowerCase());
-    }
-    if (education) {
-      query.eq("education", education.toLowerCase());
-    }
-    if (project) {
-      query.eq(
-        "employee_project_assignment.project_sites.projects.name",
-        project
-      );
-    }
-    if (project_site) {
-      query.eq("employee_project_assignment.project_sites.name", project_site);
-    }
-    if (assignment_type) {
-      query.eq("employee_project_assignment.assignment_type", assignment_type);
-    }
-    if (position) {
-      query.eq("employee_project_assignment.position", position);
-    }
-    if (skill_level) {
-      query.eq("employee_project_assignment.skill_level", skill_level);
-    }
+  for (const { field, start, end } of dateFilters) {
+    if (start) query.gte(field, formatUTCDate(start));
+    if (end) query.lte(field, formatUTCDate(end));
   }
 
-  // Fetch Data
+  if (status) {
+    query.eq("is_active", status === "active");
+  }
+  if (gender) {
+    query.eq("gender", gender.toLowerCase());
+  }
+  if (education) {
+    query.eq("education", education.toLowerCase());
+  }
+  if (project) {
+    query.eq(
+      "employee_project_assignment.project_sites.projects.name",
+      project
+    );
+  }
+  if (project_site) {
+    query.eq("employee_project_assignment.project_sites.name", project_site);
+  }
+  if (assignment_type) {
+    query.eq("employee_project_assignment.assignment_type", assignment_type);
+  }
+  if (position) {
+    query.eq("employee_project_assignment.position", position);
+  }
+  if (skill_level) {
+    query.eq("employee_project_assignment.skill_level", skill_level);
+  }
+
   const { data, count, error } = await query.range(from, to);
 
   if (error) {
@@ -247,7 +253,7 @@ export async function getEmployeesByPositionAndProjectSiteId({
     .eq("employee_project_assignment.project_site_id", projectSiteId)
     .eq("employee_project_assignment.position", position ?? "")
     .limit(MID_QUERY_LIMIT)
-    .returns<InferredType<EmployeeDatabaseRow, (typeof columns)[number]>[]>();
+    .returns<InferredType<EmployeeDatabaseRow, (typeof columns)[number]>[] | null>();
 
   if (error) {
     console.error(error);
@@ -368,7 +374,7 @@ export async function getEmployeeStatutoryDetailsById({
     .from("employee_statutory_details")
     .select(columns.join(","))
     .eq("employee_id", id)
-    .single<
+    .maybeSingle<
       InferredType<
         EmployeeStatutoryDetailsDatabaseRow,
         (typeof columns)[number]
@@ -403,7 +409,7 @@ export async function getEmployeeBankDetailsById({
     .from("employee_bank_details")
     .select(columns.join(","))
     .eq("employee_id", id)
-    .single<
+    .maybeSingle<
       InferredType<EmployeeBankDetailsDatabaseRow, (typeof columns)[number]>
     >();
 
@@ -441,7 +447,7 @@ export async function getEmployeeAddressesByEmployeeId({
     .eq("employee_id", employeeId)
     .limit(HARD_QUERY_LIMIT)
     .returns<
-      InferredType<EmployeeAddressDatabaseRow, (typeof columns)[number]>[]
+      InferredType<EmployeeAddressDatabaseRow, (typeof columns)[number]>[] | null
     >();
 
   if (error) {
@@ -479,7 +485,7 @@ export async function getEmployeeGuardiansByEmployeeId({
     .eq("employee_id", employeeId)
     .limit(HARD_QUERY_LIMIT)
     .returns<
-      InferredType<EmployeeGuardianDatabaseRow, (typeof columns)[number]>[]
+      InferredType<EmployeeGuardianDatabaseRow, (typeof columns)[number]>[] | null
     >();
 
   if (error) {
@@ -583,7 +589,7 @@ export async function getEmployeeSkillsByEmployeeId({
     .eq("employee_id", employeeId)
     .limit(HARD_QUERY_LIMIT)
     .returns<
-      InferredType<EmployeeSkillDatabaseRow, (typeof columns)[number]>[]
+      InferredType<EmployeeSkillDatabaseRow, (typeof columns)[number]>[] | null
     >();
 
   if (error) {
@@ -644,7 +650,7 @@ export async function getEmployeeWorkHistoriesByEmployeeId({
     .eq("employee_id", employeeId)
     .limit(HARD_QUERY_LIMIT)
     .returns<
-      InferredType<EmployeeWorkHistoryDatabaseRow, (typeof columns)[number]>[]
+      InferredType<EmployeeWorkHistoryDatabaseRow, (typeof columns)[number]>[] | null
     >();
 
   if (error) {
@@ -722,7 +728,7 @@ export async function getEmployeeProjectAssignmentByEmployeeId({
       )}, project_sites(id, name, projects(name)), supervisor:employees!employee_project_assignments_supervisor_id_fkey(id, employee_code)`
     )
     .eq("employee_id", employeeId)
-    .single<EmployeeProjectAssignmentDataType>();
+    .maybeSingle<EmployeeProjectAssignmentDataType>();
 
   if (error) {
     console.error(error);
@@ -764,7 +770,7 @@ export type GetEmployeesReportByCompanyIdParams = {
   from: number;
   sort?: [string, "asc" | "desc"];
   searchQuery?: string;
-  filters?: EmployeeReportFilters;
+  filters?: EmployeeReportFilters | null;
 };
 
 export async function getEmployeesReportByCompanyId({
@@ -778,6 +784,15 @@ export async function getEmployeesReportByCompanyId({
 }) {
   const { sort, from, to, filters, searchQuery } = params;
 
+  const {
+    project,
+    project_site,
+    start_year,
+    start_month,
+    end_year,
+    end_month,
+  } = filters ?? {};
+
   const columns = [
     "id",
     "employee_code",
@@ -790,9 +805,9 @@ export async function getEmployeesReportByCompanyId({
     .from("employees")
     .select(
       `${columns.join(",")},
-        employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(
+        employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? 'inner' : 'left'}(
         employee_id, assignment_type, skill_level, position, start_date, end_date,
-        project_sites!inner(id, name, projects!inner(id, name))
+        project_sites!${project_site ? 'inner' : 'left'}(id, name, projects!${project ? 'inner' : 'left'}(id, name))
       )`,
       { count: "exact" }
     )
@@ -825,52 +840,42 @@ export async function getEmployeesReportByCompanyId({
     }
   }
 
-  // Filters
-  if (filters) {
-    const {
-      project,
-      project_site,
-      start_year,
-      start_month,
-      end_year,
-      end_month,
-    } = filters;
 
-    if (start_year || end_year) {
-      let endDateLastDay = 30;
+  if (start_year || end_year) {
+    let endDateLastDay = 30;
 
-      if (end_year) {
-        const year = Number.parseInt(end_year, 10);
-        const month = new Date(`${end_month} 1, ${end_year}`).getMonth();
+    if (end_year) {
+      const year = Number.parseInt(end_year, 10);
+      const month = new Date(`${end_month} 1, ${end_year}`).getMonth();
 
-        endDateLastDay = new Date(year, month + 1, 0).getDate();
-      }
-
-      const start_date = new Date(`${start_month} 1, ${start_year}`);
-      const end_date = new Date(`${end_month} ${endDateLastDay}, ${end_year}`);
-
-      if (start_year)
-        query.gte(
-          "employee_project_assignment.start_date",
-          formatUTCDate(start_date.toISOString().split("T")[0])
-        );
-      if (end_year)
-        query.lte(
-          "employee_project_assignment.end_date",
-          formatUTCDate(end_date.toISOString().split("T")[0])
-        );
+      endDateLastDay = new Date(year, month + 1, 0).getDate();
     }
 
-    if (project) {
-      query.eq(
-        "employee_project_assignment.project_sites.projects.name",
-        project
+    const start_date = new Date(`${start_month} 1, ${start_year}`);
+    const end_date = new Date(`${end_month} ${endDateLastDay}, ${end_year}`);
+
+    if (start_year)
+      query.gte(
+        "employee_project_assignment.start_date",
+        formatUTCDate(start_date.toISOString().split("T")[0]),
       );
-    }
-    if (project_site) {
-      query.eq("employee_project_assignment.project_sites.name", project_site);
-    }
+    if (end_year)
+      query.lte(
+        "employee_project_assignment.end_date",
+        formatUTCDate(end_date.toISOString().split("T")[0]),
+      );
   }
+
+  if (project) {
+    query.eq(
+      "employee_project_assignment.project_sites.projects.name",
+      project
+    );
+  }
+  if (project_site) {
+    query.eq("employee_project_assignment.project_sites.name", project_site);
+  }
+
 
   // Fetch Data
   const { data, count, error } = await query

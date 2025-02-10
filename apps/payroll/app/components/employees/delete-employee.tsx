@@ -1,4 +1,4 @@
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,7 +20,7 @@ import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
 export const DeleteEmployee = ({ employeeId }: { employeeId: string }) => {
-  const { role } = useUserRole();
+  const { role } = useUser();
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [inputError, setInputError] = useState<string[]>([]);

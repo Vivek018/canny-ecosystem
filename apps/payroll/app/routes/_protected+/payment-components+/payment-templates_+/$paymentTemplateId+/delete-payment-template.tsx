@@ -1,7 +1,8 @@
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
-import { deleteRelationship } from "@canny_ecosystem/supabase/mutations";
+import { deletePaymentTemplate } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import {
@@ -19,32 +20,33 @@ export async function action({
   params,
 }: ActionFunctionArgs): Promise<Response> {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
-  const relationshipId = params.relationshipId;
-
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${deleteRole}:${attribute.settingRelationships}`)) {
+  if (!hasPermission(user?.role!, `${deleteRole}:${attribute.paymentTemplates}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
+    const paymentTemplateId = params.paymentTemplateId;
 
-    const { status, error } = await deleteRelationship({
+    const { status, error } = await deletePaymentTemplate({
       supabase,
-      id: relationshipId ?? "",
+      id: paymentTemplateId ?? "",
     });
 
-    if (isGoodStatus(status)) {
+    if (isGoodStatus(status))
       return json({
         status: "success",
-        message: "Relationship deleted",
+        message: "Payment Template deleted",
         error: null,
       });
-    }
 
     return json(
-      { status: "error", message: "Failed to delete relationship", error },
+      {
+        status: "error",
+        message: "Payment Template Delete Failed",
+        error,
+      },
       { status: 500 }
     );
   } catch (error) {
@@ -59,27 +61,31 @@ export async function action({
   }
 }
 
-export default function DeleteRelationship() {
+export default function DeletePaymentTemplate() {
   const actionData = useActionData<typeof action>();
+
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!actionData) return;
-    if (actionData?.status === "success") {
-      toast({
-        title: "Success",
-        description: actionData?.message,
-        variant: "success",
-      });
-    } else {
-      toast({
-        title: "Error",
-        description: actionData?.error?.message || "Relationship delete failed",
-        variant: "destructive",
-      });
+    if (actionData) {
+      if (actionData?.status === "success") {
+        clearExactCacheEntry(cacheKeyPrefix.payment_templates);
+        toast({
+          title: "Success",
+          description: actionData?.message,
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description:
+            actionData?.error?.message || "Payment Template Delete Failed",
+          variant: "destructive",
+        });
+      }
     }
-    navigate("/settings/relationships", { replace: true });
+    navigate("/payment-components/payment-templates", { replace: true });
   }, [actionData]);
 
   return null;

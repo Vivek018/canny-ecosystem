@@ -10,7 +10,12 @@ import { getInitialValueFromZod } from "@canny_ecosystem/utils";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { Form, useLoaderData } from "@remix-run/react";
+import {
+  Form,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
 import {
   json,
   unstable_parseMultipartFormData as parseMultipartFormData,
@@ -19,7 +24,7 @@ import {
 } from "@remix-run/node";
 import { Card } from "@canny_ecosystem/ui/card";
 import { setCompanyId } from "@/utils/server/company.server";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { commitSession, getSession } from "@/utils/sessions";
 import { DEFAULT_ROUTE } from "@/constant";
 import { CreateCompanyDetails } from "@/components/company/form/create-company-details";
@@ -28,6 +33,8 @@ import { CreateCompanyRegistrationDetails } from "@/components/company/form/crea
 import type { CompanyRegistrationDetailsInsert } from "@canny_ecosystem/supabase/types";
 import { FormStepHeader } from "@/components/form/form-step-header";
 import { useIsomorphicLayoutEffect } from "@canny_ecosystem/utils/hooks/isomorphic-layout-effect";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { clearAllCache } from "@/utils/cache";
 
 export const CREATE_COMPANY = [
   "create-company",
@@ -60,27 +67,34 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return json({ step, totalSteps, stepData });
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: ActionFunctionArgs): Promise<Response> {
   const url = new URL(request.url);
   const session = await getSession(request.headers.get("Cookie"));
-
   const step = Number.parseInt(url.searchParams.get(STEP) || "1");
   const currentSchema = schemas[step - 1];
   const totalSteps = schemas.length;
-
   const { supabase } = getSupabaseWithHeaders({ request });
+
   const formData = await parseMultipartFormData(
     request,
-    createMemoryUploadHandler({ maxPartSize: SIZE_1MB }),
+    createMemoryUploadHandler({ maxPartSize: SIZE_1MB })
   );
-  const action = formData.get("_action") as string;
+  const actionType = formData.get("_action") as string;
+  const submission = parseWithZod(formData, { schema: currentSchema });
 
-  const submission = parseWithZod(formData, {
-    schema: currentSchema,
-  });
+  try {
+    if (actionType === "submit") {
+      if (submission.status !== "success") {
+        return json(
+          {
+            status: "error",
+            message: "Form validation failed",
+            returnTo: `/create-company?step=${step}`,
+          },
+          { status: 400 }
+        );
+      }
 
-  if (action === "submit") {
-    if (submission.status === "success") {
       const companyData = session.get(`${SESSION_KEY_PREFIX}1`);
       const companyRegistrationDetails = submission.value as Omit<
         CompanyRegistrationDetailsInsert,
@@ -95,25 +109,25 @@ export async function action({ request }: ActionFunctionArgs) {
         });
 
       if (companyError) {
-        for (let i = 1; i <= totalSteps; i++) {
-          session.unset(`${SESSION_KEY_PREFIX}${i}`);
-        }
-        const headers = new Headers();
-        headers.append("Set-Cookie", await commitSession(session));
-        url.searchParams.delete(STEP);
-        return redirect(url.toString(), { headers });
+        return json(
+          {
+            status: "error",
+            message: "Failed to create company",
+            returnTo: "/companies",
+          },
+          { status: 500 }
+        );
       }
 
       if (registrationDetailsError) {
-        for (let i = 1; i <= totalSteps; i++) {
-          session.unset(`${SESSION_KEY_PREFIX}${i}`);
-        }
-        const headers = new Headers();
-        headers.append("Set-Cookie", setCompanyId(id));
-        headers.append("Set-Cookie", await commitSession(session));
-        return redirect(DEFAULT_ROUTE, {
-          headers,
-        });
+        return json(
+          {
+            status: "error",
+            message: "Failed to save company registration details",
+            returnTo: DEFAULT_ROUTE,
+          },
+          { status: 500 }
+        );
       }
 
       if (isGoodStatus(status)) {
@@ -123,37 +137,62 @@ export async function action({ request }: ActionFunctionArgs) {
         const headers = new Headers();
         headers.append("Set-Cookie", setCompanyId(id));
         headers.append("Set-Cookie", await commitSession(session));
-        return redirect(DEFAULT_ROUTE, {
-          headers,
-        });
+
+        return json(
+          {
+            status: "success",
+            message: "Company created successfully",
+            returnTo: DEFAULT_ROUTE,
+          },
+          {
+            status: status,
+            headers: headers,
+          }
+        );
       }
-    }
-  } else if (action === "next" || action === "back" || action === "skip") {
-    if (action === "next") {
+    } else if (
+      actionType === "next" ||
+      actionType === "back" ||
+      actionType === "skip"
+    ) {
       if (submission.status === "success") {
         session.set(`${SESSION_KEY_PREFIX}${step}`, submission.value);
       }
+
       if (submission.status === "error") {
         return json(
-          { result: submission.reply() },
-          { status: submission.status === "error" ? 400 : 200 },
+          {
+            status: "error",
+            message: "Form validation failed",
+            returnTo: `/create-company?step=${step}`,
+          },
+          { status: 400 }
         );
       }
-    }
 
-    let nextStep = step;
-    if (action === "next" || action === "skip") {
-      nextStep = Math.min(step + 1, totalSteps);
-    } else if (action === "back") {
-      nextStep = Math.max(step - 1, 1);
-    }
+      let nextStep = step;
+      if (actionType === "next" || actionType === "skip") {
+        nextStep = Math.min(step + 1, totalSteps);
+      } else if (actionType === "back") {
+        nextStep = Math.max(step - 1, 1);
+      }
 
-    url.searchParams.set(STEP, String(nextStep));
-    return redirect(url.toString(), {
-      headers: {
-        "Set-Cookie": await commitSession(session),
+      url.searchParams.set(STEP, String(nextStep));
+      return redirect(url.toString(), {
+        headers: {
+          "Set-Cookie": await commitSession(session),
+        },
+      });
+    }
+  } catch (error) {
+    return json(
+      {
+        status: "error",
+        message: `An unexpected error occurred${error}`,
+        returnTo: "/companies",
       },
-    });
+      { status: 500 }
+    );
   }
 
   return json({});
@@ -163,6 +202,10 @@ export default function CreateCompany() {
   const { step, totalSteps, stepData } = useLoaderData<typeof loader>();
   const [resetKey, setResetKey] = useState(Date.now());
 
+  const actionData = useActionData<typeof action>();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
   const COMPANY_TAG = CREATE_COMPANY[step - 1];
   const currentSchema = schemas[step - 1];
   const initialValues = getInitialValueFromZod(currentSchema);
@@ -170,6 +213,26 @@ export default function CreateCompany() {
   useIsomorphicLayoutEffect(() => {
     setResetKey(Date.now());
   }, [step]);
+
+  useEffect(() => {
+    if (actionData) {
+      if (actionData?.status === "success") {
+        clearAllCache();
+        toast({
+          title: "Success",
+          description: actionData?.message || "Company created successfully",
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: actionData?.message || "Failed to create company",
+          variant: "destructive",
+        });
+      }
+      navigate(actionData?.returnTo ?? "/companies");
+    }
+  }, [actionData]);
 
   const [form, fields] = useForm({
     id: COMPANY_TAG,
@@ -193,18 +256,21 @@ export default function CreateCompany() {
       </div>
       <FormProvider context={form.context}>
         <Form
-          method="POST"
-          encType="multipart/form-data"
+          method='POST'
+          encType='multipart/form-data'
           {...getFormProps(form)}
-          className="flex flex-col"
+          className='flex flex-col'
         >
           <Card>
-            <div className="h-[500px] overflow-scroll">
+            <div className='h-[500px] overflow-scroll'>
               {step === 1 ? (
                 <CreateCompanyDetails key={resetKey} fields={fields as any} />
               ) : null}
               {step === 2 ? (
-                <CreateCompanyRegistrationDetails fields={fields as any} />
+                <CreateCompanyRegistrationDetails
+                  key={resetKey + 1}
+                  fields={fields as any}
+                />
               ) : null}
             </div>
             <FormButtons

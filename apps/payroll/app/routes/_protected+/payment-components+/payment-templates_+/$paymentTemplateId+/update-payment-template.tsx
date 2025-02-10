@@ -29,8 +29,9 @@ import { FormButtons } from "@/components/form/form-buttons";
 import { updatePaymentTemplate } from "@canny_ecosystem/supabase/mutations";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const UPDATE_PAYMENT_TEMPLATE = "update-payment-template";
 
@@ -131,6 +132,7 @@ export default function UpdatePaymentTemplate() {
     if (!actionData) return;
 
     if (actionData?.status === "success") {
+      clearExactCacheEntry(cacheKeyPrefix.payment_templates);
       toast({
         title: "Success",
         description: actionData?.message,

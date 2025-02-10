@@ -21,7 +21,7 @@ export function SiteDialog({
 
   const [searchParams] = useSearchParams();
 
-  const isViewLinkTemplate =
+  const isOpen =
     searchParams.get("step") === modalSearchParamNames.view_link_template;
 
   const action = searchParams.get("action");
@@ -34,9 +34,9 @@ export function SiteDialog({
   };
 
   return (
-    <Dialog open={isViewLinkTemplate} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
-        <DialogTitle className="text-xl font-semibold mb-4">
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+      <DialogContent className='sm:max-w-[600px]'>
+        <DialogTitle className='text-xl font-semibold mb-4'>
           {isUpdateAction ? "Update" : "Create"} Link Payment Template
         </DialogTitle>
         {action ? (

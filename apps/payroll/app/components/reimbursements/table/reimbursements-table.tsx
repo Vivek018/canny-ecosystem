@@ -37,7 +37,7 @@ interface DataTableProps<TData, TValue> {
   companyId?: string;
   employeeId?: string;
   noFilters?: boolean;
-  filters?: ReimbursementFilters;
+  filters?: ReimbursementFilters | null;
   query?: string | null;
   initialColumnVisibility?: VisibilityState;
 }

@@ -26,12 +26,13 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { DeleteAddress } from "./delete-address";
 import {
+  createRole,
   deleteRole,
   hasPermission,
   replaceUnderscore,
   updateRole,
 } from "@canny_ecosystem/utils";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
@@ -41,7 +42,7 @@ type EmployeeAddress = Omit<
 >;
 
 export const AddressItem = ({ address }: { address: EmployeeAddress }) => {
-  const { role } = useUserRole();
+  const { role } = useUser();
   return (
     <Card
       key={address.id}
@@ -162,7 +163,7 @@ export const EmployeeAddressesCard = ({
 }: {
   employeeAddresses: EmployeeAddress[] | null;
 }) => {
-  const { role } = useUserRole();
+  const { role } = useUser();
   return (
     <Card className="rounded w-full h-full p-4">
       <div className="flex justify-between items-center mb-6">
@@ -170,14 +171,14 @@ export const EmployeeAddressesCard = ({
         <div>
           <Link
             to={
-              hasPermission(role, `${updateRole}:${attribute.employeeAddresses}`)
+              hasPermission(role, `${createRole}:${attribute.employeeAddresses}`)
                 ? "add-employee-address"
                 : DEFAULT_ROUTE
             }
             className={cn(
               buttonVariants({ variant: "outline" }),
               "bg-card",
-              !hasPermission(role, `${updateRole}:${attribute.employeeAddresses}`) &&
+              !hasPermission(role, `${createRole}:${attribute.employeeAddresses}`) &&
                 "hidden"
             )}
           >

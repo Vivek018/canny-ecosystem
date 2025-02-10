@@ -9,7 +9,7 @@ import { DeleteUser } from "./delete-user";
 import { useNavigate } from "@remix-run/react";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const UserOptionsDropdown = ({
@@ -20,7 +20,7 @@ export const UserOptionsDropdown = ({
 
   triggerChild: React.ReactElement;
 }) => {
-  const { role } = useUserRole();
+  const { role } = useUser();
   const navigate = useNavigate();
 
   const handleEdit = () => {

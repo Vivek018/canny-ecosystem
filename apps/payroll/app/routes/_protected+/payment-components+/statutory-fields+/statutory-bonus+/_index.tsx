@@ -1,10 +1,17 @@
 import { ErrorBoundary } from "@/components/error-boundary";
 import { StatutoryBonusWrapper } from "@/components/statutory-fields/statutory-bonus/statutory-bonus-wrapper";
+import { cacheKeyPrefix } from "@/constant";
+import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getStatutoryBonusByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Await, defer, json, useLoaderData } from "@remix-run/react";
+import {
+  Await,
+  type ClientLoaderFunctionArgs,
+  defer,
+  useLoaderData,
+} from "@remix-run/react";
 import { Suspense } from "react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -22,30 +29,40 @@ export async function loader({ request }: LoaderFunctionArgs) {
       error: null,
     });
   } catch (error) {
-    return json(
+    return defer(
       {
         statutoryBonusPromise: null,
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
 
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+  return await clientCaching(cacheKeyPrefix.statutory_bonus, args);
+}
+
+clientLoader.hydrate = true;
+
 export default function StatutoryBonusIndex() {
   const { statutoryBonusPromise, error } = useLoaderData<typeof loader>();
 
-  if (error)
+  if (error) {
+    clearExactCacheEntry(cacheKeyPrefix.statutory_bonus);
     return (
-      <ErrorBoundary error={error} message="Failed to load Statutory Bonus" />
+      <ErrorBoundary error={error} message='Failed to load Statutory Bonus' />
     );
+  }
 
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <Await resolve={statutoryBonusPromise}>
         {(resolvedData) => {
-          if (!resolvedData)
-            return <ErrorBoundary message="Failed to load Statutory Bonus" />;
+          if (!resolvedData) {
+            clearExactCacheEntry(cacheKeyPrefix.statutory_bonus);
+            return <ErrorBoundary message='Failed to load Statutory Bonus' />;
+          }
           return (
             <StatutoryBonusWrapper
               data={resolvedData.data as any}

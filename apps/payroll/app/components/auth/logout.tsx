@@ -1,3 +1,4 @@
+import { clearAllCache } from "@/utils/cache";
 import { DropdownMenuItem } from "@canny_ecosystem/ui/dropdown-menu";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useSubmit } from "@remix-run/react";
@@ -9,6 +10,7 @@ export function Logout() {
 
   const handleLogout = () => {
     setLoading(true);
+    clearAllCache();
     submit({}, { method: "post", action: "/logout", replace: true });
   };
 

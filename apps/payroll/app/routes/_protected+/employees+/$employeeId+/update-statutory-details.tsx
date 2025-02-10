@@ -27,9 +27,10 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import type { EmployeeStatutoryDetailsDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { safeRedirect } from "@/utils/server/http.server";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const UPDATE_EMPLOYEE_STATUTORY = "update-employee-statutory";
 
@@ -39,7 +40,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.employeeStatutory}`)) {
+  if (
+    !hasPermission(user?.role!, `${updateRole}:${attribute.employeeStatutory}`)
+  ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
@@ -118,7 +121,7 @@ export default function UpdateStatutoryDetails() {
 
   if (error)
     return (
-      <ErrorBoundary error={error} message="Failed to load statutory details" />
+      <ErrorBoundary error={error} message='Failed to load statutory details' />
     );
 
   return (
@@ -126,7 +129,7 @@ export default function UpdateStatutoryDetails() {
       <Await resolve={employeeStatutoryDetailsPromise}>
         {(resolvedData) => {
           if (!resolvedData)
-            return <ErrorBoundary message="Failed to load statutory details" />;
+            return <ErrorBoundary message='Failed to load statutory details' />;
           return (
             <UpdateStatutoryDetailsWrapper
               data={resolvedData.data}
@@ -174,10 +177,12 @@ export function UpdateStatutoryDetailsWrapper({
         description: error.message || "Failed to get statutory details",
         variant: "destructive",
       });
-      navigate(`/employees/${data?.employee_id}/work-portfolio`);
     }
     if (actionData) {
       if (actionData?.status === "success") {
+        clearExactCacheEntry(
+          `${cacheKeyPrefix.employee_overview}${employeeId}`
+        );
         toast({
           title: "Success",
           description: actionData?.message || "Employee updated",
@@ -190,18 +195,18 @@ export function UpdateStatutoryDetailsWrapper({
           variant: "destructive",
         });
       }
-      navigate(`/employees/${employeeId}/work-portfolio`);
+      navigate(`/employees/${employeeId}/overview`);
     }
   }, [actionData]);
 
   return (
-    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
+    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
       <FormProvider context={form.context}>
         <Form
-          method="POST"
-          encType="multipart/form-data"
+          method='POST'
+          encType='multipart/form-data'
           {...getFormProps(form)}
-          className="flex flex-col"
+          className='flex flex-col'
         >
           <Card>
             <CreateEmployeeStatutoryDetails
