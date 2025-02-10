@@ -72,6 +72,10 @@ export const getExits = async ({
     "last_working_day",
     "final_settlement_date",
     "reason",
+    "bonus",
+    "leave_encashment",
+    "gratuity",
+    "deduction",
     "note",
     "total",
   ] as const;
@@ -189,7 +193,12 @@ export const getExitsById = async ({
     "last_working_day",
     "final_settlement_date",
     "reason",
+    "bonus",
+    "leave_encashment",
+    "gratuity",
+    "deduction",
     "note",
+    "total",
   ] as const;
 
   const { data, error } = await supabase
@@ -198,9 +207,7 @@ export const getExitsById = async ({
     .eq("id", id)
     .single<InferredType<ExitsRow, (typeof columns)[number]>>();
 
-  if (error) {
-    console.error(error);
-  }
+  if (error) console.error(error);
 
   return { data, error };
 };

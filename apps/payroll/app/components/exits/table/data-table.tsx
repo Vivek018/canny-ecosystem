@@ -54,6 +54,7 @@ export function ExitPaymentTable<TData, TValue>({
   env,
 }: DataTableProps<TData, TValue>) {
   const [data, setData] = useState(initialData);
+
   const [from, setFrom] = useState(pageSize);
   const [hasNextPage, setHasNextPage] = useState(initialHasNextPage);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -152,14 +153,7 @@ export function ExitPaymentTable<TData, TValue>({
               {tableLength ? (
                 table.getRowModel().rows.map((row) => {
                   const rowData = row.original;
-
-                  return (
-                    <ExitPaymentsSheet
-                      key={row.id}
-                      row={row}
-                      rowData={rowData}
-                    />
-                  );
+                  return <ExitPaymentsSheet key={row.id} row={row} rowData={rowData} />
                 })
               ) : (
                 <TableRow className={cn(!tableLength && "border-none")}>

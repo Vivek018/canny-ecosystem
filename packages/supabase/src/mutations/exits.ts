@@ -49,10 +49,7 @@ export const updateExit = async ({
     const {
       data: { user },
     } = await supabase.auth.getUser();
-
-    if (!user?.email) {
-      return { status: 400, error: "Unauthorized User" };
-    }
+    if (!user?.email) return { status: 400, error: "Unauthorized User" };
   }
 
   const updateData = convertToNull(data);
@@ -64,14 +61,9 @@ export const updateExit = async ({
     .select()
     .single();
 
-  if (error) {
-    console.error("error", error);
-  }
+  if (error) console.error("error", error);
 
-  return {
-    status,
-    error,
-  };
+  return { status, error };
 };
 
 export const deleteExit = async ({

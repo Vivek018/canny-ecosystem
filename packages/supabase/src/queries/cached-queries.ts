@@ -10,7 +10,6 @@ export const getAuthUser = async ({ request }: { request: Request }) => {
   } = await supabase.auth.getUser();
 
   return { session, user };
-
   // return { user: { name: "Condra", email: "dvzcvdsv@gmail.com" } };
 };
 

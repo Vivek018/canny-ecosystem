@@ -17,15 +17,10 @@ const getDataSource = (
 
 export default function ExitAnalytics() {
   const { selectedRows } = useExitsStore();
-  const [storedValue, setValue] = useLocalStorage<ExitDataType[]>(
-    "analyticsArray",
-    [],
-  );
+  const [storedValue, setValue] = useLocalStorage<ExitDataType[]>("analyticsArray", []);
 
   useEffect(() => {
-    if (selectedRows.length > 0) {
-      setValue(selectedRows);
-    }
+    if (selectedRows.length > 0) setValue(selectedRows);
   }, [selectedRows, setValue]);
 
   const dataSource: ExitDataType[] = getDataSource(selectedRows, storedValue);
@@ -38,9 +33,7 @@ export default function ExitAnalytics() {
         <ExitByTime chartData={dataSource} />
         <ExitByReasons chartData={dataSource} />
       </div>
-      <div>
-        <ExitTopPayment chartData={dataSource} />
-      </div>
+      <div><ExitTopPayment chartData={dataSource} /></div>
     </div>
   );
 }

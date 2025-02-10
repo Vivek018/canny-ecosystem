@@ -1,103 +1,40 @@
 import { Pie, PieChart } from "recharts";
-
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@canny_ecosystem/ui/card";
-import {
-  type ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@canny_ecosystem/ui/chart";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@canny_ecosystem/ui/card";
+import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@canny_ecosystem/ui/chart";
 import type { ExitDataType } from "@canny_ecosystem/supabase/queries";
 
 const chartConfig = {
-  amount: {
-    label: "Amount",
-  },
-  january: {
-    label: "January",
-    color: "hsl(var(--chart-1))",
-  },
-  february: {
-    label: "February",
-    color: "hsl(var(--chart-2))",
-  },
-  march: {
-    label: "March",
-    color: "hsl(var(--chart-3))",
-  },
-  april: {
-    label: "April",
-    color: "hsl(var(--chart-4))",
-  },
-  may: {
-    label: "May",
-    color: "hsl(var(--chart-5))",
-  },
-  june: {
-    label: "June",
-    color: "hsl(var(--chart-6))",
-  },
-  july: {
-    label: "July",
-    color: "hsl(var(--chart-7))",
-  },
-  august: {
-    label: "August",
-    color: "hsl(var(--chart-8))",
-  },
-  september: {
-    label: "September",
-    color: "hsl(var(--chart-9))",
-  },
-  october: {
-    label: "October",
-    color: "hsl(var(--chart-10))",
-  },
-  november: {
-    label: "November",
-    color: "hsl(var(--chart-11))",
-  },
-  december: {
-    label: "December",
-    color: "hsl(var(--chart-12))",
-  },
+  amount: { label: "Amount" },
+  january: { label: "January", color: "hsl(var(--chart-1))" },
+  february: { label: "February", color: "hsl(var(--chart-2))" },
+  march: { label: "March", color: "hsl(var(--chart-3))" },
+  april: { label: "April", color: "hsl(var(--chart-4))" },
+  may: { label: "May", color: "hsl(var(--chart-5))" },
+  june: { label: "June", color: "hsl(var(--chart-6))" },
+  july: { label: "July", color: "hsl(var(--chart-7))" },
+  august: { label: "August", color: "hsl(var(--chart-8))" },
+  september: { label: "September", color: "hsl(var(--chart-9))" },
+  october: { label: "October", color: "hsl(var(--chart-10))" },
+  november: { label: "November", color: "hsl(var(--chart-11))" },
+  december: { label: "December", color: "hsl(var(--chart-12))" },
 } satisfies ChartConfig;
 
-export function ExitPaymentByTime({
-  chartData,
-}: {
-  chartData: ExitDataType[];
-}) {
-  const exitYears = new Set(
-    chartData.map((row) => new Date(row.final_settlement_date).getFullYear()),
-  );
+export function ExitPaymentByTime({ chartData }: { chartData: ExitDataType[] }) {
+  console.log("chartData = ",chartData);
+  
+  const exitYears = new Set(chartData.map((row) => new Date(row.final_settlement_date).getFullYear()));
 
   let exitByTimeData = [];
 
   if (exitYears.size > 1) {
     exitByTimeData = Object.values(
       chartData.reduce(
-        (
-          acc: Record<
-            number,
-            { year: number; amount: number; month: string | null }
-          >,
-          row,
-        ) => {
+        (acc: Record<number, { year: number; amount: number; month: string | null }>, row) => {
           if (row.final_settlement_date) {
             const date = new Date(row.final_settlement_date);
             const year = date.getFullYear();
 
-            if (!acc[year]) {
-              acc[year] = { year, amount: 0, month: null };
-            }
+            if (!acc[year]) { acc[year] = { year, amount: 0, month: null } }
             acc[year].amount += row.total || 0;
           }
           return acc;
@@ -108,20 +45,12 @@ export function ExitPaymentByTime({
   } else {
     exitByTimeData = Object.values(
       chartData.reduce(
-        (
-          acc: Record<
-            string,
-            { month: string; amount: number; year: number | null }
-          >,
-          row,
-        ) => {
+        (acc: Record<string, { month: string; amount: number; year: number | null }>, row) => {
           if (row.final_settlement_date) {
             const date = new Date(row.final_settlement_date);
             const monthName = date.toLocaleString("default", { month: "long" });
 
-            if (!acc[monthName]) {
-              acc[monthName] = { month: monthName, amount: 0, year: null };
-            }
+            if (!acc[monthName]) { acc[monthName] = { month: monthName, amount: 0, year: null } }
             acc[monthName].amount += row.total || 0;
           }
           return acc;
@@ -158,10 +87,7 @@ export function ExitPaymentByTime({
           className="w-full mx-auto aspect-square max-h-[250px] pb-0 [&_.recharts-pie-label-text]:fill-foreground"
         >
           <PieChart>
-            <ChartTooltip
-              content={<ChartTooltipContent hideLabel />}
-              wrapperStyle={{ width: "25%" }}
-            />
+            <ChartTooltip content={<ChartTooltipContent hideLabel />} wrapperStyle={{ width: "25%" }} />
             <Pie
               data={transformedChartData}
               dataKey="amount"
