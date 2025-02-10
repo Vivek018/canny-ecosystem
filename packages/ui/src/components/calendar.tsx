@@ -17,12 +17,14 @@ function Calendar({
       showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
       classNames={{
-        months: "flex flex-col sm:flex-row",
-        month: "space-y-4",
+        months: "flex flex-col",
+        month: "-mt-8",
         month_caption: "flex justify-center pt-1 relative items-center",
-        caption_label: "text-sm font-medium",
+        caption_label: "text-sm font-medium pb-1",
         month_grid: "w-full border-collapse space-y-1 mt-4",
-        chevron: "z-30 absolute top-2",
+        nav: "flex justify-between",
+        button_previous: "z-50",
+        button_next: "z-50",
         weekdays: "flex",
         weekday:
           "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
@@ -48,26 +50,16 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        Chevron: ({ orientation, className, size, ...props }) => {
-          if (orientation === "left") {
-            return (
-              <Button
-                variant='outline'
-                size='icon'
-                className={cn("left-2", className)}
-                {...props}
-              >
-                <Icon name='chevron-left' size='sm' />
-              </Button>
-            );
-          }
+        PreviousMonthButton: ({ ...props }) => {
           return (
-            <Button
-              variant='outline'
-              size='icon'
-              className={cn("right-2", className)}
-              {...props}
-            >
+            <Button variant='outline' size='icon' {...props}>
+              <Icon name='chevron-left' size='sm' />
+            </Button>
+          );
+        },
+        NextMonthButton: ({ ...props }) => {
+          return (
+            <Button variant='outline' size='icon' {...props}>
               <Icon name='chevron-right' size='sm' />
             </Button>
           );
