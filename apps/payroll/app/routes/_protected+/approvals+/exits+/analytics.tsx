@@ -8,10 +8,7 @@ import type { ExitDataType } from "@canny_ecosystem/supabase/queries";
 import { useLocalStorage } from "@canny_ecosystem/utils/hooks/local-storage";
 import { useEffect } from "react";
 
-const getDataSource = (
-  selectedRows: ExitDataType[],
-  storedValue: ExitDataType[],
-) => {
+const getDataSource = (selectedRows: ExitDataType[], storedValue: ExitDataType[]) => {
   return selectedRows.length > 0 ? selectedRows : storedValue;
 };
 

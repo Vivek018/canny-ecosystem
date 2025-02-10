@@ -1,5 +1,4 @@
 import { Pie, PieChart } from "recharts";
-
 import {
   Card,
   CardContent,
@@ -31,14 +30,12 @@ chartConfig.amount = { label: "Amount" };
 export function ExitByReasons({ chartData }: { chartData: ExitDataType[] }) {
   const exitByReasonsData = Object.values(
     chartData.reduce(
-      (acc, row) => {
+      (acc, row: any) => {
         const reason = row.reason.toLowerCase().replace(/\s+/g, "_") || "other";
 
-        if (!acc[reason]) {
-          acc[reason] = { reason, amount: 0 };
-        }
+        if (!acc[reason]) acc[reason] = { reason, amount: 0 };
 
-        acc[reason].amount += row.total || 0;
+        acc[reason].amount += row.bonus + row.leave_encashment + row.gratuity - row.deduction;
         return acc;
       },
       Object.fromEntries(
@@ -62,19 +59,10 @@ export function ExitByReasons({ chartData }: { chartData: ExitDataType[] }) {
         <CardDescription>Over the period</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
-        <ChartContainer
-          config={chartConfig}
-          className="mx-auto aspect-square max-h-[300px]"
-        >
+        <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[300px]">
           <PieChart>
             <ChartTooltip
-              content={
-                <ChartTooltipContent
-                  hideLabel
-                  nameKey="reason"
-                  className="capitalize"
-                />
-              }
+              content={<ChartTooltipContent hideLabel nameKey="reason" className="capitalize" />}
               wrapperStyle={{ width: "60%" }}
             />
             <Pie data={transformedChartData} dataKey="amount" />

@@ -9,36 +9,14 @@ import {
   ExitFormSchema,
   reasonForExitArray,
 } from "@canny_ecosystem/utils";
-import {
-  Field,
-  SearchableSelectField,
-  TextareaField,
-} from "@canny_ecosystem/ui/forms";
-import {
-  FormProvider,
-  getFormProps,
-  getInputProps,
-  getTextareaProps,
-  useForm,
-} from "@conform-to/react";
+import { Field, SearchableSelectField, TextareaField } from "@canny_ecosystem/ui/forms";
+import { FormProvider, getFormProps, getInputProps, getTextareaProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import {
-  Form,
-  json,
-  useActionData,
-  useLoaderData,
-  useNavigate,
-} from "@remix-run/react";
+import { Form, json, useActionData, useLoaderData, useNavigate } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@canny_ecosystem/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@canny_ecosystem/ui/card";
 import { createExit } from "@canny_ecosystem/supabase/mutations";
 import type { ExitsRow } from "@canny_ecosystem/supabase/types";
 import { FormButtons } from "@/components/form/form-buttons";
@@ -81,7 +59,7 @@ export async function action({ request }: ActionFunctionArgs): Promise<Response>
       );
     }
 
-    const { status, error } = await createExit({ supabase, data: submission.value as any});
+    const { status, error } = await createExit({ supabase, data: submission.value as any });
 
     if (isGoodStatus(status)) return json({ status: "success", message: "Exit created", error: null });
 
@@ -120,11 +98,7 @@ export default function CreateExit({ updateValues }: { updateValues?: ExitsRow |
     if (!actionData) return;
 
     if (actionData?.status === "success") {
-      toast({
-        title: "Success",
-        description: actionData?.message,
-        variant: "success",
-      });
+      toast({ title: "Success", description: actionData?.message, variant: "success" });
     } else {
       toast({
         title: "Error",
@@ -212,9 +186,7 @@ export default function CreateExit({ updateValues }: { updateValues?: ExitsRow |
                     ...getInputProps(fields.last_working_day, { type: "date" }),
                     placeholder: `Enter ${replaceUnderscore(fields.last_working_day.name)}`,
                   }}
-                  labelProps={{
-                    children: replaceUnderscore(fields.last_working_day.name),
-                  }}
+                  labelProps={{ children: replaceUnderscore(fields.last_working_day.name) }}
                   errors={fields.last_working_day.errors}
                 />
                 <Field
@@ -222,25 +194,17 @@ export default function CreateExit({ updateValues }: { updateValues?: ExitsRow |
                     ...getInputProps(fields.final_settlement_date, { type: "date" }),
                     placeholder: `Enter ${replaceUnderscore(fields.final_settlement_date.name)}`,
                   }}
-                  labelProps={{
-                    children: replaceUnderscore(fields.final_settlement_date.name),
-                  }}
+                  labelProps={{ children: replaceUnderscore(fields.final_settlement_date.name) }}
                   errors={fields.final_settlement_date.errors}
                 />
               </div>
               <SearchableSelectField
                 className="w-full capitalize flex-1"
                 key={resetKey}
-                options={transformStringArrayIntoOptions(
-                  reasonForExitArray as unknown as string[],
-                )}
-                inputProps={{
-                  ...getInputProps(fields.reason, { type: "text" }),
-                }}
+                options={transformStringArrayIntoOptions(reasonForExitArray as unknown as string[])}
+                inputProps={{ ...getInputProps(fields.reason, { type: "text" }) }}
                 placeholder={`Select ${replaceUnderscore(fields.reason.name)}`}
-                labelProps={{
-                  children: replaceUnderscore(fields.reason.name),
-                }}
+                labelProps={{ children: replaceUnderscore(fields.reason.name) }}
                 errors={fields.reason.errors}
               />
               <TextareaField

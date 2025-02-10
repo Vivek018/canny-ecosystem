@@ -1,26 +1,6 @@
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  LabelList,
-  XAxis,
-  YAxis,
-} from "recharts";
-
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@canny_ecosystem/ui/card";
-import {
-  type ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@canny_ecosystem/ui/chart";
+import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@canny_ecosystem/ui/card";
+import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@canny_ecosystem/ui/chart";
 import { exitPaymentFields } from "@canny_ecosystem/utils/constant";
 import { replaceUnderscore } from "@canny_ecosystem/utils";
 import type { ExitDataType } from "@canny_ecosystem/supabase/queries";
@@ -47,12 +27,8 @@ export function ExitTopPayment({ chartData }: { chartData: ExitDataType[] }) {
         if (row.exit_payments) {
           const payments = row.exit_payments;
           for (const payment of payments) {
-            const costType = payment.payment_fields.name
-              .toLowerCase()
-              .replace(/\s+/g, "_");
-            if (!acc[costType]) {
-              acc[costType] = { amount: 0, costType };
-            }
+            const costType = payment.payment_fields.name.toLowerCase().replace(/\s+/g, "_");
+            if (!acc[costType]) acc[costType] = { amount: 0, costType };
             acc[costType].amount += payment.amount;
           }
         }
@@ -82,9 +58,7 @@ export function ExitTopPayment({ chartData }: { chartData: ExitDataType[] }) {
             data={transformedChartData}
             layout="vertical"
             className="capitalize"
-            margin={{
-              right: 16,
-            }}
+            margin={{ right: 16 }}
           >
             <CartesianGrid horizontal={false} />
             <YAxis
@@ -100,18 +74,10 @@ export function ExitTopPayment({ chartData }: { chartData: ExitDataType[] }) {
             <ChartTooltip
               cursor={false}
               content={
-                <ChartTooltipContent
-                  indicator="line"
-                  className="capitalize w-2/3"
-                />
+                <ChartTooltipContent indicator="line" className="capitalize w-2/3" />
               }
             />
-            <Bar
-              dataKey="amount"
-              layout="vertical"
-              fill="var(--color-amount)"
-              radius={4}
-            >
+            <Bar dataKey="amount" layout="vertical" fill="var(--color-amount)" radius={4}>
               <LabelList
                 dataKey="costType"
                 position="insideLeft"

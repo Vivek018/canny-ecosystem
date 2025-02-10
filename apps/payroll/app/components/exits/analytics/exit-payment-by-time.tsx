@@ -20,22 +20,20 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function ExitPaymentByTime({ chartData }: { chartData: ExitDataType[] }) {
-  console.log("chartData = ",chartData);
-  
-  const exitYears = new Set(chartData.map((row) => new Date(row.final_settlement_date).getFullYear()));
+  const exitYears = new Set(chartData.map(row => new Date(row.final_settlement_date).getFullYear()));
 
   let exitByTimeData = [];
 
   if (exitYears.size > 1) {
     exitByTimeData = Object.values(
       chartData.reduce(
-        (acc: Record<number, { year: number; amount: number; month: string | null }>, row) => {
+        (acc: Record<number, { year: number; amount: number; month: string | null }>, row:any) => {
           if (row.final_settlement_date) {
             const date = new Date(row.final_settlement_date);
             const year = date.getFullYear();
 
             if (!acc[year]) { acc[year] = { year, amount: 0, month: null } }
-            acc[year].amount += row.total || 0;
+            acc[year].amount += row.bonus + row.leave_encashment + row.gratuity - row.deduction;
           }
           return acc;
         },
@@ -45,13 +43,13 @@ export function ExitPaymentByTime({ chartData }: { chartData: ExitDataType[] }) 
   } else {
     exitByTimeData = Object.values(
       chartData.reduce(
-        (acc: Record<string, { month: string; amount: number; year: number | null }>, row) => {
+        (acc: Record<string, { month: string; amount: number; year: number | null }>, row:any) => {
           if (row.final_settlement_date) {
             const date = new Date(row.final_settlement_date);
             const monthName = date.toLocaleString("default", { month: "long" });
 
             if (!acc[monthName]) { acc[monthName] = { month: monthName, amount: 0, year: null } }
-            acc[monthName].amount += row.total || 0;
+            acc[monthName].amount += row.bonus + row.leave_encashment + row.gratuity - row.deduction;
           }
           return acc;
         },
@@ -59,6 +57,7 @@ export function ExitPaymentByTime({ chartData }: { chartData: ExitDataType[] }) 
       ),
     );
   }
+
   let transformedChartData = [];
 
   if (exitYears.size > 1) {

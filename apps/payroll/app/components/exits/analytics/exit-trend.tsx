@@ -13,7 +13,7 @@ export function ExitTrend({ chartData }: { chartData: ExitDataType[] }) {
   const [activeChart, setActiveChart] = useState<keyof typeof chartConfig>("amount");
 
   const trendData = chartData
-    .map((row) => ({
+    .map((row:any) => ({
       date: row.final_settlement_date,
       amount: row.bonus + row.gratuity + row.leave_encashment - row.deduction,
     }))
