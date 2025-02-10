@@ -1,6 +1,6 @@
 import { FilterList } from "@/components/reimbursements/filter-list";
 import { ReimbursementSearchFilter } from "@/components/reimbursements/reimbursement-search-filter";
-import { reimbursementsColumns } from "@/components/reimbursements/table/columns";
+import { columns } from "@/components/reimbursements/table/columns";
 import { ReimbursementsTable } from "@/components/reimbursements/table/reimbursements-table";
 import { useUser } from "@/utils/user";
 import { cacheKeyPrefix } from "@/constant";
@@ -198,7 +198,7 @@ export default function ReimbursementsIndex() {
                 <ReimbursementsTable
                   data={data ?? []}
                   noFilters={noFilters}
-                  columns={reimbursementsColumns({ isEmployeeRoute: true })}
+                  columns={columns({ isEmployeeRoute: true })}
                   hasNextPage={hasNextPage}
                   pageSize={LAZY_LOADING_LIMIT}
                   env={env}
