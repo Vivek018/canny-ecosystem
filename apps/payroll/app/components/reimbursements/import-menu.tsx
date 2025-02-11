@@ -9,10 +9,7 @@ import {
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { createRole, hasPermission } from "@canny_ecosystem/utils";
-import {
-  attribute,
-  modalSearchParamNames,
-} from "@canny_ecosystem/utils/constant";
+import {attribute,modalSearchParamNames} from "@canny_ecosystem/utils/constant";
 import { useSearchParams } from "@remix-run/react";
 
 export function ImportReimbursementMenu() {
@@ -35,10 +32,7 @@ export function ImportReimbursementMenu() {
       <DropdownMenuContent sideOffset={10} align='end'>
         <DropdownMenuItem
           onClick={() => {
-            searchParams.set(
-              "step",
-              modalSearchParamNames.import_reimbursement
-            );
+            searchParams.set("step",modalSearchParamNames.import_reimbursement);
             setSearchParams(searchParams);
           }}
           className='space-x-2 flex items-center'

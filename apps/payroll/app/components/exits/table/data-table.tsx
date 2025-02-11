@@ -83,9 +83,7 @@ export function ExitPaymentTable<TData, TValue>({
           sort: sortParam?.split(":") as [string, "asc" | "desc"],
         },
       });
-      if (data) {
-        setData((prevData) => [...prevData, ...data] as TData[]);
-      }
+      if (data) setData((prevData) => [...prevData, ...data] as TData[]);
       setFrom(to + 1);
       setHasNextPage(count > to);
     } catch {
@@ -99,17 +97,12 @@ export function ExitPaymentTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
     onRowSelectionChange: setRowSelection,
     onColumnVisibilityChange: setColumnVisibility,
-    state: {
-      rowSelection,
-      columnVisibility,
-    },
+    state: { rowSelection, columnVisibility },
   });
 
   useEffect(() => {
     const rowArray = [];
-    for (const row of table.getSelectedRowModel().rows) {
-      rowArray.push(row.original);
-    }
+    for (const row of table.getSelectedRowModel().rows) rowArray.push(row.original);
     setSelectedRows(rowArray as ExitDataType[]);
   }, [rowSelection]);
 
@@ -118,9 +111,7 @@ export function ExitPaymentTable<TData, TValue>({
   }, [columnVisibility]);
 
   useEffect(() => {
-    if (inView) {
-      loadMoreExit();
-    }
+    if (inView) loadMoreExit();
   }, [inView]);
 
   useEffect(() => {
@@ -131,24 +122,16 @@ export function ExitPaymentTable<TData, TValue>({
 
   const tableLength = table.getRowModel().rows?.length;
 
-  const selectedRowsData = table
-    .getSelectedRowModel()
-    .rows?.map((row) => row.original);
+  const selectedRowsData = table.getSelectedRowModel().rows?.map((row) => row.original);
 
   return (
     <div className="relative mb-8">
       <div
-        className={cn(
-          "relative border overflow-x-auto rounded",
-          !tableLength && "border-none",
-        )}
+        className={cn("relative border overflow-x-auto rounded", !tableLength && "border-none")}
       >
         <div className="relative">
           <Table>
-            <ExitPaymentTableHeader
-              table={table}
-              className={cn(!tableLength && "hidden")}
-            />
+            <ExitPaymentTableHeader table={table} className={cn(!tableLength && "hidden")} />
             <TableBody>
               {tableLength ? (
                 table.getRowModel().rows.map((row) => {
@@ -162,24 +145,14 @@ export function ExitPaymentTable<TData, TValue>({
                     className="h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize"
                   >
                     <div className="flex flex-col items-center gap-1">
-                      <h2 className="text-xl">No Exit Payment Fields Found.</h2>
-                      <p
-                        className={cn(
-                          "text-muted-foreground",
-                          !data?.length && noFilters && "hidden",
-                        )}
-                      >
+                      <h2 className="text-xl">No Exits Found.</h2>
+                      <p className={cn("text-muted-foreground", !data?.length && noFilters && "hidden")}>
                         Try another search, or adjusting the filters
                       </p>
                       <Button
                         variant="outline"
-                        className={cn(
-                          "mt-4",
-                          !data?.length && noFilters && "hidden",
-                        )}
-                        onClick={() => {
-                          setSearchParams();
-                        }}
+                        className={cn("mt-4", !data?.length && noFilters && "hidden")}
+                        onClick={() => { setSearchParams() }}
                       >
                         Clear Filters
                       </Button>

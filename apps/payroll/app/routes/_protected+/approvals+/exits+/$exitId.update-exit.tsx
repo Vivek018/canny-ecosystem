@@ -11,9 +11,10 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import type { ExitsUpdate } from "@canny_ecosystem/supabase/types";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import CreateExit from "./$employeeId.create-exit";
+import { clearCacheEntry } from "@/utils/cache";
 
 export const UPDATE_EXIT = "update-exit";
 
@@ -85,6 +86,7 @@ export default function UpdateExit() {
 
     useEffect(() => {
         if (!actionData) return;
+        clearCacheEntry(cacheKeyPrefix.exits);
 
         if (actionData?.status === "success")
             toast({ title: "Success", description: actionData?.message, variant: "success" });

@@ -247,7 +247,8 @@ export const cacheKeyPrefix = {
   relationships: "relationships",
   users: "users",
   account: "account",
-  feedback_list: "feedback-list"
+  feedback_list: "feedback-list",
+  exits:"exits"
 }
 
 

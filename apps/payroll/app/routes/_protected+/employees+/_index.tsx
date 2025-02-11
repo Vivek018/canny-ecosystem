@@ -126,11 +126,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
-
-  return await clientCaching(
-    `${cacheKeyPrefix.employees}${url.searchParams.toString()}`,
-    args
-  );
+  return await clientCaching(`${cacheKeyPrefix.employees}${url.searchParams.toString()}`, args);
 }
 
 clientLoader.hydrate = true;
@@ -149,11 +145,10 @@ export async function action({ request }: ActionFunctionArgs) {
 Current date: ${new Date().toISOString().split("T")[0]}
 ### VALID FILTERS
 ${VALID_FILTERS.map(
-  (filter) =>
-    `name: "${filter.name}", type: "${
-      filter.valueType
-    }", example: ${JSON.stringify(filter.example)}`
-).join(".")}`,
+            (filter) =>
+              `name: "${filter.name}", type: "${filter.valueType
+              }", example: ${JSON.stringify(filter.example)}`
+          ).join(".")}`,
         },
         {
           role: "user",
@@ -163,18 +158,14 @@ ${VALID_FILTERS.map(
     });
 
     const content = completion.choices[0]?.message?.content;
-    if (!content) {
-      throw new Error("No content received from OpenAI");
-    }
+    if (!content) throw new Error("No content received from OpenAI");
 
     const validatedContent = extractJsonFromString(content);
 
     const searchParams = new URLSearchParams();
     for (const [key, value] of Object.entries(validatedContent) as any) {
       if (value !== null && value !== undefined && String(value)?.length) {
-        if (key === "end" && !validatedContent?.start) {
-          searchParams.append("start", "1947-08-15");
-        }
+        if (key === "end" && !validatedContent?.start) searchParams.append("start", "1947-08-15");
         searchParams.append(key, value.toString());
       }
     }
@@ -243,12 +234,7 @@ export default function EmployeesIndex() {
           {({ data, meta, error }) => {
             if (error) {
               clearCacheEntry(cacheKeyPrefix.employees);
-              return (
-                <ErrorBoundary
-                  error={error}
-                  message='Failed to load employees'
-                />
-              );
+              return <ErrorBoundary error={error} message='Failed to load employees' />
             }
 
             const hasNextPage = Boolean(meta?.count > pageSize);

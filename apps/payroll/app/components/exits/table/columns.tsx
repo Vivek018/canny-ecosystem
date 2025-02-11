@@ -31,6 +31,8 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
         {row.original?.employees?.employee_code ?? "--"}
       </p>
     },
+    enableSorting: false,
+    enableHiding: false,
   },
   {
     accessorKey: "employee_name",
@@ -41,6 +43,8 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
            ${row.original.employees?.last_name ?? ""}`}
       </p>
     },
+    enableSorting: false,
+    enableHiding: false,
   },
   {
     accessorKey: "project",
@@ -50,6 +54,8 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
         {row.original?.employees.employee_project_assignment.project_sites.projects.name ?? "--"}
       </p>
     },
+    enableSorting: false,
+    enableHiding: false,
   },
   {
     accessorKey: "project_site",
@@ -59,6 +65,8 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
         {row.original?.employees.employee_project_assignment.project_sites.name ?? "--"}
       </p>
     },
+    enableSorting: false,
+    enableHiding: false,
   },
   {
     accessorKey: "last_working_day",
@@ -141,8 +149,6 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
 
   {
     id: "actions",
-    enableSorting: false,
-    enableHiding: false,
     cell: ({ row }) => {
       const { role } = useUser();
       return (

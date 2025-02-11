@@ -163,8 +163,8 @@ export default function ReimbursementsIndex() {
                           projectArray={
                             projectData?.data?.length
                               ? projectData?.data?.map(
-                                  (project) => project!.name
-                                )
+                                (project) => project!.name
+                              )
                               : []
                           }
                           projectSiteArray={
@@ -194,12 +194,7 @@ export default function ReimbursementsIndex() {
           {({ data, meta, error }) => {
             if (error) {
               clearCacheEntry(cacheKeyPrefix.reimbursements);
-              return (
-                <ErrorBoundary
-                  error={error}
-                  message='Failed to load reimbursements'
-                />
-              );
+              return <ErrorBoundary error={error} message='Failed to load reimbursements' />
             }
 
             const hasNextPage = Boolean(meta?.count > pageSize);

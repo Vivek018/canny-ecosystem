@@ -30,15 +30,17 @@ export type ExitDataType = Pick<
   | "reason"
   | "total"
 > & {
-  employees: Pick<EmployeeDatabaseRow,"first_name" | "middle_name" | "last_name" | "employee_code"
+  employees: Pick<
+    EmployeeDatabaseRow,
+    "first_name" | "middle_name" | "last_name" | "employee_code"
   > & {
     employee_project_assignment: {
-      project_sites: {name: string;projects: { name: string }};
+      project_sites: { name: string; projects: { name: string } };
     };
   };
 } & {
   exit_payments: (Pick<ExitPaymentsRow, "amount" | "type"> & {
-    payment_fields: {name: string};
+    payment_fields: { name: string };
   })[];
 };
 
@@ -143,7 +145,7 @@ export const getExits = async ({
       if (end) query.lte(field, formatUTCDate(end));
     }
 
-    if (reason) query.eq("reason", reason);
+    if (reason) query.eq("reason", reason.toLowerCase());
 
     if (project) {
       query.eq(

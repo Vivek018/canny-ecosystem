@@ -3,20 +3,16 @@ import { ExitsSearchFilter } from "@/components/exits/exit-search-filter";
 import { FilterList } from "@/components/exits/filter-list";
 import { ExitPaymentColumns } from "@/components/exits/table/columns";
 import { ExitPaymentTable } from "@/components/exits/table/data-table";
+import { cacheKeyPrefix } from "@/constant";
+import { clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import { LAZY_LOADING_LIMIT, MAX_QUERY_LIMIT } from "@canny_ecosystem/supabase/constant";
 import {
-  LAZY_LOADING_LIMIT,
-  MAX_QUERY_LIMIT,
-} from "@canny_ecosystem/supabase/constant";
-import {
-  type ExitFilterType,
-  getExits,
-  getProjectNamesByCompanyId,
-  getSiteNamesByProjectName,
+  type ExitFilterType, getExits, getProjectNamesByCompanyId, getSiteNamesByProjectName,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { json, redirect, useLoaderData } from "@remix-run/react";
+import { type ClientLoaderFunctionArgs, json, redirect, useLoaderData } from "@remix-run/react";
 
 const pageSize = 20;
 
@@ -38,24 +34,17 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const query = searchParams.get("name") ?? undefined;
 
     const filters: ExitFilterType = {
-      last_working_day_start:
-        searchParams.get("last_working_day_start") ?? undefined,
-      last_working_day_end:
-        searchParams.get("last_working_day_end") ?? undefined,
-      final_settlement_date_start:
-        searchParams.get("final_settlement_date_start") ?? undefined,
-      final_settlement_date_end:
-        searchParams.get("final_settlement_date_end") ?? undefined,
+      last_working_day_start: searchParams.get("last_working_day_start") ?? undefined,
+      last_working_day_end: searchParams.get("last_working_day_end") ?? undefined,
+      final_settlement_date_start: searchParams.get("final_settlement_date_start") ?? undefined,
+      final_settlement_date_end: searchParams.get("final_settlement_date_end") ?? undefined,
       reason: searchParams.get("reason") ?? undefined,
       project: searchParams.get("project") ?? undefined,
       project_site: searchParams.get("project_site") ?? undefined,
     };
 
     const hasFilters =
-      filters &&
-      Object.values(filters).some(
-        (value) => value !== null && value !== undefined,
-      );
+      filters && Object.values(filters).some((value) => value !== null && value !== undefined,);
 
     const { data, meta, error } = await getExits({
       supabase,
@@ -68,23 +57,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
       },
     });
 
-    const hasNextPage = Boolean(
-      meta?.count && meta.count / (page + 1) > LAZY_LOADING_LIMIT,
-    );
+    const hasNextPage = Boolean(meta?.count && meta.count / (page + 1) > LAZY_LOADING_LIMIT);
 
     if (error) throw error;
 
-    const { data: projectData } = await getProjectNamesByCompanyId({
-      supabase,
-      companyId,
-    });
+    const { data: projectData } = await getProjectNamesByCompanyId({ supabase, companyId, });
 
     let projectSiteData = null;
     if (filters.project) {
-      const { data } = await getSiteNamesByProjectName({
-        supabase,
-        projectName: filters.project,
-      });
+      const { data } = await getSiteNamesByProjectName({ supabase, projectName: filters.project });
       projectSiteData = data;
     }
 
@@ -113,6 +94,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
   }
 }
+
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+  const url = new URL(args.request.url);
+  return await clientCaching(`${cacheKeyPrefix.exits}${url.searchParams.toString()}`, args);
+}
+clientLoader.hydrate = true;
 
 export async function action({ request }: ActionFunctionArgs) {
   const url = new URL(request.url);
@@ -144,9 +131,7 @@ export default function ExitsIndex() {
     projectSiteArray,
   } = useLoaderData<typeof loader>();
 
-  const noFilters = filters
-    ? Object.values(filters).every((value) => !value)
-    : true;
+  const noFilters = filters ? Object.values(filters).every((value) => !value) : true;
   const filterList = { ...filters, name: query };
 
   return (
