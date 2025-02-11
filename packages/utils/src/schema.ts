@@ -1207,8 +1207,6 @@ export const AttendanceDataSchema = z.object({
   holiday_type: z.enum(attendanceHolidayTypeArray).optional(),
 });
 
-
-
 export const ImportSingleEmployeeAttendanceDataSchema = z.object({
   employee_code: zNumberString.min(3),
   date: z.string(),

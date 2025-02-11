@@ -1,7 +1,7 @@
 import { Button } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { formatDate, formatDateTime } from "@canny_ecosystem/utils";
-import { monthMap } from "@canny_ecosystem/utils/constant";
+import { months } from "@canny_ecosystem/utils/constant";
 import Papa from "papaparse";
 import { useEffect, useState } from "react";
 
@@ -32,8 +32,8 @@ export function ExportBar({
     };
   });
   useEffect(() => {
-    if (fMonth && monthMap[fMonth] !== undefined) {
-      setMonth(monthMap[fMonth] - 1);
+    if (fMonth && months[fMonth] !== undefined) {
+      setMonth(months[fMonth] - 1);
     }
     if (fYear && Number(fYear)) {
       setYear(Number(fYear));

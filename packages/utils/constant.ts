@@ -121,6 +121,8 @@ export const attribute = {
   employeeProjectAssignment: "employee_project_assignment",
   employeeWorkHistory: "employee_work_history",
   employeeSkills: "employee_skills",
+  employeeReimbursements: "employee_reimbursements",
+  employeeAttendance: "employee_attendance",
   reimbursements: "reimbursements",
   exits: "exits",
   paymentFields: "payment_fields",
@@ -150,22 +152,7 @@ export const attribute = {
   attendance: "attendance",
 };
 
-export const Months = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
-
-export const monthMap: { [key: string]: number } = {
+export const months: { [key: string]: number } = {
   January: 1,
   February: 2,
   March: 3,

@@ -23,11 +23,14 @@ import { FilterList } from "@/components/attendance/filter-list";
 import { AttendanceSearchFilter } from "@/components/attendance/attendance-search-filter";
 import { useAttendanceStore } from "@/store/attendance";
 import { useEffect, useState } from "react";
-import { formatDate } from "@canny_ecosystem/utils";
+import { formatDate, hasPermission, readRole } from "@canny_ecosystem/utils";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { clientCaching } from "@/utils/cache";
-import { cacheKeyPrefix } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export type TransformedAteendanceDataType = {
   projectName: any;
@@ -42,7 +45,14 @@ export type TransformedAteendanceDataType = {
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
-  const { supabase } = getSupabaseWithHeaders({ request });
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(user?.role!, `${readRole}:${attribute.attendance}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
+
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   const searchParams = new URLSearchParams(url.searchParams);
   const query = searchParams.get("name") ?? undefined;

@@ -13,7 +13,7 @@ import {
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { getYears } from "@canny_ecosystem/utils";
-import { Months } from "@canny_ecosystem/utils/constant";
+import { months } from "@canny_ecosystem/utils/constant";
 import { useSearchParams } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -167,7 +167,7 @@ export const AttendanceFilter = ({
                     alignOffset={-4}
                     className="p-0"
                   >
-                    {Months.map((name, index) => (
+                    {Object.keys(months).map((name, index) => (
                       <DropdownMenuCheckboxItem
                         key={name + index.toString()}
                         className="capitalize"

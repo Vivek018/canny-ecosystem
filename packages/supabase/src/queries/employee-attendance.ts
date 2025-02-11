@@ -1,4 +1,4 @@
-import { monthMap } from "@canny_ecosystem/utils/constant";
+import { months } from "@canny_ecosystem/utils/constant";
 import type {
   EmployeeAttendanceDatabaseRow,
   EmployeeDatabaseRow,
@@ -102,7 +102,7 @@ export async function getAttendanceByEmployeeId({
     const { month, year } = filters as AttendanceFilters;
 
     if (month || year) {
-      const monthNumber = monthMap[month!];
+      const monthNumber = months[month!];
       const getLastDayOfMonth = (year: number, month: number): string => {
         const lastDay = new Date(year, month, 0).getDate();
         return lastDay.toString().padStart(2, "0");
@@ -291,7 +291,7 @@ export async function getAttendanceByCompanyId({
     }
 
     if (month || year) {
-      const monthNumber = monthMap[month!];
+      const monthNumber = months[month!];
       const getLastDayOfMonth = (year: number, month: number): string => {
         const lastDay = new Date(year, month, 0).getDate();
         return lastDay.toString().padStart(2, "0");

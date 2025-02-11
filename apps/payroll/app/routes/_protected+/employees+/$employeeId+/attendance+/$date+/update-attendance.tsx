@@ -58,7 +58,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.attendance}`)) {
+  if (
+    !hasPermission(user?.role!, `${updateRole}:${attribute.employeeAttendance}`)
+  ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   const employeeId = params.employeeId!;
@@ -69,7 +71,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     date: date!,
     supabase,
   });
-
 
   if (error) {
     console.error(error);
@@ -128,12 +129,10 @@ export default function UpdateAttendance() {
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { updatableData, employeeId, date } =
-    useLoaderData<typeof loader>();
+  const { updatableData, employeeId, date } = useLoaderData<typeof loader>();
   const [resetKey, setResetKey] = useState(Date.now());
 
   useEffect(() => {
-   
     if (actionData) {
       if (actionData?.status === "success") {
         clearCacheEntry(`${cacheKeyPrefix.attendance}${employeeId}`);
