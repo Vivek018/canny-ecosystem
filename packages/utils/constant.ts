@@ -10,6 +10,7 @@ export const modalSearchParamNames = {
   import_employee_address: "import-employee-address",
   import_employee_guardians: "import-employee-guardians",
   import_reimbursement: "import-reimbursement",
+  import_exits: "import-exits",
   view_template_components: "view-template-components",
   view_link_template: "view-link-template",
   create_link_template: "create-link-template",
