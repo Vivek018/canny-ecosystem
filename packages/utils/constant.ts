@@ -147,6 +147,7 @@ export const attribute = {
   settings: "settings",
   users: "users",
   payroll: "payroll",
+  attendance: "attendance",
 };
 
 export const Months = [

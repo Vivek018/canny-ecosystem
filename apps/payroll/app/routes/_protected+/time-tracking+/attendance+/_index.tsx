@@ -8,7 +8,13 @@ import {
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { json, redirect, useLoaderData, useNavigate } from "@remix-run/react";
+import {
+  type ClientLoaderFunctionArgs,
+  json,
+  redirect,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
 import { AttendanceTable } from "@/components/attendance/table/attendance-table";
 import { attendanceColumns } from "@/components/attendance/table/columns";
 import { ImportAttendanceMenu } from "@/components/attendance/import-attendance-menu";
@@ -20,6 +26,8 @@ import { useEffect, useState } from "react";
 import { formatDate } from "@canny_ecosystem/utils";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
+import { clientCaching } from "@/utils/cache";
+import { cacheKeyPrefix } from "@/constant";
 
 export type TransformedAteendanceDataType = {
   projectName: any;
@@ -83,6 +91,17 @@ export async function loader({ request }: LoaderFunctionArgs) {
     projectSiteArray: projectSiteData?.map((site) => site.name) ?? [],
   });
 }
+
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+  const url = new URL(args.request.url);
+
+  return await clientCaching(
+    `${cacheKeyPrefix.attendance}${url.searchParams.toString()}`,
+    args
+  );
+}
+
+clientLoader.hydrate = true;
 
 export async function action({ request }: ActionFunctionArgs) {
   const url = new URL(request.url);

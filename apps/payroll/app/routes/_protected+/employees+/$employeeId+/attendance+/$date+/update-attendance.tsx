@@ -1,5 +1,7 @@
 import { FormButtons } from "@/components/form/form-buttons";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { safeRedirect } from "@/utils/server/http.server";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { updateOrAddAttendance } from "@canny_ecosystem/supabase/mutations";
 import { getAttendanceByEmployeeIdAndDate } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -16,6 +18,7 @@ import {
   Field,
   SearchableSelectField,
 } from "@canny_ecosystem/ui/forms";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import {
   AttendanceDataSchema,
@@ -23,10 +26,14 @@ import {
   attendanceWorkShiftArray,
   getInitialValueFromZod,
   getValidDateForInput,
+  hasPermission,
   isGoodStatus,
   replaceUnderscore,
   transformStringArrayIntoOptions,
+  updateRole,
 } from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
+import { useEffect } from "react";
 import {
   FormProvider,
   getFormProps,
@@ -38,14 +45,22 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import {
   Form,
   json,
+  useActionData,
   useLoaderData,
   useNavigate,
   useSubmit,
 } from "@remix-run/react";
 import { useState } from "react";
+import { clearCacheEntry } from "@/utils/cache";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.attendance}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
   const employeeId = params.employeeId!;
   const date = params.date;
 
@@ -55,15 +70,23 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     supabase,
   });
 
+
   if (error) {
     console.error(error);
   }
-  return { updatableData: data, employeeId, date };
+  return { updatableData: data, employeeId, date, error };
 }
 
-export async function action({ request, params }: ActionFunctionArgs) {
-  const employeeId = params.employeeId!;
-  const { supabase } = getSupabaseWithHeaders({ request });
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.attendance}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
   const formData = await request.formData();
 
   const submission = parseWithZod(formData, { schema: AttendanceDataSchema });
@@ -80,25 +103,56 @@ export async function action({ request, params }: ActionFunctionArgs) {
   const date = attendanceData?.date;
   const { status, error } = await updateOrAddAttendance({
     supabase,
-    data: filteredData as any,
+    data: filteredData,
     date,
     type,
   });
 
-  if (isGoodStatus(status))
-    return safeRedirect(`/employees/${employeeId}/attendance`, {
-      status: 303,
+  if (isGoodStatus(status)) {
+    return json({
+      status: "success",
+      message: "Employee attendance update successfully",
+      error: null,
     });
-
-  return json({ status, error });
+  }
+  return json({
+    status: "error",
+    message: "Employee attendance update failed",
+    error,
+  });
 }
 
 export default function UpdateAttendance() {
   const submit = useSubmit();
 
+  const actionData = useActionData<typeof action>();
+  const { toast } = useToast();
   const navigate = useNavigate();
-  const { updatableData, employeeId, date } = useLoaderData<typeof loader>();
+  const { updatableData, employeeId, date } =
+    useLoaderData<typeof loader>();
   const [resetKey, setResetKey] = useState(Date.now());
+
+  useEffect(() => {
+   
+    if (actionData) {
+      if (actionData?.status === "success") {
+        clearCacheEntry(`${cacheKeyPrefix.attendance}${employeeId}`);
+        toast({
+          title: "Success",
+          description: actionData?.message || "Employee address updated",
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description:
+            actionData?.error?.message || "Employee address update failed",
+          variant: "destructive",
+        });
+      }
+      navigate(`/employees/${employeeId}/attendance`);
+    }
+  }, [actionData]);
 
   const initialValues =
     updatableData ?? getInitialValueFromZod(AttendanceDataSchema);
@@ -119,7 +173,6 @@ export default function UpdateAttendance() {
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
   });
-
 
   const handleDelete = () => {
     submit(

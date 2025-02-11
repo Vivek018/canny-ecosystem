@@ -4,6 +4,9 @@ import type { EmployeeAttendanceDatabaseRow } from "@canny_ecosystem/supabase/ty
 import { AttendanceFilter } from "./attendance-filter";
 import { useNavigate } from "@remix-run/react";
 import { FilterList } from "./filter-list";
+import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
+import { useUser } from "@/utils/user";
 
 export const AttendanceComponent = ({
   attendanceData,
@@ -18,7 +21,7 @@ export const AttendanceComponent = ({
     year?: string | undefined;
   };
 }) => {
-  
+  const { role } = useUser();
   const navigate = useNavigate();
 
   const [month, setMonth] = useState<number>(new Date().getMonth());
@@ -75,8 +78,16 @@ export const AttendanceComponent = ({
 
             {days.map((date) => (
               <div
-                onClick={() => handleUpdate(date.fullDate)}
-                onKeyDown={() => handleUpdate(date.fullDate)}
+                onClick={
+                  hasPermission(role, `${updateRole}:${attribute.attendance}`)
+                    ? () => handleUpdate(date.fullDate)
+                    : undefined
+                }
+                onKeyDown={
+                  hasPermission(role, `${updateRole}:${attribute.attendance}`)
+                    ? () => handleUpdate(date.fullDate)
+                    : undefined
+                }
                 key={date.fullDate}
                 className={cn(
                   "h-32 border p-2 bg-card flex flex-col justify-between cursor-pointer"
