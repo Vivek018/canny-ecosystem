@@ -25,11 +25,11 @@ export function TerminationLetter({
   const replacements = {
     employeeName: `${data?.employees.first_name} ${data?.employees.middle_name} ${data?.employees?.last_name}`,
     employeePosition:
-      data?.employees.employee_project_assignment.position ?? "",
+      data?.employees.employee_project_assignment?.position ?? "",
     employeeJoiningDate:
-      data?.employees.employee_project_assignment.start_date ?? "",
+      data?.employees.employee_project_assignment?.start_date ?? "",
     employeeLeavingDate:
-      data?.employees.employee_project_assignment.end_date ?? "",
+      data?.employees.employee_project_assignment?.end_date ?? "",
     companyName: companyData?.data?.name ?? "",
     companyAddress: companyData?.locationData?.address_line_1 ?? "",
     companyCity: companyData?.locationData?.city ?? "",
@@ -54,34 +54,40 @@ export function TerminationLetter({
           </View>
 
           {/* Recipient Details */}
-          {data?.include_client_address && (
-            <View style={styles.recipient}>
-              <Text>{companyData?.data?.name}</Text>
-              <Text>{companyData?.locationData?.address_line_1},</Text>
-              <Text>{companyData?.locationData?.city},</Text>
-              <Text>
-                {companyData?.locationData?.state} -{" "}
-                {companyData?.locationData?.pincode}
-              </Text>
-            </View>
-          )}
+          {data?.include_client_address &&
+            companyData?.data &&
+            companyData?.locationData && (
+              <View style={styles.recipient}>
+                <Text>{companyData?.data?.name}</Text>
+                <Text>{companyData?.locationData?.address_line_1},</Text>
+                <Text>{companyData?.locationData?.city},</Text>
+                <Text>
+                  {companyData?.locationData?.state} -{" "}
+                  {companyData?.locationData?.pincode}
+                </Text>
+              </View>
+            )}
 
-          {data?.include_employee_address && (
-            <View style={styles.recipient}>
-              <Text>To,</Text>
-              <Text style={styles.boldText}>
-                {data.employees.first_name} {data.employees.middle_name ?? " "}{" "}
-                {data.employees.last_name},
-              </Text>
-              <Text>{employeeAddressData?.address_line_1},</Text>
-              <Text>
-                {employeeAddressData?.state}, {employeeAddressData?.city},
-              </Text>
-              <Text>
-                {employeeAddressData?.country} - {employeeAddressData?.pincode}
-              </Text>
-            </View>
-          )}
+          {data?.include_employee_address &&
+            data.employees &&
+            employeeAddressData && (
+              <View style={styles.recipient}>
+                <Text>To,</Text>
+                <Text style={styles.boldText}>
+                  {data.employees.first_name}{" "}
+                  {data.employees.middle_name ?? " "} {data.employees.last_name}
+                  ,
+                </Text>
+                <Text>{employeeAddressData?.address_line_1},</Text>
+                <Text>
+                  {employeeAddressData?.state}, {employeeAddressData?.city},
+                </Text>
+                <Text>
+                  {employeeAddressData?.country} -{" "}
+                  {employeeAddressData?.pincode}
+                </Text>
+              </View>
+            )}
 
           {/* Subject Section */}
           <View style={styles.title}>
@@ -96,18 +102,30 @@ export function TerminationLetter({
           </View>
 
           {/* Closing Section */}
-          {data?.include_signatuory && (
-            <View style={styles.signatureBox}>
-              <View>
-                <Text>Yours faithfully,</Text>
-                <View style={styles.section} />
-                <Text style={styles.boldText}>
-                  For, {companyData?.data?.name}
-                </Text>
+          <View style={styles.signatureSection}>
+            {data?.include_signatuory && (
+              <View style={styles.signatureBox}>
+                <View>
+                  <Text style={styles.boldText}>Yours truly,</Text>
+                  <Text style={styles.boldText}>
+                    For Canny Management Services Pvt. Ltd
+                  </Text>
+                </View>
+                <Text>Director</Text>
               </View>
-              <Text>Director</Text>
-            </View>
-          )}
+            )}
+            {data?.include_employee_signature && (
+              <View style={styles.signatureBox}>
+                <View>
+                  <Text style={styles.boldText}>
+                    I accept the contract of employment with the terms and
+                    conditions contained thereto
+                  </Text>
+                </View>
+                <Text>__________________________________________</Text>
+              </View>
+            )}
+          </View>
         </View>
         {data?.include_letter_head && (
           <View style={styles.footer} fixed>

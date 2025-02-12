@@ -1,9 +1,15 @@
 import type { CompanyInfoDataType } from "@/routes/_protected+/employees+/$employeeId+/letters+/$letterId";
 import type { EmployeeWithLetterDataType } from "@canny_ecosystem/supabase/queries";
-import { formatDate, replaceUnderscore, styles } from "@canny_ecosystem/utils";
+import {
+  formatDate,
+  replacePlaceholders,
+  replaceUnderscore,
+  styles,
+} from "@canny_ecosystem/utils";
 import { Document, Page, View, Text } from "@react-pdf/renderer";
 import { LetterHeader } from "./letter-header";
 import type { EmployeeAddressDatabaseRow } from "@canny_ecosystem/supabase/types";
+import { MarkdownRenderer } from "../markdown-renderer";
 
 export function AppointmentLetter({
   data,
@@ -19,6 +25,24 @@ export function AppointmentLetter({
   companyData: CompanyInfoDataType | null;
   salaryData: any;
 }) {
+  const replacements = {
+    employeeName: `${data?.employees.gender === "female" ? "Ms." : "Mr."} ${data?.employees.first_name} ${data?.employees.middle_name} ${data?.employees?.last_name}`,
+    employeeGender: data?.employees.gender ?? "",
+    employeeJoiningDate: new Date(
+      data?.employees.employee_project_assignment?.start_date ?? "",
+    ).toLocaleDateString("en-IN"),
+    employeeLeavingDate: new Date(
+      data?.employees.employee_project_assignment?.end_date ?? "",
+    ).toLocaleDateString("en-IN"),
+    employeePosition:
+      data?.employees.employee_project_assignment?.position ?? "",
+    companyName: companyData?.data?.name ?? "",
+    compantAddress: companyData?.locationData?.address_line_1 ?? "",
+    companyCity: companyData?.locationData?.city ?? "",
+    siteName:
+      data?.employees.employee_project_assignment?.project_sites?.name ?? "",
+  };
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -28,217 +52,57 @@ export function AppointmentLetter({
           </View>
         )}
         <View style={styles.wrapper}>
-          {/* Header Section */}
-
           {/* Date Section */}
-          {data?.include_letter_head && (
-            <View>
-              <Text style={styles.headerDate}>
-                Date: {formatDate(data?.date ?? "")}
-              </Text>
-            </View>
-          )}
+          <View>
+            <Text style={styles.headerDate}>
+              Date: {formatDate(data?.date ?? "")}
+            </Text>
+          </View>
 
-          {data?.include_client_address && (
-            <View style={styles.recipient}>
-              <Text>{companyData?.data?.name}</Text>
-              <Text>{companyData?.locationData?.address_line_1},</Text>
-              <Text>{companyData?.locationData?.city},</Text>
-              <Text>
-                {companyData?.locationData?.state} -{" "}
-                {companyData?.locationData?.pincode}
-              </Text>
-            </View>
-          )}
-
-          {data?.include_employee_address && (
+          {data?.include_client_address &&
+            companyData?.data &&
+            companyData?.locationData && (
+              <View style={styles.recipient}>
+                <Text>{companyData?.data?.name}</Text>
+                <Text>{companyData?.locationData?.address_line_1},</Text>
+                <Text>{companyData?.locationData?.city},</Text>
+                <Text>
+                  {companyData?.locationData?.state} -{" "}
+                  {companyData?.locationData?.pincode}
+                </Text>
+              </View>
+            )}
+          {data?.include_employee_address && employeeAddressData && (
             <View style={styles.recipient}>
               <Text>To,</Text>
               <Text style={styles.boldText}>
                 {data.employees.first_name} {data.employees.middle_name ?? " "}{" "}
                 {data.employees.last_name},
               </Text>
-              <Text>{employeeAddressData?.address_line_1},</Text>
+              <Text>{employeeAddressData?.address_line_1 ?? "-"},</Text>
               <Text>
-                {employeeAddressData?.state}, {employeeAddressData?.city},
+                {employeeAddressData?.state ?? "-"},{" "}
+                {employeeAddressData?.city ?? "-"},
               </Text>
               <Text>
-                {employeeAddressData?.country} - {employeeAddressData?.pincode}
+                {employeeAddressData?.country ?? "-"} -{" "}
+                {employeeAddressData?.pincode ?? "-"}
               </Text>
             </View>
           )}
-
           <View style={[styles.title, styles.underlineText]}>
             <Text>{data?.subject}</Text>
           </View>
-
-          {/* Appointment Letter Section */}
-          <View style={styles.section}>
-            <Text>
-              Dear {data?.employees.gender === "male" ? "Mr." : "Ms."}{" "}
-              {data?.employees.first_name} {data?.employees.middle_name ?? " "}{" "}
-              {data?.employees.last_name},
-            </Text>
-            <Text>
-              With reference to your application and subsequent interview and
-              discussion that you had with us, we are pleased to offer you the
-              position of{" "}
-              <Text style={styles.boldText}>
-                "{data?.employees.employee_project_assignment.position}"
-              </Text>{" "}
-              in our organization Contract at {companyData?.data?.name}{" "}
-              {data?.employees.employee_project_assignment.project_sites.name}{" "}
-              w.e.f.{" "}
-              <Text style={styles.boldText}>
-                {data?.employees.employee_project_assignment.start_date
-                  .split("-")
-                  .reverse()
-                  .join("-")}
-              </Text>
-              .
-            </Text>
-          </View>
-
           <View style={styles.text} />
-
-          {/* Terms and Conditions */}
           <View style={styles.section}>
-            <View style={styles.keyPoints}>
-              <View>
-                <Text style={[styles.boldText, styles.underlineText]}>
-                  With the following terms and conditions:
-                </Text>
-              </View>
-
-              <View>
-                <Text>
-                  With reference to your application and subsequent interview
-                  and discussion that you had with us, we are pleased to offer
-                  you the position of “
-                  {data?.employees.employee_project_assignment.position}” in our
-                  organization Contract {companyData?.data?.name}{" "}
-                  {
-                    data?.employees.employee_project_assignment.project_sites
-                      .name
-                  }{" "}
-                  w.e.f.{" "}
-                  <Text style={styles.boldText}>
-                    {data?.employees.employee_project_assignment.start_date
-                      .split("-")
-                      .reverse()
-                      .join("-")}
-                  </Text>
-                </Text>
-              </View>
-              <View>
-                <Text style={styles.boldText}>
-                  1. POSTING AND REPORTING STRUCTURE:
-                </Text>
-                <Text>
-                  You will be posted at our Contract in{" "}
-                  {companyData?.data?.name} and you would report to Site in
-                  Charge for smooth functioning. You will interact directly with
-                  other seniors/supervisors as well.
-                </Text>
-              </View>
-
-              <View>
-                <Text style={styles.boldText}>2. PROBATION:</Text>
-                <Text>
-                  You will be on probation for a period of three months from the
-                  date of appointment. The probation period will be extendable
-                  at the discretion of management until it is satisfied with
-                  your work and conduct during the probationary period. You
-                  shall be deemed to be on probation until a letter of
-                  confirmation is issued to you in writing.
-                </Text>
-              </View>
-
-              <View>
-                <Text style={styles.boldText}>
-                  3. RESIGNATION / TERMINATION:
-                </Text>
-                <Text>
-                  During the period of probation, the company may terminate your
-                  service on 24 hours' notice. Should you choose to resign
-                  during the period of probation, you must provide 24 hours'
-                  notice. After being confirmed, the company can terminate your
-                  service without assigning any reason by giving one month's
-                  notice or salary in lieu, and vice versa.
-                </Text>
-              </View>
-
-              <View>
-                <Text style={styles.boldText}>
-                  4. PERFORMANCE EVALUATION - INCREMENT:
-                </Text>
-                <Text>
-                  Annual increment will depend upon your consistent performance
-                  and will not be a matter of right. The company reserves the
-                  right to grant or withhold annual increment as it may deem
-                  fit.
-                </Text>
-              </View>
-
-              <View>
-                <Text style={styles.boldText}>5. TRANSFER:</Text>
-                <Text>
-                  Your services are transferable to any other
-                  site/department/branch/office, etc., as existing with us at
-                  the time of transfer.
-                </Text>
-
-                <Text style={styles.boldText}>6. CONFIDENTIAL AGREEMENT:</Text>
-                <Text>
-                  Any employee should not disclose the confidential information
-                  of the organization and clients with anybody outside the
-                  organization during and after the service tenure. Any deed
-                  done by the employee using his/her or somebody else's
-                  system/workplace which may lead to damages/legal implications,
-                  any liability arising out of such deeds will be borne by the
-                  employee himself/herself.
-                </Text>
-              </View>
-
-              <View>
-                <Text style={styles.boldText}>7. JURISDICTION:</Text>
-                <Text>
-                  In case of any dispute, the courts in the city of Ahmedabad
-                  will have jurisdiction.
-                </Text>
-              </View>
-
-              <View>
-                <Text style={styles.boldText}>
-                  8. ABSENCE OR UNAUTHORIZED LEAVE:
-                </Text>
-                <Text>
-                  Unauthorized leave or absence for a continuous period of 8
-                  days would make you lose your lien in the service, and you
-                  will be considered to have abandoned your service of your own
-                  accord, and the same shall automatically come to an end
-                  without any notice or intimation to you.
-                </Text>
-              </View>
-            </View>
+            <MarkdownRenderer
+              content={replacePlaceholders(data?.content, replacements) ?? ""}
+            />
           </View>
-
-          {/* Acceptance Section */}
-          <View style={styles.section}>
-            <Text>
-              If the above terms and conditions are acceptable to you, please
-              sign the duplicate copy of the appointment letter as an
-              acknowledgment and submit the same along with the recruitment
-              papers.
-            </Text>
-            <Text>
-              With the best wishes for a happy and long association with Canny
-              Management Services Pvt. Ltd.
-            </Text>
-          </View>
-
-          {data?.include_signatuory && (
-            <View style={styles.signatureSection}>
+          <View style={styles.section} />
+          <View style={styles.section} />
+          <View style={styles.signatureSection}>
+            {data?.include_signatuory && (
               <View style={styles.signatureBox}>
                 <View>
                   <Text style={styles.boldText}>Yours truly,</Text>
@@ -248,8 +112,19 @@ export function AppointmentLetter({
                 </View>
                 <Text>Director</Text>
               </View>
-            </View>
-          )}
+            )}
+            {data?.include_employee_signature && (
+              <View style={styles.signatureBox}>
+                <View>
+                  <Text style={styles.boldText}>
+                    I accept the contract of employment with the terms and
+                    conditions contained thereto
+                  </Text>
+                </View>
+                <Text>__________________________________________</Text>
+              </View>
+            )}
+          </View>
         </View>
         {data?.include_letter_head && (
           <View style={styles.footer} fixed>
@@ -280,14 +155,15 @@ export function AppointmentLetter({
             </Text>
             <Text>
               Date:{" "}
-              {data?.employees.employee_project_assignment.start_date
-                .split("-")
+              {data?.employees.employee_project_assignment?.start_date
+                ?.split("-")
                 .reverse()
                 .join("-")}
             </Text>
             <Text>
               Ref: {companyData?.data?.name}{" "}
-              {data?.employees.employee_project_assignment.project_sites.name}
+              {data?.employees.employee_project_assignment?.project_sites
+                ?.name ?? "--"}
             </Text>
             <Text>
               Further to your employment with us, your salary for the period of
@@ -389,31 +265,6 @@ export function AppointmentLetter({
               unconditional token of acceptance.
             </Text>
           </View>
-
-          {data?.include_signatuory && (
-            <View style={styles.signatureSection}>
-              <View style={styles.signatureBox}>
-                <Text>For, Canny Management Services Pvt Ltd.</Text>
-                <Text>Authorized Signatory</Text>
-              </View>
-
-              <View style={styles.signatureBox}>
-                <View>
-                  <Text>
-                    I accept the contract of employment with the terms and
-                    conditions contained thereto.
-                  </Text>
-                  <View style={styles.text} />
-                  <Text>
-                    {data?.employees.first_name}{" "}
-                    {data?.employees.middle_name ?? " "}{" "}
-                    {data?.employees.last_name},
-                  </Text>
-                </View>
-                <Text>(Signature & Date)</Text>
-              </View>
-            </View>
-          )}
         </View>
         {data?.include_letter_head && (
           <View style={styles.footer} fixed>

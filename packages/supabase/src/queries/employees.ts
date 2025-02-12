@@ -490,6 +490,7 @@ export async function getDefaultEmployeeAddressesByEmployeeId({
     .select(columns.join(","))
     .eq("employee_id", employeeId)
     .eq("is_primary", true)
+    .order("created_at", { ascending: false })
     .limit(SINGLE_QUERY_LIMIT)
     .single<InferredType<
       Omit<EmployeeAddressDatabaseRow, "created_at" | "updated_at">,

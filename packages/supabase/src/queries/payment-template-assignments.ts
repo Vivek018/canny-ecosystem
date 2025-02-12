@@ -36,6 +36,7 @@ export async function getTemplateIdByEmployeeId({
   const { data, error } = await supabase
     .from("payment_template_assignments")
     .select(columns.join(","))
+    .order("created_at", { ascending: false })
     .eq("employee_id", employeeId)
     .maybeSingle<
       InferredType<

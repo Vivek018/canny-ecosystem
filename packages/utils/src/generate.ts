@@ -22,6 +22,7 @@ export const styles = StyleSheet.create({
     textAlign: "right",
     fontFamily: "Helvetica-Bold",
     marginBottom: 20,
+    marginTop: 10,
   },
   recipient: {
     width: "35%",
@@ -33,8 +34,7 @@ export const styles = StyleSheet.create({
   title: {
     marginHorizontal: "auto",
     fontFamily: "Helvetica-Bold",
-    marginTop: 10,
-    marginBottom: 20,
+    marginVertical: 20,
   },
   h1Text: {
     fontSize: "32px",
@@ -91,6 +91,7 @@ export const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
+    marginBottom: 10,
   },
   table: {
     marginVertical: 10,
@@ -130,7 +131,7 @@ export const styles = StyleSheet.create({
     marginTop: 10,
   },
   signatureBox: {
-    width: "50%",
+    width: "40%",
     flexDirection: "column",
     justifyContent: "space-between",
     gap: 40,

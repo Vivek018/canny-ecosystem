@@ -1211,6 +1211,7 @@ export const EmployeeLetterSchema = z.object({
   include_our_address: z.boolean().default(false),
   include_letter_head: z.boolean().default(false),
   include_signatuory: z.boolean().default(false),
+  include_employee_signature: z.boolean().default(false),
   subject: z.string().min(3).max(100),
   date: z.string().default(new Date().toISOString().split("T")[0]),
   letter_type: z

@@ -1,5 +1,4 @@
 import type {
-  EmployeeAddressDatabaseRow,
   EmployeeDatabaseRow,
   EmployeeLetterDatabaseRow,
   EmployeeProjectAssignmentDatabaseRow,
@@ -71,6 +70,7 @@ export async function getEmployeeLetterById({
     "include_our_address",
     "include_letter_head",
     "include_signatuory",
+    "include_employee_signature",
     "employee_id",
   ] as const;
 
@@ -130,6 +130,7 @@ export async function getEmployeeLetterWithEmployeeById({
     "include_our_address",
     "include_letter_head",
     "include_signatuory",
+    "include_employee_signature",
     "employee_id",
   ] as const;
 
@@ -139,7 +140,7 @@ export async function getEmployeeLetterWithEmployeeById({
       `${columns.join(",")}, employees(first_name, middle_name, last_name, gender, personal_email, employee_project_assignment!employee_project_assignments_employee_id_fkey!left(
         employee_id, assignment_type, skill_level, position, start_date, end_date,
         project_sites!left(id, name)
-      ), employee_addresses!employee_addresses_employee_id_fkey!left(id, address_line_1, address_line_2, country, state, city, pincode))`,
+      ))`,
     )
     .eq("id", id)
     .order("created_at", { ascending: false })

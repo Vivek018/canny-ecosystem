@@ -149,6 +149,32 @@ export const attribute = {
   payroll: "payroll",
 };
 
+export const DEFAULT_APPOINTMENT_LETTER = `Dear **Mr. Ayden Kai Marks**,
+
+With reference to your application and subsequent interview and discussion that you had with us, we are pleased to offer you the position of "**\${employeePosition}**" in our organization Contract at \${companyName} w.e.f. **\${employeeJoiningDate}**.&#x20;
+
+**With the following terms and conditions:**&#x20;
+
+With reference to your application and subsequent interview and discussion that you had with us, we are pleased to offer you the position of “**\${employeePosition}**” in our organization Contract \${companyName} w.e.f. **\${employeeJoiningDate}**&#x20;
+
+1\. **POSTING AND REPORTING STRUCTURE**: You will be posted at our Contract in Koss Johnson and Johnson and you would report to Site in Charge for smooth functioning. You will interact directly with other seniors/supervisors as well.&#x20;
+
+2\. **PROBATION**: You will be on probation for a period of three months from the date of appointment. The probation period will be extendable at the discretion of management until it is satisfied with your work and conduct during the probationary period. You shall be deemed to be on probation until a letter of confirmation is issued to you in writing.&#x20;
+
+3\. **RESIGNATION / TERMINATION**: During the period of probation, the company may terminate your service on 24 hours' notice. Should you choose to resign during the period of probation, you must provide 24 hours' notice. After being confirmed, the company can terminate your service without assigning any reason by giving one month's notice or salary in lieu, and vice versa.&#x20;
+
+4\. **PERFORMANCE EVALUATION - INCREMENT**: Annual increment will depend upon your consistent performance and will not be a matter of right. The company reserves the right to grant or withhold annual increment as it may deem fit.&#x20;
+
+5\. **TRANSFER**: Your services are transferable to any other site/department/branch/office, etc., as existing with us at the time of transfer.&#x20;
+
+6\. **CONFIDENTIAL AGREEMENT**: Any employee should not disclose the confidential information of the organization and clients with anybody outside the organization during and after the service tenure. Any deed done by the employee using his/her or somebody else's system/workplace which may lead to damages/legal implications, any liability arising out of such deeds will be borne by the employee himself/herself.&#x20;
+
+7\. **JURISDICTION**: In case of any dispute, the courts in the city of Ahmedabad will have jurisdiction.&#x20;
+
+8\. **ABSENCE OR UNAUTHORIZED LEAVE**: Unauthorized leave or absence for a continuous period of 8 days would make you lose your lien in the service, and you will be considered to have abandoned your service of your own accord, and the same shall automatically come to an end without any notice or intimation to you.&#x20;
+
+If the above terms and conditions are acceptable to you, please sign the duplicate copy of the appointment letter as an acknowledgment and submit the same along with the recruitment papers. With the best wishes for a happy and long association with Canny Management Services Pvt. Ltd.`;
+
 export const DEFAULT_OFFER_LETTER = `
 Dear \${employeeName},
 Congratulations! Canny Management Services Pvt Ltd is pleased to offer you the position of "\${employeePosition}" in our contract
@@ -208,7 +234,7 @@ Thanking you,
 `;
 
 export const DEFAULT_LETTER_CONTENT = {
-  appointment_letter: "",
+  appointment_letter: DEFAULT_APPOINTMENT_LETTER,
   experience_letter: DEFAULT_EXPERIENCE_LETTER,
   offer_letter: DEFAULT_OFFER_LETTER,
   noc_letter: DEFAULT_NOC_LETTER,

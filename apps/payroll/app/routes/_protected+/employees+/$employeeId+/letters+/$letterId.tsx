@@ -52,13 +52,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     if (employeeError) throw employeeError;
 
-    const { data: employeeAddressData, error: employeeAddressError } =
+    const { data: employeeAddressData } =
       await getDefaultEmployeeAddressesByEmployeeId({
         supabase,
         employeeId: employeeId ?? "",
       });
-
-    if (employeeAddressError) throw employeeAddressError;
 
     const { data: companyData, error: companyError } = await getCompanyById({
       supabase,
@@ -75,9 +73,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     let templateId = null;
 
-    const employeeSiteId =
-      employeeLetterData?.employees.employee_project_assignment.project_sites
-        .id;
     let templateComponentData = null;
     let employeeSalaryData = null;
     if (
@@ -85,24 +80,30 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       employeeLetterData?.letter_type === "offer_letter" ||
       employeeLetterData?.letter_type === "noc_letter"
     ) {
-      const { data: templateAssignmentData, error: templateAssignmentError } =
-        await getTemplateIdByEmployeeId({
-          supabase,
-          employeeId: employeeId ?? "",
-        });
+      const employeeSiteId =
+        employeeLetterData?.employees?.employee_project_assignment
+          ?.project_sites?.id;
 
-      templateId = templateAssignmentData?.template_id;
+      if (employeeSiteId) {
+        const { data: templateAssignmentData, error: templateAssignmentError } =
+          await getTemplateIdByEmployeeId({
+            supabase,
+            employeeId: employeeId ?? "",
+          });
 
-      if (!templateId || templateAssignmentError) {
-        const { data } = await getPaymentTemplateBySiteId({
-          supabase,
-          site_id: employeeSiteId ?? "",
-        });
+        templateId = templateAssignmentData?.template_id;
 
-        templateId = data?.template_id;
+        if (!templateId || templateAssignmentError) {
+          const { data } = await getPaymentTemplateBySiteId({
+            supabase,
+            site_id: employeeSiteId ?? "",
+          });
+
+          templateId = data?.template_id;
+        }
       }
 
-      if (!templateId || templateAssignmentError) {
+      if (!templateId) {
         const { data, error } = await getDefaultTemplateIdByCompanyId({
           supabase,
           companyId: companyId ?? "",
@@ -111,6 +112,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         templateId = data?.id;
         if (error || !templateId) throw new Error("No template found");
       }
+
       ({ data: templateComponentData } =
         await getPaymentTemplateComponentsByTemplateId({
           supabase,
@@ -174,6 +176,7 @@ export default function LetterPreview() {
     companyData,
     error,
   } = useLoaderData<typeof loader>();
+
   const { employeeId } = useParams();
   const navigate = useNavigate();
 

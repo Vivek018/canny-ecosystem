@@ -243,6 +243,18 @@ export default function CreateEmployeeLetter({
                   textareaProps={{
                     ...getTextareaProps(fields.content),
                     placeholder: "Write your letter content here...",
+                    defaultValue:
+                      LETTERS_TAG === "create-letter"
+                        ? String(
+                            DEFAULT_LETTER_CONTENT[
+                              fields.letter_type
+                                .value as keyof typeof DEFAULT_LETTER_CONTENT
+                            ],
+                          ) ?? fields.content.value
+                        : fields.content.value ?? DEFAULT_LETTER_CONTENT[
+                          fields.letter_type
+                            .value as keyof typeof DEFAULT_LETTER_CONTENT
+                        ],
                   }}
                   labelProps={{
                     children: "Content",
@@ -250,11 +262,10 @@ export default function CreateEmployeeLetter({
                   errorClassName={"min-h-min pt-0 pb-0"}
                   errors={fields.content.errors}
                   className={cn(!isDocument && "hidden")}
-                  formId={LETTERS_TAG}
                 />
               </div>
 
-              <div className="grid grid-cols-4 place-content-center justify-between gap-x-8 px-2">
+              <div className="grid grid-cols-3 place-content-center justify-between gap-x-8 px-2">
                 <CheckboxField
                   className="mt-8"
                   buttonProps={getInputProps(fields.include_letter_head, {
@@ -289,6 +300,18 @@ export default function CreateEmployeeLetter({
                   })}
                   labelProps={{
                     children: "Include Signatuory",
+                  }}
+                />
+                <CheckboxField
+                  className="mt-8"
+                  buttonProps={getInputProps(
+                    fields.include_employee_signature,
+                    {
+                      type: "checkbox",
+                    },
+                  )}
+                  labelProps={{
+                    children: "Include Employee Signature",
                   }}
                 />
               </div>
