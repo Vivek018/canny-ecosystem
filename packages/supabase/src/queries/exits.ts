@@ -2,7 +2,6 @@ import { formatUTCDate } from "@canny_ecosystem/utils";
 import { HARD_QUERY_LIMIT, SINGLE_QUERY_LIMIT } from "../constant";
 import type {
   EmployeeDatabaseRow,
-  ExitPaymentsRow,
   ExitsRow,
   InferredType,
   TypedSupabaseClient,
@@ -17,6 +16,23 @@ export type ExitFilterType = {
   project?: string | undefined | null;
   project_site?: string | undefined | null;
 } | null;
+
+export type ImportExitDataType = Pick<
+  ExitsRow,
+  | "employee_payable_days"
+  | "bonus"
+  | "deduction"
+  | "final_settlement_date"
+  | "gratuity"
+  | "last_working_day"
+  | "leave_encashment"
+  | "note"
+  | "organization_payable_days"
+  | "reason"
+  | "total"
+> & { employee_code: string } & { employee_name: string } & {
+  project_name: string;
+} & { project_site_name: string };
 
 export type ExitDataType = Pick<
   ExitsRow,
@@ -38,10 +54,6 @@ export type ExitDataType = Pick<
       project_sites: { name: string; projects: { name: string } };
     };
   };
-} & {
-  exit_payments: (Pick<ExitPaymentsRow, "amount" | "type"> & {
-    payment_fields: { name: string };
-  })[];
 };
 
 export const getExits = async ({

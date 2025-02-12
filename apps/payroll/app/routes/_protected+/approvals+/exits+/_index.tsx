@@ -1,6 +1,7 @@
 import { ExitActions } from "@/components/exits/exit-actions";
 import { ExitsSearchFilter } from "@/components/exits/exit-search-filter";
 import { FilterList } from "@/components/exits/filter-list";
+import { ImportExitModal } from "@/components/exits/import-export/import-modal-exits";
 import { ExitPaymentColumns } from "@/components/exits/table/columns";
 import { ExitPaymentTable } from "@/components/exits/table/data-table";
 import { cacheKeyPrefix } from "@/constant";
@@ -158,6 +159,7 @@ export default function ExitsIndex() {
         pageSize={pageSize}
         env={env}
       />
+      <ImportExitModal/>
     </section>
   );
 }

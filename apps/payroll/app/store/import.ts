@@ -13,11 +13,21 @@ type ImportStateForReimbursement = {
   setImportData: (importData: { data: ImportReimbursementDataType[] }) => void;
 };
 
+type ImportStateForExit = {
+  importData: { data: ImportExitDataType[] };
+  setImportData: (importData: { data: ImportExitDataType[] }) => void;
+};
+
 export const useImportStoreForReimbursement =
   create<ImportStateForReimbursement>()((set) => ({
     importData: { data: [] },
     setImportData: (importData) => set({ importData }),
   }));
+
+export const useImportStoreForExit = create<ImportStateForExit>()((set) => ({
+  importData: { data: [] },
+  setImportData: (importData) => set({ importData }),
+}));
 
 type ImportStateForEmployeeDetails = {
   importData: { data: ImportEmployeeDetailsDataType[] };

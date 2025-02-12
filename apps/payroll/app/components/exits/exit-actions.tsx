@@ -4,6 +4,7 @@ import { Icon } from "@canny_ecosystem/ui/icon";
 import { useNavigate } from "@remix-run/react";
 import { ColumnVisibility } from "./column-visibility";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { ImportExitMenu } from "./import-menu";
 
 export function ExitActions({ isEmpty }: { isEmpty: boolean }) {
   const { selectedRows } = useExitsStore();
@@ -12,6 +13,7 @@ export function ExitActions({ isEmpty }: { isEmpty: boolean }) {
   return (
     <div className="space-x-2 hidden md:flex">
       <ColumnVisibility disabled={isEmpty} hidden={!!selectedRows.length} />
+      <ImportExitMenu/>
       <Button
         variant="outline"
         size="icon"

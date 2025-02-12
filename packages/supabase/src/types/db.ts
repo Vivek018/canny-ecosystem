@@ -420,6 +420,7 @@ export type Database = {
           id: string
           include_client_address: boolean | null
           include_employee_address: boolean | null
+          include_employee_signature: boolean | null
           include_letter_head: boolean | null
           include_our_address: boolean | null
           include_signatuory: boolean | null
@@ -435,6 +436,7 @@ export type Database = {
           id?: string
           include_client_address?: boolean | null
           include_employee_address?: boolean | null
+          include_employee_signature?: boolean | null
           include_letter_head?: boolean | null
           include_our_address?: boolean | null
           include_signatuory?: boolean | null
@@ -450,6 +452,7 @@ export type Database = {
           id?: string
           include_client_address?: boolean | null
           include_employee_address?: boolean | null
+          include_employee_signature?: boolean | null
           include_letter_head?: boolean | null
           include_our_address?: boolean | null
           include_signatuory?: boolean | null
