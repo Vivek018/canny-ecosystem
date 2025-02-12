@@ -15,9 +15,9 @@ import { useEffect, useState } from "react";
 import Papa from "papaparse";
 
 type FieldsType = {
-  [K in keyof typeof ImportReimbursementHeaderSchema.shape]: FieldMetadata<
-    (typeof ImportReimbursementHeaderSchema.shape)[K]["_type"],
-    (typeof ImportReimbursementHeaderSchema.shape)[K],
+  [K in keyof typeof ImportReimbursementHeaderSchema._def.schema.shape]: FieldMetadata<
+    (typeof ImportReimbursementHeaderSchema._def.schema.shape)[K]["_type"],
+    (typeof ImportReimbursementHeaderSchema._def.schema.shape)[K],
     string[]
   >;
 };
