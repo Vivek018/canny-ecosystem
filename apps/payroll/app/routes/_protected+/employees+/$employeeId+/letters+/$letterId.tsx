@@ -8,6 +8,7 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
   getCompanyById,
+  getDefaultEmployeeAddressesByEmployeeId,
   getDefaultTemplateIdByCompanyId,
   getEmployeeLetterWithEmployeeById,
   getPaymentTemplateBySiteId,
@@ -26,15 +27,10 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@canny_ecosystem/ui/dialog";
-import { EmployeeLetterTypesArray } from "@canny_ecosystem/utils";
+import { employeeLetterTypesArray } from "@canny_ecosystem/utils";
 import { PDFViewer } from "@react-pdf/renderer";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import {
-  json,
-  useLoaderData,
-  useNavigate,
-  useParams,
-} from "@remix-run/react";
+import { json, useLoaderData, useNavigate, useParams } from "@remix-run/react";
 
 export type CompanyInfoDataType = {
   data: Omit<CompanyDatabaseUpdate, "created_at" | "updated_at"> | null;
@@ -56,6 +52,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     if (employeeError) throw employeeError;
 
+    const { data: employeeAddressData, error: employeeAddressError } =
+      await getDefaultEmployeeAddressesByEmployeeId({
+        supabase,
+        employeeId: employeeId ?? "",
+      });
+
+    if (employeeAddressError) throw employeeAddressError;
+
     const { data: companyData, error: companyError } = await getCompanyById({
       supabase,
       id: companyId,
@@ -71,13 +75,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     let templateId = null;
 
+    const employeeSiteId =
+      employeeLetterData?.employees.employee_project_assignment.project_sites
+        .id;
     let templateComponentData = null;
-    let templateComponentError = null;
     let employeeSalaryData = null;
     if (
-      employeeLetterData?.letter_type !== "termination_letter" &&
-      employeeLetterData?.letter_type !== "relieving_letter" &&
-      employeeLetterData?.letter_type !== "experience_letter"
+      employeeLetterData?.letter_type === "appointment_letter" ||
+      employeeLetterData?.letter_type === "offer_letter" ||
+      employeeLetterData?.letter_type === "noc_letter"
     ) {
       const { data: templateAssignmentData, error: templateAssignmentError } =
         await getTemplateIdByEmployeeId({
@@ -90,9 +96,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       if (!templateId || templateAssignmentError) {
         const { data } = await getPaymentTemplateBySiteId({
           supabase,
-          site_id:
-            employeeLetterData?.employees.employee_project_assignment
-              .project_sites.id ?? "",
+          site_id: employeeSiteId ?? "",
         });
 
         templateId = data?.template_id;
@@ -107,13 +111,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         templateId = data?.id;
         if (error || !templateId) throw new Error("No template found");
       }
-
-      ({ data: templateComponentData, error: templateComponentError } =
+      ({ data: templateComponentData } =
         await getPaymentTemplateComponentsByTemplateId({
           supabase,
           templateId: templateId ?? "",
         }));
-      if (templateComponentError) throw templateComponentError;
 
       employeeSalaryData = templateComponentData?.reduce(
         (acc, curr) => {
@@ -142,6 +144,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     return json({
       employeeLetterData,
+      employeeAddressData,
       employeeSalaryData,
       companyData: {
         data: companyData,
@@ -153,6 +156,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return json({
       error,
       employeeLetterData: null,
+      employeeAddressData: null,
       employeeSalaryData: null,
       companyData: {
         data: null,
@@ -163,52 +167,69 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export default function LetterPreview() {
-  const { employeeLetterData, employeeSalaryData, companyData, error } =
-    useLoaderData<typeof loader>();
+  const {
+    employeeLetterData,
+    employeeAddressData,
+    employeeSalaryData,
+    companyData,
+    error,
+  } = useLoaderData<typeof loader>();
   const { employeeId } = useParams();
   const navigate = useNavigate();
 
   const generateLetter = (letterType?: string) => {
     switch (letterType) {
-      case EmployeeLetterTypesArray[0]:
+      case employeeLetterTypesArray[0]:
         return (
           <AppointmentLetter
             data={employeeLetterData}
+            employeeAddressData={employeeAddressData}
             companyData={companyData}
             salaryData={employeeSalaryData}
           />
         );
 
-      case EmployeeLetterTypesArray[1]:
+      case employeeLetterTypesArray[1]:
         return (
           <ExperienceLetter
             data={employeeLetterData}
+            employeeAddressData={employeeAddressData}
             companyData={companyData}
           />
         );
 
-      case EmployeeLetterTypesArray[2]:
+      case employeeLetterTypesArray[2]:
         return (
-          <OfferLetter data={employeeLetterData} companyData={companyData} />
+          <OfferLetter
+            data={employeeLetterData}
+            employeeAddressData={employeeAddressData}
+            companyData={companyData}
+          />
         );
 
-      case EmployeeLetterTypesArray[3]:
+      case employeeLetterTypesArray[3]:
         return (
-          <NOCLetter data={employeeLetterData} companyData={companyData} />
+          <NOCLetter
+            data={employeeLetterData}
+            employeeAddressData={employeeAddressData}
+            companyData={companyData}
+          />
         );
 
-      case EmployeeLetterTypesArray[4]:
+      case employeeLetterTypesArray[4]:
         return (
           <RelievingLetter
             data={employeeLetterData}
+            employeeAddressData={employeeAddressData}
             companyData={companyData}
           />
         );
 
-      case EmployeeLetterTypesArray[5]:
+      case employeeLetterTypesArray[5]:
         return (
           <TerminationLetter
             data={employeeLetterData}
+            employeeAddressData={employeeAddressData}
             companyData={companyData}
           />
         );

@@ -55,6 +55,7 @@ export function DataTable<TData, TValue>({
                 table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
                     className="relative h-[40px] md:h-[45px] cursor-default select-text"
                   >
                     {row.getVisibleCells().map((cell) => {
@@ -63,6 +64,12 @@ export function DataTable<TData, TValue>({
                           key={cell.id}
                           className={cn(
                             "px-3 md:px-4 py-2 hidden md:table-cell",
+                            cell.column.id === "letter_type" &&
+                              "sticky left-0 bg-card z-10",
+                            cell.column.id === "issue_date" &&
+                              "sticky left-48 bg-card z-10",
+                            cell.column.id === "actions" &&
+                              "sticky right-0 min-w-20 max-w-20 bg-card z-10",
                           )}
                         >
                           {flexRender(

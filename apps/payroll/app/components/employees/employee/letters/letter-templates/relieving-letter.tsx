@@ -8,12 +8,18 @@ import { Document, Page, View, Text } from "@react-pdf/renderer";
 import { MarkdownRenderer } from "../markdown-renderer";
 import type { CompanyInfoDataType } from "@/routes/_protected+/employees+/$employeeId+/letters+/$letterId";
 import { LetterHeader } from "./letter-header";
+import type { EmployeeAddressDatabaseRow } from "@canny_ecosystem/supabase/types";
 
 export function RelievingLetter({
   data,
+  employeeAddressData,
   companyData,
 }: {
   data: EmployeeWithLetterDataType | null;
+  employeeAddressData: Omit<
+    EmployeeAddressDatabaseRow,
+    "created_at" | "updated_at"
+  > | null;
   companyData: CompanyInfoDataType | null;
 }) {
   const replacements = {
@@ -61,16 +67,12 @@ export function RelievingLetter({
                 {data.employees.first_name} {data.employees.middle_name ?? " "}{" "}
                 {data.employees.last_name},
               </Text>
+              <Text>{employeeAddressData?.address_line_1},</Text>
               <Text>
-                {data?.employees.employee_addresses[0].address_line_1},
+                {employeeAddressData?.state}, {employeeAddressData?.city},
               </Text>
               <Text>
-                {data?.employees.employee_addresses[0].state},{" "}
-                {data?.employees.employee_addresses[0].city},
-              </Text>
-              <Text>
-                {data?.employees.employee_addresses[0].country} -{" "}
-                {data?.employees.employee_addresses[0].pincode}
+                {employeeAddressData?.country} - {employeeAddressData?.pincode}
               </Text>
             </View>
           )}

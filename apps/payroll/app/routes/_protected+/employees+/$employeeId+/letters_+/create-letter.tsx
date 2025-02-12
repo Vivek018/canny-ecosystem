@@ -1,4 +1,4 @@
-import type { ActionFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
   Form,
@@ -9,9 +9,11 @@ import {
 } from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import {
+  createRole,
   EmployeeLetterSchema,
-  EmployeeLetterTypesArray,
+  employeeLetterTypesArray,
   getInitialValueFromZod,
+  hasPermission,
   isGoodStatus,
   replaceDash,
   replaceUnderscore,
@@ -42,16 +44,37 @@ import { FormButtons } from "@/components/form/form-buttons";
 import { createEmployeeLetter } from "@canny_ecosystem/supabase/mutations";
 import type { ReimbursementsUpdate } from "@canny_ecosystem/supabase/types";
 import { useEffect, useState } from "react";
-import { cacheKeyPrefix } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { UPDATE_LETTER_TAG } from "./$letterId_+/update-letter";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { clearCacheEntry } from "@/utils/cache";
+import {
+  attribute,
+  DEFAULT_LETTER_CONTENT,
+} from "@canny_ecosystem/utils/constant";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { safeRedirect } from "@/utils/server/http.server";
 
 export const CREATE_LETTER_TAG = "create-letter";
 
-export async function action({ request }: ActionFunctionArgs): Promise<Response> {
+export async function loader({ request }: LoaderFunctionArgs) {
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (
+    !hasPermission(user?.role!, `${createRole}:${attribute.employeeLetters}`)
+  ) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
+  return {};
+}
+
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
     const formData = await request.formData();
@@ -173,7 +196,7 @@ export default function CreateEmployeeLetter({
                   key={resetKey}
                   className="w-full capitalize flex-1"
                   options={transformStringArrayIntoOptions(
-                    EmployeeLetterTypesArray as unknown as string[],
+                    employeeLetterTypesArray as unknown as string[],
                   )}
                   inputProps={{
                     ...getInputProps(fields.letter_type, { type: "text" }),
@@ -216,6 +239,7 @@ export default function CreateEmployeeLetter({
                   errors={fields.subject.errors}
                 />
                 <MarkdownField
+                  key={fields.letter_type.value}
                   textareaProps={{
                     ...getTextareaProps(fields.content),
                     placeholder: "Write your letter content here...",
@@ -226,6 +250,7 @@ export default function CreateEmployeeLetter({
                   errorClassName={"min-h-min pt-0 pb-0"}
                   errors={fields.content.errors}
                   className={cn(!isDocument && "hidden")}
+                  formId={LETTERS_TAG}
                 />
               </div>
 

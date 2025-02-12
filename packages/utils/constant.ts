@@ -148,3 +148,70 @@ export const attribute = {
   users: "users",
   payroll: "payroll",
 };
+
+export const DEFAULT_OFFER_LETTER = `
+Dear \${employeeName},
+Congratulations! Canny Management Services Pvt Ltd is pleased to offer you the position of "\${employeePosition}" in our contract
+in \${companyName} \${companyCity}. We trust that this offer will meet with your approval.
+Reporting to your Manager/Supervisor, your starting salary will be 22,000=00/- in hand monthly including Bonus. Your
+first day of work will be \${employeeJoiningDate}. You are eligible for the employee benefit program as outlined in the attachment to
+this job offer.
+This offer is conditional upon our satisfactory completion of your reference checks.
+Please sign the enclosed copy of this letter and return it to us before your joining to indicate your acceptance of this
+offer.
+The entire team at Canny Management Services Pvt Ltd is looking forward to working with you, and we are confident
+you will be able to make a significant contribution to the success of our organization.
+`;
+
+export const DEFAULT_TERMINATION_LETTER = `
+Dear \${employeeName},
+You are working with us as "\${employeePosition}" in our contract with \${companyName}, \${companyCity} (Industries &
+Environment).
+Since your services are no longer required, your employment stands terminated with immediate effect i.e. from
+\${employeeLeavingDate} with the close of working hours in accordance with the terms of your employment contract.
+All your legal dues, including notice pay, will be settled as per the terms of your employment contract.
+You are advised to hand over the \${companyName}'s property, if any, to the authorized person and obtain a
+clearance certificate to enable us to process your dues settlement.
+We thank you for your services and wish you all the best in the future.
+`;
+
+export const DEFAULT_EXPERIENCE_LETTER = `Dear \${employeeName},
+Congratulations! Canny Management Services Pvt Ltd is pleased to offer you the position of "\${employeePosition}" in our contract
+in \${companyName} \${companyCity}. We trust that this offer will meet with your approval.
+Reporting to your Manager/Supervisor, your starting salary will be 22,000=00/- in hand monthly including Bonus. Your
+first day of work will be \${employeeJoiningDate}. You are eligible for the employee benefit program as outlined in the attachment to
+this job offer.
+This offer is conditional upon our satisfactory completion of your reference checks.
+Please sign the enclosed copy of this letter and return it to us before your joining to indicate your acceptance of this
+offer.
+The entire team at Canny Management Services Pvt Ltd is looking forward to working with you, and we are confident
+you will be able to make a significant contribution to the success of our organization.`;
+
+export const DEFAULT_NOC_LETTER = `Dear Sir/Madam,
+This is in regard to the above-mentioned subject; we have no objection in recruiting \${employeeName} into your
+company.
+\${employeeName} has been working in our company since \${employeeJoiningDate}.
+She is sincere and honest in her work. We wish her all the best in her future career.
+Her gross salary is Rs. 25,802/- per month as of July 2024. She is receiving benefits of PF, ESIC, and Statutory Bonus
+from our company.
+Thanking you,
+`;
+
+export const DEFAULT_RELIEVING_LETTER = `
+Dear \${employeeName},
+With reference to your resignation letter dated \${employeeLeavingDate}, we hereby accept your resignation and agree to relieve you
+from your duties on \${employeeLeavingDate}.
+We confirm that you have been working with our company from \${employeeJoiningDate} to \${employeeLeavingDate}.
+During your employment with us, we found you to be hardworking and honest.
+We wish you all the best in your future endeavors.
+Thanking you,
+`;
+
+export const DEFAULT_LETTER_CONTENT = {
+  appointment_letter: "",
+  experience_letter: DEFAULT_EXPERIENCE_LETTER,
+  offer_letter: DEFAULT_OFFER_LETTER,
+  noc_letter: DEFAULT_NOC_LETTER,
+  relieving_letter: DEFAULT_RELIEVING_LETTER,
+  termination_letter: DEFAULT_TERMINATION_LETTER,
+};

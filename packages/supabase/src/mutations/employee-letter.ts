@@ -24,7 +24,7 @@ export async function createEmployeeLetter({
     }
   }
 
-  const { error, status, data } = await supabase
+  const { status, error } = await supabase
     .from("employee_letter")
     .insert(letterData)
     .select("id")
@@ -32,18 +32,9 @@ export async function createEmployeeLetter({
 
   if (error) {
     console.error(error);
-    return {
-      data,
-      status,
-      employeeLetterError: error,
-    };
   }
 
-  return {
-    data,
-    status,
-    employeeLetterError: null,
-  };
+  return { status, error };
 }
 
 export async function updateEmployeeLetter({

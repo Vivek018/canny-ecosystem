@@ -3,13 +3,19 @@ import type { EmployeeWithLetterDataType } from "@canny_ecosystem/supabase/queri
 import { formatDate, replaceUnderscore, styles } from "@canny_ecosystem/utils";
 import { Document, Page, View, Text } from "@react-pdf/renderer";
 import { LetterHeader } from "./letter-header";
+import type { EmployeeAddressDatabaseRow } from "@canny_ecosystem/supabase/types";
 
 export function AppointmentLetter({
   data,
+  employeeAddressData,
   companyData,
   salaryData,
 }: {
   data: EmployeeWithLetterDataType | null;
+  employeeAddressData: Omit<
+    EmployeeAddressDatabaseRow,
+    "created_at" | "updated_at"
+  > | null;
   companyData: CompanyInfoDataType | null;
   salaryData: any;
 }) {
@@ -52,16 +58,12 @@ export function AppointmentLetter({
                 {data.employees.first_name} {data.employees.middle_name ?? " "}{" "}
                 {data.employees.last_name},
               </Text>
+              <Text>{employeeAddressData?.address_line_1},</Text>
               <Text>
-                {data?.employees.employee_addresses[0].address_line_1},
+                {employeeAddressData?.state}, {employeeAddressData?.city},
               </Text>
               <Text>
-                {data?.employees.employee_addresses[0].state},{" "}
-                {data?.employees.employee_addresses[0].city},
-              </Text>
-              <Text>
-                {data?.employees.employee_addresses[0].country} -{" "}
-                {data?.employees.employee_addresses[0].pincode}
+                {employeeAddressData?.country} - {employeeAddressData?.pincode}
               </Text>
             </View>
           )}
@@ -294,86 +296,88 @@ export function AppointmentLetter({
           </View>
 
           {/* Salary Table */}
-          <View style={styles.tableContainer}>
-            <View style={styles.table}>
-              <View>
-                <Text style={[styles.boldText, { marginHorizontal: "auto" }]}>
-                  YOUR TOTAL COST OF COMPANY WILL BE AS BELOW:
-                </Text>
-              </View>
-              <View style={styles.tableHeader}>
-                <Text style={styles.boldText}>GROSS SALARY</Text>
-              </View>
-              {Object.entries(
-                Object.assign(
-                  {},
-                  salaryData?.earning ? salaryData?.earning : {},
-                  salaryData?.statutory_contribution
-                    ? salaryData?.statutory_contribution
-                    : {},
-                  salaryData?.others ? salaryData?.others : {},
-                ),
-              ).map((salary) => {
-                return (
-                  <View key={salary[0]} style={styles.tableRow}>
-                    <Text style={styles.tableCell}>
-                      {replaceUnderscore(salary[0]) as string}
-                    </Text>
-                    <Text style={styles.tableCell}>
-                      Rs. {salary[1] ? `${salary[1].toString()}/-` : "--"}
-                    </Text>
-                  </View>
-                );
-              })}
-              <View style={styles.tableRow}>
-                <Text style={[styles.tableCell, styles.boldText]}>
-                  Gross Salary
-                </Text>
-                <Text style={[styles.tableCell, styles.boldText]}>
-                  Rs. 14127/-
-                </Text>
-              </View>
-              {Object.entries(
-                Object.assign(
-                  {},
-                  salaryData?.deduction !== undefined || salaryData?.deduction
-                    ? salaryData?.deduction
-                    : {},
-                  salaryData?.statutory_contribution
-                    ? salaryData?.statutory_contribution
-                    : {},
-                ),
-              ).map((salary) => {
-                return (
-                  <View key={salary[0]} style={styles.tableRow}>
-                    <Text style={styles.tableCell}>
-                      {replaceUnderscore(salary[0])}
-                    </Text>
-                    <Text style={styles.tableCell}>
-                      Rs. {salary[1] ? `${salary[1].toString()}/-` : "--"}
-                    </Text>
-                  </View>
-                );
-              })}
-              <View style={styles.tableRow}>
-                <Text style={[styles.tableCell, styles.boldText]}>
-                  Net Salary
-                </Text>
-                <Text style={[styles.tableCell, styles.boldText]}>
-                  Rs. 12,232/-
-                </Text>
-              </View>
+          {salaryData && (
+            <View style={styles.tableContainer}>
+              <View style={styles.table}>
+                <View>
+                  <Text style={[styles.boldText, { marginHorizontal: "auto" }]}>
+                    YOUR TOTAL COST OF COMPANY WILL BE AS BELOW:
+                  </Text>
+                </View>
+                <View style={styles.tableHeader}>
+                  <Text style={styles.boldText}>GROSS SALARY</Text>
+                </View>
+                {Object.entries(
+                  Object.assign(
+                    {},
+                    salaryData?.earning ? salaryData?.earning : {},
+                    salaryData?.statutory_contribution
+                      ? salaryData?.statutory_contribution
+                      : {},
+                    salaryData?.others ? salaryData?.others : {},
+                  ),
+                ).map((salary) => {
+                  return (
+                    <View key={salary[0]} style={styles.tableRow}>
+                      <Text style={styles.tableCell}>
+                        {replaceUnderscore(salary[0]) as string}
+                      </Text>
+                      <Text style={styles.tableCell}>
+                        Rs. {salary[1] ? `${salary[1].toString()}/-` : "--"}
+                      </Text>
+                    </View>
+                  );
+                })}
+                <View style={styles.tableRow}>
+                  <Text style={[styles.tableCell, styles.boldText]}>
+                    Gross Salary
+                  </Text>
+                  <Text style={[styles.tableCell, styles.boldText]}>
+                    Rs. 14127/-
+                  </Text>
+                </View>
+                {Object.entries(
+                  Object.assign(
+                    {},
+                    salaryData?.deduction !== undefined || salaryData?.deduction
+                      ? salaryData?.deduction
+                      : {},
+                    salaryData?.statutory_contribution
+                      ? salaryData?.statutory_contribution
+                      : {},
+                  ),
+                ).map((salary) => {
+                  return (
+                    <View key={salary[0]} style={styles.tableRow}>
+                      <Text style={styles.tableCell}>
+                        {replaceUnderscore(salary[0])}
+                      </Text>
+                      <Text style={styles.tableCell}>
+                        Rs. {salary[1] ? `${salary[1].toString()}/-` : "--"}
+                      </Text>
+                    </View>
+                  );
+                })}
+                <View style={styles.tableRow}>
+                  <Text style={[styles.tableCell, styles.boldText]}>
+                    Net Salary
+                  </Text>
+                  <Text style={[styles.tableCell, styles.boldText]}>
+                    Rs. 12,232/-
+                  </Text>
+                </View>
 
-              <View style={styles.tableRow}>
-                <Text style={[styles.tableCell, styles.boldText]}>
-                  Total Gross C.T.C:
-                </Text>
-                <Text style={[styles.tableCell, styles.boldText]}>
-                  Rs. 17,408/-
-                </Text>
+                <View style={styles.tableRow}>
+                  <Text style={[styles.tableCell, styles.boldText]}>
+                    Total Gross C.T.C:
+                  </Text>
+                  <Text style={[styles.tableCell, styles.boldText]}>
+                    Rs. 17,408/-
+                  </Text>
+                </View>
               </View>
             </View>
-          </View>
+          )}
 
           {/* Final Acceptance Section */}
           <View style={styles.section}>

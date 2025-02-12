@@ -109,17 +109,6 @@ export type EmployeeWithLetterDataType = Omit<
     > & {
       project_sites: Pick<SiteDatabaseRow, "id" | "name">;
     };
-  } & {
-    employee_addresses: Pick<
-      EmployeeAddressDatabaseRow,
-      | "id"
-      | "address_line_1"
-      | "address_line_2"
-      | "country"
-      | "state"
-      | "city"
-      | "pincode"
-    >[];
   };
 };
 
@@ -147,12 +136,13 @@ export async function getEmployeeLetterWithEmployeeById({
   const { data, error } = await supabase
     .from("employee_letter")
     .select(
-      `${columns.join(",")}, employees(first_name, middle_name, last_name, gender, personal_email, employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(
+      `${columns.join(",")}, employees(first_name, middle_name, last_name, gender, personal_email, employee_project_assignment!employee_project_assignments_employee_id_fkey!left(
         employee_id, assignment_type, skill_level, position, start_date, end_date,
-        project_sites!inner(id, name)
-      ), employee_addresses!employee_addresses_employee_id_fkey!inner(id, address_line_1, address_line_2, country, state, city, pincode))`,
+        project_sites!left(id, name)
+      ), employee_addresses!employee_addresses_employee_id_fkey!left(id, address_line_1, address_line_2, country, state, city, pincode))`,
     )
     .eq("id", id)
+    .order("created_at", { ascending: false })
     .single<EmployeeWithLetterDataType>();
 
   if (error) {

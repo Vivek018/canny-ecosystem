@@ -1,4 +1,4 @@
-import { useInputControl } from "@conform-to/react";
+import { useField, useInputControl } from "@conform-to/react";
 import type React from "react";
 import {
   type LabelHTMLAttributes,
@@ -36,6 +36,7 @@ import {
   toolbarPlugin,
 } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
+import { DEFAULT_LETTER_CONTENT } from "@canny_ecosystem/utils/constant";
 
 export type ListOfErrors = Array<string | null | undefined> | null | undefined;
 
@@ -645,20 +646,33 @@ export function MarkdownField({
   errors,
   className,
   errorClassName,
+  formId,
 }: {
   labelProps: LabelHTMLAttributes<HTMLLabelElement>;
   textareaProps: TextareaHTMLAttributes<HTMLTextAreaElement>;
   errors?: string[];
   className?: string;
   errorClassName?: string;
+  formId?: string;
 }) {
   const fallbackId = useId();
   const id = textareaProps.id ?? fallbackId;
   const errorId = errors?.length ? `${id}-error` : undefined;
+
+  const [meta] = useField("letter_type", { formId });
+
   const input = useInputControl({
     name: textareaProps.name!,
     formId: textareaProps.form!,
-    initialValue: textareaProps.defaultValue as string,
+    initialValue:
+      formId === "create-letter"
+        ? String(
+            DEFAULT_LETTER_CONTENT[
+              (meta.value as keyof typeof DEFAULT_LETTER_CONTENT) ??
+                "appointment_letter"
+            ],
+          )
+        : String(textareaProps.defaultValue!),
   });
 
   return (

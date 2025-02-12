@@ -233,6 +233,7 @@ export async function getPrimaryLocationByCompanyId({
     .eq("company_id", companyId)
     .eq("is_primary", true)
     .limit(SINGLE_QUERY_LIMIT)
+    .order("created_at", { ascending: false })
     .single<InferredType<LocationDatabaseRow, (typeof columns)[number]>>();
 
   if (error) {

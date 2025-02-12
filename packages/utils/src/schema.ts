@@ -1,4 +1,11 @@
 import { isValid, z } from "zod";
+import {
+  DEFAULT_EXPERIENCE_LETTER,
+  DEFAULT_NOC_LETTER,
+  DEFAULT_OFFER_LETTER,
+  DEFAULT_RELIEVING_LETTER,
+  DEFAULT_TERMINATION_LETTER,
+} from "../constant";
 
 export { z };
 
@@ -1188,7 +1195,7 @@ export type PayrollEmployeeData = {
   payrollId: string;
 };
 
-export const EmployeeLetterTypesArray = [
+export const employeeLetterTypesArray = [
   "appointment_letter",
   "experience_letter",
   "offer_letter",
@@ -1207,8 +1214,8 @@ export const EmployeeLetterSchema = z.object({
   subject: z.string().min(3).max(100),
   date: z.string().default(new Date().toISOString().split("T")[0]),
   letter_type: z
-    .enum(EmployeeLetterTypesArray)
-    .default(EmployeeLetterTypesArray[0]),
+    .enum(employeeLetterTypesArray)
+    .default(employeeLetterTypesArray[0]),
   content: z.string().optional(),
   employee_id: z.string().optional(),
 });

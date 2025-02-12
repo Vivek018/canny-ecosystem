@@ -1,10 +1,12 @@
 import {
+  createRole,
   EmployeeAddressesSchema,
   EmployeeBankDetailsSchema,
   EmployeeGuardiansSchema,
   EmployeeProjectAssignmentSchema,
   EmployeeSchema,
   EmployeeStatutorySchema,
+  hasPermission,
   isGoodStatus,
   SIZE_1MB,
 } from "@canny_ecosystem/utils";
@@ -52,6 +54,9 @@ import {
 } from "@/components/employees/form/create-employee-project-assignment";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { clearCacheEntry } from "@/utils/cache";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { attribute } from "@canny_ecosystem/utils/constant";
+import { safeRedirect } from "@/utils/server/http.server";
 
 export const CREATE_EMPLOYEE = [
   "create-employee",
@@ -77,15 +82,21 @@ const schemas = [
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(user?.role!, `${createRole}:${attribute.employee}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
+
   const urlSearchParams = new URLSearchParams(url.searchParams);
   const step = Number.parseInt(url.searchParams.get(STEP) || "1");
   const totalSteps = schemas.length;
 
   const session = await getSession(request.headers.get("Cookie"));
   const stepData: any[] = [];
-
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
   for (let i = 1; i <= totalSteps; i++) {
     stepData.push(await session.get(`${SESSION_KEY_PREFIX}${i}`));
@@ -163,7 +174,7 @@ export async function action({
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await parseMultipartFormData(
     request,
-    createMemoryUploadHandler({ maxPartSize: SIZE_1MB })
+    createMemoryUploadHandler({ maxPartSize: SIZE_1MB }),
   );
   const actionType = formData.get("_action") as string;
   const submission = parseWithZod(formData, { schema: currentSchema });
@@ -177,17 +188,17 @@ export async function action({
             message: "Form validation failed",
             returnTo: `/create-employee?step=${step}`,
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
       const employeeData = session.get(`${SESSION_KEY_PREFIX}1`);
       const employeeStatutoryDetailsData = session.get(
-        `${SESSION_KEY_PREFIX}2`
+        `${SESSION_KEY_PREFIX}2`,
       );
       const employeeBankDetailsData = session.get(`${SESSION_KEY_PREFIX}3`);
       const employeeProjectAssignmentData = session.get(
-        `${SESSION_KEY_PREFIX}4`
+        `${SESSION_KEY_PREFIX}4`,
       );
       const employeeAddressesData = session.get(`${SESSION_KEY_PREFIX}5`);
       const employeeGuardiansData =
@@ -218,7 +229,7 @@ export async function action({
             message: "Failed to create employee",
             returnTo: "/employees",
           },
-          { status: 500 }
+          { status: 500 },
         );
       }
 
@@ -235,7 +246,7 @@ export async function action({
             message: "Failed to save employee details",
             returnTo: DEFAULT_ROUTE,
           },
-          { status: 500 }
+          { status: 500 },
         );
       }
 
@@ -254,7 +265,7 @@ export async function action({
             headers: {
               "Set-Cookie": await commitSession(session),
             },
-          }
+          },
         );
       }
     } else if (
@@ -273,7 +284,7 @@ export async function action({
             message: "Form validation failed",
             returnTo: `/create-employee?step=${step}`,
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -298,7 +309,7 @@ export async function action({
         message: `An unexpected error occurred${error}`,
         returnTo: "/employees",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
@@ -364,8 +375,8 @@ export default function CreateEmployee() {
   });
 
   return (
-    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
-      <div className='w-full mx-auto mb-4'>
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
+      <div className="w-full mx-auto mb-4">
         <FormStepHeader
           totalSteps={totalSteps}
           step={step}
@@ -374,13 +385,13 @@ export default function CreateEmployee() {
       </div>
       <FormProvider context={form.context}>
         <Form
-          method='POST'
-          encType='multipart/form-data'
+          method="POST"
+          encType="multipart/form-data"
           {...getFormProps(form)}
-          className='flex flex-col'
+          className="flex flex-col"
         >
           <Card>
-            <div className='h-[560px] overflow-scroll'>
+            <div className="h-[560px] overflow-scroll">
               {step === 1 ? (
                 <CreateEmployeeDetails key={resetKey} fields={fields as any} />
               ) : null}
