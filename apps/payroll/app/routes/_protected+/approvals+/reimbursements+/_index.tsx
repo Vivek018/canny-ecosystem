@@ -3,7 +3,7 @@ import { FilterList } from "@/components/reimbursements/filter-list";
 import { ImportReimbursementModal } from "@/components/reimbursements/import-export/import-modal-reimbursements";
 
 import { ErrorBoundary } from "@/components/error-boundary";
-import { cacheKeyPrefix } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
@@ -30,6 +30,10 @@ import { Suspense } from "react";
 import { ReimbursementActions } from "@/components/reimbursements/reimbursement-actions";
 import { ReimbursementsTable } from "@/components/reimbursements/table/reimbursements-table";
 import { columns } from "@/components/reimbursements/table/columns";
+import { hasPermission, readRole } from "@canny_ecosystem/utils";
+import { safeRedirect } from "@/utils/server/http.server";
+import { attribute } from "@canny_ecosystem/utils/constant";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 
 const pageSize = LAZY_LOADING_LIMIT;
 
@@ -38,10 +42,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
 
+  if (!hasPermission(user?.role!, `${readRole}:${attribute.reimbursements}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
   try {
     const url = new URL(request.url);
-    const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
     const page = 0;
 
@@ -148,9 +156,9 @@ export default function ReimbursementsIndex() {
   const noFilters = Object.values(filterList).every((value) => !value);
 
   return (
-    <section className='py-6 px-4'>
-      <div className='w-full flex items-center justify-between pb-4'>
-        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4'>
+    <section className="py-6 px-4">
+      <div className="w-full flex items-center justify-between pb-4">
+        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
           <Suspense fallback={<div>Loading...</div>}>
             <Await resolve={projectPromise}>
               {(projectData) => (
@@ -197,7 +205,7 @@ export default function ReimbursementsIndex() {
               return (
                 <ErrorBoundary
                   error={error}
-                  message='Failed to load reimbursements'
+                  message="Failed to load reimbursements"
                 />
               );
             }

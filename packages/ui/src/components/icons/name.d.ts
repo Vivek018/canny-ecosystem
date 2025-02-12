@@ -4,6 +4,7 @@ export type IconName =
   | "calendar"
   | "caret-sort"
   | "chart"
+  | "check-circle"
   | "check"
   | "chevron-down"
   | "chevron-left"

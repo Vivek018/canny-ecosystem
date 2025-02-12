@@ -185,7 +185,7 @@ export default function ReimbursementsIndex() {
                         "flex items-center gap-1",
                         !hasPermission(
                           role,
-                          `${createRole}:${attribute.reimbursements}`
+                          `${createRole}:${attribute.employeeReimbursements}`
                         ) && "hidden"
                       )}
                     >

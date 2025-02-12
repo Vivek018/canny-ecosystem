@@ -9,6 +9,7 @@ export const modalSearchParamNames = {
   import_employee_bank_details: "import-employee-bank-details",
   import_employee_address: "import-employee-address",
   import_employee_guardians: "import-employee-guardians",
+  import_employee_attendance: "import-employee-attendance",
   import_reimbursement: "import-reimbursement",
   view_template_components: "view-template-components",
   view_link_template: "view-link-template",
@@ -120,6 +121,8 @@ export const attribute = {
   employeeProjectAssignment: "employee_project_assignment",
   employeeWorkHistory: "employee_work_history",
   employeeSkills: "employee_skills",
+  employeeReimbursements: "employee_reimbursements",
+  employeeAttendance: "employee_attendance",
   reimbursements: "reimbursements",
   exits: "exits",
   paymentFields: "payment_fields",
@@ -146,4 +149,20 @@ export const attribute = {
   settings: "settings",
   users: "users",
   payroll: "payroll",
+  attendance: "attendance",
+};
+
+export const months: { [key: string]: number } = {
+  January: 1,
+  February: 2,
+  March: 3,
+  April: 4,
+  May: 5,
+  June: 6,
+  July: 7,
+  August: 8,
+  September: 9,
+  October: 10,
+  November: 11,
+  December: 12,
 };

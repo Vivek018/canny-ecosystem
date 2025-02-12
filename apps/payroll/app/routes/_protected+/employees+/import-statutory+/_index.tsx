@@ -115,25 +115,25 @@ export default function EmployeeStatutoryImportFieldMapping() {
     }
   }, [file]);
 
-   useEffect(() => {
-      if (headerArray.length > 0) {
-        const initialMapping = FIELD_CONFIGS.reduce((mapping, field) => {
-          const matchedHeader = headerArray.find(
-            (value) =>
-              pipe(replaceUnderscore, replaceDash)(value?.toLowerCase()) ===
-              pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase())
-          );
-  
-          if (matchedHeader) {
-            mapping[field.key] = matchedHeader; 
-          }
-  
-          return mapping;
-        }, {} as Record<string, string>);
-  
-        setFieldMapping(initialMapping);
-      }
-    }, [headerArray]);
+  useEffect(() => {
+    if (headerArray.length > 0) {
+      const initialMapping = FIELD_CONFIGS.reduce((mapping, field) => {
+        const matchedHeader = headerArray.find(
+          (value) =>
+            pipe(replaceUnderscore, replaceDash)(value?.toLowerCase()) ===
+            pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase())
+        );
+
+        if (matchedHeader) {
+          mapping[field.key] = matchedHeader;
+        }
+
+        return mapping;
+      }, {} as Record<string, string>);
+
+      setFieldMapping(initialMapping);
+    }
+  }, [headerArray]);
 
   const validateMapping = () => {
     try {
@@ -210,18 +210,25 @@ export default function EmployeeStatutoryImportFieldMapping() {
         skipEmptyLines: true,
         transformHeader: (header) => swappedFieldMapping[header] || header,
         complete: async (results) => {
+          const allowedFields = FIELD_CONFIGS.map((field) => field.key);
           const finalData = results.data
             .filter((entry) =>
               Object.values(entry!).some((value) => String(value).trim() !== "")
             )
             .map((entry) => {
               const cleanEntry = Object.fromEntries(
-                Object.entries(entry as Record<string, any>).filter(
-                  ([key, value]) =>
-                    key.trim() !== "" &&
-                    value !== null &&
-                    String(value).trim() !== ""
-                )
+                Object.entries(entry as Record<string, any>)
+                  .filter(
+                    ([key, value]) =>
+                      key.trim() !== "" &&
+                      value !== null &&
+                      String(value).trim() !== ""
+                  )
+                  .filter(([key]) =>
+                    allowedFields.includes(
+                      key as keyof ImportEmployeeStatutoryDataType
+                    )
+                  )
               );
               return cleanEntry;
             });
