@@ -102,8 +102,8 @@ export async function getPaymentTemplateComponentsByTemplateId({
     .from("payment_template_components")
     .select(`${columns.join(",")}, payment_fields(id, name))`)
     .eq("template_id", templateId)
-    .limit(HARD_QUERY_LIMIT)
     .order("created_at", { ascending: true })
+    .limit(HARD_QUERY_LIMIT)
     .returns<PaymentTemplateComponentType[]>();
 
   if (error) {

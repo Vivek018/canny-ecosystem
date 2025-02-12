@@ -5,6 +5,8 @@ import { PayrollInfoCard } from "@/components/payroll/analytics/payroll-info-car
 import { PayrollTopSite } from "@/components/payroll/analytics/payroll-top-site";
 import { PayrollTrend } from "@/components/payroll/analytics/payroll-trend";
 import { StatutoryRatio } from "@/components/payroll/analytics/statutory-ratio";
+import { cacheKeyPrefix } from "@/constant";
+import { clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
   getEmployeesCountByCompanyId,
@@ -17,13 +19,18 @@ import {
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { type ClientLoaderFunctionArgs, useLoaderData } from "@remix-run/react";
 
 export type PayrollFilterType = {
   start_month?: string | undefined | null;
   end_month?: string | undefined | null;
   start_year?: string | undefined | null;
   end_year?: string | undefined | null;
+};
+
+export type AttendanceFilterType = {
+  year?: string | undefined | null;
+  month?: string | undefined | null;
 };
 
 export type CardInfoData = {
@@ -124,6 +131,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
   }
 }
 
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+  return await clientCaching(cacheKeyPrefix.dashboard, args);
+}
+
+clientLoader.hydrate = true;
+
 export default function Dashboard() {
   const {
     payrollData,
@@ -146,19 +159,19 @@ export default function Dashboard() {
   };
 
   if (error)
-    return <ErrorBoundary error={error} message="Failed to load data" />;
+    return <ErrorBoundary error={error} message='Failed to load data' />;
 
   return (
-    <section className="w-full p-4 flex flex-col gap-4">
-      <div className="flex justify-end">
-        <div className="flex justify-between gap-3">
+    <section className='w-full p-4 flex flex-col gap-4'>
+      <div className='flex justify-end'>
+        <div className='flex justify-between gap-3'>
           <FilterList filterList={filters} />
           <DashboardFilter />
         </div>
       </div>
-      <div className="w-full flex flex-col gap-4">
+      <div className='w-full flex flex-col gap-4'>
         <PayrollTrend chartData={payrollData} />
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
           <PayrollInfoCard cardData={cardData} />
 
           <StatutoryRatio chartData={payrollEntriesData} />

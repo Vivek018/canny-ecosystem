@@ -10,42 +10,48 @@ import { Label } from "@canny_ecosystem/ui/label";
 import { ToggleGroup, ToggleGroupItem } from "@canny_ecosystem/ui/toggle-group";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { getOrdinalSuffix } from "@canny_ecosystem/utils";
-import { useNavigate } from "@remix-run/react";
+import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
+import { useNavigate, useParams, useSearchParams } from "@remix-run/react";
 
 export const ViewPaySequenceDialog = ({
   values,
 }: {
   values: Omit<SitePaySequenceDatabaseRow, "created_at" | "updated_at">;
 }) => {
+  const { projectId } = useParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
+  const isOpen =
+    searchParams.get("step") === modalSearchParamNames.view_pay_sequence;
+
   const handleOpenChange = () => {
-    navigate(-1);
+    navigate(`/projects/${projectId}/sites`);
   };
 
   return (
-    <Dialog defaultOpen={true} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-max">
-        <DialogHeader className="mb-4">
-          <DialogTitle>Pay Sequence Details</DialogTitle>
-        </DialogHeader>
-        <div className="flex flex-col gap-6">
-          <div className="flex items-center gap-2">
-            <Label className="font-bold">Pay Day:</Label>
-            <p className="text-base">
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+      <DialogContent className='max-w-max'>
+      <DialogHeader className='mb-4'>
+        <DialogTitle>Pay Sequence Details</DialogTitle>
+      </DialogHeader>
+        <div className='flex flex-col gap-6'>
+          <div className='flex items-center gap-2'>
+            <Label className='font-bold'>Pay Day:</Label>
+            <p className='text-base'>
               {getOrdinalSuffix(values.pay_day)} of every month
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <Label className="font-bold">Pay Frequency:</Label>
-            <p className="capitalize">{values.pay_frequency}</p>
+          <div className='flex items-center gap-2'>
+            <Label className='font-bold'>Pay Frequency:</Label>
+            <p className='capitalize'>{values.pay_frequency}</p>
           </div>
-          <div className="flex items-center gap-2">
-            <Label className="w-max font-bold">Working Days:</Label>
+          <div className='flex items-center gap-2'>
+            <Label className='w-max font-bold'>Working Days:</Label>
             <ToggleGroup
-              type="multiple"
-              variant="outline"
-              className="flex gap-2"
+              type='multiple'
+              variant='outline'
+              className='flex gap-2'
               disabled={true}
             >
               {workingDaysOptions.map(({ label, value }) => (
@@ -54,7 +60,7 @@ export const ViewPaySequenceDialog = ({
                   className={cn(
                     "flex items-center space-x-2 disabled:opacity-100",
                     values.working_days.includes(Number.parseInt(value)) &&
-                      "bg-secondary",
+                      "bg-secondary"
                   )}
                 >
                   {label}

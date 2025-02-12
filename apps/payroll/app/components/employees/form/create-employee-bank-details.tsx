@@ -32,7 +32,7 @@ export function CreateEmployeeBankDetails({
   return (
     <Fragment>
       <CardHeader>
-        <CardTitle className="text-3xl">
+        <CardTitle className='text-3xl capitalize'>
           {isUpdate ? "Update" : "Add"} Employee Bank Details
         </CardTitle>
         <CardDescription>
@@ -41,12 +41,14 @@ export function CreateEmployeeBankDetails({
       </CardHeader>
       <CardContent>
         <input {...getInputProps(fields.employee_id, { type: "hidden" })} />
-        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+        <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
           <Field
             inputProps={{
               ...getInputProps(fields.account_number, { type: "text" }),
               autoFocus: true,
-              placeholder: `Enter ${replaceUnderscore(fields.account_number.name)}`,
+              placeholder: `Enter ${replaceUnderscore(
+                fields.account_number.name
+              )}`,
             }}
             labelProps={{
               children: replaceUnderscore(fields.account_number.name),
@@ -64,11 +66,13 @@ export function CreateEmployeeBankDetails({
             errors={fields.ifsc_code.errors}
           />
         </div>
-        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+        <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
           <Field
             inputProps={{
               ...getInputProps(fields.account_holder_name, { type: "text" }),
-              placeholder: `Enter ${replaceUnderscore(fields.account_holder_name.name)}`,
+              placeholder: `Enter ${replaceUnderscore(
+                fields.account_holder_name.name
+              )}`,
             }}
             labelProps={{
               children: replaceUnderscore(fields.account_holder_name.name),
@@ -76,21 +80,23 @@ export function CreateEmployeeBankDetails({
             errors={fields.account_holder_name.errors}
           />
           <SearchableSelectField
-            className="w-full capitalize flex-1"
+            className='w-full capitalize flex-1'
             options={transformStringArrayIntoOptions(
-              accountTypeArray as unknown as string[],
+              accountTypeArray as unknown as string[]
             )}
             inputProps={{
               ...getInputProps(fields.account_type, { type: "text" }),
             }}
-            placeholder={`Select ${replaceUnderscore(fields.account_type.name)}`}
+            placeholder={`Select ${replaceUnderscore(
+              fields.account_type.name
+            )}`}
             labelProps={{
               children: replaceUnderscore(fields.account_type.name),
             }}
             errors={fields.account_type.errors}
           />
         </div>
-        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+        <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
           <Field
             inputProps={{
               ...getInputProps(fields.bank_name, { type: "text" }),
@@ -104,7 +110,9 @@ export function CreateEmployeeBankDetails({
           <Field
             inputProps={{
               ...getInputProps(fields.branch_name, { type: "text" }),
-              placeholder: `Enter ${replaceUnderscore(fields.branch_name.name)}`,
+              placeholder: `Enter ${replaceUnderscore(
+                fields.branch_name.name
+              )}`,
             }}
             labelProps={{
               children: replaceUnderscore(fields.branch_name.name),

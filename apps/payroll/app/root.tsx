@@ -5,6 +5,7 @@ import {
   type HeadersFunction,
 } from "@remix-run/node";
 import {
+  type ClientLoaderFunctionArgs,
   Link,
   Links,
   Meta,
@@ -13,6 +14,7 @@ import {
   ScrollRestoration,
   useLoaderData,
 } from "@remix-run/react";
+import { clientCaching } from "./utils/cache";
 
 import tailwindStyleSheetUrl from "@/styles/tailwind.css?url";
 import { getTheme } from "./utils/server/theme.server";
@@ -28,7 +30,7 @@ import {
   setCompanyId,
 } from "./utils/server/company.server";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { DEFAULT_ROUTE } from "./constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "./constant";
 import { Toaster } from "@canny_ecosystem/ui/toaster";
 import { ErrorBoundary } from "./components/error-boundary";
 import {
@@ -105,6 +107,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
   }
 }
 
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+  return await clientCaching(cacheKeyPrefix.root, args);
+}
+
+clientLoader.hydrate = true;
+
 function Document({
   children,
   nonce,
@@ -115,15 +123,15 @@ function Document({
   theme?: string;
 }) {
   return (
-    <html lang="en" className={`${theme} h-full overflow-x-hidden`}>
+    <html lang='en' className={`${theme} h-full overflow-x-hidden`}>
       <head>
         <ClientHintCheck nonce={nonce} />
         <Meta />
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <meta charSet='utf-8' />
+        <meta name='viewport' content='width=device-width,initial-scale=1' />
         <Links />
       </head>
-      <body className="h-full w-full bg-background text-foreground">
+      <body className='h-full w-full bg-background text-foreground'>
         {children}
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />
@@ -147,10 +155,10 @@ function App() {
 
   return (
     <Document nonce={nonce} theme={theme}>
-      <main className="flex h-full w-full bg-background text-foreground ">
+      <main className='flex h-full w-full bg-background text-foreground '>
         {!user?.email ? (
-          <div className="w-full h-full">
-            <header className="flex justify-between items-center mx-5 mt-4 md:mx-10 md:mt-10">
+          <div className='w-full h-full'>
+            <header className='flex justify-between items-center mx-5 mt-4 md:mx-10 md:mt-10'>
               <div>
                 <Link to={DEFAULT_ROUTE}>
                   <Logo />

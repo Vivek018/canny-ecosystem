@@ -30,7 +30,7 @@ import {
   replaceUnderscore,
   updateRole,
 } from "@canny_ecosystem/utils";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
 export function LocationCard({
@@ -38,21 +38,21 @@ export function LocationCard({
 }: {
   location: Omit<LocationDatabaseRow, "created_at" | "updated_at">;
 }) {
-  const { role } = useUserRole();
+  const { role } = useUser();
   return (
     <Card
       key={location.id}
-      className="w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start"
+      className='w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start'
     >
-      <CardHeader className="flex flex-row space-y-0 items-center justify-between p-4">
-        <CardTitle className="text-lg tracking-wide">{location.name}</CardTitle>
-        <div className="flex items-center gap-3">
+      <CardHeader className='flex flex-row space-y-0 items-center justify-between p-4'>
+        <CardTitle className='text-lg tracking-wide'>{location.name}</CardTitle>
+        <div className='flex items-center gap-3'>
           <TooltipProvider>
             <Tooltip delayDuration={100}>
               <TooltipTrigger asChild>
                 <Link
-                  prefetch="intent"
-                  to={`/settings/${location.id}/update-location`}
+                  prefetch='intent'
+                  to={`/settings/locations/${location.id}/update-location`}
                   className={cn(
                     "p-2 rounded-md bg-secondary grid place-items-center ",
                     !hasPermission(
@@ -61,7 +61,7 @@ export function LocationCard({
                     ) && "hidden"
                   )}
                 >
-                  <Icon name="edit" size="xs" />
+                  <Icon name='edit' size='xs' />
                 </Link>
               </TooltipTrigger>
               <TooltipContent>Edit</TooltipContent>
@@ -80,9 +80,9 @@ export function LocationCard({
                   "hidden"
               )}
             >
-              <Icon name="dots-vertical" size="xs" />
+              <Icon name='dots-vertical' size='xs' />
             </DropdownMenuTrigger>
-            <DropdownMenuContent sideOffset={10} align="end">
+            <DropdownMenuContent sideOffset={10} align='end'>
               <DropdownMenuGroup>
                 <DropdownMenuItem
                   className={cn(
@@ -108,12 +108,11 @@ export function LocationCard({
                 </DropdownMenuItem>
                 <DropdownMenuSeparator
                   className={cn(
-                    (!location.latitude && !location.longitude) ||
-                      (!hasPermission(
-                        `${role}`,
-                        `${deleteRole}:${attribute.settingLocations}`
-                      ) &&
-                        "hidden")
+                    !location.latitude && !location.longitude && "hidden",
+                    !hasPermission(
+                      `${role}`,
+                      `${deleteRole}:${attribute.settingLocations}`
+                    ) && "hidden"
                   )}
                 />
                 <DeleteLocation locationId={location.id} />
@@ -122,13 +121,13 @@ export function LocationCard({
           </DropdownMenu>
         </div>
       </CardHeader>
-      <CardContent className="flex flex-col gap-0.5 px-4">
-        <address className="not-italic line-clamp-3">
+      <CardContent className='flex flex-col gap-0.5 px-4'>
+        <address className='not-italic line-clamp-3'>
           {`${location.address_line_1} ${
             location.address_line_2 ? location.address_line_2 : ""
           }`}
         </address>
-        <div className="flex items-center capitalize gap-2">
+        <div className='flex items-center capitalize gap-2'>
           <p>{`${location.city},`}</p>
           <p>{`${replaceUnderscore(location.state)}`}</p>
           <p>{`- ${location.pincode}`}</p>
@@ -140,7 +139,7 @@ export function LocationCard({
           !location.is_primary && "opacity-0"
         )}
       >
-        <Icon name="dot-filled" size="xs" />
+        <Icon name='dot-filled' size='xs' />
         Primary
       </CardFooter>
     </Card>

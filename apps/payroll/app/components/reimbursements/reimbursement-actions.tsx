@@ -4,6 +4,7 @@ import { useNavigate } from "@remix-run/react";
 import { ColumnVisibility } from "./column-visibility";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useReimbursementStore } from "@/store/reimbursements";
+import { ImportReimbursementMenu } from "./import-menu";
 
 export function ReimbursementActions({ isEmpty }: { isEmpty: boolean }) {
   const { selectedRows } = useReimbursementStore();
@@ -12,7 +13,7 @@ export function ReimbursementActions({ isEmpty }: { isEmpty: boolean }) {
   return (
     <div className="space-x-2 hidden md:flex">
       <ColumnVisibility disabled={isEmpty} hidden={!!selectedRows.length} />
-
+      <ImportReimbursementMenu />
       <Button
         variant="outline"
         size="icon"

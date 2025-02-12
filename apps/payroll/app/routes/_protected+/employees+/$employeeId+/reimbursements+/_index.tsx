@@ -1,126 +1,122 @@
 import { FilterList } from "@/components/reimbursements/filter-list";
 import { ReimbursementSearchFilter } from "@/components/reimbursements/reimbursement-search-filter";
-import { reimbursementsColumns } from "@/components/reimbursements/table/columns";
+import { columns } from "@/components/reimbursements/table/columns";
 import { ReimbursementsTable } from "@/components/reimbursements/table/reimbursements-table";
-import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
+import { cacheKeyPrefix } from "@/constant";
+import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import {
   LAZY_LOADING_LIMIT,
   MAX_QUERY_LIMIT,
 } from "@canny_ecosystem/supabase/constant";
 import {
-  getProjectNamesByCompanyId,
   getReimbursementsByEmployeeId,
-  getSiteNamesByProjectName,
   getUsersEmail,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
-
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { createRole, hasPermission } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { json, Link, redirect, useLoaderData } from "@remix-run/react";
-
-export const UPDATE_REIMBURSEMENTS_TAG = "Update Reimbursements";
+import {
+  Await,
+  type ClientLoaderFunctionArgs,
+  defer,
+  Link,
+  Outlet,
+  redirect,
+  useLoaderData,
+} from "@remix-run/react";
+import { Suspense } from "react";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-
-  const url = new URL(request.url);
-  const employeeId = params.employeeId;
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  let reimbursementData = null;
-  const searchParams = new URLSearchParams(url.searchParams);
-  const sortParam = searchParams.get("sort");
-  const query = searchParams.get("name") ?? undefined;
-  const page = 0;
-
-  const filters = {
-    submitted_date_start: searchParams.get("submitted_date_start") ?? undefined,
-    submitted_date_end: searchParams.get("submitted_date_end") ?? undefined,
-    status: searchParams.get("status") ?? undefined,
-    is_deductible: searchParams.get("is_deductible") ?? undefined,
-    users: searchParams.get("users") ?? undefined,
-    name: query,
-    project: searchParams.get("project") ?? undefined,
-    project_site: searchParams.get("project_site") ?? undefined,
-  };
-
-  const { data, error } = await getUsersEmail({ supabase });
-  if (error) {
-    throw error;
-  }
-  const hasFilters =
-    filters &&
-    Object.values(filters).some(
-      (value) => value !== null && value !== undefined
-    );
-
-  let theMeta = null;
-  if (employeeId) {
-    const { data, error, meta } = await getReimbursementsByEmployeeId({
-      supabase,
-      employeeId: employeeId,
-      params: {
-        from: 0,
-        to: hasFilters
-          ? MAX_QUERY_LIMIT
-          : page > 0
-          ? LAZY_LOADING_LIMIT
-          : LAZY_LOADING_LIMIT - 1,
-        filters,
-        searchQuery: query ?? undefined,
-        sort: sortParam?.split(":") as [string, "asc" | "desc"],
-      },
-    });
-
-    if (error) {
-      throw error;
-    }
-
-    reimbursementData = data;
-    theMeta = meta;
-  }
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
-  const hasNextPage = Boolean(
-    theMeta?.count && theMeta.count / (page + 1) > LAZY_LOADING_LIMIT
-  );
-  const { data: projectData } = await getProjectNamesByCompanyId({
-    supabase,
-    companyId,
-  });
 
-  let projectSiteData = null;
-  if (filters.project) {
-    const { data } = await getSiteNamesByProjectName({
-      supabase,
-      projectName: filters.project,
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const url = new URL(request.url);
+    const employeeId = params.employeeId;
+    const searchParams = new URLSearchParams(url.searchParams);
+    const sortParam = searchParams.get("sort");
+    const query = searchParams.get("name") ?? undefined;
+    const page = 0;
+
+    const filters = {
+      submitted_date_start:
+        searchParams.get("submitted_date_start") ?? undefined,
+      submitted_date_end: searchParams.get("submitted_date_end") ?? undefined,
+      status: searchParams.get("status") ?? undefined,
+      is_deductible: searchParams.get("is_deductible") ?? undefined,
+      users: searchParams.get("users") ?? undefined,
+      name: query,
+    };
+
+    const hasFilters =
+      filters &&
+      Object.values(filters).some(
+        (value) => value !== null && value !== undefined
+      );
+
+    const usersPromise = getUsersEmail({ supabase });
+
+    let reimbursementPromise = null;
+    if (employeeId) {
+      reimbursementPromise = getReimbursementsByEmployeeId({
+        supabase,
+        employeeId: employeeId,
+        params: {
+          from: 0,
+          to: hasFilters
+            ? MAX_QUERY_LIMIT
+            : page > 0
+            ? LAZY_LOADING_LIMIT
+            : LAZY_LOADING_LIMIT - 1,
+          filters,
+          searchQuery: query ?? undefined,
+          sort: sortParam?.split(":") as [string, "asc" | "desc"],
+        },
+      });
+    }
+
+    return defer({
+      reimbursementPromise: reimbursementPromise as any,
+      usersPromise,
+      employeeId,
+      filters,
+      env,
     });
-    projectSiteData = data;
+  } catch (error) {
+    console.error("Error in loader function:", error);
+    return defer({
+      reimbursementPromise: Promise.resolve({ data: [] }),
+      usersPromise: Promise.resolve({ data: [] }),
+      employeeId: "",
+      filters: {},
+      env,
+    });
   }
-
-  return json({
-    data: reimbursementData as any,
-    env,
-    employeeId,
-    hasNextPage,
-    filters,
-    query,
-    projectArray: projectData?.map((project) => project.name) ?? [],
-    projectSiteArray: projectSiteData?.map((site) => site.name) ?? [],
-    userEmails: data?.map((user) => user.email) ?? [],
-  });
 }
+
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+  const url = new URL(args.request.url);
+  return await clientCaching(
+    `${cacheKeyPrefix.employee_reimbursements}${
+      args.params.employeeId
+    }${url.searchParams.toString()}`,
+    args
+  );
+}
+
+clientLoader.hydrate = true;
 
 export async function action({ request }: ActionFunctionArgs) {
   const url = new URL(request.url);
   const formData = await request.formData();
-
   const prompt = formData.get("prompt") as string | null;
 
   const searchParams = new URLSearchParams();
@@ -129,65 +125,91 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   url.search = searchParams.toString();
-
   return redirect(url.toString());
 }
 
 export default function ReimbursementsIndex() {
-  const { role } = useUserRole();
-  const {
-    data,
-    env,
-    employeeId,
-    filters,
-    userEmails,
-    hasNextPage,
-    projectArray,
-    projectSiteArray,
-  } = useLoaderData<typeof loader>();
+  const { role } = useUser();
+  const { toast } = useToast();
+  const { reimbursementPromise, usersPromise, employeeId, filters, env } =
+    useLoaderData<typeof loader>();
 
   const noFilters = Object.values(filters).every((value) => !value);
 
   return (
-    <section className="m-4">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="w-full flex justify-between items-center ">
-          <div className="flex gap-3">
-            <ReimbursementSearchFilter
-              disabled={!data?.length && noFilters}
-              userEmails={userEmails}
-              employeeId={employeeId}
-              projectArray={projectArray}
-              projectSiteArray={projectSiteArray}
-            />
-            <FilterList filters={filters} />
-          </div>
+    <section className='py-4'>
+      <Suspense>
+        <Await
+          resolve={Promise.all([reimbursementPromise, usersPromise])}
+          errorElement={
+            <div>Error loading filters. Please try again later.</div>
+          }
+        >
+          {([{ data, meta, error }, usersData]) => {
+            if (error) {
+              clearCacheEntry(
+                `${cacheKeyPrefix.employee_reimbursements}${employeeId}`
+              );
+              toast({
+                variant: "destructive",
+                title: "Error",
+                description: "Failed to load reimbursements. Please try again.",
+              });
+              return null;
+            }
 
-          <Link
-            to={"add-reimbursement"}
-            className={cn(
-              buttonVariants({ variant: "primary-outline" }),
-              "flex items-center gap-1",
-              !hasPermission(
-                role,
-                `${updateRole}:${attribute.reimbursements}`
-              ) && "hidden"
-            )}
-          >
-            <span>Add</span>
-            <span className="hidden md:flex justify-end">Claim</span>
-          </Link>
-        </div>
-      </div>
-      <ReimbursementsTable
-        data={data ?? []}
-        noFilters={noFilters}
-        columns={reimbursementsColumns({ isEmployeeRoute: true })}
-        hasNextPage={hasNextPage}
-        pageSize={LAZY_LOADING_LIMIT}
-        env={env}
-        employeeId={employeeId}
-      />
+            const hasNextPage = Boolean(
+              meta?.count && meta.count / (0 + 1) > LAZY_LOADING_LIMIT
+            );
+            return (
+              <>
+                <div className='w-full flex items-center justify-between pb-4'>
+                  <div className='w-full flex justify-between items-center'>
+                    <div className='flex'>
+                      <ReimbursementSearchFilter
+                        disabled={!data?.length && noFilters}
+                        userEmails={
+                          usersData?.data
+                            ? usersData?.data?.map((user) => user!.email)
+                            : []
+                        }
+                        employeeId={employeeId}
+                      />
+                      <FilterList filters={filters} />
+                    </div>
+
+                    <Link
+                      to={"add-reimbursement"}
+                      className={cn(
+                        buttonVariants({ variant: "primary-outline" }),
+                        "flex items-center gap-1",
+                        !hasPermission(
+                          role,
+                          `${createRole}:${attribute.employeeReimbursements}`
+                        ) && "hidden"
+                      )}
+                    >
+                      <span>Add</span>
+                      <span className='hidden md:flex justify-end'>Claim</span>
+                    </Link>
+                  </div>
+                </div>
+
+                <ReimbursementsTable
+                  data={data ?? []}
+                  noFilters={noFilters}
+                  columns={columns({ isEmployeeRoute: true })}
+                  hasNextPage={hasNextPage}
+                  pageSize={LAZY_LOADING_LIMIT}
+                  env={env}
+                  employeeId={employeeId}
+                />
+              </>
+            );
+          }}
+        </Await>
+      </Suspense>
+      <Outlet />
     </section>
   );
 }

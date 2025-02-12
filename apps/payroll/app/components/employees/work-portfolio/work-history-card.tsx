@@ -23,13 +23,14 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import type { EmployeeWorkHistoryDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { DeleteWorkHistory } from "./delete-work-history";
 import {
+  createRole,
   deleteRole,
   formatDate,
   hasPermission,
   replaceUnderscore,
   updateRole,
 } from "@canny_ecosystem/utils";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
 type DetailItemProps = {
@@ -61,7 +62,7 @@ export const WorkHistoryItem = ({
 }: {
   workHistory: EmployeeWorkHistory;
 }) => {
-  const { role } = useUserRole();
+  const { role } = useUser();
   return (
     <Card
       key={workHistory.id}
@@ -147,7 +148,7 @@ export const EmployeeWorkHistoriesCard = ({
 }: {
   employeeWorkHistories: EmployeeWorkHistory[] | null;
 }) => {
-  const { role } = useUserRole();
+  const { role } = useUser();
   return (
     <Card className="rounded w-full h-full p-4">
       <div className="flex justify-between items-center mb-6">
@@ -160,7 +161,7 @@ export const EmployeeWorkHistoriesCard = ({
               "bg-card",
               !hasPermission(
                 `${role}`,
-                `${updateRole}:${attribute.employeeWorkHistory}`
+                `${createRole}:${attribute.employeeWorkHistory}`
               ) && "hidden"
             )}
           >

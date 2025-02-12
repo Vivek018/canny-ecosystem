@@ -2,31 +2,24 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { SecondaryMenu } from "@canny_ecosystem/ui/secondary-menu";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { json, type LoaderFunctionArgs } from "@remix-run/node";
-import { Link, Outlet, useLoaderData, useLocation } from "@remix-run/react";
-
-export async function loader({ params }: LoaderFunctionArgs) {
-  const employeeId = params.employeeId;
-
-  return json({ sucess: true, message: "Employee id found", employeeId });
-}
+import { Link, Outlet, useLocation, useParams } from "@remix-run/react";
 
 export default function Employee() {
-  const { employeeId } = useLoaderData<typeof loader>();
+  const { employeeId } = useParams();
   const { pathname } = useLocation();
 
   return (
-    <section className="relative">
-      <div className="flex items-center gap-4 py-2.5 px-4 border-b">
+    <section className='relative'>
+      <div className='flex items-center gap-4 py-2.5 px-4 border-b'>
         <Link
-          prefetch="intent"
-          to="/employees"
+          prefetch='intent'
+          to='/employees'
           className={cn(
             buttonVariants({ variant: "outline" }),
-            "bg-card w-9 h-9 px-0 rounded-full",
+            "bg-card w-9 h-9 px-0 rounded-full"
           )}
         >
-          <Icon name="chevron-left" size="sm" />
+          <Icon name='chevron-left' size='sm' />
         </Link>
         <SecondaryMenu
           items={[
@@ -39,12 +32,20 @@ export default function Employee() {
               label: "Reimbursements",
               path: `/employees/${employeeId}/reimbursements`,
             },
+            {
+              label: "Letters",
+              path: `/employees/${employeeId}/letters`,
+            },
+            {
+              label: "Attendance",
+              path: `/employees/${employeeId}/attendance`,
+            },
           ]}
           pathname={pathname}
           Link={Link}
         />
       </div>
-      <div className="px-4">
+      <div className='px-4'>
         <Outlet />
       </div>
     </section>

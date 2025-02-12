@@ -24,8 +24,9 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import type { ProfessionalTaxDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const UPDATE_PROFESSIONAL_TAX = "update-professional-tax";
 
@@ -110,6 +111,7 @@ export default function UpdateProfessionalTax() {
   useEffect(() => {
     if (!actionData) return;
     if (actionData.status === "success") {
+      clearExactCacheEntry(cacheKeyPrefix.professional_tax);
       toast({
         title: "Success",
         description: actionData.message,

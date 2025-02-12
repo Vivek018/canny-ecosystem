@@ -14,6 +14,7 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import {
   Await,
+  type ClientLoaderFunctionArgs,
   defer,
   json,
   Link,
@@ -23,14 +24,15 @@ import {
 import { Suspense } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { ProjectsWrapper } from "@/components/projects/projects-wrapper";
-import { hasPermission, updateRole } from "@canny_ecosystem/utils";
-import { useUserRole } from "@/utils/user";
+import { hasPermission, createRole } from "@canny_ecosystem/utils";
+import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
+import { cacheKeyPrefix } from "@/constant";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase} = getSupabaseWithHeaders({ request });
+  const { supabase } = getSupabaseWithHeaders({ request });
 
-  
   try {
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
@@ -58,36 +60,43 @@ export async function loader({ request }: LoaderFunctionArgs) {
   }
 }
 
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+  return await clientCaching(cacheKeyPrefix.projects, args);
+}
+
+clientLoader.hydrate = true;
+
 export default function ProjectsIndex() {
-  const { role } = useUserRole();
+  const { role } = useUser();
   const { projectsPromise, error } = useLoaderData<typeof loader>();
   const { isDocument } = useIsDocument();
 
   if (error) {
-    return <ErrorBoundary error={error} message="Failed to load projects" />;
+    clearExactCacheEntry(cacheKeyPrefix.projects);
+    return <ErrorBoundary error={error} message='Failed to load projects' />;
   }
 
   return (
-    <section className="py-4 px-4">
-      <div className="w-full flex items-end justify-between">
-        <Command className="overflow-visible">
-          <div className="w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4">
+    <section className='py-4 px-4'>
+      <div className='w-full flex items-end justify-between'>
+        <Command className='overflow-visible'>
+          <div className='w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4'>
             <CommandInput
-              divClassName="border border-input rounded-md h-10 flex-1"
-              placeholder="Search Projects"
+              divClassName='border border-input rounded-md h-10 flex-1'
+              placeholder='Search Projects'
               autoFocus={true}
             />
             <Link
-              to="/projects/create-project"
+              to='/projects/create-project'
               className={cn(
                 buttonVariants({ variant: "primary-outline" }),
                 "flex items-center gap-1",
-                !hasPermission(role, `${updateRole}:${attribute.projects}`) &&
+                !hasPermission(role, `${createRole}:${attribute.projects}`) &&
                   "hidden"
               )}
             >
               <span>Add</span>
-              <span className="hidden md:flex justify-end">Project</span>
+              <span className='hidden md:flex justify-end'>Project</span>
             </Link>
           </div>
           <CommandEmpty
@@ -98,15 +107,17 @@ export default function ProjectsIndex() {
           >
             No project found.
           </CommandEmpty>
-          <CommandList className="max-h-full py-6 overflow-x-visible overflow-y-visible">
-            <CommandGroup className="p-0 overflow-visible">
+          <CommandList className='max-h-full py-6 overflow-x-visible overflow-y-visible'>
+            <CommandGroup className='p-0 overflow-visible'>
               <Suspense fallback={<div>Loading...</div>}>
                 <Await resolve={projectsPromise}>
                   {(resolvedData) => {
-                    if (!resolvedData)
+                    if (!resolvedData) {
+                      clearExactCacheEntry(cacheKeyPrefix.projects);
                       return (
-                        <ErrorBoundary message="Failed to load projects" />
+                        <ErrorBoundary message='Failed to load projects' />
                       );
+                    }
                     return (
                       <ProjectsWrapper
                         data={resolvedData.data}

@@ -11,7 +11,7 @@ import { DeleteEmployee } from "./delete-employee";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { EmployeeDialog } from "../link-template/employee-dialog";
 import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
-import { useUserRole } from "@/utils/user";
+import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const EmployeeOptionsDropdown = ({
@@ -29,7 +29,7 @@ export const EmployeeOptionsDropdown = ({
   env: SupabaseEnv;
 }) => {
   const submit = useSubmit();
-  const { role } = useUserRole();
+  const { role } = useUser();
   const handleMarkAsActive = () => {
     submit(
       {
@@ -61,7 +61,7 @@ export const EmployeeOptionsDropdown = ({
   return (
     <DropdownMenu>
       {triggerChild}
-      <DropdownMenuContent sideOffset={10} align="end">
+      <DropdownMenuContent sideOffset={10} align='end'>
         <DropdownMenuGroup>
           <DropdownMenuItem
             className={cn(

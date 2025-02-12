@@ -36,19 +36,19 @@ import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
 
 const PLACEHOLDERS = [
   "Employees joined after Jan 2020 with a supervisor position",
-  "Active employees with a bachelor's degree at Site B",
+  "Active employees with a bachelor's degree at Project Site 'B'",
   "Skilled employees left between 2022-2024 as a contractor",
   "Male employees born after 1990 working as Sampler",
   "Inactive employees in Project A who left before 2023",
   "Semi Skilled Employees born 1990-2000 in full time",
   "Employees joined before 2015",
-  "Active employees in part time roles at Site C",
+  "Active employees in part time roles at Site 'C'",
   "Employees left after 2022 with semi skilled skills",
-  "Employees in 'Project X' born before 1985",
+  "Employees in Project 'X' born before 1985",
   "Employees joined before 2018 in Sampler role",
-  "Employees born before 1995 who worked at Site B",
+  "Employees born before 1995 who worked at Site 'B'",
   "Employees joined in 2019 in supervisor role",
-  "Full-time employees at Project Site B",
+  "Full-time employees at Project Site 'B'",
 ];
 
 export function EmployeesSearchFilter({
@@ -154,7 +154,7 @@ export function EmployeesSearchFilter({
     },
     {
       enableOnFormTags: true,
-    },
+    }
   );
 
   useHotkeys(["meta+s", "ctrl+s"], (evt) => {
@@ -189,7 +189,7 @@ export function EmployeesSearchFilter({
         {
           action: "/employees?index",
           method: "POST",
-        },
+        }
       );
     } else {
       if (prompt.length) {
@@ -201,14 +201,14 @@ export function EmployeesSearchFilter({
 
   const hasValidFilters =
     Object.entries(filterParams).filter(
-      ([key, value]) => value?.length && key !== "name",
+      ([key, value]) => value?.length && key !== "name"
     ).length > 0;
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-      <div className="flex space-x-4 w-full md:w-auto items-center">
+      <div className='flex space-x-4 w-full md:w-auto items-center'>
         <form
-          className="relative w-full md:w-auto"
+          className='relative w-full md:w-auto'
           onSubmit={(e) => {
             e.preventDefault();
             handleSubmit();
@@ -218,7 +218,7 @@ export function EmployeesSearchFilter({
             name={isSubmitting ? "update" : "search"}
             className={cn(
               "absolute pointer-events-none left-3 top-[12.5px]",
-              isSubmitting && "animate-spin",
+              isSubmitting && "animate-spin"
             )}
           />
           <Input
@@ -230,42 +230,42 @@ export function EmployeesSearchFilter({
                 : animatedPlaceholder
             }
             disabled={disabled}
-            className="pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70"
+            className='pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70'
             value={prompt}
             onChange={handleSearch}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
-            autoComplete="on"
-            autoCapitalize="none"
-            autoCorrect="off"
-            spellCheck="false"
+            autoComplete='on'
+            autoCapitalize='none'
+            autoCorrect='off'
+            spellCheck='false'
           />
 
           <DropdownMenuTrigger disabled={disabled} asChild>
             <button
               onClick={() => setIsOpen((prev) => !prev)}
-              type="button"
+              type='button'
               disabled={disabled}
               className={cn(
                 "absolute z-10 right-3 top-[6px] opacity-70",
                 !disabled &&
                   "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 hasValidFilters && "opacity-100",
-                isOpen && "opacity-100",
+                isOpen && "opacity-100"
               )}
             >
-              <Icon name="mixer" />
+              <Icon name='mixer' />
             </button>
           </DropdownMenuTrigger>
         </form>
       </div>
 
       <DropdownMenuContent
-        className="w-full md:w-[480px]"
-        align="end"
+        className='w-full md:w-[480px]'
+        align='end'
         sideOffset={19}
         alignOffset={-11}
-        side="top"
+        side='top'
       >
         <DropdownMenuGroup>
           <DropdownMenuSub>
@@ -276,17 +276,15 @@ export function EmployeesSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 <Calendar
-                  mode="range"
-                  initialFocus
+                  mode='range'
                   today={
                     filterParams.dob_start
                       ? new Date(filterParams.dob_start)
                       : new Date()
                   }
-                  toDate={new Date()}
                   selected={
                     {
                       from:
@@ -324,12 +322,12 @@ export function EmployeesSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 {educationArray.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className="capitalize"
+                    className='capitalize'
                     checked={filterParams?.education === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
@@ -355,12 +353,12 @@ export function EmployeesSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 {genderArray.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className="capitalize"
+                    className='capitalize'
                     checked={filterParams?.gender === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
@@ -386,12 +384,12 @@ export function EmployeesSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 {["active", "inactive"].map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className="capitalize"
+                    className='capitalize'
                     checked={filterParams?.status === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
@@ -417,12 +415,12 @@ export function EmployeesSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 {projectArray?.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className="capitalize"
+                    className='capitalize'
                     checked={filterParams?.project === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
@@ -448,12 +446,12 @@ export function EmployeesSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 {!searchParamsList.project ? (
                   <DropdownMenuCheckboxItem
                     disabled={true}
-                    className="p-8 items-center justify-center"
+                    className='p-8 items-center justify-center'
                   >
                     Select Project First
                   </DropdownMenuCheckboxItem>
@@ -461,7 +459,7 @@ export function EmployeesSearchFilter({
                   projectSiteArray?.map((name, index) => (
                     <DropdownMenuCheckboxItem
                       key={name + index.toString()}
-                      className="capitalize"
+                      className='capitalize'
                       checked={filterParams?.project_site === name}
                       onCheckedChange={() => {
                         setFilterParams((prev) => ({
@@ -488,12 +486,12 @@ export function EmployeesSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 {assignmentTypeArray.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className="capitalize"
+                    className='capitalize'
                     checked={filterParams?.assignment_type === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
@@ -519,12 +517,12 @@ export function EmployeesSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 {positionArray.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className="capitalize"
+                    className='capitalize'
                     checked={filterParams?.position === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
@@ -550,12 +548,12 @@ export function EmployeesSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 {skillLevelArray.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className="capitalize"
+                    className='capitalize'
                     checked={filterParams?.skill_level === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
@@ -581,10 +579,10 @@ export function EmployeesSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 <Calendar
-                  mode="range"
+                  mode='range'
                   initialFocus
                   today={
                     filterParams.doj_start
@@ -629,10 +627,10 @@ export function EmployeesSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 <Calendar
-                  mode="range"
+                  mode='range'
                   initialFocus
                   today={
                     filterParams.dol_start

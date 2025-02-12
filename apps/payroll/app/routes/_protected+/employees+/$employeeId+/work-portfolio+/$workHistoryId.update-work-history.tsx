@@ -7,6 +7,7 @@ import {
   useActionData,
   useLoaderData,
   useNavigate,
+  useParams,
 } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
 import {
@@ -24,8 +25,9 @@ import type { EmployeeWorkHistoryDatabaseUpdate } from "@canny_ecosystem/supabas
 import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const UPDATE_EMPLOYEE_WORK_HISTORY = "update-employee-work-history";
 
@@ -38,7 +40,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.employeeWorkHistory}`)) {
+  if (
+    !hasPermission(
+      user?.role!,
+      `${updateRole}:${attribute.employeeWorkHistory}`
+    )
+  ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
@@ -73,7 +80,12 @@ export async function action({
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.employeeWorkHistory}`)) {
+  if (
+    !hasPermission(
+      user?.role!,
+      `${updateRole}:${attribute.employeeWorkHistory}`
+    )
+  ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
@@ -126,10 +138,14 @@ export default function UpdateEmployeeWorkHistory() {
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { employeeId } = useParams();
 
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
+        clearExactCacheEntry(
+          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
+        );
         toast({
           title: "Success",
           description: actionData?.message || "Employee work history updated",
@@ -152,7 +168,7 @@ export default function UpdateEmployeeWorkHistory() {
         {(resolvedData) => {
           if (!resolvedData)
             return (
-              <ErrorBoundary message="Failed to load employee work history data" />
+              <ErrorBoundary message='Failed to load employee work history data' />
             );
           return (
             <UpdateEmployeeWorkHistoryWrapper
@@ -177,7 +193,7 @@ export function UpdateEmployeeWorkHistoryWrapper({
     return (
       <ErrorBoundary
         error={error}
-        message="Failed to load employee work history data"
+        message='Failed to load employee work history data'
       />
     );
   return <AddEmployeeWorkHistory updateValues={data} />;

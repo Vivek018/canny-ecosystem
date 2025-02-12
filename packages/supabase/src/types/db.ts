@@ -312,7 +312,7 @@ export type Database = {
         Row: {
           account_holder_name: string | null
           account_number: string | null
-          account_type: string
+          account_type: string | null
           bank_name: string | null
           branch_name: string | null
           created_at: string | null
@@ -323,7 +323,7 @@ export type Database = {
         Insert: {
           account_holder_name?: string | null
           account_number?: string | null
-          account_type?: string
+          account_type?: string | null
           bank_name?: string | null
           branch_name?: string | null
           created_at?: string | null
@@ -334,7 +334,7 @@ export type Database = {
         Update: {
           account_holder_name?: string | null
           account_number?: string | null
-          account_type?: string
+          account_type?: string | null
           bank_name?: string | null
           branch_name?: string | null
           created_at?: string | null
@@ -420,6 +420,7 @@ export type Database = {
           id: string
           include_client_address: boolean | null
           include_employee_address: boolean | null
+          include_employee_signature: boolean | null
           include_letter_head: boolean | null
           include_our_address: boolean | null
           include_signatuory: boolean | null
@@ -435,6 +436,7 @@ export type Database = {
           id?: string
           include_client_address?: boolean | null
           include_employee_address?: boolean | null
+          include_employee_signature?: boolean | null
           include_letter_head?: boolean | null
           include_our_address?: boolean | null
           include_signatuory?: boolean | null
@@ -450,6 +452,7 @@ export type Database = {
           id?: string
           include_client_address?: boolean | null
           include_employee_address?: boolean | null
+          include_employee_signature?: boolean | null
           include_letter_head?: boolean | null
           include_our_address?: boolean | null
           include_signatuory?: boolean | null
@@ -473,12 +476,12 @@ export type Database = {
           created_at: string | null
           employee_id: string
           end_date: string | null
-          position: string
+          position: string | null
           probation_end_date: string | null
           probation_period: boolean | null
-          project_site_id: string
+          project_site_id: string | null
           skill_level: string | null
-          start_date: string
+          start_date: string | null
           supervisor_id: string | null
           updated_at: string | null
         }
@@ -487,12 +490,12 @@ export type Database = {
           created_at?: string | null
           employee_id: string
           end_date?: string | null
-          position: string
+          position?: string | null
           probation_end_date?: string | null
           probation_period?: boolean | null
-          project_site_id: string
+          project_site_id?: string | null
           skill_level?: string | null
-          start_date: string
+          start_date?: string | null
           supervisor_id?: string | null
           updated_at?: string | null
         }
@@ -501,12 +504,12 @@ export type Database = {
           created_at?: string | null
           employee_id?: string
           end_date?: string | null
-          position?: string
+          position?: string | null
           probation_end_date?: string | null
           probation_period?: boolean | null
-          project_site_id?: string
+          project_site_id?: string | null
           skill_level?: string | null
-          start_date?: string
+          start_date?: string | null
           supervisor_id?: string | null
           updated_at?: string | null
         }
@@ -908,12 +911,16 @@ export type Database = {
       }
       exits: {
         Row: {
+          bonus: number | null
           created_at: string | null
+          deduction: number | null
           employee_id: string
           employee_payable_days: number
           final_settlement_date: string
+          gratuity: number | null
           id: string
           last_working_day: string
+          leave_encashment: number | null
           note: string | null
           organization_payable_days: number
           reason: string
@@ -921,12 +928,16 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          bonus?: number | null
           created_at?: string | null
+          deduction?: number | null
           employee_id: string
           employee_payable_days: number
           final_settlement_date: string
+          gratuity?: number | null
           id?: string
           last_working_day: string
+          leave_encashment?: number | null
           note?: string | null
           organization_payable_days: number
           reason: string
@@ -934,12 +945,16 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          bonus?: number | null
           created_at?: string | null
+          deduction?: number | null
           employee_id?: string
           employee_payable_days?: number
           final_settlement_date?: string
+          gratuity?: number | null
           id?: string
           last_working_day?: string
+          leave_encashment?: number | null
           note?: string | null
           organization_payable_days?: number
           reason?: string
@@ -950,7 +965,7 @@ export type Database = {
           {
             foreignKeyName: "exits_employee_id_fkey"
             columns: ["employee_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "employees"
             referencedColumns: ["id"]
           },

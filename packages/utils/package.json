@@ -20,10 +20,12 @@
     "./hooks/is-document": "./src/hooks/is-document.ts",
     "./hooks/debounce": "./src/hooks/debounce.ts",
     "./hooks/local-storage": "./src/hooks/local-storage.ts",
+    "./cache": "./src/cache.ts",
     "./constant": "./constant.ts"
   },
   "dependencies": {
     "@date-fns/utc": "^2.1.0",
+    "@react-pdf/renderer": "^4.1.6",
     "little-date": "^1.0.0",
     "zod": "^3.23.8"
   }

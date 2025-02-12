@@ -11,6 +11,7 @@ import {
   useActionData,
   useLoaderData,
   useNavigate,
+  useParams,
 } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
 import { updateProject } from "@canny_ecosystem/supabase/mutations";
@@ -27,8 +28,9 @@ import { Suspense, useEffect } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { clearExactCacheEntry } from "@/utils/cache";
 
 export const UPDATE_PROJECT = "update-project";
 
@@ -130,12 +132,15 @@ export default function UpdateProject() {
   const { projectPromise, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
+  const { projectId } = useParams();
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
+        clearExactCacheEntry(cacheKeyPrefix.projects);
+        clearExactCacheEntry(`${cacheKeyPrefix.project_overview}${projectId}`);
         toast({
           title: "Success",
           description: actionData?.message || "Project updated",
@@ -155,7 +160,7 @@ export default function UpdateProject() {
   }, [actionData]);
 
   if (error)
-    return <ErrorBoundary error={error} message="Failed to load project" />;
+    return <ErrorBoundary error={error} message='Failed to load project' />;
 
   return (
     <Suspense fallback={<div>Loading...</div>}>

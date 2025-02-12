@@ -1,4 +1,11 @@
 import { isValid, z } from "zod";
+import {
+  DEFAULT_EXPERIENCE_LETTER,
+  DEFAULT_NOC_LETTER,
+  DEFAULT_OFFER_LETTER,
+  DEFAULT_RELIEVING_LETTER,
+  DEFAULT_TERMINATION_LETTER,
+} from "../constant";
 
 export { z };
 
@@ -35,7 +42,7 @@ export const zEmailSuffix = z
   .max(20)
   .regex(
     /^[A-Za-z0-9]+\.[A-Za-z]{2,}$/,
-    "Must contain a dot with at least one character before and two after."
+    "Must contain a dot with at least one character before and two after.",
   );
 
 export const SIZE_1KB = 1 * 1024; //1KB
@@ -52,21 +59,21 @@ export const zImage = z
   .any()
   .refine(
     (file) => (typeof file !== "string" ? file.size < SIZE_1MB : true),
-    "File size must be less than 1MB"
+    "File size must be less than 1MB",
   )
   .refine(
     (file) =>
       typeof file !== "string"
         ? ACCEPTED_IMAGE_TYPES.includes(file?.type)
         : true,
-    "Only .jpg, .jpeg, .png and .webp formats are supported."
+    "Only .jpg, .jpeg, .png and .webp formats are supported.",
   );
 
 export const zFile = z
   .any()
   .refine(
     (file) => (typeof file !== "string" ? file.size < SIZE_1MB * 5 : true),
-    "File size must be less than 5MB"
+    "File size must be less than 5MB",
   )
   .refine(
     (file) =>
@@ -81,7 +88,7 @@ export const zFile = z
             "application/docx",
           ].includes(file?.type)
         : true,
-    "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .docx formats are supported."
+    "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .docx formats are supported.",
   );
 
 export const parseDateSchema = z
@@ -423,7 +430,7 @@ export const PaymentFieldSchema = PaymentFieldSchemaObject.refine(
   {
     message: `When payment type is "variable", calculation type must be "fixed".`,
     path: ["calculation_type"],
-  }
+  },
 );
 
 export const deductionCycleArray = ["monthly"] as const;
@@ -649,7 +656,7 @@ export const PaymentTemplateComponentsSchema = z.object({
       component_type: z.enum(componentTypeArray).default("earning"),
       calculation_value: z.number().optional(),
       display_order: z.number().int().optional(),
-    })
+    }),
   ),
 });
 
@@ -735,7 +742,7 @@ export const ImportReimbursementHeaderSchema = z
         "is_deductible",
         "status",
       ],
-    }
+    },
   );
 
 export const exitReasonArray = [
@@ -752,14 +759,14 @@ export const ImportSingleReimbursementDataSchema = z.object({
   employee_code: zNumberString,
   amount: z.preprocess(
     (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
-    z.number()
+    z.number(),
   ),
   email: zEmail.optional(),
   is_deductible: z
     .preprocess(
       (value) =>
         typeof value === "string" ? value.toLowerCase() === "true" : value,
-      z.boolean().default(false)
+      z.boolean().default(false),
     )
     .default(false),
   status: z.enum(reimbursementStatusArray),
@@ -824,7 +831,7 @@ export const ImportEmployeeDetailsHeaderSchema =
         "primary_mobile_number",
         "secondary_mobile_number",
       ],
-    }
+    },
   );
 
 export const ImportSingleEmployeeDetailsDataSchema = z.object({
@@ -840,7 +847,7 @@ export const ImportSingleEmployeeDetailsDataSchema = z.object({
     .preprocess(
       (value) =>
         typeof value === "string" ? value.toLowerCase() === "true" : value,
-      z.boolean().default(false)
+      z.boolean().default(false),
     )
     .default(false),
   primary_mobile_number: z.preprocess((value) => {
@@ -905,7 +912,7 @@ export const ImportEmployeeStatutoryHeaderSchema =
         "passport_number",
         "passport_expiry",
       ],
-    }
+    },
   );
 
 export const ImportSingleEmployeeStatutoryDataSchema = z.object({
@@ -913,14 +920,14 @@ export const ImportSingleEmployeeStatutoryDataSchema = z.object({
   aadhaar_number: zNumber.min(12).max(12),
   pan_number: z.preprocess(
     (value) => (value === "" ? undefined : value),
-    z.string().max(10).optional()
+    z.string().max(10).optional(),
   ),
   uan_number: zNumberString.max(12),
   pf_number: zNumberString.max(20),
   esic_number: zNumberString.max(20),
   driving_license_number: z.preprocess(
     (value) => (value === "" ? undefined : value),
-    z.string().max(20).optional()
+    z.string().max(20).optional(),
   ),
   driving_license_expiry: z.string().optional(),
   passport_number: zNumberString.max(20).optional(),
@@ -969,7 +976,7 @@ export const ImportEmployeeBankDetailsHeaderSchema =
         "bank_name",
         "branch_name",
       ],
-    }
+    },
   );
 
 export const ImportSingleEmployeeBankDetailsDataSchema = z.object({
@@ -1036,7 +1043,7 @@ export const ImportEmployeeAddressHeaderSchema =
         "longitude",
         "is_primary",
       ],
-    }
+    },
   );
 
 export const ImportSingleEmployeeAddressDataSchema = z.object({
@@ -1045,7 +1052,7 @@ export const ImportSingleEmployeeAddressDataSchema = z.object({
   is_primary: z.preprocess(
     (value) =>
       typeof value === "string" ? value.toLowerCase() === "true" : value,
-    z.boolean().default(false)
+    z.boolean().default(false),
   ),
   address_line_1: z
     .string()
@@ -1060,11 +1067,11 @@ export const ImportSingleEmployeeAddressDataSchema = z.object({
   pincode: zNumber.min(6).max(6),
   latitude: z.preprocess(
     (value) => (value === "" ? undefined : value),
-    z.string().max(180).min(-180).optional()
+    z.string().max(180).min(-180).optional(),
   ),
   longitude: z.preprocess(
     (value) => (value === "" ? undefined : value),
-    z.string().max(180).min(-180).optional()
+    z.string().max(180).min(-180).optional(),
   ),
 });
 
@@ -1121,7 +1128,7 @@ export const ImportEmployeeGuardiansHeaderSchema =
         "is_emergency_contact",
         "address_same_as_employee",
       ],
-    }
+    },
   );
 
 export const ImportSingleEmployeeGuardiansDataSchema = z.object({
@@ -1134,20 +1141,20 @@ export const ImportSingleEmployeeGuardiansDataSchema = z.object({
   is_emergency_contact: z.preprocess(
     (value) =>
       typeof value === "string" ? value.toLowerCase() === "true" : value,
-    z.boolean().default(false)
+    z.boolean().default(false),
   ),
   address_same_as_employee: z.preprocess(
     (value) =>
       typeof value === "string" ? value.toLowerCase() === "true" : value,
-    z.boolean().default(false)
+    z.boolean().default(false),
   ),
   mobile_number: z.preprocess(
     (value) => (value === "" ? undefined : value),
-    z.string().max(10).min(10).optional()
+    z.string().max(10).min(10).optional(),
   ),
   alternate_mobile_number: z.preprocess(
     (value) => (value === "" ? undefined : value),
-    z.string().max(10).min(10).optional()
+    z.string().max(10).min(10).optional(),
   ),
   email: zEmail.optional(),
 });
@@ -1184,6 +1191,84 @@ export type PayrollEmployeeData = {
   status: string;
   designation: string;
   payment_template_components_id: string;
-  templateComponents:any;
-  payrollId:string;
+  templateComponents: any;
+  payrollId: string;
 };
+
+export const attendanceWorkShiftArray = ["day", "afternoon", "night"] as const;
+export const attendanceHolidayTypeArray = [
+  "weekly",
+  "paid",
+  "state",
+  "national",
+] as const;
+
+export const AttendanceDataSchema = z.object({
+  type: z.enum(["add", "update"]),
+  date: z.string(),
+  no_of_hours: z.number().min(0).max(24).default(8),
+  employee_id: z.string(),
+  present: z.boolean().default(false),
+  holiday: z.boolean().default(false),
+  working_shift: z.enum(attendanceWorkShiftArray).optional(),
+  holiday_type: z.enum(attendanceHolidayTypeArray).optional(),
+});
+
+export const ImportSingleEmployeeAttendanceDataSchema = z.object({
+  employee_code: zNumberString.min(3),
+  date: z.string(),
+  no_of_hours: z.preprocess(
+    (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
+    z.number().min(0).max(24).default(8)
+  ),
+  present: z.preprocess(
+    (value) =>
+      typeof value === "string" ? value.toLowerCase() === "true" : value,
+    z.boolean().default(false)
+  ),
+  holiday: z.preprocess(
+    (value) =>
+      typeof value === "string" ? value.toLowerCase() === "true" : value,
+    z.boolean().default(false)
+  ),
+  working_shift: z.preprocess(
+    (value) =>
+      value === "" || value === undefined || value === null ? undefined : value,
+    z.enum(attendanceWorkShiftArray).optional()
+  ),
+  holiday_type: z.preprocess(
+    (value) =>
+      value === "" || value === undefined || value === null ? undefined : value,
+    z.enum(attendanceHolidayTypeArray).optional()
+  ),
+});
+
+export const ImportEmployeeAttendanceDataSchema = z.object({
+  data: z.array(ImportSingleEmployeeAttendanceDataSchema),
+});
+
+export const employeeLetterTypesArray = [
+  "appointment_letter",
+  "experience_letter",
+  "offer_letter",
+  "noc_letter",
+  "relieving_letter",
+  "termination_letter",
+] as const;
+
+export const EmployeeLetterSchema = z.object({
+  id: z.string().optional(),
+  include_client_address: z.boolean().default(false),
+  include_employee_address: z.boolean().default(false),
+  include_our_address: z.boolean().default(false),
+  include_letter_head: z.boolean().default(false),
+  include_signatuory: z.boolean().default(false),
+  include_employee_signature: z.boolean().default(false),
+  subject: z.string().min(3).max(100),
+  date: z.string().default(new Date().toISOString().split("T")[0]),
+  letter_type: z
+    .enum(employeeLetterTypesArray)
+    .default(employeeLetterTypesArray[0]),
+  content: z.string().optional(),
+  employee_id: z.string().optional(),
+});
