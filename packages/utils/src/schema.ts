@@ -1,4 +1,11 @@
 import { isValid, z } from "zod";
+import {
+  DEFAULT_EXPERIENCE_LETTER,
+  DEFAULT_NOC_LETTER,
+  DEFAULT_OFFER_LETTER,
+  DEFAULT_RELIEVING_LETTER,
+  DEFAULT_TERMINATION_LETTER,
+} from "../constant";
 
 export { z };
 
@@ -1266,4 +1273,82 @@ export const ImportSingleExitDataSchema = z.object({
 
 export const ImportExitDataSchema = z.object({
   data: z.array(ImportSingleExitDataSchema),
+});
+
+export const attendanceWorkShiftArray = ["day", "afternoon", "night"] as const;
+export const attendanceHolidayTypeArray = [
+  "weekly",
+  "paid",
+  "state",
+  "national",
+] as const;
+
+export const AttendanceDataSchema = z.object({
+  type: z.enum(["add", "update"]),
+  date: z.string(),
+  no_of_hours: z.number().min(0).max(24).default(8),
+  employee_id: z.string(),
+  present: z.boolean().default(false),
+  holiday: z.boolean().default(false),
+  working_shift: z.enum(attendanceWorkShiftArray).optional(),
+  holiday_type: z.enum(attendanceHolidayTypeArray).optional(),
+});
+
+export const ImportSingleEmployeeAttendanceDataSchema = z.object({
+  employee_code: zNumberString.min(3),
+  date: z.string(),
+  no_of_hours: z.preprocess(
+    (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
+    z.number().min(0).max(24).default(8)
+  ),
+  present: z.preprocess(
+    (value) =>
+      typeof value === "string" ? value.toLowerCase() === "true" : value,
+    z.boolean().default(false)
+  ),
+  holiday: z.preprocess(
+    (value) =>
+      typeof value === "string" ? value.toLowerCase() === "true" : value,
+    z.boolean().default(false)
+  ),
+  working_shift: z.preprocess(
+    (value) =>
+      value === "" || value === undefined || value === null ? undefined : value,
+    z.enum(attendanceWorkShiftArray).optional()
+  ),
+  holiday_type: z.preprocess(
+    (value) =>
+      value === "" || value === undefined || value === null ? undefined : value,
+    z.enum(attendanceHolidayTypeArray).optional()
+  ),
+});
+
+export const ImportEmployeeAttendanceDataSchema = z.object({
+  data: z.array(ImportSingleEmployeeAttendanceDataSchema),
+});
+
+export const employeeLetterTypesArray = [
+  "appointment_letter",
+  "experience_letter",
+  "offer_letter",
+  "noc_letter",
+  "relieving_letter",
+  "termination_letter",
+] as const;
+
+export const EmployeeLetterSchema = z.object({
+  id: z.string().optional(),
+  include_client_address: z.boolean().default(false),
+  include_employee_address: z.boolean().default(false),
+  include_our_address: z.boolean().default(false),
+  include_letter_head: z.boolean().default(false),
+  include_signatuory: z.boolean().default(false),
+  include_employee_signature: z.boolean().default(false),
+  subject: z.string().min(3).max(100),
+  date: z.string().default(new Date().toISOString().split("T")[0]),
+  letter_type: z
+    .enum(employeeLetterTypesArray)
+    .default(employeeLetterTypesArray[0]),
+  content: z.string().optional(),
+  employee_id: z.string().optional(),
 });

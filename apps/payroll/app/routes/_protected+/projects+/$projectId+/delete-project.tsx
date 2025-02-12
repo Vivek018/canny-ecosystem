@@ -42,7 +42,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
     return json(
       { status: "error", message: "Failed to delete project", error },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -51,7 +51,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

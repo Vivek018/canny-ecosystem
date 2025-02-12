@@ -29,11 +29,16 @@ export const sideNavList = [
   { name: "Employees", link: "/employees", icon: "employee" },
   { name: "Finance" },
   {
+    name: "Time Tracking",
+    link: "/time-tracking",
+    icon: "lab-timer",
+  },
+  {
     name: "Payroll",
     link: "/payroll",
     icon: "table",
   },
-  { name: "Approvals", link: "/approvals", icon: "lab-timer" },
+  { name: "Approvals", link: "/approvals", icon: "check-circle" },
   {
     name: "Payment Components",
     link: "/payment-components",
@@ -229,6 +234,7 @@ export const cacheKeyPrefix = {
   employee_overview: "employee-overview",
   employee_work_portfolio: "employee-work-portfolio",
   employee_reimbursements: "employee-reimbursements",
+  employee_letters: "employee-letters",
   reimbursements: "reimbursements",
   payment_fields: "payment-fields",
   payment_field_report: "payment-field-report",
@@ -248,7 +254,6 @@ export const cacheKeyPrefix = {
   users: "users",
   account: "account",
   feedback_list: "feedback-list",
-  exits:"exits"
-}
-
-
+  exits:"exits",
+  attendance: "attendance",
+};

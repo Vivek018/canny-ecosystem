@@ -1,6 +1,12 @@
 import { useInputControl } from "@conform-to/react";
 import type React from "react";
-import { useEffect, useId, useState } from "react";
+import {
+  type LabelHTMLAttributes,
+  type TextareaHTMLAttributes,
+  useEffect,
+  useId,
+  useState,
+} from "react";
 import { Checkbox, type CheckboxProps } from "./checkbox";
 import { Input } from "./input";
 import { Label } from "./label";
@@ -11,6 +17,25 @@ import { Button } from "./button";
 import { parseStringValue } from "@canny_ecosystem/utils";
 import { useIsomorphicLayoutEffect } from "@canny_ecosystem/utils/hooks/isomorphic-layout-effect";
 import { Icon } from "./icon";
+import {
+  KitchenSinkToolbar,
+  MDXEditor,
+  codeBlockPlugin,
+  codeMirrorPlugin,
+  diffSourcePlugin,
+  frontmatterPlugin,
+  headingsPlugin,
+  imagePlugin,
+  linkDialogPlugin,
+  linkPlugin,
+  listsPlugin,
+  markdownShortcutPlugin,
+  quotePlugin,
+  tablePlugin,
+  thematicBreakPlugin,
+  toolbarPlugin,
+} from "@mdxeditor/editor";
+import "@mdxeditor/editor/style.css";
 
 export type ListOfErrors = Array<string | null | undefined> | null | undefined;
 
@@ -63,7 +88,7 @@ export function Field({
         <sub
           className={cn(
             "hidden text-primary",
-            labelProps?.children && isRequired && "inline",
+            labelProps?.children && isRequired && "inline"
           )}
         >
           *
@@ -79,7 +104,7 @@ export function Field({
           className={cn(
             prefix && "pl-8",
             suffix && "pr-8",
-            inputProps.className,
+            inputProps.className
           )}
         />
         {suffix && (
@@ -118,7 +143,7 @@ export function TextareaField({
         <sub
           className={cn(
             "hidden text-primary",
-            labelProps?.children && isRequired && "inline",
+            labelProps?.children && isRequired && "inline"
           )}
         >
           *
@@ -157,15 +182,8 @@ export function CheckboxField({
   className?: string;
   errorClassName?: string;
 }) {
-  const { key, defaultChecked, ...checkboxProps } = buttonProps;
+  const { key, ...checkboxProps } = buttonProps;
   const fallbackId = useId();
-  const checkedValue = buttonProps.value ?? "on";
-  const input = useInputControl({
-    key,
-    name: buttonProps.name,
-    formId: buttonProps.form,
-    initialValue: defaultChecked ? checkedValue : undefined,
-  });
   const id = buttonProps.id ?? fallbackId;
   const errorId = errors?.length ? `${id}-error` : undefined;
   const isRequired = buttonProps.required;
@@ -178,19 +196,10 @@ export function CheckboxField({
           id={id}
           aria-invalid={errorId ? true : undefined}
           aria-describedby={errorId}
-          checked={input.value === checkedValue}
-          onCheckedChange={(state) => {
-            input.change(state.valueOf() ? checkedValue : "");
-            buttonProps.onCheckedChange?.(state);
-          }}
-          onFocus={(event) => {
-            input.focus();
-            buttonProps.onFocus?.(event);
-          }}
-          onBlur={(event) => {
-            input.blur();
-            buttonProps.onBlur?.(event);
-          }}
+          checked={buttonProps.checked}
+          onCheckedChange={buttonProps.onCheckedChange}
+          onFocus={buttonProps.onFocus}
+          onBlur={buttonProps.onBlur}
           type="button"
         />
         <Label
@@ -201,7 +210,7 @@ export function CheckboxField({
         <sub
           className={cn(
             "hidden text-primary",
-            labelProps?.children && isRequired && "inline",
+            labelProps?.children && isRequired && "inline"
           )}
         >
           *
@@ -253,7 +262,7 @@ export function SearchableSelectField({
         <sub
           className={cn(
             "hidden text-primary",
-            labelProps?.children && isRequired && "inline",
+            labelProps?.children && isRequired && "inline"
           )}
         >
           *
@@ -311,14 +320,14 @@ export function JSONBField({
   useIsomorphicLayoutEffect(() => {
     try {
       const parsedValue = JSON.parse(
-        inputProps.defaultValue?.toString() || "{}",
+        inputProps.defaultValue?.toString() || "{}"
       );
       const initialPairs = Object.entries(parsedValue).map(([key, value]) => ({
         key,
         value: String(value),
       }));
       setPairs(
-        initialPairs.length > 0 ? initialPairs : [{ key: "", value: "" }],
+        initialPairs.length > 0 ? initialPairs : [{ key: "", value: "" }]
       );
     } catch (error) {
       console.error("Failed to parse JSONB value:", error);
@@ -326,19 +335,16 @@ export function JSONBField({
   }, [inputProps.defaultValue]);
 
   const updateJSONBValue = (newPairs: { key: string; value: string }[]) => {
-    const jsonbValue = newPairs.reduce(
-      (acc, { key, value }) => {
-        if (key) {
-          try {
-            acc[key] = parseStringValue(value);
-          } catch {
-            acc[key] = value;
-          }
+    const jsonbValue = newPairs.reduce((acc, { key, value }) => {
+      if (key) {
+        try {
+          acc[key] = parseStringValue(value);
+        } catch {
+          acc[key] = value;
         }
-        return acc;
-      },
-      {} as Record<string, any>,
-    );
+      }
+      return acc;
+    }, {} as Record<string, any>);
     const event = {
       target: {
         name: inputProps.name,
@@ -381,7 +387,7 @@ export function JSONBField({
         <sub
           className={cn(
             "hidden text-primary",
-            labelProps?.children && isRequired && "inline",
+            labelProps?.children && isRequired && "inline"
           )}
         >
           *
@@ -425,13 +431,10 @@ export function JSONBField({
         id={id}
         defaultValue={undefined}
         value={JSON.stringify(
-          pairs.reduce(
-            (acc, { key, value }) => {
-              if (key) acc[key] = parseStringValue(value);
-              return acc;
-            },
-            {} as Record<string, string>,
-          ),
+          pairs.reduce((acc, { key, value }) => {
+            if (key) acc[key] = parseStringValue(value);
+            return acc;
+          }, {} as Record<string, string>)
         )}
       />
       <div className={cn("min-h-6 px-4 pb-2", errorClassName)}>
@@ -511,7 +514,7 @@ export const RangeField = ({
   const handleFieldChange = (
     index: number,
     fieldKey: string,
-    value: string,
+    value: string
   ) => {
     const newRanges = [...ranges];
     newRanges[index] = {
@@ -526,13 +529,10 @@ export const RangeField = ({
   };
 
   const addRange = () => {
-    const newRange = fields.reduce(
-      (acc: Record<string, any>, field) => {
-        acc[field.key] = field.type === "number" ? 0 : "";
-        return acc;
-      },
-      {} as Record<string, any>,
-    );
+    const newRange = fields.reduce((acc: Record<string, any>, field) => {
+      acc[field.key] = field.type === "number" ? 0 : "";
+      return acc;
+    }, {} as Record<string, any>);
 
     const newRanges = [...ranges, newRange];
     setRanges(newRanges);
@@ -552,7 +552,7 @@ export const RangeField = ({
         <sub
           className={cn(
             "hidden text-primary",
-            labelProps?.children && isRequired && "inline",
+            labelProps?.children && isRequired && "inline"
           )}
         >
           *
@@ -613,3 +613,87 @@ export const RangeField = ({
     </div>
   );
 };
+
+export function MarkdownField({
+  labelProps,
+  textareaProps,
+  errors,
+  className,
+  errorClassName,
+}: {
+  labelProps: LabelHTMLAttributes<HTMLLabelElement>;
+  textareaProps: TextareaHTMLAttributes<HTMLTextAreaElement>;
+  errors?: string[];
+  className?: string;
+  errorClassName?: string;
+}) {
+  const fallbackId = useId();
+  const id = textareaProps.id ?? fallbackId;
+  const errorId = errors?.length ? `${id}-error` : undefined;
+
+  const input = useInputControl({
+    name: textareaProps.name!,
+    formId: textareaProps.form!,
+    initialValue: String(textareaProps.defaultValue!),
+  });
+
+  return (
+    <div className={className}>
+      {/* Label */}
+      <Label htmlFor={id} {...labelProps} />
+      <sub
+        className={cn(
+          "hidden text-primary",
+          textareaProps?.children && textareaProps.required && "inline",
+        )}
+      >
+        *
+      </sub>
+      <input
+        type="hidden"
+        id={id}
+        name={textareaProps.name}
+        value={input.value ?? ""}
+        onChange={input.change as any}
+        onBlur={input.blur}
+      />
+      {/* Markdown Editor */}
+      <MDXEditor
+        placeholder={textareaProps.placeholder}
+        markdown={input.value ?? ""}
+        onChange={(value) => {
+          input.change(value ?? ("" as string));
+        }}
+        plugins={[
+          toolbarPlugin({ toolbarContents: () => <KitchenSinkToolbar /> }),
+          listsPlugin(),
+          quotePlugin(),
+          headingsPlugin(),
+          linkPlugin(),
+          linkDialogPlugin(),
+          imagePlugin(),
+          tablePlugin(),
+          thematicBreakPlugin(),
+          frontmatterPlugin(),
+          codeBlockPlugin({ defaultCodeBlockLanguage: "txt" }),
+          codeMirrorPlugin({
+            codeBlockLanguages: {
+              js: "JavaScript",
+              css: "CSS",
+              txt: "text",
+              tsx: "TypeScript",
+            },
+          }),
+          diffSourcePlugin({ viewMode: "rich-text", diffMarkdown: "" }),
+          markdownShortcutPlugin(),
+        ]}
+        className="min-h-[200px] border rounded dark-theme dark-editor"
+      />
+
+      {/* Errors */}
+      <div className={cn("min-h-6 px-4 pb-2", errorClassName)}>
+        {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
+      </div>
+    </div>
+  );
+}

@@ -20,6 +20,5 @@ export const getSessionUser = async ({ request }: { request: Request }) => {
 
   const user = session?.user;
 
-  return { session, user };
-  // return { user: { name: "Condra", email: "dvzcvdsv@gmail.com" } };
+  return { user: { name: "Condra", email: "dvzcvdsv@gmail.com" } };
 };

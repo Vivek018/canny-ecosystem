@@ -283,3 +283,10 @@ export type GratuityDatabaseInsert =
   Database["public"]["Tables"]["gratuity"]["Insert"];
 export type GratuityDatabaseUpdate =
   Database["public"]["Tables"]["gratuity"]["Update"];
+
+export type EmployeeLetterDatabaseRow =
+  Database["public"]["Tables"]["employee_letter"]["Row"];
+export type EmployeeLetterDatabaseInsert =
+  Database["public"]["Tables"]["employee_letter"]["Insert"];
+export type EmployeeLetterDatabaseUpdate =
+  Database["public"]["Tables"]["employee_letter"]["Update"];
