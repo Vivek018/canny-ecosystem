@@ -197,6 +197,7 @@ export async function getAttendanceByCompanyId({
   params: {
     from: number;
     to: number;
+    sort?: [string, "asc" | "desc"];
     searchQuery?: string;
     filters?: {
       month?: string | undefined;
@@ -206,7 +207,8 @@ export async function getAttendanceByCompanyId({
     };
   };
 }) {
-  const { from, to, searchQuery, filters } = params;
+  const { from, to, sort, searchQuery, filters } = params;
+  const { month, year, project, project_site } = filters ?? {};
 
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth() + 1;
@@ -223,18 +225,26 @@ export async function getAttendanceByCompanyId({
   const defaultStartDate = `${currentYear}-${monthStr}-01`;
   const defaultEndDate = `${currentYear}-${monthStr}-${lastDay}`;
 
+  const columns = [
+    "id",
+    "first_name",
+    "middle_name",
+    "last_name",
+    "employee_code",
+    "company_id",
+  ] as const;
+
   let query = supabase
     .from("employees")
     .select(
       `
-      id,
-      first_name, 
-      middle_name, 
-      last_name, 
-      employee_code,
-      company_id,
-      employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(
-        project_sites!inner(id, name, projects!inner(id, name))),
+      ${columns.join(",")},
+      employee_project_assignment!employee_project_assignments_employee_id_fkey!${
+        project ? "inner" : "left"
+      }(
+        project_sites!${project ? "inner" : "left"}(id, name, projects!${
+        project ? "inner" : "left"
+      }(id, name))),
       attendance(
         id,
         date,
@@ -255,6 +265,14 @@ export async function getAttendanceByCompanyId({
       .filter("attendance.date", "gte", defaultStartDate)
       .filter("attendance.date", "lte", defaultEndDate);
   }
+
+  if (sort) {
+    const [column, direction] = sort;
+    query.order(column, { ascending: direction === "asc" });
+  } else {
+    query.order("created_at", { ascending: false });
+  }
+
   if (searchQuery) {
     const searchQueryArray = searchQuery.split(" ");
     if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
@@ -270,62 +288,56 @@ export async function getAttendanceByCompanyId({
     }
   }
 
-  if (filters) {
-    const { month, year, project, project_site } = filters as AttendanceFilters;
+  if (project) {
+    query = query.eq(
+      "employee_project_assignment.project_sites.projects.name",
+      project
+    );
+  }
 
-    if (project) {
-      query = query.eq(
-        "employee_project_assignment.project_sites.projects.name",
-        project
-      );
-    }
+  if (project_site) {
+    query = query.filter(
+      "employee_project_assignment.project_sites.name",
+      "eq",
+      project_site
+    );
+  }
 
-    if (project_site) {
+  if (month || year) {
+    const monthNumber = months[month!];
+    const getLastDayOfMonth = (year: number, month: number): string => {
+      const lastDay = new Date(year, month, 0).getDate();
+      return lastDay.toString().padStart(2, "0");
+    };
+
+    const currentYear = new Date().getFullYear();
+
+    if (year && monthNumber) {
+      const yearNum = Number(year);
+      const monthStr = monthNumber.toString().padStart(2, "0");
+      const lastDay = getLastDayOfMonth(yearNum, monthNumber);
+
+      const startOfMonth = `${yearNum}-${monthStr}-01`;
+      const endOfMonth = `${yearNum}-${monthStr}-${lastDay}`;
+
       query = query
-        .filter(
-          "employee_project_assignment.project_sites.name",
-          "eq",
-          project_site
-        )
-        .not("employee_project_assignment.project_sites.name", "is", null);
-    }
+        .filter("attendance.date", "gte", startOfMonth)
+        .filter("attendance.date", "lte", endOfMonth);
+    } else if (year) {
+      const yearNum = Number(year);
+      query = query
+        .filter("attendance.date", "gte", `${yearNum}-01-01`)
+        .filter("attendance.date", "lte", `${yearNum}-12-31`);
+    } else if (monthNumber) {
+      const monthStr = monthNumber.toString().padStart(2, "0");
+      const lastDay = getLastDayOfMonth(currentYear, monthNumber);
 
-    if (month || year) {
-      const monthNumber = months[month!];
-      const getLastDayOfMonth = (year: number, month: number): string => {
-        const lastDay = new Date(year, month, 0).getDate();
-        return lastDay.toString().padStart(2, "0");
-      };
+      const startOfMonth = `${currentYear}-${monthStr}-01`;
+      const endOfMonth = `${currentYear}-${monthStr}-${lastDay}`;
 
-      const currentYear = new Date().getFullYear();
-
-      if (year && monthNumber) {
-        const yearNum = Number(year);
-        const monthStr = monthNumber.toString().padStart(2, "0");
-        const lastDay = getLastDayOfMonth(yearNum, monthNumber);
-
-        const startOfMonth = `${yearNum}-${monthStr}-01`;
-        const endOfMonth = `${yearNum}-${monthStr}-${lastDay}`;
-
-        query = query
-          .filter("attendance.date", "gte", startOfMonth)
-          .filter("attendance.date", "lte", endOfMonth);
-      } else if (year) {
-        const yearNum = Number(year);
-        query = query
-          .filter("attendance.date", "gte", `${yearNum}-01-01`)
-          .filter("attendance.date", "lte", `${yearNum}-12-31`);
-      } else if (monthNumber) {
-        const monthStr = monthNumber.toString().padStart(2, "0");
-        const lastDay = getLastDayOfMonth(currentYear, monthNumber);
-
-        const startOfMonth = `${currentYear}-${monthStr}-01`;
-        const endOfMonth = `${currentYear}-${monthStr}-${lastDay}`;
-
-        query = query
-          .filter("attendance.date", "gte", startOfMonth)
-          .filter("attendance.date", "lte", endOfMonth);
-      }
+      query = query
+        .filter("attendance.date", "gte", startOfMonth)
+        .filter("attendance.date", "lte", endOfMonth);
     }
   }
 

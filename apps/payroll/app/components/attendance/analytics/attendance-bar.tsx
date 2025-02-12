@@ -15,6 +15,8 @@ import {
 import { useMemo } from "react";
 import type { TransformedAteendanceDataType } from "@/routes/_protected+/time-tracking+/attendance+/_index";
 
+const MAX_EMPLOYEES = 100;
+
 const chartConfig = {
   presents: {
     label: "Presents",
@@ -44,12 +46,14 @@ export function AttendanceBars({
 
   const limitedTrendData = trendData
     .filter((employee) => employee.presents > 0)
-    .slice(0, 100);
+    .slice(0, MAX_EMPLOYEES);
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Employee Attendance</CardTitle>
+        <CardTitle>
+          Employee Attendance (Max Employees: {MAX_EMPLOYEES} )
+        </CardTitle>
         <CardDescription>Showing total presents per employee</CardDescription>
       </CardHeader>
       <CardContent>

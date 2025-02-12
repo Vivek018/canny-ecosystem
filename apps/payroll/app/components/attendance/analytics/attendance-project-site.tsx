@@ -67,7 +67,7 @@ export function AttendanceByProjectSite({
           <CardDescription>
             {project
               ? `Attendance by project site for ${project}`
-              : "Select project and see Attendance fby project sites"}
+              : "Select project and see Attendance by project sites"}
           </CardDescription>
         </CardHeader>
         <AttendanceProjectFilter

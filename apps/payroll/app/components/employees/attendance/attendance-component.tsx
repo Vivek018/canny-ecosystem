@@ -8,6 +8,8 @@ import { hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { useUser } from "@/utils/user";
 
+const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
 export const AttendanceComponent = ({
   attendanceData,
   employeeId,
@@ -58,7 +60,7 @@ export const AttendanceComponent = ({
       <div className="w-full mx-auto pb-8">
         <div className="border rounded-lg">
           <div className="grid grid-cols-7">
-            {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+            {weekDays.map((day) => (
               <div
                 key={day}
                 className="p-2 text-center bg-muted/60 font-semibold text-muted-foreground last:border-none border-r"

@@ -90,7 +90,7 @@ export async function getReimbursementsByCompanyId({
     .from("reimbursements")
     .select(
       `${columns.join(",")},
-          employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? 'inner' : 'left'}(project_sites!${project_site ? 'inner' : 'left'}(id, name, projects!${project ? 'inner' : 'left'}(id, name)))),
+          employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? 'inner' : 'left'}(project_sites!${project ? 'inner' : 'left'}(id, name, projects!${project ? 'inner' : 'left'}(id, name)))),
           users!${users ? 'inner' : 'left'}(id,email)`,
       { count: "exact" },
     )

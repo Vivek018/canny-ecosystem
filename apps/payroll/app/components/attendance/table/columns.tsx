@@ -22,7 +22,6 @@ export const attendanceColumns = (
     enableHiding: false,
   },
   {
-    enableSorting: false,
     accessorKey: "employee_code",
     header: "Employee Code",
 

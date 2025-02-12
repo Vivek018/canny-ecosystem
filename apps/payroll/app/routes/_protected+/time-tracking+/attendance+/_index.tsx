@@ -55,6 +55,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   const searchParams = new URLSearchParams(url.searchParams);
+  const sortParam = searchParams.get("sort");
   const query = searchParams.get("name") ?? undefined;
 
   const filters = {
@@ -74,6 +75,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         to: MAX_QUERY_LIMIT,
         filters,
         searchQuery: query ?? undefined,
+        sort: sortParam?.split(":") as [string, "asc" | "desc"],
       },
     });
   if (attendanceError || !attendanceData) {
@@ -93,7 +95,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
     projectSiteData = data;
   }
-
   return json({
     attendanceData,
     filters,
@@ -134,7 +135,7 @@ export default function Attendance() {
   const { attendanceData, filters, projectArray, projectSiteArray } =
     useLoaderData<typeof loader>();
 
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<TransformedAteendanceDataType[]>([]);
 
   function transformAttendanceData(data: any[]) {
     const groupedByEmployeeAndMonth = data.reduce((acc, employee) => {
@@ -150,13 +151,13 @@ export default function Attendance() {
           employee.employee_project_assignment?.project_sites?.name || null,
       };
 
-      if (!employee.attendance || employee.attendance.length === 0) {
+      if (!employee?.attendance?.length) {
         acc[empCode] = acc[empCode] || employeeDetails;
         return acc;
       }
 
       // biome-ignore lint/complexity/noForEach: <explanation>
-      employee.attendance.forEach(
+      employee?.attendance?.forEach(
         (record: {
           date: string | number | Date;
           present: any;
@@ -191,7 +192,7 @@ export default function Attendance() {
   }
 
   useEffect(() => {
-    setData(transformAttendanceData(attendanceData));
+    setData(transformAttendanceData(attendanceData) as TransformedAteendanceDataType[]);
   }, [attendanceData]);
 
   const [month, setMonth] = useState<number>(new Date().getMonth());
