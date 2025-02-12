@@ -33,6 +33,10 @@ export default function Employee() {
               path: `/employees/${employeeId}/reimbursements`,
             },
             {
+              label: "Letters",
+              path: `/employees/${employeeId}/letters`,
+            },
+            {
               label: "Attendance",
               path: `/employees/${employeeId}/attendance`,
             },

@@ -13,7 +13,7 @@ export type Database = {
         Row: {
           created_at: string | null
           date: string | null
-          employee_id: string | null
+          employee_id: string
           holiday: boolean | null
           holiday_type: Database["public"]["Enums"]["holiday_type"] | null
           id: string
@@ -25,7 +25,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           date?: string | null
-          employee_id?: string | null
+          employee_id: string
           holiday?: boolean | null
           holiday_type?: Database["public"]["Enums"]["holiday_type"] | null
           id?: string
@@ -37,7 +37,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           date?: string | null
-          employee_id?: string | null
+          employee_id?: string
           holiday?: boolean | null
           holiday_type?: Database["public"]["Enums"]["holiday_type"] | null
           id?: string
@@ -312,7 +312,7 @@ export type Database = {
         Row: {
           account_holder_name: string | null
           account_number: string | null
-          account_type: string
+          account_type: string | null
           bank_name: string | null
           branch_name: string | null
           created_at: string | null
@@ -323,7 +323,7 @@ export type Database = {
         Insert: {
           account_holder_name?: string | null
           account_number?: string | null
-          account_type?: string
+          account_type?: string | null
           bank_name?: string | null
           branch_name?: string | null
           created_at?: string | null
@@ -334,7 +334,7 @@ export type Database = {
         Update: {
           account_holder_name?: string | null
           account_number?: string | null
-          account_type?: string
+          account_type?: string | null
           bank_name?: string | null
           branch_name?: string | null
           created_at?: string | null
@@ -411,18 +411,77 @@ export type Database = {
           },
         ]
       }
+      employee_letter: {
+        Row: {
+          content: string | null
+          created_at: string
+          date: string
+          employee_id: string
+          id: string
+          include_client_address: boolean | null
+          include_employee_address: boolean | null
+          include_employee_signature: boolean | null
+          include_letter_head: boolean | null
+          include_our_address: boolean | null
+          include_signatuory: boolean | null
+          letter_type: Database["public"]["Enums"]["letter_type"]
+          subject: string | null
+          updated_at: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          date: string
+          employee_id: string
+          id?: string
+          include_client_address?: boolean | null
+          include_employee_address?: boolean | null
+          include_employee_signature?: boolean | null
+          include_letter_head?: boolean | null
+          include_our_address?: boolean | null
+          include_signatuory?: boolean | null
+          letter_type: Database["public"]["Enums"]["letter_type"]
+          subject?: string | null
+          updated_at?: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          date?: string
+          employee_id?: string
+          id?: string
+          include_client_address?: boolean | null
+          include_employee_address?: boolean | null
+          include_employee_signature?: boolean | null
+          include_letter_head?: boolean | null
+          include_our_address?: boolean | null
+          include_signatuory?: boolean | null
+          letter_type?: Database["public"]["Enums"]["letter_type"]
+          subject?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_letter_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employee_project_assignment: {
         Row: {
           assignment_type: string | null
           created_at: string | null
           employee_id: string
           end_date: string | null
-          position: string
+          position: string | null
           probation_end_date: string | null
           probation_period: boolean | null
-          project_site_id: string
+          project_site_id: string | null
           skill_level: string | null
-          start_date: string
+          start_date: string | null
           supervisor_id: string | null
           updated_at: string | null
         }
@@ -431,12 +490,12 @@ export type Database = {
           created_at?: string | null
           employee_id: string
           end_date?: string | null
-          position: string
+          position?: string | null
           probation_end_date?: string | null
           probation_period?: boolean | null
-          project_site_id: string
+          project_site_id?: string | null
           skill_level?: string | null
-          start_date: string
+          start_date?: string | null
           supervisor_id?: string | null
           updated_at?: string | null
         }
@@ -445,12 +504,12 @@ export type Database = {
           created_at?: string | null
           employee_id?: string
           end_date?: string | null
-          position?: string
+          position?: string | null
           probation_end_date?: string | null
           probation_period?: boolean | null
-          project_site_id?: string
+          project_site_id?: string | null
           skill_level?: string | null
-          start_date?: string
+          start_date?: string | null
           supervisor_id?: string | null
           updated_at?: string | null
         }
@@ -852,12 +911,16 @@ export type Database = {
       }
       exits: {
         Row: {
+          bonus: number | null
           created_at: string | null
+          deduction: number | null
           employee_id: string
           employee_payable_days: number
           final_settlement_date: string
+          gratuity: number | null
           id: string
           last_working_day: string
+          leave_encashment: number | null
           note: string | null
           organization_payable_days: number
           reason: string
@@ -865,12 +928,16 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          bonus?: number | null
           created_at?: string | null
+          deduction?: number | null
           employee_id: string
           employee_payable_days: number
           final_settlement_date: string
+          gratuity?: number | null
           id?: string
           last_working_day: string
+          leave_encashment?: number | null
           note?: string | null
           organization_payable_days: number
           reason: string
@@ -878,12 +945,16 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          bonus?: number | null
           created_at?: string | null
+          deduction?: number | null
           employee_id?: string
           employee_payable_days?: number
           final_settlement_date?: string
+          gratuity?: number | null
           id?: string
           last_working_day?: string
+          leave_encashment?: number | null
           note?: string | null
           organization_payable_days?: number
           reason?: string
@@ -1842,7 +1913,14 @@ export type Database = {
       eligibility_option_type: "position" | "skill_level"
       feedback_category: "suggestion" | "bug" | "complain"
       feedback_severity: "low" | "normal" | "urgent"
-      holiday_type: "state" | "national"
+      holiday_type: "weekly" | "paid" | "state" | "national"
+      letter_type:
+        | "appointment_letter"
+        | "experience_letter"
+        | "noc_letter"
+        | "offer_letter"
+        | "relieving_letter"
+        | "termination_letter"
       payment_type: "fixed" | "variable"
       payroll_status: "pending" | "approved" | "created"
       template_assignment_type: "employee" | "site"

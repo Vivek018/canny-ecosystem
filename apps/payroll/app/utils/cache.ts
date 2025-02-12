@@ -25,10 +25,9 @@ export function clearAllCache() {
   lruCache.clear();
 }
 
-
 export async function setDeferCache<T extends Record<string, unknown>>(
   cacheKey: string,
-  serverData: Record<keyof T, Promise<any> | any>
+  serverData: Record<keyof T, Promise<any> | any>,
 ) {
   const resolvedData: Record<keyof T, any> = {} as Record<keyof T, any>;
   let hasError = false;
@@ -51,14 +50,15 @@ export async function setDeferCache<T extends Record<string, unknown>>(
 }
 
 export function getDeferCache<T extends Record<string, unknown>>(
-  cacheKey: string
+  cacheKey: string,
 ): T | undefined {
-  return (lruCache.get(cacheKey) as T);
+  return lruCache.get(cacheKey) as T;
 }
 
-export async function clientCaching<
-  T extends Record<string, unknown>,
->(cacheKey: string, { serverLoader }: any): Promise<T> {
+export async function clientCaching<T extends Record<string, unknown>>(
+  cacheKey: string,
+  { serverLoader }: any,
+): Promise<T> {
   if (lruCache.has(cacheKey)) {
     return getDeferCache(cacheKey) as T;
   }
@@ -67,4 +67,4 @@ export async function clientCaching<
   const resolvedData = await setDeferCache(cacheKey, serverData);
 
   return resolvedData as T;
-} 
+}
