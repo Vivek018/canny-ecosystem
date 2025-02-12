@@ -102,6 +102,7 @@ export function ReimbursementImportData({
           company_id: companyId,
         };
       });
+      
       const { error, status } = await createReimbursementsFromImportedData({
         data: updatedData as ReimbursementInsert[],
 

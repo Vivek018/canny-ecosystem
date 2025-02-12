@@ -31,7 +31,18 @@ export const UpdateImportedEmployee = ({
   dataToUpdate: ImportEmployeeDetailsDataType;
 }) => {
   const { importData, setImportData } = useImportStoreForEmployeeDetails();
-  const [data, setData] = useState(dataToUpdate);
+  const convertToBoolean = (value: unknown): boolean => {
+    if (typeof value === "string") {
+      return value.toLowerCase() === "true";
+    }
+    return Boolean(value);
+  };
+
+  const initialData = {
+    ...dataToUpdate,
+    is_active: convertToBoolean(dataToUpdate.is_active),
+  };
+  const [data, setData] = useState(initialData);
 
   const onChange = (key: keyof typeof dataToUpdate, value: string) => {
     setData((prevData) => ({ ...prevData, [key]: value }));

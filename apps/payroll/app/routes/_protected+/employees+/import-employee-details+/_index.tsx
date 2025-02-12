@@ -214,18 +214,25 @@ export default function EmployeeDetailsImportFieldMapping() {
         skipEmptyLines: true,
         transformHeader: (header) => swappedFieldMapping[header] || header,
         complete: async (results) => {
+          const allowedFields = FIELD_CONFIGS.map((field) => field.key);
           const finalData = results.data
             .filter((entry) =>
               Object.values(entry!).some((value) => String(value).trim() !== "")
             )
             .map((entry) => {
               const cleanEntry = Object.fromEntries(
-                Object.entries(entry as Record<string, any>).filter(
-                  ([key, value]) =>
-                    key.trim() !== "" &&
-                    value !== null &&
-                    String(value).trim() !== ""
-                )
+                Object.entries(entry as Record<string, any>)
+                  .filter(
+                    ([key, value]) =>
+                      key.trim() !== "" &&
+                      value !== null &&
+                      String(value).trim() !== ""
+                  )
+                  .filter(([key]) =>
+                    allowedFields.includes(
+                      key as keyof ImportEmployeeDetailsDataType
+                    )
+                  )
               );
               return cleanEntry;
             });

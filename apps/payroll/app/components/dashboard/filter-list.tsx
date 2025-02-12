@@ -1,5 +1,4 @@
 import type { PayrollFilterType } from "@/routes/_protected+/dashboard";
-import type { EmployeeFilters } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { useSearchParams } from "@remix-run/react";

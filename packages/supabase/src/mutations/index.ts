@@ -16,3 +16,4 @@ export * from "./exits";
 export * from "./gratuity";
 export * from "./payroll";
 export * from "./employee-letter";
+export * from "./employee-attendance";

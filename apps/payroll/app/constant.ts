@@ -29,11 +29,16 @@ export const sideNavList = [
   { name: "Employees", link: "/employees", icon: "employee" },
   { name: "Finance" },
   {
+    name: "Time Tracking",
+    link: "/time-tracking",
+    icon: "lab-timer",
+  },
+  {
     name: "Payroll",
     link: "/payroll",
     icon: "table",
   },
-  { name: "Approvals", link: "/approvals", icon: "lab-timer" },
+  { name: "Approvals", link: "/approvals", icon: "check-circle" },
   {
     name: "Payment Components",
     link: "/payment-components",
@@ -249,4 +254,5 @@ export const cacheKeyPrefix = {
   users: "users",
   account: "account",
   feedback_list: "feedback-list",
+  attendance: "attendance",
 };

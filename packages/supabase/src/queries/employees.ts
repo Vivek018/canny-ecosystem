@@ -1,6 +1,7 @@
 import { formatUTCDate } from "@canny_ecosystem/utils";
 import type {
   EmployeeAddressDatabaseRow,
+  EmployeeAttendanceDatabaseRow,
   EmployeeBankDetailsDatabaseRow,
   EmployeeDatabaseRow,
   EmployeeGuardianDatabaseRow,
@@ -856,7 +857,7 @@ export async function getEmployeesReportByCompanyId({
       `${columns.join(",")},
         employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"}(
         employee_id, assignment_type, skill_level, position, start_date, end_date,
-        project_sites!${project_site ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"}(id, name))
+        project_sites!${project ? 'inner' : 'left'}(id, name, projects!${project ? 'inner' : 'left'}(id, name))
       )`,
       { count: "exact" },
     )
@@ -1012,6 +1013,18 @@ export type ImportEmployeeGuardiansDataType = Pick<
   | "email"
   | "is_emergency_contact"
   | "address_same_as_employee"
+> & {
+  employee_code: EmployeeDatabaseRow["employee_code"];
+};
+
+export type ImportEmployeeAttendanceDataType = Pick<
+  EmployeeAttendanceDatabaseRow,
+  | "date"
+  | "no_of_hours"
+  | "present"
+  | "holiday"
+  | "working_shift"
+  | "holiday_type"
 > & {
   employee_code: EmployeeDatabaseRow["employee_code"];
 };
