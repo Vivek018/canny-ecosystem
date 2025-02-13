@@ -5,7 +5,7 @@ import { useIsDocument } from '@canny_ecosystem/utils/hooks/is-document';
 import { Dialog, DialogContent } from '@canny_ecosystem/ui/dialog';
 import { getSupabaseWithHeaders } from '@canny_ecosystem/supabase/server';
 import { getCompanyIdOrFirstCompany } from '@/utils/server/company.server';
-import { type EmployeeProjectAssignmentDataType, getCompanyById, getCompanyRegistrationDetailsByCompanyId, getEmployeeById, getEmployeeProjectAssignmentByEmployeeId, getEmployeeStatutoryDetailsById, getPaymentFieldById, getPaymentTemplateComponentById, getPaymentTemplateComponentIdsAndAmountByPayrollIdAndEmployeeId, getPayrollById, getPrimaryCompanyLocationById, getUniqueEmployeeIdsByPayrollId } from '@canny_ecosystem/supabase/queries';
+import { type EmployeeProjectAssignmentDataType, getCompanyById, getCompanyRegistrationDetailsByCompanyId, getEmployeeById, getEmployeeProjectAssignmentByEmployeeId, getEmployeeStatutoryDetailsById, getPaymentFieldById, getPaymentTemplateComponentById, getPaymentTemplateComponentIdsAndAmountByPayrollIdAndEmployeeId, getPayrollById, getPrimaryLocationByCompanyId, getUniqueEmployeeIdsByPayrollId } from '@canny_ecosystem/supabase/queries';
 import { CANNY_MANAGEMENT_SERVICES_ADDRESS, CANNY_MANAGEMENT_SERVICES_COMPANY_ID, CANNY_MANAGEMENT_SERVICES_NAME } from '@/constant';
 import type { CompanyDatabaseRow, CompanyRegistrationDetailsRow, EmployeeDatabaseRow, EmployeeStatutoryDetailsDatabaseRow, LocationDatabaseRow, PayrollDatabaseRow } from '@canny_ecosystem/supabase/types';
 
@@ -275,7 +275,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
     const { data: cannyData } = await getCompanyRegistrationDetailsByCompanyId({ supabase, companyId: CANNY_MANAGEMENT_SERVICES_COMPANY_ID });
-    const { data: employeeCompanyLocationData } = await getPrimaryCompanyLocationById({ supabase, id: companyId });
+    const { data: employeeCompanyLocationData } = await getPrimaryLocationByCompanyId({ supabase,companyId });
     const { data: uniqueEmployeeIdsData } = await getUniqueEmployeeIdsByPayrollId({ supabase, payrollId });
     const { data: companyData } = await getCompanyById({ supabase, id: companyId });
     const { data: payrollData } = await getPayrollById({ supabase, payrollId });

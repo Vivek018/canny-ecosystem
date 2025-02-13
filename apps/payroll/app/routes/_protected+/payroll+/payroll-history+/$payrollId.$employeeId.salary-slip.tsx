@@ -5,7 +5,7 @@ import { useIsDocument } from '@canny_ecosystem/utils/hooks/is-document';
 import { Dialog, DialogContent } from '@canny_ecosystem/ui/dialog';
 import { getSupabaseWithHeaders } from '@canny_ecosystem/supabase/server';
 import { getCompanyIdOrFirstCompany } from '@/utils/server/company.server';
-import { type EmployeeProjectAssignmentDataType, getCompanyById, getEmployeeById, getEmployeeProjectAssignmentByEmployeeId, getEmployeeStatutoryDetailsById, getPaymentFieldById, getPaymentTemplateComponentById, getPaymentTemplateComponentIdsAndAmountByPayrollIdAndEmployeeId, getPayrollById, getPrimaryCompanyLocationById } from '@canny_ecosystem/supabase/queries';
+import { type EmployeeProjectAssignmentDataType, getCompanyById, getEmployeeById, getEmployeeProjectAssignmentByEmployeeId, getEmployeeStatutoryDetailsById, getPaymentFieldById, getPaymentTemplateComponentById, getPaymentTemplateComponentIdsAndAmountByPayrollIdAndEmployeeId, getPayrollById, getPrimaryLocationByCompanyId } from '@canny_ecosystem/supabase/queries';
 import { CANNY_MANAGEMENT_SERVICES_ADDRESS, CANNY_MANAGEMENT_SERVICES_NAME, numberToWordsIndian, SALARY_SLIP_TITLE } from '@/constant';
 import { formatDateTime, formatDateToMonthYear } from '@canny_ecosystem/utils';
 import type { CompanyDatabaseRow, EmployeeDatabaseRow, EmployeeStatutoryDetailsDatabaseRow, LocationDatabaseRow, PayrollDatabaseRow } from '@canny_ecosystem/supabase/types';
@@ -330,7 +330,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const { data: payrollData } = await getPayrollById({ supabase, payrollId });
     const { data: employeeData } = await getEmployeeById({ supabase, id: employeeId });
     const { data: employeeProjectAssignmentData } = await getEmployeeProjectAssignmentByEmployeeId({ supabase, employeeId });
-    const { data: employeeCompanyLocationData } = await getPrimaryCompanyLocationById({ supabase, id: companyId });
+    const { data: employeeCompanyLocationData } = await getPrimaryLocationByCompanyId({ supabase, companyId });
     const { data: employeeStatutoryDetails } = await getEmployeeStatutoryDetailsById({ supabase, id: employeeId });
 
     // const workingDetails = []; 

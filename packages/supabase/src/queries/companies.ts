@@ -209,28 +209,36 @@ export async function getLocationById({
   return { data, error };
 }
 
-export async function getPrimaryCompanyLocationById({
+export async function getPrimaryLocationByCompanyId({
   supabase,
-  id,
-}: { supabase: TypedSupabaseClient; id: string }) {
+  companyId,
+}: { supabase: TypedSupabaseClient; companyId: string }) {
   const columns = [
+    "id",
+    "company_id",
+    "name",
     "address_line_1",
     "address_line_2",
     "city",
     "state",
     "pincode",
+    "latitude",
+    "longitude",
+    "is_primary",
   ] as const;
 
   const { data, error } = await supabase
     .from("company_locations")
     .select(columns.join(","))
-    .eq("company_id", id)
+    .eq("company_id", companyId)
     .eq("is_primary", true)
-    .order("created_at")
-    .limit(1)
+    .order("created_at", { ascending: false })
+    .limit(SINGLE_QUERY_LIMIT)
     .single<InferredType<LocationDatabaseRow, (typeof columns)[number]>>();
 
-  if (error) console.error(error);
+  if (error) {
+    console.error(error);
+  }
 
   return { data, error };
 }

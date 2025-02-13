@@ -57,10 +57,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     };
 
     const hasFilters =
-      filters &&
-      Object.values(filters).some(
-        (value) => value !== null && value !== undefined
-      );
+      filters && Object.values(filters).some((value) => value !== null && value !== undefined);
 
     const usersPromise = getUsersEmail({ supabase });
 
