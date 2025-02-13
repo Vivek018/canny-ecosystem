@@ -12,7 +12,7 @@ import { createRole, hasPermission } from "@canny_ecosystem/utils";
 import {attribute,modalSearchParamNames} from "@canny_ecosystem/utils/constant";
 import { useSearchParams } from "@remix-run/react";
 
-export function ImportReimbursementMenu() {
+export function ImportExitMenu() {
   const { role } = useUser();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -21,7 +21,7 @@ export function ImportReimbursementMenu() {
       <DropdownMenuTrigger
         asChild
         className={cn(
-          !hasPermission(role, `${createRole}:${attribute.reimbursements}`) &&
+          !hasPermission(role, `${createRole}:${attribute.exits}`) &&
             "hidden"
         )}
       >
@@ -32,7 +32,7 @@ export function ImportReimbursementMenu() {
       <DropdownMenuContent sideOffset={10} align='end'>
         <DropdownMenuItem
           onClick={() => {
-            searchParams.set("step",modalSearchParamNames.import_reimbursement);
+            searchParams.set("step",modalSearchParamNames.import_exits);
             setSearchParams(searchParams);
           }}
           className='space-x-2 flex items-center'

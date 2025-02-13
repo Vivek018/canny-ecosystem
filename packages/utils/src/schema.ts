@@ -581,6 +581,7 @@ export const UserSchema = z.object({
   role: z.enum(userRoles),
 });
 
+// Exits
 export const reasonForExitArray = [
   "resignation",
   "termination",
@@ -590,26 +591,18 @@ export const reasonForExitArray = [
   "other",
 ] as const;
 
-export const ExitPaymentPage1Schema = z.object({
+export const ExitFormSchema = z.object({
+  employee_id: z.string().optional(),
+  organization_payable_days: zNumber.default("0"),
+  employee_payable_days: zNumber.default("0"),
   last_working_day: z.string(),
-  reason_for_exit: z.enum(reasonForExitArray),
   final_settlement_date: z.string(),
+  reason: z.enum(reasonForExitArray).default("other"),
   note: zTextArea.max(100).optional(),
-});
-
-export const ExitPaymentPage2Schema = z.object({
-  organization_payable_days: zNumber,
-  employee_payable_days: zNumber,
-  bonus: zNumber.optional(),
-  diwali_bonus: zNumber.optional(),
-  commission: zNumber.optional(),
-  joining_bonus: zNumber.optional(),
-  yearly_bonus: zNumber.optional(),
-  leave_encashment: zNumber.optional(),
-  gift_coupon: zNumber.optional(),
-  computer_servive_charges: zNumber.optional(),
-  gratuity: zNumber.optional(),
-  deduction: zNumber.optional(),
+  bonus: zNumber.default("0"),
+  leave_encashment: zNumber.default("0"),
+  gratuity: zNumber.default("0"),
+  deduction: zNumber.default("0"),
 });
 
 // Payment Templates
@@ -744,15 +737,6 @@ export const ImportReimbursementHeaderSchema = z
       ],
     },
   );
-
-export const exitReasonArray = [
-  "Resignation",
-  "Retirement",
-  "Transfer",
-  "Termination",
-  "Medical",
-  "Other",
-] as const;
 
 export const ImportSingleReimbursementDataSchema = z.object({
   submitted_date: z.string(),
@@ -1194,6 +1178,102 @@ export type PayrollEmployeeData = {
   templateComponents: any;
   payrollId: string;
 };
+
+// Exits
+export const exitReasonArray = [
+  "Resignation",
+  "Retirement",
+  "Transfer",
+  "Termination",
+  "Medical",
+  "Other",
+] as const;
+
+export const ImportExitHeaderSchemaObject = z.object({
+  employee_code: z.string(),
+  employee_name: z.string(),
+  project_name: z.string(),
+  project_site_name: z.string(),
+  last_working_day: z.string(),
+  reason: z.string(),
+  final_settlement_date: z.string(),
+  organization_payable_days: z.string(),
+  employee_payable_days: z.string(),
+  bonus: z.string(),
+  leave_encashment: z.string(),
+  gratuity: z.string(),
+  deduction: z.string(),
+  note: z.string(),
+  total: z.string(),
+});
+
+export const ImportExitHeaderSchema = ImportExitHeaderSchemaObject.refine(
+  (data) => {
+    const values = [
+      data.employee_code,
+      data.employee_name,
+      data.project_name,
+      data.project_site_name,
+      data.last_working_day,
+      data.reason,
+      data.final_settlement_date,
+      data.organization_payable_days,
+      data.employee_payable_days,
+      data.bonus,
+      data.leave_encashment,
+      data.gratuity,
+      data.deduction,
+      data.note,
+      data.total,
+    ].filter(Boolean);
+
+    const uniqueValues = new Set(values);
+    return uniqueValues.size === values.length;
+  },
+  {
+    message:
+      "Some fields have the same value. Please select different options.",
+    path: [
+      "employee_code",
+      "employee_name",
+      "project_name",
+      "project_site_name",
+      "last_working_day",
+      "reason",
+      "final_settlement_date",
+      "organization_payable_days",
+      "employee_payable_days",
+      "bonus",
+      "leave_encashment",
+      "gratuity",
+      "deduction",
+      "note",
+      "total",
+    ],
+  },
+);
+
+export const ImportSingleExitDataSchema = z.object({
+  employee_code: z.string(),
+  employee_name: z.string(),
+  project_name: z.string(),
+  project_site_name: z.string(),
+  last_working_day: z.string(),
+  reason: z.string(),
+  final_settlement_date: z.string(),
+  organization_payable_days: z.string(),
+  employee_payable_days: z.string(),
+  bonus: z.string(),
+  leave_encashment: z.string(),
+  gratuity: z.string(),
+  deduction: z.string(),
+  note: z.string(),
+  total: z.string(),
+});
+
+export const ImportExitDataSchema = z.object({
+  data: z.array(ImportSingleExitDataSchema),
+});
 
 export const attendanceWorkShiftArray = ["day", "afternoon", "night"] as const;
 export const attendanceHolidayTypeArray = [

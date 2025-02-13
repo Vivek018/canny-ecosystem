@@ -36,9 +36,7 @@ export async function createReimbursementsFromImportedData({
     .insert(data)
     .select();
 
-  if (error) {
-    console.error(error);
-  }
+  if (error) console.error(error);
 
   return { status, error };
 }

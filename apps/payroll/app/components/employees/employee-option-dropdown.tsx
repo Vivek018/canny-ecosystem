@@ -6,7 +6,7 @@ import {
   DropdownMenuSeparator,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { useSubmit } from "@remix-run/react";
+import { useNavigate, useSubmit } from "@remix-run/react";
 import { DeleteEmployee } from "./delete-employee";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { EmployeeDialog } from "../link-template/employee-dialog";
@@ -29,6 +29,7 @@ export const EmployeeOptionsDropdown = ({
   env: SupabaseEnv;
 }) => {
   const submit = useSubmit();
+  const navigate = useNavigate();
   const { role } = useUser();
   const handleMarkAsActive = () => {
     submit(
@@ -58,6 +59,10 @@ export const EmployeeOptionsDropdown = ({
     );
   };
 
+  const handleExit = () => {
+    navigate(`/approvals/exits/${employee.id}/create-exit`);
+  };
+
   return (
     <DropdownMenu>
       {triggerChild}
@@ -67,7 +72,7 @@ export const EmployeeOptionsDropdown = ({
             className={cn(
               employee.is_active && "hidden",
               !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
-                "hidden"
+              "hidden"
             )}
             onClick={handleMarkAsActive}
           >
@@ -77,7 +82,7 @@ export const EmployeeOptionsDropdown = ({
             className={cn(
               !employee.is_active && "hidden",
               !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
-                "hidden"
+              "hidden"
             )}
             onClick={handleMarkAsInactive}
           >
@@ -86,18 +91,25 @@ export const EmployeeOptionsDropdown = ({
           <DropdownMenuSeparator
             className={cn(
               !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
-                !hasPermission(role, `${deleteRole}:${attribute.employees}`) &&
-                "hidden"
+              !hasPermission(role, `${deleteRole}:${attribute.employees}`) &&
+              "hidden"
             )}
           />
           <EmployeeDialog employee={employee} env={env} />
           <DropdownMenuSeparator
-            className={cn(
-              "hidden",
-              hasPermission(role, `${deleteRole}:${attribute.employees}`) &&
-                "flex"
-            )}
+            className={cn("hidden", hasPermission(role, `${deleteRole}:${attribute.employees}`) && "flex")}
           />
+          <DropdownMenuItem
+            className={cn(
+              !employee.is_active && "hidden",
+              !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
+              "hidden"
+            )}
+            onClick={handleExit}
+          >
+            Exit employee
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           <DeleteEmployee employeeId={employee.id} />
         </DropdownMenuGroup>
       </DropdownMenuContent>

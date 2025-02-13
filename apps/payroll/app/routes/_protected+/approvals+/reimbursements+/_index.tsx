@@ -171,8 +171,8 @@ export default function ReimbursementsIndex() {
                           projectArray={
                             projectData?.data?.length
                               ? projectData?.data?.map(
-                                  (project) => project!.name
-                                )
+                                (project) => project!.name
+                              )
                               : []
                           }
                           projectSiteArray={

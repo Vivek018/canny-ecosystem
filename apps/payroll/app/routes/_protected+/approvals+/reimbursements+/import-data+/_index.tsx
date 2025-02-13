@@ -214,7 +214,7 @@ export default function ReimbursementFieldMapping() {
                     allowedFields.includes(
                       key as keyof ImportReimbursementDataType
                     )
-                  ) 
+                  )
               );
 
               return cleanEntry;

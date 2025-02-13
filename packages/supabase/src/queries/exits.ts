@@ -2,7 +2,6 @@ import { formatUTCDate } from "@canny_ecosystem/utils";
 import { HARD_QUERY_LIMIT, SINGLE_QUERY_LIMIT } from "../constant";
 import type {
   EmployeeDatabaseRow,
-  ExitPaymentsRow,
   ExitsRow,
   InferredType,
   TypedSupabaseClient,
@@ -17,6 +16,23 @@ export type ExitFilterType = {
   project?: string | undefined | null;
   project_site?: string | undefined | null;
 } | null;
+
+export type ImportExitDataType = Pick<
+  ExitsRow,
+  | "employee_payable_days"
+  | "bonus"
+  | "deduction"
+  | "final_settlement_date"
+  | "gratuity"
+  | "last_working_day"
+  | "leave_encashment"
+  | "note"
+  | "organization_payable_days"
+  | "reason"
+  | "total"
+> & { employee_code: string } & { employee_name: string } & {
+  project_name: string;
+} & { project_site_name: string };
 
 export type ExitDataType = Pick<
   ExitsRow,
@@ -35,18 +51,9 @@ export type ExitDataType = Pick<
     "first_name" | "middle_name" | "last_name" | "employee_code"
   > & {
     employee_project_assignment: {
-      project_sites: {
-        name: string;
-        projects: { name: string };
-      };
+      project_sites: { name: string; projects: { name: string } };
     };
   };
-} & {
-  exit_payments: (Pick<ExitPaymentsRow, "amount" | "type"> & {
-    payment_fields: {
-      name: string;
-    };
-  })[];
 };
 
 export const getExits = async ({
@@ -72,6 +79,10 @@ export const getExits = async ({
     "last_working_day",
     "final_settlement_date",
     "reason",
+    "bonus",
+    "leave_encashment",
+    "gratuity",
+    "deduction",
     "note",
     "total",
   ] as const;
@@ -146,9 +157,7 @@ export const getExits = async ({
       if (end) query.lte(field, formatUTCDate(end));
     }
 
-    if (reason) {
-      query.eq("reason", reason);
-    }
+    if (reason) query.eq("reason", reason.toLowerCase());
 
     if (project) {
       query.eq(
@@ -189,7 +198,12 @@ export const getExitsById = async ({
     "last_working_day",
     "final_settlement_date",
     "reason",
+    "bonus",
+    "leave_encashment",
+    "gratuity",
+    "deduction",
     "note",
+    "total",
   ] as const;
 
   const { data, error } = await supabase
@@ -198,9 +212,7 @@ export const getExitsById = async ({
     .eq("id", id)
     .single<InferredType<ExitsRow, (typeof columns)[number]>>();
 
-  if (error) {
-    console.error(error);
-  }
+  if (error) console.error(error);
 
   return { data, error };
 };
