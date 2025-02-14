@@ -1,8 +1,8 @@
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@canny_ecosystem/ui/card";
 import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, } from "@canny_ecosystem/ui/chart";
-import type { ExitDataType } from "@canny_ecosystem/supabase/queries";
 import { useMemo, useState } from "react";
+import type { ExitDataType } from "@canny_ecosystem/supabase/queries";
 
 const chartConfig = {
   date: { label: "Date", color: "hsl(var(--chart-0))" },

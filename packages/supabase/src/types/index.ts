@@ -270,13 +270,6 @@ export type ExitsRow = Database["public"]["Tables"]["exits"]["Row"];
 export type ExitsInsert = Database["public"]["Tables"]["exits"]["Insert"];
 export type ExitsUpdate = Database["public"]["Tables"]["exits"]["Update"];
 
-export type ExitPaymentsRow =
-  Database["public"]["Tables"]["exit_payments"]["Row"];
-export type ExitPaymentsInsert =
-  Database["public"]["Tables"]["exit_payments"]["Insert"];
-export type ExitPaymentsUpdate =
-  Database["public"]["Tables"]["exit_payments"]["Update"];
-
 export type GratuityDatabaseRow =
   Database["public"]["Tables"]["gratuity"]["Row"];
 export type GratuityDatabaseInsert =

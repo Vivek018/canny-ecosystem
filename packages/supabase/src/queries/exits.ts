@@ -71,6 +71,16 @@ export const getExits = async ({
 }) => {
   const { from, to, sort, searchQuery, filters } = params;
 
+  const {
+    last_working_day_start,
+    last_working_day_end,
+    final_settlement_date_start,
+    final_settlement_date_end,
+    reason,
+    project,
+    project_site,
+  } = filters ?? {};
+
   const columns = [
     "id",
     "employee_id",
@@ -91,8 +101,7 @@ export const getExits = async ({
     .from("exits")
     .select(
       `${columns.join(",")},
-          employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(project_sites!inner(id, name, projects!inner(id, name)))),
-          exit_payments(amount, type, payment_fields!payment_fields_id(name))`,
+          employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? 'inner' : 'left'}(project_sites!${project ? 'inner' : 'left'}(id, name, projects!${project ? 'inner' : 'left'}(id, name))))`,
       { count: "exact" },
     )
     .limit(HARD_QUERY_LIMIT);
@@ -127,17 +136,7 @@ export const getExits = async ({
     }
   }
 
-  // Filters
-  if (filters) {
-    const {
-      last_working_day_start,
-      last_working_day_end,
-      final_settlement_date_start,
-      final_settlement_date_end,
-      reason,
-      project,
-      project_site,
-    } = filters;
+    
 
     const dateFilters = [
       {
@@ -171,7 +170,7 @@ export const getExits = async ({
         project_site,
       );
     }
-  }
+  
 
   const { data, count, error } = await query.range(from, to);
 
