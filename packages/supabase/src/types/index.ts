@@ -283,3 +283,9 @@ export type GratuityDatabaseInsert =
 export type GratuityDatabaseUpdate =
   Database["public"]["Tables"]["gratuity"]["Update"];
 
+export type AccidentsDatabaseRow =
+  Database["public"]["Tables"]["accidents"]["Row"];
+export type AccidentsDatabaseInsert =
+  Database["public"]["Tables"]["accidents"]["Insert"];
+export type AccidentsDatabaseUpdate =
+  Database["public"]["Tables"]["accidents"]["Update"];

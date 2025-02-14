@@ -1,0 +1,181 @@
+import { formatUTCDate } from "@canny_ecosystem/utils";
+import type {
+  EmployeeDatabaseRow,
+  AccidentsDatabaseRow,
+  TypedSupabaseClient,
+  InferredType,
+} from "../types";
+
+export type AccidentFilters = {
+  date_start?: string | undefined | null;
+  date_end?: string | undefined | null;
+  status?: string | undefined | null;
+  location_type?: string | undefined | null;
+  category?: string | undefined | null;
+  severity?: string | undefined | null;
+  name?: string | undefined | null;
+};
+
+export type AccidentsDatabaseType = Pick<
+  AccidentsDatabaseRow,
+  | "id"
+  | "title"
+  | "date"
+  | "location_type"
+  | "location"
+  | "category"
+  | "severity"
+  | "status"
+  | "description"
+  | "medical_diagnosis"
+> & {
+  employees: {
+    id: EmployeeDatabaseRow["id"];
+    company_id: EmployeeDatabaseRow["company_id"];
+    employee_code: EmployeeDatabaseRow["employee_code"];
+    first_name: EmployeeDatabaseRow["first_name"];
+    middle_name: EmployeeDatabaseRow["middle_name"];
+    last_name: EmployeeDatabaseRow["last_name"];
+  };
+};
+
+export async function getAccidentsByCompanyId({
+  supabase,
+  companyId,
+  params,
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+  params: {
+    from: number;
+    to: number;
+    sort?: [string, "asc" | "desc"];
+    searchQuery?: string;
+    filters?: AccidentFilters | null;
+  };
+}) {
+  const { from, to, sort, searchQuery, filters } = params;
+
+  const { date_start, date_end, status, location_type, category, severity } =
+    filters ?? {};
+
+  const columns = [
+    "id",
+    "date",
+    "title",
+    "location_type",
+    "location",
+    "category",
+    "severity",
+    "status",
+    "description",
+    "medical_diagnosis",
+  ] as const;
+
+  const query = supabase
+    .from("accidents")
+    .select(
+      `${columns.join(
+        ","
+      )}, employees(id,company_id, employee_code,first_name,middle_name,last_name)`,
+      {
+        count: "exact",
+      }
+    )
+    .eq("employees.company_id", companyId);
+
+  if (sort) {
+    const [column, direction] = sort;
+    query.order(column, { ascending: direction === "asc" });
+  } else {
+    query.order("created_at", { ascending: false });
+  }
+
+  if (searchQuery) {
+    const searchQueryArray = searchQuery.split(" ");
+    if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
+      for (const searchQueryElement of searchQueryArray) {
+        query.or(
+          `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*,employee_code.ilike.*${searchQueryElement}*`,
+          {
+            referencedTable: "employees",
+          }
+        );
+      }
+    } else {
+      query.or(
+        `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`,
+        {
+          referencedTable: "employees",
+        }
+      );
+    }
+  }
+
+  const dateFilters = [
+    {
+      field: "date",
+      start: date_start,
+      end: date_end,
+    },
+  ];
+  for (const { field, start, end } of dateFilters) {
+    if (start) query.gte(field, formatUTCDate(start));
+    if (end) query.lte(field, formatUTCDate(end));
+  }
+  if (status) {
+    query.eq("status", status.toLowerCase());
+  }
+  if (location_type) {
+    query.eq("location_type", location_type.toLowerCase());
+  }
+  if (category) {
+    query.eq("category", category);
+  }
+  if (severity) {
+    query.eq("severity", severity);
+  }
+
+  const { data, count, error } = await query.range(from, to);
+  if (error) {
+    console.error(error);
+  }
+
+  return { data, meta: { count: count ?? data?.length }, error };
+}
+
+export async function getAccidentsById({
+  supabase,
+  accidentId,
+}: {
+  supabase: TypedSupabaseClient;
+  accidentId: string;
+}) {
+  const columns = [
+    "id",
+    "employee_id",
+    "date",
+    "title",
+    "location_type",
+    "location",
+    "category",
+    "severity",
+    "status",
+    "description",
+    "medical_diagnosis",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("accidents")
+    .select(`${columns.join(",")}`, {
+      count: "exact",
+    })
+    .eq("id", accidentId)
+    .single<InferredType<AccidentsDatabaseRow, (typeof columns)[number]>>();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { data, error };
+}

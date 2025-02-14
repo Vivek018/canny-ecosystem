@@ -116,7 +116,6 @@ export default function AddReimbursements({
   updateValues,
   userOptionsFromUpdate,
 }: {
-  reimbursementId?: string;
   updateValues?: ReimbursementsUpdate | null;
   userOptionsFromUpdate?: any;
 }) {

@@ -10,7 +10,12 @@ import { useSubmit } from "@remix-run/react";
 import { DeleteEmployee } from "./delete-employee";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { EmployeeDialog } from "../link-template/employee-dialog";
-import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
+import {
+  createRole,
+  deleteRole,
+  hasPermission,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
@@ -58,10 +63,22 @@ export const EmployeeOptionsDropdown = ({
     );
   };
 
+  const handleAccident = () => {
+    submit(
+      {
+        id: employee.id,
+      },
+      {
+        method: "POST",
+        action: `/employees/${employee.id}/create-accident`,
+      }
+    );
+  };
+
   return (
     <DropdownMenu>
       {triggerChild}
-      <DropdownMenuContent sideOffset={10} align='end'>
+      <DropdownMenuContent sideOffset={10} align="end">
         <DropdownMenuGroup>
           <DropdownMenuItem
             className={cn(
@@ -95,6 +112,23 @@ export const EmployeeOptionsDropdown = ({
             className={cn(
               "hidden",
               hasPermission(role, `${deleteRole}:${attribute.employees}`) &&
+                "flex"
+            )}
+          />
+          <DropdownMenuItem
+            className={cn(
+              !employee.is_active && "hidden",
+              !hasPermission(role, `${createRole}:${attribute.accidents}`) &&
+                "hidden"
+            )}
+            onClick={handleAccident}
+          >
+            Report Accident
+          </DropdownMenuItem>
+          <DropdownMenuSeparator
+            className={cn(
+              "hidden",
+              hasPermission(role, `${deleteRole}:${attribute.accidents  }`) &&
                 "flex"
             )}
           />

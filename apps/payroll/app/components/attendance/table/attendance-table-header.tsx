@@ -86,8 +86,8 @@ export function AttendanceTableHeader({
               key={id}
               className={cn(
                 "px-4 py-2 min-w-32",
-                id === "employee_code" && "w-full sticky left-12 bg-card z-10",
-                id === "employee_name" && "sticky left-[224px] bg-card z-10"
+                id === "employee_code" && "sticky left-12 bg-card z-10",
+                id === "employee_name" && "sticky left-48 bg-card z-10"
               )}
             >
               <Button

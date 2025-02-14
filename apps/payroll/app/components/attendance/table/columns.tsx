@@ -31,7 +31,7 @@ export const attendanceColumns = (
         prefetch="intent"
         className="group"
       >
-        <p className="truncate text-primary/80 w-[6.20rem]">
+        <p className="truncate text-primary/80 w-28">
           {row.original?.employee_code ?? "--"}
         </p>
       </Link>
@@ -47,7 +47,7 @@ export const attendanceColumns = (
         prefetch="intent"
         className="group"
       >
-        <p className="truncate text-primary/80 w-[10rem]">
+        <p className="truncate text-primary/80 w-48">
           {`${row.original.employee_name}`}
         </p>
       </Link>

@@ -93,7 +93,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       companyId,
     });
 
-    const userEmailsPromise = getUsersEmail({ supabase });
+    const userEmailsPromise = getUsersEmail({ supabase, companyId });
 
     let projectSitePromise = null;
     if (filters.project) {

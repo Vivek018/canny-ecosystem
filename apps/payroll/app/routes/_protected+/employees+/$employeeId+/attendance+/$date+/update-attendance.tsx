@@ -101,11 +101,9 @@ export async function action({
   const attendanceData = submission.value;
   const { type, ...filteredData } = attendanceData;
 
-  const date = attendanceData?.date;
   const { status, error } = await updateOrAddAttendance({
     supabase,
     data: filteredData,
-    date,
     type,
   });
 

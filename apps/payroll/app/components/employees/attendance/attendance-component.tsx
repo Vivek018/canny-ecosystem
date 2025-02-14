@@ -1,11 +1,11 @@
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { EmployeeAttendanceDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { AttendanceFilter } from "./attendance-filter";
 import { useNavigate } from "@remix-run/react";
 import { FilterList } from "./filter-list";
 import { hasPermission, updateRole } from "@canny_ecosystem/utils";
-import { attribute } from "@canny_ecosystem/utils/constant";
+import { attribute, months } from "@canny_ecosystem/utils/constant";
 import { useUser } from "@/utils/user";
 
 const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -26,8 +26,30 @@ export const AttendanceComponent = ({
   const { role } = useUser();
   const navigate = useNavigate();
 
-  const [month, setMonth] = useState<number>(new Date().getMonth());
-  const [year, setYear] = useState<number>(new Date().getFullYear());
+  const [month, setMonth] = useState<number>(() => {
+    if (filters.month) {
+      return months[filters.month] - 1;
+    }
+    return new Date().getMonth();
+  });
+
+  const [year, setYear] = useState<number>(() => {
+    return filters.year ? Number(filters.year) : new Date().getFullYear();
+  });
+
+  useEffect(() => {
+    if (filters.month) {
+      setMonth(months[filters.month] - 1);
+    } else {
+      setMonth(new Date().getMonth());
+    }
+
+    if (filters.year) {
+      setYear(Number(filters.year));
+    } else {
+      setYear(new Date().getFullYear());
+    }
+  }, [filters]);
 
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const firstDayOfMonth = new Date(year, month, 1).getDay();
@@ -51,7 +73,7 @@ export const AttendanceComponent = ({
   };
 
   return (
-    <div className="m-4">
+    <div className="py-4">
       <div className="flex justify-end items-center mb-4 gap-x-2">
         <FilterList filters={filters} />
         <AttendanceFilter setMonth={setMonth} setYear={setYear} />
@@ -74,7 +96,7 @@ export const AttendanceComponent = ({
             {emptyFirstDays.map((_, index) => (
               <div
                 key={`empty-${index.toString()}`}
-                className="h-32 border-b first:border-l border-t border-r p-2"
+                className="h-32 border first:border-l  p-2"
               />
             ))}
 
@@ -112,7 +134,7 @@ export const AttendanceComponent = ({
                           : "bg-destructive text-white",
                         !attendanceData.find(
                           (entry) => entry.date === date.fullDate
-                        )?.date && "hidden"
+                        )?.date && "hidden p-0"
                       )}
                     >
                       {attendanceData.find(
@@ -146,7 +168,7 @@ export const AttendanceComponent = ({
                         : "bg-muted-foreground text-muted",
                       !attendanceData.find(
                         (entry) => entry.date === date.fullDate
-                      )?.id && "hidden"
+                      )?.id && "hidden p-0"
                     )}
                   >
                     {attendanceData.find(
@@ -158,7 +180,7 @@ export const AttendanceComponent = ({
                         )?.no_of_hours
                       } hours`}
                   </div>
-                  <div className="text-xs px-1 py-0.5 rounded-sm bg-muted text-muted-foreground">
+                  <div className="text-xs px-1 rounded-sm bg-muted text-muted-foreground">
                     {
                       attendanceData.find(
                         (entry) => entry.date === date.fullDate
@@ -172,7 +194,7 @@ export const AttendanceComponent = ({
             {emptyLastDays.map((_, index) => (
               <div
                 key={`empty-${index.toString()}`}
-                className="h-32 border-b first:border-l border-t border-r p-2"
+                className="h-32 border first:border-l  p-2"
               />
             ))}
           </div>
