@@ -20,7 +20,7 @@ import { attribute } from "@canny_ecosystem/utils/constant";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { useEffect } from "react";
 import { clearCacheEntry } from "@/utils/cache";
-import RegisterAccident from "../employees+/$employeeId+/create-accident";
+import RegisterAccident from "./$employeeId.create-accident";
 import { updateAccidentsById } from "@canny_ecosystem/supabase/mutations";
 import { getAccidentsById } from "@canny_ecosystem/supabase/queries";
 import type { AccidentsDatabaseUpdate } from "@canny_ecosystem/supabase/types";

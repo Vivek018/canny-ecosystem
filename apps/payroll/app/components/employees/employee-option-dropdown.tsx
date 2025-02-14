@@ -70,7 +70,7 @@ export const EmployeeOptionsDropdown = ({
       },
       {
         method: "POST",
-        action: `/employees/${employee.id}/create-accident`,
+        action: `/accidents/${employee.id}/create-accident`,
       }
     );
   };
@@ -128,7 +128,7 @@ export const EmployeeOptionsDropdown = ({
           <DropdownMenuSeparator
             className={cn(
               "hidden",
-              hasPermission(role, `${deleteRole}:${attribute.accidents  }`) &&
+              hasPermission(role, `${deleteRole}:${attribute.accidents}`) &&
                 "flex"
             )}
           />

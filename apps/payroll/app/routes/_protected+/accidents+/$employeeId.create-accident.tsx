@@ -47,7 +47,7 @@ import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { clearCacheEntry } from "@/utils/cache";
 import type { AccidentsDatabaseUpdate } from "@canny_ecosystem/supabase/types";
-import { UPDATE_ACCIDENTS_TAG } from "../../accidents+/$accidentId.update-accidents";
+import { UPDATE_ACCIDENTS_TAG } from "./$accidentId.update-accidents";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { safeRedirect } from "@/utils/server/http.server";
@@ -144,7 +144,7 @@ export default function CreateAccident({
       }
       navigate(actionData.returnTo);
     }
-  }, [actionData, navigate, toast]);
+  }, [actionData]);
 
   const ACCIDENT_TAG = updateValues
     ? UPDATE_ACCIDENTS_TAG
