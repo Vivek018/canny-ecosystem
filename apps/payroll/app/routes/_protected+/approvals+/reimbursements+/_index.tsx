@@ -126,7 +126,7 @@ export default function ReimbursementsIndex() {
   const noFilters = Object.values(filterList).every((value) => !value);
 
   return (
-    <section className="py-6 px-4">
+    <section className="p-4">
       <div className="w-full flex items-center justify-between pb-4">
         <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
           <Suspense fallback={<div>Loading...</div>}>

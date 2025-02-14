@@ -87,10 +87,11 @@ export default function UpdateExit() {
     useEffect(() => {
         if (!actionData) return;
 
-        if (actionData?.status === "success")
-            toast({ title: "Success", description: actionData?.message, variant: "success" });
-        else {
+        if (actionData?.status === "success"){
             clearCacheEntry(cacheKeyPrefix.exits);
+            toast({ title: "Success", description: actionData?.message, variant: "success" });
+        }
+        else {
             toast({
                 title: "Error",
                 description: actionData?.error?.message || "Exit update failed",

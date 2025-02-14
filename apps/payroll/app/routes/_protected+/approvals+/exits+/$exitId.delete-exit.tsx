@@ -49,12 +49,11 @@ export default function DeleteExit() {
   const actionData = useActionData<typeof action>();
   const navigate = useNavigate();
   useEffect(() => {
-    clearCacheEntry(cacheKeyPrefix.exits);
     if (actionData?.status === "success") {
+      clearCacheEntry(cacheKeyPrefix.exits);
       toast({ title: "Success", description: actionData?.message, variant: "success" });
     }
     else {
-      clearCacheEntry(cacheKeyPrefix.exits);
       toast({ title: "Error", description: actionData?.message, variant: "success" });
     }
     navigate(actionData?.returnTo ?? "/approvals/exits");

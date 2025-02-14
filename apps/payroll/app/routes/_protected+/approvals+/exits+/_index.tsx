@@ -130,7 +130,7 @@ export default function ExitsIndex() {
   const filterList = { ...filters, name: query };
 
   return (
-    <section className="m-4">
+    <section className="p-4">
       <div className="w-full flex items-center justify-between pb-4">
         <div className="flex-1 flex flex-col md:flex-row items-start md:items-center gap-4">
           <Suspense fallback={<div>Loading...</div>}>

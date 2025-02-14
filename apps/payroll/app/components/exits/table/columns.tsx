@@ -27,7 +27,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     accessorKey: "employee_code",
     header: "Employee Code",
     cell: ({ row }) => {
-      return <p className="truncate text-primary/80 w-28 group-hover:text-primary">
+      return <p className="truncate text-primary/80 w-28 cursor-pointer">
         {row.original?.employees?.employee_code ?? "--"}
       </p>
     },
@@ -38,7 +38,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     accessorKey: "employee_name",
     header: "Employee Name",
     cell: ({ row }) => {
-      return <p className="truncate text-primary/80 w-32 group-hover:text-primary">
+      return <p className="truncate text-primary/80 w-32 cursor-pointer">
         {`${row.original.employees?.first_name} ${row.original.employees?.middle_name ?? ""}
            ${row.original.employees?.last_name ?? ""}`}
       </p>
