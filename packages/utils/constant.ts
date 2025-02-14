@@ -129,6 +129,7 @@ export const attribute = {
   statutoryFieldsLwf: "statutory_fields_lwf",
   statutoryFieldsStatutoryBonus: "statutory_fields_statutory_bonus",
   statutoryFieldsGraduity: "statutory_fields_graduity",
+  statutoryFieldsLeaveEncashment: "statutory_fields_leave_encashment",
   paymentTemplates: "payment_templates",
   projects: "projects",
   project: "project",

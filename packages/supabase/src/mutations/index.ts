@@ -17,3 +17,4 @@ export * from "./gratuity";
 export * from "./payroll";
 export * from "./employee-letter";
 export * from "./employee-attendance";
+export * from "./leave-encashment";

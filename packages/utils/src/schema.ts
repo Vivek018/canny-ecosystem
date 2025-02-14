@@ -448,7 +448,7 @@ export const EmployeeProvidentFundSchema = z.object({
   edli_restrict_value: z.number().default(EDLI_RESTRICTED_VALUE),
   include_employer_edli_contribution: z.boolean().default(false),
   include_admin_charges: z.boolean().default(false),
-  is_default: z.boolean().default(true),
+  is_default: z.boolean().default(false),
 });
 
 export const ESI_EMPLOYEE_CONTRIBUTION = 0.0075;
@@ -463,7 +463,7 @@ export const EmployeeStateInsuranceSchema = z.object({
   employees_contribution: z.number().default(ESI_EMPLOYEE_CONTRIBUTION),
   employers_contribution: z.number().default(ESI_EMPLOYER_CONTRIBUTION),
   include_employer_contribution: z.boolean().default(false),
-  is_default: z.boolean().default(true),
+  is_default: z.boolean().default(false),
   max_limit: z.number().default(ESI_MAX_LIMIT),
 });
 
@@ -525,7 +525,7 @@ export const StatutoryBonusSchema = z
 export const GratuitySchema = z.object({
   id: z.string().optional(),
   company_id: z.string(),
-  is_default: z.boolean().default(true),
+  is_default: z.boolean().default(false),
   eligibility_years: z.number().min(0).default(4.5),
   present_day_per_year: z.number().min(1).max(365).default(240),
   payment_days_per_year: z.number().min(1).max(365).default(15),
@@ -1292,27 +1292,27 @@ export const ImportSingleEmployeeAttendanceDataSchema = z.object({
   date: z.string(),
   no_of_hours: z.preprocess(
     (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
-    z.number().min(0).max(24).default(8)
+    z.number().min(0).max(24).default(8),
   ),
   present: z.preprocess(
     (value) =>
       typeof value === "string" ? value.toLowerCase() === "true" : value,
-    z.boolean().default(false)
+    z.boolean().default(false),
   ),
   holiday: z.preprocess(
     (value) =>
       typeof value === "string" ? value.toLowerCase() === "true" : value,
-    z.boolean().default(false)
+    z.boolean().default(false),
   ),
   working_shift: z.preprocess(
     (value) =>
       value === "" || value === undefined || value === null ? undefined : value,
-    z.enum(attendanceWorkShiftArray).optional()
+    z.enum(attendanceWorkShiftArray).optional(),
   ),
   holiday_type: z.preprocess(
     (value) =>
       value === "" || value === undefined || value === null ? undefined : value,
-    z.enum(attendanceHolidayTypeArray).optional()
+    z.enum(attendanceHolidayTypeArray).optional(),
   ),
 });
 
@@ -1344,4 +1344,22 @@ export const EmployeeLetterSchema = z.object({
     .default(employeeLetterTypesArray[0]),
   content: z.string().optional(),
   employee_id: z.string().optional(),
+});
+
+export const encashmentFreqArray = ["annual", "exit", "special"] as const;
+
+export const LeaveEncashmentSchema = z.object({
+  id: z.string().optional(),
+  company_id: z.string(),
+  eligible_years: z.number().min(0).default(0),
+  max_encashable_leaves: z.number().min(0).max(365).default(0),
+  max_encashment_amount: z.number().min(0).default(0),
+  encashment_multiplier: z.number().positive().default(1),
+  working_days_per_year: z.number().min(1).max(365).default(260),
+  encashment_frequency: z
+    .enum(encashmentFreqArray)
+    .default(encashmentFreqArray[0]),
+  is_default: z.boolean().default(false),
+  created_at: z.string().optional(),
+  updated_at: z.string().optional(),
 });
