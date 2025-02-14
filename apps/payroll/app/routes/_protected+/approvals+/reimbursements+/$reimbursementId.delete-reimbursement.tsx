@@ -22,11 +22,8 @@ export async function action({
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (
-    !hasPermission(user?.role!, `${deleteRole}:${attribute.reimbursements}`)
-  ) {
+  if (!hasPermission(user?.role!, `${deleteRole}:${attribute.reimbursements}`))
     return safeRedirect(DEFAULT_ROUTE, { headers });
-  }
 
   const reimbursementId = params.reimbursementId;
   try {
@@ -77,9 +74,7 @@ export default function DeleteEmployee() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(
-          `${cacheKeyPrefix.employee_reimbursements}${actionData.employeeId}`
-        );
+        clearCacheEntry(`${cacheKeyPrefix.employee_reimbursements}${actionData.employeeId}`);
         clearCacheEntry(cacheKeyPrefix.reimbursements)
         toast({
           title: "Success",

@@ -29,6 +29,7 @@ export function ReimbursementImportData({
   env: SupabaseEnv;
   companyId: string;
 }) {
+
   const navigate = useNavigate();
   const { supabase } = useSupabase({ env });
   const { importData } = useImportStoreForReimbursement();
@@ -39,6 +40,7 @@ export function ReimbursementImportData({
   const validateImportData = (data: any[]) => {
     try {
       const result = ImportReimbursementDataSchema.safeParse({ data });
+
       if (!result.success) {
         console.error("Data validation error");
         return false;
@@ -46,7 +48,6 @@ export function ReimbursementImportData({
       return true;
     } catch (error) {
       console.error("Data validation error:", error);
-
       return false;
     }
   };
@@ -65,36 +66,27 @@ export function ReimbursementImportData({
   const handleFinalImport = async () => {
     if (validateImportData(importData.data)) {
       const userEmails = importData.data!.map((value) => value.email!);
+      const employeeCodes = importData.data!.map((value) => value.employee_code);
 
-      const employeeCodes = importData.data!.map(
-        (value) => value.employee_code
-      );
+      const { data: employees, error: codeError } = await getEmployeeIdsByEmployeeCodes({
+        supabase,
+        employeeCodes,
+      });
 
-      const { data: employees, error: codeError } =
-        await getEmployeeIdsByEmployeeCodes({
-          supabase,
-          employeeCodes,
-        });
-
-      if (codeError) {
-        throw codeError;
-      }
+      if (codeError) throw codeError;
       const { data: users, error: userError } = await getUserIdsByUserEmails({
         supabase,
         userEmails,
       });
 
-      if (userError) {
-        throw userError;
-      }
+      if (userError) throw userError;
 
       const updatedData = importData.data!.map((item: any) => {
-        const employeeId = employees?.find(
-          (e) => e.employee_code === item.employee_code
-        )?.id;
+        const employeeId = employees?.find((e) => e.employee_code === item.employee_code)?.id;
         const userId = users?.find((u) => u.email === item.email)?.id;
 
         const { email, employee_code, ...rest } = item;
+
         return {
           ...rest,
           ...(employeeId ? { employee_id: employeeId } : {}),
@@ -105,16 +97,10 @@ export function ReimbursementImportData({
       
       const { error, status } = await createReimbursementsFromImportedData({
         data: updatedData as ReimbursementInsert[],
-
         supabase,
       });
-
-      if (error) {
-        console.error(error);
-      }
-      if (isGoodStatus(status)) {
-        navigate("/approvals/reimbursements");
-      }
+      if (error) console.error("ERROR=================>", error);
+      if (isGoodStatus(status)) navigate("/approvals/reimbursements");
     }
   };
 
@@ -138,9 +124,7 @@ export function ReimbursementImportData({
             />
           </div>
           <div className="flex items-center gap-3">
-            <Button variant={"default"} onClick={handleFinalImport}>
-              Import
-            </Button>
+            <Button variant={"default"} onClick={handleFinalImport}>Import</Button>
           </div>
         </div>
       </div>

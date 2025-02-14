@@ -91,3 +91,10 @@ export function getYears(numberOfYears = 30, currentYear: number | null = new Da
 
   return years;
 }
+
+export const formatDateToMonthYear = (dateString) => {
+  return new Date(dateString).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+  });
+};

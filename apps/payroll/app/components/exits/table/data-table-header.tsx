@@ -3,7 +3,6 @@ import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { TableHead, TableHeader, TableRow } from "@canny_ecosystem/ui/table";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { exitPaymentFields } from "@canny_ecosystem/utils/constant";
 import { useSearchParams } from "@remix-run/react";
 
 type Props = {
@@ -23,8 +22,11 @@ export const ExitPaymentColumnIdArray = [
   "final_settlement_date",
   "organization_payable_days",
   "employee_payable_days",
-  ...exitPaymentFields,
-  "total",
+  "bonus",
+  "leave_encashment",
+  "gratuity",
+  "deduction",
+  "net_pay",
   "note",
 ] as const;
 
@@ -36,13 +38,9 @@ export function ExitPaymentTableHeader({ table, className, loading }: Props) {
   const [column, value] = sortParam ? sortParam.split(":") : [];
 
   const createSortQuery = (name: string) => {
-    if (`${name}:asc` === sortParam) {
-      searchParams.set("sort", `${name}:desc`);
-    } else if (`${name}:desc` === sortParam) {
-      searchParams.delete("sort");
-    } else {
-      searchParams.set("sort", `${name}:asc`);
-    }
+    if (`${name}:asc` === sortParam) searchParams.set("sort", `${name}:desc`);
+    else if (`${name}:desc` === sortParam) searchParams.delete("sort");
+    else searchParams.set("sort", `${name}:asc`);
     setSearchParams(searchParams);
   };
 
@@ -87,7 +85,10 @@ export function ExitPaymentTableHeader({ table, className, loading }: Props) {
         {ExitPaymentColumnIdArray?.map((id) => {
           return (
             isVisible(id) && (
-              <TableHead key={id} className={cn("px-4 py-2")}>
+              <TableHead key={id} className={cn(
+                "px-4 py-2", id === "employee_code" && "w-full sticky left-12 bg-card z-10",
+                id === "employee_name" && "sticky left-[192px] bg-card z-10"
+              )}>
                 <Button
                   className="p-0 hover:bg-transparent space-x-2 disabled:opacity-100"
                   variant="ghost"

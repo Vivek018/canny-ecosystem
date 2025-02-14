@@ -35,7 +35,7 @@ export function PayrollSheet({ row, rowData, editable }: { row: any, rowData: Pa
 
   // keeping track of which particular field is linked to which template
   const templateComponents: { paymentTemplateComponentId: string; name: string }[] = [];
-  rowData.templateComponents.map((row: { amount: number; paymentTemplateComponentId: string; name: string }) => {
+  rowData.templateComponents?.map((row: { amount: number; paymentTemplateComponentId: string; name: string }) => {
     const { paymentTemplateComponentId, name } = row;
     initialValues[paymentTemplateComponentId] = row.amount;
     templateComponents.push({ paymentTemplateComponentId, name });
@@ -58,7 +58,7 @@ export function PayrollSheet({ row, rowData, editable }: { row: any, rowData: Pa
     },
   });
 
-  const earnings:deductionAndEarning[] = [
+  const earnings: deductionAndEarning[] = [
     {
       title: "Gross Pay",
       inputPropField: fields.gross_pay,
@@ -71,7 +71,7 @@ export function PayrollSheet({ row, rowData, editable }: { row: any, rowData: Pa
   const deductions: deductionAndEarning[] = [];
 
   // populating earnings and deductions from templateComponents
-  rowData.templateComponents.map((row: any) => {
+  rowData.templateComponents?.map((row: any) => {
     const { paymentTemplateComponentId, name } = row;
     const paymentFieldData = {
       title: name,
@@ -94,8 +94,7 @@ export function PayrollSheet({ row, rowData, editable }: { row: any, rowData: Pa
     setNetPay(newNetPay);
   }, [
     fields.gross_pay.value,
-    ...rowData.templateComponents
-      .map((row: { paymentTemplateComponentId: string }) => fields[row.paymentTemplateComponentId].value)
+    ...rowData.templateComponents?.map((row: { paymentTemplateComponentId: string }) => fields[row.paymentTemplateComponentId].value)
   ]);
 
   return (
@@ -104,7 +103,7 @@ export function PayrollSheet({ row, rowData, editable }: { row: any, rowData: Pa
         <TableRow key={row.id} className="relative cursor-pointer select-text">
           {row.getVisibleCells().map((cell: any) => (
             <TableCell
-              key={cell.id}
+              key={cell.id || Date.now()}
               className={cn(
                 "px-3 md:px-4 py-2 hidden md:table-cell",
                 cell.column.id === "name" &&
@@ -157,7 +156,7 @@ export function PayrollSheet({ row, rowData, editable }: { row: any, rowData: Pa
               </div>
               <hr />
               {
-                earnings.map((earning, key) => {
+                earnings?.map((earning, key) => {
                   return <div className="flex justify-between" key={key as any}>
                     <div>
                       <h3 className="my-3 text-muted-foreground font-semibold capitalize">{earning.title}</h3>
@@ -185,7 +184,7 @@ export function PayrollSheet({ row, rowData, editable }: { row: any, rowData: Pa
               </div>
               <hr />
               {
-                deductions.map((deduction:deductionAndEarning, key) => {
+                deductions?.map((deduction: deductionAndEarning, key) => {
                   return <div className="flex justify-between" key={key as any}>
                     <div>
                       <h3 className="my-3 text-muted-foreground font-semibold capitalize">{deduction.title}</h3>

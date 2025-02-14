@@ -39,13 +39,13 @@ export function ExitPaymentStep1({ fields }: { fields: any }) {
             reasonForExitArray as unknown as string[],
           )}
           inputProps={{
-            ...getInputProps(fields.reason_for_exit, { type: "text" }),
+            ...getInputProps(fields.reason, { type: "text" }),
           }}
-          placeholder={`Select ${fields.reason_for_exit.name}`}
+          placeholder={`Select ${fields.reason.name}`}
           labelProps={{
-            children: replaceUnderscore(fields.reason_for_exit.name),
+            children: replaceUnderscore(fields.reason.name),
           }}
-          errors={fields.reason_for_exit.errors}
+          errors={fields.reason.errors}
         />
         <Field
           inputProps={{

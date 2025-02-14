@@ -1,81 +1,26 @@
 import * as React from "react";
 import { Label, Pie, PieChart } from "recharts";
-
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@canny_ecosystem/ui/card";
-import {
-  type ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@canny_ecosystem/ui/chart";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@canny_ecosystem/ui/card";
+import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@canny_ecosystem/ui/chart";
 import type { ExitDataType } from "@canny_ecosystem/supabase/queries";
 
 const chartConfig = {
-  count: {
-    label: "Count",
-  },
-  january: {
-    label: "January",
-    color: "hsl(var(--chart-1))",
-  },
-  february: {
-    label: "February",
-    color: "hsl(var(--chart-2))",
-  },
-  march: {
-    label: "March",
-    color: "hsl(var(--chart-3))",
-  },
-  april: {
-    label: "April",
-    color: "hsl(var(--chart-4))",
-  },
-  may: {
-    label: "May",
-    color: "hsl(var(--chart-5))",
-  },
-  june: {
-    label: "June",
-    color: "hsl(var(--chart-6))",
-  },
-  july: {
-    label: "July",
-    color: "hsl(var(--chart-7))",
-  },
-  august: {
-    label: "August",
-    color: "hsl(var(--chart-8))",
-  },
-  september: {
-    label: "September",
-    color: "hsl(var(--chart-9))",
-  },
-  october: {
-    label: "October",
-    color: "hsl(var(--chart-10))",
-  },
-  november: {
-    label: "November",
-    color: "hsl(var(--chart-11))",
-  },
-  december: {
-    label: "December",
-    color: "hsl(var(--chart-12))",
-  },
+  count: { label: "Count" },
+  january: { label: "January", color: "hsl(var(--chart-1))", },
+  february: { label: "February", color: "hsl(var(--chart-2))" },
+  march: { label: "March", color: "hsl(var(--chart-3))" },
+  april: { label: "April", color: "hsl(var(--chart-4))" },
+  may: { label: "May", color: "hsl(var(--chart-5))" },
+  june: { label: "June", color: "hsl(var(--chart-6))" },
+  july: { label: "July", color: "hsl(var(--chart-7))" },
+  august: { label: "August", color: "hsl(var(--chart-8))" },
+  september: { label: "September", color: "hsl(var(--chart-9))" },
+  october: { label: "October", color: "hsl(var(--chart-10))" },
+  november: { label: "November", color: "hsl(var(--chart-11))" },
+  december: { label: "December", color: "hsl(var(--chart-12))" },
 } satisfies ChartConfig;
 
-export function ExitByTime({
-  chartData,
-}: {
-  chartData: ExitDataType[];
-}) {
+export function ExitByTime({ chartData }: { chartData: ExitDataType[] }) {
   const exitLastWorkingYears = new Set(
     chartData.map((row) => {
       const date = new Date(row.last_working_day || "");
@@ -99,12 +44,8 @@ export function ExitByTime({
   } else {
     const groupedByMonth = chartData.reduce(
       (acc: Record<string, number>, row) => {
-        const month = new Date(row.last_working_day).toLocaleString("default", {
-          month: "long",
-        });
-        if (!acc[month]) {
-          acc[month] = 0;
-        }
+        const month = new Date(row.last_working_day).toLocaleString("default", { month: "long" });
+        if (!acc[month]) acc[month] = 0;
         acc[month]++;
         return acc;
       },
@@ -143,15 +84,9 @@ export function ExitByTime({
         <CardDescription>Over the period</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
-        <ChartContainer
-          config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px]"
-        >
+        <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[250px]">
           <PieChart>
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
+            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
             <Pie
               data={transformedChartData}
               dataKey="count"
@@ -163,12 +98,7 @@ export function ExitByTime({
                 content={({ viewBox }) => {
                   if (viewBox && "cx" in viewBox && "cy" in viewBox) {
                     return (
-                      <text
-                        x={viewBox.cx}
-                        y={viewBox.cy}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                      >
+                      <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle" dominantBaseline="middle">
                         <tspan
                           x={viewBox.cx}
                           y={viewBox.cy}
@@ -176,11 +106,7 @@ export function ExitByTime({
                         >
                           {totalExitCount.toLocaleString()}
                         </tspan>
-                        <tspan
-                          x={viewBox.cx}
-                          y={(viewBox.cy || 0) + 24}
-                          className="fill-muted-foreground"
-                        >
+                        <tspan x={viewBox.cx} y={(viewBox.cy || 0) + 24} className="fill-muted-foreground">
                           Total Exits
                         </tspan>
                       </text>
@@ -193,9 +119,7 @@ export function ExitByTime({
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
-        <div className="leading-none text-muted-foreground">
-          Showing exits count for the time period.
-        </div>
+        <div className="leading-none text-muted-foreground">Showing exits count for the time period.</div>
       </CardFooter>
     </Card>
   );

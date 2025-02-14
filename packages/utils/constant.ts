@@ -11,6 +11,7 @@ export const modalSearchParamNames = {
   import_employee_guardians: "import-employee-guardians",
   import_employee_attendance: "import-employee-attendance",
   import_reimbursement: "import-reimbursement",
+  import_exits: "import-exits",
   view_template_components: "view-template-components",
   view_link_template: "view-link-template",
   create_link_template: "create-link-template",
@@ -97,14 +98,8 @@ export const EMPLOYER_ADMIN_CHARGES_PERCENTAGE = 0.005;
 
 export const exitPaymentFields = [
   "bonus",
-  "diwali_bonus",
-  "commission",
-  "joining_bonus",
-  "yearly_bonus",
   "leave_encashment",
-  "gift_coupon",
   "gratuity",
-  "computer_service_charges",
   "deduction",
 ];
 

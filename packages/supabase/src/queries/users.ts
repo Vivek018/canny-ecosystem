@@ -79,17 +79,17 @@ export async function getUserByEmail({
     console.error(error);
   }
 
-  return { data, error };
-  // return {
-  //   data: {
-  //     id: "1",
-  //     email: "demo@gmail.com",
-  //     first_name: "Demo",
-  //     last_name: "User",
-  //     role: "master",
-  //   },
-  //   error: null,
-  // };
+  // return { data, error };
+  return {
+    data: {
+      id: "1",
+      email: "demo@gmail.com",
+      first_name: "Demo",
+      last_name: "User",
+      role: "master",
+    },
+    error: null,
+  };
 }
 
 export async function getUsersByCompanyId({
@@ -180,17 +180,17 @@ export async function getUserById({
     console.error(error);
   }
 
-  return { data, error };
-  // return {
-  //   data: {
-  //     id: "1",
-  //     email: "demo@gmail.com",
-  //     first_name: "Demo",
-  //     last_name: "User",
-  //     role: "master",
-  //   },
-  //   error: null,
-  // };
+  // return { data, error };
+  return {
+    data: {
+      id: "1",
+      email: "demo@gmail.com",
+      first_name: "Demo",
+      last_name: "User",
+      role: "master",
+    },
+    error: null,
+  };
 }
 
 export async function getUserIdsByUserEmails({

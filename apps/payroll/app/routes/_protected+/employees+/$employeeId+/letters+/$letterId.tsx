@@ -65,10 +65,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     if (companyError) throw companyError;
 
     const { data: companyLocationData, error: companyLocationError } =
-      await getPrimaryLocationByCompanyId({
-        supabase,
-        companyId: companyId ?? "",
-      });
+      await getPrimaryLocationByCompanyId({ supabase, companyId: companyId ?? "" });
     if (companyLocationError) throw companyLocationError;
 
     let templateId = null;

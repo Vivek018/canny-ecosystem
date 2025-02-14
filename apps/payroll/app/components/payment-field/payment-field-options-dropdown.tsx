@@ -56,9 +56,7 @@ export const PaymentFieldOptionsDropdown = ({
   };
 
   const handleEdit = () => {
-    navigate(
-      `/payment-components/payment-fields/${paymentField.id}/update-payment-field`
-    );
+    navigate(`/payment-components/payment-fields/${paymentField.id}/update-payment-field`);
   };
 
   const handleReports = () => {

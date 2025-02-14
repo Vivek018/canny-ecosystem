@@ -4,13 +4,7 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Link, useParams } from "@remix-run/react";
 import type { EmployeeProjectAssignmentDataType } from "@canny_ecosystem/supabase/queries";
-import {
-  createRole,
-  formatDate,
-  hasPermission,
-  replaceUnderscore,
-  updateRole,
-} from "@canny_ecosystem/utils";
+import { createRole, formatDate, hasPermission, replaceUnderscore, updateRole } from "@canny_ecosystem/utils";
 import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
@@ -25,11 +19,7 @@ type EmployeeProjectAssignment = Omit<
   "created_at" | "updated_at"
 >;
 
-export const DetailItem: React.FC<DetailItemProps> = ({
-  label,
-  value,
-  formatter,
-}) => {
+export const DetailItem: React.FC<DetailItemProps> = ({ label, value, formatter }) => {
   const formattedValue = value ? (formatter ? formatter(value) : value) : "--";
 
   return (

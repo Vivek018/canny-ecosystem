@@ -9,6 +9,69 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      accidents: {
+        Row: {
+          category: Database["public"]["Enums"]["accident_category_type"] | null
+          created_at: string
+          date: string | null
+          description: string | null
+          employee_id: string
+          id: string
+          location: string | null
+          location_type:
+            | Database["public"]["Enums"]["accident_location_type"]
+            | null
+          medical_diagnosis: string | null
+          severity: Database["public"]["Enums"]["accident_severity"] | null
+          status: Database["public"]["Enums"]["accident_status_type"] | null
+          title: string | null
+        }
+        Insert: {
+          category?:
+            | Database["public"]["Enums"]["accident_category_type"]
+            | null
+          created_at?: string
+          date?: string | null
+          description?: string | null
+          employee_id: string
+          id?: string
+          location?: string | null
+          location_type?:
+            | Database["public"]["Enums"]["accident_location_type"]
+            | null
+          medical_diagnosis?: string | null
+          severity?: Database["public"]["Enums"]["accident_severity"] | null
+          status?: Database["public"]["Enums"]["accident_status_type"] | null
+          title?: string | null
+        }
+        Update: {
+          category?:
+            | Database["public"]["Enums"]["accident_category_type"]
+            | null
+          created_at?: string
+          date?: string | null
+          description?: string | null
+          employee_id?: string
+          id?: string
+          location?: string | null
+          location_type?:
+            | Database["public"]["Enums"]["accident_location_type"]
+            | null
+          medical_diagnosis?: string | null
+          severity?: Database["public"]["Enums"]["accident_severity"] | null
+          status?: Database["public"]["Enums"]["accident_status_type"] | null
+          title?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accidents_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       attendance: {
         Row: {
           created_at: string | null
@@ -864,51 +927,6 @@ export type Database = {
           },
         ]
       }
-      exit_payments: {
-        Row: {
-          amount: number
-          created_at: string | null
-          exit_id: string
-          id: string
-          payment_fields_id: string
-          type: string
-          updated_at: string | null
-        }
-        Insert: {
-          amount: number
-          created_at?: string | null
-          exit_id: string
-          id?: string
-          payment_fields_id: string
-          type?: string
-          updated_at?: string | null
-        }
-        Update: {
-          amount?: number
-          created_at?: string | null
-          exit_id?: string
-          id?: string
-          payment_fields_id?: string
-          type?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "exit_payments_exit_id_fkey"
-            columns: ["exit_id"]
-            isOneToOne: false
-            referencedRelation: "exits"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "exit_payments_payment_fields_id_fkey"
-            columns: ["payment_fields_id"]
-            isOneToOne: false
-            referencedRelation: "payment_fields"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       exits: {
         Row: {
           bonus: number | null
@@ -921,10 +939,10 @@ export type Database = {
           id: string
           last_working_day: string
           leave_encashment: number | null
+          net_pay: number | null
           note: string | null
           organization_payable_days: number
           reason: string
-          total: number | null
           updated_at: string | null
         }
         Insert: {
@@ -938,10 +956,10 @@ export type Database = {
           id?: string
           last_working_day: string
           leave_encashment?: number | null
+          net_pay?: number | null
           note?: string | null
           organization_payable_days: number
           reason: string
-          total?: number | null
           updated_at?: string | null
         }
         Update: {
@@ -955,10 +973,10 @@ export type Database = {
           id?: string
           last_working_day?: string
           leave_encashment?: number | null
+          net_pay?: number | null
           note?: string | null
           organization_payable_days?: number
           reason?: string
-          total?: number | null
           updated_at?: string | null
         }
         Relationships: [
@@ -1958,6 +1976,27 @@ export type Database = {
       }
     }
     Enums: {
+      accident_category_type:
+        | "theft"
+        | "assault"
+        | "fall"
+        | "accident"
+        | "machinery"
+        | "others"
+      accident_location_type: "onsite" | "others"
+      accident_severity:
+        | "minor"
+        | "moderate"
+        | "severe"
+        | "critical"
+        | "fatal"
+        | "unknown"
+      accident_status_type:
+        | "active"
+        | "inactive"
+        | "pending"
+        | "completed"
+        | "cancelled"
       assignment_target_type:
         | "payment_field"
         | "epf"

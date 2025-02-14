@@ -742,6 +742,39 @@ export async function getEmployeeWorkHistoryById({
   return { data, error };
 }
 
+export async function getEmployeeWorkHistoryByEmployeeIdAndCompanyName({
+  supabase,
+  employeeId,
+  companyName
+}: {
+  supabase: TypedSupabaseClient;
+  employeeId: string;
+  companyName:string;
+}) {
+  const columns = [
+    "id",
+    "company_name",
+    "position",
+    "responsibilities",
+    "start_date",
+    "end_date",
+    "employee_id",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("employee_work_history")
+    .select(columns.join(","))
+    .eq("employee_id", employeeId)
+    .eq("company_name",companyName)
+    .single<
+      InferredType<EmployeeWorkHistoryDatabaseRow, (typeof columns)[number]>
+    >();
+
+  if (error) console.error(error);
+
+  return { data, error };
+}
+
 export type EmployeeProjectAssignmentDataType = Omit<
   EmployeeProjectAssignmentDatabaseRow,
   "created_at" | "updated_at"
