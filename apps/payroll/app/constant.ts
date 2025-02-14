@@ -222,6 +222,11 @@ export const statutorySideNavList = [
     link: "/payment-components/statutory-fields/gratuity",
     icon: "",
   },
+  {
+    name: "Leave Encashment",
+    link: "/payment-components/statutory-fields/leave-encashment",
+    icon: "",
+  },
 ];
 
 export const cacheKeyPrefix = {
@@ -244,6 +249,7 @@ export const cacheKeyPrefix = {
   labour_welfare_fund: "labour-welfare-fund",
   statutory_bonus: "statutory-bonus",
   gratuity: "gratuity",
+  leave_encashment: "leave-encashment",
   payment_templates: "payment-templates",
   projects: "projects",
   project_overview: "project-overview",

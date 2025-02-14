@@ -965,7 +965,7 @@ export type Database = {
           {
             foreignKeyName: "exits_employee_id_fkey"
             columns: ["employee_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "employees"
             referencedColumns: ["id"]
           },
@@ -1106,6 +1106,62 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "labour_welfare_fund_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leave_encashment: {
+        Row: {
+          company_id: string
+          created_at: string
+          eligible_years: number | null
+          encashment_frequency:
+            | Database["public"]["Enums"]["encashment_frequency"]
+            | null
+          encashment_multiplier: number | null
+          id: string
+          is_default: boolean | null
+          max_encashable_leaves: number | null
+          max_encashment_amount: number | null
+          updated_at: string | null
+          working_days_per_year: number | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          eligible_years?: number | null
+          encashment_frequency?:
+            | Database["public"]["Enums"]["encashment_frequency"]
+            | null
+          encashment_multiplier?: number | null
+          id?: string
+          is_default?: boolean | null
+          max_encashable_leaves?: number | null
+          max_encashment_amount?: number | null
+          updated_at?: string | null
+          working_days_per_year?: number | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          eligible_years?: number | null
+          encashment_frequency?:
+            | Database["public"]["Enums"]["encashment_frequency"]
+            | null
+          encashment_multiplier?: number | null
+          id?: string
+          is_default?: boolean | null
+          max_encashable_leaves?: number | null
+          max_encashment_amount?: number | null
+          updated_at?: string | null
+          working_days_per_year?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leave_encashment_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
@@ -1911,6 +1967,7 @@ export type Database = {
         | "lwf"
       calculation_type: "fixed" | "percentage_of_ctc"
       eligibility_option_type: "position" | "skill_level"
+      encashment_frequency: "annual" | "exit" | "special"
       feedback_category: "suggestion" | "bug" | "complain"
       feedback_severity: "low" | "normal" | "urgent"
       holiday_type: "weekly" | "paid" | "state" | "national"
