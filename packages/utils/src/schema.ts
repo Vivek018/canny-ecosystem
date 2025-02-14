@@ -1219,27 +1219,27 @@ export const ImportSingleEmployeeAttendanceDataSchema = z.object({
   date: z.string(),
   no_of_hours: z.preprocess(
     (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
-    z.number().min(0).max(24).default(8)
+    z.number().min(0).max(24).default(8),
   ),
   present: z.preprocess(
     (value) =>
       typeof value === "string" ? value.toLowerCase() === "true" : value,
-    z.boolean().default(false)
+    z.boolean().default(false),
   ),
   holiday: z.preprocess(
     (value) =>
       typeof value === "string" ? value.toLowerCase() === "true" : value,
-    z.boolean().default(false)
+    z.boolean().default(false),
   ),
   working_shift: z.preprocess(
     (value) =>
       value === "" || value === undefined || value === null ? undefined : value,
-    z.enum(attendanceWorkShiftArray).optional()
+    z.enum(attendanceWorkShiftArray).optional(),
   ),
   holiday_type: z.preprocess(
     (value) =>
       value === "" || value === undefined || value === null ? undefined : value,
-    z.enum(attendanceHolidayTypeArray).optional()
+    z.enum(attendanceHolidayTypeArray).optional(),
   ),
 });
 
@@ -1271,4 +1271,20 @@ export const EmployeeLetterSchema = z.object({
     .default(employeeLetterTypesArray[0]),
   content: z.string().optional(),
   employee_id: z.string().optional(),
+});
+
+export const EncashmentFreqArray = ["annual", "exit", "special"] as const;
+
+export const LeaveEncashmentSchema = z.object({
+  id: z.string().optional(),
+  company_id: z.string(),
+  eligible_years: z.number().min(0).default(0),
+  max_encashable_leaves: z.number().min(0).default(0),
+  max_encashment_amount: z.number().min(0).default(0),
+  encashment_multiplier: z.number().positive().default(1.5),
+  working_days_per_year: z.number().min(1).default(260),
+  encashment_frequency: z.enum(EncashmentFreqArray).default("annual"),
+  is_default: z.boolean().default(true),
+  created_at: z.string().optional(),
+  updated_at: z.string().optional(),
 });

@@ -289,3 +289,12 @@ export type EmployeeLetterDatabaseInsert =
   Database["public"]["Tables"]["employee_letter"]["Insert"];
 export type EmployeeLetterDatabaseUpdate =
   Database["public"]["Tables"]["employee_letter"]["Update"];
+
+export type LeaveEncashmentDatabaseRow =
+  Database["public"]["Tables"]["leave_encashment"]["Row"];
+
+export type LeaveEncashmentDatabaseInsert =
+  Database["public"]["Tables"]["leave_encashment"]["Insert"];
+
+export type LeaveEncashmentDatabaseUpdate =
+  Database["public"]["Tables"]["leave_encashment"]["Update"];
