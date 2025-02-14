@@ -1197,7 +1197,7 @@ export const ImportExitHeaderSchemaObject = z.object({
   gratuity: z.string(),
   deduction: z.string(),
   note: z.string(),
-  total: z.string(),
+  net_pay: z.string(),
 });
 
 export const ImportExitHeaderSchema = ImportExitHeaderSchemaObject.refine(
@@ -1217,7 +1217,7 @@ export const ImportExitHeaderSchema = ImportExitHeaderSchemaObject.refine(
       data.gratuity,
       data.deduction,
       data.note,
-      data.total,
+      data.net_pay,
     ].filter(Boolean);
 
     const uniqueValues = new Set(values);
@@ -1261,7 +1261,7 @@ export const ImportSingleExitDataSchema = z.object({
   gratuity: z.string(),
   deduction: z.string(),
   note: z.string(),
-  total: z.string(),
+  net_pay: z.string(),
 });
 
 export const ImportExitDataSchema = z.object({

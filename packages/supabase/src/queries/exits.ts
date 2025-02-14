@@ -29,7 +29,7 @@ export type ImportExitDataType = Pick<
   | "note"
   | "organization_payable_days"
   | "reason"
-  | "total"
+  | "net_pay"
 > & { employee_code: string } & { employee_name: string } & {
   project_name: string;
 } & { project_site_name: string };
@@ -44,7 +44,7 @@ export type ExitDataType = Pick<
   | "note"
   | "organization_payable_days"
   | "reason"
-  | "total"
+  | "net_pay"
 > & {
   employees: Pick<
     EmployeeDatabaseRow,
@@ -84,7 +84,7 @@ export const getExits = async ({
     "gratuity",
     "deduction",
     "note",
-    "total",
+    "net_pay",
   ] as const;
 
   const query = supabase
@@ -203,7 +203,7 @@ export const getExitsById = async ({
     "gratuity",
     "deduction",
     "note",
-    "total",
+    "net_pay",
   ] as const;
 
   const { data, error } = await supabase

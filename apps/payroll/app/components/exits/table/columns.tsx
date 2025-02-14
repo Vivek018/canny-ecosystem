@@ -132,11 +132,11 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     },
   },
   {
-    accessorKey: "total",
-    header: "Total",
+    accessorKey: "net_pay",
+    header: "Net Pay",
     cell: ({ row }) => {
-      const total = Number(row.original.bonus) + Number(row.original.leave_encashment) + Number(row.original.gratuity) - Number(row.original.deduction);
-      return <p className="capitalize truncate">{total ?? "--"}</p>
+      const netPay = Number(row.original.bonus) + Number(row.original.leave_encashment) + Number(row.original.gratuity) - Number(row.original.deduction);
+      return <p className="capitalize truncate">{netPay ?? "--"}</p>
     },
   },
   {

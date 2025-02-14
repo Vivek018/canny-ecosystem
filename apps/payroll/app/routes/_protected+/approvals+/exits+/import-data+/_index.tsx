@@ -48,7 +48,7 @@ const FIELD_CONFIGS: FieldConfig[] = [
   { key: "leave_encashment", required: true },
   { key: "gratuity", required: true },
   { key: "deduction", required: true },
-  { key: "total" },
+  { key: "net_pay" },
   { key: "note", required: true },
 ];
 
@@ -68,16 +68,12 @@ clientLoader.hydrate = true;
 
 export default function ExitFieldMapping() {
   const { env } = useLoaderData<typeof loader>();
-
   const { setImportData } = useImportStoreForExit();
-
   const [loadNext, setLoadNext] = useState(false);
-
   const location = useLocation();
   const [file] = useState(location.state?.file);
   const [headerArray, setHeaderArray] = useState<string[]>([]);
   const [fieldMapping, setFieldMapping] = useState<Record<string, string>>({});
-
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
@@ -120,9 +116,7 @@ export default function ExitFieldMapping() {
   const validateMapping = () => {
     try {
       const mappingResult = ImportExitHeaderSchema.safeParse(
-        Object.fromEntries(
-          Object.entries(fieldMapping).map(([key, value]) => [key, value || undefined])
-        )
+        Object.fromEntries(Object.entries(fieldMapping).map(([key, value]) => [key, value || undefined]))
       );
 
       if (!mappingResult.success) {

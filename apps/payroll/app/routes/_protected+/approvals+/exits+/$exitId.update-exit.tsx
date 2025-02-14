@@ -51,7 +51,7 @@ export async function action({ request, params }: ActionFunctionArgs): Promise<R
             );
         }
 
-        const { data: exitData } = await getExitsById({ supabase, id: exitId as string});
+        const { data: exitData } = await getExitsById({ supabase, id: exitId as string });
 
         const { status, error } = await updateExit({
             supabase,
@@ -86,17 +86,17 @@ export default function UpdateExit() {
 
     useEffect(() => {
         if (!actionData) return;
-        clearCacheEntry(cacheKeyPrefix.exits);
 
         if (actionData?.status === "success")
             toast({ title: "Success", description: actionData?.message, variant: "success" });
-        else
+        else {
+            clearCacheEntry(cacheKeyPrefix.exits);
             toast({
                 title: "Error",
                 description: actionData?.error?.message || "Exit update failed",
                 variant: "destructive",
             });
-
+        }
         navigate("/approvals/exits", { replace: true });
     }, [actionData]);
 
@@ -120,9 +120,11 @@ export function UpdateExitWrapper({
     error: Error | null | { message: string };
 }) {
     const { toast } = useToast();
-
     useEffect(() => {
-        if (error) toast({ title: "Error", description: error?.message, variant: "destructive" });
+        if (error) {
+            clearCacheEntry(cacheKeyPrefix.exits);
+            toast({ title: "Error", description: error?.message, variant: "destructive" });
+        }
     }, [error]);
 
     return <CreateExit updateValues={data as any} />;

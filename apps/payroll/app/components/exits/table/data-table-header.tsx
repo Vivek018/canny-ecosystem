@@ -26,7 +26,7 @@ export const ExitPaymentColumnIdArray = [
   "leave_encashment",
   "gratuity",
   "deduction",
-  "total",
+  "net_pay",
   "note",
 ] as const;
 

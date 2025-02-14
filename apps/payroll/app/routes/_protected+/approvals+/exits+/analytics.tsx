@@ -17,7 +17,8 @@ const getDataSource = (selectedRows: ExitDataType[], storedValue: ExitDataType[]
 
 // caching
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return await clientCaching(cacheKeyPrefix.exits,args);
+  const url = new URL(args.request.url);
+  return await clientCaching(`${cacheKeyPrefix.exits}${url.searchParams.toString()}`, args);
 }
 clientLoader.hydrate = true;
 

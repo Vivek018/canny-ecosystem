@@ -97,10 +97,10 @@ export default function CreateExit({ updateValues }: { updateValues?: ExitsRow |
 
   useEffect(() => {
     if (!actionData) return;
-    clearCacheEntry(cacheKeyPrefix.exits);
     if (actionData?.status === "success") {
       toast({ title: "Success", description: actionData?.message, variant: "success" });
     } else {
+      clearCacheEntry(cacheKeyPrefix.exits);
       toast({
         title: "Error",
         description: actionData?.error?.message || "Exit creation failed",
