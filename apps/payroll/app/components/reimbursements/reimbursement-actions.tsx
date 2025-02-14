@@ -13,7 +13,7 @@ export function ReimbursementActions({ isEmpty }: { isEmpty: boolean }) {
   return (
     <div className="space-x-2 hidden md:flex">
       <ColumnVisibility disabled={isEmpty} hidden={!!selectedRows.length} />
-      <ImportReimbursementMenu />
+      <ImportReimbursementMenu/>
       <Button
         variant="outline"
         size="icon"

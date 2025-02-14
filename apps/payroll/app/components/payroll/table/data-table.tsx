@@ -33,6 +33,7 @@ export function PayrollDataTable<TData, TValue>({ columns, data, editable }: Pay
         if (!isAccessorKeyExists(template.name)) {
           dynamicHeaders.push(template.name);
           newColumns.push({
+            id: `col-${template.name}`,
             accessorKey: template.name,
             header: template.name,
             cell: ({ row }) => {
@@ -47,28 +48,30 @@ export function PayrollDataTable<TData, TValue>({ columns, data, editable }: Pay
   }, [data, columns]);
 
 
-  // 3 dot actions
-  processedColumns.push({
-    id: "actions",
-    enableSorting: false,
-    enableHiding: false,
-    cell: ({ row }) => {
-      return (
-        <PayrollEntryDropdown
-          payrollId={row.original.payrollId}
-          employeeId={row.original.employee_id}
-          triggerChild={
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <Icon name="dots-vertical" />
-              </Button>
-            </DropdownMenuTrigger>
-          }
-        />
-      );
-    },
-  });
+  // showing previews in payroll history only
+  if (!editable) {
+    processedColumns.push({
+      id: "actions",
+      enableSorting: false,
+      enableHiding: false,
+      cell: ({ row }) => {
+        return (
+          <PayrollEntryDropdown
+            payrollId={row.original.payrollId}
+            employeeId={row.original.employee_id}
+            triggerChild={
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <Icon name="dots-vertical" />
+                </Button>
+              </DropdownMenuTrigger>
+            }
+          />
+        );
+      },
+    });
+  }
 
   const [sorting, setSorting] = useState<SortingState>([]);
 

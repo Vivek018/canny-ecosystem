@@ -206,3 +206,7 @@ export const newAmount = (
   // new amount according to working days
   return (amount * presentDays) / totalWorkingDaysOfCurrentMonth;
 };
+
+export const capitalizeFirstLetter=(val)=> {
+  return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+}

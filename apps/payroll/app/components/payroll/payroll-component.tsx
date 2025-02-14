@@ -7,6 +7,7 @@ import { Outlet, useNavigation, useSubmit } from "@remix-run/react";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useState, useEffect } from "react";
 import type { PayrollEmployeeData } from "@canny_ecosystem/utils";
+import { PayrollActions } from "./payroll-actions";
 
 export function PayrollComponent({ data, editable }: {
   data: PayrollEmployeeData[],
@@ -64,6 +65,7 @@ export function PayrollComponent({ data, editable }: {
                 className="pl-8 h-10 w-full focus-visible:ring-0"
               />
             </div>
+            <PayrollActions payrollId={data[0].payrollId}/>
             <div className={cn(editable ? "" : "hidden")}>
               <Button onClick={(e) => approvePayroll(e)} disabled={disable}>Submit & Approve</Button>
             </div>

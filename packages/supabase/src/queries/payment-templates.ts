@@ -102,13 +102,48 @@ export async function getPaymentTemplateComponentsByTemplateId({
     .from("payment_template_components")
     .select(`${columns.join(",")}, payment_fields(id, name))`)
     .eq("template_id", templateId)
-    .limit(HARD_QUERY_LIMIT)
     .order("created_at", { ascending: true })
+    .limit(HARD_QUERY_LIMIT)
     .returns<PaymentTemplateComponentType[]>();
 
   if (error) {
     console.error(error);
   }
+
+  return { data, error };
+}
+
+export async function getPaymentTemplateComponentById({
+  supabase,
+  id,
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+}) {
+  const columns = [
+    "id",
+    "template_id",
+    "target_type",
+    "payment_field_id",
+    "epf_id",
+    "esi_id",
+    "pt_id",
+    "lwf_id",
+    "bonus_id",
+    "component_type",
+    "calculation_value",
+    "display_order",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("payment_template_components")
+    .select(`${columns.join(",")}`)
+    .eq("id", id)
+    .single<
+      InferredType<PaymentTemplateComponentType, (typeof columns)[number]>
+    >();
+
+  if (error) console.error(error);
 
   return { data, error };
 }

@@ -1,66 +1,62 @@
+import { ErrorBoundary } from "@/components/error-boundary";
 import { ExitActions } from "@/components/exits/exit-actions";
 import { ExitsSearchFilter } from "@/components/exits/exit-search-filter";
 import { FilterList } from "@/components/exits/filter-list";
+import { ImportExitModal } from "@/components/exits/import-export/import-modal-exits";
 import { ExitPaymentColumns } from "@/components/exits/table/columns";
 import { ExitPaymentTable } from "@/components/exits/table/data-table";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
+import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { LAZY_LOADING_LIMIT, MAX_QUERY_LIMIT } from "@canny_ecosystem/supabase/constant";
 import {
-  LAZY_LOADING_LIMIT,
-  MAX_QUERY_LIMIT,
-} from "@canny_ecosystem/supabase/constant";
-import {
-  type ExitFilterType,
-  getExits,
-  getProjectNamesByCompanyId,
-  getSiteNamesByProjectName,
+  type ExitFilterType, getExits, getProjectNamesByCompanyId, getSiteNamesByProjectName,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
+import { hasPermission, readRole } from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { json, redirect, useLoaderData } from "@remix-run/react";
+import { Await, type ClientLoaderFunctionArgs, defer, redirect, useLoaderData } from "@remix-run/react";
+import { Suspense } from "react";
 
 const pageSize = 20;
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-
-  
-
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  const url = new URL(request.url);
-  const page = 0;
+  if (!hasPermission(user?.role!, `${readRole}:${attribute.reimbursements}`))
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+
   try {
+    const url = new URL(request.url);
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    const page = 0;
 
     const searchParams = new URLSearchParams(url.searchParams);
     const sortParam = searchParams.get("sort");
-
     const query = searchParams.get("name") ?? undefined;
 
     const filters: ExitFilterType = {
-      last_working_day_start:
-        searchParams.get("last_working_day_start") ?? undefined,
-      last_working_day_end:
-        searchParams.get("last_working_day_end") ?? undefined,
-      final_settlement_date_start:
-        searchParams.get("final_settlement_date_start") ?? undefined,
-      final_settlement_date_end:
-        searchParams.get("final_settlement_date_end") ?? undefined,
+      last_working_day_start: searchParams.get("last_working_day_start") ?? undefined,
+      last_working_day_end: searchParams.get("last_working_day_end") ?? undefined,
+      final_settlement_date_start: searchParams.get("final_settlement_date_start") ?? undefined,
+      final_settlement_date_end: searchParams.get("final_settlement_date_end") ?? undefined,
       reason: searchParams.get("reason") ?? undefined,
       project: searchParams.get("project") ?? undefined,
       project_site: searchParams.get("project_site") ?? undefined,
     };
 
     const hasFilters =
-      filters &&
-      Object.values(filters).some(
-        (value) => value !== null && value !== undefined
-      );
+      filters && Object.values(filters).some((value) => value !== null && value !== undefined);
 
-    const { data, meta, error } = await getExits({
+    const exitsPromise = getExits({
       supabase,
       params: {
         from: 0,
@@ -71,53 +67,40 @@ export async function loader({ request }: LoaderFunctionArgs) {
       },
     });
 
-    const hasNextPage = Boolean(
-      meta?.count && meta.count / (page + 1) > LAZY_LOADING_LIMIT
-    );
+    const projectPromise = getProjectNamesByCompanyId({ supabase, companyId });
 
-    if (error) {
-      throw error;
-    }
+    let projectSitePromise = null;
+    if (filters.project)
+      projectSitePromise = getSiteNamesByProjectName({ supabase, projectName: filters.project });
 
-    const { data: projectData } = await getProjectNamesByCompanyId({
-      supabase,
-      companyId,
-    });
-
-    let projectSiteData = null;
-    if (filters.project) {
-      const { data } = await getSiteNamesByProjectName({
-        supabase,
-        projectName: filters.project,
-      });
-      projectSiteData = data;
-    }
-
-    return json({
-      data: data as any,
-      count: meta?.count,
+    return defer({
+      exitsPromise,
       query,
       filters,
-      hasNextPage,
-      projectArray: projectData?.map((project) => project.name) ?? [],
-      projectSiteArray: projectSiteData?.map((site) => site.name) ?? [],
+      projectPromise,
+      projectSitePromise,
       env,
       error: null,
     });
   } catch (error) {
-    return json({
-      data: null,
-      count: 0,
+    return defer({
+      exitsPromise: null,
       query: null,
       filters: null,
-      hasNextPage: false,
-      projectArray: null,
-      projectSiteArray: null,
+      projectPromise: null,
+      projectSitePromise: null,
       env,
       error,
     });
   }
 }
+
+// caching
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+  const url = new URL(args.request.url);
+  return await clientCaching(`${cacheKeyPrefix.exits}${url.searchParams.toString()}`, args);
+}
+clientLoader.hydrate = true;
 
 export async function action({ request }: ActionFunctionArgs) {
   const url = new URL(request.url);
@@ -125,13 +108,9 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const prompt = formData.get("prompt") as string | null;
 
-  // Prepare search parameters
   const searchParams = new URLSearchParams();
-  if (prompt && prompt.trim().length > 0) {
-    searchParams.append("name", prompt.trim());
-  }
+  if (prompt && prompt.trim().length > 0) searchParams.append("name", prompt.trim());
 
-  // Update the URL with the search parameters
   url.search = searchParams.toString();
 
   return redirect(url.toString());
@@ -139,47 +118,82 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function ExitsIndex() {
   const {
-    data,
-    count,
+    exitsPromise,
     query,
     filters,
-    hasNextPage,
     env,
-    projectArray,
-    projectSiteArray,
+    projectPromise,
+    projectSitePromise,
   } = useLoaderData<typeof loader>();
 
-  const noFilters = filters
-    ? Object.values(filters).every((value) => !value)
-    : true;
+  const noFilters = filters ? Object.values(filters).every((value) => !value) : true;
   const filterList = { ...filters, name: query };
 
   return (
-    <section className="m-4">
+    <section className="p-4">
       <div className="w-full flex items-center justify-between pb-4">
-        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
-          <ExitsSearchFilter
-            disabled={!data?.length && noFilters}
-            projectArray={projectArray}
-            projectSiteArray={projectSiteArray}
-          />
-          <FilterList filterList={filterList} />
+        <div className="flex-1 flex flex-col md:flex-row items-start md:items-center gap-4">
+          <Suspense fallback={<div>Loading...</div>}>
+            <Await resolve={projectPromise}>
+              {(projectData) => (
+                <Await resolve={projectSitePromise}>
+                  {(projectSiteData) => {
+                    if (projectSiteData?.error) {
+                      clearCacheEntry(cacheKeyPrefix.exits);
+                      return <ErrorBoundary error={projectSiteData?.error} message="Failed to load Exits" />
+                    }
+                    const projectArray = projectData?.data?.map((project) => project.name) ?? [];
+                    const projectSiteArray = projectSiteData?.data?.map((site) => site.name) ?? [];
+
+                    return (
+                      <>
+                        <ExitsSearchFilter
+                          disabled={!exitsPromise && noFilters}
+                          projectArray={projectArray}
+                          projectSiteArray={projectSiteArray}
+                        />
+                        <FilterList filterList={filterList} />
+                      </>
+                    );
+                  }}
+                </Await>
+              )}
+            </Await>
+          </Suspense>
         </div>
-        <div className="space-x-2 hidden md:flex">
-          <ExitActions isEmpty={!data?.length} />
+        <div className="flex-shrink-0">
+          <ExitActions isEmpty={!exitsPromise} />
         </div>
       </div>
-      <ExitPaymentTable
-        data={data ?? []}
-        columns={ExitPaymentColumns}
-        count={count ?? data?.length ?? 0}
-        query={query}
-        noFilters={noFilters}
-        filters={filters}
-        hasNextPage={hasNextPage}
-        pageSize={pageSize}
-        env={env}
-      />
+
+      <Suspense fallback={<div>Loading...</div>}>
+        <Await
+          resolve={exitsPromise}
+          errorElement={<div>Sorry, Exit data can't be loaded. Try again later!</div>}
+        >
+          {(exitsData) => {
+            if (exitsData?.error) {
+              clearCacheEntry(cacheKeyPrefix.exits);
+              return <ErrorBoundary error={exitsData?.error} message="Failed to load Exits" />
+            }
+            const hasNextPage = Boolean(exitsData?.meta?.count && exitsData.meta.count > LAZY_LOADING_LIMIT);
+            return (
+              <ExitPaymentTable
+                data={exitsData?.data ?? [] as any}
+                columns={ExitPaymentColumns}
+                count={exitsData?.meta?.count ?? exitsData?.data?.length ?? 0}
+                query={query}
+                noFilters={noFilters}
+                filters={filters}
+                hasNextPage={hasNextPage}
+                pageSize={pageSize}
+                env={env}
+              />
+            );
+          }}
+        </Await>
+      </Suspense>
+      <ImportExitModal />
     </section>
   );
 }

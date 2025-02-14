@@ -1,26 +1,6 @@
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  LabelList,
-  XAxis,
-  YAxis,
-} from "recharts";
-
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@canny_ecosystem/ui/card";
-import {
-  type ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@canny_ecosystem/ui/chart";
+import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@canny_ecosystem/ui/card";
+import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@canny_ecosystem/ui/chart";
 import { exitPaymentFields } from "@canny_ecosystem/utils/constant";
 import { replaceUnderscore } from "@canny_ecosystem/utils";
 import type { ExitDataType } from "@canny_ecosystem/supabase/queries";
@@ -40,26 +20,35 @@ chartConfig.amount = {
   color: "hsl(var(--background))",
 };
 
-export function ExitTopPayment({ chartData }: { chartData: ExitDataType[] }) {
+export function ExitOverview({ chartData }: { chartData: ExitDataType[] }) {
   const exitTopPaymentData = Object.values(
-    chartData.reduce(
-      (acc, row) => {
-        if (row.exit_payments) {
-          const payments = row.exit_payments;
-          for (const payment of payments) {
-            const costType = payment.payment_fields.name
-              .toLowerCase()
-              .replace(/\s+/g, "_");
-            if (!acc[costType]) {
-              acc[costType] = { amount: 0, costType };
-            }
-            acc[costType].amount += payment.amount;
-          }
-        }
-        return acc;
-      },
-      {} as Record<string, { amount: number; costType: string }>,
-    ),
+    chartData.reduce((acc, row:any) => {
+      // Handle bonus
+      if (row.bonus) {
+        if (!acc.bonus) acc.bonus = { amount: 0, costType: 'bonus' };
+        acc.bonus.amount += row.bonus;
+      }
+
+      // Handle leave encashment
+      if (row.leave_encashment) {
+        if (!acc.leave_encashment) acc.leave_encashment = { amount: 0, costType: 'leave_encashment' };
+        acc.leave_encashment.amount += row.leave_encashment;
+      }
+
+      // Handle gratuity
+      if (row.gratuity) {
+        if (!acc.gratuity) acc.gratuity = { amount: 0, costType: 'gratuity' };
+        acc.gratuity.amount += row.gratuity;
+      }
+
+      // Handle deductions
+      if (row.deduction) {
+        if (!acc.deduction) acc.deduction = { amount: 0, costType: 'deduction' };
+        acc.deduction.amount += row.deduction;
+      }
+
+      return acc;
+    }, {} as Record<string, { amount: number; costType: string }>)
   );
 
   const transformedChartData = exitTopPaymentData.map((data, i) => ({
@@ -71,7 +60,7 @@ export function ExitTopPayment({ chartData }: { chartData: ExitDataType[] }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Exits Top Payment</CardTitle>
+        <CardTitle>Exits Overview</CardTitle>
         <CardDescription>Over the period</CardDescription>
       </CardHeader>
       <CardContent>
@@ -82,9 +71,7 @@ export function ExitTopPayment({ chartData }: { chartData: ExitDataType[] }) {
             data={transformedChartData}
             layout="vertical"
             className="capitalize"
-            margin={{
-              right: 16,
-            }}
+            margin={{ right: 16 }}
           >
             <CartesianGrid horizontal={false} />
             <YAxis
@@ -99,19 +86,9 @@ export function ExitTopPayment({ chartData }: { chartData: ExitDataType[] }) {
             <XAxis dataKey="amount" type="number" hide />
             <ChartTooltip
               cursor={false}
-              content={
-                <ChartTooltipContent
-                  indicator="line"
-                  className="capitalize w-2/3"
-                />
-              }
+              content={<ChartTooltipContent indicator="line" className="capitalize w-2/3" />}
             />
-            <Bar
-              dataKey="amount"
-              layout="vertical"
-              fill="var(--color-amount)"
-              radius={4}
-            >
+            <Bar dataKey="amount" layout="vertical" fill="var(--color-amount)" radius={4}>
               <LabelList
                 dataKey="costType"
                 position="insideLeft"
@@ -132,7 +109,7 @@ export function ExitTopPayment({ chartData }: { chartData: ExitDataType[] }) {
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="leading-none text-muted-foreground">
-          Showing top exit payment for the time period.
+          Showing exits overview for the time period.
         </div>
       </CardFooter>
     </Card>

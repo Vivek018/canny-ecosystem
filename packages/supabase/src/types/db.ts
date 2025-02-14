@@ -927,51 +927,6 @@ export type Database = {
           },
         ]
       }
-      exit_payments: {
-        Row: {
-          amount: number
-          created_at: string | null
-          exit_id: string
-          id: string
-          payment_fields_id: string
-          type: string
-          updated_at: string | null
-        }
-        Insert: {
-          amount: number
-          created_at?: string | null
-          exit_id: string
-          id?: string
-          payment_fields_id: string
-          type?: string
-          updated_at?: string | null
-        }
-        Update: {
-          amount?: number
-          created_at?: string | null
-          exit_id?: string
-          id?: string
-          payment_fields_id?: string
-          type?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "exit_payments_exit_id_fkey"
-            columns: ["exit_id"]
-            isOneToOne: false
-            referencedRelation: "exits"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "exit_payments_payment_fields_id_fkey"
-            columns: ["payment_fields_id"]
-            isOneToOne: false
-            referencedRelation: "payment_fields"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       exits: {
         Row: {
           bonus: number | null
@@ -984,10 +939,10 @@ export type Database = {
           id: string
           last_working_day: string
           leave_encashment: number | null
+          net_pay: number | null
           note: string | null
           organization_payable_days: number
           reason: string
-          total: number | null
           updated_at: string | null
         }
         Insert: {
@@ -1001,10 +956,10 @@ export type Database = {
           id?: string
           last_working_day: string
           leave_encashment?: number | null
+          net_pay?: number | null
           note?: string | null
           organization_payable_days: number
           reason: string
-          total?: number | null
           updated_at?: string | null
         }
         Update: {
@@ -1018,10 +973,10 @@ export type Database = {
           id?: string
           last_working_day?: string
           leave_encashment?: number | null
+          net_pay?: number | null
           note?: string | null
           organization_payable_days?: number
           reason?: string
-          total?: number | null
           updated_at?: string | null
         }
         Relationships: [

@@ -1,5 +1,4 @@
 import { Pie, PieChart } from "recharts";
-
 import {
   Card,
   CardContent,
@@ -16,7 +15,7 @@ import {
   ChartTooltipContent,
 } from "@canny_ecosystem/ui/chart";
 import { reasonForExitArray, replaceUnderscore } from "@canny_ecosystem/utils";
-import type { ExitDataType } from "@canny_ecosystem/supabase/queries";
+import type { ExitsRow } from "@canny_ecosystem/supabase/types";
 
 const chartConfig = reasonForExitArray.reduce((config, reason, i) => {
   config[reason] = {
@@ -28,17 +27,15 @@ const chartConfig = reasonForExitArray.reduce((config, reason, i) => {
 
 chartConfig.amount = { label: "Amount" };
 
-export function ExitByReasons({ chartData }: { chartData: ExitDataType[] }) {
+export function ExitByReasons({ chartData }: { chartData: ExitsRow[] }) {
   const exitByReasonsData = Object.values(
     chartData.reduce(
       (acc, row) => {
         const reason = row.reason.toLowerCase().replace(/\s+/g, "_") || "other";
 
-        if (!acc[reason]) {
-          acc[reason] = { reason, amount: 0 };
-        }
+        if (!acc[reason]) acc[reason] = { reason, amount: 0 };
 
-        acc[reason].amount += row.total || 0;
+        acc[reason].amount += Number(row?.bonus) + Number(row.leave_encashment) + Number(row.gratuity) - Number(row.deduction);
         return acc;
       },
       Object.fromEntries(
@@ -62,19 +59,10 @@ export function ExitByReasons({ chartData }: { chartData: ExitDataType[] }) {
         <CardDescription>Over the period</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
-        <ChartContainer
-          config={chartConfig}
-          className="mx-auto aspect-square max-h-[300px]"
-        >
+        <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[300px]">
           <PieChart>
             <ChartTooltip
-              content={
-                <ChartTooltipContent
-                  hideLabel
-                  nameKey="reason"
-                  className="capitalize"
-                />
-              }
+              content={<ChartTooltipContent hideLabel nameKey="reason" className="capitalize" />}
               wrapperStyle={{ width: "60%" }}
             />
             <Pie data={transformedChartData} dataKey="amount" />
