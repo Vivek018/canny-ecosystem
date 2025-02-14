@@ -1266,7 +1266,7 @@ export const EmployeeLetterSchema = z.object({
   employee_id: z.string().optional(),
 });
 
-export const EncashmentFreqArray = ["annual", "exit", "special"] as const;
+export const encashmentFreqArray = ["annual", "exit", "special"] as const;
 
 export const LeaveEncashmentSchema = z.object({
   id: z.string().optional(),
@@ -1276,7 +1276,9 @@ export const LeaveEncashmentSchema = z.object({
   max_encashment_amount: z.number().min(0).default(0),
   encashment_multiplier: z.number().positive().default(1.5),
   working_days_per_year: z.number().min(1).default(260),
-  encashment_frequency: z.enum(EncashmentFreqArray).default("annual"),
+  encashment_frequency: z
+    .enum(encashmentFreqArray)
+    .default(encashmentFreqArray[0]),
   is_default: z.boolean().default(true),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),

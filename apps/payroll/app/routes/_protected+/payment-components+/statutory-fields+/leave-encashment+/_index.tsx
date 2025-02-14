@@ -44,11 +44,11 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 
 clientLoader.hydrate = true;
 
-export default function GratuityIndex() {
+export default function LeaveEncashmentIndex() {
   const { leaveEncashmentPromise, error } = useLoaderData<typeof loader>();
 
   if (error) {
-    clearExactCacheEntry(cacheKeyPrefix.gratuity);
+    clearExactCacheEntry(cacheKeyPrefix.leave_encashment);
     return (
       <ErrorBoundary error={error} message="Failed to load leave encashment" />
     );

@@ -1,14 +1,8 @@
 import { FormButtons } from "@/components/form/form-buttons";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import {
-  createGratuity,
-  createLeaveEncashment,
-} from "@canny_ecosystem/supabase/mutations";
+import { createLeaveEncashment } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import type {
-  GratuityDatabaseUpdate,
-  LeaveEncashmentDatabaseUpdate,
-} from "@canny_ecosystem/supabase/types";
+import type { LeaveEncashmentDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import {
   Card,
   CardContent,
@@ -25,7 +19,7 @@ import {
   createRole,
   LeaveEncashmentSchema,
   transformStringArrayIntoOptions,
-  EncashmentFreqArray,
+  encashmentFreqArray,
 } from "@canny_ecosystem/utils";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
@@ -40,7 +34,7 @@ import {
   useLoaderData,
   useNavigate,
 } from "@remix-run/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { UPDATE_LEAVE_ENCASHMENT } from "./$leaveEncashmentId.update-leave-encashment";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
@@ -143,6 +137,8 @@ export default function CreateLeaveEncashment({
   const initialValues =
     updateValues ?? getInitialValueFromZod(LeaveEncashmentSchema);
 
+  const [resetKey, setResetKey] = useState(Date.now());
+
   const [form, fields] = useForm({
     id: LEAVE_ENCASHMENT_TAG,
     constraint: getZodConstraint(LeaveEncashmentSchema),
@@ -210,10 +206,10 @@ export default function CreateLeaveEncashment({
               />
 
               <SearchableSelectField
-                // key={resetKey}
+                key={resetKey}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  EncashmentFreqArray as unknown as string[],
+                  encashmentFreqArray as unknown as string[],
                 )}
                 inputProps={{
                   ...getInputProps(fields.encashment_frequency, {
@@ -308,7 +304,7 @@ export default function CreateLeaveEncashment({
               />
             </div>
           </CardContent>
-          <FormButtons form={form} isSingle={true} />
+          <FormButtons form={form} setResetKey={setResetKey} isSingle={true} />
         </Card>
       </Form>
     </section>

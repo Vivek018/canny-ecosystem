@@ -121,7 +121,7 @@ export async function action({
   }
 }
 
-export default function UpdateEmployeeStateInsurance() {
+export default function UpdateLeaveEncashment() {
   const { leaveEncashmentPromise, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
@@ -183,7 +183,7 @@ export function UpdateLeaveEncashmentWrapper({
     if (error) {
       toast({
         title: "Error",
-        description: error?.message || "Failed to load gratuity",
+        description: error?.message || "Failed to load leave encashment",
         variant: "destructive",
       });
     }

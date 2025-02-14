@@ -38,7 +38,6 @@ export function LeaveEncashmentWrapper({
     return <ErrorBoundary error={error} message="Failed to load data" />;
   }
   if (!data) return <LeaveEncashmentNoData />;
-  console.log(data);
 
   return (
     <>
