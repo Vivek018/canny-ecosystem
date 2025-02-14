@@ -22,9 +22,7 @@ export async function action({
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (
-    !hasPermission(user?.role!, `${deleteRole}:${attribute.accidents}`)
-  ) {
+  if (!hasPermission(user?.role!, `${deleteRole}:${attribute.accidents}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
@@ -77,10 +75,7 @@ export default function DeleteAccident() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(
-          `${cacheKeyPrefix.accident}${actionData.accidentId}`
-        );
-        clearCacheEntry(cacheKeyPrefix.accident)
+        clearCacheEntry(cacheKeyPrefix.accident);
         toast({
           title: "Success",
           description: actionData?.message || "Accident deleted",

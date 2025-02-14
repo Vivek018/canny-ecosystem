@@ -112,7 +112,7 @@ export default function UpdateAccidents() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(`${cacheKeyPrefix.accident}`);
+        clearCacheEntry(cacheKeyPrefix.accident);
         toast({
           title: "Success",
           description: actionData?.message || "Accident updated successfully",

@@ -19,11 +19,7 @@ import { attribute, DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
-export const DeleteAccident = ({
-  id,
-}: {
-  id: string;
-}) => {
+export const DeleteAccident = ({ id }: { id: string }) => {
   const { role } = useUser();
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
@@ -70,8 +66,8 @@ export const DeleteAccident = ({
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your User
-            and remove it's data from our servers.
+            This action cannot be undone. This will permanently delete your
+            Accident and remove it's data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="py-4">
