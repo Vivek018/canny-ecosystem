@@ -3,14 +3,23 @@ import { ExitByTime } from "@/components/exits/analytics/exit-by-time";
 import { ExitPaymentByTime } from "@/components/exits/analytics/exit-payment-by-time";
 import { ExitTopPayment } from "@/components/exits/analytics/exit-top-payment";
 import { ExitTrend } from "@/components/exits/analytics/exit-trend";
+import { cacheKeyPrefix } from "@/constant";
 import { useExitsStore } from "@/store/exits";
+import { clientCaching } from "@/utils/cache";
 import type { ExitDataType } from "@canny_ecosystem/supabase/queries";
 import { useLocalStorage } from "@canny_ecosystem/utils/hooks/local-storage";
+import type { ClientLoaderFunctionArgs } from "@remix-run/react";
 import { useEffect } from "react";
 
 const getDataSource = (selectedRows: ExitDataType[], storedValue: ExitDataType[]) => {
   return selectedRows.length > 0 ? selectedRows : storedValue;
 };
+
+// caching
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+  return await clientCaching(cacheKeyPrefix.exits,args);
+}
+clientLoader.hydrate = true;
 
 export default function ExitAnalytics() {
   const { selectedRows } = useExitsStore();

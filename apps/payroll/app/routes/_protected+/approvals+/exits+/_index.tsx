@@ -13,7 +13,8 @@ import {
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { type ClientLoaderFunctionArgs, json, redirect, useLoaderData } from "@remix-run/react";
+import { Await, type ClientLoaderFunctionArgs, defer, redirect, useLoaderData } from "@remix-run/react";
+import { Suspense } from "react";
 
 const pageSize = 20;
 
@@ -62,43 +63,41 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     if (error) throw error;
 
-    const { data: projectData } = await getProjectNamesByCompanyId({ supabase, companyId, });
+    const projectPromise = getProjectNamesByCompanyId({ supabase, companyId, });
 
-    let projectSiteData = null;
-    if (filters.project) {
-      const { data } = await getSiteNamesByProjectName({ supabase, projectName: filters.project });
-      projectSiteData = data;
-    }
+    let projectSitePromise = null;
+    if (filters.project)
+      projectSitePromise = getSiteNamesByProjectName({ supabase, projectName: filters.project });
 
-    return json({
+    return defer({
       data: data as any,
       count: meta?.count,
       query,
       filters,
       hasNextPage,
-      projectArray: projectData?.map((project) => project.name) ?? [],
-      projectSiteArray: projectSiteData?.map((site) => site.name) ?? [],
+      projectPromise,
+      projectSitePromise,
       env,
       error: null,
     });
   } catch (error) {
-    return json({
+    return defer({
       data: null,
       count: 0,
       query: null,
       filters: null,
       hasNextPage: false,
-      projectArray: null,
-      projectSiteArray: null,
+      projectPromise: null,
+      projectSitePromise: null,
       env,
       error,
     });
   }
 }
 
+// caching
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  const url = new URL(args.request.url);
-  return await clientCaching(`${cacheKeyPrefix.exits}${url.searchParams.toString()}`, args);
+  return await clientCaching(cacheKeyPrefix.exits,args);
 }
 clientLoader.hydrate = true;
 
@@ -110,9 +109,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   // Prepare search parameters
   const searchParams = new URLSearchParams();
-  if (prompt && prompt.trim().length > 0) {
-    searchParams.append("name", prompt.trim());
-  }
+  if (prompt && prompt.trim().length > 0) searchParams.append("name", prompt.trim());
 
   // Update the URL with the search parameters
   url.search = searchParams.toString();
@@ -128,8 +125,8 @@ export default function ExitsIndex() {
     filters,
     hasNextPage,
     env,
-    projectArray,
-    projectSiteArray,
+    projectPromise,
+    projectSitePromise,
   } = useLoaderData<typeof loader>();
 
   const noFilters = filters ? Object.values(filters).every((value) => !value) : true;
@@ -137,29 +134,47 @@ export default function ExitsIndex() {
 
   return (
     <section className="m-4">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
-          <ExitsSearchFilter
-            disabled={!data?.length && noFilters}
-            projectArray={projectArray}
-            projectSiteArray={projectSiteArray}
-          />
-          <FilterList filterList={filterList} />
-        </div>
-        <div className="space-x-2 hidden md:flex"><ExitActions isEmpty={!data?.length} /></div>
-      </div>
-      <ExitPaymentTable
-        data={data ?? []}
-        columns={ExitPaymentColumns}
-        count={count ?? data?.length ?? 0}
-        query={query}
-        noFilters={noFilters}
-        filters={filters}
-        hasNextPage={hasNextPage}
-        pageSize={pageSize}
-        env={env}
-      />
-      <ImportExitModal/>
+      <Suspense fallback={<div>loading...</div>}>
+        <Await 
+        resolve={Promise.all([projectPromise, projectSitePromise])}
+        errorElement={<div>Sorry, Exit data can't be load. Try again later!</div>}
+        >
+          {([projectResult, projectSiteResult]) => {
+            const projectArray = projectResult?.data?.map((project) => project.name) ?? [];
+            const projectSiteArray = projectSiteResult?.data?.map((site) => site.name) ?? [];
+
+            return (
+              <>
+                <div className="w-full flex items-center justify-between pb-4">
+                  <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
+                    <ExitsSearchFilter
+                      disabled={!data?.length && noFilters}
+                      projectArray={projectArray}
+                      projectSiteArray={projectSiteArray}
+                    />
+                    <FilterList filterList={filterList} />
+                  </div>
+                  <div className="space-x-2 hidden md:flex">
+                    <ExitActions isEmpty={!data?.length} />
+                  </div>
+                </div>
+                <ExitPaymentTable
+                  data={data ?? []}
+                  columns={ExitPaymentColumns}
+                  count={count ?? data?.length ?? 0}
+                  query={query}
+                  noFilters={noFilters}
+                  filters={filters}
+                  hasNextPage={hasNextPage}
+                  pageSize={pageSize}
+                  env={env}
+                />
+                <ImportExitModal />
+              </>
+            );
+          }}
+        </Await>
+      </Suspense>
     </section>
   );
 }

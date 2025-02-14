@@ -11,6 +11,7 @@ import { useNavigate } from "@remix-run/react";
 import { useState, useEffect } from "react";
 import { ImportedDataTable } from "../imported-table/imported-data-table";
 import { ImportedDataColumns } from "../imported-table/columns";
+import { toast } from "@canny_ecosystem/ui/use-toast";
 
 export function ExitImportData({ env }: { env: SupabaseEnv }) {
   const navigate = useNavigate();
@@ -67,8 +68,21 @@ export function ExitImportData({ env }: { env: SupabaseEnv }) {
         supabase,
       });
 
-      if (error) console.error(error);
-      if (isGoodStatus(status)) navigate("/approvals/exits");
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Exit creation Failed! Try Again, later.",
+          variant: "destructive"
+        });
+      }
+      if (isGoodStatus(status)) {
+        toast({
+          title: "Success",
+          description: "Exit created successfully!",
+          variant: "success"
+        });
+        navigate("/approvals/exits");
+      }
     }
   };
 

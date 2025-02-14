@@ -71,8 +71,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
           to: hasFilters
             ? MAX_QUERY_LIMIT
             : page > 0
-            ? LAZY_LOADING_LIMIT
-            : LAZY_LOADING_LIMIT - 1,
+              ? LAZY_LOADING_LIMIT
+              : LAZY_LOADING_LIMIT - 1,
           filters,
           searchQuery: query ?? undefined,
           sort: sortParam?.split(":") as [string, "asc" | "desc"],
@@ -102,8 +102,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return await clientCaching(
-    `${cacheKeyPrefix.employee_reimbursements}${
-      args.params.employeeId
+    `${cacheKeyPrefix.employee_reimbursements}${args.params.employeeId
     }${url.searchParams.toString()}`,
     args
   );
@@ -138,15 +137,11 @@ export default function ReimbursementsIndex() {
       <Suspense>
         <Await
           resolve={Promise.all([reimbursementPromise, usersPromise])}
-          errorElement={
-            <div>Error loading filters. Please try again later.</div>
-          }
+          errorElement={<div>Error loading filters. Please try again later.</div>}
         >
           {([{ data, meta, error }, usersData]) => {
             if (error) {
-              clearCacheEntry(
-                `${cacheKeyPrefix.employee_reimbursements}${employeeId}`
-              );
+              clearCacheEntry(`${cacheKeyPrefix.employee_reimbursements}${employeeId}`);
               toast({
                 variant: "destructive",
                 title: "Error",
@@ -155,9 +150,7 @@ export default function ReimbursementsIndex() {
               return null;
             }
 
-            const hasNextPage = Boolean(
-              meta?.count && meta.count / (0 + 1) > LAZY_LOADING_LIMIT
-            );
+            const hasNextPage = Boolean(meta?.count && meta.count / (0 + 1) > LAZY_LOADING_LIMIT);
             return (
               <>
                 <div className='w-full flex items-center justify-between pb-4'>
