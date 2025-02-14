@@ -9,6 +9,78 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      accidents: {
+        Row: {
+          category: Database["public"]["Enums"]["accident_category_type"] | null
+          created_at: string
+          date: string | null
+          description: string | null
+          employee_id: string
+          id: string
+          location: string | null
+          location_type:
+            | Database["public"]["Enums"]["accident_location_type"]
+            | null
+          medical_diagnosis: string | null
+          severity: Database["public"]["Enums"]["feedback_severity"]
+          status: Database["public"]["Enums"]["accident_status_type"] | null
+          title: string | null
+          type_of_accident:
+            | Database["public"]["Enums"]["accident_typeOf_type"]
+            | null
+        }
+        Insert: {
+          category?:
+            | Database["public"]["Enums"]["accident_category_type"]
+            | null
+          created_at?: string
+          date?: string | null
+          description?: string | null
+          employee_id: string
+          id?: string
+          location?: string | null
+          location_type?:
+            | Database["public"]["Enums"]["accident_location_type"]
+            | null
+          medical_diagnosis?: string | null
+          severity: Database["public"]["Enums"]["feedback_severity"]
+          status?: Database["public"]["Enums"]["accident_status_type"] | null
+          title?: string | null
+          type_of_accident?:
+            | Database["public"]["Enums"]["accident_typeOf_type"]
+            | null
+        }
+        Update: {
+          category?:
+            | Database["public"]["Enums"]["accident_category_type"]
+            | null
+          created_at?: string
+          date?: string | null
+          description?: string | null
+          employee_id?: string
+          id?: string
+          location?: string | null
+          location_type?:
+            | Database["public"]["Enums"]["accident_location_type"]
+            | null
+          medical_diagnosis?: string | null
+          severity?: Database["public"]["Enums"]["feedback_severity"]
+          status?: Database["public"]["Enums"]["accident_status_type"] | null
+          title?: string | null
+          type_of_accident?:
+            | Database["public"]["Enums"]["accident_typeOf_type"]
+            | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accidents_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       attendance: {
         Row: {
           created_at: string | null
@@ -1113,6 +1185,62 @@ export type Database = {
           },
         ]
       }
+      leave_encashment: {
+        Row: {
+          company_id: string
+          created_at: string
+          eligible_years: number | null
+          encashment_frequency:
+            | Database["public"]["Enums"]["encashment_frequency"]
+            | null
+          encashment_multiplier: number | null
+          id: string
+          is_default: boolean | null
+          max_encashable_leaves: number | null
+          max_encashment_amount: number | null
+          updated_at: string | null
+          working_days_per_year: number | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          eligible_years?: number | null
+          encashment_frequency?:
+            | Database["public"]["Enums"]["encashment_frequency"]
+            | null
+          encashment_multiplier?: number | null
+          id?: string
+          is_default?: boolean | null
+          max_encashable_leaves?: number | null
+          max_encashment_amount?: number | null
+          updated_at?: string | null
+          working_days_per_year?: number | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          eligible_years?: number | null
+          encashment_frequency?:
+            | Database["public"]["Enums"]["encashment_frequency"]
+            | null
+          encashment_multiplier?: number | null
+          id?: string
+          is_default?: boolean | null
+          max_encashable_leaves?: number | null
+          max_encashment_amount?: number | null
+          updated_at?: string | null
+          working_days_per_year?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leave_encashment_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payment_fields: {
         Row: {
           amount: number | null
@@ -1902,6 +2030,21 @@ export type Database = {
       }
     }
     Enums: {
+      accident_category_type:
+        | "theft"
+        | "assault"
+        | "fall"
+        | "accident"
+        | "machinery"
+        | "others"
+      accident_location_type: "onsite" | "others"
+      accident_status_type:
+        | "active"
+        | "inactive"
+        | "pending"
+        | "completed"
+        | "cancelled"
+      accident_typeOf_type: "people" | "property" | "both"
       assignment_target_type:
         | "payment_field"
         | "epf"
@@ -1911,6 +2054,7 @@ export type Database = {
         | "lwf"
       calculation_type: "fixed" | "percentage_of_ctc"
       eligibility_option_type: "position" | "skill_level"
+      encashment_frequency: "annual" | "exit" | "special"
       feedback_category: "suggestion" | "bug" | "complain"
       feedback_severity: "low" | "normal" | "urgent"
       holiday_type: "weekly" | "paid" | "state" | "national"

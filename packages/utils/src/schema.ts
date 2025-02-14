@@ -1,11 +1,4 @@
 import { isValid, z } from "zod";
-import {
-  DEFAULT_EXPERIENCE_LETTER,
-  DEFAULT_NOC_LETTER,
-  DEFAULT_OFFER_LETTER,
-  DEFAULT_RELIEVING_LETTER,
-  DEFAULT_TERMINATION_LETTER,
-} from "../constant";
 
 export { z };
 
