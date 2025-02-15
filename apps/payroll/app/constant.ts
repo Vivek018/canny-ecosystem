@@ -49,9 +49,10 @@ export const sideNavList = [
     link: "/payment-components",
     icon: "input",
   },
+  { name: "Incident" },
+  { name: "Accidents", link: "/accidents", icon: "exclaimation-triangle" },
   { name: "Stats" },
   { name: "Reports", link: "/reports", icon: "report" },
-
   { name: "General" },
   { name: "Projects", link: "/projects", icon: "project" },
   {
@@ -267,6 +268,7 @@ export const cacheKeyPrefix = {
   feedback_list: "feedback-list",
   exits:"exits",
   attendance: "attendance",
+  accident: "accident",
 };
 export const SALARY_SLIP_TITLE = "Salary Slip Form IV B [Rule 26(2)(b)]";
 

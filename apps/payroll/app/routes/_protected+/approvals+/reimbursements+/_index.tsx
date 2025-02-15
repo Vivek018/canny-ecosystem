@@ -71,7 +71,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     const projectPromise = getProjectNamesByCompanyId({supabase,companyId});
 
-    const userEmailsPromise = getUsersEmail({ supabase });
+    const userEmailsPromise = getUsersEmail({ supabase, companyId });
 
     let projectSitePromise = null;
     if (filters.project) 

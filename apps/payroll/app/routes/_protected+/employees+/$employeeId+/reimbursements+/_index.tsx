@@ -30,15 +30,17 @@ import {
 } from "@remix-run/react";
 import { Suspense } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
+  const { supabase } = getSupabaseWithHeaders({ request });
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
 
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
     const url = new URL(request.url);
     const employeeId = params.employeeId;
     const searchParams = new URLSearchParams(url.searchParams);
@@ -59,7 +61,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const hasFilters =
       filters && Object.values(filters).some((value) => value !== null && value !== undefined);
 
-    const usersPromise = getUsersEmail({ supabase });
+    const usersPromise = getUsersEmail({ supabase ,companyId });
 
     let reimbursementPromise = null;
     if (employeeId) {

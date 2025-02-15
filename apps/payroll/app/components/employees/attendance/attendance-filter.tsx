@@ -37,7 +37,7 @@ export const AttendanceFilter = ({
 
   const [filterParams, setFilterParams] = useState(initialFilterParams);
 
-  // const submit = useSubmit();
+ 
 
   const deleteAllSearchParams = () => {
     for (const [key, _val] of Object.entries(filterParams)) {
@@ -98,7 +98,7 @@ export const AttendanceFilter = ({
               className="relative w-full md:w-auto"
               onSubmit={(e) => {
                 e.preventDefault();
-                // handleSubmit();
+                
               }}
             >
               <DropdownMenuTrigger asChild>
@@ -110,7 +110,7 @@ export const AttendanceFilter = ({
                     isOpen && "opacity-100"
                   )}
                 >
-                  <Icon name="mixer" className="" />
+                  <Icon name="mixer" className="h-4 w-4" />
                 </button>
               </DropdownMenuTrigger>
             </form>

@@ -19,6 +19,7 @@ export type IconName =
   | "dots-vertical"
   | "edit"
   | "employee"
+  | "exclaimation-triangle"
   | "feedback"
   | "import"
   | "info"

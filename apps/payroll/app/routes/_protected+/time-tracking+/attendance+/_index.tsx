@@ -30,7 +30,7 @@ import { clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
-import { attribute } from "@canny_ecosystem/utils/constant";
+import { attribute, months } from "@canny_ecosystem/utils/constant";
 
 export type TransformedAteendanceDataType = {
   projectName: any;
@@ -192,11 +192,35 @@ export default function Attendance() {
   }
 
   useEffect(() => {
-    setData(transformAttendanceData(attendanceData) as TransformedAteendanceDataType[]);
+    setData(
+      transformAttendanceData(attendanceData) as TransformedAteendanceDataType[]
+    );
   }, [attendanceData]);
 
-  const [month, setMonth] = useState<number>(new Date().getMonth());
-  const [year, setYear] = useState<number>(new Date().getFullYear());
+  const [month, setMonth] = useState<number>(() => {
+    if (filters.month) {
+      return months[filters.month] - 1;
+    }
+    return new Date().getMonth();
+  });
+
+  const [year, setYear] = useState<number>(() => {
+    return filters.year ? Number(filters.year) : new Date().getFullYear();
+  });
+
+  useEffect(() => {
+    if (filters.month) {
+      setMonth(months[filters.month] - 1);
+    } else {
+      setMonth(new Date().getMonth());
+    }
+
+    if (filters.year) {
+      setYear(Number(filters.year));
+    } else {
+      setYear(new Date().getFullYear());
+    }
+  }, [filters]);
 
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
@@ -214,7 +238,7 @@ export default function Attendance() {
   const noFilters = Object.values(filters).every((value) => !value);
 
   return (
-    <section className="m-4">
+    <section className="py-4">
       <div className="w-full flex items-center justify-between pb-4">
         <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
           <AttendanceSearchFilter

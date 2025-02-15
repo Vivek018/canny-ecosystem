@@ -292,3 +292,9 @@ export type LeaveEncashmentDatabaseInsert =
 
 export type LeaveEncashmentDatabaseUpdate =
   Database["public"]["Tables"]["leave_encashment"]["Update"];
+export type AccidentsDatabaseRow =
+  Database["public"]["Tables"]["accidents"]["Row"];
+export type AccidentsDatabaseInsert =
+  Database["public"]["Tables"]["accidents"]["Insert"];
+export type AccidentsDatabaseUpdate =
+  Database["public"]["Tables"]["accidents"]["Update"];

@@ -1363,3 +1363,35 @@ export const LeaveEncashmentSchema = z.object({
   created_at: z.string().optional(),
   updated_at: z.string().optional(),
 });
+
+export const locationTypeArray = ["onsite", "others"] as const;
+export const severityTypeArray = [
+  "minor",
+  "moderate",
+  "severe",
+  "critical",
+  "fatal",
+  "unknown",
+] as const;
+
+export const categoryOfAccidentArray = [
+  "theft",
+  "assault",
+  "fall",
+  "accident",
+  "machinery",
+  "others",
+] as const;
+
+export const AccidentSchema = z.object({
+  employee_id: z.string(),
+  date: z.string(),
+  title: zString.min(3).max(30),
+  location_type: z.enum(locationTypeArray),
+  location: z.string().optional(),
+  category: z.enum(categoryOfAccidentArray),
+  severity: z.enum(severityTypeArray).default("moderate"),
+  status: z.enum(statusArray),
+  description: zTextArea.max(500),
+  medical_diagnosis: z.string().optional(),
+});

@@ -1,6 +1,6 @@
 import type {
-  EmployeeAddressDatabaseUpdate,
   EmployeeAttendanceDatabaseInsert,
+  EmployeeAttendanceDatabaseUpdate,
   TypedSupabaseClient,
 } from "../types";
 
@@ -29,21 +29,21 @@ export async function deleteAttendanceByDate({
 }
 
 export async function updateOrAddAttendance({
-  date,
   supabase,
   data,
   type,
 }: {
-  date: string;
   supabase: TypedSupabaseClient;
-  data: EmployeeAddressDatabaseUpdate;
+  data: EmployeeAttendanceDatabaseUpdate;
   type: "update" | "add";
 }) {
-  if (type === "update") {
+  if (type === "update" && data.date && data.employee_id) {
+
     const { error, status } = await supabase
       .from("attendance")
       .update(data)
-      .eq("date", date)
+      .eq("date", data.date)
+      .eq("employee_id", data.employee_id)
       .single();
 
     if (error) {
@@ -52,7 +52,9 @@ export async function updateOrAddAttendance({
     return { error, status };
   }
 
-  const { error, status } = await supabase.from("attendance").insert(data);
+  const { error, status } = await supabase
+    .from("attendance")
+    .insert(data as any);
 
   if (error) {
     console.error(error);

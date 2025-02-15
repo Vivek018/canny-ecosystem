@@ -128,7 +128,9 @@ export async function getUsersByCompanyId({
 
 export async function getUsersEmail({
   supabase,
+  companyId
 }: {
+  companyId: string;
   supabase: TypedSupabaseClient;
 }) {
   const columns = ["email"] as const;
@@ -136,6 +138,7 @@ export async function getUsersEmail({
   const { data, error } = await supabase
     .from("users")
     .select(`${columns.join(",")},email`)
+    .eq("company_id", companyId)
     .order("created_at", { ascending: false })
     .limit(HARD_QUERY_LIMIT)
     .returns<InferredType<UserDatabaseRow, (typeof columns)[number]>[]>();
