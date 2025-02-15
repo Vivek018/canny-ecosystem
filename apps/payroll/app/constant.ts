@@ -30,9 +30,9 @@ export const workingDaysOptions = [
 
 export const sideNavList = [
   { name: "Dashboard", link: "/dashboard", icon: "dashboard" },
-  { name: "Management" },
+  { name: "Group 1" },
   { name: "Employees", link: "/employees", icon: "employee" },
-  { name: "Finance" },
+  { name: "Group 2" },
   {
     name: "Time Tracking",
     link: "/time-tracking",
@@ -43,18 +43,16 @@ export const sideNavList = [
     link: "/payroll",
     icon: "table",
   },
-  { name: "Settings" },
-  { name: "Approvals", link: "/approvals", icon: "check-circle" },
   {
     name: "Payment Components",
     link: "/payment-components",
     icon: "input",
   },
-  { name: "Incident" },
+  { name: "Group 3" },
+  { name: "Approvals", link: "/approvals", icon: "check-circle" },
   { name: "Accidents", link: "/accidents", icon: "exclaimation-triangle" },
-  { name: "Stats" },
   { name: "Reports", link: "/reports", icon: "report" },
-  { name: "General" },
+  { name: "Group 5" },
   { name: "Projects", link: "/projects", icon: "project" },
   {
     name: "Settings",
