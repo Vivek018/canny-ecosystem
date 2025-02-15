@@ -1,4 +1,3 @@
-
 import {
   AlertDialog,
   AlertDialogAction,
@@ -73,21 +72,21 @@ export const DeleteSkill = ({
             employee's skill and remove it's data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <div className="py-4">
-          <p className="text-sm text-foreground/80">
+        <div className='p-4'>
+          <p className='text-sm text-foreground/80'>
             Please type{" "}
-            <i className="text-foreground font-medium">{DELETE_TEXT}</i> to
+            <i className='text-foreground font-medium'>{DELETE_TEXT}</i> to
             confirm.
           </p>
           <Input
-            type="text"
+            type='text'
             value={inputValue}
             onChange={(e) => {
               setInputValue(e.target.value);
               setInputError([]);
             }}
-            className="border border-input rounded-md h-10 w-full"
-            placeholder="Confirm your action"
+            className='border border-input rounded-md h-10 w-full'
+            placeholder='Confirm your action'
             onPaste={(e) => {
               e.preventDefault();
               return false;

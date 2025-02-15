@@ -19,7 +19,9 @@ import { useState } from "react";
 
 export const DeleteEmployeePaymentTemplateAssignment = ({
   employeeId,
-}: { employeeId: string }) => {
+}: {
+  employeeId: string;
+}) => {
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [inputError, setInputError] = useState<string[]>([]);
@@ -32,7 +34,7 @@ export const DeleteEmployeePaymentTemplateAssignment = ({
   };
 
   const handleDeleteEmployeePaymentTemplateAssignment = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -44,7 +46,7 @@ export const DeleteEmployeePaymentTemplateAssignment = ({
         {
           method: "POST",
           action: `/templates/${employeeId}/delete-employee-link`,
-        },
+        }
       );
     } else {
       e.preventDefault();
@@ -57,7 +59,7 @@ export const DeleteEmployeePaymentTemplateAssignment = ({
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "destructive-outline", size: "full" }),
-          "text-[13px] h-9",
+          "text-[13px] h-9"
         )}
       >
         Delete link template
@@ -71,21 +73,21 @@ export const DeleteEmployeePaymentTemplateAssignment = ({
             servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <div className="py-4">
-          <p className="text-sm text-foreground/80">
+        <div className='p-4'>
+          <p className='text-sm text-foreground/80'>
             Please type{" "}
-            <i className="text-foreground font-medium">{DELETE_TEXT}</i> to
+            <i className='text-foreground font-medium'>{DELETE_TEXT}</i> to
             confirm.
           </p>
           <Input
-            type="text"
+            type='text'
             value={inputValue}
             onChange={(e) => {
               setInputValue(e.target.value);
               setInputError([]);
             }}
-            className="border border-input rounded-md h-10 w-full"
-            placeholder="Confirm your action"
+            className='border border-input rounded-md h-10 w-full'
+            placeholder='Confirm your action'
             onPaste={(e) => {
               e.preventDefault();
               return false;

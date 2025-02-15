@@ -30,7 +30,7 @@ export const workingDaysOptions = [
 
 export const sideNavList = [
   { name: "Dashboard", link: "/dashboard", icon: "dashboard" },
-  { name: "management" },
+  { name: "Management" },
   { name: "Employees", link: "/employees", icon: "employee" },
   { name: "Finance" },
   {
@@ -43,6 +43,7 @@ export const sideNavList = [
     link: "/payroll",
     icon: "table",
   },
+  { name: "Settings" },
   { name: "Approvals", link: "/approvals", icon: "check-circle" },
   {
     name: "Payment Components",
@@ -266,7 +267,7 @@ export const cacheKeyPrefix = {
   users: "users",
   account: "account",
   feedback_list: "feedback-list",
-  exits:"exits",
+  exits: "exits",
   attendance: "attendance",
   accident: "accident",
 };

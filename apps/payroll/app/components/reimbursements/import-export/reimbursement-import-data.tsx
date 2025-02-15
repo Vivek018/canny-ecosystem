@@ -29,7 +29,6 @@ export function ReimbursementImportData({
   env: SupabaseEnv;
   companyId: string;
 }) {
-
   const navigate = useNavigate();
   const { supabase } = useSupabase({ env });
   const { importData } = useImportStoreForReimbursement();
@@ -66,12 +65,15 @@ export function ReimbursementImportData({
   const handleFinalImport = async () => {
     if (validateImportData(importData.data)) {
       const userEmails = importData.data!.map((value) => value.email!);
-      const employeeCodes = importData.data!.map((value) => value.employee_code);
+      const employeeCodes = importData.data!.map(
+        (value) => value.employee_code
+      );
 
-      const { data: employees, error: codeError } = await getEmployeeIdsByEmployeeCodes({
-        supabase,
-        employeeCodes,
-      });
+      const { data: employees, error: codeError } =
+        await getEmployeeIdsByEmployeeCodes({
+          supabase,
+          employeeCodes,
+        });
 
       if (codeError) throw codeError;
       const { data: users, error: userError } = await getUserIdsByUserEmails({
@@ -82,7 +84,9 @@ export function ReimbursementImportData({
       if (userError) throw userError;
 
       const updatedData = importData.data!.map((item: any) => {
-        const employeeId = employees?.find((e) => e.employee_code === item.employee_code)?.id;
+        const employeeId = employees?.find(
+          (e) => e.employee_code === item.employee_code
+        )?.id;
         const userId = users?.find((u) => u.email === item.email)?.id;
 
         const { email, employee_code, ...rest } = item;
@@ -94,7 +98,7 @@ export function ReimbursementImportData({
           company_id: companyId,
         };
       });
-      
+
       const { error, status } = await createReimbursementsFromImportedData({
         data: updatedData as ReimbursementInsert[],
         supabase,
@@ -105,26 +109,28 @@ export function ReimbursementImportData({
   };
 
   return (
-    <section className="m-4">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="w-full  flex justify-between items-center">
-          <div className="relative w-[30rem] ">
-            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+    <section className='p-4'>
+      <div className='w-full flex items-center justify-between pb-4'>
+        <div className='w-full  flex justify-between items-center'>
+          <div className='relative w-[30rem] '>
+            <div className='absolute inset-y-0 left-3 flex items-center pointer-events-none'>
               <Icon
-                name="magnifying-glass"
-                size="sm"
-                className="text-gray-400"
+                name='magnifying-glass'
+                size='sm'
+                className='text-gray-400'
               />
             </div>
             <Input
-              placeholder="Search Reimbursements"
+              placeholder='Search Reimbursements'
               value={searchString}
               onChange={(e) => setSearchString(e.target.value)}
-              className="pl-8 h-10 w-full focus-visible:ring-0"
+              className='pl-8 h-10 w-full focus-visible:ring-0'
             />
           </div>
-          <div className="flex items-center gap-3">
-            <Button variant={"default"} onClick={handleFinalImport}>Import</Button>
+          <div className='flex items-center gap-3'>
+            <Button variant={"default"} onClick={handleFinalImport}>
+              Import
+            </Button>
           </div>
         </div>
       </div>

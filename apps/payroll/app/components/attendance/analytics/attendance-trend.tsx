@@ -1,4 +1,4 @@
-import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
+import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
 import {
   Card,
   CardContent,
@@ -77,9 +77,6 @@ export function AttendanceTrend({
                 <span className="text-xs text-muted-foreground">
                   {chartConfig[chart]?.label}
                 </span>
-                {/* <span className="text-lg font-bold leading-none sm:text-3xl">
-                  {total[chart]?.toLocaleString()}
-                </span> */}
               </button>
             );
           })}
@@ -112,7 +109,6 @@ export function AttendanceTrend({
                 })
               }
             />
-            <YAxis allowDecimals={false} />
             <ChartTooltip
               content={
                 <ChartTooltipContent

@@ -17,7 +17,7 @@ import {
   useLoaderData,
 } from "@remix-run/react";
 import { Suspense } from "react";
-import {  hasPermission, readRole } from "@canny_ecosystem/utils";
+import { hasPermission, readRole } from "@canny_ecosystem/utils";
 import { safeRedirect } from "@/utils/server/http.server";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
@@ -120,9 +120,9 @@ export default function AccidentsIndex() {
   const noFilters = Object.values(filterList).every((value) => !value);
 
   return (
-    <section className="py-6 px-4">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
+    <section className='p-4'>
+      <div className='w-full flex items-center justify-between pb-4'>
+        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4'>
           <AccidentSearchFilter />
           <FilterList filters={filterList} />
         </div>
@@ -135,7 +135,7 @@ export default function AccidentsIndex() {
               return (
                 <ErrorBoundary
                   error={error}
-                  message="Failed to load accidents"
+                  message='Failed to load accidents'
                 />
               );
             }

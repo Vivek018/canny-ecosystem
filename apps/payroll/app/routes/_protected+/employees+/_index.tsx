@@ -72,7 +72,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined,
+        (value) => value !== null && value !== undefined
       );
 
     const employeesPromise = getEmployeesByCompanyId({
@@ -126,7 +126,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
-  return await clientCaching(`${cacheKeyPrefix.employees}${url.searchParams.toString()}`, args);
+  return await clientCaching(
+    `${cacheKeyPrefix.employees}${url.searchParams.toString()}`,
+    args
+  );
 }
 
 clientLoader.hydrate = true;
@@ -145,10 +148,11 @@ export async function action({ request }: ActionFunctionArgs) {
 Current date: ${new Date().toISOString().split("T")[0]}
 ### VALID FILTERS
 ${VALID_FILTERS.map(
-            (filter) =>
-              `name: "${filter.name}", type: "${filter.valueType
-              }", example: ${JSON.stringify(filter.example)}`
-          ).join(".")}`,
+  (filter) =>
+    `name: "${filter.name}", type: "${
+      filter.valueType
+    }", example: ${JSON.stringify(filter.example)}`
+).join(".")}`,
         },
         {
           role: "user",
@@ -165,7 +169,8 @@ ${VALID_FILTERS.map(
     const searchParams = new URLSearchParams();
     for (const [key, value] of Object.entries(validatedContent) as any) {
       if (value !== null && value !== undefined && String(value)?.length) {
-        if (key === "end" && !validatedContent?.start) searchParams.append("start", "1947-08-15");
+        if (key === "end" && !validatedContent?.start)
+          searchParams.append("start", "1947-08-15");
         searchParams.append(key, value.toString());
       }
     }
@@ -197,9 +202,9 @@ export default function EmployeesIndex() {
   const noFilters = Object.values(filterList).every((value) => !value);
 
   return (
-    <section className="py-6 px-4">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
+    <section className='p-4'>
+      <div className='w-full flex items-center justify-between pb-4'>
+        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4'>
           <Suspense fallback={<div>Loading...</div>}>
             <Await resolve={projectPromise}>
               {(projectData) => (
@@ -234,7 +239,12 @@ export default function EmployeesIndex() {
           {({ data, meta, error }) => {
             if (error) {
               clearCacheEntry(cacheKeyPrefix.employees);
-              return <ErrorBoundary error={error} message='Failed to load employees' />
+              return (
+                <ErrorBoundary
+                  error={error}
+                  message='Failed to load employees'
+                />
+              );
             }
 
             const hasNextPage = Boolean(meta?.count > pageSize);

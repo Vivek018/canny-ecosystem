@@ -83,13 +83,13 @@ export const EmployeeOptionsDropdown = ({
   return (
     <DropdownMenu>
       {triggerChild}
-      <DropdownMenuContent sideOffset={10} align="end">
+      <DropdownMenuContent sideOffset={10} align='end'>
         <DropdownMenuGroup>
           <DropdownMenuItem
             className={cn(
               employee.is_active && "hidden",
               !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
-              "hidden"
+                "hidden"
             )}
             onClick={handleMarkAsActive}
           >
@@ -99,7 +99,7 @@ export const EmployeeOptionsDropdown = ({
             className={cn(
               !employee.is_active && "hidden",
               !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
-              "hidden"
+                "hidden"
             )}
             onClick={handleMarkAsInactive}
           >
@@ -108,28 +108,22 @@ export const EmployeeOptionsDropdown = ({
           <DropdownMenuSeparator
             className={cn(
               !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
-              !hasPermission(role, `${deleteRole}:${attribute.employees}`) &&
-              "hidden"
+                !hasPermission(role, `${deleteRole}:${attribute.employees}`) &&
+                "hidden"
             )}
           />
           <EmployeeDialog employee={employee} env={env} />
-          <DropdownMenuSeparator
-            className={cn("hidden", hasPermission(role, `${deleteRole}:${attribute.employees}`) && "flex")}
-          />
           <DropdownMenuItem
             className={cn(
-              !employee.is_active && "hidden",
               !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
-              "hidden"
+                "hidden"
             )}
             onClick={handleExit}
           >
             Exit employee
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
           <DropdownMenuItem
             className={cn(
-              !employee.is_active && "hidden",
               !hasPermission(role, `${createRole}:${attribute.accidents}`) &&
                 "hidden"
             )}

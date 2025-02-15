@@ -9,19 +9,26 @@ import { useState, useEffect } from "react";
 import type { PayrollEmployeeData } from "@canny_ecosystem/utils";
 import { PayrollActions } from "./payroll-actions";
 
-export function PayrollComponent({ data, editable }: {
-  data: PayrollEmployeeData[],
-  editable: boolean
+export function PayrollComponent({
+  data,
+  editable,
+}: {
+  data: PayrollEmployeeData[];
+  editable: boolean;
 }) {
   const navigation = useNavigation();
-  const disable = navigation.state === "submitting" || navigation.state === "loading";
+  const disable =
+    navigation.state === "submitting" || navigation.state === "loading";
 
   // searching functionality
   const [searchString, setSearchString] = useState("");
   const [tableData, setTableData] = useState(data);
   useEffect(() => {
-    const filteredData = data?.filter((item: { [s: string]: unknown; } | ArrayLike<unknown>) =>
-      Object.values(item).some((value) => String(value).toLowerCase().includes(searchString.toLowerCase())),
+    const filteredData = data?.filter(
+      (item: { [s: string]: unknown } | ArrayLike<unknown>) =>
+        Object.values(item).some((value) =>
+          String(value).toLowerCase().includes(searchString.toLowerCase())
+        )
     );
     setTableData(filteredData);
   }, [searchString, data]);
@@ -34,46 +41,52 @@ export function PayrollComponent({ data, editable }: {
       {
         data: JSON.stringify({
           payrollId: data[0].payrollId,
-          siteId: data[0].site_id
+          siteId: data[0].site_id,
         }),
         returnTo: "/payroll/run-payroll/site/",
       },
       {
         method: "POST",
-        action: "/payroll/run-payroll/approve-payroll"
-      },
+        action: "/payroll/run-payroll/approve-payroll",
+      }
     );
-  }
+  };
 
   return (
-    <section className="m-4">
-      <div className="py-4">
-        <div className="w-full flex items-center justify-between pb-4">
-          <div className="w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4">
-            <div className="relative w-full">
-              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+    <section className='p-4'>
+      <div className='py-4'>
+        <div className='w-full flex items-center justify-between pb-4'>
+          <div className='w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4'>
+            <div className='relative w-full'>
+              <div className='absolute inset-y-0 left-3 flex items-center pointer-events-none'>
                 <Icon
-                  name="magnifying-glass"
-                  size="sm"
-                  className="text-gray-400"
+                  name='magnifying-glass'
+                  size='sm'
+                  className='text-gray-400'
                 />
               </div>
               <Input
-                placeholder="Search Users"
+                placeholder='Search Users'
                 value={searchString}
                 onChange={(e) => setSearchString(e.target.value)}
-                className="pl-8 h-10 w-full focus-visible:ring-0"
+                className='pl-8 h-10 w-full focus-visible:ring-0'
               />
             </div>
-            <PayrollActions payrollId={data[0].payrollId}/>
+            <PayrollActions payrollId={data[0].payrollId} />
             <div className={cn(editable ? "" : "hidden")}>
-              <Button onClick={(e) => approvePayroll(e)} disabled={disable}>Submit & Approve</Button>
+              <Button onClick={(e) => approvePayroll(e)} disabled={disable}>
+                Submit & Approve
+              </Button>
             </div>
           </div>
         </div>
-        <PayrollDataTable data={tableData ?? []} columns={payrollColumns} editable={editable} />
+        <PayrollDataTable
+          data={tableData ?? []}
+          columns={payrollColumns}
+          editable={editable}
+        />
       </div>
       <Outlet />
     </section>
   );
-};
+}
