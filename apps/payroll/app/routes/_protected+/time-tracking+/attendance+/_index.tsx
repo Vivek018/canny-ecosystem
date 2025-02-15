@@ -156,34 +156,26 @@ export default function Attendance() {
         return acc;
       }
 
-      // biome-ignore lint/complexity/noForEach: <explanation>
-      employee?.attendance?.forEach(
-        (record: {
-          date: string | number | Date;
-          present: any;
-          holiday: any;
-          holiday_type: string;
-        }) => {
-          const date = new Date(record.date);
-          const monthYear = `${date.getMonth()}-${date.getFullYear()}`;
-          const key = `${empCode}-${monthYear}`;
+      for (const record of employee?.attendance ?? []) {
+        const date = new Date(record.date);
+        const monthYear = `${date.getMonth()}-${date.getFullYear()}`;
+        const key = `${empCode}-${monthYear}`;
 
-          if (!acc[key]) {
-            acc[key] = { ...employeeDetails };
-          }
-
-          const fullDate = formatDate(date.toISOString().split("T")[0]);
-          acc[key][fullDate] = record.present
-            ? "P"
-            : record.holiday
-            ? record.holiday_type === "weekly"
-              ? "(WOF)"
-              : record.holiday_type === "paid"
-              ? "L"
-              : "A"
-            : "A";
+        if (!acc[key]) {
+          acc[key] = { ...employeeDetails };
         }
-      );
+
+        const fullDate = formatDate(date.toISOString().split("T")[0]);
+        acc[key][fullDate] = record.present
+          ? "P"
+          : record.holiday
+          ? record.holiday_type === "weekly"
+            ? "(WOF)"
+            : record.holiday_type === "paid"
+            ? "L"
+            : "A"
+          : "A";
+      }
 
       return acc;
     }, {});

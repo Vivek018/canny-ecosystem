@@ -34,7 +34,7 @@ export function AttendanceTable({
   noFilters,
   filters,
 }: DataTableProps) {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [_searchParams, setSearchParams] = useSearchParams();
   const [data, setData] =
     useState<TransformedAteendanceDataType[]>(initialData);
 
@@ -70,14 +70,14 @@ export function AttendanceTable({
   const tableLength = table.getRowModel().rows?.length;
 
   return (
-    <div className="relative mb-8">
+    <div className='relative mb-8'>
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
           !tableLength && "border-none"
         )}
       >
-        <div className="relative">
+        <div className='relative'>
           <Table>
             <AttendanceTableHeader
               table={table}
@@ -90,7 +90,7 @@ export function AttendanceTable({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    className="relative cursor-default select-text"
+                    className='relative cursor-default select-text'
                   >
                     {row.getVisibleCells().map((cell) => {
                       return (
@@ -119,10 +119,10 @@ export function AttendanceTable({
                 <TableRow className={cn(!tableLength && "border-none")}>
                   <TableCell
                     colSpan={columns.length}
-                    className="h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize"
+                    className='h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize'
                   >
-                    <div className="flex flex-col items-center gap-1">
-                      <h2 className="text-xl">No Attendance Found.</h2>
+                    <div className='flex flex-col items-center gap-1'>
+                      <h2 className='text-xl'>No Attendance Found.</h2>
                       <p
                         className={cn(
                           "text-muted-foreground",
@@ -132,7 +132,7 @@ export function AttendanceTable({
                         Try another search, or adjusting the filters
                       </p>
                       <Button
-                        variant="outline"
+                        variant='outline'
                         className={cn(
                           "mt-4",
                           !data?.length && noFilters && "hidden"
