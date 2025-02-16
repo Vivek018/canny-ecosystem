@@ -14,6 +14,10 @@ export async function getUsersCount({
     .from("users")
     .select("", { count: "exact", head: true });
 
+  if (error) {
+    console.error("getUsersCount Error", error);
+  }
+
   return { count, error };
 }
 
@@ -40,7 +44,7 @@ export async function getUsers({
     .returns<InferredType<UserDatabaseRow, (typeof columns)[number]>[]>();
 
   if (error) {
-    console.error(error);
+    console.error("getUsers Error", error);
   }
 
   return { data, error };
@@ -76,20 +80,20 @@ export async function getUserByEmail({
     .single<InferredType<UserDatabaseRow, (typeof columns)[number]>>();
 
   if (error) {
-    console.error(error);
+    console.error("getUserByEmail Error", error);
   }
 
-  // return { data, error };
-  return {
-    data: {
-      id: "1",
-      email: "demo@gmail.com",
-      first_name: "Demo",
-      last_name: "User",
-      role: "master",
-    },
-    error: null,
-  };
+  return { data, error };
+  // return {
+  //   data: {
+  //     id: "1",
+  //     email: "demo@gmail.com",
+  //     first_name: "Demo",
+  //     last_name: "User",
+  //     role: "master",
+  //   },
+  //   error: null,
+  // };
 }
 
 export async function getUsersByCompanyId({
@@ -120,7 +124,7 @@ export async function getUsersByCompanyId({
     .returns<InferredType<UserDatabaseRow, (typeof columns)[number]>[]>();
 
   if (error) {
-    console.error(error);
+    console.error("getUsersByCompanyId Error", error);
   }
 
   return { data, error };
@@ -144,7 +148,7 @@ export async function getUsersEmail({
     .returns<InferredType<UserDatabaseRow, (typeof columns)[number]>[]>();
 
   if (error) {
-    console.error(error);
+    console.error("getUsersEmail Error", error);
   }
 
   return { data, error };
@@ -180,20 +184,20 @@ export async function getUserById({
     .single<InferredType<UserDatabaseRow, (typeof columns)[number]>>();
 
   if (error) {
-    console.error(error);
+    console.error("getUserById Error", error);
   }
 
-  // return { data, error };
-  return {
-    data: {
-      id: "1",
-      email: "demo@gmail.com",
-      first_name: "Demo",
-      last_name: "User",
-      role: "master",
-    },
-    error: null,
-  };
+  return { data, error };
+  // return {
+  //   data: {
+  //     id: "1",
+  //     email: "demo@gmail.com",
+  //     first_name: "Demo",
+  //     last_name: "User",
+  //     role: "master",
+  //   },
+  //   error: null,
+  // };
 }
 
 export async function getUserIdsByUserEmails({
@@ -212,7 +216,7 @@ export async function getUserIdsByUserEmails({
     .returns<InferredType<UserDatabaseRow, (typeof columns)[number]>[]>();
 
   if (error) {
-    console.error(error);
+    console.error("getUserIdsByUserEmails Error", error);
   }
 
   return { data, error };

@@ -93,7 +93,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       env,
     });
   } catch (error) {
-    console.error("Error in loader function:", error);
+    console.error("Accidents Error in loader function:", error);
 
     return defer({
       accidentsPromise: Promise.resolve({ data: [] }),

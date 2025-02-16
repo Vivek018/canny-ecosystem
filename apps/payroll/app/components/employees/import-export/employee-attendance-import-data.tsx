@@ -47,12 +47,12 @@ export function EmployeeAttendanceImportData({
     try {
       const result = ImportEmployeeAttendanceDataSchema.safeParse({ data });
       if (!result.success) {
-        console.error("Data validation error");
+        console.error("Employee Attendance Data validation error");
         return false;
       }
       return true;
     } catch (error) {
-      console.error("Data validation error:", error);
+      console.error("Employee Attendance Data validation error:", error);
 
       return false;
     }
@@ -98,7 +98,7 @@ export function EmployeeAttendanceImportData({
 
       setConflictingIndex(conflictingIndices);
     } catch (err) {
-      console.error("Error fetching conflicts:", err);
+      console.error("Employee Attendance Error fetching conflicts:", err);
     }
   };
 
@@ -128,7 +128,7 @@ export function EmployeeAttendanceImportData({
       });
 
       if (error) {
-        console.error(error);
+        console.error("Employee Attendance", error);
       }
       if (
         status === "No new data to insert after filtering duplicates" ||

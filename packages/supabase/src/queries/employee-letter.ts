@@ -42,7 +42,7 @@ export async function getEmployeeLettersByEmployeeId({
     >();
 
   if (error) {
-    console.error("Error fetching employees:", error);
+    console.error("getEmployeeLettersByEmployeeId Error", error);
     return { data: null, error };
   }
 
@@ -83,7 +83,7 @@ export async function getEmployeeLetterById({
     >();
 
   if (error) {
-    console.error("Error fetching employee letter:", error);
+    console.error("getEmployeeLetterById Error", error);
     return { data: null, error };
   }
 
@@ -147,7 +147,7 @@ export async function getEmployeeLetterWithEmployeeById({
     .single<EmployeeWithLetterDataType>();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeLetterWithEmployeeById Error", error);
   }
 
   return { data, error };

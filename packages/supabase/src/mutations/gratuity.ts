@@ -31,7 +31,7 @@ export const createGratuity = async ({
     .single();
 
   if (error) {
-    console.error("error", error);
+    console.error("createGratuity Error", error);
   }
 
   return {
@@ -69,7 +69,7 @@ export const updateGratuity = async ({
     .single();
 
   if (error) {
-    console.error("error", error);
+    console.error("updateGratuity Error", error);
   }
 
   return {
@@ -103,7 +103,7 @@ export const deleteGratuity = async ({
     .eq("id", id);
 
   if (error) {
-    console.error(error);
+    console.error("deleteGratuity Error", error);
   }
 
   return {

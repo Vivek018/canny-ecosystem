@@ -73,7 +73,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   });
 
   if (error) {
-    console.error(error);
+    console.error("Attendance",error);
   }
   return { updatableData: data, employeeId, date, error };
 }

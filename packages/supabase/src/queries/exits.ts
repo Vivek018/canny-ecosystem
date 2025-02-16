@@ -136,47 +136,46 @@ export const getExits = async ({
     }
   }
 
-    
 
-    const dateFilters = [
-      {
-        field: "last_working_day",
-        start: last_working_day_start,
-        end: last_working_day_end,
-      },
-      {
-        field: "final_settlement_date",
-        start: final_settlement_date_start,
-        end: final_settlement_date_end,
-      },
-    ];
 
-    for (const { field, start, end } of dateFilters) {
-      if (start) query.gte(field, formatUTCDate(start));
-      if (end) query.lte(field, formatUTCDate(end));
-    }
+  const dateFilters = [
+    {
+      field: "last_working_day",
+      start: last_working_day_start,
+      end: last_working_day_end,
+    },
+    {
+      field: "final_settlement_date",
+      start: final_settlement_date_start,
+      end: final_settlement_date_end,
+    },
+  ];
 
-    if (reason) query.eq("reason", reason.toLowerCase());
+  for (const { field, start, end } of dateFilters) {
+    if (start) query.gte(field, formatUTCDate(start));
+    if (end) query.lte(field, formatUTCDate(end));
+  }
 
-    if (project) {
-      query.eq(
-        "employees.employee_project_assignment.project_sites.projects.name",
-        project,
-      );
-    }
-    if (project_site) {
-      query.eq(
-        "employees.employee_project_assignment.project_sites.name",
-        project_site,
-      );
-    }
-  
+  if (reason) query.eq("reason", reason.toLowerCase());
+
+  if (project) {
+    query.eq(
+      "employees.employee_project_assignment.project_sites.projects.name",
+      project,
+    );
+  }
+  if (project_site) {
+    query.eq(
+      "employees.employee_project_assignment.project_sites.name",
+      project_site,
+    );
+  }
+
 
   const { data, count, error } = await query.range(from, to);
 
   if (error) {
-    console.error(error);
-    return { data: null, meta: { count: 0 }, error };
+    console.error("getExits Error", error);
   }
 
   return { data, meta: { count: count ?? data?.length }, error };
@@ -211,7 +210,7 @@ export const getExitsById = async ({
     .eq("id", id)
     .single<InferredType<ExitsRow, (typeof columns)[number]>>();
 
-  if (error) console.error(error);
+  if (error) console.error("getExitsById Error", error);
 
   return { data, error };
 };
@@ -243,7 +242,7 @@ export const getExitsByCompanyId = async ({
     .maybeSingle<InferredType<ExitsRow, (typeof columns)[number]>>();
 
   if (error) {
-    console.error(error);
+    console.error("getExitsByCompanyId Error", error);
   }
 
   return { data, error };

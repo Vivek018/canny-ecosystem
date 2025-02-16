@@ -43,12 +43,12 @@ export function EmployeeDetailsImportData({
     try {
       const result = ImportEmployeeDetailsDataSchema.safeParse({ data });
       if (!result.success) {
-        console.error("Data validation error");
+        console.error("Employee Details Data validation error");
         return false;
       }
       return true;
     } catch (error) {
-      console.error("Data validation error:", error);
+      console.error("Employee Details Data validation error:", error);
 
       return false;
     }
@@ -67,7 +67,7 @@ export function EmployeeDetailsImportData({
 
       setConflictingIndex(conflictingIndices);
     } catch (err) {
-      console.error("Error fetching conflicts:", err);
+      console.error("Employee Details Error fetching conflicts:", err);
     }
   };
 
@@ -102,7 +102,7 @@ export function EmployeeDetailsImportData({
       });
 
       if (error) {
-        console.error(error);
+        console.error("Employee Details", error);
       }
 
       if (

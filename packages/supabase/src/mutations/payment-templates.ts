@@ -29,6 +29,7 @@ export async function createPaymentTemplateWithComponents({
   });
 
   if (error) {
+    console.error("createPaymentTemplateWithComponents Error", error)
     return {
       status,
       templateError: error,
@@ -100,7 +101,7 @@ export async function createPaymentTemplate({
     .single();
 
   if (error) {
-    console.error("payment_templates ", error);
+    console.error("createPaymentTemplate Error", error);
   }
 
   return { data: supabaseData, status, error };
@@ -129,7 +130,7 @@ export async function updatePaymentTemplateWithComponents({
   if (error) {
     return {
       status,
-      error: error,
+      error,
     };
   }
 
@@ -186,7 +187,7 @@ export async function updatePaymentTemplate({
     .select("id")
     .single();
 
-  if (error) console.error("error", error);
+  if (error) console.error("updatePaymentTemplate Error", error);
 
   return { data: supabaseData, status, error };
 }
@@ -213,7 +214,7 @@ export async function deletePaymentTemplate({
     .delete()
     .eq("id", id);
 
-  if (error) console.error(error);
+  if (error) console.error("deletePaymentTemplate Error", error);
 
   return { status, error };
 }
@@ -294,7 +295,7 @@ export async function createMultiPaymentTemplateComponents({
     .insert(dataArray);
 
   if (error) {
-    console.error("payment_template_components ", error);
+    console.error("createMultiPaymentTemplateComponents Error", error);
   }
 
   return {
@@ -334,7 +335,7 @@ export async function updateMultiPaymentTemplateComponents({
       ignoreDuplicates: false,
     });
 
-  if (error) console.error("error", error);
+  if (error) console.error("updateMultiPaymentTemplateComponents Error", error);
 
   return { status, error };
 }

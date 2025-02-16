@@ -104,7 +104,7 @@ export default function EmployeeGuardiansImportFieldMapping() {
           setHeaderArray(headers);
         },
         error: (error) => {
-          console.error("Header parsing error:", error);
+          console.error("Employee Guardians Header parsing error:", error);
           setErrors((prev) => ({ ...prev, parsing: "Error parsing headers" }));
         },
       });
@@ -153,7 +153,7 @@ export default function EmployeeGuardiansImportFieldMapping() {
       setValidationErrors([]);
       return true;
     } catch (error) {
-      console.error("Validation error:", error);
+      console.error("Employee Guardians Validation error:", error);
       setValidationErrors(["An unexpected error occurred during validation"]);
       return false;
     }
@@ -171,7 +171,7 @@ export default function EmployeeGuardiansImportFieldMapping() {
       }
       return true;
     } catch (error) {
-      console.error("Data validation error:", error);
+      console.error("Employee Guardians Data validation error:", error);
       setValidationErrors([
         "An unexpected error occurred during data validation",
       ]);
@@ -249,7 +249,7 @@ export default function EmployeeGuardiansImportFieldMapping() {
           }
         },
         error: (error) => {
-          console.error("Data parsing error:", error);
+          console.error("Employee Guardians Data parsing error:", error);
           setErrors((prev) => ({
             ...prev,
             parsing: "Error parsing file data",
@@ -260,14 +260,14 @@ export default function EmployeeGuardiansImportFieldMapping() {
   };
 
   return (
-    <section className="py-4 ">
+    <section className='py-4 '>
       {loadNext ? (
         <EmployeeGuardiansImportData
           conflictingIndices={hasConflict}
           env={env}
         />
       ) : (
-        <Card className="m-4 px-40">
+        <Card className='m-4 px-40'>
           <CardHeader>
             <CardTitle>Map Fields</CardTitle>
             <CardDescription>
@@ -276,15 +276,15 @@ export default function EmployeeGuardiansImportFieldMapping() {
           </CardHeader>
           <CardContent>
             {validationErrors.length > 0 && (
-              <div className="mb-4 p-4 border border-red-200 bg-red-50 rounded">
-                <h4 className="text-red-700 font-medium mb-2">
+              <div className='mb-4 p-4 border border-red-200 bg-red-50 rounded'>
+                <h4 className='text-red-700 font-medium mb-2'>
                   Validation Errors:
                 </h4>
-                <ul className="grid grid-cols-3 gap-y-1">
+                <ul className='grid grid-cols-3 gap-y-1'>
                   {validationErrors.map((error, index) => (
                     <li
                       key={error.toString() + index.toString()}
-                      className="text-red-600 text-sm"
+                      className='text-red-600 text-sm'
                     >
                       {error}
                     </li>
@@ -293,11 +293,11 @@ export default function EmployeeGuardiansImportFieldMapping() {
               </div>
             )}
 
-            <div className="grid grid-cols-2 place-content-center justify-between gap-y-8 gap-x-10 mt-5">
+            <div className='grid grid-cols-2 place-content-center justify-between gap-y-8 gap-x-10 mt-5'>
               {FIELD_CONFIGS.map((field) => (
-                <div key={field.key} className="flex flex-col">
-                  <div className="flex flex-row gap-1 pb-1">
-                    <label className="text-sm text-muted-foreground capitalize">
+                <div key={field.key} className='flex flex-col'>
+                  <div className='flex flex-row gap-1 pb-1'>
+                    <label className='text-sm text-muted-foreground capitalize'>
                       {replaceUnderscore(field.key)}
                     </label>
                     <sub
@@ -338,13 +338,13 @@ export default function EmployeeGuardiansImportFieldMapping() {
 
               <div />
             </div>
-            <div className="flex flex-col items-end gap-2">
+            <div className='flex flex-col items-end gap-2'>
               {errors.general && (
-                <span className="text-red-500 text-sm">{errors.general}</span>
+                <span className='text-red-500 text-sm'>{errors.general}</span>
               )}
               <Button
-                className="w-24"
-                variant="default"
+                className='w-24'
+                variant='default'
                 onClick={handleParsedData}
               >
                 Submit

@@ -1,5 +1,4 @@
 import { convertToNull } from "@canny_ecosystem/utils";
-
 import type {
   ProfessionalTaxDatabaseInsert,
   ProfessionalTaxDatabaseUpdate,
@@ -15,7 +14,6 @@ export async function createProfessionalTax({
   data: ProfessionalTaxDatabaseInsert;
   bypassAuth?: boolean;
 }) {
-  
   if (!bypassAuth) {
     const {
       data: { user },
@@ -33,7 +31,7 @@ export async function createProfessionalTax({
     .single();
 
   if (error) {
-    console.error(error);
+    console.error("createProfessionalTax Error:", error);
   }
 
   return { status, error };
@@ -68,7 +66,7 @@ export async function updateProfessionalTax({
     .single();
 
   if (error) {
-    console.error("error", error);
+    console.error("updateProfessionalTax Error:", error);
   }
 
   return { status, error };
@@ -99,7 +97,7 @@ export async function deleteProfessionalTax({
     .eq("id", id);
 
   if (error) {
-    console.error(error);
+    console.error("deleteProfessionalTax Error:", error);
   }
 
   return { status, error };

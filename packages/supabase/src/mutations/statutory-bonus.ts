@@ -31,7 +31,7 @@ export async function createStatutoryBonus({
   } = await supabase.from("statutory_bonus").insert(data).select().single();
 
   if (error) {
-    console.error("error", error);
+    console.error("createStatutoryBonus Error:", error);
   }
 
   return {
@@ -70,7 +70,7 @@ export async function updateStatutoryBonus({
     .single();
 
   if (error) {
-    console.error("error", error);
+    console.error("updateStatutoryBonus Error:", error);
   }
 
   return {
@@ -104,7 +104,7 @@ export async function deleteStatutoryBonus({
     .eq("id", id);
 
   if (error) {
-    console.error(error);
+    console.error("deleteStatutoryBonus Error:", error);
   }
 
   return { status, error };

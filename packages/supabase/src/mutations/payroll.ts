@@ -15,7 +15,7 @@ export async function createPayroll({
     error,
   } = await supabase.from("payroll").insert(data).select().single();
 
-  if (error) console.error(error);
+  if (error) console.error("createPayroll Error", error);
 
   return { data: payrollData, status, error };
 }
@@ -33,7 +33,7 @@ export async function createPayrollEntry({
     error,
   } = await supabase.from("payroll_entries").insert(data).select().single();
 
-  if (error) console.error(error);
+  if (error) console.error("createPayrollEntry Error", error);
 
   return { data: payrollEntryData, status, error };
 }
@@ -46,7 +46,7 @@ export async function updatePayrollEntryByEmployeeIdAndPayrollIdAndPaymentTempla
   paymentTemplateComponentId,
 }: {
   supabase: TypedSupabaseClient;
-  data:any;
+  data: any;
   employeeId: string;
   payrollId: string;
   paymentTemplateComponentId: string;
@@ -62,7 +62,7 @@ export async function updatePayrollEntryByEmployeeIdAndPayrollIdAndPaymentTempla
     .select()
     .single();
 
-  if (error) console.error("error", error);
+  if (error) console.error("updatePayrollEntryByEmployeeIdAndPayrollIdAndPaymentTemplateComponentId Error", error);
 
   return { status, error };
 }
@@ -81,7 +81,7 @@ export async function approvePayrollById({
     .select()
     .single();
 
-  if (error) console.error("error", error);
+  if (error) console.error("approvePayrollById Error", error);
 
   return { status, error };
 }

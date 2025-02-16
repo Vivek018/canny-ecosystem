@@ -46,12 +46,12 @@ export function EmployeeStatutoryImportData({
     try {
       const result = ImportEmployeeStatutoryDataSchema.safeParse({ data });
       if (!result.success) {
-        console.error("Data validation error");
+        console.error("Employee Statutory Data validation error");
         return false;
       }
       return true;
     } catch (error) {
-      console.error("Data validation error:", error);
+      console.error("Employee Statutory Data validation error:", error);
 
       return false;
     }
@@ -98,7 +98,7 @@ export function EmployeeStatutoryImportData({
 
       setConflictingIndex(conflictingIndices);
     } catch (err) {
-      console.error("Error fetching conflicts:", err);
+      console.error("Employee Statutory Error fetching conflicts:", err);
     }
   };
 
@@ -128,7 +128,7 @@ export function EmployeeStatutoryImportData({
       });
 
       if (error) {
-        console.error(error);
+        console.error("Employee Statutory", error);
       }
       if (
         status === "No new data to insert after filtering duplicates" ||

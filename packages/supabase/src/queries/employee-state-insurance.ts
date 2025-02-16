@@ -43,7 +43,7 @@ export const getEmployeeStateInsuranceById = async ({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeStateInsuranceById Error", error);
   }
 
   return { data, error };
@@ -74,7 +74,7 @@ export const getEmployeeStateInsuranceByESINumber = async ({
       InferredType<EmployeeStateInsuranceDatabaseRow, (typeof columns)[number]>
     >();
 
-  if (error) console.error(error);
+  if (error) console.error("getEmployeeStateInsuranceByESINumber Error", error);
 
   return { data, error };
 };
@@ -110,7 +110,7 @@ export const getEmployeeStateInsuranceByCompanyId = async ({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeStateInsuranceByCompanyId Error", error);
   }
 
   return { data, error };

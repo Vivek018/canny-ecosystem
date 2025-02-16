@@ -25,12 +25,12 @@ export function ExitImportData({ env }: { env: SupabaseEnv }) {
     try {
       const result = ImportExitDataSchema.safeParse({ data });
       if (!result.success) {
-        console.error("Data validation error");
+        console.error("Exit Data validation error");
         return false;
       }
       return true;
     } catch (error) {
-      console.error("Data validation error:", error);
+      console.error("Exit Data validation error:", error);
       return false;
     }
   };

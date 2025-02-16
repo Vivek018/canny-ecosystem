@@ -98,7 +98,7 @@ export default function EmployeeBankDetailsImportFieldMapping() {
           setHeaderArray(headers);
         },
         error: (error) => {
-          console.error("Header parsing error:", error);
+          console.error("Employee Bank Header parsing error:", error);
           setErrors((prev) => ({ ...prev, parsing: "Error parsing headers" }));
         },
       });
@@ -147,7 +147,7 @@ export default function EmployeeBankDetailsImportFieldMapping() {
       setValidationErrors([]);
       return true;
     } catch (error) {
-      console.error("Validation error:", error);
+      console.error("Employee Bank Validation error:", error);
       setValidationErrors(["An unexpected error occurred during validation"]);
       return false;
     }
@@ -165,7 +165,7 @@ export default function EmployeeBankDetailsImportFieldMapping() {
       }
       return true;
     } catch (error) {
-      console.error("Data validation error:", error);
+      console.error("Employee Bank Data validation error:", error);
       setValidationErrors([
         "An unexpected error occurred during data validation",
       ]);
@@ -269,7 +269,7 @@ export default function EmployeeBankDetailsImportFieldMapping() {
           }
         },
         error: (error) => {
-          console.error("Data parsing error:", error);
+          console.error("Employee Bank Data parsing error:", error);
           setErrors((prev) => ({
             ...prev,
             parsing: "Error parsing file data",

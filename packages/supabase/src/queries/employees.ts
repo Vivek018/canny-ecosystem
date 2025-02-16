@@ -92,7 +92,7 @@ export async function getEmployeesCountByCompanyId({
     .eq("company_id", companyId);
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeesCountByCompanyId Error", error);
   }
 
   return { count, error };
@@ -224,14 +224,13 @@ export async function getEmployeesByCompanyId({
   const { data, count, error } = await query.range(from, to);
 
   if (error) {
-    console.error("Error fetching employees:", error);
-    return { data: null, error };
+    console.error("getEmployeesByCompanyId Error", error);
   }
 
   return {
     data,
     meta: { count: count ?? data?.length },
-    error: null,
+    error,
   };
 }
 
@@ -262,7 +261,7 @@ export async function getEmployeesByPositionAndProjectSiteId({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeesByPositionAndProjectSiteId Error", error);
   }
 
   return {
@@ -286,7 +285,7 @@ export async function getEmployeeIdsByEmployeeCodes({
     .returns<InferredType<EmployeeDatabaseRow, (typeof columns)[number]>[]>();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeIdsByEmployeeCodes Error", error);
   }
 
   return { data, error };
@@ -313,7 +312,7 @@ export async function getEmployeeIdsByProjectSiteId({
       >[]
     >();
 
-  if (error) console.error(error);
+  if (error) console.error("getEmployeeIdsByProjectSiteId Error", error);
 
   return { data, error };
 }
@@ -350,7 +349,7 @@ export async function getEmployeeById({
     .single<InferredType<EmployeeDatabaseRow, (typeof columns)[number]>>();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeById Error", error);
   }
 
   return { data, error };
@@ -388,7 +387,7 @@ export async function getEmployeeStatutoryDetailsById({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeStatutoryDetailsById Error", error);
   }
 
   return { data, error };
@@ -420,7 +419,7 @@ export async function getEmployeeBankDetailsById({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeBankDetailsById Error", error);
   }
 
   return { data, error };
@@ -458,7 +457,7 @@ export async function getEmployeeAddressesByEmployeeId({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeAddressesByEmployeeId Error", error);
   }
 
   return { data, error };
@@ -499,7 +498,7 @@ export async function getDefaultEmployeeAddressesByEmployeeId({
     > | null>();
 
   if (error) {
-    console.error(error);
+    console.error("getDefaultEmployeeAddressesByEmployeeId Error", error);
   }
 
   return { data, error };
@@ -538,7 +537,7 @@ export async function getEmployeeGuardiansByEmployeeId({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeGuardiansByEmployeeId Error", error);
   }
 
   return { data, error };
@@ -574,7 +573,7 @@ export async function getEmployeeAddressById({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeAddressById Error", error);
   }
 
   return { data, error };
@@ -611,7 +610,7 @@ export async function getEmployeeGuardianById({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeGuardianById Error", error);
   }
 
   return { data, error };
@@ -642,7 +641,7 @@ export async function getEmployeeSkillsByEmployeeId({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeSkillsByEmployeeId Error", error);
   }
 
   return { data, error };
@@ -670,7 +669,7 @@ export async function getEmployeeSkillById({
     .single<InferredType<EmployeeSkillDatabaseRow, (typeof columns)[number]>>();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeSkillById Error", error);
   }
 
   return { data, error };
@@ -704,7 +703,7 @@ export async function getEmployeeWorkHistoriesByEmployeeId({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeWorkHistoriesByEmployeeId Error", error);
   }
 
   return { data, error };
@@ -736,7 +735,7 @@ export async function getEmployeeWorkHistoryById({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeWorkHistoryById Error", error);
   }
 
   return { data, error };
@@ -749,7 +748,7 @@ export async function getEmployeeWorkHistoryByEmployeeIdAndCompanyName({
 }: {
   supabase: TypedSupabaseClient;
   employeeId: string;
-  companyName:string;
+  companyName: string;
 }) {
   const columns = [
     "id",
@@ -765,12 +764,12 @@ export async function getEmployeeWorkHistoryByEmployeeIdAndCompanyName({
     .from("employee_work_history")
     .select(columns.join(","))
     .eq("employee_id", employeeId)
-    .eq("company_name",companyName)
+    .eq("company_name", companyName)
     .single<
       InferredType<EmployeeWorkHistoryDatabaseRow, (typeof columns)[number]>
     >();
 
-  if (error) console.error(error);
+  if (error) console.error("getEmployeeWorkHistoryByEmployeeIdAndCompanyName Error",error);
 
   return { data, error };
 }
@@ -814,7 +813,7 @@ export async function getEmployeeProjectAssignmentByEmployeeId({
     .maybeSingle<EmployeeProjectAssignmentDataType>();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeProjectAssignmentByEmployeeId Error",error);
   }
 
   return { data, error };
@@ -964,7 +963,7 @@ export async function getEmployeesReportByCompanyId({
     .returns<EmployeeReportDataType[]>();
 
   if (error) {
-    console.error("Error fetching employees:", error);
+    console.error("getEmployeesReportByCompanyId Error", error);
     return { data: null, error };
   }
 

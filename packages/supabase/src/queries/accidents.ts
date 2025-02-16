@@ -138,7 +138,7 @@ export async function getAccidentsByCompanyId({
 
   const { data, count, error } = await query.range(from, to);
   if (error) {
-    console.error(error);
+    console.error("getAccidentsByCompanyId Error", error);
   }
 
   return { data, meta: { count: count ?? data?.length }, error };
@@ -174,7 +174,7 @@ export async function getAccidentsById({
     .single<InferredType<AccidentsDatabaseRow, (typeof columns)[number]>>();
 
   if (error) {
-    console.error(error);
+    console.error("getAccidentsById Error", error);
   }
 
   return { data, error };

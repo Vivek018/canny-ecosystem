@@ -29,7 +29,7 @@ export async function createPaymentTemplateAssignment({
     .select()
     .single();
 
-  if (error) console.error(error);
+  if (error) console.error("createPaymentTemplateAssignment Error", error);
 
   return { status, error };
 }
@@ -62,7 +62,7 @@ export async function updatePaymentTemplateAssignment({
     .select()
     .single();
 
-  if (error) console.error("error", error);
+  if (error) console.error("updatePaymentTemplateAssignment Error", error);
 
   return { status, error };
 }
@@ -89,7 +89,7 @@ export async function deletePaymentTemplateAssignment({
     .delete()
     .eq("id", id);
 
-  if (error) console.error(error);
+  if (error) console.error("deletePaymentTemplateAssignment Error", error);
 
   return { status, error };
 }

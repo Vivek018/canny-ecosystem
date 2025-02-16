@@ -47,12 +47,12 @@ export function EmployeeGuardiansImportData({
     try {
       const result = ImportEmployeeGuardiansDataSchema.safeParse({ data });
       if (!result.success) {
-        console.error("Data validation error");
+        console.error("Employee Guardians Data validation error");
         return false;
       }
       return true;
     } catch (error) {
-      console.error("Data validation error:", error);
+      console.error("Employee Guardians Data validation error:", error);
 
       return false;
     }
@@ -99,7 +99,7 @@ export function EmployeeGuardiansImportData({
 
       setConflictingIndex(conflictingIndices);
     } catch (err) {
-      console.error("Error fetching conflicts:", err);
+      console.error("Employee Guardians Error fetching conflicts:", err);
     }
   };
 
@@ -129,7 +129,7 @@ export function EmployeeGuardiansImportData({
       });
 
       if (error) {
-        console.error(error);
+        console.error("Employee Guardians", error);
       }
       if (
         status === "No new data to insert" ||

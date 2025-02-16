@@ -110,7 +110,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       env,
     });
   } catch (error) {
-    console.error("Error in loader function:", error);
+    console.error("Employees Error in loader function:", error);
 
     return defer({
       employeesPromise: Promise.resolve({ data: [] }),
@@ -179,7 +179,7 @@ ${VALID_FILTERS.map(
 
     return redirect(url.toString());
   } catch (error) {
-    console.error("Error in action function:", error);
+    console.error("Employees Error in action function:", error);
 
     const fallbackUrl = new URL(request.url);
     fallbackUrl.search = "";

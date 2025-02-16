@@ -21,7 +21,7 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { useEffect } from "react";
 import { clearCacheEntry } from "@/utils/cache";
 import RegisterAccident from "./$employeeId.create-accident";
-import { updateAccidentsById } from "@canny_ecosystem/supabase/mutations";
+import { updateAccidentById } from "@canny_ecosystem/supabase/mutations";
 import { getAccidentsById } from "@canny_ecosystem/supabase/queries";
 import type { AccidentsDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 
@@ -68,10 +68,9 @@ export async function action({
       { status: submission.status === "error" ? 400 : 200 }
     );
   }
-  const data = [submission.value];
+  const data = { ...submission.value, id: submission.value.id ?? accidentId };
 
-  const { status, error } = await updateAccidentsById({
-    accidentId: accidentId!,
+  const { status, error } = await updateAccidentById({
     supabase,
     data,
   });

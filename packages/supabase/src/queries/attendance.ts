@@ -142,7 +142,7 @@ export async function getAttendanceByEmployeeId({
 
   const { data, error } = await query;
   if (error) {
-    console.error(error);
+    console.error("getAttendanceByEmployeeId Error", error);
   }
 
   return { data, error };
@@ -175,7 +175,7 @@ export async function getAttendanceByEmployeeIdAndDate({
     .single<
       InferredType<EmployeeAttendanceDatabaseRow, (typeof columns)[number]>
     >();
-  if (error) console.error(error);
+  if (error) console.error("getAttendanceByEmployeeIdAndDate Error", error);
 
   return { data, error };
 }
@@ -239,11 +239,9 @@ export async function getAttendanceByCompanyId({
     .select(
       `
       ${columns.join(",")},
-      employee_project_assignment!employee_project_assignments_employee_id_fkey!${
-        project ? "inner" : "left"
+      employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
       }(
-        project_sites!${project ? "inner" : "left"}(id, name, projects!${
-        project ? "inner" : "left"
+        project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
       }(id, name))),
       attendance(
         id,
@@ -343,7 +341,7 @@ export async function getAttendanceByCompanyId({
 
   const { data, error } = await query.range(from, to);
   if (error) {
-    console.error(error);
+    console.error("getAttendanceByCompanyId Error", error);
   }
 
   return { data, error };

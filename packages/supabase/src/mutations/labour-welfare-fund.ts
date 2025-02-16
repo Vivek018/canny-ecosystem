@@ -28,7 +28,7 @@ export async function createLabourWelfareFund({
     .select()
     .single();
 
-  if (error) console.error(error);
+  if (error) console.error("createLabourWelfareFund Error", error);
 
   return { status, error };
 }
@@ -59,7 +59,7 @@ export async function updateLabourWelfareFund({
     .select()
     .single();
 
-  if (error) console.error("error", error);
+  if (error) console.error("updateLabourWelfareFund Error", error);
 
   return { status, error };
 }
@@ -86,7 +86,7 @@ export async function deleteLabourWelfareFund({
     .delete()
     .eq("id", id);
 
-  if (error) console.error(error);
+  if (error) console.error("deleteLabourWelfareFund Error", error);
 
   return { status, error };
 }

@@ -35,7 +35,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   });
 
   if (companiesError) {
-    console.error("companiesError", companiesError);
+    console.error("Protected Companies", companiesError);
   }
 
   return json({

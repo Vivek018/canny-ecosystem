@@ -21,7 +21,7 @@ export async function getCompanies({
     .returns<InferredType<CompanyDatabaseRow, (typeof columns)[number]>[]>();
 
   if (error) {
-    console.error(error);
+    console.error("getCompanies Error", error);
   }
 
   return { data, error };
@@ -40,7 +40,7 @@ export async function getFirstCompany({
     .single<InferredType<CompanyDatabaseRow, (typeof columns)[number]>>();
 
   if (error) {
-    console.error(error);
+    console.error("getFirstCompany Error", error);
   }
 
   return { data, error };
@@ -66,7 +66,7 @@ export async function getCompanyById({
     .single<InferredType<CompanyDatabaseRow, (typeof columns)[number]>>();
 
   if (error) {
-    console.error(error);
+    console.error("getCompanyById Error", error);
   }
 
   return { data, error };
@@ -97,7 +97,7 @@ export async function getCompanyRegistrationDetailsByCompanyId({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getCompanyRegistrationDetailsByCompanyId Error", error);
   }
 
   return { data, error };
@@ -113,7 +113,7 @@ export async function getLocationsCountByCompanyId({
     .eq("company_id", companyId);
 
   if (error) {
-    console.error(error);
+    console.error("getLocationsCountByCompanyId Error", error);
   }
 
   return { count, error };
@@ -135,7 +135,7 @@ export async function getLocationsForSelectByCompanyId({
     .returns<InferredType<LocationDatabaseRow, (typeof columns)[number]>[]>();
 
   if (error) {
-    console.error(error);
+    console.error("getLocationsForSelectByCompanyId Error", error);
   }
 
   return { data, error };
@@ -167,15 +167,11 @@ export async function getLocationsByCompanyId({
     .order("created_at", { ascending: false })
     .returns<InferredType<LocationDatabaseRow, (typeof columns)[number]>[]>();
 
-  let supabaseError = null;
   if (error) {
-    console.error(error);
-    supabaseError = error;
-  } else if (!data?.length) {
-    supabaseError = { message: "No locations found" };
+    console.error("getLocationsByCompanyId Error", error);
   }
 
-  return { data, error: supabaseError };
+  return { data, error };
 }
 
 export async function getLocationById({
@@ -203,7 +199,7 @@ export async function getLocationById({
     .single<InferredType<LocationDatabaseRow, (typeof columns)[number]>>();
 
   if (error) {
-    console.error(error);
+    console.error("getLocationById Error", error);
   }
 
   return { data, error };
@@ -237,7 +233,7 @@ export async function getPrimaryLocationByCompanyId({
     .single<InferredType<LocationDatabaseRow, (typeof columns)[number]>>();
 
   if (error) {
-    console.error(error);
+    console.error("getPrimaryLocationByCompanyId Error", error);
   }
 
   return { data, error };
@@ -275,7 +271,7 @@ export async function getRelationshipsByCompanyId({
     .returns<Omit<RelationshipWithCompany, "created_at" | "updated_at">[]>();
 
   if (error) {
-    console.error(error);
+    console.error("getRelationshipsByCompanyId Error", error);
   }
 
   return { data, error };
@@ -307,7 +303,7 @@ export async function getRelationshipById({
     .single<Omit<RelationshipWithCompany, "created_at" | "updated_at">>();
 
   if (error) {
-    console.error(error);
+    console.error("getRelationshipById Error", error);
   }
 
   return { data, error };
@@ -331,7 +327,7 @@ export async function getRelationshipIdByParentIdAndChildId({
     .eq("child_company_id", childCompanyId)
     .single<Omit<RelationshipWithCompany, "created_at" | "updated_at">>();
 
-  if (error) console.error(error);
+  if (error) console.error("getRelationshipIdByParentIdAndChildId Error", error);
 
   return { data, error };
 }
@@ -350,7 +346,7 @@ export async function getRelationshipTermsById({
     .single<InferredType<RelationshipDatabaseRow, (typeof columns)[number]>>();
 
   if (error) {
-    console.error(error);
+    console.error("getRelationshipTermsById Error", error);
   }
 
   return { data, error };

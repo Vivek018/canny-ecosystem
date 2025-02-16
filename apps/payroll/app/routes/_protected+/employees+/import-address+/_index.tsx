@@ -102,7 +102,7 @@ export default function EmployeeAddressImportFieldMapping() {
           setHeaderArray(headers);
         },
         error: (error) => {
-          console.error("Header parsing error:", error);
+          console.error("Address Header parsing error:", error);
           setErrors((prev) => ({ ...prev, parsing: "Error parsing headers" }));
         },
       });
@@ -151,7 +151,7 @@ export default function EmployeeAddressImportFieldMapping() {
       setValidationErrors([]);
       return true;
     } catch (error) {
-      console.error("Validation error:", error);
+      console.error("Address Validation error:", error);
       setValidationErrors(["An unexpected error occurred during validation"]);
       return false;
     }
@@ -169,7 +169,7 @@ export default function EmployeeAddressImportFieldMapping() {
       }
       return true;
     } catch (error) {
-      console.error("Data validation error:", error);
+      console.error("Address Data validation error:", error);
       setValidationErrors([
         "An unexpected error occurred during data validation",
       ]);
@@ -237,7 +237,7 @@ export default function EmployeeAddressImportFieldMapping() {
           }
         },
         error: (error) => {
-          console.error("Data parsing error:", error);
+          console.error("Address Data parsing error:", error);
           setErrors((prev) => ({
             ...prev,
             parsing: "Error parsing file data",

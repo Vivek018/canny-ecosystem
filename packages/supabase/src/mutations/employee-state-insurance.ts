@@ -35,7 +35,7 @@ export async function createEmployeeStateInsurance({
     .single();
 
   if (error) {
-    console.error("error", error);
+    console.error("createEmployeeStateInsurance Error", error);
   }
 
   return {
@@ -74,7 +74,7 @@ export async function updateEmployeeStateInsurance({
     .single();
 
   if (error) {
-    console.error("error", error);
+    console.error("updateEmployeeStateInsurance Error", error);
   }
 
   return {
@@ -83,7 +83,7 @@ export async function updateEmployeeStateInsurance({
   };
 }
 
-export async function deleteStateInsurence({
+export async function deleteEmployeeStateInsurance({
   supabase,
   id,
   bypassAuth = false,
@@ -110,7 +110,7 @@ export async function deleteStateInsurence({
     .single();
 
   if (error) {
-    console.error(error);
+    console.error("deleteEmployeeStateInsurance Error", error);
   }
 
   return { status, error };

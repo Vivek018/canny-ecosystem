@@ -41,12 +41,12 @@ export function ReimbursementImportData({
       const result = ImportReimbursementDataSchema.safeParse({ data });
 
       if (!result.success) {
-        console.error("Data validation error");
+        console.error("Reimbursement Data validation error");
         return false;
       }
       return true;
     } catch (error) {
-      console.error("Data validation error:", error);
+      console.error("Reimbursement Data validation error:", error);
       return false;
     }
   };
@@ -103,7 +103,7 @@ export function ReimbursementImportData({
         data: updatedData as ReimbursementInsert[],
         supabase,
       });
-      if (error) console.error("ERROR=================>", error);
+      if (error) console.error("Reimbursement", error);
       if (isGoodStatus(status)) navigate("/approvals/reimbursements");
     }
   };

@@ -88,7 +88,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       env,
     });
   } catch (error) {
-    console.error("Error in loader function:", error);
+    console.error("Reimbursement Error in loader function:", error);
 
     return defer({
       reimbursementsPromise: Promise.resolve({ data: [] }),

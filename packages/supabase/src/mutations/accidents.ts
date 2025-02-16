@@ -1,3 +1,4 @@
+import { convertToNull } from "@canny_ecosystem/utils";
 import type {
   AccidentsDatabaseInsert,
   AccidentsDatabaseUpdate,
@@ -30,29 +31,41 @@ export async function createAccident({
     .single();
 
   if (error) {
-    console.error(error);
+    console.error("createAccident error:", error);
   }
 
   return { status, error };
 }
 
-export async function updateAccidentsById({
-  accidentId,
+export async function updateAccidentById({
   supabase,
   data,
+  bypassAuth = false
 }: {
-  accidentId: string;
   supabase: TypedSupabaseClient;
-  data: AccidentsDatabaseUpdate[];
+  data: AccidentsDatabaseUpdate;
+  bypassAuth?: boolean;
 }) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
+  const updateData = convertToNull(data);
+
   const { error, status } = await supabase
     .from("accidents")
-    .update(data)
-    .eq("id", accidentId ?? "")
+    .update(updateData)
+    .eq("id", data.id!)
     .single();
 
   if (error) {
-    console.error(error);
+    console.error("updateAccidentById error:", error);
   }
 
   return { error, status };
@@ -71,13 +84,8 @@ export async function deleteAccidentById({
     .eq("id", id);
 
   if (error) {
-    console.error("Error deleting user:", error);
-    return { status, error };
+    console.error("deleteAccidentById error:", error);
   }
 
-  if (status < 200 || status >= 300) {
-    console.error("Unexpected Supabase status:", status);
-  }
-
-  return { status, error: null };
+  return { status, error };
 }

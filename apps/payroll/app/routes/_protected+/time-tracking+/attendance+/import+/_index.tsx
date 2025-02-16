@@ -82,7 +82,7 @@ export default function EmployeeAttendanceImportFieldMapping() {
       }
       return true;
     } catch (error) {
-      console.error("Data validation error:", error);
+      console.error("Attendance Data validation error:", error);
       setValidationErrors([
         "An unexpected error occurred during data validation",
       ]);
@@ -287,7 +287,7 @@ export default function EmployeeAttendanceImportFieldMapping() {
           }
         },
         error: (error) => {
-          console.error("Data parsing error:", error);
+          console.error("Attendance Data parsing error:", error);
           setErrors((prev) => ({
             ...prev,
             parsing: "Error parsing file data",
@@ -298,14 +298,14 @@ export default function EmployeeAttendanceImportFieldMapping() {
   };
 
   return (
-    <section className="py-4 ">
+    <section className='py-4 '>
       {loadNext ? (
         <EmployeeAttendanceImportData
           conflictingIndices={hasConflict}
           env={env}
         />
       ) : (
-        <Card className="m-4 mx-auto w-1/3 flex flex-col items-center">
+        <Card className='m-4 mx-auto w-1/3 flex flex-col items-center'>
           <CardHeader>
             <CardTitle>Attendance Import Format</CardTitle>
             <CardDescription>
@@ -328,8 +328,8 @@ export default function EmployeeAttendanceImportFieldMapping() {
 
             {formatType === "custom(normal)" && (
               <div
-                className="grid mt-10
- grid-cols-2 place-content-center justify-between gap-3"
+                className='grid mt-10
+ grid-cols-2 place-content-center justify-between gap-3'
               >
                 <Field
                   inputProps={{
@@ -352,8 +352,8 @@ export default function EmployeeAttendanceImportFieldMapping() {
             {formatType === "custom(shift)" && (
               <>
                 <div
-                  className="grid mt-10
-grid-cols-2 place-content-center gap-3"
+                  className='grid mt-10
+grid-cols-2 place-content-center gap-3'
                 >
                   <Field
                     inputProps={{
@@ -373,8 +373,8 @@ grid-cols-2 place-content-center gap-3"
                   />
                 </div>
                 <div
-                  className="grid mt-4
-grid-cols-2 place-content-center justify-between gap-3"
+                  className='grid mt-4
+grid-cols-2 place-content-center justify-between gap-3'
                 >
                   <Field
                     inputProps={{
@@ -398,10 +398,10 @@ grid-cols-2 place-content-center justify-between gap-3"
           </CardContent>
           <CardFooter>
             <div
-              className="grid
-grid-cols-1 gap-2"
+              className='grid
+grid-cols-1 gap-2'
             >
-              <span className="text-red-500 text-sm">
+              <span className='text-red-500 text-sm'>
                 {errors.errors}
                 {validationErrors[0]}
               </span>

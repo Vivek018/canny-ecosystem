@@ -46,7 +46,7 @@ export async function getPaymentFieldById({
     .single<PaymentFieldDataType>();
 
   if (error) {
-    console.error(error);
+    console.error("getPaymentFieldById Error", error);
   }
 
   return { data, error };
@@ -72,7 +72,7 @@ export async function getPaymentFieldNamesByCompanyId({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getPaymentFieldNamesByCompanyId Error", error);
   }
 
   return {
@@ -110,7 +110,7 @@ export async function getPaymentFieldsByCompanyId({
     .returns<PaymentFieldDataType[]>();
 
   if (error) {
-    console.error(error);
+    console.error("getPaymentFieldsByCompanyId Error", error);
   }
 
   return {

@@ -1,6 +1,5 @@
 import { convertToNull } from "@canny_ecosystem/utils";
 import type { ExitsInsert, ExitsUpdate, TypedSupabaseClient } from "../types";
-import type { ImportExitDataType } from "../queries";
 
 export const createExit = async ({
   supabase,
@@ -28,7 +27,7 @@ export const createExit = async ({
     .single();
 
   if (error) {
-    console.error("error", error);
+    console.error("createExit Error:", error);
   }
 
   return {
@@ -62,7 +61,9 @@ export const updateExit = async ({
     .select()
     .single();
 
-  if (error) console.error("error", error);
+  if (error) {
+    console.error("updateExit Error:", error);
+  }
 
   return { status, error };
 };
@@ -89,7 +90,7 @@ export const deleteExit = async ({
   const { error, status } = await supabase.from("exits").delete().eq("id", id);
 
   if (error) {
-    console.error(error);
+    console.error("deleteExit Error:", error);
   }
 
   return {
@@ -143,7 +144,7 @@ export const deleteExit = async ({
 //   const { data: conflictingRecords, error } = await query;
 
 //   if (error) {
-//     console.error("Error fetching conflicts:", error);
+//     console.error("getExitsConflicts Error:", error);
 //     return { conflictingIndices: [], error };
 //   }
 
@@ -177,7 +178,9 @@ export async function createExitsFromImportedData({
 }) {
   const { error, status } = await supabase.from("exits").insert(data).select();
 
-  if (error) console.error(error);
+  if (error) {
+    console.error("createExitsFromImportedData Error:", error);
+  }
 
   return { status, error };
 }

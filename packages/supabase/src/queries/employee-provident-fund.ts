@@ -37,7 +37,7 @@ export const getEmployeeProvidentFundById = async ({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeProvidentFundById Error", error);
   }
 
   return { data, error };
@@ -72,7 +72,7 @@ export const getEmployeeProvidentFundByEPFNumber = async ({
     .eq("epf_number", epfNumber)
     .single<InferredType<EmployeeProvidentFundDatabaseRow, (typeof columns)[number]>>();
 
-  if (error) console.error(error);
+  if (error) console.error("getEmployeeProvidentFundByEPFNumber Error", error);
 
   return { data, error };
 };
@@ -113,7 +113,7 @@ export const getEmployeeProvidentFundByCompanyId = async ({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeProvidentFundByCompanyId Error", error);
   }
 
   return { data, error };

@@ -31,7 +31,7 @@ export async function createEmployeeLetter({
     .single();
 
   if (error) {
-    console.error(error);
+    console.error("createEmployeeLetter Error", error);
   }
 
   return { status, error };
@@ -66,7 +66,7 @@ export async function updateEmployeeLetter({
     .single();
 
   if (error) {
-    console.error("error", error);
+    console.error("updateEmployeeLetter Error", error);
   }
 
   return { status, error };
@@ -97,7 +97,7 @@ export async function deleteEmployeeLetter({
     .eq("id", id);
 
   if (error) {
-    console.error(error);
+    console.error("deleteEmployeeLetter Error", error);
   }
 
   return { status, error };

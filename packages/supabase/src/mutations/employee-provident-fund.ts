@@ -31,7 +31,7 @@ export const createEmployeeProvidentFund = async ({
     .single();
 
   if (error) {
-    console.error("error", error);
+    console.error("createEmployeeProvidentFund Error", error);
   }
 
   return {
@@ -69,7 +69,7 @@ export const updateEmployeeProvidentFund = async ({
     .single();
 
   if (error) {
-    console.error("error", error);
+    console.error("updateEmployeeProvidentFund Error", error);
   }
 
   return {
@@ -103,7 +103,7 @@ export const deleteEmployeeProvidentFund = async ({
     .eq("id", id);
 
   if (error) {
-    console.error(error);
+    console.error("deleteEmployeeProvidentFund Error", error);
   }
 
   return {

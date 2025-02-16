@@ -17,15 +17,14 @@ export async function deleteAttendanceByDate({
     .eq("date", date);
 
   if (error) {
-    console.error("Error deleting user:", error);
-    return { status, error };
+    console.error("deleteAttendanceByDate Error", error);
   }
 
   if (status < 200 || status >= 300) {
     console.error("Unexpected Supabase status:", status);
   }
 
-  return { status, error: null };
+  return { status, error };
 }
 
 export async function updateOrAddAttendance({
@@ -47,14 +46,15 @@ export async function updateOrAddAttendance({
       .single();
 
     if (error) {
-      console.error(error);
+      console.error("updateOrAddAttendance Error", error);
     }
+
     return { error, status };
   }
 
   const { error, status } = await supabase
     .from("attendance")
-    .insert(data as any);
+    .insert(data as EmployeeAttendanceDatabaseInsert);
 
   if (error) {
     console.error(error);
@@ -135,7 +135,7 @@ export async function createEmployeeAttendanceFromImportedData({
 
   const existingSet = new Set(
     existingRecords?.map((record) => `${record.employee_id}-${record.date}`) ||
-      []
+    []
   );
 
   if (import_type === "skip") {

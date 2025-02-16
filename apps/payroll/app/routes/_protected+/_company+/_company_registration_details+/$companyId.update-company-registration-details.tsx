@@ -40,7 +40,7 @@ export async function action({ request }: ActionFunctionArgs) {
   });
 
   if (error) {
-    console.error(error);
+    console.error("Company", error);
     return safeRedirect("/settings", { status: 303 });
   }
 

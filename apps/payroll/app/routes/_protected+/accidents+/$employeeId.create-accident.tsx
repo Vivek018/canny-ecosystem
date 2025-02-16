@@ -150,7 +150,7 @@ export default function CreateAccident({
     ? UPDATE_ACCIDENTS_TAG
     : CREATE_ACCIDENTS_TAG;
 
-  const initialValues: any =
+  const initialValues =
     updateValues ?? getInitialValueFromZod(AccidentSchema);
 
   const [form, fields] = useForm({
@@ -181,6 +181,9 @@ export default function CreateAccident({
               </CardDescription>
             </CardHeader>
             <CardContent>
+              <input
+                {...getInputProps(fields.id, { type: "hidden" })}
+              />
               <input
                 {...getInputProps(fields.employee_id, { type: "hidden" })}
               />

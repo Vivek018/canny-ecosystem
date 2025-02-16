@@ -36,12 +36,12 @@ export function EmployeeAddressImportData({ env }: { env: SupabaseEnv }) {
     try {
       const result = ImportEmployeeAddressDataSchema.safeParse({ data });
       if (!result.success) {
-        console.error("Data validation error");
+        console.error("Employee Address Data validation error");
         return false;
       }
       return true;
     } catch (error) {
-      console.error("Data validation error:", error);
+      console.error("Employee Address Data validation error:", error);
 
       return false;
     }
@@ -93,7 +93,7 @@ export function EmployeeAddressImportData({ env }: { env: SupabaseEnv }) {
       });
 
       if (error) {
-        console.error(error);
+        console.error("Employee Address",error);
       }
       if (isGoodStatus(status)) {
         navigate("/employees");

@@ -141,7 +141,7 @@ export async function getReimbursementsByCompanyId({
     query.eq("status", status.toLowerCase());
   }
   if (is_deductible) {
-    query.eq("is_deductible", is_deductible.toLowerCase());
+    query.eq("is_deductible", Boolean(is_deductible));
   }
   if (users) {
     query.eq("users.email", users);
@@ -162,7 +162,7 @@ export async function getReimbursementsByCompanyId({
 
   const { data, count, error } = await query.range(from, to);
   if (error) {
-    console.error(error);
+    console.error("getReimbursementsByCompanyId Error", error);
   }
 
   return { data, meta: { count: count ?? data?.length }, error };
@@ -193,7 +193,7 @@ export async function getReimbursementsById({
     .single<InferredType<ReimbursementRow, (typeof columns)[number]>>();
 
   if (error) {
-    console.error(error);
+    console.error("getReimbursementsById Error", error);
   }
 
   return { data, error };
@@ -281,7 +281,7 @@ export async function getReimbursementsByEmployeeId({
       query.eq("status", status.toLowerCase());
     }
     if (is_deductible) {
-      query.eq("is_deductible", is_deductible.toLowerCase());
+      query.eq("is_deductible", Boolean(is_deductible));
     }
     if (users) {
       query.eq("users.email", users);
@@ -289,7 +289,7 @@ export async function getReimbursementsByEmployeeId({
   }
   const { data, count, error } = await query.range(from, to);
   if (error) {
-    console.error(error);
+    console.error("getReimbursementsByEmployeeId Error", error);
   }
 
   return { data, meta: { count: count ?? data?.length }, error };

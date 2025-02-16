@@ -73,7 +73,7 @@ export async function getPayrollWithSiteBySiteId({
     .order("run_date", { ascending: true })
     .returns<InferredType<PayrollDatabaseRow, (typeof columns)[number]>[]>();
 
-  if (error) console.error(error);
+  if (error) console.error("getPayrollWithSiteBySiteId Error", error);
 
   return { data, error };
 }
@@ -103,7 +103,7 @@ export async function getEarliestPayrollBySiteId({
     .order("created_at", { ascending: true })
     .single<InferredType<PayrollDatabaseRow, (typeof columns)[number]>>();
 
-  if (error) console.error(error);
+  if (error) console.error("getEarliestPayrollBySiteId Error", error);
 
   return { data, error };
 }
@@ -128,7 +128,7 @@ export async function getPayrollEntriesByPayrollId({
     .select(columns.join(","))
     .eq("payroll_id", payrollId);
 
-  if (error) console.error(error);
+  if (error) console.error("getPayrollEntriesByPayrollId Error", error);
 
   return { data, error };
 }
@@ -148,8 +148,8 @@ export async function getUniqueEmployeeIdsByPayrollId({
       ...result,
       data: result.data ? [...new Set(result.data.map(item => item.employee_id))] : null
     }));
-  
-  if (error) console.error(error);
+
+  if (error) console.error("getUniqueEmployeeIdsByPayrollId Error", error);
   return { data, error };
 }
 
@@ -165,7 +165,7 @@ export async function getPendingPayrollCountBySiteId({
     .select("id", { count: "exact" })
     .eq("site_id", siteId);
 
-  if (error) console.error(error);
+  if (error) console.error("getPendingPayrollCountBySiteId Error", error);
 
   return { data: data?.length, error };
 }
@@ -202,7 +202,7 @@ export async function getPayrollEntriesWithTemplateComponentsByPayrollId({
       >[]
     >();
 
-  if (error) console.error(error);
+  if (error) console.error("getPayrollEntriesWithTemplateComponentsByPayrollId Error", error);
 
   return { data, error };
 }
@@ -222,10 +222,10 @@ export async function getPaymentTemplateComponentIdsByPayrollIdAndEmployeeId({
     .from("payroll_entries")
     .select(columns.join(","))
     .eq("payroll_id", payrollId)
-    .eq("employee_id",employeeId)
+    .eq("employee_id", employeeId)
     .returns<PayrollEntriesDatabaseRow[]>();
 
-  if (error) console.error(error);
+  if (error) console.error("getPaymentTemplateComponentIdsByPayrollIdAndEmployeeId Error", error);
 
   return { data, error };
 }
@@ -254,7 +254,7 @@ export async function getPayrollsBySiteId({
     .order("created_at", { ascending: false })
     .returns<PayrollDatabaseRow[]>();
 
-  if (error) console.error(error);
+  if (error) console.error("getPayrollsBySiteId Error", error);
 
   return { data, error };
 }
@@ -281,7 +281,7 @@ export async function getPayrollById({
     .eq("id", payrollId)
     .single<InferredType<PayrollDatabaseRow, (typeof columns)[number]>>();
 
-  if (error) console.error(error);
+  if (error) console.error("getPayrollById Error", error);
 
   return { data, error };
 }
@@ -311,7 +311,7 @@ export async function getPayrollEntryAmountByEmployeeIdAndPayrollIdAndPaymentTem
       InferredType<PayrollEntriesDatabaseRow, (typeof columns)[number]>
     >();
 
-  if (error) console.error(error);
+  if (error) console.error("getPayrollEntryAmountByEmployeeIdAndPayrollIdAndPaymentTemplateComponentId Error", error);
 
   return { data, error };
 }
@@ -335,7 +335,7 @@ export async function getPaymentTemplateComponentIdsAndAmountByPayrollIdAndEmplo
     .order("created_at", { ascending: false })
     .returns<PayrollEntriesDatabaseRow[]>();
 
-  if (error) console.error(error);
+  if (error) console.error("getPaymentTemplateComponentIdsAndAmountByPayrollIdAndEmployeeId Error", error);
 
   return { data, error };
 }

@@ -34,7 +34,7 @@ export const getStatutoryBonusById = async ({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getStatutoryBonusById Error", error);
   }
 
   return { data, error };
@@ -67,7 +67,7 @@ export const getStatutoryBonusByCompanyId = async ({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getStatutoryBonusByCompanyId Error", error);
   }
 
   return { data, error };

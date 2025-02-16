@@ -112,7 +112,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       env,
     });
   } catch (error) {
-    console.error("Error in loader function:", error);
+    console.error("Report Error in loader function:", error);
     return defer({
       reportPromise: Promise.resolve({ data: [], meta: { count: 0 } }),
       paymentFieldPromise: Promise.resolve({ data: null, error: null }),
@@ -151,7 +151,7 @@ export async function action({ request }: ActionFunctionArgs) {
     url.search = searchParams.toString();
     return redirect(url.toString());
   } catch (error) {
-    console.error("Error in action function:", error);
+    console.error("Report Error in action function:", error);
     const fallbackUrl = new URL(request.url);
     fallbackUrl.search = "";
     return redirect(fallbackUrl.toString());

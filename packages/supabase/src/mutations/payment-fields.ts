@@ -32,7 +32,7 @@ export async function createPaymentField({
     .single();
 
   if (error) {
-    console.error(error);
+    console.error("createPaymentField Error", error);
   }
 
   return { status, error };
@@ -67,7 +67,7 @@ export async function updatePaymentField({
     .single();
 
   if (error) {
-    console.error("error", error);
+    console.error("updatePaymentField Error", error);
   }
 
   return { status, error };
@@ -98,7 +98,7 @@ export async function deletePaymentField({
     .eq("id", id);
 
   if (error) {
-    console.error(error);
+    console.error("deletePaymentField Error", error);
   }
 
   return { status, error };

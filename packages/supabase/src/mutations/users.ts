@@ -19,7 +19,7 @@ export async function createUserById({
     .single();
 
   if (error) {
-    console.error(error);
+    console.error("createUserById Error:", error);
   }
 
   return { status, error };
@@ -53,7 +53,7 @@ export async function updateUserLastLogin({
     .single();
 
   if (error) {
-    console.error(error);
+    console.error("updateUserLastLogin Error:", error);
   }
 
   return { data, error, status };
@@ -86,7 +86,7 @@ export async function updateUserById({
     .single();
 
   if (error) {
-    console.error(error);
+    console.error("updateUserById Error:", error);
   }
 
   return { error, status };
@@ -119,7 +119,7 @@ export async function updateSameUserByEmail({
     .single();
 
   if (error) {
-    console.error(error);
+    console.error("updateSameUserByEmail Error:", error);
   }
 
   return { error, status };
@@ -135,12 +135,12 @@ export async function deleteUserById({
   const { error, status } = await supabase.from("users").delete().eq("id", id);
 
   if (error) {
-    console.error("Error deleting user:", error);
+    console.error("deleteUserById Error:", error);
     return { status, error };
   }
 
   if (status < 200 || status >= 300) {
-    console.error("Unexpected Supabase status:", status);
+    console.error("deleteUserById Unexpected Supabase status:", status);
   }
 
   return { status, error: null };

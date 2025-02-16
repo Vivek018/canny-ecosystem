@@ -37,7 +37,7 @@ export async function getPaymentTemplatesByCompanyId({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getPaymentTemplatesByCompanyId Error", error);
   }
 
   return { data, error };
@@ -70,7 +70,7 @@ export async function getPaymentTemplateById({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getPaymentTemplateById Error", error);
   }
 
   return { data, error };
@@ -107,7 +107,7 @@ export async function getPaymentTemplateComponentsByTemplateId({
     .returns<PaymentTemplateComponentType[]>();
 
   if (error) {
-    console.error(error);
+    console.error("getPaymentTemplateComponentsByTemplateId Error", error);
   }
 
   return { data, error };
@@ -143,7 +143,7 @@ export async function getPaymentTemplateComponentById({
       InferredType<PaymentTemplateComponentType, (typeof columns)[number]>
     >();
 
-  if (error) console.error(error);
+  if (error) console.error("getPaymentTemplateComponentById Error", error);
 
   return { data, error };
 }
@@ -199,7 +199,7 @@ export async function getPaymentTemplateByEmployeeId({
       >
     >();
 
-  if (error) console.error(error);
+  if (error) console.error("getPaymentTemplateByEmployeeId Error", error);
 
   return { data, error };
 }
@@ -221,7 +221,7 @@ export async function getPaymentTemplateBySiteId({
       >
     >();
 
-  if (error) console.error(error);
+  if (error) console.error("getPaymentTemplateBySiteId Error", error);
 
   return { data, error };
 }
@@ -241,7 +241,7 @@ export async function getDefaultTemplateIdByCompanyId({
       InferredType<PaymentTemplateDatabaseRow, (typeof columns)[number]>
     >();
 
-  if (error) console.error(error);
+  if (error) console.error("getDefaultTemplateIdByCompanyId Error", error);
 
   return { data, error };
 }

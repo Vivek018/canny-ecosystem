@@ -1,7 +1,5 @@
 import { convertToNull } from "@canny_ecosystem/utils";
 import type {
-  GratuityDatabaseInsert,
-  GratuityDatabaseUpdate,
   LeaveEncashmentDatabaseInsert,
   LeaveEncashmentDatabaseUpdate,
   TypedSupabaseClient,
@@ -33,7 +31,7 @@ export const createLeaveEncashment = async ({
     .single();
 
   if (error) {
-    console.error("error", error);
+    console.error("createLeaveEncashment Error", error);
   }
 
   return {
@@ -71,7 +69,7 @@ export const updateLeaveEncashment = async ({
     .single();
 
   if (error) {
-    console.error("error", error);
+    console.error("updateLeaveEncashment Error", error);
   }
 
   return {
@@ -105,7 +103,7 @@ export const deleteLeaveEncashment = async ({
     .eq("id", id);
 
   if (error) {
-    console.error(error);
+    console.error("deleteLeaveEncashment Error", error);
   }
 
   return {

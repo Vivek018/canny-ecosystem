@@ -65,7 +65,7 @@ export async function createEmployee({
     .single();
 
   if (error) {
-    console.error("employee ", error);
+    console.error("createEmployee Error:", error);
     return {
       data,
       status,
@@ -183,7 +183,7 @@ export async function updateEmployee({
     .single();
 
   if (error) {
-    console.error("error", error);
+    console.error("updateEmployee Error:", error);
   }
 
   return { status, error };
@@ -214,7 +214,7 @@ export async function deleteEmployee({
     .eq("id", id);
 
   if (error) {
-    console.error(error);
+    console.error("deleteEmployee Error:", error);
   }
 
   return { status, error };
@@ -245,7 +245,7 @@ export async function createEmployeeStatutoryDetails({
     .single();
 
   if (error) {
-    console.error("employee_statutory_details_error", error);
+    console.error("createEmployeeStatutoryDetails Error:", error);
   }
 
   return { error, status };
@@ -276,7 +276,7 @@ export async function createEmployeeBankDetails({
     .single();
 
   if (error) {
-    console.error("employee_bank_details_error", error);
+    console.error("createEmployeeBankDetails Error:", error);
   }
 
   return { error, status };
@@ -307,7 +307,7 @@ export async function createEmployeeAddresses({
     .single();
 
   if (error) {
-    console.error("employee_addresses_error", error);
+    console.error("createEmployeeAddresses Error:", error);
   }
 
   return { error, status };
@@ -338,7 +338,7 @@ export async function createEmployeeGuardians({
     .single();
 
   if (error) {
-    console.error("employee_guardians_error", error);
+    console.error("createEmployeeGuardians Error:", error);
   }
 
   return { error, status };
@@ -373,7 +373,7 @@ export async function updateEmployeeStatutoryDetails({
     .single();
 
   if (error) {
-    console.error("error", error);
+    console.error("updateEmployeeStatutoryDetails Error:", error);
   }
 
   return { status, error };
@@ -408,7 +408,7 @@ export async function updateEmployeeBankDetails({
     .single();
 
   if (error) {
-    console.error("error", error);
+    console.error("updateEmployeeBankDetails Error:", error);
   }
 
   return { status, error };
@@ -443,7 +443,7 @@ export async function updateEmployeeAddress({
     .single();
 
   if (error) {
-    console.error("error", error);
+    console.error("updateEmployeeAddress Error:", error);
   }
 
   return { status, error };
@@ -474,7 +474,7 @@ export async function deleteEmployeeAddress({
     .eq("id", id);
 
   if (error) {
-    console.error(error);
+    console.error("deleteEmployeeAddress Error:", error);
   }
 
   return { status, error };
@@ -509,7 +509,7 @@ export async function updateEmployeeGuardian({
     .single();
 
   if (error) {
-    console.error("error", error);
+    console.error("updateEmployeeGuardian Error:", error);
   }
 
   return { status, error };
@@ -540,7 +540,7 @@ export async function deleteEmployeeGuardian({
     .eq("id", id);
 
   if (error) {
-    console.error(error);
+    console.error("deleteEmployeeGuardian Error:", error);
   }
 
   return { status, error };
@@ -571,7 +571,7 @@ export async function createEmployeeSkill({
     .single();
 
   if (error) {
-    console.error("employee_skills_error", error);
+    console.error("createEmployeeSkill Error:", error);
   }
 
   return { error, status };
@@ -606,7 +606,7 @@ export async function updateEmployeeSkill({
     .single();
 
   if (error) {
-    console.error("error", error);
+    console.error("updateEmployeeSkill Error:", error);
   }
 
   return { status, error };
@@ -637,7 +637,7 @@ export async function deleteEmployeeSkill({
     .eq("id", id);
 
   if (error) {
-    console.error(error);
+    console.error("deleteEmployeeSkill Error:", error);
   }
 
   return { status, error };
@@ -668,7 +668,7 @@ export async function createEmployeeWorkHistory({
     .single();
 
   if (error) {
-    console.error("employee_works_history_error", error);
+    console.error("createEmployeeWorkHistory Error:", error);
   }
 
   return { error, status };
@@ -703,7 +703,7 @@ export async function updateEmployeeWorkHistory({
     .single();
 
   if (error) {
-    console.error("error", error);
+    console.error("updateEmployeeWorkHistory Error:", error);
   }
 
   return { status, error };
@@ -734,7 +734,7 @@ export async function deleteEmployeeWorkHistory({
     .eq("id", id);
 
   if (error) {
-    console.error(error);
+    console.error("deleteEmployeeWorkHistory Error:", error);
   }
 
   return { status, error };
@@ -765,7 +765,7 @@ export async function createEmployeeProjectAssignment({
     .single();
 
   if (error) {
-    console.error("employee_project_assignments_error", error);
+    console.error("createEmployeeProjectAssignment Error:", error);
   }
 
   return { error, status };
@@ -800,7 +800,7 @@ export async function updateEmployeeProjectAssignment({
     .single();
 
   if (error) {
-    console.error("error", error);
+    console.error("updateEmployeeProjectAssignment Error:", error);
   }
 
   return { status, error };

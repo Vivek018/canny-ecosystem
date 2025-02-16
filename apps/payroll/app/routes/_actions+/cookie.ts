@@ -35,7 +35,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
     return safeRedirect(formData.get("returnTo"), { headers });
   } catch (error) {
-    console.error(error);
+    console.error("Cookie", error);
     return safeRedirect(DEFAULT_ROUTE, { status: 500 });
   }
 }

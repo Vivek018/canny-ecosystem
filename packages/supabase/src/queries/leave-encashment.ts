@@ -36,7 +36,7 @@ export async function getLeaveEncashmentByCompanyId({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getLeaveEncashmentByCompanyId Error", error);
   }
 
   return { data, error };
@@ -71,7 +71,7 @@ export const getLeaveEncashmentById = async ({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getLeaveEncashmentById Error", error);
   }
 
   return { data, error };

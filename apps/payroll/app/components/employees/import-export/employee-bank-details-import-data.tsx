@@ -47,12 +47,12 @@ export function EmployeeBankDetailsImportData({
     try {
       const result = ImportEmployeeBankDetailsDataSchema.safeParse({ data });
       if (!result.success) {
-        console.error("Data validation error");
+        console.error("Employee Bank Data validation error");
         return false;
       }
       return true;
     } catch (error) {
-      console.error("Data validation error:", error);
+      console.error("Employee Bank Data validation error:", error);
 
       return false;
     }
@@ -98,7 +98,7 @@ export function EmployeeBankDetailsImportData({
 
       setConflictingIndex(conflictingIndices);
     } catch (err) {
-      console.error("Error fetching conflicts:", err);
+      console.error("Employee Bank Error fetching conflicts:", err);
     }
   };
 
@@ -130,7 +130,7 @@ export function EmployeeBankDetailsImportData({
       );
 
       if (error) {
-        console.error(error);
+        console.error("Employee Bank ", error);
       }
       if (
         status === "No new data to insert after filtering duplicates" ||

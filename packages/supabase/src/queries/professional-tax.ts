@@ -32,7 +32,7 @@ export async function getProfessionalTaxesByCompanyId({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getProfessionalTaxesByCompanyId Error", error);
   }
 
   return { data, error };
@@ -68,7 +68,7 @@ export async function getProfessionalTaxByStateAndCompanyId({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getProfessionalTaxByStateAndCompanyId Error", error);
   }
 
   return { data, error };
@@ -99,7 +99,7 @@ export async function getProfessionalTaxById({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getProfessionalTaxById Error", error);
   }
 
   return { data, error };

@@ -11,7 +11,7 @@ export * from "./labour-welfare-fund";
 export * from "./statutory-bonus";
 export * from "./payment-template-assignments";
 export * from "./payment-templates";
-export * from "./employee-attendance";
+export * from "./attendance";
 export * from "./reimbursements";
 export * from "./payroll";
 export * from "./reimbursements";
