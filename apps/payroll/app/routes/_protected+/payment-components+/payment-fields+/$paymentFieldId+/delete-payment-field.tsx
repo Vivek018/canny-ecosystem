@@ -47,7 +47,7 @@ export async function action({
         message: "Payment Field delete failed",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -56,7 +56,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -73,7 +73,7 @@ export default function DeletePaymentField() {
       if (actionData?.status === "success") {
         clearExactCacheEntry(cacheKeyPrefix.payment_fields);
         clearCacheEntry(
-          `${cacheKeyPrefix.payment_field_report}${paymentFieldId}`
+          `${cacheKeyPrefix.payment_field_report}${paymentFieldId}`,
         );
         toast({
           title: "Success",

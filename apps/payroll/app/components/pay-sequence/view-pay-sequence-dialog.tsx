@@ -31,27 +31,27 @@ export const ViewPaySequenceDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent className='max-w-max'>
-      <DialogHeader className='mb-4'>
-        <DialogTitle>Pay Sequence Details</DialogTitle>
-      </DialogHeader>
-        <div className='flex flex-col gap-6'>
-          <div className='flex items-center gap-2'>
-            <Label className='font-bold'>Pay Day:</Label>
-            <p className='text-base'>
+      <DialogContent className="max-w-max">
+        <DialogHeader className="mb-4">
+          <DialogTitle>Pay Sequence Details</DialogTitle>
+        </DialogHeader>
+        <div className="flex flex-col gap-6">
+          <div className="flex items-center gap-2">
+            <Label className="font-bold">Pay Day:</Label>
+            <p className="text-base">
               {getOrdinalSuffix(values.pay_day)} of every month
             </p>
           </div>
-          <div className='flex items-center gap-2'>
-            <Label className='font-bold'>Pay Frequency:</Label>
-            <p className='capitalize'>{values.pay_frequency}</p>
+          <div className="flex items-center gap-2">
+            <Label className="font-bold">Pay Frequency:</Label>
+            <p className="capitalize">{values.pay_frequency}</p>
           </div>
-          <div className='flex items-center gap-2'>
-            <Label className='w-max font-bold'>Working Days:</Label>
+          <div className="flex items-center gap-2">
+            <Label className="w-max font-bold">Working Days:</Label>
             <ToggleGroup
-              type='multiple'
-              variant='outline'
-              className='flex gap-2'
+              type="multiple"
+              variant="outline"
+              className="flex gap-2"
               disabled={true}
             >
               {workingDaysOptions.map(({ label, value }) => (
@@ -60,7 +60,7 @@ export const ViewPaySequenceDialog = ({
                   className={cn(
                     "flex items-center space-x-2 disabled:opacity-100",
                     values.working_days.includes(Number.parseInt(value)) &&
-                      "bg-secondary"
+                      "bg-secondary",
                   )}
                 >
                   {label}

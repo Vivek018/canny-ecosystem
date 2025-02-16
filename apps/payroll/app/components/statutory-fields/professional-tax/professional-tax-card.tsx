@@ -53,11 +53,11 @@ const DetailItem: React.FC<DetailItemProps> = ({ label, value, formatter }) => {
   const formattedValue = value ? (formatter ? formatter(value) : value) : "--";
 
   return (
-    <div className='flex flex-row items-center gap-4 text-base'>
-      <h3 className='text-muted-foreground tracking-wide capitalize w-40 truncate'>
+    <div className="flex flex-row items-center gap-4 text-base">
+      <h3 className="text-muted-foreground tracking-wide capitalize w-40 truncate">
         {label}
       </h3>
-      <p className='w-44 truncate'>{formattedValue}</p>
+      <p className="w-44 truncate">{formattedValue}</p>
     </div>
   );
 };
@@ -72,34 +72,34 @@ export function ProfessionalTaxCard({
 }) {
   const { role } = useUser();
   const grossSalaryRangeJson = JSON.parse(
-    String(professionalTax?.gross_salary_range) ?? ""
+    String(professionalTax?.gross_salary_range) ?? "",
   ) as ProfessionalTaxGrossSalaryRangeType;
 
   return (
     <Card
       key={professionalTax.id}
-      className='w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start'
+      className="w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start"
     >
-      <CardHeader className='flex flex-row space-y-0 items-center justify-between p-4'>
-        <CardTitle className='text-lg tracking-wide'>
+      <CardHeader className="flex flex-row space-y-0 items-center justify-between p-4">
+        <CardTitle className="text-lg tracking-wide">
           {replaceUnderscore(professionalTax.state)}
         </CardTitle>
-        <div className='flex items-center gap-3'>
+        <div className="flex items-center gap-3">
           <TooltipProvider>
             <Tooltip delayDuration={100}>
               <TooltipTrigger asChild>
                 <Link
-                  prefetch='intent'
+                  prefetch="intent"
                   to={`${professionalTax.id}/update-professional-tax`}
                   className={cn(
                     "p-2 rounded-md bg-secondary grid place-items-center",
                     !hasPermission(
                       `${role}`,
-                      `${updateRole}:${attribute.statutoryFieldsPf}`
-                    ) && "hidden"
+                      `${updateRole}:${attribute.statutoryFieldsPf}`,
+                    ) && "hidden",
                   )}
                 >
-                  <Icon name='edit' size='xs' />
+                  <Icon name="edit" size="xs" />
                 </Link>
               </TooltipTrigger>
               <TooltipContent>Edit</TooltipContent>
@@ -111,13 +111,13 @@ export function ProfessionalTaxCard({
                 "p-2 py-2 rounded-md bg-secondary grid place-items-center",
                 !hasPermission(
                   `${role}`,
-                  `${deleteRole}:${attribute.statutoryFieldsPf}`
-                ) && "hidden"
+                  `${deleteRole}:${attribute.statutoryFieldsPf}`,
+                ) && "hidden",
               )}
             >
-              <Icon name='dots-vertical' size='xs' />
+              <Icon name="dots-vertical" size="xs" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent sideOffset={10} align='end'>
+            <DropdownMenuContent sideOffset={10} align="end">
               <DropdownMenuGroup>
                 <DeleteProfessionalTax professionalTaxId={professionalTax.id} />
               </DropdownMenuGroup>
@@ -125,42 +125,42 @@ export function ProfessionalTaxCard({
           </DropdownMenu>
         </div>
       </CardHeader>
-      <CardContent className='flex flex-col gap-4 py-2 pb-4 px-4'>
-        <DetailItem label='PT Number' value={professionalTax.pt_number} />
+      <CardContent className="flex flex-col gap-4 py-2 pb-4 px-4">
+        <DetailItem label="PT Number" value={professionalTax.pt_number} />
         <DetailItem
-          label='Deduction Cycle'
+          label="Deduction Cycle"
           value={professionalTax.deduction_cycle}
         />
-        <div className='flex flex-row items-center gap-4 text-base'>
-          <h3 className='text-muted-foreground tracking-wide capitalize w-40 truncate'>
+        <div className="flex flex-row items-center gap-4 text-base">
+          <h3 className="text-muted-foreground tracking-wide capitalize w-40 truncate">
             Gross Salary Range
           </h3>
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant='link' className='h-min py-0 px-0'>
+              <Button variant="link" className="h-min py-0 px-0">
                 View Salary Range
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogTitle>Gross Salary Range</DialogTitle>
-              <DialogDescription className='grid grid-cols-3 place-content-center justify-between gap-6 py-4'>
+              <DialogDescription className="grid grid-cols-3 place-content-center justify-between gap-6 py-4">
                 {grossSalaryRangeJson?.map((salaryRange, index) => {
                   return (
                     <Fragment key={String(index)}>
                       <Input
                         value={salaryRange.start}
                         disabled={true}
-                        className='disabled:opacity-100 disabled:cursor-text'
+                        className="disabled:opacity-100 disabled:cursor-text"
                       />
                       <Input
                         value={salaryRange.end}
                         disabled={true}
-                        className='disabled:opacity-100 disabled:cursor-text'
+                        className="disabled:opacity-100 disabled:cursor-text"
                       />
                       <Input
                         value={salaryRange.value}
                         disabled={true}
-                        className='disabled:opacity-100 disabled:cursor-text border-muted-foreground'
+                        className="disabled:opacity-100 disabled:cursor-text border-muted-foreground"
                       />
                     </Fragment>
                   );

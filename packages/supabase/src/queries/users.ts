@@ -5,8 +5,18 @@ import type {
   UserDatabaseRow,
 } from "../types";
 
-export async function getUsersCount({ supabase }: { supabase: TypedSupabaseClient }) {
-  const { count, error } = await supabase.from("users").select("", { count: "exact", head: true });
+export async function getUsersCount({
+  supabase,
+}: {
+  supabase: TypedSupabaseClient;
+}) {
+  const { count, error } = await supabase
+    .from("users")
+    .select("", { count: "exact", head: true });
+
+  if (error) {
+    console.error("getUsersCount Error", error);
+  }
 
   return { count, error };
 }
@@ -34,7 +44,7 @@ export async function getUsers({
     .returns<InferredType<UserDatabaseRow, (typeof columns)[number]>[]>();
 
   if (error) {
-    console.error(error);
+    console.error("getUsers Error", error);
   }
 
   return { data, error };
@@ -70,7 +80,7 @@ export async function getUserByEmail({
     .single<InferredType<UserDatabaseRow, (typeof columns)[number]>>();
 
   if (error) {
-    console.error(error);
+    console.error("getUserByEmail Error", error);
   }
 
   return { data, error };
@@ -80,6 +90,7 @@ export async function getUserByEmail({
   //     email: "demo@gmail.com",
   //     first_name: "Demo",
   //     last_name: "User",
+  //     role: "master",
   //   },
   //   error: null,
   // };
@@ -113,7 +124,7 @@ export async function getUsersByCompanyId({
     .returns<InferredType<UserDatabaseRow, (typeof columns)[number]>[]>();
 
   if (error) {
-    console.error(error);
+    console.error("getUsersByCompanyId Error", error);
   }
 
   return { data, error };
@@ -121,7 +132,9 @@ export async function getUsersByCompanyId({
 
 export async function getUsersEmail({
   supabase,
+  companyId,
 }: {
+  companyId: string;
   supabase: TypedSupabaseClient;
 }) {
   const columns = ["email"] as const;
@@ -129,12 +142,13 @@ export async function getUsersEmail({
   const { data, error } = await supabase
     .from("users")
     .select(`${columns.join(",")},email`)
+    .eq("company_id", companyId)
     .order("created_at", { ascending: false })
     .limit(HARD_QUERY_LIMIT)
     .returns<InferredType<UserDatabaseRow, (typeof columns)[number]>[]>();
 
   if (error) {
-    console.error(error);
+    console.error("getUsersEmail Error", error);
   }
 
   return { data, error };
@@ -170,7 +184,7 @@ export async function getUserById({
     .single<InferredType<UserDatabaseRow, (typeof columns)[number]>>();
 
   if (error) {
-    console.error(error);
+    console.error("getUserById Error", error);
   }
 
   return { data, error };
@@ -180,6 +194,7 @@ export async function getUserById({
   //     email: "demo@gmail.com",
   //     first_name: "Demo",
   //     last_name: "User",
+  //     role: "master",
   //   },
   //   error: null,
   // };
@@ -201,7 +216,7 @@ export async function getUserIdsByUserEmails({
     .returns<InferredType<UserDatabaseRow, (typeof columns)[number]>[]>();
 
   if (error) {
-    console.error(error);
+    console.error("getUserIdsByUserEmails Error", error);
   }
 
   return { data, error };

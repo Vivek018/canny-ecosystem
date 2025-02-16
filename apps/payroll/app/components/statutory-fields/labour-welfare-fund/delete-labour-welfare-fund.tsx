@@ -19,7 +19,9 @@ import { useState } from "react";
 
 export const DeleteLabourWelfareFund = ({
   labourWelfareFundId,
-}: { labourWelfareFundId: string }) => {
+}: {
+  labourWelfareFundId: string;
+}) => {
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [inputError, setInputError] = useState<string[]>([]);
@@ -68,7 +70,7 @@ export const DeleteLabourWelfareFund = ({
             and remove it's data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <div className="py-4">
+        <div className="p-4">
           <p className="text-sm text-foreground/80">
             Please type{" "}
             <i className="text-foreground font-medium">{DELETE_TEXT}</i> to

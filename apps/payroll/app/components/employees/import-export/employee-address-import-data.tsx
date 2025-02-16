@@ -1,6 +1,8 @@
 import { ImportedDataColumns } from "@/components/employees/imported-address-table/columns";
 import { ImportedDataTable } from "@/components/employees/imported-address-table/imported-data-table";
+import { cacheKeyPrefix } from "@/constant";
 import { useImportStoreForEmployeeAddress } from "@/store/import";
+import { clearCacheEntry } from "@/utils/cache";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
 import { createEmployeeAddressFromImportedData } from "@canny_ecosystem/supabase/mutations";
 import { getEmployeeIdsByEmployeeCodes } from "@canny_ecosystem/supabase/queries";
@@ -36,12 +38,12 @@ export function EmployeeAddressImportData({ env }: { env: SupabaseEnv }) {
     try {
       const result = ImportEmployeeAddressDataSchema.safeParse({ data });
       if (!result.success) {
-        console.error("Data validation error");
+        console.error("Employee Address Data validation error");
         return false;
       }
       return true;
     } catch (error) {
-      console.error("Data validation error:", error);
+      console.error("Employee Address Data validation error:", error);
 
       return false;
     }
@@ -52,8 +54,8 @@ export function EmployeeAddressImportData({ env }: { env: SupabaseEnv }) {
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase())
-      )
+          String(value).toLowerCase().includes(searchString.toLowerCase()),
+      ),
     );
     setTableData(filteredData);
   }, [searchString, importData]);
@@ -61,7 +63,7 @@ export function EmployeeAddressImportData({ env }: { env: SupabaseEnv }) {
   const handleFinalImport = async () => {
     if (validateImportData(importData.data)) {
       const employeeCodes = importData.data!.map(
-        (value: { employee_code: any }) => value.employee_code
+        (value: { employee_code: any }) => value.employee_code,
       );
 
       const { data: employees, error: idByCodeError } =
@@ -76,7 +78,7 @@ export function EmployeeAddressImportData({ env }: { env: SupabaseEnv }) {
 
       const updatedData = importData.data!.map((item: any) => {
         const employeeId = employees?.find(
-          (e: { employee_code: any }) => e.employee_code === item.employee_code
+          (e: { employee_code: any }) => e.employee_code === item.employee_code,
         )?.id;
 
         const { employee_code, ...rest } = item;
@@ -93,16 +95,17 @@ export function EmployeeAddressImportData({ env }: { env: SupabaseEnv }) {
       });
 
       if (error) {
-        console.error(error);
+        console.error("Employee Address", error);
       }
       if (isGoodStatus(status)) {
+        clearCacheEntry(cacheKeyPrefix.employee_overview);
         navigate("/employees");
       }
     }
   };
 
   return (
-    <section className="m-4">
+    <section className="p-4">
       <div className="w-full flex items-center justify-between pb-4">
         <div className="w-full  flex justify-between items-center">
           <div className="relative w-[30rem] ">
@@ -124,7 +127,7 @@ export function EmployeeAddressImportData({ env }: { env: SupabaseEnv }) {
             <Combobox
               className={cn("w-52 h-10")}
               options={transformStringArrayIntoOptions(
-                duplicationTypeArray as unknown as string[]
+                duplicationTypeArray as unknown as string[],
               )}
               value={importType}
               onChange={(value: string) => {

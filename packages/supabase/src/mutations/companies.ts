@@ -43,7 +43,7 @@ export async function createCompany({
     .single();
 
   if (error) {
-    console.error("company ", error);
+    console.error("createCompany error:", error);
     return {
       status,
       companyError: error,
@@ -105,7 +105,7 @@ export async function updateCompany({
     .single();
 
   if (error) {
-    console.error(error);
+    console.error("updateCompany error:", error);
   }
 
   return { status, error };
@@ -136,7 +136,7 @@ export async function deleteCompany({
     .eq("id", id);
 
   if (error) {
-    console.error(error);
+    console.error("deleteCompany error:", error);
   }
 
   return { status, error };
@@ -168,7 +168,7 @@ export async function createCompanyRegistrationDetails({
     .single();
 
   if (error) {
-    console.error(error);
+    console.error("createCompanyRegistrationDetails error:", error);
   }
 
   return { status, error };
@@ -220,7 +220,7 @@ export async function updateOrCreateCompanyRegistrationDetails({
     .single();
 
   if (error) {
-    console.error(error);
+    console.error("updateOrCreateCompanyRegistrationDetails Error", error);
   }
 
   return { status, error };
@@ -252,7 +252,7 @@ export async function createLocation({
     .single();
 
   if (error) {
-    console.error(error);
+    console.error("createLocation Error", error);
   }
 
   return { status, error };
@@ -291,7 +291,7 @@ export async function updateLocation({
     .single();
 
   if (error) {
-    console.error(error);
+    console.error("updateLocation Error", error);
   }
 
   return { status, error };
@@ -322,7 +322,7 @@ export async function deleteLocation({
     .eq("id", id);
 
   if (error) {
-    console.error(error);
+    console.error("deleteLocation", error);
   }
 
   return { status, error };
@@ -352,7 +352,7 @@ export async function createRelationship({
     .insert(data);
 
   if (error) {
-    console.error(error);
+    console.error("createRelationship Error", error);
   }
 
   return {
@@ -390,7 +390,7 @@ export async function updateRelationship({
     .single();
 
   if (error) {
-    console.error(error);
+    console.error("updateRelationship Error", error);
   }
 
   return { status, error };
@@ -421,7 +421,7 @@ export async function deleteRelationship({
     .eq("id", id);
 
   if (error) {
-    console.error(error);
+    console.error("deleteRelationship Error", error);
   }
 
   return { status, error };

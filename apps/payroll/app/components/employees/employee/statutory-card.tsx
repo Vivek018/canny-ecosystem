@@ -23,8 +23,8 @@ const DetailItem: React.FC<DetailItemProps> = ({ label, value, formatter }) => {
   const formattedValue = value ? (formatter ? formatter(value) : value) : "--";
 
   return (
-    <div className='flex flex-col items-start'>
-      <h3 className='text-muted-foreground text-[13px] tracking-wide capitalize'>
+    <div className="flex flex-col items-start">
+      <h3 className="text-muted-foreground text-[13px] tracking-wide capitalize">
         {label}
       </h3>
       <p>{formattedValue}</p>
@@ -44,77 +44,77 @@ export const EmployeeStatutoryCard: React.FC<{
   const { employeeId } = useParams();
 
   return (
-    <Card className='rounded w-full h-full p-4 flex flex-col gap-6'>
-      <div className='w-full flex items-center justify-between'>
-        <h2 className='text-xl font-semibold'>Statutory Details</h2>
+    <Card className="rounded w-full h-full p-4 flex flex-col gap-6">
+      <div className="w-full flex items-center justify-between">
+        <h2 className="text-xl font-semibold">Statutory Details</h2>
         <Link
-          prefetch='intent'
+          prefetch="intent"
           to={`/employees/${employeeId}/update-statutory-details`}
           className={cn(
             buttonVariants({ variant: "outline" }),
             "bg-card",
             !hasPermission(
               role,
-              `${updateRole}:${attribute.employeeStatutory}`
+              `${updateRole}:${attribute.employeeStatutory}`,
             ) && "hidden",
-            !employeeStatutory?.employee_id && "hidden"
+            !employeeStatutory?.employee_id && "hidden",
           )}
         >
-          <Icon name='edit' className='mr-2' />
+          <Icon name="edit" className="mr-2" />
           Edit
         </Link>
         <Link
-          prefetch='intent'
+          prefetch="intent"
           to={`/employees/${employeeId}/overview/add-statutory-details`}
           className={cn(
             buttonVariants({ variant: "outline" }),
             "bg-card",
             !hasPermission(
               `${role}`,
-              `${createRole}:${attribute.employeeStatutory}`
+              `${createRole}:${attribute.employeeStatutory}`,
             ) && "hidden",
-            employeeStatutory?.employee_id && "hidden"
+            employeeStatutory?.employee_id && "hidden",
           )}
         >
-          <Icon name='plus-circled' className='mr-2' />
+          <Icon name="plus-circled" className="mr-2" />
           Add
         </Link>
       </div>
 
       {employeeStatutory ? (
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5'>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           <DetailItem
-            label='Aadhaar Number'
+            label="Aadhaar Number"
             value={employeeStatutory.aadhaar_number}
           />
-          <DetailItem label='PAN Number' value={employeeStatutory.pan_number} />
-          <DetailItem label='UAN Number' value={employeeStatutory.uan_number} />
-          <DetailItem label='PF Number' value={employeeStatutory.pf_number} />
+          <DetailItem label="PAN Number" value={employeeStatutory.pan_number} />
+          <DetailItem label="UAN Number" value={employeeStatutory.uan_number} />
+          <DetailItem label="PF Number" value={employeeStatutory.pf_number} />
           <DetailItem
-            label='ESIC Number'
+            label="ESIC Number"
             value={employeeStatutory.esic_number}
           />
           <DetailItem
-            label='Driving License Number'
+            label="Driving License Number"
             value={employeeStatutory.driving_license_number}
           />
           <DetailItem
-            label='Driving License Expiry'
+            label="Driving License Expiry"
             value={employeeStatutory.driving_license_expiry}
             formatter={formatDate}
           />
           <DetailItem
-            label='Passport Number'
+            label="Passport Number"
             value={employeeStatutory.passport_number}
           />
           <DetailItem
-            label='Passport Expiry'
+            label="Passport Expiry"
             value={employeeStatutory.passport_expiry}
             formatter={formatDate}
           />
         </div>
       ) : (
-        <div className='text-center py-8'>
+        <div className="text-center py-8">
           <p>No statutory data available.</p>
         </div>
       )}

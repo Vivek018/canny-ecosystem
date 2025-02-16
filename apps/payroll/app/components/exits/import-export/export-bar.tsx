@@ -19,48 +19,42 @@ export function ExportBar({
   columnVisibility: VisibilityState;
 }) {
   const totalAmount = data.reduce(
-    (sum: number, { total }) => sum + (total ?? 0),
-    0
+    (acc, d: any) =>
+      acc + d.bonus + d.gratuity + d.leave_encashment - d.deduction,
+    0,
   );
 
-  const toBeExportedData = data.map((element) => {
+  const toBeExportedData = data.map((element: any) => {
     const employee_name =
       `${element.employees.first_name} ${element.employees.middle_name} ${element.employees.last_name}`.trim();
 
-    const exportedData: any = {};
+    const exportedData = {} as any;
+    let total = 0;
 
     for (const key of ExitPaymentColumnIdArray) {
-      if (columnVisibility[key] === false) {
-        continue;
-      }
+      if (columnVisibility[key] === false) continue;
 
-      if (key === "employee_code") {
+      if (key === "employee_code")
         exportedData.employee_code = element.employees.employee_code;
-      } else if (key === "employee_name") {
+      else if (key === "employee_name")
         exportedData.employee_name = employee_name;
-      } else if (key === "project") {
+      else if (key === "project")
         exportedData.project_name =
           element.employees.employee_project_assignment.project_sites.projects.name;
-      } else if (key === "project_site") {
+      else if (key === "project_site")
         exportedData.project_site_name =
           element.employees.employee_project_assignment.project_sites.name;
-      } else {
-        exportedData[key] = element[key as keyof ExitDataType];
-      }
+      else exportedData[key] = element[key];
     }
 
     for (const field of exitPaymentFields) {
-      const payment = element.exit_payments.find(
-        (p) => p.payment_fields.name === field
-      );
-
+      if (field === "deduction") total -= element[field];
+      else total += element[field];
       const mappedKey = field.replace(/\s/g, "_").toLowerCase();
-
-      if (columnVisibility[mappedKey] !== false) {
-        exportedData[mappedKey] = payment?.amount;
-      }
+      if (columnVisibility[mappedKey] !== false)
+        exportedData[mappedKey] = element[field];
     }
-
+    exportedData.total = total;
     return exportedData;
   });
   const handleExport = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -80,7 +74,7 @@ export function ExportBar({
     <div
       className={cn(
         "z-40 fixed bottom-8 left-0 right-0 mx-auto h-14 w-max shadow-md rounded-full flex gap-10 justify-between items-center p-2 text-sm border dark:border-muted-foreground/30 bg-card text-card-foreground",
-        className
+        className,
       )}
     >
       <div className="ml-2 flex items-center space-x-1 rounded-md">

@@ -31,7 +31,7 @@ export const DeleteImportedReimbursement = ({
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
-          "text-[13px] h-9"
+          "text-[13px] h-9",
         )}
       >
         Delete Reimbursement

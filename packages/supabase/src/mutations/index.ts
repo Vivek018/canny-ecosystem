@@ -15,3 +15,7 @@ export * from "./reimbursements";
 export * from "./exits";
 export * from "./gratuity";
 export * from "./payroll";
+export * from "./employee-letter";
+export * from "./attendance";
+export * from "./leave-encashment";
+export * from "./accidents";

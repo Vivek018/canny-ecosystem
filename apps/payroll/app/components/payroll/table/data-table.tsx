@@ -1,6 +1,17 @@
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { Table, TableBody, TableCell, TableRow } from "@canny_ecosystem/ui/table";
-import { type ColumnDef, getCoreRowModel, getSortedRowModel, type SortingState, useReactTable } from "@tanstack/react-table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+} from "@canny_ecosystem/ui/table";
+import {
+  type ColumnDef,
+  getCoreRowModel,
+  getSortedRowModel,
+  type SortingState,
+  useReactTable,
+} from "@tanstack/react-table";
 import { PayrollTableHeader } from "./data-table-headers";
 import { PayrollSheet } from "../payroll-sheet";
 import { useState, useMemo } from "react";
@@ -15,7 +26,11 @@ interface PayrollTableProps<TData, TValue> {
   editable: boolean;
 }
 
-export function PayrollDataTable<TData, TValue>({ columns, data, editable }: PayrollTableProps<TData, TValue>) {
+export function PayrollDataTable<TData, TValue>({
+  columns,
+  data,
+  editable,
+}: PayrollTableProps<TData, TValue>) {
   // Use useMemo to prevent unnecessary recalculations
   // Showing dynamic payment and statutory fields in the payroll table
   const { processedData, processedColumns, dynamicHeaders } = useMemo(() => {
@@ -33,42 +48,50 @@ export function PayrollDataTable<TData, TValue>({ columns, data, editable }: Pay
         if (!isAccessorKeyExists(template.name)) {
           dynamicHeaders.push(template.name);
           newColumns.push({
+            id: `col-${template.name}`,
             accessorKey: template.name,
             header: template.name,
             cell: ({ row }) => {
-              return <p className="truncate capitalize w-48">{`${row.original[template.name] ?? "--"}`}</p>;
+              return (
+                <p className="truncate capitalize w-48">{`${row.original[template.name] ?? "--"}`}</p>
+              );
             },
           });
         }
       });
     });
 
-    return { processedData: newData, processedColumns: newColumns, dynamicHeaders };
+    return {
+      processedData: newData,
+      processedColumns: newColumns,
+      dynamicHeaders,
+    };
   }, [data, columns]);
 
-
-  // 3 dot actions
-  processedColumns.push({
-    id: "actions",
-    enableSorting: false,
-    enableHiding: false,
-    cell: ({ row }) => {
-      return (
-        <PayrollEntryDropdown
-          payrollId={row.original.payrollId}
-          employeeId={row.original.employee_id}
-          triggerChild={
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <Icon name="dots-vertical" />
-              </Button>
-            </DropdownMenuTrigger>
-          }
-        />
-      );
-    },
-  });
+  // showing previews in payroll history only
+  if (!editable) {
+    processedColumns.push({
+      id: "actions",
+      enableSorting: false,
+      enableHiding: false,
+      cell: ({ row }) => {
+        return (
+          <PayrollEntryDropdown
+            payrollId={row.original.payrollId}
+            employeeId={row.original.employee_id}
+            triggerChild={
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <Icon name="dots-vertical" />
+                </Button>
+              </DropdownMenuTrigger>
+            }
+          />
+        );
+      },
+    });
+  }
 
   const [sorting, setSorting] = useState<SortingState>([]);
 
@@ -102,7 +125,14 @@ export function PayrollDataTable<TData, TValue>({ columns, data, editable }: Pay
             {tableLength ? (
               table.getRowModel().rows.map((row) => {
                 const rowData = row.original;
-                return <PayrollSheet key={row.id} row={row} rowData={rowData} editable={editable} />;
+                return (
+                  <PayrollSheet
+                    key={row.id}
+                    row={row}
+                    rowData={rowData}
+                    editable={editable}
+                  />
+                );
               })
             ) : (
               <TableRow className={cn(!tableLength && "border-none")}>

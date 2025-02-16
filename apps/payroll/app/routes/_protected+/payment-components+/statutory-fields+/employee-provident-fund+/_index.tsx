@@ -33,7 +33,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
         error,
         epfPromise: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 };
@@ -49,17 +49,17 @@ export default function EmployeeProvidentFundIndex() {
 
   if (error) {
     clearExactCacheEntry(cacheKeyPrefix.statutory_field_epf);
-    return <ErrorBoundary error={error} message='Failed to load data' />;
+    return <ErrorBoundary error={error} message="Failed to load data" />;
   }
 
   return (
-    <div className='p-4 flex gap-3 place-content-center justify-between'>
+    <div className="p-4 flex gap-3 place-content-center justify-between">
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={epfPromise}>
           {(resolvedData) => {
             if (!resolvedData) {
               clearExactCacheEntry(cacheKeyPrefix.statutory_field_epf);
-              return <ErrorBoundary message='Failed to load data' />;
+              return <ErrorBoundary message="Failed to load data" />;
             }
             return (
               <EPFWrapper

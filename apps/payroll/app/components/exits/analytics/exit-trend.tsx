@@ -1,6 +1,4 @@
-import * as React from "react";
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
-
 import {
   Card,
   CardContent,
@@ -14,32 +12,27 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@canny_ecosystem/ui/chart";
+import { useMemo, useState } from "react";
 import type { ExitDataType } from "@canny_ecosystem/supabase/queries";
 
 const chartConfig = {
-  date: {
-    label: "Date",
-    color: "hsl(var(--chart-0))",
-  },
-  amount: {
-    label: "Total Amount",
-    color: "hsl(var(--chart-1))",
-  },
+  date: { label: "Date", color: "hsl(var(--chart-0))" },
+  amount: { label: "Total Amount", color: "hsl(var(--chart-1))" },
 } satisfies ChartConfig;
 
 export function ExitTrend({ chartData }: { chartData: ExitDataType[] }) {
   const [activeChart, setActiveChart] =
-    React.useState<keyof typeof chartConfig>("amount");
+    useState<keyof typeof chartConfig>("amount");
 
-  const trendData = chartData.map((row) => ({
-    date: row.final_settlement_date,
-    amount: row.total || 0,
-  }));
+  const trendData = chartData
+    .map((row: any) => ({
+      date: row.final_settlement_date,
+      amount: row.bonus + row.gratuity + row.leave_encashment - row.deduction,
+    }))
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-  const total = React.useMemo(
-    () => ({
-      amount: trendData.reduce((acc, curr) => acc + curr.amount, 0),
-    }),
+  const total = useMemo(
+    () => ({ amount: trendData.reduce((acc, curr) => acc + curr.amount, 0) }),
     [],
   );
 
@@ -82,10 +75,7 @@ export function ExitTrend({ chartData }: { chartData: ExitDataType[] }) {
           <LineChart
             accessibilityLayer
             data={trendData}
-            margin={{
-              left: 12,
-              right: 12,
-            }}
+            margin={{ left: 12, right: 12 }}
           >
             <CartesianGrid vertical={false} />
             <XAxis

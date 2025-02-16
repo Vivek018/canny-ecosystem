@@ -67,7 +67,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined
+        (value) => value !== null && value !== undefined,
       );
 
     const reportPromise = getEmployeesReportByCompanyId({
@@ -112,7 +112,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       env,
     });
   } catch (error) {
-    console.error("Error in loader function:", error);
+    console.error("Report Error in loader function:", error);
     return defer({
       reportPromise: Promise.resolve({ data: [], meta: { count: 0 } }),
       paymentFieldPromise: Promise.resolve({ data: null, error: null }),
@@ -132,7 +132,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
     `${cacheKeyPrefix.payment_field_report}${
       args.params.paymentFieldId
     }${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 
@@ -151,7 +151,7 @@ export async function action({ request }: ActionFunctionArgs) {
     url.search = searchParams.toString();
     return redirect(url.toString());
   } catch (error) {
-    console.error("Error in action function:", error);
+    console.error("Report Error in action function:", error);
     const fallbackUrl = new URL(request.url);
     fallbackUrl.search = "";
     return redirect(fallbackUrl.toString());
@@ -175,9 +175,9 @@ export default function PaymentFieldsReport() {
   const noFilters = Object.values(filterList).every((value) => !value);
 
   return (
-    <section className='py-6 px-4'>
-      <div className='w-full flex items-center justify-between pb-4'>
-        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4'>
+    <section className="py-6 px-4">
+      <div className="w-full flex items-center justify-between pb-4">
+        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
           <Suspense fallback={<div>Loading...</div>}>
             <Await resolve={projectPromise}>
               {(projectData) => (
@@ -206,7 +206,7 @@ export default function PaymentFieldsReport() {
           {([{ data, meta, error }, paymentField]) => {
             if (error || paymentField.error || !data?.length) {
               clearCacheEntry(
-                `${cacheKeyPrefix.payment_field_report}${paymentFieldId}`
+                `${cacheKeyPrefix.payment_field_report}${paymentFieldId}`,
               );
               throw error || paymentField.error;
             }
@@ -220,7 +220,7 @@ export default function PaymentFieldsReport() {
                 amount: 4324,
                 start_date: new Date(),
                 end_date: new Date(),
-              })
+              }),
             );
 
             return (

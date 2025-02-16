@@ -41,3 +41,7 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+
+# Files
+packages/supabase/src/types/db.ts
+

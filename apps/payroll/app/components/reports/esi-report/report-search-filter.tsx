@@ -56,7 +56,7 @@ export function ESIReportSearchFilter({
   };
 
   const startYear = Number.parseInt(searchParams.get("start_year") ?? "");
-  const endYear = Number.parseInt(searchParams.get("end_year") ?? "") ;
+  const endYear = Number.parseInt(searchParams.get("end_year") ?? "");
 
   const [filterParams, setFilterParams] = useState(initialFilterParams);
 

@@ -31,14 +31,14 @@ export function DataTable<TData, TValue>({
   const tableLength = table.getRowModel().rows?.length;
 
   return (
-    <div className='relative mb-8'>
+    <div className="relative mb-8">
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
-          !tableLength && "border-none"
+          !tableLength && "border-none",
         )}
       >
-        <div className='relative'>
+        <div className="relative">
           <Table>
             <DataTableHeader
               table={table}
@@ -49,7 +49,7 @@ export function DataTable<TData, TValue>({
                 table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
-                    className='relative h-[40px] md:h-[45px] cursor-default select-text'
+                    className="relative h-[40px] md:h-[45px] cursor-default select-text"
                   >
                     {row.getVisibleCells().map((cell) => {
                       return (
@@ -58,12 +58,12 @@ export function DataTable<TData, TValue>({
                           className={cn(
                             "px-3 md:px-4 py-2 hidden md:table-cell",
                             cell.column.id === "actions" &&
-                              "sticky right-0 min-w-20 max-w-20 bg-card z-10"
+                              "sticky right-0 min-w-20 max-w-20 bg-card z-10",
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                         </TableCell>
                       );
@@ -74,7 +74,7 @@ export function DataTable<TData, TValue>({
                 <TableRow className={cn(!tableLength && "border-none")}>
                   <TableCell
                     colSpan={columns.length}
-                    className='h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize'
+                    className="h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize"
                   >
                     No Payment Templates Found.
                   </TableCell>

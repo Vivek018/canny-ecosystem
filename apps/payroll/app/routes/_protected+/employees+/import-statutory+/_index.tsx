@@ -103,37 +103,40 @@ export default function EmployeeStatutoryImportFieldMapping() {
         skipEmptyLines: true,
         complete: (results: Papa.ParseResult<string[]>) => {
           const headers = results.data[0].filter(
-            (header) => header !== null && header.trim() !== ""
+            (header) => header !== null && header.trim() !== "",
           );
           setHeaderArray(headers);
         },
         error: (error) => {
-          console.error("Header parsing error:", error);
+          console.error("Employee Statutory Header parsing error:", error);
           setErrors((prev) => ({ ...prev, parsing: "Error parsing headers" }));
         },
       });
     }
   }, [file]);
 
-   useEffect(() => {
-      if (headerArray.length > 0) {
-        const initialMapping = FIELD_CONFIGS.reduce((mapping, field) => {
+  useEffect(() => {
+    if (headerArray.length > 0) {
+      const initialMapping = FIELD_CONFIGS.reduce(
+        (mapping, field) => {
           const matchedHeader = headerArray.find(
             (value) =>
               pipe(replaceUnderscore, replaceDash)(value?.toLowerCase()) ===
-              pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase())
+              pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase()),
           );
-  
+
           if (matchedHeader) {
-            mapping[field.key] = matchedHeader; 
+            mapping[field.key] = matchedHeader;
           }
-  
+
           return mapping;
-        }, {} as Record<string, string>);
-  
-        setFieldMapping(initialMapping);
-      }
-    }, [headerArray]);
+        },
+        {} as Record<string, string>,
+      );
+
+      setFieldMapping(initialMapping);
+    }
+  }, [headerArray]);
 
   const validateMapping = () => {
     try {
@@ -142,13 +145,13 @@ export default function EmployeeStatutoryImportFieldMapping() {
           Object.entries(fieldMapping).map(([key, value]) => [
             key,
             value || undefined,
-          ])
-        )
+          ]),
+        ),
       );
 
       if (!mappingResult.success) {
         const formattedErrors = mappingResult.error.errors.map(
-          (err) => err.message
+          (err) => err.message,
         );
         setValidationErrors(formattedErrors);
         return false;
@@ -157,7 +160,7 @@ export default function EmployeeStatutoryImportFieldMapping() {
       setValidationErrors([]);
       return true;
     } catch (error) {
-      console.error("Validation error:", error);
+      console.error("Employee Statutory Validation error:", error);
       setValidationErrors(["An unexpected error occurred during validation"]);
       return false;
     }
@@ -168,14 +171,14 @@ export default function EmployeeStatutoryImportFieldMapping() {
       const result = ImportEmployeeStatutoryDataSchema.safeParse({ data });
       if (!result.success) {
         const formattedErrors = result.error.errors.map(
-          (err) => `${err.path[2]}: ${err.message}`
+          (err) => `${err.path[2]}: ${err.message}`,
         );
         setValidationErrors(formattedErrors);
         return false;
       }
       return true;
     } catch (error) {
-      console.error("Data validation error:", error);
+      console.error("Employee Statutory Data validation error:", error);
       setValidationErrors([
         "An unexpected error occurred during data validation",
       ]);
@@ -201,7 +204,7 @@ export default function EmployeeStatutoryImportFieldMapping() {
     }
 
     const swappedFieldMapping = Object.fromEntries(
-      Object.entries(fieldMapping).map(([key, value]) => [value, key])
+      Object.entries(fieldMapping).map(([key, value]) => [value, key]),
     );
 
     if (file) {
@@ -210,18 +213,27 @@ export default function EmployeeStatutoryImportFieldMapping() {
         skipEmptyLines: true,
         transformHeader: (header) => swappedFieldMapping[header] || header,
         complete: async (results) => {
+          const allowedFields = FIELD_CONFIGS.map((field) => field.key);
           const finalData = results.data
             .filter((entry) =>
-              Object.values(entry!).some((value) => String(value).trim() !== "")
+              Object.values(entry!).some(
+                (value) => String(value).trim() !== "",
+              ),
             )
             .map((entry) => {
               const cleanEntry = Object.fromEntries(
-                Object.entries(entry as Record<string, any>).filter(
-                  ([key, value]) =>
-                    key.trim() !== "" &&
-                    value !== null &&
-                    String(value).trim() !== ""
-                )
+                Object.entries(entry as Record<string, any>)
+                  .filter(
+                    ([key, value]) =>
+                      key.trim() !== "" &&
+                      value !== null &&
+                      String(value).trim() !== "",
+                  )
+                  .filter(([key]) =>
+                    allowedFields.includes(
+                      key as keyof ImportEmployeeStatutoryDataType,
+                    ),
+                  ),
               );
               return cleanEntry;
             });
@@ -232,7 +244,7 @@ export default function EmployeeStatutoryImportFieldMapping() {
             });
 
             const employeeCodes = finalData!.map(
-              (value) => value.employee_code
+              (value) => value.employee_code,
             );
             const { data: employees, error: idByCodeError } =
               await getEmployeeIdsByEmployeeCodes({
@@ -246,7 +258,7 @@ export default function EmployeeStatutoryImportFieldMapping() {
 
             const updatedData = finalData!.map((item: any) => {
               const employeeId = employees?.find(
-                (e) => e.employee_code === item.employee_code
+                (e) => e.employee_code === item.employee_code,
               )?.id;
 
               const { employee_code, ...rest } = item;
@@ -272,7 +284,7 @@ export default function EmployeeStatutoryImportFieldMapping() {
           }
         },
         error: (error) => {
-          console.error("Data parsing error:", error);
+          console.error("Employee Statutory Data parsing error:", error);
           setErrors((prev) => ({
             ...prev,
             parsing: "Error parsing file data",
@@ -326,7 +338,7 @@ export default function EmployeeStatutoryImportFieldMapping() {
                     <sub
                       className={cn(
                         "hidden text-primary mt-1",
-                        field.required && "inline"
+                        field.required && "inline",
                       )}
                     >
                       *
@@ -340,11 +352,11 @@ export default function EmployeeStatutoryImportFieldMapping() {
                         return (
                           pipe(
                             replaceUnderscore,
-                            replaceDash
+                            replaceDash,
                           )(value?.toLowerCase()) ===
                           pipe(
                             replaceUnderscore,
-                            replaceDash
+                            replaceDash,
                           )(field.key?.toLowerCase())
                         );
                       }) ||

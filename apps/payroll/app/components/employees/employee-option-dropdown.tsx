@@ -6,11 +6,16 @@ import {
   DropdownMenuSeparator,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { useSubmit } from "@remix-run/react";
+import { useNavigate, useSubmit } from "@remix-run/react";
 import { DeleteEmployee } from "./delete-employee";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { EmployeeDialog } from "../link-template/employee-dialog";
-import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
+import {
+  createRole,
+  deleteRole,
+  hasPermission,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
@@ -29,6 +34,7 @@ export const EmployeeOptionsDropdown = ({
   env: SupabaseEnv;
 }) => {
   const submit = useSubmit();
+  const navigate = useNavigate();
   const { role } = useUser();
   const handleMarkAsActive = () => {
     submit(
@@ -40,7 +46,7 @@ export const EmployeeOptionsDropdown = ({
       {
         method: "POST",
         action: `/employees/${employee.id}/update-active`,
-      }
+      },
     );
   };
 
@@ -54,20 +60,36 @@ export const EmployeeOptionsDropdown = ({
       {
         method: "POST",
         action: `/employees/${employee.id}/update-active`,
-      }
+      },
+    );
+  };
+
+  const handleExit = () => {
+    navigate(`/approvals/exits/${employee.id}/create-exit`);
+  };
+
+  const handleAccident = () => {
+    submit(
+      {
+        id: employee.id,
+      },
+      {
+        method: "POST",
+        action: `/accidents/${employee.id}/create-accident`,
+      },
     );
   };
 
   return (
     <DropdownMenu>
       {triggerChild}
-      <DropdownMenuContent sideOffset={10} align='end'>
+      <DropdownMenuContent sideOffset={10} align="end">
         <DropdownMenuGroup>
           <DropdownMenuItem
             className={cn(
               employee.is_active && "hidden",
               !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
-                "hidden"
+                "hidden",
             )}
             onClick={handleMarkAsActive}
           >
@@ -77,7 +99,7 @@ export const EmployeeOptionsDropdown = ({
             className={cn(
               !employee.is_active && "hidden",
               !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
-                "hidden"
+                "hidden",
             )}
             onClick={handleMarkAsInactive}
           >
@@ -87,15 +109,33 @@ export const EmployeeOptionsDropdown = ({
             className={cn(
               !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
                 !hasPermission(role, `${deleteRole}:${attribute.employees}`) &&
-                "hidden"
+                "hidden",
             )}
           />
           <EmployeeDialog employee={employee} env={env} />
+          <DropdownMenuItem
+            className={cn(
+              !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
+                "hidden",
+            )}
+            onClick={handleExit}
+          >
+            Exit employee
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className={cn(
+              !hasPermission(role, `${createRole}:${attribute.accidents}`) &&
+                "hidden",
+            )}
+            onClick={handleAccident}
+          >
+            Report Accident
+          </DropdownMenuItem>
           <DropdownMenuSeparator
             className={cn(
               "hidden",
-              hasPermission(role, `${deleteRole}:${attribute.employees}`) &&
-                "flex"
+              hasPermission(role, `${deleteRole}:${attribute.accidents}`) &&
+                "flex",
             )}
           />
           <DeleteEmployee employeeId={employee.id} />

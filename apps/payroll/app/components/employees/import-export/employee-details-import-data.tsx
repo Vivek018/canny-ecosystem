@@ -1,6 +1,8 @@
 import { ImportedDataColumns } from "@/components/employees/imported-employee-details-table/columns";
 import { ImportedDataTable } from "@/components/employees/imported-employee-details-table/imported-data-table";
+import { cacheKeyPrefix } from "@/constant";
 import { useImportStoreForEmployeeDetails } from "@/store/import";
+import { clearCacheEntry } from "@/utils/cache";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
 import {
   createEmployeeDetailsFromImportedData,
@@ -43,12 +45,12 @@ export function EmployeeDetailsImportData({
     try {
       const result = ImportEmployeeDetailsDataSchema.safeParse({ data });
       if (!result.success) {
-        console.error("Data validation error");
+        console.error("Employee Details Data validation error");
         return false;
       }
       return true;
     } catch (error) {
-      console.error("Data validation error:", error);
+      console.error("Employee Details Data validation error:", error);
 
       return false;
     }
@@ -67,7 +69,7 @@ export function EmployeeDetailsImportData({
 
       setConflictingIndex(conflictingIndices);
     } catch (err) {
-      console.error("Error fetching conflicts:", err);
+      console.error("Employee Details Error fetching conflicts:", err);
     }
   };
 
@@ -82,8 +84,8 @@ export function EmployeeDetailsImportData({
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase())
-      )
+          String(value).toLowerCase().includes(searchString.toLowerCase()),
+      ),
     );
     setTableData(filteredData);
   }, [searchString, importData]);
@@ -102,7 +104,7 @@ export function EmployeeDetailsImportData({
       });
 
       if (error) {
-        console.error(error);
+        console.error("Employee Details", error);
       }
 
       if (
@@ -110,13 +112,15 @@ export function EmployeeDetailsImportData({
         status === "Successfully inserted new records" ||
         status === "Successfully processed updates and new insertions"
       ) {
+        clearCacheEntry(cacheKeyPrefix.employees);
+        clearCacheEntry(cacheKeyPrefix.employee_overview);
         navigate("/employees");
       }
     }
   };
 
   return (
-    <section className="m-4">
+    <section className="p-4">
       <div className="w-full flex items-center justify-between pb-4">
         <div className="w-full  flex justify-between items-center">
           <div className="relative w-[30rem] ">
@@ -138,10 +142,10 @@ export function EmployeeDetailsImportData({
             <Combobox
               className={cn(
                 "w-52 h-10",
-                conflictingIndex?.length > 0 ? "flex" : "hidden"
+                conflictingIndex?.length > 0 ? "flex" : "hidden",
               )}
               options={transformStringArrayIntoOptions(
-                duplicationTypeArray as unknown as string[]
+                duplicationTypeArray as unknown as string[],
               )}
               value={importType}
               onChange={(value: string) => {

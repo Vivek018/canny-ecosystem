@@ -9,7 +9,6 @@ export async function getCompanyIdOrFirstCompany(
   request: Request,
   supabase: TypedSupabaseClient,
 ): Promise<{ companyId: string; setCookie: boolean }> {
-  
   const cookieHeader = request.headers.get("Cookie");
   const parsed = cookieHeader ? cookie.parse(cookieHeader)[cookieName] : null;
   if (parsed?.length) {

@@ -5,10 +5,8 @@ import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { SecondaryMenu } from "@canny_ecosystem/ui/secondary-menu";
 import { hasPermission, readRole } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
-import type{ LoaderFunctionArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Outlet, useLocation, Link } from "@remix-run/react";
-
-
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });

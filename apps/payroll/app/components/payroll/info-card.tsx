@@ -6,8 +6,12 @@ type InfoCardProps = {
   netDiff: number;
   isPercentage?: boolean;
 };
-export function InfoCard({ heading , value, netDiff=0, isPercentage = true }:InfoCardProps) {
-
+export function InfoCard({
+  heading,
+  value,
+  netDiff = 0,
+  isPercentage = true,
+}: InfoCardProps) {
   return (
     <Card className="w-full p-4 flex flex-col gap-4 justify-between">
       <h2 className="text-muted-foreground font-semibold">{heading}</h2>

@@ -54,7 +54,7 @@ export async function loader({
   if (
     !hasPermission(
       `${user?.role!}`,
-      `${updateRole}:${attribute.employeeProjectAssignment}`
+      `${updateRole}:${attribute.employeeProjectAssignment}`,
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -159,7 +159,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -228,7 +228,7 @@ export default function UpdateEmployeeProjectAssignment() {
       if (actionData?.status === "success") {
         clearCacheEntry(cacheKeyPrefix.employees);
         clearExactCacheEntry(
-          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
+          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`,
         );
         toast({
           title: "Success",
@@ -247,13 +247,13 @@ export default function UpdateEmployeeProjectAssignment() {
   }, [actionData]);
 
   return (
-    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
       <FormProvider context={form.context}>
         <Form
-          method='POST'
-          encType='multipart/form-data'
+          method="POST"
+          encType="multipart/form-data"
           {...getFormProps(form)}
-          className='flex flex-col'
+          className="flex flex-col"
         >
           <Card>
             <CreateEmployeeProjectAssignment

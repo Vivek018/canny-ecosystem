@@ -25,7 +25,7 @@ export const PaymentFieldsSelect: FC<PaymentFieldsSelectProps> = ({
   disabled,
 }) => {
   const [selectedFields, setSelectedFields] = useState<string[]>(
-    defaultValue ?? []
+    defaultValue ?? [],
   );
   const { setSelectedPaymentFields } = usePaymentComponentsStore();
   const { supabase } = useSupabase({ env });
@@ -36,13 +36,13 @@ export const PaymentFieldsSelect: FC<PaymentFieldsSelectProps> = ({
         selectedFields.map(async (id) => {
           const { data } = await getPaymentFieldById({ supabase, id });
           return data;
-        })
+        }),
       );
 
       setSelectedPaymentFields(
         selectedFieldsData.filter(
-          (data): data is PaymentFieldDataType => data !== null
-        )
+          (data): data is PaymentFieldDataType => data !== null,
+        ),
       );
     } else {
       setSelectedPaymentFields([]);
@@ -81,13 +81,13 @@ export const PaymentFieldsSelect: FC<PaymentFieldsSelectProps> = ({
   return (
     <div className={className}>
       <MultiSelectCombobox
-        label='Payment Field'
+        label="Payment Field"
         options={options}
         value={selectedFields}
         onChange={handleFieldChange}
         renderItem={(option) => (
           <div
-            role='option'
+            role="option"
             aria-selected={selectedFields.includes(String(option.value))}
           >
             {option.label}
@@ -95,12 +95,12 @@ export const PaymentFieldsSelect: FC<PaymentFieldsSelectProps> = ({
         )}
         renderSelectedItem={handleRenderSelectedItem}
         disabled={disabled}
-        aria-label='Filter by payment field'
-        aria-required='false'
-        aria-multiselectable='true'
-        aria-describedby='payment-field-description'
+        aria-label="Filter by payment field"
+        aria-required="false"
+        aria-multiselectable="true"
+        aria-describedby="payment-field-description"
       />
-      <span id='payment-field-description' className='sr-only'>
+      <span id="payment-field-description" className="sr-only">
         Select one or more payment fields. Shows individual payment fields names
         when 3 or fewer are selected.
       </span>

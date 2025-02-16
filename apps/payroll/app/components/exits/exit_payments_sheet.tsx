@@ -1,4 +1,3 @@
-import type { ExitPaymentsRow } from "@canny_ecosystem/supabase/types";
 import {
   Sheet,
   SheetContent,
@@ -13,28 +12,12 @@ import { flexRender } from "@tanstack/react-table";
 export function ExitPaymentsSheet({
   row,
   rowData,
-}: {
-  row: any;
-  rowData: any;
-}) {
-  const paymentSummary = rowData.exit_payments?.reduce(
-    (
-      acc: Record<string, number>,
-      payment: Omit<ExitPaymentsRow, "created_at" | "updated_at"> & {
-        payment_fields: { name: string };
-      },
-    ) => {
-      const key = payment.payment_fields.name;
-      const value = payment.amount;
-
-      acc.total = 0;
-      acc[key] = value;
-      acc.total += value;
-      return acc;
-    },
-    {},
-  );
-
+}: { row: any; rowData: any }) {
+  const netPay =
+    rowData.bonus +
+    rowData.leave_encashment +
+    rowData.gratuity -
+    rowData.deduction;
   return (
     <Sheet>
       <TableRow
@@ -71,8 +54,10 @@ export function ExitPaymentsSheet({
                     cell.column.id === "reason" ||
                     cell.column.id === "note") &&
                     "hidden md:table-cell",
-                  cell.column.id === "employee_name" &&
+                  cell.column.id === "employee_code" &&
                     "sticky left-12 bg-card z-10",
+                  cell.column.id === "employee_name" &&
+                    "sticky left-[192px] bg-card z-10",
                 )}
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -96,7 +81,7 @@ export function ExitPaymentsSheet({
 
             <div className="flex flex-col items-end justify-around">
               <h2 className="text-xl text-muted-foreground">Net Pay</h2>
-              <p className="font-bold">{paymentSummary?.total}</p>
+              <p className="font-bold">{netPay}</p>
             </div>
           </SheetTitle>
         </SheetHeader>
@@ -109,46 +94,17 @@ export function ExitPaymentsSheet({
         <div className="flex justify-between mx-5">
           <div>
             <h3 className="my-3 text-muted-foreground font-semibold">Bonus</h3>
-
-            <h3 className="my-3 text-muted-foreground font-semibold">
-              Diwali Bonus
-            </h3>
-
-            <h3 className="my-3 text-muted-foreground font-semibold">
-              Commission
-            </h3>
-
-            <h3 className="my-3 text-muted-foreground font-semibold">
-              Joining Bonus
-            </h3>
-
-            <h3 className="my-3 text-muted-foreground font-semibold">
-              Yearly Bonus
-            </h3>
-
             <h3 className="my-3 text-muted-foreground font-semibold">
               Leave Encashment
             </h3>
-
-            <h3 className="my-3 text-muted-foreground font-semibold">
-              Gift Coupon
-            </h3>
-
             <h3 className="my-3 text-muted-foreground font-semibold">
               Gratuity
             </h3>
           </div>
           <div className="text-end font-semibold">
-            <p className="my-3">Rs {paymentSummary?.bonus ?? "--"}</p>
-            <p className="my-3">Rs {paymentSummary?.diwali_bonus ?? "--"}</p>
-            <p className="my-3">Rs {paymentSummary?.commision ?? "--"}</p>
-            <p className="my-3">Rs {paymentSummary?.joining_bonus ?? "--"}</p>
-            <p className="my-3">Rs {paymentSummary?.yearly_bonus ?? "--"}</p>
-            <p className="my-3">
-              Rs {paymentSummary?.leave_encashment ?? "--"}
-            </p>
-            <p className="my-3">Rs {paymentSummary?.gift_coupon ?? "--"}</p>
-            <p className="my-3">Rs {paymentSummary?.gratuity ?? "--"}</p>
+            <p className="my-3">Rs {rowData.bonus ?? "--"}</p>
+            <p className="my-3">Rs {rowData.leave_encashment ?? "--"}</p>
+            <p className="my-3">Rs {rowData.gratuity ?? "--"}</p>
           </div>
         </div>
         <hr />
@@ -160,23 +116,17 @@ export function ExitPaymentsSheet({
         <div className=" flex justify-between mx-5">
           <div className="">
             <h3 className="my-3 text-muted-foreground font-semibold">
-              Computer Service Charges
-            </h3>
-            <h3 className="my-3 text-muted-foreground font-semibold">
               Deduction
             </h3>
           </div>
           <div className="text-end font-semibold">
-            <p className="my-3">
-              Rs {paymentSummary?.computer_service_charges ?? "--"}
-            </p>
-            <p className="my-3">Rs {paymentSummary?.deduction ?? "--"}</p>
+            <p className="my-3">Rs {rowData.deduction ?? "--"}</p>
           </div>
         </div>
         <hr />
         <div className=" flex justify-between mx-5">
           <h3 className="my-3 text-muted-foreground font-semibold">Net Pay</h3>
-          <p className="my-3 font-bold">Rs {paymentSummary?.total ?? "--"}</p>
+          <p className="my-3 font-bold">Rs {netPay}</p>
         </div>
       </SheetContent>
     </Sheet>

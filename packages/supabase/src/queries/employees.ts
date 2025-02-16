@@ -1,6 +1,7 @@
 import { formatUTCDate } from "@canny_ecosystem/utils";
 import type {
   EmployeeAddressDatabaseRow,
+  EmployeeAttendanceDatabaseRow,
   EmployeeBankDetailsDatabaseRow,
   EmployeeDatabaseRow,
   EmployeeGuardianDatabaseRow,
@@ -14,7 +15,11 @@ import type {
   TypedSupabaseClient,
 } from "../types";
 
-import { HARD_QUERY_LIMIT, MID_QUERY_LIMIT } from "../constant";
+import {
+  HARD_QUERY_LIMIT,
+  MID_QUERY_LIMIT,
+  SINGLE_QUERY_LIMIT,
+} from "../constant";
 
 export type EmployeeFilters = {
   dob_start?: string | undefined | null;
@@ -87,7 +92,7 @@ export async function getEmployeesCountByCompanyId({
     .eq("company_id", companyId);
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeesCountByCompanyId Error", error);
   }
 
   return { count, error };
@@ -150,11 +155,11 @@ export async function getEmployeesByCompanyId({
     .from("employees")
     .select(
       `${columns.join(",")},
-        employee_project_assignment!employee_project_assignments_employee_id_fkey!${hasProjectAssignmentFilter ? 'inner' : 'left'}(
+        employee_project_assignment!employee_project_assignments_employee_id_fkey!${hasProjectAssignmentFilter ? "inner" : "left"}(
         employee_id, assignment_type, skill_level, position, start_date, end_date,
-        project_sites!${hasProjectAssignmentFilter ? 'inner' : 'left'}(id, name, projects!${hasProjectAssignmentFilter ? 'inner' : 'left'}(id, name))
+        project_sites!${hasProjectAssignmentFilter ? "inner" : "left"}(id, name, projects!${hasProjectAssignmentFilter ? "inner" : "left"}(id, name))
       )`,
-      { count: "exact" }
+      { count: "exact" },
     )
     .eq("company_id", companyId);
 
@@ -200,7 +205,7 @@ export async function getEmployeesByCompanyId({
   if (project) {
     query.eq(
       "employee_project_assignment.project_sites.projects.name",
-      project
+      project,
     );
   }
   if (project_site) {
@@ -219,14 +224,13 @@ export async function getEmployeesByCompanyId({
   const { data, count, error } = await query.range(from, to);
 
   if (error) {
-    console.error("Error fetching employees:", error);
-    return { data: null, error };
+    console.error("getEmployeesByCompanyId Error", error);
   }
 
   return {
     data,
     meta: { count: count ?? data?.length },
-    error: null,
+    error,
   };
 }
 
@@ -245,17 +249,19 @@ export async function getEmployeesByPositionAndProjectSiteId({
     .from("employees")
     .select(
       `${columns.join(
-        ","
-      )},employee_project_assignment!employee_project_assignment_employee_id_fkey!inner(*)`
+        ",",
+      )},employee_project_assignment!employee_project_assignment_employee_id_fkey!inner(*)`,
     )
     .eq("employee_project_assignment.is_current", true)
     .eq("employee_project_assignment.project_site_id", projectSiteId)
     .eq("employee_project_assignment.position", position ?? "")
     .limit(MID_QUERY_LIMIT)
-    .returns<InferredType<EmployeeDatabaseRow, (typeof columns)[number]>[] | null>();
+    .returns<
+      InferredType<EmployeeDatabaseRow, (typeof columns)[number]>[] | null
+    >();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeesByPositionAndProjectSiteId Error", error);
   }
 
   return {
@@ -279,7 +285,7 @@ export async function getEmployeeIdsByEmployeeCodes({
     .returns<InferredType<EmployeeDatabaseRow, (typeof columns)[number]>[]>();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeIdsByEmployeeCodes Error", error);
   }
 
   return { data, error };
@@ -306,7 +312,7 @@ export async function getEmployeeIdsByProjectSiteId({
       >[]
     >();
 
-  if (error) console.error(error);
+  if (error) console.error("getEmployeeIdsByProjectSiteId Error", error);
 
   return { data, error };
 }
@@ -343,7 +349,7 @@ export async function getEmployeeById({
     .single<InferredType<EmployeeDatabaseRow, (typeof columns)[number]>>();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeById Error", error);
   }
 
   return { data, error };
@@ -381,7 +387,7 @@ export async function getEmployeeStatutoryDetailsById({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeStatutoryDetailsById Error", error);
   }
 
   return { data, error };
@@ -413,7 +419,7 @@ export async function getEmployeeBankDetailsById({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeBankDetailsById Error", error);
   }
 
   return { data, error };
@@ -446,11 +452,53 @@ export async function getEmployeeAddressesByEmployeeId({
     .eq("employee_id", employeeId)
     .limit(HARD_QUERY_LIMIT)
     .returns<
-      InferredType<EmployeeAddressDatabaseRow, (typeof columns)[number]>[] | null
+      | InferredType<EmployeeAddressDatabaseRow, (typeof columns)[number]>[]
+      | null
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeAddressesByEmployeeId Error", error);
+  }
+
+  return { data, error };
+}
+
+export async function getDefaultEmployeeAddressesByEmployeeId({
+  supabase,
+  employeeId,
+}: {
+  supabase: TypedSupabaseClient;
+  employeeId: string;
+}) {
+  const columns = [
+    "id",
+    "address_type",
+    "address_line_1",
+    "address_line_2",
+    "city",
+    "state",
+    "pincode",
+    "is_primary",
+    "latitude",
+    "longitude",
+    "employee_id",
+    "country",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("employee_addresses")
+    .select(columns.join(","))
+    .eq("employee_id", employeeId)
+    .eq("is_primary", true)
+    .order("created_at", { ascending: false })
+    .limit(SINGLE_QUERY_LIMIT)
+    .single<InferredType<
+      Omit<EmployeeAddressDatabaseRow, "created_at" | "updated_at">,
+      (typeof columns)[number]
+    > | null>();
+
+  if (error) {
+    console.error("getDefaultEmployeeAddressesByEmployeeId Error", error);
   }
 
   return { data, error };
@@ -484,11 +532,12 @@ export async function getEmployeeGuardiansByEmployeeId({
     .eq("employee_id", employeeId)
     .limit(HARD_QUERY_LIMIT)
     .returns<
-      InferredType<EmployeeGuardianDatabaseRow, (typeof columns)[number]>[] | null
+      | InferredType<EmployeeGuardianDatabaseRow, (typeof columns)[number]>[]
+      | null
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeGuardiansByEmployeeId Error", error);
   }
 
   return { data, error };
@@ -524,7 +573,7 @@ export async function getEmployeeAddressById({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeAddressById Error", error);
   }
 
   return { data, error };
@@ -561,7 +610,7 @@ export async function getEmployeeGuardianById({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeGuardianById Error", error);
   }
 
   return { data, error };
@@ -592,7 +641,7 @@ export async function getEmployeeSkillsByEmployeeId({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeSkillsByEmployeeId Error", error);
   }
 
   return { data, error };
@@ -620,7 +669,7 @@ export async function getEmployeeSkillById({
     .single<InferredType<EmployeeSkillDatabaseRow, (typeof columns)[number]>>();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeSkillById Error", error);
   }
 
   return { data, error };
@@ -649,11 +698,12 @@ export async function getEmployeeWorkHistoriesByEmployeeId({
     .eq("employee_id", employeeId)
     .limit(HARD_QUERY_LIMIT)
     .returns<
-      InferredType<EmployeeWorkHistoryDatabaseRow, (typeof columns)[number]>[] | null
+      | InferredType<EmployeeWorkHistoryDatabaseRow, (typeof columns)[number]>[]
+      | null
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeWorkHistoriesByEmployeeId Error", error);
   }
 
   return { data, error };
@@ -685,8 +735,45 @@ export async function getEmployeeWorkHistoryById({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeWorkHistoryById Error", error);
   }
+
+  return { data, error };
+}
+
+export async function getEmployeeWorkHistoryByEmployeeIdAndCompanyName({
+  supabase,
+  employeeId,
+  companyName,
+}: {
+  supabase: TypedSupabaseClient;
+  employeeId: string;
+  companyName: string;
+}) {
+  const columns = [
+    "id",
+    "company_name",
+    "position",
+    "responsibilities",
+    "start_date",
+    "end_date",
+    "employee_id",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("employee_work_history")
+    .select(columns.join(","))
+    .eq("employee_id", employeeId)
+    .eq("company_name", companyName)
+    .single<
+      InferredType<EmployeeWorkHistoryDatabaseRow, (typeof columns)[number]>
+    >();
+
+  if (error)
+    console.error(
+      "getEmployeeWorkHistoryByEmployeeIdAndCompanyName Error",
+      error,
+    );
 
   return { data, error };
 }
@@ -723,14 +810,14 @@ export async function getEmployeeProjectAssignmentByEmployeeId({
     .from("employee_project_assignment")
     .select(
       `${columns.join(
-        ","
-      )}, project_sites(id, name, projects(name)), supervisor:employees!employee_project_assignments_supervisor_id_fkey(id, employee_code)`
+        ",",
+      )}, project_sites(id, name, projects(name)), supervisor:employees!employee_project_assignments_supervisor_id_fkey(id, employee_code)`,
     )
     .eq("employee_id", employeeId)
     .maybeSingle<EmployeeProjectAssignmentDataType>();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeProjectAssignmentByEmployeeId Error", error);
   }
 
   return { data, error };
@@ -804,11 +891,11 @@ export async function getEmployeesReportByCompanyId({
     .from("employees")
     .select(
       `${columns.join(",")},
-        employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? 'inner' : 'left'}(
+        employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"}(
         employee_id, assignment_type, skill_level, position, start_date, end_date,
-        project_sites!${project_site ? 'inner' : 'left'}(id, name, projects!${project ? 'inner' : 'left'}(id, name))
+        project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"}(id, name))
       )`,
-      { count: "exact" }
+      { count: "exact" },
     )
     .eq("company_id", companyId);
 
@@ -829,16 +916,15 @@ export async function getEmployeesReportByCompanyId({
     if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
       for (const searchQueryElement of searchQueryArray) {
         query.or(
-          `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*,employee_code.ilike.*${searchQueryElement}*`
+          `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*,employee_code.ilike.*${searchQueryElement}*`,
         );
       }
     } else {
       query.or(
-        `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`
+        `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`,
       );
     }
   }
-
 
   if (start_year || end_year) {
     let endDateLastDay = 30;
@@ -868,23 +954,20 @@ export async function getEmployeesReportByCompanyId({
   if (project) {
     query.eq(
       "employee_project_assignment.project_sites.projects.name",
-      project
+      project,
     );
   }
   if (project_site) {
     query.eq("employee_project_assignment.project_sites.name", project_site);
   }
 
-
   // Fetch Data
   const { data, count, error } = await query
     .range(from, to)
-    .returns<
-      EmployeeReportDataType[]
-    >();
+    .returns<EmployeeReportDataType[]>();
 
   if (error) {
-    console.error("Error fetching employees:", error);
+    console.error("getEmployeesReportByCompanyId Error", error);
     return { data: null, error };
   }
 
@@ -966,6 +1049,18 @@ export type ImportEmployeeGuardiansDataType = Pick<
   | "email"
   | "is_emergency_contact"
   | "address_same_as_employee"
+> & {
+  employee_code: EmployeeDatabaseRow["employee_code"];
+};
+
+export type ImportEmployeeAttendanceDataType = Pick<
+  EmployeeAttendanceDatabaseRow,
+  | "date"
+  | "no_of_hours"
+  | "present"
+  | "holiday"
+  | "working_shift"
+  | "holiday_type"
 > & {
   employee_code: EmployeeDatabaseRow["employee_code"];
 };

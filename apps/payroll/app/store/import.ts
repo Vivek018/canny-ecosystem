@@ -5,6 +5,7 @@ import type {
   ImportEmployeeAddressDataType,
   ImportEmployeeGuardiansDataType,
   ImportReimbursementDataType,
+  ImportEmployeeAttendanceDataType,
 } from "@canny_ecosystem/supabase/queries";
 import { create } from "zustand";
 
@@ -13,11 +14,21 @@ type ImportStateForReimbursement = {
   setImportData: (importData: { data: ImportReimbursementDataType[] }) => void;
 };
 
+type ImportStateForExit = {
+  importData: { data: ImportExitDataType[] };
+  setImportData: (importData: { data: ImportExitDataType[] }) => void;
+};
+
 export const useImportStoreForReimbursement =
   create<ImportStateForReimbursement>()((set) => ({
     importData: { data: [] },
     setImportData: (importData) => set({ importData }),
   }));
+
+export const useImportStoreForExit = create<ImportStateForExit>()((set) => ({
+  importData: { data: [] },
+  setImportData: (importData) => set({ importData }),
+}));
 
 type ImportStateForEmployeeDetails = {
   importData: { data: ImportEmployeeDetailsDataType[] };
@@ -80,6 +91,19 @@ type ImportStateForEmployeeForGuardians = {
 
 export const useImportStoreForEmployeeGuardians =
   create<ImportStateForEmployeeForGuardians>()((set) => ({
+    importData: { data: [] },
+    setImportData: (importData) => set({ importData }),
+  }));
+
+type ImportStateForEmployeeForAttendance = {
+  importData: { data: ImportEmployeeAttendanceDataType[] };
+  setImportData: (importData: {
+    data: ImportEmployeeAttendanceDataType[];
+  }) => void;
+};
+
+export const useImportStoreForEmployeeAttendance =
+  create<ImportStateForEmployeeForAttendance>()((set) => ({
     importData: { data: [] },
     setImportData: (importData) => set({ importData }),
   }));

@@ -39,7 +39,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   if (
     !hasPermission(
       `${user?.role!}`,
-      `${updateRole}:${attribute.statutoryFieldsStatutoryBonus}`
+      `${updateRole}:${attribute.statutoryFieldsStatutoryBonus}`,
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -68,7 +68,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         companyId: null,
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -87,7 +87,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -115,7 +115,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

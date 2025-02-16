@@ -22,7 +22,31 @@ export async function getPaymentTemplateAssignmentIdByEmployeeId({
       >
     >();
 
-  if (error) console.error(error);
+  if (error)
+    console.error("getPaymentTemplateAssignmentIdByEmployeeId Error", error);
+
+  return { data, error };
+}
+
+export async function getTemplateIdByEmployeeId({
+  supabase,
+  employeeId,
+}: { supabase: TypedSupabaseClient; employeeId: string }) {
+  const columns = ["template_id"] as const;
+
+  const { data, error } = await supabase
+    .from("payment_template_assignments")
+    .select(columns.join(","))
+    .order("created_at", { ascending: false })
+    .eq("employee_id", employeeId)
+    .maybeSingle<
+      InferredType<
+        Pick<PaymentTemplateAssignmentsDatabaseRow, "template_id">,
+        (typeof columns)[number]
+      >
+    >();
+
+  if (error) console.error("getTemplateIdByEmployeeId Error", error);
 
   return { data, error };
 }
@@ -57,7 +81,8 @@ export async function getPaymentTemplateAssignmentByEmployeeId({
       >
     >();
 
-  if (error) console.error(error);
+  if (error)
+    console.error("getPaymentTemplateAssignmentByEmployeeId Error", error);
 
   return { data, error };
 }
@@ -105,7 +130,8 @@ export async function getPaymentTemplateAssignmentsBySiteId({
     .order("created_at", { ascending: false })
     .returns<PaymentTemplateAssignmentsType[]>();
 
-  if (error) console.error(error);
+  if (error)
+    console.error("getPaymentTemplateAssignmentsBySiteId Error", error);
 
   return { data, error };
 }

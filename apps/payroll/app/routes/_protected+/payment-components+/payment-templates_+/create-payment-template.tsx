@@ -146,7 +146,7 @@ export async function action({
             message: "Form validation failed",
             returnTo: `/payment-templates?step=${step}`,
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -179,7 +179,7 @@ export async function action({
             message: "Failed to create payment template",
             returnTo: "/payment-templates",
           },
-          { status: 500 }
+          { status: 500 },
         );
       }
 
@@ -190,7 +190,7 @@ export async function action({
             message: "Failed to create template components",
             returnTo: DEFAULT_ROUTE,
           },
-          { status: 500 }
+          { status: 500 },
         );
       }
 
@@ -210,7 +210,7 @@ export async function action({
           {
             status: status,
             headers: headers,
-          }
+          },
         );
       }
     } else if (
@@ -229,7 +229,7 @@ export async function action({
             message: "Form validation failed",
             returnTo: `/payment-templates?step=${step}`,
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -254,7 +254,7 @@ export async function action({
         message: `An unexpected error occurred: ${error}`,
         returnTo: "/payment-templates",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
@@ -347,7 +347,7 @@ export default function CreatePaymentTemplate() {
     const updatedComponents = [
       ...selectedPaymentFields.map((paymentField) => {
         const existingComponent = existingComponents?.find(
-          (component) => component?.payment_field_id === paymentField?.id
+          (component) => component?.payment_field_id === paymentField?.id,
         );
 
         return {
@@ -413,8 +413,8 @@ export default function CreatePaymentTemplate() {
   }, [step]);
 
   return (
-    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
-      <div className='w-full mx-auto mb-4'>
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
+      <div className="w-full mx-auto mb-4">
         <FormStepHeader
           totalSteps={totalSteps}
           step={step}
@@ -423,13 +423,13 @@ export default function CreatePaymentTemplate() {
       </div>
       <FormProvider context={form.context}>
         <Form
-          method='POST'
-          encType='multipart/form-data'
+          method="POST"
+          encType="multipart/form-data"
           {...getFormProps(form)}
-          className='flex flex-col'
+          className="flex flex-col"
         >
           <Card>
-            <div className='h-[500px] overflow-scroll'>
+            <div className="h-[500px] overflow-scroll">
               {step === 1 ? (
                 <CreatePaymentTemplateDetails
                   key={resetKey}

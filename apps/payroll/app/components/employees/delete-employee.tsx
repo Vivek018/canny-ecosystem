@@ -33,7 +33,7 @@ export const DeleteEmployee = ({ employeeId }: { employeeId: string }) => {
   };
 
   const handleDeleteEmployee = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -43,7 +43,7 @@ export const DeleteEmployee = ({ employeeId }: { employeeId: string }) => {
           method: "post",
           action: `/employees/${employeeId}/delete-employee`,
           replace: true,
-        }
+        },
       );
     } else {
       e.preventDefault();
@@ -57,7 +57,7 @@ export const DeleteEmployee = ({ employeeId }: { employeeId: string }) => {
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "text-[13px] h-9 hidden",
-          hasPermission(role, `${deleteRole}:${attribute.employees}`) && "flex"
+          hasPermission(role, `${deleteRole}:${attribute.employees}`) && "flex",
         )}
       >
         Delete Employee
@@ -70,7 +70,7 @@ export const DeleteEmployee = ({ employeeId }: { employeeId: string }) => {
             employee and remove it's data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <div className="py-4">
+        <div className="p-4">
           <p className="text-sm text-foreground/80">
             Please type{" "}
             <i className="text-foreground font-medium">{DELETE_TEXT}</i> to

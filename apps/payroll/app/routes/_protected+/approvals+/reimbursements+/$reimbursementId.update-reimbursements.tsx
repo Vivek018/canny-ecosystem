@@ -46,9 +46,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   let error = null;
 
   const { data: userData, error: userError } = await getUsers({ supabase });
-  if (userError || !userData) {
-    throw userError;
-  }
+  if (userError || !userData) throw userError;
 
   if (reimbursementId) {
     const { data, error: reimbursementError } = await getReimbursementsById({
@@ -80,7 +78,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 

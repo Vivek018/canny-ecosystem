@@ -38,7 +38,7 @@ export function CreateEmployeeGuardianDetails({
   return (
     <Fragment>
       <CardHeader>
-        <CardTitle className='text-3xl capitalize'>
+        <CardTitle className="text-3xl capitalize">
           {isUpdate ? "Update" : "Add"} Employee Guardian
         </CardTitle>
         <CardDescription>
@@ -49,9 +49,9 @@ export function CreateEmployeeGuardianDetails({
         <input {...getInputProps(fields.id, { type: "hidden" })} />
         <input {...getInputProps(fields.employee_id, { type: "hidden" })} />
         <SearchableSelectField
-          className='w-full capitalize flex-1'
+          className="w-full capitalize flex-1"
           options={transformStringArrayIntoOptions(
-            relationshipArray as unknown as string[]
+            relationshipArray as unknown as string[],
           )}
           inputProps={{
             ...getInputProps(fields.relationship, { type: "text" }),
@@ -62,7 +62,7 @@ export function CreateEmployeeGuardianDetails({
           }}
           errors={fields.relationship.errors}
         />
-        <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
+        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
           <Field
             inputProps={{
               ...getInputProps(fields.first_name, { type: "text" }),
@@ -81,12 +81,12 @@ export function CreateEmployeeGuardianDetails({
             errors={fields.last_name.errors}
           />
         </div>
-        <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
+        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
           <Field
             inputProps={{
               ...getInputProps(fields.date_of_birth, { type: "date" }),
               placeholder: `Enter ${replaceUnderscore(
-                fields.date_of_birth.name
+                fields.date_of_birth.name,
               )}`,
               max: getValidDateForInput(new Date().toISOString()),
             }}
@@ -96,9 +96,9 @@ export function CreateEmployeeGuardianDetails({
             errors={fields.date_of_birth.errors}
           />
           <SearchableSelectField
-            className='w-full capitalize flex-1'
+            className="w-full capitalize flex-1"
             options={transformStringArrayIntoOptions(
-              genderArray as unknown as string[]
+              genderArray as unknown as string[],
             )}
             inputProps={{
               ...getInputProps(fields.gender, { type: "text" }),
@@ -128,12 +128,12 @@ export function CreateEmployeeGuardianDetails({
             children: "Is the address same as employee?",
           }}
         />
-        <div className='grid grid-cols-3 place-content-center justify-between gap-6'>
+        <div className="grid grid-cols-3 place-content-center justify-between gap-6">
           <Field
             inputProps={{
               ...getInputProps(fields.mobile_number, { type: "text" }),
               placeholder: `Enter ${replaceUnderscore(
-                fields.mobile_number.name
+                fields.mobile_number.name,
               )}`,
             }}
             labelProps={{
@@ -147,7 +147,7 @@ export function CreateEmployeeGuardianDetails({
                 type: "text",
               }),
               placeholder: `Enter ${replaceUnderscore(
-                fields.alternate_mobile_number.name
+                fields.alternate_mobile_number.name,
               )}`,
             }}
             labelProps={{

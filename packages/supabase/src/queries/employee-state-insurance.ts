@@ -43,8 +43,38 @@ export const getEmployeeStateInsuranceById = async ({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeStateInsuranceById Error", error);
   }
+
+  return { data, error };
+};
+
+export const getEmployeeStateInsuranceByESINumber = async ({
+  supabase,
+  esiNumber,
+}: {
+  supabase: TypedSupabaseClient;
+  esiNumber: string;
+}) => {
+  const columns = [
+    "id",
+    "company_id",
+    "esi_number",
+    "deduction_cycle",
+    "employees_contribution",
+    "employers_contribution",
+    "include_employer_contribution",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("employee_state_insurance")
+    .select(columns.join(","))
+    .eq("esi_number", esiNumber)
+    .single<
+      InferredType<EmployeeStateInsuranceDatabaseRow, (typeof columns)[number]>
+    >();
+
+  if (error) console.error("getEmployeeStateInsuranceByESINumber Error", error);
 
   return { data, error };
 };
@@ -80,7 +110,7 @@ export const getEmployeeStateInsuranceByCompanyId = async ({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeStateInsuranceByCompanyId Error", error);
   }
 
   return { data, error };

@@ -52,7 +52,7 @@ export const UserContact = ({ updateValues }: UserContactProps) => {
     <FormProvider context={form.context}>
       <Card>
         <Form
-          method='post'
+          method="post"
           {...getFormProps(form)}
           action={"/user/update-user-contact"}
         >
@@ -63,7 +63,7 @@ export const UserContact = ({ updateValues }: UserContactProps) => {
             </CardDescription>
           </CardHeader>
 
-          <CardContent className='grid grid-cols-1 px-6 py-0 md:grid-cols-2 items-center justify-center md:gap-x-8'>
+          <CardContent className="grid grid-cols-1 px-6 py-0 md:grid-cols-2 items-center justify-center md:gap-x-8">
             <Field
               inputProps={{
                 ...getInputProps(fields.email, {
@@ -80,21 +80,21 @@ export const UserContact = ({ updateValues }: UserContactProps) => {
                   type: "text",
                 }),
                 placeholder: `Enter ${replaceUnderscore(
-                  fields.mobile_number.name
+                  fields.mobile_number.name,
                 )}`,
               }}
               errors={fields.mobile_number.errors}
             />
           </CardContent>
-          <CardFooter className='border-t justify-between pt-6'>
+          <CardFooter className="border-t justify-between pt-6">
             <div>
               This is your primary email address and mobile number for
               notifications and more.
             </div>
-            <div className='flex gap-4'>
+            <div className="flex gap-4">
               <Button
-                variant='secondary'
-                type='reset'
+                variant="secondary"
+                type="reset"
                 {...form.reset.getButtonProps()}
               >
                 Reset
@@ -104,8 +104,8 @@ export const UserContact = ({ updateValues }: UserContactProps) => {
                 disabled={
                   !form.valid || deepEqualCheck(form.initialValue, form.value)
                 }
-                variant='default'
-                type='submit'
+                variant="default"
+                type="submit"
               >
                 Save
               </Button>

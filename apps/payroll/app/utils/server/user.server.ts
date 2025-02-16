@@ -9,11 +9,14 @@ import * as cookie from "cookie";
 
 const cookieName = "user";
 
-export type UserCookieType = Pick<UserDatabaseRow, "id" | "email" | "role" | "company_id">;
+export type UserCookieType = Pick<
+  UserDatabaseRow,
+  "id" | "email" | "role" | "company_id"
+>;
 
 export async function getUserCookieOrFetchUser(
   request: Request,
-  supabase: TypedSupabaseClient
+  supabase: TypedSupabaseClient,
 ): Promise<{
   user: UserCookieType | null;
   setCookie: boolean;
@@ -52,10 +55,7 @@ export async function getUserCookieOrFetchUser(
   return { user: null, setCookie: false };
 }
 
-export function setUserCookie(
-  user: UserCookieType | null,
-  deleteUser = false
-) {
+export function setUserCookie(user: UserCookieType | null, deleteUser = false) {
   if (!user || deleteUser) {
     return cookie.serialize(cookieName, "", {
       path: "/",

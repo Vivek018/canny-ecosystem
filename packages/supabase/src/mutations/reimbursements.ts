@@ -18,7 +18,7 @@ export async function createReimbursementsFromData({
     .single();
 
   if (error) {
-    console.error(error);
+    console.error("createReimbursementsFromData Error:", error);
   }
 
   return { status, error };
@@ -37,7 +37,7 @@ export async function createReimbursementsFromImportedData({
     .select();
 
   if (error) {
-    console.error(error);
+    console.error("createReimbursementsFromImportedData Error:", error);
   }
 
   return { status, error };
@@ -59,7 +59,7 @@ export async function updateReimbursementsById({
     .single();
 
   if (error) {
-    console.error(error);
+    console.error("updateReimbursementsById Error:", error);
   }
 
   return { error, status };
@@ -78,12 +78,15 @@ export async function deleteReimbursementById({
     .eq("id", id);
 
   if (error) {
-    console.error("Error deleting user:", error);
+    console.error("deleteReimbursementById Error:", error);
     return { status, error };
   }
 
   if (status < 200 || status >= 300) {
-    console.error("Unexpected Supabase status:", status);
+    console.error(
+      "deleteReimbursementById Unexpected Supabase status:",
+      status,
+    );
   }
 
   return { status, error: null };

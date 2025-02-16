@@ -28,11 +28,7 @@ import {
   json,
   type LoaderFunctionArgs,
 } from "@remix-run/node";
-import {
-  Form,
-  useActionData,
-  useNavigate,
-} from "@remix-run/react";
+import { Form, useActionData, useNavigate } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { UPDATE_STATUTORY_BONUS } from "./$sbId.update-statutory-bonus";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
@@ -52,7 +48,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   if (
     !hasPermission(
       `${user?.role!}`,
-      `${createRole}:${attribute.statutoryFieldsStatutoryBonus} `
+      `${createRole}:${attribute.statutoryFieldsStatutoryBonus} `,
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -76,7 +72,7 @@ export const action = async ({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -105,7 +101,7 @@ export const action = async ({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 };
@@ -118,13 +114,13 @@ export default function CreateStatutoryBonus({
   const actionData = useActionData<typeof action>();
 
   const { companyId } = useCompanyId();
-  
+
   const STATUTORY_BONUS_TAG = updateValues
-  ? UPDATE_STATUTORY_BONUS
-  : CREATE_STATUTORY_BONUS;
-  
+    ? UPDATE_STATUTORY_BONUS
+    : CREATE_STATUTORY_BONUS;
+
   const initialValues =
-  updateValues ?? getInitialValueFromZod(StatutoryBonusSchema);
+    updateValues ?? getInitialValueFromZod(StatutoryBonusSchema);
 
   const [resetKey, setResetKey] = useState(Date.now());
 
@@ -168,11 +164,11 @@ export default function CreateStatutoryBonus({
   }, [actionData]);
 
   return (
-    <section className='p-4 w-full'>
-      <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
+    <section className="p-4 w-full">
+      <Form method="POST" {...getFormProps(form)} className="flex flex-col">
         <Card>
           <CardHeader>
-            <CardTitle className='text-2xl mb-6 capitalize'>
+            <CardTitle className="text-2xl mb-6 capitalize">
               {replaceDash(STATUTORY_BONUS_TAG)}
             </CardTitle>
             <hr />
@@ -180,17 +176,17 @@ export default function CreateStatutoryBonus({
           <CardContent>
             <input {...getInputProps(fields.id, { type: "hidden" })} />
             <input {...getInputProps(fields.company_id, { type: "hidden" })} />
-            <div className='flex flex-col items-start justify-between gap-2'>
+            <div className="flex flex-col items-start justify-between gap-2">
               <SearchableSelectField
                 key={resetKey}
-                className='capitalize'
+                className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  statutoryBonusPayFrequencyArray as unknown as string[]
+                  statutoryBonusPayFrequencyArray as unknown as string[],
                 )}
                 inputProps={{
                   ...getInputProps(fields.payment_frequency, { type: "text" }),
                 }}
-                placeholder='Select an option'
+                placeholder="Select an option"
                 labelProps={{
                   children: replaceUnderscore(fields.payment_frequency.name),
                 }}
@@ -212,13 +208,13 @@ export default function CreateStatutoryBonus({
               />
               <SearchableSelectField
                 key={resetKey + 1}
-                className='capitalize'
+                className="capitalize"
                 options={payoutMonths}
                 inputProps={{
                   disabled: form.value?.payment_frequency === "monthly",
                   ...getInputProps(fields.payout_month, { type: "text" }),
                 }}
-                placeholder='Select an option'
+                placeholder="Select an option"
                 labelProps={{
                   children: replaceUnderscore(fields.payout_month.name),
                 }}

@@ -2,7 +2,11 @@ import { Link } from "@remix-run/react";
 import { Card, CardContent, CardTitle } from "@canny_ecosystem/ui/card";
 import type { ProjectsWithCompany } from "@canny_ecosystem/supabase/queries";
 
-export function PayrollProjectCard({ project }: { project: ProjectsWithCompany & { totalSites: number, pendingPayroll: number } }) {
+export function PayrollProjectCard({
+  project,
+}: {
+  project: ProjectsWithCompany & { totalSites: number; pendingPayroll: number };
+}) {
   return (
     <Card
       key={project.id}
@@ -31,17 +35,23 @@ export function PayrollProjectCard({ project }: { project: ProjectsWithCompany &
         <div className="flex gap-8">
           {/* Total Sites */}
           <div className="flex flex-col items-center justify-center min-w-24">
-            <span className="text-sm text-muted-foreground text-center">Total Sites</span>
+            <span className="text-sm text-muted-foreground text-center">
+              Total Sites
+            </span>
             <span className="text-lg font-bold">{project.totalSites || 0}</span>
           </div>
 
           {/* Pending Payroll */}
           <div className="flex flex-col items-center justify-center min-w-24">
-            <span className="text-sm text-muted-foreground text-center">Pending Payroll</span>
-            <span className="text-lg font-bold">{project.pendingPayroll || 0}</span>
+            <span className="text-sm text-muted-foreground text-center">
+              Pending Payroll
+            </span>
+            <span className="text-lg font-bold">
+              {project.pendingPayroll || 0}
+            </span>
           </div>
         </div>
       </CardContent>
     </Card>
   );
-};
+}

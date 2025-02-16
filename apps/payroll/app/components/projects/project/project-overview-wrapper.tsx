@@ -34,15 +34,15 @@ export function ProjectOverviewWrapper({
 
   if (!data) {
     clearExactCacheEntry(`${cacheKeyPrefix.project_overview}${projectId}`);
-    return <ErrorBoundary error={error} message='Failed to load project' />;
+    return <ErrorBoundary error={error} message="Failed to load project" />;
   }
 
   return (
-    <div className='w-full my-4'>
-      <Card className='my-4 rounded w-full h-full p-4 flex flex-col lg:flex-row gap-4'>
-        <div className='flex flex-col w-full gap-6'>
+    <div className="w-full my-4">
+      <Card className="my-4 rounded w-full h-full p-4 flex flex-col lg:flex-row gap-4">
+        <div className="flex flex-col w-full gap-6">
           <ProjectHeader project={data} />
-          <div className='flex flex-col w-full justify-between lg:flex-row gap-6'>
+          <div className="flex flex-col w-full justify-between lg:flex-row gap-6">
             <ProjectDetails project={data} />
             <ProjectInformationCard project={data} />
           </div>

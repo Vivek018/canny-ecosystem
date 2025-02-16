@@ -30,11 +30,11 @@ function Calendar({
           "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
         week: "flex w-full mt-2",
         day_button: cn(
-          "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].range-end)]:rounded-r-md [&:has([aria-selected].outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20"
+          "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].range-end)]:rounded-r-md [&:has([aria-selected].outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
         ),
         day: cn(
           buttonVariants({ variant: "ghost" }),
-          "h-9 w-9 p-0 font-normal aria-selected:opacity-100"
+          "h-9 w-9 p-0 font-normal aria-selected:opacity-100",
         ),
         selected:
           "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
@@ -52,15 +52,15 @@ function Calendar({
       components={{
         PreviousMonthButton: ({ ...props }) => {
           return (
-            <Button variant='outline' size='icon' {...props}>
-              <Icon name='chevron-left' size='sm' />
+            <Button variant="outline" size="icon" {...props}>
+              <Icon name="chevron-left" size="sm" />
             </Button>
           );
         },
         NextMonthButton: ({ ...props }) => {
           return (
-            <Button variant='outline' size='icon' {...props}>
-              <Icon name='chevron-right' size='sm' />
+            <Button variant="outline" size="icon" {...props}>
+              <Icon name="chevron-right" size="sm" />
             </Button>
           );
         },

@@ -22,7 +22,8 @@ export const ImportEmployeeGuardiansModal = () => {
   const MAX_FILE_SIZE_LIMIT = SIZE_1MB * 3;
 
   const isOpen =
-    searchParams.get("step") === modalSearchParamNames.import_employee_guardians;
+    searchParams.get("step") ===
+    modalSearchParamNames.import_employee_guardians;
 
   const onClose = () => {
     searchParams.delete("step");
@@ -85,7 +86,7 @@ export const ImportEmployeeGuardiansModal = () => {
           className={cn(
             "text-sm",
             selectedFile ? "flex" : "hidden",
-            !eligibleFileSize ? "text-destructive" : "text-muted-foreground"
+            !eligibleFileSize ? "text-destructive" : "text-muted-foreground",
           )}
         >
           {!eligibleFileSize

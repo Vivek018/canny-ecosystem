@@ -39,7 +39,7 @@ export function CreateEmployeeDetails({
   return (
     <Fragment>
       <CardHeader>
-        <CardTitle className='text-3xl capitalize'>
+        <CardTitle className="text-3xl capitalize">
           {isUpdate ? "Update" : "Create"} Employee
         </CardTitle>
         <CardDescription>
@@ -50,7 +50,7 @@ export function CreateEmployeeDetails({
       <CardContent>
         <input {...getInputProps(fields.id, { type: "hidden" })} />
         <input {...getInputProps(fields.company_id, { type: "hidden" })} />
-        <div className='grid grid-cols-3 place-content-center justify-between gap-6'>
+        <div className="grid grid-cols-3 place-content-center justify-between gap-6">
           <Field
             inputProps={{
               ...getInputProps(fields.first_name, { type: "text" }),
@@ -64,7 +64,7 @@ export function CreateEmployeeDetails({
             inputProps={{
               ...getInputProps(fields.middle_name, { type: "text" }),
               placeholder: `Enter ${replaceUnderscore(
-                fields.middle_name.name
+                fields.middle_name.name,
               )}`,
             }}
             labelProps={{
@@ -81,12 +81,12 @@ export function CreateEmployeeDetails({
             errors={fields.last_name.errors}
           />
         </div>
-        <div className='grid grid-cols-3 place-content-center justify-between gap-6'>
+        <div className="grid grid-cols-3 place-content-center justify-between gap-6">
           <Field
             inputProps={{
               ...getInputProps(fields.employee_code, { type: "text" }),
               placeholder: `Enter ${replaceUnderscore(
-                fields.employee_code.name
+                fields.employee_code.name,
               )}`,
             }}
             labelProps={{
@@ -106,7 +106,7 @@ export function CreateEmployeeDetails({
             inputProps={{
               ...getInputProps(fields.date_of_birth, { type: "date" }),
               placeholder: `Enter ${replaceUnderscore(
-                fields.date_of_birth.name
+                fields.date_of_birth.name,
               )}`,
               max: getValidDateForInput(new Date().toISOString()),
             }}
@@ -116,11 +116,11 @@ export function CreateEmployeeDetails({
             errors={fields.date_of_birth.errors}
           />
         </div>
-        <div className='grid grid-cols-3 place-content-center justify-between gap-6'>
+        <div className="grid grid-cols-3 place-content-center justify-between gap-6">
           <SearchableSelectField
-            className='w-full capitalize flex-1'
+            className="w-full capitalize flex-1"
             options={transformStringArrayIntoOptions(
-              genderArray as unknown as string[]
+              genderArray as unknown as string[],
             )}
             inputProps={{
               ...getInputProps(fields.gender, { type: "text" }),
@@ -132,9 +132,9 @@ export function CreateEmployeeDetails({
             errors={fields.gender.errors}
           />
           <SearchableSelectField
-            className='w-full capitalize flex-1'
+            className="w-full capitalize flex-1"
             options={transformStringArrayIntoOptions(
-              educationArray as unknown as string[]
+              educationArray as unknown as string[],
             )}
             inputProps={{
               ...getInputProps(fields.education, { type: "text" }),
@@ -146,15 +146,15 @@ export function CreateEmployeeDetails({
             errors={fields.education.errors}
           />
           <SearchableSelectField
-            className='w-full capitalize flex-1'
+            className="w-full capitalize flex-1"
             options={transformStringArrayIntoOptions(
-              maritalStatusArray as unknown as string[]
+              maritalStatusArray as unknown as string[],
             )}
             inputProps={{
               ...getInputProps(fields.marital_status, { type: "text" }),
             }}
             placeholder={`Select ${replaceUnderscore(
-              fields.marital_status.name
+              fields.marital_status.name,
             )}`}
             labelProps={{
               children: replaceUnderscore(fields.marital_status.name),
@@ -163,7 +163,7 @@ export function CreateEmployeeDetails({
           />
         </div>
         <CheckboxField
-          className='mt-0.5 mb-3'
+          className="mt-0.5 mb-3"
           buttonProps={getInputProps(fields.is_active, {
             type: "checkbox",
           })}
@@ -172,12 +172,12 @@ export function CreateEmployeeDetails({
             children: "Is this employee active?",
           }}
         />
-        <div className='grid grid-cols-3 place-content-center justify-between gap-6'>
+        <div className="grid grid-cols-3 place-content-center justify-between gap-6">
           <Field
             inputProps={{
               ...getInputProps(fields.primary_mobile_number, { type: "text" }),
               placeholder: `Enter ${replaceUnderscore(
-                fields.primary_mobile_number.name
+                fields.primary_mobile_number.name,
               )}`,
             }}
             labelProps={{
@@ -191,7 +191,7 @@ export function CreateEmployeeDetails({
                 type: "text",
               }),
               placeholder: `Enter ${replaceUnderscore(
-                fields.secondary_mobile_number.name
+                fields.secondary_mobile_number.name,
               )}`,
             }}
             labelProps={{
@@ -205,7 +205,7 @@ export function CreateEmployeeDetails({
                 type: "text",
               }),
               placeholder: `Enter ${replaceUnderscore(
-                fields.personal_email.name
+                fields.personal_email.name,
               )}`,
             }}
             labelProps={{

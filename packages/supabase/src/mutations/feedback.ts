@@ -26,7 +26,7 @@ export async function createFeedback({
     .single();
 
   if (error) {
-    console.error(error);
+    console.error("createFeedback Error", error);
   }
 
   return { status, error };

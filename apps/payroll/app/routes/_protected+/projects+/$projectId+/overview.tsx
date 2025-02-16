@@ -37,7 +37,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         error,
         projectPromise: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -45,7 +45,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   return await clientCaching(
     `${cacheKeyPrefix.project_overview}${args.params.projectId}`,
-    args
+    args,
   );
 }
 
@@ -57,7 +57,7 @@ export default function ProjectIndex() {
 
   if (error) {
     clearExactCacheEntry(`${cacheKeyPrefix.project_overview}${projectId}`);
-    return <ErrorBoundary error={error} message='Failed to load projects' />;
+    return <ErrorBoundary error={error} message="Failed to load projects" />;
   }
 
   return (
@@ -66,9 +66,9 @@ export default function ProjectIndex() {
         {(resolvedData) => {
           if (!resolvedData) {
             clearExactCacheEntry(
-              `${cacheKeyPrefix.project_overview}${projectId}`
+              `${cacheKeyPrefix.project_overview}${projectId}`,
             );
-            return <ErrorBoundary message='Failed to load project' />;
+            return <ErrorBoundary message="Failed to load project" />;
           }
           return (
             <ProjectOverviewWrapper

@@ -25,7 +25,7 @@ export async function action({
   if (
     !hasPermission(
       user?.role!,
-      `${deleteRole}:${attribute.employeeWorkHistory}`
+      `${deleteRole}:${attribute.employeeWorkHistory}`,
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -55,7 +55,7 @@ export async function action({
         error,
         employeeId,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json({
@@ -77,7 +77,7 @@ export default function DeleteWorkHistory() {
     if (actionData) {
       if (actionData?.status === "success") {
         clearExactCacheEntry(
-          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
+          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`,
         );
         toast({
           title: "Success",

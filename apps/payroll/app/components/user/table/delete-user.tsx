@@ -38,7 +38,7 @@ export const DeleteUser = ({
   };
 
   const handleDeleteUser = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -48,7 +48,7 @@ export const DeleteUser = ({
           method: "post",
           action: `${id}/delete-user`,
           replace: true,
-        }
+        },
       );
     } else {
       e.preventDefault();
@@ -62,10 +62,8 @@ export const DeleteUser = ({
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "hidden text-[13px] h-9",
-          hasPermission(
-            role,
-            `${deleteRole}:${attribute.settingUsers}`
-          ) && "flex"
+          hasPermission(role, `${deleteRole}:${attribute.settingUsers}`) &&
+            "flex",
         )}
       >
         Delete User
@@ -78,7 +76,7 @@ export const DeleteUser = ({
             and remove it's data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <div className="py-4">
+        <div className="p-4">
           <p className="text-sm text-foreground/80">
             Please type{" "}
             <i className="text-foreground font-medium">{DELETE_TEXT}</i> to

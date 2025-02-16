@@ -48,7 +48,7 @@ export default function ProfessionalTaxIndex() {
     return (
       <ErrorBoundary
         error={error}
-        message='Failed to load Professional Taxes'
+        message="Failed to load Professional Taxes"
       />
     );
   }
@@ -60,7 +60,7 @@ export default function ProfessionalTaxIndex() {
           if (!resolvedData) {
             clearExactCacheEntry(cacheKeyPrefix.professional_tax);
             return (
-              <ErrorBoundary message='Failed to load Professional Taxes' />
+              <ErrorBoundary message="Failed to load Professional Taxes" />
             );
           }
           return (

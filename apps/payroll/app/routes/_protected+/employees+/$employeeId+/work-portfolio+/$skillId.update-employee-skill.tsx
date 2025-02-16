@@ -81,7 +81,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 
@@ -116,7 +116,7 @@ export default function UpdateEmployeeSkill() {
     if (actionData) {
       if (actionData?.status === "success") {
         clearExactCacheEntry(
-          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
+          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`,
         );
         toast({
           title: "Success",
@@ -138,7 +138,7 @@ export default function UpdateEmployeeSkill() {
     return (
       <ErrorBoundary
         error={error}
-        message='Failed to load employee skills data'
+        message="Failed to load employee skills data"
       />
     );
 
@@ -148,7 +148,7 @@ export default function UpdateEmployeeSkill() {
         {(resolvedData) => {
           if (!resolvedData)
             return (
-              <ErrorBoundary message='Failed to load employee skills data' />
+              <ErrorBoundary message="Failed to load employee skills data" />
             );
           return (
             <UpdateEmployeeSkillWrapper
@@ -173,7 +173,7 @@ export function UpdateEmployeeSkillWrapper({
     return (
       <ErrorBoundary
         error={error}
-        message='Failed to load employee skills data'
+        message="Failed to load employee skills data"
       />
     );
   return <AddEmployeeSkill updateValues={data} />;

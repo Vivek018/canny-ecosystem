@@ -61,7 +61,7 @@ export const CompanyDetails = ({
   return (
     <FormProvider context={form.context}>
       <Form
-        method='POST'
+        method="POST"
         {...getFormProps(form)}
         action={`/${updateValues.id}/update-company`}
       >
@@ -72,8 +72,8 @@ export const CompanyDetails = ({
               This is your company's visible details within canny.
             </CardDescription>
           </CardHeader>
-          <CardContent className='pb-2'>
-            <div className='grid grid-cols-1 md:grid-cols-2 items-center justify-center md:gap-x-8'>
+          <CardContent className="pb-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 items-center justify-center md:gap-x-8">
               <input {...getInputProps(fields.id, { type: "hidden" })} />
               <Field
                 inputProps={{
@@ -82,7 +82,7 @@ export const CompanyDetails = ({
                   placeholder: `Enter ${fields.name.name}`,
                   readOnly: !hasPermission(
                     role,
-                    `${updateRole}:${attribute.settingGeneral}`
+                    `${updateRole}:${attribute.settingGeneral}`,
                   ),
                 }}
                 errors={fields.name.errors}
@@ -91,48 +91,48 @@ export const CompanyDetails = ({
                 inputProps={{
                   ...getInputProps(fields.email_suffix, { type: "text" }),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.email_suffix.name
+                    fields.email_suffix.name,
                   )}`,
                   readOnly: !hasPermission(
                     role,
-                    `${updateRole}:${attribute.settingGeneral}`
+                    `${updateRole}:${attribute.settingGeneral}`,
                   ),
                 }}
                 errors={fields.email_suffix.errors}
               />
               <SearchableSelectField
                 key={resetKey}
-                className='w-full capitalize flex-1'
+                className="w-full capitalize flex-1"
                 options={transformStringArrayIntoOptions(
-                  company_type as unknown as string[]
+                  company_type as unknown as string[],
                 )}
                 inputProps={{
                   ...getInputProps(fields.company_type, { type: "text" }),
                   readOnly: !hasPermission(
                     role,
-                    `${updateRole}:${attribute.settingGeneral}`
+                    `${updateRole}:${attribute.settingGeneral}`,
                   ),
                 }}
                 placeholder={`Select ${replaceUnderscore(
-                  fields.company_type.name
+                  fields.company_type.name,
                 )}`}
                 errors={fields.company_type.errors}
               />
               <SearchableSelectField
                 key={resetKey + 1}
-                className='w-full capitalize flex-1'
+                className="w-full capitalize flex-1"
                 options={transformStringArrayIntoOptions(
-                  company_size as unknown as string[]
+                  company_size as unknown as string[],
                 )}
                 inputProps={{
                   ...getInputProps(fields.company_size, { type: "text" }),
                   readOnly: !hasPermission(
                     role,
-                    `${updateRole}:${attribute.settingGeneral}`
+                    `${updateRole}:${attribute.settingGeneral}`,
                   ),
                 }}
                 placeholder={`Select ${replaceUnderscore(
-                  fields.company_size.name
+                  fields.company_size.name,
                 )}`}
                 errors={fields.company_size.errors}
               />
@@ -144,15 +144,15 @@ export const CompanyDetails = ({
               "border-t pt-6 flex justify-between  ",
               !hasPermission(
                 role,
-                `${updateRole}:${attribute.settingGeneral}`
-              ) && "hidden"
+                `${updateRole}:${attribute.settingGeneral}`,
+              ) && "hidden",
             )}
           >
             <div>Please use 32 characters at maximum.</div>
-            <div className='flex gap-4'>
+            <div className="flex gap-4">
               <Button
-                variant='secondary'
-                type='reset'
+                variant="secondary"
+                type="reset"
                 {...form.reset.getButtonProps()}
                 onClick={() => setResetKey(Date.now())}
               >
@@ -163,8 +163,8 @@ export const CompanyDetails = ({
                 disabled={
                   !form.valid || deepEqualCheck(form.initialValue, form.value)
                 }
-                variant='default'
-                type='submit'
+                variant="default"
+                type="submit"
               >
                 Save
               </Button>

@@ -39,7 +39,7 @@ export const DeleteAddress = ({
   };
 
   const handleDeleteAddress = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -49,7 +49,7 @@ export const DeleteAddress = ({
           method: "post",
           action: `/employees/${employeeId}/${addressId}/delete-employee-address`,
           replace: true,
-        }
+        },
       );
     } else {
       e.preventDefault();
@@ -64,7 +64,7 @@ export const DeleteAddress = ({
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "text-[13px] h-9 hidden",
           hasPermission(role, `${deleteRole}:${attribute.employeeAddresses}`) &&
-            "flex"
+            "flex",
         )}
       >
         Delete Address
@@ -77,7 +77,7 @@ export const DeleteAddress = ({
             address and remove it's data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <div className="py-4">
+        <div className="p-4">
           <p className="text-sm text-foreground/80">
             Please type{" "}
             <i className="text-foreground font-medium">{DELETE_TEXT}</i> to

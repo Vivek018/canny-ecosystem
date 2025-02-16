@@ -87,13 +87,13 @@ export type EmployeeDatabaseInsert =
 export type EmployeeDatabaseUpdate =
   Database["public"]["Tables"]["employees"]["Update"];
 
-// Employees attendance
+// Attendance
 export type EmployeeAttendanceDatabaseRow =
-  Database["public"]["Tables"]["employee_attendance"]["Row"];
+  Database["public"]["Tables"]["attendance"]["Row"];
 export type EmployeeAttendanceDatabaseInsert =
-  Database["public"]["Tables"]["employee_attendance"]["Insert"];
+  Database["public"]["Tables"]["attendance"]["Insert"];
 export type EmployeeAttendanceDatabaseUpdate =
-  Database["public"]["Tables"]["employee_attendance"]["Update"];
+  Database["public"]["Tables"]["attendance"]["Update"];
 
 // Employee Statutory Details
 export type EmployeeStatutoryDetailsDatabaseRow =
@@ -265,16 +265,10 @@ export type ReimbursementRow =
 export type ReimbursementsUpdate =
   Database["public"]["Tables"]["reimbursements"]["Update"];
 
+// Exits
 export type ExitsRow = Database["public"]["Tables"]["exits"]["Row"];
 export type ExitsInsert = Database["public"]["Tables"]["exits"]["Insert"];
 export type ExitsUpdate = Database["public"]["Tables"]["exits"]["Update"];
-
-export type ExitPaymentsRow =
-  Database["public"]["Tables"]["exit_payments"]["Row"];
-export type ExitPaymentsInsert =
-  Database["public"]["Tables"]["exit_payments"]["Insert"];
-export type ExitPaymentsUpdate =
-  Database["public"]["Tables"]["exit_payments"]["Update"];
 
 export type GratuityDatabaseRow =
   Database["public"]["Tables"]["gratuity"]["Row"];
@@ -283,15 +277,24 @@ export type GratuityDatabaseInsert =
 export type GratuityDatabaseUpdate =
   Database["public"]["Tables"]["gratuity"]["Update"];
 
-export type PayrollDatabaseRow = Database["public"]["Tables"]["payroll"]["Row"];
-export type PayrollDatabaseInsert =
-  Database["public"]["Tables"]["payroll"]["Insert"];
-export type PayrollDatabaseUpdate =
-  Database["public"]["Tables"]["payroll"]["Update"];
+export type EmployeeLetterDatabaseRow =
+  Database["public"]["Tables"]["employee_letter"]["Row"];
+export type EmployeeLetterDatabaseInsert =
+  Database["public"]["Tables"]["employee_letter"]["Insert"];
+export type EmployeeLetterDatabaseUpdate =
+  Database["public"]["Tables"]["employee_letter"]["Update"];
 
-export type PayrollEntriesDatabaseRow =
-  Database["public"]["Tables"]["payroll_entries"]["Row"];
-export type PayrollEntriesDatabaseInsert =
-  Database["public"]["Tables"]["payroll_entries"]["Insert"];
-export type PayrollEntriesDatabaseUpdate =
-  Database["public"]["Tables"]["payroll_entries"]["Update"];
+export type LeaveEncashmentDatabaseRow =
+  Database["public"]["Tables"]["leave_encashment"]["Row"];
+
+export type LeaveEncashmentDatabaseInsert =
+  Database["public"]["Tables"]["leave_encashment"]["Insert"];
+
+export type LeaveEncashmentDatabaseUpdate =
+  Database["public"]["Tables"]["leave_encashment"]["Update"];
+export type AccidentsDatabaseRow =
+  Database["public"]["Tables"]["accidents"]["Row"];
+export type AccidentsDatabaseInsert =
+  Database["public"]["Tables"]["accidents"]["Insert"];
+export type AccidentsDatabaseUpdate =
+  Database["public"]["Tables"]["accidents"]["Update"];

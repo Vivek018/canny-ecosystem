@@ -93,7 +93,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const gratuityReportData = data.map((employee: EmployeeReportDataType) => {
     const gratuityEligibleYears: number = gratuityData?.eligibility_years ?? 5;
     const joining_date = new Date(
-      employee?.employee_project_assignment?.start_date,
+      employee?.employee_project_assignment?.start_date ?? "",
     );
     const totalDays = gratuityEligibleYears * 365.25;
 
@@ -168,7 +168,7 @@ export default function GratuityReport() {
   const noFilters = Object.values(filterList).every((value) => !value);
 
   return (
-    <section className="py-6 px-4">
+    <section className="py-4">
       <div className="w-full flex items-center justify-between pb-4">
         <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
           <GratuityReportSearchFilter

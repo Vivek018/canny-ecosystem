@@ -59,7 +59,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
   if (
-    !hasPermission(user?.role!, `${createRole}:${attribute.reimbursements}`)
+    !hasPermission(
+      user?.role!,
+      `${createRole}:${attribute.employeeReimbursements}`,
+    )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
@@ -89,7 +92,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 
@@ -116,7 +119,6 @@ export default function AddReimbursements({
   updateValues,
   userOptionsFromUpdate,
 }: {
-  reimbursementId?: string;
   updateValues?: ReimbursementsUpdate | null;
   userOptionsFromUpdate?: any;
 }) {
@@ -131,7 +133,7 @@ export default function AddReimbursements({
     if (actionData) {
       if (actionData?.status === "success") {
         clearCacheEntry(
-          `${cacheKeyPrefix.employee_reimbursements}${employeeId}`
+          `${cacheKeyPrefix.employee_reimbursements}${employeeId}`,
         );
         toast({
           title: "Success",
@@ -173,17 +175,17 @@ export default function AddReimbursements({
   });
 
   return (
-    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
       <FormProvider context={form.context}>
-        <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
+        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
           <Card>
             <CardHeader>
-              <CardTitle className='capitalize'>
+              <CardTitle className="capitalize">
                 {replaceUnderscore(REIMBURSEMENTS_TAG)}
               </CardTitle>
-              <CardDescription className='lowercase'>
+              <CardDescription className="lowercase">
                 {`${replaceUnderscore(
-                  REIMBURSEMENTS_TAG
+                  REIMBURSEMENTS_TAG,
                 )} by filling this form`}
               </CardDescription>
             </CardHeader>
@@ -194,7 +196,7 @@ export default function AddReimbursements({
               <input
                 {...getInputProps(fields.employee_id, { type: "hidden" })}
               />
-              <div className='grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10'>
+              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.submitted_date, {
@@ -210,15 +212,15 @@ export default function AddReimbursements({
                 />
                 <SearchableSelectField
                   key={resetKey}
-                  className='w-full capitalize flex-1 '
+                  className="w-full capitalize flex-1 "
                   options={transformStringArrayIntoOptions(
-                    reimbursementStatusArray as unknown as string[]
+                    reimbursementStatusArray as unknown as string[],
                   )}
                   inputProps={{
                     ...getInputProps(fields.status, { type: "text" }),
                   }}
                   placeholder={`Select ${replaceUnderscore(
-                    fields.status.name
+                    fields.status.name,
                   )}`}
                   labelProps={{
                     children: "Status",
@@ -226,14 +228,14 @@ export default function AddReimbursements({
                   errors={fields.status.errors}
                 />
               </div>
-              <div className='grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10'>
+              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.amount, {
                       type: "number",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.amount.name
+                      fields.amount.name,
                     )}`,
                     className: "",
                   }}
@@ -250,7 +252,7 @@ export default function AddReimbursements({
                     }),
                     placeholder: "Select an authority that approved",
                   }}
-                  className='lowercase'
+                  className="lowercase"
                   options={(userOptions as any) ?? userOptionsFromUpdate}
                   labelProps={{
                     children: "Approved By",
@@ -260,7 +262,7 @@ export default function AddReimbursements({
               </div>
 
               <CheckboxField
-                className='mt-8'
+                className="mt-8"
                 buttonProps={getInputProps(fields.is_deductible, {
                   type: "checkbox",
                 })}

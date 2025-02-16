@@ -22,7 +22,12 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import type { EmployeeSkillDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { DeleteSkill } from "./delete-skill";
-import { createRole, deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
+import {
+  createRole,
+  deleteRole,
+  hasPermission,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
@@ -73,8 +78,8 @@ export const SkillItem = ({ skill }: { skill: EmployeeSkill }) => {
                     "px-2.5 h-min",
                     !hasPermission(
                       role,
-                      `${updateRole}:${attribute.employeeSkills}`
-                    ) && "hidden"
+                      `${updateRole}:${attribute.employeeSkills}`,
+                    ) && "hidden",
                   )}
                 >
                   <Icon name="edit" size="xs" />
@@ -88,8 +93,10 @@ export const SkillItem = ({ skill }: { skill: EmployeeSkill }) => {
               className={cn(
                 buttonVariants({ variant: "muted" }),
                 "px-2.5 h-min hidden",
-                hasPermission(role, `${deleteRole}:${attribute.employeeSkills}`) &&
-                  "flex"
+                hasPermission(
+                  role,
+                  `${deleteRole}:${attribute.employeeSkills}`,
+                ) && "flex",
               )}
             >
               <Icon name="dots-vertical" size="xs" />
@@ -132,8 +139,10 @@ export const EmployeeSkillsCard = ({
             className={cn(
               buttonVariants({ variant: "outline" }),
               "bg-card",
-              !hasPermission(role, `${createRole}:${attribute.employeeSkills}`) &&
-                "hidden"
+              !hasPermission(
+                role,
+                `${createRole}:${attribute.employeeSkills}`,
+              ) && "hidden",
             )}
           >
             <Icon name="plus-circled" className="mr-2" />

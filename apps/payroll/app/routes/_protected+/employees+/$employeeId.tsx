@@ -9,17 +9,17 @@ export default function Employee() {
   const { pathname } = useLocation();
 
   return (
-    <section className='relative'>
-      <div className='flex items-center gap-4 py-2.5 px-4 border-b'>
+    <section className="relative">
+      <div className="flex items-center gap-4 py-2.5 px-4 border-b">
         <Link
-          prefetch='intent'
-          to='/employees'
+          prefetch="intent"
+          to="/employees"
           className={cn(
             buttonVariants({ variant: "outline" }),
-            "bg-card w-9 h-9 px-0 rounded-full"
+            "bg-card w-9 h-9 px-0 rounded-full",
           )}
         >
-          <Icon name='chevron-left' size='sm' />
+          <Icon name="chevron-left" size="sm" />
         </Link>
         <SecondaryMenu
           items={[
@@ -32,12 +32,20 @@ export default function Employee() {
               label: "Reimbursements",
               path: `/employees/${employeeId}/reimbursements`,
             },
+            {
+              label: "Letters",
+              path: `/employees/${employeeId}/letters`,
+            },
+            {
+              label: "Attendance",
+              path: `/employees/${employeeId}/attendance`,
+            },
           ]}
           pathname={pathname}
           Link={Link}
         />
       </div>
-      <div className='px-4'>
+      <div className="px-4">
         <Outlet />
       </div>
     </section>

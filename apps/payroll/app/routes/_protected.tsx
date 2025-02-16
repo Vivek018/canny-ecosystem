@@ -1,5 +1,9 @@
 import { json, redirect, type LoaderFunctionArgs } from "@remix-run/node";
-import { type ClientLoaderFunctionArgs, Outlet, useLoaderData } from "@remix-run/react";
+import {
+  type ClientLoaderFunctionArgs,
+  Outlet,
+  useLoaderData,
+} from "@remix-run/react";
 import { getSessionUser } from "@canny_ecosystem/supabase/cached-queries";
 import {
   getUserByEmail,
@@ -35,7 +39,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   });
 
   if (companiesError) {
-    console.error("companiesError", companiesError);
+    console.error("Protected Companies", companiesError);
   }
 
   return json({

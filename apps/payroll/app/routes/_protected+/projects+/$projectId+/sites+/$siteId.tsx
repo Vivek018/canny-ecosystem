@@ -53,7 +53,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
           (paymentTemplate) => ({
             label: paymentTemplate.name,
             value: paymentTemplate.id ?? "",
-          })
+          }),
         );
       }
 
@@ -85,7 +85,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         paymentTemplatesOptions,
         linkTemplates,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

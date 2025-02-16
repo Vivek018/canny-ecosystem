@@ -16,7 +16,10 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { clearAllCache } from "@/utils/cache";
 import { DEFAULT_ROUTE } from "@/constant";
 
-export async function action({ request, params }: ActionFunctionArgs): Promise<Response> {
+export async function action({
+  request,
+  params,
+}: ActionFunctionArgs): Promise<Response> {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
@@ -31,7 +34,7 @@ export async function action({ request, params }: ActionFunctionArgs): Promise<R
       {
         status: 403,
         headers,
-      }
+      },
     );
   }
 
@@ -55,7 +58,7 @@ export async function action({ request, params }: ActionFunctionArgs): Promise<R
         {
           status: 200,
           headers,
-        }
+        },
       );
     }
 
@@ -68,7 +71,7 @@ export async function action({ request, params }: ActionFunctionArgs): Promise<R
       {
         status: 500,
         headers,
-      }
+      },
     );
   } catch (error) {
     return json(
@@ -82,7 +85,7 @@ export async function action({ request, params }: ActionFunctionArgs): Promise<R
       {
         status: 500,
         headers,
-      }
+      },
     );
   }
 }

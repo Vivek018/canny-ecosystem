@@ -35,7 +35,7 @@ export function CreateEmployeeAddress({
   return (
     <Fragment>
       <CardHeader>
-        <CardTitle className='text-3xl capitalize'>
+        <CardTitle className="text-3xl capitalize">
           {isUpdate ? "Update" : "Add"} Employee Address
         </CardTitle>
         <CardDescription>
@@ -77,7 +77,7 @@ export function CreateEmployeeAddress({
           errors={fields.address_line_1.errors}
         />
         <Field
-          className='-mt-4'
+          className="-mt-4"
           inputProps={{
             ...getInputProps(fields.address_line_2, { type: "text" }),
             placeholder: replaceUnderscore(fields.address_line_2.name),
@@ -85,7 +85,7 @@ export function CreateEmployeeAddress({
           }}
           errors={fields.address_line_2.errors}
         />
-        <div className='grid grid-cols-3 place-content-center justify-between gap-6'>
+        <div className="grid grid-cols-3 place-content-center justify-between gap-6">
           <Field
             inputProps={{
               ...getInputProps(fields.city, { type: "text" }),
@@ -98,7 +98,7 @@ export function CreateEmployeeAddress({
             errors={fields.city.errors}
           />
           <SearchableSelectField
-            className='capitalize'
+            className="capitalize"
             options={statesAndUTs}
             inputProps={{
               ...getInputProps(fields.state, { type: "text" }),
@@ -121,7 +121,7 @@ export function CreateEmployeeAddress({
             errors={fields.pincode.errors}
           />
         </div>
-        <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
+        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
           <Field
             inputProps={{
               ...getInputProps(fields.latitude, { type: "number" }),

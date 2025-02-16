@@ -24,8 +24,8 @@ export default function Account() {
   const { pathname } = useLocation();
 
   return (
-    <section className='flex flex-col h-full'>
-      <div className='py-[18px] px-4 border-b'>
+    <section className="flex flex-col h-full">
+      <div className="py-[18px] px-4 border-b">
         <SecondaryMenu
           items={[
             { label: "Account", path: "/user/account" },
@@ -39,7 +39,7 @@ export default function Account() {
           Link={Link}
         />
       </div>
-      <div className='px-4 h-full'>
+      <div className="px-4 h-full">
         <Outlet />
       </div>
     </section>

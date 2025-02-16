@@ -36,7 +36,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.statutoryFieldsEpf}`)) {
+  if (
+    !hasPermission(user?.role!, `${updateRole}:${attribute.statutoryFieldsEpf}`)
+  ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
@@ -64,7 +66,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         epfPromise: null,
         companyId: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -83,7 +85,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -112,7 +114,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

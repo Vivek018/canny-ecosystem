@@ -32,9 +32,8 @@ export function ExportBar({
       if (key === "employee_code") {
         exportedData[key] = element.employee_code;
       } else if (key === "employee_name") {
-        exportedData[
-          key
-        ] = `${element.first_name} ${element.middle_name} ${element.last_name}`;
+        exportedData[key] =
+          `${element.first_name} ${element.middle_name} ${element.last_name}`;
       } else if (key === "project") {
         exportedData[key] =
           element.employee_project_assignment.project_sites.projects.name;
@@ -73,7 +72,7 @@ export function ExportBar({
     <div
       className={cn(
         "z-40 fixed bottom-8 left-0 right-0 mx-auto h-14 w-max shadow-md rounded-full flex gap-10 justify-between items-center p-2 text-sm border dark:border-muted-foreground/30 bg-card text-card-foreground",
-        className
+        className,
       )}
     >
       <div className="ml-2 flex items-center space-x-1 rounded-md">

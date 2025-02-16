@@ -1,5 +1,4 @@
 import type { PayrollFilterType } from "@/routes/_protected+/dashboard";
-import type { EmployeeFilters } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { useSearchParams } from "@remix-run/react";
@@ -19,7 +18,7 @@ export function FilterList({ filterList }: Props) {
     switch (key) {
       case "start_year":
         return `${filterList?.start_month?.slice(0, 3)} ${value}`;
-        
+
       case "end_year":
         return `${filterList?.end_month?.slice(0, 3)} ${value}`;
 
@@ -44,7 +43,10 @@ export function FilterList({ filterList }: Props) {
     <ul className="flex flex-0 space-x-2 w-full overflow-scroll no-scrollbar">
       {filterList &&
         Object.entries(filterList)
-          .filter(([key, value]) => value !== null && value !== undefined && !key.endsWith("month"))
+          .filter(
+            ([key, value]) =>
+              value !== null && value !== undefined && !key.endsWith("month"),
+          )
           .map(([key, value]) => {
             return (
               <li key={key}>

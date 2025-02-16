@@ -1,6 +1,8 @@
 import { ImportedDataColumns } from "@/components/employees/imported-guardians-table/columns";
 import { ImportedDataTable } from "@/components/employees/imported-guardians-table/imported-data-table";
+import { cacheKeyPrefix } from "@/constant";
 import { useImportStoreForEmployeeGuardians } from "@/store/import";
+import { clearCacheEntry } from "@/utils/cache";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
 import {
   createEmployeeGuardiansFromImportedData,
@@ -47,12 +49,12 @@ export function EmployeeGuardiansImportData({
     try {
       const result = ImportEmployeeGuardiansDataSchema.safeParse({ data });
       if (!result.success) {
-        console.error("Data validation error");
+        console.error("Employee Guardians Data validation error");
         return false;
       }
       return true;
     } catch (error) {
-      console.error("Data validation error:", error);
+      console.error("Employee Guardians Data validation error:", error);
 
       return false;
     }
@@ -61,7 +63,7 @@ export function EmployeeGuardiansImportData({
   const fetchConflicts = async () => {
     try {
       const employeeCodes = importData.data!.map(
-        (value: { employee_code: any }) => value.employee_code
+        (value: { employee_code: any }) => value.employee_code,
       );
       const { data: employees, error: idByCodeError } =
         await getEmployeeIdsByEmployeeCodes({
@@ -75,7 +77,7 @@ export function EmployeeGuardiansImportData({
 
       const updatedData = importData.data!.map((item: any) => {
         const employeeId = employees?.find(
-          (e: { employee_code: any }) => e.employee_code === item.employee_code
+          (e: { employee_code: any }) => e.employee_code === item.employee_code,
         )?.id;
 
         const { employee_code, ...rest } = item;
@@ -90,7 +92,7 @@ export function EmployeeGuardiansImportData({
         {
           supabase,
           importedData: updatedData as EmployeeBankDetailsDatabaseInsert[],
-        }
+        },
       );
 
       if (error) {
@@ -99,7 +101,7 @@ export function EmployeeGuardiansImportData({
 
       setConflictingIndex(conflictingIndices);
     } catch (err) {
-      console.error("Error fetching conflicts:", err);
+      console.error("Employee Guardians Error fetching conflicts:", err);
     }
   };
 
@@ -114,8 +116,8 @@ export function EmployeeGuardiansImportData({
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase())
-      )
+          String(value).toLowerCase().includes(searchString.toLowerCase()),
+      ),
     );
     setTableData(filteredData);
   }, [searchString, importData]);
@@ -129,19 +131,20 @@ export function EmployeeGuardiansImportData({
       });
 
       if (error) {
-        console.error(error);
+        console.error("Employee Guardians", error);
       }
       if (
         status === "No new data to insert" ||
         status === "Data processed successfully"
       ) {
+        clearCacheEntry(cacheKeyPrefix.employee_overview);
         navigate("/employees");
       }
     }
   };
 
   return (
-    <section className="m-4">
+    <section className="p-4">
       <div className="w-full flex items-center justify-between pb-4">
         <div className="w-full  flex justify-between items-center">
           <div className="relative w-[30rem] ">
@@ -163,10 +166,10 @@ export function EmployeeGuardiansImportData({
             <Combobox
               className={cn(
                 "w-52 h-10",
-                conflictingIndex?.length > 0 ? "flex" : "hidden"
+                conflictingIndex?.length > 0 ? "flex" : "hidden",
               )}
               options={transformStringArrayIntoOptions(
-                duplicationTypeArray as unknown as string[]
+                duplicationTypeArray as unknown as string[],
               )}
               value={importType}
               onChange={(value: string) => {

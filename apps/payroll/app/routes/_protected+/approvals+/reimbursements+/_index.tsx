@@ -1,9 +1,8 @@
 import { ReimbursementSearchFilter } from "@/components/reimbursements/reimbursement-search-filter";
 import { FilterList } from "@/components/reimbursements/filter-list";
 import { ImportReimbursementModal } from "@/components/reimbursements/import-export/import-modal-reimbursements";
-
 import { ErrorBoundary } from "@/components/error-boundary";
-import { cacheKeyPrefix } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
@@ -30,6 +29,10 @@ import { Suspense } from "react";
 import { ReimbursementActions } from "@/components/reimbursements/reimbursement-actions";
 import { ReimbursementsTable } from "@/components/reimbursements/table/reimbursements-table";
 import { columns } from "@/components/reimbursements/table/columns";
+import { hasPermission, readRole } from "@canny_ecosystem/utils";
+import { safeRedirect } from "@/utils/server/http.server";
+import { attribute } from "@canny_ecosystem/utils/constant";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 
 const pageSize = LAZY_LOADING_LIMIT;
 
@@ -38,16 +41,19 @@ export async function loader({ request }: LoaderFunctionArgs) {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (!hasPermission(user?.role!, `${readRole}:${attribute.reimbursements}`))
+    return safeRedirect(DEFAULT_ROUTE, { headers });
 
   try {
     const url = new URL(request.url);
-    const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
     const page = 0;
 
     const searchParams = new URLSearchParams(url.searchParams);
     const sortParam = searchParams.get("sort");
-
     const query = searchParams.get("name") ?? undefined;
 
     const filters: ReimbursementFilters = {
@@ -65,7 +71,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined
+        (value) => value !== null && value !== undefined,
       );
 
     const reimbursementsPromise = getReimbursementsByCompanyId({
@@ -80,20 +86,16 @@ export async function loader({ request }: LoaderFunctionArgs) {
       },
     });
 
-    const projectPromise = getProjectNamesByCompanyId({
-      supabase,
-      companyId,
-    });
+    const projectPromise = getProjectNamesByCompanyId({ supabase, companyId });
 
-    const userEmailsPromise = getUsersEmail({ supabase });
+    const userEmailsPromise = getUsersEmail({ supabase, companyId });
 
     let projectSitePromise = null;
-    if (filters.project) {
+    if (filters.project)
       projectSitePromise = getSiteNamesByProjectName({
         supabase,
         projectName: filters.project,
       });
-    }
 
     return defer({
       reimbursementsPromise: reimbursementsPromise as any,
@@ -106,7 +108,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       env,
     });
   } catch (error) {
-    console.error("Error in loader function:", error);
+    console.error("Reimbursement Error in loader function:", error);
 
     return defer({
       reimbursementsPromise: Promise.resolve({ data: [] }),
@@ -123,10 +125,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
-
   return await clientCaching(
     `${cacheKeyPrefix.reimbursements}${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 
@@ -148,9 +149,9 @@ export default function ReimbursementsIndex() {
   const noFilters = Object.values(filterList).every((value) => !value);
 
   return (
-    <section className='py-6 px-4'>
-      <div className='w-full flex items-center justify-between pb-4'>
-        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4'>
+    <section className="p-4">
+      <div className="w-full flex items-center justify-between pb-4">
+        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
           <Suspense fallback={<div>Loading...</div>}>
             <Await resolve={projectPromise}>
               {(projectData) => (
@@ -163,7 +164,7 @@ export default function ReimbursementsIndex() {
                           projectArray={
                             projectData?.data?.length
                               ? projectData?.data?.map(
-                                  (project) => project!.name
+                                  (project) => project!.name,
                                 )
                               : []
                           }
@@ -197,7 +198,7 @@ export default function ReimbursementsIndex() {
               return (
                 <ErrorBoundary
                   error={error}
-                  message='Failed to load reimbursements'
+                  message="Failed to load reimbursements"
                 />
               );
             }

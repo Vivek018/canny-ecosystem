@@ -37,7 +37,7 @@ export const PaymentFieldOptionsDropdown = ({
       {
         method: "POST",
         action: `/payment-components/payment-fields/${paymentField.id}/update-payment-field-status`,
-      }
+      },
     );
   };
 
@@ -51,13 +51,13 @@ export const PaymentFieldOptionsDropdown = ({
       {
         method: "POST",
         action: `/payment-components/payment-fields/${paymentField.id}/update-payment-field-status`,
-      }
+      },
     );
   };
 
   const handleEdit = () => {
     navigate(
-      `/payment-components/payment-fields/${paymentField.id}/update-payment-field`
+      `/payment-components/payment-fields/${paymentField.id}/update-payment-field`,
     );
   };
 
@@ -68,7 +68,7 @@ export const PaymentFieldOptionsDropdown = ({
   return (
     <DropdownMenu>
       {triggerChild}
-      <DropdownMenuContent sideOffset={10} align='end'>
+      <DropdownMenuContent sideOffset={10} align="end">
         <DropdownMenuGroup>
           <DropdownMenuItem onClick={handleReports}>
             View Report
@@ -80,9 +80,9 @@ export const PaymentFieldOptionsDropdown = ({
             !hasPermission(role, `${updateRole}:${attribute.paymentFields}`) &&
               !hasPermission(
                 role,
-                `${deleteRole}:${attribute.paymentFields}`
+                `${deleteRole}:${attribute.paymentFields}`,
               ) &&
-              "hidden"
+              "hidden",
           )}
         />
 
@@ -92,8 +92,8 @@ export const PaymentFieldOptionsDropdown = ({
               paymentField.is_active && "hidden",
               !hasPermission(
                 role,
-                `${updateRole}:${attribute.paymentFields}`
-              ) && "hidden"
+                `${updateRole}:${attribute.paymentFields}`,
+              ) && "hidden",
             )}
             onClick={handleMarkAsActive}
           >
@@ -104,8 +104,8 @@ export const PaymentFieldOptionsDropdown = ({
               !paymentField.is_active && "hidden",
               !hasPermission(
                 role,
-                `${updateRole}:${attribute.paymentFields}`
-              ) && "hidden"
+                `${updateRole}:${attribute.paymentFields}`,
+              ) && "hidden",
             )}
             onClick={handleMarkAsInactive}
           >
@@ -116,7 +116,7 @@ export const PaymentFieldOptionsDropdown = ({
             className={cn(
               "hidden",
               hasPermission(role, `${updateRole}:${attribute.paymentFields}`) &&
-                "flex"
+                "flex",
             )}
           >
             Edit payment field
@@ -125,7 +125,7 @@ export const PaymentFieldOptionsDropdown = ({
             className={cn(
               "hidden",
               hasPermission(role, `${deleteRole}:${attribute.paymentFields}`) &&
-                "flex"
+                "flex",
             )}
           />
           <DeletePaymentField paymentFieldId={paymentField.id} />

@@ -34,7 +34,7 @@ export async function createProject({
   } = await supabase.from("projects").insert(data).select().single();
 
   if (error) {
-    console.error(error);
+    console.error("createProject Error:", error);
   }
 
   return { status, error, id: projectData?.id };
@@ -69,7 +69,7 @@ export async function updateProject({
     .single();
 
   if (error) {
-    console.error("error", error);
+    console.error("updateProject Error:", error);
   }
 
   return { status, error };
@@ -100,7 +100,7 @@ export async function deleteProject({
     .eq("id", id);
 
   if (error) {
-    console.error(error);
+    console.error("deleteProject Error:", error);
   }
 
   return { status, error };
@@ -139,11 +139,13 @@ export async function createSite({
       .single();
 
     if (paySequenceError) {
-      console.error(paySequenceError);
+      console.error("createSite PaySequence Error:", paySequenceError);
     }
   }
 
-  console.error(error);
+  if (error) {
+    console.error("createSite Error:", error);
+  }
 
   return { data: projectSiteData, status, error };
 }
@@ -175,7 +177,7 @@ export async function updateSite({
     .single();
 
   if (error) {
-    console.error(error);
+    console.error("updateSite Error:", error);
   }
 
   return { status, error };
@@ -206,7 +208,7 @@ export async function deleteSite({
     .eq("id", id);
 
   if (error) {
-    console.error(error);
+    console.error("deleteSite Error:", error);
   }
 
   return { status, error };
@@ -240,7 +242,7 @@ export async function updateSitePaySequence({
     .single();
 
   if (error) {
-    console.error(error);
+    console.error("updateSitePaySequence Error:", error);
   }
 
   return { status, error };

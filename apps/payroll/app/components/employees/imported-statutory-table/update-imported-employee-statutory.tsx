@@ -13,9 +13,7 @@ import {
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Field } from "@canny_ecosystem/ui/forms";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import {
-  ImportSingleEmployeeStatutoryDataSchema,
-} from "@canny_ecosystem/utils";
+import { ImportSingleEmployeeStatutoryDataSchema } from "@canny_ecosystem/utils";
 import { useState } from "react";
 
 export const UpdateImportedEmployee = ({
@@ -39,7 +37,7 @@ export const UpdateImportedEmployee = ({
     if (parsedResult.success) {
       setImportData({
         data: importData.data?.map((item, index) =>
-          index === indexToUpdate ? data : item
+          index === indexToUpdate ? data : item,
         ),
       });
     }
@@ -50,7 +48,7 @@ export const UpdateImportedEmployee = ({
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "ghost", size: "full" }),
-          "text-[13px] h-9"
+          "text-[13px] h-9",
         )}
       >
         Update Employee
@@ -124,7 +122,8 @@ export const UpdateImportedEmployee = ({
               inputProps={{
                 type: "number",
                 value: data.driving_license_number!,
-                onChange: (e) => onChange("driving_license_number", e.target.value),
+                onChange: (e) =>
+                  onChange("driving_license_number", e.target.value),
                 placeholder: "Driving License Number",
               }}
             />
@@ -133,7 +132,8 @@ export const UpdateImportedEmployee = ({
               inputProps={{
                 type: "date",
                 value: data.driving_license_expiry!,
-                onChange: (e) => onChange("driving_license_expiry", e.target.value),
+                onChange: (e) =>
+                  onChange("driving_license_expiry", e.target.value),
                 placeholder: "Driving License Expiry Date",
               }}
             />
@@ -158,12 +158,6 @@ export const UpdateImportedEmployee = ({
               }}
             />
           </div>
-
-          
-          
-          
-
-          
         </div>
 
         <AlertDialogFooter>

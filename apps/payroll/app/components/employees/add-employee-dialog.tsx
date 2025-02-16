@@ -27,19 +27,19 @@ export function AddEmployeeDialog() {
         asChild
         className={cn(
           !hasPermission(role, `${createRole}:${attribute.employees}`) &&
-            "hidden"
+            "hidden",
         )}
       >
-        <Button variant='outline' size='icon' className='h-10 w-10'>
-          <Icon name='plus' className='h-[18px] w-[18px]' />
+        <Button variant="outline" size="icon" className="h-10 w-10">
+          <Icon name="plus" className="h-[18px] w-[18px]" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent sideOffset={10} align='end'>
+      <DropdownMenuContent sideOffset={10} align="end">
         <DropdownMenuItem
           onClick={() => navigate("/employees/create-employee")}
-          className='space-x-2'
+          className="space-x-2"
         >
-          <Icon name='plus-circled' size='sm' />
+          <Icon name="plus-circled" size="sm" />
           <span>Create employee</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -47,65 +47,65 @@ export function AddEmployeeDialog() {
           onClick={() => {
             searchParams.set(
               "step",
-              modalSearchParamNames.import_employee_details
+              modalSearchParamNames.import_employee_details,
             );
             setSearchParams(searchParams);
           }}
-          className='space-x-2 flex items-center'
+          className="space-x-2 flex items-center"
         >
-          <Icon name='import' size='sm' className='mb-0.5' />
+          <Icon name="import" size="sm" className="mb-0.5" />
           <span>Import Employee</span>
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
             searchParams.set(
               "step",
-              modalSearchParamNames.import_employee_statutory
+              modalSearchParamNames.import_employee_statutory,
             );
             setSearchParams(searchParams);
           }}
-          className='space-x-2 flex items-center'
+          className="space-x-2 flex items-center"
         >
-          <Icon name='import' size='sm' className='mb-0.5' />
+          <Icon name="import" size="sm" className="mb-0.5" />
           <span>Import Statutory</span>
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
             searchParams.set(
               "step",
-              modalSearchParamNames.import_employee_bank_details
+              modalSearchParamNames.import_employee_bank_details,
             );
             setSearchParams(searchParams);
           }}
-          className='space-x-2 flex items-center'
+          className="space-x-2 flex items-center"
         >
-          <Icon name='import' size='sm' className='mb-0.5' />
+          <Icon name="import" size="sm" className="mb-0.5" />
           <span>Import Bank Details</span>
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
             searchParams.set(
               "step",
-              modalSearchParamNames.import_employee_address
+              modalSearchParamNames.import_employee_address,
             );
             setSearchParams(searchParams);
           }}
-          className='space-x-2 flex items-center'
+          className="space-x-2 flex items-center"
         >
-          <Icon name='import' size='sm' className='mb-0.5' />
+          <Icon name="import" size="sm" className="mb-0.5" />
           <span>Import Address</span>
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
             searchParams.set(
               "step",
-              modalSearchParamNames.import_employee_guardians
+              modalSearchParamNames.import_employee_guardians,
             );
             setSearchParams(searchParams);
           }}
-          className='space-x-2 flex items-center'
+          className="space-x-2 flex items-center"
         >
-          <Icon name='import' size='sm' className='mb-0.5' />
+          <Icon name="import" size="sm" className="mb-0.5" />
           <span>Import Guardians</span>
         </DropdownMenuItem>
       </DropdownMenuContent>

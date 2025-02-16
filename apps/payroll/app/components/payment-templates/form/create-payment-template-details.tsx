@@ -31,7 +31,7 @@ export function CreatePaymentTemplateDetails({
   return (
     <Fragment>
       <CardHeader>
-        <CardTitle className='text-3xl capitalize'>
+        <CardTitle className="text-3xl capitalize">
           {isUpdate ? "Update" : "Create"} Payment Template
         </CardTitle>
         <CardDescription>
@@ -59,7 +59,7 @@ export function CreatePaymentTemplateDetails({
           labelProps={{ children: fields.description.name }}
           errors={fields.description.errors}
         />
-        <div className='grid grid-cols-2 place-content-center justify-between gap-x-4'>
+        <div className="grid grid-cols-2 place-content-center justify-between gap-x-4">
           <CheckboxField
             buttonProps={getInputProps(fields.is_active, {
               type: "checkbox",

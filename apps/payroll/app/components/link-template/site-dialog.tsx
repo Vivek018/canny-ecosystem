@@ -35,8 +35,8 @@ export function SiteDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent className='sm:max-w-[600px]'>
-        <DialogTitle className='text-xl font-semibold mb-4'>
+      <DialogContent className="sm:max-w-[600px]">
+        <DialogTitle className="text-xl font-semibold mb-4">
           {isUpdateAction ? "Update" : "Create"} Link Payment Template
         </DialogTitle>
         {action ? (

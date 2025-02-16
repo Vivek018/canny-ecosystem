@@ -144,7 +144,7 @@ export const columns = ({
       return (
         <p className="capitalize">
           {replaceUnderscore(
-            row.original?.employee_project_assignment?.assignment_type ?? ""
+            row.original?.employee_project_assignment?.assignment_type ?? "",
           )}
         </p>
       );
@@ -158,7 +158,7 @@ export const columns = ({
       return (
         <p className="w-40 truncate capitalize">
           {replaceUnderscore(
-            row.original?.employee_project_assignment?.position
+            row.original?.employee_project_assignment?.position,
           )}
         </p>
       );
@@ -172,7 +172,7 @@ export const columns = ({
       return (
         <p className="w-max capitalize">
           {replaceUnderscore(
-            row.original?.employee_project_assignment?.skill_level ?? ""
+            row.original?.employee_project_assignment?.skill_level ?? "",
           )}
         </p>
       );
@@ -223,8 +223,11 @@ export const columns = ({
               asChild
               className={cn(
                 !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
-                  !hasPermission(role, `${deleteRole}:${attribute.employees}`) &&
-                  "hidden"
+                  !hasPermission(
+                    role,
+                    `${deleteRole}:${attribute.employees}`,
+                  ) &&
+                  "hidden",
               )}
             >
               <Button variant="ghost" className="h-8 w-8 p-0">

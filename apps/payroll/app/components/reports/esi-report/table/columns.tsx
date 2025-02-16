@@ -74,9 +74,7 @@ export const columns = (): ColumnDef<ESIReportType>[] => [
     header: "ESI Number",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-28 capitalize">
-          {row.original?.esi_number}
-        </p>
+        <p className="truncate w-28 capitalize">{row.original?.esi_number}</p>
       );
     },
   },
@@ -85,7 +83,9 @@ export const columns = (): ColumnDef<ESIReportType>[] => [
     accessorKey: "esi_wages",
     header: "ESI Wages",
     cell: ({ row }) => {
-      return <p className="truncate w-28 capitalize">{row.original?.esi_wages}</p>;
+      return (
+        <p className="truncate w-28 capitalize">{row.original?.esi_wages}</p>
+      );
     },
   },
   {
@@ -94,7 +94,9 @@ export const columns = (): ColumnDef<ESIReportType>[] => [
     header: "Employees' Contribution",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-28 capitalize">{row.original?.employee_contribution}</p>
+        <p className="truncate w-28 capitalize">
+          {row.original?.employee_contribution}
+        </p>
       );
     },
   },

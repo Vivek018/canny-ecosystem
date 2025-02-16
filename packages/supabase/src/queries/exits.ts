@@ -2,7 +2,6 @@ import { formatUTCDate } from "@canny_ecosystem/utils";
 import { HARD_QUERY_LIMIT, SINGLE_QUERY_LIMIT } from "../constant";
 import type {
   EmployeeDatabaseRow,
-  ExitPaymentsRow,
   ExitsRow,
   InferredType,
   TypedSupabaseClient,
@@ -18,6 +17,23 @@ export type ExitFilterType = {
   project_site?: string | undefined | null;
 } | null;
 
+export type ImportExitDataType = Pick<
+  ExitsRow,
+  | "employee_payable_days"
+  | "bonus"
+  | "deduction"
+  | "final_settlement_date"
+  | "gratuity"
+  | "last_working_day"
+  | "leave_encashment"
+  | "note"
+  | "organization_payable_days"
+  | "reason"
+  | "net_pay"
+> & { employee_code: string } & { employee_name: string } & {
+  project_name: string;
+} & { project_site_name: string };
+
 export type ExitDataType = Pick<
   ExitsRow,
   | "id"
@@ -28,25 +44,16 @@ export type ExitDataType = Pick<
   | "note"
   | "organization_payable_days"
   | "reason"
-  | "total"
+  | "net_pay"
 > & {
   employees: Pick<
     EmployeeDatabaseRow,
     "first_name" | "middle_name" | "last_name" | "employee_code"
   > & {
     employee_project_assignment: {
-      project_sites: {
-        name: string;
-        projects: { name: string };
-      };
+      project_sites: { name: string; projects: { name: string } };
     };
   };
-} & {
-  exit_payments: (Pick<ExitPaymentsRow, "amount" | "type"> & {
-    payment_fields: {
-      name: string;
-    };
-  })[];
 };
 
 export const getExits = async ({
@@ -64,6 +71,16 @@ export const getExits = async ({
 }) => {
   const { from, to, sort, searchQuery, filters } = params;
 
+  const {
+    last_working_day_start,
+    last_working_day_end,
+    final_settlement_date_start,
+    final_settlement_date_end,
+    reason,
+    project,
+    project_site,
+  } = filters ?? {};
+
   const columns = [
     "id",
     "employee_id",
@@ -72,16 +89,19 @@ export const getExits = async ({
     "last_working_day",
     "final_settlement_date",
     "reason",
+    "bonus",
+    "leave_encashment",
+    "gratuity",
+    "deduction",
     "note",
-    "total",
+    "net_pay",
   ] as const;
 
   const query = supabase
     .from("exits")
     .select(
       `${columns.join(",")},
-          employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(project_sites!inner(id, name, projects!inner(id, name)))),
-          exit_payments(amount, type, payment_fields!payment_fields_id(name))`,
+          employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"}(project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"}(id, name))))`,
       { count: "exact" },
     )
     .limit(HARD_QUERY_LIMIT);
@@ -116,59 +136,43 @@ export const getExits = async ({
     }
   }
 
-  // Filters
-  if (filters) {
-    const {
-      last_working_day_start,
-      last_working_day_end,
-      final_settlement_date_start,
-      final_settlement_date_end,
-      reason,
+  const dateFilters = [
+    {
+      field: "last_working_day",
+      start: last_working_day_start,
+      end: last_working_day_end,
+    },
+    {
+      field: "final_settlement_date",
+      start: final_settlement_date_start,
+      end: final_settlement_date_end,
+    },
+  ];
+
+  for (const { field, start, end } of dateFilters) {
+    if (start) query.gte(field, formatUTCDate(start));
+    if (end) query.lte(field, formatUTCDate(end));
+  }
+
+  if (reason) query.eq("reason", reason.toLowerCase());
+
+  if (project) {
+    query.eq(
+      "employees.employee_project_assignment.project_sites.projects.name",
       project,
+    );
+  }
+  if (project_site) {
+    query.eq(
+      "employees.employee_project_assignment.project_sites.name",
       project_site,
-    } = filters;
-
-    const dateFilters = [
-      {
-        field: "last_working_day",
-        start: last_working_day_start,
-        end: last_working_day_end,
-      },
-      {
-        field: "final_settlement_date",
-        start: final_settlement_date_start,
-        end: final_settlement_date_end,
-      },
-    ];
-
-    for (const { field, start, end } of dateFilters) {
-      if (start) query.gte(field, formatUTCDate(start));
-      if (end) query.lte(field, formatUTCDate(end));
-    }
-
-    if (reason) {
-      query.eq("reason", reason);
-    }
-
-    if (project) {
-      query.eq(
-        "employees.employee_project_assignment.project_sites.projects.name",
-        project,
-      );
-    }
-    if (project_site) {
-      query.eq(
-        "employees.employee_project_assignment.project_sites.name",
-        project_site,
-      );
-    }
+    );
   }
 
   const { data, count, error } = await query.range(from, to);
 
   if (error) {
-    console.error(error);
-    return { data: null, meta: { count: 0 }, error };
+    console.error("getExits Error", error);
   }
 
   return { data, meta: { count: count ?? data?.length }, error };
@@ -189,7 +193,12 @@ export const getExitsById = async ({
     "last_working_day",
     "final_settlement_date",
     "reason",
+    "bonus",
+    "leave_encashment",
+    "gratuity",
+    "deduction",
     "note",
+    "net_pay",
   ] as const;
 
   const { data, error } = await supabase
@@ -198,9 +207,7 @@ export const getExitsById = async ({
     .eq("id", id)
     .single<InferredType<ExitsRow, (typeof columns)[number]>>();
 
-  if (error) {
-    console.error(error);
-  }
+  if (error) console.error("getExitsById Error", error);
 
   return { data, error };
 };
@@ -232,7 +239,7 @@ export const getExitsByCompanyId = async ({
     .maybeSingle<InferredType<ExitsRow, (typeof columns)[number]>>();
 
   if (error) {
-    console.error(error);
+    console.error("getExitsByCompanyId Error", error);
   }
 
   return { data, error };

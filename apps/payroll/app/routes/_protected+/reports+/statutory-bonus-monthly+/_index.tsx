@@ -60,7 +60,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
     meta?.count && meta.count / (page + 1) > pageSize,
   );
 
-
   if (error) {
     throw error;
   }
@@ -141,7 +140,7 @@ export default function StatutoryBonusReport() {
   const noFilters = Object.values(filterList).every((value) => !value);
 
   return (
-    <section className="py-6 px-4">
+    <section className="py-4">
       <div className="w-full flex items-center justify-between pb-4">
         <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
           <SBReportSearchFilter

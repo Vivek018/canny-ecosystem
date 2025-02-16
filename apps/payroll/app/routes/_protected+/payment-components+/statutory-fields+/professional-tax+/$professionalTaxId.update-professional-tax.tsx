@@ -35,7 +35,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.statutoryFieldsPf}`)) {
+  if (
+    !hasPermission(user?.role!, `${updateRole}:${attribute.statutoryFieldsPf}`)
+  ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   try {
@@ -60,7 +62,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         error,
         professionalTaxPromise: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -78,7 +80,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 

@@ -42,7 +42,7 @@ export async function action({
 
     return json(
       { status: "error", message: "Failed to delete employee", error },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json({
@@ -64,10 +64,10 @@ export default function DeleteEmployee() {
       if (actionData?.status === "success") {
         clearCacheEntry(cacheKeyPrefix.employees);
         clearExactCacheEntry(
-          `${cacheKeyPrefix.employee_overview}${employeeId}`
+          `${cacheKeyPrefix.employee_overview}${employeeId}`,
         );
         clearExactCacheEntry(
-          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
+          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`,
         );
         toast({
           title: "Success",

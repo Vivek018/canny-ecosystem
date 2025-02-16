@@ -30,8 +30,8 @@ export function SitesWrapper({
   }, [error]);
 
   return (
-    <CommandGroup className='p-0 overflow-visible'>
-      <div className='w-full grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4'>
+    <CommandGroup className="p-0 overflow-visible">
+      <div className="w-full grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
         {data?.map((site) => (
           <CommandItem
             key={site?.id}
@@ -45,7 +45,7 @@ export function SitesWrapper({
               replaceUnderscore(site?.state) +
               site?.pincode
             }
-            className='data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0'
+            className="data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0"
           >
             <SiteCard site={site} />
           </CommandItem>

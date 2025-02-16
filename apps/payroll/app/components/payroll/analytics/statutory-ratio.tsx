@@ -14,12 +14,11 @@ import {
 } from "@canny_ecosystem/ui/chart";
 import type { PayrollEntriesWithTemplateComponents } from "@canny_ecosystem/supabase/queries";
 
-
 type ChartDataPoint = {
   name: string;
   amount: number;
   fill?: string;
-}
+};
 
 const chartConfig: Record<string, { label: string; color?: string }> = {
   amount: {
@@ -53,10 +52,9 @@ const chartConfig: Record<string, { label: string; color?: string }> = {
 
 type StatutoryRatioProps = {
   chartData: PayrollEntriesWithTemplateComponents[];
-}
+};
 
 export function StatutoryRatio({ chartData }: StatutoryRatioProps) {
-  
   const totalStatutoryFields = chartData.reduce<Record<string, ChartDataPoint>>(
     (acc, row) => {
       const name = row.payment_template_components.target_type;

@@ -1,5 +1,4 @@
 import { Pie, PieChart } from "recharts";
-
 import {
   Card,
   CardContent,
@@ -17,64 +16,24 @@ import {
 import type { ExitDataType } from "@canny_ecosystem/supabase/queries";
 
 const chartConfig = {
-  amount: {
-    label: "Amount",
-  },
-  january: {
-    label: "January",
-    color: "hsl(var(--chart-1))",
-  },
-  february: {
-    label: "February",
-    color: "hsl(var(--chart-2))",
-  },
-  march: {
-    label: "March",
-    color: "hsl(var(--chart-3))",
-  },
-  april: {
-    label: "April",
-    color: "hsl(var(--chart-4))",
-  },
-  may: {
-    label: "May",
-    color: "hsl(var(--chart-5))",
-  },
-  june: {
-    label: "June",
-    color: "hsl(var(--chart-6))",
-  },
-  july: {
-    label: "July",
-    color: "hsl(var(--chart-7))",
-  },
-  august: {
-    label: "August",
-    color: "hsl(var(--chart-8))",
-  },
-  september: {
-    label: "September",
-    color: "hsl(var(--chart-9))",
-  },
-  october: {
-    label: "October",
-    color: "hsl(var(--chart-10))",
-  },
-  november: {
-    label: "November",
-    color: "hsl(var(--chart-11))",
-  },
-  december: {
-    label: "December",
-    color: "hsl(var(--chart-12))",
-  },
+  amount: { label: "Amount" },
+  january: { label: "January", color: "hsl(var(--chart-1))" },
+  february: { label: "February", color: "hsl(var(--chart-2))" },
+  march: { label: "March", color: "hsl(var(--chart-3))" },
+  april: { label: "April", color: "hsl(var(--chart-4))" },
+  may: { label: "May", color: "hsl(var(--chart-5))" },
+  june: { label: "June", color: "hsl(var(--chart-6))" },
+  july: { label: "July", color: "hsl(var(--chart-7))" },
+  august: { label: "August", color: "hsl(var(--chart-8))" },
+  september: { label: "September", color: "hsl(var(--chart-9))" },
+  october: { label: "October", color: "hsl(var(--chart-10))" },
+  november: { label: "November", color: "hsl(var(--chart-11))" },
+  december: { label: "December", color: "hsl(var(--chart-12))" },
 } satisfies ChartConfig;
 
 export function ExitPaymentByTime({
   chartData,
-}: {
-  chartData: ExitDataType[];
-}) {
+}: { chartData: ExitDataType[] }) {
   const exitYears = new Set(
     chartData.map((row) => new Date(row.final_settlement_date).getFullYear()),
   );
@@ -89,7 +48,7 @@ export function ExitPaymentByTime({
             number,
             { year: number; amount: number; month: string | null }
           >,
-          row,
+          row: any,
         ) => {
           if (row.final_settlement_date) {
             const date = new Date(row.final_settlement_date);
@@ -98,7 +57,8 @@ export function ExitPaymentByTime({
             if (!acc[year]) {
               acc[year] = { year, amount: 0, month: null };
             }
-            acc[year].amount += row.total || 0;
+            acc[year].amount +=
+              row.bonus + row.leave_encashment + row.gratuity - row.deduction;
           }
           return acc;
         },
@@ -113,7 +73,7 @@ export function ExitPaymentByTime({
             string,
             { month: string; amount: number; year: number | null }
           >,
-          row,
+          row: any,
         ) => {
           if (row.final_settlement_date) {
             const date = new Date(row.final_settlement_date);
@@ -122,7 +82,8 @@ export function ExitPaymentByTime({
             if (!acc[monthName]) {
               acc[monthName] = { month: monthName, amount: 0, year: null };
             }
-            acc[monthName].amount += row.total || 0;
+            acc[monthName].amount +=
+              row.bonus + row.leave_encashment + row.gratuity - row.deduction;
           }
           return acc;
         },
@@ -130,6 +91,7 @@ export function ExitPaymentByTime({
       ),
     );
   }
+
   let transformedChartData = [];
 
   if (exitYears.size > 1) {

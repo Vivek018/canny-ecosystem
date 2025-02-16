@@ -89,27 +89,35 @@ export function DataTable<TData, TValue>({
         },
       });
 
-      const gratuityReportData = data?.map((employee: EmployeeReportDataType) => {
-        const joining_date = new Date(
-          employee.employee_project_assignment.start_date,
-        );
-        const totalDays = gratuityEligibleYears * 365.25;
+      const gratuityReportData = data?.map(
+        (employee: EmployeeReportDataType) => {
+          const joining_date = new Date(
+            employee.employee_project_assignment.start_date,
+          );
+          const totalDays = gratuityEligibleYears * 365.25;
 
-        const employeeWorkingYears =
-          new Date().getFullYear() - joining_date.getFullYear();
+          const employeeWorkingYears =
+            new Date().getFullYear() - joining_date.getFullYear();
 
-          const presentDaysInYears = { first_year: 230, second_year: 240, third_year: 250, fourth_year: 260, fifth_year: 250 };
+          const presentDaysInYears = {
+            first_year: 230,
+            second_year: 240,
+            third_year: 250,
+            fourth_year: 260,
+            fifth_year: 250,
+          };
 
-        return {
-          ...employee,
-          ...presentDaysInYears,
-          is_eligible_for_gratuity:
-            employeeWorkingYears >= gratuityEligibleYears,
-          employee_eligible_date: joining_date.setDate(
-            joining_date.getDate() + totalDays,
-          ),
-        };
-      });
+          return {
+            ...employee,
+            ...presentDaysInYears,
+            is_eligible_for_gratuity:
+              employeeWorkingYears >= gratuityEligibleYears,
+            employee_eligible_date: joining_date.setDate(
+              joining_date.getDate() + totalDays,
+            ),
+          };
+        },
+      );
       if (data) {
         setData(
           (prevData) => [...prevData, ...(gratuityReportData ?? [])] as TData[],

@@ -13,7 +13,13 @@ interface Props {
   allColumns: ColumnDef<any, any>[];
 }
 
-export function PayrollTableHeader({ table, className, loading, dynamicHeaders, allColumns }: Props) {
+export function PayrollTableHeader({
+  table,
+  className,
+  loading,
+  dynamicHeaders,
+  allColumns,
+}: Props) {
   const columnName = (id: string) => {
     if (loading) return id;
     const column = allColumns.find((col: any) => col.accessorKey === id);
@@ -38,7 +44,9 @@ export function PayrollTableHeader({ table, className, loading, dynamicHeaders, 
   const [sortingId, setSortingId] = useState("");
 
   const sort = (id: string) => {
-    const column = table?.getAllLeafColumns()?.find((col: any) => col.accessorKey === id);
+    const column = table
+      ?.getAllLeafColumns()
+      ?.find((col: any) => col.accessorKey === id);
     column?.toggleSorting();
 
     if (sortingOrder === "") {
@@ -61,7 +69,7 @@ export function PayrollTableHeader({ table, className, loading, dynamicHeaders, 
             key={id}
             className={cn(
               "px-4 py-2",
-              id === "name" && "sticky left-0 bg-card z-10"
+              id === "name" && "sticky left-0 bg-card z-10",
             )}
           >
             <Button
@@ -72,11 +80,17 @@ export function PayrollTableHeader({ table, className, loading, dynamicHeaders, 
               <span className="capitalize">{columnName(id)}</span>
               <Icon
                 name="chevron-down"
-                className={cn("hidden", sortingId === id && sortingOrder === "desc" && "flex")}
+                className={cn(
+                  "hidden",
+                  sortingId === id && sortingOrder === "desc" && "flex",
+                )}
               />
               <Icon
                 name="chevron-up"
-                className={cn("hidden", sortingId === id && sortingOrder === "asc" && "flex")}
+                className={cn(
+                  "hidden",
+                  sortingId === id && sortingOrder === "asc" && "flex",
+                )}
               />
             </Button>
           </TableHead>

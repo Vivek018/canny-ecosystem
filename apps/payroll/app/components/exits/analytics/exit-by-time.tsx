@@ -1,6 +1,5 @@
 import * as React from "react";
 import { Label, Pie, PieChart } from "recharts";
-
 import {
   Card,
   CardContent,
@@ -18,64 +17,22 @@ import {
 import type { ExitDataType } from "@canny_ecosystem/supabase/queries";
 
 const chartConfig = {
-  count: {
-    label: "Count",
-  },
-  january: {
-    label: "January",
-    color: "hsl(var(--chart-1))",
-  },
-  february: {
-    label: "February",
-    color: "hsl(var(--chart-2))",
-  },
-  march: {
-    label: "March",
-    color: "hsl(var(--chart-3))",
-  },
-  april: {
-    label: "April",
-    color: "hsl(var(--chart-4))",
-  },
-  may: {
-    label: "May",
-    color: "hsl(var(--chart-5))",
-  },
-  june: {
-    label: "June",
-    color: "hsl(var(--chart-6))",
-  },
-  july: {
-    label: "July",
-    color: "hsl(var(--chart-7))",
-  },
-  august: {
-    label: "August",
-    color: "hsl(var(--chart-8))",
-  },
-  september: {
-    label: "September",
-    color: "hsl(var(--chart-9))",
-  },
-  october: {
-    label: "October",
-    color: "hsl(var(--chart-10))",
-  },
-  november: {
-    label: "November",
-    color: "hsl(var(--chart-11))",
-  },
-  december: {
-    label: "December",
-    color: "hsl(var(--chart-12))",
-  },
+  count: { label: "Count" },
+  january: { label: "January", color: "hsl(var(--chart-1))" },
+  february: { label: "February", color: "hsl(var(--chart-2))" },
+  march: { label: "March", color: "hsl(var(--chart-3))" },
+  april: { label: "April", color: "hsl(var(--chart-4))" },
+  may: { label: "May", color: "hsl(var(--chart-5))" },
+  june: { label: "June", color: "hsl(var(--chart-6))" },
+  july: { label: "July", color: "hsl(var(--chart-7))" },
+  august: { label: "August", color: "hsl(var(--chart-8))" },
+  september: { label: "September", color: "hsl(var(--chart-9))" },
+  october: { label: "October", color: "hsl(var(--chart-10))" },
+  november: { label: "November", color: "hsl(var(--chart-11))" },
+  december: { label: "December", color: "hsl(var(--chart-12))" },
 } satisfies ChartConfig;
 
-export function ExitByTime({
-  chartData,
-}: {
-  chartData: ExitDataType[];
-}) {
+export function ExitByTime({ chartData }: { chartData: ExitDataType[] }) {
   const exitLastWorkingYears = new Set(
     chartData.map((row) => {
       const date = new Date(row.last_working_day || "");
@@ -102,9 +59,7 @@ export function ExitByTime({
         const month = new Date(row.last_working_day).toLocaleString("default", {
           month: "long",
         });
-        if (!acc[month]) {
-          acc[month] = 0;
-        }
+        if (!acc[month]) acc[month] = 0;
         acc[month]++;
         return acc;
       },

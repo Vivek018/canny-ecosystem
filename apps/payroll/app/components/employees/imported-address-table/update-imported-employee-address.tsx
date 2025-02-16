@@ -13,9 +13,7 @@ import {
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { CheckboxField, Field } from "@canny_ecosystem/ui/forms";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import {
-  ImportSingleEmployeeAddressDataSchema,
-} from "@canny_ecosystem/utils";
+import { ImportSingleEmployeeAddressDataSchema } from "@canny_ecosystem/utils";
 import { useState } from "react";
 
 export const UpdateImportedEmployee = ({
@@ -26,8 +24,18 @@ export const UpdateImportedEmployee = ({
   dataToUpdate: ImportEmployeeAddressDataType;
 }) => {
   const { importData, setImportData } = useImportStoreForEmployeeAddress();
-  const [data, setData] = useState(dataToUpdate);
+  const convertToBoolean = (value: unknown): boolean => {
+    if (typeof value === "string") {
+      return value.toLowerCase() === "true";
+    }
+    return Boolean(value);
+  };
 
+  const initialData = {
+    ...dataToUpdate,
+    is_primary: convertToBoolean(dataToUpdate.is_primary),
+  };
+  const [data, setData] = useState(initialData);
   const onChange = (key: keyof typeof dataToUpdate, value: string) => {
     setData((prevData) => ({ ...prevData, [key]: value }));
   };
@@ -38,7 +46,7 @@ export const UpdateImportedEmployee = ({
     if (parsedResult.success) {
       setImportData({
         data: importData.data?.map((item, index) =>
-          index === indexToUpdate ? data : item
+          index === indexToUpdate ? data : item,
         ),
       });
     }
@@ -49,7 +57,7 @@ export const UpdateImportedEmployee = ({
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "ghost", size: "full" }),
-          "text-[13px] h-9"
+          "text-[13px] h-9",
         )}
       >
         Update Employee
@@ -163,14 +171,14 @@ export const UpdateImportedEmployee = ({
               buttonProps={{
                 form: "",
                 type: "button",
-                name: "is_active",
+                name: "is_primary",
                 checked: data.is_primary ?? false,
                 onCheckedChange: (state) => {
                   onChange("is_primary", String(state));
                 },
               }}
               labelProps={{
-                children: "IS Active?",
+                children: "Is Primary?",
               }}
             />
           </div>

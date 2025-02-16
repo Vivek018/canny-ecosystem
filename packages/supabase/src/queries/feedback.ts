@@ -61,7 +61,7 @@ export async function getFeedbacksByCompanyId({
     .returns<FeedbackDatabaseType[]>();
 
   if (error) {
-    console.error(error);
+    console.error("getFeedbacksByCompanyId Error", error);
   }
 
   return { data, error, totalCount: count ?? 0 };

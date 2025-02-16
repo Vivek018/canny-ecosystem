@@ -37,8 +37,44 @@ export const getEmployeeProvidentFundById = async ({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeProvidentFundById Error", error);
   }
+
+  return { data, error };
+};
+
+export const getEmployeeProvidentFundByEPFNumber = async ({
+  supabase,
+  epfNumber,
+}: {
+  supabase: TypedSupabaseClient;
+  epfNumber: string;
+}) => {
+  const columns = [
+    "id",
+    "company_id",
+    "epf_number",
+    "deduction_cycle",
+    "employee_contribution",
+    "employer_contribution",
+    "employee_restrict_value",
+    "employer_restrict_value",
+    "restrict_employee_contribution",
+    "restrict_employer_contribution",
+    "include_employer_contribution",
+    "include_employer_edli_contribution",
+    "include_admin_charges",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("employee_provident_fund")
+    .select(columns.join(","))
+    .eq("epf_number", epfNumber)
+    .single<
+      InferredType<EmployeeProvidentFundDatabaseRow, (typeof columns)[number]>
+    >();
+
+  if (error) console.error("getEmployeeProvidentFundByEPFNumber Error", error);
 
   return { data, error };
 };
@@ -79,7 +115,7 @@ export const getEmployeeProvidentFundByCompanyId = async ({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getEmployeeProvidentFundByCompanyId Error", error);
   }
 
   return { data, error };

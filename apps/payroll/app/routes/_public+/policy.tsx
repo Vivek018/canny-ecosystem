@@ -60,7 +60,6 @@ export const privacyPolicyData = [
   },
 ];
 
-
 export default function Policy() {
   return (
     <section className="pb-10 md:pb-20">

@@ -21,14 +21,13 @@ export async function getProjectsCountByCompanyId({
   supabase: TypedSupabaseClient;
   companyId: string;
 }) {
-  const { count, error }= await supabase
+  const { count, error } = await supabase
     .from("projects")
     .select("", { count: "exact", head: true })
     .eq("project_client_id", companyId);
 
-
   if (error) {
-    console.error(error);
+    console.error("getProjectsCountByCompanyId Error", error);
   }
 
   return { count, error };
@@ -66,7 +65,7 @@ export async function getProjectsByCompanyId({
     .returns<Omit<ProjectsWithCompany, "created_at" | "updated_at">[]>();
 
   if (error) {
-    console.error(error);
+    console.error("getProjectsByCompanyId Error", error);
   }
 
   return { data, error };
@@ -90,7 +89,7 @@ export async function getProjectNamesByCompanyId({
     .returns<{ id: string; name: string }[]>();
 
   if (error) {
-    console.error(error);
+    console.error("getProjectNamesByCompanyId Error", error);
   }
 
   return { data, error };
@@ -137,7 +136,7 @@ export async function getProjectById({
     .single<Omit<ProjectsWithCompany, "created_at" | "updated_at">>();
 
   if (error) {
-    console.error(error);
+    console.error("getProjectById Error", error);
   }
 
   return { data, error };
@@ -181,7 +180,7 @@ export async function getSitesByProjectId({
     .returns<Omit<SitesWithLocation, "created_at" | "updated_at">[]>();
 
   if (error) {
-    console.error(error);
+    console.error("getSitesByProjectId Error", error);
   }
 
   return { data, error };
@@ -199,9 +198,9 @@ export async function getAllSitesByProjectId({
     .from("project_sites")
     .select(columns.join(","))
     .eq("project_id", projectId)
-    .returns<{id:string}[]>();
+    .returns<{ id: string }[]>();
 
-  if (error) console.error(error);
+  if (error) console.error("getAllSitesByProjectId Error", error);
 
   return { data, error };
 }
@@ -239,7 +238,7 @@ export async function getSitesWithEmployeeCountByProjectId({
     .order("created_at", { ascending: false })
     .returns<SitesWithLocation[]>();
 
-  if (error) console.error(error);
+  if (error) console.error("getSitesWithEmployeeCountByProjectId Error", error);
 
   return { data, error };
 }
@@ -262,7 +261,7 @@ export async function getSiteNamesByProjectName({
     .returns<{ name: string }[]>();
 
   if (error) {
-    console.error(error);
+    console.error("getSiteNamesByProjectName Error", error);
   }
 
   return { data, error };
@@ -307,7 +306,7 @@ export async function getSitesByCompanyId({
     .returns<SitesWithProjects[]>();
 
   if (error) {
-    console.error(error);
+    console.error("getSitesByCompanyId Error", error);
   }
 
   return { data, count: data?.length, error };
@@ -344,7 +343,7 @@ export async function getSiteById({
     .single<Omit<SitesWithLocation, "created_at" | "updated_at">>();
 
   if (error) {
-    console.error(error);
+    console.error("getSiteById Error", error);
   }
 
   return { data, error };
@@ -375,7 +374,7 @@ export async function getSitePaySequenceInSite({
     >();
 
   if (error) {
-    console.error(error);
+    console.error("getSitePaySequenceInSite Error", error);
   }
 
   return { data, error };

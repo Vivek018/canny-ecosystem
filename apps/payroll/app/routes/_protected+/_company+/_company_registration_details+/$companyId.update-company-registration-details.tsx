@@ -30,7 +30,7 @@ export async function action({ request }: ActionFunctionArgs) {
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 
@@ -40,7 +40,7 @@ export async function action({ request }: ActionFunctionArgs) {
   });
 
   if (error) {
-    console.error(error);
+    console.error("Company", error);
     return safeRedirect("/settings", { status: 303 });
   }
 

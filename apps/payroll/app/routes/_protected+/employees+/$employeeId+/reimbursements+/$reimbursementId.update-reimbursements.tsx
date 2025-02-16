@@ -37,7 +37,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
   if (
-    !hasPermission(user?.role!, `${updateRole}:${attribute.reimbursements}`)
+    !hasPermission(
+      user?.role!,
+      `${updateRole}:${attribute.employeeReimbursements}`,
+    )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
@@ -78,7 +81,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 
@@ -123,7 +126,7 @@ export default function UpdateReimbursememts() {
     if (actionData) {
       if (actionData?.status === "success") {
         clearCacheEntry(
-          `${cacheKeyPrefix.employee_reimbursements}${employeeId}`
+          `${cacheKeyPrefix.employee_reimbursements}${employeeId}`,
         );
         toast({
           title: "Success",

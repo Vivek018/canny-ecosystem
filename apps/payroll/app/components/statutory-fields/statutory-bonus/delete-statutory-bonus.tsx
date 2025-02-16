@@ -38,7 +38,7 @@ export const DeleteStatutoryBonus = ({
   };
 
   const handleDeleteSB = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -48,7 +48,7 @@ export const DeleteStatutoryBonus = ({
           method: "post",
           action: `${employeeStatutoryBonusId}/delete-statutory-bonus`,
           replace: true,
-        }
+        },
       );
     } else {
       e.preventDefault();
@@ -64,11 +64,11 @@ export const DeleteStatutoryBonus = ({
           "text-sm h-9 flex gap-1 items-center",
           !hasPermission(
             role,
-            `${deleteRole}:${attribute.statutoryFieldsStatutoryBonus}`
-          ) && "hidden"
+            `${deleteRole}:${attribute.statutoryFieldsStatutoryBonus}`,
+          ) && "hidden",
         )}
       >
-        <Icon name='trash' size='md' />
+        <Icon name="trash" size="md" />
         <span>Delete Statutory Bonus</span>
       </AlertDialogTrigger>
       <AlertDialogContent>
@@ -79,21 +79,21 @@ export const DeleteStatutoryBonus = ({
             Statutory Bonus and remove it's data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <div className='py-4'>
-          <p className='text-sm text-foreground/80'>
+        <div className="py-4">
+          <p className="text-sm text-foreground/80">
             Please type{" "}
-            <i className='text-foreground font-medium'>{DELETE_TEXT}</i> to
+            <i className="text-foreground font-medium">{DELETE_TEXT}</i> to
             confirm.
           </p>
           <Input
-            type='text'
+            type="text"
             value={inputValue}
             onChange={(e) => {
               setInputValue(e.target.value);
               setInputError([]);
             }}
-            className='border border-input rounded-md h-10 w-full'
-            placeholder='Confirm your action'
+            className="border border-input rounded-md h-10 w-full"
+            placeholder="Confirm your action"
             onPaste={(e) => {
               e.preventDefault();
               return false;

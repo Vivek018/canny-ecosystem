@@ -42,7 +42,7 @@ export const UpdateImportedEmployee = ({
     if (parsedResult.success) {
       setImportData({
         data: importData.data?.map((item, index) =>
-          index === indexToUpdate ? data : item
+          index === indexToUpdate ? data : item,
         ),
       });
     }
@@ -53,7 +53,7 @@ export const UpdateImportedEmployee = ({
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "ghost", size: "full" }),
-          "text-[13px] h-9"
+          "text-[13px] h-9",
         )}
       >
         Update Employee
@@ -106,7 +106,7 @@ export const UpdateImportedEmployee = ({
           <div className="grid mb-5 grid-cols-2 place-content-center justify-between gap-3">
             <Combobox
               options={transformStringArrayIntoOptions(
-                accountTypeArray as unknown as string[]
+                accountTypeArray as unknown as string[],
               )}
               value={data.account_type ?? accountTypeArray[0]}
               onChange={(value: string) => {

@@ -33,7 +33,7 @@ export async function getGratuityByCompanyId({
     .maybeSingle<InferredType<GratuityDatabaseRow, (typeof columns)[number]>>();
 
   if (error) {
-    console.error(error);
+    console.error("getGratuityByCompanyId Error", error);
   }
 
   return { data, error };
@@ -64,7 +64,7 @@ export const getGratuityById = async ({
     .single<InferredType<GratuityDatabaseRow, (typeof columns)[number]>>();
 
   if (error) {
-    console.error(error);
+    console.error("getGratuityById Error", error);
   }
 
   return { data, error };

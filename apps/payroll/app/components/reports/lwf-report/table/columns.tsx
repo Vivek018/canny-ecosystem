@@ -84,7 +84,9 @@ export const columns = (): ColumnDef<LWFReportType>[] => [
     header: "Employer's Contribution",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-28 capitalize">{row.original?.employer_contribution}</p>
+        <p className="truncate w-28 capitalize">
+          {row.original?.employer_contribution}
+        </p>
       );
     },
   },
@@ -94,7 +96,9 @@ export const columns = (): ColumnDef<LWFReportType>[] => [
     header: "Total Contribution",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-28 capitalize">{row.original?.total_contribution}</p>
+        <p className="truncate w-28 capitalize">
+          {row.original?.total_contribution}
+        </p>
       );
     },
   },
