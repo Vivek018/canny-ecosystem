@@ -24,6 +24,8 @@ import { useNavigate } from "@remix-run/react";
 import { useState, useEffect } from "react";
 import { ImportedDataTable } from "../import-attendance-table/imported-data-table";
 import { ImportedDataColumns } from "../import-attendance-table/columns";
+import { clearCacheEntry } from "@/utils/cache";
+import { cacheKeyPrefix } from "@/constant";
 
 export function EmployeeAttendanceImportData({
   env,
@@ -135,6 +137,7 @@ export function EmployeeAttendanceImportData({
         status === "Successfully inserted new records" ||
         status === "Successfully processed updates and new insertions"
       ) {
+        clearCacheEntry(cacheKeyPrefix.attendance)
         navigate("/time-tracking/attendance");
       }
     }

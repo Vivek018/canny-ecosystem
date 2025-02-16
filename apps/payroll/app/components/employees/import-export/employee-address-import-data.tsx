@@ -1,6 +1,8 @@
 import { ImportedDataColumns } from "@/components/employees/imported-address-table/columns";
 import { ImportedDataTable } from "@/components/employees/imported-address-table/imported-data-table";
+import { cacheKeyPrefix } from "@/constant";
 import { useImportStoreForEmployeeAddress } from "@/store/import";
+import { clearCacheEntry } from "@/utils/cache";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
 import { createEmployeeAddressFromImportedData } from "@canny_ecosystem/supabase/mutations";
 import { getEmployeeIdsByEmployeeCodes } from "@canny_ecosystem/supabase/queries";
@@ -96,6 +98,7 @@ export function EmployeeAddressImportData({ env }: { env: SupabaseEnv }) {
         console.error("Employee Address", error);
       }
       if (isGoodStatus(status)) {
+        clearCacheEntry(cacheKeyPrefix.employee_overview);
         navigate("/employees");
       }
     }

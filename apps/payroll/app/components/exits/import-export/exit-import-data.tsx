@@ -12,6 +12,8 @@ import { useState, useEffect } from "react";
 import { ImportedDataTable } from "../imported-table/imported-data-table";
 import { ImportedDataColumns } from "../imported-table/columns";
 import { toast } from "@canny_ecosystem/ui/use-toast";
+import { clearCacheEntry } from "@/utils/cache";
+import { cacheKeyPrefix } from "@/constant";
 
 export function ExitImportData({ env }: { env: SupabaseEnv }) {
   const navigate = useNavigate();
@@ -85,6 +87,7 @@ export function ExitImportData({ env }: { env: SupabaseEnv }) {
         });
       }
       if (isGoodStatus(status)) {
+        clearCacheEntry(cacheKeyPrefix.exits)
         toast({
           title: "Success",
           description: "Exit created successfully!",

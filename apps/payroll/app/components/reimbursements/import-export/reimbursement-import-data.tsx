@@ -21,6 +21,8 @@ import { useNavigate } from "@remix-run/react";
 import { useState, useEffect } from "react";
 import { ImportedDataTable } from "../imported-table/imported-data-table";
 import { ImportedDataColumns } from "../imported-table/columns";
+import { clearCacheEntry } from "@/utils/cache";
+import { cacheKeyPrefix } from "@/constant";
 
 export function ReimbursementImportData({
   env,
@@ -104,7 +106,9 @@ export function ReimbursementImportData({
         supabase,
       });
       if (error) console.error("Reimbursement", error);
-      if (isGoodStatus(status)) navigate("/approvals/reimbursements");
+      if (isGoodStatus(status)) {
+        clearCacheEntry(cacheKeyPrefix.reimbursements)
+        navigate("/approvals/reimbursements")};
     }
   };
 

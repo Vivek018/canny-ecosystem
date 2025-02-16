@@ -1,6 +1,8 @@
 import { ImportedDataColumns } from "@/components/employees/imported-employee-details-table/columns";
 import { ImportedDataTable } from "@/components/employees/imported-employee-details-table/imported-data-table";
+import { cacheKeyPrefix } from "@/constant";
 import { useImportStoreForEmployeeDetails } from "@/store/import";
+import { clearCacheEntry } from "@/utils/cache";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
 import {
   createEmployeeDetailsFromImportedData,
@@ -110,6 +112,8 @@ export function EmployeeDetailsImportData({
         status === "Successfully inserted new records" ||
         status === "Successfully processed updates and new insertions"
       ) {
+        clearCacheEntry(cacheKeyPrefix.employees);
+        clearCacheEntry(cacheKeyPrefix.employee_overview);
         navigate("/employees");
       }
     }

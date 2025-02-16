@@ -1,6 +1,8 @@
 import { ImportedDataColumns } from "@/components/employees/imported-guardians-table/columns";
 import { ImportedDataTable } from "@/components/employees/imported-guardians-table/imported-data-table";
+import { cacheKeyPrefix } from "@/constant";
 import { useImportStoreForEmployeeGuardians } from "@/store/import";
+import { clearCacheEntry } from "@/utils/cache";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
 import {
   createEmployeeGuardiansFromImportedData,
@@ -135,6 +137,7 @@ export function EmployeeGuardiansImportData({
         status === "No new data to insert" ||
         status === "Data processed successfully"
       ) {
+        clearCacheEntry(cacheKeyPrefix.employee_overview);
         navigate("/employees");
       }
     }
