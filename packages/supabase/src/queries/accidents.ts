@@ -9,10 +9,10 @@ import type {
 export type AccidentFilters = {
   date_start?: string | undefined | null;
   date_end?: string | undefined | null;
-  status?: string | undefined | null;
-  location_type?: string | undefined | null;
-  category?: string | undefined | null;
-  severity?: string | undefined | null;
+  status?: AccidentsDatabaseRow["status"];
+  location_type?: AccidentsDatabaseRow["location_type"];
+  category?: AccidentsDatabaseRow["category"];
+  severity?: AccidentsDatabaseRow["severity"];
   name?: string | undefined | null;
 };
 
@@ -124,10 +124,10 @@ export async function getAccidentsByCompanyId({
     if (end) query.lte(field, formatUTCDate(end));
   }
   if (status) {
-    query.eq("status", status.toLowerCase());
+    query.eq("status", status);
   }
   if (location_type) {
-    query.eq("location_type", location_type.toLowerCase());
+    query.eq("location_type", location_type);
   }
   if (category) {
     query.eq("category", category);

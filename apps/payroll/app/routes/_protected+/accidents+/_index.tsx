@@ -56,11 +56,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const filters: AccidentFilters = {
       date_start: searchParams.get("date_start") ?? undefined,
       date_end: searchParams.get("date_end") ?? undefined,
-      status: searchParams.get("status") ?? undefined,
-      location_type: searchParams.get("location_type") ?? undefined,
-      category: searchParams.get("category") ?? undefined,
+      status: (searchParams.get("status") ??
+        undefined) as AccidentFilters["status"],
+      location_type: (searchParams.get("location_type") ??
+        undefined) as AccidentFilters["location_type"],
+      category: (searchParams.get("category") ??
+        undefined) as AccidentFilters["category"],
       name: query,
-      severity: searchParams.get("severity") ?? undefined,
+      severity: (searchParams.get("severity") ??
+        undefined) as AccidentFilters["severity"],
     };
 
     const hasFilters =

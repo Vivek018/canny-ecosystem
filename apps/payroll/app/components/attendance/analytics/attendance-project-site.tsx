@@ -60,14 +60,14 @@ export function AttendanceByProjectSite({
   }, [chartData, project]);
 
   return (
-    <Card className="flex flex-col  ">
-      <div className="flex justify-between p-2  items-start">
-        <CardHeader className="flex-1 flex flex-col items-center pt-3">
+    <Card className='flex flex-col'>
+      <div className='flex justify-between p-2 relative items-start'>
+        <CardHeader className='flex-1 flex flex-col items-center pt-3'>
           <CardTitle>Project Site Attendance</CardTitle>
           <CardDescription>
             {project
               ? `Attendance by project site for ${project}`
-              : "Select project and see Attendance by project sites"}
+              : "Select project to see attendance by project sites"}
           </CardDescription>
         </CardHeader>
         <AttendanceProjectFilter
@@ -76,10 +76,10 @@ export function AttendanceByProjectSite({
         />
       </div>
       {project ? (
-        <CardContent className="flex-1 pb-0 pt-2">
+        <CardContent className='flex-1 pb-0 pt-2'>
           <ChartContainer
             config={chartConfig}
-            className="mx-auto aspect-square max-h-[250px]"
+            className='mx-auto aspect-square max-h-[250px]'
           >
             <RadialBarChart
               data={trendData}
@@ -90,17 +90,17 @@ export function AttendanceByProjectSite({
             >
               <ChartTooltip
                 cursor={false}
-                content={<ChartTooltipContent hideLabel nameKey="presents" />}
+                content={<ChartTooltipContent hideLabel nameKey='presents' />}
               />
               <RadialBar
-                dataKey="presents"
+                dataKey='presents'
                 background
-                fill="hsl(var(--chart-2))"
+                fill='hsl(var(--chart-2))'
               >
                 <LabelList
-                  position="insideStart"
-                  dataKey="projectSite"
-                  className="fill-white capitalize mix-blend-luminosity"
+                  position='insideStart'
+                  dataKey='projectSite'
+                  className='fill-white capitalize mix-blend-luminosity'
                   fontSize={10}
                 />
               </RadialBar>
@@ -108,7 +108,7 @@ export function AttendanceByProjectSite({
           </ChartContainer>
         </CardContent>
       ) : (
-        <div className="flex justify-center items-center text-muted-foreground mt-10">
+        <div className='flex justify-center items-center text-muted-foreground mt-10'>
           Select the Project first
         </div>
       )}
