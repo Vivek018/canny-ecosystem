@@ -70,9 +70,7 @@ export const columns = (): ColumnDef<SBReportType>[] => [
     header: "Bonus Amount",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-28 capitalize">
-          {row.original?.bonus_amount}
-        </p>
+        <p className="truncate w-28 capitalize">{row.original?.bonus_amount}</p>
       );
     },
   },

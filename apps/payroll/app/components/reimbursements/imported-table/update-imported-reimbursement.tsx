@@ -35,7 +35,6 @@ export const UpdateImportedReimbursement = ({
   const onChange = (key: keyof typeof dataToUpdate, value: string) => {
     setData((prevData) => ({ ...prevData, [key]: value }));
   };
-  
 
   const handleUpdate = () => {
     const parsedResult = ImportSingleReimbursementDataSchema.safeParse(data);
@@ -43,7 +42,7 @@ export const UpdateImportedReimbursement = ({
     if (parsedResult.success) {
       setImportData({
         data: importData.data?.map((item, index) =>
-          index === indexToUpdate ? data : item
+          index === indexToUpdate ? data : item,
         ),
       });
     }
@@ -54,7 +53,7 @@ export const UpdateImportedReimbursement = ({
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "ghost", size: "full" }),
-          "text-[13px] h-9"
+          "text-[13px] h-9",
         )}
       >
         Update Reimbursement
@@ -87,7 +86,7 @@ export const UpdateImportedReimbursement = ({
           <div className="grid grid-cols-2 place-content-center justify-between gap-3">
             <Combobox
               options={transformStringArrayIntoOptions(
-                reimbursementStatusArray as unknown as string[]
+                reimbursementStatusArray as unknown as string[],
               )}
               value={data.status ?? reimbursementStatusArray[0]}
               onChange={(value: string) => {

@@ -27,7 +27,7 @@ export async function action({
     !hasPermission(
       `${user?.role!}`,
       `${deleteRole}:  "${attribute.statutoryFieldsPf}",
-`
+`,
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -51,7 +51,7 @@ export async function action({
 
     return json(
       { status: "error", message: "Failed to delete Professional Tax", error },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -60,7 +60,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

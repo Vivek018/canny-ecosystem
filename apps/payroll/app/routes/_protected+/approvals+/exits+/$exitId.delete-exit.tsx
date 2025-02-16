@@ -5,7 +5,11 @@ import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { deleteExit } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { toast } from "@canny_ecosystem/ui/use-toast";
-import { deleteRole, hasPermission, isGoodStatus } from "@canny_ecosystem/utils";
+import {
+  deleteRole,
+  hasPermission,
+  isGoodStatus,
+} from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { json, useActionData, useNavigate } from "@remix-run/react";
@@ -26,21 +30,20 @@ export async function action({ request, params }: ActionFunctionArgs) {
       return json({
         status: "success",
         returnTo: "/approvals/exits",
-        message: "Exit deleted successfully."
+        message: "Exit deleted successfully.",
       });
     }
 
     return json({
       status: "error",
       returnTo: "/approvals/exits",
-      message: "Error deleting Exit. Please, Try again!"
+      message: "Error deleting Exit. Please, Try again!",
     });
-
   } catch (error) {
     return json({
       status: "error",
       returnTo: "/approvals/exits",
-      message: error?.toString()
+      message: error?.toString(),
     });
   }
 }
@@ -51,10 +54,17 @@ export default function DeleteExit() {
   useEffect(() => {
     if (actionData?.status === "success") {
       clearCacheEntry(cacheKeyPrefix.exits);
-      toast({ title: "Success", description: actionData?.message, variant: "success" });
-    }
-    else {
-      toast({ title: "Error", description: actionData?.message, variant: "success" });
+      toast({
+        title: "Success",
+        description: actionData?.message,
+        variant: "success",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: actionData?.message,
+        variant: "success",
+      });
     }
     navigate(actionData?.returnTo ?? "/approvals/exits");
   }, [actionData]);

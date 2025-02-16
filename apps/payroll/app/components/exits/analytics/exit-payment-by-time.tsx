@@ -1,6 +1,18 @@
 import { Pie, PieChart } from "recharts";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@canny_ecosystem/ui/card";
-import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@canny_ecosystem/ui/chart";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@canny_ecosystem/ui/card";
+import {
+  type ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@canny_ecosystem/ui/chart";
 import type { ExitDataType } from "@canny_ecosystem/supabase/queries";
 
 const chartConfig = {
@@ -19,21 +31,34 @@ const chartConfig = {
   december: { label: "December", color: "hsl(var(--chart-12))" },
 } satisfies ChartConfig;
 
-export function ExitPaymentByTime({ chartData }: { chartData: ExitDataType[] }) {
-  const exitYears = new Set(chartData.map(row => new Date(row.final_settlement_date).getFullYear()));
+export function ExitPaymentByTime({
+  chartData,
+}: { chartData: ExitDataType[] }) {
+  const exitYears = new Set(
+    chartData.map((row) => new Date(row.final_settlement_date).getFullYear()),
+  );
 
   let exitByTimeData = [];
 
   if (exitYears.size > 1) {
     exitByTimeData = Object.values(
       chartData.reduce(
-        (acc: Record<number, { year: number; amount: number; month: string | null }>, row:any) => {
+        (
+          acc: Record<
+            number,
+            { year: number; amount: number; month: string | null }
+          >,
+          row: any,
+        ) => {
           if (row.final_settlement_date) {
             const date = new Date(row.final_settlement_date);
             const year = date.getFullYear();
 
-            if (!acc[year]) { acc[year] = { year, amount: 0, month: null } }
-            acc[year].amount += row.bonus + row.leave_encashment + row.gratuity - row.deduction;
+            if (!acc[year]) {
+              acc[year] = { year, amount: 0, month: null };
+            }
+            acc[year].amount +=
+              row.bonus + row.leave_encashment + row.gratuity - row.deduction;
           }
           return acc;
         },
@@ -43,13 +68,22 @@ export function ExitPaymentByTime({ chartData }: { chartData: ExitDataType[] }) 
   } else {
     exitByTimeData = Object.values(
       chartData.reduce(
-        (acc: Record<string, { month: string; amount: number; year: number | null }>, row:any) => {
+        (
+          acc: Record<
+            string,
+            { month: string; amount: number; year: number | null }
+          >,
+          row: any,
+        ) => {
           if (row.final_settlement_date) {
             const date = new Date(row.final_settlement_date);
             const monthName = date.toLocaleString("default", { month: "long" });
 
-            if (!acc[monthName]) { acc[monthName] = { month: monthName, amount: 0, year: null } }
-            acc[monthName].amount += row.bonus + row.leave_encashment + row.gratuity - row.deduction;
+            if (!acc[monthName]) {
+              acc[monthName] = { month: monthName, amount: 0, year: null };
+            }
+            acc[monthName].amount +=
+              row.bonus + row.leave_encashment + row.gratuity - row.deduction;
           }
           return acc;
         },
@@ -86,7 +120,10 @@ export function ExitPaymentByTime({ chartData }: { chartData: ExitDataType[] }) 
           className="w-full mx-auto aspect-square max-h-[250px] pb-0 [&_.recharts-pie-label-text]:fill-foreground"
         >
           <PieChart>
-            <ChartTooltip content={<ChartTooltipContent hideLabel />} wrapperStyle={{ width: "25%" }} />
+            <ChartTooltip
+              content={<ChartTooltipContent hideLabel />}
+              wrapperStyle={{ width: "25%" }}
+            />
             <Pie
               data={transformedChartData}
               dataKey="amount"

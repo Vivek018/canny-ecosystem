@@ -66,7 +66,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         esiPromise: null,
         companyId: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -85,7 +85,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -114,7 +114,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -70,14 +70,14 @@ export function AttendanceTable({
   const tableLength = table.getRowModel().rows?.length;
 
   return (
-    <div className='relative mb-8'>
+    <div className="relative mb-8">
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
-          !tableLength && "border-none"
+          !tableLength && "border-none",
         )}
       >
-        <div className='relative'>
+        <div className="relative">
           <Table>
             <AttendanceTableHeader
               table={table}
@@ -90,7 +90,7 @@ export function AttendanceTable({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    className='relative cursor-default select-text'
+                    className="relative cursor-default select-text"
                   >
                     {row.getVisibleCells().map((cell) => {
                       return (
@@ -103,12 +103,12 @@ export function AttendanceTable({
                             cell.column.id === "employee_code" &&
                               "sticky left-12 bg-card z-10",
                             cell.column.id === "employee_name" &&
-                              "sticky left-48 bg-card z-10"
+                              "sticky left-48 bg-card z-10",
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                         </TableCell>
                       );
@@ -119,23 +119,23 @@ export function AttendanceTable({
                 <TableRow className={cn(!tableLength && "border-none")}>
                   <TableCell
                     colSpan={columns.length}
-                    className='h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize'
+                    className="h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize"
                   >
-                    <div className='flex flex-col items-center gap-1'>
-                      <h2 className='text-xl'>No Attendance Found.</h2>
+                    <div className="flex flex-col items-center gap-1">
+                      <h2 className="text-xl">No Attendance Found.</h2>
                       <p
                         className={cn(
                           "text-muted-foreground",
-                          !data?.length && noFilters && "hidden"
+                          !data?.length && noFilters && "hidden",
                         )}
                       >
                         Try another search, or adjusting the filters
                       </p>
                       <Button
-                        variant='outline'
+                        variant="outline"
                         className={cn(
                           "mt-4",
-                          !data?.length && noFilters && "hidden"
+                          !data?.length && noFilters && "hidden",
                         )}
                         onClick={() => {
                           setSearchParams();

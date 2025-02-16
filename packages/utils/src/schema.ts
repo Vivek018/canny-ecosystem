@@ -72,14 +72,14 @@ export const zFile = z
     (file) =>
       typeof file !== "string"
         ? [
-          ...ACCEPTED_IMAGE_TYPES,
-          "image/pdf",
-          "image/doc",
-          "image/docx",
-          "application/pdf",
-          "application/doc",
-          "application/docx",
-        ].includes(file?.type)
+            ...ACCEPTED_IMAGE_TYPES,
+            "image/pdf",
+            "image/doc",
+            "image/docx",
+            "application/pdf",
+            "application/doc",
+            "application/docx",
+          ].includes(file?.type)
         : true,
     "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .docx formats are supported.",
   );

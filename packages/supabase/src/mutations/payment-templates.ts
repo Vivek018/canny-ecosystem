@@ -29,7 +29,7 @@ export async function createPaymentTemplateWithComponents({
   });
 
   if (error) {
-    console.error("createPaymentTemplateWithComponents Error", error)
+    console.error("createPaymentTemplateWithComponents Error", error);
     return {
       status,
       templateError: error,

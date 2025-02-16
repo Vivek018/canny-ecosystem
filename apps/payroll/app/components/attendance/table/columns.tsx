@@ -8,7 +8,7 @@ export const attendanceColumns = (
   days: {
     day: number;
     fullDate: string;
-  }[]
+  }[],
 ): ColumnDef<TransformedAteendanceDataType>[] => [
   {
     id: "select",

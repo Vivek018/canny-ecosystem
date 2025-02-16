@@ -78,7 +78,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return await clientCaching(
     `${cacheKeyPrefix.feedback_list}${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 
@@ -86,35 +86,35 @@ clientLoader.hydrate = true;
 
 function FeedbackCard({ feedback }: { feedback: any }) {
   return (
-    <Card className='w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-between'>
-      <CardHeader className='flex flex-row space-y-0 items-center justify-between py-4'>
-        <CardTitle className='font-bold'>{feedback.category}</CardTitle>
+    <Card className="w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-between">
+      <CardHeader className="flex flex-row space-y-0 items-center justify-between py-4">
+        <CardTitle className="font-bold">{feedback.category}</CardTitle>
         <CardTitle
           className={cn(
             "px-1",
             feedback.severity === "urgent"
               ? "text-destructive"
               : feedback.severity === "normal"
-              ? "text-purple-500"
-              : "text-yellow-400"
+                ? "text-purple-500"
+                : "text-yellow-400",
           )}
         >
           {feedback.severity}
         </CardTitle>
       </CardHeader>
 
-      <CardContent className='flex flex-col gap-0.5'>
-        <article className='py-2'>
-          <h3 className='capitalize text-sm'>{feedback.subject}</h3>
-          <p className='pt-1 capitalize text-xs text-muted-foreground break-words line-clamp-4'>
+      <CardContent className="flex flex-col gap-0.5">
+        <article className="py-2">
+          <h3 className="capitalize text-sm">{feedback.subject}</h3>
+          <p className="pt-1 capitalize text-xs text-muted-foreground break-words line-clamp-4">
             {feedback.message}
           </p>
         </article>
       </CardContent>
 
-      <CardFooter className='flex-col items-center'>
-        <div className='w-full flex flex-shrink items-center justify-start'>
-          <Avatar className='w-10 h-10 cursor-pointer'>
+      <CardFooter className="flex-col items-center">
+        <div className="w-full flex flex-shrink items-center justify-start">
+          <Avatar className="w-10 h-10 cursor-pointer">
             {feedback.users?.avatar && (
               <AvatarImage
                 src={feedback.users?.avatar}
@@ -122,21 +122,21 @@ function FeedbackCard({ feedback }: { feedback: any }) {
               />
             )}
             <AvatarFallback>
-              <span className='text-xs'>
+              <span className="text-xs">
                 {feedback.users?.first_name?.charAt(0)?.toUpperCase()}
               </span>
             </AvatarFallback>
           </Avatar>
-          <div className='w-full flex justify-between text-wrap items-center'>
-            <div className='flex flex-col ml-3'>
-              <span className='text-wrap'>
+          <div className="w-full flex justify-between text-wrap items-center">
+            <div className="flex flex-col ml-3">
+              <span className="text-wrap">
                 {`${feedback.users.first_name} ${feedback.users.last_name}`}
               </span>
-              <span className='truncate w-36 text-xs text-[#606060] font-normal'>
+              <span className="truncate w-36 text-xs text-[#606060] font-normal">
                 {feedback.users.email}
               </span>
             </div>
-            <div className='ml-2 truncate text-xs text-[#606060] font-normal text-wrap'>
+            <div className="ml-2 truncate text-xs text-[#606060] font-normal text-wrap">
               {formatDateTime(feedback.created_at)}
             </div>
           </div>
@@ -164,12 +164,12 @@ export default function FeedbackList() {
 
   if (status === "error") {
     clearCacheEntry(cacheKeyPrefix.feedback_list);
-    return <ErrorBoundary message='Failed to load feedback list' />;
+    return <ErrorBoundary message="Failed to load feedback list" />;
   }
 
   return (
-    <section className='pt-4 flex flex-col h-full'>
-      <div className='h-full flex flex-col w-full flex-grow justify-between items-end'>
+    <section className="pt-4 flex flex-col h-full">
+      <div className="h-full flex flex-col w-full flex-grow justify-between items-end">
         <Suspense fallback={<div>Loading feedback data...</div>}>
           <Await resolve={feedbackPromise}>
             {(feedbackResult) => {
@@ -180,12 +180,12 @@ export default function FeedbackList() {
                   title: "Error",
                   description: "Failed to load feedback data",
                 });
-                return <ErrorBoundary message='Failed to load feedback data' />;
+                return <ErrorBoundary message="Failed to load feedback data" />;
               }
 
               return (
                 <>
-                  <div className='flex-1 w-full grid gap-6 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 justify-start auto-rows-min'>
+                  <div className="flex-1 w-full grid gap-6 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 justify-start auto-rows-min">
                     {feedbackResult?.data.map((feedback) => (
                       <FeedbackCard key={feedback.id} feedback={feedback} />
                     ))}

@@ -28,21 +28,21 @@ export function CreateCompanyRegistrationDetails({
   return (
     <Fragment>
       <CardHeader>
-        <CardTitle className='text-3xl capitalize'>
+        <CardTitle className="text-3xl capitalize">
           Create Company Registration Details
         </CardTitle>
         <CardDescription>
           Add Company Registration details of the company
         </CardDescription>
       </CardHeader>
-      <CardContent className='grid grid-cols-2 gap-x-6'>
+      <CardContent className="grid grid-cols-2 gap-x-6">
         <Field
-          className='col-span-2'
+          className="col-span-2"
           inputProps={{
             ...getInputProps(fields.registration_number, { type: "text" }),
             autoFocus: true,
             placeholder: `Enter ${replaceUnderscore(
-              fields.registration_number.name
+              fields.registration_number.name,
             )}`,
           }}
           labelProps={{

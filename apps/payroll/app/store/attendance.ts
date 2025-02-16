@@ -1,4 +1,4 @@
-import type{ TransformedAteendanceDataType } from "@/routes/_protected+/time-tracking+/attendance+/_index";
+import type { TransformedAteendanceDataType } from "@/routes/_protected+/time-tracking+/attendance+/_index";
 import type { RowSelectionState, Updater } from "@tanstack/react-table";
 import { create } from "zustand";
 

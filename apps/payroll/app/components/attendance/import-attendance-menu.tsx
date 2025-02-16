@@ -37,7 +37,7 @@ export function ImportAttendanceMenu() {
           onClick={() => {
             searchParams.set(
               "step",
-              modalSearchParamNames.import_employee_attendance
+              modalSearchParamNames.import_employee_attendance,
             );
             setSearchParams(searchParams);
           }}

@@ -20,7 +20,7 @@ export interface ComboboxSelectOption {
 
 interface ComboboxProps {
   options: ComboboxSelectOption[];
-  value: string|number;
+  value: string | number;
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;

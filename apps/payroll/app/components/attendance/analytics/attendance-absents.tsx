@@ -41,7 +41,7 @@ export function AttendanceAbsentees({
       const totalAbsents = attendanceRecords.reduce(
         (count: number, entry: { present: boolean }) =>
           count + (!entry.present ? 1 : 0),
-        0
+        0,
       );
 
       grouped[employee_code] = totalAbsents;

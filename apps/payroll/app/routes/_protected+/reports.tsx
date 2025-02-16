@@ -4,7 +4,7 @@ import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { hasPermission, readRole } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
-import type{ LoaderFunctionArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Outlet } from "@remix-run/react";
 
 export async function loader({ request }: LoaderFunctionArgs) {

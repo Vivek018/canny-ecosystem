@@ -1,7 +1,19 @@
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { getAllSitesByProjectId, getPendingPayrollCountBySiteId, getProjectsByCompanyId, type ProjectsWithCompany } from "@canny_ecosystem/supabase/queries";
+import {
+  getAllSitesByProjectId,
+  getPendingPayrollCountBySiteId,
+  getProjectsByCompanyId,
+  type ProjectsWithCompany,
+} from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@canny_ecosystem/ui/command";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@canny_ecosystem/ui/command";
 import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import type { LoaderFunctionArgs } from "@remix-run/node";
@@ -10,22 +22,31 @@ import { PayrollProjectCard } from "@/components/payroll/payroll-project-card";
 import { Suspense } from "react";
 import type { TypedSupabaseClient } from "@canny_ecosystem/supabase/types";
 
-async function enrichProjectData(supabase: TypedSupabaseClient, projectData: Omit<ProjectsWithCompany, "created_at" | "updated_at">[]) {
+async function enrichProjectData(
+  supabase: TypedSupabaseClient,
+  projectData: Omit<ProjectsWithCompany, "created_at" | "updated_at">[],
+) {
   return await Promise.all(
     (projectData ?? []).map(async (project) => {
-      const { data: siteData } = await getAllSitesByProjectId({ supabase, projectId: project.id });
+      const { data: siteData } = await getAllSitesByProjectId({
+        supabase,
+        projectId: project.id,
+      });
       const payrollCounts = await Promise.all(
         (siteData ?? []).map(async (site) => {
-          const { data } = await getPendingPayrollCountBySiteId({ supabase, siteId: site.id });
+          const { data } = await getPendingPayrollCountBySiteId({
+            supabase,
+            siteId: site.id,
+          });
           return data ?? 0;
-        })
+        }),
       );
       return {
         ...project,
         totalSites: siteData?.length || 0,
-        pendingPayroll: payrollCounts.reduce((sum, count) => sum + count, 0)
+        pendingPayroll: payrollCounts.reduce((sum, count) => sum + count, 0),
       };
-    })
+    }),
   );
 }
 
@@ -33,7 +54,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-  const { data: projectData, error: projectError } = await getProjectsByCompanyId({ supabase, companyId });
+  const { data: projectData, error: projectError } =
+    await getProjectsByCompanyId({ supabase, companyId });
   if (projectError) throw projectError;
 
   const enrichedDataPromise = enrichProjectData(supabase, projectData ?? []);
@@ -94,8 +116,14 @@ export default function ProjectsIndex() {
   return (
     <section className="py-4 px-4">
       <div className="w-full flex items-end justify-between">
-        <Suspense fallback={<div className="w-full py-20 text-center">Loading projects...</div>}>
-          <Await resolve={projectPromise}>{(projects) => <ProjectList projects={projects} />}</Await>
+        <Suspense
+          fallback={
+            <div className="w-full py-20 text-center">Loading projects...</div>
+          }
+        >
+          <Await resolve={projectPromise}>
+            {(projects) => <ProjectList projects={projects} />}
+          </Await>
         </Suspense>
       </div>
       <Outlet />

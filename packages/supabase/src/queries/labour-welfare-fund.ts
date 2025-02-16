@@ -87,7 +87,8 @@ export async function getLabourWelfareFundByStateAndCompanyId({
       InferredType<LabourWelfareFundDatabaseRow, (typeof columns)[number]>
     >();
 
-  if (error) console.error("getLabourWelfareFundByStateAndCompanyId Error", error);
+  if (error)
+    console.error("getLabourWelfareFundByStateAndCompanyId Error", error);
 
   return { data, error };
 }

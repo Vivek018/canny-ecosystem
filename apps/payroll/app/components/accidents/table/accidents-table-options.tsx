@@ -36,10 +36,8 @@ export const AccidentOptionsDropdown = ({
             onClick={handleEdit}
             className={cn(
               "hidden",
-              hasPermission(
-                role,
-                `${updateRole}:${attribute.accidents}`
-              ) && "flex"
+              hasPermission(role, `${updateRole}:${attribute.accidents}`) &&
+                "flex",
             )}
           >
             Update Accident
@@ -47,15 +45,11 @@ export const AccidentOptionsDropdown = ({
           <DropdownMenuSeparator
             className={cn(
               "hidden",
-              hasPermission(
-                role,
-                `${deleteRole}:${attribute.accidents}`
-              ) && "flex"
+              hasPermission(role, `${deleteRole}:${attribute.accidents}`) &&
+                "flex",
             )}
           />
-          <DeleteAccident
-            id={accidentId}
-          />
+          <DeleteAccident id={accidentId} />
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>

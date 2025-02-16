@@ -73,7 +73,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   });
 
   if (error) {
-    console.error("Attendance",error);
+    console.error("Attendance", error);
   }
   return { updatableData: data, employeeId, date, error };
 }
@@ -95,7 +95,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
   const attendanceData = submission.value;
@@ -180,7 +180,7 @@ export default function UpdateAttendance() {
         method: "post",
         action: `/employees/${employeeId}/attendance/${date}/delete-attendance`,
         replace: true,
-      }
+      },
     );
   };
 
@@ -261,7 +261,7 @@ export default function UpdateAttendance() {
                 key={resetKey}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  attendanceWorkShiftArray as unknown as string[]
+                  attendanceWorkShiftArray as unknown as string[],
                 )}
                 inputProps={{
                   ...getInputProps(fields.working_shift, { type: "text" }),
@@ -276,7 +276,7 @@ export default function UpdateAttendance() {
                 key={resetKey + 1}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  attendanceHolidayTypeArray as unknown as string[]
+                  attendanceHolidayTypeArray as unknown as string[],
                 )}
                 inputProps={{
                   ...getInputProps(fields.holiday_type, { type: "text" }),
@@ -293,7 +293,7 @@ export default function UpdateAttendance() {
         <div
           className={cn(
             "flex  pb-0 h-10",
-            updatableData ? "justify-between" : "justify-end"
+            updatableData ? "justify-between" : "justify-end",
           )}
         >
           {updatableData && (

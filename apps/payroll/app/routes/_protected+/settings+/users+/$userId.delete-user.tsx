@@ -38,7 +38,7 @@ export async function action({
         error: "Invalid user ID",
         redirectUrl: "/settings/users",
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -60,7 +60,7 @@ export async function action({
           error,
           redirectUrl: "/settings/users",
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -101,7 +101,7 @@ export async function action({
         error,
         redirectUrl: "/settings/users",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -34,7 +34,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         statutoryBonusPromise: null,
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -51,7 +51,7 @@ export default function StatutoryBonusIndex() {
   if (error) {
     clearExactCacheEntry(cacheKeyPrefix.statutory_bonus);
     return (
-      <ErrorBoundary error={error} message='Failed to load Statutory Bonus' />
+      <ErrorBoundary error={error} message="Failed to load Statutory Bonus" />
     );
   }
 
@@ -61,7 +61,7 @@ export default function StatutoryBonusIndex() {
         {(resolvedData) => {
           if (!resolvedData) {
             clearExactCacheEntry(cacheKeyPrefix.statutory_bonus);
-            return <ErrorBoundary message='Failed to load Statutory Bonus' />;
+            return <ErrorBoundary message="Failed to load Statutory Bonus" />;
           }
           return (
             <StatutoryBonusWrapper

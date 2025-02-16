@@ -64,10 +64,10 @@ export default function DeleteEmployee() {
       if (actionData?.status === "success") {
         clearCacheEntry(cacheKeyPrefix.employees);
         clearExactCacheEntry(
-          `${cacheKeyPrefix.employee_overview}${employeeId}`
+          `${cacheKeyPrefix.employee_overview}${employeeId}`,
         );
         clearExactCacheEntry(
-          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
+          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`,
         );
         toast({
           title: "Success",

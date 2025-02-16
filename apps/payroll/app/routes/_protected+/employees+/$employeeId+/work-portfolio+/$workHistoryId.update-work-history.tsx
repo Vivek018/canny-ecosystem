@@ -43,7 +43,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   if (
     !hasPermission(
       user?.role!,
-      `${updateRole}:${attribute.employeeWorkHistory}`
+      `${updateRole}:${attribute.employeeWorkHistory}`,
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -83,7 +83,7 @@ export async function action({
   if (
     !hasPermission(
       user?.role!,
-      `${updateRole}:${attribute.employeeWorkHistory}`
+      `${updateRole}:${attribute.employeeWorkHistory}`,
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -99,7 +99,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -144,7 +144,7 @@ export default function UpdateEmployeeWorkHistory() {
     if (actionData) {
       if (actionData?.status === "success") {
         clearExactCacheEntry(
-          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
+          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`,
         );
         toast({
           title: "Success",
@@ -168,7 +168,7 @@ export default function UpdateEmployeeWorkHistory() {
         {(resolvedData) => {
           if (!resolvedData)
             return (
-              <ErrorBoundary message='Failed to load employee work history data' />
+              <ErrorBoundary message="Failed to load employee work history data" />
             );
           return (
             <UpdateEmployeeWorkHistoryWrapper
@@ -193,7 +193,7 @@ export function UpdateEmployeeWorkHistoryWrapper({
     return (
       <ErrorBoundary
         error={error}
-        message='Failed to load employee work history data'
+        message="Failed to load employee work history data"
       />
     );
   return <AddEmployeeWorkHistory updateValues={data} />;

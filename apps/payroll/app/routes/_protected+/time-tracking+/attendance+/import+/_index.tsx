@@ -75,7 +75,7 @@ export default function EmployeeAttendanceImportFieldMapping() {
       const result = ImportEmployeeAttendanceDataSchema.safeParse({ data });
       if (!result.success) {
         const formattedErrors = result.error.errors.map(
-          (err) => `${err.path[2]}: ${err.message}`
+          (err) => `${err.path[2]}: ${err.message}`,
         );
         setValidationErrors(formattedErrors);
         return false;
@@ -99,7 +99,9 @@ export default function EmployeeAttendanceImportFieldMapping() {
         complete: async (results) => {
           const cleanedData = results.data
             .filter((entry) =>
-              Object.values(entry!).some((value) => String(value).trim() !== "")
+              Object.values(entry!).some(
+                (value) => String(value).trim() !== "",
+              ),
             )
             .map((entry) => {
               const cleanEntry = Object.fromEntries(
@@ -107,8 +109,8 @@ export default function EmployeeAttendanceImportFieldMapping() {
                   ([key, value]) =>
                     key.trim() !== "" &&
                     value !== null &&
-                    String(value).trim() !== ""
-                )
+                    String(value).trim() !== "",
+                ),
               );
               return cleanEntry;
             });
@@ -141,7 +143,7 @@ export default function EmployeeAttendanceImportFieldMapping() {
 
               const date = `20${year}-${monthMap[month]}-${day.padStart(
                 2,
-                "0"
+                "0",
               )}`;
               const status = value?.toString().toUpperCase();
 
@@ -248,7 +250,7 @@ export default function EmployeeAttendanceImportFieldMapping() {
             });
 
             const employeeCodes = transformedData!.map(
-              (value) => value.employee_code
+              (value) => value.employee_code,
             );
             const { data: employees, error: idByCodeError } =
               await getEmployeeIdsByEmployeeCodes({
@@ -262,7 +264,7 @@ export default function EmployeeAttendanceImportFieldMapping() {
 
             const updatedData = transformedData!.map((item: any) => {
               const employeeId = employees?.find(
-                (e) => e.employee_code === item.employee_code
+                (e) => e.employee_code === item.employee_code,
               )?.id;
 
               const { employee_code, ...rest } = item;
@@ -298,14 +300,14 @@ export default function EmployeeAttendanceImportFieldMapping() {
   };
 
   return (
-    <section className='py-4 '>
+    <section className="py-4 ">
       {loadNext ? (
         <EmployeeAttendanceImportData
           conflictingIndices={hasConflict}
           env={env}
         />
       ) : (
-        <Card className='m-4 mx-auto w-1/3 flex flex-col items-center'>
+        <Card className="m-4 mx-auto w-1/3 flex flex-col items-center">
           <CardHeader>
             <CardTitle>Attendance Import Format</CardTitle>
             <CardDescription>
@@ -316,7 +318,7 @@ export default function EmployeeAttendanceImportFieldMapping() {
             <Combobox
               className={cn("w-80 h-10 mr-4")}
               options={transformStringArrayIntoOptions(
-                formatTypeArray as unknown as string[]
+                formatTypeArray as unknown as string[],
               )}
               value={formatType}
               onChange={(value: string) => {
@@ -328,8 +330,8 @@ export default function EmployeeAttendanceImportFieldMapping() {
 
             {formatType === "custom(normal)" && (
               <div
-                className='grid mt-10
- grid-cols-2 place-content-center justify-between gap-3'
+                className="grid mt-10
+ grid-cols-2 place-content-center justify-between gap-3"
               >
                 <Field
                   inputProps={{
@@ -352,8 +354,8 @@ export default function EmployeeAttendanceImportFieldMapping() {
             {formatType === "custom(shift)" && (
               <>
                 <div
-                  className='grid mt-10
-grid-cols-2 place-content-center gap-3'
+                  className="grid mt-10
+grid-cols-2 place-content-center gap-3"
                 >
                   <Field
                     inputProps={{
@@ -373,8 +375,8 @@ grid-cols-2 place-content-center gap-3'
                   />
                 </div>
                 <div
-                  className='grid mt-4
-grid-cols-2 place-content-center justify-between gap-3'
+                  className="grid mt-4
+grid-cols-2 place-content-center justify-between gap-3"
                 >
                   <Field
                     inputProps={{
@@ -398,10 +400,10 @@ grid-cols-2 place-content-center justify-between gap-3'
           </CardContent>
           <CardFooter>
             <div
-              className='grid
-grid-cols-1 gap-2'
+              className="grid
+grid-cols-1 gap-2"
             >
-              <span className='text-red-500 text-sm'>
+              <span className="text-red-500 text-sm">
                 {errors.errors}
                 {validationErrors[0]}
               </span>

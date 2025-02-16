@@ -144,9 +144,11 @@ export async function getUniqueEmployeeIdsByPayrollId({
     .from("payroll_entries")
     .select("employee_id")
     .eq("payroll_id", payrollId)
-    .then(result => ({
+    .then((result) => ({
       ...result,
-      data: result.data ? [...new Set(result.data.map(item => item.employee_id))] : null
+      data: result.data
+        ? [...new Set(result.data.map((item) => item.employee_id))]
+        : null,
     }));
 
   if (error) console.error("getUniqueEmployeeIdsByPayrollId Error", error);
@@ -202,7 +204,11 @@ export async function getPayrollEntriesWithTemplateComponentsByPayrollId({
       >[]
     >();
 
-  if (error) console.error("getPayrollEntriesWithTemplateComponentsByPayrollId Error", error);
+  if (error)
+    console.error(
+      "getPayrollEntriesWithTemplateComponentsByPayrollId Error",
+      error,
+    );
 
   return { data, error };
 }
@@ -210,7 +216,7 @@ export async function getPayrollEntriesWithTemplateComponentsByPayrollId({
 export async function getPaymentTemplateComponentIdsByPayrollIdAndEmployeeId({
   supabase,
   payrollId,
-  employeeId
+  employeeId,
 }: {
   supabase: TypedSupabaseClient;
   payrollId: string;
@@ -225,7 +231,11 @@ export async function getPaymentTemplateComponentIdsByPayrollIdAndEmployeeId({
     .eq("employee_id", employeeId)
     .returns<PayrollEntriesDatabaseRow[]>();
 
-  if (error) console.error("getPaymentTemplateComponentIdsByPayrollIdAndEmployeeId Error", error);
+  if (error)
+    console.error(
+      "getPaymentTemplateComponentIdsByPayrollIdAndEmployeeId Error",
+      error,
+    );
 
   return { data, error };
 }
@@ -311,7 +321,11 @@ export async function getPayrollEntryAmountByEmployeeIdAndPayrollIdAndPaymentTem
       InferredType<PayrollEntriesDatabaseRow, (typeof columns)[number]>
     >();
 
-  if (error) console.error("getPayrollEntryAmountByEmployeeIdAndPayrollIdAndPaymentTemplateComponentId Error", error);
+  if (error)
+    console.error(
+      "getPayrollEntryAmountByEmployeeIdAndPayrollIdAndPaymentTemplateComponentId Error",
+      error,
+    );
 
   return { data, error };
 }
@@ -335,7 +349,11 @@ export async function getPaymentTemplateComponentIdsAndAmountByPayrollIdAndEmplo
     .order("created_at", { ascending: false })
     .returns<PayrollEntriesDatabaseRow[]>();
 
-  if (error) console.error("getPaymentTemplateComponentIdsAndAmountByPayrollIdAndEmployeeId Error", error);
+  if (error)
+    console.error(
+      "getPaymentTemplateComponentIdsAndAmountByPayrollIdAndEmployeeId Error",
+      error,
+    );
 
   return { data, error };
 }

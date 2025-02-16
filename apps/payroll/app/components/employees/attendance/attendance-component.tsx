@@ -73,30 +73,30 @@ export const AttendanceComponent = ({
   };
 
   return (
-    <div className='p-4'>
-      <div className='flex justify-end items-center mb-4 gap-x-2'>
+    <div className="p-4">
+      <div className="flex justify-end items-center mb-4 gap-x-2">
         <FilterList filters={filters} />
         <AttendanceFilter setMonth={setMonth} setYear={setYear} />
       </div>
 
-      <div className='w-full mx-auto pb-8'>
-        <div className='border rounded-lg'>
-          <div className='grid grid-cols-7'>
+      <div className="w-full mx-auto pb-8">
+        <div className="border rounded-lg">
+          <div className="grid grid-cols-7">
             {weekDays.map((day) => (
               <div
                 key={day}
-                className='p-2 text-center bg-muted/60 font-semibold text-muted-foreground last:border-none border-r'
+                className="p-2 text-center bg-muted/60 font-semibold text-muted-foreground last:border-none border-r"
               >
                 {day}
               </div>
             ))}
           </div>
 
-          <div className='grid grid-cols-7 '>
+          <div className="grid grid-cols-7 ">
             {emptyFirstDays.map((_, index) => (
               <div
                 key={`empty-${index.toString()}`}
-                className='h-32 border first:border-l  p-2'
+                className="h-32 border first:border-l  p-2"
               />
             ))}
 
@@ -114,42 +114,42 @@ export const AttendanceComponent = ({
                 }
                 key={date.fullDate}
                 className={cn(
-                  "h-32 border p-2 bg-card flex flex-col justify-between cursor-pointer"
+                  "h-32 border p-2 bg-card flex flex-col justify-between cursor-pointer",
                 )}
               >
-                <div className='flex justify-between items-center'>
-                  <div className='font-extrabold text-lg'>{date.day}</div>
-                  <div className='text-xs flex flex-col items-end'>
+                <div className="flex justify-between items-center">
+                  <div className="font-extrabold text-lg">{date.day}</div>
+                  <div className="text-xs flex flex-col items-end">
                     <div
                       className={cn(
                         "py-0.5 px-1 rounded-sm text-center",
                         attendanceData.find(
-                          (entry) => entry.date === date.fullDate
+                          (entry) => entry.date === date.fullDate,
                         )?.holiday
                           ? "bg-yellow-300 dark:text-black"
                           : attendanceData.find(
-                              (entry) => entry.date === date.fullDate
-                            )?.present
-                          ? "bg-green"
-                          : "bg-destructive text-white",
+                                (entry) => entry.date === date.fullDate,
+                              )?.present
+                            ? "bg-green"
+                            : "bg-destructive text-white",
                         !attendanceData.find(
-                          (entry) => entry.date === date.fullDate
-                        )?.date && "hidden p-0"
+                          (entry) => entry.date === date.fullDate,
+                        )?.date && "hidden p-0",
                       )}
                     >
                       {attendanceData.find(
-                        (entry) => entry.date === date.fullDate
+                        (entry) => entry.date === date.fullDate,
                       )?.present
                         ? "Present"
                         : "Absent"}
                     </div>
                     {attendanceData.find(
-                      (entry) => entry.date === date.fullDate
+                      (entry) => entry.date === date.fullDate,
                     )?.holiday && (
-                      <div className='capitalize mt-1 py-0.5 px-1 rounded-sm text-center bg-muted text-muted-foreground'>
+                      <div className="capitalize mt-1 py-0.5 px-1 rounded-sm text-center bg-muted text-muted-foreground">
                         {
                           attendanceData.find(
-                            (entry) => entry.date === date.fullDate
+                            (entry) => entry.date === date.fullDate,
                           )?.holiday_type
                         }
                       </div>
@@ -157,33 +157,33 @@ export const AttendanceComponent = ({
                   </div>
                 </div>
 
-                <div className='flex justify-between items-center text-xs'>
+                <div className="flex justify-between items-center text-xs">
                   <div
                     className={cn(
                       "rounded-sm px-1 py-0.5",
                       attendanceData.find(
-                        (entry) => entry.date === date.fullDate
+                        (entry) => entry.date === date.fullDate,
                       )?.no_of_hours === 8
                         ? "bg-muted text-muted-foreground"
                         : "bg-muted-foreground text-muted",
                       !attendanceData.find(
-                        (entry) => entry.date === date.fullDate
-                      )?.id && "hidden p-0"
+                        (entry) => entry.date === date.fullDate,
+                      )?.id && "hidden p-0",
                     )}
                   >
                     {attendanceData.find(
-                      (entry) => entry.date === date.fullDate
+                      (entry) => entry.date === date.fullDate,
                     )?.no_of_hours &&
                       `${
                         attendanceData.find(
-                          (entry) => entry.date === date.fullDate
+                          (entry) => entry.date === date.fullDate,
                         )?.no_of_hours
                       } hours`}
                   </div>
-                  <div className='text-xs px-1 rounded-sm bg-muted text-muted-foreground'>
+                  <div className="text-xs px-1 rounded-sm bg-muted text-muted-foreground">
                     {
                       attendanceData.find(
-                        (entry) => entry.date === date.fullDate
+                        (entry) => entry.date === date.fullDate,
                       )?.working_shift
                     }
                   </div>
@@ -194,7 +194,7 @@ export const AttendanceComponent = ({
             {emptyLastDays.map((_, index) => (
               <div
                 key={`empty-${index.toString()}`}
-                className='h-32 border first:border-l  p-2'
+                className="h-32 border first:border-l  p-2"
               />
             ))}
           </div>

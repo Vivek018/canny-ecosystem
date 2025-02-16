@@ -70,7 +70,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined
+        (value) => value !== null && value !== undefined,
       );
 
     const accidentsPromise = getAccidentsByCompanyId({
@@ -110,7 +110,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 
   return await clientCaching(
     `${cacheKeyPrefix.accident}${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 
@@ -124,9 +124,9 @@ export default function AccidentsIndex() {
   const noFilters = Object.values(filterList).every((value) => !value);
 
   return (
-    <section className='p-4'>
-      <div className='w-full flex items-center justify-between pb-4'>
-        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4'>
+    <section className="p-4">
+      <div className="w-full flex items-center justify-between pb-4">
+        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
           <AccidentSearchFilter />
           <FilterList filters={filterList} />
         </div>
@@ -139,7 +139,7 @@ export default function AccidentsIndex() {
               return (
                 <ErrorBoundary
                   error={error}
-                  message='Failed to load accidents'
+                  message="Failed to load accidents"
                 />
               );
             }

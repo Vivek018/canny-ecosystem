@@ -28,7 +28,7 @@ export async function action({
     !hasPermission(
       `${user?.role!}`,
       `${deleteRole}:  "${attribute.statutoryFieldsStatutoryBonus}",
-  `
+  `,
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -60,7 +60,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

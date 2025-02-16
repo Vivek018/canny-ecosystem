@@ -154,9 +154,9 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
                 !hasPermission(role, `${updateRole}:${attribute.accidents}`) &&
                   !hasPermission(
                     role,
-                    `${deleteRole}:${attribute.accidents}`
+                    `${deleteRole}:${attribute.accidents}`,
                   ) &&
-                  "hidden"
+                  "hidden",
               )}
               asChild
             >

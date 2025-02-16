@@ -35,7 +35,11 @@ export function ExitByReasons({ chartData }: { chartData: ExitsRow[] }) {
 
         if (!acc[reason]) acc[reason] = { reason, amount: 0 };
 
-        acc[reason].amount += Number(row?.bonus) + Number(row.leave_encashment) + Number(row.gratuity) - Number(row.deduction);
+        acc[reason].amount +=
+          Number(row?.bonus) +
+          Number(row.leave_encashment) +
+          Number(row.gratuity) -
+          Number(row.deduction);
         return acc;
       },
       Object.fromEntries(
@@ -59,10 +63,19 @@ export function ExitByReasons({ chartData }: { chartData: ExitsRow[] }) {
         <CardDescription>Over the period</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
-        <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[300px]">
+        <ChartContainer
+          config={chartConfig}
+          className="mx-auto aspect-square max-h-[300px]"
+        >
           <PieChart>
             <ChartTooltip
-              content={<ChartTooltipContent hideLabel nameKey="reason" className="capitalize" />}
+              content={
+                <ChartTooltipContent
+                  hideLabel
+                  nameKey="reason"
+                  className="capitalize"
+                />
+              }
               wrapperStyle={{ width: "60%" }}
             />
             <Pie data={transformedChartData} dataKey="amount" />

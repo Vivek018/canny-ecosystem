@@ -24,16 +24,22 @@ export const ExitOptionsDropdown = ({
   return (
     <DropdownMenu>
       {triggerChild}
-      <DropdownMenuContent sideOffset={10} align='end'>
+      <DropdownMenuContent sideOffset={10} align="end">
         <DropdownMenuGroup>
           <DropdownMenuItem
-            className={cn("hidden", hasPermission(role, `${updateRole}:${attribute.exits}`) && "flex")}
+            className={cn(
+              "hidden",
+              hasPermission(role, `${updateRole}:${attribute.exits}`) && "flex",
+            )}
             onClick={() => navigate(`/approvals/exits/${exitId}/update-exit`)}
           >
             Edit Exit
           </DropdownMenuItem>
           <DropdownMenuSeparator
-            className={cn("hidden", hasPermission(role, `${deleteRole}:${attribute.exits}`) && "flex")}
+            className={cn(
+              "hidden",
+              hasPermission(role, `${deleteRole}:${attribute.exits}`) && "flex",
+            )}
           />
           <DeleteExit exitId={exitId} />
         </DropdownMenuGroup>

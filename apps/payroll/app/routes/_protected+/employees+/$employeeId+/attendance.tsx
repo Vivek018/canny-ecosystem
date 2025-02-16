@@ -42,7 +42,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
     `${cacheKeyPrefix.attendance}${
       args.params.employeeId
     }${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 

@@ -1,12 +1,24 @@
 import * as React from "react";
 import { Label, Pie, PieChart } from "recharts";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@canny_ecosystem/ui/card";
-import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@canny_ecosystem/ui/chart";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@canny_ecosystem/ui/card";
+import {
+  type ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@canny_ecosystem/ui/chart";
 import type { ExitDataType } from "@canny_ecosystem/supabase/queries";
 
 const chartConfig = {
   count: { label: "Count" },
-  january: { label: "January", color: "hsl(var(--chart-1))", },
+  january: { label: "January", color: "hsl(var(--chart-1))" },
   february: { label: "February", color: "hsl(var(--chart-2))" },
   march: { label: "March", color: "hsl(var(--chart-3))" },
   april: { label: "April", color: "hsl(var(--chart-4))" },
@@ -44,7 +56,9 @@ export function ExitByTime({ chartData }: { chartData: ExitDataType[] }) {
   } else {
     const groupedByMonth = chartData.reduce(
       (acc: Record<string, number>, row) => {
-        const month = new Date(row.last_working_day).toLocaleString("default", { month: "long" });
+        const month = new Date(row.last_working_day).toLocaleString("default", {
+          month: "long",
+        });
         if (!acc[month]) acc[month] = 0;
         acc[month]++;
         return acc;
@@ -84,9 +98,15 @@ export function ExitByTime({ chartData }: { chartData: ExitDataType[] }) {
         <CardDescription>Over the period</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
-        <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[250px]">
+        <ChartContainer
+          config={chartConfig}
+          className="mx-auto aspect-square max-h-[250px]"
+        >
           <PieChart>
-            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent hideLabel />}
+            />
             <Pie
               data={transformedChartData}
               dataKey="count"
@@ -98,7 +118,12 @@ export function ExitByTime({ chartData }: { chartData: ExitDataType[] }) {
                 content={({ viewBox }) => {
                   if (viewBox && "cx" in viewBox && "cy" in viewBox) {
                     return (
-                      <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle" dominantBaseline="middle">
+                      <text
+                        x={viewBox.cx}
+                        y={viewBox.cy}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                      >
                         <tspan
                           x={viewBox.cx}
                           y={viewBox.cy}
@@ -106,7 +131,11 @@ export function ExitByTime({ chartData }: { chartData: ExitDataType[] }) {
                         >
                           {totalExitCount.toLocaleString()}
                         </tspan>
-                        <tspan x={viewBox.cx} y={(viewBox.cy || 0) + 24} className="fill-muted-foreground">
+                        <tspan
+                          x={viewBox.cx}
+                          y={(viewBox.cy || 0) + 24}
+                          className="fill-muted-foreground"
+                        >
                           Total Exits
                         </tspan>
                       </text>
@@ -119,7 +148,9 @@ export function ExitByTime({ chartData }: { chartData: ExitDataType[] }) {
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
-        <div className="leading-none text-muted-foreground">Showing exits count for the time period.</div>
+        <div className="leading-none text-muted-foreground">
+          Showing exits count for the time period.
+        </div>
       </CardFooter>
     </Card>
   );

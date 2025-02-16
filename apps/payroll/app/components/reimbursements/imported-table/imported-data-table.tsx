@@ -63,7 +63,7 @@ export function ImportedDataTable<TData, TValue>({
                                 : cell.getValue() === "pending" &&
                                   "text-muted-foreground"),
                             cell.column.id === "actions" &&
-                              "sticky right-0 min-w-20 max-w-20 bg-card z-10"
+                              "sticky right-0 min-w-20 max-w-20 bg-card z-10",
                           )}
                         >
                           {flexRender(

@@ -56,7 +56,7 @@ export function EPFReportSearchFilter({
   };
 
   const startYear = Number.parseInt(searchParams.get("start_year") ?? "");
-  const endYear = Number.parseInt(searchParams.get("end_year") ?? "") ;
+  const endYear = Number.parseInt(searchParams.get("end_year") ?? "");
 
   const [filterParams, setFilterParams] = useState(initialFilterParams);
 
@@ -243,10 +243,7 @@ export function EPFReportSearchFilter({
                 alignOffset={-4}
                 className="p-0"
               >
-                {getYears(
-                  10,
-                  endYear ? endYear : new Date().getFullYear(),
-                )
+                {getYears(10, endYear ? endYear : new Date().getFullYear())
                   ?.sort((a, b) => b - a)
                   .map((name, index) => (
                     <DropdownMenuCheckboxItem

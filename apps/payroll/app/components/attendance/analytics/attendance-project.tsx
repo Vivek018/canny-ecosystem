@@ -37,7 +37,7 @@ export function AttendanceByProjects({
         const totalPresents = (row.attendance ?? []).reduce(
           (count, entry: { present: boolean }) =>
             count + (entry.present ? 1 : 0),
-          0
+          0,
         );
 
         return {

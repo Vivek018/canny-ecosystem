@@ -9,8 +9,15 @@ import { TableCell, TableRow } from "@canny_ecosystem/ui/table";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { flexRender } from "@tanstack/react-table";
 
-export function ExitPaymentsSheet({ row, rowData }: { row: any; rowData: any }) {
-  const netPay = rowData.bonus + rowData.leave_encashment + rowData.gratuity - rowData.deduction;
+export function ExitPaymentsSheet({
+  row,
+  rowData,
+}: { row: any; rowData: any }) {
+  const netPay =
+    rowData.bonus +
+    rowData.leave_encashment +
+    rowData.gratuity -
+    rowData.deduction;
   return (
     <Sheet>
       <TableRow
@@ -26,9 +33,9 @@ export function ExitPaymentsSheet({ row, rowData }: { row: any; rowData: any }) 
                 className={cn(
                   "px-3 md:px-4 py-4 hidden md:table-cell",
                   cell.column.id === "select" &&
-                  "sticky left-0 min-w-12 max-w-12 bg-card z-10",
+                    "sticky left-0 min-w-12 max-w-12 bg-card z-10",
                   cell.column.id === "actions" &&
-                  "sticky right-0 min-w-20 max-w-20 bg-card z-10",
+                    "sticky right-0 min-w-20 max-w-20 bg-card z-10",
                 )}
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -46,11 +53,11 @@ export function ExitPaymentsSheet({ row, rowData }: { row: any; rowData: any }) 
                     cell.column.id === "employee_payable_days" ||
                     cell.column.id === "reason" ||
                     cell.column.id === "note") &&
-                  "hidden md:table-cell",
+                    "hidden md:table-cell",
                   cell.column.id === "employee_code" &&
-                  "sticky left-12 bg-card z-10",
+                    "sticky left-12 bg-card z-10",
                   cell.column.id === "employee_name" &&
-                  "sticky left-[192px] bg-card z-10"
+                    "sticky left-[192px] bg-card z-10",
                 )}
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -65,8 +72,9 @@ export function ExitPaymentsSheet({ row, rowData }: { row: any; rowData: any }) 
             <div>
               <h1 className="text-primary text-3xl">
                 {rowData.employees
-                  ? `${rowData.employees.first_name} ${rowData.employees.middle_name ?? ""
-                  } ${rowData.employees.last_name}`
+                  ? `${rowData.employees.first_name} ${
+                      rowData.employees.middle_name ?? ""
+                    } ${rowData.employees.last_name}`
                   : "--"}
               </h1>
             </div>
@@ -86,8 +94,12 @@ export function ExitPaymentsSheet({ row, rowData }: { row: any; rowData: any }) 
         <div className="flex justify-between mx-5">
           <div>
             <h3 className="my-3 text-muted-foreground font-semibold">Bonus</h3>
-            <h3 className="my-3 text-muted-foreground font-semibold">Leave Encashment</h3>
-            <h3 className="my-3 text-muted-foreground font-semibold">Gratuity</h3>
+            <h3 className="my-3 text-muted-foreground font-semibold">
+              Leave Encashment
+            </h3>
+            <h3 className="my-3 text-muted-foreground font-semibold">
+              Gratuity
+            </h3>
           </div>
           <div className="text-end font-semibold">
             <p className="my-3">Rs {rowData.bonus ?? "--"}</p>
@@ -103,7 +115,9 @@ export function ExitPaymentsSheet({ row, rowData }: { row: any; rowData: any }) 
         <hr />
         <div className=" flex justify-between mx-5">
           <div className="">
-            <h3 className="my-3 text-muted-foreground font-semibold">Deduction</h3>
+            <h3 className="my-3 text-muted-foreground font-semibold">
+              Deduction
+            </h3>
           </div>
           <div className="text-end font-semibold">
             <p className="my-3">Rs {rowData.deduction ?? "--"}</p>

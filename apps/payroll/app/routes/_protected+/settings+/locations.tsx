@@ -46,7 +46,7 @@ export default function Locations() {
 
   if (error) {
     clearExactCacheEntry(cacheKeyPrefix.locations);
-    return <ErrorBoundary error={error} message='Failed to load locations' />;
+    return <ErrorBoundary error={error} message="Failed to load locations" />;
   }
 
   return (
@@ -55,7 +55,7 @@ export default function Locations() {
         {(resolvedData) => {
           if (!resolvedData) {
             clearExactCacheEntry(cacheKeyPrefix.locations);
-            return <ErrorBoundary message='Failed to load locations' />;
+            return <ErrorBoundary message="Failed to load locations" />;
           }
           return (
             <LocationsWrapper

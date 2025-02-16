@@ -70,7 +70,9 @@ export const getEmployeeProvidentFundByEPFNumber = async ({
     .from("employee_provident_fund")
     .select(columns.join(","))
     .eq("epf_number", epfNumber)
-    .single<InferredType<EmployeeProvidentFundDatabaseRow, (typeof columns)[number]>>();
+    .single<
+      InferredType<EmployeeProvidentFundDatabaseRow, (typeof columns)[number]>
+    >();
 
   if (error) console.error("getEmployeeProvidentFundByEPFNumber Error", error);
 

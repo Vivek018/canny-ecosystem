@@ -132,7 +132,7 @@ export async function getUsersByCompanyId({
 
 export async function getUsersEmail({
   supabase,
-  companyId
+  companyId,
 }: {
   companyId: string;
   supabase: TypedSupabaseClient;

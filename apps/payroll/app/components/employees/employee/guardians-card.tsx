@@ -22,7 +22,12 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import type { EmployeeGuardianDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { DeleteGuardian } from "./delete-guardian";
-import { createRole, deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
+import {
+  createRole,
+  deleteRole,
+  hasPermission,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import { useUser } from "@/utils/user";
 import { DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
@@ -74,8 +79,8 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
                     "px-2.5 h-min",
                     !hasPermission(
                       role,
-                      `${updateRole}:${attribute.employeeGuardians}`
-                    ) && "hidden"
+                      `${updateRole}:${attribute.employeeGuardians}`,
+                    ) && "hidden",
                   )}
                 >
                   <Icon name="edit" size="xs" />
@@ -89,8 +94,10 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
               className={cn(
                 buttonVariants({ variant: "muted" }),
                 "px-2.5 h-min hidden",
-                hasPermission(role, `${deleteRole}:${attribute.employeeGuardians}`) &&
-                  "flex"
+                hasPermission(
+                  role,
+                  `${deleteRole}:${attribute.employeeGuardians}`,
+                ) && "flex",
               )}
             >
               <Icon name="dots-vertical" size="xs" />
@@ -133,7 +140,7 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
                 "dark:mt-[1px]",
                 guardian.is_emergency_contact
                   ? "text-green"
-                  : "text-destructive"
+                  : "text-destructive",
               )}
             />
             <p>Is emergency contact</p>
@@ -146,7 +153,7 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
                 "dark:mt-[1px]",
                 guardian.address_same_as_employee
                   ? "text-green"
-                  : "text-destructive"
+                  : "text-destructive",
               )}
             />
             <p>Address same as employee</p>
@@ -164,15 +171,15 @@ export const EmployeeGuardiansCard = ({
 }) => {
   const { role } = useUser();
   return (
-    <Card className='rounded w-full h-full p-4'>
-      <div className='flex justify-between items-center mb-6'>
-        <h2 className='text-xl font-semibold'>Guardians Details</h2>
+    <Card className="rounded w-full h-full p-4">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-semibold">Guardians Details</h2>
         <div>
           <Link
             to={
               hasPermission(
                 role,
-                `${createRole}:${attribute.employeeGuardians}`
+                `${createRole}:${attribute.employeeGuardians}`,
               )
                 ? "add-employee-guardian"
                 : DEFAULT_ROUTE
@@ -182,19 +189,19 @@ export const EmployeeGuardiansCard = ({
               "bg-card",
               !hasPermission(
                 role,
-                `${createRole}:${attribute.employeeGuardians}`
-              ) && "hidden"
+                `${createRole}:${attribute.employeeGuardians}`,
+              ) && "hidden",
             )}
           >
-            <Icon name='plus-circled' className='mr-2' />
+            <Icon name="plus-circled" className="mr-2" />
             Add
           </Link>
         </div>
       </div>
 
-      <div className='w-full overflow-scroll no-scrollbar'>
+      <div className="w-full overflow-scroll no-scrollbar">
         {employeeGuardians?.length ? (
-          <div className='flex items-center gap-4 min-w-max'>
+          <div className="flex items-center gap-4 min-w-max">
             {employeeGuardians.map((guardian, index) => (
               <GuardianItem
                 key={guardian?.id + index.toString()}
@@ -203,7 +210,7 @@ export const EmployeeGuardiansCard = ({
             ))}
           </div>
         ) : (
-          <div className='text-center py-8'>
+          <div className="text-center py-8">
             <p>No guardians details available.</p>
           </div>
         )}

@@ -54,7 +54,7 @@ export const UpdateImportedEmployee = ({
     if (parsedResult.success) {
       setImportData({
         data: importData.data?.map((item, index) =>
-          index === indexToUpdate ? data : item
+          index === indexToUpdate ? data : item,
         ),
       });
     }
@@ -65,7 +65,7 @@ export const UpdateImportedEmployee = ({
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "ghost", size: "full" }),
-          "text-[13px] h-9"
+          "text-[13px] h-9",
         )}
       >
         Update Employee
@@ -117,7 +117,7 @@ export const UpdateImportedEmployee = ({
           <div className="grid mb-5 grid-cols-2 place-content-center justify-between gap-3">
             <Combobox
               options={transformStringArrayIntoOptions(
-                genderArray as unknown as string[]
+                genderArray as unknown as string[],
               )}
               value={data.gender ?? genderArray[0]}
               onChange={(value: string) => {
@@ -127,7 +127,7 @@ export const UpdateImportedEmployee = ({
             />
             <Combobox
               options={transformStringArrayIntoOptions(
-                educationArray as unknown as string[]
+                educationArray as unknown as string[],
               )}
               value={data.education ?? educationArray[0]}
               onChange={(value: string) => {
@@ -139,7 +139,7 @@ export const UpdateImportedEmployee = ({
           <div className="mb-5 grid grid-cols-1">
             <Combobox
               options={transformStringArrayIntoOptions(
-                maritalStatusArray as unknown as string[]
+                maritalStatusArray as unknown as string[],
               )}
               value={data.marital_status ?? maritalStatusArray[0]}
               onChange={(value: string) => {

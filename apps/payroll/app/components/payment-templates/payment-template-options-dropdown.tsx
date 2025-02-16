@@ -29,26 +29,26 @@ export const PaymentTemplateOptionsDropdown = ({
 
   const handleViewComponents = () => {
     navigate(
-      `/payment-components/payment-templates/${paymentTemplate.id}?step=${modalSearchParamNames.view_template_components}`
+      `/payment-components/payment-templates/${paymentTemplate.id}?step=${modalSearchParamNames.view_template_components}`,
     );
   };
 
   const handleEdit = () => {
     navigate(
-      `/payment-components/payment-templates/${paymentTemplate.id}/update-payment-template`
+      `/payment-components/payment-templates/${paymentTemplate.id}/update-payment-template`,
     );
   };
 
   const handleEditComponents = () => {
     navigate(
-      `/payment-components/payment-templates/${paymentTemplate.id}/update-payment-template-components`
+      `/payment-components/payment-templates/${paymentTemplate.id}/update-payment-template-components`,
     );
   };
 
   return (
     <DropdownMenu>
       {triggerChild}
-      <DropdownMenuContent sideOffset={10} align='end'>
+      <DropdownMenuContent sideOffset={10} align="end">
         <DropdownMenuGroup>
           <DropdownMenuItem onClick={handleViewComponents}>
             View Template Components
@@ -57,13 +57,13 @@ export const PaymentTemplateOptionsDropdown = ({
             className={cn(
               !hasPermission(
                 role,
-                `${updateRole}:${attribute.paymentTemplates}`
+                `${updateRole}:${attribute.paymentTemplates}`,
               ) &&
                 !hasPermission(
                   role,
-                  `${deleteRole}:${attribute.paymentTemplates}`
+                  `${deleteRole}:${attribute.paymentTemplates}`,
                 ) &&
-                "hidden"
+                "hidden",
             )}
           />
           <DropdownMenuItem
@@ -72,8 +72,8 @@ export const PaymentTemplateOptionsDropdown = ({
               "hidden",
               hasPermission(
                 role,
-                `${updateRole}:${attribute.paymentTemplates}`
-              ) && "flex"
+                `${updateRole}:${attribute.paymentTemplates}`,
+              ) && "flex",
             )}
           >
             Edit Payment Template
@@ -84,8 +84,8 @@ export const PaymentTemplateOptionsDropdown = ({
               "hidden",
               hasPermission(
                 role,
-                `${updateRole}:${attribute.paymentTemplates}`
-              ) && "flex"
+                `${updateRole}:${attribute.paymentTemplates}`,
+              ) && "flex",
             )}
           >
             Edit Template Components
@@ -95,8 +95,8 @@ export const PaymentTemplateOptionsDropdown = ({
               "hidden",
               hasPermission(
                 role,
-                `${deleteRole}:${attribute.paymentTemplates}`
-              ) && "flex"
+                `${deleteRole}:${attribute.paymentTemplates}`,
+              ) && "flex",
             )}
           />
           <DeletePaymentTemplate paymentTemplateId={paymentTemplate.id} />

@@ -42,7 +42,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const hasFilters =
     filters &&
     Object.values(filters).some(
-      (value) => value !== null && value !== undefined
+      (value) => value !== null && value !== undefined,
     );
 
   const { data, meta, error } = await getEmployeesReportByCompanyId({
@@ -58,7 +58,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   });
 
   const hasNextPage = Boolean(
-    meta?.count && meta.count / (page + 1) > pageSize
+    meta?.count && meta.count / (page + 1) > pageSize,
   );
 
   if (error) {
@@ -142,9 +142,9 @@ export default function StatutoryBonusReport() {
   const noFilters = Object.values(filterList).every((value) => !value);
 
   return (
-    <section className='py-4'>
-      <div className='w-full flex items-center justify-between pb-4'>
-        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4'>
+    <section className="py-4">
+      <div className="w-full flex items-center justify-between pb-4">
+        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
           <SBReportSearchFilter
             disabled={!data?.length && noFilters}
             projectArray={projectArray}

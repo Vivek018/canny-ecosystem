@@ -67,7 +67,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return json({ step, totalSteps, stepData });
 }
 
-export async function action({ request }: ActionFunctionArgs): Promise<Response> {
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
   const url = new URL(request.url);
   const session = await getSession(request.headers.get("Cookie"));
   const step = Number.parseInt(url.searchParams.get(STEP) || "1");
@@ -77,7 +79,7 @@ export async function action({ request }: ActionFunctionArgs): Promise<Response>
 
   const formData = await parseMultipartFormData(
     request,
-    createMemoryUploadHandler({ maxPartSize: SIZE_1MB })
+    createMemoryUploadHandler({ maxPartSize: SIZE_1MB }),
   );
   const actionType = formData.get("_action") as string;
   const submission = parseWithZod(formData, { schema: currentSchema });
@@ -91,7 +93,7 @@ export async function action({ request }: ActionFunctionArgs): Promise<Response>
             message: "Form validation failed",
             returnTo: `/create-company?step=${step}`,
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -115,7 +117,7 @@ export async function action({ request }: ActionFunctionArgs): Promise<Response>
             message: "Failed to create company",
             returnTo: "/companies",
           },
-          { status: 500 }
+          { status: 500 },
         );
       }
 
@@ -126,7 +128,7 @@ export async function action({ request }: ActionFunctionArgs): Promise<Response>
             message: "Failed to save company registration details",
             returnTo: DEFAULT_ROUTE,
           },
-          { status: 500 }
+          { status: 500 },
         );
       }
 
@@ -147,7 +149,7 @@ export async function action({ request }: ActionFunctionArgs): Promise<Response>
           {
             status: status,
             headers: headers,
-          }
+          },
         );
       }
     } else if (
@@ -166,7 +168,7 @@ export async function action({ request }: ActionFunctionArgs): Promise<Response>
             message: "Form validation failed",
             returnTo: `/create-company?step=${step}`,
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -191,7 +193,7 @@ export async function action({ request }: ActionFunctionArgs): Promise<Response>
         message: `An unexpected error occurred${error}`,
         returnTo: "/companies",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
@@ -246,8 +248,8 @@ export default function CreateCompany() {
   });
 
   return (
-    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
-      <div className='w-full mx-auto mb-4'>
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
+      <div className="w-full mx-auto mb-4">
         <FormStepHeader
           totalSteps={totalSteps}
           step={step}
@@ -256,13 +258,13 @@ export default function CreateCompany() {
       </div>
       <FormProvider context={form.context}>
         <Form
-          method='POST'
-          encType='multipart/form-data'
+          method="POST"
+          encType="multipart/form-data"
           {...getFormProps(form)}
-          className='flex flex-col'
+          className="flex flex-col"
         >
           <Card>
-            <div className='h-[500px] overflow-scroll'>
+            <div className="h-[500px] overflow-scroll">
               {step === 1 ? (
                 <CreateCompanyDetails key={resetKey} fields={fields as any} />
               ) : null}

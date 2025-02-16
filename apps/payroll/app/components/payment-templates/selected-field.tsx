@@ -41,7 +41,9 @@ export const SelectedPaymentField = ({
   const fieldId =
     field.payment_field_id.value ?? field.payment_field_id.initialValue ?? "";
   const value = Number.parseFloat(
-    field.calculation_value.value ?? field.calculation_value.initialValue ?? "0"
+    field.calculation_value.value ??
+      field.calculation_value.initialValue ??
+      "0",
   );
   const componentType =
     field.component_type.value ?? field.component_type.initialValue ?? "";
@@ -103,22 +105,22 @@ export const SelectedPaymentField = ({
       />
 
       <input {...getInputProps(field.target_type, { type: "hidden" })} />
-      <div className='flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm  items-center shadow-sm'>
+      <div className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm  items-center shadow-sm">
         {fieldName}
       </div>
       <SearchableSelectField
-        className='capitalize'
+        className="capitalize"
         options={transformStringArrayIntoOptions(
-          componentTypeArray as unknown as string[]
+          componentTypeArray as unknown as string[],
         )}
         inputProps={{
           ...getInputProps(field.component_type, { type: "text" }),
         }}
-        placeholder='Select Component Type'
+        placeholder="Select Component Type"
         errors={field.component_type.errors}
         errorClassName={errorClassName}
       />
-      <div className='flex items-center gap-1'>
+      <div className="flex items-center gap-1">
         <Field
           inputProps={{
             ...getInputProps(field.calculation_value, {
@@ -134,7 +136,7 @@ export const SelectedPaymentField = ({
         <p
           className={cn(
             "h-9 w-52 text-sm tracking-wide truncate hidden justify-center items-center bg-muted text-muted-foreground rounded",
-            percentageAmount && "flex"
+            percentageAmount && "flex",
           )}
         >
           {percentageAmount}% of CTC
@@ -162,23 +164,23 @@ export const SelectedEPFField = ({
         })}
       />
       <input {...getInputProps(field.target_type, { type: "hidden" })} />
-      <div className='flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm  items-center shadow-sm'>
+      <div className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm  items-center shadow-sm">
         {epfName}
       </div>
       <SearchableSelectField
-        className='capitalize'
+        className="capitalize"
         options={transformStringArrayIntoOptions(
-          componentTypeArray as unknown as string[]
+          componentTypeArray as unknown as string[],
         )}
         inputProps={{
           ...getInputProps(field.component_type, { type: "text" }),
           readOnly: true,
         }}
-        placeholder='Select Component Type'
+        placeholder="Select Component Type"
         errors={field.component_type.errors}
         errorClassName={errorClassName}
       />
-      <div className='flex items-center gap-1'>
+      <div className="flex items-center gap-1">
         <Field
           inputProps={{
             ...getInputProps(field.calculation_value, {
@@ -193,7 +195,7 @@ export const SelectedEPFField = ({
         />
         <p
           className={cn(
-            "h-9 w-52 text-sm tracking-wide truncate flex justify-center items-center bg-muted text-muted-foreground rounded"
+            "h-9 w-52 text-sm tracking-wide truncate flex justify-center items-center bg-muted text-muted-foreground rounded",
           )}
         >
           {(percentageAmount ?? 0) * 100}% of Earnings
@@ -222,23 +224,23 @@ export const SelectedESIField = ({
       />
 
       <input {...getInputProps(field.target_type, { type: "hidden" })} />
-      <div className='flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm  items-center shadow-sm'>
+      <div className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm  items-center shadow-sm">
         {esiName}
       </div>
       <SearchableSelectField
-        className='capitalize'
+        className="capitalize"
         options={transformStringArrayIntoOptions(
-          componentTypeArray as unknown as string[]
+          componentTypeArray as unknown as string[],
         )}
         inputProps={{
           ...getInputProps(field.component_type, { type: "text" }),
           readOnly: true,
         }}
-        placeholder='Select Component Type'
+        placeholder="Select Component Type"
         errors={field.component_type.errors}
         errorClassName={errorClassName}
       />
-      <div className='flex items-center gap-1'>
+      <div className="flex items-center gap-1">
         <Field
           inputProps={{
             ...getInputProps(field.calculation_value, {
@@ -253,7 +255,7 @@ export const SelectedESIField = ({
         />
         <p
           className={cn(
-            "h-9 w-52 text-sm tracking-wide truncate flex justify-center items-center bg-muted text-muted-foreground rounded"
+            "h-9 w-52 text-sm tracking-wide truncate flex justify-center items-center bg-muted text-muted-foreground rounded",
           )}
         >
           {(employeesContribution ?? 0) * 100}% of Earnings
@@ -281,19 +283,19 @@ export const SelectedPTField = ({
       />
 
       <input {...getInputProps(field.target_type, { type: "hidden" })} />
-      <div className='flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm items-center shadow-sm'>
+      <div className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm items-center shadow-sm">
         {ptName}
       </div>
       <SearchableSelectField
-        className='capitalize'
+        className="capitalize"
         options={transformStringArrayIntoOptions(
-          componentTypeArray as unknown as string[]
+          componentTypeArray as unknown as string[],
         )}
         inputProps={{
           ...getInputProps(field.component_type, { type: "text" }),
           readOnly: true,
         }}
-        placeholder='Select Component Type'
+        placeholder="Select Component Type"
         errors={field.component_type.errors}
         errorClassName={errorClassName}
       />
@@ -332,19 +334,19 @@ export const SelectedLWFField = ({
       />
 
       <input {...getInputProps(field.target_type, { type: "hidden" })} />
-      <div className='flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm items-center shadow-sm'>
+      <div className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm items-center shadow-sm">
         {lwfName}
       </div>
       <SearchableSelectField
-        className='capitalize'
+        className="capitalize"
         options={transformStringArrayIntoOptions(
-          componentTypeArray as unknown as string[]
+          componentTypeArray as unknown as string[],
         )}
         inputProps={{
           ...getInputProps(field.component_type, { type: "text" }),
           readOnly: true,
         }}
-        placeholder='Select Component Type'
+        placeholder="Select Component Type"
         errors={field.component_type.errors}
         errorClassName={errorClassName}
       />
@@ -384,23 +386,23 @@ export const SelectedBonusField = ({
       />
 
       <input {...getInputProps(field.target_type, { type: "hidden" })} />
-      <div className='flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm items-center shadow-sm'>
+      <div className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm items-center shadow-sm">
         {bonusName}
       </div>
       <SearchableSelectField
-        className='capitalize'
+        className="capitalize"
         options={transformStringArrayIntoOptions(
-          componentTypeArray as unknown as string[]
+          componentTypeArray as unknown as string[],
         )}
         inputProps={{
           ...getInputProps(field.component_type, { type: "text" }),
           readOnly: true,
         }}
-        placeholder='Select Component Type'
+        placeholder="Select Component Type"
         errors={field.component_type.errors}
         errorClassName={errorClassName}
       />
-      <div className='flex items-center gap-1'>
+      <div className="flex items-center gap-1">
         <Field
           inputProps={{
             ...getInputProps(field.calculation_value, {
@@ -416,7 +418,7 @@ export const SelectedBonusField = ({
         />
         <p
           className={cn(
-            "h-9 w-52 text-sm tracking-wide truncate flex justify-center items-center bg-muted text-muted-foreground rounded"
+            "h-9 w-52 text-sm tracking-wide truncate flex justify-center items-center bg-muted text-muted-foreground rounded",
           )}
         >
           {bonusPercentage}% of Basic

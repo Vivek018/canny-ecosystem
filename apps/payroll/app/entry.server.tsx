@@ -77,7 +77,7 @@ function handleBotRequest(
           // errors encountered during initial shell rendering since they'll
           // reject and get logged in handleDocumentRequest.
           if (shellRendered) {
-            console.error("Server Entry 1",error);
+            console.error("Server Entry 1", error);
           }
         },
       },

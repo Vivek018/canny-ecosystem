@@ -744,7 +744,7 @@ export async function getEmployeeWorkHistoryById({
 export async function getEmployeeWorkHistoryByEmployeeIdAndCompanyName({
   supabase,
   employeeId,
-  companyName
+  companyName,
 }: {
   supabase: TypedSupabaseClient;
   employeeId: string;
@@ -769,7 +769,11 @@ export async function getEmployeeWorkHistoryByEmployeeIdAndCompanyName({
       InferredType<EmployeeWorkHistoryDatabaseRow, (typeof columns)[number]>
     >();
 
-  if (error) console.error("getEmployeeWorkHistoryByEmployeeIdAndCompanyName Error",error);
+  if (error)
+    console.error(
+      "getEmployeeWorkHistoryByEmployeeIdAndCompanyName Error",
+      error,
+    );
 
   return { data, error };
 }
@@ -813,7 +817,7 @@ export async function getEmployeeProjectAssignmentByEmployeeId({
     .maybeSingle<EmployeeProjectAssignmentDataType>();
 
   if (error) {
-    console.error("getEmployeeProjectAssignmentByEmployeeId Error",error);
+    console.error("getEmployeeProjectAssignmentByEmployeeId Error", error);
   }
 
   return { data, error };
@@ -889,7 +893,7 @@ export async function getEmployeesReportByCompanyId({
       `${columns.join(",")},
         employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"}(
         employee_id, assignment_type, skill_level, position, start_date, end_date,
-        project_sites!${project ? 'inner' : 'left'}(id, name, projects!${project ? 'inner' : 'left'}(id, name))
+        project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"}(id, name))
       )`,
       { count: "exact" },
     )

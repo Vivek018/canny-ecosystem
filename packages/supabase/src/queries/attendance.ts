@@ -239,10 +239,12 @@ export async function getAttendanceByCompanyId({
     .select(
       `
       ${columns.join(",")},
-      employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
+      employee_project_assignment!employee_project_assignments_employee_id_fkey!${
+        project ? "inner" : "left"
       }(
-        project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
-      }(id, name))),
+        project_sites!${project ? "inner" : "left"}(id, name, projects!${
+          project ? "inner" : "left"
+        }(id, name))),
       attendance(
         id,
         date,
@@ -254,7 +256,7 @@ export async function getAttendanceByCompanyId({
         working_shift
       )
     `,
-      { count: "exact" }
+      { count: "exact" },
     )
     .eq("company_id", companyId);
 
@@ -276,12 +278,12 @@ export async function getAttendanceByCompanyId({
     if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
       for (const searchQueryElement of searchQueryArray) {
         query = query.or(
-          `or(first_name.ilike.%${searchQueryElement}%,middle_name.ilike.%${searchQueryElement}%,last_name.ilike.%${searchQueryElement}%,employee_code.ilike.%${searchQueryElement}%)`
+          `or(first_name.ilike.%${searchQueryElement}%,middle_name.ilike.%${searchQueryElement}%,last_name.ilike.%${searchQueryElement}%,employee_code.ilike.%${searchQueryElement}%)`,
         );
       }
     } else {
       query = query.or(
-        `or(first_name.ilike.%${searchQuery}%,middle_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,employee_code.ilike.%${searchQuery}%)`
+        `or(first_name.ilike.%${searchQuery}%,middle_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,employee_code.ilike.%${searchQuery}%)`,
       );
     }
   }
@@ -289,7 +291,7 @@ export async function getAttendanceByCompanyId({
   if (project) {
     query = query.eq(
       "employee_project_assignment.project_sites.projects.name",
-      project
+      project,
     );
   }
 
@@ -297,7 +299,7 @@ export async function getAttendanceByCompanyId({
     query = query.filter(
       "employee_project_assignment.project_sites.name",
       "eq",
-      project_site
+      project_site,
     );
   }
 

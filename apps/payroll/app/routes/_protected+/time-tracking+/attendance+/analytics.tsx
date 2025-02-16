@@ -16,7 +16,7 @@ import { AttendanceByProjectSite } from "@/components/attendance/analytics/atten
 
 const getDataSource = (
   selectedRows: TransformedAteendanceDataType[],
-  storedValue: TransformedAteendanceDataType[]
+  storedValue: TransformedAteendanceDataType[],
 ) => {
   return selectedRows.length > 0 ? selectedRows : storedValue;
 };
@@ -50,7 +50,7 @@ export default function AttendanceAnalytics() {
 
   const dataSource: TransformedAteendanceDataType[] = getDataSource(
     selectedRows,
-    storedValue
+    storedValue,
   );
 
   const transformedData = dataSource.map((entry) => ({

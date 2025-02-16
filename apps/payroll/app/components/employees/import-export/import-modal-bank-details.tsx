@@ -86,7 +86,7 @@ export const ImportEmployeeBankDetailsModal = () => {
           className={cn(
             "text-sm",
             selectedFile ? "flex" : "hidden",
-            !eligibleFileSize ? "text-destructive" : "text-muted-foreground"
+            !eligibleFileSize ? "text-destructive" : "text-muted-foreground",
           )}
         >
           {!eligibleFileSize

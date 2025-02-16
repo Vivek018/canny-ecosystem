@@ -86,7 +86,7 @@ export const ImportEmployeeAttendanceModal = () => {
           className={cn(
             "text-sm",
             selectedFile ? "flex" : "hidden",
-            !eligibleFileSize ? "text-destructive" : "text-muted-foreground"
+            !eligibleFileSize ? "text-destructive" : "text-muted-foreground",
           )}
         >
           {!eligibleFileSize

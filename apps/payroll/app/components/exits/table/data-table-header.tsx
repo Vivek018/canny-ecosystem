@@ -85,10 +85,15 @@ export function ExitPaymentTableHeader({ table, className, loading }: Props) {
         {ExitPaymentColumnIdArray?.map((id) => {
           return (
             isVisible(id) && (
-              <TableHead key={id} className={cn(
-                "px-4 py-2", id === "employee_code" && "w-full sticky left-12 bg-card z-10",
-                id === "employee_name" && "sticky left-[192px] bg-card z-10"
-              )}>
+              <TableHead
+                key={id}
+                className={cn(
+                  "px-4 py-2",
+                  id === "employee_code" &&
+                    "w-full sticky left-12 bg-card z-10",
+                  id === "employee_name" && "sticky left-[192px] bg-card z-10",
+                )}
+              >
                 <Button
                   className="p-0 hover:bg-transparent space-x-2 disabled:opacity-100"
                   variant="ghost"

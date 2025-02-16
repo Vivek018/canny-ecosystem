@@ -42,7 +42,11 @@ export const columns = (): ColumnDef<PaymentFieldsReportType>[] => [
     header: "Employee Code",
     cell: ({ row }) => {
       return (
-        <Link to={`/employees/${row.original.id}`} prefetch="intent" className="group">
+        <Link
+          to={`/employees/${row.original.id}`}
+          prefetch="intent"
+          className="group"
+        >
           <p className="truncate text-primary/80 group-hover:text-primary w-28">
             {row.original?.employee_code}
           </p>
@@ -55,7 +59,11 @@ export const columns = (): ColumnDef<PaymentFieldsReportType>[] => [
     header: "Full Name",
     cell: ({ row }) => {
       return (
-        <Link to={`/employees/${row.original.id}`} prefetch="intent" className="group">
+        <Link
+          to={`/employees/${row.original.id}`}
+          prefetch="intent"
+          className="group"
+        >
           <p className="truncate text-primary/80 w-48 group-hover:text-primary">{`${
             row.original?.first_name
           } ${row.original?.middle_name ?? ""} ${
@@ -73,7 +81,7 @@ export const columns = (): ColumnDef<PaymentFieldsReportType>[] => [
       return (
         <p className="truncate w-48 capitalize">{row.original?.field_name}</p>
       );
-    }
+    },
   },
   {
     enableSorting: false,

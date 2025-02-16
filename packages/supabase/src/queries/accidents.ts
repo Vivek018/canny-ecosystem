@@ -76,11 +76,11 @@ export async function getAccidentsByCompanyId({
     .from("accidents")
     .select(
       `${columns.join(
-        ","
+        ",",
       )}, employees(id,company_id, employee_code,first_name,middle_name,last_name)`,
       {
         count: "exact",
-      }
+      },
     )
     .eq("employees.company_id", companyId);
 
@@ -99,7 +99,7 @@ export async function getAccidentsByCompanyId({
           `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*,employee_code.ilike.*${searchQueryElement}*`,
           {
             referencedTable: "employees",
-          }
+          },
         );
       }
     } else {
@@ -107,7 +107,7 @@ export async function getAccidentsByCompanyId({
         `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`,
         {
           referencedTable: "employees",
-        }
+        },
       );
     }
   }

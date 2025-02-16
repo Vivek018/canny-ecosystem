@@ -8,13 +8,19 @@ import type { ExitDataType } from "@canny_ecosystem/supabase/queries";
 import { useLocalStorage } from "@canny_ecosystem/utils/hooks/local-storage";
 import { useEffect } from "react";
 
-const getDataSource = (selectedRows: ExitDataType[], storedValue: ExitDataType[]) => {
+const getDataSource = (
+  selectedRows: ExitDataType[],
+  storedValue: ExitDataType[],
+) => {
   return selectedRows.length > 0 ? selectedRows : storedValue;
 };
 
 export default function ExitAnalytics() {
   const { selectedRows } = useExitsStore();
-  const [storedValue, setValue] = useLocalStorage<ExitDataType[]>("analyticsArray", []);
+  const [storedValue, setValue] = useLocalStorage<ExitDataType[]>(
+    "analyticsArray",
+    [],
+  );
 
   useEffect(() => {
     if (selectedRows.length > 0) setValue(selectedRows);
@@ -30,7 +36,9 @@ export default function ExitAnalytics() {
         <ExitByTime chartData={dataSource} />
         <ExitByReasons chartData={dataSource as any} />
       </div>
-      <div><ExitOverview chartData={dataSource} /></div>
+      <div>
+        <ExitOverview chartData={dataSource} />
+      </div>
     </div>
   );
 }

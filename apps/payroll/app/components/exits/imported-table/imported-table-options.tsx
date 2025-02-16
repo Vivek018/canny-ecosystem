@@ -23,10 +23,7 @@ export const ImportedExitOptionsDropdown = ({
       {triggerChild}
       <DropdownMenuContent sideOffset={10} align="end">
         <DropdownMenuGroup>
-          <UpdateImportedExit
-            indexToUpdate={index}
-            dataToUpdate={data}
-          />
+          <UpdateImportedExit indexToUpdate={index} dataToUpdate={data} />
           <DropdownMenuSeparator />
           <DeleteImportedExit indexToDelete={index} />
         </DropdownMenuGroup>

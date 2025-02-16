@@ -1,6 +1,17 @@
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@canny_ecosystem/ui/card";
-import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, } from "@canny_ecosystem/ui/chart";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@canny_ecosystem/ui/card";
+import {
+  type ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@canny_ecosystem/ui/chart";
 import { useMemo, useState } from "react";
 import type { ExitDataType } from "@canny_ecosystem/supabase/queries";
 
@@ -10,23 +21,29 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function ExitTrend({ chartData }: { chartData: ExitDataType[] }) {
-  const [activeChart, setActiveChart] = useState<keyof typeof chartConfig>("amount");
+  const [activeChart, setActiveChart] =
+    useState<keyof typeof chartConfig>("amount");
 
   const trendData = chartData
-    .map((row:any) => ({
+    .map((row: any) => ({
       date: row.final_settlement_date,
       amount: row.bonus + row.gratuity + row.leave_encashment - row.deduction,
     }))
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-  const total = useMemo(() => ({ amount: trendData.reduce((acc, curr) => acc + curr.amount, 0) }), []);
+  const total = useMemo(
+    () => ({ amount: trendData.reduce((acc, curr) => acc + curr.amount, 0) }),
+    [],
+  );
 
   return (
     <Card className="overflow-hidden">
       <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
         <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
           <CardTitle>Exits Over Time</CardTitle>
-          <CardDescription>Showing trend of exits for the period.</CardDescription>
+          <CardDescription>
+            Showing trend of exits for the period.
+          </CardDescription>
         </div>
         <div className="flex">
           {["amount"].map((key) => {
@@ -39,7 +56,9 @@ export function ExitTrend({ chartData }: { chartData: ExitDataType[] }) {
                 onClick={() => setActiveChart(chart)}
                 type="button"
               >
-                <span className="text-xs text-muted-foreground">{chartConfig[chart]?.label}</span>
+                <span className="text-xs text-muted-foreground">
+                  {chartConfig[chart]?.label}
+                </span>
                 <span className="text-lg font-bold leading-none sm:text-3xl">
                   {total[key as keyof typeof total]?.toLocaleString()}
                 </span>
@@ -49,8 +68,15 @@ export function ExitTrend({ chartData }: { chartData: ExitDataType[] }) {
         </div>
       </CardHeader>
       <CardContent className="px-2 sm:px-6">
-        <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
-          <LineChart accessibilityLayer data={trendData} margin={{ left: 12, right: 12 }}>
+        <ChartContainer
+          config={chartConfig}
+          className="aspect-auto h-[250px] w-full"
+        >
+          <LineChart
+            accessibilityLayer
+            data={trendData}
+            margin={{ left: 12, right: 12 }}
+          >
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="date"
@@ -60,7 +86,10 @@ export function ExitTrend({ chartData }: { chartData: ExitDataType[] }) {
               minTickGap={32}
               tickFormatter={(value) => {
                 const date = new Date(value);
-                return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+                return date.toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                });
               }}
             />
             <ChartTooltip

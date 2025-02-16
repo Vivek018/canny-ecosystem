@@ -36,7 +36,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.reimbursements}`)) {
+  if (
+    !hasPermission(user?.role!, `${updateRole}:${attribute.reimbursements}`)
+  ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
@@ -74,7 +76,10 @@ export async function action({
   const submission = parseWithZod(formData, { schema: ReimbursementSchema });
 
   if (submission.status !== "success") {
-    return json({ result: submission.reply() }, { status: submission.status === "error" ? 400 : 200 });
+    return json(
+      { result: submission.reply() },
+      { status: submission.status === "error" ? 400 : 200 },
+    );
   }
 
   const { status, error } = await updateReimbursementsById({
@@ -84,14 +89,23 @@ export async function action({
   });
 
   if (isGoodStatus(status)) {
-    return json({ status: "success", message: "Employee reimbursement updated successfully", error: null });
+    return json({
+      status: "success",
+      message: "Employee reimbursement updated successfully",
+      error: null,
+    });
   }
 
-  return json({ status: "error", message: "Employee reimbursement update failed", error });
+  return json({
+    status: "error",
+    message: "Employee reimbursement update failed",
+    error,
+  });
 }
 
 export default function UpdateReimbursements() {
-  const { data, userOptions, reimbursementId, error } = useLoaderData<typeof loader>();
+  const { data, userOptions, reimbursementId, error } =
+    useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const updatableData = data;
 
@@ -115,13 +129,15 @@ export default function UpdateReimbursements() {
         clearCacheEntry(`${cacheKeyPrefix.reimbursements}`);
         toast({
           title: "Success",
-          description: actionData?.message || "Reimbursement updated successfully",
+          description:
+            actionData?.message || "Reimbursement updated successfully",
           variant: "success",
         });
       } else {
         toast({
           title: "Error",
-          description: actionData?.error?.message || "Failed to update reimbursement",
+          description:
+            actionData?.error?.message || "Failed to update reimbursement",
           variant: "destructive",
         });
       }
@@ -129,9 +145,11 @@ export default function UpdateReimbursements() {
     }
   }, [actionData]);
 
-  return <AddReimbursements
-    updateValues={updatableData}
-    userOptionsFromUpdate={userOptions}
-    reimbursementId={reimbursementId}
-  />
+  return (
+    <AddReimbursements
+      updateValues={updatableData}
+      userOptionsFromUpdate={userOptions}
+      reimbursementId={reimbursementId}
+    />
+  );
 }

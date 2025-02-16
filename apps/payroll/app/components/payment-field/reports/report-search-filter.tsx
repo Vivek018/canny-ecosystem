@@ -39,7 +39,8 @@ export function PaymentFieldsReportSearchFilter({
   const isSubmitting =
     navigation.state === "submitting" ||
     (navigation.state === "loading" &&
-      navigation.location.pathname === "/payment-components/payment-fields/reports" &&
+      navigation.location.pathname ===
+        "/payment-components/payment-fields/reports" &&
       navigation.location.search.length);
   const inputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -286,7 +287,6 @@ export function PaymentFieldsReportSearchFilter({
           </DropdownMenuSub>
         </DropdownMenuGroup>
 
-        
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
@@ -298,26 +298,28 @@ export function PaymentFieldsReportSearchFilter({
                 alignOffset={-4}
                 className="p-0"
               >
-                {payoutMonths.map(item=>item.label)?.map((name, index) => (
-                  <DropdownMenuCheckboxItem
-                    key={name + index.toString()}
-                    className="capitalize"
-                    checked={filterParams?.end_month === name}
-                    onCheckedChange={() => {
-                      setFilterParams((prev) => ({
-                        ...prev,
-                        end_month: name,
-                      }));
-                    }}
-                  >
-                    {name}
-                  </DropdownMenuCheckboxItem>
-                ))}
+                {payoutMonths
+                  .map((item) => item.label)
+                  ?.map((name, index) => (
+                    <DropdownMenuCheckboxItem
+                      key={name + index.toString()}
+                      className="capitalize"
+                      checked={filterParams?.end_month === name}
+                      onCheckedChange={() => {
+                        setFilterParams((prev) => ({
+                          ...prev,
+                          end_month: name,
+                        }));
+                      }}
+                    >
+                      {name}
+                    </DropdownMenuCheckboxItem>
+                  ))}
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>
         </DropdownMenuGroup>
-        
+
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>

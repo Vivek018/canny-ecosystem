@@ -40,7 +40,7 @@ export async function createAccident({
 export async function updateAccidentById({
   supabase,
   data,
-  bypassAuth = false
+  bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
   data: AccidentsDatabaseUpdate;

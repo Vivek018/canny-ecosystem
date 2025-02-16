@@ -327,7 +327,8 @@ export async function getRelationshipIdByParentIdAndChildId({
     .eq("child_company_id", childCompanyId)
     .single<Omit<RelationshipWithCompany, "created_at" | "updated_at">>();
 
-  if (error) console.error("getRelationshipIdByParentIdAndChildId Error", error);
+  if (error)
+    console.error("getRelationshipIdByParentIdAndChildId Error", error);
 
   return { data, error };
 }

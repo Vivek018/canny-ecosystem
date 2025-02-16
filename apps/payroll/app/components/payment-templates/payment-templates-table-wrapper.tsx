@@ -31,8 +31,8 @@ export function PaymentTemplatesTableWrapper({
 
     const filteredData = data?.filter((item) =>
       Object.values(item).some((value) =>
-        String(value).toLowerCase().includes(searchString.toLowerCase())
-      )
+        String(value).toLowerCase().includes(searchString.toLowerCase()),
+      ),
     );
     setTableData(filteredData ?? []);
   }, [searchString, data]);

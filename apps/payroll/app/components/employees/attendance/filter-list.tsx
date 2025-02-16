@@ -7,7 +7,6 @@ type Props = {
 };
 
 export function FilterList({ filters }: Props) {
-
   const [searchParams, setSearchParams] = useSearchParams();
 
   const renderFilter = ({

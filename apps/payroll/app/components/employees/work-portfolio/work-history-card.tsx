@@ -84,8 +84,8 @@ export const WorkHistoryItem = ({
                     "px-2.5 h-min",
                     !hasPermission(
                       `${role}`,
-                      `${updateRole}:${attribute.employeeWorkHistory}`
-                    ) && "hidden"
+                      `${updateRole}:${attribute.employeeWorkHistory}`,
+                    ) && "hidden",
                   )}
                 >
                   <Icon name="edit" size="xs" />
@@ -101,8 +101,8 @@ export const WorkHistoryItem = ({
                 "px-2.5 h-min hidden",
                 hasPermission(
                   `${role}`,
-                  `${deleteRole}:${attribute.employeeWorkHistory}`
-                ) && "flex"
+                  `${deleteRole}:${attribute.employeeWorkHistory}`,
+                ) && "flex",
               )}
             >
               <Icon name="dots-vertical" size="xs" />
@@ -161,8 +161,8 @@ export const EmployeeWorkHistoriesCard = ({
               "bg-card",
               !hasPermission(
                 `${role}`,
-                `${createRole}:${attribute.employeeWorkHistory}`
-              ) && "hidden"
+                `${createRole}:${attribute.employeeWorkHistory}`,
+              ) && "hidden",
             )}
           >
             <Icon name="plus-circled" className="mr-2" />

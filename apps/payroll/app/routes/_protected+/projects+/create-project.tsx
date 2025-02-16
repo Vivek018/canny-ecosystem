@@ -80,7 +80,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
           return { data: companyOptions, error };
         }
         return { data: null, error };
-      }
+      },
     );
 
     return defer({
@@ -95,7 +95,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         companyId: null,
         companyOptionsPromise: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -114,7 +114,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -132,7 +132,7 @@ export async function action({
     }
     return json(
       { status: "error", message: "Project creation failed", error },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -141,7 +141,7 @@ export async function action({
         message: "An error occurred",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -200,21 +200,21 @@ export default function CreateProject({
 
   if (error) {
     clearExactCacheEntry(cacheKeyPrefix.projects);
-    return <ErrorBoundary error={error} message='Failed to load projects' />;
+    return <ErrorBoundary error={error} message="Failed to load projects" />;
   }
 
   return (
-    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
       <FormProvider context={form.context}>
         <Form
-          method='POST'
-          encType='multipart/form-data'
+          method="POST"
+          encType="multipart/form-data"
           {...getFormProps(form)}
-          className='flex flex-col'
+          className="flex flex-col"
         >
           <Card>
             <CardHeader>
-              <CardTitle className='text-3xl capitalize'>
+              <CardTitle className="text-3xl capitalize">
                 {replaceDash(PROJECT_TAG)}
               </CardTitle>
               <CardDescription>
@@ -238,14 +238,14 @@ export default function CreateProject({
                 labelProps={{ children: fields.name.name }}
                 errors={fields.name.errors}
               />
-              <div className='grid grid-cols-3 place-content-center justify-between gap-6'>
+              <div className="grid grid-cols-3 place-content-center justify-between gap-6">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.project_code, {
                       type: "text",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.project_code.name
+                      fields.project_code.name,
                     )}`,
                   }}
                   labelProps={{
@@ -259,7 +259,7 @@ export default function CreateProject({
                       type: "text",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.project_type.name
+                      fields.project_type.name,
                     )}`,
                   }}
                   labelProps={{
@@ -276,7 +276,7 @@ export default function CreateProject({
                     placeholder: `Select ${fields.status.name}`,
                   }}
                   options={transformStringArrayIntoOptions(
-                    statusArray as unknown as string[]
+                    statusArray as unknown as string[],
                   )}
                   labelProps={{
                     children: fields.status.name,
@@ -297,7 +297,7 @@ export default function CreateProject({
                   {(resolvedData) => {
                     if (!resolvedData) {
                       return (
-                        <ErrorBoundary message='Failed to load company options' />
+                        <ErrorBoundary message="Failed to load company options" />
                       );
                     }
                     return (
@@ -312,16 +312,16 @@ export default function CreateProject({
                   }}
                 </Await>
               </Suspense>
-              <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
+              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.start_date, { type: "date" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.start_date.name
+                      fields.start_date.name,
                     )}`,
                     max: getValidDateForInput(new Date().toISOString()),
                     defaultValue: getValidDateForInput(
-                      fields.start_date.initialValue
+                      fields.start_date.initialValue,
                     ),
                   }}
                   labelProps={{
@@ -335,11 +335,11 @@ export default function CreateProject({
                       type: "date",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.estimated_end_date.name
+                      fields.estimated_end_date.name,
                     )}`,
                     min: getValidDateForInput(fields.start_date.value),
                     defaultValue: getValidDateForInput(
-                      fields.estimated_end_date.initialValue
+                      fields.estimated_end_date.initialValue,
                     ),
                   }}
                   labelProps={{
@@ -352,7 +352,7 @@ export default function CreateProject({
                 textareaProps={{
                   ...getTextareaProps(fields.risk_assessment),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.risk_assessment.name
+                    fields.risk_assessment.name,
                   )}`,
                 }}
                 labelProps={{
@@ -364,7 +364,7 @@ export default function CreateProject({
                 textareaProps={{
                   ...getTextareaProps(fields.quality_standards),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.quality_standards.name
+                    fields.quality_standards.name,
                   )}`,
                 }}
                 labelProps={{
@@ -376,12 +376,12 @@ export default function CreateProject({
                 textareaProps={{
                   ...getTextareaProps(fields.health_safety_requirements),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.health_safety_requirements.name
+                    fields.health_safety_requirements.name,
                   )}`,
                 }}
                 labelProps={{
                   children: replaceUnderscore(
-                    fields.health_safety_requirements.name
+                    fields.health_safety_requirements.name,
                   ),
                 }}
                 errors={fields.health_safety_requirements.errors}
@@ -390,12 +390,12 @@ export default function CreateProject({
                 textareaProps={{
                   ...getTextareaProps(fields.environmental_considerations),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.environmental_considerations.name
+                    fields.environmental_considerations.name,
                   )}`,
                 }}
                 labelProps={{
                   children: replaceUnderscore(
-                    fields.environmental_considerations.name
+                    fields.environmental_considerations.name,
                   ),
                 }}
                 errors={fields.environmental_considerations.errors}

@@ -246,15 +246,16 @@ export default function CreateEmployeeLetter({
                     defaultValue:
                       LETTERS_TAG === "create-letter"
                         ? String(
+                            DEFAULT_LETTER_CONTENT[
+                              fields.letter_type
+                                .value as keyof typeof DEFAULT_LETTER_CONTENT
+                            ],
+                          ) ?? fields.content.value
+                        : fields.content.value ??
                           DEFAULT_LETTER_CONTENT[
-                          fields.letter_type
-                            .value as keyof typeof DEFAULT_LETTER_CONTENT
+                            fields.letter_type
+                              .value as keyof typeof DEFAULT_LETTER_CONTENT
                           ],
-                        ) ?? fields.content.value
-                        : fields.content.value ?? DEFAULT_LETTER_CONTENT[
-                        fields.letter_type
-                          .value as keyof typeof DEFAULT_LETTER_CONTENT
-                        ],
                   }}
                   labelProps={{
                     children: "Content",

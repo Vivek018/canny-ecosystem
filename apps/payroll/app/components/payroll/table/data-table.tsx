@@ -1,6 +1,17 @@
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { Table, TableBody, TableCell, TableRow } from "@canny_ecosystem/ui/table";
-import { type ColumnDef, getCoreRowModel, getSortedRowModel, type SortingState, useReactTable } from "@tanstack/react-table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+} from "@canny_ecosystem/ui/table";
+import {
+  type ColumnDef,
+  getCoreRowModel,
+  getSortedRowModel,
+  type SortingState,
+  useReactTable,
+} from "@tanstack/react-table";
 import { PayrollTableHeader } from "./data-table-headers";
 import { PayrollSheet } from "../payroll-sheet";
 import { useState, useMemo } from "react";
@@ -15,7 +26,11 @@ interface PayrollTableProps<TData, TValue> {
   editable: boolean;
 }
 
-export function PayrollDataTable<TData, TValue>({ columns, data, editable }: PayrollTableProps<TData, TValue>) {
+export function PayrollDataTable<TData, TValue>({
+  columns,
+  data,
+  editable,
+}: PayrollTableProps<TData, TValue>) {
   // Use useMemo to prevent unnecessary recalculations
   // Showing dynamic payment and statutory fields in the payroll table
   const { processedData, processedColumns, dynamicHeaders } = useMemo(() => {
@@ -37,16 +52,21 @@ export function PayrollDataTable<TData, TValue>({ columns, data, editable }: Pay
             accessorKey: template.name,
             header: template.name,
             cell: ({ row }) => {
-              return <p className="truncate capitalize w-48">{`${row.original[template.name] ?? "--"}`}</p>;
+              return (
+                <p className="truncate capitalize w-48">{`${row.original[template.name] ?? "--"}`}</p>
+              );
             },
           });
         }
       });
     });
 
-    return { processedData: newData, processedColumns: newColumns, dynamicHeaders };
+    return {
+      processedData: newData,
+      processedColumns: newColumns,
+      dynamicHeaders,
+    };
   }, [data, columns]);
-
 
   // showing previews in payroll history only
   if (!editable) {
@@ -105,7 +125,14 @@ export function PayrollDataTable<TData, TValue>({ columns, data, editable }: Pay
             {tableLength ? (
               table.getRowModel().rows.map((row) => {
                 const rowData = row.original;
-                return <PayrollSheet key={row.id} row={row} rowData={rowData} editable={editable} />;
+                return (
+                  <PayrollSheet
+                    key={row.id}
+                    row={row}
+                    rowData={rowData}
+                    editable={editable}
+                  />
+                );
               })
             ) : (
               <TableRow className={cn(!tableLength && "border-none")}>

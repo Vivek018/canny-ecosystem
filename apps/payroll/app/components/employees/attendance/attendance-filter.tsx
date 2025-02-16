@@ -37,8 +37,6 @@ export const AttendanceFilter = ({
 
   const [filterParams, setFilterParams] = useState(initialFilterParams);
 
- 
-
   const deleteAllSearchParams = () => {
     for (const [key, _val] of Object.entries(filterParams)) {
       searchParams.delete(key);
@@ -87,7 +85,7 @@ export const AttendanceFilter = ({
     },
     {
       enableOnFormTags: true,
-    }
+    },
   );
   return (
     <div>
@@ -98,7 +96,6 @@ export const AttendanceFilter = ({
               className="relative w-full md:w-auto"
               onSubmit={(e) => {
                 e.preventDefault();
-                
               }}
             >
               <DropdownMenuTrigger asChild>
@@ -107,7 +104,7 @@ export const AttendanceFilter = ({
                   type="button"
                   className={cn(
                     "flex items-center justify-center opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
-                    isOpen && "opacity-100"
+                    isOpen && "opacity-100",
                   )}
                 >
                   <Icon name="mixer" className="h-4 w-4" />
@@ -149,7 +146,7 @@ export const AttendanceFilter = ({
                         >
                           {name}
                         </DropdownMenuCheckboxItem>
-                      )
+                      ),
                     )}
                   </DropdownMenuSubContent>
                 </DropdownMenuPortal>

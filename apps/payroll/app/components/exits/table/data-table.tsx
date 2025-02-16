@@ -102,7 +102,8 @@ export function ExitPaymentTable<TData, TValue>({
 
   useEffect(() => {
     const rowArray = [];
-    for (const row of table.getSelectedRowModel().rows) rowArray.push(row.original);
+    for (const row of table.getSelectedRowModel().rows)
+      rowArray.push(row.original);
     setSelectedRows(rowArray as ExitDataType[]);
   }, [rowSelection]);
 
@@ -122,21 +123,35 @@ export function ExitPaymentTable<TData, TValue>({
 
   const tableLength = table.getRowModel().rows?.length;
 
-  const selectedRowsData = table.getSelectedRowModel().rows?.map((row) => row.original);
+  const selectedRowsData = table
+    .getSelectedRowModel()
+    .rows?.map((row) => row.original);
 
   return (
     <div className="relative mb-8">
       <div
-        className={cn("relative border overflow-x-auto rounded", !tableLength && "border-none")}
+        className={cn(
+          "relative border overflow-x-auto rounded",
+          !tableLength && "border-none",
+        )}
       >
         <div className="relative">
           <Table>
-            <ExitPaymentTableHeader table={table} className={cn(!tableLength && "hidden")} />
+            <ExitPaymentTableHeader
+              table={table}
+              className={cn(!tableLength && "hidden")}
+            />
             <TableBody>
               {tableLength ? (
                 table.getRowModel().rows.map((row) => {
                   const rowData = row.original;
-                  return <ExitPaymentsSheet key={row.id} row={row} rowData={rowData} />
+                  return (
+                    <ExitPaymentsSheet
+                      key={row.id}
+                      row={row}
+                      rowData={rowData}
+                    />
+                  );
                 })
               ) : (
                 <TableRow className={cn(!tableLength && "border-none")}>
@@ -146,13 +161,23 @@ export function ExitPaymentTable<TData, TValue>({
                   >
                     <div className="flex flex-col items-center gap-1">
                       <h2 className="text-xl">No Exits Found.</h2>
-                      <p className={cn("text-muted-foreground", !data?.length && noFilters && "hidden")}>
+                      <p
+                        className={cn(
+                          "text-muted-foreground",
+                          !data?.length && noFilters && "hidden",
+                        )}
+                      >
                         Try another search, or adjusting the filters
                       </p>
                       <Button
                         variant="outline"
-                        className={cn("mt-4", !data?.length && noFilters && "hidden")}
-                        onClick={() => { setSearchParams() }}
+                        className={cn(
+                          "mt-4",
+                          !data?.length && noFilters && "hidden",
+                        )}
+                        onClick={() => {
+                          setSearchParams();
+                        }}
                       >
                         Clear Filters
                       </Button>

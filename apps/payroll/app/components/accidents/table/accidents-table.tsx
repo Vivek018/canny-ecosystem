@@ -63,7 +63,7 @@ export function AccidentsTable<TData, TValue>({
   const { rowSelection, setSelectedRows, setRowSelection, setColumns } =
     useAccidentStore();
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    initialColumnVisibility ?? {}
+    initialColumnVisibility ?? {},
   );
   const loadMoreEmployees = async () => {
     const formattedFrom = from;
@@ -140,7 +140,7 @@ export function AccidentsTable<TData, TValue>({
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
-          !tableLength && "border-none"
+          !tableLength && "border-none",
         )}
       >
         <div className="relative">
@@ -170,12 +170,12 @@ export function AccidentsTable<TData, TValue>({
                             cell.column.id === "employee_name" &&
                               "sticky left-48 bg-card z-10",
                             cell.column.id === "actions" &&
-                              "sticky right-0 min-w-20 max-w-20 bg-card z-10"
+                              "sticky right-0 min-w-20 max-w-20 bg-card z-10",
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                         </TableCell>
                       );
@@ -193,7 +193,7 @@ export function AccidentsTable<TData, TValue>({
                       <p
                         className={cn(
                           "text-muted-foreground",
-                          !data?.length && noFilters && "hidden"
+                          !data?.length && noFilters && "hidden",
                         )}
                       >
                         Try another search, or adjusting the filters
@@ -202,7 +202,7 @@ export function AccidentsTable<TData, TValue>({
                         variant="outline"
                         className={cn(
                           "mt-4",
-                          !data?.length && noFilters && "hidden"
+                          !data?.length && noFilters && "hidden",
                         )}
                         onClick={() => {
                           setSearchParams();

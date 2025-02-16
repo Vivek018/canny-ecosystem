@@ -27,8 +27,8 @@ export const EditPaySequenceSheet = ({
 
   return (
     <Sheet open={isOpen} onOpenChange={handleOpenChange}>
-      <SheetContent className='w-[460px]'>
-        <SheetHeader className='mb-8'>
+      <SheetContent className="w-[460px]">
+        <SheetHeader className="mb-8">
           <SheetTitle>Edit Pay Sequence</SheetTitle>
         </SheetHeader>
 

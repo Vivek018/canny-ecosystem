@@ -23,7 +23,8 @@ export const FormButtons = ({
   const [searchParams, setSearchParams] = useSearchParams();
   const navigation = useNavigation();
 
-  const disableAll = navigation.state === "submitting" || navigation.state === "loading";
+  const disableAll =
+    navigation.state === "submitting" || navigation.state === "loading";
 
   return (
     <CardFooter className={cn("flex items-center justify-between", className)}>

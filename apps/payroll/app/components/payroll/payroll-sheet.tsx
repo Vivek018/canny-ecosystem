@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
-import { type PayrollEmployeeData, PayrollSchema } from "@canny_ecosystem/utils";
-import { FormProvider, getFormProps, getInputProps, useForm } from "@conform-to/react";
+import {
+  type PayrollEmployeeData,
+  PayrollSchema,
+} from "@canny_ecosystem/utils";
+import {
+  FormProvider,
+  getFormProps,
+  getInputProps,
+  useForm,
+} from "@conform-to/react";
 import { Field, type ListOfErrors } from "@canny_ecosystem/ui/forms";
 import { Form } from "@remix-run/react";
 import {
@@ -10,7 +18,7 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
-  SheetTrigger
+  SheetTrigger,
 } from "@canny_ecosystem/ui/sheet";
 import { TableCell, TableRow } from "@canny_ecosystem/ui/table";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
@@ -19,14 +27,18 @@ import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { FormButtons } from "../form/form-buttons";
 
 type deductionAndEarning = {
-  title: string,
-  inputPropField: any,
-  placeholder: string,
-  errors: ListOfErrors,
-  value: any
-}
+  title: string;
+  inputPropField: any;
+  placeholder: string;
+  errors: ListOfErrors;
+  value: any;
+};
 
-export function PayrollSheet({ row, rowData, editable }: { row: any, rowData: PayrollEmployeeData, editable: boolean }) {
+export function PayrollSheet({
+  row,
+  rowData,
+  editable,
+}: { row: any; rowData: PayrollEmployeeData; editable: boolean }) {
   const [_resetKey, setResetKey] = useState(Date.now());
   const [netPay, setNetPay] = useState(0);
 
@@ -34,12 +46,21 @@ export function PayrollSheet({ row, rowData, editable }: { row: any, rowData: Pa
   const initialValues = { gross_pay: rowData.gross_pay ?? 0 };
 
   // keeping track of which particular field is linked to which template
-  const templateComponents: { paymentTemplateComponentId: string; name: string }[] = [];
-  rowData.templateComponents?.map((row: { amount: number; paymentTemplateComponentId: string; name: string }) => {
-    const { paymentTemplateComponentId, name } = row;
-    initialValues[paymentTemplateComponentId] = row.amount;
-    templateComponents.push({ paymentTemplateComponentId, name });
-  });
+  const templateComponents: {
+    paymentTemplateComponentId: string;
+    name: string;
+  }[] = [];
+  rowData.templateComponents?.map(
+    (row: {
+      amount: number;
+      paymentTemplateComponentId: string;
+      name: string;
+    }) => {
+      const { paymentTemplateComponentId, name } = row;
+      initialValues[paymentTemplateComponentId] = row.amount;
+      templateComponents.push({ paymentTemplateComponentId, name });
+    },
+  );
 
   const [form, fields] = useForm({
     id: rowData.employee_id,
@@ -54,7 +75,7 @@ export function PayrollSheet({ row, rowData, editable }: { row: any, rowData: Pa
       site_id: rowData.site_id,
       employee_id: rowData.employee_id,
       payrollId: rowData.payrollId,
-      templateComponents: JSON.stringify(templateComponents)
+      templateComponents: JSON.stringify(templateComponents),
     },
   });
 
@@ -64,8 +85,8 @@ export function PayrollSheet({ row, rowData, editable }: { row: any, rowData: Pa
       inputPropField: fields.gross_pay,
       placeholder: "Enter gross pay",
       errors: fields.gross_pay.errors,
-      value: fields.gross_pay.value
-    }
+      value: fields.gross_pay.value,
+    },
   ];
 
   const deductions: deductionAndEarning[] = [];
@@ -78,13 +99,15 @@ export function PayrollSheet({ row, rowData, editable }: { row: any, rowData: Pa
       inputPropField: fields[paymentTemplateComponentId],
       placeholder: `Enter ${name}`,
       errors: fields[paymentTemplateComponentId].errors,
-      value: fields[paymentTemplateComponentId].value
+      value: fields[paymentTemplateComponentId].value,
     } as any;
 
-    if (row.componentType === "deductions" || row.componentType === "statutory_contribution")
+    if (
+      row.componentType === "deductions" ||
+      row.componentType === "statutory_contribution"
+    )
       deductions.push(paymentFieldData);
-    else
-      earnings.push(paymentFieldData)
+    else earnings.push(paymentFieldData);
   });
 
   useEffect(() => {
@@ -94,7 +117,10 @@ export function PayrollSheet({ row, rowData, editable }: { row: any, rowData: Pa
     setNetPay(newNetPay);
   }, [
     fields.gross_pay.value,
-    ...rowData.templateComponents?.map((row: { paymentTemplateComponentId: string }) => fields[row.paymentTemplateComponentId].value)
+    ...rowData.templateComponents?.map(
+      (row: { paymentTemplateComponentId: string }) =>
+        fields[row.paymentTemplateComponentId].value,
+    ),
   ]);
 
   return (
@@ -107,7 +133,7 @@ export function PayrollSheet({ row, rowData, editable }: { row: any, rowData: Pa
               className={cn(
                 "px-3 md:px-4 py-2 hidden md:table-cell",
                 cell.column.id === "name" &&
-                "sticky left-0 min-w-12 max-w-12 bg-card z-10"
+                  "sticky left-0 min-w-12 max-w-12 bg-card z-10",
               )}
             >
               {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -140,73 +166,95 @@ export function PayrollSheet({ row, rowData, editable }: { row: any, rowData: Pa
               action="/payroll/run-payroll/update-payroll-entry"
             >
               <input {...getInputProps(fields.site_id, { type: "hidden" })} />
-              <input {...getInputProps(fields.employee_id, { type: "hidden" })} />
+              <input
+                {...getInputProps(fields.employee_id, { type: "hidden" })}
+              />
               <input {...getInputProps(fields.payrollId, { type: "hidden" })} />
-              <input {...getInputProps(fields.templateComponents, { type: "hidden" })} />
+              <input
+                {...getInputProps(fields.templateComponents, {
+                  type: "hidden",
+                })}
+              />
               <div className="flex justify-between">
-                <h3 className="my-3 text-muted-foreground font-semibold">Paid Days</h3>
+                <h3 className="my-3 text-muted-foreground font-semibold">
+                  Paid Days
+                </h3>
                 <p className="my-3 font-bold">{rowData.present_days ?? "--"}</p>
               </div>
               <hr />
 
               {/* EARNINGS */}
               <div className="flex justify-between">
-                <h3 className="my-3 text-green font-semibold">(+) EARNINGS (in Rs)</h3>
+                <h3 className="my-3 text-green font-semibold">
+                  (+) EARNINGS (in Rs)
+                </h3>
                 <p className="my-3 font-bold">Amount</p>
               </div>
               <hr />
-              {
-                earnings?.map((earning, key) => {
-                  return <div className="flex justify-between" key={key as any}>
+              {earnings?.map((earning, key) => {
+                return (
+                  <div className="flex justify-between" key={key as any}>
                     <div>
-                      <h3 className="my-3 text-muted-foreground font-semibold capitalize">{earning.title}</h3>
+                      <h3 className="my-3 text-muted-foreground font-semibold capitalize">
+                        {earning.title}
+                      </h3>
                     </div>
                     <div className="text-end font-semibold">
                       <Field
                         inputProps={{
-                          ...getInputProps(earning.inputPropField, { type: "number" }),
+                          ...getInputProps(earning.inputPropField, {
+                            type: "number",
+                          }),
                           className: "capitalize",
                           placeholder: earning.placeholder,
-                          readOnly: !editable
+                          readOnly: !editable,
                         }}
                         errors={earning.errors}
                       />
                     </div>
                   </div>
-                })
-              }
+                );
+              })}
               <hr />
 
               {/* DEDUCTIONS */}
               <div className="flex justify-between">
-                <h3 className="my-3 text-destructive font-semibold">(-) DEDUCTION (in Rs)</h3>
+                <h3 className="my-3 text-destructive font-semibold">
+                  (-) DEDUCTION (in Rs)
+                </h3>
                 <p className="my-3 font-bold">Amount</p>
               </div>
               <hr />
-              {
-                deductions?.map((deduction: deductionAndEarning, key) => {
-                  return <div className="flex justify-between" key={key as any}>
+              {deductions?.map((deduction: deductionAndEarning, key) => {
+                return (
+                  <div className="flex justify-between" key={key as any}>
                     <div>
-                      <h3 className="my-3 text-muted-foreground font-semibold capitalize">{deduction.title}</h3>
+                      <h3 className="my-3 text-muted-foreground font-semibold capitalize">
+                        {deduction.title}
+                      </h3>
                     </div>
                     <div className="text-end font-semibold">
                       <Field
                         inputProps={{
-                          ...getInputProps(deduction.inputPropField, { type: "number" }),
+                          ...getInputProps(deduction.inputPropField, {
+                            type: "number",
+                          }),
                           className: "capitalize",
                           placeholder: deduction.placeholder,
-                          readOnly: !editable
+                          readOnly: !editable,
                         }}
                         errors={deduction.errors}
                       />
                     </div>
                   </div>
-                })
-              }
+                );
+              })}
               <hr />
 
               <div className="flex justify-between">
-                <h3 className="my-3 text-muted-foreground font-semibold">Net Pay</h3>
+                <h3 className="my-3 text-muted-foreground font-semibold">
+                  Net Pay
+                </h3>
                 <p className="font-bold">Rs {netPay}</p>
               </div>
             </Form>
@@ -214,15 +262,13 @@ export function PayrollSheet({ row, rowData, editable }: { row: any, rowData: Pa
         </div>
         <SheetFooter className="mt-6 flex-shrink-0">
           <SheetClose asChild>
-            {
-              editable && (
-                <FormButtons
-                  form={form}
-                  setResetKey={setResetKey}
-                  isSingle={true}
-                />
-              )
-            }
+            {editable && (
+              <FormButtons
+                form={form}
+                setResetKey={setResetKey}
+                isSingle={true}
+              />
+            )}
           </SheetClose>
         </SheetFooter>
       </SheetContent>

@@ -88,7 +88,7 @@ export function Field({
         <sub
           className={cn(
             "hidden text-primary",
-            labelProps?.children && isRequired && "inline"
+            labelProps?.children && isRequired && "inline",
           )}
         >
           *
@@ -104,7 +104,7 @@ export function Field({
           className={cn(
             prefix && "pl-8",
             suffix && "pr-8",
-            inputProps.className
+            inputProps.className,
           )}
         />
         {suffix && (
@@ -143,7 +143,7 @@ export function TextareaField({
         <sub
           className={cn(
             "hidden text-primary",
-            labelProps?.children && isRequired && "inline"
+            labelProps?.children && isRequired && "inline",
           )}
         >
           *
@@ -210,7 +210,7 @@ export function CheckboxField({
         <sub
           className={cn(
             "hidden text-primary",
-            labelProps?.children && isRequired && "inline"
+            labelProps?.children && isRequired && "inline",
           )}
         >
           *
@@ -262,7 +262,7 @@ export function SearchableSelectField({
         <sub
           className={cn(
             "hidden text-primary",
-            labelProps?.children && isRequired && "inline"
+            labelProps?.children && isRequired && "inline",
           )}
         >
           *
@@ -320,14 +320,14 @@ export function JSONBField({
   useIsomorphicLayoutEffect(() => {
     try {
       const parsedValue = JSON.parse(
-        inputProps.defaultValue?.toString() || "{}"
+        inputProps.defaultValue?.toString() || "{}",
       );
       const initialPairs = Object.entries(parsedValue).map(([key, value]) => ({
         key,
         value: String(value),
       }));
       setPairs(
-        initialPairs.length > 0 ? initialPairs : [{ key: "", value: "" }]
+        initialPairs.length > 0 ? initialPairs : [{ key: "", value: "" }],
       );
     } catch (error) {
       console.error("Failed to parse JSONB value:", error);
@@ -335,16 +335,19 @@ export function JSONBField({
   }, [inputProps.defaultValue]);
 
   const updateJSONBValue = (newPairs: { key: string; value: string }[]) => {
-    const jsonbValue = newPairs.reduce((acc, { key, value }) => {
-      if (key) {
-        try {
-          acc[key] = parseStringValue(value);
-        } catch {
-          acc[key] = value;
+    const jsonbValue = newPairs.reduce(
+      (acc, { key, value }) => {
+        if (key) {
+          try {
+            acc[key] = parseStringValue(value);
+          } catch {
+            acc[key] = value;
+          }
         }
-      }
-      return acc;
-    }, {} as Record<string, any>);
+        return acc;
+      },
+      {} as Record<string, any>,
+    );
     const event = {
       target: {
         name: inputProps.name,
@@ -387,7 +390,7 @@ export function JSONBField({
         <sub
           className={cn(
             "hidden text-primary",
-            labelProps?.children && isRequired && "inline"
+            labelProps?.children && isRequired && "inline",
           )}
         >
           *
@@ -431,10 +434,13 @@ export function JSONBField({
         id={id}
         defaultValue={undefined}
         value={JSON.stringify(
-          pairs.reduce((acc, { key, value }) => {
-            if (key) acc[key] = parseStringValue(value);
-            return acc;
-          }, {} as Record<string, string>)
+          pairs.reduce(
+            (acc, { key, value }) => {
+              if (key) acc[key] = parseStringValue(value);
+              return acc;
+            },
+            {} as Record<string, string>,
+          ),
         )}
       />
       <div className={cn("min-h-6 px-4 pb-2", errorClassName)}>
@@ -514,7 +520,7 @@ export const RangeField = ({
   const handleFieldChange = (
     index: number,
     fieldKey: string,
-    value: string
+    value: string,
   ) => {
     const newRanges = [...ranges];
     newRanges[index] = {
@@ -529,10 +535,13 @@ export const RangeField = ({
   };
 
   const addRange = () => {
-    const newRange = fields.reduce((acc: Record<string, any>, field) => {
-      acc[field.key] = field.type === "number" ? 0 : "";
-      return acc;
-    }, {} as Record<string, any>);
+    const newRange = fields.reduce(
+      (acc: Record<string, any>, field) => {
+        acc[field.key] = field.type === "number" ? 0 : "";
+        return acc;
+      },
+      {} as Record<string, any>,
+    );
 
     const newRanges = [...ranges, newRange];
     setRanges(newRanges);
@@ -552,7 +561,7 @@ export const RangeField = ({
         <sub
           className={cn(
             "hidden text-primary",
-            labelProps?.children && isRequired && "inline"
+            labelProps?.children && isRequired && "inline",
           )}
         >
           *

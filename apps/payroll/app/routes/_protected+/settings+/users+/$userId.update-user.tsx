@@ -59,7 +59,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         error,
         userPromise: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -78,7 +78,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -106,7 +106,7 @@ export async function action({
         message: "Failed to update user",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -144,7 +144,7 @@ export default function UpdateUser() {
       <Await resolve={userPromise}>
         {(resolvedData) => {
           if (!resolvedData) {
-            return <ErrorBoundary message='Failed to load user' />;
+            return <ErrorBoundary message="Failed to load user" />;
           }
           return (
             <UpdateUserWrapper
@@ -166,7 +166,7 @@ export function UpdateUserWrapper({
   error: Error | null | { message: string };
 }) {
   if (error) {
-    return <ErrorBoundary error={error} message='Failed to load user' />;
+    return <ErrorBoundary error={error} message="Failed to load user" />;
   }
 
   return <CreateUser updateValues={data} />;

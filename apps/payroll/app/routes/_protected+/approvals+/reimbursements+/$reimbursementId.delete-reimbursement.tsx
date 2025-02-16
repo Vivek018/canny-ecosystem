@@ -53,7 +53,7 @@ export async function action({
         returnTo,
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json({
@@ -74,8 +74,10 @@ export default function DeleteEmployee() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(`${cacheKeyPrefix.employee_reimbursements}${actionData.employeeId}`);
-        clearCacheEntry(cacheKeyPrefix.reimbursements)
+        clearCacheEntry(
+          `${cacheKeyPrefix.employee_reimbursements}${actionData.employeeId}`,
+        );
+        clearCacheEntry(cacheKeyPrefix.reimbursements);
         toast({
           title: "Success",
           description: actionData?.message || "Reimbursement deleted",

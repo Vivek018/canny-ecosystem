@@ -36,10 +36,12 @@ export const UpdateImportedEmployee = ({
     }
     return Boolean(value);
   };
-  
+
   const initialData = {
     ...dataToUpdate,
-    address_same_as_employee: convertToBoolean(dataToUpdate.address_same_as_employee),
+    address_same_as_employee: convertToBoolean(
+      dataToUpdate.address_same_as_employee,
+    ),
     is_emergency_contact: convertToBoolean(dataToUpdate.is_emergency_contact),
   };
   const [data, setData] = useState(initialData);
@@ -55,7 +57,7 @@ export const UpdateImportedEmployee = ({
     if (parsedResult.success) {
       setImportData({
         data: importData.data?.map((item, index) =>
-          index === indexToUpdate ? data : item
+          index === indexToUpdate ? data : item,
         ),
       });
     }
@@ -66,7 +68,7 @@ export const UpdateImportedEmployee = ({
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "ghost", size: "full" }),
-          "text-[13px] h-9"
+          "text-[13px] h-9",
         )}
       >
         Update Employee
@@ -87,7 +89,7 @@ export const UpdateImportedEmployee = ({
             />
             <Combobox
               options={transformStringArrayIntoOptions(
-                relationshipArray as unknown as string[]
+                relationshipArray as unknown as string[],
               )}
               value={data.relationship ?? relationshipArray[0]}
               onChange={(value: string) => {
@@ -126,7 +128,7 @@ export const UpdateImportedEmployee = ({
             />
             <Combobox
               options={transformStringArrayIntoOptions(
-                genderArray as unknown as string[]
+                genderArray as unknown as string[],
               )}
               value={data.gender ?? genderArray[0]}
               onChange={(value: string) => {

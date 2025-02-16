@@ -64,19 +64,19 @@ export default function AccountSettings() {
   if (error) {
     clearExactCacheEntry(cacheKeyPrefix.account);
     return (
-      <ErrorBoundary error={error} message='Failed to load user details' />
+      <ErrorBoundary error={error} message="Failed to load user details" />
     );
   }
 
   return (
     <section key={resetKey}>
-      <div className='flex flex-col gap-6 w-full lg:w-2/3 py-4'>
+      <div className="flex flex-col gap-6 w-full lg:w-2/3 py-4">
         <Suspense fallback={<div>Loading...</div>}>
           <Await resolve={userDataPromise}>
             {(resolvedData) => {
               if (!resolvedData || resolvedData.error) {
                 clearExactCacheEntry(cacheKeyPrefix.account);
-                return <ErrorBoundary message='Failed to load user details' />;
+                return <ErrorBoundary message="Failed to load user details" />;
               }
 
               const userData = resolvedData.data;

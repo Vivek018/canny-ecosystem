@@ -59,7 +59,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
           return { data: companyOptions, error };
         }
         return { data: null, error };
-      }
+      },
     );
 
     return defer({
@@ -76,7 +76,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         projectPromise: null,
         companyOptionsPromise: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -95,7 +95,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -113,7 +113,7 @@ export async function action({
     }
     return json(
       { status: "error", message: "Project update failed", error },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -123,7 +123,7 @@ export async function action({
         error,
         data: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -160,7 +160,7 @@ export default function UpdateProject() {
   }, [actionData]);
 
   if (error)
-    return <ErrorBoundary error={error} message='Failed to load project' />;
+    return <ErrorBoundary error={error} message="Failed to load project" />;
 
   return (
     <Suspense fallback={<div>Loading...</div>}>

@@ -27,7 +27,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   try {
     const employeeProjectAssignmentPromise =
-      getEmployeeProjectAssignmentByEmployeeId({ supabase, employeeId: employeeId ?? "" });
+      getEmployeeProjectAssignmentByEmployeeId({
+        supabase,
+        employeeId: employeeId ?? "",
+      });
 
     const employeeWorkHistoriesPromise = getEmployeeWorkHistoriesByEmployeeId({
       supabase,
@@ -56,7 +59,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return await clientCaching(`${cacheKeyPrefix.employee_work_portfolio}${args.params.employeeId}`, args);
+  return await clientCaching(
+    `${cacheKeyPrefix.employee_work_portfolio}${args.params.employeeId}`,
+    args,
+  );
 }
 
 clientLoader.hydrate = true;
@@ -71,22 +77,32 @@ export default function WorkPortfolio() {
   const { employeeId } = useParams();
 
   if (error) {
-    clearExactCacheEntry(`${cacheKeyPrefix.employee_work_portfolio}${employeeId}`);
-    return <ErrorBoundary error={error} message='Failed to load data' />;
+    clearExactCacheEntry(
+      `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`,
+    );
+    return <ErrorBoundary error={error} message="Failed to load data" />;
   }
 
   return (
-    <div className='w-full py-4 flex flex-col gap-8'>
+    <div className="w-full py-4 flex flex-col gap-8">
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={employeeProjectAssignmentPromise}>
           {(resolvedData) => {
             if (!resolvedData) {
-              clearExactCacheEntry(`${cacheKeyPrefix.employee_work_portfolio}${employeeId}`);
-              return <ErrorBoundary message='Failed to load employee project assignment' />
+              clearExactCacheEntry(
+                `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`,
+              );
+              return (
+                <ErrorBoundary message="Failed to load employee project assignment" />
+              );
             }
             return (
               <CommonWrapper
-                Component={<EmployeeProjectAssignmentCard projectAssignment={resolvedData.data} />}
+                Component={
+                  <EmployeeProjectAssignmentCard
+                    projectAssignment={resolvedData.data}
+                  />
+                }
                 error={resolvedData.error}
               />
             );
@@ -98,12 +114,20 @@ export default function WorkPortfolio() {
         <Await resolve={employeeWorkHistoriesPromise}>
           {(resolvedData) => {
             if (!resolvedData) {
-              clearExactCacheEntry(`${cacheKeyPrefix.employee_work_portfolio}${employeeId}`);
-              return <ErrorBoundary message='Failed to load employee work history' />
+              clearExactCacheEntry(
+                `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`,
+              );
+              return (
+                <ErrorBoundary message="Failed to load employee work history" />
+              );
             }
             return (
               <CommonWrapper
-                Component={<EmployeeWorkHistoriesCard employeeWorkHistories={resolvedData.data} />}
+                Component={
+                  <EmployeeWorkHistoriesCard
+                    employeeWorkHistories={resolvedData.data}
+                  />
+                }
                 error={resolvedData.error}
               />
             );
@@ -115,12 +139,16 @@ export default function WorkPortfolio() {
         <Await resolve={employeeSkillsPromise}>
           {(resolvedData) => {
             if (!resolvedData) {
-              clearExactCacheEntry(`${cacheKeyPrefix.employee_work_portfolio}${employeeId}`);
-              return <ErrorBoundary message='Failed to load employee skills' />;
+              clearExactCacheEntry(
+                `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`,
+              );
+              return <ErrorBoundary message="Failed to load employee skills" />;
             }
             return (
               <CommonWrapper
-                Component={<EmployeeSkillsCard employeeSkills={resolvedData.data} />}
+                Component={
+                  <EmployeeSkillsCard employeeSkills={resolvedData.data} />
+                }
                 error={resolvedData.error}
               />
             );
@@ -131,16 +159,22 @@ export default function WorkPortfolio() {
   );
 }
 
-export function CommonWrapper({ Component, error }: { Component: ReactNode; error: any }) {
+export function CommonWrapper({
+  Component,
+  error,
+}: { Component: ReactNode; error: any }) {
   const { toast } = useToast();
   const { employeeId } = useParams();
 
   useEffect(() => {
     if (error) {
-      clearExactCacheEntry(`${cacheKeyPrefix.employee_work_portfolio}${employeeId}`);
+      clearExactCacheEntry(
+        `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`,
+      );
       toast({
         title: "Error",
-        description: error?.message || "Failed to load employee work portfolio details",
+        description:
+          error?.message || "Failed to load employee work portfolio details",
         variant: "destructive",
       });
     }

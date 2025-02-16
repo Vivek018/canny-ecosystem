@@ -5,13 +5,26 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { LAZY_LOADING_LIMIT, MAX_QUERY_LIMIT } from "@canny_ecosystem/supabase/constant";
 import {
-  type ReimbursementFilters, getReimbursementsByCompanyId, getProjectNamesByCompanyId, getSiteNamesByProjectName, getUsersEmail,
+  LAZY_LOADING_LIMIT,
+  MAX_QUERY_LIMIT,
+} from "@canny_ecosystem/supabase/constant";
+import {
+  type ReimbursementFilters,
+  getReimbursementsByCompanyId,
+  getProjectNamesByCompanyId,
+  getSiteNamesByProjectName,
+  getUsersEmail,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Await, type ClientLoaderFunctionArgs, defer, Outlet, useLoaderData } from "@remix-run/react";
+import {
+  Await,
+  type ClientLoaderFunctionArgs,
+  defer,
+  Outlet,
+  useLoaderData,
+} from "@remix-run/react";
 import { Suspense } from "react";
 import { ReimbursementActions } from "@/components/reimbursements/reimbursement-actions";
 import { ReimbursementsTable } from "@/components/reimbursements/table/reimbursements-table";
@@ -44,7 +57,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const query = searchParams.get("name") ?? undefined;
 
     const filters: ReimbursementFilters = {
-      submitted_date_start: searchParams.get("submitted_date_start") ?? undefined,
+      submitted_date_start:
+        searchParams.get("submitted_date_start") ?? undefined,
       submitted_date_end: searchParams.get("submitted_date_end") ?? undefined,
       status: searchParams.get("status") ?? undefined,
       is_deductible: searchParams.get("is_deductible") ?? undefined,
@@ -55,7 +69,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
     };
 
     const hasFilters =
-      filters && Object.values(filters).some((value) => value !== null && value !== undefined);
+      filters &&
+      Object.values(filters).some(
+        (value) => value !== null && value !== undefined,
+      );
 
     const reimbursementsPromise = getReimbursementsByCompanyId({
       supabase,
@@ -69,13 +86,16 @@ export async function loader({ request }: LoaderFunctionArgs) {
       },
     });
 
-    const projectPromise = getProjectNamesByCompanyId({supabase,companyId});
+    const projectPromise = getProjectNamesByCompanyId({ supabase, companyId });
 
     const userEmailsPromise = getUsersEmail({ supabase, companyId });
 
     let projectSitePromise = null;
-    if (filters.project) 
-      projectSitePromise = getSiteNamesByProjectName({supabase,projectName: filters.project});
+    if (filters.project)
+      projectSitePromise = getSiteNamesByProjectName({
+        supabase,
+        projectName: filters.project,
+      });
 
     return defer({
       reimbursementsPromise: reimbursementsPromise as any,
@@ -105,7 +125,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
-  return await clientCaching(`${cacheKeyPrefix.reimbursements}${url.searchParams.toString()}`, args);
+  return await clientCaching(
+    `${cacheKeyPrefix.reimbursements}${url.searchParams.toString()}`,
+    args,
+  );
 }
 
 clientLoader.hydrate = true;
@@ -140,15 +163,20 @@ export default function ReimbursementsIndex() {
                           disabled={!projectData?.data?.length && noFilters}
                           projectArray={
                             projectData?.data?.length
-                              ? projectData?.data?.map((project) => project!.name) : []
+                              ? projectData?.data?.map(
+                                  (project) => project!.name,
+                                )
+                              : []
                           }
                           projectSiteArray={
                             projectSiteData?.data?.length
-                              ? projectSiteData?.data?.map((site) => site!.name) : []
+                              ? projectSiteData?.data?.map((site) => site!.name)
+                              : []
                           }
                           userEmails={
                             userEmailsData?.data?.length
-                              ? userEmailsData?.data?.map((user) => user!.email) : []
+                              ? userEmailsData?.data?.map((user) => user!.email)
+                              : []
                           }
                         />
                       )}
@@ -167,7 +195,12 @@ export default function ReimbursementsIndex() {
           {({ data, meta, error }) => {
             if (error) {
               clearCacheEntry(cacheKeyPrefix.reimbursements);
-              return <ErrorBoundary error={error} message="Failed to load reimbursements"/>
+              return (
+                <ErrorBoundary
+                  error={error}
+                  message="Failed to load reimbursements"
+                />
+              );
             }
 
             const hasNextPage = Boolean(meta?.count > pageSize);

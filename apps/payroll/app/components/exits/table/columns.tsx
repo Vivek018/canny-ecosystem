@@ -27,9 +27,11 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     accessorKey: "employee_code",
     header: "Employee Code",
     cell: ({ row }) => {
-      return <p className="truncate text-primary/80 w-28 cursor-pointer">
-        {row.original?.employees?.employee_code ?? "--"}
-      </p>
+      return (
+        <p className="truncate text-primary/80 w-28 cursor-pointer">
+          {row.original?.employees?.employee_code ?? "--"}
+        </p>
+      );
     },
     enableSorting: false,
     enableHiding: false,
@@ -38,10 +40,12 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     accessorKey: "employee_name",
     header: "Employee Name",
     cell: ({ row }) => {
-      return <p className="truncate text-primary/80 w-32 cursor-pointer">
-        {`${row.original.employees?.first_name} ${row.original.employees?.middle_name ?? ""}
+      return (
+        <p className="truncate text-primary/80 w-32 cursor-pointer">
+          {`${row.original.employees?.first_name} ${row.original.employees?.middle_name ?? ""}
            ${row.original.employees?.last_name ?? ""}`}
-      </p>
+        </p>
+      );
     },
     enableSorting: false,
     enableHiding: false,
@@ -50,9 +54,12 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     accessorKey: "project",
     header: "Project",
     cell: ({ row }) => {
-      return <p className="truncate capitalize">
-        {row.original?.employees.employee_project_assignment.project_sites.projects.name ?? "--"}
-      </p>
+      return (
+        <p className="truncate capitalize">
+          {row.original?.employees.employee_project_assignment.project_sites
+            .projects.name ?? "--"}
+        </p>
+      );
     },
     enableSorting: false,
     enableHiding: false,
@@ -61,9 +68,12 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     accessorKey: "project_site",
     header: "Project Site",
     cell: ({ row }) => {
-      return <p className="truncate capitalize">
-        {row.original?.employees.employee_project_assignment.project_sites.name ?? "--"}
-      </p>
+      return (
+        <p className="truncate capitalize">
+          {row.original?.employees.employee_project_assignment.project_sites
+            .name ?? "--"}
+        </p>
+      );
     },
     enableSorting: false,
     enableHiding: false,
@@ -72,78 +82,110 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     accessorKey: "last_working_day",
     header: "Last Working Day ",
     cell: ({ row }) => {
-      return <p className="truncate capitalize">{`${row.original?.last_working_day ?? "--"}`}</p>
+      return (
+        <p className="truncate capitalize">{`${row.original?.last_working_day ?? "--"}`}</p>
+      );
     },
   },
   {
     accessorKey: "reason",
     header: "Reason for Exit",
     cell: ({ row }) => {
-      return <p className="truncate capitalize">{row.original?.reason ?? "--"}</p>
+      return (
+        <p className="truncate capitalize">{row.original?.reason ?? "--"}</p>
+      );
     },
   },
   {
     accessorKey: "final_settlement_date",
     header: "Final Settlement Date",
     cell: ({ row }) => {
-      return <p className="truncate  ">{row.original?.final_settlement_date ?? "--"}</p>
+      return (
+        <p className="truncate  ">
+          {row.original?.final_settlement_date ?? "--"}
+        </p>
+      );
     },
   },
   {
     accessorKey: "organization_payable_days",
     header: "Organization Payable Days",
     cell: ({ row }) => {
-      return <p className="truncate">{row.original?.organization_payable_days ?? "--"}</p>
+      return (
+        <p className="truncate">
+          {row.original?.organization_payable_days ?? "--"}
+        </p>
+      );
     },
   },
   {
     accessorKey: "employee_payable_days",
     header: "Employee Payable Days",
     cell: ({ row }) => {
-      return <p className="truncate">{row.original?.employee_payable_days ?? "--"}</p>
+      return (
+        <p className="truncate">
+          {row.original?.employee_payable_days ?? "--"}
+        </p>
+      );
     },
   },
   {
     accessorKey: "bonus",
     header: "Bonus",
     cell: ({ row }) => {
-      return <p className="capitalize truncate">{row.original.bonus ?? "--"}</p>;
+      return (
+        <p className="capitalize truncate">{row.original.bonus ?? "--"}</p>
+      );
     },
   },
   {
     accessorKey: "leave_encashment",
     header: "Leave Encashment",
     cell: ({ row }) => {
-      return <p className="capitalize truncate">{row.original.leave_encashment ?? "--"}</p>
+      return (
+        <p className="capitalize truncate">
+          {row.original.leave_encashment ?? "--"}
+        </p>
+      );
     },
   },
   {
     accessorKey: "gratuity",
     header: "Gratuity",
     cell: ({ row }) => {
-      return <p className="capitalize truncate">{row.original.gratuity ?? "--"}</p>;
+      return (
+        <p className="capitalize truncate">{row.original.gratuity ?? "--"}</p>
+      );
     },
   },
   {
     accessorKey: "deduction",
     header: "Deduction",
     cell: ({ row }) => {
-      return <p className="capitalize truncate">{row.original.deduction ?? "--"}</p>;
+      return (
+        <p className="capitalize truncate">{row.original.deduction ?? "--"}</p>
+      );
     },
   },
   {
     accessorKey: "net_pay",
     header: "Net Pay",
     cell: ({ row }) => {
-      const netPay = Number(row.original.bonus) + Number(row.original.leave_encashment) + Number(row.original.gratuity) - Number(row.original.deduction);
-      return <p className="capitalize truncate">{netPay ?? "--"}</p>
+      const netPay =
+        Number(row.original.bonus) +
+        Number(row.original.leave_encashment) +
+        Number(row.original.gratuity) -
+        Number(row.original.deduction);
+      return <p className="capitalize truncate">{netPay ?? "--"}</p>;
     },
   },
   {
     accessorKey: "note",
     header: "Note",
     cell: ({ row }) => {
-      return <p className="capitalize truncate">{row.original?.note ?? "--"}</p>
+      return (
+        <p className="capitalize truncate">{row.original?.note ?? "--"}</p>
+      );
     },
   },
 
@@ -160,8 +202,8 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
               asChild
               className={cn(
                 !hasPermission(role, `${updateRole}:${attribute.exits}`) &&
-                !hasPermission(role, `${deleteRole}:${attribute.exits}`) &&
-                "hidden"
+                  !hasPermission(role, `${deleteRole}:${attribute.exits}`) &&
+                  "hidden",
               )}
             >
               <Button variant="ghost" className="h-8 w-8 p-0">

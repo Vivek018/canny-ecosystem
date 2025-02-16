@@ -22,7 +22,8 @@ export async function getPaymentTemplateAssignmentIdByEmployeeId({
       >
     >();
 
-  if (error) console.error("getPaymentTemplateAssignmentIdByEmployeeId Error", error);
+  if (error)
+    console.error("getPaymentTemplateAssignmentIdByEmployeeId Error", error);
 
   return { data, error };
 }
@@ -80,7 +81,8 @@ export async function getPaymentTemplateAssignmentByEmployeeId({
       >
     >();
 
-  if (error) console.error("getPaymentTemplateAssignmentByEmployeeId Error", error);
+  if (error)
+    console.error("getPaymentTemplateAssignmentByEmployeeId Error", error);
 
   return { data, error };
 }
@@ -128,7 +130,8 @@ export async function getPaymentTemplateAssignmentsBySiteId({
     .order("created_at", { ascending: false })
     .returns<PaymentTemplateAssignmentsType[]>();
 
-  if (error) console.error("getPaymentTemplateAssignmentsBySiteId Error", error);
+  if (error)
+    console.error("getPaymentTemplateAssignmentsBySiteId Error", error);
 
   return { data, error };
 }

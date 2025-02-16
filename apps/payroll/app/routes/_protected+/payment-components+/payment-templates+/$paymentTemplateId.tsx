@@ -25,7 +25,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         data: null,
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -37,7 +37,7 @@ export default function PaymentTemplateId() {
     return (
       <ErrorBoundary
         error={error ?? "No Data"}
-        message='Failed to load payment template components'
+        message="Failed to load payment template components"
       />
     );
   }

@@ -26,7 +26,6 @@ export async function getProjectsCountByCompanyId({
     .select("", { count: "exact", head: true })
     .eq("project_client_id", companyId);
 
-
   if (error) {
     console.error("getProjectsCountByCompanyId Error", error);
   }

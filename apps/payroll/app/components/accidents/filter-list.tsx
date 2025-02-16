@@ -23,11 +23,9 @@ export function FilterList({ filters }: Props) {
     switch (key) {
       case "date_start":
         if (filters?.date_end) {
-          return formatDateRange(
-            new Date(value),
-            new Date(filters.date_end),
-            { includeTime: false },
-          );
+          return formatDateRange(new Date(value), new Date(filters.date_end), {
+            includeTime: false,
+          });
         }
         return formatDate(new Date(value));
 

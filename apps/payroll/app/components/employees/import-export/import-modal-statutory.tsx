@@ -22,7 +22,8 @@ export const ImportEmployeeStatutoryModal = () => {
   const MAX_FILE_SIZE_LIMIT = SIZE_1MB * 3;
 
   const isOpen =
-    searchParams.get("step") === modalSearchParamNames.import_employee_statutory;
+    searchParams.get("step") ===
+    modalSearchParamNames.import_employee_statutory;
 
   const onClose = () => {
     searchParams.delete("step");
@@ -85,7 +86,7 @@ export const ImportEmployeeStatutoryModal = () => {
           className={cn(
             "text-sm",
             selectedFile ? "flex" : "hidden",
-            !eligibleFileSize ? "text-destructive" : "text-muted-foreground"
+            !eligibleFileSize ? "text-destructive" : "text-muted-foreground",
           )}
         >
           {!eligibleFileSize

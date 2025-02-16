@@ -61,7 +61,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         error,
         paymentFieldPromise: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -77,7 +77,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -105,7 +105,7 @@ export async function action({
         message: "Payment Field update failed",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -114,7 +114,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -133,7 +133,7 @@ export default function UpdatePaymentField() {
     if (actionData?.status === "success") {
       clearExactCacheEntry(cacheKeyPrefix.payment_fields);
       clearCacheEntry(
-        `${cacheKeyPrefix.payment_field_report}${paymentFieldId}`
+        `${cacheKeyPrefix.payment_field_report}${paymentFieldId}`,
       );
       toast({
         title: "Success",
@@ -159,7 +159,7 @@ export default function UpdatePaymentField() {
       <Await resolve={paymentFieldPromise}>
         {(resolvedData) => {
           if (!resolvedData)
-            return <ErrorBoundary message='Failed to load payment field' />;
+            return <ErrorBoundary message="Failed to load payment field" />;
           return (
             <UpdatePaymentFieldWrapper
               data={resolvedData?.data}

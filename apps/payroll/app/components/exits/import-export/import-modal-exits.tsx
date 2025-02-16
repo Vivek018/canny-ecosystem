@@ -49,7 +49,9 @@ export const ImportExitModal = () => {
 
   const handleFileSubmit = () => {
     if (eligibleFileSize && selectedFile) {
-      navigate("/approvals/exits/import-data", {state: { file: selectedFile }});
+      navigate("/approvals/exits/import-data", {
+        state: { file: selectedFile },
+      });
     }
   };
 

@@ -78,7 +78,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 
@@ -100,7 +100,7 @@ export async function action({
       message: "Location update failed",
       error,
     },
-    { status: 500 }
+    { status: 500 },
   );
 }
 
@@ -133,7 +133,7 @@ export default function UpdateLocation() {
   }, [actionData]);
 
   if (error) {
-    return <ErrorBoundary error={error} message='Failed to load location' />;
+    return <ErrorBoundary error={error} message="Failed to load location" />;
   }
 
   return (
@@ -141,7 +141,7 @@ export default function UpdateLocation() {
       <Await resolve={locationPromise}>
         {(resolvedData) => {
           if (!resolvedData)
-            return <ErrorBoundary message='Failed to load location' />;
+            return <ErrorBoundary message="Failed to load location" />;
           if (resolvedData.error)
             return <ErrorBoundary error={resolvedData.error} />;
           return <CreateLocation updateValues={resolvedData.data} />;

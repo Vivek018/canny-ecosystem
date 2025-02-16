@@ -1,6 +1,3 @@
-
-
 export default function Leaves() {
-    return <div>Leaves</div>;
-  }
-  
+  return <div>Leaves</div>;
+}

@@ -60,7 +60,7 @@ export const CompanyRegistrationDetails = ({
   return (
     <FormProvider context={form.context}>
       <Form
-        method='POST'
+        method="POST"
         {...getFormProps(form)}
         action={`/${updateValues?.company_id}/update-company-registration-details`}
       >
@@ -71,23 +71,23 @@ export const CompanyRegistrationDetails = ({
               This is your company's registration details within canny.
             </CardDescription>
           </CardHeader>
-          <CardContent className='pb-2'>
-            <div className='grid grid-cols-1 md:grid-cols-2 items-center justify-center md:gap-x-8'>
+          <CardContent className="pb-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 items-center justify-center md:gap-x-8">
               <input
                 {...getInputProps(fields.company_id, { type: "hidden" })}
               />
               <Field
-                className='md:col-span-2'
+                className="md:col-span-2"
                 inputProps={{
                   ...getInputProps(fields.registration_number, {
                     type: "text",
                   }),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.registration_number.name
+                    fields.registration_number.name,
                   )}`,
                   readOnly: !hasPermission(
                     role,
-                    `${updateRole}:${attribute.settingGeneral}`
+                    `${updateRole}:${attribute.settingGeneral}`,
                   ),
                 }}
                 errors={fields.registration_number.errors}
@@ -96,11 +96,11 @@ export const CompanyRegistrationDetails = ({
                 inputProps={{
                   ...getInputProps(fields.gst_number, { type: "text" }),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.gst_number.name
+                    fields.gst_number.name,
                   )}`,
                   readOnly: !hasPermission(
                     role,
-                    `${updateRole}:${attribute.settingGeneral}`
+                    `${updateRole}:${attribute.settingGeneral}`,
                   ),
                 }}
                 errors={fields.gst_number.errors}
@@ -109,11 +109,11 @@ export const CompanyRegistrationDetails = ({
                 inputProps={{
                   ...getInputProps(fields.pan_number, { type: "text" }),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.pan_number.name
+                    fields.pan_number.name,
                   )}`,
                   readOnly: !hasPermission(
                     role,
-                    `${updateRole}:${attribute.settingGeneral}`
+                    `${updateRole}:${attribute.settingGeneral}`,
                   ),
                 }}
                 errors={fields.pan_number.errors}
@@ -122,11 +122,11 @@ export const CompanyRegistrationDetails = ({
                 inputProps={{
                   ...getInputProps(fields.pf_number, { type: "text" }),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.pf_number.name
+                    fields.pf_number.name,
                   )}`,
                   readOnly: !hasPermission(
                     role,
-                    `${updateRole}:${attribute.settingGeneral}`
+                    `${updateRole}:${attribute.settingGeneral}`,
                   ),
                 }}
                 errors={fields.pf_number.errors}
@@ -135,11 +135,11 @@ export const CompanyRegistrationDetails = ({
                 inputProps={{
                   ...getInputProps(fields.esic_number, { type: "text" }),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.esic_number.name
+                    fields.esic_number.name,
                   )}`,
                   readOnly: !hasPermission(
                     role,
-                    `${updateRole}:${attribute.settingGeneral}`
+                    `${updateRole}:${attribute.settingGeneral}`,
                   ),
                 }}
                 errors={fields.esic_number.errors}
@@ -148,11 +148,11 @@ export const CompanyRegistrationDetails = ({
                 inputProps={{
                   ...getInputProps(fields.lwf_number, { type: "text" }),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.lwf_number.name
+                    fields.lwf_number.name,
                   )}`,
                   readOnly: !hasPermission(
                     role,
-                    `${updateRole}:${attribute.settingGeneral}`
+                    `${updateRole}:${attribute.settingGeneral}`,
                   ),
                 }}
                 errors={fields.lwf_number.errors}
@@ -161,11 +161,11 @@ export const CompanyRegistrationDetails = ({
                 inputProps={{
                   ...getInputProps(fields.pt_number, { type: "text" }),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.pt_number.name
+                    fields.pt_number.name,
                   )}`,
                   readOnly: !hasPermission(
                     role,
-                    `${updateRole}:${attribute.settingGeneral}`
+                    `${updateRole}:${attribute.settingGeneral}`,
                   ),
                 }}
                 errors={fields.pt_number.errors}
@@ -178,15 +178,15 @@ export const CompanyRegistrationDetails = ({
               "border-t pt-6 flex justify-between",
               !hasPermission(
                 role,
-                `${updateRole}:${attribute.settingGeneral}`
-              ) && "hidden"
+                `${updateRole}:${attribute.settingGeneral}`,
+              ) && "hidden",
             )}
           >
             <div>Please use 15 characters at maximum.</div>
-            <div className='flex gap-4'>
+            <div className="flex gap-4">
               <Button
-                variant='secondary'
-                type='reset'
+                variant="secondary"
+                type="reset"
                 {...form.reset.getButtonProps()}
               >
                 Reset
@@ -196,8 +196,8 @@ export const CompanyRegistrationDetails = ({
                 disabled={
                   !form.valid || deepEqualCheck(form.initialValue, form.value)
                 }
-                variant='default'
-                type='submit'
+                variant="default"
+                type="submit"
               >
                 Save
               </Button>

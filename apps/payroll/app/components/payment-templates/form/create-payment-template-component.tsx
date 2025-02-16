@@ -64,7 +64,7 @@ export function CreatePaymentTemplateComponentDetails({
   });
 
   const targetTypeDefaultValue = (
-    fields: { name: string; value: string | null | undefined }[]
+    fields: { name: string; value: string | null | undefined }[],
   ) => {
     for (const field of fields) {
       if (field.value) {
@@ -94,23 +94,23 @@ export function CreatePaymentTemplateComponentDetails({
 
       const mergeUniqueValues = (
         existingValues: string[],
-        newValues: (string | undefined)[]
+        newValues: (string | undefined)[],
       ): string[] => [
         ...existingValues,
         ...newValues.filter(
           (val): val is string =>
-            val !== undefined && !existingValues.includes(val)
+            val !== undefined && !existingValues.includes(val),
         ),
       ];
 
       setSelectFieldDefaultValues((prev) => ({
         paymentFieldDefaultValue: mergeUniqueValues(
           prev.paymentFieldDefaultValue,
-          paymentFieldDefaultValue
+          paymentFieldDefaultValue,
         ),
         statutoryFieldDefaultValue: mergeUniqueValues(
           prev.statutoryFieldDefaultValue,
-          statutoryFieldDefaultValue
+          statutoryFieldDefaultValue,
         ),
       }));
     }
@@ -122,7 +122,7 @@ export function CreatePaymentTemplateComponentDetails({
   return (
     <Fragment>
       <CardHeader>
-        <CardTitle className='text-3xl capitalize'>
+        <CardTitle className="text-3xl capitalize">
           {isUpdate ? "Update" : "Create"} Payment Template
         </CardTitle>
         <CardDescription>
@@ -131,13 +131,13 @@ export function CreatePaymentTemplateComponentDetails({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
+        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
           <input {...getInputProps(fields.id, { type: "hidden" })} />
           <Field
             inputProps={{
               ...getInputProps(fields.monthly_ctc, { type: "number" }),
               placeholder: `Enter ${replaceUnderscore(
-                fields.monthly_ctc.name
+                fields.monthly_ctc.name,
               )}`,
               autoFocus: true,
             }}
@@ -145,7 +145,7 @@ export function CreatePaymentTemplateComponentDetails({
             errors={fields.monthly_ctc.errors}
           />
           <SearchableSelectField
-            className='capitalize'
+            className="capitalize"
             options={statesAndUTs}
             inputProps={{
               ...getInputProps(fields.state, { type: "text" }),
@@ -157,7 +157,7 @@ export function CreatePaymentTemplateComponentDetails({
             errors={fields.state.errors}
           />
         </div>
-        <div className='grid grid-cols-2 place-content-center justify-between gap-6 mb-4'>
+        <div className="grid grid-cols-2 place-content-center justify-between gap-6 mb-4">
           <PaymentFieldsSelect
             key={resetKey}
             defaultValue={paymentFieldDefaultValue}
@@ -169,19 +169,19 @@ export function CreatePaymentTemplateComponentDetails({
             key={resetKey ? resetKey + 1 : undefined}
             defaultValue={statutoryFieldDefaultValue}
             options={transformStringArrayIntoOptions(
-              statutoryFieldsArray as unknown as string[]
+              statutoryFieldsArray as unknown as string[],
             )}
             env={env}
             state={fields.state.value ?? ""}
             disabled={!fields.state.value || !fields.monthly_ctc.value}
           />
         </div>
-        <div className='w-full grid grid-cols-3 gap-3 justify-between border-b py-2 font-semibold'>
+        <div className="w-full grid grid-cols-3 gap-3 justify-between border-b py-2 font-semibold">
           <p>Component Name</p>
           <p>Component Type</p>
           <p>Amount</p>
         </div>
-        <div className='flex flex-col items-center justify-center py-1'>
+        <div className="flex flex-col items-center justify-center py-1">
           {paymentTemplateComponentsField.map((field) => {
             const fieldSet = field.getFieldset();
 
@@ -198,7 +198,7 @@ export function CreatePaymentTemplateComponentDetails({
               (paymentField) =>
                 paymentField.id ===
                 (fieldSet.payment_field_id.value ??
-                  fieldSet.payment_field_id.initialValue)
+                  fieldSet.payment_field_id.initialValue),
             );
 
             if (defaultTargetType) {
@@ -209,7 +209,7 @@ export function CreatePaymentTemplateComponentDetails({
                     fieldSet.id.value +
                     resetKey
                   }
-                  className='w-full grid grid-cols-3 gap-3 justify-between items-center'
+                  className="w-full grid grid-cols-3 gap-3 justify-between items-center"
                 >
                   <input {...getInputProps(fieldSet.id, { type: "hidden" })} />
                   <input

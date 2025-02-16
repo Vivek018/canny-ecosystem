@@ -108,7 +108,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 
   return await clientCaching(
     `${cacheKeyPrefix.attendance}${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 
@@ -169,12 +169,12 @@ export default function Attendance() {
         acc[key][fullDate] = record.present
           ? "P"
           : record.holiday
-          ? record.holiday_type === "weekly"
-            ? "(WOF)"
-            : record.holiday_type === "paid"
-            ? "L"
-            : "A"
-          : "A";
+            ? record.holiday_type === "weekly"
+              ? "(WOF)"
+              : record.holiday_type === "paid"
+                ? "L"
+                : "A"
+            : "A";
       }
 
       return acc;
@@ -185,7 +185,9 @@ export default function Attendance() {
 
   useEffect(() => {
     setData(
-      transformAttendanceData(attendanceData) as TransformedAteendanceDataType[]
+      transformAttendanceData(
+        attendanceData,
+      ) as TransformedAteendanceDataType[],
     );
   }, [attendanceData]);
 
@@ -230,9 +232,9 @@ export default function Attendance() {
   const noFilters = Object.values(filters).every((value) => !value);
 
   return (
-    <section className='py-4'>
-      <div className='w-full flex items-center justify-between pb-4'>
-        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4'>
+    <section className="py-4">
+      <div className="w-full flex items-center justify-between pb-4">
+        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
           <AttendanceSearchFilter
             disabled={!attendanceData?.length && noFilters}
             projectArray={projectArray}
@@ -242,18 +244,18 @@ export default function Attendance() {
           />
           <FilterList filters={filters} />
         </div>
-        <div className='space-x-2 hidden md:flex'>
+        <div className="space-x-2 hidden md:flex">
           {!selectedRows.length ? (
             <ImportAttendanceMenu />
           ) : (
             <Button
-              variant='outline'
-              size='icon'
-              className='h-10 w-10'
+              variant="outline"
+              size="icon"
+              className="h-10 w-10"
               disabled={!selectedRows.length}
               onClick={() => navigate("/time-tracking/attendance/analytics")}
             >
-              <Icon name='chart' className='h-[18px] w-[18px]' />
+              <Icon name="chart" className="h-[18px] w-[18px]" />
             </Button>
           )}
         </div>

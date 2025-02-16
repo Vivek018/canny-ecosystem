@@ -49,7 +49,7 @@ export const UserName = ({ updateValues }: UserNameProps) => {
   return (
     <FormProvider context={form.context}>
       <Form
-        method='POST'
+        method="POST"
         {...getFormProps(form)}
         action={"/user/update-user-name"}
       >
@@ -60,14 +60,14 @@ export const UserName = ({ updateValues }: UserNameProps) => {
               Please enter your first name and last name.
             </CardDescription>
           </CardHeader>
-          <CardContent className='grid grid-cols-1 px-6 py-0 md:grid-cols-2 items-center justify-center md:gap-x-8'>
+          <CardContent className="grid grid-cols-1 px-6 py-0 md:grid-cols-2 items-center justify-center md:gap-x-8">
             <Field
               inputProps={{
                 ...getInputProps(fields.first_name, {
                   type: "text",
                 }),
                 placeholder: `Enter ${replaceUnderscore(
-                  fields.first_name.name
+                  fields.first_name.name,
                 )}`,
               }}
               errors={fields.first_name.errors}
@@ -78,18 +78,18 @@ export const UserName = ({ updateValues }: UserNameProps) => {
                   type: "text",
                 }),
                 placeholder: `Enter ${replaceUnderscore(
-                  fields.last_name.name
+                  fields.last_name.name,
                 )}`,
               }}
               errors={fields.last_name.errors}
             />
           </CardContent>
-          <CardFooter className='border-t justify-between pt-6'>
+          <CardFooter className="border-t justify-between pt-6">
             <div>Please use 20 characters at maximum.</div>
-            <div className='flex gap-4'>
+            <div className="flex gap-4">
               <Button
-                variant='secondary'
-                type='reset'
+                variant="secondary"
+                type="reset"
                 {...form.reset.getButtonProps()}
               >
                 Reset
@@ -99,8 +99,8 @@ export const UserName = ({ updateValues }: UserNameProps) => {
                 disabled={
                   !form.valid || deepEqualCheck(form.initialValue, form.value)
                 }
-                variant='default'
-                type='submit'
+                variant="default"
+                type="submit"
               >
                 Save
               </Button>

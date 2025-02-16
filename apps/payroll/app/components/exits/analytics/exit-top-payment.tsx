@@ -1,6 +1,25 @@
-import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@canny_ecosystem/ui/card";
-import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@canny_ecosystem/ui/chart";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  LabelList,
+  XAxis,
+  YAxis,
+} from "recharts";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@canny_ecosystem/ui/card";
+import {
+  type ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@canny_ecosystem/ui/chart";
 import { exitPaymentFields } from "@canny_ecosystem/utils/constant";
 import { replaceUnderscore } from "@canny_ecosystem/utils";
 import type { ExitDataType } from "@canny_ecosystem/supabase/queries";
@@ -22,33 +41,38 @@ chartConfig.amount = {
 
 export function ExitOverview({ chartData }: { chartData: ExitDataType[] }) {
   const exitTopPaymentData = Object.values(
-    chartData.reduce((acc, row:any) => {
-      // Handle bonus
-      if (row.bonus) {
-        if (!acc.bonus) acc.bonus = { amount: 0, costType: 'bonus' };
-        acc.bonus.amount += row.bonus;
-      }
+    chartData.reduce(
+      (acc, row: any) => {
+        // Handle bonus
+        if (row.bonus) {
+          if (!acc.bonus) acc.bonus = { amount: 0, costType: "bonus" };
+          acc.bonus.amount += row.bonus;
+        }
 
-      // Handle leave encashment
-      if (row.leave_encashment) {
-        if (!acc.leave_encashment) acc.leave_encashment = { amount: 0, costType: 'leave_encashment' };
-        acc.leave_encashment.amount += row.leave_encashment;
-      }
+        // Handle leave encashment
+        if (row.leave_encashment) {
+          if (!acc.leave_encashment)
+            acc.leave_encashment = { amount: 0, costType: "leave_encashment" };
+          acc.leave_encashment.amount += row.leave_encashment;
+        }
 
-      // Handle gratuity
-      if (row.gratuity) {
-        if (!acc.gratuity) acc.gratuity = { amount: 0, costType: 'gratuity' };
-        acc.gratuity.amount += row.gratuity;
-      }
+        // Handle gratuity
+        if (row.gratuity) {
+          if (!acc.gratuity) acc.gratuity = { amount: 0, costType: "gratuity" };
+          acc.gratuity.amount += row.gratuity;
+        }
 
-      // Handle deductions
-      if (row.deduction) {
-        if (!acc.deduction) acc.deduction = { amount: 0, costType: 'deduction' };
-        acc.deduction.amount += row.deduction;
-      }
+        // Handle deductions
+        if (row.deduction) {
+          if (!acc.deduction)
+            acc.deduction = { amount: 0, costType: "deduction" };
+          acc.deduction.amount += row.deduction;
+        }
 
-      return acc;
-    }, {} as Record<string, { amount: number; costType: string }>)
+        return acc;
+      },
+      {} as Record<string, { amount: number; costType: string }>,
+    ),
   );
 
   const transformedChartData = exitTopPaymentData.map((data, i) => ({
@@ -86,9 +110,19 @@ export function ExitOverview({ chartData }: { chartData: ExitDataType[] }) {
             <XAxis dataKey="amount" type="number" hide />
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent indicator="line" className="capitalize w-2/3" />}
+              content={
+                <ChartTooltipContent
+                  indicator="line"
+                  className="capitalize w-2/3"
+                />
+              }
             />
-            <Bar dataKey="amount" layout="vertical" fill="var(--color-amount)" radius={4}>
+            <Bar
+              dataKey="amount"
+              layout="vertical"
+              fill="var(--color-amount)"
+              radius={4}
+            >
               <LabelList
                 dataKey="costType"
                 position="insideLeft"

@@ -107,7 +107,7 @@ export default function EmployeeDetailsImportFieldMapping() {
         skipEmptyLines: true,
         complete: (results: Papa.ParseResult<string[]>) => {
           const headers = results.data[0].filter(
-            (header) => header !== null && header.trim() !== ""
+            (header) => header !== null && header.trim() !== "",
           );
           setHeaderArray(headers);
         },
@@ -121,19 +121,22 @@ export default function EmployeeDetailsImportFieldMapping() {
 
   useEffect(() => {
     if (headerArray.length > 0) {
-      const initialMapping = FIELD_CONFIGS.reduce((mapping, field) => {
-        const matchedHeader = headerArray.find(
-          (value) =>
-            pipe(replaceUnderscore, replaceDash)(value?.toLowerCase()) ===
-            pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase())
-        );
+      const initialMapping = FIELD_CONFIGS.reduce(
+        (mapping, field) => {
+          const matchedHeader = headerArray.find(
+            (value) =>
+              pipe(replaceUnderscore, replaceDash)(value?.toLowerCase()) ===
+              pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase()),
+          );
 
-        if (matchedHeader) {
-          mapping[field.key] = matchedHeader;
-        }
+          if (matchedHeader) {
+            mapping[field.key] = matchedHeader;
+          }
 
-        return mapping;
-      }, {} as Record<string, string>);
+          return mapping;
+        },
+        {} as Record<string, string>,
+      );
 
       setFieldMapping(initialMapping);
     }
@@ -146,13 +149,13 @@ export default function EmployeeDetailsImportFieldMapping() {
           Object.entries(fieldMapping).map(([key, value]) => [
             key,
             value || undefined,
-          ])
-        )
+          ]),
+        ),
       );
 
       if (!mappingResult.success) {
         const formattedErrors = mappingResult.error.errors.map(
-          (err) => err.message
+          (err) => err.message,
         );
         setValidationErrors(formattedErrors);
         return false;
@@ -172,7 +175,7 @@ export default function EmployeeDetailsImportFieldMapping() {
       const result = ImportEmployeeDetailsDataSchema.safeParse({ data });
       if (!result.success) {
         const formattedErrors = result.error.errors.map(
-          (err) => `${err.path[2]}: ${err.message}`
+          (err) => `${err.path[2]}: ${err.message}`,
         );
         setValidationErrors(formattedErrors);
         return false;
@@ -205,7 +208,7 @@ export default function EmployeeDetailsImportFieldMapping() {
     }
 
     const swappedFieldMapping = Object.fromEntries(
-      Object.entries(fieldMapping).map(([key, value]) => [value, key])
+      Object.entries(fieldMapping).map(([key, value]) => [value, key]),
     );
 
     if (file) {
@@ -217,7 +220,9 @@ export default function EmployeeDetailsImportFieldMapping() {
           const allowedFields = FIELD_CONFIGS.map((field) => field.key);
           const finalData = results.data
             .filter((entry) =>
-              Object.values(entry!).some((value) => String(value).trim() !== "")
+              Object.values(entry!).some(
+                (value) => String(value).trim() !== "",
+              ),
             )
             .map((entry) => {
               const cleanEntry = Object.fromEntries(
@@ -226,13 +231,13 @@ export default function EmployeeDetailsImportFieldMapping() {
                     ([key, value]) =>
                       key.trim() !== "" &&
                       value !== null &&
-                      String(value).trim() !== ""
+                      String(value).trim() !== "",
                   )
                   .filter(([key]) =>
                     allowedFields.includes(
-                      key as keyof ImportEmployeeDetailsDataType
-                    )
-                  )
+                      key as keyof ImportEmployeeDetailsDataType,
+                    ),
+                  ),
               );
               return cleanEntry;
             });
@@ -267,7 +272,7 @@ export default function EmployeeDetailsImportFieldMapping() {
   };
 
   return (
-    <section className='py-4 '>
+    <section className="py-4 ">
       {loadNext ? (
         <EmployeeDetailsImportData
           conflictingIndices={hasConflict}
@@ -275,7 +280,7 @@ export default function EmployeeDetailsImportFieldMapping() {
           companyId={companyId}
         />
       ) : (
-        <Card className='m-4 px-40'>
+        <Card className="m-4 px-40">
           <CardHeader>
             <CardTitle>Map Fields</CardTitle>
             <CardDescription>
@@ -284,15 +289,15 @@ export default function EmployeeDetailsImportFieldMapping() {
           </CardHeader>
           <CardContent>
             {validationErrors.length > 0 && (
-              <div className='mb-4 p-4 border border-red-200 bg-red-50 rounded'>
-                <h4 className='text-red-700 font-medium mb-2'>
+              <div className="mb-4 p-4 border border-red-200 bg-red-50 rounded">
+                <h4 className="text-red-700 font-medium mb-2">
                   Validation Errors:
                 </h4>
-                <ul className='grid grid-cols-3 gap-y-1'>
+                <ul className="grid grid-cols-3 gap-y-1">
                   {validationErrors.map((error, index) => (
                     <li
                       key={error.toString() + index.toString()}
-                      className='text-red-600 text-sm'
+                      className="text-red-600 text-sm"
                     >
                       {error}
                     </li>
@@ -301,17 +306,17 @@ export default function EmployeeDetailsImportFieldMapping() {
               </div>
             )}
 
-            <div className='grid grid-cols-2 place-content-center justify-between gap-y-8 gap-x-10 mt-5'>
+            <div className="grid grid-cols-2 place-content-center justify-between gap-y-8 gap-x-10 mt-5">
               {FIELD_CONFIGS.map((field) => (
-                <div key={field.key} className='flex flex-col'>
-                  <div className='flex flex-row gap-1 pb-1'>
-                    <label className='text-sm text-muted-foreground capitalize'>
+                <div key={field.key} className="flex flex-col">
+                  <div className="flex flex-row gap-1 pb-1">
+                    <label className="text-sm text-muted-foreground capitalize">
                       {replaceUnderscore(field.key)}
                     </label>
                     <sub
                       className={cn(
                         "hidden text-primary mt-1",
-                        field.required && "inline"
+                        field.required && "inline",
                       )}
                     >
                       *
@@ -325,11 +330,11 @@ export default function EmployeeDetailsImportFieldMapping() {
                         return (
                           pipe(
                             replaceUnderscore,
-                            replaceDash
+                            replaceDash,
                           )(value?.toLowerCase()) ===
                           pipe(
                             replaceUnderscore,
-                            replaceDash
+                            replaceDash,
                           )(field.key?.toLowerCase())
                         );
                       }) ||
@@ -342,7 +347,7 @@ export default function EmployeeDetailsImportFieldMapping() {
                     className={errors[field.key] ? "border-red-500" : ""}
                   />
                   {errors[field.key] && (
-                    <span className='text-red-500 text-sm mt-1'>
+                    <span className="text-red-500 text-sm mt-1">
                       {errors[field.key]}
                     </span>
                   )}
@@ -350,13 +355,13 @@ export default function EmployeeDetailsImportFieldMapping() {
               ))}
 
               <div />
-              <div className='flex flex-col items-end gap-2'>
+              <div className="flex flex-col items-end gap-2">
                 {errors.general && (
-                  <span className='text-red-500 text-sm'>{errors.general}</span>
+                  <span className="text-red-500 text-sm">{errors.general}</span>
                 )}
                 <Button
-                  className='w-24'
-                  variant='default'
+                  className="w-24"
+                  variant="default"
                   onClick={handleParsedData}
                 >
                   Submit

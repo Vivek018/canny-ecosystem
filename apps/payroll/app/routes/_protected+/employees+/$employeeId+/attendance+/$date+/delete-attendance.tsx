@@ -23,7 +23,9 @@ export async function action({
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${deleteRole}:${attribute.employeeAttendance}`)) {
+  if (
+    !hasPermission(user?.role!, `${deleteRole}:${attribute.employeeAttendance}`)
+  ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
@@ -54,7 +56,7 @@ export async function action({
         error,
         employeeId,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -64,7 +66,7 @@ export async function action({
         error,
         employeeId,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

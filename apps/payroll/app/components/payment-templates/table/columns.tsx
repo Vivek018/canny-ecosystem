@@ -13,7 +13,7 @@ export const columns: ColumnDef<
     accessorKey: "name",
     header: "Template Name",
     cell: ({ row }) => {
-      return <p className='truncate w-48'>{`${row.original?.name ?? "--"}`}</p>;
+      return <p className="truncate w-48">{`${row.original?.name ?? "--"}`}</p>;
     },
   },
   {
@@ -21,7 +21,7 @@ export const columns: ColumnDef<
     header: "Description",
     cell: ({ row }) => {
       return (
-        <p className='truncate w-96'>{`${
+        <p className="truncate w-96">{`${
           row.original?.description ?? "--"
         }`}</p>
       );
@@ -32,7 +32,9 @@ export const columns: ColumnDef<
     header: "Monthly CTC",
     cell: ({ row }) => {
       return (
-        <p className='truncate w-20 capitalize'>{row.original?.monthly_ctc ?? "--"}</p>
+        <p className="truncate w-20 capitalize">
+          {row.original?.monthly_ctc ?? "--"}
+        </p>
       );
     },
   },
@@ -41,7 +43,7 @@ export const columns: ColumnDef<
     header: "State",
     cell: ({ row }) => {
       return (
-        <p className='truncate w-32 capitalize'>
+        <p className="truncate w-32 capitalize">
           {replaceUnderscore(row.original?.state ?? "--")}
         </p>
       );
@@ -52,7 +54,7 @@ export const columns: ColumnDef<
     header: "Status",
     cell: ({ row }) => {
       return (
-        <p className='capitalize'>
+        <p className="capitalize">
           {row.original?.is_active ? "Active" : "Inactive"}
         </p>
       );
@@ -63,7 +65,7 @@ export const columns: ColumnDef<
     header: "Is Default",
     cell: ({ row }) => {
       return (
-        <p className='capitalize'>{row.original?.is_default ? "Yes" : "No"}</p>
+        <p className="capitalize">{row.original?.is_default ? "Yes" : "No"}</p>
       );
     },
   },
@@ -80,9 +82,9 @@ export const columns: ColumnDef<
           }}
           triggerChild={
             <DropdownMenuTrigger asChild>
-              <Button variant='ghost' className='h-8 w-8 p-0'>
-                <span className='sr-only'>Open menu</span>
-                <Icon name='dots-vertical' />
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <Icon name="dots-vertical" />
               </Button>
             </DropdownMenuTrigger>
           }

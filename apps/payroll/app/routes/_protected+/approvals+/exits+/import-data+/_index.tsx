@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { type ClientLoaderFunctionArgs, json, useLoaderData, useLocation } from "@remix-run/react";
+import {
+  type ClientLoaderFunctionArgs,
+  json,
+  useLoaderData,
+  useLocation,
+} from "@remix-run/react";
 import Papa from "papaparse";
 import { Combobox } from "@canny_ecosystem/ui/combobox";
 import { Button } from "@canny_ecosystem/ui/button";
@@ -8,18 +13,18 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "@canny_ecosystem/ui/card";
 import {
   ImportExitDataSchema,
-  ImportExitHeaderSchema
+  ImportExitHeaderSchema,
 } from "@canny_ecosystem/utils";
 import type { ImportExitDataType } from "@canny_ecosystem/supabase/queries";
 import {
   transformStringArrayIntoOptions,
   replaceUnderscore,
   pipe,
-  replaceDash
+  replaceDash,
 } from "@canny_ecosystem/utils";
 import type { z } from "zod";
 
@@ -62,7 +67,7 @@ export async function loader() {
 
 // caching
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return await clientCaching(cacheKeyPrefix.exits,args);
+  return await clientCaching(cacheKeyPrefix.exits, args);
 }
 clientLoader.hydrate = true;
 
@@ -83,7 +88,7 @@ export default function ExitFieldMapping() {
         skipEmptyLines: true,
         complete: (results: Papa.ParseResult<string[]>) => {
           const headers = results.data[0].filter(
-            (header) => header !== null && header.trim() !== ""
+            (header) => header !== null && header.trim() !== "",
           );
           setHeaderArray(headers);
         },
@@ -97,17 +102,20 @@ export default function ExitFieldMapping() {
 
   useEffect(() => {
     if (headerArray.length > 0) {
-      const initialMapping = FIELD_CONFIGS.reduce((mapping, field) => {
-        const matchedHeader = headerArray.find(
-          (value) =>
-            pipe(replaceUnderscore, replaceDash)(value?.toLowerCase()) ===
-            pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase())
-        );
+      const initialMapping = FIELD_CONFIGS.reduce(
+        (mapping, field) => {
+          const matchedHeader = headerArray.find(
+            (value) =>
+              pipe(replaceUnderscore, replaceDash)(value?.toLowerCase()) ===
+              pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase()),
+          );
 
-        if (matchedHeader) mapping[field.key] = matchedHeader;
+          if (matchedHeader) mapping[field.key] = matchedHeader;
 
-        return mapping;
-      }, {} as Record<string, string>);
+          return mapping;
+        },
+        {} as Record<string, string>,
+      );
 
       setFieldMapping(initialMapping);
     }
@@ -116,11 +124,18 @@ export default function ExitFieldMapping() {
   const validateMapping = () => {
     try {
       const mappingResult = ImportExitHeaderSchema.safeParse(
-        Object.fromEntries(Object.entries(fieldMapping).map(([key, value]) => [key, value || undefined]))
+        Object.fromEntries(
+          Object.entries(fieldMapping).map(([key, value]) => [
+            key,
+            value || undefined,
+          ]),
+        ),
       );
 
       if (!mappingResult.success) {
-        const formattedErrors = mappingResult.error.errors.map((err) => err.message);
+        const formattedErrors = mappingResult.error.errors.map(
+          (err) => err.message,
+        );
         setValidationErrors(formattedErrors);
         return false;
       }
@@ -138,14 +153,18 @@ export default function ExitFieldMapping() {
     try {
       const result = ImportExitDataSchema.safeParse({ data });
       if (!result.success) {
-        const formattedErrors = result.error.errors.map((err) => `${err.path[2]}: ${err.message}`);
+        const formattedErrors = result.error.errors.map(
+          (err) => `${err.path[2]}: ${err.message}`,
+        );
         setValidationErrors(formattedErrors);
         return false;
       }
       return true;
     } catch (error) {
       console.error("Exit Data validation error:", error);
-      setValidationErrors(["An unexpected error occurred during data validation"]);
+      setValidationErrors([
+        "An unexpected error occurred during data validation",
+      ]);
       return false;
     }
   };
@@ -166,7 +185,7 @@ export default function ExitFieldMapping() {
     if (!validateMapping()) return;
 
     const swappedFieldMapping = Object.fromEntries(
-      Object.entries(fieldMapping).map(([key, value]) => [value, key])
+      Object.entries(fieldMapping).map(([key, value]) => [value, key]),
     );
 
     if (file) {
@@ -177,7 +196,11 @@ export default function ExitFieldMapping() {
         complete: async (results) => {
           const allowedData = FIELD_CONFIGS.map((field) => field.key);
           const finalData = results.data
-            .filter((entry) => Object.values(entry!).some((value) => String(value).trim() !== ""))
+            .filter((entry) =>
+              Object.values(entry!).some(
+                (value) => String(value).trim() !== "",
+              ),
+            )
             .map((entry) => {
               const cleanEntry = Object.fromEntries(
                 Object.entries(entry as Record<string, any>)
@@ -185,9 +208,11 @@ export default function ExitFieldMapping() {
                     ([key, value]) =>
                       key.trim() !== "" &&
                       value !== null &&
-                      String(value).trim() !== ""
+                      String(value).trim() !== "",
                   )
-                  .filter(([key]) => allowedData.includes(key as keyof ImportExitDataType))
+                  .filter(([key]) =>
+                    allowedData.includes(key as keyof ImportExitDataType),
+                  ),
               );
               return cleanEntry;
             });
@@ -199,7 +224,10 @@ export default function ExitFieldMapping() {
         },
         error: (error) => {
           console.error("Exit Data parsing error:", error);
-          setErrors((prev) => ({ ...prev, parsing: "Error parsing file data" }));
+          setErrors((prev) => ({
+            ...prev,
+            parsing: "Error parsing file data",
+          }));
         },
       });
     }
@@ -207,78 +235,100 @@ export default function ExitFieldMapping() {
 
   return (
     <section className="py-4 ">
-      {loadNext ? (<ExitImportData env={env} />)
-        : (
-          <Card className="m-4 px-40">
-            <CardHeader>
-              <CardTitle>Map Fields</CardTitle>
-              <CardDescription>Map your fields with the Exits fields</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {validationErrors.length > 0 && (
-                <div className="mb-4 p-4 border border-red-200 bg-red-50 rounded">
-                  <h4 className="text-red-700 font-medium mb-2">Validation Errors:</h4>
-                  <ul className="grid grid-cols-3 gap-y-1">
-                    {validationErrors.map((error, index) => (
-                      <li
-                        key={error.toString() + index.toString()}
-                        className="text-red-600 text-sm"
-                      >
-                        {error}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              <div className="grid grid-cols-2 place-content-center justify-between gap-y-8 gap-x-10 mt-5">
-                {FIELD_CONFIGS.map((field) => (
-                  <div key={field.key} className="flex flex-col">
-                    <div className="flex flex-row gap-1 pb-1">
-                      <label className="text-sm text-muted-foreground capitalize">
-                        {replaceUnderscore(field.key)}
-                      </label>
-                      <sub
-                        className={cn("hidden text-primary mt-1", field.required && "inline")}
-                      >
-                        *
-                      </sub>
-                    </div>
-                    <Combobox
-                      options={transformStringArrayIntoOptions(headerArray)}
-                      value={
-                        fieldMapping[field.key] ||
-                        headerArray?.find((value) => {
-                          return (
-                            pipe(replaceUnderscore, replaceDash)(value?.toLowerCase()) ===
-                            pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase())
-                          );
-                        }) ||
-                        ""
-                      }
-                      onChange={(value: string) => handleMapping(field.key, value)}
-                      placeholder={`Select ${replaceUnderscore(field.key)}`}
-                      className={errors[field.key] ? "border-red-500" : ""}
-                    />
-                    {errors[field.key] && (
-                      <span className="text-red-500 text-sm mt-1">{errors[field.key]}</span>
-                    )}
-                  </div>
-                ))}
-
-                <div />
-                <div className="flex flex-col items-end gap-2">
-                  {errors.general && (
-                    <span className="text-red-500 text-sm">{errors.general}</span>
-                  )}
-                  <Button className="w-24" variant="default" onClick={handleParsedData}>
-                    Submit
-                  </Button>
-                </div>
+      {loadNext ? (
+        <ExitImportData env={env} />
+      ) : (
+        <Card className="m-4 px-40">
+          <CardHeader>
+            <CardTitle>Map Fields</CardTitle>
+            <CardDescription>
+              Map your fields with the Exits fields
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {validationErrors.length > 0 && (
+              <div className="mb-4 p-4 border border-red-200 bg-red-50 rounded">
+                <h4 className="text-red-700 font-medium mb-2">
+                  Validation Errors:
+                </h4>
+                <ul className="grid grid-cols-3 gap-y-1">
+                  {validationErrors.map((error, index) => (
+                    <li
+                      key={error.toString() + index.toString()}
+                      className="text-red-600 text-sm"
+                    >
+                      {error}
+                    </li>
+                  ))}
+                </ul>
               </div>
-            </CardContent>
-          </Card>
-        )}
+            )}
+
+            <div className="grid grid-cols-2 place-content-center justify-between gap-y-8 gap-x-10 mt-5">
+              {FIELD_CONFIGS.map((field) => (
+                <div key={field.key} className="flex flex-col">
+                  <div className="flex flex-row gap-1 pb-1">
+                    <label className="text-sm text-muted-foreground capitalize">
+                      {replaceUnderscore(field.key)}
+                    </label>
+                    <sub
+                      className={cn(
+                        "hidden text-primary mt-1",
+                        field.required && "inline",
+                      )}
+                    >
+                      *
+                    </sub>
+                  </div>
+                  <Combobox
+                    options={transformStringArrayIntoOptions(headerArray)}
+                    value={
+                      fieldMapping[field.key] ||
+                      headerArray?.find((value) => {
+                        return (
+                          pipe(
+                            replaceUnderscore,
+                            replaceDash,
+                          )(value?.toLowerCase()) ===
+                          pipe(
+                            replaceUnderscore,
+                            replaceDash,
+                          )(field.key?.toLowerCase())
+                        );
+                      }) ||
+                      ""
+                    }
+                    onChange={(value: string) =>
+                      handleMapping(field.key, value)
+                    }
+                    placeholder={`Select ${replaceUnderscore(field.key)}`}
+                    className={errors[field.key] ? "border-red-500" : ""}
+                  />
+                  {errors[field.key] && (
+                    <span className="text-red-500 text-sm mt-1">
+                      {errors[field.key]}
+                    </span>
+                  )}
+                </div>
+              ))}
+
+              <div />
+              <div className="flex flex-col items-end gap-2">
+                {errors.general && (
+                  <span className="text-red-500 text-sm">{errors.general}</span>
+                )}
+                <Button
+                  className="w-24"
+                  variant="default"
+                  onClick={handleParsedData}
+                >
+                  Submit
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </section>
   );
 }

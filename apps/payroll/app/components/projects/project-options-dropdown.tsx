@@ -41,7 +41,7 @@ export const ProjectOptionsDropdown = ({
       {
         method: "POST",
         action: `/projects/${project.id}/update-completed`,
-      }
+      },
     );
   };
 
@@ -56,20 +56,20 @@ export const ProjectOptionsDropdown = ({
       {
         method: "POST",
         action: `/projects/${project.id}/update-completed`,
-      }
+      },
     );
   };
 
   return (
     <DropdownMenu>
       {triggerChild}
-      <DropdownMenuContent sideOffset={10} align='end'>
+      <DropdownMenuContent sideOffset={10} align="end">
         <DropdownMenuGroup>
           <DropdownMenuItem
             className={cn(
               project.actual_end_date && "hidden",
               !hasPermission(role, `${updateRole}:${attribute.projects}`) &&
-                "hidden"
+                "hidden",
             )}
             onClick={handleMarkAsCompleted}
           >
@@ -79,7 +79,7 @@ export const ProjectOptionsDropdown = ({
             className={cn(
               !project.actual_end_date && "hidden",
               !hasPermission(role, `${updateRole}:${attribute.projects}`) &&
-                "hidden"
+                "hidden",
             )}
             onClick={handleMarkAsActive}
           >
@@ -89,7 +89,7 @@ export const ProjectOptionsDropdown = ({
             className={cn(
               "hidden",
               hasPermission(role, `${deleteRole}:${attribute.projects}`) &&
-                "flex"
+                "flex",
             )}
           />
           <DeleteProject projectId={project.id} />

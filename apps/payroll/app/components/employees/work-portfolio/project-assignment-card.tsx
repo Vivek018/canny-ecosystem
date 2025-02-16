@@ -4,7 +4,13 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Link, useParams } from "@remix-run/react";
 import type { EmployeeProjectAssignmentDataType } from "@canny_ecosystem/supabase/queries";
-import { createRole, formatDate, hasPermission, replaceUnderscore, updateRole } from "@canny_ecosystem/utils";
+import {
+  createRole,
+  formatDate,
+  hasPermission,
+  replaceUnderscore,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
@@ -19,7 +25,11 @@ type EmployeeProjectAssignment = Omit<
   "created_at" | "updated_at"
 >;
 
-export const DetailItem: React.FC<DetailItemProps> = ({ label, value, formatter }) => {
+export const DetailItem: React.FC<DetailItemProps> = ({
+  label,
+  value,
+  formatter,
+}) => {
   const formattedValue = value ? (formatter ? formatter(value) : value) : "--";
 
   return (
@@ -41,51 +51,51 @@ export const EmployeeProjectAssignmentCard = ({
   const { employeeId } = useParams();
 
   return (
-    <Card className='rounded w-full h-full p-4 flex flex-col gap-6'>
-      <div className='flex justify-between items-center'>
-        <h2 className='text-xl font-semibold'>Project Assigment</h2>
+    <Card className="rounded w-full h-full p-4 flex flex-col gap-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold">Project Assigment</h2>
         <Link
-          prefetch='intent'
+          prefetch="intent"
           to={`/employees/${employeeId}/work-portfolio/update-project-assignment`}
           className={cn(
             buttonVariants({ variant: "outline" }),
             "bg-card",
             !hasPermission(
               `${role}`,
-              `${updateRole}:${attribute.employeeProjectAssignment}`
+              `${updateRole}:${attribute.employeeProjectAssignment}`,
             ) && "hidden",
-            !projectAssignment?.employee_id && "hidden"
+            !projectAssignment?.employee_id && "hidden",
           )}
         >
-          <Icon name='edit' className='mr-2' />
+          <Icon name="edit" className="mr-2" />
           Edit
         </Link>
         <Link
-          prefetch='intent'
+          prefetch="intent"
           to={`/employees/${employeeId}/work-portfolio/add-project-assignment`}
           className={cn(
             buttonVariants({ variant: "outline" }),
             "bg-card",
             !hasPermission(
               `${role}`,
-              `${createRole}:${attribute.employeeProjectAssignment}`
+              `${createRole}:${attribute.employeeProjectAssignment}`,
             ) && "hidden",
-            projectAssignment?.employee_id && "hidden"
+            projectAssignment?.employee_id && "hidden",
           )}
         >
-          <Icon name='plus-circled' className='mr-2' />
+          <Icon name="plus-circled" className="mr-2" />
           Add
         </Link>
       </div>
 
       {projectAssignment ? (
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5'>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           <DetailItem
-            label='Project Name'
+            label="Project Name"
             value={projectAssignment.project_sites?.projects?.name}
           />
           <DetailItem
-            label='Site Name'
+            label="Site Name"
             value={projectAssignment?.project_sites?.name}
           />
           <DetailItem
@@ -93,42 +103,42 @@ export const EmployeeProjectAssignmentCard = ({
             value={projectAssignment?.supervisor?.employee_code}
           />
           <DetailItem
-            label='Assignment Type'
+            label="Assignment Type"
             value={projectAssignment?.assignment_type}
             formatter={replaceUnderscore}
           />
           <DetailItem
-            label='Position'
+            label="Position"
             value={projectAssignment?.position}
             formatter={replaceUnderscore}
           />
           <DetailItem
-            label='Skill Level'
+            label="Skill Level"
             value={projectAssignment?.skill_level}
             formatter={replaceUnderscore}
           />
           <DetailItem
-            label='Start Date'
+            label="Start Date"
             value={projectAssignment?.start_date}
             formatter={formatDate}
           />
           <DetailItem
-            label='End Date'
+            label="End Date"
             value={projectAssignment?.end_date}
             formatter={formatDate}
           />
           <DetailItem
-            label='Probation Period'
+            label="Probation Period"
             value={projectAssignment?.probation_period ? "Yes" : "No"}
           />
           <DetailItem
-            label='Probation End Date'
+            label="Probation End Date"
             value={projectAssignment?.probation_end_date}
             formatter={formatDate}
           />
         </div>
       ) : (
-        <div className='text-center py-8'>
+        <div className="text-center py-8">
           <p>No project assignment details available.</p>
         </div>
       )}

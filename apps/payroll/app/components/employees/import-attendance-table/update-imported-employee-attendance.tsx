@@ -31,23 +31,24 @@ export const UpdateImportedEmployee = ({
 }) => {
   const { importData, setImportData } = useImportStoreForEmployeeAttendance();
   const convertToBoolean = (value: unknown): boolean => {
-    if (typeof value === 'string') {
-      return value.toLowerCase() === 'true';
+    if (typeof value === "string") {
+      return value.toLowerCase() === "true";
     }
     return Boolean(value);
   };
 
-  
   const initialData = {
     ...dataToUpdate,
     present: convertToBoolean(dataToUpdate.present),
-    holiday: convertToBoolean(dataToUpdate.holiday)
+    holiday: convertToBoolean(dataToUpdate.holiday),
   };
 
-  
   const [data, setData] = useState(initialData);
 
-  const onChange = (key: keyof typeof dataToUpdate, value: string | boolean) => {
+  const onChange = (
+    key: keyof typeof dataToUpdate,
+    value: string | boolean,
+  ) => {
     setData((prevData) => ({ ...prevData, [key]: value }));
   };
 
@@ -58,7 +59,7 @@ export const UpdateImportedEmployee = ({
     if (parsedResult.success) {
       setImportData({
         data: importData.data?.map((item, index) =>
-          index === indexToUpdate ? data : item
+          index === indexToUpdate ? data : item,
         ),
       });
     }
@@ -69,7 +70,7 @@ export const UpdateImportedEmployee = ({
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "ghost", size: "full" }),
-          "text-[13px] h-9"
+          "text-[13px] h-9",
         )}
       >
         Update Employee
@@ -140,7 +141,7 @@ export const UpdateImportedEmployee = ({
           <div className="grid mb-5 grid-cols-2 place-content-center justify-between gap-3">
             <Combobox
               options={transformStringArrayIntoOptions(
-                attendanceWorkShiftArray as unknown as string[]
+                attendanceWorkShiftArray as unknown as string[],
               )}
               value={data.working_shift ?? attendanceWorkShiftArray[0]}
               onChange={(value: string) => {
@@ -150,7 +151,7 @@ export const UpdateImportedEmployee = ({
             />
             <Combobox
               options={transformStringArrayIntoOptions(
-                attendanceHolidayTypeArray as unknown as string[]
+                attendanceHolidayTypeArray as unknown as string[],
               )}
               value={data.holiday_type ?? attendanceHolidayTypeArray[0]}
               onChange={(value: string) => {

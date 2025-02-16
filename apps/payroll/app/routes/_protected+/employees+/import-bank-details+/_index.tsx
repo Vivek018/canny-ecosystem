@@ -93,7 +93,7 @@ export default function EmployeeBankDetailsImportFieldMapping() {
         skipEmptyLines: true,
         complete: (results: Papa.ParseResult<string[]>) => {
           const headers = results.data[0].filter(
-            (header) => header !== null && header.trim() !== ""
+            (header) => header !== null && header.trim() !== "",
           );
           setHeaderArray(headers);
         },
@@ -107,19 +107,22 @@ export default function EmployeeBankDetailsImportFieldMapping() {
 
   useEffect(() => {
     if (headerArray.length > 0) {
-      const initialMapping = FIELD_CONFIGS.reduce((mapping, field) => {
-        const matchedHeader = headerArray.find(
-          (value) =>
-            pipe(replaceUnderscore, replaceDash)(value?.toLowerCase()) ===
-            pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase())
-        );
+      const initialMapping = FIELD_CONFIGS.reduce(
+        (mapping, field) => {
+          const matchedHeader = headerArray.find(
+            (value) =>
+              pipe(replaceUnderscore, replaceDash)(value?.toLowerCase()) ===
+              pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase()),
+          );
 
-        if (matchedHeader) {
-          mapping[field.key] = matchedHeader;
-        }
+          if (matchedHeader) {
+            mapping[field.key] = matchedHeader;
+          }
 
-        return mapping;
-      }, {} as Record<string, string>);
+          return mapping;
+        },
+        {} as Record<string, string>,
+      );
 
       setFieldMapping(initialMapping);
     }
@@ -132,13 +135,13 @@ export default function EmployeeBankDetailsImportFieldMapping() {
           Object.entries(fieldMapping).map(([key, value]) => [
             key,
             value || undefined,
-          ])
-        )
+          ]),
+        ),
       );
 
       if (!mappingResult.success) {
         const formattedErrors = mappingResult.error.errors.map(
-          (err) => err.message
+          (err) => err.message,
         );
         setValidationErrors(formattedErrors);
         return false;
@@ -158,7 +161,7 @@ export default function EmployeeBankDetailsImportFieldMapping() {
       const result = ImportEmployeeBankDetailsDataSchema.safeParse({ data });
       if (!result.success) {
         const formattedErrors = result.error.errors.map(
-          (err) => `${err.path[2]}: ${err.message}`
+          (err) => `${err.path[2]}: ${err.message}`,
         );
         setValidationErrors(formattedErrors);
         return false;
@@ -191,7 +194,7 @@ export default function EmployeeBankDetailsImportFieldMapping() {
     }
 
     const swappedFieldMapping = Object.fromEntries(
-      Object.entries(fieldMapping).map(([key, value]) => [value, key])
+      Object.entries(fieldMapping).map(([key, value]) => [value, key]),
     );
 
     if (file) {
@@ -203,7 +206,9 @@ export default function EmployeeBankDetailsImportFieldMapping() {
           const allowedFields = FIELD_CONFIGS.map((field) => field.key);
           const finalData = results.data
             .filter((entry) =>
-              Object.values(entry!).some((value) => String(value).trim() !== "")
+              Object.values(entry!).some(
+                (value) => String(value).trim() !== "",
+              ),
             )
             .map((entry) => {
               const cleanEntry = Object.fromEntries(
@@ -212,13 +217,13 @@ export default function EmployeeBankDetailsImportFieldMapping() {
                     ([key, value]) =>
                       key.trim() !== "" &&
                       value !== null &&
-                      String(value).trim() !== ""
+                      String(value).trim() !== "",
                   )
                   .filter(([key]) =>
                     allowedFields.includes(
-                      key as keyof ImportEmployeeBankDetailsDataType
-                    )
-                  )
+                      key as keyof ImportEmployeeBankDetailsDataType,
+                    ),
+                  ),
               );
               return cleanEntry;
             });
@@ -229,7 +234,7 @@ export default function EmployeeBankDetailsImportFieldMapping() {
             });
 
             const employeeCodes = finalData!.map(
-              (value) => value.employee_code
+              (value) => value.employee_code,
             );
             const { data: employees, error: idByCodeError } =
               await getEmployeeIdsByEmployeeCodes({
@@ -243,7 +248,7 @@ export default function EmployeeBankDetailsImportFieldMapping() {
 
             const updatedData = finalData!.map((item: any) => {
               const employeeId = employees?.find(
-                (e) => e.employee_code === item.employee_code
+                (e) => e.employee_code === item.employee_code,
               )?.id;
 
               const { employee_code, ...rest } = item;
@@ -323,7 +328,7 @@ export default function EmployeeBankDetailsImportFieldMapping() {
                     <sub
                       className={cn(
                         "hidden text-primary mt-1",
-                        field.required && "inline"
+                        field.required && "inline",
                       )}
                     >
                       *
@@ -337,11 +342,11 @@ export default function EmployeeBankDetailsImportFieldMapping() {
                         return (
                           pipe(
                             replaceUnderscore,
-                            replaceDash
+                            replaceDash,
                           )(value?.toLowerCase()) ===
                           pipe(
                             replaceUnderscore,
-                            replaceDash
+                            replaceDash,
                           )(field.key?.toLowerCase())
                         );
                       }) ||

@@ -16,7 +16,10 @@ import { Field } from "@canny_ecosystem/ui/forms";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import {
   capitalizeFirstLetter,
-  exitReasonArray, getValidDateForInput, ImportSingleExitDataSchema, transformStringArrayIntoOptions,
+  exitReasonArray,
+  getValidDateForInput,
+  ImportSingleExitDataSchema,
+  transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
 import { useState } from "react";
 
@@ -39,19 +42,29 @@ export const UpdateImportedExit = ({
 
     if (parsedResult.success) {
       setImportData({
-        data: importData.data?.map((item, index) => index === indexToUpdate ? data : item),
+        data: importData.data?.map((item, index) =>
+          index === indexToUpdate ? data : item,
+        ),
       });
     }
   };
 
   const calculateTotal = () => {
-    return Number(data.bonus ?? 0) + Number(data.gratuity ?? 0) + Number(data.leave_encashment ?? 0) - Number(data.deduction ?? 0);
-  }
+    return (
+      Number(data.bonus ?? 0) +
+      Number(data.gratuity ?? 0) +
+      Number(data.leave_encashment ?? 0) -
+      Number(data.deduction ?? 0)
+    );
+  };
 
   return (
     <AlertDialog>
       <AlertDialogTrigger
-        className={cn(buttonVariants({ variant: "ghost", size: "full" }), "text-[13px] h-9")}
+        className={cn(
+          buttonVariants({ variant: "ghost", size: "full" }),
+          "text-[13px] h-9",
+        )}
       >
         Update Exit
       </AlertDialogTrigger>
@@ -109,7 +122,8 @@ export const UpdateImportedExit = ({
               inputProps={{
                 type: "date",
                 value: getValidDateForInput(data.final_settlement_date!),
-                onChange: (e) => onChange("final_settlement_date", e.target.value),
+                onChange: (e) =>
+                  onChange("final_settlement_date", e.target.value),
                 placeholder: "Final Settlement Date",
               }}
             />
@@ -155,7 +169,8 @@ export const UpdateImportedExit = ({
               inputProps={{
                 type: "number",
                 value: data.employee_payable_days ?? 0,
-                onChange: (e) => onChange("employee_payable_days", e.target.value),
+                onChange: (e) =>
+                  onChange("employee_payable_days", e.target.value),
                 placeholder: "Empoyee Payable Days",
               }}
             />
@@ -163,16 +178,21 @@ export const UpdateImportedExit = ({
               inputProps={{
                 type: "number",
                 value: data.organization_payable_days ?? 0,
-                onChange: (e) => onChange("organization_payable_days", e.target.value),
+                onChange: (e) =>
+                  onChange("organization_payable_days", e.target.value),
                 placeholder: "Organizational Payable Days",
               }}
             />
           </div>
           <div className="grid grid-cols-2 place-content-center justify-between gap-3">
             <Combobox
-              options={transformStringArrayIntoOptions(exitReasonArray as unknown as string[])}
+              options={transformStringArrayIntoOptions(
+                exitReasonArray as unknown as string[],
+              )}
               value={capitalizeFirstLetter(data.reason) ?? exitReasonArray[0]}
-              onChange={(value: string) => { onChange("reason", value) }}
+              onChange={(value: string) => {
+                onChange("reason", value);
+              }}
               placeholder={"Select reason"}
               className="capitalize"
             />
@@ -180,7 +200,7 @@ export const UpdateImportedExit = ({
               inputProps={{
                 value: calculateTotal() ?? 0,
                 placeholder: "Total",
-                readOnly: true
+                readOnly: true,
               }}
             />
           </div>
@@ -196,7 +216,6 @@ export const UpdateImportedExit = ({
           />
         </div>
 
-
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
@@ -211,4 +230,3 @@ export const UpdateImportedExit = ({
     </AlertDialog>
   );
 };
-

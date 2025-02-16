@@ -87,7 +87,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         locationOptionsPromise: null,
         projectId,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -109,7 +109,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -139,7 +139,7 @@ export async function action({
         message: "Failed to update site",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -174,14 +174,14 @@ export default function UpdateSite() {
   }, [actionData]);
 
   if (error)
-    return <ErrorBoundary error={error} message='Failed to load site' />;
+    return <ErrorBoundary error={error} message="Failed to load site" />;
 
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <Await resolve={sitePromise}>
         {(resolvedData) => {
           if (!resolvedData)
-            return <ErrorBoundary message='Failed to load site' />;
+            return <ErrorBoundary message="Failed to load site" />;
           return (
             <UpdateSiteWrapper
               data={resolvedData.data}

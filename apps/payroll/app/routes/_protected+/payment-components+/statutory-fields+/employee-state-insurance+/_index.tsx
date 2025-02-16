@@ -33,7 +33,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         error,
         esiPromise: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -49,7 +49,7 @@ export default function EmployeeStateInsuranceIndex() {
 
   if (error) {
     clearExactCacheEntry(cacheKeyPrefix.statutory_field_esi);
-    return <ErrorBoundary error={error} message='Failed to load ESI' />;
+    return <ErrorBoundary error={error} message="Failed to load ESI" />;
   }
 
   return (
@@ -58,7 +58,7 @@ export default function EmployeeStateInsuranceIndex() {
         {(resolvedData) => {
           if (!resolvedData) {
             clearExactCacheEntry(cacheKeyPrefix.statutory_field_esi);
-            return <ErrorBoundary message='Failed to load ESI' />;
+            return <ErrorBoundary message="Failed to load ESI" />;
           }
           return (
             <ESIWrapper data={resolvedData.data} error={resolvedData.error} />

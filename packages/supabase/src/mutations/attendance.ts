@@ -37,7 +37,6 @@ export async function updateOrAddAttendance({
   type: "update" | "add";
 }) {
   if (type === "update" && data.date && data.employee_id) {
-
     const { error, status } = await supabase
       .from("attendance")
       .update(data)
@@ -88,7 +87,7 @@ export async function getEmployeeAttendanceConflicts({
       const hasConflict = existingRecords?.some(
         (existing) =>
           existing.employee_id === record.employee_id &&
-          existing.date === record.date
+          existing.date === record.date,
       );
 
       if (hasConflict) {
@@ -96,7 +95,7 @@ export async function getEmployeeAttendanceConflicts({
       }
       return indices;
     },
-    []
+    [],
   );
 
   return { conflictingIndices, error: null };
@@ -125,7 +124,7 @@ export async function createEmployeeAttendanceFromImportedData({
     .select("employee_id, date")
     .in(
       "employee_id",
-      identifiers.map((entry) => entry.employee_id).filter(Boolean)
+      identifiers.map((entry) => entry.employee_id).filter(Boolean),
     );
 
   if (existingError) {
@@ -135,12 +134,12 @@ export async function createEmployeeAttendanceFromImportedData({
 
   const existingSet = new Set(
     existingRecords?.map((record) => `${record.employee_id}-${record.date}`) ||
-    []
+      [],
   );
 
   if (import_type === "skip") {
     const newData = data.filter(
-      (entry) => !existingSet.has(`${entry.employee_id}-${entry.date}`)
+      (entry) => !existingSet.has(`${entry.employee_id}-${entry.date}`),
     );
 
     if (newData.length === 0) {
@@ -190,7 +189,7 @@ export async function createEmployeeAttendanceFromImportedData({
           .insert(record);
 
         return { type: "insert", error: insertError };
-      })
+      }),
     );
 
     const errors = results.filter((r) => r.error);

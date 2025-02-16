@@ -2,8 +2,6 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Link } from "@remix-run/react";
 
-
-
 export default function ReportsIndex() {
   return (
     <section className="grid grid-cols-3 gap-10 py-6 px-6">

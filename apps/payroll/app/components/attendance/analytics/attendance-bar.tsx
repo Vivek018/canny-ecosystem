@@ -34,7 +34,7 @@ export function AttendanceBars({
       const totalPresents = (attendance ?? []).reduce(
         (total: number, entry: { present: any }) =>
           total + (entry.present ? 1 : 0),
-        0
+        0,
       );
 
       return {

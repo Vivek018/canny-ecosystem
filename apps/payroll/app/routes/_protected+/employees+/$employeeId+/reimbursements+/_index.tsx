@@ -59,9 +59,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     };
 
     const hasFilters =
-      filters && Object.values(filters).some((value) => value !== null && value !== undefined);
+      filters &&
+      Object.values(filters).some(
+        (value) => value !== null && value !== undefined,
+      );
 
-    const usersPromise = getUsersEmail({ supabase ,companyId });
+    const usersPromise = getUsersEmail({ supabase, companyId });
 
     let reimbursementPromise = null;
     if (employeeId) {
@@ -104,9 +107,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return await clientCaching(
-    `${cacheKeyPrefix.employee_reimbursements}${args.params.employeeId
+    `${cacheKeyPrefix.employee_reimbursements}${
+      args.params.employeeId
     }${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 
@@ -135,15 +139,19 @@ export default function ReimbursementsIndex() {
   const noFilters = Object.values(filters).every((value) => !value);
 
   return (
-    <section className='py-4'>
+    <section className="py-4">
       <Suspense>
         <Await
           resolve={Promise.all([reimbursementPromise, usersPromise])}
-          errorElement={<div>Error loading filters. Please try again later.</div>}
+          errorElement={
+            <div>Error loading filters. Please try again later.</div>
+          }
         >
           {([{ data, meta, error }, usersData]) => {
             if (error) {
-              clearCacheEntry(`${cacheKeyPrefix.employee_reimbursements}${employeeId}`);
+              clearCacheEntry(
+                `${cacheKeyPrefix.employee_reimbursements}${employeeId}`,
+              );
               toast({
                 variant: "destructive",
                 title: "Error",
@@ -152,12 +160,14 @@ export default function ReimbursementsIndex() {
               return null;
             }
 
-            const hasNextPage = Boolean(meta?.count && meta.count / (0 + 1) > LAZY_LOADING_LIMIT);
+            const hasNextPage = Boolean(
+              meta?.count && meta.count / (0 + 1) > LAZY_LOADING_LIMIT,
+            );
             return (
               <>
-                <div className='w-full flex items-center justify-between pb-4'>
-                  <div className='w-full flex justify-between items-center'>
-                    <div className='flex'>
+                <div className="w-full flex items-center justify-between pb-4">
+                  <div className="w-full flex justify-between items-center">
+                    <div className="flex">
                       <ReimbursementSearchFilter
                         disabled={!data?.length && noFilters}
                         userEmails={
@@ -177,12 +187,12 @@ export default function ReimbursementsIndex() {
                         "flex items-center gap-1",
                         !hasPermission(
                           role,
-                          `${createRole}:${attribute.employeeReimbursements}`
-                        ) && "hidden"
+                          `${createRole}:${attribute.employeeReimbursements}`,
+                        ) && "hidden",
                       )}
                     >
                       <span>Add</span>
-                      <span className='hidden md:flex justify-end'>Claim</span>
+                      <span className="hidden md:flex justify-end">Claim</span>
                     </Link>
                   </div>
                 </div>

@@ -34,7 +34,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         labourWelfareFundPromise: null,
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -53,7 +53,7 @@ export default function LabourWelfareFundIndex() {
     return (
       <ErrorBoundary
         error={error}
-        message='Failed to load labour welfare funds'
+        message="Failed to load labour welfare funds"
       />
     );
   }
@@ -65,7 +65,7 @@ export default function LabourWelfareFundIndex() {
           if (!resolvedData) {
             clearExactCacheEntry(cacheKeyPrefix.labour_welfare_fund);
             return (
-              <ErrorBoundary message='Failed to load labour welfare funds' />
+              <ErrorBoundary message="Failed to load labour welfare funds" />
             );
           }
           return (

@@ -45,7 +45,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   if (
     !hasPermission(
       user?.role!,
-      `${updateRole}:${attribute.settingRelationships}`
+      `${updateRole}:${attribute.settingRelationships}`,
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -81,7 +81,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         relationshipPromise: null,
         companiesData: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -100,7 +100,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -128,7 +128,7 @@ export async function action({
         message: "Failed to update relationship",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -166,7 +166,7 @@ export default function UpdateRelationship() {
       <Await resolve={relationshipPromise}>
         {(resolvedData) => {
           if (!resolvedData)
-            return <ErrorBoundary message='Failed to load relationship' />;
+            return <ErrorBoundary message="Failed to load relationship" />;
           return (
             <UpdateRelationshipWrapper
               data={resolvedData.data}
@@ -196,7 +196,7 @@ export function UpdateRelationshipWrapper({
 
   if (error) {
     return (
-      <ErrorBoundary error={error} message='Failed to load relationship' />
+      <ErrorBoundary error={error} message="Failed to load relationship" />
     );
   }
 

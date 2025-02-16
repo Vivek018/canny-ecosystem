@@ -62,7 +62,11 @@ export async function updatePayrollEntryByEmployeeIdAndPayrollIdAndPaymentTempla
     .select()
     .single();
 
-  if (error) console.error("updatePayrollEntryByEmployeeIdAndPayrollIdAndPaymentTemplateComponentId Error", error);
+  if (error)
+    console.error(
+      "updatePayrollEntryByEmployeeIdAndPayrollIdAndPaymentTemplateComponentId Error",
+      error,
+    );
 
   return { status, error };
 }

@@ -31,7 +31,7 @@ export const ReimbursementOptionsDropdown = ({
     navigate(
       isEmployeeRoute
         ? `/employees/${employeeId}/reimbursements/${reimbursementId}/update-reimbursements`
-        : `/approvals/reimbursements/${reimbursementId}/update-reimbursements`
+        : `/approvals/reimbursements/${reimbursementId}/update-reimbursements`,
     );
   };
 
@@ -46,8 +46,8 @@ export const ReimbursementOptionsDropdown = ({
               "hidden",
               hasPermission(
                 role,
-                `${updateRole}:${attribute.reimbursements}`
-              ) && "flex"
+                `${updateRole}:${attribute.reimbursements}`,
+              ) && "flex",
             )}
           >
             Update Reimbursement
@@ -57,8 +57,8 @@ export const ReimbursementOptionsDropdown = ({
               "hidden",
               hasPermission(
                 role,
-                `${deleteRole}:${attribute.reimbursements}`
-              ) && "flex"
+                `${deleteRole}:${attribute.reimbursements}`,
+              ) && "flex",
             )}
           />
           <DeleteReimbursement

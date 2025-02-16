@@ -52,8 +52,8 @@ export function EmployeeAddressImportData({ env }: { env: SupabaseEnv }) {
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase())
-      )
+          String(value).toLowerCase().includes(searchString.toLowerCase()),
+      ),
     );
     setTableData(filteredData);
   }, [searchString, importData]);
@@ -61,7 +61,7 @@ export function EmployeeAddressImportData({ env }: { env: SupabaseEnv }) {
   const handleFinalImport = async () => {
     if (validateImportData(importData.data)) {
       const employeeCodes = importData.data!.map(
-        (value: { employee_code: any }) => value.employee_code
+        (value: { employee_code: any }) => value.employee_code,
       );
 
       const { data: employees, error: idByCodeError } =
@@ -76,7 +76,7 @@ export function EmployeeAddressImportData({ env }: { env: SupabaseEnv }) {
 
       const updatedData = importData.data!.map((item: any) => {
         const employeeId = employees?.find(
-          (e: { employee_code: any }) => e.employee_code === item.employee_code
+          (e: { employee_code: any }) => e.employee_code === item.employee_code,
         )?.id;
 
         const { employee_code, ...rest } = item;
@@ -93,7 +93,7 @@ export function EmployeeAddressImportData({ env }: { env: SupabaseEnv }) {
       });
 
       if (error) {
-        console.error("Employee Address",error);
+        console.error("Employee Address", error);
       }
       if (isGoodStatus(status)) {
         navigate("/employees");
@@ -102,29 +102,29 @@ export function EmployeeAddressImportData({ env }: { env: SupabaseEnv }) {
   };
 
   return (
-    <section className='p-4'>
-      <div className='w-full flex items-center justify-between pb-4'>
-        <div className='w-full  flex justify-between items-center'>
-          <div className='relative w-[30rem] '>
-            <div className='absolute inset-y-0 left-3 flex items-center pointer-events-none'>
+    <section className="p-4">
+      <div className="w-full flex items-center justify-between pb-4">
+        <div className="w-full  flex justify-between items-center">
+          <div className="relative w-[30rem] ">
+            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
               <Icon
-                name='magnifying-glass'
-                size='sm'
-                className='text-gray-400'
+                name="magnifying-glass"
+                size="sm"
+                className="text-gray-400"
               />
             </div>
             <Input
-              placeholder='Search Employees'
+              placeholder="Search Employees"
               value={searchString}
               onChange={(e) => setSearchString(e.target.value)}
-              className='pl-8 h-10 w-full focus-visible:ring-0'
+              className="pl-8 h-10 w-full focus-visible:ring-0"
             />
           </div>
-          <div className='flex items-center gap-3'>
+          <div className="flex items-center gap-3">
             <Combobox
               className={cn("w-52 h-10")}
               options={transformStringArrayIntoOptions(
-                duplicationTypeArray as unknown as string[]
+                duplicationTypeArray as unknown as string[],
               )}
               value={importType}
               onChange={(value: string) => {
@@ -138,10 +138,10 @@ export function EmployeeAddressImportData({ env }: { env: SupabaseEnv }) {
           </div>
         </div>
       </div>
-      <input type='hidden' name='import_type' value={importType} />
+      <input type="hidden" name="import_type" value={importType} />
       <input
-        name='stringified_data'
-        type='hidden'
+        name="stringified_data"
+        type="hidden"
         value={JSON.stringify(importData)}
       />
       <ImportedDataTable data={tableData} columns={ImportedDataColumns} />

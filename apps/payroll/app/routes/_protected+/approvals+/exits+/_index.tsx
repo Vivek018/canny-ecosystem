@@ -10,15 +10,27 @@ import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
-import { LAZY_LOADING_LIMIT, MAX_QUERY_LIMIT } from "@canny_ecosystem/supabase/constant";
 import {
-  type ExitFilterType, getExits, getProjectNamesByCompanyId, getSiteNamesByProjectName,
+  LAZY_LOADING_LIMIT,
+  MAX_QUERY_LIMIT,
+} from "@canny_ecosystem/supabase/constant";
+import {
+  type ExitFilterType,
+  getExits,
+  getProjectNamesByCompanyId,
+  getSiteNamesByProjectName,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { hasPermission, readRole } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { Await, type ClientLoaderFunctionArgs, defer, redirect, useLoaderData } from "@remix-run/react";
+import {
+  Await,
+  type ClientLoaderFunctionArgs,
+  defer,
+  redirect,
+  useLoaderData,
+} from "@remix-run/react";
 import { Suspense } from "react";
 
 const pageSize = 20;
@@ -44,17 +56,24 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const query = searchParams.get("name") ?? undefined;
 
     const filters: ExitFilterType = {
-      last_working_day_start: searchParams.get("last_working_day_start") ?? undefined,
-      last_working_day_end: searchParams.get("last_working_day_end") ?? undefined,
-      final_settlement_date_start: searchParams.get("final_settlement_date_start") ?? undefined,
-      final_settlement_date_end: searchParams.get("final_settlement_date_end") ?? undefined,
+      last_working_day_start:
+        searchParams.get("last_working_day_start") ?? undefined,
+      last_working_day_end:
+        searchParams.get("last_working_day_end") ?? undefined,
+      final_settlement_date_start:
+        searchParams.get("final_settlement_date_start") ?? undefined,
+      final_settlement_date_end:
+        searchParams.get("final_settlement_date_end") ?? undefined,
       reason: searchParams.get("reason") ?? undefined,
       project: searchParams.get("project") ?? undefined,
       project_site: searchParams.get("project_site") ?? undefined,
     };
 
     const hasFilters =
-      filters && Object.values(filters).some((value) => value !== null && value !== undefined);
+      filters &&
+      Object.values(filters).some(
+        (value) => value !== null && value !== undefined,
+      );
 
     const exitsPromise = getExits({
       supabase,
@@ -71,7 +90,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     let projectSitePromise = null;
     if (filters.project)
-      projectSitePromise = getSiteNamesByProjectName({ supabase, projectName: filters.project });
+      projectSitePromise = getSiteNamesByProjectName({
+        supabase,
+        projectName: filters.project,
+      });
 
     return defer({
       exitsPromise,
@@ -98,7 +120,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 // caching
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
-  return await clientCaching(`${cacheKeyPrefix.exits}${url.searchParams.toString()}`, args);
+  return await clientCaching(
+    `${cacheKeyPrefix.exits}${url.searchParams.toString()}`,
+    args,
+  );
 }
 clientLoader.hydrate = true;
 
@@ -109,7 +134,8 @@ export async function action({ request }: ActionFunctionArgs) {
   const prompt = formData.get("prompt") as string | null;
 
   const searchParams = new URLSearchParams();
-  if (prompt && prompt.trim().length > 0) searchParams.append("name", prompt.trim());
+  if (prompt && prompt.trim().length > 0)
+    searchParams.append("name", prompt.trim());
 
   url.search = searchParams.toString();
 
@@ -126,7 +152,9 @@ export default function ExitsIndex() {
     projectSitePromise,
   } = useLoaderData<typeof loader>();
 
-  const noFilters = filters ? Object.values(filters).every((value) => !value) : true;
+  const noFilters = filters
+    ? Object.values(filters).every((value) => !value)
+    : true;
   const filterList = { ...filters, name: query };
 
   return (
@@ -140,10 +168,17 @@ export default function ExitsIndex() {
                   {(projectSiteData) => {
                     if (projectSiteData?.error) {
                       clearCacheEntry(cacheKeyPrefix.exits);
-                      return <ErrorBoundary error={projectSiteData?.error} message="Failed to load Exits" />
+                      return (
+                        <ErrorBoundary
+                          error={projectSiteData?.error}
+                          message="Failed to load Exits"
+                        />
+                      );
                     }
-                    const projectArray = projectData?.data?.map((project) => project.name) ?? [];
-                    const projectSiteArray = projectSiteData?.data?.map((site) => site.name) ?? [];
+                    const projectArray =
+                      projectData?.data?.map((project) => project.name) ?? [];
+                    const projectSiteArray =
+                      projectSiteData?.data?.map((site) => site.name) ?? [];
 
                     return (
                       <>
@@ -169,17 +204,27 @@ export default function ExitsIndex() {
       <Suspense fallback={<div>Loading...</div>}>
         <Await
           resolve={exitsPromise}
-          errorElement={<div>Sorry, Exit data can't be loaded. Try again later!</div>}
+          errorElement={
+            <div>Sorry, Exit data can't be loaded. Try again later!</div>
+          }
         >
           {(exitsData) => {
             if (exitsData?.error) {
               clearCacheEntry(cacheKeyPrefix.exits);
-              return <ErrorBoundary error={exitsData?.error} message="Failed to load Exits" />
+              return (
+                <ErrorBoundary
+                  error={exitsData?.error}
+                  message="Failed to load Exits"
+                />
+              );
             }
-            const hasNextPage = Boolean(exitsData?.meta?.count && exitsData.meta.count > LAZY_LOADING_LIMIT);
+            const hasNextPage = Boolean(
+              exitsData?.meta?.count &&
+                exitsData.meta.count > LAZY_LOADING_LIMIT,
+            );
             return (
               <ExitPaymentTable
-                data={exitsData?.data ?? [] as any}
+                data={exitsData?.data ?? ([] as any)}
                 columns={ExitPaymentColumns}
                 count={exitsData?.meta?.count ?? exitsData?.data?.length ?? 0}
                 query={query}

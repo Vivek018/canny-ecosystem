@@ -41,11 +41,11 @@ const DetailItem: React.FC<DetailItemProps> = ({ label, value, formatter }) => {
   const formattedValue = value ? (formatter ? formatter(value) : value) : "--";
 
   return (
-    <div className='flex flex-row items-center gap-4 text-base'>
-      <h3 className='text-muted-foreground tracking-wide capitalize w-44 truncate'>
+    <div className="flex flex-row items-center gap-4 text-base">
+      <h3 className="text-muted-foreground tracking-wide capitalize w-44 truncate">
         {label}
       </h3>
-      <p className='w-44 truncate'>{formattedValue}</p>
+      <p className="w-44 truncate">{formattedValue}</p>
     </div>
   );
 };
@@ -63,29 +63,29 @@ export function LabourWelfareFundCard({
     <Card
       key={labourWelfareFund.id}
       className={cn(
-        "w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start"
+        "w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start",
       )}
     >
-      <CardHeader className='flex flex-row space-y-0 items-center justify-between p-4'>
-        <CardTitle className='text-lg tracking-wide'>
+      <CardHeader className="flex flex-row space-y-0 items-center justify-between p-4">
+        <CardTitle className="text-lg tracking-wide">
           {replaceUnderscore(labourWelfareFund.state)}
         </CardTitle>
-        <div className='flex items-center gap-3'>
+        <div className="flex items-center gap-3">
           <TooltipProvider>
             <Tooltip delayDuration={100}>
               <TooltipTrigger asChild>
                 <Link
-                  prefetch='intent'
+                  prefetch="intent"
                   to={`${labourWelfareFund.id}/update-labour-welfare-fund`}
                   className={cn(
                     "p-2 rounded-md bg-secondary grid place-items-center",
                     !hasPermission(
                       `${role}`,
-                      `${updateRole}:${attribute.statutoryFieldsLwf}`
-                    ) && "hidden"
+                      `${updateRole}:${attribute.statutoryFieldsLwf}`,
+                    ) && "hidden",
                   )}
                 >
-                  <Icon name='edit' size='xs' />
+                  <Icon name="edit" size="xs" />
                 </Link>
               </TooltipTrigger>
               <TooltipContent>Edit</TooltipContent>
@@ -97,13 +97,13 @@ export function LabourWelfareFundCard({
                 "p-2 py-2 rounded-md bg-secondary grid place-items-center",
                 !hasPermission(
                   `${role}`,
-                  `${deleteRole}:${attribute.statutoryFieldsLwf}`
-                ) && "hidden"
+                  `${deleteRole}:${attribute.statutoryFieldsLwf}`,
+                ) && "hidden",
               )}
             >
-              <Icon name='dots-vertical' size='xs' />
+              <Icon name="dots-vertical" size="xs" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent sideOffset={10} align='end'>
+            <DropdownMenuContent sideOffset={10} align="end">
               <DropdownMenuGroup>
                 <DeleteLabourWelfareFund
                   labourWelfareFundId={labourWelfareFund.id}
@@ -113,23 +113,23 @@ export function LabourWelfareFundCard({
           </DropdownMenu>
         </div>
       </CardHeader>
-      <CardContent className='flex flex-col gap-4'>
+      <CardContent className="flex flex-col gap-4">
         <DetailItem
-          label='Employee Contribution'
+          label="Employee Contribution"
           value={labourWelfareFund.employee_contribution}
         />
         <DetailItem
-          label='Employer Contribution'
+          label="Employer Contribution"
           value={labourWelfareFund.employer_contribution}
         />
         <DetailItem
-          label='Deduction Cycle'
+          label="Deduction Cycle"
           value={labourWelfareFund.deduction_cycle}
         />
       </CardContent>
       {labourWelfareFund.status && (
-        <CardFooter className='px-2.5 ml-auto bg-secondary text-foreground py-1.5 text-sm tracking-wide font-sem rounded-tl-md border-foreground flex gap-1 justify-center'>
-          <Icon name='dot-filled' size='xs' />
+        <CardFooter className="px-2.5 ml-auto bg-secondary text-foreground py-1.5 text-sm tracking-wide font-sem rounded-tl-md border-foreground flex gap-1 justify-center">
+          <Icon name="dot-filled" size="xs" />
           Active
         </CardFooter>
       )}
