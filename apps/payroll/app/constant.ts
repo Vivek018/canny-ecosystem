@@ -50,7 +50,7 @@ export const sideNavList = [
   },
   { name: "Group 3" },
   { name: "Approvals", link: "/approvals", icon: "check-circle" },
-  { name: "Accidents", link: "/accidents", icon: "exclaimation-triangle" },
+  { name: "Incidents", link: "/incidents", icon: "exclaimation-triangle" },
   { name: "Reports", link: "/reports", icon: "report" },
   { name: "Group 5" },
   { name: "Projects", link: "/projects", icon: "project" },

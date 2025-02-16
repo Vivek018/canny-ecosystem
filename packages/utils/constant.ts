@@ -142,6 +142,7 @@ export const attribute = {
   feedbackList: "feedback_list",
   reports: "reports",
   approvals: "approvals",
+  incidents: "incidents",
   paymentComponent: "payment_component",
   settings: "settings",
   users: "users",

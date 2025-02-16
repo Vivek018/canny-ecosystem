@@ -125,7 +125,7 @@ export default function UpdateAccidents() {
           variant: "destructive",
         });
       }
-      navigate("/accidents");
+      navigate("/incidents/accidents");
     }
   }, [actionData]);
 

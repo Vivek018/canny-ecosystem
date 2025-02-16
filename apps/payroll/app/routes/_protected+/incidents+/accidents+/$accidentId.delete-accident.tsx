@@ -91,7 +91,7 @@ export default function DeleteAccident() {
           variant: "destructive",
         });
       }
-      navigate(actionData?.returnTo ?? "/accidents");
+      navigate(actionData?.returnTo ?? "/incidents/accidents");
     }
   }, [actionData]);
 

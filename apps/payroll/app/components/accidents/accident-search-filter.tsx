@@ -27,17 +27,13 @@ import {
 
 import type { AccidentFilters } from "@canny_ecosystem/supabase/queries";
 
-export function AccidentSearchFilter({
-  disabled,
-}: {
-  disabled?: boolean;
-}) {
+export function AccidentSearchFilter({ disabled }: { disabled?: boolean }) {
   const [prompt, setPrompt] = useState("");
   const navigation = useNavigation();
   const isSubmitting =
     navigation.state === "submitting" ||
     (navigation.state === "loading" &&
-      navigation.location.pathname === "/accidents" &&
+      navigation.location.pathname === "/incidents/accidents" &&
       navigation.location.search.length);
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -48,11 +44,11 @@ export function AccidentSearchFilter({
   const initialFilterParams: AccidentFilters = {
     date_start: "",
     date_end: "",
-    status: "",
-    location_type: "",
-    category: "",
+    status: null,
+    location_type: null,
+    category: null,
     name: "",
-    severity: "",
+    severity: null,
   };
 
   const [filterParams, setFilterParams] = useState(initialFilterParams);
@@ -76,10 +72,12 @@ export function AccidentSearchFilter({
   const searchParamsList: AccidentFilters = {
     date_start: searchParams.get("date_start"),
     date_end: searchParams.get("date_end"),
-    status: searchParams.get("status"),
-    location_type: searchParams.get("location_type"),
-    category: searchParams.get("category"),
-    severity: searchParams.get("severity"),
+    status: searchParams.get("status") as AccidentFilters["status"],
+    location_type: searchParams.get(
+      "location_type"
+    ) as AccidentFilters["location_type"],
+    category: searchParams.get("category") as AccidentFilters["category"],
+    severity: searchParams.get("severity") as AccidentFilters["severity"],
   };
 
   useEffect(() => {
@@ -100,7 +98,7 @@ export function AccidentSearchFilter({
     },
     {
       enableOnFormTags: true,
-    },
+    }
   );
 
   useHotkeys(["meta+s", "ctrl+s"], (evt) => {
@@ -138,14 +136,14 @@ export function AccidentSearchFilter({
 
   const hasValidFilters =
     Object.entries(filterParams).filter(
-      ([key, value]) => value?.length && key !== "name",
+      ([key, value]) => value?.length && key !== "name"
     ).length > 0;
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-      <div className="flex space-x-4 w-full md:w-auto items-center">
+      <div className='flex space-x-4 w-full md:w-auto items-center'>
         <form
-          className="relative w-full md:w-auto"
+          className='relative w-full md:w-auto'
           onSubmit={(e) => {
             e.preventDefault();
             handleSubmit(e);
@@ -155,7 +153,7 @@ export function AccidentSearchFilter({
             name={isSubmitting ? "update" : "search"}
             className={cn(
               "absolute pointer-events-none left-3 top-[12.5px]",
-              isSubmitting && "animate-spin",
+              isSubmitting && "animate-spin"
             )}
           />
           <Input
@@ -167,40 +165,40 @@ export function AccidentSearchFilter({
                 : "Search Accidents"
             }
             disabled={disabled}
-            className="pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70"
+            className='pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70'
             value={prompt}
             onChange={handleSearch}
-            autoComplete="on"
-            autoCapitalize="none"
-            autoCorrect="off"
-            spellCheck="false"
+            autoComplete='on'
+            autoCapitalize='none'
+            autoCorrect='off'
+            spellCheck='false'
           />
 
           <DropdownMenuTrigger disabled={disabled} asChild>
             <button
               onClick={() => setIsOpen((prev) => !prev)}
-              type="button"
+              type='button'
               disabled={disabled}
               className={cn(
                 "absolute z-10 right-3 top-[6px] opacity-70",
                 !disabled &&
                   "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 hasValidFilters && "opacity-100",
-                isOpen && "opacity-100",
+                isOpen && "opacity-100"
               )}
             >
-              <Icon name="mixer" />
+              <Icon name='mixer' />
             </button>
           </DropdownMenuTrigger>
         </form>
       </div>
 
       <DropdownMenuContent
-        className="w-full md:w-[480px]"
-        align="end"
+        className='w-full md:w-[480px]'
+        align='end'
         sideOffset={19}
         alignOffset={-11}
-        side="top"
+        side='top'
       >
         <DropdownMenuGroup>
           <DropdownMenuSub>
@@ -211,10 +209,10 @@ export function AccidentSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 <Calendar
-                  mode="range"
+                  mode='range'
                   initialFocus
                   today={
                     filterParams.date_start
@@ -260,12 +258,12 @@ export function AccidentSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 {statusArray.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className="capitalize"
+                    className='capitalize'
                     checked={filterParams?.status === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
@@ -291,12 +289,12 @@ export function AccidentSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 {locationTypeArray.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className="capitalize"
+                    className='capitalize'
                     checked={filterParams?.location_type === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
@@ -321,7 +319,7 @@ export function AccidentSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 {categoryOfAccidentArray?.map((name, index) => (
                   <DropdownMenuCheckboxItem
@@ -351,12 +349,12 @@ export function AccidentSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 {severityTypeArray?.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className="capitalize"
+                    className='capitalize'
                     checked={filterParams?.severity === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({

@@ -93,7 +93,7 @@ export async function action({
         status: "success",
         message: "Accident registered successfully",
         error: null,
-        returnTo: "/accidents",
+        returnTo: "/incidents/accidents",
       });
     }
 

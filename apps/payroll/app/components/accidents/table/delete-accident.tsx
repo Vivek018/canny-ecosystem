@@ -41,7 +41,7 @@ export const DeleteAccident = ({ id }: { id: string }) => {
         {},
         {
           method: "post",
-          action: `/accidents/${id}/delete-accident`,
+          action: `/incidents/accidents/${id}/delete-accident`,
           replace: true,
         },
       );

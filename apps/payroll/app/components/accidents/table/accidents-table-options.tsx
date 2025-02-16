@@ -24,20 +24,20 @@ export const AccidentOptionsDropdown = ({
   const navigate = useNavigate();
 
   const handleEdit = () => {
-    navigate(`/accidents/${accidentId}/update-accidents`);
+    navigate(`/incidents/accidents/${accidentId}/update-accidents`);
   };
 
   return (
     <DropdownMenu>
       {triggerChild}
-      <DropdownMenuContent sideOffset={10} align="end">
+      <DropdownMenuContent sideOffset={10} align='end'>
         <DropdownMenuGroup>
           <DropdownMenuItem
             onClick={handleEdit}
             className={cn(
               "hidden",
               hasPermission(role, `${updateRole}:${attribute.accidents}`) &&
-                "flex",
+                "flex"
             )}
           >
             Update Accident
@@ -46,7 +46,7 @@ export const AccidentOptionsDropdown = ({
             className={cn(
               "hidden",
               hasPermission(role, `${deleteRole}:${attribute.accidents}`) &&
-                "flex",
+                "flex"
             )}
           />
           <DeleteAccident id={accidentId} />

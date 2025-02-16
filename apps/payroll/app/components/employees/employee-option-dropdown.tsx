@@ -75,7 +75,7 @@ export const EmployeeOptionsDropdown = ({
       },
       {
         method: "POST",
-        action: `/accidents/${employee.id}/create-accident`,
+        action: `/incidents/accidents/${employee.id}/create-accident`,
       },
     );
   };
