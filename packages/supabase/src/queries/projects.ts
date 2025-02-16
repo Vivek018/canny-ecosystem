@@ -201,7 +201,7 @@ export async function getAllSitesByProjectId({
     .eq("project_id", projectId)
     .returns<{ id: string }[]>();
 
-  if (error) console.error("Error", error);
+  if (error) console.error("getAllSitesByProjectId Error", error);
 
   return { data, error };
 }

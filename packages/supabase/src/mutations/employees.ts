@@ -1457,7 +1457,7 @@ export async function createEmployeeAddressFromImportedData({
     .select();
 
   if (error) {
-    console.error(error);
+    console.error("createEmployeeAddressFromImportedData Error", error);
   }
 
   return { status, error };

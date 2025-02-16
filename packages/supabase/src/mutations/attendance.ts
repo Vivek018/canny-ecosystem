@@ -57,7 +57,7 @@ export async function updateOrAddAttendance({
     .insert(data as EmployeeAttendanceDatabaseInsert);
 
   if (error) {
-    console.error(error);
+    console.error("updateOrAddAttendance Error", error);
   }
   return { error, status };
 }
