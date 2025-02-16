@@ -5,7 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@canny_ecosystem/ui/dropdown-menu";
-import { DeleteExit } from "../exits/delete-exit";
+import { DeleteExit } from "./delete-exit";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { useUser } from "@/utils/user";
