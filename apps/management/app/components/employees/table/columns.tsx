@@ -43,8 +43,8 @@ export const columns = ({
     header: "Employee Code",
     cell: ({ row }) => {
       return (
-        <Link to={`${row.original.id}`} prefetch="intent" className="group">
-          <p className="truncate text-primary/80 group-hover:text-primary w-28">
+        <Link to={`${row.original.id}`} prefetch='intent' className='group'>
+          <p className='truncate text-primary/80 group-hover:text-primary w-28'>
             {row.original?.employee_code}
           </p>
         </Link>
@@ -56,8 +56,8 @@ export const columns = ({
     header: "Full Name",
     cell: ({ row }) => {
       return (
-        <Link to={`${row.original.id}`} prefetch="intent" className="group">
-          <p className="truncate text-primary/80 w-48 group-hover:text-primary">{`${
+        <Link to={`${row.original.id}`} prefetch='intent' className='group'>
+          <p className='truncate text-primary/80 w-48 group-hover:text-primary'>{`${
             row.original?.first_name
           } ${row.original?.middle_name ?? ""} ${
             row.original?.last_name ?? ""
@@ -85,7 +85,7 @@ export const columns = ({
     header: "Education",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-20 capitalize">
+        <p className='truncate w-20 capitalize'>
           {replaceUnderscore(row.original?.education ?? "")}
         </p>
       );
@@ -95,7 +95,7 @@ export const columns = ({
     accessorKey: "gender",
     header: "Gender",
     cell: ({ row }) => {
-      return <p className="capitalize">{row.original?.gender}</p>;
+      return <p className='capitalize'>{row.original?.gender}</p>;
     },
   },
   {
@@ -103,7 +103,7 @@ export const columns = ({
     header: "Status",
     cell: ({ row }) => {
       return (
-        <p className="capitalize">
+        <p className='capitalize'>
           {row.original?.is_active ? "Active" : "Inactive"}
         </p>
       );
@@ -115,7 +115,7 @@ export const columns = ({
     header: "Project",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-28 capitalize">
+        <p className='truncate w-28 capitalize'>
           {
             row.original?.employee_project_assignment?.project_sites?.projects
               ?.name
@@ -130,7 +130,7 @@ export const columns = ({
     header: "Project Site",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-28 capitalize">
+        <p className='truncate w-28 capitalize'>
           {row.original?.employee_project_assignment?.project_sites?.name}
         </p>
       );
@@ -142,9 +142,9 @@ export const columns = ({
     header: "Assignment Type",
     cell: ({ row }) => {
       return (
-        <p className="capitalize">
+        <p className='capitalize'>
           {replaceUnderscore(
-            row.original?.employee_project_assignment?.assignment_type ?? "",
+            row.original?.employee_project_assignment?.assignment_type ?? ""
           )}
         </p>
       );
@@ -156,9 +156,9 @@ export const columns = ({
     header: "Position",
     cell: ({ row }) => {
       return (
-        <p className="w-40 truncate capitalize">
+        <p className='w-40 truncate capitalize'>
           {replaceUnderscore(
-            row.original?.employee_project_assignment?.position,
+            row.original?.employee_project_assignment?.position ?? ""
           )}
         </p>
       );
@@ -170,9 +170,9 @@ export const columns = ({
     header: "Skill Level",
     cell: ({ row }) => {
       return (
-        <p className="w-max capitalize">
+        <p className='w-max capitalize'>
           {replaceUnderscore(
-            row.original?.employee_project_assignment?.skill_level ?? "",
+            row.original?.employee_project_assignment?.skill_level ?? ""
           )}
         </p>
       );
@@ -184,7 +184,7 @@ export const columns = ({
     header: "Date of joining",
     cell: ({ row }) => {
       return (
-        <p className="w-max capitalize">
+        <p className='w-max capitalize'>
           {row.original?.employee_project_assignment?.start_date &&
             formatDate(row.original?.employee_project_assignment?.start_date)}
         </p>
@@ -197,7 +197,7 @@ export const columns = ({
     header: "Date of leaving",
     cell: ({ row }) => {
       return (
-        <p className="w-max capitalize">
+        <p className='w-max capitalize'>
           {row.original?.employee_project_assignment?.end_date &&
             formatDate(row.original?.employee_project_assignment?.end_date)}
         </p>
@@ -225,14 +225,14 @@ export const columns = ({
                 !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
                   !hasPermission(
                     role,
-                    `${deleteRole}:${attribute.employees}`,
+                    `${deleteRole}:${attribute.employees}`
                   ) &&
-                  "hidden",
+                  "hidden"
               )}
             >
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <Icon name="dots-vertical" />
+              <Button variant='ghost' className='h-8 w-8 p-0'>
+                <span className='sr-only'>Open menu</span>
+                <Icon name='dots-vertical' />
               </Button>
             </DropdownMenuTrigger>
           }

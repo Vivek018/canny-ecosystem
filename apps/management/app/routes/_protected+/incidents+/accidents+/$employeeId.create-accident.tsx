@@ -81,11 +81,11 @@ export async function action({
         { status: submission.status === "error" ? 400 : 200 },
       );
     }
-    const data = [submission.value];
+    const data = submission.value;
 
     const { status, error } = await createAccident({
       supabase,
-      data: data,
+      data,
     });
 
     if (isGoodStatus(status)) {

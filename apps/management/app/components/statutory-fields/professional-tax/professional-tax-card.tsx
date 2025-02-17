@@ -81,7 +81,7 @@ export function ProfessionalTaxCard({
       className="w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start"
     >
       <CardHeader className="flex flex-row space-y-0 items-center justify-between p-4">
-        <CardTitle className="text-lg tracking-wide">
+        <CardTitle className="text-lg tracking-wide capitalize">
           {replaceUnderscore(professionalTax.state)}
         </CardTitle>
         <div className="flex items-center gap-3">

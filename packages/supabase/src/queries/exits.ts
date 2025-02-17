@@ -1,5 +1,4 @@
 import { formatUTCDate } from "@canny_ecosystem/utils";
-import { HARD_QUERY_LIMIT, SINGLE_QUERY_LIMIT } from "../constant";
 import type {
   EmployeeDatabaseRow,
   ExitsRow,
@@ -56,11 +55,13 @@ export type ExitDataType = Pick<
   };
 };
 
-export const getExits = async ({
+export const getExitsByCompanyId = async ({
   supabase,
+  companyId,
   params,
 }: {
   supabase: TypedSupabaseClient;
+  companyId: string;
   params: {
     from: number;
     to: number;
@@ -104,7 +105,7 @@ export const getExits = async ({
           employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"}(project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"}(id, name))))`,
       { count: "exact" },
     )
-    .limit(HARD_QUERY_LIMIT);
+    .eq("employees.company_id", companyId);
 
   // Sorting
   if (sort) {
@@ -208,39 +209,6 @@ export const getExitsById = async ({
     .single<InferredType<ExitsRow, (typeof columns)[number]>>();
 
   if (error) console.error("getExitsById Error", error);
-
-  return { data, error };
-};
-
-export const getExitsByCompanyId = async ({
-  supabase,
-  companyId,
-}: {
-  supabase: TypedSupabaseClient;
-  companyId: string;
-}) => {
-  const columns = [
-    "id",
-    "employee_id",
-    "organization_payable_days",
-    "employee_payable_days",
-    "last_working_day",
-    "final_settlement_date",
-    "reason",
-    "note",
-  ] as const;
-
-  const { data, error } = await supabase
-    .from("exits")
-    .select(columns.join(","))
-    .eq("company_id", companyId)
-    .order("created_at", { ascending: false })
-    .limit(SINGLE_QUERY_LIMIT)
-    .maybeSingle<InferredType<ExitsRow, (typeof columns)[number]>>();
-
-  if (error) {
-    console.error("getExitsByCompanyId Error", error);
-  }
 
   return { data, error };
 };
