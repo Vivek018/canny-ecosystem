@@ -42,7 +42,9 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     cell: ({ row }) => {
       return (
         <p className="truncate text-primary/80 w-32 cursor-pointer">
-          {`${row.original.employees?.first_name} ${row.original.employees?.middle_name ?? ""}
+          {`${row.original.employees?.first_name} ${
+            row.original.employees?.middle_name ?? ""
+          }
            ${row.original.employees?.last_name ?? ""}`}
         </p>
       );
@@ -56,8 +58,8 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     cell: ({ row }) => {
       return (
         <p className="truncate capitalize">
-          {row.original?.employees.employee_project_assignment.project_sites
-            .projects.name ?? "--"}
+          {row.original?.employees?.employee_project_assignment?.project_sites
+            ?.projects.name ?? "--"}
         </p>
       );
     },
@@ -70,8 +72,8 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     cell: ({ row }) => {
       return (
         <p className="truncate capitalize">
-          {row.original?.employees.employee_project_assignment.project_sites
-            .name ?? "--"}
+          {row.original?.employees?.employee_project_assignment?.project_sites
+            ?.name ?? "--"}
         </p>
       );
     },
@@ -83,7 +85,9 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     header: "Last Working Day ",
     cell: ({ row }) => {
       return (
-        <p className="truncate capitalize">{`${row.original?.last_working_day ?? "--"}`}</p>
+        <p className="truncate capitalize">{`${
+          row.original?.last_working_day ?? "--"
+        }`}</p>
       );
     },
   },
@@ -203,7 +207,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
               className={cn(
                 !hasPermission(role, `${updateRole}:${attribute.exits}`) &&
                   !hasPermission(role, `${deleteRole}:${attribute.exits}`) &&
-                  "hidden",
+                  "hidden"
               )}
             >
               <Button variant="ghost" className="h-8 w-8 p-0">

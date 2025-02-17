@@ -25,6 +25,8 @@ import { AccidentsTable } from "@/components/accidents/table/accidents-table";
 import {
   type AccidentFilters,
   getAccidentsByCompanyId,
+  getProjectNamesByCompanyId,
+  getSiteNamesByProjectName,
 } from "@canny_ecosystem/supabase/queries";
 import { columns } from "@/components/accidents/table/columns";
 import { FilterList } from "@/components/accidents/filter-list";
@@ -65,12 +67,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
       name: query,
       severity: (searchParams.get("severity") ??
         undefined) as AccidentFilters["severity"],
+
+      project: searchParams.get("project") ?? undefined,
+      project_site: searchParams.get("project_site") ?? undefined,
     };
 
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined,
+        (value) => value !== null && value !== undefined
       );
 
     const accidentsPromise = getAccidentsByCompanyId({
@@ -85,8 +90,19 @@ export async function loader({ request }: LoaderFunctionArgs) {
       },
     });
 
+    const projectPromise = getProjectNamesByCompanyId({ supabase, companyId });
+
+    let projectSitePromise = null;
+    if (filters.project)
+      projectSitePromise = getSiteNamesByProjectName({
+        supabase,
+        projectName: filters.project,
+      });
+
     return defer({
       accidentsPromise: accidentsPromise as any,
+      projectPromise,
+      projectSitePromise,
       query,
       filters,
       companyId,
@@ -97,6 +113,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     return defer({
       accidentsPromise: Promise.resolve({ data: [] }),
+      projectPromise: Promise.resolve({ data: [] }),
+      projectSitePromise: Promise.resolve({ data: [] }),
       query: "",
       filters: null,
       companyId: "",
@@ -110,15 +128,22 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 
   return await clientCaching(
     `${cacheKeyPrefix.accident}${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 
 clientLoader.hydrate = true;
 
 export default function AccidentsIndex() {
-  const { accidentsPromise, query, filters, companyId, env } =
-    useLoaderData<typeof loader>();
+  const {
+    accidentsPromise,
+    query,
+    filters,
+    companyId,
+    env,
+    projectPromise,
+    projectSitePromise,
+  } = useLoaderData<typeof loader>();
 
   const filterList = { ...filters, name: query };
   const noFilters = Object.values(filterList).every((value) => !value);
@@ -127,7 +152,29 @@ export default function AccidentsIndex() {
     <section className="p-4">
       <div className="w-full flex items-center justify-between pb-4">
         <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
-          <AccidentSearchFilter />
+          <Suspense fallback={<div>Loading...</div>}>
+            <Await resolve={projectPromise}>
+              {(projectData) => (
+                <Await resolve={projectSitePromise}>
+                  {(projectSiteData) => (
+                    <AccidentSearchFilter
+                      disabled={!projectData?.data?.length && noFilters}
+                      projectArray={
+                        projectData?.data?.length
+                          ? projectData?.data?.map((project) => project!.name)
+                          : []
+                      }
+                      projectSiteArray={
+                        projectSiteData?.data?.length
+                          ? projectSiteData?.data?.map((site) => site!.name)
+                          : []
+                      }
+                    />
+                  )}
+                </Await>
+              )}
+            </Await>
+          </Suspense>
           <FilterList filters={filterList} />
         </div>
       </div>

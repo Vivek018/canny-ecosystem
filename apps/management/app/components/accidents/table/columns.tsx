@@ -54,6 +54,32 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
       );
     },
   },
+  {
+    enableSorting: false,
+    accessorKey: "project",
+    header: "Project",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate w-28">
+          {row.original?.employees?.employee_project_assignment?.project_sites
+            .projects?.name ?? "--"}
+        </p>
+      );
+    },
+  },
+  {
+    enableSorting: false,
+    accessorKey: "project_site",
+    header: "Project Site",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate w-28">
+          {row.original?.employees?.employee_project_assignment?.project_sites
+            ?.name ?? "--"}
+        </p>
+      );
+    },
+  },
 
   {
     accessorKey: "date",
@@ -107,7 +133,7 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
     accessorKey: "severity",
     header: "Severity",
     cell: ({ row }) => {
-      return <p className="truncate ">{row.original.severity ?? "--"}</p>;
+      return <p className="truncate ">{row.original?.severity ?? "--"}</p>;
     },
   },
   {
@@ -115,7 +141,7 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      return <p className="truncate ">{row.original.status ?? "--"}</p>;
+      return <p className="truncate ">{row.original?.status ?? "--"}</p>;
     },
   },
   {
@@ -123,7 +149,7 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
     accessorKey: "description",
     header: "Description",
     cell: ({ row }) => {
-      return <p className="truncate ">{row.original.description ?? "--"}</p>;
+      return <p className="truncate ">{row.original?.description ?? "--"}</p>;
     },
   },
   {
@@ -132,7 +158,7 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
     header: "Medical Diagnosis",
     cell: ({ row }) => {
       return (
-        <p className="truncate ">{row.original.medical_diagnosis ?? "--"}</p>
+        <p className="truncate ">{row.original?.medical_diagnosis ?? "--"}</p>
       );
     },
   },
@@ -154,9 +180,9 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
                 !hasPermission(role, `${updateRole}:${attribute.accidents}`) &&
                   !hasPermission(
                     role,
-                    `${deleteRole}:${attribute.accidents}`,
+                    `${deleteRole}:${attribute.accidents}`
                   ) &&
-                  "hidden",
+                  "hidden"
               )}
               asChild
             >

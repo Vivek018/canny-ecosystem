@@ -199,12 +199,7 @@ export async function getAttendanceByCompanyId({
     to: number;
     sort?: [string, "asc" | "desc"];
     searchQuery?: string;
-    filters?: {
-      month?: string | undefined;
-      year?: string | undefined;
-      project?: string | undefined;
-      project_site?: string | undefined;
-    };
+    filters?: AttendanceFilters;
   };
 }) {
   const { from, to, sort, searchQuery, filters } = params;
@@ -243,8 +238,8 @@ export async function getAttendanceByCompanyId({
         project ? "inner" : "left"
       }(
         project_sites!${project ? "inner" : "left"}(id, name, projects!${
-          project ? "inner" : "left"
-        }(id, name))),
+        project ? "inner" : "left"
+      }(id, name))),
       attendance(
         id,
         date,
@@ -256,7 +251,7 @@ export async function getAttendanceByCompanyId({
         working_shift
       )
     `,
-      { count: "exact" },
+      { count: "exact" }
     )
     .eq("company_id", companyId);
 
@@ -278,12 +273,12 @@ export async function getAttendanceByCompanyId({
     if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
       for (const searchQueryElement of searchQueryArray) {
         query = query.or(
-          `or(first_name.ilike.%${searchQueryElement}%,middle_name.ilike.%${searchQueryElement}%,last_name.ilike.%${searchQueryElement}%,employee_code.ilike.%${searchQueryElement}%)`,
+          `or(first_name.ilike.%${searchQueryElement}%,middle_name.ilike.%${searchQueryElement}%,last_name.ilike.%${searchQueryElement}%,employee_code.ilike.%${searchQueryElement}%)`
         );
       }
     } else {
       query = query.or(
-        `or(first_name.ilike.%${searchQuery}%,middle_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,employee_code.ilike.%${searchQuery}%)`,
+        `or(first_name.ilike.%${searchQuery}%,middle_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,employee_code.ilike.%${searchQuery}%)`
       );
     }
   }
@@ -291,7 +286,7 @@ export async function getAttendanceByCompanyId({
   if (project) {
     query = query.eq(
       "employee_project_assignment.project_sites.projects.name",
-      project,
+      project
     );
   }
 
@@ -299,7 +294,7 @@ export async function getAttendanceByCompanyId({
     query = query.filter(
       "employee_project_assignment.project_sites.name",
       "eq",
-      project_site,
+      project_site
     );
   }
 
@@ -341,10 +336,10 @@ export async function getAttendanceByCompanyId({
     }
   }
 
-  const { data, error } = await query.range(from, to);
+  const { data, count, error } = await query.range(from, to);
   if (error) {
     console.error("getAttendanceByCompanyId Error", error);
   }
 
-  return { data, error };
+  return { data, meta: { count: count ?? data?.length }, error };
 }
