@@ -34,6 +34,8 @@ export function FilterList({ filters }: Props) {
       case "location_type":
       case "category":
       case "severity":
+      case "project":
+      case "project_site":
         return value;
       default:
         return null;
