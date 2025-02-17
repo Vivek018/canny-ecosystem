@@ -1,17 +1,17 @@
 import { convertToNull } from "@canny_ecosystem/utils";
 import type {
-  AccidentsDatabaseInsert,
-  AccidentsDatabaseUpdate,
+  CasesDatabaseInsert,
+  CasesDatabaseUpdate,
   TypedSupabaseClient,
 } from "../types";
 
-export async function createAccident({
+export async function createCase({
   supabase,
   data,
   bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
-  data: AccidentsDatabaseInsert;
+  data: CasesDatabaseInsert;
   bypassAuth?: boolean;
 }) {
   if (!bypassAuth) {
@@ -25,25 +25,25 @@ export async function createAccident({
   }
 
   const { error, status } = await supabase
-    .from("accidents")
+    .from("cases")
     .insert(data)
     .select()
     .single();
 
   if (error) {
-    console.error("createAccident error:", error);
+    console.error("createCases error:", error);
   }
 
   return { status, error };
 }
 
-export async function updateAccidentById({
+export async function updateCaseById({
   supabase,
   data,
   bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
-  data: AccidentsDatabaseUpdate;
+  data: CasesDatabaseUpdate;
   bypassAuth?: boolean;
 }) {
   if (!bypassAuth) {
@@ -59,32 +59,29 @@ export async function updateAccidentById({
   const updateData = convertToNull(data);
 
   const { error, status } = await supabase
-    .from("accidents")
+    .from("cases")
     .update(updateData)
     .eq("id", data.id!)
     .single();
 
   if (error) {
-    console.error("updateAccidentById error:", error);
+    console.error("updateCasesById error:", error);
   }
 
   return { error, status };
 }
 
-export async function deleteAccidentById({
+export async function deleteCasesById({
   supabase,
   id,
 }: {
   supabase: TypedSupabaseClient;
   id: string;
 }) {
-  const { error, status } = await supabase
-    .from("accidents")
-    .delete()
-    .eq("id", id);
+  const { error, status } = await supabase.from("cases").delete().eq("id", id);
 
   if (error) {
-    console.error("deleteAccidentById error:", error);
+    console.error("deleteCasesById error:", error);
   }
 
   return { status, error };

@@ -1396,3 +1396,57 @@ export const AccidentSchema = z.object({
   description: zTextArea.max(500),
   medical_diagnosis: z.string().optional(),
 });
+
+export const caseTypeArray = [
+  "dispute",
+  "wage_issue",
+  "injury",
+  "misconduct",
+  "legal",
+  "contract_violation",
+] as const;
+export const caseStatusArray = [
+  "open",
+  "in_progress",
+  "resolved",
+  "close",
+] as const;
+export const reportedByArray = [
+  "employee",
+  "site",
+  "project",
+  "company",
+  "canny",
+  "other",
+] as const;
+export const reportedOnArray = [
+  "employee",
+  "site",
+  "project",
+  "company",
+  "canny",
+  "other",
+] as const;
+export const caseLocationTypeArray = ["employee", "site", "other"] as const;
+
+export const CaseSchema = z.object({
+  id: z.string().optional(),
+  company_id: z.string(),
+  date: z.string().default(new Date().toISOString().split("T")[0]),
+  title: z.string().min(1, "Title is required"),
+  case_type: z.enum(caseTypeArray).default("dispute"),
+  status: z.enum(caseStatusArray).default("open"),
+  incident_date: z.string().optional(),
+  reported_by: z.enum(reportedByArray).default("employee"),
+  reported_on: z.enum(reportedOnArray).default("employee"),
+  location: z.string().optional(),
+  location_type: z.enum(caseLocationTypeArray).default("employee"),
+  amount_given: z.number().optional(),
+  amount_received: z.number().optional(),
+  court_case_reference: z.string().optional(),
+  description: z.string().optional(),
+  document: z.string().url().optional(),
+  resolution_date: z.string().optional(),
+  reported_on_id: z.string().optional(),
+  reported_by_id: z.string().optional(),
+});

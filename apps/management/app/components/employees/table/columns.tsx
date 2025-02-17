@@ -158,8 +158,8 @@ export const columns = ({
       return (
         <p className="w-40 truncate capitalize">
           {replaceUnderscore(
-            row.original?.employee_project_assignment?.position,
-          )}
+            row.original?.employee_project_assignment?.position ?? "",
+          ) ?? "--"}
         </p>
       );
     },

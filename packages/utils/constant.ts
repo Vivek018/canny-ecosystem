@@ -149,6 +149,7 @@ export const attribute = {
   payroll: "payroll",
   attendance: "attendance",
   accidents: "accidents",
+  cases: "cases",
 };
 
 export const months: { [key: string]: number } = {
