@@ -448,7 +448,7 @@ export const EmployeeProvidentFundSchema = z.object({
   edli_restrict_value: z.number().default(EDLI_RESTRICTED_VALUE),
   include_employer_edli_contribution: z.boolean().default(false),
   include_admin_charges: z.boolean().default(false),
-  is_default: z.boolean().default(false),
+  is_default: z.boolean().default(true),
 });
 
 export const ESI_EMPLOYEE_CONTRIBUTION = 0.0075;
@@ -463,7 +463,7 @@ export const EmployeeStateInsuranceSchema = z.object({
   employees_contribution: z.number().default(ESI_EMPLOYEE_CONTRIBUTION),
   employers_contribution: z.number().default(ESI_EMPLOYER_CONTRIBUTION),
   include_employer_contribution: z.boolean().default(false),
-  is_default: z.boolean().default(false),
+  is_default: z.boolean().default(true),
   max_limit: z.number().default(ESI_MAX_LIMIT),
 });
 
@@ -525,7 +525,7 @@ export const StatutoryBonusSchema = z
 export const GratuitySchema = z.object({
   id: z.string().optional(),
   company_id: z.string(),
-  is_default: z.boolean().default(false),
+  is_default: z.boolean().default(true),
   eligibility_years: z.number().min(0).default(4.5),
   present_day_per_year: z.number().min(1).max(365).default(240),
   payment_days_per_year: z.number().min(1).max(365).default(15),
@@ -1371,7 +1371,7 @@ export const LeaveEncashmentSchema = z.object({
   encashment_frequency: z
     .enum(encashmentFreqArray)
     .default(encashmentFreqArray[0]),
-  is_default: z.boolean().default(false),
+  is_default: z.boolean().default(true),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),
 });
