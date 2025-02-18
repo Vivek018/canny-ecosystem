@@ -33,14 +33,15 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
 
   try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+
     const url = new URL(request.url);
     const employeeId = params.employeeId;
     const searchParams = new URLSearchParams(url.searchParams);
@@ -61,29 +62,26 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined,
+        (value) => value !== null && value !== undefined
       );
 
     const usersPromise = getUsersEmail({ supabase, companyId });
 
-    let reimbursementPromise = null;
-    if (employeeId) {
-      reimbursementPromise = getReimbursementsByEmployeeId({
-        supabase,
-        employeeId: employeeId,
-        params: {
-          from: 0,
-          to: hasFilters
-            ? MAX_QUERY_LIMIT
-            : page > 0
-              ? LAZY_LOADING_LIMIT
-              : LAZY_LOADING_LIMIT - 1,
-          filters,
-          searchQuery: query ?? undefined,
-          sort: sortParam?.split(":") as [string, "asc" | "desc"],
-        },
-      });
-    }
+    const reimbursementPromise = getReimbursementsByEmployeeId({
+      supabase,
+      employeeId: employeeId ?? "",
+      params: {
+        from: 0,
+        to: hasFilters
+          ? MAX_QUERY_LIMIT
+          : page > 0
+          ? LAZY_LOADING_LIMIT
+          : LAZY_LOADING_LIMIT - 1,
+        filters,
+        searchQuery: query ?? undefined,
+        sort: sortParam?.split(":") as [string, "asc" | "desc"],
+      },
+    });
 
     return defer({
       reimbursementPromise: reimbursementPromise as any,
@@ -106,11 +104,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
+
   return await clientCaching(
     `${cacheKeyPrefix.employee_reimbursements}${
       args.params.employeeId
     }${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 
@@ -131,84 +130,101 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function ReimbursementsIndex() {
-  const { role } = useUser();
-  const { toast } = useToast();
   const { reimbursementPromise, usersPromise, employeeId, filters, env } =
     useLoaderData<typeof loader>();
+  const { role } = useUser();
+  const { toast } = useToast();
 
   const noFilters = Object.values(filters).every((value) => !value);
 
   return (
-    <section className="py-4">
-      <Suspense>
+    <section className='py-4' key={reimbursementPromise}>
+      <Suspense fallback={<div>Loading...</div>}>
         <Await
-          resolve={Promise.all([reimbursementPromise, usersPromise])}
+          resolve={usersPromise}
           errorElement={
-            <div>Error loading filters. Please try again later.</div>
+            <div>Error loading user data. Please try again later.</div>
           }
         >
-          {([{ data, meta, error }, usersData]) => {
-            if (error) {
-              clearCacheEntry(
-                `${cacheKeyPrefix.employee_reimbursements}${employeeId}`,
-              );
-              toast({
-                variant: "destructive",
-                title: "Error",
-                description: "Failed to load reimbursements. Please try again.",
-              });
-              return null;
-            }
+          {(usersData) => (
+            <Suspense fallback={<div>Loading reimbursements...</div>}>
+              <Await
+                resolve={reimbursementPromise}
+                errorElement={
+                  <div>
+                    Error loading reimbursements. Please try again later.
+                  </div>
+                }
+              >
+                {({ data, meta, error }) => {
+                  if (error) {
+                    clearCacheEntry(
+                      `${cacheKeyPrefix.employee_reimbursements}${employeeId}`
+                    );
+                    toast({
+                      variant: "destructive",
+                      title: "Error",
+                      description:
+                        "Failed to load reimbursements. Please try again.",
+                    });
+                    return null;
+                  }
 
-            const hasNextPage = Boolean(
-              meta?.count && meta.count / (0 + 1) > LAZY_LOADING_LIMIT,
-            );
-            return (
-              <>
-                <div className="w-full flex items-center justify-between pb-4">
-                  <div className="w-full flex justify-between items-center">
-                    <div className="flex">
-                      <ReimbursementSearchFilter
-                        disabled={!data?.length && noFilters}
-                        userEmails={
-                          usersData?.data
-                            ? usersData?.data?.map((user) => user!.email)
-                            : []
-                        }
+                  const hasNextPage = Boolean(
+                    meta?.count && meta.count / (0 + 1) > LAZY_LOADING_LIMIT
+                  );
+
+                  return (
+                    <>
+                      <div className='w-full flex items-center justify-between pb-4'>
+                        <div className='w-full flex justify-between items-center'>
+                          <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4'>
+                            <ReimbursementSearchFilter
+                              disabled={!data?.length && noFilters}
+                              userEmails={
+                                usersData?.data
+                                  ? usersData?.data?.map((user) => user!.email)
+                                  : []
+                              }
+                              employeeId={employeeId}
+                            />
+                            <FilterList filters={filters} />
+                          </div>
+
+                          <Link
+                            to={"add-reimbursement"}
+                            className={cn(
+                              buttonVariants({ variant: "primary-outline" }),
+                              "flex items-center gap-1",
+                              !hasPermission(
+                                role,
+                                `${createRole}:${attribute.employeeReimbursements}`
+                              ) && "hidden"
+                            )}
+                          >
+                            <span>Add</span>
+                            <span className='hidden md:flex justify-end'>
+                              Claim
+                            </span>
+                          </Link>
+                        </div>
+                      </div>
+
+                      <ReimbursementsTable
+                        data={data}
+                        noFilters={noFilters}
+                        columns={columns({ isEmployeeRoute: true })}
+                        hasNextPage={hasNextPage}
+                        pageSize={LAZY_LOADING_LIMIT}
+                        env={env}
                         employeeId={employeeId}
                       />
-                      <FilterList filters={filters} />
-                    </div>
-
-                    <Link
-                      to={"add-reimbursement"}
-                      className={cn(
-                        buttonVariants({ variant: "primary-outline" }),
-                        "flex items-center gap-1",
-                        !hasPermission(
-                          role,
-                          `${createRole}:${attribute.employeeReimbursements}`,
-                        ) && "hidden",
-                      )}
-                    >
-                      <span>Add</span>
-                      <span className="hidden md:flex justify-end">Claim</span>
-                    </Link>
-                  </div>
-                </div>
-
-                <ReimbursementsTable
-                  data={data ?? []}
-                  noFilters={noFilters}
-                  columns={columns({ isEmployeeRoute: true })}
-                  hasNextPage={hasNextPage}
-                  pageSize={LAZY_LOADING_LIMIT}
-                  env={env}
-                  employeeId={employeeId}
-                />
-              </>
-            );
-          }}
+                    </>
+                  );
+                }}
+              </Await>
+            </Suspense>
+          )}
         </Await>
       </Suspense>
       <Outlet />
