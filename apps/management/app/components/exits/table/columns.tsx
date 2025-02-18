@@ -58,8 +58,8 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     cell: ({ row }) => {
       return (
         <p className='truncate capitalize'>
-          {row.original?.employees.employee_project_assignment.project_sites
-            .projects.name ?? "--"}
+          {row.original?.employees?.employee_project_assignment?.project_sites
+            ?.projects?.name ?? "--"}
         </p>
       );
     },
@@ -72,7 +72,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     cell: ({ row }) => {
       return (
         <p className='truncate capitalize'>
-          {row.original?.employees.employee_project_assignment.project_sites
+          {row.original?.employees?.employee_project_assignment?.project_sites
             .name ?? "--"}
         </p>
       );
@@ -138,7 +138,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     header: "Bonus",
     cell: ({ row }) => {
       return (
-        <p className='capitalize truncate'>{row.original.bonus ?? "--"}</p>
+        <p className='capitalize truncate'>{row.original?.bonus ?? "--"}</p>
       );
     },
   },
@@ -148,7 +148,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     cell: ({ row }) => {
       return (
         <p className='capitalize truncate'>
-          {row.original.leave_encashment ?? "--"}
+          {row.original?.leave_encashment ?? "--"}
         </p>
       );
     },
@@ -158,7 +158,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     header: "Gratuity",
     cell: ({ row }) => {
       return (
-        <p className='capitalize truncate'>{row.original.gratuity ?? "--"}</p>
+        <p className='capitalize truncate'>{row.original?.gratuity ?? "--"}</p>
       );
     },
   },
@@ -167,7 +167,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     header: "Deduction",
     cell: ({ row }) => {
       return (
-        <p className='capitalize truncate'>{row.original.deduction ?? "--"}</p>
+        <p className='capitalize truncate'>{row.original?.deduction ?? "--"}</p>
       );
     },
   },
@@ -176,10 +176,10 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     header: "Net Pay",
     cell: ({ row }) => {
       const netPay =
-        Number(row.original.bonus) +
-        Number(row.original.leave_encashment) +
-        Number(row.original.gratuity) -
-        Number(row.original.deduction);
+        Number(row.original?.bonus) +
+        Number(row.original?.leave_encashment) +
+        Number(row.original?.gratuity) -
+        Number(row.original?.deduction);
       return <p className='capitalize truncate'>{netPay ?? "--"}</p>;
     },
   },
