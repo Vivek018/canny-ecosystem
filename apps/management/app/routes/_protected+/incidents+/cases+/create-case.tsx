@@ -77,11 +77,10 @@ export async function action({
         { status: submission.status === "error" ? 400 : 200 },
       );
     }
-    const data = submission.value;
 
     const { status, error } = await createCase({
       supabase,
-      data,
+      data: submission.value,
     });
 
     if (isGoodStatus(status)) {

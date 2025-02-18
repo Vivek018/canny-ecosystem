@@ -14,7 +14,6 @@ import { useUser } from "@/utils/user";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import type { CasesDatabaseRow } from "@canny_ecosystem/supabase/types";
-import { Link } from "@remix-run/react";
 import { CaseOptionsDropdown } from "./cases-table-options";
 
 export const columns: ColumnDef<CasesDatabaseRow>[] = [

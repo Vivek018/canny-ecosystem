@@ -1,4 +1,4 @@
-import type { AccidentsDatabaseType } from "@canny_ecosystem/supabase/queries";
+import type { CasesDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { Button } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { formatDateTime } from "@canny_ecosystem/utils";
@@ -12,7 +12,7 @@ export function ExportBar({
   columnVisibility,
 }: {
   rows: number;
-  data: AccidentsDatabaseType[];
+  data: Omit<CasesDatabaseRow, "created_at" | "updated_at">[];
   className: string;
   columnVisibility: VisibilityState;
 }) {
@@ -43,9 +43,9 @@ export function ExportBar({
         <p className="font-semibold">{rows} Selected</p>
       </div>
       <div className="h-full flex justify-center items-center gap-2">
-        {/* <div className='h-full tracking-wide font-medium rounded-full flex justify-between items-center px-6 border dark:border-muted-foreground/30 '>
-          Amount: <span className='ml-1.5'>{totalAmount}</span>
-        </div> */}
+        <div className="h-full tracking-wide font-medium rounded-full flex justify-between items-center px-6 border dark:border-muted-foreground/30 ">
+          Cases: <span className="ml-1.5">{data.length ?? ""}</span>
+        </div>
         <Button
           onClick={handleExport}
           variant="default"

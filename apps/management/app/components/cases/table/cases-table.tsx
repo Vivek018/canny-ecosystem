@@ -7,7 +7,6 @@ import {
 } from "@canny_ecosystem/ui/table";
 import {
   type ColumnDef,
-  flexRender,
   getCoreRowModel,
   useReactTable,
   type VisibilityState,
@@ -16,8 +15,7 @@ import { CasesTableHeader } from "./cases-table-header";
 import { useInView } from "react-intersection-observer";
 import { useEffect, useState } from "react";
 import {
-  // type AccidentFilters,
-  type AccidentsDatabaseType,
+  type CaseFilters,
   getCasesByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
@@ -26,6 +24,8 @@ import { useSearchParams } from "@remix-run/react";
 import { Button } from "@canny_ecosystem/ui/button";
 import { ExportBar } from "../export-bar";
 import { useCaseStore } from "@/store/cases";
+import type { CasesDatabaseRow } from "@canny_ecosystem/supabase/types";
+import { CasesSheet } from "../cases_sheet";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -35,8 +35,8 @@ interface DataTableProps<TData, TValue> {
   env: any;
   companyId?: string;
   employeeId?: string;
-  // noFilters?: boolean;
-  // filters?: AccidentFilters | null;
+  noFilters?: boolean;
+  filters?: CaseFilters | null;
   query?: string | null;
   initialColumnVisibility?: VisibilityState;
 }
@@ -48,8 +48,8 @@ export function CasesTable<TData, TValue>({
   pageSize,
   env,
   companyId,
-  // noFilters,
-  // filters,
+  noFilters,
+  filters,
   initialColumnVisibility,
   query,
 }: DataTableProps<TData, TValue>) {
@@ -77,7 +77,7 @@ export function CasesTable<TData, TValue>({
           params: {
             from: from,
             to: to,
-            // filters,
+            filters,
             searchQuery: query ?? undefined,
             sort: sortParam?.split(":") as [string, "asc" | "desc"],
           },
@@ -114,7 +114,9 @@ export function CasesTable<TData, TValue>({
     for (const row of table.getSelectedRowModel().rows) {
       rowArray.push(row.original);
     }
-    setSelectedRows(rowArray as AccidentsDatabaseType[]);
+    setSelectedRows(
+      rowArray as Omit<CasesDatabaseRow, "created_at" | "updated_at">[],
+    );
   }, [rowSelection]);
 
   useEffect(() => {
@@ -151,35 +153,12 @@ export function CasesTable<TData, TValue>({
             />
             <TableBody>
               {tableLength ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                    className="relative cursor-default select-text"
-                  >
-                    {row.getVisibleCells().map((cell) => {
-                      return (
-                        <TableCell
-                          key={cell.id}
-                          className={cn(
-                            "px-3 md:px-4 py-4 hidden md:table-cell",
-                            cell.column.id === "select" &&
-                              "sticky left-0 min-w-12 max-w-12 bg-card z-10",
-                            cell.column.id === "title" &&
-                              "sticky left-12 bg-card z-10",
-                            cell.column.id === "actions" &&
-                              "sticky right-0 min-w-20 max-w-20 bg-card z-10",
-                          )}
-                        >
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                ))
+                table.getRowModel().rows.map((row) => {
+                  const rowData = row.original;
+                  return (
+                    <CasesSheet key={row.id} row={row} rowData={rowData} />
+                  );
+                })
               ) : (
                 <TableRow className={cn(!tableLength && "border-none")}>
                   <TableCell
@@ -191,7 +170,7 @@ export function CasesTable<TData, TValue>({
                       <p
                         className={cn(
                           "text-muted-foreground",
-                          !data?.length && "noFilters" && "hidden",
+                          !data?.length && noFilters && "hidden",
                         )}
                       >
                         Try another search, or adjusting the filters
@@ -200,7 +179,7 @@ export function CasesTable<TData, TValue>({
                         variant="outline"
                         className={cn(
                           "mt-4",
-                          !data?.length && "noFilters" && "hidden",
+                          !data?.length && noFilters && "hidden",
                         )}
                         onClick={() => {
                           setSearchParams();

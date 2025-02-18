@@ -10,35 +10,15 @@ export type CaseFilters = {
   status?: string | undefined | null;
   reported_on?: string | undefined | null;
   reported_by?: string | undefined | null;
-  date?: string | undefined | null;
-  incident_date?: string | undefined | null;
+  date_start?: string | undefined | null;
+  date_end?: string | undefined | null;
+  incident_date_start?: string | undefined | null;
+  incident_date_end?: string | undefined | null;
   location?: string | undefined | null;
   location_type?: string | undefined | null;
-  resolution_date?: string | undefined | null;
+  resolution_date_start?: string | undefined | null;
+  resolution_date_end?: string | undefined | null;
 };
-
-// export type AccidentsDatabaseType = Pick<
-//   AccidentsDatabaseRow,
-//   | "id"
-//   | "title"
-//   | "date"
-//   | "location_type"
-//   | "location"
-//   | "category"
-//   | "severity"
-//   | "status"
-//   | "description"
-//   | "medical_diagnosis"
-// > & {
-//   employees: {
-//     id: EmployeeDatabaseRow["id"];
-//     company_id: EmployeeDatabaseRow["company_id"];
-//     employee_code: EmployeeDatabaseRow["employee_code"];
-//     first_name: EmployeeDatabaseRow["first_name"];
-//     middle_name: EmployeeDatabaseRow["middle_name"];
-//     last_name: EmployeeDatabaseRow["last_name"];
-//   };
-// };
 
 export async function getCasesByCompanyId({
   supabase,
@@ -62,11 +42,13 @@ export async function getCasesByCompanyId({
     status,
     reported_on,
     reported_by,
-    date,
-    incident_date,
-    location,
+    date_start,
+    date_end,
+    incident_date_start,
+    incident_date_end,
     location_type,
-    resolution_date,
+    resolution_date_start,
+    resolution_date_end,
   } = filters ?? {};
 
   const columns = [
@@ -119,29 +101,42 @@ export async function getCasesByCompanyId({
     }
   }
 
-  // const dateFilters = [
-  //   {
-  //     field: "date",
-  //     start: date_start,
-  //     end: date_end,
-  //   },
-  // ];
-  // for (const { field, start, end } of dateFilters) {
-  //   if (start) query.gte(field, formatUTCDate(start));
-  //   if (end) query.lte(field, formatUTCDate(end));
-  // }
-  // if (status) {
-  //   query.eq("status", status);
-  // }
-  // if (location_type) {
-  //   query.eq("location_type", location_type);
-  // }
-  // if (category) {
-  //   query.eq("category", category);
-  // }
-  // if (severity) {
-  //   query.eq("severity", severity);
-  // }
+  const dateFilters = [
+    {
+      field: "date",
+      start: date_start,
+      end: date_end,
+    },
+    {
+      field: "incident_date",
+      start: incident_date_start,
+      end: incident_date_end,
+    },
+    {
+      field: "resolution_date",
+      start: resolution_date_start,
+      end: resolution_date_end,
+    },
+  ];
+  for (const { field, start, end } of dateFilters) {
+    if (start) query.gte(field, formatUTCDate(start));
+    if (end) query.lte(field, formatUTCDate(end));
+  }
+  if (case_type) {
+    query.eq("case_type", case_type);
+  }
+  if (status) {
+    query.eq("status", status);
+  }
+  if (location_type) {
+    query.eq("location_type", location_type);
+  }
+  if (reported_by) {
+    query.eq("reported_by", reported_by);
+  }
+  if (reported_on) {
+    query.eq("reported_on", reported_on);
+  }
 
   const { data, count, error } = await query.range(from, to);
   if (error) {

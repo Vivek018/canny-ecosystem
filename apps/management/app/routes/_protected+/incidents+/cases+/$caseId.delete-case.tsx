@@ -63,7 +63,7 @@ export async function action({
   }
 }
 
-export default function DeleteAccident() {
+export default function DeleteCase() {
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();

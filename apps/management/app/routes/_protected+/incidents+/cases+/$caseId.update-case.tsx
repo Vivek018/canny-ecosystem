@@ -1,6 +1,8 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
+  Await,
+  defer,
   json,
   useActionData,
   useLoaderData,
@@ -18,12 +20,12 @@ import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { clearCacheEntry } from "@/utils/cache";
 import RegisterCase from "./create-case";
 import { updateCaseById } from "@canny_ecosystem/supabase/mutations";
 import { getCasesById } from "@canny_ecosystem/supabase/queries";
-import type { CasesDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 export const UPDATE_CASES_TAG = "Update-Case";
 
@@ -31,26 +33,26 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const caseId = params.caseId;
   const { supabase, headers } = getSupabaseWithHeaders({ request });
 
-  const { user } = await getUserCookieOrFetchUser(request, supabase);
+  try {
+    const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.cases}`)) {
-    return safeRedirect(DEFAULT_ROUTE, { headers });
+    if (!hasPermission(user?.role!, `${updateRole}:${attribute.cases}`)) {
+      return safeRedirect(DEFAULT_ROUTE, { headers });
+    }
+
+    let casePromise = null;
+
+    if (caseId) {
+      casePromise = getCasesById({
+        supabase,
+        caseId,
+      });
+    }
+
+    return defer({ casePromise, error: null });
+  } catch (error) {
+    return json({ casePromise: null, error });
   }
-
-  let caseData = null;
-  let error = null;
-
-  if (caseId) {
-    const { data, error: caseError } = await getCasesById({
-      supabase,
-      caseId,
-    });
-
-    caseData = data;
-    error = caseError;
-  }
-
-  return json({ data: caseData as CasesDatabaseUpdate, error });
 }
 
 export async function action({
@@ -91,42 +93,48 @@ export async function action({
 }
 
 export default function UpdateCases() {
-  const { data, error } = useLoaderData<typeof loader>();
+  const { casePromise, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
-  const updatableData = data;
 
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (error) {
+    if (!actionData) return;
+    if (actionData?.status === "success") {
+      clearCacheEntry(cacheKeyPrefix.case);
+      toast({
+        title: "Success",
+        description: actionData?.message || "Case updated successfully",
+        variant: "success",
+      });
+    } else {
       toast({
         title: "Error",
-        description: error?.message || "Failed to load case data",
+        description: actionData?.error?.message || "Failed to update case",
         variant: "destructive",
       });
     }
-  }, [error]);
-
-  useEffect(() => {
-    if (actionData) {
-      if (actionData?.status === "success") {
-        clearCacheEntry(cacheKeyPrefix.case);
-        toast({
-          title: "Success",
-          description: actionData?.message || "Case updated successfully",
-          variant: "success",
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: actionData?.error?.message || "Failed to update case",
-          variant: "destructive",
-        });
-      }
-      navigate("/incidents/cases");
-    }
+    navigate("/incidents/cases");
   }, [actionData]);
 
-  return <RegisterCase updateValues={updatableData} />;
+  if (error)
+    return <ErrorBoundary error={error} message="Failed to load case" />;
+
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Await resolve={casePromise}>
+        {(resolvedData) => {
+          if (resolvedData?.error)
+            return (
+              <ErrorBoundary
+                error={resolvedData?.error}
+                message="Failed to load case"
+              />
+            );
+          return <RegisterCase updateValues={resolvedData?.data} />;
+        }}
+      </Await>
+    </Suspense>
+  );
 }

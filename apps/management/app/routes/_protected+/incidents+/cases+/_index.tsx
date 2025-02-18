@@ -23,12 +23,11 @@ import { safeRedirect } from "@/utils/server/http.server";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import {
-  // type AccidentFilters,
+  type CaseFilters,
   getCasesByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import { columns } from "@/components/cases/table/columns";
-import { FilterList } from "@/components/accidents/filter-list";
-import { AccidentSearchFilter } from "@/components/accidents/accident-search-filter";
+import { FilterList } from "@/components/cases/filter-list";
 import { CasesTable } from "@/components/cases/table/cases-table";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
@@ -58,18 +57,21 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     const query = searchParams.get("name") ?? undefined;
 
-    const filters: AccidentFilters = {
+    const filters: CaseFilters = {
       case_type: searchParams.get("case_type") ?? undefined,
       status: searchParams.get("status") ?? undefined,
-      report_on: (searchParams.get("report_on") ??
-        undefined) as AccidentFilters["status"],
-      location_type: (searchParams.get("location_type") ??
-        undefined) as AccidentFilters["location_type"],
-      category: (searchParams.get("category") ??
-        undefined) as AccidentFilters["category"],
-      name: query,
-      severity: (searchParams.get("severity") ??
-        undefined) as AccidentFilters["severity"],
+      reported_on: searchParams.get("reported_on") ?? undefined,
+      reported_by: searchParams.get("reported_by") ?? undefined,
+      date_start: searchParams.get("date_start") ?? undefined,
+      date_end: searchParams.get("date_end") ?? undefined,
+      incident_date_start: searchParams.get("incident_date_start") ?? undefined,
+      incident_date_end: searchParams.get("incident_date_end") ?? undefined,
+      location: searchParams.get("location") ?? undefined,
+      resolution_date_start:
+        searchParams.get("resolution_date_start") ?? undefined,
+      resolution_date_end: searchParams.get("resolution_date_end") ?? undefined,
+      location_type: searchParams.get("location_type") ?? undefined,
+      // name: query,
     };
 
     const hasFilters =
@@ -84,7 +86,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       params: {
         from: 0,
         to: hasFilters ? MAX_QUERY_LIMIT : page > 0 ? pageSize : pageSize - 1,
-        // filters,
+        filters,
         searchQuery: query ?? undefined,
         sort: sortParam?.split(":") as [string, "asc" | "desc"],
       },
@@ -93,7 +95,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return defer({
       casesPromise: casesPromise as any,
       query,
-      //       filters,
+      filters,
       companyId,
       env,
     });
@@ -103,7 +105,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return defer({
       casesPromise: Promise.resolve({ data: [] }),
       query: "",
-      //       filters: null,
+      filters: null,
       companyId: "",
       env,
     });
@@ -122,12 +124,12 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 clientLoader.hydrate = true;
 
 export default function CasesIndex() {
-  const { casesPromise, query, companyId, env } =
+  const { casesPromise, query, companyId, filters, env } =
     useLoaderData<typeof loader>();
   const { role } = useUser();
 
-  //   const filterList = { ...filters, name: query };
-  //   const noFilters = Object.values(filterList).every((value) => !value);
+  const filterList = { ...filters, name: query };
+  const noFilters = Object.values(filterList).every((value) => !value);
 
   return (
     <section className="p-4">
@@ -146,13 +148,12 @@ export default function CasesIndex() {
             <span>Add</span>
             <span className="hidden md:flex justify-end">Case</span>
           </Link>
-          {/* <FilterList filters={filterList} /> */}
+          <FilterList filters={filterList} />
         </div>
       </div>
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={casesPromise}>
           {({ data, meta, error }) => {
-            console.log(data);
             if (error) {
               clearCacheEntry(cacheKeyPrefix.case);
               return (
@@ -167,8 +168,8 @@ export default function CasesIndex() {
                 data={data ?? []}
                 columns={columns}
                 query={query}
-                // filters={filters}
-                // noFilters={noFilters}
+                filters={filters}
+                noFilters={noFilters}
                 hasNextPage={hasNextPage}
                 pageSize={pageSize}
                 companyId={companyId}

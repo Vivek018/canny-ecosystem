@@ -1,11 +1,11 @@
-import type { AccidentFilters } from "@canny_ecosystem/supabase/queries";
+import type { CaseFilters } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { formatDate, formatDateRange } from "@canny_ecosystem/utils";
 import { useSearchParams } from "@remix-run/react";
 
 type Props = {
-  filters: AccidentFilters | undefined | null;
+  filters: CaseFilters | undefined | null;
 };
 
 export function FilterList({ filters }: Props) {
@@ -29,11 +29,37 @@ export function FilterList({ filters }: Props) {
         }
         return formatDate(new Date(value));
 
+      case "incident_date_start":
+        if (filters?.incident_date_end) {
+          return formatDateRange(
+            new Date(value),
+            new Date(filters.incident_date_end),
+            {
+              includeTime: false,
+            },
+          );
+        }
+        return formatDate(new Date(value));
+
+      case "resolution_date_start":
+        if (filters?.resolution_date_end) {
+          return formatDateRange(
+            new Date(value),
+            new Date(filters.resolution_date_end),
+            {
+              includeTime: false,
+            },
+          );
+        }
+        return formatDate(new Date(value));
+
       case "name":
       case "status":
+      case "case_type":
       case "location_type":
-      case "category":
-      case "severity":
+      case "location":
+      case "reported_by":
+      case "reported_on":
         return value;
       default:
         return null;
@@ -45,6 +71,14 @@ export function FilterList({ filters }: Props) {
 
     if (key === "date_start" && filters?.date_end) {
       updatedSearchParams.delete("date_end");
+    }
+
+    if (key === "incident_date_start" && filters?.incident_date_end) {
+      updatedSearchParams.delete("incident_date_end");
+    }
+
+    if (key === "resolution_date_start" && filters?.resolution_date_end) {
+      updatedSearchParams.delete("resolution_date_end");
     }
 
     updatedSearchParams.delete(key);

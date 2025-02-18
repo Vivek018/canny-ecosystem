@@ -142,6 +142,13 @@ export default function CreateAccident({
           variant: "success",
         });
       }
+      if (actionData.status === "error") {
+        toast({
+          title: "Error",
+          description: actionData.message,
+          variant: "destructive",
+        });
+      }
       navigate(actionData.returnTo);
     }
   }, [actionData]);

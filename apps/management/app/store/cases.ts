@@ -1,4 +1,4 @@
-import type { AccidentsDatabaseType } from "@canny_ecosystem/supabase/queries";
+import type { CasesDatabaseRow } from "@canny_ecosystem/supabase/types";
 import type { RowSelectionState, Updater } from "@tanstack/react-table";
 import { create } from "zustand";
 
@@ -7,8 +7,10 @@ interface CaseState {
   setColumns: (columns?: any[]) => void;
   setRowSelection: (updater: Updater<RowSelectionState>) => void;
   rowSelection: Record<string, boolean>;
-  selectedRows: AccidentsDatabaseType[];
-  setSelectedRows: (updater: Updater<AccidentsDatabaseType[]>) => void;
+  selectedRows: Omit<CasesDatabaseRow, "created_at" | "updated_at">[];
+  setSelectedRows: (
+    updater: Updater<Omit<CasesDatabaseRow, "created_at" | "updated_at">[]>,
+  ) => void;
 }
 
 export const useCaseStore = create<CaseState>()((set) => ({
