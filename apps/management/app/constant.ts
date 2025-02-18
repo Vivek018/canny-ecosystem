@@ -266,8 +266,9 @@ export const cacheKeyPrefix = {
   account: "account",
   feedback_list: "feedback-list",
   exits: "exits",
-  attendance: "attendance",
   accident: "accident",
+  attendance: "attendance",
+  payments: "payments",
 };
 export const SALARY_SLIP_TITLE = "Salary Slip Form IV B [Rule 26(2)(b)]";
 

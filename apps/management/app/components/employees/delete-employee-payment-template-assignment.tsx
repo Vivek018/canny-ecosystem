@@ -17,11 +17,7 @@ import { DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
-export const DeleteEmployeePaymentTemplateAssignment = ({
-  employeeId,
-}: {
-  employeeId: string;
-}) => {
+export const DeleteEmployeePaymentTemplateAssignment = ({ employeeId }: { employeeId: string }) => {
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [inputError, setInputError] = useState<string[]>([]);
@@ -45,7 +41,7 @@ export const DeleteEmployeePaymentTemplateAssignment = ({
         },
         {
           method: "POST",
-          action: `/templates/${employeeId}/delete-employee-link`,
+          action: `/employees/${employeeId}/payments/delete-link-template`,
         },
       );
     } else {
