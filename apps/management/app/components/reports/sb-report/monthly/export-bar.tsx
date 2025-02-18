@@ -30,20 +30,20 @@ export function ExportBar({
         continue;
       }
       if (key === "employee_code") {
-        exportedData[key] = element.employee_code;
+        exportedData[key] = element?.employee_code;
       } else if (key === "employee_name") {
         exportedData[key] =
-          `${element.first_name} ${element.middle_name} ${element.last_name}`;
+          `${element?.first_name} ${element?.middle_name} ${element?.last_name}`;
       } else if (key === "project") {
         exportedData[key] =
-          element.employee_project_assignment.project_sites.projects.name;
+          element?.employee_project_assignment?.project_sites?.projects?.name;
       } else if (key === "project_site") {
         exportedData[key] =
-          element.employee_project_assignment.project_sites.name;
+          element?.employee_project_assignment?.project_sites?.name;
       } else if (key === "start_range") {
-        exportedData[key] = element.start_range;
+        exportedData[key] = element?.start_range;
       } else if (key === "end_range") {
-        exportedData[key] = element.end_range ?? "";
+        exportedData[key] = element?.end_range ?? "";
       } else {
         exportedData[key] = element[key as keyof EmployeeReportDataType] as any;
       }

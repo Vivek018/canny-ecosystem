@@ -49,10 +49,10 @@ export function ExportBar({
       project_site: string;
     }) => {
       const formattedEntry: any = {
-        employee_code: entry.employee_code,
-        employee_name: entry.employee_name,
-        project: entry.project,
-        project_site: entry.project_site,
+        employee_code: entry?.employee_code,
+        employee_name: entry?.employee_name,
+        project: entry?.project,
+        project_site: entry?.project_site,
       };
 
       // biome-ignore lint/complexity/noForEach: <explanation>
@@ -62,8 +62,33 @@ export function ExportBar({
       });
 
       return formattedEntry;
-    },
+    }
   );
+
+  function calculateMonthlyAvgPresence(data: any) {
+    let totalDays = 0;
+    let totalP = 0;
+
+    for (const employee of data) {
+      for (const key in employee) {
+        if (
+          ![
+            "employee_code",
+            "employee_name",
+            "project",
+            "project_site",
+          ].includes(key)
+        ) {
+          totalDays++;
+          if (employee[key] === "P") {
+            totalP++;
+          }
+        }
+      }
+    }
+
+    return totalDays > 0 ? (totalP / (totalDays / data.length)).toFixed(2) : 0;
+  }
 
   const handleExport = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
@@ -75,7 +100,7 @@ export function ExportBar({
 
     link.setAttribute(
       "download",
-      `Attendances - ${formatDateTime(Date.now())}`,
+      `Attendances - ${formatDateTime(Date.now())}`
     );
 
     document.body.appendChild(link);
@@ -88,7 +113,7 @@ export function ExportBar({
     <div
       className={cn(
         "z-40 fixed bottom-8 left-0 right-0 mx-auto h-14 w-max shadow-md rounded-full flex gap-10 justify-between items-center p-2 text-sm border dark:border-muted-foreground/30 bg-card text-card-foreground",
-        className,
+        className
       )}
     >
       <div className="ml-2 flex items-center space-x-1 rounded-md">
@@ -96,7 +121,10 @@ export function ExportBar({
       </div>
       <div className="h-full flex justify-center items-center gap-2">
         <div className="h-full tracking-wide font-medium rounded-full flex justify-between items-center px-6 border dark:border-muted-foreground/30 ">
-          Employees
+          Avg Presents:{" "}
+          <span className="ml-1.5">
+            {calculateMonthlyAvgPresence(formattedData)}
+          </span>
         </div>
         <Button
           onClick={handleExport}

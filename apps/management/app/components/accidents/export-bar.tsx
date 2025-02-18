@@ -2,20 +2,19 @@ import type { AccidentsDatabaseType } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { formatDateTime } from "@canny_ecosystem/utils";
-import type { VisibilityState } from "@tanstack/react-table";
 import Papa from "papaparse";
 
 export function ExportBar({
   rows,
   data,
   className,
-  columnVisibility,
 }: {
   rows: number;
   data: AccidentsDatabaseType[];
   className: string;
-  columnVisibility: VisibilityState;
 }) {
+  const pendingCount = data.filter((item) => item.status === "pending").length;
+
   const handleExport = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     const csv = Papa.unparse(data);
@@ -36,16 +35,16 @@ export function ExportBar({
     <div
       className={cn(
         "z-40 fixed bottom-8 left-0 right-0 mx-auto h-14 w-max shadow-md rounded-full flex gap-10 justify-between items-center p-2 text-sm border dark:border-muted-foreground/30 bg-card text-card-foreground",
-        className,
+        className
       )}
     >
       <div className="ml-2 flex items-center space-x-1 rounded-md">
         <p className="font-semibold">{rows} Selected</p>
       </div>
       <div className="h-full flex justify-center items-center gap-2">
-        {/* <div className='h-full tracking-wide font-medium rounded-full flex justify-between items-center px-6 border dark:border-muted-foreground/30 '>
-          Amount: <span className='ml-1.5'>{totalAmount}</span>
-        </div> */}
+        <div className="h-full tracking-wide font-medium rounded-full flex justify-between items-center px-6 border dark:border-muted-foreground/30 ">
+          Pending: <span className="ml-1.5">{pendingCount}</span>
+        </div>
         <Button
           onClick={handleExport}
           variant="default"

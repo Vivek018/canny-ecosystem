@@ -16,30 +16,144 @@ import { Button } from "@canny_ecosystem/ui/button";
 import { useAttendanceStore } from "@/store/attendance";
 import type { AttendanceFilterType } from "@/routes/_protected+/dashboard";
 import { ExportBar } from "../export-bar";
-import type { TransformedAteendanceDataType } from "@/routes/_protected+/time-tracking+/attendance+/_index";
+import type { TransformedAttendanceDataType } from "@/routes/_protected+/time-tracking+/attendance+/_index";
 import { useSearchParams } from "@remix-run/react";
+import { useSupabase } from "@canny_ecosystem/supabase/client";
+import { useInView } from "react-intersection-observer";
+import { getAttendanceByCompanyId } from "@canny_ecosystem/supabase/queries";
+import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
+import { Spinner } from "@canny_ecosystem/ui/spinner";
+import { formatDate } from "@canny_ecosystem/utils";
 
 interface DataTableProps {
   days: { day: number; fullDate: string };
   columns: any;
-  data: TransformedAteendanceDataType[];
+  data: TransformedAttendanceDataType[];
   noFilters?: boolean;
-  filters?: AttendanceFilterType;
+  hasNextPage: boolean;
+  count: number;
+  pageSize: number;
+  filters?: AttendanceFilterType ;
+  companyId: string;
+  env: SupabaseEnv;
+  query?: string | null;
 }
 
 export function AttendanceTable({
   days,
   columns,
   data: initialData,
+  hasNextPage: initialHasNextPage,
   noFilters,
+  pageSize,
   filters,
+  count,
+  query,
+  env,
+  companyId,
 }: DataTableProps) {
-  const [_searchParams, setSearchParams] = useSearchParams();
-  const [data, setData] =
-    useState<TransformedAteendanceDataType[]>(initialData);
-
   const { rowSelection, setSelectedRows, setRowSelection } =
     useAttendanceStore();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [data, setData] =
+    useState<TransformedAttendanceDataType[]>(initialData);
+  const [from, setFrom] = useState(pageSize);
+  const [hasNextPage, setHasNextPage] = useState(initialHasNextPage);
+
+  const { supabase } = useSupabase({ env });
+
+  const { ref, inView } = useInView();
+
+  function transformAttendanceData(data: any[]) {
+    const groupedByEmployeeAndMonth = data.reduce((acc, employee) => {
+      const empCode = employee.employee_code;
+      const employeeDetails = {
+        employee_id: employee.id,
+        employee_code: empCode,
+        employee_name: `${employee.first_name} ${employee.middle_name} ${employee.last_name}`,
+        project:
+          employee.employee_project_assignment?.project_sites?.projects?.name ||
+          null,
+        project_site:
+          employee.employee_project_assignment?.project_sites?.name || null,
+      };
+
+      if (!employee?.attendance?.length) {
+        acc[empCode] = acc[empCode] || employeeDetails;
+        return acc;
+      }
+
+      for (const record of employee?.attendance ?? []) {
+        const date = new Date(record.date);
+        const monthYear = `${date.getMonth()}-${date.getFullYear()}`;
+        const key = `${empCode}-${monthYear}`;
+
+        if (!acc[key]) {
+          acc[key] = { ...employeeDetails };
+        }
+
+        const fullDate = formatDate(date.toISOString().split("T")[0]);
+        acc[key][fullDate] = record.present
+          ? "P"
+          : record.holiday
+          ? record.holiday_type === "weekly"
+            ? "(WOF)"
+            : record.holiday_type === "paid"
+            ? "L"
+            : "A"
+          : "A";
+      }
+
+      return acc;
+    }, {});
+
+    return Object.values(groupedByEmployeeAndMonth);
+  }
+
+  const loadMoreEmployees = async () => {
+    const formattedFrom = from;
+    const to = formattedFrom + pageSize - 1;
+    const sortParam = searchParams.get("sort");
+
+    try {
+      const { data: newData } = await getAttendanceByCompanyId({
+        supabase,
+        companyId,
+        params: {
+          from: formattedFrom,
+          to: to,
+          filters,
+          searchQuery: query ?? undefined,
+          sort: sortParam?.split(":") as [string, "asc" | "desc"],
+        },
+      });
+
+      if (newData && newData.length > 0) {
+        const transformedData = transformAttendanceData(newData);
+        setData((prevData) => [...prevData, ...transformedData] as any);
+        setFrom(to + 1);
+
+        setHasNextPage(count > to + 1);
+      } else {
+        setHasNextPage(false);
+      }
+    } catch (error) {
+      console.error("Error loading more employees:", error);
+      setHasNextPage(false);
+    }
+  };
+
+  useEffect(() => {
+    setData(initialData);
+    setFrom(pageSize);
+    setHasNextPage(initialHasNextPage);
+  }, [initialData, initialHasNextPage, pageSize]);
+
+  useEffect(() => {
+    if (inView) {
+      loadMoreEmployees();
+    }
+  }, [inView]);
 
   const table = useReactTable({
     data,
@@ -60,21 +174,16 @@ export function AttendanceTable({
     for (const row of table.getSelectedRowModel().rows) {
       rowArray.push(row.original);
     }
-    setSelectedRows(rowArray as unknown as TransformedAteendanceDataType[]);
+    setSelectedRows(rowArray as unknown as TransformedAttendanceDataType[]);
   }, [rowSelection]);
 
-  useEffect(() => {
-    setData(initialData);
-  }, [initialData]);
-
   const tableLength = table.getRowModel().rows?.length;
-
   return (
     <div className="relative mb-8">
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
-          !tableLength && "border-none",
+          !tableLength && "border-none"
         )}
       >
         <div className="relative">
@@ -103,12 +212,12 @@ export function AttendanceTable({
                             cell.column.id === "employee_code" &&
                               "sticky left-12 bg-card z-10",
                             cell.column.id === "employee_name" &&
-                              "sticky left-48 bg-card z-10",
+                              "sticky left-48 bg-card z-10"
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext(),
+                            cell.getContext()
                           )}
                         </TableCell>
                       );
@@ -126,7 +235,7 @@ export function AttendanceTable({
                       <p
                         className={cn(
                           "text-muted-foreground",
-                          !data?.length && noFilters && "hidden",
+                          !data?.length && noFilters && "hidden"
                         )}
                       >
                         Try another search, or adjusting the filters
@@ -135,7 +244,7 @@ export function AttendanceTable({
                         variant="outline"
                         className={cn(
                           "mt-4",
-                          !data?.length && noFilters && "hidden",
+                          !data?.length && noFilters && "hidden"
                         )}
                         onClick={() => {
                           setSearchParams();
@@ -151,7 +260,13 @@ export function AttendanceTable({
           </Table>
         </div>
       </div>
-
+      {hasNextPage && initialData?.length && (
+        <div className="flex items-center justify-center mt-6" ref={ref}>
+          <div className="flex items-center space-x-2 px-6 py-5">
+            <Spinner />
+          </div>
+        </div>
+      )}
       <ExportBar
         className={cn(!table.getSelectedRowModel().rows.length && "hidden")}
         rows={table.getSelectedRowModel().rows.length}
