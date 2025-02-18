@@ -220,7 +220,7 @@ export const columns = ({
                   !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
                   !hasPermission(
                     role,
-                    `${deleteRole}:${attribute.employees}`,
+                    `${deleteRole}:${attribute.employees}`
                   ) &&
                   "hidden",
                 )}

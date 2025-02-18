@@ -1,11 +1,11 @@
 import { formatUTCDate } from "@canny_ecosystem/utils";
-import { HARD_QUERY_LIMIT, SINGLE_QUERY_LIMIT } from "../constant";
 import type {
   EmployeeDatabaseRow,
   ExitsRow,
   InferredType,
   TypedSupabaseClient,
 } from "../types";
+import { SINGLE_QUERY_LIMIT } from "../constant";
 
 export type ExitFilterType = {
   last_working_day_start?: string | undefined | null;
@@ -30,9 +30,7 @@ export type ImportExitDataType = Pick<
   | "organization_payable_days"
   | "reason"
   | "net_pay"
-> & { employee_code: string } & { employee_name: string } & {
-  project_name: string;
-} & { project_site_name: string };
+> & { employee_code: string };
 
 export type ExitDataType = Pick<
   ExitsRow,
@@ -56,127 +54,133 @@ export type ExitDataType = Pick<
   };
 };
 
-export const getExits = async ({
-  supabase,
-  params,
-}: {
-  supabase: TypedSupabaseClient;
-  params: {
-    from: number;
-    to: number;
-    sort?: [string, "asc" | "desc"];
-    searchQuery?: string;
-    filters?: ExitFilterType;
-  };
-}) => {
-  const { from, to, sort, searchQuery, filters } = params;
+// export const getExitsByCompanyId = async ({
+//   supabase,
+//   companyId,
+//   params,
+// }: {
+//   supabase: TypedSupabaseClient;
+//   companyId: string;
+//   params: {
+//     from: number;
+//     to: number;
+//     sort?: [string, "asc" | "desc"];
+//     searchQuery?: string;
+//     filters?: ExitFilterType;
+//   };
+// }) => {
+//   const { from, to, sort, searchQuery, filters } = params;
 
-  const {
-    last_working_day_start,
-    last_working_day_end,
-    final_settlement_date_start,
-    final_settlement_date_end,
-    reason,
-    project,
-    project_site,
-  } = filters ?? {};
+//   const {
+//     last_working_day_start,
+//     last_working_day_end,
+//     final_settlement_date_start,
+//     final_settlement_date_end,
+//     reason,
+//     project,
+//     project_site,
+//   } = filters ?? {};
 
-  const columns = [
-    "id",
-    "employee_id",
-    "organization_payable_days",
-    "employee_payable_days",
-    "last_working_day",
-    "final_settlement_date",
-    "reason",
-    "bonus",
-    "leave_encashment",
-    "gratuity",
-    "deduction",
-    "note",
-    "net_pay",
-  ] as const;
+//   const columns = [
+//     "id",
+//     "employee_id",
+//     "organization_payable_days",
+//     "employee_payable_days",
+//     "last_working_day",
+//     "final_settlement_date",
+//     "reason",
+//     "bonus",
+//     "leave_encashment",
+//     "gratuity",
+//     "deduction",
+//     "note",
+//     "net_pay",
+//   ] as const;
 
-  const query = supabase
-    .from("exits")
-    .select(
-      `${columns.join(",")},
-          employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"}(project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"}(id, name))))`,
-      { count: "exact" },
-    )
-    .limit(HARD_QUERY_LIMIT);
+//   const query = supabase
+//     .from("exits")
+//     .select(
+//       `${columns.join(",")},
+//           employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${
+//             project ? "inner" : "left"
+//           }(project_sites!${project ? "inner" : "left"}(id, name, projects!${
+//         project ? "inner" : "left"
+//       }(id, name))))`,
+//       { count: "exact" }
+//     )
+//     .eq("employees.company_id", companyId);
 
-  // Sorting
-  if (sort) {
-    const [column, direction] = sort;
-    query.order(column, { ascending: direction === "asc" });
-  } else {
-    query.order("created_at", { ascending: false });
-  }
+//   // Sorting
+//   if (sort) {
+//     const [column, direction] = sort;
+//     query.order(column, { ascending: direction === "asc" });
+//   } else {
+//     query.order("created_at", { ascending: false });
+//   }
 
-  // Full-text search
-  if (searchQuery) {
-    const searchQueryArray = searchQuery.split(" ");
-    if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
-      for (const searchQueryElement of searchQueryArray) {
-        query.or(
-          `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*,employee_code.ilike.*${searchQueryElement}*`,
-          {
-            referencedTable: "employees",
-          },
-        );
-      }
-    } else {
-      query.or(
-        `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`,
-        {
-          referencedTable: "employees",
-        },
-      );
-    }
-  }
+//   // Full-text search
+//   if (searchQuery) {
+//     const searchQueryArray = searchQuery.split(" ");
+//     if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
+//       for (const searchQueryElement of searchQueryArray) {
+//         query.or(
+//           `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*,employee_code.ilike.*${searchQueryElement}*`,
+//           {
+//             referencedTable: "employees",
+//           }
+//         );
+//       }
+//     } else {
+//       query.or(
+//         `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`,
+//         {
+//           referencedTable: "employees",
+//         }
+//       );
+//     }
+//   }
 
-  const dateFilters = [
-    {
-      field: "last_working_day",
-      start: last_working_day_start,
-      end: last_working_day_end,
-    },
-    {
-      field: "final_settlement_date",
-      start: final_settlement_date_start,
-      end: final_settlement_date_end,
-    },
-  ];
+//   const dateFilters = [
+//     {
+//       field: "last_working_day",
+//       start: last_working_day_start,
+//       end: last_working_day_end,
+//     },
+//     {
+//       field: "final_settlement_date",
+//       start: final_settlement_date_start,
+//       end: final_settlement_date_end,
+//     },
+//   ];
 
-  for (const { field, start, end } of dateFilters) {
-    if (start) query.gte(field, formatUTCDate(start));
-    if (end) query.lte(field, formatUTCDate(end));
-  }
+//   for (const { field, start, end } of dateFilters) {
+//     if (start) query.gte(field, formatUTCDate(start));
+//     if (end) query.lte(field, formatUTCDate(end));
+//   }
 
-  if (reason) query.eq("reason", reason.toLowerCase());
+//   if (reason) query.eq("reason", reason.toLowerCase());
 
-  if (project) {
-    query.eq(
-      "employees.employee_project_assignment.project_sites.projects.name",
-      project,
-    );
-  }
-  if (project_site) {
-    query.eq(
-      "employees.employee_project_assignment.project_sites.name",
-      project_site,
-    );
-  }
+//   if (project) {
+//     query.eq(
+//       "employees.employee_project_assignment.project_sites.projects.name",
+//       project
+//     );
+//   }
+//   if (project_site) {
+//     query.eq(
+//       "employees.employee_project_assignment.project_sites.name",
+//       project_site
+//     );
+//   }
 
-  const { data, count, error } = await query.range(from, to);
+//   const { data, count, error } = await query.range(from, to);
 
-  if (error) {
-    console.error("getExits Error", error);
-  }
+//   if (error) {
+//     console.error("getExits Error", error);
+//   }
 
-  return { data, meta: { count: count ?? data?.length }, error };
-};
+//   return { data, meta: { count: count ?? data?.length }, error };
+// };
 
 export const getExitsById = async ({
   supabase,

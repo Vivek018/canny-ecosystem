@@ -16,7 +16,7 @@ import {
 } from "@canny_ecosystem/supabase/constant";
 import {
   type ExitFilterType,
-  getExits,
+  getExitsByCompanyId,
   getProjectNamesByCompanyId,
   getSiteNamesByProjectName,
 } from "@canny_ecosystem/supabase/queries";
@@ -72,11 +72,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined,
+        (value) => value !== null && value !== undefined
       );
 
-    const exitsPromise = getExits({
+    const exitsPromise = getExitsByCompanyId({
       supabase,
+      companyId,
       params: {
         from: 0,
         to: hasFilters ? MAX_QUERY_LIMIT : page > 0 ? pageSize : pageSize - 1,
@@ -122,7 +123,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return await clientCaching(
     `${cacheKeyPrefix.exits}${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 clientLoader.hydrate = true;
@@ -158,9 +159,9 @@ export default function ExitsIndex() {
   const filterList = { ...filters, name: query };
 
   return (
-    <section className="p-4">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="flex-1 flex flex-col md:flex-row items-start md:items-center gap-4">
+    <section className='p-4'>
+      <div className='w-full flex items-center justify-between pb-4'>
+        <div className='flex-1 flex flex-col md:flex-row items-start md:items-center gap-4'>
           <Suspense fallback={<div>Loading...</div>}>
             <Await resolve={projectPromise}>
               {(projectData) => (
@@ -171,7 +172,7 @@ export default function ExitsIndex() {
                       return (
                         <ErrorBoundary
                           error={projectSiteData?.error}
-                          message="Failed to load Exits"
+                          message='Failed to load Exits'
                         />
                       );
                     }
@@ -183,7 +184,7 @@ export default function ExitsIndex() {
                     return (
                       <>
                         <ExitsSearchFilter
-                          disabled={!exitsPromise && noFilters}
+                          disabled={!projectData?.data?.length && noFilters}
                           projectArray={projectArray}
                           projectSiteArray={projectSiteArray}
                         />
@@ -196,7 +197,7 @@ export default function ExitsIndex() {
             </Await>
           </Suspense>
         </div>
-        <div className="flex-shrink-0">
+        <div className='flex-shrink-0'>
           <ExitActions isEmpty={!exitsPromise} />
         </div>
       </div>
@@ -214,14 +215,15 @@ export default function ExitsIndex() {
               return (
                 <ErrorBoundary
                   error={exitsData?.error}
-                  message="Failed to load Exits"
+                  message='Failed to load Exits'
                 />
               );
             }
             const hasNextPage = Boolean(
               exitsData?.meta?.count &&
-                exitsData.meta.count > LAZY_LOADING_LIMIT,
+                exitsData.meta.count > LAZY_LOADING_LIMIT
             );
+
             return (
               <ExitPaymentTable
                 data={exitsData?.data ?? ([] as any)}

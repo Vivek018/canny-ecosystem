@@ -17,7 +17,7 @@ import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import {
   type ExitDataType,
   type ExitFilterType,
-  getExits,
+  getExitsByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import { useState, useEffect } from "react";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
@@ -27,6 +27,7 @@ import { Spinner } from "@canny_ecosystem/ui/spinner";
 import { useSearchParams } from "@remix-run/react";
 import { Button } from "@canny_ecosystem/ui/button";
 import { ExportBar } from "../import-export/export-bar";
+import { useCompanyId } from "@/utils/company";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -59,13 +60,14 @@ export function ExitPaymentTable<TData, TValue>({
   const [hasNextPage, setHasNextPage] = useState(initialHasNextPage);
   const [searchParams, setSearchParams] = useSearchParams();
   const { supabase } = useSupabase({ env });
+  const { companyId } = useCompanyId();
 
   const { ref, inView } = useInView();
   const { rowSelection, setSelectedRows, setRowSelection, setColumns } =
     useExitsStore();
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    initialColumnVisibility ?? {},
+    initialColumnVisibility ?? {}
   );
 
   const loadMoreExit = async () => {
@@ -73,8 +75,9 @@ export function ExitPaymentTable<TData, TValue>({
     const to = formattedFrom + pageSize;
     const sortParam = searchParams.get("sort");
     try {
-      const { data } = await getExits({
+      const { data } = await getExitsByCompanyId({
         supabase,
+        companyId: companyId ?? "",
         params: {
           from: from,
           to: to,
@@ -128,14 +131,14 @@ export function ExitPaymentTable<TData, TValue>({
     .rows?.map((row) => row.original);
 
   return (
-    <div className="relative mb-8">
+    <div className='relative mb-8'>
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
-          !tableLength && "border-none",
+          !tableLength && "border-none"
         )}
       >
-        <div className="relative">
+        <div className='relative'>
           <Table>
             <ExitPaymentTableHeader
               table={table}
@@ -157,23 +160,23 @@ export function ExitPaymentTable<TData, TValue>({
                 <TableRow className={cn(!tableLength && "border-none")}>
                   <TableCell
                     colSpan={columns.length}
-                    className="h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize"
+                    className='h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize'
                   >
-                    <div className="flex flex-col items-center gap-1">
-                      <h2 className="text-xl">No Exits Found.</h2>
+                    <div className='flex flex-col items-center gap-1'>
+                      <h2 className='text-xl'>No Exits Found.</h2>
                       <p
                         className={cn(
                           "text-muted-foreground",
-                          !data?.length && noFilters && "hidden",
+                          !data?.length && noFilters && "hidden"
                         )}
                       >
                         Try another search, or adjusting the filters
                       </p>
                       <Button
-                        variant="outline"
+                        variant='outline'
                         className={cn(
                           "mt-4",
-                          !data?.length && noFilters && "hidden",
+                          !data?.length && noFilters && "hidden"
                         )}
                         onClick={() => {
                           setSearchParams();
@@ -190,11 +193,11 @@ export function ExitPaymentTable<TData, TValue>({
         </div>
       </div>
 
-      {hasNextPage && (
+      {hasNextPage && initialData?.length && (
         <div className="flex items-center justify-center mt-6" ref={ref}>
           <div className="flex items-center space-x-2 px-6 py-5">
             <Spinner />
-            <span className="text-sm text-[#606060]">Loading more...</span>
+            <span className='text-sm text-[#606060]'>Loading more...</span>
           </div>
         </div>
       )}

@@ -37,6 +37,7 @@ export function LeaveEncashmentWrapper({
     clearExactCacheEntry(cacheKeyPrefix.leave_encashment);
     return <ErrorBoundary error={error} message="Failed to load data" />;
   }
+  
   if (!data) return <LeaveEncashmentNoData />;
 
   return (

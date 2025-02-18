@@ -2,14 +2,14 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 import { Link } from "@remix-run/react";
 import { formatDate } from "@canny_ecosystem/utils";
-import type { TransformedAteendanceDataType } from "@/routes/_protected+/time-tracking+/attendance+/_index";
+import type { TransformedAttendanceDataType } from "@/routes/_protected+/time-tracking+/attendance+/_index";
 
 export const attendanceColumns = (
   days: {
     day: number;
     fullDate: string;
-  }[],
-): ColumnDef<TransformedAteendanceDataType>[] => [
+  }[]
+): ColumnDef<TransformedAttendanceDataType>[] => [
   {
     id: "select",
     cell: ({ row }) => (
@@ -43,7 +43,7 @@ export const attendanceColumns = (
     header: "Employee Name",
     cell: ({ row }) => (
       <Link
-        to={`/employees/${row.original.employee_id}/attendance`}
+        to={`/employees/${row.original?.employee_id}/attendance`}
         prefetch="intent"
         className="group"
       >
@@ -57,19 +57,19 @@ export const attendanceColumns = (
     enableSorting: false,
     accessorKey: "project_name",
     header: "Project",
-    cell: ({ row }) => <p className="truncate">{row.original.project}</p>,
+    cell: ({ row }) => <p className="truncate">{row.original?.project}</p>,
   },
   {
     enableSorting: false,
     accessorKey: "project_site_name",
     header: "Project Site",
-    cell: ({ row }) => <p className="truncate">{row.original.project_site}</p>,
+    cell: ({ row }) => <p className="truncate">{row.original?.project_site}</p>,
   },
   ...days.map((day) => ({
     enableSorting: false,
     accessorKey: `${formatDate(day.fullDate.toString())}`,
     header: formatDate(day.fullDate.toString()),
-    cell: ({ row }) => (
+    cell: ({ row }: { row: any }) => (
       <p className="truncate">
         {row.original[`${formatDate(day.fullDate)}`] ?? "--"}
       </p>

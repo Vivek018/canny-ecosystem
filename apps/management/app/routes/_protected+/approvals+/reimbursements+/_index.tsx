@@ -71,7 +71,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined,
+        (value) => value !== null && value !== undefined
       );
 
     const reimbursementsPromise = getReimbursementsByCompanyId({
@@ -127,7 +127,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return await clientCaching(
     `${cacheKeyPrefix.reimbursements}${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 
@@ -149,9 +149,9 @@ export default function ReimbursementsIndex() {
   const noFilters = Object.values(filterList).every((value) => !value);
 
   return (
-    <section className="p-4">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
+    <section className='p-4'>
+      <div className='w-full flex items-center justify-between pb-4'>
+        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4'>
           <Suspense fallback={<div>Loading...</div>}>
             <Await resolve={projectPromise}>
               {(projectData) => (
@@ -164,7 +164,7 @@ export default function ReimbursementsIndex() {
                           projectArray={
                             projectData?.data?.length
                               ? projectData?.data?.map(
-                                  (project) => project!.name,
+                                  (project) => project!.name
                                 )
                               : []
                           }
@@ -198,7 +198,7 @@ export default function ReimbursementsIndex() {
               return (
                 <ErrorBoundary
                   error={error}
-                  message="Failed to load reimbursements"
+                  message='Failed to load reimbursements'
                 />
               );
             }
