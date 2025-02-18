@@ -1,6 +1,8 @@
+import type { CasesDatabaseRow } from "@canny_ecosystem/supabase/types";
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -10,7 +12,10 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { formatDate } from "@canny_ecosystem/utils";
 import { flexRender } from "@tanstack/react-table";
 
-export function CasesSheet({ row, rowData }: { row: any; rowData: any }) {
+export function CaseSheet({
+  row,
+  rowData,
+}: { row: any; rowData: Omit<CasesDatabaseRow, "created_at" | "updated_at"> }) {
   return (
     <Sheet>
       <TableRow
@@ -49,16 +54,14 @@ export function CasesSheet({ row, rowData }: { row: any; rowData: any }) {
           );
         })}
       </TableRow>
-      <SheetContent className="w-[800px]">
+      <SheetContent className="w-[600px]">
         <SheetHeader className="m-5">
-          <SheetTitle className="grid grid-cols-2">
-            <div className="inline-block w-[40vw] h-full text-wrap">
-              <h1 className="text-primary text-3xl">{rowData.title ?? "--"}</h1>
-              <p className="text-muted-foreground text-lg line-clamp-4">
-                {rowData.description ?? ""}
-              </p>
-            </div>
+          <SheetTitle className="text-primary text-3xl">
+            {rowData?.title ?? "--"}
           </SheetTitle>
+          <SheetDescription className="text-muted-foreground text-sm line-clamp-4">
+            {rowData?.description ?? ""}
+          </SheetDescription>
         </SheetHeader>
         <hr />
         <div className="mx-5 flex justify-between">
@@ -66,7 +69,7 @@ export function CasesSheet({ row, rowData }: { row: any; rowData: any }) {
             Court Case Reference
           </h3>
           <p className="my-3 font-bold capitalize">
-            {rowData.court_case_reference ?? "--"}
+            {rowData?.court_case_reference ?? "--"}
           </p>
         </div>
         <hr />
@@ -75,13 +78,12 @@ export function CasesSheet({ row, rowData }: { row: any; rowData: any }) {
           <p
             className={cn(
               "my-3 font-bold capitalize",
-              rowData.status === "open" && "text-emerald-400",
-              rowData.status === "closed" && "text-red-400",
-              rowData.status === "resolved" && "text-green-400",
-              rowData.status === "in-progress" && "text-amber-400",
+              rowData?.status === "open" && "text-emerald-400",
+              rowData?.status === "closed" && "text-red-400",
+              rowData?.status === "resolved" && "text-green-400",
             )}
           >
-            {rowData.status ?? "--"}
+            {rowData?.status ?? "--"}
           </p>
         </div>
 
@@ -90,22 +92,40 @@ export function CasesSheet({ row, rowData }: { row: any; rowData: any }) {
             Case Type
           </h3>
           <p className="my-3 font-bold capitalize">
-            {rowData.case_type ?? "--"}
+            {rowData?.case_type ?? "--"}
           </p>
         </div>
 
         <div className=" mx-5 flex justify-between">
           <h3 className="my-3 text-muted-foreground font-semibold">Location</h3>
           <p className="my-3 font-bold capitalize">
-            {rowData.location === "other"
-              ? rowData.location
-              : rowData.location_type ?? "--" ?? "--"}
+            {rowData?.location === "other"
+              ? rowData?.location
+              : rowData?.location_type ?? "--" ?? "--"}
           </p>
         </div>
 
         <div className=" mx-5 flex justify-between">
+          <h3 className="my-3 text-muted-foreground font-semibold">
+            Reported On
+          </h3>
+          <p className="my-3 font-bold capitalize">
+            {rowData?.reported_on ?? "--"}
+          </p>
+        </div>
+
+        <div className=" mx-5 flex justify-between">
+          <h3 className="my-3 text-muted-foreground font-semibold">
+            Reported By
+          </h3>
+          <p className="my-3 font-bold capitalize">
+            {rowData?.reported_by ?? "--"}
+          </p>
+        </div>
+
+        <div className="mx-5 flex justify-between">
           <h3 className="my-3 text-muted-foreground font-semibold">Date</h3>
-          <p className="my-3 font-bold">{formatDate(rowData.date) ?? "--"}</p>
+          <p className="my-3 font-bold">{formatDate(rowData?.date) ?? "--"}</p>
         </div>
 
         <div className=" mx-5 flex justify-between">
@@ -113,9 +133,24 @@ export function CasesSheet({ row, rowData }: { row: any; rowData: any }) {
             Resolution Date
           </h3>
           <p className="my-3 font-bold">
-            {formatDate(rowData.resolution_date) ?? "--"}
+            {rowData?.resolution_date
+              ? formatDate(rowData?.resolution_date ?? "")
+              : "--"}
           </p>
         </div>
+
+        {
+          <div className=" mx-5 flex justify-between">
+            <h3 className="my-3 text-muted-foreground font-semibold">
+              Incident Date
+            </h3>
+            <p className="my-3 font-bold">
+              {rowData?.incident_date
+                ? formatDate(rowData?.incident_date)
+                : "--"}
+            </p>
+          </div>
+        }
 
         <hr className="my-3" />
         <div className="flex justify-between mx-5">
@@ -128,8 +163,8 @@ export function CasesSheet({ row, rowData }: { row: any; rowData: any }) {
             </h3>
           </div>
           <div className="text-end font-semibold">
-            <p className="my-3">Rs {rowData.amount_given ?? "--"}</p>
-            <p className="my-3">Rs {rowData.amount_received ?? "--"}</p>
+            <p className="my-3">Rs {rowData?.amount_given ?? "--"}</p>
+            <p className="my-3">Rs {rowData?.amount_received ?? "--"}</p>
           </div>
         </div>
       </SheetContent>

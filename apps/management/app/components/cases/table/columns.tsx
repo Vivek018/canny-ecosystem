@@ -37,19 +37,6 @@ export const columns: ColumnDef<CasesDatabaseRow>[] = [
     },
   },
   {
-    enableSorting: false,
-    accessorKey: "description",
-    header: "Description",
-    cell: ({ row }) => {
-      return (
-        <p className="truncate w-48 group-hover:text-primary">
-          {row.original?.description ?? "--"}
-        </p>
-      );
-    },
-  },
-
-  {
     accessorKey: "date",
     header: "Date",
     cell: ({ row }) => {

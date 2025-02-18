@@ -25,7 +25,7 @@ import { Button } from "@canny_ecosystem/ui/button";
 import { ExportBar } from "../export-bar";
 import { useCaseStore } from "@/store/cases";
 import type { CasesDatabaseRow } from "@canny_ecosystem/supabase/types";
-import { CasesSheet } from "../cases_sheet";
+import { CaseSheet } from "../case-sheet";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -155,9 +155,7 @@ export function CasesTable<TData, TValue>({
               {tableLength ? (
                 table.getRowModel().rows.map((row) => {
                   const rowData = row.original;
-                  return (
-                    <CasesSheet key={row.id} row={row} rowData={rowData} />
-                  );
+                  return <CaseSheet key={row.id} row={row} rowData={rowData} />;
                 })
               ) : (
                 <TableRow className={cn(!tableLength && "border-none")}>

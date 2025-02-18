@@ -138,6 +138,13 @@ export default function CreateCase({
         });
       }
       navigate(actionData.returnTo);
+    } else {
+      toast({
+        title: "Error",
+        description:
+          actionData?.error?.message ?? "An unexpected error occurred",
+        variant: "destructive",
+      });
     }
   }, [actionData]);
 

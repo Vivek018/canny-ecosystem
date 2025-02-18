@@ -33,6 +33,7 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { useUser } from "@/utils/user";
 import { CaseSearchFilter } from "@/components/cases/case-search-filter";
+import { CaseActions } from "@/components/cases/case-actions";
 
 const pageSize = LAZY_LOADING_LIMIT;
 
@@ -136,20 +137,9 @@ export default function CasesIndex() {
       <div className="w-full flex items-center justify-between pb-4">
         <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
           <CaseSearchFilter />
-          <Link
-            to="/incidents/cases/create-case"
-            className={cn(
-              buttonVariants({ variant: "primary-outline" }),
-              "flex items-center gap-1",
-              !hasPermission(role, `${createRole}:${attribute.cases}`) &&
-                "hidden",
-            )}
-          >
-            <span>Add</span>
-            <span className="hidden md:flex justify-end">Case</span>
-          </Link>
           <FilterList filters={filterList} />
         </div>
+        <CaseActions />
       </div>
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={casesPromise}>

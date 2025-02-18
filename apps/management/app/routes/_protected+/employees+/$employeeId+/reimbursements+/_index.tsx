@@ -31,6 +31,7 @@ import {
 import { Suspense } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import { EmployeeReimbursementActions } from "@/components/reimbursements/employee-reimbursement-actions";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const env = {
@@ -62,7 +63,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined
+        (value) => value !== null && value !== undefined,
       );
 
     const usersPromise = getUsersEmail({ supabase, companyId });
@@ -75,8 +76,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         to: hasFilters
           ? MAX_QUERY_LIMIT
           : page > 0
-          ? LAZY_LOADING_LIMIT
-          : LAZY_LOADING_LIMIT - 1,
+            ? LAZY_LOADING_LIMIT
+            : LAZY_LOADING_LIMIT - 1,
         filters,
         searchQuery: query ?? undefined,
         sort: sortParam?.split(":") as [string, "asc" | "desc"],
@@ -109,7 +110,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
     `${cacheKeyPrefix.employee_reimbursements}${
       args.params.employeeId
     }${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 
@@ -138,7 +139,7 @@ export default function ReimbursementsIndex() {
   const noFilters = Object.values(filters).every((value) => !value);
 
   return (
-    <section className='py-4' key={reimbursementPromise}>
+    <section className="py-4" key={reimbursementPromise}>
       <Suspense fallback={<div>Loading...</div>}>
         <Await
           resolve={usersPromise}
@@ -159,7 +160,7 @@ export default function ReimbursementsIndex() {
                 {({ data, meta, error }) => {
                   if (error) {
                     clearCacheEntry(
-                      `${cacheKeyPrefix.employee_reimbursements}${employeeId}`
+                      `${cacheKeyPrefix.employee_reimbursements}${employeeId}`,
                     );
                     toast({
                       variant: "destructive",
@@ -171,14 +172,14 @@ export default function ReimbursementsIndex() {
                   }
 
                   const hasNextPage = Boolean(
-                    meta?.count && meta.count / (0 + 1) > LAZY_LOADING_LIMIT
+                    meta?.count && meta.count / (0 + 1) > LAZY_LOADING_LIMIT,
                   );
 
                   return (
                     <>
-                      <div className='w-full flex items-center justify-between pb-4'>
-                        <div className='w-full flex justify-between items-center'>
-                          <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4'>
+                      <div className="w-full flex items-center justify-between pb-4">
+                        <div className="w-full flex justify-between items-center">
+                          <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
                             <ReimbursementSearchFilter
                               disabled={!data?.length && noFilters}
                               userEmails={
@@ -191,22 +192,9 @@ export default function ReimbursementsIndex() {
                             <FilterList filters={filters} />
                           </div>
 
-                          <Link
-                            to={"add-reimbursement"}
-                            className={cn(
-                              buttonVariants({ variant: "primary-outline" }),
-                              "flex items-center gap-1",
-                              !hasPermission(
-                                role,
-                                `${createRole}:${attribute.employeeReimbursements}`
-                              ) && "hidden"
-                            )}
-                          >
-                            <span>Add</span>
-                            <span className='hidden md:flex justify-end'>
-                              Claim
-                            </span>
-                          </Link>
+                          <EmployeeReimbursementActions
+                            isEmpty={!data?.length}
+                          />
                         </div>
                       </div>
 

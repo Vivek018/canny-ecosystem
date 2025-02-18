@@ -12,8 +12,6 @@ export function ReimbursementActions({ isEmpty }: { isEmpty: boolean }) {
 
   return (
     <div className="space-x-2 hidden md:flex">
-      <ColumnVisibility disabled={isEmpty} hidden={!!selectedRows.length} />
-      <ImportReimbursementMenu />
       <Button
         variant="outline"
         size="icon"
@@ -23,6 +21,8 @@ export function ReimbursementActions({ isEmpty }: { isEmpty: boolean }) {
       >
         <Icon name="chart" className="h-[18px] w-[18px]" />
       </Button>
+      <ColumnVisibility disabled={isEmpty} hidden={!!selectedRows.length} />
+      <ImportReimbursementMenu />
     </div>
   );
 }

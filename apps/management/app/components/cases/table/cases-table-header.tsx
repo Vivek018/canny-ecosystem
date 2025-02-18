@@ -14,7 +14,6 @@ type Props = {
 // make sure the order is same as header order
 export const CasesColumnIdArray = [
   "title",
-  "description",
   "date",
   "case_type",
   "status",
