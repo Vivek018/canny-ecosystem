@@ -68,7 +68,6 @@ export function ExitPaymentTable<TData, TValue>({
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
     initialColumnVisibility ?? {}
-    initialColumnVisibility ?? {}
   );
 
   const loadMoreExit = async () => {
