@@ -21,7 +21,7 @@ import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { Suspense, useEffect } from "react";
-import { clearCacheEntry } from "@/utils/cache";
+import { clearExactCacheEntry } from "@/utils/cache";
 import RegisterCase from "./create-case";
 import { updateCaseById } from "@canny_ecosystem/supabase/mutations";
 import { getCasesById } from "@canny_ecosystem/supabase/queries";
@@ -102,7 +102,7 @@ export default function UpdateCases() {
   useEffect(() => {
     if (!actionData) return;
     if (actionData?.status === "success") {
-      clearCacheEntry(cacheKeyPrefix.case);
+      clearExactCacheEntry(cacheKeyPrefix.case);
       toast({
         title: "Success",
         description: actionData?.message || "Case updated successfully",
@@ -125,13 +125,15 @@ export default function UpdateCases() {
     <Suspense fallback={<div>Loading...</div>}>
       <Await resolve={casePromise}>
         {(resolvedData) => {
-          if (resolvedData?.error)
+          if (resolvedData?.error) {
+            clearExactCacheEntry(cacheKeyPrefix.case);
             return (
               <ErrorBoundary
                 error={resolvedData?.error}
                 message="Failed to load case"
               />
             );
+          }
           return <RegisterCase updateValues={resolvedData?.data} />;
         }}
       </Await>
