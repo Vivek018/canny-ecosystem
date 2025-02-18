@@ -4,9 +4,11 @@ import { Icon } from "@canny_ecosystem/ui/icon";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import type { ExitsRow } from "@canny_ecosystem/supabase/types";
-import { createRole, formatDate, hasPermission } from "@canny_ecosystem/utils";
+import { createRole, formatDate, hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { ExitsDropdown } from "../exits-dropdown";
+import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
 
 type DetailItemProps = {
   label: string;
@@ -20,7 +22,7 @@ const DetailItem: React.FC<DetailItemProps> = ({ label, value, formatter }) => {
   return (
     <div className="flex flex-col">
       <h3 className="text-muted-foreground text-[13px] tracking-wide capitalize">{label}</h3>
-      <p>{formattedValue}</p>
+      <p className="truncate w-80">{formattedValue}</p>
     </div>
   );
 };
@@ -28,14 +30,6 @@ const DetailItem: React.FC<DetailItemProps> = ({ label, value, formatter }) => {
 export const ExitsItem = ({ exitsData }: { exitsData: any }) => {
   return (
     <section className="w-full select-text cursor-auto h-full flex flex-col justify-start p-4">
-      <header className="flex flex-row space-y-0 items-center justify-between mb-4">
-        <h2 className="text-lg tracking-wide font-semibold">
-          <DetailItem
-            label="Project Name"
-            value={exitsData?.employees?.employee_project_assignment?.project_sites?.projects?.name}
-          />
-        </h2>
-      </header>
       <ul className="grid grid-cols-3 gap-4">
         <li>
           <DetailItem label="Organization Payable Days" value={exitsData?.organization_payable_days} />
@@ -60,12 +54,6 @@ export const ExitsItem = ({ exitsData }: { exitsData: any }) => {
         <li>
           <DetailItem label="Net Pay" value={exitsData.net_pay ? `₹${exitsData?.net_pay}` : '-'} />
         </li>
-        <li>
-          <DetailItem
-            label="Project Site"
-            value={exitsData?.employees?.employee_project_assignment?.project_sites.name}
-          />
-        </li>
         <li><DetailItem label="Note" value={exitsData?.note} /></li>
       </ul>
     </section>
@@ -81,28 +69,39 @@ export const ExitsCard = ({ exitsData, employeeId }: { exitsData: ExitsRow, empl
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold">Exits</h2>
         <div>
-          <Link
-            to={`/approvals/exits/${exitsData ? exitsData.id : employeeId}/${exitsData ? "update" : "create"}-exit`}
-            className={cn(
-              buttonVariants({ variant: "outline" }),
-              "bg-card",
-              !hasPermission(`${role}`, `${createRole}:${attribute.employeeExits}`) && "hidden",
-            )}
-          >
-            {
-              exitsData
-                ?
-                <>
-                  <Icon name={"edit"} className="mr-2" />
-                  Update Exit
-                </>
-                :
-                <>
-                  <Icon name={"plus-circled"} className="mr-2" />
-                  Create Exit
-                </>
-            }
-          </Link>
+          {
+            exitsData
+              ?
+              <ExitsDropdown
+                exitId={exitsData.id}
+                triggerChild={
+                  <DropdownMenuTrigger
+                    className={cn(
+                      buttonVariants({ variant: "outline" }),
+                      "bg-card",
+                      !hasPermission(
+                        role, `${updateRole}:${attribute.employeeExits}`,
+                      ) && "hidden",
+                    )}
+                  >
+                    <Icon name="dots-vertical" size="xs" className="mr-1.5" />
+                    <p>More Options</p>
+                  </DropdownMenuTrigger>
+                }
+              />
+              :
+              <Link
+                to={`/approvals/exits/${employeeId}/create-exit`}
+                className={cn(
+                  buttonVariants({ variant: "outline" }),
+                  "bg-card",
+                  !hasPermission(`${role}`, `${createRole}:${attribute.employeeExits}`) && "hidden",
+                )}
+              >
+                <Icon name={"plus-circled"} className="mr-2" />
+                Create Exit
+              </Link>
+          }
         </div>
       </div>
 

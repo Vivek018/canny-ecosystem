@@ -586,16 +586,16 @@ export const reasonForExitArray = [
 
 export const ExitFormSchema = z.object({
   employee_id: z.string().optional(),
-  organization_payable_days: zNumber.default("0"),
-  employee_payable_days: zNumber.default("0"),
+  organization_payable_days: z.number().default(0),
+  employee_payable_days: z.number().default(0),
   last_working_day: z.string(),
   final_settlement_date: z.string(),
   reason: z.enum(reasonForExitArray).default("other"),
-  note: zTextArea.max(100).optional(),
-  bonus: zNumber.default("0"),
-  leave_encashment: zNumber.default("0"),
-  gratuity: zNumber.default("0"),
-  deduction: zNumber.default("0"),
+  note: zString.optional(),
+  bonus: z.number().default(0),
+  leave_encashment: z.number().default(0),
+  gratuity: z.number().default(0),
+  deduction: z.number().default(0),
 });
 
 // Payment Templates

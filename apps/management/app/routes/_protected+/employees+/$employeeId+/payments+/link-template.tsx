@@ -1,6 +1,6 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { Form, json, useLoaderData, useNavigation, useParams } from "@remix-run/react";
+import { Form, json, useLoaderData, useParams } from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import {
   EmployeeLinkSchema, getInitialValueFromZod, getValidDateForInput,
@@ -17,11 +17,9 @@ import { safeRedirect } from "@/utils/server/http.server";
 import { DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
-import { StatusButton } from "@canny_ecosystem/ui/status-button";
-import { DeleteEmployeePaymentTemplateAssignment } from "@/components/employees/delete-employee-payment-template-assignment";
 import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
-import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@canny_ecosystem/ui/card";
+import { FormButtons } from "@/components/form/form-buttons";
 
 export async function loader({ request, params }: LoaderFunctionArgs): Promise<Response> {
   const employeeId = params.employeeId as string;
@@ -70,7 +68,6 @@ export default function EmployeeLinkTemplateForm() {
     paymentTemplateAssignmentData, paymentTemplatesData
   } = useLoaderData<typeof loader>();
 
-  const navigation = useNavigation();
   const { employeeId } = useParams();
 
   const [paymentTemplatesOptions, setPaymentTemplatesOptions] = useState<
@@ -88,7 +85,6 @@ export default function EmployeeLinkTemplateForm() {
   );
   const [resetKey, setResetKey] = useState(Date.now());
 
-  const disableAll = navigation.state === "submitting" || navigation.state === "loading";
 
   const [form, fields] = useForm({
     id: "payment-template-form",
@@ -181,19 +177,11 @@ export default function EmployeeLinkTemplateForm() {
                 labelProps={{ children: "Payment templates" }}
                 errors={fields.template_id.errors}
               />
-              <div className="mt-6">
-                <StatusButton
-                  status={navigation.state === "submitting" ? "pending" : "idle"}
-                  variant="default"
-                  className="w-full capitalize"
-                  disabled={!form.valid || disableAll}
-                >
-                  {initialValues ? "Update" : "Create"} link template
-                </StatusButton>
-                <div className={cn("w-full mt-3", !initialValues && "hidden")}>
-                  <DeleteEmployeePaymentTemplateAssignment employeeId={employeeId as string} />
-                </div>
-              </div>
+              <FormButtons
+                form={form}
+                setResetKey={setResetKey}
+                isSingle={true}
+              />
             </CardContent>
           </Card>
         </Form>

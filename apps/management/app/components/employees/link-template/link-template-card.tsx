@@ -4,9 +4,11 @@ import { Icon } from "@canny_ecosystem/ui/icon";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import type { PaymentTemplateAssignmentsDatabaseRow } from "@canny_ecosystem/supabase/types";
-import { createRole, formatDate, hasPermission } from "@canny_ecosystem/utils";
+import { createRole, formatDate, hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
+import { LinkTemplateDropdown } from "../link-template-dropdown";
 
 type DetailItemProps = {
   label: string;
@@ -31,12 +33,8 @@ export const LinkTemplateItem = ({ paymentTemplateAssignmentData }:
   }) => {
   return (
     <section className="w-full select-text cursor-auto h-full flex flex-col justify-start p-4">
-      <header className="flex flex-row space-y-0 items-center justify-between mb-4">
-        <h2 className="text-lg tracking-wide font-semibold">
-          <DetailItem label="Template Name" value={paymentTemplateAssignmentData.name} />
-        </h2>
-      </header>
-      <ul className="grid grid-cols-2 gap-4">
+      <ul className="grid grid-cols-3 gap-4">
+        <li><DetailItem label="Template Name" value={paymentTemplateAssignmentData.name} /></li>
         <li><DetailItem label="Template ID" value={paymentTemplateAssignmentData.template_id} /></li>
         <li><DetailItem label="Assignment Type" value={paymentTemplateAssignmentData.assignment_type} /></li>
         <li><DetailItem label="Employee ID" value={paymentTemplateAssignmentData.employee_id} /></li>
@@ -48,10 +46,9 @@ export const LinkTemplateItem = ({ paymentTemplateAssignmentData }:
   );
 };
 
-
 export const LinkTemplateCard = (
   { paymentTemplateAssignmentData }:
-    {paymentTemplateAssignmentData: PaymentTemplateAssignmentsDatabaseRow}
+    { paymentTemplateAssignmentData: PaymentTemplateAssignmentsDatabaseRow }
 ) => {
   const { role } = useUser();
 
@@ -60,28 +57,39 @@ export const LinkTemplateCard = (
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold">Link Template</h2>
         <div>
-          <Link
-            to="link-template"
-            className={cn(
-              buttonVariants({ variant: "outline" }),
-              "bg-card",
-              !hasPermission(`${role}`, `${createRole}:${attribute.employeePaymentTemplateLink}`) && "hidden",
-            )}
-          >
-            {
-              paymentTemplateAssignmentData
-                ?
-                <>
-                  <Icon name={"edit"} className="mr-2" />
-                  Update Template
-                </>
-                :
-                <>
-                  <Icon name={"plus-circled"} className="mr-2" />
-                  Create Template
-                </>
-            }
-          </Link>
+          {
+            paymentTemplateAssignmentData
+              ?
+              <LinkTemplateDropdown
+                employeeId={paymentTemplateAssignmentData.employee_id as string}
+                triggerChild={
+                  <DropdownMenuTrigger
+                    className={cn(
+                      buttonVariants({ variant: "outline" }),
+                      "bg-card",
+                      !hasPermission(
+                        role, `${updateRole}:${attribute.employeePaymentTemplateLink}`,
+                      ) && "hidden",
+                    )}
+                  >
+                    <Icon name="dots-vertical" size="xs" className="mr-1.5" />
+                    <p>More Options</p>
+                  </DropdownMenuTrigger>
+                }
+              />
+              :
+              <Link
+                to="link-template"
+                className={cn(
+                  buttonVariants({ variant: "outline" }),
+                  "bg-card",
+                  !hasPermission(`${role}`, `${createRole}:${attribute.employeePaymentTemplateLink}`) && "hidden",
+                )}
+              >
+                <Icon name={"plus-circled"} className="mr-2" />
+                Create Template
+              </Link>
+          }
         </div>
       </div>
 

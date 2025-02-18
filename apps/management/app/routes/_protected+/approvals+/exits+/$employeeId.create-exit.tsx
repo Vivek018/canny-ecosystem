@@ -12,13 +12,11 @@ import {
 import {
   Field,
   SearchableSelectField,
-  TextareaField,
 } from "@canny_ecosystem/ui/forms";
 import {
   FormProvider,
   getFormProps,
   getInputProps,
-  getTextareaProps,
   useForm,
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
@@ -128,7 +126,7 @@ export default function CreateExit({
     defaultValue: {
       ...initialValues,
       employee_id: employeeId,
-    } as any,
+    },
   });
 
   useEffect(() => {
@@ -287,12 +285,15 @@ export default function CreateExit({
                 labelProps={{ children: replaceUnderscore(fields.reason.name) }}
                 errors={fields.reason.errors}
               />
-              <TextareaField
-                textareaProps={{
-                  ...getTextareaProps(fields.note),
+              <Field
+                inputProps={{
+                  ...getInputProps(fields.note, { type: "text" }),
+                  className: "capitalize",
                   placeholder: `Enter ${replaceUnderscore(fields.note.name)}`,
                 }}
-                labelProps={{ children: replaceUnderscore(fields.note.name) }}
+                labelProps={{
+                  children: replaceUnderscore(fields.note.name),
+                }}
                 errors={fields.note.errors}
               />
             </CardContent>
