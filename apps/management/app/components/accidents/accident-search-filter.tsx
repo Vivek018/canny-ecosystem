@@ -27,7 +27,15 @@ import {
 
 import type { AccidentFilters } from "@canny_ecosystem/supabase/queries";
 
-export function AccidentSearchFilter({ disabled }: { disabled?: boolean }) {
+export function AccidentSearchFilter({
+  disabled,
+  projectArray,
+  projectSiteArray,
+}: {
+  disabled?: boolean;
+  projectArray?: string[];
+  projectSiteArray?: string[];
+}) {
   const [prompt, setPrompt] = useState("");
   const navigation = useNavigation();
   const isSubmitting =
@@ -49,6 +57,8 @@ export function AccidentSearchFilter({ disabled }: { disabled?: boolean }) {
     category: null,
     name: "",
     severity: null,
+    project: null,
+    project_site: null,
   };
 
   const [filterParams, setFilterParams] = useState(initialFilterParams);
@@ -78,6 +88,10 @@ export function AccidentSearchFilter({ disabled }: { disabled?: boolean }) {
     ) as AccidentFilters["location_type"],
     category: searchParams.get("category") as AccidentFilters["category"],
     severity: searchParams.get("severity") as AccidentFilters["severity"],
+    project: searchParams.get("project") as AccidentFilters["project"],
+    project_site: searchParams.get(
+      "project_site"
+    ) as AccidentFilters["project_site"],
   };
 
   useEffect(() => {
@@ -141,9 +155,9 @@ export function AccidentSearchFilter({ disabled }: { disabled?: boolean }) {
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-      <div className='flex space-x-4 w-full md:w-auto items-center'>
+      <div className="flex space-x-4 w-full md:w-auto items-center">
         <form
-          className='relative w-full md:w-auto'
+          className="relative w-full md:w-auto"
           onSubmit={(e) => {
             e.preventDefault();
             handleSubmit(e);
@@ -165,19 +179,19 @@ export function AccidentSearchFilter({ disabled }: { disabled?: boolean }) {
                 : "Search Accidents"
             }
             disabled={disabled}
-            className='pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70'
+            className="pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70"
             value={prompt}
             onChange={handleSearch}
-            autoComplete='on'
-            autoCapitalize='none'
-            autoCorrect='off'
-            spellCheck='false'
+            autoComplete="on"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck="false"
           />
 
           <DropdownMenuTrigger disabled={disabled} asChild>
             <button
               onClick={() => setIsOpen((prev) => !prev)}
-              type='button'
+              type="button"
               disabled={disabled}
               className={cn(
                 "absolute z-10 right-3 top-[6px] opacity-70",
@@ -187,18 +201,18 @@ export function AccidentSearchFilter({ disabled }: { disabled?: boolean }) {
                 isOpen && "opacity-100"
               )}
             >
-              <Icon name='mixer' />
+              <Icon name="mixer" />
             </button>
           </DropdownMenuTrigger>
         </form>
       </div>
 
       <DropdownMenuContent
-        className='w-full md:w-[480px]'
-        align='end'
+        className="w-full md:w-[480px]"
+        align="end"
         sideOffset={19}
         alignOffset={-11}
-        side='top'
+        side="top"
       >
         <DropdownMenuGroup>
           <DropdownMenuSub>
@@ -209,10 +223,10 @@ export function AccidentSearchFilter({ disabled }: { disabled?: boolean }) {
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className='p-0'
+                className="p-0"
               >
                 <Calendar
-                  mode='range'
+                  mode="range"
                   initialFocus
                   today={
                     filterParams.date_start
@@ -258,12 +272,12 @@ export function AccidentSearchFilter({ disabled }: { disabled?: boolean }) {
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className='p-0'
+                className="p-0"
               >
                 {statusArray.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className='capitalize'
+                    className="capitalize"
                     checked={filterParams?.status === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
@@ -289,12 +303,12 @@ export function AccidentSearchFilter({ disabled }: { disabled?: boolean }) {
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className='p-0'
+                className="p-0"
               >
                 {locationTypeArray.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className='capitalize'
+                    className="capitalize"
                     checked={filterParams?.location_type === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
@@ -319,7 +333,7 @@ export function AccidentSearchFilter({ disabled }: { disabled?: boolean }) {
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className='p-0'
+                className="p-0"
               >
                 {categoryOfAccidentArray?.map((name, index) => (
                   <DropdownMenuCheckboxItem
@@ -349,12 +363,12 @@ export function AccidentSearchFilter({ disabled }: { disabled?: boolean }) {
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className='p-0'
+                className="p-0"
               >
                 {severityTypeArray?.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className='capitalize'
+                    className="capitalize"
                     checked={filterParams?.severity === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
@@ -366,6 +380,76 @@ export function AccidentSearchFilter({ disabled }: { disabled?: boolean }) {
                     {name}
                   </DropdownMenuCheckboxItem>
                 ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+        </DropdownMenuGroup>
+        <DropdownMenuGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <span>Project</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent
+                sideOffset={14}
+                alignOffset={-4}
+                className="p-0"
+              >
+                {projectArray?.map((name, index) => (
+                  <DropdownMenuCheckboxItem
+                    key={name + index.toString()}
+                    className="capitalize"
+                    checked={filterParams?.project === name}
+                    onCheckedChange={() => {
+                      setFilterParams((prev) => ({
+                        ...prev,
+                        project: name,
+                      }));
+                    }}
+                  >
+                    {name}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+        </DropdownMenuGroup>
+
+        <DropdownMenuGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <span>Project Site</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent
+                sideOffset={14}
+                alignOffset={-4}
+                className="p-0"
+              >
+                {!searchParamsList.project ? (
+                  <DropdownMenuCheckboxItem
+                    disabled={true}
+                    className="p-8 items-center justify-center"
+                  >
+                    Select Project First
+                  </DropdownMenuCheckboxItem>
+                ) : (
+                  projectSiteArray?.map((name, index) => (
+                    <DropdownMenuCheckboxItem
+                      key={name + index.toString()}
+                      className="capitalize"
+                      checked={filterParams?.project_site === name}
+                      onCheckedChange={() => {
+                        setFilterParams((prev) => ({
+                          ...prev,
+                          project_site: name,
+                        }));
+                      }}
+                    >
+                      {name}
+                    </DropdownMenuCheckboxItem>
+                  ))
+                )}
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>

@@ -68,6 +68,7 @@ export function ExitPaymentTable<TData, TValue>({
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
     initialColumnVisibility ?? {}
+    initialColumnVisibility ?? {}
   );
 
   const loadMoreExit = async () => {
@@ -193,9 +194,9 @@ export function ExitPaymentTable<TData, TValue>({
         </div>
       </div>
 
-      {hasNextPage && (
-        <div className='flex items-center justify-center mt-6' ref={ref}>
-          <div className='flex items-center space-x-2 px-6 py-5'>
+      {hasNextPage && initialData?.length && (
+        <div className="flex items-center justify-center mt-6" ref={ref}>
+          <div className="flex items-center space-x-2 px-6 py-5">
             <Spinner />
             <span className='text-sm text-[#606060]'>Loading more...</span>
           </div>

@@ -26,7 +26,7 @@ export function ExportBar({
 
   const toBeExportedData = data.map((element: any) => {
     const employee_name =
-      `${element.employees.first_name} ${element.employees.middle_name} ${element.employees.last_name}`.trim();
+      `${element.employees?.first_name} ${element.employees?.middle_name} ${element.employees.last_name}`.trim();
 
     const exportedData = {} as any;
     let total = 0;
@@ -35,15 +35,15 @@ export function ExportBar({
       if (columnVisibility[key] === false) continue;
 
       if (key === "employee_code")
-        exportedData.employee_code = element.employees.employee_code;
+        exportedData.employee_code = element.employees?.employee_code;
       else if (key === "employee_name")
         exportedData.employee_name = employee_name;
       else if (key === "project")
         exportedData.project_name =
-          element.employees.employee_project_assignment.project_sites.projects.name;
+          element.employees?.employee_project_assignment?.project_sites?.projects?.name;
       else if (key === "project_site")
         exportedData.project_site_name =
-          element.employees.employee_project_assignment.project_sites.name;
+          element.employees?.employee_project_assignment?.project_sites?.name;
       else exportedData[key] = element[key];
     }
 

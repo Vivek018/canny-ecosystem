@@ -1,5 +1,8 @@
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { MAX_QUERY_LIMIT } from "@canny_ecosystem/supabase/constant";
+import {
+  LAZY_LOADING_LIMIT,
+  MAX_QUERY_LIMIT,
+} from "@canny_ecosystem/supabase/constant";
 import {
   getAttendanceByCompanyId,
   getProjectNamesByCompanyId,
@@ -9,8 +12,9 @@ import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import {
+  Await,
   type ClientLoaderFunctionArgs,
-  json,
+  defer,
   redirect,
   useLoaderData,
   useNavigate,
@@ -19,23 +23,24 @@ import { AttendanceTable } from "@/components/attendance/table/attendance-table"
 import { attendanceColumns } from "@/components/attendance/table/columns";
 import { ImportAttendanceMenu } from "@/components/attendance/import-attendance-menu";
 import { ImportEmployeeAttendanceModal } from "@/components/employees/import-export/import-modal-attendance";
-import { FilterList } from "@/components/attendance/filter-list";
-import { AttendanceSearchFilter } from "@/components/attendance/attendance-search-filter";
 import { useAttendanceStore } from "@/store/attendance";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { formatDate, hasPermission, readRole } from "@canny_ecosystem/utils";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import { clientCaching } from "@/utils/cache";
+import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { attribute, months } from "@canny_ecosystem/utils/constant";
+import { ErrorBoundary } from "@/components/error-boundary";
+import { AttendanceSearchFilter } from "@/components/attendance/attendance-search-filter";
+import { FilterList } from "@/components/attendance/filter-list";
 
-export type TransformedAteendanceDataType = {
-  projectName: any;
+const pageSize = LAZY_LOADING_LIMIT;
+export type TransformedAttendanceDataType = {
+  projectName: string;
   attendance: never[];
-
   employee_id: string;
   employee_code: string;
   employee_name: string;
@@ -44,63 +49,85 @@ export type TransformedAteendanceDataType = {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const url = new URL(request.url);
-  const { supabase, headers } = getSupabaseWithHeaders({ request });
-
-  const { user } = await getUserCookieOrFetchUser(request, supabase);
-
-  if (!hasPermission(user?.role!, `${readRole}:${attribute.attendance}`)) {
-    return safeRedirect(DEFAULT_ROUTE, { headers });
-  }
-
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const searchParams = new URLSearchParams(url.searchParams);
-  const sortParam = searchParams.get("sort");
-  const query = searchParams.get("name") ?? undefined;
-
-  const filters = {
-    month: searchParams.get("month") ?? undefined,
-    year: searchParams.get("year") ?? undefined,
-    name: query,
-    project: searchParams.get("project") ?? undefined,
-    project_site: searchParams.get("project_site") ?? undefined,
+  const env = {
+    SUPABASE_URL: process.env.SUPABASE_URL!,
+    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
+  try {
+    const url = new URL(request.url);
+    const { supabase, headers } = getSupabaseWithHeaders({ request });
+    const page = 0;
+    const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  const { data: attendanceData, error: attendanceError } =
-    await getAttendanceByCompanyId({
+    if (!hasPermission(user?.role!, `${readRole}:${attribute.attendance}`)) {
+      return safeRedirect(DEFAULT_ROUTE, { headers });
+    }
+
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    const searchParams = new URLSearchParams(url.searchParams);
+    const sortParam = searchParams.get("sort");
+    const query = searchParams.get("name") ?? undefined;
+
+    const filters = {
+      month: searchParams.get("month") ?? undefined,
+      year: searchParams.get("year") ?? undefined,
+      name: query,
+      project: searchParams.get("project") ?? undefined,
+      project_site: searchParams.get("project_site") ?? undefined,
+    };
+
+    const hasFilters =
+      filters &&
+      Object.values(filters).some(
+        (value) => value !== null && value !== undefined
+      );
+
+    const attendancePromise = await getAttendanceByCompanyId({
       supabase,
       companyId,
       params: {
         from: 0,
-        to: MAX_QUERY_LIMIT,
+        to: hasFilters ? MAX_QUERY_LIMIT : page > 0 ? pageSize : pageSize - 1,
         filters,
         searchQuery: query ?? undefined,
         sort: sortParam?.split(":") as [string, "asc" | "desc"],
       },
     });
-  if (attendanceError || !attendanceData) {
-    throw attendanceError;
-  }
 
-  const { data: projectData } = await getProjectNamesByCompanyId({
-    supabase,
-    companyId,
-  });
-
-  let projectSiteData = null;
-  if (filters.project) {
-    const { data } = await getSiteNamesByProjectName({
+    const projectPromise = await getProjectNamesByCompanyId({
       supabase,
-      projectName: filters.project,
+      companyId,
     });
-    projectSiteData = data;
+
+    let projectSitePromise = null;
+    if (filters.project) {
+      projectSitePromise = await getSiteNamesByProjectName({
+        supabase,
+        projectName: filters.project,
+      });
+    }
+    return defer({
+      projectPromise,
+      projectSitePromise,
+      attendancePromise: attendancePromise as any,
+      filters,
+      query,
+      env,
+      companyId,
+    });
+  } catch (error) {
+    console.error("Attendance Error in loader function:", error);
+
+    return defer({
+      attendancePromise: Promise.resolve({ data: [] }),
+      projectPromise: Promise.resolve({ data: [] }),
+      projectSitePromise: Promise.resolve({ data: [] }),
+      query: "",
+      filters: undefined,
+      companyId: "",
+      env,
+    });
   }
-  return json({
-    attendanceData,
-    filters,
-    projectArray: projectData?.map((project) => project.name) ?? [],
-    projectSiteArray: projectSiteData?.map((site) => site.name) ?? [],
-  });
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
@@ -108,7 +135,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 
   return await clientCaching(
     `${cacheKeyPrefix.attendance}${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 
@@ -132,10 +159,15 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function Attendance() {
   const navigate = useNavigate();
-  const { attendanceData, filters, projectArray, projectSiteArray } =
-    useLoaderData<typeof loader>();
-
-  const [data, setData] = useState<TransformedAteendanceDataType[]>([]);
+  const {
+    attendancePromise,
+    projectPromise,
+    projectSitePromise,
+    query,
+    filters,
+    companyId,
+    env,
+  } = useLoaderData<typeof loader>();
 
   function transformAttendanceData(data: any[]) {
     const groupedByEmployeeAndMonth = data.reduce((acc, employee) => {
@@ -169,12 +201,12 @@ export default function Attendance() {
         acc[key][fullDate] = record.present
           ? "P"
           : record.holiday
-            ? record.holiday_type === "weekly"
-              ? "(WOF)"
-              : record.holiday_type === "paid"
-                ? "L"
-                : "A"
-            : "A";
+          ? record.holiday_type === "weekly"
+            ? "(WOF)"
+            : record.holiday_type === "paid"
+            ? "L"
+            : "A"
+          : "A";
       }
 
       return acc;
@@ -183,34 +215,26 @@ export default function Attendance() {
     return Object.values(groupedByEmployeeAndMonth);
   }
 
-  useEffect(() => {
-    setData(
-      transformAttendanceData(
-        attendanceData,
-      ) as TransformedAteendanceDataType[],
-    );
-  }, [attendanceData]);
-
   const [month, setMonth] = useState<number>(() => {
-    if (filters.month) {
-      return months[filters.month] - 1;
+    if (filters?.month) {
+      return months[filters?.month] - 1;
     }
     return new Date().getMonth();
   });
 
   const [year, setYear] = useState<number>(() => {
-    return filters.year ? Number(filters.year) : new Date().getFullYear();
+    return filters?.year ? Number(filters?.year) : new Date().getFullYear();
   });
 
   useEffect(() => {
-    if (filters.month) {
-      setMonth(months[filters.month] - 1);
+    if (filters?.month) {
+      setMonth(months[filters?.month] - 1);
     } else {
       setMonth(new Date().getMonth());
     }
 
-    if (filters.year) {
-      setYear(Number(filters.year));
+    if (filters?.year) {
+      setYear(Number(filters?.year));
     } else {
       setYear(new Date().getFullYear());
     }
@@ -230,18 +254,36 @@ export default function Attendance() {
   const { selectedRows } = useAttendanceStore();
 
   const noFilters = Object.values(filters).every((value) => !value);
-
   return (
     <section className="py-4">
       <div className="w-full flex items-center justify-between pb-4">
         <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
-          <AttendanceSearchFilter
-            disabled={!attendanceData?.length && noFilters}
-            projectArray={projectArray}
-            projectSiteArray={projectSiteArray}
-            setMonth={setMonth}
-            setYear={setYear}
-          />
+          <Suspense fallback={<div>Loading...</div>}>
+            <Await resolve={projectPromise}>
+              {(projectData) => (
+                <Await resolve={projectSitePromise}>
+                  {(projectSiteData) => (
+                    <AttendanceSearchFilter
+                      setMonth={setMonth}
+                      setYear={setYear}
+                      disabled={!projectData?.data?.length && noFilters}
+                      projectArray={
+                        projectData?.data?.length
+                          ? projectData?.data?.map((project) => project!.name)
+                          : []
+                      }
+                      projectSiteArray={
+                        projectSiteData?.data?.length
+                          ? projectSiteData?.data?.map((site) => site!.name)
+                          : []
+                      }
+                    />
+                  )}
+                </Await>
+              )}
+            </Await>
+          </Suspense>
+
           <FilterList filters={filters} />
         </div>
         <div className="space-x-2 hidden md:flex">
@@ -260,13 +302,43 @@ export default function Attendance() {
           )}
         </div>
       </div>
-      <AttendanceTable
-        days={days as any}
-        data={data as any}
-        columns={attendanceColumns(days)}
-        filters={filters}
-        noFilters={noFilters}
-      />
+      <Suspense fallback={<div>Loading...</div>}>
+        <Await resolve={attendancePromise}>
+          {({ data, meta, error }) => {
+            if (error) {
+              clearCacheEntry(cacheKeyPrefix.attendance);
+              return (
+                <ErrorBoundary
+                  error={error}
+                  message="Failed to load Attendance"
+                />
+              );
+            }
+
+            const attdData = transformAttendanceData(
+              data
+            ) as TransformedAttendanceDataType[];
+
+            const hasNextPage = Boolean(meta?.count > pageSize);
+
+            return (
+              <AttendanceTable
+                days={days as any}
+                data={attdData as any}
+                hasNextPage={hasNextPage}
+                pageSize={pageSize}
+                query={query}
+                count={meta?.count ?? data?.length ?? 0}
+                columns={attendanceColumns(days)}
+                filters={filters}
+                noFilters={noFilters}
+                companyId={companyId}
+                env={env}
+              />
+            );
+          }}
+        </Await>
+      </Suspense>
 
       <ImportEmployeeAttendanceModal />
     </section>

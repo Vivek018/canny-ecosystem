@@ -19,7 +19,10 @@ import {
   ImportExitDataSchema,
   ImportExitHeaderSchema,
 } from "@canny_ecosystem/utils";
-import type { ImportExitDataType } from "@canny_ecosystem/supabase/queries";
+import {
+  getEmployeeIdsByEmployeeCodes,
+  type ImportExitDataType,
+} from "@canny_ecosystem/supabase/queries";
 import {
   transformStringArrayIntoOptions,
   replaceUnderscore,
@@ -33,6 +36,8 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { ExitImportData } from "@/components/exits/import-export/exit-import-data";
 import { clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
+import { useSupabase } from "@canny_ecosystem/supabase/client";
+import { getExitsConflicts } from "@canny_ecosystem/supabase/mutations";
 
 type FieldConfig = {
   key: keyof z.infer<typeof ImportExitHeaderSchema>;
@@ -41,9 +46,6 @@ type FieldConfig = {
 
 const FIELD_CONFIGS: FieldConfig[] = [
   { key: "employee_code", required: true },
-  { key: "employee_name", required: true },
-  { key: "project_name", required: true },
-  { key: "project_site_name", required: true },
   { key: "last_working_day", required: true },
   { key: "reason", required: true },
   { key: "final_settlement_date", required: true },
@@ -73,9 +75,11 @@ clientLoader.hydrate = true;
 
 export default function ExitFieldMapping() {
   const { env } = useLoaderData<typeof loader>();
+  const { supabase } = useSupabase({ env });
   const { setImportData } = useImportStoreForExit();
   const [loadNext, setLoadNext] = useState(false);
   const location = useLocation();
+  const [hasConflict, setHasConflict] = useState<number[]>([]);
   const [file] = useState(location.state?.file);
   const [headerArray, setHeaderArray] = useState<string[]>([]);
   const [fieldMapping, setFieldMapping] = useState<Record<string, string>>({});
@@ -88,7 +92,7 @@ export default function ExitFieldMapping() {
         skipEmptyLines: true,
         complete: (results: Papa.ParseResult<string[]>) => {
           const headers = results.data[0].filter(
-            (header) => header !== null && header.trim() !== "",
+            (header) => header !== null && header.trim() !== ""
           );
           setHeaderArray(headers);
         },
@@ -102,20 +106,17 @@ export default function ExitFieldMapping() {
 
   useEffect(() => {
     if (headerArray.length > 0) {
-      const initialMapping = FIELD_CONFIGS.reduce(
-        (mapping, field) => {
-          const matchedHeader = headerArray.find(
-            (value) =>
-              pipe(replaceUnderscore, replaceDash)(value?.toLowerCase()) ===
-              pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase()),
-          );
+      const initialMapping = FIELD_CONFIGS.reduce((mapping, field) => {
+        const matchedHeader = headerArray.find(
+          (value) =>
+            pipe(replaceUnderscore, replaceDash)(value?.toLowerCase()) ===
+            pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase())
+        );
 
-          if (matchedHeader) mapping[field.key] = matchedHeader;
+        if (matchedHeader) mapping[field.key] = matchedHeader;
 
-          return mapping;
-        },
-        {} as Record<string, string>,
-      );
+        return mapping;
+      }, {} as Record<string, string>);
 
       setFieldMapping(initialMapping);
     }
@@ -128,13 +129,13 @@ export default function ExitFieldMapping() {
           Object.entries(fieldMapping).map(([key, value]) => [
             key,
             value || undefined,
-          ]),
-        ),
+          ])
+        )
       );
 
       if (!mappingResult.success) {
         const formattedErrors = mappingResult.error.errors.map(
-          (err) => err.message,
+          (err) => err.message
         );
         setValidationErrors(formattedErrors);
         return false;
@@ -154,11 +155,12 @@ export default function ExitFieldMapping() {
       const result = ImportExitDataSchema.safeParse({ data });
       if (!result.success) {
         const formattedErrors = result.error.errors.map(
-          (err) => `${err.path[2]}: ${err.message}`,
+          (err) => `${err.path[2]}: ${err.message}`
         );
         setValidationErrors(formattedErrors);
         return false;
       }
+
       return true;
     } catch (error) {
       console.error("Exit Data validation error:", error);
@@ -185,7 +187,7 @@ export default function ExitFieldMapping() {
     if (!validateMapping()) return;
 
     const swappedFieldMapping = Object.fromEntries(
-      Object.entries(fieldMapping).map(([key, value]) => [value, key]),
+      Object.entries(fieldMapping).map(([key, value]) => [value, key])
     );
 
     if (file) {
@@ -197,9 +199,7 @@ export default function ExitFieldMapping() {
           const allowedData = FIELD_CONFIGS.map((field) => field.key);
           const finalData = results.data
             .filter((entry) =>
-              Object.values(entry!).some(
-                (value) => String(value).trim() !== "",
-              ),
+              Object.values(entry!).some((value) => String(value).trim() !== "")
             )
             .map((entry) => {
               const cleanEntry = Object.fromEntries(
@@ -208,17 +208,53 @@ export default function ExitFieldMapping() {
                     ([key, value]) =>
                       key.trim() !== "" &&
                       value !== null &&
-                      String(value).trim() !== "",
+                      String(value).trim() !== ""
                   )
                   .filter(([key]) =>
-                    allowedData.includes(key as keyof ImportExitDataType),
-                  ),
+                    allowedData.includes(key as keyof ImportExitDataType)
+                  )
               );
               return cleanEntry;
             });
 
           if (validateImportData(finalData)) {
             setImportData({ data: finalData as ImportExitDataType[] });
+            const employeeCodes = finalData!.map(
+              (value) => value.employee_code
+            );
+
+            const { data: employees, error: idByCodeError } =
+              await getEmployeeIdsByEmployeeCodes({
+                supabase,
+                employeeCodes,
+              });
+
+            if (idByCodeError) {
+              throw idByCodeError;
+            }
+
+            const updatedData = finalData!.map((item: any) => {
+              const employeeId = employees?.find(
+                (e) => e.employee_code === item.employee_code
+              )?.id;
+
+              const { employee_code, ...rest } = item;
+              return {
+                ...rest,
+                ...(employeeId ? { employee_id: employeeId } : {}),
+              };
+            });
+
+            const { conflictingIndices, error } = await getExitsConflicts({
+              supabase,
+              importedData: updatedData as any,
+            });
+
+            if (error) {
+              throw error;
+            }
+
+            setHasConflict(conflictingIndices);
             setLoadNext(true);
           }
         },
@@ -236,13 +272,13 @@ export default function ExitFieldMapping() {
   return (
     <section className="py-4 ">
       {loadNext ? (
-        <ExitImportData env={env} />
+        <ExitImportData env={env} conflictingIndices={hasConflict} />
       ) : (
         <Card className="m-4 px-40">
           <CardHeader>
             <CardTitle>Map Fields</CardTitle>
             <CardDescription>
-              Map your fields with the Exits fields
+              Map your fields with the Employee fields
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -274,7 +310,7 @@ export default function ExitFieldMapping() {
                     <sub
                       className={cn(
                         "hidden text-primary mt-1",
-                        field.required && "inline",
+                        field.required && "inline"
                       )}
                     >
                       *
@@ -288,11 +324,11 @@ export default function ExitFieldMapping() {
                         return (
                           pipe(
                             replaceUnderscore,
-                            replaceDash,
+                            replaceDash
                           )(value?.toLowerCase()) ===
                           pipe(
                             replaceUnderscore,
-                            replaceDash,
+                            replaceDash
                           )(field.key?.toLowerCase())
                         );
                       }) ||

@@ -223,6 +223,7 @@ export default function ExitsIndex() {
               exitsData?.meta?.count &&
                 exitsData.meta.count > LAZY_LOADING_LIMIT
             );
+
             return (
               <ExitPaymentTable
                 data={exitsData?.data ?? ([] as any)}

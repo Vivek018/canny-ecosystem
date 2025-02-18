@@ -210,6 +210,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
                 !hasPermission(role, `${updateRole}:${attribute.exits}`) &&
                   !hasPermission(role, `${deleteRole}:${attribute.exits}`) &&
                   "hidden"
+                  "hidden"
               )}
             >
               <Button variant='ghost' className='h-8 w-8 p-0'>
