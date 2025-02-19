@@ -254,7 +254,7 @@ export default function LetterPreview() {
     <Dialog defaultOpen onOpenChange={handleOpenChange}>
       <DialogTitle />
       <DialogDescription className="text-muted-foreground" />
-      <DialogContent disableIcon className="max-w-[60%] h-[90%]">
+      <DialogContent disableIcon className="max-w-[60%] h-[90%] p-0 overflow-hidden">
         <PDFViewer width="100%" height="100%">
           {generateLetter(employeeLetterData?.letter_type)}
         </PDFViewer>

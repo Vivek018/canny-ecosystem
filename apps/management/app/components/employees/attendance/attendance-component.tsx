@@ -85,7 +85,7 @@ export const AttendanceComponent = ({
             {weekDays.map((day) => (
               <div
                 key={day}
-                className='p-2 text-center bg-muted/60 font-semibold text-muted-foreground border-x'
+                className='p-2 text-center bg-accent dark:bg-muted/60 font-semibold text-muted-foreground border border-x'
               >
                 {day}
               </div>
@@ -93,26 +93,26 @@ export const AttendanceComponent = ({
           </div>
 
           <div className='grid grid-cols-7'>
-            {emptyFirstDays.map((_, index) => (
+            {emptyFirstDays?.map((_, index) => (
               <div
                 key={`empty-${index.toString()}`}
                 className='h-32 border first:border-l p-2'
               />
             ))}
 
-            {days.map((date) => (
+            {days?.map((date) => (
               <div
                 onClick={
                   hasPermission(role, `${updateRole}:${attribute.attendance}`)
-                    ? () => handleUpdate(date.fullDate)
+                    ? () => handleUpdate(date?.fullDate)
                     : undefined
                 }
                 onKeyDown={
                   hasPermission(role, `${updateRole}:${attribute.attendance}`)
-                    ? () => handleUpdate(date.fullDate)
+                    ? () => handleUpdate(date?.fullDate)
                     : undefined
                 }
-                key={date.fullDate}
+                key={date?.fullDate}
                 className={cn(
                   "h-32 border p-2 bg-card flex flex-col justify-between cursor-pointer"
                 )}
@@ -143,13 +143,13 @@ export const AttendanceComponent = ({
                         ? "Present"
                         : "Absent"}
                     </div>
-                    {attendanceData.find(
-                      (entry) => entry.date === date.fullDate
+                    {attendanceData?.find(
+                      (entry) => entry?.date === date?.fullDate
                     )?.holiday && (
                       <div className='capitalize mt-1 py-0.5 px-1 rounded-sm text-center bg-muted text-muted-foreground'>
                         {
                           attendanceData.find(
-                            (entry) => entry.date === date.fullDate
+                            (entry) => entry?.date === date?.fullDate
                           )?.holiday_type
                         }
                       </div>
@@ -161,29 +161,29 @@ export const AttendanceComponent = ({
                   <div
                     className={cn(
                       "rounded-sm px-1 py-0.5",
-                      attendanceData.find(
-                        (entry) => entry.date === date.fullDate
+                      attendanceData?.find(
+                        (entry) => entry?.date === date?.fullDate
                       )?.no_of_hours === 8
                         ? "bg-muted text-muted-foreground"
                         : "bg-muted-foreground text-muted",
-                      !attendanceData.find(
-                        (entry) => entry.date === date.fullDate
+                      !attendanceData?.find(
+                        (entry) => entry?.date === date?.fullDate
                       )?.id && "hidden p-0"
                     )}
                   >
-                    {attendanceData.find(
-                      (entry) => entry.date === date.fullDate
+                    {attendanceData?.find(
+                      (entry) => entry?.date === date?.fullDate
                     )?.no_of_hours &&
                       `${
-                        attendanceData.find(
-                          (entry) => entry.date === date.fullDate
+                        attendanceData?.find(
+                          (entry) => entry?.date === date?.fullDate
                         )?.no_of_hours
                       } hours`}
                   </div>
                   <div className='text-xs px-1 rounded-sm bg-muted text-muted-foreground'>
                     {
-                      attendanceData.find(
-                        (entry) => entry.date === date.fullDate
+                      attendanceData?.find(
+                        (entry) => entry?.date === date?.fullDate
                       )?.working_shift
                     }
                   </div>
@@ -191,7 +191,7 @@ export const AttendanceComponent = ({
               </div>
             ))}
 
-            {emptyLastDays.map((_, index) => (
+            {emptyLastDays?.map((_, index) => (
               <div
                 key={`empty-${index.toString()}`}
                 className='h-32 border first:border-l p-2'

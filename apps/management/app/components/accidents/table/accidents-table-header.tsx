@@ -17,14 +17,14 @@ export const AccidentsColumnIdArray = [
   "employee_name",
   "project",
   "project_site",
-  "date",
   "title",
+  "description",
+  "date",
   "location_type",
   "location",
   "category",
   "severity",
   "status",
-  "description",
   "medical_diagnosis",
 ];
 

@@ -13,7 +13,9 @@ export function ExportBar({
   data: AccidentsDatabaseType[];
   className: string;
 }) {
-  const pendingCount = data.filter((item) => item.status === "pending").length;
+  const pendingCount = data.filter(
+    (item) => item?.status === "pending" || item?.status === "active"
+  ).length;
 
   const handleExport = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
@@ -38,18 +40,18 @@ export function ExportBar({
         className
       )}
     >
-      <div className="ml-2 flex items-center space-x-1 rounded-md">
-        <p className="font-semibold">{rows} Selected</p>
+      <div className='ml-2 flex items-center space-x-1 rounded-md'>
+        <p className='font-semibold'>{rows} Selected</p>
       </div>
-      <div className="h-full flex justify-center items-center gap-2">
-        <div className="h-full tracking-wide font-medium rounded-full flex justify-between items-center px-6 border dark:border-muted-foreground/30 ">
-          Pending: <span className="ml-1.5">{pendingCount}</span>
+      <div className='h-full flex justify-center items-center gap-2'>
+        <div className='h-full tracking-wide font-medium rounded-full flex justify-between items-center px-6 border dark:border-muted-foreground/30 '>
+          Active | Pending: <span className='ml-1.5'>{pendingCount}</span>
         </div>
         <Button
           onClick={handleExport}
-          variant="default"
-          size="lg"
-          className="h-full rounded-full"
+          variant='default'
+          size='lg'
+          className='h-full rounded-full'
         >
           Export
         </Button>

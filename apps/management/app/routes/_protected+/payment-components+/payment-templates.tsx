@@ -93,7 +93,7 @@ export default function PaymentTemplates() {
                 placeholder="Search Payment Templates"
                 value={searchString}
                 onChange={(e) => setSearchString(e.target.value)}
-                className="pl-8 h-10 w-full focus-visible:ring-0"
+                className="pl-8 h-10 w-full focus-visible:ring-0 shadow-none"
               />
             </div>
             <Link

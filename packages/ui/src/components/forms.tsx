@@ -20,7 +20,6 @@ import { Icon } from "./icon";
 import {
   KitchenSinkToolbar,
   MDXEditor,
-  codeBlockPlugin,
   codeMirrorPlugin,
   diffSourcePlugin,
   frontmatterPlugin,
@@ -36,6 +35,7 @@ import {
   toolbarPlugin,
 } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
+import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
 
 export type ListOfErrors = Array<string | null | undefined> | null | undefined;
 
@@ -49,9 +49,9 @@ export function ErrorList({
   const errorsToRender = errors?.filter(Boolean);
   if (!errorsToRender?.length) return null;
   return (
-    <ul id={id} className="flex flex-col gap-1">
+    <ul id={id} className='flex flex-col gap-1'>
       {errorsToRender.map((e) => (
-        <li key={e} className="text-[10px] text-destructive">
+        <li key={e} className='text-[10px] text-destructive'>
           {e}
         </li>
       ))}
@@ -83,19 +83,19 @@ export function Field({
 
   return (
     <div className={cn("w-full flex flex-col gap-1.5", className)}>
-      <div className="flex flex-row gap-[1px]">
+      <div className='flex flex-row gap-[1px]'>
         <Label htmlFor={id} {...labelProps} />
         <sub
           className={cn(
             "hidden text-primary",
-            labelProps?.children && isRequired && "inline",
+            labelProps?.children && isRequired && "inline"
           )}
         >
           *
         </sub>
       </div>
-      <div className="relative flex items-center">
-        {prefix && <span className="absolute left-2 text-muted">{prefix}</span>}
+      <div className='relative flex items-center'>
+        {prefix && <span className='absolute left-2 text-muted'>{prefix}</span>}
         <Input
           id={id}
           aria-invalid={errorId ? true : undefined}
@@ -104,11 +104,11 @@ export function Field({
           className={cn(
             prefix && "pl-8",
             suffix && "pr-8",
-            inputProps.className,
+            inputProps.className
           )}
         />
         {suffix && (
-          <span className="absolute right-2 text-muted">{suffix}</span>
+          <span className='absolute right-2 text-muted'>{suffix}</span>
         )}
       </div>
       <div className={cn("min-h-6 px-4 pb-2", errorClassName)}>
@@ -138,12 +138,12 @@ export function TextareaField({
 
   return (
     <div className={cn("w-full flex flex-col gap-1.5", className)}>
-      <div className="flex flex-row gap-[1px]">
+      <div className='flex flex-row gap-[1px]'>
         <Label htmlFor={id} {...labelProps} />
         <sub
           className={cn(
             "hidden text-primary",
-            labelProps?.children && isRequired && "inline",
+            labelProps?.children && isRequired && "inline"
           )}
         >
           *
@@ -190,7 +190,7 @@ export function CheckboxField({
 
   return (
     <div className={className}>
-      <div className="flex items-center gap-2">
+      <div className='flex items-center gap-2'>
         <Checkbox
           {...checkboxProps}
           id={id}
@@ -200,17 +200,17 @@ export function CheckboxField({
           onCheckedChange={buttonProps.onCheckedChange}
           onFocus={buttonProps.onFocus}
           onBlur={buttonProps.onBlur}
-          type="button"
+          type='button'
         />
         <Label
           htmlFor={id}
           {...labelProps}
-          className="self-center text-foreground"
+          className='self-center text-foreground'
         />
         <sub
           className={cn(
             "hidden text-primary",
-            labelProps?.children && isRequired && "inline",
+            labelProps?.children && isRequired && "inline"
           )}
         >
           *
@@ -257,19 +257,19 @@ export function SearchableSelectField({
 
   return (
     <div className={cn("w-full flex flex-col gap-1.5", className)}>
-      <div className="flex">
+      <div className='flex'>
         <Label {...labelProps} />
         <sub
           className={cn(
             "hidden text-primary",
-            labelProps?.children && isRequired && "inline",
+            labelProps?.children && isRequired && "inline"
           )}
         >
           *
         </sub>
       </div>
       <input
-        type="hidden"
+        type='hidden'
         id={id}
         name={inputProps.name}
         value={input.value ?? ""}
@@ -320,14 +320,14 @@ export function JSONBField({
   useIsomorphicLayoutEffect(() => {
     try {
       const parsedValue = JSON.parse(
-        inputProps.defaultValue?.toString() || "{}",
+        inputProps.defaultValue?.toString() || "{}"
       );
       const initialPairs = Object.entries(parsedValue).map(([key, value]) => ({
         key,
         value: String(value),
       }));
       setPairs(
-        initialPairs.length > 0 ? initialPairs : [{ key: "", value: "" }],
+        initialPairs.length > 0 ? initialPairs : [{ key: "", value: "" }]
       );
     } catch (error) {
       console.error("Failed to parse JSONB value:", error);
@@ -335,19 +335,16 @@ export function JSONBField({
   }, [inputProps.defaultValue]);
 
   const updateJSONBValue = (newPairs: { key: string; value: string }[]) => {
-    const jsonbValue = newPairs.reduce(
-      (acc, { key, value }) => {
-        if (key) {
-          try {
-            acc[key] = parseStringValue(value);
-          } catch {
-            acc[key] = value;
-          }
+    const jsonbValue = newPairs.reduce((acc, { key, value }) => {
+      if (key) {
+        try {
+          acc[key] = parseStringValue(value);
+        } catch {
+          acc[key] = value;
         }
-        return acc;
-      },
-      {} as Record<string, any>,
-    );
+      }
+      return acc;
+    }, {} as Record<string, any>);
     const event = {
       target: {
         name: inputProps.name,
@@ -385,62 +382,59 @@ export function JSONBField({
 
   return (
     <div className={cn("w-full flex flex-col gap-1.5", className)}>
-      <div className="flex">
+      <div className='flex'>
         <Label htmlFor={inputProps.id} {...labelProps} />
         <sub
           className={cn(
             "hidden text-primary",
-            labelProps?.children && isRequired && "inline",
+            labelProps?.children && isRequired && "inline"
           )}
         >
           *
         </sub>
       </div>
       {pairs.map((pair, index) => (
-        <div key={index.toString()} className="flex gap-2 mb-2">
+        <div key={index.toString()} className='flex gap-2 mb-2'>
           <Input
-            placeholder="Key"
+            placeholder='Key'
             value={pair.key}
             onChange={(e) => handleKeyChange(index, e.target.value)}
-            className="flex-1"
+            className='flex-1'
           />
           <Input
-            placeholder="Value"
+            placeholder='Value'
             value={pair.value}
             onChange={(e) => handleValueChange(index, e.target.value)}
-            className="flex-1"
+            className='flex-1'
           />
           <Button
-            type="button"
+            type='button'
             onClick={() => removePair(index)}
-            variant="destructive-outline"
-            className="px-3"
+            variant='destructive-outline'
+            className='px-3'
           >
-            <Icon name="cross" size="md" />
+            <Icon name='cross' size='md' />
           </Button>
         </div>
       ))}
       <Button
-        type="button"
+        type='button'
         onClick={addPair}
-        variant="primary-outline"
-        className="mt-2"
+        variant='primary-outline'
+        className='mt-2'
       >
         Add Key-Value Pair
       </Button>
       <input
         {...inputProps}
-        type="hidden"
+        type='hidden'
         id={id}
         defaultValue={undefined}
         value={JSON.stringify(
-          pairs.reduce(
-            (acc, { key, value }) => {
-              if (key) acc[key] = parseStringValue(value);
-              return acc;
-            },
-            {} as Record<string, string>,
-          ),
+          pairs.reduce((acc, { key, value }) => {
+            if (key) acc[key] = parseStringValue(value);
+            return acc;
+          }, {} as Record<string, string>)
         )}
       />
       <div className={cn("min-h-6 px-4 pb-2", errorClassName)}>
@@ -520,7 +514,7 @@ export const RangeField = ({
   const handleFieldChange = (
     index: number,
     fieldKey: string,
-    value: string,
+    value: string
   ) => {
     const newRanges = [...ranges];
     newRanges[index] = {
@@ -535,13 +529,10 @@ export const RangeField = ({
   };
 
   const addRange = () => {
-    const newRange = fields.reduce(
-      (acc: Record<string, any>, field) => {
-        acc[field.key] = field.type === "number" ? 0 : "";
-        return acc;
-      },
-      {} as Record<string, any>,
-    );
+    const newRange = fields.reduce((acc: Record<string, any>, field) => {
+      acc[field.key] = field.type === "number" ? 0 : "";
+      return acc;
+    }, {} as Record<string, any>);
 
     const newRanges = [...ranges, newRange];
     setRanges(newRanges);
@@ -556,12 +547,12 @@ export const RangeField = ({
 
   return (
     <div className={cn("w-full flex flex-col gap-1.5", className)}>
-      <div className="flex">
+      <div className='flex'>
         <Label htmlFor={inputProps.id} {...labelProps} />
         <sub
           className={cn(
             "hidden text-primary",
-            labelProps?.children && isRequired && "inline",
+            labelProps?.children && isRequired && "inline"
           )}
         >
           *
@@ -569,7 +560,7 @@ export const RangeField = ({
       </div>
 
       {ranges.map((range, index) => (
-        <div key={String(index)} className="flex gap-2 mb-2">
+        <div key={String(index)} className='flex gap-2 mb-2'>
           {fields.map((field) => (
             <Input
               key={field.key}
@@ -579,32 +570,32 @@ export const RangeField = ({
               onChange={(e) =>
                 handleFieldChange(index, field.key, e.target.value)
               }
-              className="flex-1"
+              className='flex-1'
             />
           ))}
           <Button
-            type="button"
+            type='button'
             onClick={() => removeRange(index)}
-            variant="destructive-outline"
-            className="px-3"
+            variant='destructive-outline'
+            className='px-3'
           >
-            <Icon name="cross" />
+            <Icon name='cross' />
           </Button>
         </div>
       ))}
 
       <Button
-        type="button"
+        type='button'
         onClick={addRange}
-        variant="primary-outline"
-        className="mt-2"
+        variant='primary-outline'
+        className='mt-2'
       >
         Add Range
       </Button>
 
       <input
         {...inputProps}
-        type="hidden"
+        type='hidden'
         id={id}
         defaultValue={undefined}
         value={JSON.stringify(ranges)}
@@ -612,7 +603,7 @@ export const RangeField = ({
 
       <div className={cn("min-h-6 px-4 pb-2", errorClassName)}>
         {errors && errors.length > 0 ? (
-          <div className="text-destructive">
+          <div className='text-destructive'>
             {errors.map((error, index) => (
               <div key={String(index)}>{error}</div>
             ))}
@@ -626,16 +617,19 @@ export const RangeField = ({
 export function MarkdownField({
   labelProps,
   textareaProps,
+  theme = "light",
   errors,
   className,
   errorClassName,
 }: {
   labelProps: LabelHTMLAttributes<HTMLLabelElement>;
   textareaProps: TextareaHTMLAttributes<HTMLTextAreaElement>;
+  theme?: "dark" | "light" | "system";
   errors?: string[];
   className?: string;
   errorClassName?: string;
 }) {
+  const { isDocument } = useIsDocument();
   const fallbackId = useId();
   const id = textareaProps.id ?? fallbackId;
   const errorId = errors?.length ? `${id}-error` : undefined;
@@ -646,20 +640,20 @@ export function MarkdownField({
     initialValue: String(textareaProps.defaultValue!),
   });
 
-  return (
+  return isDocument ? (
     <div className={className}>
       {/* Label */}
       <Label htmlFor={id} {...labelProps} />
       <sub
         className={cn(
           "hidden text-primary",
-          textareaProps?.children && textareaProps.required && "inline",
+          textareaProps?.children && textareaProps.required && "inline"
         )}
       >
         *
       </sub>
       <input
-        type="hidden"
+        type='hidden'
         id={id}
         name={textareaProps.name}
         value={input.value ?? ""}
@@ -684,7 +678,6 @@ export function MarkdownField({
           tablePlugin(),
           thematicBreakPlugin(),
           frontmatterPlugin(),
-          codeBlockPlugin({ defaultCodeBlockLanguage: "txt" }),
           codeMirrorPlugin({
             codeBlockLanguages: {
               js: "JavaScript",
@@ -696,7 +689,10 @@ export function MarkdownField({
           diffSourcePlugin({ viewMode: "rich-text", diffMarkdown: "" }),
           markdownShortcutPlugin(),
         ]}
-        className="min-h-[200px] border rounded dark-theme dark-editor"
+        className={cn(
+          "border rounded",
+          theme === "dark" && "dark-theme"
+        )}
       />
 
       {/* Errors */}
@@ -704,5 +700,7 @@ export function MarkdownField({
         {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
       </div>
     </div>
+  ) : (
+    <></>
   );
 }
