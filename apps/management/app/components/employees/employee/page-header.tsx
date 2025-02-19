@@ -15,7 +15,6 @@ import { attribute } from "@canny_ecosystem/utils/constant";
 
 export function EmployeePageHeader({
   employee,
-  env,
 }: {
   employee: Pick<
     EmployeeDatabaseRow,
@@ -83,8 +82,7 @@ export function EmployeePageHeader({
               buttonVariants({ variant: "outline" }),
               "w-full bg-card",
               !hasPermission(
-                role,
-                `${updateRole}:${attribute.employeeDetails}`,
+                role,`${updateRole}:${attribute.employeeDetails}`,
               ) && "hidden",
             )}
           >
@@ -98,7 +96,6 @@ export function EmployeePageHeader({
               returnTo: `/employees/${employee.id}/overview`,
               companyId: employee.company_id,
             }}
-            env={env}
             triggerChild={
               <DropdownMenuTrigger
                 className={cn(
