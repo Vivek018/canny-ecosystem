@@ -17,7 +17,7 @@ import { DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
-export const DeleteEmployeeExits = ({ exitId }: { exitId: string }) => {
+export const DeleteEmployeeExits = ({ exitId, employeeId }: { exitId: string, employeeId: string }) => {
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [inputError, setInputError] = useState<string[]>([]);
@@ -41,7 +41,7 @@ export const DeleteEmployeeExits = ({ exitId }: { exitId: string }) => {
         },
         {
           method: "POST",
-          action: `/approvals/exits/${exitId}/delete-exit`,
+          action: `/employees/${employeeId}/payments/${exitId}/delete-exit`,
         },
       );
     } else {

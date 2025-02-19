@@ -29,7 +29,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 // caching
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return await clientCaching(`${cacheKeyPrefix.payments}${args.params.employeeId}`, args);
+  return await clientCaching(`${cacheKeyPrefix.employee_payments}${args.params.employeeId}`, args);
 }
 clientLoader.hydrate = true;
 
@@ -48,7 +48,7 @@ export default function Payments() {
         <Await resolve={paymentTemplateAssignmentPromise}>
           {(resolvedData) => {
             if (!resolvedData) {
-              clearExactCacheEntry(`${cacheKeyPrefix.payments}${employeeId}`);
+              clearExactCacheEntry(`${cacheKeyPrefix.employee_payments}${employeeId}`);
               return <ErrorBoundary message="Failed to load link template" />;
             }
 
@@ -61,7 +61,7 @@ export default function Payments() {
         <Await resolve={exitsPromise}>
           {(resolvedData) => {
             if (!resolvedData) {
-              clearExactCacheEntry(`${cacheKeyPrefix.payments}${employeeId}`);
+              clearExactCacheEntry(`${cacheKeyPrefix.employee_payments}${employeeId}`);
               return <ErrorBoundary message="Failed to load link template" />;
             }
             return <ExitsCard exitsData={resolvedData.data as any} employeeId={employeeId as string} />

@@ -35,9 +35,7 @@ export const LinkTemplateItem = ({ paymentTemplateAssignmentData }:
     <section className="w-full select-text cursor-auto h-full flex flex-col justify-start p-4">
       <ul className="grid grid-cols-3 gap-4">
         <li><DetailItem label="Template Name" value={paymentTemplateAssignmentData.name} /></li>
-        <li><DetailItem label="Template ID" value={paymentTemplateAssignmentData.template_id} /></li>
         <li><DetailItem label="Assignment Type" value={paymentTemplateAssignmentData.assignment_type} /></li>
-        <li><DetailItem label="Employee ID" value={paymentTemplateAssignmentData.employee_id} /></li>
         <li><DetailItem label="Effective From" value={paymentTemplateAssignmentData.effective_from} formatter={formatDate} /></li>
         <li><DetailItem label="Effective To" value={paymentTemplateAssignmentData.effective_to} formatter={formatDate} /></li>
         <li><DetailItem label="Is Active" value={paymentTemplateAssignmentData.is_active ? "Yes" : "No"} /></li>
@@ -60,23 +58,36 @@ export const LinkTemplateCard = (
           {
             paymentTemplateAssignmentData
               ?
-              <LinkTemplateDropdown
-                employeeId={paymentTemplateAssignmentData.employee_id as string}
-                triggerChild={
-                  <DropdownMenuTrigger
-                    className={cn(
-                      buttonVariants({ variant: "outline" }),
-                      "bg-card",
-                      !hasPermission(
-                        role, `${updateRole}:${attribute.employeePaymentTemplateLink}`,
-                      ) && "hidden",
-                    )}
-                  >
-                    <Icon name="dots-vertical" size="xs" className="mr-1.5" />
-                    <p>More Options</p>
-                  </DropdownMenuTrigger>
-                }
-              />
+              <div className="flex gap-4">
+                <Link
+                  to={`/employees/${paymentTemplateAssignmentData.employee_id}/payments/link-template`}
+                  className={cn(
+                    buttonVariants({ variant: "outline" }),
+                    "bg-card",
+                    !hasPermission(`${role}`, `${createRole}:${attribute.employeePaymentTemplateLink}`) && "hidden",
+                  )}
+                >
+                  <Icon name={"edit"} className="mr-2" />
+                  Update Template
+                </Link>
+                <LinkTemplateDropdown
+                  employeeId={paymentTemplateAssignmentData.employee_id as string}
+                  triggerChild={
+                    <DropdownMenuTrigger
+                      className={cn(
+                        buttonVariants({ variant: "outline" }),
+                        "bg-card",
+                        !hasPermission(
+                          role, `${updateRole}:${attribute.employeePaymentTemplateLink}`,
+                        ) && "hidden",
+                      )}
+                    >
+                      <Icon name="dots-vertical" size="xs" className="mr-1.5" />
+                      <p>More Options</p>
+                    </DropdownMenuTrigger>
+                  }
+                />
+              </div>
               :
               <Link
                 to="link-template"

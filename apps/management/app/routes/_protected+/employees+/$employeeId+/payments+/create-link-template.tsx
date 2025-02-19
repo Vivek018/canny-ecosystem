@@ -56,7 +56,7 @@ export default function CreateEmployeeLinkTemplate() {
   useEffect(() => {
     if (actionData) {
       if (actionData.status === "success") {
-        clearCacheEntry(cacheKeyPrefix.payments);
+        clearCacheEntry(cacheKeyPrefix.employee_payments);
         toast({
           title: "Success",
           description: actionData.message,

@@ -72,26 +72,40 @@ export const ExitsCard = ({ exitsData, employeeId }: { exitsData: ExitsRow, empl
           {
             exitsData
               ?
-              <ExitsDropdown
-                exitId={exitsData.id}
-                triggerChild={
-                  <DropdownMenuTrigger
-                    className={cn(
-                      buttonVariants({ variant: "outline" }),
-                      "bg-card",
-                      !hasPermission(
-                        role, `${updateRole}:${attribute.employeeExits}`,
-                      ) && "hidden",
-                    )}
-                  >
-                    <Icon name="dots-vertical" size="xs" className="mr-1.5" />
-                    <p>More Options</p>
-                  </DropdownMenuTrigger>
-                }
-              />
+              <div className="flex gap-4">
+                <Link
+                  to={`/employees/${employeeId}/payments/${exitsData.id}/update-exit`}
+                  className={cn(
+                    buttonVariants({ variant: "outline" }),
+                    "bg-card",
+                    !hasPermission(`${role}`, `${createRole}:${attribute.employeeExits}`) && "hidden",
+                  )}
+                >
+                  <Icon name={"edit"} className="mr-2" />
+                  Update Exit
+                </Link>
+                <ExitsDropdown
+                  exitId={exitsData.id}
+                  employeeId={employeeId}
+                  triggerChild={
+                    <DropdownMenuTrigger
+                      className={cn(
+                        buttonVariants({ variant: "outline" }),
+                        "bg-card",
+                        !hasPermission(
+                          role, `${updateRole}:${attribute.employeeExits}`,
+                        ) && "hidden",
+                      )}
+                    >
+                      <Icon name="dots-vertical" size="xs" className="mr-1.5" />
+                      <p>More Options</p>
+                    </DropdownMenuTrigger>
+                  }
+                />
+              </div>
               :
               <Link
-                to={`/approvals/exits/${employeeId}/create-exit`}
+                to={`/employees/${employeeId}/payments/create-exit`}
                 className={cn(
                   buttonVariants({ variant: "outline" }),
                   "bg-card",

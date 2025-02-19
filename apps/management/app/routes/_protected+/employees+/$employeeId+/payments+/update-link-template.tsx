@@ -10,7 +10,7 @@ import { type ActionFunctionArgs, json } from "@remix-run/node";
 import { useActionData, useNavigate } from "@remix-run/react";
 import { useEffect } from "react";
 
-export async function action({ request, params }: ActionFunctionArgs):Promise<Response> {
+export async function action({ request, params }: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
   const employeeId = params.employeeId as string;
   const formData = await request.formData();
@@ -73,7 +73,7 @@ export default function UpdateEmployeeLinkTemplate() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(cacheKeyPrefix.payments);
+        clearCacheEntry(cacheKeyPrefix.employee_payments);
         toast({
           title: "Success",
           description: actionData?.message,
