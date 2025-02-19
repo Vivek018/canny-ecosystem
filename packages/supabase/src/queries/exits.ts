@@ -242,7 +242,7 @@ export const getExitByEmployeeId = async ({
     .from("exits")
     .select(columns.join(","))
     .eq("employee_id", employeeId)
-    .single<InferredType<ExitsRow, (typeof columns)[number]>>();
+    .maybeSingle<InferredType<ExitsRow, (typeof columns)[number]>>();
 
   if (error) console.error("getExitByEmployeeId Error", error);
 
