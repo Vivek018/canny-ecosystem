@@ -132,7 +132,7 @@ export default function CreateExit({
   useEffect(() => {
     if (!actionData) return;
     if (actionData?.status === "success") {
-      clearCacheEntry(cacheKeyPrefix.exits);
+      clearCacheEntry(cacheKeyPrefix.employee_payments);
       toast({
         title: "Success",
         description: actionData?.message,
@@ -145,7 +145,7 @@ export default function CreateExit({
         variant: "destructive",
       });
     }
-    navigate("/approvals/exits", { replace: true });
+    navigate(`/employees/${employeeId}/payments`, { replace: true });
   }, [actionData]);
 
   return (
