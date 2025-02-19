@@ -68,7 +68,7 @@ export const LinkTemplateCard = (
                   )}
                 >
                   <Icon name={"edit"} className="mr-2" />
-                  Update Template
+                  Update
                 </Link>
                 <LinkTemplateDropdown
                   employeeId={paymentTemplateAssignmentData.employee_id as string}
@@ -98,7 +98,7 @@ export const LinkTemplateCard = (
                 )}
               >
                 <Icon name={"plus-circled"} className="mr-2" />
-                Create Template
+                Create
               </Link>
           }
         </div>
