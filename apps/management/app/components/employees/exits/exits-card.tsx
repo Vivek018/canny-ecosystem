@@ -4,7 +4,7 @@ import { Icon } from "@canny_ecosystem/ui/icon";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import type { ExitsRow } from "@canny_ecosystem/supabase/types";
-import { createRole, formatDate, hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { createRole, formatDate, hasPermission, replaceUnderscore, updateRole } from "@canny_ecosystem/utils";
 import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { ExitsDropdown } from "../exits-dropdown";
@@ -28,15 +28,6 @@ const DetailItem: React.FC<DetailItemProps> = ({ label, value, formatter }) => {
 };
 
 export const ExitsItem = ({ exitsData }: { exitsData: any }) => {
-  const exitPaymentFields = [
-    { label: "Bonus", value: `₹${exitsData?.bonus}` },
-    { label: "Leave Encashment", value: `₹${exitsData?.leave_encashment}` },
-    { label: "Gratuity", value: `₹${exitsData?.gratuity}` },
-    { label: "Deduction", value: `₹${exitsData?.deduction}` },
-    { label: "Net Pay", value: `₹${exitsData?.bonus + exitsData?.leave_encashment + exitsData?.gratuity + exitsData?.deduction}` },
-  ];
-
-
   return (
     <section className="w-full select-text cursor-auto h-full flex flex-col justify-start p-4">
       <ul className="grid grid-cols-3 gap-4">
@@ -50,35 +41,21 @@ export const ExitsItem = ({ exitsData }: { exitsData: any }) => {
           <DetailItem label="Last Working Day" value={formatDate(exitsData?.last_working_day)} />
         </li>
         <li>
-          <DetailItem label="Final Settlement Date" value={formatDate(exitsData?.final_settlement_date)} />
+          <DetailItem
+            label="Final Settlement Date"
+            value={formatDate(exitsData.final_settlement_date)}
+          />
         </li>
+        <li><DetailItem label="Exit Reason" value={replaceUnderscore(exitsData.reason)} /></li>
+        <li><DetailItem label="Bonus" value={`₹${exitsData?.bonus}`} /></li>
+        <li><DetailItem label="Leave Encashment" value={`₹${exitsData.leave_encashment}`} /></li>
+        <li><DetailItem label="Gratuity" value={`₹${exitsData.gratuity}`} /></li>
+        <li><DetailItem label="Deduction" value={`₹${exitsData?.deduction}`} /></li>
         <li>
-          <DetailItem label="Note" value={exitsData?.note} />
+          <DetailItem label="Net Pay" value={exitsData.net_pay ? `₹${exitsData?.net_pay}` : '-'} />
         </li>
-        <li>
-          <DetailItem label="Exit Reason" value={exitsData?.reason} />
-        </li>
+        <li><DetailItem label="Note" value={exitsData?.note} /></li>
       </ul>
-
-      {/* Exit Payments Table */}
-      <div className="flex flex-col w-full h-full mt-6">
-        <div className="grid grid-cols-2 place-content-center justify-between gap-4 py-4 text-foreground text-base font-semibold">
-          <span>Payment Type</span>
-          <span>Amount</span>
-        </div>
-        <div className="max-h-96 overflow-y-auto">
-          {exitPaymentFields.map((exitPaymentField) => (
-            <div key={exitPaymentField.label} className="grid grid-cols-2 place-content-center justify-between gap-4 py-3">
-              <div className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm items-center shadow-sm">
-                {exitPaymentField.label}
-              </div>
-              <div className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm items-center shadow-sm">
-                {exitPaymentField.value}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
     </section>
   );
 };
@@ -136,7 +113,7 @@ export const ExitsCard = ({ exitsData, employeeId }: { exitsData: ExitsRow, empl
                 )}
               >
                 <Icon name={"plus-circled"} className="mr-2" />
-                Create
+                Create 
               </Link>
           }
         </div>

@@ -3,13 +3,13 @@ import { LinkTemplateCard } from "@/components/employees/link-template/link-temp
 import { ErrorBoundary } from "@/components/error-boundary";
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
-import { getExitByEmployeeId, getPaymentTemplateAssignmentByEmployeeId } from "@canny_ecosystem/supabase/queries";
+import { getExitByEmployeeId, getPaymentTemplateAssignmentByEmployeeId, getPaymentTemplateComponentsByTemplateId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { defer, type LoaderFunctionArgs } from "@remix-run/node";
 import {
   Await, type ClientLoaderFunctionArgs, useLoaderData, useParams,
 } from "@remix-run/react";
-import {  Suspense } from "react";
+import { Suspense } from "react";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -19,11 +19,33 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const paymentTemplateAssignmentPromise = getPaymentTemplateAssignmentByEmployeeId({
       supabase, employeeId,
     });
+    const paymentTemplateComponentsPromise = paymentTemplateAssignmentPromise.then(
+      (assignmentResult) => {
+        if (assignmentResult.data?.template_id) {
+          return getPaymentTemplateComponentsByTemplateId({
+            supabase,
+            templateId: assignmentResult.data.template_id,
+          });
+        }
+        return { data: null, error: null };
+      }
+    );
     const exitsPromise = getExitByEmployeeId({ supabase, employeeId });
 
-    return defer({ paymentTemplateAssignmentPromise, exitsPromise, error: null });
+    return defer({
+      paymentTemplateAssignmentPromise,
+      paymentTemplateComponentsPromise,
+      exitsPromise,
+      error: null
+    });
+
   } catch (error) {
-    return defer({ error, paymentTemplateAssignmentPromise: null, exitsPromise: null });
+    return defer({
+      error,
+      paymentTemplateAssignmentPromise: null,
+      paymentTemplateComponentsPromise: null,
+      exitsPromise: null
+    });
   }
 }
 
@@ -34,7 +56,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 clientLoader.hydrate = true;
 
 export default function Payments() {
-  const { paymentTemplateAssignmentPromise, exitsPromise, error } = useLoaderData<typeof loader>();
+  const { paymentTemplateAssignmentPromise, paymentTemplateComponentsPromise, exitsPromise, error } = useLoaderData<typeof loader>();
   const { employeeId } = useParams();
 
   if (error) {
@@ -46,13 +68,22 @@ export default function Payments() {
     <div className="w-full py-4 flex flex-col gap-8">
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={paymentTemplateAssignmentPromise}>
-          {(resolvedData) => {
-            if (!resolvedData) {
+          {(resolvedAssignment) => {
+            if (!resolvedAssignment) {
               clearExactCacheEntry(`${cacheKeyPrefix.employee_payments}${employeeId}`);
               return <ErrorBoundary message="Failed to load link template" />;
             }
 
-            return <LinkTemplateCard paymentTemplateAssignmentData={resolvedData.data as any} />
+            return (
+              <Await resolve={paymentTemplateComponentsPromise}>
+                {(resolvedPaymentTemplateComponents) => (
+                  <LinkTemplateCard
+                    paymentTemplateAssignmentData={resolvedAssignment.data as any}
+                    paymentTemplateComponentsData={resolvedPaymentTemplateComponents?.data as any}
+                  />
+                )}
+              </Await>
+            );
           }}
         </Await>
       </Suspense>
