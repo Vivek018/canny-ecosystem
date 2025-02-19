@@ -115,11 +115,29 @@ export function CaseSheet({
         </div>
 
         <div className=" mx-5 flex justify-between">
+          <h3 className="my-3 text-muted-foreground font-semibold capitalize">
+            {rowData?.reported_on ?? ""} Name
+          </h3>
+          <p className="my-3 font-bold capitalize">
+            {rowData?.reported_on_id ?? "--"}
+          </p>
+        </div>
+
+        <div className=" mx-5 flex justify-between">
           <h3 className="my-3 text-muted-foreground font-semibold">
             Reported By
           </h3>
           <p className="my-3 font-bold capitalize">
             {rowData?.reported_by ?? "--"}
+          </p>
+        </div>
+
+        <div className=" mx-5 flex justify-between">
+          <h3 className="my-3 text-muted-foreground font-semibold capitalize">
+            {rowData?.reported_by ?? ""} Name
+          </h3>
+          <p className="my-3 font-bold capitalize">
+            {rowData?.reported_by_id ?? "--"}
           </p>
         </div>
 

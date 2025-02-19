@@ -40,7 +40,7 @@ export function ColumnVisibility({ disabled }: { disabled?: boolean }) {
                   />
                   <label
                     htmlFor={column.id}
-                    className="text-sm peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    className="text-sm peer-disabled:cursor-not-allowed peer-disabled:opacity-70 capitalize"
                   >
                     {column.columnDef.header}
                   </label>

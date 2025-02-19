@@ -13,7 +13,6 @@ import {
   Await,
   type ClientLoaderFunctionArgs,
   defer,
-  Link,
   Outlet,
   useLoaderData,
 } from "@remix-run/react";

@@ -1,4 +1,11 @@
-import { Form, json, useActionData, useNavigate } from "@remix-run/react";
+import {
+  Form,
+  json,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+  useSearchParams,
+} from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import {
   FormProvider,
@@ -18,9 +25,9 @@ import {
   CaseSchema,
   caseTypeArray,
   caseLocationTypeArray,
-  reportedByArray,
   reportedOnArray,
   caseStatusArray,
+  reportedByArray,
 } from "@canny_ecosystem/utils";
 import {
   Card,
@@ -47,20 +54,109 @@ import { attribute } from "@canny_ecosystem/utils/constant";
 import { safeRedirect } from "@/utils/server/http.server";
 import { UPDATE_CASES_TAG } from "./$caseId.update-case";
 import { useCompanyId } from "@/utils/company";
+import {
+  getEmployeesByCompanyId,
+  getProjectsByCompanyId,
+  getSitesByProjectId,
+} from "@canny_ecosystem/supabase/queries";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import { PROJECT_SITE_PARAM } from "@/components/employees/form/create-employee-project-assignment";
+import { Label } from "@canny_ecosystem/ui/label";
+import { Combobox } from "@canny_ecosystem/ui/combobox";
 
 export const CREATE_CASES_TAG = "Create-Case";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const { supabase, headers } = getSupabaseWithHeaders({ request });
-
-  const { user } = await getUserCookieOrFetchUser(request, supabase);
-
-  if (!hasPermission(user?.role!, `${createRole}:${attribute.cases}`)) {
-    return safeRedirect(DEFAULT_ROUTE, { headers });
-  }
   const caseId = params.caseId;
 
-  return json({ caseId });
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+  try {
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+    if (!hasPermission(user?.role!, `${createRole}:${attribute.cases}`)) {
+      return safeRedirect(DEFAULT_ROUTE, { headers });
+    }
+    const url = new URL(request.url);
+    const urlSearchParams = new URLSearchParams(url.searchParams);
+
+    const reportedBy = urlSearchParams.get("reported_by");
+    const reportedOn = urlSearchParams.get("reported_on");
+    let employees = null;
+    let projects = null;
+    let projectSites = null;
+
+    if (
+      reportedBy === "project" ||
+      reportedBy === "site" ||
+      reportedBy === "employee" ||
+      reportedOn === "project" ||
+      reportedOn === "site" ||
+      reportedOn === "company"
+    ) {
+      ({ data: projects } = await getProjectsByCompanyId({
+        supabase,
+        companyId,
+      }));
+    }
+    if (
+      (reportedBy === "site" ||
+        reportedBy === "employee" ||
+        reportedOn === "site" ||
+        reportedOn === "employee") &&
+      (urlSearchParams.get("reported_by_project") ||
+        urlSearchParams.get("reported_on_project"))
+    ) {
+      ({ data: projectSites } = await getSitesByProjectId({
+        supabase,
+        projectId:
+          urlSearchParams.get("reported_by_project") ??
+          urlSearchParams.get("reported_on_project") ??
+          "",
+      }));
+    }
+
+    if (
+      urlSearchParams.get("project-site") &&
+      (reportedBy === "employee" || reportedOn === "employee")
+    ) {
+      ({ data: employees } = await getEmployeesByCompanyId({
+        supabase,
+        companyId,
+        params: {
+          from: 0,
+          to: 100,
+        },
+      }));
+    }
+
+    return json({
+      caseId,
+      employeeOptions: employees?.map((employee: any) => ({
+        label: `${employee?.first_name} ${employee?.last_name}`,
+        value: employee?.id ?? "",
+      })),
+      projectOptions:
+        projects?.map((project) => ({
+          label: project?.name,
+          value: project?.id,
+        })) ?? [],
+      projectSiteOptions:
+        projectSites?.map((item) => ({
+          label: item?.name,
+          value: item?.id,
+        })) ?? [],
+      error: null,
+    });
+  } catch (error) {
+    return json({
+      caseId,
+      employeeOptions: null,
+      projectOptions: null,
+      projectSiteOptions: null,
+      error,
+    });
+  }
 }
 
 export async function action({
@@ -78,9 +174,37 @@ export async function action({
       );
     }
 
+    const {
+      reported_by_employee,
+      reported_on_employee,
+      reported_by_site,
+      reported_on_site,
+      reported_by_project,
+      reported_on_project,
+      ...restData
+    } = submission.value;
+
+    restData.reported_on_id =
+      restData.reported_on === "project"
+        ? reported_on_project
+        : restData.reported_on === "site"
+          ? reported_on_site
+          : restData.reported_on === "employee"
+            ? reported_on_employee
+            : "";
+
+    restData.reported_by_id =
+      restData.reported_by === "project"
+        ? reported_by_project
+        : restData.reported_by === "site"
+          ? reported_by_site
+          : restData.reported_by === "employee"
+            ? reported_by_employee
+            : "";
+
     const { status, error } = await createCase({
       supabase,
-      data: submission.value,
+      data: restData,
     });
 
     if (isGoodStatus(status)) {
@@ -116,9 +240,17 @@ export async function action({
 
 export default function CreateCase({
   updateValues,
+  employeeData,
+  projectData,
+  projectSiteData,
 }: {
   updateValues?: CasesDatabaseUpdate | null;
+  employeeData?: { label: string; value: string };
+  projectData?: { label: string; value: string };
+  projectSiteData?: { label: string; value: string };
 }) {
+  const { employeeOptions, projectOptions, projectSiteOptions, error } =
+    useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { companyId } = useCompanyId();
 
@@ -126,27 +258,7 @@ export default function CreateCase({
 
   const { toast } = useToast();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (actionData) {
-      if (actionData.status === "success") {
-        clearCacheEntry(cacheKeyPrefix.case);
-        toast({
-          title: "Success",
-          description: actionData.message,
-          variant: "success",
-        });
-      }
-      navigate(actionData.returnTo);
-    } else {
-      toast({
-        title: "Error",
-        description:
-          actionData?.error?.message ?? "An unexpected error occurred",
-        variant: "destructive",
-      });
-    }
-  }, [actionData]);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const CASE_TAG = updateValues ? UPDATE_CASES_TAG : CREATE_CASES_TAG;
 
@@ -165,6 +277,33 @@ export default function CreateCase({
       company_id: companyId,
     },
   });
+
+  useEffect(() => {
+    if (actionData) {
+      if (actionData.status === "error") {
+        toast({
+          title: "Error",
+          description:
+            actionData?.error?.message ?? "An unexpected error occurred",
+          variant: "destructive",
+        });
+      } else if (actionData.status === "success") {
+        clearCacheEntry(cacheKeyPrefix.case);
+        toast({
+          title: "Success",
+          description: actionData.message,
+          variant: "success",
+        });
+      }
+      navigate(actionData.returnTo);
+    }
+  }, [actionData]);
+
+  useEffect(() => {
+    searchParams.set("reported_by", fields.reported_by.value ?? "");
+    searchParams.set("reported_on", fields.reported_on.value ?? "");
+    setSearchParams(searchParams);
+  }, [fields.reported_by.value, fields.reported_on.value]);
 
   return (
     <section className="flex flex-col w-full mx-auto lg:px-10 xl:px-14 2xl:px-40 py-4">
@@ -262,10 +401,12 @@ export default function CreateCase({
                   errors={fields.location.errors}
                 />
               </div>
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+
+              <hr className="mb-7 mt-1" />
+              <div className="grid grid-cols-3 place-content-center justify-between gap-6">
                 <SearchableSelectField
                   key={resetKey + 1}
-                  className="capitalize"
+                  className="capitalize col-span-3"
                   options={transformStringArrayIntoOptions(
                     reportedByArray as unknown as string[],
                   )}
@@ -278,9 +419,74 @@ export default function CreateCase({
                   }}
                   errors={fields.reported_by.errors}
                 />
+                <div className="w-full flex flex-col gap-1.5">
+                  <div className="flex">
+                    <Label>Projects</Label>
+                    <sub className="text-primary">*</sub>
+                  </div>
+                  <Combobox
+                    options={(projectOptions as any) ?? projectData ?? []}
+                    value={searchParams.get("reported_by_project") ?? ""}
+                    onChange={(project) => {
+                      form.update({
+                        name: "reported_by_project",
+                        value: project,
+                      });
+                      if (project?.length) {
+                        searchParams.set("reported_by_project", project);
+                      } else {
+                        searchParams.delete("reported_by_project");
+                      }
+                      setSearchParams(searchParams);
+                    }}
+                    placeholder={"Select Projects"}
+                  />
+                </div>
                 <SearchableSelectField
-                  key={resetKey + 2}
                   className="capitalize"
+                  options={(projectSiteOptions as any) ?? projectSiteData ?? []}
+                  inputProps={{
+                    ...getInputProps(fields.reported_by_site, {
+                      type: "text",
+                    }),
+                    defaultValue:
+                      searchParams.get("reported_by_project_site") ??
+                      String(fields.reported_by_site.initialValue),
+                  }}
+                  placeholder={"Select Project Site"}
+                  labelProps={{
+                    children: "Project Site",
+                  }}
+                  onChange={(projectSite) => {
+                    if (projectSite?.length) {
+                      searchParams.set(PROJECT_SITE_PARAM, projectSite);
+                    } else {
+                      searchParams.delete(PROJECT_SITE_PARAM);
+                    }
+                    setSearchParams(searchParams);
+                  }}
+                  errors={fields.reported_by_site.errors}
+                />
+                <SearchableSelectField
+                  className="capitalize"
+                  options={(employeeOptions as any) ?? employeeData ?? []}
+                  inputProps={{
+                    ...getInputProps(fields.reported_by_employee, {
+                      type: "text",
+                    }),
+                  }}
+                  placeholder={"Select Employee"}
+                  labelProps={{
+                    children: "Employee",
+                  }}
+                  errors={fields.reported_by_employee.errors}
+                />
+              </div>
+              <hr className="mb-7 mt-1" />
+              <div className="grid grid-cols-3 place-content-center justify-between gap-6">
+                <SearchableSelectField
+                  key={resetKey + 1}
+                  className="capitalize col-span-3"
                   options={transformStringArrayIntoOptions(
                     reportedOnArray as unknown as string[],
                   )}
@@ -293,7 +499,75 @@ export default function CreateCase({
                   }}
                   errors={fields.reported_on.errors}
                 />
+
+                <div className="w-full flex flex-col gap-1.5">
+                  <div className="flex">
+                    <Label>Reported On Projects</Label>
+                    <sub className="text-primary">*</sub>
+                  </div>
+                  <Combobox
+                    options={(projectOptions as any) ?? projectData ?? []}
+                    value={searchParams.get("reported_on_project") ?? ""}
+                    onChange={(project) => {
+                      form.update({
+                        name: "reported_on_project",
+                        value: project,
+                      });
+                      if (project?.length) {
+                        searchParams.set("reported_on_project", project);
+                      } else {
+                        searchParams.delete("reported_on_project");
+                      }
+                      setSearchParams(searchParams);
+                    }}
+                    placeholder={"Select Projects"}
+                  />
+                </div>
+
+                <SearchableSelectField
+                  className="capitalize"
+                  options={(projectSiteOptions as any) ?? projectSiteData ?? []}
+                  inputProps={{
+                    ...getInputProps(fields.reported_on_site, {
+                      type: "text",
+                    }),
+                    defaultValue:
+                      searchParams.get("reported_on_project_site") ??
+                      String(fields.reported_on_site.initialValue),
+                  }}
+                  placeholder={"Select Project Site"}
+                  labelProps={{
+                    children: replaceUnderscore(fields.reported_on_site.name),
+                  }}
+                  onChange={(projectSite) => {
+                    if (projectSite?.length) {
+                      searchParams.set(PROJECT_SITE_PARAM, projectSite);
+                    } else {
+                      searchParams.delete(PROJECT_SITE_PARAM);
+                    }
+                    setSearchParams(searchParams);
+                  }}
+                  errors={fields.reported_on_site.errors}
+                />
+
+                <SearchableSelectField
+                  className="capitalize"
+                  options={(employeeOptions as any) ?? employeeData ?? []}
+                  inputProps={{
+                    ...getInputProps(fields.reported_on_employee, {
+                      type: "text",
+                    }),
+                  }}
+                  placeholder={"Select Employee"}
+                  labelProps={{
+                    children: replaceUnderscore(
+                      fields.reported_on_employee.name,
+                    ),
+                  }}
+                  errors={fields.reported_on_employee.errors}
+                />
               </div>
+              <hr className="mb-7 mt-1" />
               <div className="grid grid-cols-2 place-content-center justify-between gap-6">
                 <SearchableSelectField
                   key={resetKey + 3}

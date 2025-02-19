@@ -44,7 +44,10 @@ export function ExportBar({
       </div>
       <div className="h-full flex justify-center items-center gap-2">
         <div className="h-full tracking-wide font-medium rounded-full flex justify-between items-center px-6 border dark:border-muted-foreground/30 ">
-          Cases: <span className="ml-1.5">{data.length ?? ""}</span>
+          Open:{" "}
+          <span className="ml-1.5">
+            {data?.filter((item) => item?.status === "open")?.length ?? ""}
+          </span>
         </div>
         <Button
           onClick={handleExport}

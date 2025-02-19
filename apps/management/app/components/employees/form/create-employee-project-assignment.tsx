@@ -87,7 +87,7 @@ export const CreateEmployeeProjectAssignment = ({
           </div>
           <SearchableSelectField
             className="capitalize"
-            options={projectSiteOptions ?? projectSiteOptions ?? []}
+            options={projectSiteOptions ?? []}
             inputProps={{
               ...getInputProps(fields.project_site_id, { type: "text" }),
               defaultValue:
@@ -110,7 +110,7 @@ export const CreateEmployeeProjectAssignment = ({
           />
           <SearchableSelectField
             className="capitalize"
-            options={siteEmployeeOptions ?? siteEmployeeOptions ?? []}
+            options={siteEmployeeOptions ?? []}
             inputProps={{
               ...getInputProps(fields.supervisor_id, { type: "text" }),
             }}

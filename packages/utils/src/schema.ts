@@ -1436,24 +1436,84 @@ export const reportedOnArray = [
 ] as const;
 export const caseLocationTypeArray = ["employee", "site", "other"] as const;
 
-export const CaseSchema = z.object({
-  id: z.string().optional(),
-  company_id: z.string(),
-  date: z.string().default(new Date().toISOString().split("T")[0]),
-  title: z.string().min(1, "Title is required"),
-  case_type: z.enum(caseTypeArray).default("dispute"),
-  status: z.enum(caseStatusArray).default("open"),
-  incident_date: z.string().optional(),
-  reported_by: z.enum(reportedByArray).default("employee"),
-  reported_on: z.enum(reportedOnArray).default("employee"),
-  location: z.string().optional(),
-  location_type: z.enum(caseLocationTypeArray).default("employee"),
-  amount_given: z.number().optional(),
-  amount_received: z.number().optional(),
-  court_case_reference: z.string().optional(),
-  description: z.string().optional(),
-  document: z.string().url().optional(),
-  resolution_date: z.string().optional(),
-  reported_on_id: z.string().optional(),
-  reported_by_id: z.string().optional(),
-});
+export const CaseSchema = z
+  .object({
+    id: z.string().optional(),
+    company_id: z.string(),
+    date: z.string().default(new Date().toISOString().split("T")[0]),
+    title: z.string().min(1, "Title is required"),
+    case_type: z.enum(caseTypeArray).default("dispute"),
+    status: z.enum(caseStatusArray).default("open"),
+    incident_date: z.string().optional(),
+    reported_by: z.enum(reportedByArray).default("employee"),
+    reported_on: z.enum(reportedOnArray).default("employee"),
+    location: z.string().optional(),
+    location_type: z.enum(caseLocationTypeArray).default("employee"),
+    amount_given: z.number().optional(),
+    amount_received: z.number().optional(),
+    court_case_reference: z.string().optional(),
+    description: zTextArea.optional(),
+    document: z.string().url().optional(),
+    resolution_date: z.string().optional(),
+    reported_on_id: z.string().optional(),
+    reported_on_employee: z.string().optional(),
+    reported_on_project: z.string().optional(),
+    reported_on_site: z.string().optional(),
+    reported_by_id: z.string().optional(),
+    reported_by_employee: z.string().optional(),
+    reported_by_project: z.string().optional(),
+    reported_by_site: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    // Helper function to validate reported_by fields
+    const validateReportedBy = (type: string, field: string | undefined) => {
+      if (!field) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `When 'reported_by' is '${type}', '${type}_employee', '${type}_site', '${type}_project', or '${type}_company' must be provided.`,
+          path: [`reported_by_${type}`],
+        });
+      }
+    };
+
+    // Helper function to validate reported_on fields
+    const validateReportedOn = (type: string, field: string | undefined) => {
+      if (!field) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `When 'reported_on' is '${type}', '${type}_employee', '${type}_site', '${type}_project', or '${type}_company' must be provided.`,
+          path: [`reported_on_${type}`],
+        });
+      }
+    };
+
+    // Validate reported_by fields
+    switch (data.reported_by) {
+      case "employee":
+        validateReportedBy("employee", data.reported_by_employee);
+        break;
+      case "site":
+        validateReportedBy("site", data.reported_by_site);
+        break;
+      case "project":
+        validateReportedBy("project", data.reported_by_project);
+        break;
+      default:
+        break; // No additional validation for "canny" or "other"
+    }
+
+    // Validate reported_on fields
+    switch (data.reported_on) {
+      case "employee":
+        validateReportedOn("employee", data.reported_on_employee);
+        break;
+      case "site":
+        validateReportedOn("site", data.reported_on_site);
+        break;
+      case "project":
+        validateReportedOn("project", data.reported_on_project);
+        break;
+      default:
+        break; // No additional validation for "canny" or "other"
+    }
+  });
