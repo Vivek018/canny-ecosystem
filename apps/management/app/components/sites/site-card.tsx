@@ -44,7 +44,7 @@ export function SiteCard({
   const { role } = useUser();
   const navigate = useNavigate();
 
-  const viewLinkTemplateSearchParam = `step=${modalSearchParamNames.view_link_template}`;
+  const viewLinkTemplateSearchParam = "step=";
   const viewPaySequenceSearchParam = `step=${modalSearchParamNames.view_pay_sequence}`;
   const editPaySequenceSearchParam = `step=${modalSearchParamNames.edit_pay_sequence}`;
 

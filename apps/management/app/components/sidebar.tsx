@@ -86,6 +86,7 @@ export function Sidebar({
               </NavLink>
             );
           })}
+          <div className='my-0.5'>&nbsp;</div>
         </ul>
       </nav>
       <div

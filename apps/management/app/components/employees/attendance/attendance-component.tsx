@@ -85,7 +85,7 @@ export const AttendanceComponent = ({
             {weekDays.map((day) => (
               <div
                 key={day}
-                className='p-2 text-center bg-accent dark:bg-muted/60 font-semibold text-muted-foreground border border-x'
+                className='bg-border p-2 text-center font-semibold text-muted-foreground'
               >
                 {day}
               </div>
@@ -96,7 +96,7 @@ export const AttendanceComponent = ({
             {emptyFirstDays?.map((_, index) => (
               <div
                 key={`empty-${index.toString()}`}
-                className='h-32 border first:border-l p-2'
+                className='h-32 border first:border-l  bg-[repeating-linear-gradient(-60deg,#DBDBDB,#DBDBDB_1px,transparent_1px,transparent_5px)] dark:bg-[repeating-linear-gradient(-60deg,#2C2C2C,#2C2C2C_1px,transparent_1px,transparent_5px)]'
               />
             ))}
 
@@ -194,7 +194,7 @@ export const AttendanceComponent = ({
             {emptyLastDays?.map((_, index) => (
               <div
                 key={`empty-${index.toString()}`}
-                className='h-32 border first:border-l p-2'
+                className='h-32 border first:border-l bg-[repeating-linear-gradient(-60deg,#DBDBDB,#DBDBDB_1px,transparent_1px,transparent_5px)] dark:bg-[repeating-linear-gradient(-60deg,#2C2C2C,#2C2C2C_1px,transparent_1px,transparent_5px)]'
               />
             ))}
           </div>

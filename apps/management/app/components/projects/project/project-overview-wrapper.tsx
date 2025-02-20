@@ -38,8 +38,8 @@ export function ProjectOverviewWrapper({
   }
 
   return (
-    <div className="w-full my-4">
-      <Card className="my-4 rounded w-full h-full p-4 flex flex-col lg:flex-row gap-4">
+    <div className="w-full py-4">
+      <Card className="rounded w-full h-full p-4 flex flex-col lg:flex-row gap-4">
         <div className="flex flex-col w-full gap-6">
           <ProjectHeader project={data} />
           <div className="flex flex-col w-full justify-between lg:flex-row gap-6">
