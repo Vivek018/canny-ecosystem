@@ -3,6 +3,8 @@ import type {
   TypedSupabaseClient,
   InferredType,
   CasesDatabaseRow,
+  ProjectDatabaseRow,
+  EmployeeDatabaseRow,
 } from "../types";
 
 export type CaseFilters = {
@@ -20,6 +22,34 @@ export type CaseFilters = {
   resolution_date_end?: string | undefined | null;
 };
 
+export type CasesDataType = Pick<
+  CasesDatabaseRow,
+  | "id"
+  | "title"
+  | "description"
+  | "case_type"
+  | "status"
+  | "incident_date"
+  | "date"
+  | "resolution_date"
+  | "location"
+  | "location_type"
+  | "reported_by"
+  | "reported_on"
+  | "amount_given"
+  | "amount_received"
+  | "court_case_reference"
+  | "document"
+> & {
+  reported_by_project: Pick<ProjectDatabaseRow, "name">;
+  reported_by_site: Pick<ProjectDatabaseRow, "name">;
+  reported_by_company: Pick<ProjectDatabaseRow, "name">;
+  reported_by_employee: Pick<EmployeeDatabaseRow, "first_name" | "last_name">;
+  reported_on_project: Pick<ProjectDatabaseRow, "name">;
+  reported_on_site: Pick<ProjectDatabaseRow, "name">;
+  reported_on_company: Pick<ProjectDatabaseRow, "name">;
+  reported_on_employee: Pick<EmployeeDatabaseRow, "first_name" | "last_name">;
+};
 export async function getCasesByCompanyId({
   supabase,
   companyId,
@@ -72,9 +102,15 @@ export async function getCasesByCompanyId({
 
   const query = supabase
     .from("cases")
-    .select(columns.join(","), {
-      count: "exact",
-    })
+    .select(
+      `${columns.join(",")}, reported_by_project:projects!cases_reported_by_project_fkey(name), reported_on_project:projects!cases_reported_on_project_fkey(name),
+       reported_by_employee:employees!cases_reported_by_employee_fkey(first_name,last_name), reported_on_employee:employees!cases_reported_on_employee_fkey(first_name,last_name),
+       reported_by_site:project_sites!cases_reported_by_site_fkey(name), reported_on_site:project_sites!cases_reported_on_site_fkey(name),
+       reported_by_company:companies!cases_reported_by_company_fkey(name), reported_on_company:companies!cases_reported_on_company_fkey(name)`,
+      {
+        count: "exact",
+      },
+    )
     .eq("company_id", companyId);
 
   if (sort) {
@@ -163,18 +199,24 @@ export async function getCasesById({
     "location",
     "location_type",
     "reported_by",
-    "reported_by_id",
     "reported_on",
-    "reported_on_id",
     "amount_given",
     "amount_received",
     "court_case_reference",
     "document",
+    "reported_by_project_id",
+    "reported_by_site_id",
+    "reported_by_company_id",
+    "reported_by_employee_id",
+    "reported_on_project_id",
+    "reported_on_site_id",
+    "reported_on_company_id",
+    "reported_on_employee_id",
   ] as const;
 
   const { data, error } = await supabase
     .from("cases")
-    .select(columns.join(","), {
+    .select(`${columns.join(",")}`, {
       count: "exact",
     })
     .eq("id", caseId)

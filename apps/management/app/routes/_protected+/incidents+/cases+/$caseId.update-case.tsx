@@ -26,7 +26,8 @@ import RegisterCase from "./create-case";
 import { updateCaseById } from "@canny_ecosystem/supabase/mutations";
 import {
   getCasesById,
-  getEmployeesByCompanyId,
+  getCompanies,
+  getEmployeesByProjectSiteId,
   getProjectsByCompanyId,
   getSitesByProjectId,
 } from "@canny_ecosystem/supabase/queries";
@@ -61,78 +62,122 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     const reportedBy = urlSearchParams.get("reported_by");
     const reportedOn = urlSearchParams.get("reported_on");
-    let employees = null;
-    let projects = null;
-    let projectSites = null;
+    const reportedByProject = urlSearchParams.get("reported_by_project");
+    const reportedOnProject = urlSearchParams.get("reported_on_project");
+    const reportedBySiteId = urlSearchParams.get("reported_by_site");
+    const reportedOnSiteId = urlSearchParams.get("reported_on_site");
 
-    if (
-      reportedBy === "project" ||
-      reportedBy === "site" ||
-      reportedBy === "employee" ||
-      reportedOn === "project" ||
-      reportedOn === "site" ||
-      reportedOn === "company"
-    ) {
+    let companies = null;
+    let projects = null;
+    let reportedByEmployee = null;
+    let reportedOnEmployee = null;
+    let reportedBySite = null;
+    let reportedOnSite = null;
+
+    if (reportedBy === "company" || reportedOn === "company") {
+      ({ data: companies } = await getCompanies({ supabase }));
+    }
+
+    const needsProjects = [
+      reportedBy === "project",
+      reportedBy === "site",
+      reportedBy === "employee",
+      reportedOn === "project",
+      reportedOn === "site",
+      reportedOn === "employee",
+    ].some(Boolean);
+
+    if (needsProjects) {
       ({ data: projects } = await getProjectsByCompanyId({
         supabase,
         companyId,
       }));
     }
-    if (
-      (reportedBy === "site" ||
-        reportedBy === "employee" ||
-        reportedOn === "site" ||
-        reportedOn === "employee") &&
-      (urlSearchParams.get("reported_by_project") ||
-        urlSearchParams.get("reported_on_project"))
-    ) {
-      ({ data: projectSites } = await getSitesByProjectId({
+
+    const needsReportedBySite =
+      (reportedBy === "site" || reportedBy === "employee") && reportedByProject;
+
+    if (needsReportedBySite) {
+      ({ data: reportedBySite } = await getSitesByProjectId({
         supabase,
-        projectId:
-          urlSearchParams.get("reported_by_project") ??
-          urlSearchParams.get("reported_on_project") ??
-          "",
+        projectId: reportedByProject ?? "",
       }));
     }
 
-    if (
-      urlSearchParams.get("project-site") &&
-      (reportedBy === "employee" || reportedOn === "employee")
-    ) {
-      ({ data: employees } = await getEmployeesByCompanyId({
+    const needsReportedOnSite =
+      (reportedOn === "site" || reportedOn === "employee") && reportedOnProject;
+
+    if (needsReportedOnSite) {
+      ({ data: reportedOnSite } = await getSitesByProjectId({
         supabase,
-        companyId,
-        params: {
-          from: 0,
-          to: 100,
-        },
+        projectId: reportedOnProject ?? "",
       }));
     }
+
+    if (reportedBySiteId && reportedBy === "employee") {
+      ({ data: reportedByEmployee } = await getEmployeesByProjectSiteId({
+        supabase,
+        projectSiteId: reportedBySiteId,
+      }));
+    }
+
+    if (reportedOnSiteId && reportedOn === "employee") {
+      ({ data: reportedOnEmployee } = await getEmployeesByProjectSiteId({
+        supabase,
+        projectSiteId: reportedOnSiteId,
+      }));
+    }
+
+    const companyOptions = companies?.map((company: any) => ({
+      label: company?.name,
+      value: company?.id ?? "",
+    }));
+
+    const projectOptions = projects?.map((project: any) => ({
+      label: project?.name,
+      value: project?.id ?? "",
+    }));
+
+    const reportedByEmployeeOptions = reportedByEmployee?.map(
+      (employee: any) => ({
+        label: `${employee?.first_name} ${employee?.last_name}`,
+        value: employee?.id ?? "",
+      }),
+    );
+
+    const reportedOnEmployeeOptions = reportedOnEmployee?.map(
+      (employee: any) => ({
+        label: `${employee?.first_name} ${employee?.last_name}`,
+        value: employee?.id ?? "",
+      }),
+    );
+
+    const reportedBySiteOptions = reportedBySite?.map((item) => ({
+      label: item?.name,
+      value: item?.id,
+    }));
+
+    const reportedOnSiteOptions = reportedOnSite?.map((item) => ({
+      label: item?.name,
+      value: item?.id,
+    }));
 
     return defer({
       casePromise,
-      employees: employees?.map((employee: any) => ({
-        label: `${employee?.first_name} ${employee?.last_name}`,
-        value: employee?.id ?? "",
-      })),
-      projects:
-        projects?.map((project) => ({
-          label: project?.name,
-          value: project?.id,
-        })) ?? [],
-      projectSites:
-        projectSites?.map((item) => ({
-          label: item?.name,
-          value: item?.id,
-        })) ?? [],
+      options: {
+        companyOptions,
+        projectOptions,
+        reportedByEmployeeOptions,
+        reportedOnEmployeeOptions,
+        reportedBySiteOptions,
+        reportedOnSiteOptions,
+      },
       error: null,
     });
   } catch (error) {
     return json({
       casePromise: null,
-      employees: null,
-      projects: null,
-      projectSites: null,
+      options: null,
       error,
     });
   }
@@ -153,7 +198,40 @@ export async function action({
       { status: submission.status === "error" ? 400 : 200 },
     );
   }
-  const data = { ...submission.value, id: submission.value.id ?? caseId };
+
+  const {
+    reported_by_company_id,
+    reported_on_company_id,
+    reported_by_project_id,
+    reported_on_project_id,
+    reported_by_site_id,
+    reported_on_site_id,
+    reported_by_employee_id,
+    reported_on_employee_id,
+    ...data
+  } = submission.value as any;
+
+  data.id = submission.value.id ?? caseId;
+
+  if (data.reported_by === "company") {
+    data.reported_by_company_id = reported_by_company_id;
+  } else if (data.reported_by === "project") {
+    data.reported_by_project_id = reported_by_project_id;
+  } else if (data.reported_by === "site") {
+    data.reported_by_site_id = reported_by_site_id;
+  } else if (data.reported_by === "employee") {
+    data.reported_by_employee_id = reported_by_employee_id;
+  }
+
+  if (data.reported_on === "company") {
+    data.reported_on_company_id = reported_on_company_id;
+  } else if (data.reported_on === "project") {
+    data.reported_on_project_id = reported_on_project_id;
+  } else if (data.reported_on === "site") {
+    data.reported_on_site_id = reported_on_site_id;
+  } else if (data.reported_on === "employee") {
+    data.reported_on_employee_id = reported_on_employee_id;
+  }
 
   const { status, error } = await updateCaseById({
     supabase,
@@ -176,8 +254,7 @@ export async function action({
 }
 
 export default function UpdateCases() {
-  const { casePromise, employees, projects, projectSites, error } =
-    useLoaderData<typeof loader>();
+  const { casePromise, options, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
   const { toast } = useToast();
@@ -219,12 +296,7 @@ export default function UpdateCases() {
             );
           }
           return (
-            <RegisterCase
-              updateValues={resolvedData?.data}
-              employeeData={employees}
-              projectData={projects}
-              projectSiteData={projectSites}
-            />
+            <RegisterCase updateValues={resolvedData?.data} options={options} />
           );
         }}
       </Await>

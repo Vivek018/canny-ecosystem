@@ -1,4 +1,4 @@
-import type { CasesDatabaseRow } from "@canny_ecosystem/supabase/types";
+import type { CasesDataType } from "@canny_ecosystem/supabase/queries";
 import {
   Sheet,
   SheetContent,
@@ -15,7 +15,28 @@ import { flexRender } from "@tanstack/react-table";
 export function CaseSheet({
   row,
   rowData,
-}: { row: any; rowData: Omit<CasesDatabaseRow, "created_at" | "updated_at"> }) {
+}: { row: any; rowData: CasesDataType }) {
+  const reportedByName: string =
+    rowData?.reported_by === "project"
+      ? rowData?.reported_on_project.name
+      : rowData?.reported_by === "employee"
+        ? `${rowData?.reported_by_employee.first_name} ${rowData?.reported_by_employee.last_name}`
+        : rowData?.reported_by === "site"
+          ? rowData?.reported_on_site.name
+          : rowData?.reported_by === "company"
+            ? rowData?.reported_on_company.name
+            : "Canny Inc.";
+
+  const reportedOnName: string =
+    rowData?.reported_on === "project"
+      ? rowData?.reported_on_project.name
+      : rowData?.reported_on === "employee"
+        ? `${rowData?.reported_on_employee.first_name} ${rowData?.reported_on_employee.last_name}`
+        : rowData?.reported_on === "site"
+          ? rowData?.reported_on_site.name
+          : rowData?.reported_on === "company"
+            ? rowData?.reported_on_company.name
+            : "Canny Inc.";
   return (
     <Sheet>
       <TableRow
@@ -105,42 +126,6 @@ export function CaseSheet({
           </p>
         </div>
 
-        <div className=" mx-5 flex justify-between">
-          <h3 className="my-3 text-muted-foreground font-semibold">
-            Reported On
-          </h3>
-          <p className="my-3 font-bold capitalize">
-            {rowData?.reported_on ?? "--"}
-          </p>
-        </div>
-
-        <div className=" mx-5 flex justify-between">
-          <h3 className="my-3 text-muted-foreground font-semibold capitalize">
-            {rowData?.reported_on ?? ""} Name
-          </h3>
-          <p className="my-3 font-bold capitalize">
-            {rowData?.reported_on_id ?? "--"}
-          </p>
-        </div>
-
-        <div className=" mx-5 flex justify-between">
-          <h3 className="my-3 text-muted-foreground font-semibold">
-            Reported By
-          </h3>
-          <p className="my-3 font-bold capitalize">
-            {rowData?.reported_by ?? "--"}
-          </p>
-        </div>
-
-        <div className=" mx-5 flex justify-between">
-          <h3 className="my-3 text-muted-foreground font-semibold capitalize">
-            {rowData?.reported_by ?? ""} Name
-          </h3>
-          <p className="my-3 font-bold capitalize">
-            {rowData?.reported_by_id ?? "--"}
-          </p>
-        </div>
-
         <div className="mx-5 flex justify-between">
           <h3 className="my-3 text-muted-foreground font-semibold">Date</h3>
           <p className="my-3 font-bold">{formatDate(rowData?.date) ?? "--"}</p>
@@ -169,6 +154,42 @@ export function CaseSheet({
             </p>
           </div>
         }
+
+        <hr />
+        <div className=" mx-5 flex justify-between">
+          <h3 className="my-3 text-muted-foreground font-semibold">
+            Reported On
+          </h3>
+          <p className="my-3 font-bold capitalize">
+            {rowData?.reported_on ?? "--"}
+          </p>
+        </div>
+        {rowData?.reported_on !== "other" && (
+          <div className=" mx-5 flex justify-between">
+            <h3 className="my-3 text-muted-foreground font-semibold capitalize">
+              R/O {rowData?.reported_on ?? ""} Name
+            </h3>
+            <p className="my-3 font-bold capitalize">{reportedOnName}</p>
+          </div>
+        )}
+        <hr />
+        <div className=" mx-5 flex justify-between">
+          <h3 className="my-3 text-muted-foreground font-semibold">
+            Reported By
+          </h3>
+          <p className="my-3 font-bold capitalize">
+            {rowData?.reported_by ?? "--"}
+          </p>
+        </div>
+
+        {rowData?.reported_by !== "other" && (
+          <div className=" mx-5 flex justify-between">
+            <h3 className="my-3 text-muted-foreground font-semibold capitalize">
+              R/B {rowData?.reported_by ?? ""} Name
+            </h3>
+            <p className="my-3 font-bold capitalize">{reportedByName}</p>
+          </div>
+        )}
 
         <hr className="my-3" />
         <div className="flex justify-between mx-5">
