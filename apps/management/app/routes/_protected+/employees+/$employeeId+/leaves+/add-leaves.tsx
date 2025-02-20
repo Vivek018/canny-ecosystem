@@ -13,11 +13,11 @@ import {
   getInitialValueFromZod,
   hasPermission,
   isGoodStatus,
-  ReimbursementSchema,
-  reimbursementStatusArray,
   replaceUnderscore,
   transformStringArrayIntoOptions,
   createRole,
+  LeaveSchema,
+  leaveTypeArray,
 } from "@canny_ecosystem/utils";
 
 import {
@@ -33,25 +33,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
-import {
-  CheckboxField,
-  Field,
-  SearchableSelectField,
-} from "@canny_ecosystem/ui/forms";
+import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import { FormButtons } from "@/components/form/form-buttons";
-import { createReimbursementsFromData } from "@canny_ecosystem/supabase/mutations";
-import type { ReimbursementsUpdate } from "@canny_ecosystem/supabase/types";
-import { UPDATE_REIMBURSEMENTS_TAG } from "../../../approvals+/reimbursements+/$reimbursementId.update-reimbursements";
-import { getUsers } from "@canny_ecosystem/supabase/queries";
+import type { LeavesDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { useEffect, useState } from "react";
-import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { clearCacheEntry } from "@/utils/cache";
+import { addLeavesFromData } from "@canny_ecosystem/supabase/mutations";
+import { UPDATE_LEAVES_TAG } from "./$id.$route.update-leave";
+import { getUsers } from "@canny_ecosystem/supabase/queries";
 
-export const ADD_REIMBURSEMENTS_TAG = "Add_Reimbursement";
+export const ADD_LEAVES_TAG = "Add_Leave";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
@@ -59,16 +54,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
   if (
-    !hasPermission(
-      user?.role!,
-      `${createRole}:${attribute.employeeReimbursements}`
-    )
+    !hasPermission(user?.role!, `${createRole}:${attribute.employeeLeaves}`)
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   const employeeId = params.employeeId;
-
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   const { data: userData, error: userError } = await getUsers({ supabase });
   if (userError || !userData) {
     throw userError;
@@ -79,7 +69,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     value: userData.id,
   }));
 
-  return json({ userOptions, companyId, employeeId });
+  return json({ employeeId, userOptions });
 }
 
 export async function action({
@@ -87,7 +77,7 @@ export async function action({
 }: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
-  const submission = parseWithZod(formData, { schema: ReimbursementSchema });
+  const submission = parseWithZod(formData, { schema: LeaveSchema });
 
   if (submission.status !== "success") {
     return json(
@@ -96,7 +86,7 @@ export async function action({
     );
   }
 
-  const { status, error } = await createReimbursementsFromData({
+  const { status, error } = await addLeavesFromData({
     supabase,
     data: submission.value,
   });
@@ -104,26 +94,25 @@ export async function action({
   if (isGoodStatus(status)) {
     return json({
       status: "success",
-      message: "Employee reimbursement create successfully",
+      message: "Employee Leave create successfully",
       error: null,
     });
   }
   return json({
     status: "error",
-    message: "Employee reimbursement create failed",
+    message: "Employee leave create failed",
     error,
   });
 }
 
-export default function AddReimbursements({
+export default function AddLeaves({
   updateValues,
   userOptionsFromUpdate,
 }: {
-  updateValues?: ReimbursementsUpdate | null;
+  updateValues?: LeavesDatabaseUpdate | null;
   userOptionsFromUpdate?: any;
-  reimbursementId?: string;
 }) {
-  const { userOptions, employeeId, companyId } = useLoaderData<typeof loader>();
+  const { employeeId, userOptions } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
 
@@ -133,44 +122,38 @@ export default function AddReimbursements({
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(
-          `${cacheKeyPrefix.employee_reimbursements}${employeeId}`
-        );
+        clearCacheEntry(`${cacheKeyPrefix.employee_leaves}${employeeId}`);
         toast({
           title: "Success",
-          description: actionData?.message || "Employee bank details created",
+          description: actionData?.message || "Employee Leaves created",
           variant: "success",
         });
       } else {
         toast({
           title: "Error",
           description:
-            actionData?.error?.message || "Employee bank details create failed",
+            actionData?.error?.message || "Employee Leaves create failed",
           variant: "destructive",
         });
       }
-      navigate(`/employees/${employeeId}/reimbursements`);
+      navigate(`/employees/${employeeId}/leaves`);
     }
   }, [actionData]);
 
-  const REIMBURSEMENTS_TAG = updateValues
-    ? UPDATE_REIMBURSEMENTS_TAG
-    : ADD_REIMBURSEMENTS_TAG;
+  const LEAVES_TAG = updateValues ? UPDATE_LEAVES_TAG : ADD_LEAVES_TAG;
 
-  const initialValues =
-    updateValues ?? getInitialValueFromZod(ReimbursementSchema);
+  const initialValues = updateValues ?? getInitialValueFromZod(LeaveSchema);
 
   const [form, fields] = useForm({
-    id: REIMBURSEMENTS_TAG,
-    constraint: getZodConstraint(ReimbursementSchema),
+    id: LEAVES_TAG,
+    constraint: getZodConstraint(LeaveSchema),
     onValidate({ formData }) {
-      return parseWithZod(formData, { schema: ReimbursementSchema });
+      return parseWithZod(formData, { schema: LeaveSchema });
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
     defaultValue: {
       ...initialValues,
-      company_id: initialValues.company_id ?? companyId,
       employee_id: initialValues.employee_id ?? employeeId,
     },
   });
@@ -182,68 +165,33 @@ export default function AddReimbursements({
           <Card>
             <CardHeader>
               <CardTitle className="capitalize">
-                {replaceUnderscore(REIMBURSEMENTS_TAG)}
+                {replaceUnderscore(LEAVES_TAG)}
               </CardTitle>
               <CardDescription className="lowercase">
-                {`${replaceUnderscore(
-                  REIMBURSEMENTS_TAG
-                )} by filling this form`}
+                {`${replaceUnderscore(LEAVES_TAG)} by filling this form`}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <input
-                {...getInputProps(fields.company_id, { type: "hidden" })}
-              />
-              <input
                 {...getInputProps(fields.employee_id, { type: "hidden" })}
               />
               <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10">
-                <Field
-                  inputProps={{
-                    ...getInputProps(fields.submitted_date, {
-                      type: "date",
-                    }),
-
-                    className: "",
-                  }}
-                  labelProps={{
-                    children: replaceUnderscore(fields.submitted_date.name),
-                  }}
-                  errors={fields.submitted_date.errors}
-                />
                 <SearchableSelectField
                   key={resetKey}
                   className="w-full capitalize flex-1 "
                   options={transformStringArrayIntoOptions(
-                    reimbursementStatusArray as unknown as string[]
+                    leaveTypeArray as unknown as string[]
                   )}
                   inputProps={{
-                    ...getInputProps(fields.status, { type: "text" }),
+                    ...getInputProps(fields.leave_type, { type: "text" }),
                   }}
                   placeholder={`Select ${replaceUnderscore(
-                    fields.status.name
+                    fields.leave_type.name
                   )}`}
                   labelProps={{
-                    children: "Status",
+                    children: "Leave Type",
                   }}
-                  errors={fields.status.errors}
-                />
-              </div>
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10">
-                <Field
-                  inputProps={{
-                    ...getInputProps(fields.amount, {
-                      type: "number",
-                    }),
-                    placeholder: `Enter ${replaceUnderscore(
-                      fields.amount.name
-                    )}`,
-                    className: "",
-                  }}
-                  labelProps={{
-                    children: replaceUnderscore(fields.amount.name),
-                  }}
-                  errors={fields.amount.errors}
+                  errors={fields.leave_type.errors}
                 />
                 <SearchableSelectField
                   key={resetKey + 1}
@@ -261,15 +209,48 @@ export default function AddReimbursements({
                   errors={fields.user_id.errors}
                 />
               </div>
+              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 ">
+                <Field
+                  inputProps={{
+                    ...getInputProps(fields.start_date, {
+                      type: "date",
+                    }),
 
-              <CheckboxField
-                className="mt-8"
-                buttonProps={getInputProps(fields.is_deductible, {
-                  type: "checkbox",
-                })}
-                labelProps={{
-                  children: "Is Deductible?",
+                    className: "",
+                  }}
+                  labelProps={{
+                    children: replaceUnderscore(fields.start_date.name),
+                  }}
+                  errors={fields.start_date.errors}
+                />
+
+                <Field
+                  inputProps={{
+                    ...getInputProps(fields.end_date, {
+                      type: "date",
+                    }),
+
+                    className: "",
+                  }}
+                  labelProps={{
+                    children: replaceUnderscore(fields.end_date.name),
+                  }}
+                  errors={fields.end_date.errors}
+                />
+              </div>
+
+              <Field
+                inputProps={{
+                  ...getInputProps(fields.reason, {
+                    type: "text",
+                  }),
+
+                  className: "",
                 }}
+                labelProps={{
+                  children: replaceUnderscore(fields.reason.name),
+                }}
+                errors={fields.reason.errors}
               />
             </CardContent>
 

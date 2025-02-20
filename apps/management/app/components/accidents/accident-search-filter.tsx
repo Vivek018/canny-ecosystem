@@ -212,7 +212,6 @@ export function AccidentSearchFilter({
         align="end"
         sideOffset={19}
         alignOffset={-11}
-        side="top"
       >
         <DropdownMenuGroup>
           <DropdownMenuSub>

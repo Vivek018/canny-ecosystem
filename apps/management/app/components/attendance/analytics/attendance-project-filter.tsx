@@ -36,7 +36,7 @@ export function AttendanceProjectFilter({
               "border-2 border-muted rounded-lg p-2 opacity-70 grid place-items-center",
               !disabled &&
                 "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
-              isOpen && "opacity-100",
+              isOpen && "opacity-100"
             )}
           >
             <Icon name="mixer" />
@@ -49,7 +49,6 @@ export function AttendanceProjectFilter({
         align="end"
         sideOffset={-50}
         alignOffset={50}
-        side="top"
       >
         <DropdownMenuGroup>
           <DropdownMenuSub>

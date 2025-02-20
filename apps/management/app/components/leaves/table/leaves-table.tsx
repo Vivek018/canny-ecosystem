@@ -12,22 +12,24 @@ import {
   useReactTable,
   type VisibilityState,
 } from "@tanstack/react-table";
-import { AccidentsTableHeader } from "./accidents-table-header";
-import { useInView } from "react-intersection-observer";
+import { LeavesTableHeader } from "./leaves-table-header";
+import { Spinner } from "@canny_ecosystem/ui/spinner";
 import { useEffect, useState } from "react";
 import {
-  type AccidentFilters,
-  getAccidentsByCompanyId,
-  type AccidentsDatabaseType,
+  type LeavesFilters,
+  type LeavesDataType,
+  getLeavesByCompanyId,
+  getLeavesByEmployeeId,
 } from "@canny_ecosystem/supabase/queries";
-import { useSupabase } from "@canny_ecosystem/supabase/client";
-import { Spinner } from "@canny_ecosystem/ui/spinner";
 import { useSearchParams } from "@remix-run/react";
+import { useSupabase } from "@canny_ecosystem/supabase/client";
+import { useLeavesStore } from "@/store/leaves";
+import { useInView } from "react-intersection-observer";
 import { Button } from "@canny_ecosystem/ui/button";
-import { useAccidentStore } from "@/store/accidents";
 import { ExportBar } from "../export-bar";
 
-interface DataTableProps<TData, TValue> {
+
+interface LeavesDataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   hasNextPage: boolean;
@@ -36,23 +38,24 @@ interface DataTableProps<TData, TValue> {
   companyId?: string;
   employeeId?: string;
   noFilters?: boolean;
-  filters?: AccidentFilters | null;
+  filters?: LeavesFilters | null;
   query?: string | null;
   initialColumnVisibility?: VisibilityState;
 }
 
-export function AccidentsTable<TData, TValue>({
+export function LeavesDataTable<TData, TValue>({
   columns,
   data: initialData,
   hasNextPage: initialHasNextPage,
   pageSize,
   env,
-  companyId,
   noFilters,
+  companyId,
   filters,
   initialColumnVisibility,
   query,
-}: DataTableProps<TData, TValue>) {
+  employeeId,
+}: LeavesDataTableProps<TData, TValue>) {
   const [data, setData] = useState(initialData);
   const [from, setFrom] = useState(pageSize);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -61,7 +64,7 @@ export function AccidentsTable<TData, TValue>({
 
   const { ref, inView } = useInView();
   const { rowSelection, setSelectedRows, setRowSelection, setColumns } =
-    useAccidentStore();
+    useLeavesStore();
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
     initialColumnVisibility ?? {}
   );
@@ -71,7 +74,7 @@ export function AccidentsTable<TData, TValue>({
     const sortParam = searchParams.get("sort");
     if (companyId) {
       try {
-        const { data } = await getAccidentsByCompanyId({
+        const { data } = await getLeavesByCompanyId({
           supabase,
           companyId,
           params: {
@@ -91,6 +94,27 @@ export function AccidentsTable<TData, TValue>({
         setHasNextPage(false);
       }
     }
+    if (employeeId) {
+          try {
+            const { data } = await getLeavesByEmployeeId({
+              supabase,
+              employeeId,
+              params: {
+                from: from,
+                to: to,
+                filters,
+                sort: sortParam?.split(":") as [string, "asc" | "desc"],
+              },
+            });
+            if (data) {
+              setData((prevData) => [...prevData, ...data] as TData[]);
+            }
+            setFrom(to + 1);
+            setHasNextPage(data?.length! > to);
+          } catch {
+            setHasNextPage(false);
+          }
+        }
   };
 
   const table = useReactTable({
@@ -114,7 +138,7 @@ export function AccidentsTable<TData, TValue>({
     for (const row of table.getSelectedRowModel().rows) {
       rowArray.push(row.original);
     }
-    setSelectedRows(rowArray as AccidentsDatabaseType[]);
+    setSelectedRows(rowArray as LeavesDataType[]);
   }, [rowSelection]);
 
   useEffect(() => {
@@ -145,7 +169,7 @@ export function AccidentsTable<TData, TValue>({
       >
         <div className="relative">
           <Table>
-            <AccidentsTableHeader
+            <LeavesTableHeader
               table={table}
               className={cn(!tableLength && "hidden")}
             />
@@ -165,10 +189,6 @@ export function AccidentsTable<TData, TValue>({
                             "px-3 md:px-4 py-4 hidden md:table-cell",
                             cell.column.id === "select" &&
                               "sticky left-0 min-w-12 max-w-12 bg-card z-10",
-                            cell.column.id === "employee_code" &&
-                              "sticky left-12 bg-card z-10",
-                            cell.column.id === "employee_name" &&
-                              "sticky left-48 bg-card z-10",
                             cell.column.id === "actions" &&
                               "sticky right-0 min-w-20 max-w-20 bg-card z-10"
                           )}
@@ -189,7 +209,7 @@ export function AccidentsTable<TData, TValue>({
                     className="h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize"
                   >
                     <div className="flex flex-col items-center gap-1">
-                      <h2 className="text-xl">No Accidents Found.</h2>
+                      <h2 className="text-xl">No Leaves Found.</h2>
                       <p
                         className={cn(
                           "text-muted-foreground",
@@ -230,6 +250,7 @@ export function AccidentsTable<TData, TValue>({
         className={cn(!table.getSelectedRowModel().rows.length && "hidden")}
         rows={table.getSelectedRowModel().rows.length}
         data={selectedRowsData as any}
+        columnVisibility={columnVisibility}
       />
     </div>
   );

@@ -210,8 +210,6 @@ export function ReimbursementSearchFilter({
         className="w-full md:w-[480px]"
         align="end"
         sideOffset={19}
-        alignOffset={-11}
-        side="top"
       >
         <DropdownMenuGroup>
           <DropdownMenuSub>

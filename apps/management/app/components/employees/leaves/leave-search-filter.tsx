@@ -12,64 +12,57 @@ import {
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
-import { useEffect, useRef, useState } from "react";
+import { formatISO } from "date-fns";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import {
-  type SubmitOptions,
-  useNavigation,
-  useSearchParams,
-  useSubmit,
-} from "@remix-run/react";
-import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
-import { payoutMonths } from "@canny_ecosystem/utils/constant";
-import { getYears } from "@canny_ecosystem/utils";
-import type { EmployeeReportFilters } from "@canny_ecosystem/supabase/queries";
+import { useNavigation, useSearchParams } from "@remix-run/react";
+import { Calendar } from "@canny_ecosystem/ui/calendar";
+import { leaveTypeArray, replaceUnderscore } from "@canny_ecosystem/utils";
 
-export function GratuityReportSearchFilter({
+import type { LeavesFilters } from "@canny_ecosystem/supabase/queries";
+
+export function LeavesSearchFilter({
   disabled,
+  employeeId,
   projectArray,
   projectSiteArray,
+  userEmails,
 }: {
   disabled?: boolean;
-  projectArray: string[] | null;
-  projectSiteArray: string[] | null;
+  employeeId?: string | undefined;
+  projectArray?: string[];
+  projectSiteArray?: string[];
+  userEmails: (string | null | undefined)[];
 }) {
+
   const [prompt, setPrompt] = useState("");
   const navigation = useNavigation();
   const isSubmitting =
     navigation.state === "submitting" ||
     (navigation.state === "loading" &&
-      navigation.location.pathname === "/reports/gratuity" &&
+      navigation.location.pathname === `/employees/${employeeId}/leaves` &&
       navigation.location.search.length);
+
   const inputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
 
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const initialFilterParams: EmployeeReportFilters = {
+  const initialFilterParams: LeavesFilters = {
+    date_start: "",
+    date_end: "",
+    leave_type: "",
+    name: "",
     project: "",
     project_site: "",
-    start_month: "",
-    start_year: "",
-    end_year: "",
-    end_month: "",
   };
 
-  const startYear = Number.parseInt(searchParams.get("start_year") ?? "");
-  const endYear = Number.parseInt(searchParams.get("end_year") ?? "");
-
   const [filterParams, setFilterParams] = useState(initialFilterParams);
-
-  const submit = useSubmit();
-  const debounceSubmit = useDebounce((target: any, options?: SubmitOptions) => {
-    submit(target, options);
-  }, 300);
 
   const deleteAllSearchParams = () => {
     for (const [key, _val] of Object.entries(filterParams)) {
       searchParams.delete(key);
     }
-    searchParams.delete("name");
     setSearchParams(searchParams);
   };
 
@@ -77,32 +70,17 @@ export function GratuityReportSearchFilter({
     for (const [key, value] of Object.entries(filterParams)) {
       if (value !== null && value !== undefined && String(value)?.length) {
         searchParams.set(key, value);
-
-        if (key === "start_year" && !searchParams.get("start_month")) {
-          searchParams.set("start_month", "January");
-        }
-        if (key === "end_year" && !searchParams.get("end_month")) {
-          searchParams.set("end_month", "December");
-        }
       }
       setSearchParams(searchParams);
     }
   }, [filterParams]);
 
-  const searchParamsList: {
-    project: string | null;
-    project_site: string | null;
-    start_month: string | null;
-    start_year: string | null;
-    end_month: string | null;
-    end_year: string | null;
-  } = {
+  const searchParamsList: LeavesFilters = {
+    date_start: searchParams.get("date_start"),
+    date_end: searchParams.get("date_end"),
+    leave_type: searchParams.get("leave_type"),
     project: searchParams.get("project"),
     project_site: searchParams.get("project_site"),
-    start_month: searchParams.get("start_month"),
-    start_year: searchParams.get("start_year"),
-    end_month: searchParams.get("end_month"),
-    end_year: searchParams.get("end_year"),
   };
 
   useEffect(() => {
@@ -151,14 +129,8 @@ export function GratuityReportSearchFilter({
     }
   };
 
-  const handleSubmit = () => {
-    debounceSubmit(
-      { prompt: prompt },
-      {
-        action: "/reports/gratuity?index",
-        method: "POST",
-      }
-    );
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (prompt.length) {
       searchParams.set("name", prompt);
       setSearchParams(searchParams);
@@ -167,8 +139,7 @@ export function GratuityReportSearchFilter({
 
   const hasValidFilters =
     Object.entries(filterParams).filter(
-      ([key, value]) =>
-        typeof value === "string" && value.length && key !== "name"
+      ([key, value]) => value?.length && key !== "name"
     ).length > 0;
 
   return (
@@ -178,7 +149,7 @@ export function GratuityReportSearchFilter({
           className="relative w-full md:w-auto"
           onSubmit={(e) => {
             e.preventDefault();
-            handleSubmit();
+            handleSubmit(e);
           }}
         >
           <Icon
@@ -192,9 +163,7 @@ export function GratuityReportSearchFilter({
             tabIndex={-1}
             ref={inputRef}
             placeholder={
-              disabled
-                ? "No Employee Data to Search And Filter"
-                : "Search employee report"
+              disabled ? "No Leaves Data to Search And Filter" : "Search Leaves"
             }
             disabled={disabled}
             className="pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70"
@@ -234,7 +203,7 @@ export function GratuityReportSearchFilter({
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
-              <span>Start Year</span>
+              <span>Date</span>
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent
@@ -242,26 +211,39 @@ export function GratuityReportSearchFilter({
                 alignOffset={-4}
                 className="p-0"
               >
-                {getYears(
-                  10,
-                  endYear ? Number(endYear) : new Date().getFullYear()
-                )
-                  ?.sort((a, b) => b - a)
-                  .map((name, index) => (
-                    <DropdownMenuCheckboxItem
-                      key={name + index.toString()}
-                      className="capitalize"
-                      checked={filterParams?.start_year === name.toString()}
-                      onCheckedChange={() => {
-                        setFilterParams((prev) => ({
-                          ...prev,
-                          start_year: name.toString(),
-                        }));
-                      }}
-                    >
-                      {name}
-                    </DropdownMenuCheckboxItem>
-                  ))}
+                <Calendar
+                  mode="range"
+                  initialFocus
+                  today={
+                    filterParams.date_start
+                      ? new Date(filterParams.date_start)
+                      : new Date()
+                  }
+                  toDate={new Date()}
+                  selected={
+                    {
+                      from:
+                        filterParams.date_start &&
+                        new Date(filterParams.date_start).toISOString(),
+                      to:
+                        filterParams.date_end &&
+                        new Date(filterParams.date_end),
+                    } as any
+                  }
+                  onSelect={(range) => {
+                    if (!range) return;
+
+                    const newRange = {
+                      date_start: range.from
+                        ? formatISO(range.from, { representation: "date" })
+                        : String(filterParams.date_start),
+                      date_end: range.to
+                        ? formatISO(range.to, { representation: "date" })
+                        : "",
+                    };
+                    setFilterParams((prev) => ({ ...prev, ...newRange }));
+                  }}
+                />
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>
@@ -270,7 +252,7 @@ export function GratuityReportSearchFilter({
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
-              <span>Start Month</span>
+              <span>Leave Type</span>
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent
@@ -278,113 +260,25 @@ export function GratuityReportSearchFilter({
                 alignOffset={-4}
                 className="p-0"
               >
-                {!searchParamsList.start_year ? (
-                  <DropdownMenuCheckboxItem
-                    disabled={true}
-                    className="p-8 items-center justify-center"
-                  >
-                    Select Start Year First
-                  </DropdownMenuCheckboxItem>
-                ) : (
-                  payoutMonths
-                    .slice(1)
-                    .map((item) => item.label)
-                    ?.map((name, index) => (
-                      <DropdownMenuCheckboxItem
-                        key={name + index.toString()}
-                        className="capitalize"
-                        checked={filterParams?.start_month === name}
-                        onCheckedChange={() => {
-                          setFilterParams((prev) => ({
-                            ...prev,
-                            start_month: name,
-                          }));
-                        }}
-                      >
-                        {name}
-                      </DropdownMenuCheckboxItem>
-                    ))
-                )}
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-        </DropdownMenuGroup>
-
-        <DropdownMenuGroup>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-              <span>End Year</span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent
-                sideOffset={14}
-                alignOffset={-4}
-                className="p-0"
-              >
-                {getYears(10)?.map((name, index) => (
+                {leaveTypeArray.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
                     className="capitalize"
-                    checked={filterParams?.end_year === name.toString()}
-                    disabled={startYear > name}
+                    checked={filterParams?.leave_type === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
                         ...prev,
-                        end_year: name.toString(),
+                        leave_type: name,
                       }));
                     }}
                   >
-                    {name}
+                    {replaceUnderscore(name)}
                   </DropdownMenuCheckboxItem>
                 ))}
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>
         </DropdownMenuGroup>
-
-        <DropdownMenuGroup>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-              <span>End Month</span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent
-                sideOffset={14}
-                alignOffset={-4}
-                className="p-0"
-              >
-                {!searchParamsList.end_year ? (
-                  <DropdownMenuCheckboxItem
-                    disabled={true}
-                    className="p-8 items-center justify-center"
-                  >
-                    Select End Year First
-                  </DropdownMenuCheckboxItem>
-                ) : (
-                  payoutMonths
-                    .slice(0, payoutMonths.length - 1)
-                    .map((item) => item.label)
-                    ?.map((name, index) => (
-                      <DropdownMenuCheckboxItem
-                        key={name + index.toString()}
-                        className="capitalize"
-                        checked={filterParams?.end_month === name}
-                        onCheckedChange={() => {
-                          setFilterParams((prev) => ({
-                            ...prev,
-                            end_month: name,
-                          }));
-                        }}
-                      >
-                        {name}
-                      </DropdownMenuCheckboxItem>
-                    ))
-                )}
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-        </DropdownMenuGroup>
-
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
@@ -451,6 +345,35 @@ export function GratuityReportSearchFilter({
                     </DropdownMenuCheckboxItem>
                   ))
                 )}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+        </DropdownMenuGroup>
+        <DropdownMenuGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <span>Users</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent
+                sideOffset={14}
+                alignOffset={-4}
+                className="p-0"
+              >
+                {userEmails?.map((name, index) => (
+                  <DropdownMenuCheckboxItem
+                    key={name + index.toString()}
+                    checked={filterParams?.users === name}
+                    onCheckedChange={() => {
+                      setFilterParams((prev) => ({
+                        ...prev,
+                        users: name,
+                      }));
+                    }}
+                  >
+                    {name}
+                  </DropdownMenuCheckboxItem>
+                ))}
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>

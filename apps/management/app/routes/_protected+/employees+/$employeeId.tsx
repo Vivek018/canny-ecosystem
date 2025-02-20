@@ -16,7 +16,7 @@ export default function Employee() {
           to="/employees"
           className={cn(
             buttonVariants({ variant: "outline" }),
-            "bg-card w-9 h-9 px-0 rounded-full",
+            "bg-card w-9 h-9 px-0 rounded-full"
           )}
         >
           <Icon name="chevron-left" size="sm" />
@@ -39,6 +39,10 @@ export default function Employee() {
             {
               label: "Attendance",
               path: `/employees/${employeeId}/attendance`,
+            },
+            {
+              label: "Leaves",
+              path: `/employees/${employeeId}/leaves`,
             },
           ]}
           pathname={pathname}

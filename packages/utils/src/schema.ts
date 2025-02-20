@@ -1408,3 +1408,21 @@ export const AccidentSchema = z.object({
   description: zTextArea.max(500),
   medical_diagnosis: z.string().optional(),
 });
+
+export const leaveTypeArray = [
+  "casual_leave",
+  "paid_leave",
+  "unpaid_leave",
+  "sick_leave",
+  "paternity_leave",
+] as const;
+
+export const LeaveSchema = z.object({
+  employee_id: z.string(),
+  start_date: z.string(),
+  end_date: z.string().optional(),
+  reason: z.string().max(100).min(3),
+  leave_type: z.enum(leaveTypeArray),
+
+  user_id: z.string().optional(),
+});

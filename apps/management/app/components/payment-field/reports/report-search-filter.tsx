@@ -114,7 +114,7 @@ export function PaymentFieldsReportSearchFilter({
     },
     {
       enableOnFormTags: true,
-    },
+    }
   );
 
   useHotkeys(["meta+s", "ctrl+s"], (evt) => {
@@ -148,7 +148,7 @@ export function PaymentFieldsReportSearchFilter({
       {
         action: "/payment-components/payment-fields/reports?index",
         method: "POST",
-      },
+      }
     );
     if (prompt.length) {
       searchParams.set("name", prompt);
@@ -159,7 +159,7 @@ export function PaymentFieldsReportSearchFilter({
   const hasValidFilters =
     Object.entries(filterParams).filter(
       ([key, value]) =>
-        typeof value === "string" && value.length && key !== "name",
+        typeof value === "string" && value.length && key !== "name"
     ).length > 0;
 
   return (
@@ -176,7 +176,7 @@ export function PaymentFieldsReportSearchFilter({
             name={isSubmitting ? "update" : "search"}
             className={cn(
               "absolute pointer-events-none left-3 top-[12.5px]",
-              isSubmitting && "animate-spin",
+              isSubmitting && "animate-spin"
             )}
           />
           <Input
@@ -207,7 +207,7 @@ export function PaymentFieldsReportSearchFilter({
                 !disabled &&
                   "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 hasValidFilters && "opacity-100",
-                isOpen && "opacity-100",
+                isOpen && "opacity-100"
               )}
             >
               <Icon name="mixer" />
@@ -221,7 +221,6 @@ export function PaymentFieldsReportSearchFilter({
         align="end"
         sideOffset={19}
         alignOffset={-11}
-        side="top"
       >
         <DropdownMenuGroup>
           <DropdownMenuSub>

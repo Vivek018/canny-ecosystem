@@ -298,3 +298,9 @@ export type AccidentsDatabaseInsert =
   Database["public"]["Tables"]["accidents"]["Insert"];
 export type AccidentsDatabaseUpdate =
   Database["public"]["Tables"]["accidents"]["Update"];
+
+export type LeavesDatabaseRow = Database["public"]["Tables"]["leaves"]["Row"];
+export type LeavesDatabaseInsert =
+  Database["public"]["Tables"]["leaves"]["Insert"];
+export type LeavesDatabaseUpdate =
+  Database["public"]["Tables"]["leaves"]["Update"];

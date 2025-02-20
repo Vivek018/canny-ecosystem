@@ -19,3 +19,4 @@ export * from "./employee-letter";
 export * from "./attendance";
 export * from "./leave-encashment";
 export * from "./accidents";
+export * from "./leaves"
