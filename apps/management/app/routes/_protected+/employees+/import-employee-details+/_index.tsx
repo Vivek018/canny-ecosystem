@@ -218,7 +218,7 @@ export default function EmployeeDetailsImportFieldMapping() {
         transformHeader: (header) => swappedFieldMapping[header] || header,
         complete: async (results) => {
           const allowedFields = FIELD_CONFIGS.map((field) => field.key);
-          const finalData = results.data
+          const finalData = results?.data
             .filter((entry) =>
               Object.values(entry!).some(
                 (value) => String(value).trim() !== "",
@@ -249,7 +249,7 @@ export default function EmployeeDetailsImportFieldMapping() {
             const { conflictingIndices, error } =
               await getEmployeeDetailsConflicts({
                 supabase,
-                importedData: finalData as any,
+                importedData: finalData as ImportEmployeeDetailsDataType[],
               });
 
             if (error) {

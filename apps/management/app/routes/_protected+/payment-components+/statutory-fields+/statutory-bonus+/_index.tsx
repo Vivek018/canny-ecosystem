@@ -65,7 +65,7 @@ export default function StatutoryBonusIndex() {
           }
           return (
             <StatutoryBonusWrapper
-              data={resolvedData.data as any}
+              data={resolvedData.data}
               error={resolvedData.error}
             />
           );

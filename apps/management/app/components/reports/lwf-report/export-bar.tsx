@@ -46,7 +46,7 @@ export function ExportBar({
       } else if (key === "end_range") {
         exportedData[key] = element?.end_range ?? "";
       } else {
-        exportedData[key] = element[key as keyof EmployeeReportDataType] as any;
+        exportedData[key] = element[key as keyof EmployeeReportDataType] as string | boolean | number;
       }
     }
 

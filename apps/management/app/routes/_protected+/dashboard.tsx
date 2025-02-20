@@ -9,6 +9,7 @@ import { cacheKeyPrefix } from "@/constant";
 import { clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
+  type PayrollEntriesWithTemplateComponents,
   getEmployeesCountByCompanyId,
   getLocationsCountByCompanyId,
   getPayrollEntriesWithTemplateComponentsByPayrollId,
@@ -121,7 +122,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   } catch (error) {
     return json({
       payrollData: null,
-      payrollEntriesData: null as any,
+      payrollEntriesData: null,
       projectsCount: 0,
       sitesCount: 0,
       usersCount: 0,
@@ -164,19 +165,23 @@ export default function Dashboard() {
     return <ErrorBoundary error={error} message="Failed to load data" />;
 
   return (
-    <section className="w-full p-4 flex flex-col gap-4">
-      <div className="flex justify-end">
-        <div className="flex justify-between gap-3">
+    <section className='w-full p-4 flex flex-col gap-4'>
+      <div className='flex justify-end'>
+        <div className='flex justify-between gap-3'>
           <FilterList filterList={filters} />
           <DashboardFilter />
         </div>
       </div>
-      <div className="w-full flex flex-col gap-4">
+      <div className='w-full flex flex-col gap-4'>
         <PayrollTrend chartData={payrollData} />
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
           <PayrollInfoCard cardData={cardData} />
 
-          <StatutoryRatio chartData={payrollEntriesData} />
+          <StatutoryRatio
+            chartData={
+              payrollEntriesData as PayrollEntriesWithTemplateComponents[]
+            }
+          />
 
           <PayrollTopSite chartData={payrollData} />
         </div>

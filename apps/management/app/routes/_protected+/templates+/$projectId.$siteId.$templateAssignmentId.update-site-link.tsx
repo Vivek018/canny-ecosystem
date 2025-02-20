@@ -26,7 +26,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
       ...submission.value,
       assignment_type: "site",
       site_id,
-    } as any,
+    },
     id: templateAssignmentId as string,
   });
 

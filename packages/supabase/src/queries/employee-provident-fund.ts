@@ -95,6 +95,7 @@ export const getEmployeeProvidentFundByCompanyId = async ({
     "employer_contribution",
     "employee_restrict_value",
     "employer_restrict_value",
+    "edli_restrict_value",
     "restrict_employee_contribution",
     "restrict_employer_contribution",
     "include_employer_contribution",

@@ -197,7 +197,7 @@ export async function action({
     );
   }
 
-return json({});
+  return json({});
 }
 
 export default function CreateCompany() {

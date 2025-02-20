@@ -15,15 +15,12 @@ export function WorkingDaysField({
   labelProps?: React.LabelHTMLAttributes<HTMLLabelElement>;
   errors?: ListOfErrors;
   className?: string;
-  selectProps: React.SelectHTMLAttributes<HTMLSelectElement> & {
-    defaultValue?: string[];
-  };
+  selectProps: React.SelectHTMLAttributes<HTMLSelectElement>;
 }) {
   const fallbackId = useId();
   const id = labelProps?.htmlFor ?? fallbackId;
   const errorId = errors?.length ? `${id}-error` : undefined;
 
-  // Using Conform's useField hook to manage the field
   const selectInput: any = useInputControl({
     name: selectProps.name!,
     formId: selectProps.form!,
@@ -41,7 +38,7 @@ export function WorkingDaysField({
         variant="outline"
         className="flex gap-2"
         value={selectInput.value ?? ""}
-        onValueChange={selectInput.change as any}
+        onValueChange={selectInput.change}
         onBlur={selectInput.blur}
       >
         {workingDaysOptions.map((day) => (
@@ -58,7 +55,7 @@ export function WorkingDaysField({
       <select
         multiple
         value={selectInput.value ?? ""}
-        onChange={selectInput.change as any}
+        onChange={selectInput.change}
         onBlur={selectInput.blur}
         className="hidden"
       >
@@ -69,7 +66,6 @@ export function WorkingDaysField({
         ))}
       </select>
 
-      {/* Error Display */}
       <div className="min-h-[32px] px-4 pb-3 pt-1">
         {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
       </div>

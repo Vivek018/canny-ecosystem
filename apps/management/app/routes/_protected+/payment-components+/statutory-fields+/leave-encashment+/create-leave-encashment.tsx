@@ -95,7 +95,7 @@ export async function action({
 
     const { status, error } = await createLeaveEncashment({
       supabase,
-      data: submission.value as any,
+      data: submission.value,
     });
 
     if (isGoodStatus(status)) {

@@ -45,7 +45,6 @@ export function PayrollSheet({
   // initial values
   const initialValues = { gross_pay: rowData.gross_pay ?? 0 };
 
-  // keeping track of which particular field is linked to which template
   const templateComponents: {
     paymentTemplateComponentId: string;
     name: string;
@@ -100,7 +99,7 @@ export function PayrollSheet({
       placeholder: `Enter ${name}`,
       errors: fields[paymentTemplateComponentId].errors,
       value: fields[paymentTemplateComponentId].value,
-    } as any;
+    };
 
     if (
       row.componentType === "deductions" ||
@@ -117,7 +116,7 @@ export function PayrollSheet({
     setNetPay(newNetPay);
   }, [
     fields.gross_pay.value,
-    ...rowData.templateComponents?.map(
+    ...rowData.templateComponents.map(
       (row: { paymentTemplateComponentId: string }) =>
         fields[row.paymentTemplateComponentId].value,
     ),
@@ -193,7 +192,7 @@ export function PayrollSheet({
               <hr />
               {earnings?.map((earning, key) => {
                 return (
-                  <div className="flex justify-between" key={key as any}>
+                  <div className="flex justify-between" key={key.toString()}>
                     <div>
                       <h3 className="my-3 text-muted-foreground font-semibold capitalize">
                         {earning.title}
@@ -227,7 +226,7 @@ export function PayrollSheet({
               <hr />
               {deductions?.map((deduction: deductionAndEarning, key) => {
                 return (
-                  <div className="flex justify-between" key={key as any}>
+                  <div className="flex justify-between" key={key.toString()}>
                     <div>
                       <h3 className="my-3 text-muted-foreground font-semibold capitalize">
                         {deduction.title}

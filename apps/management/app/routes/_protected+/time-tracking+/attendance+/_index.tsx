@@ -38,14 +38,19 @@ import { AttendanceSearchFilter } from "@/components/attendance/attendance-searc
 import { FilterList } from "@/components/attendance/filter-list";
 
 const pageSize = LAZY_LOADING_LIMIT;
+
 export type TransformedAttendanceDataType = {
-  projectName: string;
-  attendance: never[];
+  attendance: any[];
   employee_id: string;
   employee_code: string;
   employee_name: string;
   project: string | null;
   project_site: string | null;
+};
+
+export type DayType = {
+  day: number;
+  fullDate: string;
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -123,7 +128,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       projectPromise: Promise.resolve({ data: [] }),
       projectSitePromise: Promise.resolve({ data: [] }),
       query: "",
-      filters: undefined,
+      filters: null,
       companyId: "",
       env,
     });
@@ -253,11 +258,13 @@ export default function Attendance() {
 
   const { selectedRows } = useAttendanceStore();
 
-  const noFilters = Object.values(filters).every((value) => !value);
+  const noFilters = Boolean(
+    filters && Object.values(filters).every((value) => !value)
+  );
   return (
-    <section className="py-4">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
+    <section className='py-4'>
+      <div className='w-full flex items-center justify-between pb-4'>
+        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4'>
           <Suspense fallback={<div>Loading...</div>}>
             <Await resolve={projectPromise}>
               {(projectData) => (
@@ -284,20 +291,20 @@ export default function Attendance() {
             </Await>
           </Suspense>
 
-          <FilterList filters={filters} />
+          <FilterList filters={filters ?? undefined} />
         </div>
-        <div className="space-x-2 hidden md:flex">
+        <div className='space-x-2 hidden md:flex'>
           {!selectedRows.length ? (
             <ImportAttendanceMenu />
           ) : (
             <Button
-              variant="outline"
-              size="icon"
-              className="h-10 w-10"
+              variant='outline'
+              size='icon'
+              className='h-10 w-10'
               disabled={!selectedRows.length}
               onClick={() => navigate("/time-tracking/attendance/analytics")}
             >
-              <Icon name="chart" className="h-[18px] w-[18px]" />
+              <Icon name='chart' className='h-[18px] w-[18px]' />
             </Button>
           )}
         </div>
@@ -310,7 +317,7 @@ export default function Attendance() {
               return (
                 <ErrorBoundary
                   error={error}
-                  message="Failed to load Attendance"
+                  message='Failed to load Attendance'
                 />
               );
             }
@@ -323,14 +330,14 @@ export default function Attendance() {
 
             return (
               <AttendanceTable
-                days={days as any}
-                data={attdData as any}
+                days={days}
+                data={attdData}
                 hasNextPage={hasNextPage}
                 pageSize={pageSize}
                 query={query}
                 count={meta?.count ?? data?.length ?? 0}
                 columns={attendanceColumns(days)}
-                filters={filters}
+                filters={filters ?? undefined}
                 noFilters={noFilters}
                 companyId={companyId}
                 env={env}

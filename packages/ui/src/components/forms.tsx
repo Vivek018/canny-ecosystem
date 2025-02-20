@@ -1,6 +1,7 @@
 import { useInputControl } from "@conform-to/react";
 import type React from "react";
 import {
+  type ChangeEventHandler,
   type LabelHTMLAttributes,
   type TextareaHTMLAttributes,
   useEffect,
@@ -273,7 +274,9 @@ export function SearchableSelectField({
         id={id}
         name={inputProps.name}
         value={input.value ?? ""}
-        onChange={input.change as any}
+        onChange={
+          input.change as unknown as ChangeEventHandler<HTMLInputElement>
+        }
         onBlur={input.blur}
       />
       <Combobox
@@ -657,7 +660,9 @@ export function MarkdownField({
         id={id}
         name={textareaProps.name}
         value={input.value ?? ""}
-        onChange={input.change as any}
+        onChange={
+          input.change as unknown as ChangeEventHandler<HTMLInputElement>
+        }
         onBlur={input.blur}
       />
       {/* Markdown Editor */}
@@ -689,10 +694,7 @@ export function MarkdownField({
           diffSourcePlugin({ viewMode: "rich-text", diffMarkdown: "" }),
           markdownShortcutPlugin(),
         ]}
-        className={cn(
-          "border rounded",
-          theme === "dark" && "dark-theme"
-        )}
+        className={cn("border rounded", theme === "dark" && "dark-theme")}
       />
 
       {/* Errors */}

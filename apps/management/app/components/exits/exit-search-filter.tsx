@@ -85,7 +85,7 @@ export function ExitsSearchFilter({
     last_working_day_start: searchParams.get("last_working_day_start"),
     last_working_day_end: searchParams.get("last_working_day_end"),
     final_settlement_date_start: searchParams.get(
-      "final_settlement_date_start",
+      "final_settlement_date_start"
     ),
     final_settlement_date_end: searchParams.get("final_settlement_date_end"),
     reason: searchParams.get("reason"),
@@ -111,7 +111,7 @@ export function ExitsSearchFilter({
     },
     {
       enableOnFormTags: true,
-    },
+    }
   );
 
   useHotkeys(["meta+s", "ctrl+s"], (evt) => {
@@ -145,7 +145,7 @@ export function ExitsSearchFilter({
       {
         action: "/approvals/exits?index",
         method: "POST",
-      },
+      }
     );
     // if (prompt.split(" ").length > 1) {
     // } else {
@@ -157,14 +157,14 @@ export function ExitsSearchFilter({
 
   const hasValidFilters =
     Object.entries(filterParams).filter(
-      ([key, value]) => value?.length && key !== "name",
+      ([key, value]) => value?.length && key !== "name"
     ).length > 0;
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-      <div className="flex space-x-4 w-full md:w-auto items-center">
+      <div className='flex space-x-4 w-full md:w-auto items-center'>
         <form
-          className="relative w-full md:w-auto"
+          className='relative w-full md:w-auto'
           onSubmit={(e) => {
             e.preventDefault();
             handleSubmit();
@@ -174,7 +174,7 @@ export function ExitsSearchFilter({
             name={isSubmitting ? "update" : "search"}
             className={cn(
               "absolute pointer-events-none left-3 top-[12.5px]",
-              isSubmitting && "animate-spin",
+              isSubmitting && "animate-spin"
             )}
           />
           <Input
@@ -184,40 +184,40 @@ export function ExitsSearchFilter({
               disabled ? "No Exits Data to Search And Filter" : "Search Exits"
             }
             disabled={disabled}
-            className="pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70"
+            className='pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70'
             value={prompt}
             onChange={handleSearch}
-            autoComplete="on"
-            autoCapitalize="none"
-            autoCorrect="off"
-            spellCheck="false"
+            autoComplete='on'
+            autoCapitalize='none'
+            autoCorrect='off'
+            spellCheck='false'
           />
 
           <DropdownMenuTrigger disabled={disabled} asChild>
             <button
               onClick={() => setIsOpen((prev) => !prev)}
-              type="button"
+              type='button'
               disabled={disabled}
               className={cn(
                 "absolute z-10 right-3 top-[6px] opacity-70",
                 !disabled &&
                   "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 hasValidFilters && "opacity-100",
-                isOpen && "opacity-100",
+                isOpen && "opacity-100"
               )}
             >
-              <Icon name="mixer" />
+              <Icon name='mixer' />
             </button>
           </DropdownMenuTrigger>
         </form>
       </div>
 
       <DropdownMenuContent
-        className="w-full md:w-[480px]"
-        align="end"
+        className='w-full md:w-[480px]'
+        align='end'
         sideOffset={19}
         alignOffset={-11}
-        side="bottom"
+        side='bottom'
       >
         <DropdownMenuGroup>
           <DropdownMenuSub>
@@ -228,31 +228,25 @@ export function ExitsSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 <Calendar
-                  mode="range"
+                  mode='range'
                   initialFocus
                   today={
                     filterParams.last_working_day_start
                       ? new Date(filterParams.last_working_day_start)
                       : new Date()
                   }
-                  toDate={new Date()}
-                  selected={
-                    {
-                      from:
-                        filterParams.last_working_day_start &&
-                        new Date(
-                          filterParams.last_working_day_start,
-                        ).toISOString(),
-                      to:
-                        filterParams.last_working_day_end &&
-                        new Date(
-                          filterParams.last_working_day_end,
-                        ).toISOString(),
-                    } as any
-                  }
+                  hidden={{ after: new Date() }}
+                  selected={{
+                    from: filterParams.last_working_day_start
+                      ? new Date(filterParams.last_working_day_start)
+                      : undefined,
+                    to: filterParams.last_working_day_end
+                      ? new Date(filterParams.last_working_day_end)
+                      : undefined,
+                  }}
                   onSelect={(range) => {
                     if (!range) return;
 
@@ -281,12 +275,12 @@ export function ExitsSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 {exitReasonArray.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className="capitalize"
+                    className='capitalize'
                     checked={filterParams?.reason === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
@@ -312,29 +306,25 @@ export function ExitsSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 <Calendar
-                  mode="range"
+                  mode='range'
                   initialFocus
                   today={
                     filterParams.final_settlement_date_start
                       ? new Date(filterParams.final_settlement_date_start)
                       : new Date()
                   }
-                  toDate={new Date()}
-                  selected={
-                    {
-                      from:
-                        filterParams.final_settlement_date_start &&
-                        new Date(
-                          filterParams.final_settlement_date_start,
-                        ).toISOString(),
-                      to:
-                        filterParams.final_settlement_date_end &&
-                        new Date(filterParams.final_settlement_date_end),
-                    } as any
-                  }
+                  hidden={{ after: new Date() }}
+                  selected={{
+                    from: filterParams.final_settlement_date_start
+                      ? new Date(filterParams.final_settlement_date_start)
+                      : undefined,
+                    to: filterParams.final_settlement_date_end
+                      ? new Date(filterParams.final_settlement_date_end)
+                      : undefined,
+                  }}
                   onSelect={(range) => {
                     if (!range) return;
 
@@ -363,12 +353,12 @@ export function ExitsSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 {projectArray?.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className="capitalize"
+                    className='capitalize'
                     checked={filterParams?.project === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
@@ -394,12 +384,12 @@ export function ExitsSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 {!searchParamsList.project ? (
                   <DropdownMenuCheckboxItem
                     disabled={true}
-                    className="p-8 items-center justify-center"
+                    className='p-8 items-center justify-center'
                   >
                     Select Project First
                   </DropdownMenuCheckboxItem>
@@ -407,7 +397,7 @@ export function ExitsSearchFilter({
                   projectSiteArray?.map((name, index) => (
                     <DropdownMenuCheckboxItem
                       key={name + index.toString()}
-                      className="capitalize"
+                      className='capitalize'
                       checked={filterParams?.project_site === name}
                       onCheckedChange={() => {
                         setFilterParams((prev) => ({

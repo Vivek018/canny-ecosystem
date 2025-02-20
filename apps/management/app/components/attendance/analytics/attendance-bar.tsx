@@ -13,7 +13,7 @@ import {
   ChartTooltipContent,
 } from "@canny_ecosystem/ui/chart";
 import { useMemo } from "react";
-import type { TransformedAteendanceDataType } from "@/routes/_protected+/time-tracking+/attendance+/_index";
+import type { TransformedAttendanceDataType } from "@/routes/_protected+/time-tracking+/attendance+/_index";
 
 const MAX_EMPLOYEES = 100;
 
@@ -27,14 +27,14 @@ const chartConfig = {
 export function AttendanceBars({
   chartData,
 }: {
-  chartData: TransformedAteendanceDataType[];
+  chartData: TransformedAttendanceDataType[];
 }) {
   const trendData = useMemo(() => {
     return chartData.map(({ employee_code, attendance }) => {
       const totalPresents = (attendance ?? []).reduce(
         (total: number, entry: { present: any }) =>
           total + (entry.present ? 1 : 0),
-        0,
+        0
       );
 
       return {
@@ -59,13 +59,13 @@ export function AttendanceBars({
       <CardContent>
         <ChartContainer config={chartConfig}>
           <BarChart data={limitedTrendData} width={600} height={300}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="employee_code" tickFormatter={(value) => value} />
+            <CartesianGrid strokeDasharray='3 3' />
+            <XAxis dataKey='employee_code' tickFormatter={(value) => value} />
             <YAxis />
             <ChartTooltip content={<ChartTooltipContent />} />
             <Bar
-              dataKey="presents"
-              fill="hsl(var(--chart-1))"
+              dataKey='presents'
+              fill='hsl(var(--chart-1))'
               radius={[4, 4, 0, 0]}
             />
           </BarChart>

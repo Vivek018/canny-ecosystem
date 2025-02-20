@@ -50,7 +50,7 @@ export function ExportBar({
       } else {
         exportedData[key] = element?.[
           key as keyof ReimbursementDataType
-        ] as any;
+        ] as string | boolean | number;
       }
     }
 

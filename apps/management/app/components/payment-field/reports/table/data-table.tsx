@@ -22,6 +22,7 @@ import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
 import {
   type EmployeeFilters,
+  type EmployeeReportDataType,
   getEmployeesReportByCompanyId,
   getPaymentFieldById,
 } from "@canny_ecosystem/supabase/queries";
@@ -257,7 +258,10 @@ export function DataTable<TData, TValue>({
       <ExportBar
         className={cn(!table.getSelectedRowModel().rows.length && "hidden")}
         rows={table.getSelectedRowModel().rows.length}
-        data={selectedRowsData as any}
+        data={selectedRowsData as (EmployeeReportDataType & {
+            start_range: string;
+            end_range: string;
+          })[]}
         columnVisibility={columnVisibility}
       />
     </div>

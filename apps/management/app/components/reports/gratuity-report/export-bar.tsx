@@ -50,12 +50,12 @@ export function ExportBar({
         exportedData[key] =
           element?.employee_project_assignment?.project_sites?.name;
       } else if (key === "date_of_joining") {
-        exportedData[key] = element?.employee_project_assignment?.start_date;
+        exportedData[key] = element?.employee_project_assignment?.start_date!;
       } else if (key === "date_of_leaving") {
         exportedData[key] =
           element?.employee_project_assignment?.end_date ?? "";
       } else {
-        exportedData[key] = element[key as keyof EmployeeReportDataType] as any;
+        exportedData[key] = element[key as keyof EmployeeReportDataType] as string | boolean | number;
       }
     }
 

@@ -143,14 +143,14 @@ export function DataTable<TData, TValue>({
   const tableLength = table.getRowModel().rows?.length;
 
   return (
-    <div className="relative mb-8">
+    <div className='relative mb-8'>
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
           !tableLength && "border-none"
         )}
       >
-        <div className="relative">
+        <div className='relative'>
           <Table>
             <DataTableHeader
               table={table}
@@ -162,7 +162,7 @@ export function DataTable<TData, TValue>({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    className="relative h-[40px] md:h-[45px] cursor-default select-text"
+                    className='relative h-[40px] md:h-[45px] cursor-default select-text'
                   >
                     {row.getVisibleCells().map((cell) => {
                       return (
@@ -203,8 +203,8 @@ export function DataTable<TData, TValue>({
                       "h-96 bg-background grid place-items-center text-center tracking-wide"
                     )}
                   >
-                    <div className="flex flex-col items-center gap-1">
-                      <h2 className="text-xl">No employees found.</h2>
+                    <div className='flex flex-col items-center gap-1'>
+                      <h2 className='text-xl'>No employees found.</h2>
                       <p
                         className={cn(
                           "text-muted-foreground",
@@ -214,7 +214,7 @@ export function DataTable<TData, TValue>({
                         Try another search, or adjusting the filters
                       </p>
                       <Button
-                        variant="outline"
+                        variant='outline'
                         className={cn(
                           "mt-4",
                           !data?.length && noFilters && "hidden"
@@ -235,17 +235,22 @@ export function DataTable<TData, TValue>({
       </div>
 
       {hasNextPage && initialData?.length && (
-        <div className="flex items-center justify-center mt-6" ref={ref}>
-          <div className="flex items-center space-x-2 px-6 py-5">
+        <div className='flex items-center justify-center mt-6' ref={ref}>
+          <div className='flex items-center space-x-2 px-6 py-5'>
             <Spinner />
-            <span className="text-sm text-[#606060]">Loading more...</span>
+            <span className='text-sm text-[#606060]'>Loading more...</span>
           </div>
         </div>
       )}
       <ExportBar
         className={cn(!table.getSelectedRowModel().rows.length && "hidden")}
         rows={table.getSelectedRowModel().rows.length}
-        data={selectedRowsData as any}
+        data={
+          selectedRowsData as (EmployeeReportDataType & {
+            start_range: string;
+            end_range: string;
+          })[]
+        }
         columnVisibility={columnVisibility}
       />
     </div>

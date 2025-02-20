@@ -1,14 +1,15 @@
-import type { TransformedAteendanceDataType } from "@/routes/_protected+/time-tracking+/attendance+/_index";
+import type { TransformedAttendanceDataType } from "@/routes/_protected+/time-tracking+/attendance+/_index";
 import type { RowSelectionState, Updater } from "@tanstack/react-table";
 import { create } from "zustand";
+
 
 interface AttendanceState {
   columns: string[];
   setColumns: (columns?: any[]) => void;
   setRowSelection: (updater: Updater<RowSelectionState>) => void;
   rowSelection: Record<string, boolean>;
-  selectedRows: TransformedAteendanceDataType[];
-  setSelectedRows: (updater: Updater<TransformedAteendanceDataType[]>) => void;
+  selectedRows: TransformedAttendanceDataType[];
+  setSelectedRows: (updater: Updater<TransformedAttendanceDataType[]>) => void;
 }
 
 export const useAttendanceStore = create<AttendanceState>()((set) => ({

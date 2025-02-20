@@ -13,7 +13,7 @@ export function ExportBar({
   data: AccidentsDatabaseType[];
   className: string;
 }) {
-  const pendingCount = data.filter(
+  const pendingCount = data?.filter(
     (item) => item?.status === "pending" || item?.status === "active"
   ).length;
 

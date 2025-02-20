@@ -247,7 +247,7 @@ export default function ExitFieldMapping() {
 
             const { conflictingIndices, error } = await getExitsConflicts({
               supabase,
-              importedData: updatedData as any,
+              importedData: updatedData,
             });
 
             if (error) {

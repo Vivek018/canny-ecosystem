@@ -63,7 +63,7 @@ export default function EmployeeProvidentFundIndex() {
             }
             return (
               <EPFWrapper
-                data={resolvedData.data as any}
+                data={resolvedData.data}
                 error={resolvedData.error}
               />
             );

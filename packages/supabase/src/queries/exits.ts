@@ -36,6 +36,11 @@ export type ExitDataType = Pick<
   | "id"
   | "employee_id"
   | "employee_payable_days"
+  | "bonus"
+  | "deduction"
+  | "final_settlement_date"
+  | "gratuity"
+  | "leave_encashment"
   | "last_working_day"
   | "final_settlement_date"
   | "note"
@@ -100,10 +105,8 @@ export const getExitsByCompanyId = async ({
     .from("exits")
     .select(
       `${columns.join(",")},
-          employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${
-            project ? "inner" : "left"
-          }(project_sites!${project ? "inner" : "left"}(id, name, projects!${
-        project ? "inner" : "left"
+          employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
+      }(project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
       }(id, name))))`,
       { count: "exact" }
     )

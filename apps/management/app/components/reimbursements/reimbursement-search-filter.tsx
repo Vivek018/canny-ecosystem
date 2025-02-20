@@ -232,19 +232,15 @@ export function ReimbursementSearchFilter({
                       ? new Date(filterParams.submitted_date_start)
                       : new Date()
                   }
-                  toDate={new Date()}
-                  selected={
-                    {
-                      from:
-                        filterParams.submitted_date_start &&
-                        new Date(
-                          filterParams.submitted_date_start
-                        ).toISOString(),
-                      to:
-                        filterParams.submitted_date_end &&
-                        new Date(filterParams.submitted_date_end),
-                    } as any
-                  }
+                  hidden={{ after: new Date() }}
+                  selected={{
+                    from: filterParams.submitted_date_start
+                      ? new Date(filterParams.submitted_date_start)
+                      : undefined,
+                    to: filterParams.submitted_date_end
+                      ? new Date(filterParams.submitted_date_end)
+                      : undefined,
+                  }}
                   onSelect={(range) => {
                     if (!range) return;
 

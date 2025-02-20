@@ -61,7 +61,7 @@ export function EmployeeDetailsImportData({
     try {
       const { conflictingIndices, error } = await getEmployeeDetailsConflicts({
         supabase,
-        importedData: importData.data as any,
+        importedData: importData?.data,
       });
 
       if (error) {
@@ -169,7 +169,7 @@ export function EmployeeDetailsImportData({
       <ImportedDataTable
         data={tableData}
         columns={ImportedDataColumns}
-        conflictingIndex={conflictingIndex as any}
+        conflictingIndex={conflictingIndex}
       />
     </section>
   );

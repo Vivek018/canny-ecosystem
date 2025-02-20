@@ -199,13 +199,13 @@ export async function updateOrCreateCompanyRegistrationDetails({
 
   const { data: dataExist } = await getCompanyRegistrationDetailsByCompanyId({
     supabase,
-    companyId: data.company_id,
+    companyId: data?.company_id,
   });
 
   if (!dataExist) {
     return await createCompanyRegistrationDetails({
       supabase,
-      data: data as any,
+      data: { ...data, company_id: data?.company_id },
       bypassAuth,
     });
   }

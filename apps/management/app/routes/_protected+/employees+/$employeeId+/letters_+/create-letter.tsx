@@ -89,7 +89,7 @@ export async function action({
 
     const { status, error } = await createEmployeeLetter({
       supabase,
-      letterData: employeeLetterData as any,
+      letterData: employeeLetterData,
     });
 
     if (isGoodStatus(status))

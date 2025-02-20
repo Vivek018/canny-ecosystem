@@ -187,7 +187,7 @@ export default function EmployeeLinkTemplateForm() {
                     placeholder: replaceUnderscore(fields.effective_from.name),
                     max: getValidDateForInput(new Date().toISOString()),
                     defaultValue: getValidDateForInput(
-                      fields.effective_from.initialValue as any
+                      fields.effective_from.initialValue as string
                     ),
                   }}
                   labelProps={{
@@ -201,10 +201,10 @@ export default function EmployeeLinkTemplateForm() {
                     ...getInputProps(fields.effective_to, { type: "date" }),
                     placeholder: replaceUnderscore(fields.effective_to.name),
                     min: getValidDateForInput(
-                      fields.effective_from.value as any
+                      fields.effective_from.value as string
                     ),
                     defaultValue: getValidDateForInput(
-                      fields.effective_to.initialValue as any
+                      fields.effective_to.initialValue as string
                     ),
                   }}
                   labelProps={{

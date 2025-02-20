@@ -88,7 +88,7 @@ export function EditPaySequenceForm({
             key={resetKey + 1}
             labelProps={{ htmlFor: fields.working_days.id }}
             errors={fields.working_days.errors}
-            selectProps={getSelectProps(fields.working_days) as any}
+            selectProps={getSelectProps(fields.working_days)}
           />
           <div className="mt-auto mb-14 w-full flex gap-4">
             <Button

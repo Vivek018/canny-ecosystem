@@ -9,10 +9,7 @@ import {
   ExitFormSchema,
   reasonForExitArray,
 } from "@canny_ecosystem/utils";
-import {
-  Field,
-  SearchableSelectField,
-} from "@canny_ecosystem/ui/forms";
+import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import {
   FormProvider,
   getFormProps,
@@ -38,7 +35,7 @@ import {
   CardTitle,
 } from "@canny_ecosystem/ui/card";
 import { createExit } from "@canny_ecosystem/supabase/mutations";
-import type { ExitsRow } from "@canny_ecosystem/supabase/types";
+import type { ExitsUpdate } from "@canny_ecosystem/supabase/types";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
@@ -78,13 +75,13 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
     const { status, error } = await createExit({
       supabase,
-      data: submission.value as any,
+      data: submission.value,
     });
 
     if (isGoodStatus(status))
@@ -92,19 +89,21 @@ export async function action({
 
     return json(
       { status: "error", message: "Exit creation failed", error },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json(
       { status: "error", message: "An unexpected error occurred", error },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
 
 export default function CreateExit({
   updateValues,
-}: { updateValues?: ExitsRow | null }) {
+}: {
+  updateValues?: ExitsUpdate | null;
+}) {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [resetKey, setResetKey] = useState(Date.now());
@@ -149,12 +148,12 @@ export default function CreateExit({
   }, [actionData]);
 
   return (
-    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
+    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
       <FormProvider context={form.context}>
-        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
+        <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
           <Card>
             <CardHeader>
-              <CardTitle className="text-3xl capitalize">
+              <CardTitle className='text-3xl capitalize'>
                 {replaceDash(EXIT_TAG)}
               </CardTitle>
               <CardDescription>
@@ -163,21 +162,24 @@ export default function CreateExit({
               </CardDescription>
             </CardHeader>
             <CardContent>
+              <input {...getInputProps(fields.id, { type: "hidden" })} />
               <input
                 {...getInputProps(fields.employee_id, { type: "hidden" })}
               />
-              <div className="flex gap-7">
+              <div className='flex gap-7'>
                 <Field
                   inputProps={{
                     ...getInputProps(fields.organization_payable_days, {
                       type: "number",
                     }),
                     className: "capitalize",
-                    placeholder: `Enter ${replaceUnderscore(fields.organization_payable_days.name)}`,
+                    placeholder: `Enter ${replaceUnderscore(
+                      fields.organization_payable_days.name
+                    )}`,
                   }}
                   labelProps={{
                     children: replaceUnderscore(
-                      fields.organization_payable_days.name,
+                      fields.organization_payable_days.name
                     ),
                   }}
                   errors={fields.organization_payable_days.errors}
@@ -188,22 +190,26 @@ export default function CreateExit({
                       type: "number",
                     }),
                     className: "capitalize",
-                    placeholder: `Enter ${replaceUnderscore(fields.employee_payable_days.name)}`,
+                    placeholder: `Enter ${replaceUnderscore(
+                      fields.employee_payable_days.name
+                    )}`,
                   }}
                   labelProps={{
                     children: replaceUnderscore(
-                      fields.employee_payable_days.name,
+                      fields.employee_payable_days.name
                     ),
                   }}
                   errors={fields.employee_payable_days.errors}
                 />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <Field
                   inputProps={{
                     ...getInputProps(fields.bonus, { type: "number" }),
                     className: "capitalize",
-                    placeholder: `Enter ${replaceUnderscore(fields.bonus.name)}`,
+                    placeholder: `Enter ${replaceUnderscore(
+                      fields.bonus.name
+                    )}`,
                   }}
                   labelProps={{
                     children: replaceUnderscore(fields.bonus.name),
@@ -216,7 +222,9 @@ export default function CreateExit({
                       type: "number",
                     }),
                     className: "capitalize",
-                    placeholder: `Enter ${replaceUnderscore(fields.leave_encashment.name)}`,
+                    placeholder: `Enter ${replaceUnderscore(
+                      fields.leave_encashment.name
+                    )}`,
                   }}
                   labelProps={{
                     children: replaceUnderscore(fields.leave_encashment.name),
@@ -227,7 +235,9 @@ export default function CreateExit({
                   inputProps={{
                     ...getInputProps(fields.gratuity, { type: "number" }),
                     className: "capitalize",
-                    placeholder: `Enter ${replaceUnderscore(fields.gratuity.name)}`,
+                    placeholder: `Enter ${replaceUnderscore(
+                      fields.gratuity.name
+                    )}`,
                   }}
                   labelProps={{
                     children: replaceUnderscore(fields.gratuity.name),
@@ -238,7 +248,9 @@ export default function CreateExit({
                   inputProps={{
                     ...getInputProps(fields.deduction, { type: "number" }),
                     className: "capitalize",
-                    placeholder: `Enter ${replaceUnderscore(fields.deduction.name)}`,
+                    placeholder: `Enter ${replaceUnderscore(
+                      fields.deduction.name
+                    )}`,
                   }}
                   labelProps={{
                     children: replaceUnderscore(fields.deduction.name),
@@ -246,11 +258,13 @@ export default function CreateExit({
                   errors={fields.deduction.errors}
                 />
               </div>
-              <div className="flex gap-7">
+              <div className='flex gap-7'>
                 <Field
                   inputProps={{
                     ...getInputProps(fields.last_working_day, { type: "date" }),
-                    placeholder: `Enter ${replaceUnderscore(fields.last_working_day.name)}`,
+                    placeholder: `Enter ${replaceUnderscore(
+                      fields.last_working_day.name
+                    )}`,
                   }}
                   labelProps={{
                     children: replaceUnderscore(fields.last_working_day.name),
@@ -262,21 +276,23 @@ export default function CreateExit({
                     ...getInputProps(fields.final_settlement_date, {
                       type: "date",
                     }),
-                    placeholder: `Enter ${replaceUnderscore(fields.final_settlement_date.name)}`,
+                    placeholder: `Enter ${replaceUnderscore(
+                      fields.final_settlement_date.name
+                    )}`,
                   }}
                   labelProps={{
                     children: replaceUnderscore(
-                      fields.final_settlement_date.name,
+                      fields.final_settlement_date.name
                     ),
                   }}
                   errors={fields.final_settlement_date.errors}
                 />
               </div>
               <SearchableSelectField
-                className="w-full capitalize flex-1"
+                className='w-full capitalize flex-1'
                 key={resetKey}
                 options={transformStringArrayIntoOptions(
-                  reasonForExitArray as unknown as string[],
+                  reasonForExitArray as unknown as string[]
                 )}
                 inputProps={{
                   ...getInputProps(fields.reason, { type: "text" }),

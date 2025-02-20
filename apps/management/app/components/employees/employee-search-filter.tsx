@@ -285,15 +285,15 @@ export function EmployeesSearchFilter({
                       ? new Date(filterParams.dob_start)
                       : new Date()
                   }
-                  selected={
-                    {
-                      from:
-                        filterParams.dob_start &&
-                        new Date(filterParams.dob_start).toISOString(),
-                      to:
-                        filterParams.dob_end && new Date(filterParams.dob_end),
-                    } as any
-                  }
+                  hidden={{ after: new Date() }}
+                  selected={{
+                    from: filterParams.dob_start
+                      ? new Date(filterParams.dob_start)
+                      : undefined,
+                    to: filterParams.dob_end
+                      ? new Date(filterParams.dob_end)
+                      : undefined,
+                  }}
                   onSelect={(range) => {
                     if (!range) return;
 
@@ -583,22 +583,20 @@ export function EmployeesSearchFilter({
               >
                 <Calendar
                   mode='range'
-                  initialFocus
                   today={
                     filterParams.doj_start
                       ? new Date(filterParams.doj_start)
                       : new Date()
                   }
-                  toDate={new Date()}
-                  selected={
-                    {
-                      from:
-                        filterParams.doj_start &&
-                        new Date(filterParams.doj_start).toISOString(),
-                      to:
-                        filterParams.doj_end && new Date(filterParams.doj_end),
-                    } as any
-                  }
+                  hidden={{ after: new Date() }}
+                  selected={{
+                    from: filterParams.doj_start
+                      ? new Date(filterParams.doj_start)
+                      : undefined,
+                    to: filterParams.doj_end
+                      ? new Date(filterParams.doj_end)
+                      : undefined,
+                  }}
                   onSelect={(range) => {
                     if (!range) return;
 
@@ -637,16 +635,15 @@ export function EmployeesSearchFilter({
                       ? new Date(filterParams.dol_start)
                       : new Date()
                   }
-                  toDate={new Date()}
-                  selected={
-                    {
-                      from:
-                        filterParams.dol_start &&
-                        new Date(filterParams.dol_start).toISOString(),
-                      to:
-                        filterParams.dol_end && new Date(filterParams.dol_end),
-                    } as any
-                  }
+                  hidden={{ after: new Date() }}
+                  selected={{
+                    from: filterParams.dol_start
+                      ? new Date(filterParams.dol_start)
+                      : undefined,
+                    to: filterParams.dol_end
+                      ? new Date(filterParams.dol_end)
+                      : undefined,
+                  }}
                   onSelect={(range) => {
                     if (!range) return;
 

@@ -94,7 +94,7 @@ export default function Users() {
           </Link>
         </div>
       </div>
-      <UserDataTable data={tableData as any} columns={columns} />
+      <UserDataTable data={tableData} columns={columns} />
     </section>
   );
 }

@@ -9,7 +9,10 @@ import { type ActionFunctionArgs, json } from "@remix-run/node";
 import { useActionData, useNavigate } from "@remix-run/react";
 import { useEffect } from "react";
 
-export async function action({ request, params }: ActionFunctionArgs):Promise<Response> {
+export async function action({
+  request,
+  params,
+}: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
   const employeeId = params.employeeId as string;
   const formData = await request.formData();
@@ -19,7 +22,7 @@ export async function action({ request, params }: ActionFunctionArgs):Promise<Re
   if (submission.status !== "success")
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: submission.status === "error" ? 400 : 200 }
     );
 
   try {
@@ -29,7 +32,7 @@ export async function action({ request, params }: ActionFunctionArgs):Promise<Re
         ...submission.value,
         employee_id: employeeId,
         assignment_type: "employee",
-      } as any,
+      },
     });
     if (error) throw error;
     return json({

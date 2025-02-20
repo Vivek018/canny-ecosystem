@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useAttendanceStore } from "@/store/attendance";
 import { AttendanceTrend } from "@/components/attendance/analytics/attendance-trend";
 import { AttendanceBars } from "@/components/attendance/analytics/attendance-bar";
-import type { TransformedAteendanceDataType } from "./_index";
+import type { TransformedAttendanceDataType } from "./_index";
 
 import { AttendanceAbsentees } from "@/components/attendance/analytics/attendance-absents";
 import { AttendanceByProjects } from "@/components/attendance/analytics/attendance-project";
@@ -15,8 +15,8 @@ import { useLoaderData } from "@remix-run/react";
 import { AttendanceByProjectSite } from "@/components/attendance/analytics/attendance-project-site";
 
 const getDataSource = (
-  selectedRows: TransformedAteendanceDataType[],
-  storedValue: TransformedAteendanceDataType[],
+  selectedRows: TransformedAttendanceDataType[],
+  storedValue: TransformedAttendanceDataType[]
 ) => {
   return selectedRows.length > 0 ? selectedRows : storedValue;
 };
@@ -39,7 +39,7 @@ export default function AttendanceAnalytics() {
   const { projectArray } = useLoaderData<typeof loader>();
   const { selectedRows } = useAttendanceStore();
   const [storedValue, setValue] = useLocalStorage<
-    TransformedAteendanceDataType[]
+    TransformedAttendanceDataType[]
   >("analyticsArray", []);
 
   useEffect(() => {
@@ -48,71 +48,57 @@ export default function AttendanceAnalytics() {
     }
   }, [selectedRows, setValue]);
 
-  const dataSource: TransformedAteendanceDataType[] = getDataSource(
+  const dataSource: TransformedAttendanceDataType[] = getDataSource(
     selectedRows,
-    storedValue,
+    storedValue
   );
 
-  const transformedData = dataSource.map((entry) => ({
-    id: entry.employee_id,
-    employee_code: entry.employee_code,
-    employeeName: entry.employee_name,
-    projectName: entry.project,
-    projectSiteName: entry.project_site,
-    attendance: Object.entries(entry)
-      .filter(([key]) => key.match(/^\d{2} \w{3} \d{4}$/))
-      .map(([date, status]) => {
-        const isPresent = status === "P";
-        const isWeeklyOff = status === "(WOF)";
-        const isLeave = status === "L";
+  const transformedData: TransformedAttendanceDataType[] = dataSource.map(
+    (entry) => ({
+      employee_id: entry.employee_id,
+      employee_code: entry.employee_code,
+      employee_name: entry.employee_name,
+      project: entry.project,
+      project_site: entry.project_site,
+      attendance: Object.entries(entry)
+        .filter(([key]) => key.match(/^\d{2} \w{3} \d{4}$/))
+        .map(([date, status]) => {
+          const isPresent = status === "P";
+          const isWeeklyOff = status === "(WOF)";
+          const isLeave = status === "L";
 
-        return {
-          date,
-          no_of_hours: isPresent ? 8 : 0,
-          present: isPresent,
-          holiday: isWeeklyOff || isLeave,
-          working_shift: "",
-          holiday_type: isWeeklyOff ? "weekly" : isLeave ? "paid" : "",
-        };
-      }),
-  }));
+          return {
+            date,
+            no_of_hours: isPresent ? 8 : 0,
+            present: isPresent,
+            holiday: isWeeklyOff || isLeave,
+            working_shift: "",
+            holiday_type: isWeeklyOff ? "weekly" : isLeave ? "paid" : "",
+          };
+        }),
+    })
+  );
 
   return (
-    <div className="w-full p-4 m-auto flex flex-col gap-4">
-      <div className="grid grid-cols-3 gap-3">
-        <div className="col-span-3">
-          <AttendanceTrend
-            chartData={
-              transformedData as unknown as TransformedAteendanceDataType[]
-            }
-          />
+    <div className='w-full p-4 m-auto flex flex-col gap-4'>
+      <div className='grid grid-cols-3 gap-3'>
+        <div className='col-span-3'>
+          <AttendanceTrend chartData={transformedData} />
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
-        <AttendanceByProjects
-          chartData={
-            transformedData as unknown as TransformedAteendanceDataType[]
-          }
-        />
+      <div className='grid grid-cols-3 gap-3'>
+        <AttendanceByProjects chartData={transformedData} />
         <AttendanceByProjectSite
-          chartData={transformedData as any}
+          chartData={transformedData}
           projectArray={projectArray}
         />
 
-        <AttendanceAbsentees
-          chartData={
-            transformedData as unknown as TransformedAteendanceDataType[]
-          }
-        />
+        <AttendanceAbsentees chartData={transformedData} />
       </div>
 
-      <div className="col-span-1">
-        <AttendanceBars
-          chartData={
-            transformedData as unknown as TransformedAteendanceDataType[]
-          }
-        />
+      <div className='col-span-1'>
+        <AttendanceBars chartData={transformedData} />
       </div>
     </div>
   );

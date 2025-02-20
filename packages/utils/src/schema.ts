@@ -1,4 +1,4 @@
-import { isValid, z } from "zod";
+import { z } from "zod";
 
 export { z };
 
@@ -72,23 +72,17 @@ export const zFile = z
     (file) =>
       typeof file !== "string"
         ? [
-            ...ACCEPTED_IMAGE_TYPES,
-            "image/pdf",
-            "image/doc",
-            "image/docx",
-            "application/pdf",
-            "application/doc",
-            "application/docx",
-          ].includes(file?.type)
+          ...ACCEPTED_IMAGE_TYPES,
+          "image/pdf",
+          "image/doc",
+          "image/docx",
+          "application/pdf",
+          "application/doc",
+          "application/docx",
+        ].includes(file?.type)
         : true,
     "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .docx formats are supported."
   );
-
-export const parseDateSchema = z
-  .date()
-  .transform((value) => new Date(value))
-  .transform((v: any) => isValid(v))
-  .refine((v) => !!v, { message: "Invalid date" });
 
 export const booleanArray = ["true", "false"] as const;
 
@@ -163,7 +157,7 @@ export const LocationSchema = z.object({
 export const RelationshipSchema = z.object({
   id: z.string().optional(),
   relationship_type: zString.min(3),
-  parent_company_id: z.string().optional(),
+  parent_company_id: z.string(),
   child_company_id: z.string().optional(),
   is_active: z.boolean().default(false),
   terms: z.string().transform((str, ctx) => {
@@ -225,7 +219,7 @@ export const SiteSchema = z.object({
   pincode: zNumber.min(6).max(6),
   latitude: z.number().min(-90).max(90).optional(),
   longitude: z.number().min(-180).max(180).optional(),
-  project_id: z.string().optional(),
+  project_id: z.string(),
 });
 
 // Pay Sequence
@@ -585,7 +579,8 @@ export const reasonForExitArray = [
 ] as const;
 
 export const ExitFormSchema = z.object({
-  employee_id: z.string().optional(),
+  id: z.string().optional(),
+  employee_id: z.string(),
   organization_payable_days: z.number().default(0),
   employee_payable_days: z.number().default(0),
   last_working_day: z.string(),
@@ -685,6 +680,7 @@ export const SiteLinkSchema = z.object({
 export const reimbursementStatusArray = ["approved", "pending"] as const;
 
 export const ReimbursementSchema = z.object({
+  id: z.string().optional(),
   submitted_date: z.string(),
   status: z.enum(reimbursementStatusArray),
   amount: z.number().min(1).max(100000000),
@@ -1355,7 +1351,7 @@ export const EmployeeLetterSchema = z.object({
     .enum(employeeLetterTypesArray)
     .default(employeeLetterTypesArray[0]),
   content: z.string().optional(),
-  employee_id: z.string().optional(),
+  employee_id: z.string(),
 });
 
 export const encashmentFreqArray = ["annual", "exit", "special"] as const;

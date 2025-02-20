@@ -248,7 +248,7 @@ export function ReimbursementsTable<TData, TValue>({
       <ExportBar
         className={cn(!table.getSelectedRowModel().rows.length && "hidden")}
         rows={table.getSelectedRowModel().rows.length}
-        data={selectedRowsData as any}
+        data={selectedRowsData as ReimbursementDataType[]}
         columnVisibility={columnVisibility}
       />
     </div>

@@ -100,38 +100,38 @@ export async function createEmployee({
   ] = await Promise.all([
     employeeStatutoryDetailsData
       ? createEmployeeStatutoryDetails({
-          supabase,
-          data: { ...employeeStatutoryDetailsData, employee_id: data.id },
-          bypassAuth,
-        })
+        supabase,
+        data: { ...employeeStatutoryDetailsData, employee_id: data.id },
+        bypassAuth,
+      })
       : { error: null, status: null },
     employeeBankDetailsData
       ? createEmployeeBankDetails({
-          supabase,
-          data: { ...employeeBankDetailsData, employee_id: data.id },
-          bypassAuth,
-        })
+        supabase,
+        data: { ...employeeBankDetailsData, employee_id: data.id },
+        bypassAuth,
+      })
       : { error: null, status: null },
     employeeProjectAssignmentData
       ? createEmployeeProjectAssignment({
-          supabase,
-          data: { ...employeeProjectAssignmentData, employee_id: data.id },
-          bypassAuth,
-        })
+        supabase,
+        data: { ...employeeProjectAssignmentData, employee_id: data.id },
+        bypassAuth,
+      })
       : { error: null, status: null },
     employeeAddressesData
       ? createEmployeeAddresses({
-          supabase,
-          data: { ...employeeAddressesData, employee_id: data.id },
-          bypassAuth,
-        })
+        supabase,
+        data: { ...employeeAddressesData, employee_id: data.id },
+        bypassAuth,
+      })
       : { error: null, status: null },
     employeeGuardiansData
       ? createEmployeeGuardians({
-          supabase,
-          data: { ...employeeGuardiansData, employee_id: data.id },
-          bypassAuth,
-        })
+        supabase,
+        data: { ...employeeGuardiansData, employee_id: data.id },
+        bypassAuth,
+      })
       : { error: null, status: null },
   ]);
 
@@ -972,7 +972,7 @@ export async function createEmployeeDetailsFromImportedData({
             existing.employee_code === record.employee_code ||
             existing.primary_mobile_number === record.primary_mobile_number ||
             existing.secondary_mobile_number ===
-              record.secondary_mobile_number ||
+            record.secondary_mobile_number ||
             existing.personal_email === record.personal_email,
         );
 
@@ -1211,24 +1211,24 @@ export async function createEmployeeStatutoryFromImportedData({
             normalize(existing.employee_id) === normalize(record.employee_id) ||
             (record.aadhaar_number &&
               normalize(existing.aadhaar_number) ===
-                normalize(record.aadhaar_number)) ||
+              normalize(record.aadhaar_number)) ||
             (record.pan_number &&
               normalize(existing.pan_number) ===
-                normalize(record.pan_number)) ||
+              normalize(record.pan_number)) ||
             (record.uan_number &&
               normalize(existing.uan_number) ===
-                normalize(record.uan_number)) ||
+              normalize(record.uan_number)) ||
             (record.pf_number &&
               normalize(existing.pf_number) === normalize(record.pf_number)) ||
             (record.esic_number &&
               normalize(existing.esic_number) ===
-                normalize(record.esic_number)) ||
+              normalize(record.esic_number)) ||
             (record.driving_license_number &&
               normalize(existing.driving_license_number) ===
-                normalize(record.driving_license_number)) ||
+              normalize(record.driving_license_number)) ||
             (record.passport_number &&
               normalize(existing.passport_number) ===
-                normalize(record.passport_number)),
+              normalize(record.passport_number)),
         );
 
         if (existingRecord) {
@@ -1407,7 +1407,7 @@ export async function createEmployeeBankDetailsFromImportedData({
             normalize(existing.employee_id) === normalize(record.employee_id) ||
             (record.account_number &&
               normalize(existing.account_number) ===
-                normalize(record.account_number)),
+              normalize(record.account_number)),
         );
 
         if (existingRecord) {
@@ -1531,7 +1531,7 @@ export async function createEmployeeGuardiansFromImportedData({
   import_type,
 }: {
   supabase: TypedSupabaseClient;
-  data: EmployeeGuardianDatabaseInsert[];
+  data: EmployeeGuardianDatabaseInsert[] | EmployeeGuardianDatabaseUpdate[];
   import_type?: string;
 }) {
   if (!data || data.length === 0) {
@@ -1593,7 +1593,7 @@ export async function createEmployeeGuardiansFromImportedData({
 
     const { error, status } = await supabase
       .from("employee_guardians")
-      .upsert(newData);
+      .upsert(newData as EmployeeAddressDatabaseInsert[]);
 
     if (error) {
       console.error("Error inserting employee guardians data:", error);
@@ -1608,18 +1608,21 @@ export async function createEmployeeGuardiansFromImportedData({
         (record) =>
           normalize(record.mobile_number) === normalize(entry.mobile_number) ||
           normalize(record.alternate_mobile_number) ===
-            normalize(entry.alternate_mobile_number) ||
+          normalize(entry.alternate_mobile_number) ||
           normalize(record.email) === normalize(entry.email),
       );
 
       if (existing) {
-        const updateData: EmployeeAddressDatabaseUpdate = {};
+        let updateData: typeof entry = {};
 
         const keys = Object.keys(entry);
         for (let i = 0; i < keys.length; i++) {
           const key = keys[i] as keyof typeof entry;
-          if (entry[key] !== existing[key]) {
-            (updateData as any)[key] = entry[key];
+          if (entry[key!] !== existing[key!]) {
+            updateData = {
+              ...updateData,
+              [key]: entry[key!]
+            };
           }
         }
 
@@ -1636,7 +1639,7 @@ export async function createEmployeeGuardiansFromImportedData({
       } else {
         const { error: insertError } = await supabase
           .from("employee_guardians")
-          .insert(entry);
+          .insert(entry as EmployeeGuardianDatabaseInsert);
 
         if (insertError) {
           console.error("Error inserting new record:", insertError);
