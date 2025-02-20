@@ -26,7 +26,7 @@ export function EditPaySequenceForm({
   updateValues,
   projectId,
 }: {
-  updateValues: SitePaySequenceDatabaseUpdate;
+  updateValues: Omit<SitePaySequenceDatabaseUpdate, "created_at" | "updated_at"> | null;
   projectId: string;
 }) {
   const PAY_SEQUENCE_TAG = EDIT_PAY_SEQUENCE;
@@ -52,9 +52,9 @@ export function EditPaySequenceForm({
         <Form
           method="POST"
           {...getFormProps(form)}
-          action={`/projects/${projectId}/sites/${
-            fields.id.value ?? fields.id.initialValue
-          }/edit-pay-sequence`}
+          action={
+            `/projects/${projectId}/sites/${fields.id.value ?? fields.id.initialValue}/edit-pay-sequence`
+        }
           className="flex flex-col h-full"
         >
           <input {...getInputProps(fields.id, { type: "hidden" })} />

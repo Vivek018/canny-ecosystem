@@ -108,9 +108,7 @@ export default function EditPaySequence() {
         linkTemplates={linkTemplates}
       />
       {paySequenceData && <ViewPaySequenceDialog values={paySequenceData} />}
-      {paySequenceData && (
-        <EditPaySequenceSheet updateValues={paySequenceData} />
-      )}
+      {paySequenceData && <EditPaySequenceSheet updateValues={paySequenceData} />}
     </>
   );
 }

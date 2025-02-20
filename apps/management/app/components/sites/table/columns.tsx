@@ -1,9 +1,10 @@
 import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
-import { useSearchParams } from "@remix-run/react";
+import { useNavigate } from "@remix-run/react";
 import type { ColumnDef } from "@tanstack/react-table";
 
-export const columns = (): ColumnDef<{ id: string; name: string }>[] => {
-  const [searchParams, setSearchParams] = useSearchParams();
+export const columns = (projectId:string, siteId:string): ColumnDef<{ id: string; name: string }>[] => {
+  const navigate = useNavigate();
+
   return [
     {
       accessorKey: "name",
@@ -12,28 +13,10 @@ export const columns = (): ColumnDef<{ id: string; name: string }>[] => {
         return (
           <p
             onClick={() => {
-              searchParams.set(
-                "currentPaymentTemplateAssignmentId",
-                row.original.id,
-              );
-
-              searchParams.set(
-                "action",
-                modalSearchParamNames.update_link_template,
-              );
-              setSearchParams(searchParams);
+              navigate(`/projects/${projectId}/${siteId}/manipulate-template?action=${modalSearchParamNames.update_link_template}&currentPaymentTemplateAssignmentId=${row.original.id}`);
             }}
             onKeyDown={() => {
-              searchParams.set(
-                "currentPaymentTemplateAssignmentId",
-                row.original.id,
-              );
-
-              searchParams.set(
-                "action",
-                modalSearchParamNames.update_link_template,
-              );
-              setSearchParams(searchParams);
+              navigate(`/projects/${projectId}/${siteId}/manipulate-template?action=${modalSearchParamNames.update_link_template}&currentPaymentTemplateAssignmentId=${row.original.id}`);
             }}
             className="truncate w-48 hover:cursor-pointer hover:text-primary"
           >

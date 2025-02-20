@@ -6,17 +6,19 @@ import { useEffect, useState } from "react";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Button, buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import { useSearchParams } from "@remix-run/react";
+import { useNavigate } from "@remix-run/react";
 import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
 
 export function SiteLinkedTemplates({
-  linkedTemplates,
+  linkedTemplates, projectId, siteId
 }: {
-  linkedTemplates: PaymentTemplateAssignmentsType[] | null;
+  linkedTemplates: Omit<PaymentTemplateAssignmentsType[], "created_at" | "updated_at"> | null | undefined;
+  projectId: string;
+  siteId: string;
 }) {
   const [searchString, setSearchString] = useState("");
   const [tableData, setTableData] = useState(linkedTemplates);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const filteredData = linkedTemplates?.filter((item) =>
@@ -29,8 +31,7 @@ export function SiteLinkedTemplates({
 
   const linkNewTemplate = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    searchParams.set("action", modalSearchParamNames.create_link_template);
-    setSearchParams(searchParams);
+    navigate(`/projects/${projectId}/${siteId}/manipulate-template?action=${modalSearchParamNames.create_link_template}`);
   };
 
   return (
@@ -63,7 +64,7 @@ export function SiteLinkedTemplates({
           </Button>
         </div>
       </div>
-      <DataTable data={tableData ?? []} columns={columns()} />
+      <DataTable data={tableData ?? []} columns={columns(projectId, siteId)} />
     </section>
   );
 }

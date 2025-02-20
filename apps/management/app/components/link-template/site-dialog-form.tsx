@@ -4,22 +4,11 @@ import { Button } from "@canny_ecosystem/ui/button";
 import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import {
-  eligibilityOptionsArray,
-  getInitialValueFromZod,
-  getValidDateForInput,
-  SiteLinkSchema,
-  positionArray,
-  replaceUnderscore,
-  skillLevelArray,
-  transformStringArrayIntoOptions,
+  eligibilityOptionsArray, getInitialValueFromZod, getValidDateForInput, SiteLinkSchema,
+  positionArray, replaceUnderscore, skillLevelArray, transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
 import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
-import {
-  FormProvider,
-  getFormProps,
-  getInputProps,
-  useForm,
-} from "@conform-to/react";
+import { FormProvider, getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { Form, useNavigation, useSearchParams } from "@remix-run/react";
 import { useEffect, useState } from "react";
@@ -27,15 +16,10 @@ import { DeleteSitePaymentTemplateAssignment } from "../sites/delete-site-paymen
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 
 export const SiteDialogForm = ({
-  siteId,
-  projectId,
-  action,
-  linkTemplates,
-  paymentTemplateOptions,
+  siteId, projectId, linkTemplates, paymentTemplateOptions,
 }: {
   siteId: string;
   projectId: string;
-  action: string;
   linkTemplates: PaymentTemplateAssignmentsType[];
   paymentTemplateOptions: ComboboxSelectOption[];
 }) => {
@@ -44,15 +28,14 @@ export const SiteDialogForm = ({
   const [resetKey, setResetKey] = useState(Date.now());
 
   const [searchParams] = useSearchParams();
-  const currentPaymentTemplateAssignmentId = searchParams.get(
-    "currentPaymentTemplateAssignmentId",
-  );
+  const currentPaymentTemplateAssignmentId = searchParams.get("currentPaymentTemplateAssignmentId");
+  const action = searchParams.get("action");
 
   const navigation = useNavigation();
-  const disableAll =
-    navigation.state === "submitting" || navigation.state === "loading";
+  const disableAll = navigation.state === "submitting" || navigation.state === "loading";
 
-  const updateURL = `/templates/${projectId}/${siteId}/${currentPaymentTemplateAssignmentId}/update-site-link`;
+  const updateURL =
+    `/templates/${projectId}/${siteId}/${currentPaymentTemplateAssignmentId}/update-site-link`;
   const createURL = `/templates/${projectId}/${siteId}/create-site-link`;
 
   const isUpdateAction = action === modalSearchParamNames.update_link_template;
@@ -116,9 +99,7 @@ export const SiteDialogForm = ({
         method="POST"
         {...getFormProps(form)}
         action={
-          action === modalSearchParamNames.update_link_template
-            ? updateURL
-            : createURL
+          action === modalSearchParamNames.update_link_template ? updateURL : createURL
         }
       >
         <Field

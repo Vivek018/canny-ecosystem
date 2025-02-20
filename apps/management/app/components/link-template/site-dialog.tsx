@@ -28,9 +28,7 @@ export function SiteDialog({
   const isUpdateAction = action === modalSearchParamNames.update_link_template;
 
   const handleOpenChange = () => {
-    navigate(`/projects/${projectId}/sites`, {
-      replace: true,
-    });
+    navigate(`/projects/${projectId}/sites`, { replace: true });
   };
 
   return (
@@ -43,12 +41,16 @@ export function SiteDialog({
           <SiteDialogForm
             siteId={siteId}
             projectId={projectId}
-            action={action}
+            // action={action}
             linkTemplates={linkTemplates}
             paymentTemplateOptions={paymentTemplateOptions}
           />
         ) : (
-          <SiteLinkedTemplates linkedTemplates={linkTemplates} />
+          <SiteLinkedTemplates
+            projectId={projectId}
+            siteId={siteId}
+            linkedTemplates={linkTemplates}
+          />
         )}
       </DialogContent>
     </Dialog>
