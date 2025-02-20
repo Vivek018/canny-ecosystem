@@ -121,6 +121,7 @@ export default function UpdateLeaves() {
     if (actionData) {
       if (actionData?.status === "success") {
         clearCacheEntry(`${cacheKeyPrefix.employee_leaves}${employeeId}`);
+        clearCacheEntry(`${cacheKeyPrefix.leaves}`);
         toast({
           title: "Success",
           description: actionData?.message || "Leave updated",
