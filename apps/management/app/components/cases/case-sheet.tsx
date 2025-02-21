@@ -1,4 +1,3 @@
-import type { CasesDataType } from "@canny_ecosystem/supabase/queries";
 import {
   Sheet,
   SheetContent,
@@ -35,7 +34,7 @@ function getRedirectUrl(type: string, data: any, keyPrefix: string): string {
     case "employee":
       return `/employees/${entity?.id}`;
     case "site":
-      return `/sites/${entity?.id}`;
+      return `/projects/${entity?.projects?.id}/sites/${entity?.id}`;
     case "project":
       return `/projects/${entity?.id}`;
     default:
@@ -163,14 +162,24 @@ export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
         />
 
         <hr />
-        <KeyValueRow label="Reported On" value={rowData?.reported_on ?? "--"} />
+        <KeyValueRow
+          label="Reported On"
+          value={rowData?.reported_on ?? "--"}
+          className="capitalize"
+        />
         {rowData?.reported_on !== "other" && (
           <KeyValueRow
             label={`R/O ${rowData?.reported_on ?? ""} Name`}
             value={
               <Link
                 to={redirectedToReportedOn}
-                className="font-bold capitalize text-primary/80 group-hover:text-primary"
+                className={cn(
+                  "font-bold capitalize cursor-text",
+                  rowData?.reported_on !== "company" &&
+                    rowData?.reported_on !== "other" &&
+                    rowData?.reported_on !== "canny" &&
+                    "text-primary/80 group-hover:text-primary cursor-pointer",
+                )}
               >
                 {reportedOnName}
               </Link>
@@ -179,14 +188,24 @@ export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
         )}
 
         <hr />
-        <KeyValueRow label="Reported By" value={rowData?.reported_by ?? "--"} />
+        <KeyValueRow
+          label="Reported By"
+          value={rowData?.reported_by ?? "--"}
+          className="capitalize"
+        />
         {rowData?.reported_by !== "other" && (
           <KeyValueRow
             label={`R/B ${rowData?.reported_by ?? ""} Name`}
             value={
               <Link
                 to={redirectedToReportedBy}
-                className="font-bold capitalize text-primary/80 group-hover:text-primary"
+                className={cn(
+                  "font-bold capitalize cursor-text",
+                  rowData?.reported_by !== "company" &&
+                    rowData?.reported_by !== "other" &&
+                    rowData?.reported_by !== "canny" &&
+                    "text-primary/80 group-hover:text-primary cursor-pointer",
+                )}
               >
                 {reportedByName}
               </Link>

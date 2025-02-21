@@ -241,20 +241,14 @@ export async function getEmployeesByProjectSiteId({
   supabase: TypedSupabaseClient;
   projectSiteId: string;
 }) {
-  const columns = [
-    "id",
-    "first_name",
-    "middle_name",
-    "last_name",
-    "employee_code",
-  ] as const;
+  const columns = ["id", "employee_code"] as const;
 
   const { data, error } = await supabase
     .from("employees")
     .select(
       `${columns.join(
         ",",
-      )},employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(*)`,
+      )},employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(project_site_id)`,
     )
     .eq("employee_project_assignment.project_site_id", projectSiteId)
     .limit(MID_QUERY_LIMIT)
@@ -288,7 +282,7 @@ export async function getEmployeesByPositionAndProjectSiteId({
     .select(
       `${columns.join(
         ",",
-      )},employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(*)`,
+      )},employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(project_site_id)`,
     )
     .eq("employee_project_assignment.project_site_id", projectSiteId)
     .eq("employee_project_assignment.position", position ?? "")

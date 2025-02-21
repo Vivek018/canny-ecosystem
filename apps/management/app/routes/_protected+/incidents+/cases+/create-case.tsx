@@ -157,19 +157,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       value: project?.id ?? "",
     }));
 
-    const reportedByEmployeeOptions = reportedByEmployee?.map(
-      (employee: any) => ({
-        label: `${employee?.first_name} ${employee?.last_name}`,
-        value: employee?.id ?? "",
-      }),
-    );
+    const reportedByEmployeeOptions = reportedByEmployee?.map((employee) => ({
+      label: employee?.employee_code,
+      value: employee?.id ?? "",
+    }));
 
-    const reportedOnEmployeeOptions = reportedOnEmployee?.map(
-      (employee: any) => ({
-        label: `${employee?.first_name} ${employee?.last_name}`,
-        value: employee?.id ?? "",
-      }),
-    );
+    const reportedOnEmployeeOptions = reportedOnEmployee?.map((employee) => ({
+      label: employee?.employee_code,
+      value: employee?.id ?? "",
+    }));
 
     const reportedBySiteOptions = reportedBySite?.map((item) => ({
       label: item?.name,
@@ -295,7 +291,7 @@ export async function action({
 }
 
 export type CaseOptionsType = {
-  label: string;
+  label: string | undefined;
   value?: string | number | undefined;
 }[];
 

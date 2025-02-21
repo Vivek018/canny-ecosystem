@@ -140,14 +140,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     const reportedByEmployeeOptions = reportedByEmployee?.map(
       (employee: any) => ({
-        label: `${employee?.first_name} ${employee?.last_name}`,
+        label: employee?.employee_code as string,
         value: employee?.id ?? "",
       }),
     );
 
     const reportedOnEmployeeOptions = reportedOnEmployee?.map(
       (employee: any) => ({
-        label: `${employee?.first_name} ${employee?.last_name}`,
+        label: employee?.employee_code as string,
         value: employee?.id ?? "",
       }),
     );
