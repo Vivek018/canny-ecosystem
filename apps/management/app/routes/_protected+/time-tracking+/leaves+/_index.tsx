@@ -144,7 +144,7 @@ export default function LeavesIndex() {
   const noFilters = Object.values(filterList).every((value) => !value);
 
   return (
-    <section className="p-4">
+    <section className="py-4">
       <div className="w-full flex items-center justify-between pb-4">
         <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
           <Suspense fallback={<div>Loading...</div>}>
@@ -156,6 +156,7 @@ export default function LeavesIndex() {
                       {(userEmailsData) => (
                         <LeavesSearchFilter
                           disabled={!projectData?.data?.length && noFilters}
+                          isEmployeeRoute={isEmployeeRoute}
                           projectArray={
                             projectData?.data?.length
                               ? projectData?.data?.map(

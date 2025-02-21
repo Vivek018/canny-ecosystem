@@ -27,14 +27,15 @@ export function LeavesSearchFilter({
   projectArray,
   projectSiteArray,
   userEmails,
+  isEmployeeRoute,
 }: {
   disabled?: boolean;
   employeeId?: string | undefined;
   projectArray?: string[];
   projectSiteArray?: string[];
   userEmails: (string | null | undefined)[];
+  isEmployeeRoute: boolean;
 }) {
-
   const [prompt, setPrompt] = useState("");
   const navigation = useNavigation();
   const isSubmitting =
@@ -279,7 +280,7 @@ export function LeavesSearchFilter({
             </DropdownMenuPortal>
           </DropdownMenuSub>
         </DropdownMenuGroup>
-        <DropdownMenuGroup>
+        <DropdownMenuGroup className={cn(isEmployeeRoute && "hidden")}>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
               <span>Project</span>
@@ -310,7 +311,7 @@ export function LeavesSearchFilter({
           </DropdownMenuSub>
         </DropdownMenuGroup>
 
-        <DropdownMenuGroup>
+        <DropdownMenuGroup className={cn(isEmployeeRoute && "hidden")}  >
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
               <span>Project Site</span>

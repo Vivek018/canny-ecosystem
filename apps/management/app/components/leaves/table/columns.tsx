@@ -2,6 +2,7 @@ import {
   deleteRole,
   formatDate,
   hasPermission,
+  replaceUnderscore,
   updateRole,
 } from "@canny_ecosystem/utils";
 import { Button } from "@canny_ecosystem/ui/button";
@@ -86,7 +87,7 @@ export const columns = (
     accessorKey: "leave_type",
     header: "Leave Type",
     cell: ({ row }) => {
-      return row.original?.leave_type ?? "--";
+      return replaceUnderscore(row.original?.leave_type) ?? "--";
     },
   },
   {

@@ -1,7 +1,11 @@
 import type { LeavesFilters } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import { formatDate, formatDateRange } from "@canny_ecosystem/utils";
+import {
+  formatDate,
+  formatDateRange,
+  replaceUnderscore,
+} from "@canny_ecosystem/utils";
 import { useSearchParams } from "@remix-run/react";
 
 type Props = {
@@ -68,7 +72,7 @@ export function FilterList({ filters }: Props) {
                   className="scale-0 group-hover:scale-100 transition-all w-0 group-hover:w-4"
                 />
                 <span className="capitalize">
-                  {renderFilter({ key, value: value ?? "" })}
+                  {replaceUnderscore(renderFilter({ key, value: value ?? "" }))}
                 </span>
               </Button>
             </li>

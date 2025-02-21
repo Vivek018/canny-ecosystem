@@ -88,7 +88,6 @@ export async function getLeavesByEmployeeId({
     )
     .eq("employee_id", employeeId);
 
-  // Handle sorting
   if (sort) {
     const [column, direction] = sort;
     query.order(column, { ascending: direction === "asc" });
@@ -231,6 +230,9 @@ export async function getLeavesByCompanyId({
         "employees.employee_project_assignment.project_sites.name",
         project_site
       );
+    }
+    if (users) {
+      query.eq("users.email", users);
     }
   }
 

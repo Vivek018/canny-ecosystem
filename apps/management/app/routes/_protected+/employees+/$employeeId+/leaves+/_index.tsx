@@ -171,10 +171,11 @@ export default function Leaves() {
                       <LeaveCountCards leaveType={leaveType} />
                       <div className="w-full flex items-center justify-between pb-4">
                         <div className="w-full flex justify-start items-center gap-x-3">
-                          <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
+                          <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-14">
                             <LeavesSearchFilter
                               disabled={!data?.length && noFilters}
                               employeeId={employeeId}
+                              isEmployeeRoute={isEmployeeRoute}
                               userEmails={
                                 usersData?.data
                                   ? usersData?.data?.map((user) => user!.email)
@@ -183,7 +184,7 @@ export default function Leaves() {
                             />
                             <FilterList filters={filters} />
                           </div>
-                          <div className="space-x-2 hidden md:flex">
+                          <div className="space-x-2 hidden md:flex ">
                             <ColumnVisibility disabled={!leavesPromise} />
                             <AddLeaveDialog />
                           </div>
