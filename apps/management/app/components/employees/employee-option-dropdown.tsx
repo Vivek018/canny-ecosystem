@@ -6,10 +6,8 @@ import {
   DropdownMenuSeparator,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { useNavigate, useSubmit } from "@remix-run/react";
+import {  useSubmit } from "@remix-run/react";
 import { DeleteEmployee } from "./delete-employee";
-import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
-import { EmployeeDialog } from "../link-template/employee-dialog";
 import {
   createRole,
   deleteRole,
@@ -22,7 +20,6 @@ import { attribute } from "@canny_ecosystem/utils/constant";
 export const EmployeeOptionsDropdown = ({
   employee,
   triggerChild,
-  env,
 }: {
   employee: {
     id: string;
@@ -31,10 +28,8 @@ export const EmployeeOptionsDropdown = ({
     companyId: string;
   };
   triggerChild: React.ReactElement;
-  env: SupabaseEnv;
 }) => {
   const submit = useSubmit();
-  const navigate = useNavigate();
   const { role } = useUser();
   const handleMarkAsActive = () => {
     submit(
@@ -62,10 +57,6 @@ export const EmployeeOptionsDropdown = ({
         action: `/employees/${employee.id}/update-active`,
       },
     );
-  };
-
-  const handleExit = () => {
-    navigate(`/approvals/exits/${employee.id}/create-exit`);
   };
 
   const handleAccident = () => {
@@ -112,16 +103,6 @@ export const EmployeeOptionsDropdown = ({
                 "hidden",
             )}
           />
-          <EmployeeDialog employee={employee} env={env} />
-          <DropdownMenuItem
-            className={cn(
-              !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
-                "hidden",
-            )}
-            onClick={handleExit}
-          >
-            Exit employee
-          </DropdownMenuItem>
           <DropdownMenuItem
             className={cn(
               !hasPermission(role, `${createRole}:${attribute.accidents}`) &&

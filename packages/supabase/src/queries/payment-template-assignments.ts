@@ -74,7 +74,7 @@ export async function getPaymentTemplateAssignmentByEmployeeId({
     .from("payment_template_assignments")
     .select(columns.join(","))
     .eq("employee_id", employeeId)
-    .single<
+    .maybeSingle<
       InferredType<
         PaymentTemplateAssignmentsDatabaseRow,
         (typeof columns)[number]

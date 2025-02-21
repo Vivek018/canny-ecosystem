@@ -119,6 +119,8 @@ export const attribute = {
   employeeLetters: "employee_letters",
   employeeReimbursements: "employee_reimbursements",
   employeeAttendance: "employee_attendance",
+  employeeExits:"employee_exits",
+  employeePaymentTemplateLink:"payment_template_link",
   reimbursements: "reimbursements",
   exits: "exits",
   paymentFields: "payment_fields",

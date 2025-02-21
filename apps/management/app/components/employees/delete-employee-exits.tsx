@@ -17,19 +17,19 @@ import { DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
-export const DeleteEmployeePaymentTemplateAssignment = ({ employeeId }: { employeeId: string }) => {
+export const DeleteEmployeeExits = ({ exitId, employeeId }: { exitId: string, employeeId: string }) => {
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [inputError, setInputError] = useState<string[]>([]);
   const submit = useSubmit();
 
-  const handleCancelEmployeePaymentTemplateAssignment = () => {
+  const handleCancelEmployeeExits = () => {
     setInputError([]);
     setInputValue("");
     setLoading(false);
   };
 
-  const handleDeleteEmployeePaymentTemplateAssignment = (
+  const handleDeleteEmployeeExits = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
@@ -41,7 +41,7 @@ export const DeleteEmployeePaymentTemplateAssignment = ({ employeeId }: { employ
         },
         {
           method: "POST",
-          action: `/employees/${employeeId}/payments/delete-link-template`,
+          action: `/employees/${employeeId}/payments/${exitId}/delete-exit`,
         },
       );
     } else {
@@ -58,15 +58,14 @@ export const DeleteEmployeePaymentTemplateAssignment = ({ employeeId }: { employ
           "text-[13px] h-9",
         )}
       >
-        Delete link template
+        Delete Exit
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
             This action cannot be undone. This will permanently delete your
-            employee's payment template assignment and remove it's data from our
-            servers.
+            employee's exit and remove it's data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="p-4">
@@ -78,10 +77,7 @@ export const DeleteEmployeePaymentTemplateAssignment = ({ employeeId }: { employ
           <Input
             type="text"
             value={inputValue}
-            onChange={(e) => {
-              setInputValue(e.target.value);
-              setInputError([]);
-            }}
+            onChange={(e) => { setInputValue(e.target.value); setInputError([]) }}
             className="border border-input rounded-md h-10 w-full"
             placeholder="Confirm your action"
             onPaste={(e) => {
@@ -93,14 +89,14 @@ export const DeleteEmployeePaymentTemplateAssignment = ({ employeeId }: { employ
         </div>
         <AlertDialogFooter>
           <AlertDialogCancel
-            onClick={handleCancelEmployeePaymentTemplateAssignment}
+            onClick={handleCancelEmployeeExits}
           >
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
             className={cn(buttonVariants({ variant: "destructive" }))}
-            onClick={handleDeleteEmployeePaymentTemplateAssignment}
-            onSelect={handleDeleteEmployeePaymentTemplateAssignment}
+            onClick={handleDeleteEmployeeExits}
+            onSelect={handleDeleteEmployeeExits}
           >
             {isLoading ? "Deleting..." : "Delete"}
           </AlertDialogAction>
