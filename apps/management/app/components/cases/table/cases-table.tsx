@@ -11,86 +11,85 @@ import {
   useReactTable,
   type VisibilityState,
 } from "@tanstack/react-table";
-import { ExitPaymentTableHeader } from "./data-table-header";
-import { ExitPaymentsSheet } from "@/components/exits/exit-payments-sheet";
-import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
-import {
-  type ExitDataType,
-  type ExitFilterType,
-  getExitsByCompanyId,
-} from "@canny_ecosystem/supabase/queries";
-import { useState, useEffect } from "react";
-import { useSupabase } from "@canny_ecosystem/supabase/client";
+import { CasesTableHeader } from "./cases-table-header";
 import { useInView } from "react-intersection-observer";
-import { useExitsStore } from "@/store/exits";
+import { useEffect, useState } from "react";
+import {
+  type CaseFilters,
+  getCasesByCompanyId,
+} from "@canny_ecosystem/supabase/queries";
+import { useSupabase } from "@canny_ecosystem/supabase/client";
 import { Spinner } from "@canny_ecosystem/ui/spinner";
 import { useSearchParams } from "@remix-run/react";
 import { Button } from "@canny_ecosystem/ui/button";
-import { ExportBar } from "../import-export/export-bar";
-import { useCompanyId } from "@/utils/company";
+import { ExportBar } from "../export-bar";
+import { useCaseStore } from "@/store/cases";
+import type { CasesDatabaseRow } from "@canny_ecosystem/supabase/types";
+import { CaseSheet } from "../case-sheet";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  count: number;
-  query?: string | null;
-  filters?: ExitFilterType;
-  noFilters?: boolean;
   hasNextPage: boolean;
   pageSize: number;
+  env: any;
+  companyId?: string;
+  employeeId?: string;
+  noFilters?: boolean;
+  filters?: CaseFilters | null;
+  query?: string | null;
   initialColumnVisibility?: VisibilityState;
-  env: SupabaseEnv;
 }
 
-export function ExitPaymentTable<TData, TValue>({
-  data: initialData,
+export function CasesTable<TData, TValue>({
   columns,
-  count,
-  query,
-  filters,
-  noFilters,
+  data: initialData,
   hasNextPage: initialHasNextPage,
   pageSize,
-  initialColumnVisibility,
   env,
+  companyId,
+  noFilters,
+  filters,
+  initialColumnVisibility,
+  query,
 }: DataTableProps<TData, TValue>) {
   const [data, setData] = useState(initialData);
-
   const [from, setFrom] = useState(pageSize);
-  const [hasNextPage, setHasNextPage] = useState(initialHasNextPage);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [hasNextPage, setHasNextPage] = useState(initialHasNextPage);
   const { supabase } = useSupabase({ env });
-  const { companyId } = useCompanyId();
 
   const { ref, inView } = useInView();
   const { rowSelection, setSelectedRows, setRowSelection, setColumns } =
-    useExitsStore();
-
+    useCaseStore();
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    initialColumnVisibility ?? {}
+    initialColumnVisibility ?? {},
   );
-
-  const loadMoreExit = async () => {
+  const loadMoreCases = async () => {
     const formattedFrom = from;
     const to = formattedFrom + pageSize;
     const sortParam = searchParams.get("sort");
-    try {
-      const { data } = await getExitsByCompanyId({
-        supabase,
-        companyId: companyId ?? "",
-        params: {
-          from: from,
-          to: to,
-          filters,
-          searchQuery: query ?? undefined,
-          sort: sortParam?.split(":") as [string, "asc" | "desc"],
-        },
-      });
-      if (data) setData((prevData) => [...prevData, ...data] as TData[]);
-      setFrom(to + 1);
-      setHasNextPage(count > to);
-    } catch {
-      setHasNextPage(false);
+    if (companyId) {
+      try {
+        const { data } = await getCasesByCompanyId({
+          supabase,
+          companyId,
+          params: {
+            from: from,
+            to: to,
+            filters,
+            searchQuery: query ?? undefined,
+            sort: sortParam?.split(":") as [string, "asc" | "desc"],
+          },
+        });
+        if (data) {
+          setData((prevData) => [...prevData, ...data] as TData[]);
+        }
+        setFrom(to + 1);
+        setHasNextPage(data?.length! > to);
+      } catch {
+        setHasNextPage(false);
+      }
     }
   };
 
@@ -100,14 +99,24 @@ export function ExitPaymentTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
     onRowSelectionChange: setRowSelection,
     onColumnVisibilityChange: setColumnVisibility,
-    state: { rowSelection, columnVisibility },
+    state: {
+      rowSelection,
+      columnVisibility,
+    },
   });
+
+  const selectedRowsData = table
+    .getSelectedRowModel()
+    .rows?.map((row) => row.original);
 
   useEffect(() => {
     const rowArray = [];
-    for (const row of table.getSelectedRowModel().rows)
+    for (const row of table.getSelectedRowModel().rows) {
       rowArray.push(row.original);
-    setSelectedRows(rowArray as ExitDataType[]);
+    }
+    setSelectedRows(
+      rowArray as Omit<CasesDatabaseRow, "created_at" | "updated_at">[],
+    );
   }, [rowSelection]);
 
   useEffect(() => {
@@ -115,7 +124,9 @@ export function ExitPaymentTable<TData, TValue>({
   }, [columnVisibility]);
 
   useEffect(() => {
-    if (inView) loadMoreExit();
+    if (inView) {
+      loadMoreCases();
+    }
   }, [inView]);
 
   useEffect(() => {
@@ -126,21 +137,17 @@ export function ExitPaymentTable<TData, TValue>({
 
   const tableLength = table.getRowModel().rows?.length;
 
-  const selectedRowsData = table
-    .getSelectedRowModel()
-    .rows?.map((row) => row.original);
-
   return (
-    <div className='relative mb-8'>
+    <div className="relative mb-8">
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
-          !tableLength && "border-none"
+          !tableLength && "border-none",
         )}
       >
-        <div className='relative'>
+        <div className="relative">
           <Table>
-            <ExitPaymentTableHeader
+            <CasesTableHeader
               table={table}
               className={cn(!tableLength && "hidden")}
             />
@@ -148,35 +155,29 @@ export function ExitPaymentTable<TData, TValue>({
               {tableLength ? (
                 table.getRowModel().rows.map((row) => {
                   const rowData = row.original;
-                  return (
-                    <ExitPaymentsSheet
-                      key={row.id}
-                      row={row}
-                      rowData={rowData}
-                    />
-                  );
+                  return <CaseSheet key={row.id} row={row} rowData={rowData} />;
                 })
               ) : (
                 <TableRow className={cn(!tableLength && "border-none")}>
                   <TableCell
                     colSpan={columns.length}
-                    className='h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize'
+                    className="h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize"
                   >
-                    <div className='flex flex-col items-center gap-1'>
-                      <h2 className='text-xl'>No Exits Found.</h2>
+                    <div className="flex flex-col items-center gap-1">
+                      <h2 className="text-xl">No Cases Found.</h2>
                       <p
                         className={cn(
                           "text-muted-foreground",
-                          !data?.length && noFilters && "hidden"
+                          !data?.length && noFilters && "hidden",
                         )}
                       >
                         Try another search, or adjusting the filters
                       </p>
                       <Button
-                        variant='outline'
+                        variant="outline"
                         className={cn(
                           "mt-4",
-                          !data?.length && noFilters && "hidden"
+                          !data?.length && noFilters && "hidden",
                         )}
                         onClick={() => {
                           setSearchParams();
@@ -192,12 +193,11 @@ export function ExitPaymentTable<TData, TValue>({
           </Table>
         </div>
       </div>
-
-      {hasNextPage && initialData?.length && (
+      {hasNextPage && (
         <div className="flex items-center justify-center mt-6" ref={ref}>
           <div className="flex items-center space-x-2 px-6 py-5">
             <Spinner />
-            <span className='text-sm text-[#606060]'>Loading more...</span>
+            <span className="text-sm text-[#606060]">Loading more...</span>
           </div>
         </div>
       )}

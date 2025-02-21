@@ -189,7 +189,7 @@ export function AccidentsTable<TData, TValue>({
                     className="h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize"
                   >
                     <div className="flex flex-col items-center gap-1">
-                      <h2 className="text-xl">No Reimbursments Found.</h2>
+                      <h2 className="text-xl">No Accidents Found.</h2>
                       <p
                         className={cn(
                           "text-muted-foreground",
