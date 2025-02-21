@@ -59,11 +59,11 @@ export const DeleteSitePaymentTemplateAssignment = ({
     <AlertDialog>
       <AlertDialogTrigger
         className={cn(
-          buttonVariants({ variant: "destructive-outline", size: "full" }),
+          buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "text-[13px] h-9",
         )}
       >
-        Delete link template
+        Delete link assignment
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

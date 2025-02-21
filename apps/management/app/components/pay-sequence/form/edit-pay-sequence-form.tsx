@@ -1,5 +1,4 @@
 import type { SitePaySequenceDatabaseUpdate } from "@canny_ecosystem/supabase/types";
-import { Button } from "@canny_ecosystem/ui/button";
 import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import {
   getInitialValueFromZod,
@@ -19,6 +18,7 @@ import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { Form } from "@remix-run/react";
 import { useState } from "react";
 import { WorkingDaysField } from "../working-days-field";
+import { FormButtons } from "@/components/form/form-buttons";
 
 export const EDIT_PAY_SEQUENCE = "edit-pay-sequence";
 
@@ -54,7 +54,7 @@ export function EditPaySequenceForm({
           {...getFormProps(form)}
           action={
             `/projects/${projectId}/sites/${fields.id.value ?? fields.id.initialValue}/edit-pay-sequence`
-        }
+          }
           className="flex flex-col h-full"
         >
           <input {...getInputProps(fields.id, { type: "hidden" })} />
@@ -89,27 +89,9 @@ export function EditPaySequenceForm({
             labelProps={{ htmlFor: fields.working_days.id }}
             errors={fields.working_days.errors}
             selectProps={getSelectProps(fields.working_days) as any}
+            className="flex flex-col items-start"
           />
-          <div className="mt-auto mb-14 w-full flex gap-4">
-            <Button
-              variant="secondary"
-              size="full"
-              type="reset"
-              onClick={() => setResetKey(Date.now())}
-              {...form.reset.getButtonProps()}
-            >
-              Reset
-            </Button>
-            <Button
-              form={form.id}
-              disabled={!form.valid}
-              variant="default"
-              size="full"
-              type="submit"
-            >
-              Submit
-            </Button>
-          </div>
+          <FormButtons form={form} setResetKey={setResetKey} isSingle={true} />
         </Form>
       </FormProvider>
     </section>

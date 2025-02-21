@@ -1,39 +1,15 @@
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenu,DropdownMenuContent,DropdownMenuGroup,DropdownMenuTrigger,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@canny_ecosystem/ui/tooltip";
+import {Tooltip,TooltipContent,TooltipProvider,TooltipTrigger} from "@canny_ecosystem/ui/tooltip";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Link, useNavigate } from "@remix-run/react";
 import { DeleteSite } from "./delete-site";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@canny_ecosystem/ui/card";
+import {Card,CardContent,CardFooter,CardHeader,CardTitle} from "@canny_ecosystem/ui/card";
 import type { SitesWithLocation } from "@canny_ecosystem/supabase/queries";
-import {
-  attribute,
-  modalSearchParamNames,
-} from "@canny_ecosystem/utils/constant";
-import {
-  deleteRole,
-  hasPermission,
-  replaceUnderscore,
-  updateRole,
-} from "@canny_ecosystem/utils";
+import {attribute} from "@canny_ecosystem/utils/constant";
+import {hasPermission,replaceUnderscore,updateRole} from "@canny_ecosystem/utils";
 import { useUser } from "@/utils/user";
 
 export function SiteCard({
@@ -57,7 +33,7 @@ export function SiteCard({
         <div className="flex flex-col items-start">
           <CardTitle
             className="text-lg tracking-wide hover:cursor-pointer hover:text-primary"
-            onClick={() => navigate(`/projects/${site.project_id}/${site.id}/pay-sequence`)}
+            onClick={() => navigate(`/projects/${site.project_id}/${site.id}/overview`)}
           >
             {site.name}
           </CardTitle>

@@ -1,19 +1,17 @@
-import { DeleteSitePaymentTemplateAssignment } from "@/components/sites/delete-site-payment-template-assignment";
+import { FormButtons } from "@/components/form/form-buttons";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getPaymentTemplateAssignmentsBySiteId, getPaymentTemplatesByCompanyId, type PaymentTemplateAssignmentsType } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { PaymentTemplateAssignmentsDatabaseUpdate } from "@canny_ecosystem/supabase/types";
-import { Button } from "@canny_ecosystem/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@canny_ecosystem/ui/card";
 import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
-import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { eligibilityOptionsArray, getInitialValueFromZod, getValidDateForInput, positionArray, replaceUnderscore, SiteLinkSchema, skillLevelArray, transformStringArrayIntoOptions } from "@canny_ecosystem/utils";
 import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
 import { FormProvider, getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Form, json, useLoaderData, useNavigation, useSearchParams } from "@remix-run/react";
+import { Form, json, useLoaderData, useSearchParams } from "@remix-run/react";
 import { useEffect, useState } from "react";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
@@ -79,10 +77,6 @@ export default function ManipulateTemplate() {
   const [searchParams] = useSearchParams();
   const action = searchParams.get("action");
   const currentPaymentTemplateAssignmentId = searchParams.get("currentPaymentTemplateAssignmentId");
-
-  const navigation = useNavigation();
-  const disableAll =
-    navigation.state === "submitting" || navigation.state === "loading";
 
   const updateURL = `/templates/${projectId}/${siteId}/${currentPaymentTemplateAssignmentId}/update-site-link`;
   const createURL = `/templates/${projectId}/${siteId}/create-site-link`;
@@ -249,15 +243,7 @@ export default function ManipulateTemplate() {
                   errors={fields.skill_level.errors}
                 />
               </div>
-              <Button variant="default" className="w-full" disabled={!form.valid || disableAll}>
-                {isUpdateAction ? "Update" : "Create"} link template
-              </Button>
-              <div className={cn("w-full mt-3", !initialValues && "hidden")}>
-                <DeleteSitePaymentTemplateAssignment
-                  projectId={projectId as string}
-                  templateAssignmentId={currentPaymentTemplateAssignmentId!}
-                />
-              </div>
+              <FormButtons form={form} setResetKey={setResetKey} isSingle={true} />
             </Form>
           </FormProvider>
         </CardContent>

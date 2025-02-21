@@ -36,9 +36,5 @@ export function PaymentFieldTableWrapper({
     setTableData(filteredData ?? []);
   }, [searchString, data]);
 
-  return (
-    <>
-      <DataTable columns={columns} data={tableData ?? []} />
-    </>
-  );
+  return <DataTable columns={columns} data={tableData ?? []} />;
 }

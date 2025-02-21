@@ -14,7 +14,7 @@ export default function Project() {
       <div className="flex items-center gap-4 py-2.5 px-4 border-b">
         <Link
           prefetch="intent"
-          to="/projects"
+          to={`/projects/${projectId}/sites`}
           className={cn(
             buttonVariants({ variant: "outline" }),
             "bg-card w-9 h-9 px-0 rounded-full",
@@ -25,8 +25,8 @@ export default function Project() {
 
         <SecondaryMenu
           items={[
-            { label: "Pay Sequence", path: `/projects/${projectId}/${siteId}/pay-sequence` },
-            { label: "Link Template", path: `/projects/${projectId}/${siteId}/link-template` },
+            { label: "Overview", path: `/projects/${projectId}/${siteId}/overview` },
+            { label: "Link Templates", path: `/projects/${projectId}/${siteId}/link-templates` },
           ]}
           className="pt-0 pb-0"
           pathname={pathname}
