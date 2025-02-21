@@ -13,6 +13,7 @@ import { LocationsWrapper } from "@/components/locations/locations-wrapper";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
+import LoadingSpinner from "@/components/loader";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {
@@ -50,7 +51,7 @@ export default function Locations() {
   }
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<LoadingSpinner className="h-[300px]" />}>
       <Await resolve={locationsPromise}>
         {(resolvedData) => {
           if (!resolvedData) {

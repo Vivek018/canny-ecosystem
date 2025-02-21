@@ -17,6 +17,7 @@ import {
   useLoaderData,
 } from "@remix-run/react";
 import { Suspense, useEffect, useState } from "react";
+import LoadingSpinner from "../../../components/loader";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {
@@ -35,16 +36,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
       });
 
     return defer({
-      status: "success",
-      message: "Company found",
-      error: null,
       companyDetailsPromise,
       companyRegistrationDetailsPromise,
+      error: null,
     });
   } catch (error) {
     return defer({
-      status: "error",
-      message: "Failed to get company",
       error,
       companyDetailsPromise: null,
       companyRegistrationDetailsPromise: null,
@@ -71,14 +68,17 @@ export default function SettingGeneral() {
   if (error) {
     clearExactCacheEntry(cacheKeyPrefix.general);
     return (
-      <ErrorBoundary error={error} message="Failed to load company details" />
+      <ErrorBoundary
+        error={error}
+        message="Something went wrong while loading the page."
+      />
     );
   }
 
   return (
     <section key={resetKey}>
       <div className="flex flex-col gap-6 w-full lg:w-2/3 py-4">
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<LoadingSpinner className={"h-[300px]"} />}>
           <Await resolve={companyDetailsPromise}>
             {(resolvedData) => {
               if (!resolvedData) {
@@ -99,19 +99,22 @@ export default function SettingGeneral() {
       </div>
 
       <div className="flex flex-col gap-6 w-full lg:w-2/3 py-4">
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<LoadingSpinner />}>
           <Await resolve={companyRegistrationDetailsPromise}>
             {(resolvedData) => {
-              if (!resolvedData) {
+              if (resolvedData?.error) {
                 clearExactCacheEntry(cacheKeyPrefix.general);
                 return (
-                  <ErrorBoundary message="Failed to load company registration details" />
+                  <ErrorBoundary
+                    error={resolvedData?.error}
+                    message="Failed to load company registration details"
+                  />
                 );
               }
               return (
                 <CompanyRegistrationDetailsWrapper
-                  data={resolvedData.data}
-                  error={resolvedData.error}
+                  data={resolvedData?.data ?? null}
+                  error={resolvedData?.error ?? null}
                 />
               );
             }}

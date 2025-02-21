@@ -262,6 +262,10 @@ export async function getRelationshipsByCompanyId({
     "child_company:companies!child_company_id (id, name)",
   ] as const;
 
+  const delayFunc = (ms: number) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
+  await delayFunc(7000);
+
   const { data, error } = await supabase
     .from("company_relationships")
     .select(columns.join(","))

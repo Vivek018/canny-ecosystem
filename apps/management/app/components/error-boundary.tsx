@@ -26,15 +26,15 @@ export function ErrorBoundary({ error, message }: ErrorBoundaryProps) {
 
   return (
     <div className="mt-20 flex justify-center items-center">
-      <div className="text-center p-5 flex justify-between flex-col gap-10">
-        <div className="text-2xl font-semibold">
+      <div className="text-center p-5 flex justify-between items-center flex-col gap-10 w-2/5">
+        <div className="text-2xl font-semibold w-10/12">
           {message || "Something went wrong"}
         </div>
-        <div className="flex flex-col justify-between gap-4">
+        <div className="flex flex-col justify-between items-center gap-4 w-full">
           <Button
             type="button"
             variant={"secondary"}
-            className="px-5 py-2"
+            className="px-5 py-2 w-1/2"
             onClick={() => navigate(DEFAULT_ROUTE)}
           >
             Go to home page
@@ -42,7 +42,7 @@ export function ErrorBoundary({ error, message }: ErrorBoundaryProps) {
           <Button
             type="button"
             variant={"destructive-outline"}
-            className="px-5 py-2"
+            className="px-5 py-2 w-1/2"
             onClick={() => navigate(0)}
           >
             Try again

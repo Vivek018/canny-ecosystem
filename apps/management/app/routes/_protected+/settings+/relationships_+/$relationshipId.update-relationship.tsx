@@ -34,6 +34,7 @@ import { safeRedirect } from "@/utils/server/http.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
+import LoadingSpinner from "@/components/loader";
 
 export const UPDATE_RELATIONSHIP = "update-relationship";
 
@@ -162,7 +163,7 @@ export default function UpdateRelationship() {
   }, [actionData]);
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<LoadingSpinner className="h-96" />}>
       <Await resolve={relationshipPromise}>
         {(resolvedData) => {
           if (!resolvedData)

@@ -27,6 +27,7 @@ import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
+import LoadingSpinner from "@/components/loader";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {
@@ -104,7 +105,7 @@ export default function Relationships() {
           </CommandEmpty>
           <CommandList className="max-h-full py-6 overflow-x-visible overflow-y-visible">
             <CommandGroup className="p-0 overflow-visible">
-              <Suspense fallback={<div>Loading...</div>}>
+              <Suspense fallback={<LoadingSpinner className="h-96" />}>
                 <Await resolve={relationshipsPromise}>
                   {(resolvedData) => {
                     if (!resolvedData) {
