@@ -17,17 +17,12 @@ import {
   defer,
   redirect,
   useLoaderData,
-  useNavigate,
 } from "@remix-run/react";
 import { AttendanceTable } from "@/components/attendance/table/attendance-table";
 import { attendanceColumns } from "@/components/attendance/table/columns";
-import { ImportAttendanceMenu } from "@/components/attendance/import-attendance-menu";
 import { ImportEmployeeAttendanceModal } from "@/components/employees/import-export/import-modal-attendance";
-import { useAttendanceStore } from "@/store/attendance";
 import { Suspense, useEffect, useState } from "react";
 import { formatDate, hasPermission, readRole } from "@canny_ecosystem/utils";
-import { Button } from "@canny_ecosystem/ui/button";
-import { Icon } from "@canny_ecosystem/ui/icon";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
@@ -255,8 +250,6 @@ export default function Attendance() {
       fullDate: currentDate.toISOString().split("T")[0],
     };
   });
-
-  const { selectedRows } = useAttendanceStore();
 
   const noFilters = Boolean(
     filters && Object.values(filters).every((value) => !value)
