@@ -245,7 +245,7 @@ export const cacheKeyPrefix = {
   employee_work_portfolio: "employee-work-portfolio",
   employee_reimbursements: "employee-reimbursements",
   employee_letters: "employee-letters",
-  employee_payments:"employee_payments",
+  employee_payments: "employee_payments",
   reimbursements: "reimbursements",
   payment_fields: "payment-fields",
   payment_field_report: "payment-field-report",
@@ -269,6 +269,7 @@ export const cacheKeyPrefix = {
   exits: "exits",
   accident: "accident",
   attendance: "attendance",
+  case: "case",
 };
 export const SALARY_SLIP_TITLE = "Salary Slip Form IV B [Rule 26(2)(b)]";
 

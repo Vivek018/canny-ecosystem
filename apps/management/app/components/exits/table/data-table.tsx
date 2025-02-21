@@ -12,7 +12,7 @@ import {
   type VisibilityState,
 } from "@tanstack/react-table";
 import { ExitPaymentTableHeader } from "./data-table-header";
-import { ExitPaymentsSheet } from "@/components/exits/exit_payments_sheet";
+import { ExitPaymentsSheet } from "@/components/exits/exit-payments-sheet";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import {
   type ExitDataType,

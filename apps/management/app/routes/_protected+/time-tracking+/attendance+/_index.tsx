@@ -36,6 +36,7 @@ import { attribute, months } from "@canny_ecosystem/utils/constant";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { AttendanceSearchFilter } from "@/components/attendance/attendance-search-filter";
 import { FilterList } from "@/components/attendance/filter-list";
+import { AttendanceActions } from "@/components/attendance/attendance-actions";
 
 const pageSize = LAZY_LOADING_LIMIT;
 
@@ -84,7 +85,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined
+        (value) => value !== null && value !== undefined,
       );
 
     const attendancePromise = await getAttendanceByCompanyId({
@@ -140,7 +141,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 
   return await clientCaching(
     `${cacheKeyPrefix.attendance}${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 
@@ -163,7 +164,6 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function Attendance() {
-  const navigate = useNavigate();
   const {
     attendancePromise,
     projectPromise,
@@ -206,12 +206,12 @@ export default function Attendance() {
         acc[key][fullDate] = record.present
           ? "P"
           : record.holiday
-          ? record.holiday_type === "weekly"
-            ? "(WOF)"
-            : record.holiday_type === "paid"
-            ? "L"
-            : "A"
-          : "A";
+            ? record.holiday_type === "weekly"
+              ? "(WOF)"
+              : record.holiday_type === "paid"
+                ? "L"
+                : "A"
+            : "A";
       }
 
       return acc;
@@ -293,21 +293,7 @@ export default function Attendance() {
 
           <FilterList filters={filters ?? undefined} />
         </div>
-        <div className='space-x-2 hidden md:flex'>
-          {!selectedRows.length ? (
-            <ImportAttendanceMenu />
-          ) : (
-            <Button
-              variant='outline'
-              size='icon'
-              className='h-10 w-10'
-              disabled={!selectedRows.length}
-              onClick={() => navigate("/time-tracking/attendance/analytics")}
-            >
-              <Icon name='chart' className='h-[18px] w-[18px]' />
-            </Button>
-          )}
-        </div>
+        <AttendanceActions />
       </div>
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={attendancePromise}>
@@ -323,7 +309,7 @@ export default function Attendance() {
             }
 
             const attdData = transformAttendanceData(
-              data
+              data,
             ) as TransformedAttendanceDataType[];
 
             const hasNextPage = Boolean(meta?.count > pageSize);

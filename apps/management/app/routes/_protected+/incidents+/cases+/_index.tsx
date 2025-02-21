@@ -21,17 +21,15 @@ import { hasPermission, readRole } from "@canny_ecosystem/utils";
 import { safeRedirect } from "@/utils/server/http.server";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
-import { AccidentsTable } from "@/components/accidents/table/accidents-table";
 import {
-  type AccidentFilters,
-  getAccidentsByCompanyId,
-  getProjectNamesByCompanyId,
-  getSiteNamesByProjectName,
+  type CaseFilters,
+  getCasesByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
-import { columns } from "@/components/accidents/table/columns";
-import { FilterList } from "@/components/accidents/filter-list";
-import { AccidentSearchFilter } from "@/components/accidents/accident-search-filter";
-import { AccidentActions } from "@/components/accidents/accident-actions";
+import { columns } from "@/components/cases/table/columns";
+import { FilterList } from "@/components/cases/filter-list";
+import { CasesTable } from "@/components/cases/table/cases-table";
+import { CaseSearchFilter } from "@/components/cases/case-search-filter";
+import { CaseActions } from "@/components/cases/case-actions";
 
 const pageSize = LAZY_LOADING_LIMIT;
 
@@ -43,7 +41,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${readRole}:${attribute.accidents}`)) {
+  if (!hasPermission(user?.role!, `${readRole}:${attribute.cases}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   try {
@@ -56,21 +54,21 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     const query = searchParams.get("name") ?? undefined;
 
-    const filters: AccidentFilters = {
+    const filters: CaseFilters = {
+      case_type: searchParams.get("case_type") ?? undefined,
+      status: searchParams.get("status") ?? undefined,
+      reported_on: searchParams.get("reported_on") ?? undefined,
+      reported_by: searchParams.get("reported_by") ?? undefined,
       date_start: searchParams.get("date_start") ?? undefined,
       date_end: searchParams.get("date_end") ?? undefined,
-      status: (searchParams.get("status") ??
-        undefined) as AccidentFilters["status"],
-      location_type: (searchParams.get("location_type") ??
-        undefined) as AccidentFilters["location_type"],
-      category: (searchParams.get("category") ??
-        undefined) as AccidentFilters["category"],
-      name: query,
-      severity: (searchParams.get("severity") ??
-        undefined) as AccidentFilters["severity"],
-
-      project: searchParams.get("project") ?? undefined,
-      project_site: searchParams.get("project_site") ?? undefined,
+      incident_date_start: searchParams.get("incident_date_start") ?? undefined,
+      incident_date_end: searchParams.get("incident_date_end") ?? undefined,
+      location: searchParams.get("location") ?? undefined,
+      resolution_date_start:
+        searchParams.get("resolution_date_start") ?? undefined,
+      resolution_date_end: searchParams.get("resolution_date_end") ?? undefined,
+      location_type: searchParams.get("location_type") ?? undefined,
+      // name: query,
     };
 
     const hasFilters =
@@ -79,7 +77,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         (value) => value !== null && value !== undefined,
       );
 
-    const accidentsPromise = getAccidentsByCompanyId({
+    const casesPromise = getCasesByCompanyId({
       supabase,
       companyId,
       params: {
@@ -91,31 +89,18 @@ export async function loader({ request }: LoaderFunctionArgs) {
       },
     });
 
-    const projectPromise = getProjectNamesByCompanyId({ supabase, companyId });
-
-    let projectSitePromise = null;
-    if (filters.project)
-      projectSitePromise = getSiteNamesByProjectName({
-        supabase,
-        projectName: filters.project,
-      });
-
     return defer({
-      accidentsPromise: accidentsPromise as any,
-      projectPromise,
-      projectSitePromise,
+      casesPromise: casesPromise as any,
       query,
       filters,
       companyId,
       env,
     });
   } catch (error) {
-    console.error("Accidents Error in loader function:", error);
+    console.error("Cases Error in loader function:", error);
 
     return defer({
-      accidentsPromise: Promise.resolve({ data: [] }),
-      projectPromise: Promise.resolve({ data: [] }),
-      projectSitePromise: Promise.resolve({ data: [] }),
+      casesPromise: Promise.resolve({ data: [] }),
       query: "",
       filters: null,
       companyId: "",
@@ -128,23 +113,16 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
 
   return await clientCaching(
-    `${cacheKeyPrefix.accident}${url.searchParams.toString()}`,
+    `${cacheKeyPrefix.case}${url.searchParams.toString()}`,
     args,
   );
 }
 
 clientLoader.hydrate = true;
 
-export default function AccidentsIndex() {
-  const {
-    accidentsPromise,
-    query,
-    filters,
-    companyId,
-    env,
-    projectPromise,
-    projectSitePromise,
-  } = useLoaderData<typeof loader>();
+export default function CasesIndex() {
+  const { casesPromise, query, companyId, filters, env } =
+    useLoaderData<typeof loader>();
 
   const filterList = { ...filters, name: query };
   const noFilters = Object.values(filterList).every((value) => !value);
@@ -153,50 +131,25 @@ export default function AccidentsIndex() {
     <section className="p-4">
       <div className="w-full flex items-center justify-between pb-4">
         <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
-          <Suspense fallback={<div>Loading...</div>}>
-            <Await resolve={projectPromise}>
-              {(projectData) => (
-                <Await resolve={projectSitePromise}>
-                  {(projectSiteData) => (
-                    <AccidentSearchFilter
-                      disabled={!projectData?.data?.length && noFilters}
-                      projectArray={
-                        projectData?.data?.length
-                          ? projectData?.data?.map((project) => project!.name)
-                          : []
-                      }
-                      projectSiteArray={
-                        projectSiteData?.data?.length
-                          ? projectSiteData?.data?.map((site) => site!.name)
-                          : []
-                      }
-                    />
-                  )}
-                </Await>
-              )}
-            </Await>
-          </Suspense>
+          <CaseSearchFilter />
           <FilterList filters={filterList} />
         </div>
-        <AccidentActions />
+        <CaseActions />
       </div>
       <Suspense fallback={<div>Loading...</div>}>
-        <Await resolve={accidentsPromise}>
+        <Await resolve={casesPromise}>
           {({ data, meta, error }) => {
             if (error) {
-              clearCacheEntry(cacheKeyPrefix.accident);
+              clearCacheEntry(cacheKeyPrefix.case);
               return (
-                <ErrorBoundary
-                  error={error}
-                  message="Failed to load accidents"
-                />
+                <ErrorBoundary error={error} message="Failed to load cases" />
               );
             }
 
             const hasNextPage = Boolean(meta?.count > pageSize);
 
             return (
-              <AccidentsTable
+              <CasesTable
                 data={data ?? []}
                 columns={columns}
                 query={query}

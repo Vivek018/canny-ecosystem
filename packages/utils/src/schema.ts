@@ -35,7 +35,7 @@ export const zEmailSuffix = z
   .max(20)
   .regex(
     /^[A-Za-z0-9]+\.[A-Za-z]{2,}$/,
-    "Must contain a dot with at least one character before and two after."
+    "Must contain a dot with at least one character before and two after.",
   );
 
 export const SIZE_1KB = 1 * 1024; //1KB
@@ -52,21 +52,21 @@ export const zImage = z
   .any()
   .refine(
     (file) => (typeof file !== "string" ? file.size < SIZE_1MB : true),
-    "File size must be less than 1MB"
+    "File size must be less than 1MB",
   )
   .refine(
     (file) =>
       typeof file !== "string"
         ? ACCEPTED_IMAGE_TYPES.includes(file?.type)
         : true,
-    "Only .jpg, .jpeg, .png and .webp formats are supported."
+    "Only .jpg, .jpeg, .png and .webp formats are supported.",
   );
 
 export const zFile = z
   .any()
   .refine(
     (file) => (typeof file !== "string" ? file.size < SIZE_1MB * 5 : true),
-    "File size must be less than 5MB"
+    "File size must be less than 5MB",
   )
   .refine(
     (file) =>
@@ -81,7 +81,7 @@ export const zFile = z
           "application/docx",
         ].includes(file?.type)
         : true,
-    "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .docx formats are supported."
+    "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .docx formats are supported.",
   );
 
 export const booleanArray = ["true", "false"] as const;
@@ -417,7 +417,7 @@ export const PaymentFieldSchema = PaymentFieldSchemaObject.refine(
   {
     message: `When payment type is "variable", calculation type must be "fixed".`,
     path: ["calculation_type"],
-  }
+  },
 );
 
 export const deductionCycleArray = ["monthly"] as const;
@@ -637,7 +637,7 @@ export const PaymentTemplateComponentsSchema = z.object({
       component_type: z.enum(componentTypeArray).default("earning"),
       calculation_value: z.number().optional(),
       display_order: z.number().int().optional(),
-    })
+    }),
   ),
 });
 
@@ -724,7 +724,7 @@ export const ImportReimbursementHeaderSchema = z
         "is_deductible",
         "status",
       ],
-    }
+    },
   );
 
 export const ImportSingleReimbursementDataSchema = z.object({
@@ -732,14 +732,14 @@ export const ImportSingleReimbursementDataSchema = z.object({
   employee_code: zNumberString,
   amount: z.preprocess(
     (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
-    z.number()
+    z.number(),
   ),
   email: zEmail.optional(),
   is_deductible: z
     .preprocess(
       (value) =>
         typeof value === "string" ? value.toLowerCase() === "true" : value,
-      z.boolean().default(false)
+      z.boolean().default(false),
     )
     .default(false),
   status: z.enum(reimbursementStatusArray),
@@ -804,7 +804,7 @@ export const ImportEmployeeDetailsHeaderSchema =
         "primary_mobile_number",
         "secondary_mobile_number",
       ],
-    }
+    },
   );
 
 export const ImportSingleEmployeeDetailsDataSchema = z.object({
@@ -820,7 +820,7 @@ export const ImportSingleEmployeeDetailsDataSchema = z.object({
     .preprocess(
       (value) =>
         typeof value === "string" ? value.toLowerCase() === "true" : value,
-      z.boolean().default(false)
+      z.boolean().default(false),
     )
     .default(false),
   primary_mobile_number: z.preprocess((value) => {
@@ -885,7 +885,7 @@ export const ImportEmployeeStatutoryHeaderSchema =
         "passport_number",
         "passport_expiry",
       ],
-    }
+    },
   );
 
 export const ImportSingleEmployeeStatutoryDataSchema = z.object({
@@ -893,14 +893,14 @@ export const ImportSingleEmployeeStatutoryDataSchema = z.object({
   aadhaar_number: zNumber.min(12).max(12),
   pan_number: z.preprocess(
     (value) => (value === "" ? undefined : value),
-    z.string().max(10).optional()
+    z.string().max(10).optional(),
   ),
   uan_number: zNumberString.max(12),
   pf_number: zNumberString.max(20),
   esic_number: zNumberString.max(20),
   driving_license_number: z.preprocess(
     (value) => (value === "" ? undefined : value),
-    z.string().max(20).optional()
+    z.string().max(20).optional(),
   ),
   driving_license_expiry: z.string().optional(),
   passport_number: zNumberString.max(20).optional(),
@@ -949,7 +949,7 @@ export const ImportEmployeeBankDetailsHeaderSchema =
         "bank_name",
         "branch_name",
       ],
-    }
+    },
   );
 
 export const ImportSingleEmployeeBankDetailsDataSchema = z.object({
@@ -1016,7 +1016,7 @@ export const ImportEmployeeAddressHeaderSchema =
         "longitude",
         "is_primary",
       ],
-    }
+    },
   );
 
 export const ImportSingleEmployeeAddressDataSchema = z.object({
@@ -1025,7 +1025,7 @@ export const ImportSingleEmployeeAddressDataSchema = z.object({
   is_primary: z.preprocess(
     (value) =>
       typeof value === "string" ? value.toLowerCase() === "true" : value,
-    z.boolean().default(false)
+    z.boolean().default(false),
   ),
   address_line_1: z
     .string()
@@ -1040,11 +1040,11 @@ export const ImportSingleEmployeeAddressDataSchema = z.object({
   pincode: zNumber.min(6).max(6),
   latitude: z.preprocess(
     (value) => (value === "" ? undefined : value),
-    z.string().max(180).min(-180).optional()
+    z.string().max(180).min(-180).optional(),
   ),
   longitude: z.preprocess(
     (value) => (value === "" ? undefined : value),
-    z.string().max(180).min(-180).optional()
+    z.string().max(180).min(-180).optional(),
   ),
 });
 
@@ -1101,7 +1101,7 @@ export const ImportEmployeeGuardiansHeaderSchema =
         "is_emergency_contact",
         "address_same_as_employee",
       ],
-    }
+    },
   );
 
 export const ImportSingleEmployeeGuardiansDataSchema = z.object({
@@ -1114,20 +1114,20 @@ export const ImportSingleEmployeeGuardiansDataSchema = z.object({
   is_emergency_contact: z.preprocess(
     (value) =>
       typeof value === "string" ? value.toLowerCase() === "true" : value,
-    z.boolean().default(false)
+    z.boolean().default(false),
   ),
   address_same_as_employee: z.preprocess(
     (value) =>
       typeof value === "string" ? value.toLowerCase() === "true" : value,
-    z.boolean().default(false)
+    z.boolean().default(false),
   ),
   mobile_number: z.preprocess(
     (value) => (value === "" ? undefined : value),
-    z.string().max(10).min(10).optional()
+    z.string().max(10).min(10).optional(),
   ),
   alternate_mobile_number: z.preprocess(
     (value) => (value === "" ? undefined : value),
-    z.string().max(10).min(10).optional()
+    z.string().max(10).min(10).optional(),
   ),
   email: zEmail.optional(),
 });
@@ -1230,7 +1230,7 @@ export const ImportExitHeaderSchema = ImportExitHeaderSchemaObject.refine(
       "note",
       "total",
     ],
-  }
+  },
 );
 
 export const ImportSingleExitDataSchema = z.object({
@@ -1239,36 +1239,36 @@ export const ImportSingleExitDataSchema = z.object({
   reason: z.string(),
   final_settlement_date: z.preprocess(
     (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
-    z.number()
+    z.number(),
   ),
   organization_payable_days: z.preprocess(
     (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
-    z.number()
+    z.number(),
   ),
   employee_payable_days: z.preprocess(
     (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
-    z.number()
+    z.number(),
   ),
   bonus: z.preprocess(
     (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
-    z.number()
+    z.number(),
   ),
   leave_encashment: z.preprocess(
     (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
-    z.number()
+    z.number(),
   ),
   gratuity: z.preprocess(
     (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
-    z.number()
+    z.number(),
   ),
   deduction: z.preprocess(
     (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
-    z.number()
+    z.number(),
   ),
   note: z.string().optional(),
   net_pay: z.preprocess(
     (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
-    z.number()
+    z.number(),
   ),
 });
 
@@ -1300,27 +1300,27 @@ export const ImportSingleEmployeeAttendanceDataSchema = z.object({
   date: z.string(),
   no_of_hours: z.preprocess(
     (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
-    z.number().min(0).max(24).default(8)
+    z.number().min(0).max(24).default(8),
   ),
   present: z.preprocess(
     (value) =>
       typeof value === "string" ? value.toLowerCase() === "true" : value,
-    z.boolean().default(false)
+    z.boolean().default(false),
   ),
   holiday: z.preprocess(
     (value) =>
       typeof value === "string" ? value.toLowerCase() === "true" : value,
-    z.boolean().default(false)
+    z.boolean().default(false),
   ),
   working_shift: z.preprocess(
     (value) =>
       value === "" || value === undefined || value === null ? undefined : value,
-    z.enum(attendanceWorkShiftArray).optional()
+    z.enum(attendanceWorkShiftArray).optional(),
   ),
   holiday_type: z.preprocess(
     (value) =>
       value === "" || value === undefined || value === null ? undefined : value,
-    z.enum(attendanceHolidayTypeArray).optional()
+    z.enum(attendanceHolidayTypeArray).optional(),
   ),
 });
 
@@ -1404,3 +1404,111 @@ export const AccidentSchema = z.object({
   description: zTextArea.max(500),
   medical_diagnosis: z.string().optional(),
 });
+
+export const caseTypeArray = [
+  "dispute",
+  "wage_issue",
+  "injury",
+  "misconduct",
+  "legal",
+  "contract_violation",
+] as const;
+export const caseStatusArray = ["open", "resolved", "closed"] as const;
+export const reportedByArray = [
+  "employee",
+  "site",
+  "project",
+  "company",
+  "canny",
+  "other",
+] as const;
+export const reportedOnArray = [
+  "employee",
+  "site",
+  "project",
+  "company",
+  "canny",
+  "other",
+] as const;
+export const caseLocationTypeArray = ["employee", "site", "other"] as const;
+
+export const CaseSchema = z.object({
+  id: z.string().optional(),
+  company_id: z.string(),
+  date: z.string().default(new Date().toISOString().split("T")[0]),
+  title: z.string().min(1, "Title is required"),
+  case_type: z.enum(caseTypeArray).default("dispute"),
+  status: z.enum(caseStatusArray).default("open"),
+  incident_date: z.string().optional(),
+  reported_by: z.enum(reportedByArray).default("employee"),
+  reported_on: z.enum(reportedOnArray).default("employee"),
+  location: z.string().optional(),
+  location_type: z.enum(caseLocationTypeArray).default("employee"),
+  amount_given: z.number().optional(),
+  amount_received: z.number().optional(),
+  court_case_reference: z.string().optional(),
+  description: zTextArea.optional(),
+  document: z.string().url().optional(),
+  resolution_date: z.string().optional(),
+  reported_on_employee_id: z.string().optional(),
+  reported_on_project_id: z.string().optional(),
+  reported_on_site_id: z.string().optional(),
+  reported_on_company_id: z.string().optional(),
+  reported_by_company_id: z.string().optional(),
+  reported_by_employee_id: z.string().optional(),
+  reported_by_project_id: z.string().optional(),
+  reported_by_site_id: z.string().optional(),
+});
+// .superRefine((data, ctx) => {
+//   // Helper function to validate reported_by fields
+//   const validateReportedBy = (type: string, field: string | undefined) => {
+//     if (!field) {
+//       ctx.addIssue({
+//         code: z.ZodIssueCode.custom,
+//         message: `When 'reported_by' is '${type}', '${type}_employee', '${type}_site', '${type}_project', or '${type}_company' must be provided.`,
+//         path: [`reported_by_${type}`],
+//       });
+//     }
+//   };
+
+//   // Helper function to validate reported_on fields
+//   const validateReportedOn = (type: string, field: string | undefined) => {
+//     if (!field) {
+//       ctx.addIssue({
+//         code: z.ZodIssueCode.custom,
+//         message: `When 'reported_on' is '${type}', '${type}_employee', '${type}_site', '${type}_project', or '${type}_company' must be provided.`,
+//         path: [`reported_on_${type}`],
+//       });
+//     }
+//   };
+
+//   // Validate reported_by fields
+//   switch (data.reported_by) {
+//     case "employee":
+//       validateReportedBy("employee", data.reported_by_employee);
+//       break;
+//     case "site":
+//       validateReportedBy("site", data.reported_by_site);
+//       break;
+//     case "project":
+//       validateReportedBy("project", data.reported_by_project);
+//       break;
+//     default:
+//       break; // No additional validation for "canny" or "other"
+//   }
+
+//   // Validate reported_on fields
+//   switch (data.reported_on) {
+//     case "employee":
+//       validateReportedOn("employee", data.reported_on_employee);
+//       break;
+//     case "site":
+//       validateReportedOn("site", data.reported_on_site);
+//       break;
+//     case "project":
+//       validateReportedOn("project", data.reported_on_project);
+//       break;
+//     default:
+//       break; // No additional validation for "canny" or "other"
+//   }
+// });
