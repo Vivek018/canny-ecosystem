@@ -129,13 +129,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     const companyOptions = companies?.map((company: any) => ({
-      label: company?.name,
-      value: company?.id ?? "",
+      label: company?.name as string,
+      value: (company?.id as string) ?? "",
     }));
 
     const projectOptions = projects?.map((project: any) => ({
-      label: project?.name,
-      value: project?.id ?? "",
+      label: project?.name as string,
+      value: (project?.id as string) ?? "",
     }));
 
     const reportedByEmployeeOptions = reportedByEmployee?.map(
@@ -164,20 +164,23 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     return defer({
       casePromise,
-      options: {
-        companyOptions,
-        projectOptions,
-        reportedByEmployeeOptions,
-        reportedOnEmployeeOptions,
-        reportedBySiteOptions,
-        reportedOnSiteOptions,
-      },
+      companyOptions: companyOptions || null,
+      projectOptions: projectOptions || null,
+      reportedByEmployeeOptions: reportedByEmployeeOptions || null,
+      reportedOnEmployeeOptions: reportedOnEmployeeOptions || null,
+      reportedBySiteOptions: reportedBySiteOptions || null,
+      reportedOnSiteOptions: reportedOnSiteOptions || null,
       error: null,
     });
   } catch (error) {
     return json({
       casePromise: null,
-      options: null,
+      companyOptions: null,
+      projectOptions: null,
+      reportedByEmployeeOptions: null,
+      reportedOnEmployeeOptions: null,
+      reportedBySiteOptions: null,
+      reportedOnSiteOptions: null,
       error,
     });
   }
@@ -199,38 +202,44 @@ export async function action({
     );
   }
 
-  const {
-    reported_by_company_id,
-    reported_on_company_id,
-    reported_by_project_id,
-    reported_on_project_id,
-    reported_by_site_id,
-    reported_on_site_id,
-    reported_by_employee_id,
-    reported_on_employee_id,
-    ...data
-  } = submission.value as any;
+  const data = submission.value;
 
-  data.id = submission.value.id ?? caseId;
+  data.id = submission?.value?.id ?? caseId;
 
   if (data.reported_by === "company") {
-    data.reported_by_company_id = reported_by_company_id;
+    data.reported_by_project_id = undefined;
+    data.reported_by_site_id = undefined;
+    data.reported_by_employee_id = undefined;
   } else if (data.reported_by === "project") {
-    data.reported_by_project_id = reported_by_project_id;
+    data.reported_by_company_id = undefined;
+    data.reported_by_site_id = undefined;
+    data.reported_by_employee_id = undefined;
   } else if (data.reported_by === "site") {
-    data.reported_by_site_id = reported_by_site_id;
+    data.reported_by_project_id = undefined;
+    data.reported_by_company_id = undefined;
+    data.reported_by_employee_id = undefined;
   } else if (data.reported_by === "employee") {
-    data.reported_by_employee_id = reported_by_employee_id;
+    data.reported_by_project_id = undefined;
+    data.reported_by_company_id = undefined;
+    data.reported_by_site_id = undefined;
   }
 
   if (data.reported_on === "company") {
-    data.reported_on_company_id = reported_on_company_id;
+    data.reported_on_project_id = undefined;
+    data.reported_on_site_id = undefined;
+    data.reported_on_employee_id = undefined;
   } else if (data.reported_on === "project") {
-    data.reported_on_project_id = reported_on_project_id;
+    data.reported_on_company_id = undefined;
+    data.reported_on_site_id = undefined;
+    data.reported_on_employee_id = undefined;
   } else if (data.reported_on === "site") {
-    data.reported_on_site_id = reported_on_site_id;
+    data.reported_on_project_id = undefined;
+    data.reported_on_company_id = undefined;
+    data.reported_on_employee_id = undefined;
   } else if (data.reported_on === "employee") {
-    data.reported_on_employee_id = reported_on_employee_id;
+    data.reported_on_project_id = undefined;
+    data.reported_on_company_id = undefined;
+    data.reported_on_site_id = undefined;
   }
 
   const { status, error } = await updateCaseById({
@@ -254,29 +263,39 @@ export async function action({
 }
 
 export default function UpdateCases() {
-  const { casePromise, options, error } = useLoaderData<typeof loader>();
+  const {
+    casePromise,
+    companyOptions,
+    projectOptions,
+    reportedByEmployeeOptions,
+    reportedOnEmployeeOptions,
+    reportedBySiteOptions,
+    reportedOnSiteOptions,
+    error,
+  } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!actionData) return;
-    if (actionData?.status === "success") {
-      clearExactCacheEntry(cacheKeyPrefix.case);
-      toast({
-        title: "Success",
-        description: actionData?.message || "Case updated successfully",
-        variant: "success",
-      });
-    } else {
-      toast({
-        title: "Error",
-        description: actionData?.error?.message || "Failed to update case",
-        variant: "destructive",
-      });
+    if (actionData) {
+      if (actionData?.status === "success") {
+        clearExactCacheEntry(cacheKeyPrefix.case);
+        toast({
+          title: "Success",
+          description: actionData?.message || "Case updated successfully",
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: actionData?.error?.message || "Failed to update case",
+          variant: "destructive",
+        });
+      }
+      navigate("/incidents/cases");
     }
-    navigate("/incidents/cases");
   }, [actionData]);
 
   if (error)
@@ -296,7 +315,17 @@ export default function UpdateCases() {
             );
           }
           return (
-            <RegisterCase updateValues={resolvedData?.data} options={options} />
+            <RegisterCase
+              updateValues={resolvedData?.data}
+              options={{
+                companyOptions: companyOptions || null,
+                projectOptions: projectOptions || null,
+                reportedByEmployeeOptions: reportedByEmployeeOptions || null,
+                reportedOnEmployeeOptions: reportedOnEmployeeOptions || null,
+                reportedBySiteOptions: reportedBySiteOptions || null,
+                reportedOnSiteOptions: reportedOnSiteOptions || null,
+              }}
+            />
           );
         }}
       </Await>

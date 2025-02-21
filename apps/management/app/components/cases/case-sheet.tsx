@@ -10,33 +10,70 @@ import {
 import { TableCell, TableRow } from "@canny_ecosystem/ui/table";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { formatDate } from "@canny_ecosystem/utils";
+import { Link } from "@remix-run/react";
 import { flexRender } from "@tanstack/react-table";
 
-export function CaseSheet({
-  row,
-  rowData,
-}: { row: any; rowData: CasesDataType }) {
-  const reportedByName: string =
-    rowData?.reported_by === "project"
-      ? rowData?.reported_on_project.name
-      : rowData?.reported_by === "employee"
-        ? `${rowData?.reported_by_employee.first_name} ${rowData?.reported_by_employee.last_name}`
-        : rowData?.reported_by === "site"
-          ? rowData?.reported_on_site.name
-          : rowData?.reported_by === "company"
-            ? rowData?.reported_on_company.name
-            : "Canny Inc.";
+function getName(type: string, data: any, keyPrefix: string): string {
+  const entity = data?.[`${keyPrefix}_${type}`];
+  switch (type) {
+    case "project":
+      return entity?.name || "Canny Inc.";
+    case "employee":
+      return entity ? `${entity.first_name} ${entity.last_name}` : "Canny Inc.";
+    case "site":
+      return entity?.name || "Canny Inc.";
+    case "company":
+      return entity?.name || "Canny Inc.";
+    default:
+      return "Canny Inc.";
+  }
+}
 
-  const reportedOnName: string =
-    rowData?.reported_on === "project"
-      ? rowData?.reported_on_project.name
-      : rowData?.reported_on === "employee"
-        ? `${rowData?.reported_on_employee.first_name} ${rowData?.reported_on_employee.last_name}`
-        : rowData?.reported_on === "site"
-          ? rowData?.reported_on_site.name
-          : rowData?.reported_on === "company"
-            ? rowData?.reported_on_company.name
-            : "Canny Inc.";
+function getRedirectUrl(type: string, data: any, keyPrefix: string): string {
+  const entity = data?.[`${keyPrefix}_${type}`];
+  switch (type) {
+    case "employee":
+      return `/employees/${entity?.id}`;
+    case "site":
+      return `/sites/${entity?.id}`;
+    case "project":
+      return `/projects/${entity?.id}`;
+    default:
+      return "?";
+  }
+}
+
+function KeyValueRow({
+  label,
+  value,
+  className = "",
+}: {
+  label: string;
+  value: string | React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={`mx-5 flex justify-between ${className}`}>
+      <h3 className="my-3 text-muted-foreground font-semibold">{label}</h3>
+      <p className="my-3 font-bold">{value}</p>
+    </div>
+  );
+}
+
+export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
+  const reportedByName = getName(rowData?.reported_by, rowData, "reported_by");
+  const reportedOnName = getName(rowData?.reported_on, rowData, "reported_on");
+  const redirectedToReportedOn = getRedirectUrl(
+    rowData?.reported_on,
+    rowData,
+    "reported_on",
+  );
+  const redirectedToReportedBy = getRedirectUrl(
+    rowData?.reported_by,
+    rowData,
+    "reported_by",
+  );
+
   return (
     <Sheet>
       <TableRow
@@ -75,6 +112,7 @@ export function CaseSheet({
           );
         })}
       </TableRow>
+
       <SheetContent className="w-[600px]">
         <SheetHeader className="m-5">
           <SheetTitle className="text-primary text-3xl">
@@ -84,111 +122,76 @@ export function CaseSheet({
             {rowData?.description ?? ""}
           </SheetDescription>
         </SheetHeader>
-        <hr />
-        <div className="mx-5 flex justify-between">
-          <h3 className="my-3 text-muted-foreground font-semibold">
-            Court Case Reference
-          </h3>
-          <p className="my-3 font-bold capitalize">
-            {rowData?.court_case_reference ?? "--"}
-          </p>
-        </div>
-        <hr />
-        <div className=" mx-5 flex justify-between">
-          <h3 className="my-3 text-muted-foreground font-semibold">Status</h3>
-          <p
-            className={cn(
-              "my-3 font-bold capitalize",
-              rowData?.status === "open" && "text-emerald-400",
-              rowData?.status === "closed" && "text-red-400",
-              rowData?.status === "resolved" && "text-green-400",
-            )}
-          >
-            {rowData?.status ?? "--"}
-          </p>
-        </div>
-
-        <div className=" mx-5 flex justify-between">
-          <h3 className="my-3 text-muted-foreground font-semibold">
-            Case Type
-          </h3>
-          <p className="my-3 font-bold capitalize">
-            {rowData?.case_type ?? "--"}
-          </p>
-        </div>
-
-        <div className=" mx-5 flex justify-between">
-          <h3 className="my-3 text-muted-foreground font-semibold">Location</h3>
-          <p className="my-3 font-bold capitalize">
-            {rowData?.location === "other"
-              ? rowData?.location
-              : rowData?.location_type ?? "--" ?? "--"}
-          </p>
-        </div>
-
-        <div className="mx-5 flex justify-between">
-          <h3 className="my-3 text-muted-foreground font-semibold">Date</h3>
-          <p className="my-3 font-bold">{formatDate(rowData?.date) ?? "--"}</p>
-        </div>
-
-        <div className=" mx-5 flex justify-between">
-          <h3 className="my-3 text-muted-foreground font-semibold">
-            Resolution Date
-          </h3>
-          <p className="my-3 font-bold">
-            {rowData?.resolution_date
-              ? formatDate(rowData?.resolution_date ?? "")
-              : "--"}
-          </p>
-        </div>
-
-        {
-          <div className=" mx-5 flex justify-between">
-            <h3 className="my-3 text-muted-foreground font-semibold">
-              Incident Date
-            </h3>
-            <p className="my-3 font-bold">
-              {rowData?.incident_date
-                ? formatDate(rowData?.incident_date)
-                : "--"}
-            </p>
-          </div>
-        }
 
         <hr />
-        <div className=" mx-5 flex justify-between">
-          <h3 className="my-3 text-muted-foreground font-semibold">
-            Reported On
-          </h3>
-          <p className="my-3 font-bold capitalize">
-            {rowData?.reported_on ?? "--"}
-          </p>
-        </div>
+        <KeyValueRow
+          label="Court Case Reference"
+          value={rowData?.court_case_reference ?? "--"}
+        />
+        <hr />
+        <KeyValueRow
+          label="Status"
+          value={
+            <span
+              className={cn(
+                "capitalize",
+                rowData?.status === "open" && "text-emerald-400",
+                rowData?.status === "closed" && "text-red-400",
+                rowData?.status === "resolved" && "text-green-400",
+              )}
+            >
+              {rowData?.status ?? "--"}
+            </span>
+          }
+        />
+        <KeyValueRow label="Case Type" value={rowData?.case_type ?? "--"} />
+        <KeyValueRow label="Location" value={rowData?.location ?? "--"} />
+        <KeyValueRow label="Date" value={formatDate(rowData?.date) ?? "--"} />
+        <KeyValueRow
+          label="Resolution Date"
+          value={
+            rowData?.resolution_date
+              ? formatDate(rowData?.resolution_date)
+              : "--"
+          }
+        />
+        <KeyValueRow
+          label="Incident Date"
+          value={
+            rowData?.incident_date ? formatDate(rowData?.incident_date) : "--"
+          }
+        />
+
+        <hr />
+        <KeyValueRow label="Reported On" value={rowData?.reported_on ?? "--"} />
         {rowData?.reported_on !== "other" && (
-          <div className=" mx-5 flex justify-between">
-            <h3 className="my-3 text-muted-foreground font-semibold capitalize">
-              R/O {rowData?.reported_on ?? ""} Name
-            </h3>
-            <p className="my-3 font-bold capitalize">{reportedOnName}</p>
-          </div>
+          <KeyValueRow
+            label={`R/O ${rowData?.reported_on ?? ""} Name`}
+            value={
+              <Link
+                to={redirectedToReportedOn}
+                className="font-bold capitalize text-primary/80 group-hover:text-primary"
+              >
+                {reportedOnName}
+              </Link>
+            }
+          />
         )}
-        <hr />
-        <div className=" mx-5 flex justify-between">
-          <h3 className="my-3 text-muted-foreground font-semibold">
-            Reported By
-          </h3>
-          <p className="my-3 font-bold capitalize">
-            {rowData?.reported_by ?? "--"}
-          </p>
-        </div>
 
+        <hr />
+        <KeyValueRow label="Reported By" value={rowData?.reported_by ?? "--"} />
         {rowData?.reported_by !== "other" && (
-          <div className=" mx-5 flex justify-between">
-            <h3 className="my-3 text-muted-foreground font-semibold capitalize">
-              R/B {rowData?.reported_by ?? ""} Name
-            </h3>
-            <p className="my-3 font-bold capitalize">{reportedByName}</p>
-          </div>
+          <KeyValueRow
+            label={`R/B ${rowData?.reported_by ?? ""} Name`}
+            value={
+              <Link
+                to={redirectedToReportedBy}
+                className="font-bold capitalize text-primary/80 group-hover:text-primary"
+              >
+                {reportedByName}
+              </Link>
+            }
+          />
         )}
 
         <hr className="my-3" />

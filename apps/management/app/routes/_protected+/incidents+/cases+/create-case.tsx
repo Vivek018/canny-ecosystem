@@ -69,7 +69,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
 
   try {
-    // Authentication and permission verification
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
     const { user } = await getUserCookieOrFetchUser(request, supabase);
 
@@ -77,7 +76,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       return safeRedirect(DEFAULT_ROUTE, { headers });
     }
 
-    // Parse URL parameters
     const url = new URL(request.url);
     const urlSearchParams = new URLSearchParams(url.searchParams);
 
@@ -222,36 +220,42 @@ export async function action({
       );
     }
 
-    const {
-      reported_by_company_id,
-      reported_on_company_id,
-      reported_by_project_id,
-      reported_on_project_id,
-      reported_by_site_id,
-      reported_on_site_id,
-      reported_by_employee_id,
-      reported_on_employee_id,
-      ...data
-    } = submission.value as any;
+    const data = submission.value;
 
     if (data.reported_by === "company") {
-      data.reported_by_company_id = reported_by_company_id;
+      data.reported_by_project_id = undefined;
+      data.reported_by_site_id = undefined;
+      data.reported_by_employee_id = undefined;
     } else if (data.reported_by === "project") {
-      data.reported_by_project_id = reported_by_project_id;
+      data.reported_by_company_id = undefined;
+      data.reported_by_site_id = undefined;
+      data.reported_by_employee_id = undefined;
     } else if (data.reported_by === "site") {
-      data.reported_by_site_id = reported_by_site_id;
+      data.reported_by_project_id = undefined;
+      data.reported_by_company_id = undefined;
+      data.reported_by_employee_id = undefined;
     } else if (data.reported_by === "employee") {
-      data.reported_by_employee_id = reported_by_employee_id;
+      data.reported_by_project_id = undefined;
+      data.reported_by_company_id = undefined;
+      data.reported_by_site_id = undefined;
     }
 
     if (data.reported_on === "company") {
-      data.reported_on_company_id = reported_on_company_id;
+      data.reported_on_project_id = undefined;
+      data.reported_on_site_id = undefined;
+      data.reported_on_employee_id = undefined;
     } else if (data.reported_on === "project") {
-      data.reported_on_project_id = reported_on_project_id;
+      data.reported_on_company_id = undefined;
+      data.reported_on_site_id = undefined;
+      data.reported_on_employee_id = undefined;
     } else if (data.reported_on === "site") {
-      data.reported_on_site_id = reported_on_site_id;
+      data.reported_on_project_id = undefined;
+      data.reported_on_company_id = undefined;
+      data.reported_on_employee_id = undefined;
     } else if (data.reported_on === "employee") {
-      data.reported_on_employee_id = reported_on_employee_id;
+      data.reported_on_project_id = undefined;
+      data.reported_on_company_id = undefined;
+      data.reported_on_site_id = undefined;
     }
 
     const { status, error } = await createCase({
@@ -290,7 +294,10 @@ export async function action({
   }
 }
 
-export type CaseOptionsType = { label: string; value?: string }[] | null;
+export type CaseOptionsType = {
+  label: string;
+  value?: string | number | undefined;
+}[];
 
 export default function CreateCase({
   updateValues,
@@ -304,7 +311,7 @@ export default function CreateCase({
     reportedBySiteOptions?: CaseOptionsType | null;
     reportedOnEmployeeOptions?: CaseOptionsType | null;
     reportedOnSiteOptions?: CaseOptionsType | null;
-  } | null;
+  };
 }) {
   const {
     companyOptions,
@@ -313,7 +320,6 @@ export default function CreateCase({
     reportedOnEmployeeOptions,
     reportedOnSiteOptions,
     reportedBySiteOptions,
-    error,
   } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { companyId } = useCompanyId();
@@ -389,8 +395,6 @@ export default function CreateCase({
     }
     setSearchParams(searchParams);
   }, [fields.reported_by.value, fields.reported_on.value]);
-
-  console.log(form.value, companyOptions);
 
   return (
     <section className="flex flex-col w-full mx-auto lg:px-10 xl:px-14 2xl:px-40 py-4">

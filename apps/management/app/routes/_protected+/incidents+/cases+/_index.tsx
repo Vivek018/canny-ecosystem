@@ -124,7 +124,6 @@ clientLoader.hydrate = true;
 export default function CasesIndex() {
   const { casesPromise, query, companyId, filters, env } =
     useLoaderData<typeof loader>();
-  const { role } = useUser();
 
   const filterList = { ...filters, name: query };
   const noFilters = Object.values(filterList).every((value) => !value);

@@ -41,14 +41,20 @@ export type CasesDataType = Pick<
   | "court_case_reference"
   | "document"
 > & {
-  reported_by_project: Pick<ProjectDatabaseRow, "name">;
-  reported_by_site: Pick<ProjectDatabaseRow, "name">;
-  reported_by_company: Pick<ProjectDatabaseRow, "name">;
-  reported_by_employee: Pick<EmployeeDatabaseRow, "first_name" | "last_name">;
-  reported_on_project: Pick<ProjectDatabaseRow, "name">;
-  reported_on_site: Pick<ProjectDatabaseRow, "name">;
-  reported_on_company: Pick<ProjectDatabaseRow, "name">;
-  reported_on_employee: Pick<EmployeeDatabaseRow, "first_name" | "last_name">;
+  reported_by_project: Pick<ProjectDatabaseRow, "id" | "name">;
+  reported_by_site: Pick<ProjectDatabaseRow, "id" | "name">;
+  reported_by_company: Pick<ProjectDatabaseRow, "id" | "name">;
+  reported_by_employee: Pick<
+    EmployeeDatabaseRow,
+    "id" | "first_name" | "last_name"
+  >;
+  reported_on_project: Pick<ProjectDatabaseRow, "id" | "name">;
+  reported_on_site: Pick<ProjectDatabaseRow, "id" | "name">;
+  reported_on_company: Pick<ProjectDatabaseRow, "id" | "name">;
+  reported_on_employee: Pick<
+    EmployeeDatabaseRow,
+    "id" | "first_name" | "last_name"
+  >;
 };
 export async function getCasesByCompanyId({
   supabase,
@@ -104,9 +110,9 @@ export async function getCasesByCompanyId({
     .from("cases")
     .select(
       `${columns.join(",")}, reported_by_project:projects!cases_reported_by_project_fkey(name), reported_on_project:projects!cases_reported_on_project_fkey(name),
-       reported_by_employee:employees!cases_reported_by_employee_fkey(first_name,last_name), reported_on_employee:employees!cases_reported_on_employee_fkey(first_name,last_name),
-       reported_by_site:project_sites!cases_reported_by_site_fkey(name), reported_on_site:project_sites!cases_reported_on_site_fkey(name),
-       reported_by_company:companies!cases_reported_by_company_fkey(name), reported_on_company:companies!cases_reported_on_company_fkey(name)`,
+       reported_by_employee:employees!cases_reported_by_employee_fkey(id, first_name,last_name), reported_on_employee:employees!cases_reported_on_employee_fkey(id, first_name,last_name),
+       reported_by_site:project_sites!cases_reported_by_site_fkey(id, name), reported_on_site:project_sites!cases_reported_on_site_fkey(id, name),
+       reported_by_company:companies!cases_reported_by_company_fkey(id, name), reported_on_company:companies!cases_reported_on_company_fkey(id, name)`,
       {
         count: "exact",
       },
