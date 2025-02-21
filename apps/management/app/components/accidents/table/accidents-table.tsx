@@ -26,13 +26,14 @@ import { useSearchParams } from "@remix-run/react";
 import { Button } from "@canny_ecosystem/ui/button";
 import { useAccidentStore } from "@/store/accidents";
 import { ExportBar } from "../export-bar";
+import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   hasNextPage: boolean;
   pageSize: number;
-  env: any;
+  env: SupabaseEnv;
   companyId?: string;
   employeeId?: string;
   noFilters?: boolean;

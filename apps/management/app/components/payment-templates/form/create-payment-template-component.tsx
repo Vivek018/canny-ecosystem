@@ -77,7 +77,7 @@ export function CreatePaymentTemplateComponentDetails({
     if (isUpdate) {
       const getFieldValues = (idKey: string, value: string) =>
         paymentTemplateComponentsField
-          .filter((field) => (field as any).getFieldset()[idKey]?.value)
+          .filter((field) => (field.getFieldset() as Record<string, any>)[idKey]?.value)
           .map(() => value);
 
       const paymentFieldDefaultValue = paymentTemplateComponentsField
