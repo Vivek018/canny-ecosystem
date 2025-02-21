@@ -44,19 +44,13 @@ export type CasesDataType = Pick<
   reported_by_project: Pick<ProjectDatabaseRow, "id" | "name">;
   reported_by_site: Pick<ProjectDatabaseRow, "id" | "name">;
   reported_by_company: Pick<ProjectDatabaseRow, "id" | "name">;
-  reported_by_employee: Pick<
-    EmployeeDatabaseRow,
-    "id" | "first_name" | "last_name"
-  >;
+  reported_by_employee: Pick<EmployeeDatabaseRow, "id" | "employee_code">;
   reported_on_project: Pick<ProjectDatabaseRow, "id" | "name"> & {
     projects: Pick<ProjectDatabaseRow, "id">;
   };
   reported_on_site: Pick<ProjectDatabaseRow, "id" | "name">;
   reported_on_company: Pick<ProjectDatabaseRow, "id" | "name">;
-  reported_on_employee: Pick<
-    EmployeeDatabaseRow,
-    "id" | "first_name" | "last_name"
-  >;
+  reported_on_employee: Pick<EmployeeDatabaseRow, "id" | "employee_code">;
 };
 export async function getCasesByCompanyId({
   supabase,
@@ -112,7 +106,7 @@ export async function getCasesByCompanyId({
     .from("cases")
     .select(
       `${columns.join(",")}, reported_by_project:projects!cases_reported_by_project_fkey(id, name), reported_on_project:projects!cases_reported_on_project_fkey(id, name),
-       reported_by_employee:employees!cases_reported_by_employee_fkey(id, first_name,last_name), reported_on_employee:employees!cases_reported_on_employee_fkey(id, first_name,last_name),
+       reported_by_employee:employees!cases_reported_by_employee_fkey(id, employee_code), reported_on_employee:employees!cases_reported_on_employee_fkey(id, employee_code),
        reported_by_site:project_sites!cases_reported_by_site_fkey(id, name, projects!project_sites_project_id_fkey(id)), reported_on_site:project_sites!cases_reported_on_site_fkey(id, name),
        reported_by_company:companies!cases_reported_by_company_fkey(id, name), reported_on_company:companies!cases_reported_on_company_fkey(id, name)`,
       {

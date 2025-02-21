@@ -18,7 +18,7 @@ function getName(type: string, data: any, keyPrefix: string): string {
     case "project":
       return entity?.name || "Canny Inc.";
     case "employee":
-      return entity ? `${entity.first_name} ${entity.last_name}` : "Canny Inc.";
+      return entity ? entity?.employee_code : "Canny Inc.";
     case "site":
       return entity?.name || "Canny Inc.";
     case "company":
@@ -53,7 +53,7 @@ function KeyValueRow({
 }) {
   return (
     <div className={`mx-5 flex justify-between ${className}`}>
-      <h3 className="my-3 text-muted-foreground font-semibold">{label}</h3>
+      <h3 className="my-3 text-muted-foreground font-semibold capitalize">{label}</h3>
       <p className="my-3 font-bold">{value}</p>
     </div>
   );
@@ -143,8 +143,16 @@ export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
             </span>
           }
         />
-        <KeyValueRow label="Case Type" value={rowData?.case_type ?? "--"} />
-        <KeyValueRow label="Location" value={rowData?.location ?? "--"} />
+        <KeyValueRow
+          label="Case Type"
+          value={rowData?.case_type ?? "--"}
+          className="capitalize"
+        />
+        <KeyValueRow
+          label="Location"
+          value={rowData?.location ?? "--"}
+          className="capitalize"
+        />
         <KeyValueRow label="Date" value={formatDate(rowData?.date) ?? "--"} />
         <KeyValueRow
           label="Resolution Date"
@@ -169,7 +177,7 @@ export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
         />
         {rowData?.reported_on !== "other" && (
           <KeyValueRow
-            label={`R/O ${rowData?.reported_on ?? ""} Name`}
+            label={`R/O ${rowData?.reported_on ?? ""}`}
             value={
               <Link
                 to={redirectedToReportedOn}
@@ -195,7 +203,7 @@ export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
         />
         {rowData?.reported_by !== "other" && (
           <KeyValueRow
-            label={`R/B ${rowData?.reported_by ?? ""} Name`}
+            label={`R/B ${rowData?.reported_by ?? ""}`}
             value={
               <Link
                 to={redirectedToReportedBy}

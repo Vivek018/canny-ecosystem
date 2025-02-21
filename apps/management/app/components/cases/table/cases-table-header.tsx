@@ -23,6 +23,8 @@ export const CasesColumnIdArray = [
   "amount_given",
   "amount_received",
   "court_case_reference",
+  "reported_on",
+  "reported_by",
 ];
 
 export function CasesTableHeader({ table, className, loading }: Props) {

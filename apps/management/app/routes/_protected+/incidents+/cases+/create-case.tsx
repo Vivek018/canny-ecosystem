@@ -510,7 +510,6 @@ export default function CreateCase({
                     ...getInputProps(fields.reported_by_company_id, {
                       type: "text",
                     }),
-                    // disabled: fields.reported_by.value !== "company",
                   }}
                   placeholder={"Select Company"}
                   labelProps={{
@@ -528,10 +527,6 @@ export default function CreateCase({
                     ...getInputProps(fields.reported_by_project_id, {
                       type: "text",
                     }),
-                    // disabled:
-                    //   fields.reported_by.value === "company" ||
-                    //   fields.reported_by.value === "other" ||
-                    //   fields.reported_by.value === "canny",
                     defaultValue:
                       searchParams.get("reported_on_project") ??
                       String(fields.reported_by_project_id.initialValue),
@@ -562,9 +557,6 @@ export default function CreateCase({
                     ...getInputProps(fields.reported_by_site_id, {
                       type: "text",
                     }),
-                    // disabled:
-                    //   fields.reported_by.value !== "site" &&
-                    //   fields.reported_by.value !== "employee",
                     defaultValue:
                       searchParams.get("reported_by_site") ??
                       String(fields.reported_by_site_id.initialValue),
@@ -595,7 +587,6 @@ export default function CreateCase({
                     ...getInputProps(fields.reported_by_employee_id, {
                       type: "text",
                     }),
-                    // disabled: fields.reported_by.value !== "employee",
                   }}
                   placeholder={"Select Employee"}
                   labelProps={{
@@ -631,7 +622,6 @@ export default function CreateCase({
                     ...getInputProps(fields.reported_on_company_id, {
                       type: "text",
                     }),
-                    // disabled: fields.reported_on.value !== "company",
                   }}
                   placeholder={"Select Company"}
                   labelProps={{
@@ -649,10 +639,6 @@ export default function CreateCase({
                     ...getInputProps(fields.reported_on_project_id, {
                       type: "text",
                     }),
-                    // disabled:
-                    //   fields.reported_on.value === "company" ||
-                    //   fields.reported_on.value === "other" ||
-                    //   fields.reported_on.value === "canny",
                     defaultValue:
                       searchParams.get("reported_on_project") ??
                       String(fields.reported_on_project_id.initialValue),
@@ -683,9 +669,6 @@ export default function CreateCase({
                     ...getInputProps(fields.reported_on_site_id, {
                       type: "text",
                     }),
-                    // disabled:
-                    //   fields.reported_on.value !== "site" &&
-                    //   fields.reported_on.value !== "employee",
                     defaultValue:
                       searchParams.get("reported_on_site") ??
                       String(fields.reported_on_site_id.initialValue),
@@ -717,7 +700,6 @@ export default function CreateCase({
                     ...getInputProps(fields.reported_on_employee_id, {
                       type: "text",
                     }),
-                    // disabled: fields.reported_on.value !== "employee",
                   }}
                   placeholder={"Select Employee"}
                   labelProps={{

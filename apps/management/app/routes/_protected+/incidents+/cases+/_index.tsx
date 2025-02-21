@@ -17,7 +17,7 @@ import {
   useLoaderData,
 } from "@remix-run/react";
 import { Suspense } from "react";
-import { createRole, hasPermission, readRole } from "@canny_ecosystem/utils";
+import { hasPermission, readRole } from "@canny_ecosystem/utils";
 import { safeRedirect } from "@/utils/server/http.server";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
@@ -28,7 +28,6 @@ import {
 import { columns } from "@/components/cases/table/columns";
 import { FilterList } from "@/components/cases/filter-list";
 import { CasesTable } from "@/components/cases/table/cases-table";
-import { useUser } from "@/utils/user";
 import { CaseSearchFilter } from "@/components/cases/case-search-filter";
 import { CaseActions } from "@/components/cases/case-actions";
 

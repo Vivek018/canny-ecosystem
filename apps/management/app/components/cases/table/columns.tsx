@@ -120,11 +120,32 @@ export const columns: ColumnDef<CasesDatabaseRow>[] = [
     header: "Court Case Reference",
     cell: ({ row }) => {
       return (
-        <p className="truncate ">{row.original.court_case_reference ?? "--"}</p>
+        <p className="truncate">{row.original.court_case_reference ?? "--"}</p>
       );
     },
   },
-
+  {
+    accessorKey: "reported_on",
+    header: "Reported On",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate capitalize">
+          {row.original.reported_on ?? "--"}
+        </p>
+      );
+    },
+  },
+  {
+    accessorKey: "reported_by",
+    header: "Reported By",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate capitalize">
+          {row.original.reported_by ?? "--"}
+        </p>
+      );
+    },
+  },
   {
     id: "actions",
     enableSorting: false,
