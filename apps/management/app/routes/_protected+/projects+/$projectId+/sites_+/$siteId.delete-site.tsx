@@ -58,7 +58,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -66,7 +66,7 @@ export async function action({
 export default function DeleteSite() {
   const actionData = useActionData<typeof action>();
 
-  const { projectId } = useParams();
+  const { projectId, siteId } = useParams();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -74,6 +74,7 @@ export default function DeleteSite() {
     if (actionData) {
       if (actionData?.status === "success") {
         clearExactCacheEntry(`${cacheKeyPrefix.sites}${projectId}`);
+        clearExactCacheEntry(`${cacheKeyPrefix.site_overview}${siteId}`);
         toast({
           title: "Success",
           description: actionData?.message,

@@ -20,7 +20,7 @@ import {
 } from "@remix-run/react";
 import { json } from "@remix-run/react";
 import { Suspense } from "react";
-import { SitesWrapper } from "@/components/projects/sites/sites-wrapper";
+import { SitesWrapper } from "@/components/sites/sites-wrapper";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { hasPermission, createRole } from "@canny_ecosystem/utils";
 import { useUser } from "@/utils/user";

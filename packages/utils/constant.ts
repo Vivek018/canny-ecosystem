@@ -13,12 +13,7 @@ export const modalSearchParamNames = {
   import_reimbursement: "import-reimbursement",
   import_exits: "import-exits",
   view_template_components: "view-template-components",
-  view_link_template: "view-link-template",
-  create_link_template: "create-link-template",
-  update_link_template: "update-link-template",
   view_relationship_terms: "view-relationship-terms",
-  view_pay_sequence: "view-pay-sequence",
-  edit_pay_sequence: "edit-pay-sequence",
 };
 
 export const statesAndUTs = [

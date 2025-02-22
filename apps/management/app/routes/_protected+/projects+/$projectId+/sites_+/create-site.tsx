@@ -47,7 +47,7 @@ import { getLocationsForSelectByCompanyId } from "@canny_ecosystem/supabase/quer
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { LocationsListWrapper } from "@/components/projects/sites/locations-list-wrapper";
+import { LocationsListWrapper } from "@/components/sites/locations-list-wrapper";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";

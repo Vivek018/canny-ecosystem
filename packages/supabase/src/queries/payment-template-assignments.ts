@@ -87,6 +87,42 @@ export async function getPaymentTemplateAssignmentByEmployeeId({
   return { data, error };
 }
 
+export async function getPaymentTemplateAssignmentById({
+  supabase,
+  id,
+}: { supabase: TypedSupabaseClient; id: string }) {
+  const columns = [
+    "id",
+    "template_id",
+    "assignment_type",
+    "employee_id",
+    "site_id",
+    "eligibility_option",
+    "position",
+    "skill_level",
+    "effective_from",
+    "effective_to",
+    "is_active",
+    "name",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("payment_template_assignments")
+    .select(columns.join(","))
+    .eq("id", id)
+    .single<
+      InferredType<
+        PaymentTemplateAssignmentsDatabaseRow,
+        (typeof columns)[number]
+      >
+    >();
+
+  if (error)
+    console.error("getPaymentTemplateAssignmentById Error", error);
+
+  return { data, error };
+}
+
 export type PaymentTemplateAssignmentsType = Pick<
   PaymentTemplateAssignmentsDatabaseRow,
   | "id"

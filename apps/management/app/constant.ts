@@ -260,6 +260,8 @@ export const cacheKeyPrefix = {
   projects: "projects",
   project_overview: "project-overview",
   sites: "sites",
+  site_overview: "site-overview",
+  site_link_templates: "site-link-templates",
   general: "general",
   locations: "locations",
   relationships: "relationships",

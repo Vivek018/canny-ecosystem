@@ -22,8 +22,8 @@ export const DeleteSitePaymentTemplateAssignment = ({
   siteId,
   templateAssignmentId,
 }: {
-  projectId: string;
-  siteId:string;
+  projectId: string | undefined;
+  siteId: string | undefined;
   templateAssignmentId: string;
 }) => {
   const [isLoading, setLoading] = useState(false);
@@ -38,7 +38,7 @@ export const DeleteSitePaymentTemplateAssignment = ({
   };
 
   const handleDeleteSitePaymentTemplateAssignment = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
@@ -48,8 +48,8 @@ export const DeleteSitePaymentTemplateAssignment = ({
         },
         {
           method: "POST",
-          action: `/templates/${projectId}/${siteId}/${templateAssignmentId}/delete-site-link`,
-        },
+          action: `/projects/${projectId}/${siteId}/link-templates/${templateAssignmentId}/delete-site-template`,
+        }
       );
     } else {
       e.preventDefault();
@@ -62,7 +62,7 @@ export const DeleteSitePaymentTemplateAssignment = ({
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
-          "text-[13px] h-9",
+          "text-[13px] h-9"
         )}
       >
         Delete link assignment
@@ -71,24 +71,26 @@ export const DeleteSitePaymentTemplateAssignment = ({
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your site's payment template assignment and remove it's data from our servers.
+            This action cannot be undone. This will permanently delete your
+            site's payment template assignment and remove it's data from our
+            servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <div className="p-4">
-          <p className="text-sm text-foreground/80">
+        <div className='p-4'>
+          <p className='text-sm text-foreground/80'>
             Please type{" "}
-            <i className="text-foreground font-medium">{DELETE_TEXT}</i> to
+            <i className='text-foreground font-medium'>{DELETE_TEXT}</i> to
             confirm.
           </p>
           <Input
-            type="text"
+            type='text'
             value={inputValue}
             onChange={(e) => {
               setInputValue(e.target.value);
               setInputError([]);
             }}
-            className="border border-input rounded-md h-10 w-full"
-            placeholder="Confirm your action"
+            className='border border-input rounded-md h-10 w-full'
+            placeholder='Confirm your action'
             onPaste={(e) => {
               e.preventDefault();
               return false;

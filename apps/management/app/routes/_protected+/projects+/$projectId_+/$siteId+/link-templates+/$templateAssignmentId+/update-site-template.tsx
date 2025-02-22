@@ -1,42 +1,39 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import CreateSite from "./create-site";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
-  Await,
-  defer,
   json,
   useActionData,
   useLoaderData,
   useNavigate,
+  useParams,
 } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
 import {
   hasPermission,
   isGoodStatus,
-  SiteSchema,
+  SiteLinkSchema,
   updateRole,
 } from "@canny_ecosystem/utils";
 import {
-  getLocationsForSelectByCompanyId,
-  getSiteById,
+  getPaymentTemplateAssignmentById,
+  getPaymentTemplatesByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
-import { updateSite } from "@canny_ecosystem/supabase/mutations";
+import { updatePaymentTemplateAssignment } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { Suspense, useEffect } from "react";
+import { useEffect } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
-import type { SiteDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
+import CreateSiteTemplate from "../create-site-template";
 
-export const UPDATE_SITE = "update-site";
+export const UPDATE_SITE_TEMPLATE = "update-site-template";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const siteId = params.siteId;
-  const projectId = params.projectId;
+  const { templateAssignmentId, siteId } = params;
   const { supabase, headers } = getSupabaseWithHeaders({ request });
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
@@ -45,49 +42,46 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
+  let paymentTemplatesOptions = null;
+  let templatesData = null;
   try {
-    if (!projectId) throw new Error("No projectId provided");
+    if (!siteId) throw new Error("No siteId provided");
 
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-    const locationOptionsPromise = getLocationsForSelectByCompanyId({
+    const { data } = await getPaymentTemplatesByCompanyId({
       supabase,
       companyId,
-    }).then(({ data, error }) => {
-      if (data) {
-        const locationOptions = data.map((location) => ({
-          label: location.name,
-          value: location.id,
-        }));
-        return { data: locationOptions, error };
-      }
-      return { data, error };
     });
-
-    let sitePromise = null;
-
-    if (siteId) {
-      sitePromise = getSiteById({
-        supabase,
-        id: siteId,
-      });
+    if (data) {
+      paymentTemplatesOptions = data.map((template) => ({
+        label: template.name,
+        value: template.id ?? "",
+      }));
     }
 
-    return defer({
+    if (templateAssignmentId) {
+      const { data, error } = await getPaymentTemplateAssignmentById({
+        supabase,
+        id: templateAssignmentId,
+      });
+
+      if (data && !error) {
+        templatesData = data;
+      }
+    }
+
+    return json({
       error: null,
-      sitePromise,
-      locationOptionsPromise,
-      projectId,
-      siteId,
+      templatesData,
+      paymentTemplatesOptions,
     });
   } catch (error) {
     return json(
       {
         error,
-        sitePromise: null,
-        locationOptionsPromise: null,
-        projectId,
-        siteId,
+        templatesData,
+        paymentTemplatesOptions,
       },
       { status: 500 }
     );
@@ -98,14 +92,14 @@ export async function action({
   request,
   params,
 }: ActionFunctionArgs): Promise<Response> {
-  const projectId = params.projectId;
+  const { templateAssignmentId, siteId, projectId } = params;
 
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
     const formData = await request.formData();
 
     const submission = parseWithZod(formData, {
-      schema: SiteSchema,
+      schema: SiteLinkSchema,
     });
 
     if (submission.status !== "success") {
@@ -115,30 +109,33 @@ export async function action({
       );
     }
 
-    const { status, error } = await updateSite({
+    const { status, error } = await updatePaymentTemplateAssignment({
       supabase,
       data: submission.value,
+      id: templateAssignmentId as string,
     });
 
     if (isGoodStatus(status)) {
       return json({
         status: "success",
-        message: "Site updated",
+        message: "Site template updated successfully",
         error: null,
         projectId,
+        siteId,
       });
     }
     return json({
       status: "error",
-      message: "Site update failed",
+      message: "Failed to update site template",
       error,
       projectId,
+      siteId,
     });
   } catch (error) {
     return json(
       {
         status: "error",
-        message: "Failed to update site",
+        message: "An unexpected error occurred",
         error,
       },
       { status: 500 }
@@ -146,76 +143,47 @@ export async function action({
   }
 }
 
-export default function UpdateSite() {
-  const { sitePromise, error, projectId, siteId } =
+export default function UpdateSiteTemplate() {
+  const { error, templatesData, paymentTemplatesOptions } =
     useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
+  const { projectId, siteId } = useParams();
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearExactCacheEntry(`${cacheKeyPrefix.sites}${projectId}`);
-        clearExactCacheEntry(`${cacheKeyPrefix.site_overview}${siteId}`);
+        clearExactCacheEntry(`${cacheKeyPrefix.site_link_templates}${siteId}`);
         toast({
           title: "Success",
-          description: actionData?.message || "Site updated",
+          description: actionData?.message || "Site template updated",
           variant: "success",
         });
       } else {
         toast({
           title: "Error",
-          description: actionData?.error.message || "Site update failed",
+          description:
+            actionData?.error?.message || "Site template update failed",
           variant: "destructive",
         });
       }
-      navigate(`/projects/${projectId}/sites`, {
+      navigate(`/projects/${projectId}/${siteId}/link-templates`, {
         replace: true,
       });
     }
   }, [actionData]);
 
   if (error)
-    return <ErrorBoundary error={error} message='Failed to load site' />;
+    return (
+      <ErrorBoundary error={error} message='Failed to load site template' />
+    );
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Await resolve={sitePromise}>
-        {(resolvedData) => {
-          if (!resolvedData)
-            return <ErrorBoundary message='Failed to load site' />;
-          return (
-            <UpdateSiteWrapper
-              data={resolvedData.data}
-              error={resolvedData.error}
-            />
-          );
-        }}
-      </Await>
-    </Suspense>
+    <CreateSiteTemplate
+      updateValues={templatesData}
+      updatePaymentTemplatesOptions={paymentTemplatesOptions}
+    />
   );
-}
-
-export function UpdateSiteWrapper({
-  data,
-  error,
-}: {
-  data: SiteDatabaseUpdate | null;
-  error: Error | null | { message: string };
-}) {
-  const { toast } = useToast();
-
-  useEffect(() => {
-    if (error) {
-      toast({
-        title: "Error",
-        description: error?.message || "Failed to load site",
-        variant: "destructive",
-      });
-    }
-  }, [error]);
-
-  return <CreateSite updateValues={data} />;
 }

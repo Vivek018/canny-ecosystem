@@ -72,14 +72,14 @@ export const zFile = z
     (file) =>
       typeof file !== "string"
         ? [
-            ...ACCEPTED_IMAGE_TYPES,
-            "image/pdf",
-            "image/doc",
-            "image/docx",
-            "application/pdf",
-            "application/doc",
-            "application/docx",
-          ].includes(file?.type)
+          ...ACCEPTED_IMAGE_TYPES,
+          "image/pdf",
+          "image/doc",
+          "image/docx",
+          "application/pdf",
+          "application/doc",
+          "application/docx",
+        ].includes(file?.type)
         : true,
     "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .docx formats are supported.",
   );
@@ -656,6 +656,7 @@ export const EmployeeLinkSchema = z.object({
   effective_from: z.string().default(new Date().toISOString().split("T")[0]),
   effective_to: z.string().optional(),
   template_id: z.string(),
+  assignment_type: z.enum(paymentAssignmentTypesArray).default("employee")
 });
 
 export const PaymentTemplateFormSiteDialogSchema = z.object({
@@ -673,6 +674,7 @@ export const DeleteEmployeeLinkSchema = z.object({
 });
 
 export const SiteLinkSchema = z.object({
+  id: z.string().optional(),
   name: z.string(),
   effective_from: z.string().default(new Date().toISOString().split("T")[0]),
   effective_to: z.string().optional(),
@@ -680,6 +682,8 @@ export const SiteLinkSchema = z.object({
   eligibility_option: z.enum(eligibilityOptionsArray).optional(),
   position: z.string().optional(),
   skill_level: z.string().optional(),
+  assignment_type: z.enum(paymentAssignmentTypesArray).default("site"),
+  site_id: z.string(),
 });
 
 export const reimbursementStatusArray = ["approved", "pending"] as const;
@@ -1463,56 +1467,3 @@ export const CaseSchema = z.object({
   reported_by_project_id: z.string().optional(),
   reported_by_site_id: z.string().optional(),
 });
-// .superRefine((data, ctx) => {
-//   // Helper function to validate reported_by fields
-//   const validateReportedBy = (type: string, field: string | undefined) => {
-//     if (!field) {
-//       ctx.addIssue({
-//         code: z.ZodIssueCode.custom,
-//         message: `When 'reported_by' is '${type}', '${type}_employee', '${type}_site', '${type}_project', or '${type}_company' must be provided.`,
-//         path: [`reported_by_${type}`],
-//       });
-//     }
-//   };
-
-//   // Helper function to validate reported_on fields
-//   const validateReportedOn = (type: string, field: string | undefined) => {
-//     if (!field) {
-//       ctx.addIssue({
-//         code: z.ZodIssueCode.custom,
-//         message: `When 'reported_on' is '${type}', '${type}_employee', '${type}_site', '${type}_project', or '${type}_company' must be provided.`,
-//         path: [`reported_on_${type}`],
-//       });
-//     }
-//   };
-
-//   // Validate reported_by fields
-//   switch (data.reported_by) {
-//     case "employee":
-//       validateReportedBy("employee", data.reported_by_employee);
-//       break;
-//     case "site":
-//       validateReportedBy("site", data.reported_by_site);
-//       break;
-//     case "project":
-//       validateReportedBy("project", data.reported_by_project);
-//       break;
-//     default:
-//       break; // No additional validation for "canny" or "other"
-//   }
-
-//   // Validate reported_on fields
-//   switch (data.reported_on) {
-//     case "employee":
-//       validateReportedOn("employee", data.reported_on_employee);
-//       break;
-//     case "site":
-//       validateReportedOn("site", data.reported_on_site);
-//       break;
-//     case "project":
-//       validateReportedOn("project", data.reported_on_project);
-//       break;
-//     default:
-//       break; // No additional validation for "canny" or "other"
-//   }
-// });
