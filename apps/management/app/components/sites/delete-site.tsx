@@ -64,7 +64,7 @@ export const DeleteSite = ({
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "text-[13px] h-9 hidden",
           hasPermission(role, `${deleteRole}:${attribute.projectSite}`) &&
-            "flex",
+          "flex",
         )}
       >
         Delete Site

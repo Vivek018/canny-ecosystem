@@ -12,6 +12,8 @@ export async function action({
   params,
 }: ActionFunctionArgs): Promise<Response> {
   const projectId = params.projectId;
+  const siteId = params.siteId;
+
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
     const formData = await request.formData();
@@ -37,7 +39,7 @@ export async function action({
         status: "success",
         message: "Pay sequence updated",
         error: null,
-        projectId,
+        returnTo: `/projects/${projectId}/${siteId}/overview`,
       });
     }
     return json(
@@ -45,7 +47,7 @@ export async function action({
         status: "error",
         message: "Pay sequence update failed",
         error,
-        projectId,
+        returnTo: `/projects/${projectId}/${siteId}/overview`,
       },
       { status: 500 },
     );
@@ -54,7 +56,7 @@ export async function action({
       status: "error",
       message: "An unexpected error occurred",
       error,
-      projectId,
+      returnTo: `/projects/${projectId}/${siteId}/overview`,
     });
   }
 }
@@ -79,8 +81,7 @@ export default function EditPaySequence() {
           variant: "destructive",
         });
       }
-      navigate(`/projects/${actionData?.projectId}/sites`);
+      navigate(actionData.returnTo);
     }
   }, []);
-  return null;
 }

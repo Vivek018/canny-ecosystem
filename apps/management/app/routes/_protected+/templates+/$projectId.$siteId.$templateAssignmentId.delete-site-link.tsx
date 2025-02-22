@@ -1,9 +1,8 @@
-import { isGoodStatus, SiteLinkSchema } from "@canny_ecosystem/utils";
-import { parseWithZod } from "@conform-to/zod";
+import { isGoodStatus } from "@canny_ecosystem/utils";
 import { json, useActionData, useNavigate } from "@remix-run/react";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { updatePaymentTemplateAssignment } from "@canny_ecosystem/supabase/mutations";
+import { deletePaymentTemplateAssignment } from "@canny_ecosystem/supabase/mutations";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { useEffect } from "react";
 import { clearCacheEntry } from "@/utils/cache";
@@ -18,46 +17,31 @@ type ActionDataType = {
 
 export async function action({ request, params }: ActionFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
-  const { templateAssignmentId, siteId: site_id, projectId } = params;
-  const formData = await request.formData();
+  const { projectId, siteId, templateAssignmentId } = params;
 
-  const submission = parseWithZod(formData, { schema: SiteLinkSchema });
-
-  if (submission.status !== "success") {
-    return json(
-      { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
-    );
-  }
-
-  const { status, error } = await updatePaymentTemplateAssignment({
+  const { status, error } = await deletePaymentTemplateAssignment({
     supabase,
-    data: {
-      ...submission.value,
-      assignment_type: "site",
-      site_id,
-    } as any,
     id: templateAssignmentId as string,
   });
 
   if (isGoodStatus(status)) {
     return json({
       status: "success",
-      message: "Site link updated successfully",
-      returnTo: `/projects/${projectId}/${site_id}/link-templates`,
+      message: "Site link deleted successfully",
+      returnTo: `/projects/${projectId}/${siteId}/link-templates`,
       error: null
     });
   }
 
   return json({
     status: "error",
-    message: "Failed to update site link",
-    returnTo: `/projects/${projectId}/${site_id}/link-templates`,
+    message: "Failed to delete site link",
+    returnTo: `/projects/${projectId}/${siteId}/link-templates`,
     error
   });
 }
 
-export default function UpdateSiteLink() {
+export default function DeleteSiteLink() {
   const actionData = useActionData<ActionDataType>();
   const { toast } = useToast();
   const navigate = useNavigate();

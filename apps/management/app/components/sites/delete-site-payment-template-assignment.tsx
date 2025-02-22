@@ -19,9 +19,11 @@ import { useState } from "react";
 
 export const DeleteSitePaymentTemplateAssignment = ({
   projectId,
+  siteId,
   templateAssignmentId,
 }: {
   projectId: string;
+  siteId:string;
   templateAssignmentId: string;
 }) => {
   const [isLoading, setLoading] = useState(false);
@@ -42,11 +44,11 @@ export const DeleteSitePaymentTemplateAssignment = ({
       setLoading(true);
       submit(
         {
-          returnTo: `/projects/${projectId}/sites`,
+          returnTo: `/projects/${projectId}/${siteId}/link-templates`,
         },
         {
           method: "POST",
-          action: `/templates/${projectId}/${templateAssignmentId}/delete-site-link`,
+          action: `/templates/${projectId}/${siteId}/${templateAssignmentId}/delete-site-link`,
         },
       );
     } else {
@@ -59,19 +61,17 @@ export const DeleteSitePaymentTemplateAssignment = ({
     <AlertDialog>
       <AlertDialogTrigger
         className={cn(
-          buttonVariants({ variant: "destructive-outline", size: "full" }),
+          buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "text-[13px] h-9",
         )}
       >
-        Delete link template
+        Delete link assignment
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your
-            employee's payment template assignment and remove it's data from our
-            servers.
+            This action cannot be undone. This will permanently delete your site's payment template assignment and remove it's data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="p-4">

@@ -6,17 +6,19 @@ import { useEffect, useState } from "react";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Button, buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import { useSearchParams } from "@remix-run/react";
+import { useNavigate } from "@remix-run/react";
 import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
 
 export function SiteLinkedTemplates({
-  linkedTemplates,
+  linkedTemplates, projectId, siteId
 }: {
-  linkedTemplates: PaymentTemplateAssignmentsType[] | null;
+  linkedTemplates: Omit<PaymentTemplateAssignmentsType[], "created_at" | "updated_at"> | null | undefined;
+  projectId: string;
+  siteId: string;
 }) {
   const [searchString, setSearchString] = useState("");
   const [tableData, setTableData] = useState(linkedTemplates);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const filteredData = linkedTemplates?.filter((item) =>
@@ -29,21 +31,16 @@ export function SiteLinkedTemplates({
 
   const linkNewTemplate = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    searchParams.set("action", modalSearchParamNames.create_link_template);
-    setSearchParams(searchParams);
+    navigate(`/projects/${projectId}/${siteId}/link-templates/manipulate-template?action=${modalSearchParamNames.create_link_template}`);
   };
 
   return (
-    <section className="py-4 px-4">
+    <section>
       <div className="w-full flex items-center justify-between pb-4">
-        <div className="w-full flex items-center gap-4">
+        <div className="w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4">
           <div className="relative w-full">
             <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-              <Icon
-                name="magnifying-glass"
-                size="sm"
-                className="text-gray-400"
-              />
+              <Icon name="magnifying-glass" size="sm" className="text-gray-400" />
             </div>
             <Input
               placeholder="Search linked templates"
@@ -59,11 +56,12 @@ export function SiteLinkedTemplates({
             )}
             onClick={(e) => linkNewTemplate(e)}
           >
-            Link new template
+            <span>Link</span>
+            <span className="hidden md:flex justify-end">New Template</span>
           </Button>
         </div>
       </div>
-      <DataTable data={tableData ?? []} columns={columns()} />
+      <DataTable data={tableData ?? []} columns={columns(projectId, siteId)} />
     </section>
   );
 }
