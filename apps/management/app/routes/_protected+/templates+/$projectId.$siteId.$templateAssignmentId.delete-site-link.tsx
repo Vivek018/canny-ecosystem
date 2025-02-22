@@ -17,18 +17,18 @@ type ActionDataType = {
 
 export async function action({ request, params }: ActionFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
-  const { projectId, templateAssignmentId } = params;
+  const { projectId, siteId, templateAssignmentId } = params;
 
   const { status, error } = await deletePaymentTemplateAssignment({
     supabase,
     id: templateAssignmentId as string,
   });
-  
+
   if (isGoodStatus(status)) {
     return json({
       status: "success",
       message: "Site link deleted successfully",
-      returnTo: `/projects/${projectId}/sites`,
+      returnTo: `/projects/${projectId}/${siteId}/link-templates`,
       error: null
     });
   }
@@ -36,7 +36,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   return json({
     status: "error",
     message: "Failed to delete site link",
-    returnTo: `/projects/${projectId}/sites`,
+    returnTo: `/projects/${projectId}/${siteId}/link-templates`,
     error
   });
 }

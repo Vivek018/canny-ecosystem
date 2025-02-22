@@ -39,7 +39,7 @@ export const SiteOptionsDropdown = ({
               "flex",
             )}
           >
-            Edit Assignment
+            Edit Link Assignment
           </DropdownMenuItem>
           <DropdownMenuSeparator
             className={cn(
@@ -48,7 +48,11 @@ export const SiteOptionsDropdown = ({
               "flex",
             )}
           />
-          <DeleteSitePaymentTemplateAssignment projectId={projectId} templateAssignmentId={currentPaymentTemplateAssignmentId} />
+          <DeleteSitePaymentTemplateAssignment
+            projectId={projectId}
+            siteId={siteId}
+            templateAssignmentId={currentPaymentTemplateAssignmentId}
+          />
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>

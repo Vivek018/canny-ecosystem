@@ -131,24 +131,24 @@ export default function ManipulateTemplate() {
 
   return (
     <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-3xl capitalize">
-            {action === modalSearchParamNames.create_link_template ? "Create " : "Update "}
-            Link Template
-          </CardTitle>
-          <CardDescription>
-            {action === modalSearchParamNames.create_link_template ? "Create " : "Update "}
-            Link Template for the site
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <FormProvider context={form.context}>
-            <Form
-              method="POST"
-              {...getFormProps(form)}
-              action={action === modalSearchParamNames.update_link_template ? updateURL : createURL}
-            >
+      <FormProvider context={form.context}>
+        <Form
+          method="POST"
+          {...getFormProps(form)}
+          action={action === modalSearchParamNames.update_link_template ? updateURL : createURL}
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-3xl capitalize">
+                {action === modalSearchParamNames.create_link_template ? "Create " : "Update "}
+                Link Template
+              </CardTitle>
+              <CardDescription>
+                {action === modalSearchParamNames.create_link_template ? "Create " : "Update "}
+                Link Template for the site
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
               <Field
                 className="w-full"
                 inputProps={{
@@ -243,11 +243,11 @@ export default function ManipulateTemplate() {
                   errors={fields.skill_level.errors}
                 />
               </div>
-              <FormButtons form={form} setResetKey={setResetKey} isSingle={true} />
-            </Form>
-          </FormProvider>
-        </CardContent>
-      </Card>
+            </CardContent>
+            <FormButtons form={form} setResetKey={setResetKey} isSingle={true} />
+          </Card>
+        </Form>
+      </FormProvider>
     </section>
   );
 }

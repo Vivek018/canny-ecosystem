@@ -21,7 +21,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
   const formData = await request.formData();
 
   const { projectId, siteId } = params;
-
   const submission = parseWithZod(formData, { schema: SiteLinkSchema });
 
   if (submission.status !== "success") {
@@ -44,7 +43,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     return json({
       status: "success",
       message: "Site link created successfully",
-      returnTo: `/projects/${projectId}/sites`,
+      returnTo: `/projects/${projectId}/${siteId}/link-templates`,
       error: null
     });
   }
@@ -52,7 +51,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   return json({
     status: "error",
     message: "Failed to create site link",
-    returnTo: `/projects/${projectId}/sites`,
+    returnTo: `/projects/${projectId}/${siteId}/link-templates`,
     error
   });
 }

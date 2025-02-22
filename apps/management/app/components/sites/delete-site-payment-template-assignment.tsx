@@ -19,9 +19,11 @@ import { useState } from "react";
 
 export const DeleteSitePaymentTemplateAssignment = ({
   projectId,
+  siteId,
   templateAssignmentId,
 }: {
   projectId: string;
+  siteId:string;
   templateAssignmentId: string;
 }) => {
   const [isLoading, setLoading] = useState(false);
@@ -42,11 +44,11 @@ export const DeleteSitePaymentTemplateAssignment = ({
       setLoading(true);
       submit(
         {
-          returnTo: `/projects/${projectId}/sites`,
+          returnTo: `/projects/${projectId}/${siteId}/link-templates`,
         },
         {
           method: "POST",
-          action: `/templates/${projectId}/${templateAssignmentId}/delete-site-link`,
+          action: `/templates/${projectId}/${siteId}/${templateAssignmentId}/delete-site-link`,
         },
       );
     } else {

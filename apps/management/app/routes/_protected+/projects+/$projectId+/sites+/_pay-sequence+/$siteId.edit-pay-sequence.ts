@@ -4,7 +4,7 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { isGoodStatus, SitePaySequenceSchema } from "@canny_ecosystem/utils";
 import { parseWithZod } from "@conform-to/zod";
 import { json, type ActionFunctionArgs } from "@remix-run/node";
-import { useActionData, useNavigate, useParams } from "@remix-run/react";
+import { useActionData, useNavigate } from "@remix-run/react";
 import { useEffect } from "react";
 
 export async function action({
@@ -12,6 +12,8 @@ export async function action({
   params,
 }: ActionFunctionArgs): Promise<Response> {
   const projectId = params.projectId;
+  const siteId = params.siteId;
+
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
     const formData = await request.formData();
@@ -37,7 +39,7 @@ export async function action({
         status: "success",
         message: "Pay sequence updated",
         error: null,
-        projectId,
+        returnTo: `/projects/${projectId}/${siteId}/overview`,
       });
     }
     return json(
@@ -45,7 +47,7 @@ export async function action({
         status: "error",
         message: "Pay sequence update failed",
         error,
-        projectId,
+        returnTo: `/projects/${projectId}/${siteId}/overview`,
       },
       { status: 500 },
     );
@@ -54,7 +56,7 @@ export async function action({
       status: "error",
       message: "An unexpected error occurred",
       error,
-      projectId,
+      returnTo: `/projects/${projectId}/${siteId}/overview`,
     });
   }
 }
@@ -63,7 +65,6 @@ export default function EditPaySequence() {
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { projectId, siteId } = useParams();
 
   useEffect(() => {
     if (actionData) {
@@ -80,7 +81,7 @@ export default function EditPaySequence() {
           variant: "destructive",
         });
       }
-      navigate(`/projects/${projectId}/${siteId}/overview`);
+      navigate(actionData.returnTo);
     }
   }, []);
 }

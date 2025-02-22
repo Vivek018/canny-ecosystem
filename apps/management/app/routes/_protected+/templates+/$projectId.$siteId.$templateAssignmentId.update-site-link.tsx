@@ -44,7 +44,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     return json({
       status: "success",
       message: "Site link updated successfully",
-      returnTo: `/projects/${projectId}/sites`,
+      returnTo: `/projects/${projectId}/${site_id}/link-templates`,
       error: null
     });
   }
@@ -52,7 +52,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   return json({
     status: "error",
     message: "Failed to update site link",
-    returnTo: `/projects/${projectId}/sites`,
+    returnTo: `/projects/${projectId}/${site_id}/link-templates`,
     error
   });
 }
