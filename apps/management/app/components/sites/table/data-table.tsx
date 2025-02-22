@@ -14,7 +14,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
 
   return (
     <div className="relative mb-8">
-      <div className={cn("relative border overflow-x-auto rounded", tableLength && "border-none")}>
+      <div className={cn("relative border overflow-x-auto rounded", !tableLength && "border-none")}>
         <div className="relative">
           <Table>
             <DataTableHeader table={table} className={cn(!tableLength && "hidden")} />
@@ -37,7 +37,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
                     colSpan={columns.length}
                     className="h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize"
                   >
-                    No payment templates linked.
+                    No linked assignments found.
                   </TableCell>
                 </TableRow>
               )}

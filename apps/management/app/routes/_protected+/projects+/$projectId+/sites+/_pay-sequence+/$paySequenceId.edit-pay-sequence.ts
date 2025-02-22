@@ -4,7 +4,7 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { isGoodStatus, SitePaySequenceSchema } from "@canny_ecosystem/utils";
 import { parseWithZod } from "@conform-to/zod";
 import { json, type ActionFunctionArgs } from "@remix-run/node";
-import { useActionData, useNavigate } from "@remix-run/react";
+import { useActionData, useNavigate, useParams } from "@remix-run/react";
 import { useEffect } from "react";
 
 export async function action({
@@ -63,6 +63,7 @@ export default function EditPaySequence() {
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { projectId, siteId } = useParams();
 
   useEffect(() => {
     if (actionData) {
@@ -79,8 +80,7 @@ export default function EditPaySequence() {
           variant: "destructive",
         });
       }
-      navigate(`/projects/${actionData?.projectId}/sites`);
+      navigate(`/projects/${projectId}/${siteId}/overview`);
     }
   }, []);
-  return null;
 }

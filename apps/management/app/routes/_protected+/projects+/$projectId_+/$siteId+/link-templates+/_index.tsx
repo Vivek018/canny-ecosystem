@@ -44,7 +44,7 @@ export default function LinkTemplate() {
     } = useLoaderData<typeof loader>();
 
     return (
-        <div className='w-full py-2 flex flex-col gap-8'>
+        <div className='w-full py-4 flex flex-col gap-8'>
             <Suspense fallback={<div>Loading...</div>}>
                 <Await resolve={paymentTemplatesPromise}>
                     {(resolvedPaymentTemplates) => {

@@ -4,8 +4,9 @@ import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import type { PaymentTemplateAssignmentsDatabaseRow } from "@canny_ecosystem/supabase/types";
+import { replaceUnderscore } from "@canny_ecosystem/utils";
 
-export const columns = (projectId: string, siteId: string): ColumnDef<PaymentTemplateAssignmentsDatabaseRow>[] => {
+export const columns = (projectId: string, siteId: string): ColumnDef<Omit<PaymentTemplateAssignmentsDatabaseRow, "created_at" | "updated_at">>[] => {
   return [
     {
       accessorKey: "name",
@@ -39,7 +40,7 @@ export const columns = (projectId: string, siteId: string): ColumnDef<PaymentTem
       accessorKey: "skill_level",
       header: "Skill Level",
       cell: ({ row }) => {
-        return row.original?.skill_level ?? "--";
+        return replaceUnderscore(row.original?.skill_level ?? "--");
       },
     },
     {

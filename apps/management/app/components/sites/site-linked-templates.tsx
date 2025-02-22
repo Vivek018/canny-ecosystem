@@ -35,7 +35,7 @@ export function SiteLinkedTemplates({
   };
 
   return (
-    <section className="p-2">
+    <section>
       <div className="w-full flex items-center justify-between pb-4">
         <div className="w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4">
           <div className="relative w-full">
