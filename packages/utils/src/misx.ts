@@ -5,11 +5,11 @@ export function isGoodStatus(status: number | string) {
   return statusString.startsWith("2");
 }
 
-export function replaceDash(str: string | null) {
+export function replaceDash(str: string | null | undefined) {
   return str?.replaceAll("-", " ");
 }
 
-export function replaceUnderscore(str: string | null) {
+export function replaceUnderscore(str: string | null | undefined) {
   return str?.replaceAll("_", " ");
 }
 

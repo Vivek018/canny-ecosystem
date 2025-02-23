@@ -1,39 +1,15 @@
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenu,DropdownMenuContent,DropdownMenuGroup,DropdownMenuTrigger,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@canny_ecosystem/ui/tooltip";
+import {Tooltip,TooltipContent,TooltipProvider,TooltipTrigger} from "@canny_ecosystem/ui/tooltip";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Link, useNavigate } from "@remix-run/react";
 import { DeleteSite } from "./delete-site";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@canny_ecosystem/ui/card";
+import {Card,CardContent,CardFooter,CardHeader,CardTitle} from "@canny_ecosystem/ui/card";
 import type { SitesWithLocation } from "@canny_ecosystem/supabase/queries";
-import {
-  attribute,
-  modalSearchParamNames,
-} from "@canny_ecosystem/utils/constant";
-import {
-  deleteRole,
-  hasPermission,
-  replaceUnderscore,
-  updateRole,
-} from "@canny_ecosystem/utils";
+import {attribute} from "@canny_ecosystem/utils/constant";
+import {hasPermission,replaceUnderscore,updateRole} from "@canny_ecosystem/utils";
 import { useUser } from "@/utils/user";
 
 export function SiteCard({
@@ -44,9 +20,9 @@ export function SiteCard({
   const { role } = useUser();
   const navigate = useNavigate();
 
-  const viewLinkTemplateSearchParam = `step=${modalSearchParamNames.view_link_template}`;
-  const viewPaySequenceSearchParam = `step=${modalSearchParamNames.view_pay_sequence}`;
-  const editPaySequenceSearchParam = `step=${modalSearchParamNames.edit_pay_sequence}`;
+  // const viewLinkTemplateSearchParam = `step=${modalSearchParamNames.view_link_template}`;
+  // const viewPaySequenceSearchParam = `step=${modalSearchParamNames.view_pay_sequence}`;
+  // const editPaySequenceSearchParam = `step=${modalSearchParamNames.edit_pay_sequence}`;
 
   return (
     <Card
@@ -55,7 +31,12 @@ export function SiteCard({
     >
       <CardHeader className="flex flex-row space-y-0 items-start justify-between p-4">
         <div className="flex flex-col items-start">
-          <CardTitle className="text-lg tracking-wide">{site.name}</CardTitle>
+          <CardTitle
+            className="text-lg tracking-wide hover:cursor-pointer hover:text-primary"
+            onClick={() => navigate(`/projects/${site.project_id}/${site.id}/overview`)}
+          >
+            {site.name}
+          </CardTitle>
           <p className="text-[12px] w-max text-muted-foreground -mt-1 rounded-md">
             {site.site_code}
           </p>
@@ -68,7 +49,7 @@ export function SiteCard({
                   prefetch="intent"
                   to={`/projects/${site.project_id}/sites/${site.id}/update-site`}
                   className={cn(
-                    "p-2 rounded-md bg-secondary grid place-items-center ",
+                    "p-2 rounded-md bg-secondary grid place-items-center",
                     !hasPermission(
                       role,
                       `${updateRole}:${attribute.projectSites}`,
@@ -87,63 +68,6 @@ export function SiteCard({
             </DropdownMenuTrigger>
             <DropdownMenuContent sideOffset={10} align="end">
               <DropdownMenuGroup>
-                <DropdownMenuItem
-                  onClick={() => {
-                    navigate(
-                      `/projects/${site.project_id}/sites/${site.id}?${viewPaySequenceSearchParam}`,
-                    );
-                  }}
-                >
-                  View Pay Sequence
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className={cn(
-                    !hasPermission(
-                      role,
-                      `${updateRole}:${attribute.projectSites}`,
-                    ) && "hidden",
-                  )}
-                  onClick={() => {
-                    navigate(
-                      `/projects/${site.project_id}/sites/${site.id}?${editPaySequenceSearchParam}`,
-                    );
-                  }}
-                >
-                  Edit Pay Sequence
-                </DropdownMenuItem>
-                <DropdownMenuSeparator
-                  className={cn(
-                    !hasPermission(
-                      role,
-                      `${updateRole}:${attribute.projectSites}`,
-                    ) && "hidden",
-                  )}
-                />
-                <DropdownMenuItem
-                  className={cn(
-                    !hasPermission(
-                      role,
-                      `${updateRole}:${attribute.projectSites}`,
-                    ) && "hidden",
-                  )}
-                  onClick={() => {
-                    navigate(
-                      `/projects/${site.project_id}/sites/${site.id}?${viewLinkTemplateSearchParam}`,
-                    );
-                  }}
-                >
-                  Link Template
-                </DropdownMenuItem>
-                <DropdownMenuSeparator
-                  className={cn(
-                    (!site.latitude && !site.longitude) ||
-                      (!hasPermission(
-                        role,
-                        `${deleteRole}:${attribute.projectSites}`,
-                      ) &&
-                        "hidden"),
-                  )}
-                />
                 <DeleteSite projectId={site.project_id} siteId={site.id} />
               </DropdownMenuGroup>
             </DropdownMenuContent>
@@ -152,9 +76,8 @@ export function SiteCard({
       </CardHeader>
       <CardContent className="flex flex-col gap-0.5 px-4">
         <address className="not-italic line-clamp-3">
-          {`${site.address_line_1} ${
-            site.address_line_2 ? site.address_line_2 : ""
-          }`}
+          {`${site.address_line_1} ${site.address_line_2 ? site.address_line_2 : ""
+            }`}
         </address>
         <div className="flex items-center capitalize gap-2">
           <p>{`${site.city},`}</p>

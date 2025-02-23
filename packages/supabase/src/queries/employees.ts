@@ -234,6 +234,38 @@ export async function getEmployeesByCompanyId({
   };
 }
 
+export async function getEmployeesByProjectSiteId({
+  supabase,
+  projectSiteId,
+}: {
+  supabase: TypedSupabaseClient;
+  projectSiteId: string;
+}) {
+  const columns = ["id", "employee_code"] as const;
+
+  const { data, error } = await supabase
+    .from("employees")
+    .select(
+      `${columns.join(
+        ",",
+      )},employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(project_site_id)`,
+    )
+    .eq("employee_project_assignment.project_site_id", projectSiteId)
+    .limit(MID_QUERY_LIMIT)
+    .returns<
+      InferredType<EmployeeDatabaseRow, (typeof columns)[number]>[] | null
+    >();
+
+  if (error) {
+    console.error("getEmployeesByProjectSiteId Error", error);
+  }
+
+  return {
+    data,
+    error,
+  };
+}
+
 export async function getEmployeesByPositionAndProjectSiteId({
   supabase,
   position,
@@ -250,9 +282,8 @@ export async function getEmployeesByPositionAndProjectSiteId({
     .select(
       `${columns.join(
         ",",
-      )},employee_project_assignment!employee_project_assignment_employee_id_fkey!inner(*)`,
+      )},employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(project_site_id)`,
     )
-    .eq("employee_project_assignment.is_current", true)
     .eq("employee_project_assignment.project_site_id", projectSiteId)
     .eq("employee_project_assignment.position", position ?? "")
     .limit(MID_QUERY_LIMIT)

@@ -24,22 +24,11 @@ export default function Employee() {
         <SecondaryMenu
           items={[
             { label: "Overview", path: `/employees/${employeeId}/overview` },
-            {
-              label: "Work Portfolio",
-              path: `/employees/${employeeId}/work-portfolio`,
-            },
-            {
-              label: "Reimbursements",
-              path: `/employees/${employeeId}/reimbursements`,
-            },
-            {
-              label: "Letters",
-              path: `/employees/${employeeId}/letters`,
-            },
-            {
-              label: "Attendance",
-              path: `/employees/${employeeId}/attendance`,
-            },
+            { label: "Work Portfolio", path: `/employees/${employeeId}/work-portfolio` },
+            { label: "Reimbursements", path: `/employees/${employeeId}/reimbursements` },
+            { label: "Letters", path: `/employees/${employeeId}/letters` },
+            { label: "Attendance", path: `/employees/${employeeId}/attendance` },
+            { label: "Payments", path: `/employees/${employeeId}/payments` },
             {
               label: "Leaves",
               path: `/employees/${employeeId}/leaves`,
@@ -49,9 +38,7 @@ export default function Employee() {
           Link={Link}
         />
       </div>
-      <div className="px-4">
-        <Outlet />
-      </div>
+      <div className="px-4"><Outlet /></div>
     </section>
   );
 }

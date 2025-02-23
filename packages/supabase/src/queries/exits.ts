@@ -214,3 +214,37 @@ export const getExitsById = async ({
 
   return { data, error };
 };
+
+export const getExitByEmployeeId = async ({
+  supabase,
+  employeeId,
+}: {
+  supabase: TypedSupabaseClient;
+  employeeId: string;
+}) => {
+  const columns = [
+    "id",
+    "employee_id",
+    "organization_payable_days",
+    "employee_payable_days",
+    "last_working_day",
+    "final_settlement_date",
+    "reason",
+    "note",
+    "leave_encashment",
+    "gratuity",
+    "deduction",
+    "bonus",
+    "net_pay",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("exits")
+    .select(columns.join(","))
+    .eq("employee_id", employeeId)
+    .maybeSingle<InferredType<ExitsRow, (typeof columns)[number]>>();
+
+  if (error) console.error("getExitByEmployeeId Error", error);
+
+  return { data, error };
+};

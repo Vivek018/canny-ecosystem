@@ -31,6 +31,7 @@ import {
 import { columns } from "@/components/accidents/table/columns";
 import { FilterList } from "@/components/accidents/filter-list";
 import { AccidentSearchFilter } from "@/components/accidents/accident-search-filter";
+import { AccidentActions } from "@/components/accidents/accident-actions";
 
 const pageSize = LAZY_LOADING_LIMIT;
 
@@ -75,7 +76,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined
+        (value) => value !== null && value !== undefined,
       );
 
     const accidentsPromise = getAccidentsByCompanyId({
@@ -128,7 +129,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 
   return await clientCaching(
     `${cacheKeyPrefix.accident}${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 
@@ -177,6 +178,7 @@ export default function AccidentsIndex() {
           </Suspense>
           <FilterList filters={filterList} />
         </div>
+        <AccidentActions />
       </div>
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={accidentsPromise}>

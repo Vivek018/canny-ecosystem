@@ -5,29 +5,6 @@ import type {
   TypedSupabaseClient,
 } from "../types";
 
-export async function getPaymentTemplateAssignmentIdByEmployeeId({
-  supabase,
-  employeeId,
-}: { supabase: TypedSupabaseClient; employeeId: string }) {
-  const columns = ["id"] as const;
-
-  const { data, error } = await supabase
-    .from("payment_template_assignments")
-    .select(columns.join(","))
-    .eq("employee_id", employeeId)
-    .single<
-      InferredType<
-        PaymentTemplateAssignmentsDatabaseRow,
-        (typeof columns)[number]
-      >
-    >();
-
-  if (error)
-    console.error("getPaymentTemplateAssignmentIdByEmployeeId Error", error);
-
-  return { data, error };
-}
-
 export async function getTemplateIdByEmployeeId({
   supabase,
   employeeId,
@@ -74,7 +51,7 @@ export async function getPaymentTemplateAssignmentByEmployeeId({
     .from("payment_template_assignments")
     .select(columns.join(","))
     .eq("employee_id", employeeId)
-    .single<
+    .maybeSingle<
       InferredType<
         PaymentTemplateAssignmentsDatabaseRow,
         (typeof columns)[number]
@@ -83,6 +60,42 @@ export async function getPaymentTemplateAssignmentByEmployeeId({
 
   if (error)
     console.error("getPaymentTemplateAssignmentByEmployeeId Error", error);
+
+  return { data, error };
+}
+
+export async function getPaymentTemplateAssignmentById({
+  supabase,
+  id,
+}: { supabase: TypedSupabaseClient; id: string }) {
+  const columns = [
+    "id",
+    "template_id",
+    "assignment_type",
+    "employee_id",
+    "site_id",
+    "eligibility_option",
+    "position",
+    "skill_level",
+    "effective_from",
+    "effective_to",
+    "is_active",
+    "name",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("payment_template_assignments")
+    .select(columns.join(","))
+    .eq("id", id)
+    .single<
+      InferredType<
+        PaymentTemplateAssignmentsDatabaseRow,
+        (typeof columns)[number]
+      >
+    >();
+
+  if (error)
+    console.error("getPaymentTemplateAssignmentById Error", error);
 
   return { data, error };
 }

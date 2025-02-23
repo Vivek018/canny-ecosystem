@@ -78,6 +78,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       sitePromise,
       locationOptionsPromise,
       projectId,
+      siteId,
     });
   } catch (error) {
     return json(
@@ -86,8 +87,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         sitePromise: null,
         locationOptionsPromise: null,
         projectId,
+        siteId,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -109,7 +111,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -139,13 +141,14 @@ export async function action({
         message: "Failed to update site",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
 
 export default function UpdateSite() {
-  const { sitePromise, error, projectId } = useLoaderData<typeof loader>();
+  const { sitePromise, error, projectId, siteId } =
+    useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
   const { toast } = useToast();
@@ -155,6 +158,7 @@ export default function UpdateSite() {
     if (actionData) {
       if (actionData?.status === "success") {
         clearExactCacheEntry(`${cacheKeyPrefix.sites}${projectId}`);
+        clearExactCacheEntry(`${cacheKeyPrefix.site_overview}${siteId}`);
         toast({
           title: "Success",
           description: actionData?.message || "Site updated",
@@ -174,14 +178,14 @@ export default function UpdateSite() {
   }, [actionData]);
 
   if (error)
-    return <ErrorBoundary error={error} message="Failed to load site" />;
+    return <ErrorBoundary error={error} message='Failed to load site' />;
 
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <Await resolve={sitePromise}>
         {(resolvedData) => {
           if (!resolvedData)
-            return <ErrorBoundary message="Failed to load site" />;
+            return <ErrorBoundary message='Failed to load site' />;
           return (
             <UpdateSiteWrapper
               data={resolvedData.data}

@@ -21,13 +21,17 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export default function Incidents() {
   const { pathname } = useLocation();
   return (
-    <section className='flex flex-col h-full'>
-      <div className='py-[18px] px-4 border-b'>
+    <section className="flex flex-col h-full">
+      <div className="py-[18px] px-4 border-b">
         <SecondaryMenu
           items={[
             {
               label: "Accidents",
               path: "/incidents/accidents",
+            },
+            {
+              label: "Cases",
+              path: "/incidents/cases",
             },
           ]}
           pathname={pathname}
