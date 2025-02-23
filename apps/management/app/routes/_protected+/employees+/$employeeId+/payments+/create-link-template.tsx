@@ -101,7 +101,6 @@ export async function action({
     return json(
       { result: submission.reply() },
       { status: submission.status === "error" ? 400 : 200 }
-      { status: submission.status === "error" ? 400 : 200 }
     );
 
   try {
