@@ -5,29 +5,6 @@ import type {
   TypedSupabaseClient,
 } from "../types";
 
-export async function getPaymentTemplateAssignmentIdByEmployeeId({
-  supabase,
-  employeeId,
-}: { supabase: TypedSupabaseClient; employeeId: string }) {
-  const columns = ["id"] as const;
-
-  const { data, error } = await supabase
-    .from("payment_template_assignments")
-    .select(columns.join(","))
-    .eq("employee_id", employeeId)
-    .single<
-      InferredType<
-        PaymentTemplateAssignmentsDatabaseRow,
-        (typeof columns)[number]
-      >
-    >();
-
-  if (error)
-    console.error("getPaymentTemplateAssignmentIdByEmployeeId Error", error);
-
-  return { data, error };
-}
-
 export async function getTemplateIdByEmployeeId({
   supabase,
   employeeId,

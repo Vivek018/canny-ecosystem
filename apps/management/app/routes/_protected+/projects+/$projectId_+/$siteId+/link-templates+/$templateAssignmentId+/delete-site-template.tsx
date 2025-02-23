@@ -51,9 +51,7 @@ export default function DeleteSiteLink() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearExactCacheEntry(
-                        `${cacheKeyPrefix.site_link_templates}${siteId}`
-                      )
+        clearExactCacheEntry(`${cacheKeyPrefix.site_link_templates}${siteId}`);
         toast({
           title: "Success",
           description: actionData?.message,

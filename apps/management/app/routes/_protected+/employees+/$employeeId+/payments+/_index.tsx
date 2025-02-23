@@ -76,9 +76,7 @@ export default function Payments() {
   const { employeeId } = useParams();
 
   if (error) {
-    clearExactCacheEntry(
-      `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
-    );
+    clearExactCacheEntry(`${cacheKeyPrefix.employee_payments}${employeeId}`);
     return <ErrorBoundary error={error} message='Failed to load data' />;
   }
 

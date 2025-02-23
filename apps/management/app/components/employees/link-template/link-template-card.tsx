@@ -100,7 +100,7 @@ export const LinkTemplateCard = ({
           {paymentTemplateAssignmentData ? (
             <div className='flex gap-4'>
               <Link
-                to={`/employees/${paymentTemplateAssignmentData.employee_id}/payments/link-template`}
+                to={`/employees/${paymentTemplateAssignmentData.employee_id}/payments/${paymentTemplateAssignmentData.id}/update-link-template`}
                 className={cn(
                   buttonVariants({ variant: "outline" }),
                   "bg-card",
@@ -114,7 +114,7 @@ export const LinkTemplateCard = ({
                 Update
               </Link>
               <LinkTemplateDropdown
-                employeeId={paymentTemplateAssignmentData.employee_id as string}
+                templateId={paymentTemplateAssignmentData.id}
                 triggerChild={
                   <DropdownMenuTrigger
                     className={cn(
@@ -134,7 +134,7 @@ export const LinkTemplateCard = ({
             </div>
           ) : (
             <Link
-              to='link-template'
+              to='create-link-template'
               className={cn(
                 buttonVariants({ variant: "outline" }),
                 "bg-card",

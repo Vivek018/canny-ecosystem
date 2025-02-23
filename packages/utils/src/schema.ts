@@ -652,10 +652,12 @@ export const eligibilityOptionsArray = ["position", "skill_level"] as const;
 
 // Payment Template Assignment
 export const EmployeeLinkSchema = z.object({
+  id: z.string().optional(),
   name: z.string(),
   effective_from: z.string().default(new Date().toISOString().split("T")[0]),
   effective_to: z.string().optional(),
   template_id: z.string(),
+  employee_id: z.string(),
   assignment_type: z.enum(paymentAssignmentTypesArray).default("employee")
 });
 

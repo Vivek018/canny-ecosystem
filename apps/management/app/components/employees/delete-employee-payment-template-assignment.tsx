@@ -14,10 +14,15 @@ import { ErrorList } from "@canny_ecosystem/ui/forms";
 import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { DELETE_TEXT } from "@canny_ecosystem/utils/constant";
-import { useSubmit } from "@remix-run/react";
+import { useParams, useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
-export const DeleteEmployeePaymentTemplateAssignment = ({ employeeId }: { employeeId: string }) => {
+export const DeleteEmployeePaymentTemplateAssignment = ({
+  templateId,
+}: {
+  templateId: string | null;
+}) => {
+  const { employeeId } = useParams();
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [inputError, setInputError] = useState<string[]>([]);
@@ -30,19 +35,16 @@ export const DeleteEmployeePaymentTemplateAssignment = ({ employeeId }: { employ
   };
 
   const handleDeleteEmployeePaymentTemplateAssignment = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
       submit(
-        {
-          is_active: false,
-          returnTo: "/employees",
-        },
+        {},
         {
           method: "POST",
-          action: `/employees/${employeeId}/payments/delete-link-template`,
-        },
+          action: `/employees/${employeeId}/payments/${templateId}/delete-link-template`,
+        }
       );
     } else {
       e.preventDefault();
@@ -55,7 +57,7 @@ export const DeleteEmployeePaymentTemplateAssignment = ({ employeeId }: { employ
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
-          "text-[13px] h-9",
+          "text-[13px] h-9"
         )}
       >
         Delete link template
@@ -69,21 +71,21 @@ export const DeleteEmployeePaymentTemplateAssignment = ({ employeeId }: { employ
             servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <div className="p-4">
-          <p className="text-sm text-foreground/80">
+        <div className='p-4'>
+          <p className='text-sm text-foreground/80'>
             Please type{" "}
-            <i className="text-foreground font-medium">{DELETE_TEXT}</i> to
+            <i className='text-foreground font-medium'>{DELETE_TEXT}</i> to
             confirm.
           </p>
           <Input
-            type="text"
+            type='text'
             value={inputValue}
             onChange={(e) => {
               setInputValue(e.target.value);
               setInputError([]);
             }}
-            className="border border-input rounded-md h-10 w-full"
-            placeholder="Confirm your action"
+            className='border border-input rounded-md h-10 w-full'
+            placeholder='Confirm your action'
             onPaste={(e) => {
               e.preventDefault();
               return false;
