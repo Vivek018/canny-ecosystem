@@ -304,3 +304,23 @@ export type CasesDatabaseInsert =
   Database["public"]["Tables"]["cases"]["Insert"];
 export type CasesDatabaseUpdate =
   Database["public"]["Tables"]["cases"]["Update"];
+
+export type LeavesDatabaseRow = Database["public"]["Tables"]["leaves"]["Row"];
+export type LeavesDatabaseInsert =
+  Database["public"]["Tables"]["leaves"]["Insert"];
+export type LeavesDatabaseUpdate =
+  Database["public"]["Tables"]["leaves"]["Update"];
+
+export type LeaveTypeDatabaseRow =
+  Database["public"]["Tables"]["leave_type"]["Row"];
+export type LeaveTypeDatabaseInsert =
+  Database["public"]["Tables"]["leave_type"]["Insert"];
+export type LeaveTypeDatabaseUpdate =
+  Database["public"]["Tables"]["leave_type"]["Update"];
+
+  export type HolidaysDatabaseRow =
+  Database["public"]["Tables"]["holidays"]["Row"];
+export type HolidaysDatabaseInsert =
+  Database["public"]["Tables"]["holidays"]["Insert"];
+export type HolidaysDatabaseUpdate =
+  Database["public"]["Tables"]["holidays"]["Update"];

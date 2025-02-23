@@ -20,3 +20,5 @@ export * from "./attendance";
 export * from "./leave-encashment";
 export * from "./accidents";
 export * from "./cases";
+export * from "./leaves";
+export * from "./holidays";

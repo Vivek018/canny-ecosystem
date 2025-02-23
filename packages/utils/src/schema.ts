@@ -1415,6 +1415,37 @@ export const AccidentSchema = z.object({
   medical_diagnosis: z.string().optional(),
 });
 
+export const leaveTypeArray = [
+  "casual_leave",
+  "paid_leave",
+  "unpaid_leave",
+  "sick_leave",
+  "paternity_leave",
+] as const;
+
+export const LeaveSchema = z.object({
+  employee_id: z.string(),
+  start_date: z.string(),
+  end_date: z.string().optional(),
+  reason: z.string().max(100).min(3),
+  leave_type: z.enum(leaveTypeArray),
+  user_id: z.string().optional(),
+});
+
+export const LeaveTypeSchema = z.object({
+  company_id: z.string(),
+  leaves_per_year: z.number().max(365),
+  leave_type: z.enum(leaveTypeArray),
+});
+
+export const HolidaysSchema = z.object({
+  company_id: z.string(),
+  name: z.string().max(20),
+  start_date: z.string(),
+  no_of_days: z.number().min(1).max(365),
+  is_mandatory: z.boolean().optional().default(false),
+});
+
 export const caseTypeArray = [
   "dispute",
   "wage_issue",

@@ -101,7 +101,7 @@ export function DashboardFilter({ disabled }: { disabled?: boolean }) {
     },
     {
       enableOnFormTags: true,
-    },
+    }
   );
 
   useHotkeys(["meta+s", "ctrl+s"], (evt) => {
@@ -124,7 +124,7 @@ export function DashboardFilter({ disabled }: { disabled?: boolean }) {
       {
         action: "/dashboard",
         method: "POST",
-      },
+      }
     );
   };
 
@@ -145,7 +145,7 @@ export function DashboardFilter({ disabled }: { disabled?: boolean }) {
               disabled={disabled}
               className={cn(
                 "flex items-center justify-center opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
-                isOpen && "opacity-100",
+                isOpen && "opacity-100"
               )}
             >
               <Icon name="mixer" />
@@ -159,7 +159,6 @@ export function DashboardFilter({ disabled }: { disabled?: boolean }) {
         align="end"
         sideOffset={19}
         alignOffset={-11}
-        side="top"
       >
         <DropdownMenuGroup>
           <DropdownMenuSub>
@@ -174,7 +173,7 @@ export function DashboardFilter({ disabled }: { disabled?: boolean }) {
               >
                 {getYears(
                   10,
-                  endYear ? Number(endYear) : new Date().getFullYear(),
+                  endYear ? Number(endYear) : new Date().getFullYear()
                 ).map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}

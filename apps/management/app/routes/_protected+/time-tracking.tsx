@@ -10,11 +10,11 @@ import { Link, Outlet, useLocation } from "@remix-run/react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
-  //   const { user } = await getUserCookieOrFetchUser(request, supabase);
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  //   if (!hasPermission(user?.role!, `${readRole}:${attribute.settings}`)) {
-  //     return safeRedirect(DEFAULT_ROUTE, { headers });
-  //   }
+  if (!hasPermission(user?.role!, `${readRole}:${attribute.timeTracking}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
   return {};
 }
 
@@ -28,6 +28,7 @@ export default function TimeTracking() {
           items={[
             { label: "Attendance", path: "/time-tracking/attendance" },
             { label: "Leaves", path: "/time-tracking/leaves" },
+            { label: "Holidays", path: "/time-tracking/holidays" },
           ]}
           pathname={pathname}
           Link={Link}

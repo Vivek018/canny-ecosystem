@@ -72,7 +72,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined,
+        (value) => value !== null && value !== undefined
       );
 
     const employeesPromise = getEmployeesByCompanyId({
@@ -128,7 +128,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return await clientCaching(
     `${cacheKeyPrefix.employees}${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 
@@ -151,7 +151,7 @@ ${VALID_FILTERS.map(
   (filter) =>
     `name: "${filter.name}", type: "${
       filter.valueType
-    }", example: ${JSON.stringify(filter.example)}`,
+    }", example: ${JSON.stringify(filter.example)}`
 ).join(".")}`,
         },
         {

@@ -123,7 +123,7 @@ export function LWFReportSearchFilter({
     },
     {
       enableOnFormTags: true,
-    },
+    }
   );
 
   useHotkeys(["meta+s", "ctrl+s"], (evt) => {
@@ -157,7 +157,7 @@ export function LWFReportSearchFilter({
       {
         action: "/reports/lwf?index",
         method: "POST",
-      },
+      }
     );
     if (prompt.length) {
       searchParams.set("name", prompt);
@@ -168,7 +168,7 @@ export function LWFReportSearchFilter({
   const hasValidFilters =
     Object.entries(filterParams).filter(
       ([key, value]) =>
-        typeof value === "string" && value.length && key !== "name",
+        typeof value === "string" && value.length && key !== "name"
     ).length > 0;
 
   return (
@@ -185,7 +185,7 @@ export function LWFReportSearchFilter({
             name={isSubmitting ? "update" : "search"}
             className={cn(
               "absolute pointer-events-none left-3 top-[12.5px]",
-              isSubmitting && "animate-spin",
+              isSubmitting && "animate-spin"
             )}
           />
           <Input
@@ -216,7 +216,7 @@ export function LWFReportSearchFilter({
                 !disabled &&
                   "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 hasValidFilters && "opacity-100",
-                isOpen && "opacity-100",
+                isOpen && "opacity-100"
               )}
             >
               <Icon name="mixer" />
@@ -230,7 +230,6 @@ export function LWFReportSearchFilter({
         align="end"
         sideOffset={19}
         alignOffset={-11}
-        side="top"
       >
         <DropdownMenuGroup>
           <DropdownMenuSub>
@@ -245,7 +244,7 @@ export function LWFReportSearchFilter({
               >
                 {getYears(
                   10,
-                  endYear ? Number(endYear) : new Date().getFullYear(),
+                  endYear ? Number(endYear) : new Date().getFullYear()
                 )
                   ?.sort((a, b) => b - a)
                   .map((name, index) => (

@@ -42,7 +42,9 @@ import { FormButtons } from "@/components/form/form-buttons";
 import { createReimbursementsFromData } from "@canny_ecosystem/supabase/mutations";
 import type { ReimbursementsUpdate } from "@canny_ecosystem/supabase/types";
 import { UPDATE_REIMBURSEMENTS_TAG } from "../../../approvals+/reimbursements+/$reimbursementId.update-reimbursements";
-import { getUsers } from "@canny_ecosystem/supabase/queries";
+import {
+  getUsersByCompanyId,
+} from "@canny_ecosystem/supabase/queries";
 import { useEffect, useState } from "react";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
@@ -61,7 +63,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   if (
     !hasPermission(
       user?.role!,
-      `${createRole}:${attribute.employeeReimbursements}`,
+      `${createRole}:${attribute.employeeReimbursements}`
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -69,7 +71,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const employeeId = params.employeeId;
 
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data: userData, error: userError } = await getUsers({ supabase });
+  const { data: userData, error: userError } = await getUsersByCompanyId({
+    supabase,
+    companyId,
+  });
   if (userError || !userData) {
     throw userError;
   }
@@ -92,7 +97,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: submission.status === "error" ? 400 : 200 }
     );
   }
 
@@ -121,6 +126,7 @@ export default function AddReimbursements({
 }: {
   updateValues?: ReimbursementsUpdate | null;
   userOptionsFromUpdate?: any;
+  reimbursementId?: string;
 }) {
   const { userOptions, employeeId, companyId } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
@@ -133,7 +139,7 @@ export default function AddReimbursements({
     if (actionData) {
       if (actionData?.status === "success") {
         clearCacheEntry(
-          `${cacheKeyPrefix.employee_reimbursements}${employeeId}`,
+          `${cacheKeyPrefix.employee_reimbursements}${employeeId}`
         );
         toast({
           title: "Success",
@@ -185,7 +191,7 @@ export default function AddReimbursements({
               </CardTitle>
               <CardDescription className="lowercase">
                 {`${replaceUnderscore(
-                  REIMBURSEMENTS_TAG,
+                  REIMBURSEMENTS_TAG
                 )} by filling this form`}
               </CardDescription>
             </CardHeader>
@@ -214,13 +220,13 @@ export default function AddReimbursements({
                   key={resetKey}
                   className="w-full capitalize flex-1 "
                   options={transformStringArrayIntoOptions(
-                    reimbursementStatusArray as unknown as string[],
+                    reimbursementStatusArray as unknown as string[]
                   )}
                   inputProps={{
                     ...getInputProps(fields.status, { type: "text" }),
                   }}
                   placeholder={`Select ${replaceUnderscore(
-                    fields.status.name,
+                    fields.status.name
                   )}`}
                   labelProps={{
                     children: "Status",
@@ -235,7 +241,7 @@ export default function AddReimbursements({
                       type: "number",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.amount.name,
+                      fields.amount.name
                     )}`,
                     className: "",
                   }}

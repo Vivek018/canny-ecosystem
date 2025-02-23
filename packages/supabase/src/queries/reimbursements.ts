@@ -90,9 +90,13 @@ export async function getReimbursementsByCompanyId({
     .from("reimbursements")
     .select(
       `${columns.join(",")},
-          employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"}(project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"}(id, name)))),
+          employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${
+            project ? "inner" : "left"
+          }(project_sites!${project ? "inner" : "left"}(id, name, projects!${
+        project ? "inner" : "left"
+      }(id, name)))),
           users!${users ? "inner" : "left"}(id,email)`,
-      { count: "exact" },
+      { count: "exact" }
     )
     .eq("company_id", companyId);
 
@@ -111,7 +115,7 @@ export async function getReimbursementsByCompanyId({
           `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*,employee_code.ilike.*${searchQueryElement}*`,
           {
             referencedTable: "employees",
-          },
+          }
         );
       }
     } else {
@@ -119,7 +123,7 @@ export async function getReimbursementsByCompanyId({
         `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`,
         {
           referencedTable: "employees",
-        },
+        }
       );
     }
   }
@@ -147,14 +151,17 @@ export async function getReimbursementsByCompanyId({
   if (project) {
     query.eq(
       "employees.employee_project_assignment.project_sites.projects.name",
-      project,
+      project
     );
   }
   if (project_site) {
     query.eq(
       "employees.employee_project_assignment.project_sites.name",
-      project_site,
+      project_site
     );
+  }
+  if (users) {
+    query.eq("users.email", users);
   }
 
   const { data, count, error } = await query.range(from, to);
@@ -248,7 +255,7 @@ export async function getReimbursementsByEmployeeId({
         ${columns.join(",")},
           employees!inner(id, first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!left(project_sites!left(id, name, projects!left(id, name)))),
           users!${users ? "inner" : "left"}(id,email)`,
-      { count: "exact" },
+      { count: "exact" }
     )
     .eq("employee_id", employeeId);
 

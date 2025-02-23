@@ -14,7 +14,10 @@ export default function Employee() {
         <Link
           prefetch="intent"
           to="/employees"
-          className={cn(buttonVariants({ variant: "outline" }), "bg-card w-9 h-9 px-0 rounded-full")}
+          className={cn(
+            buttonVariants({ variant: "outline" }),
+            "bg-card w-9 h-9 px-0 rounded-full"
+          )}
         >
           <Icon name="chevron-left" size="sm" />
         </Link>
@@ -26,6 +29,10 @@ export default function Employee() {
             { label: "Letters", path: `/employees/${employeeId}/letters` },
             { label: "Attendance", path: `/employees/${employeeId}/attendance` },
             { label: "Payments", path: `/employees/${employeeId}/payments` },
+            {
+              label: "Leaves",
+              path: `/employees/${employeeId}/leaves`,
+            },
           ]}
           pathname={pathname}
           Link={Link}

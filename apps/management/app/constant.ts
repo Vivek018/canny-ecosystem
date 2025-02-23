@@ -272,6 +272,9 @@ export const cacheKeyPrefix = {
   accident: "accident",
   attendance: "attendance",
   case: "case",
+  employee_leaves: "employee-leaves",
+  leaves: "leaves",
+  holidays: "holidays",
 };
 export const SALARY_SLIP_TITLE = "Salary Slip Form IV B [Rule 26(2)(b)]";
 
@@ -328,7 +331,9 @@ export function numberToWordsIndian(num: number) {
       return (
         tens[Math.floor(n / 10)] + (n % 10 ? ` ${belowTwenty[n % 10]}` : "")
       );
-    return `${belowTwenty[Math.floor(n / 100)]} hundred${n % 100 ? ` ${convertBelowThousand(n % 100)}` : ""}`;
+    return `${belowTwenty[Math.floor(n / 100)]} hundred${
+      n % 100 ? ` ${convertBelowThousand(n % 100)}` : ""
+    }`;
   }
 
   function convertIntegerToWordsIndian(n: number) {
@@ -342,7 +347,7 @@ export function numberToWordsIndian(num: number) {
       if (remainder > 0) {
         const groupName = i > 0 ? units[i] : ""; // Add lakh, crore, etc.
         parts.unshift(
-          convertBelowThousand(remainder) + (groupName ? ` ${groupName}` : ""),
+          convertBelowThousand(remainder) + (groupName ? ` ${groupName}` : "")
         );
       }
       n = Math.floor(n / (i === 0 ? 1000 : 100)); // Reduce the number based on the group
@@ -362,7 +367,7 @@ export function numberToWordsIndian(num: number) {
   // Split integer and decimal parts
   const [integerPart, decimalPart] = num.toString().split(".");
   const integerWords = convertIntegerToWordsIndian(
-    Number.parseInt(integerPart, 10),
+    Number.parseInt(integerPart, 10)
   );
   const decimalWords = decimalPart
     ? `point ${convertDecimalPart(decimalPart)}`
