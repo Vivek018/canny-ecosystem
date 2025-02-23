@@ -128,5 +128,5 @@ export default function UpdateLeaveTypes() {
     }
   }, [actionData]);
 
-  return <AddLeaveType updatableData={updatableData as any} />;
+  return <AddLeaveType updatableData={updatableData} />;
 }

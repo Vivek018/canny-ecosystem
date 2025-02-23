@@ -104,7 +104,7 @@ export async function action({
 export default function AddHolidays({
   updatableData,
 }: {
-  updatableData: HolidaysDatabaseUpdate;
+  updatableData?: HolidaysDatabaseUpdate | null;
 }) {
   const { companyId } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();

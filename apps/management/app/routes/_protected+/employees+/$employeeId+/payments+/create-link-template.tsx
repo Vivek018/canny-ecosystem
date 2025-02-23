@@ -243,11 +243,9 @@ export default function CreateEmployeeLinkTemplate({
                   inputProps={{
                     ...getInputProps(fields.effective_to, { type: "date" }),
                     placeholder: replaceUnderscore(fields.effective_to.name),
-                    min: getValidDateForInput(
-                      fields.effective_from.value as any
-                    ),
+                    min: getValidDateForInput(fields.effective_from.value),
                     defaultValue: getValidDateForInput(
-                      fields.effective_to.initialValue as any
+                      fields.effective_to.initialValue
                     ),
                   }}
                   labelProps={{

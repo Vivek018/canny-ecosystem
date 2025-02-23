@@ -106,7 +106,7 @@ export async function action({
 export default function AddLeaveType({
   updatableData,
 }: {
-  updatableData: LeaveTypeDatabaseUpdate;
+  updatableData?: LeaveTypeDatabaseUpdate | null;
 }) {
   const { companyId } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();

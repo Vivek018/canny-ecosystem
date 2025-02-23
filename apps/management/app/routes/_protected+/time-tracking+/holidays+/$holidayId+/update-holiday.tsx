@@ -127,5 +127,5 @@ export default function UpdateHolidays() {
     }
   }, [actionData]);
 
-  return <AddHolidays updatableData={updatableData as any} />;
+  return <AddHolidays updatableData={updatableData} />;
 }
