@@ -4,6 +4,7 @@ import type {
   EmployeeProjectAssignmentDatabaseRow,
   InferredType,
   LeavesDatabaseRow,
+  LeaveTypeDatabaseRow,
   ProjectDatabaseRow,
   SiteDatabaseRow,
   TypedSupabaseClient,
@@ -243,4 +244,69 @@ export async function getLeavesByCompanyId({
   }
 
   return { data, meta: { count: count ?? data?.length }, error };
+}
+
+export type LeaveTypeDataType = Pick<
+  LeaveTypeDatabaseRow,
+  "id" | "company_id" | "leave_type" | "leaves_per_year"
+>;
+
+export async function getLeaveTypeByCompanyId({
+  supabase,
+  companyId,
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+}) {
+  const columns = [
+    "id",
+    "company_id",
+    "leave_type",
+    "leaves_per_year",
+  ] as const;
+
+  const query = supabase
+    .from("leave_type")
+    .select(
+      `
+        ${columns.join(",")}
+      `,
+      { count: "exact" }
+    )
+    .eq("company_id", companyId);
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error("getLeavesByEmployeeId Error", error);
+  }
+
+  return { data, error };
+}
+
+export async function getLeaveTypeById({
+  supabase,
+  leaveId,
+}: {
+  supabase: TypedSupabaseClient;
+  leaveId: string;
+}) {
+  const columns = [
+    "id",
+    "company_id",
+    "leave_type",
+    "leaves_per_year",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("leave_type")
+    .select(columns.join(","))
+    .eq("id", leaveId)
+    .single<InferredType<LeaveTypeDatabaseRow, (typeof columns)[number]>>();
+
+  if (error) {
+    console.error("getLeaveTypeById Error", error);
+  }
+
+  return { data, error };
 }

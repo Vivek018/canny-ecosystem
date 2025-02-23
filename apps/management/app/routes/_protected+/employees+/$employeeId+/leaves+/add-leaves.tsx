@@ -44,13 +44,16 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { clearCacheEntry } from "@/utils/cache";
 import { addLeavesFromData } from "@canny_ecosystem/supabase/mutations";
 import { UPDATE_LEAVES_TAG } from "./$id.$route.update-leave";
-import { getUsers } from "@canny_ecosystem/supabase/queries";
+import {
+  getUsersByCompanyId,
+} from "@canny_ecosystem/supabase/queries";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
 export const ADD_LEAVES_TAG = "Add_Leave";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
-
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
   if (
@@ -59,7 +62,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   const employeeId = params.employeeId;
-  const { data: userData, error: userError } = await getUsers({ supabase });
+  const { data: userData, error: userError } = await getUsersByCompanyId({
+    supabase,
+    companyId,
+  });
   if (userError || !userData) {
     throw userError;
   }

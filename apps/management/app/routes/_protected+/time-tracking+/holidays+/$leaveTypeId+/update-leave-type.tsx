@@ -5,49 +5,42 @@ import {
   useActionData,
   useLoaderData,
   useNavigate,
-  useParams,
 } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
 import { safeRedirect } from "@/utils/server/http.server";
 import {
   hasPermission,
   isGoodStatus,
-  LeaveSchema,
+  LeaveTypeSchema,
   updateRole,
 } from "@canny_ecosystem/utils";
-import { updateLeavesById } from "@canny_ecosystem/supabase/mutations";
-import {
-  getLeavesById,
-  getUsersByCompanyId,
-} from "@canny_ecosystem/supabase/queries";
+import { updateLeaveTypeById } from "@canny_ecosystem/supabase/mutations";
+import { getLeaveTypeById } from "@canny_ecosystem/supabase/queries";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { useEffect } from "react";
 import { clearCacheEntry } from "@/utils/cache";
-import AddLeaves from "./add-leaves";
-import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import AddLeaveType from "../add-leave-type";
 
-export const UPDATE_LEAVES_TAG = "Update_Leave";
+export const UPDATE_LEAVETYPE_TAG = "Update_LeaveType";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const leaveId = params.id;
+  const leaveId = params.leaveTypeId;
   const { supabase, headers } = getSupabaseWithHeaders({ request });
 
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (
-    !hasPermission(user?.role!, `${updateRole}:${attribute.employeeLeaves}`)
-  ) {
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.holidays}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
-  let leaveData = null;
 
+  let leaveData = null;
   let error = null;
+
   if (leaveId) {
-    const { data, error: leaveError } = await getLeavesById({
+    const { data, error: leaveError } = await getLeaveTypeById({
       supabase,
       leaveId,
     });
@@ -55,29 +48,18 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     leaveData = data;
     error = leaveError;
   }
-  const { data: userData, error: userError } = await getUsersByCompanyId({
-    supabase,
-    companyId,
-  });
-  if (userError || !userData) {
-    throw userError;
-  }
-  const userOptions = userData.map((userData) => ({
-    label: userData.email?.toLowerCase(),
-    value: userData.id,
-  }));
-  return json({ data: leaveData, error, userOptions });
+
+  return json({ data: leaveData, error });
 }
 
 export async function action({
   request,
   params,
 }: ActionFunctionArgs): Promise<Response> {
-  const leaveId = params.id;
-  const isEmployeeRoute = params.route;
+  const id = params.leaveTypeId;
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
-  const submission = parseWithZod(formData, { schema: LeaveSchema });
+  const submission = parseWithZod(formData, { schema: LeaveTypeSchema });
 
   if (submission.status !== "success") {
     return json(
@@ -86,8 +68,8 @@ export async function action({
     );
   }
 
-  const { status, error } = await updateLeavesById({
-    leaveId: leaveId!,
+  const { status, error } = await updateLeaveTypeById({
+    leaveTypeId: id!,
     supabase,
     data: submission.value,
   });
@@ -95,66 +77,56 @@ export async function action({
   if (isGoodStatus(status)) {
     return json({
       status: "success",
-      message: "Employee Leave update successfully",
+      message: "Leave type updated successfully",
       error: null,
-      isEmployeeRoute,
     });
   }
+
   return json({
     status: "error",
-    message: "Employee leave update failed",
+    message: "Leave Type update failed",
     error,
-    isEmployeeRoute,
   });
 }
 
-export default function UpdateLeaves() {
-  const { data, error, userOptions } = useLoaderData<typeof loader>();
-
+export default function UpdateLeaveTypes() {
+  const { data, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const updatableData = data;
 
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { employeeId } = useParams();
 
   useEffect(() => {
     if (error) {
       toast({
         title: "Error",
-        description: error?.message || "Leave update failed",
+        description: error?.message || "Failed to load leave type data",
         variant: "destructive",
       });
     }
+  }, [error]);
+
+  useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(`${cacheKeyPrefix.employee_leaves}${employeeId}`);
-        clearCacheEntry(`${cacheKeyPrefix.leaves}`);
+        clearCacheEntry(`${cacheKeyPrefix.holidays}`);
         toast({
           title: "Success",
-          description: actionData?.message || "Leave updated",
+          description: actionData?.message || "Leave type updated successfully",
           variant: "success",
         });
       } else {
         toast({
           title: "Error",
-          description: actionData?.error?.message || "Leave update failed",
+          description:
+            actionData?.error?.message || "Failed to update leave type",
           variant: "destructive",
         });
       }
-
-      navigate(
-        actionData.isEmployeeRoute === "true"
-          ? `/employees/${employeeId}/leaves`
-          : "/time-tracking/leaves"
-      );
+      navigate("/time-tracking/holidays");
     }
   }, [actionData]);
 
-  return (
-    <AddLeaves
-      updateValues={updatableData}
-      userOptionsFromUpdate={userOptions as any}
-    />
-  );
+  return <AddLeaveType updatableData={updatableData as any} />;
 }

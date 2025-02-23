@@ -2,7 +2,9 @@ import { cacheKeyPrefix } from "@/constant";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import {
   getLeavesByEmployeeId,
+  getLeaveTypeByCompanyId,
   getUsersEmail,
+  type LeaveTypeDataType,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
@@ -58,7 +60,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         (value) => value !== null && value !== undefined
       );
     const usersPromise = getUsersEmail({ supabase, companyId });
-    
+
     const leavesPromise = getLeavesByEmployeeId({
       supabase,
       employeeId: employeeId ?? "",
@@ -75,8 +77,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       },
     });
 
+    const leaveTypePromise = getLeaveTypeByCompanyId({ supabase, companyId });
+
     return defer({
       leavesPromise: leavesPromise as any,
+      leaveTypePromise,
       usersPromise,
       employeeId,
       filters,
@@ -87,6 +92,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return defer({
       leavesPromise: Promise.resolve({ data: [] }),
       usersPromise: Promise.resolve({ data: [] }),
+      leaveTypePromise: Promise.resolve({ data: [] }),
       employeeId: "",
       filters: {},
       env,
@@ -122,8 +128,14 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function Leaves() {
-  const { leavesPromise, employeeId, filters, env, usersPromise } =
-    useLoaderData<typeof loader>();
+  const {
+    leavesPromise,
+    employeeId,
+    filters,
+    env,
+    usersPromise,
+    leaveTypePromise,
+  } = useLoaderData<typeof loader>();
   const { toast } = useToast();
   const noFilters = Object.values(filters).every((value) => !value);
   return (
@@ -167,39 +179,59 @@ export default function Leaves() {
                   });
 
                   return (
-                    <>
-                      <LeaveCountCards leaveType={leaveType} />
-                      <div className="w-full flex items-center justify-between pb-4">
-                        <div className="w-full flex justify-start items-center gap-x-3">
-                          <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-14">
-                            <LeavesSearchFilter
-                              disabled={!data?.length && noFilters}
-                              employeeId={employeeId}
-                              isEmployeeRoute={isEmployeeRoute}
-                              userEmails={
-                                usersData?.data
-                                  ? usersData?.data?.map((user) => user!.email)
-                                  : []
+                    <Suspense fallback={<div>Loading leave types...</div>}>
+                      <Await
+                        resolve={leaveTypePromise}
+                        errorElement={
+                          <div>
+                            Error loading Leave Types. Please try again later.
+                          </div>
+                        }
+                      >
+                        {(leaveTypeData) => (
+                          <>
+                            <LeaveCountCards
+                              leaveType={leaveType}
+                              leaveTypeData={
+                                leaveTypeData?.data as unknown as LeaveTypeDataType
                               }
                             />
-                            <FilterList filters={filters} />
-                          </div>
-                          <div className="space-x-2 hidden md:flex ">
-                            <ColumnVisibility disabled={!leavesPromise} />
-                            <AddLeaveDialog />
-                          </div>
-                        </div>
-                      </div>
-                      <LeavesDataTable
-                        data={data}
-                        columns={columns(isEmployeeRoute)}
-                        noFilters={noFilters}
-                        hasNextPage={hasNextPage}
-                        pageSize={LAZY_LOADING_LIMIT}
-                        env={env}
-                        employeeId={employeeId}
-                      />
-                    </>
+                            <div className="w-full flex items-center justify-between pb-4">
+                              <div className="w-full flex justify-start items-center gap-x-3">
+                                <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-14">
+                                  <LeavesSearchFilter
+                                    disabled={!data?.length && noFilters}
+                                    employeeId={employeeId}
+                                    isEmployeeRoute={isEmployeeRoute}
+                                    userEmails={
+                                      usersData?.data
+                                        ? usersData?.data?.map(
+                                            (user) => user!.email
+                                          )
+                                        : []
+                                    }
+                                  />
+                                  <FilterList filters={filters} />
+                                </div>
+                                <div className="space-x-2 hidden md:flex ">
+                                  <ColumnVisibility disabled={!leavesPromise} />
+                                  <AddLeaveDialog />
+                                </div>
+                              </div>
+                            </div>
+                            <LeavesDataTable
+                              data={data}
+                              columns={columns(isEmployeeRoute)}
+                              noFilters={noFilters}
+                              hasNextPage={hasNextPage}
+                              pageSize={LAZY_LOADING_LIMIT}
+                              env={env}
+                              employeeId={employeeId}
+                            />
+                          </>
+                        )}
+                      </Await>
+                    </Suspense>
                   );
                 }}
               </Await>

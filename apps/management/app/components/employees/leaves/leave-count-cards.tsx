@@ -1,3 +1,4 @@
+import type { LeaveTypeDataType } from "@canny_ecosystem/supabase/queries";
 import {
   Card,
   CardContent,
@@ -7,25 +8,35 @@ import {
 
 export function LeaveCountCards({
   leaveType,
+  leaveTypeData,
 }: {
   leaveType: {
     reduce: any;
     leave_type: string;
   };
+  leaveTypeData?: LeaveTypeDataType | any;
 }) {
+  const leaveTypesMap =
+    leaveTypeData?.reduce(
+      (
+        acc: { [x: string]: any },
+        item: { leave_type: string | number; leaves_per_year: any }
+      ) => {
+        acc[item.leave_type] = item.leaves_per_year;
+        return acc;
+      },
+      {} as Record<string, number>
+    ) || {};
+
   const cardInfo = [
-    { title: "Casual Leaves", key: "casual_leave", available: 12, booked: 0 },
-    { title: "Paid Leaves", key: "paid_leave", available: 10, booked: 0 },
-    { title: "Unpaid Leaves", key: "unpaid_leave", available: 5, booked: 0 },
-    {
-      title: "Paternity Leaves",
-      key: "paternity_leave",
-      available: 7,
-      booked: 0,
-    },
-    { title: "Sick Leaves", key: "sick_leave", available: 8, booked: 0 },
+    { title: "Casual Leaves", key: "casual_leave" },
+    { title: "Paid Leaves", key: "paid_leave" },
+    { title: "Unpaid Leaves", key: "unpaid_leave" },
+    { title: "Paternity Leaves", key: "paternity_leave" },
+    { title: "Sick Leaves", key: "sick_leave" },
   ];
 
+  // Calculate booked counts
   const bookedCounts = leaveType.reduce(
     (acc: { [x: string]: any }, { leave_type }: any) => {
       acc[leave_type] = (acc[leave_type] || 0) + 1;
@@ -36,7 +47,7 @@ export function LeaveCountCards({
 
   return (
     <div className="mb-5 grid grid-cols-5 gap-5">
-      {cardInfo.map(({ title, available, key }) => (
+      {cardInfo.map(({ title, key }) => (
         <Card
           key={title}
           className="w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-between"
@@ -47,10 +58,12 @@ export function LeaveCountCards({
 
           <CardContent className="flex flex-col gap-2">
             <div className="flex justify-around">
-              <p>Available</p> <p>{available}</p>
+              <p>Available</p>
+              <p>{leaveTypesMap[key] || 0}</p>
             </div>
             <div className="flex justify-around">
-              <p>Booked</p> <p>{bookedCounts[key] || 0}</p>
+              <p>Booked</p>
+              <p>{bookedCounts[key] || 0}</p>
             </div>
           </CardContent>
         </Card>

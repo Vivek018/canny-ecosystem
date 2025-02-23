@@ -42,7 +42,9 @@ import { FormButtons } from "@/components/form/form-buttons";
 import { createReimbursementsFromData } from "@canny_ecosystem/supabase/mutations";
 import type { ReimbursementsUpdate } from "@canny_ecosystem/supabase/types";
 import { UPDATE_REIMBURSEMENTS_TAG } from "../../../approvals+/reimbursements+/$reimbursementId.update-reimbursements";
-import { getUsers } from "@canny_ecosystem/supabase/queries";
+import {
+  getUsersByCompanyId,
+} from "@canny_ecosystem/supabase/queries";
 import { useEffect, useState } from "react";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
@@ -69,7 +71,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const employeeId = params.employeeId;
 
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data: userData, error: userError } = await getUsers({ supabase });
+  const { data: userData, error: userError } = await getUsersByCompanyId({
+    supabase,
+    companyId,
+  });
   if (userError || !userData) {
     throw userError;
   }

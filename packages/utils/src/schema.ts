@@ -1423,6 +1423,19 @@ export const LeaveSchema = z.object({
   end_date: z.string().optional(),
   reason: z.string().max(100).min(3),
   leave_type: z.enum(leaveTypeArray),
-
   user_id: z.string().optional(),
+});
+
+export const LeaveTypeSchema = z.object({
+  company_id: z.string(),
+  leaves_per_year: z.number().max(365),
+  leave_type: z.enum(leaveTypeArray),
+});
+
+export const HolidaysSchema = z.object({
+  company_id: z.string(),
+  name: z.string().max(20),
+  start_date: z.string(),
+  no_of_days: z.number().min(1).max(365),
+  is_mandatory: z.boolean().optional().default(false),
 });

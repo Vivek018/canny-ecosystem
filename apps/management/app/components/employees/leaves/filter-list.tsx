@@ -50,11 +50,11 @@ export function FilterList({ filters }: Props) {
     if (key === "date_start" && filters?.date_end) {
       updatedSearchParams.delete("date_end");
     }
-
+    if (key === "users") {
+    }
     updatedSearchParams.delete(key);
     setSearchParams(updatedSearchParams);
   };
-
   return (
     <ul className="flex flex-0 space-x-2 w-full overflow-scroll no-scrollbar">
       {filters &&

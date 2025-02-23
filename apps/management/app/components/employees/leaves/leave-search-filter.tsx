@@ -56,6 +56,7 @@ export function LeavesSearchFilter({
     name: "",
     project: "",
     project_site: "",
+    users: "",
   };
 
   const [filterParams, setFilterParams] = useState(initialFilterParams);
@@ -82,6 +83,7 @@ export function LeavesSearchFilter({
     leave_type: searchParams.get("leave_type"),
     project: searchParams.get("project"),
     project_site: searchParams.get("project_site"),
+    users: searchParams.get("users"),
   };
 
   useEffect(() => {
@@ -311,7 +313,7 @@ export function LeavesSearchFilter({
           </DropdownMenuSub>
         </DropdownMenuGroup>
 
-        <DropdownMenuGroup className={cn(isEmployeeRoute && "hidden")}  >
+        <DropdownMenuGroup className={cn(isEmployeeRoute && "hidden")}>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
               <span>Project Site</span>

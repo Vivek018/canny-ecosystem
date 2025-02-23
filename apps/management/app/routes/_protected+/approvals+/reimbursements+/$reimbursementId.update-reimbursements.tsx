@@ -18,7 +18,7 @@ import {
 import { updateReimbursementsById } from "@canny_ecosystem/supabase/mutations";
 import {
   getReimbursementsById,
-  getUsers,
+  getUsersByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
@@ -27,6 +27,7 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { useEffect } from "react";
 import { clearCacheEntry } from "@/utils/cache";
 import AddReimbursements from "../../employees+/$employeeId+/reimbursements+/add-reimbursement";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
 export const UPDATE_REIMBURSEMENTS_TAG = "Update_Reimbursement";
 
@@ -34,6 +35,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const reimbursementId = params.reimbursementId;
   const { supabase, headers } = getSupabaseWithHeaders({ request });
 
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
   if (
@@ -45,7 +47,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   let reimbursementData = null;
   let error = null;
 
-  const { data: userData, error: userError } = await getUsers({ supabase });
+  const { data: userData, error: userError } = await getUsersByCompanyId({
+    supabase,
+    companyId,
+  });
   if (userError || !userData) throw userError;
 
   if (reimbursementId) {
@@ -78,7 +83,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: submission.status === "error" ? 400 : 200 }
     );
   }
 
