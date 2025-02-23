@@ -105,10 +105,10 @@ export async function getCasesByCompanyId({
   const query = supabase
     .from("cases")
     .select(
-      `${columns.join(",")}, reported_by_project:projects!cases_reported_by_project_fkey(id, name), reported_on_project:projects!cases_reported_on_project_fkey(id, name),
-       reported_by_employee:employees!cases_reported_by_employee_fkey(id, employee_code), reported_on_employee:employees!cases_reported_on_employee_fkey(id, employee_code),
-       reported_by_site:project_sites!cases_reported_by_site_fkey(id, name, projects!project_sites_project_id_fkey(id)), reported_on_site:project_sites!cases_reported_on_site_fkey(id, name),
-       reported_by_company:companies!cases_reported_by_company_fkey(id, name), reported_on_company:companies!cases_reported_on_company_fkey(id, name)`,
+      `${columns.join(",")}, reported_by_project:projects!cases_reported_by_project_id_fkey(id, name), reported_on_project:projects!cases_reported_on_project_id_fkey(id, name),
+       reported_by_employee:employees!cases_reported_by_employee_id_fkey(id, employee_code), reported_on_employee:employees!cases_reported_on_employee_id_fkey(id, employee_code),
+       reported_by_site:project_sites!cases_reported_by_site_id_fkey(id, name, projects!project_sites_project_id_fkey(id)), reported_on_site:project_sites!cases_reported_on_site_id_fkey(id, name),
+       reported_by_company:companies!cases_reported_by_company_id_fkey(id, name), reported_on_company:companies!cases_reported_on_company_id_fkey(id, name)`,
       {
         count: "exact",
       },
@@ -159,19 +159,19 @@ export async function getCasesByCompanyId({
     if (end) query.lte(field, formatUTCDate(end));
   }
   if (case_type) {
-    query.eq("case_type", case_type);
+    query.eq("case_type", case_type as CasesDatabaseRow["case_type"]);
   }
   if (status) {
-    query.eq("status", status);
+    query.eq("status", status as CasesDatabaseRow["status"]);
   }
   if (location_type) {
-    query.eq("location_type", location_type);
+    query.eq("location_type", location_type as CasesDatabaseRow["location_type"]);
   }
   if (reported_by) {
-    query.eq("reported_by", reported_by);
+    query.eq("reported_by", reported_by as CasesDatabaseRow["reported_by"]);
   }
   if (reported_on) {
-    query.eq("reported_on", reported_on);
+    query.eq("reported_on", reported_on as CasesDatabaseRow["reported_on"]);
   }
 
   const { data, count, error } = await query.range(from, to);

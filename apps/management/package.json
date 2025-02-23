@@ -4,9 +4,11 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "build": "remix vite:build",
-    "dev": "remix vite:dev",
-    "start": "remix-serve ./build/server/index.js",
+    "build": "run-s build:*",
+    "build:remix": "remix vite:build",
+    "build:server": "tsx ./server/build-server.ts",
+    "dev": "cross-env NODE_ENV=development node ./server/dev-server.js",
+    "start": "cross-env NODE_ENV=production node .",
     "link": "biome lint",
     "format": "biome format --write .",
     "typecheck": "tsc --noEmit"
@@ -35,7 +37,16 @@
     "react-hotkeys-hook": "^4.5.1",
     "react-intersection-observer": "^9.13.1",
     "react-markdown": "^9.0.3",
-    "zustand": "^5.0.0-rc.2"
+    "zustand": "^5.0.0-rc.2",
+    "@nichtsam/helmet": "^0.3.0",
+    "address": "^2.0.3",
+    "close-with-grace": "^2.2.0",
+    "compression": "^1.8.0",
+    "cross-env": "^7.0.3",
+    "execa": "^9.5.2",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "get-port": "^7.1.0"
   },
   "devDependencies": {
     "@remix-run/dev": "^2.15.3",
@@ -45,9 +56,13 @@
     "remix-flat-routes": "^0.6.5",
     "typescript": "^5.5.4",
     "vite": "^5.1.0",
-    "vite-tsconfig-paths": "^4.2.1"
+    "vite-tsconfig-paths": "^4.2.1",
+    "@types/compression": "^1.7.5",
+    "@types/express": "^5.0.0",
+    "@types/morgan": "^1.9.9",
+    "npm-run-all": "^4.1.5"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": "21.0.0"
   }
 }

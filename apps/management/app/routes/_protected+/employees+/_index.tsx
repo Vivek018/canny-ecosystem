@@ -13,7 +13,7 @@ import { cacheKeyPrefix, VALID_FILTERS } from "@/constant";
 import { AIChat4o } from "@/utils/ai";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { MAX_QUERY_LIMIT } from "@canny_ecosystem/supabase/constant";
+import { LAZY_LOADING_LIMIT, MAX_QUERY_LIMIT } from "@canny_ecosystem/supabase/constant";
 import {
   type EmployeeFilters,
   getEmployeesByCompanyId,
@@ -33,7 +33,7 @@ import {
 } from "@remix-run/react";
 import { Suspense } from "react";
 
-const pageSize = 20;
+const pageSize = LAZY_LOADING_LIMIT;
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const env = {

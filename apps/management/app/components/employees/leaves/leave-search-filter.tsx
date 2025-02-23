@@ -216,7 +216,6 @@ export function LeavesSearchFilter({
               >
                 <Calendar
                   mode='range'
-                  initialFocus
                   today={
                     filterParams.date_start
                       ? new Date(filterParams.date_start)
