@@ -62,22 +62,16 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
-
-    const { data: exitData } = await getExitsById({
-      supabase,
-      id: exitId as string,
-    });
 
     const { status, error } = await updateExit({
       supabase,
       data: {
         ...submission.value,
-        employee_id: exitData?.employee_id,
-        id: exitId,
-      } as any,
+        id: submission.value.id ?? exitId,
+      },
     });
 
     if (isGoodStatus(status))
@@ -85,7 +79,7 @@ export async function action({
 
     return json(
       { status: "error", message: "Exit update failed", error },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json(
@@ -94,7 +88,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -131,7 +125,7 @@ export default function UpdateExit() {
       <Await resolve={exitPromise}>
         {(resolvedData) => {
           if (!resolvedData)
-            return <ErrorBoundary message="Failed to load Exit" />;
+            return <ErrorBoundary message='Failed to load Exit' />;
           return (
             <UpdateExitWrapper
               data={resolvedData?.data}
@@ -154,7 +148,6 @@ export function UpdateExitWrapper({
   const { toast } = useToast();
   useEffect(() => {
     if (error) {
-      clearCacheEntry(cacheKeyPrefix.exits);
       toast({
         title: "Error",
         description: error?.message,
@@ -163,5 +156,5 @@ export function UpdateExitWrapper({
     }
   }, [error]);
 
-  return <CreateExit updateValues={data as any} />;
+  return <CreateExit updateValues={data} />;
 }

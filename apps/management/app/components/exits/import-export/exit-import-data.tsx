@@ -84,7 +84,7 @@ export function ExitImportData({
       setFinalData(updatedData);
       const { conflictingIndices, error } = await getExitsConflicts({
         supabase,
-        importedData: updatedData as any,
+        importedData: updatedData,
       });
 
       if (error) {
@@ -185,7 +185,7 @@ export function ExitImportData({
       <ImportedDataTable
         data={tableData}
         columns={ImportedDataColumns}
-        conflictingIndex={conflictingIndex as any}
+        conflictingIndex={conflictingIndex}
       />
     </section>
   );

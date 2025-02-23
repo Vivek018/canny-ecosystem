@@ -80,7 +80,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   const userOptions = userData.map((userData) => ({
-    label: userData.email?.toLowerCase(),
+    label: userData.email?.toLowerCase() ?? "",
     value: userData.id,
   }));
 
@@ -181,28 +181,29 @@ export default function AddReimbursements({
   });
 
   return (
-    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
+    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
       <FormProvider context={form.context}>
-        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
+        <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
           <Card>
             <CardHeader>
-              <CardTitle className="capitalize">
+              <CardTitle className='capitalize'>
                 {replaceUnderscore(REIMBURSEMENTS_TAG)}
               </CardTitle>
-              <CardDescription className="lowercase">
+              <CardDescription className='lowercase'>
                 {`${replaceUnderscore(
                   REIMBURSEMENTS_TAG
                 )} by filling this form`}
               </CardDescription>
             </CardHeader>
             <CardContent>
+              <input {...getInputProps(fields.id, { type: "hidden" })} />
               <input
                 {...getInputProps(fields.company_id, { type: "hidden" })}
               />
               <input
                 {...getInputProps(fields.employee_id, { type: "hidden" })}
               />
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10">
+              <div className='grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10'>
                 <Field
                   inputProps={{
                     ...getInputProps(fields.submitted_date, {
@@ -218,7 +219,7 @@ export default function AddReimbursements({
                 />
                 <SearchableSelectField
                   key={resetKey}
-                  className="w-full capitalize flex-1 "
+                  className='w-full capitalize flex-1 '
                   options={transformStringArrayIntoOptions(
                     reimbursementStatusArray as unknown as string[]
                   )}
@@ -234,7 +235,7 @@ export default function AddReimbursements({
                   errors={fields.status.errors}
                 />
               </div>
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10">
+              <div className='grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10'>
                 <Field
                   inputProps={{
                     ...getInputProps(fields.amount, {
@@ -258,8 +259,8 @@ export default function AddReimbursements({
                     }),
                     placeholder: "Select an authority that approved",
                   }}
-                  className="lowercase"
-                  options={(userOptions as any) ?? userOptionsFromUpdate}
+                  className='lowercase'
+                  options={userOptions ?? userOptionsFromUpdate}
                   labelProps={{
                     children: "Approved By",
                   }}
@@ -268,7 +269,7 @@ export default function AddReimbursements({
               </div>
 
               <CheckboxField
-                className="mt-8"
+                className='mt-8'
                 buttonProps={getInputProps(fields.is_deductible, {
                   type: "checkbox",
                 })}

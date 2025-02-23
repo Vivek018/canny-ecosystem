@@ -9,7 +9,6 @@ export function ExportBar({
   rows,
   data,
   className,
-  columnVisibility,
 }: {
   rows: number;
   data: Omit<CasesDatabaseRow, "created_at" | "updated_at">[];

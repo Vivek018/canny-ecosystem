@@ -15,7 +15,7 @@ import {
   ChartTooltipContent,
 } from "@canny_ecosystem/ui/chart";
 import { reasonForExitArray, replaceUnderscore } from "@canny_ecosystem/utils";
-import type { ExitsRow } from "@canny_ecosystem/supabase/types";
+import type { ExitDataType } from "@canny_ecosystem/supabase/queries";
 
 const chartConfig = reasonForExitArray.reduce((config, reason, i) => {
   config[reason] = {
@@ -27,31 +27,31 @@ const chartConfig = reasonForExitArray.reduce((config, reason, i) => {
 
 chartConfig.amount = { label: "Amount" };
 
-export function ExitByReasons({ chartData }: { chartData: ExitsRow[] }) {
+export function ExitByReasons({ chartData }: { chartData: ExitDataType[] }) {
   const exitByReasonsData = Object.values(
     chartData.reduce(
       (acc, row) => {
-        const reason = row.reason.toLowerCase().replace(/\s+/g, "_") || "other";
+        const reason = row?.reason?.toLowerCase().replace(/\s+/g, "_") || "other";
 
         if (!acc[reason]) acc[reason] = { reason, amount: 0 };
 
         acc[reason].amount +=
           Number(row?.bonus) +
-          Number(row.leave_encashment) +
-          Number(row.gratuity) -
-          Number(row.deduction);
+          Number(row?.leave_encashment) +
+          Number(row?.gratuity) -
+          Number(row?.deduction);
         return acc;
       },
       Object.fromEntries(
         reasonForExitArray.map((reason) => {
-          const normalizedReason = reason.toLowerCase().replace(/\s+/g, "_");
+          const normalizedReason = reason?.toLowerCase().replace(/\s+/g, "_");
           return [normalizedReason, { reason: normalizedReason, amount: 0 }];
         }),
       ),
     ),
   );
 
-  const transformedChartData = exitByReasonsData.map((data, i) => ({
+  const transformedChartData = exitByReasonsData?.map((data, i) => ({
     ...data,
     fill: `hsl(var(--chart-${i + 1}))`,
   }));

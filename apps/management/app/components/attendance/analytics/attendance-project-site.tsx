@@ -14,6 +14,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@canny_ecosystem/ui/chart";
+import type { TransformedAttendanceDataType } from "@/routes/_protected+/time-tracking+/attendance+/_index";
 
 const chartConfig = {
   presents: {
@@ -30,17 +31,13 @@ export function AttendanceByProjectSite({
   chartData,
   projectArray,
 }: {
-  chartData: Array<{
-    projectSiteName: any;
-    projectName: string;
-    attendance?: Array<{ present: boolean }>;
-  }>;
+  chartData: TransformedAttendanceDataType[];
   projectArray: string[];
 }) {
   const [project, setProject] = useState<string>();
 
   const trendData = useMemo(() => {
-    const filteredData = chartData.filter((row) => row.projectName === project);
+    const filteredData = chartData.filter((row) => row.project === project);
 
     if (filteredData.length === 0) return [];
     return filteredData
@@ -51,7 +48,7 @@ export function AttendanceByProjectSite({
         );
 
         return {
-          projectSite: row.projectSiteName,
+          projectSite: row.project_site,
           presents: totalPresents,
         };
       })

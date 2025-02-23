@@ -167,7 +167,7 @@ ${VALID_FILTERS.map(
     const validatedContent = extractJsonFromString(content);
 
     const searchParams = new URLSearchParams();
-    for (const [key, value] of Object.entries(validatedContent) as any) {
+    for (const [key, value] of Object.entries(validatedContent)) {
       if (value !== null && value !== undefined && String(value)?.length) {
         if (key === "end" && !validatedContent?.start)
           searchParams.append("start", "1947-08-15");
@@ -202,9 +202,9 @@ export default function EmployeesIndex() {
   const noFilters = Object.values(filterList).every((value) => !value);
 
   return (
-    <section className="p-4">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
+    <section className='p-4'>
+      <div className='w-full flex items-center justify-between pb-4'>
+        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-2 mr-4'>
           <Suspense fallback={<div>Loading...</div>}>
             <Await resolve={projectPromise}>
               {(projectData) => (
@@ -242,7 +242,7 @@ export default function EmployeesIndex() {
               return (
                 <ErrorBoundary
                   error={error}
-                  message="Failed to load employees"
+                  message='Failed to load employees'
                 />
               );
             }

@@ -51,83 +51,82 @@ const chartConfig: Record<string, { label: string; color?: string }> = {
 } as const;
 
 type StatutoryRatioProps = {
-  chartData: PayrollEntriesWithTemplateComponents[];
+  chartData: PayrollEntriesWithTemplateComponents[] | null;
 };
 
 export function StatutoryRatio({ chartData }: StatutoryRatioProps) {
-  const totalStatutoryFields = chartData.reduce<Record<string, ChartDataPoint>>(
-    (acc, row) => {
-      const name = row.payment_template_components.target_type;
+  const totalStatutoryFields = chartData?.reduce<
+    Record<string, ChartDataPoint>
+  >((acc, row) => {
+    const name = row.payment_template_components.target_type;
 
-      if (name && name !== "payment_field") {
-        if (!acc[name]) {
-          acc[name] = { name, amount: 0 };
-        }
-        acc[name].amount +=
-          row.payment_template_components.calculation_value ?? 0;
+    if (name && name !== "payment_field") {
+      if (!acc[name]) {
+        acc[name] = { name, amount: 0 };
       }
-      return acc;
-    },
-    {},
-  );
+      acc[name].amount +=
+        row.payment_template_components.calculation_value ?? 0;
+    }
+    return acc;
+  }, {});
 
   // Process the top statutory data
-  const sortedData = Object.values(totalStatutoryFields).sort(
-    (a, b) => b.amount - a.amount,
-  );
+  const sortedData =
+    totalStatutoryFields &&
+    Object.values(totalStatutoryFields).sort((a, b) => b.amount - a.amount);
 
-  const topStatutoryData = sortedData.slice(0, 4);
+  const topStatutoryData = sortedData?.slice(0, 4);
 
   // Handle additional entries as "Others"
-  if (sortedData.length > 4) {
+  if (sortedData?.length && sortedData?.length > 4) {
     const othersAmount = sortedData
-      .slice(4)
+      ?.slice(4)
       .reduce((acc, item) => acc + item.amount, 0);
 
-    topStatutoryData.push({
+    topStatutoryData?.push({
       name: "Others",
-      amount: othersAmount,
+      amount: othersAmount ?? 0,
     });
   }
 
   // Transform data for the chart
-  const transformedChartData = topStatutoryData.map((row) => ({
+  const transformedChartData = topStatutoryData?.map((row) => ({
     ...row,
     fill: `var(--color-${row.name.toLowerCase()})`,
   }));
 
   return (
-    <Card className="flex flex-col">
-      <CardHeader className="items-center pb-0">
+    <Card className='flex flex-col'>
+      <CardHeader className='items-center pb-0'>
         <CardTitle>Statutory Ratio</CardTitle>
         <CardDescription>Over the period</CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 pb-0">
+      <CardContent className='flex-1 pb-0'>
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px] [&_.recharts-text]:fill-background"
+          className='mx-auto aspect-square max-h-[250px] [&_.recharts-text]:fill-background'
         >
           <PieChart>
             <ChartTooltip
               content={
                 <ChartTooltipContent
-                  nameKey="amount"
+                  nameKey='amount'
                   hideLabel
-                  className="w-40"
+                  className='w-40'
                 />
               }
             />
             <Pie
               data={transformedChartData}
-              dataKey="amount"
-              cx="50%"
-              cy="50%"
+              dataKey='amount'
+              cx='50%'
+              cy='50%'
               outerRadius={80}
             >
               <LabelList
-                dataKey="name"
-                className="fill-background"
-                stroke="none"
+                dataKey='name'
+                className='fill-background'
+                stroke='none'
                 fontSize={12}
                 formatter={(value: string) =>
                   chartConfig[value.toLowerCase()]?.label ?? value
@@ -137,8 +136,8 @@ export function StatutoryRatio({ chartData }: StatutoryRatioProps) {
           </PieChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col gap-2 text-sm">
-        <div className="leading-none text-muted-foreground">
+      <CardFooter className='flex-col gap-2 text-sm'>
+        <div className='leading-none text-muted-foreground'>
           Showing total statutory amount ratio.
         </div>
       </CardFooter>

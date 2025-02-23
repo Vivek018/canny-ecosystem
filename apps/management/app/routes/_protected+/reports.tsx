@@ -18,5 +18,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function Reports() {
-  return <Outlet />;
+  return (
+    <section className="px-4">
+      <Outlet />
+    </section>
+  );
 }

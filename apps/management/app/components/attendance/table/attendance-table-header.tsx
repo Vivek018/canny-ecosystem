@@ -1,3 +1,4 @@
+import type { DayType } from "@/routes/_protected+/time-tracking+/attendance+/_index";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 import { Icon } from "@canny_ecosystem/ui/icon";
@@ -10,14 +11,9 @@ type Props = {
   table?: any;
   className?: string;
   loading?: boolean;
-  days: {
-    [x: string]: any;
-    day: number;
-    fullDate: string;
-  };
+  days: DayType[];
 };
 
-// make sure the order is same as header order
 
 export function AttendanceTableHeader({
   table,
@@ -26,15 +22,16 @@ export function AttendanceTableHeader({
   days,
 }: Props) {
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // make sure the order is same as header order
   const AttendanceColumnIdArray = [
     "employee_code",
     "employee_name",
     "project_name",
     "project_site_name",
-
     ...days.map(
       (day: { fullDate: { toString: () => string | number | Date } }) =>
-        formatDate(day.fullDate.toString()),
+        formatDate(day.fullDate.toString())
     ),
   ];
   const sortParam = searchParams.get("sort");
@@ -68,8 +65,8 @@ export function AttendanceTableHeader({
 
   return (
     <TableHeader className={className}>
-      <TableRow className="h-[45px] hover:bg-transparent">
-        <TableHead className="hidden md:table-cell px-3 md:px-4 py-2 sticky left-0 min-w-12 max-w-12 bg-card z-10">
+      <TableRow className='h-[45px] hover:bg-transparent'>
+        <TableHead className='hidden md:table-cell px-3 md:px-4 py-2 sticky left-0 min-w-12 max-w-12 bg-card z-10'>
           <Checkbox
             checked={
               table?.getIsAllPageRowsSelected() ||
@@ -87,31 +84,31 @@ export function AttendanceTableHeader({
               className={cn(
                 "px-4 py-2 min-w-32",
                 id === "employee_code" && "sticky left-12 bg-card z-10",
-                id === "employee_name" && "sticky left-48 bg-card z-10",
+                id === "employee_name" && "sticky left-48 bg-card z-10"
               )}
             >
               <Button
-                className="p-0 hover:bg-transparent space-x-2 disabled:opacity-100"
-                variant="ghost"
+                className='p-0 hover:bg-transparent space-x-2 disabled:opacity-100'
+                variant='ghost'
                 disabled={!isEnableSorting(id)}
                 onClick={(e) => {
                   e.preventDefault();
                   createSortQuery(id);
                 }}
               >
-                <span className="capitalize">{columnName(id)}</span>
+                <span className='capitalize'>{columnName(id)}</span>
                 <Icon
-                  name="chevron-up"
+                  name='chevron-up'
                   className={cn(
                     "hidden",
-                    id === column && value === "desc" && "flex",
+                    id === column && value === "desc" && "flex"
                   )}
                 />
                 <Icon
-                  name="chevron-down"
+                  name='chevron-down'
                   className={cn(
                     "hidden",
-                    id === column && value === "asc" && "flex",
+                    id === column && value === "asc" && "flex"
                   )}
                 />
               </Button>

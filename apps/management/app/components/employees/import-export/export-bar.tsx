@@ -19,7 +19,7 @@ export function ExportBar({
 }) {
   const totalActive = data.reduce(
     (count: number, { is_active }) => count + (is_active ? 1 : 0),
-    0,
+    0
   );
 
   const toBeExportedData = data.map((element) => {
@@ -34,8 +34,9 @@ export function ExportBar({
       if (key === "employee_code") {
         exportedData[key] = element?.employee_code;
       } else if (key === "full_name") {
-        exportedData[key] =
-          `${element?.first_name} ${element?.middle_name} ${element?.last_name}`;
+        exportedData[
+          key
+        ] = `${element?.first_name} ${element?.middle_name} ${element?.last_name}`;
       } else if (key === "mobile_number") {
         exportedData[key] = element?.primary_mobile_number;
       } else if (key === "date_of_birth") {
@@ -56,17 +57,20 @@ export function ExportBar({
         exportedData[key] =
           element?.employee_project_assignment?.assignment_type ?? "";
       } else if (key === "position") {
-        exportedData[key] = element?.employee_project_assignment?.position;
+        exportedData[key] = element?.employee_project_assignment?.position!;
       } else if (key === "skill_level") {
         exportedData[key] =
           element?.employee_project_assignment?.skill_level ?? "";
       } else if (key === "start_date") {
-        exportedData[key] = element?.employee_project_assignment?.start_date;
+        exportedData[key] = element?.employee_project_assignment?.start_date!;
       } else if (key === "end_date") {
         exportedData[key] =
           element?.employee_project_assignment?.end_date ?? "";
       } else {
-        exportedData[key] = element?.[key as keyof EmployeeDataType] as any;
+        exportedData[key] = element[key as keyof EmployeeDataType] as
+          | string
+          | boolean
+          | number;
       }
     }
 
@@ -93,21 +97,21 @@ export function ExportBar({
     <div
       className={cn(
         "z-40 fixed bottom-8 left-0 right-0 mx-auto h-14 w-max shadow-md rounded-full flex gap-10 justify-between items-center p-2 text-sm border dark:border-muted-foreground/30 bg-card text-card-foreground",
-        className,
+        className
       )}
     >
-      <div className="ml-2 flex items-center space-x-1 rounded-md">
-        <p className="font-semibold">{rows} Selected</p>
+      <div className='ml-2 flex items-center space-x-1 rounded-md'>
+        <p className='font-semibold'>{rows} Selected</p>
       </div>
-      <div className="h-full flex justify-center items-center gap-2">
-        <div className="h-full tracking-wide font-medium rounded-full flex justify-between items-center px-6 border dark:border-muted-foreground/30 ">
-          Active: <span className="ml-1.5">{totalActive}</span>
+      <div className='h-full flex justify-center items-center gap-2'>
+        <div className='h-full tracking-wide font-medium rounded-full flex justify-between items-center px-6 border dark:border-muted-foreground/30 '>
+          Active: <span className='ml-1.5'>{totalActive}</span>
         </div>
         <Button
           onClick={handleExport}
-          variant="default"
-          size="lg"
-          className="h-full rounded-full"
+          variant='default'
+          size='lg'
+          className='h-full rounded-full'
         >
           Export
         </Button>

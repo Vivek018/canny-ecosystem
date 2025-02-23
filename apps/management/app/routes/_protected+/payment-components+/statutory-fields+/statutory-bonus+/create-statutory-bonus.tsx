@@ -78,7 +78,7 @@ export const action = async ({
 
     const { status, error } = await createStatutoryBonus({
       supabase,
-      data: submission.value as any,
+      data: submission.value,
     });
 
     if (isGoodStatus(status)) {

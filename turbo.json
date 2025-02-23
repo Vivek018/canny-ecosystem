@@ -1,11 +1,27 @@
 {
   "$schema": "https://turborepo.org/schema.json",
-  "globalDependencies": ["**/.env"],
+  "globalDependencies": [
+    "**/.env"
+  ],
   "ui": "stream",
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["build/**"]
+      "env": [
+        "SUPABASE_DATABASE_URL",
+        "SUPABASE_URL",
+        "SUPABASE_ANON_KEY",
+        "OPENAI_KEY",
+        "SESSION_SECRET"
+      ],
+      "inputs": [
+        ".env"
+      ],
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "build/**"
+      ]
     },
     "start": {
       "cache": false
@@ -14,7 +30,9 @@
       "outputs": []
     },
     "dev": {
-      "inputs": ["$TURBO_DEFAULT$", ".env"],
+      "inputs": [
+        ".env"
+      ],
       "persistent": true,
       "cache": false
     }

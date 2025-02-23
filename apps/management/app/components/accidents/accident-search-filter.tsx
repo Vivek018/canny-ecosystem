@@ -155,9 +155,9 @@ export function AccidentSearchFilter({
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-      <div className="flex space-x-4 w-full md:w-auto items-center">
+      <div className='flex space-x-4 w-full md:w-auto items-center'>
         <form
-          className="relative w-full md:w-auto"
+          className='relative w-full md:w-auto'
           onSubmit={(e) => {
             e.preventDefault();
             handleSubmit(e);
@@ -179,19 +179,19 @@ export function AccidentSearchFilter({
                 : "Search Accidents"
             }
             disabled={disabled}
-            className="pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70"
+            className='pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70'
             value={prompt}
             onChange={handleSearch}
-            autoComplete="on"
-            autoCapitalize="none"
-            autoCorrect="off"
-            spellCheck="false"
+            autoComplete='on'
+            autoCapitalize='none'
+            autoCorrect='off'
+            spellCheck='false'
           />
 
           <DropdownMenuTrigger disabled={disabled} asChild>
             <button
               onClick={() => setIsOpen((prev) => !prev)}
-              type="button"
+              type='button'
               disabled={disabled}
               className={cn(
                 "absolute z-10 right-3 top-[6px] opacity-70",
@@ -201,15 +201,15 @@ export function AccidentSearchFilter({
                 isOpen && "opacity-100"
               )}
             >
-              <Icon name="mixer" />
+              <Icon name='mixer' />
             </button>
           </DropdownMenuTrigger>
         </form>
       </div>
 
       <DropdownMenuContent
-        className="w-full md:w-[480px]"
-        align="end"
+        className='w-full md:w-[480px]'
+        align='end'
         sideOffset={19}
         alignOffset={-11}
       >
@@ -222,27 +222,25 @@ export function AccidentSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 <Calendar
-                  mode="range"
+                  mode='range'
                   initialFocus
                   today={
                     filterParams.date_start
                       ? new Date(filterParams.date_start)
                       : new Date()
                   }
-                  toDate={new Date()}
-                  selected={
-                    {
-                      from:
-                        filterParams.date_start &&
-                        new Date(filterParams.date_start).toISOString(),
-                      to:
-                        filterParams.date_end &&
-                        new Date(filterParams.date_end),
-                    } as any
-                  }
+                  hidden={{ after: new Date() }}
+                  selected={{
+                    from: filterParams.date_start
+                      ? new Date(filterParams.date_start)
+                      : undefined,
+                    to: filterParams.date_end
+                      ? new Date(filterParams.date_end)
+                      : undefined,
+                  }}
                   onSelect={(range) => {
                     if (!range) return;
 
@@ -271,12 +269,12 @@ export function AccidentSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 {statusArray.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className="capitalize"
+                    className='capitalize'
                     checked={filterParams?.status === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
@@ -302,12 +300,12 @@ export function AccidentSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 {locationTypeArray.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className="capitalize"
+                    className='capitalize'
                     checked={filterParams?.location_type === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
@@ -332,7 +330,7 @@ export function AccidentSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 {categoryOfAccidentArray?.map((name, index) => (
                   <DropdownMenuCheckboxItem
@@ -362,12 +360,12 @@ export function AccidentSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 {severityTypeArray?.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className="capitalize"
+                    className='capitalize'
                     checked={filterParams?.severity === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
@@ -392,12 +390,12 @@ export function AccidentSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 {projectArray?.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className="capitalize"
+                    className='capitalize'
                     checked={filterParams?.project === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
@@ -423,12 +421,12 @@ export function AccidentSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 {!searchParamsList.project ? (
                   <DropdownMenuCheckboxItem
                     disabled={true}
-                    className="p-8 items-center justify-center"
+                    className='p-8 items-center justify-center'
                   >
                     Select Project First
                   </DropdownMenuCheckboxItem>
@@ -436,7 +434,7 @@ export function AccidentSearchFilter({
                   projectSiteArray?.map((name, index) => (
                     <DropdownMenuCheckboxItem
                       key={name + index.toString()}
-                      className="capitalize"
+                      className='capitalize'
                       checked={filterParams?.project_site === name}
                       onCheckedChange={() => {
                         setFilterParams((prev) => ({

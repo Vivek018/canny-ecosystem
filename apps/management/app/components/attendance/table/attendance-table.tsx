@@ -16,7 +16,10 @@ import { Button } from "@canny_ecosystem/ui/button";
 import { useAttendanceStore } from "@/store/attendance";
 import type { AttendanceFilterType } from "@/routes/_protected+/dashboard";
 import { ExportBar } from "../export-bar";
-import type { TransformedAttendanceDataType } from "@/routes/_protected+/time-tracking+/attendance+/_index";
+import type {
+  DayType,
+  TransformedAttendanceDataType,
+} from "@/routes/_protected+/time-tracking+/attendance+/_index";
 import { useSearchParams } from "@remix-run/react";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
 import { useInView } from "react-intersection-observer";
@@ -26,14 +29,14 @@ import { Spinner } from "@canny_ecosystem/ui/spinner";
 import { formatDate } from "@canny_ecosystem/utils";
 
 interface DataTableProps {
-  days: { day: number; fullDate: string };
+  days: DayType[];
   columns: any;
   data: TransformedAttendanceDataType[];
   noFilters?: boolean;
   hasNextPage: boolean;
   count: number;
   pageSize: number;
-  filters?: AttendanceFilterType ;
+  filters?: AttendanceFilterType;
   companyId: string;
   env: SupabaseEnv;
   query?: string | null;
@@ -130,7 +133,10 @@ export function AttendanceTable({
 
       if (newData && newData.length > 0) {
         const transformedData = transformAttendanceData(newData);
-        setData((prevData) => [...prevData, ...transformedData] as any);
+        setData(
+          (prevData) =>
+            [...prevData, ...transformedData] as TransformedAttendanceDataType[]
+        );
         setFrom(to + 1);
 
         setHasNextPage(count > to + 1);
@@ -179,14 +185,14 @@ export function AttendanceTable({
 
   const tableLength = table.getRowModel().rows?.length;
   return (
-    <div className="relative mb-8">
+    <div className='relative mb-8'>
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
           !tableLength && "border-none"
         )}
       >
-        <div className="relative">
+        <div className='relative'>
           <Table>
             <AttendanceTableHeader
               table={table}
@@ -199,7 +205,7 @@ export function AttendanceTable({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    className="relative cursor-default select-text"
+                    className='relative cursor-default select-text'
                   >
                     {row.getVisibleCells().map((cell) => {
                       return (
@@ -228,10 +234,10 @@ export function AttendanceTable({
                 <TableRow className={cn(!tableLength && "border-none")}>
                   <TableCell
                     colSpan={columns.length}
-                    className="h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize"
+                    className='h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize'
                   >
-                    <div className="flex flex-col items-center gap-1">
-                      <h2 className="text-xl">No Attendance Found.</h2>
+                    <div className='flex flex-col items-center gap-1'>
+                      <h2 className='text-xl'>No Attendance Found.</h2>
                       <p
                         className={cn(
                           "text-muted-foreground",
@@ -241,7 +247,7 @@ export function AttendanceTable({
                         Try another search, or adjusting the filters
                       </p>
                       <Button
-                        variant="outline"
+                        variant='outline'
                         className={cn(
                           "mt-4",
                           !data?.length && noFilters && "hidden"
@@ -261,8 +267,8 @@ export function AttendanceTable({
         </div>
       </div>
       {hasNextPage && initialData?.length && (
-        <div className="flex items-center justify-center mt-6" ref={ref}>
-          <div className="flex items-center space-x-2 px-6 py-5">
+        <div className='flex items-center justify-center mt-6' ref={ref}>
+          <div className='flex items-center space-x-2 px-6 py-5'>
             <Spinner />
           </div>
         </div>
@@ -270,7 +276,7 @@ export function AttendanceTable({
       <ExportBar
         className={cn(!table.getSelectedRowModel().rows.length && "hidden")}
         rows={table.getSelectedRowModel().rows.length}
-        data={selectedRowsData as any}
+        data={selectedRowsData}
         fMonth={filters?.month}
         fYear={filters?.year}
       />

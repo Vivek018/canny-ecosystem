@@ -47,7 +47,10 @@ export function ExportBar({
       } else if (key === "end_range") {
         exportedData[key] = element?.end_range ?? "";
       } else {
-        exportedData[key] = element[key as keyof EmployeeReportDataType] as any;
+        exportedData[key] = element[key as keyof EmployeeReportDataType] as
+          | string
+          | boolean
+          | number;
       }
     }
 
@@ -80,15 +83,15 @@ export function ExportBar({
         className
       )}
     >
-      <div className="ml-2 flex items-center space-x-1 rounded-md">
-        <p className="font-semibold">{rows} Selected</p>
+      <div className='ml-2 flex items-center space-x-1 rounded-md'>
+        <p className='font-semibold'>{rows} Selected</p>
       </div>
-      <div className="h-full flex justify-center items-center gap-2">
+      <div className='h-full flex justify-center items-center gap-2'>
         <Button
           onClick={handleExport}
-          variant="default"
-          size="lg"
-          className="h-full rounded-full"
+          variant='default'
+          size='lg'
+          className='h-full rounded-full'
         >
           Export
         </Button>

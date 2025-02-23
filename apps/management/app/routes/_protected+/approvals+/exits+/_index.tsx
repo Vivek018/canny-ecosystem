@@ -97,7 +97,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       });
 
     return defer({
-      exitsPromise,
+      exitsPromise: exitsPromise as any,
       query,
       filters,
       projectPromise,
@@ -226,7 +226,7 @@ export default function ExitsIndex() {
 
             return (
               <ExitPaymentTable
-                data={exitsData?.data ?? ([] as any)}
+                data={exitsData?.data ?? []}
                 columns={ExitPaymentColumns}
                 count={exitsData?.meta?.count ?? exitsData?.data?.length ?? 0}
                 query={query}

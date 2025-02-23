@@ -71,7 +71,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     value: userData.id,
   }));
 
-  return json({ data: reimbursementData, userOptions, reimbursementId, error });
+  return json({ data: reimbursementData, userOptions, error });
 }
 
 export async function action({
@@ -111,7 +111,7 @@ export async function action({
 }
 
 export default function UpdateReimbursememts() {
-  const { data, userOptions, reimbursementId, error } =
+  const { data, userOptions, error } =
     useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const updatableData = data;
@@ -153,8 +153,7 @@ export default function UpdateReimbursememts() {
   return (
     <AddReimbursements
       updateValues={updatableData}
-      userOptionsFromUpdate={userOptions as any}
-      reimbursementId={reimbursementId}
+      userOptionsFromUpdate={userOptions}
     />
   );
 }

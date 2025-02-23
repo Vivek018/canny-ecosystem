@@ -5,16 +5,18 @@ import { useHints } from "./client-hints";
 import type { Theme } from "@canny_ecosystem/types";
 import { ThemeFormSchema } from "@canny_ecosystem/utils";
 
-export function useTheme(): Theme {
+export function useTheme(): { theme: Theme } {
   const hints = useHints();
   const requestInfo = useRequestInfo();
   const optimisticMode = useOptimisticThemeMode();
   if (optimisticMode) {
-    return (optimisticMode === "system"
-      ? hints?.theme
-      : optimisticMode) as unknown as Theme;
+    return {
+      theme: (optimisticMode === "system"
+        ? hints?.theme
+        : optimisticMode) as unknown as Theme
+    };
   }
-  return requestInfo?.userPrefs.theme ?? (hints?.theme as Theme);
+  return { theme: requestInfo?.userPrefs.theme ?? (hints?.theme as Theme) };
 }
 
 export function useOptimisticThemeMode() {

@@ -192,7 +192,7 @@ export function EmployeeStatutoryImportData({
       <ImportedDataTable
         data={tableData}
         columns={ImportedDataColumns}
-        conflictingIndex={conflictingIndex as any}
+        conflictingIndex={conflictingIndex}
       />
     </section>
   );

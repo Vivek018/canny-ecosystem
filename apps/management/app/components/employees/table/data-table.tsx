@@ -22,6 +22,7 @@ import { useSearchParams } from "@remix-run/react";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
 import {
+  type EmployeeDataType,
   type EmployeeFilters,
   getEmployeesByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
@@ -238,7 +239,7 @@ export function DataTable<TData, TValue>({
       <ExportBar
         className={cn(!table.getSelectedRowModel().rows.length && "hidden")}
         rows={table.getSelectedRowModel().rows.length}
-        data={selectedRowsData as any}
+        data={selectedRowsData as EmployeeDataType[]}
         columnVisibility={columnVisibility}
       />
     </div>

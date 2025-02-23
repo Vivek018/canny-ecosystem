@@ -4,7 +4,7 @@ import { Link } from "@remix-run/react";
 
 export default function ReportsIndex() {
   return (
-    <section className="grid grid-cols-3 gap-10 py-6 px-6">
+    <section className="grid grid-cols-4 py-8">
       <div>
         <h1 className="flex items-center tracking-wide font-bold justify-between pb-4 text-xl">
           Gratuity Reports

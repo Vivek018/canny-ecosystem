@@ -17,17 +17,12 @@ import {
   defer,
   redirect,
   useLoaderData,
-  useNavigate,
 } from "@remix-run/react";
 import { AttendanceTable } from "@/components/attendance/table/attendance-table";
 import { attendanceColumns } from "@/components/attendance/table/columns";
-import { ImportAttendanceMenu } from "@/components/attendance/import-attendance-menu";
 import { ImportEmployeeAttendanceModal } from "@/components/employees/import-export/import-modal-attendance";
-import { useAttendanceStore } from "@/store/attendance";
 import { Suspense, useEffect, useState } from "react";
 import { formatDate, hasPermission, readRole } from "@canny_ecosystem/utils";
-import { Button } from "@canny_ecosystem/ui/button";
-import { Icon } from "@canny_ecosystem/ui/icon";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
@@ -39,14 +34,19 @@ import { FilterList } from "@/components/attendance/filter-list";
 import { AttendanceActions } from "@/components/attendance/attendance-actions";
 
 const pageSize = LAZY_LOADING_LIMIT;
+
 export type TransformedAttendanceDataType = {
-  projectName: string;
-  attendance: never[];
+  attendance: any[];
   employee_id: string;
   employee_code: string;
   employee_name: string;
   project: string | null;
   project_site: string | null;
+};
+
+export type DayType = {
+  day: number;
+  fullDate: string;
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -124,7 +124,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       projectPromise: Promise.resolve({ data: [] }),
       projectSitePromise: Promise.resolve({ data: [] }),
       query: "",
-      filters: undefined,
+      filters: null,
       companyId: "",
       env,
     });
@@ -251,13 +251,13 @@ export default function Attendance() {
     };
   });
 
-  const { selectedRows } = useAttendanceStore();
-
-  const noFilters = Object.values(filters).every((value) => !value);
+  const noFilters = Boolean(
+    filters && Object.values(filters).every((value) => !value)
+  );
   return (
-    <section className="py-4">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
+    <section className='py-4'>
+      <div className='w-full flex items-center justify-between pb-4'>
+        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4'>
           <Suspense fallback={<div>Loading...</div>}>
             <Await resolve={projectPromise}>
               {(projectData) => (
@@ -284,7 +284,7 @@ export default function Attendance() {
             </Await>
           </Suspense>
 
-          <FilterList filters={filters} />
+          <FilterList filters={filters ?? undefined} />
         </div>
         <AttendanceActions />
       </div>
@@ -296,7 +296,7 @@ export default function Attendance() {
               return (
                 <ErrorBoundary
                   error={error}
-                  message="Failed to load Attendance"
+                  message='Failed to load Attendance'
                 />
               );
             }
@@ -309,14 +309,14 @@ export default function Attendance() {
 
             return (
               <AttendanceTable
-                days={days as any}
-                data={attdData as any}
+                days={days}
+                data={attdData}
                 hasNextPage={hasNextPage}
                 pageSize={pageSize}
                 query={query}
                 count={meta?.count ?? data?.length ?? 0}
                 columns={attendanceColumns(days)}
-                filters={filters}
+                filters={filters ?? undefined}
                 noFilters={noFilters}
                 companyId={companyId}
                 env={env}

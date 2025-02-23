@@ -14,7 +14,7 @@ import {
   ChartTooltipContent,
 } from "@canny_ecosystem/ui/chart";
 import { useMemo } from "react";
-import type { TransformedAteendanceDataType } from "@/routes/_protected+/time-tracking+/attendance+/_index";
+import type { TransformedAttendanceDataType } from "@/routes/_protected+/time-tracking+/attendance+/_index";
 
 const chartConfig = {
   amount: {
@@ -29,7 +29,7 @@ const chartConfig = {
 export function AttendanceAbsentees({
   chartData,
 }: {
-  chartData: TransformedAteendanceDataType[];
+  chartData: TransformedAttendanceDataType[];
 }) {
   const trendData = useMemo(() => {
     const grouped: Record<string, number> = {};

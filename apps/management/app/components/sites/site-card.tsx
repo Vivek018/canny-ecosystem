@@ -20,10 +20,6 @@ export function SiteCard({
   const { role } = useUser();
   const navigate = useNavigate();
 
-  // const viewLinkTemplateSearchParam = `step=${modalSearchParamNames.view_link_template}`;
-  // const viewPaySequenceSearchParam = `step=${modalSearchParamNames.view_pay_sequence}`;
-  // const editPaySequenceSearchParam = `step=${modalSearchParamNames.edit_pay_sequence}`;
-
   return (
     <Card
       key={site.id}

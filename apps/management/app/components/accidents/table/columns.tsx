@@ -34,7 +34,7 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
     header: "Employee Code",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-28">
+        <p className='truncate w-28'>
           {row.original?.employees?.employee_code ?? "--"}
         </p>
       );
@@ -46,7 +46,7 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
     header: "Employee Name",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-48 group-hover:text-primary">{`${
+        <p className='truncate w-48 group-hover:text-primary'>{`${
           row.original.employees?.first_name
         } ${row.original.employees?.middle_name ?? ""} ${
           row.original.employees?.last_name ?? ""
@@ -60,7 +60,7 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
     header: "Project",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-28">
+        <p className='truncate w-28'>
           {row.original?.employees?.employee_project_assignment?.project_sites
             .projects?.name ?? "--"}
         </p>
@@ -73,21 +73,9 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
     header: "Project Site",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-28">
+        <p className='truncate w-28'>
           {row.original?.employees?.employee_project_assignment?.project_sites
             ?.name ?? "--"}
-        </p>
-      );
-    },
-  },
-
-  {
-    accessorKey: "date",
-    header: "Date",
-    cell: ({ row }) => {
-      return (
-        <p className="truncate ">
-          {formatDate(row.original?.date ?? "") ?? "--"}
         </p>
       );
     },
@@ -96,7 +84,26 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
     accessorKey: "title",
     header: "Title",
     cell: ({ row }) => {
-      return <p className=" truncate">{row.original?.title ?? "--"}</p>;
+      return <p className=' truncate'>{row.original?.title ?? "--"}</p>;
+    },
+  },
+  {
+    enableSorting: false,
+    accessorKey: "description",
+    header: "Description",
+    cell: ({ row }) => {
+      return <p className='truncate '>{row.original?.description ?? "--"}</p>;
+    },
+  },
+  {
+    accessorKey: "date",
+    header: "Date",
+    cell: ({ row }) => {
+      return (
+        <p className='truncate '>
+          {formatDate(row.original?.date ?? "") ?? "--"}
+        </p>
+      );
     },
   },
   {
@@ -104,7 +111,7 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
     header: "Location Type",
     cell: ({ row }) => {
       return (
-        <p className="truncate capitalize ">
+        <p className='truncate capitalize '>
           {row.original?.location_type ?? "--"}
         </p>
       );
@@ -116,7 +123,7 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
     header: "Location",
     cell: ({ row }) => {
       return (
-        <p className="truncate capitalize">{row.original?.location ?? "--"}</p>
+        <p className='truncate capitalize'>{row.original?.location ?? "--"}</p>
       );
     },
   },
@@ -125,7 +132,7 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
     accessorKey: "category",
     header: "Category",
     cell: ({ row }) => {
-      return <p className=" truncate">{row.original?.category ?? "--"}</p>;
+      return <p className=' truncate'>{row.original?.category ?? "--"}</p>;
     },
   },
   {
@@ -133,7 +140,7 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
     accessorKey: "severity",
     header: "Severity",
     cell: ({ row }) => {
-      return <p className="truncate ">{row.original?.severity ?? "--"}</p>;
+      return <p className='truncate '>{row.original?.severity ?? "--"}</p>;
     },
   },
   {
@@ -141,15 +148,7 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      return <p className="truncate ">{row.original?.status ?? "--"}</p>;
-    },
-  },
-  {
-    enableSorting: false,
-    accessorKey: "description",
-    header: "Description",
-    cell: ({ row }) => {
-      return <p className="truncate ">{row.original?.description ?? "--"}</p>;
+      return <p className='truncate '>{row.original?.status ?? "--"}</p>;
     },
   },
   {
@@ -158,7 +157,7 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
     header: "Medical Diagnosis",
     cell: ({ row }) => {
       return (
-        <p className="truncate ">{row.original?.medical_diagnosis ?? "--"}</p>
+        <p className='truncate '>{row.original?.medical_diagnosis ?? "--"}</p>
       );
     },
   },
@@ -186,9 +185,9 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
               )}
               asChild
             >
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <Icon name="dots-vertical" />
+              <Button variant='ghost' className='h-8 w-8 p-0'>
+                <span className='sr-only'>Open menu</span>
+                <Icon name='dots-vertical' />
               </Button>
             </DropdownMenuTrigger>
           }

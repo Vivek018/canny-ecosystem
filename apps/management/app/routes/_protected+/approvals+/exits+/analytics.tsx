@@ -34,7 +34,7 @@ export default function ExitAnalytics() {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <ExitPaymentByTime chartData={dataSource} />
         <ExitByTime chartData={dataSource} />
-        <ExitByReasons chartData={dataSource as any} />
+        <ExitByReasons chartData={dataSource} />
       </div>
       <div>
         <ExitOverview chartData={dataSource} />
