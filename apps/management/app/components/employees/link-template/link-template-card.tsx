@@ -114,7 +114,7 @@ export const LinkTemplateCard = ({
                 Update
               </Link>
               <LinkTemplateDropdown
-                templateId={paymentTemplateAssignmentData.id}
+                templateAssignmentId={paymentTemplateAssignmentData.id}
                 triggerChild={
                   <DropdownMenuTrigger
                     className={cn(

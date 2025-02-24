@@ -6,7 +6,7 @@ import { PayrollTopSite } from "@/components/payroll/analytics/payroll-top-site"
 import { PayrollTrend } from "@/components/payroll/analytics/payroll-trend";
 import { StatutoryRatio } from "@/components/payroll/analytics/statutory-ratio";
 import { cacheKeyPrefix } from "@/constant";
-import { clientCaching } from "@/utils/cache";
+import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
   type PayrollEntriesWithTemplateComponents,
@@ -135,7 +135,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return await clientCaching(cacheKeyPrefix.dashboard, args);
+  const url = new URL(args.request.url);
+  return await clientCaching(
+    `${cacheKeyPrefix.dashboard}${url.searchParams.toString()}`,
+    args
+  );
 }
 
 clientLoader.hydrate = true;
@@ -161,8 +165,10 @@ export default function Dashboard() {
     totalUsers: usersCount,
   };
 
-  if (error)
-    return <ErrorBoundary error={error} message="Failed to load data" />;
+  if (error) {
+    clearCacheEntry(cacheKeyPrefix.dashboard);
+    return <ErrorBoundary error={error} message='Failed to load data' />;
+  }
 
   return (
     <section className='w-full p-4 flex flex-col gap-4'>

@@ -44,12 +44,10 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { clearCacheEntry } from "@/utils/cache";
 import { addLeavesFromData } from "@canny_ecosystem/supabase/mutations";
 import { UPDATE_LEAVES_TAG } from "./$id.$route.update-leave";
-import {
-  getUsersByCompanyId,
-} from "@canny_ecosystem/supabase/queries";
+import { getUsersByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
-export const ADD_LEAVES_TAG = "Add_Leave";
+export const ADD_LEAVES_TAG = "Create_Leave";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
@@ -165,15 +163,15 @@ export default function AddLeaves({
   });
 
   return (
-    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
+    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
       <FormProvider context={form.context}>
-        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
+        <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
           <Card>
             <CardHeader>
-              <CardTitle className="capitalize">
+              <CardTitle className='capitalize'>
                 {replaceUnderscore(LEAVES_TAG)}
               </CardTitle>
-              <CardDescription className="lowercase">
+              <CardDescription className='lowercase'>
                 {`${replaceUnderscore(LEAVES_TAG)} by filling this form`}
               </CardDescription>
             </CardHeader>
@@ -181,10 +179,10 @@ export default function AddLeaves({
               <input
                 {...getInputProps(fields.employee_id, { type: "hidden" })}
               />
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10">
+              <div className='grid grid-cols-2 place-content-center justify-between gap-x-8 mt-4'>
                 <SearchableSelectField
                   key={resetKey}
-                  className="w-full capitalize flex-1 "
+                  className='w-full capitalize flex-1 '
                   options={transformStringArrayIntoOptions(
                     leaveTypeArray as unknown as string[]
                   )}
@@ -207,7 +205,7 @@ export default function AddLeaves({
                     }),
                     placeholder: "Select an authority that approved",
                   }}
-                  className="lowercase"
+                  className='lowercase'
                   options={(userOptions as any) ?? userOptionsFromUpdate}
                   labelProps={{
                     children: "Approved By",
@@ -215,7 +213,7 @@ export default function AddLeaves({
                   errors={fields.user_id.errors}
                 />
               </div>
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 ">
+              <div className='grid grid-cols-2 place-content-center justify-between gap-x-8 '>
                 <Field
                   inputProps={{
                     ...getInputProps(fields.start_date, {

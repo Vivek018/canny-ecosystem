@@ -14,11 +14,11 @@ export async function action({
 }: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
   const employeeId = params.employeeId as string;
-  const templateId = params.templateId;
+  const templateAssignmentId = params.templateAssignmentId;
 
   const { status, error } = await deletePaymentTemplateAssignment({
     supabase,
-    id: templateId ?? "",
+    id: templateAssignmentId ?? "",
   });
   if (isGoodStatus(status)) {
     return json({
