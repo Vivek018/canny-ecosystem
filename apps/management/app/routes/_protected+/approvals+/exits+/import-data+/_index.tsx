@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import {
-  type ClientLoaderFunctionArgs,
   json,
   useLoaderData,
   useLocation,
@@ -34,8 +33,6 @@ import type { z } from "zod";
 import { useImportStoreForExit } from "@/store/import";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { ExitImportData } from "@/components/exits/import-export/exit-import-data";
-import { clientCaching } from "@/utils/cache";
-import { cacheKeyPrefix } from "@/constant";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
 import { getExitsConflicts } from "@canny_ecosystem/supabase/mutations";
 
@@ -66,12 +63,6 @@ export async function loader() {
   };
   return json({ env });
 }
-
-// caching
-export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return await clientCaching(cacheKeyPrefix.exits, args);
-}
-clientLoader.hydrate = true;
 
 export default function ExitFieldMapping() {
   const { env } = useLoaderData<typeof loader>();

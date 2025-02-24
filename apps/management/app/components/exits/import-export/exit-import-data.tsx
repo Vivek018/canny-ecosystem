@@ -130,7 +130,7 @@ export function ExitImportData({
         status === "Successfully inserted new records" ||
         status === "Successfully processed updates and new insertions"
       ) {
-        clearCacheEntry(cacheKeyPrefix.employee_overview);
+        clearCacheEntry(cacheKeyPrefix.exits);
         navigate("/approvals/exits");
       }
     }
