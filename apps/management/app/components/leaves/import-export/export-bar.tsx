@@ -4,7 +4,7 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { formatDateTime } from "@canny_ecosystem/utils";
 import type { VisibilityState } from "@tanstack/react-table";
 import Papa from "papaparse";
-import { LeavesColumnIdArray } from "./table/leaves-table-header";
+import { LeavesColumnIdArray } from "../table/leaves-table-header";
 
 export function ExportBar({
   rows,

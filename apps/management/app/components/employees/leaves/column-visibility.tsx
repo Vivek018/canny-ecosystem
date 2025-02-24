@@ -20,7 +20,7 @@ export function ColumnVisibility({
 
   return (
     <Popover>
-      <PopoverTrigger asChild className={cn(hidden && "hidden")}>
+      <PopoverTrigger asChild className={cn(" mx-2", hidden && "hidden")}>
         <Button
           variant="outline"
           size="icon"

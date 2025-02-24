@@ -11,6 +11,13 @@ import type {
   UserDatabaseRow,
 } from "../types";
 
+export type ImportLeavesDataType = Pick<
+  LeavesDatabaseRow,
+   "start_date" | "end_date" | "reason" | "leave_type"
+> & { email: UserDatabaseRow["email"] } & {
+  employee_code: EmployeeDatabaseRow["employee_code"];
+};
+
 export type LeavesDataType = Pick<
   LeavesDatabaseRow,
   "id" | "employee_id" | "start_date" | "end_date" | "reason" | "leave_type"

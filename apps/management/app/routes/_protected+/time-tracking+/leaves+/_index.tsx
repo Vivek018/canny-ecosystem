@@ -21,6 +21,7 @@ import {
   defer,
   Outlet,
   useLoaderData,
+  useNavigate,
 } from "@remix-run/react";
 import { Suspense } from "react";
 import { hasPermission, readRole } from "@canny_ecosystem/utils";
@@ -32,6 +33,12 @@ import { columns } from "@/components/leaves/table/columns";
 import { LeavesSearchFilter } from "@/components/employees/leaves/leave-search-filter";
 import { FilterList } from "@/components/employees/leaves/filter-list";
 import { ColumnVisibility } from "@/components/employees/leaves/column-visibility";
+import { Icon } from "@canny_ecosystem/ui/icon";
+import { useLeavesStore } from "@/store/leaves";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { Button } from "@canny_ecosystem/ui/button";
+import { ImportLeavesMenu } from "@/components/leaves/import-menu";
+import { ImportLeavesModal } from "@/components/leaves/import-export/import-modal-leaves";
 
 const pageSize = LAZY_LOADING_LIMIT;
 const isEmployeeRoute = false;
@@ -129,6 +136,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 clientLoader.hydrate = true;
 
 export default function LeavesIndex() {
+  const navigate = useNavigate();
   const {
     leavesPromise,
     projectPromise,
@@ -139,7 +147,7 @@ export default function LeavesIndex() {
     companyId,
     env,
   } = useLoaderData<typeof loader>();
-
+  const { selectedRows } = useLeavesStore();
   const filterList = { ...filters, name: query };
   const noFilters = Object.values(filterList).every((value) => !value);
 
@@ -184,7 +192,19 @@ export default function LeavesIndex() {
           </Suspense>
           <FilterList filters={filterList} />
         </div>
-      <ColumnVisibility/>
+        <div className="flex">
+          <Button
+            variant="outline"
+            size="icon"
+            className={cn("h-10 w-10", !selectedRows.length && "hidden")}
+            disabled={!selectedRows.length}
+            onClick={() => navigate("/time-tracking/leaves/analytics")}
+          >
+            <Icon name="chart" className="h-[18px] w-[18px]" />
+          </Button>
+          <ColumnVisibility />
+          <ImportLeavesMenu />
+        </div>
       </div>
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={leavesPromise}>
@@ -214,7 +234,7 @@ export default function LeavesIndex() {
           }}
         </Await>
       </Suspense>
-      {/* <ImportReimbursementModal /> */}
+      <ImportLeavesModal />
       <Outlet />
     </section>
   );
