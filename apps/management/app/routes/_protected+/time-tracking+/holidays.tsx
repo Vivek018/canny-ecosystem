@@ -107,16 +107,13 @@ export default function Holidays() {
               return (
                 <>
                   {data.map((leave: LeaveTypeDatabaseRow) => (
-                    <Card
-                      key={leave.id}
-                      className='bg-muted/10 hover:shadow-lg transition-shadow'
-                    >
+                    <Card key={leave?.id}>
                       <LeaveTypeOptionsDropdown
-                        id={leave.id}
+                        id={leave?.id}
                         triggerChild={
                           <DropdownMenuTrigger
                             className={cn(
-                              "p-2 py-2 ml-auto mr-2 mt-2 rounded-md  grid place-items-center ",
+                              "p-2 py-2 ml-auto mr-2 mt-2 rounded-md  grid place-items-center focus-visible:outline-none",
                               !hasPermission(
                                 role,
                                 `${deleteRole}:${attribute.holidays}`
@@ -147,7 +144,7 @@ export default function Holidays() {
 
                   {data.length < 5 && (
                     <Card
-                      className='h-28 bg-muted/40 hover:shadow-lg transition-shadow cursor-pointer grid place-items-center'
+                      className='h-28 bg-muted/40 dark:bg-muted/80 cursor-pointer grid place-items-center'
                       onClick={() => navigate("add-leave-type")}
                     >
                       <Icon
