@@ -7,12 +7,16 @@ import {
 } from "@canny_ecosystem/ui/sheet";
 import { TableCell, TableRow } from "@canny_ecosystem/ui/table";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { useNavigate } from "@remix-run/react";
 import { flexRender } from "@tanstack/react-table";
 
 export function ExitPaymentsSheet({
   row,
   rowData,
 }: { row: any; rowData: any }) {
+
+  const navigate = useNavigate();
+
   const netPay =
     rowData.bonus +
     rowData.leave_encashment +
@@ -68,7 +72,9 @@ export function ExitPaymentsSheet({
       </TableRow>
       <SheetContent className='w-[600px]'>
         <SheetHeader className='m-5'>
-          <SheetTitle className='flex  justify-between'>
+          <SheetTitle className='flex justify-between cursor-pointer' onClick={() => {
+            navigate(`/employees/${rowData.employee_id}/payments`);
+          }}>
             <div>
               <h1 className='text-primary text-3xl'>
                 {rowData.employees

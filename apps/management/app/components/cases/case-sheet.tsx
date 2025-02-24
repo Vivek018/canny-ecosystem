@@ -116,7 +116,7 @@ export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
 
       <SheetContent className='w-[600px]'>
         <SheetHeader className='m-5'>
-          <SheetTitle className='text-primary text-3xl'>
+          <SheetTitle className='text-3xl'>
             {rowData?.title ?? "--"}
           </SheetTitle>
           <SheetDescription className='text-muted-foreground text-sm line-clamp-4'>
