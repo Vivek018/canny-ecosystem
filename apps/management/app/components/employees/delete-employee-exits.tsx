@@ -68,7 +68,7 @@ export const DeleteEmployeeExits = ({ exitId, employeeId }: { exitId: string, em
             employee's exit and remove it's data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <div className="p-4">
+        <div className="py-4">
           <p className="text-sm text-foreground/80">
             Please type{" "}
             <i className="text-foreground font-medium">{DELETE_TEXT}</i> to

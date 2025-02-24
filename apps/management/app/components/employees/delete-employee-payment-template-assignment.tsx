@@ -18,9 +18,9 @@ import { useParams, useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
 export const DeleteEmployeePaymentTemplateAssignment = ({
-  templateId,
+  templateAssignmentId,
 }: {
-  templateId: string | null;
+  templateAssignmentId: string | null;
 }) => {
   const { employeeId } = useParams();
   const [isLoading, setLoading] = useState(false);
@@ -43,7 +43,7 @@ export const DeleteEmployeePaymentTemplateAssignment = ({
         {},
         {
           method: "POST",
-          action: `/employees/${employeeId}/payments/${templateId}/delete-link-template`,
+          action: `/employees/${employeeId}/payments/${templateAssignmentId}/delete-link-template`,
         }
       );
     } else {
@@ -71,7 +71,7 @@ export const DeleteEmployeePaymentTemplateAssignment = ({
             servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <div className='p-4'>
+        <div className='py-4'>
           <p className='text-sm text-foreground/80'>
             Please type{" "}
             <i className='text-foreground font-medium'>{DELETE_TEXT}</i> to

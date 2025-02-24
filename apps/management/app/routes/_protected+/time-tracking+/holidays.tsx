@@ -113,7 +113,7 @@ export default function Holidays() {
                         triggerChild={
                           <DropdownMenuTrigger
                             className={cn(
-                              "p-2 py-2 ml-auto mr-2 mt-2 rounded-md  grid place-items-center focus-visible:outline-none",
+                              "p-2 py-2 ml-auto mr-2 mt-2 rounded-md  grid place-items-center",
                               !hasPermission(
                                 role,
                                 `${deleteRole}:${attribute.holidays}`

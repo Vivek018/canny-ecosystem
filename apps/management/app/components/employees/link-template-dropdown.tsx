@@ -9,10 +9,10 @@ import { useSearchParams } from "@remix-run/react";
 import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
 
 export const LinkTemplateDropdown = ({
-  templateId,
+  templateAssignmentId,
   triggerChild,
 }: {
-  templateId: string | null;
+  templateAssignmentId: string | null;
   triggerChild: React.ReactElement;
 }) => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -29,7 +29,7 @@ export const LinkTemplateDropdown = ({
           <DropdownMenuItem onClick={handleViewComponents}>
             View Template Components
           </DropdownMenuItem>
-          <DeleteEmployeePaymentTemplateAssignment templateId={templateId} />
+          <DeleteEmployeePaymentTemplateAssignment templateAssignmentId={templateAssignmentId} />
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
