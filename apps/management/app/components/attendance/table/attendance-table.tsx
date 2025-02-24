@@ -9,6 +9,7 @@ import {
   flexRender,
   getCoreRowModel,
   useReactTable,
+  type VisibilityState,
 } from "@tanstack/react-table";
 import { AttendanceTableHeader } from "./attendance-table-header";
 import { useEffect, useState } from "react";
@@ -40,6 +41,7 @@ interface DataTableProps {
   companyId: string;
   env: SupabaseEnv;
   query?: string | null;
+  initialColumnVisibility?: VisibilityState;
 }
 
 export function AttendanceTable({
@@ -54,9 +56,13 @@ export function AttendanceTable({
   query,
   env,
   companyId,
+  initialColumnVisibility,
 }: DataTableProps) {
-  const { rowSelection, setSelectedRows, setRowSelection } =
+  const { rowSelection, setSelectedRows, setRowSelection, setColumns } =
     useAttendanceStore();
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+    initialColumnVisibility ?? {}
+  );
   const [searchParams, setSearchParams] = useSearchParams();
   const [data, setData] =
     useState<TransformedAttendanceDataType[]>(initialData);
@@ -96,7 +102,7 @@ export function AttendanceTable({
         }
 
         const fullDate = formatDate(date.toISOString().split("T")[0]);
-        acc[key][fullDate] = record.present
+        acc[key][fullDate!] = record.present
           ? "P"
           : record.holiday
           ? record.holiday_type === "weekly"
@@ -156,6 +162,10 @@ export function AttendanceTable({
   }, [initialData, initialHasNextPage, pageSize]);
 
   useEffect(() => {
+    setColumns(table.getAllLeafColumns());
+  }, [columnVisibility]);
+
+  useEffect(() => {
     if (inView) {
       loadMoreEmployees();
     }
@@ -166,8 +176,10 @@ export function AttendanceTable({
     columns,
     getCoreRowModel: getCoreRowModel(),
     onRowSelectionChange: setRowSelection,
+    onColumnVisibilityChange: setColumnVisibility,
     state: {
       rowSelection,
+      columnVisibility,
     },
   });
 
@@ -185,14 +197,14 @@ export function AttendanceTable({
 
   const tableLength = table.getRowModel().rows?.length;
   return (
-    <div className='relative mb-8'>
+    <div className="relative mb-8">
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
           !tableLength && "border-none"
         )}
       >
-        <div className='relative'>
+        <div className="relative">
           <Table>
             <AttendanceTableHeader
               table={table}
@@ -205,7 +217,7 @@ export function AttendanceTable({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    className='relative cursor-default select-text'
+                    className="relative cursor-default select-text"
                   >
                     {row.getVisibleCells().map((cell) => {
                       return (
@@ -234,10 +246,10 @@ export function AttendanceTable({
                 <TableRow className={cn(!tableLength && "border-none")}>
                   <TableCell
                     colSpan={columns.length}
-                    className='h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize'
+                    className="h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize"
                   >
-                    <div className='flex flex-col items-center gap-1'>
-                      <h2 className='text-xl'>No Attendance Found.</h2>
+                    <div className="flex flex-col items-center gap-1">
+                      <h2 className="text-xl">No Attendance Found.</h2>
                       <p
                         className={cn(
                           "text-muted-foreground",
@@ -247,7 +259,7 @@ export function AttendanceTable({
                         Try another search, or adjusting the filters
                       </p>
                       <Button
-                        variant='outline'
+                        variant="outline"
                         className={cn(
                           "mt-4",
                           !data?.length && noFilters && "hidden"
@@ -267,8 +279,8 @@ export function AttendanceTable({
         </div>
       </div>
       {hasNextPage && initialData?.length && (
-        <div className='flex items-center justify-center mt-6' ref={ref}>
-          <div className='flex items-center space-x-2 px-6 py-5'>
+        <div className="flex items-center justify-center mt-6" ref={ref}>
+          <div className="flex items-center space-x-2 px-6 py-5">
             <Spinner />
           </div>
         </div>
@@ -279,6 +291,7 @@ export function AttendanceTable({
         data={selectedRowsData}
         fMonth={filters?.month}
         fYear={filters?.year}
+        columnVisibility={columnVisibility}
       />
     </div>
   );

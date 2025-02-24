@@ -21,7 +21,7 @@ import {
 import { AttendanceTable } from "@/components/attendance/table/attendance-table";
 import { attendanceColumns } from "@/components/attendance/table/columns";
 import { ImportEmployeeAttendanceModal } from "@/components/employees/import-export/import-modal-attendance";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { formatDate, hasPermission, readRole } from "@canny_ecosystem/utils";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
@@ -80,7 +80,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined,
+        (value) => value !== null && value !== undefined
       );
 
     const attendancePromise = await getAttendanceByCompanyId({
@@ -136,7 +136,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 
   return await clientCaching(
     `${cacheKeyPrefix.attendance}${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 
@@ -168,52 +168,6 @@ export default function Attendance() {
     companyId,
     env,
   } = useLoaderData<typeof loader>();
-
-  function transformAttendanceData(data: any[]) {
-    const groupedByEmployeeAndMonth = data.reduce((acc, employee) => {
-      const empCode = employee.employee_code;
-      const employeeDetails = {
-        employee_id: employee.id,
-        employee_code: empCode,
-        employee_name: `${employee.first_name} ${employee.middle_name} ${employee.last_name}`,
-        project:
-          employee.employee_project_assignment?.project_sites?.projects?.name ||
-          null,
-        project_site:
-          employee.employee_project_assignment?.project_sites?.name || null,
-      };
-
-      if (!employee?.attendance?.length) {
-        acc[empCode] = acc[empCode] || employeeDetails;
-        return acc;
-      }
-
-      for (const record of employee?.attendance ?? []) {
-        const date = new Date(record.date);
-        const monthYear = `${date.getMonth()}-${date.getFullYear()}`;
-        const key = `${empCode}-${monthYear}`;
-
-        if (!acc[key]) {
-          acc[key] = { ...employeeDetails };
-        }
-
-        const fullDate = formatDate(date.toISOString().split("T")[0]);
-        acc[key][fullDate] = record.present
-          ? "P"
-          : record.holiday
-            ? record.holiday_type === "weekly"
-              ? "(WOF)"
-              : record.holiday_type === "paid"
-                ? "L"
-                : "A"
-            : "A";
-      }
-
-      return acc;
-    }, {});
-
-    return Object.values(groupedByEmployeeAndMonth);
-  }
 
   const [month, setMonth] = useState<number>(() => {
     if (filters?.month) {
@@ -251,13 +205,61 @@ export default function Attendance() {
     };
   });
 
+  const transformAttendanceData = useMemo(() => {
+    return (data: any[]) => {
+      const groupedByEmployeeAndMonth = data.reduce((acc, employee) => {
+        const empCode = employee.employee_code;
+        const employeeDetails = {
+          employee_id: employee.id,
+          employee_code: empCode,
+          employee_name: `${employee.first_name} ${employee.middle_name} ${employee.last_name}`,
+          project:
+            employee.employee_project_assignment?.project_sites?.projects
+              ?.name || null,
+          project_site:
+            employee.employee_project_assignment?.project_sites?.name || null,
+        };
+
+        if (!employee?.attendance?.length) {
+          acc[empCode] = acc[empCode] || employeeDetails;
+          return acc;
+        }
+
+        for (const record of employee?.attendance ?? []) {
+          const date = new Date(record.date);
+          const monthYear = `${date.getMonth()}-${date.getFullYear()}`;
+          const key = `${empCode}-${monthYear}`;
+
+          if (!acc[key]) {
+            acc[key] = { ...employeeDetails };
+          }
+
+          const fullDate = formatDate(date.toISOString().split("T")[0]);
+          acc[key][fullDate!] = record.present
+            ? "P"
+            : record.holiday
+            ? record.holiday_type === "weekly"
+              ? "(WOF)"
+              : record.holiday_type === "paid"
+              ? "L"
+              : "A"
+            : "A";
+        }
+
+        return acc;
+      }, {});
+
+      return Object.values(groupedByEmployeeAndMonth);
+    };
+  }, [month, year, days]);
+
   const noFilters = Boolean(
     filters && Object.values(filters).every((value) => !value)
   );
   return (
-    <section className='py-4'>
-      <div className='w-full flex items-center justify-between pb-4'>
-        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4'>
+    <section className="py-4">
+      <div className="w-full flex items-center justify-between pb-4">
+        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
           <Suspense fallback={<div>Loading...</div>}>
             <Await resolve={projectPromise}>
               {(projectData) => (
@@ -296,21 +298,23 @@ export default function Attendance() {
               return (
                 <ErrorBoundary
                   error={error}
-                  message='Failed to load Attendance'
+                  message="Failed to load Attendance"
                 />
               );
             }
 
-            const attdData = transformAttendanceData(
-              data,
-            ) as TransformedAttendanceDataType[];
+            const transformedData = useMemo(() => {
+              return transformAttendanceData(data);
+            }, [data, transformAttendanceData]);
 
             const hasNextPage = Boolean(meta?.count > pageSize);
 
             return (
               <AttendanceTable
                 days={days}
-                data={attdData}
+                data={
+                  transformedData as unknown as TransformedAttendanceDataType[]
+                }
                 hasNextPage={hasNextPage}
                 pageSize={pageSize}
                 query={query}

@@ -2,6 +2,7 @@ import { Button } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { formatDate, formatDateTime } from "@canny_ecosystem/utils";
 import { months } from "@canny_ecosystem/utils/constant";
+import type { VisibilityState } from "@tanstack/react-table";
 import Papa from "papaparse";
 import { useEffect, useState } from "react";
 
@@ -11,12 +12,14 @@ export function ExportBar({
   className,
   fMonth,
   fYear,
+  columnVisibility,
 }: {
   rows: number;
   data: any;
   className: string;
   fMonth: string | undefined | null;
   fYear: string | undefined | null;
+  columnVisibility: VisibilityState;
 }) {
   const [month, setMonth] = useState<number>(new Date().getMonth());
   const [year, setYear] = useState<number>(new Date().getFullYear());
@@ -48,17 +51,25 @@ export function ExportBar({
       project: string;
       project_site: string;
     }) => {
-      const formattedEntry: any = {
-        employee_code: entry?.employee_code,
-        employee_name: entry?.employee_name,
-        project: entry?.project,
-        project_site: entry?.project_site,
-      };
+      const formattedEntry: any = {};
+
+      for (const key of [
+        "employee_code",
+        "employee_name",
+        "project",
+        "project_site",
+      ]) {
+        if (columnVisibility[key] !== false) {
+          formattedEntry[key] = entry[key];
+        }
+      }
 
       // biome-ignore lint/complexity/noForEach: <explanation>
       days.forEach(({ fullDate }) => {
         const formattedDate = formatDate(fullDate);
-        formattedEntry[formattedDate] = entry[formattedDate] || "";
+        if (columnVisibility[formattedDate!] !== false) {
+          formattedEntry[formattedDate!] = entry[formattedDate!] || "";
+        }
       });
 
       return formattedEntry;
