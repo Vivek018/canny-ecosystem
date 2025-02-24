@@ -39,6 +39,7 @@ import {
   Await,
   type ClientLoaderFunctionArgs,
   Link,
+  Outlet,
   useLoaderData,
   useNavigate,
 } from "@remix-run/react";
@@ -83,7 +84,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 
 clientLoader.hydrate = true;
 
-export default function HolidayIndex() {
+export default function Holidays() {
   const { leaveTypePromise, holidaysPromise } = useLoaderData<typeof loader>();
   const { role } = useUser();
   const navigate = useNavigate();
@@ -238,6 +239,7 @@ export default function HolidayIndex() {
           </Await>
         </Suspense>
       </div>
+      <Outlet />
     </div>
   );
 }

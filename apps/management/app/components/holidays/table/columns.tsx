@@ -12,21 +12,9 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import type { HolidaysDataType } from "@canny_ecosystem/supabase/queries";
-import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 import { HolidaysOptionsDropdown } from "./holidays-options-dropdown";
 
 export const columns: ColumnDef<HolidaysDataType>[] = [
-  {
-    id: "select",
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
   {
     accessorKey: "name",
     header: "Name",
@@ -60,7 +48,7 @@ export const columns: ColumnDef<HolidaysDataType>[] = [
     cell: ({ row }) => {
       return (
         <p className="truncate capitalize">
-          {(row.original?.is_mandatory)?.toString() ?? "--"}
+          {row.original?.is_mandatory?.toString() ?? "--"}
         </p>
       );
     },

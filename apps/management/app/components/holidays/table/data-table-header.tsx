@@ -1,4 +1,3 @@
-import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 import { TableHead, TableHeader, TableRow } from "@canny_ecosystem/ui/table";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 
@@ -17,7 +16,6 @@ export const HolidaysColumnIdArray = [
 ];
 
 export function HolidaysTableHeader({ table, className, loading }: Props) {
-
   const isVisible = (id: string) =>
     loading ||
     table
@@ -36,17 +34,6 @@ export function HolidaysTableHeader({ table, className, loading }: Props) {
   return (
     <TableHeader className={className}>
       <TableRow className="h-[45px] hover:bg-transparent">
-        <TableHead className="hidden md:table-cell px-3 md:px-4 py-2 sticky left-0 min-w-12 max-w-12 bg-card z-10">
-          <Checkbox
-            checked={
-              table?.getIsAllPageRowsSelected() ||
-              (table?.getIsSomePageRowsSelected() && "indeterminate")
-            }
-            onCheckedChange={(value) => {
-              table?.toggleAllPageRowsSelected(!!value);
-            }}
-          />
-        </TableHead>
         {HolidaysColumnIdArray?.map((id) => {
           return (
             isVisible(id) && (
