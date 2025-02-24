@@ -28,7 +28,6 @@ import { useInView } from "react-intersection-observer";
 import { Button } from "@canny_ecosystem/ui/button";
 import { ExportBar } from "../import-export/export-bar";
 
-
 interface LeavesDataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
@@ -95,26 +94,26 @@ export function LeavesDataTable<TData, TValue>({
       }
     }
     if (employeeId) {
-          try {
-            const { data } = await getLeavesByEmployeeId({
-              supabase,
-              employeeId,
-              params: {
-                from: from,
-                to: to,
-                filters,
-                sort: sortParam?.split(":") as [string, "asc" | "desc"],
-              },
-            });
-            if (data) {
-              setData((prevData) => [...prevData, ...data] as TData[]);
-            }
-            setFrom(to + 1);
-            setHasNextPage(data?.length! > to);
-          } catch {
-            setHasNextPage(false);
-          }
+      try {
+        const { data } = await getLeavesByEmployeeId({
+          supabase,
+          employeeId,
+          params: {
+            from: from,
+            to: to,
+            filters,
+            sort: sortParam?.split(":") as [string, "asc" | "desc"],
+          },
+        });
+        if (data) {
+          setData((prevData) => [...prevData, ...data] as TData[]);
         }
+        setFrom(to + 1);
+        setHasNextPage(data?.length! > to);
+      } catch {
+        setHasNextPage(false);
+      }
+    }
   };
 
   const table = useReactTable({
@@ -189,6 +188,10 @@ export function LeavesDataTable<TData, TValue>({
                             "px-3 md:px-4 py-4 hidden md:table-cell",
                             cell.column.id === "select" &&
                               "sticky left-0 min-w-12 max-w-12 bg-card z-10",
+                            cell.column.id === "employee_code" &&
+                              "sticky left-12 bg-card z-10",
+                            cell.column.id === "employee_name" &&
+                              "sticky left-48 bg-card z-10",
                             cell.column.id === "actions" &&
                               "sticky right-0 min-w-20 max-w-20 bg-card z-10"
                           )}

@@ -152,9 +152,9 @@ export default function LeavesIndex() {
   const noFilters = Object.values(filterList).every((value) => !value);
 
   return (
-    <section className="py-4">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
+    <section className='py-4'>
+      <div className='w-full flex items-center justify-between pb-4'>
+        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4'>
           <Suspense fallback={<div>Loading...</div>}>
             <Await resolve={projectPromise}>
               {(projectData) => (
@@ -192,15 +192,15 @@ export default function LeavesIndex() {
           </Suspense>
           <FilterList filters={filterList} />
         </div>
-        <div className="flex">
+        <div className='space-x-2 hidden md:flex'>
           <Button
-            variant="outline"
-            size="icon"
+            variant='outline'
+            size='icon'
             className={cn("h-10 w-10", !selectedRows.length && "hidden")}
             disabled={!selectedRows.length}
             onClick={() => navigate("/time-tracking/leaves/analytics")}
           >
-            <Icon name="chart" className="h-[18px] w-[18px]" />
+            <Icon name='chart' className='h-[18px] w-[18px]' />
           </Button>
           <ColumnVisibility />
           <ImportLeavesMenu />
@@ -212,7 +212,7 @@ export default function LeavesIndex() {
             if (error) {
               clearCacheEntry(cacheKeyPrefix.leaves);
               return (
-                <ErrorBoundary error={error} message="Failed to load leaves" />
+                <ErrorBoundary error={error} message='Failed to load leaves' />
               );
             }
 

@@ -40,10 +40,10 @@ export const columns = (
     cell: ({ row }) => (
       <Link
         to={`/employees/${row.original.employee_id}/leaves`}
-        prefetch="intent"
-        className="group"
+        prefetch='intent'
+        className='group'
       >
-        <p className="truncate text-primary/80 w-28">
+        <p className='truncate text-primary/80 w-28'>
           {row.original?.employees?.employee_code}
         </p>
       </Link>
@@ -57,10 +57,10 @@ export const columns = (
     cell: ({ row }) => (
       <Link
         to={`/employees/${row.original.employee_id}/leaves`}
-        prefetch="intent"
-        className="group"
+        prefetch='intent'
+        className='group'
       >
-        <p className="truncate text-primary/80 w-28">{`${
+        <p className='truncate text-primary/80 w-28'>{`${
           row.original?.employees?.first_name
         } ${row.original?.employees?.middle_name ?? ""} ${
           row.original?.employees?.last_name ?? ""
@@ -96,28 +96,36 @@ export const columns = (
     accessorKey: "leave_type",
     header: "Leave Type",
     cell: ({ row }) => {
-      return replaceUnderscore(row.original?.leave_type) ?? "--";
+      return (
+        <p className='w-max'>
+          {replaceUnderscore(row.original?.leave_type) ?? "--"}
+        </p>
+      );
     },
   },
   {
     accessorKey: "start_date",
     header: "Start Date",
     cell: ({ row }) => {
-      return formatDate(row.original?.start_date) ?? "--";
+      return (
+        <p className='w-max'>{formatDate(row.original?.start_date) ?? "--"}</p>
+      );
     },
   },
   {
     accessorKey: "end_date",
     header: "End Date",
     cell: ({ row }) => {
-      return row.original?.end_date ? formatDate(row.original?.end_date) : "--";
+      return (
+        <p className='w-max'>{formatDate(row.original?.end_date) ?? "--"}</p>
+      );
     },
   },
   {
     accessorKey: "reason",
     header: "Reason",
     cell: ({ row }) => {
-      return <p className="capitalize">{row.original?.reason ?? "--"}</p>;
+      return <p className='capitalize'>{row.original?.reason ?? "--"}</p>;
     },
   },
   {
@@ -125,7 +133,7 @@ export const columns = (
     accessorKey: "email",
     header: "Approved By",
     cell: ({ row }) => {
-      return <p className=" truncate">{row.original?.users?.email ?? "--"}</p>;
+      return <p className=' truncate'>{row.original?.users?.email ?? "--"}</p>;
     },
   },
 
@@ -156,9 +164,9 @@ export const columns = (
                   "hidden"
               )}
             >
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <Icon name="dots-vertical" />
+              <Button variant='ghost' className='h-8 w-8 p-0'>
+                <span className='sr-only'>Open menu</span>
+                <Icon name='dots-vertical' />
               </Button>
             </DropdownMenuTrigger>
           }

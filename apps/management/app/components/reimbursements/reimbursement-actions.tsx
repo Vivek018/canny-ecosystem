@@ -11,17 +11,17 @@ export function ReimbursementActions({ isEmpty }: { isEmpty: boolean }) {
   const navigate = useNavigate();
 
   return (
-    <div className="space-x-2 hidden md:flex">
+    <div className='space-x-2 hidden md:flex'>
       <Button
-        variant="outline"
-        size="icon"
+        variant='outline'
+        size='icon'
         className={cn("h-10 w-10", !selectedRows.length && "hidden")}
         disabled={!selectedRows.length}
         onClick={() => navigate("/approvals/reimbursements/analytics")}
       >
-        <Icon name="chart" className="h-[18px] w-[18px]" />
+        <Icon name='chart' className='h-[18px] w-[18px]' />
       </Button>
-      <ColumnVisibility disabled={isEmpty} hidden={!!selectedRows.length} />
+      <ColumnVisibility disabled={isEmpty} />
       <ImportReimbursementMenu />
     </div>
   );
