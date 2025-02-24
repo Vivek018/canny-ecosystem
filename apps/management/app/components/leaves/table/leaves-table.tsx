@@ -26,7 +26,7 @@ import { useSupabase } from "@canny_ecosystem/supabase/client";
 import { useLeavesStore } from "@/store/leaves";
 import { useInView } from "react-intersection-observer";
 import { Button } from "@canny_ecosystem/ui/button";
-import { ExportBar } from "../export-bar";
+import { ExportBar } from "../import-export/export-bar";
 
 
 interface LeavesDataTableProps<TData, TValue> {

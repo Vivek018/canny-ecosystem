@@ -16,6 +16,7 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { LeavesOptionsDropdown } from "@/components/employees/leaves/table/leaves-table-options";
+import { Link } from "@remix-run/react";
 
 export const columns = (
   isEmployeeRoute?: boolean
@@ -36,28 +37,36 @@ export const columns = (
     enableSorting: false,
     accessorKey: "employee_code",
     header: "Employee Code",
-    cell: ({ row }) => {
-      return (
-        <p className="truncate  w-28">
+    cell: ({ row }) => (
+      <Link
+        to={`/employees/${row.original.employee_id}/leaves`}
+        prefetch="intent"
+        className="group"
+      >
+        <p className="truncate text-primary/80 w-28">
           {row.original?.employees?.employee_code}
         </p>
-      );
-    },
+      </Link>
+    ),
   },
   {
     enableSorting: false,
 
     accessorKey: "employee_name",
     header: "Employee Name",
-    cell: ({ row }) => {
-      return (
-        <p className="truncate  w-428">{`${
+    cell: ({ row }) => (
+      <Link
+        to={`/employees/${row.original.employee_id}/leaves`}
+        prefetch="intent"
+        className="group"
+      >
+        <p className="truncate text-primary/80 w-28">{`${
           row.original?.employees?.first_name
         } ${row.original?.employees?.middle_name ?? ""} ${
           row.original?.employees?.last_name ?? ""
         }`}</p>
-      );
-    },
+      </Link>
+    ),
   },
   {
     enableSorting: false,
