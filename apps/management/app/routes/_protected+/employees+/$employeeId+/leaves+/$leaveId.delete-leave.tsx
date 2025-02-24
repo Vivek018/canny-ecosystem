@@ -25,7 +25,7 @@ export async function action({
   if (!hasPermission(user?.role!, `${deleteRole}:${attribute.employeeLeaves}`))
     return safeRedirect(DEFAULT_ROUTE, { headers });
 
-  const leavesId = params.id;
+  const leavesId = params.leaveId;
   try {
     const formData = await request.formData();
     const employeeId = formData.get("employeeId");
