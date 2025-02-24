@@ -44,3 +44,6 @@ yarn-error.log*
 
 # Files
 packages/supabase/src/types/db.ts
+
+#Folders
+**/server-build/
