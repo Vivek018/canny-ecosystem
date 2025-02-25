@@ -46,7 +46,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
 
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const templateId = params.templateId;
+  const templateAssignmentId = params.templateAssignmentId;
 
   const { data, error } = await getPaymentTemplatesByCompanyId({
     supabase,
@@ -65,7 +65,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const { data: paymentTemplateAssigmentData } =
     await getPaymentTemplateAssignmentById({
       supabase,
-      id: templateId ?? "",
+      id: templateAssignmentId ?? "",
     });
 
   return json({
@@ -80,7 +80,7 @@ export async function action({
   params,
 }: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
-  const templateId = params.employeeId as string;
+  const templateAssignmentId = params.employeeId as string;
   const employeeId = params.employeeId as string;
   const formData = await request.formData();
 
@@ -96,7 +96,7 @@ export async function action({
     const { error } = await updatePaymentTemplateAssignment({
       supabase,
       data: submission.value,
-      id: submission.value.id ?? templateId,
+      id: submission.value.id ?? templateAssignmentId,
     });
 
     if (error) throw error;

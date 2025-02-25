@@ -21,6 +21,7 @@ import {
   defer,
   Outlet,
   useLoaderData,
+  useNavigate,
 } from "@remix-run/react";
 import { Suspense } from "react";
 import { hasPermission, readRole } from "@canny_ecosystem/utils";
@@ -33,6 +34,12 @@ import { LeavesSearchFilter } from "@/components/employees/leaves/leave-search-f
 import { FilterList } from "@/components/employees/leaves/filter-list";
 import { ColumnVisibility } from "@/components/employees/leaves/column-visibility";
 import LoadingSpinner from "@/components/loading-spinner";
+import { Icon } from "@canny_ecosystem/ui/icon";
+import { useLeavesStore } from "@/store/leaves";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { Button } from "@canny_ecosystem/ui/button";
+import { ImportLeavesMenu } from "@/components/leaves/import-menu";
+import { ImportLeavesModal } from "@/components/leaves/import-export/import-modal-leaves";
 
 const pageSize = LAZY_LOADING_LIMIT;
 const isEmployeeRoute = false;
@@ -130,6 +137,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 clientLoader.hydrate = true;
 
 export default function LeavesIndex() {
+  const navigate = useNavigate();
   const {
     leavesPromise,
     projectPromise,
@@ -140,14 +148,14 @@ export default function LeavesIndex() {
     companyId,
     env,
   } = useLoaderData<typeof loader>();
-
+  const { selectedRows } = useLeavesStore();
   const filterList = { ...filters, name: query };
   const noFilters = Object.values(filterList).every((value) => !value);
 
   return (
-    <section className="py-4">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
+    <section className='py-4'>
+      <div className='w-full flex items-center justify-between pb-4'>
+        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4'>
           <Suspense fallback={<LoadingSpinner className="w-1/2" />}>
             <Await resolve={projectPromise}>
               {(projectData) => (
@@ -185,7 +193,19 @@ export default function LeavesIndex() {
           </Suspense>
           <FilterList filters={filterList} />
         </div>
-        <ColumnVisibility />
+        <div className='space-x-2 hidden md:flex'>
+          <Button
+            variant='outline'
+            size='icon'
+            className={cn("h-10 w-10", !selectedRows.length && "hidden")}
+            disabled={!selectedRows.length}
+            onClick={() => navigate("/time-tracking/leaves/analytics")}
+          >
+            <Icon name='chart' className='h-[18px] w-[18px]' />
+          </Button>
+          <ColumnVisibility />
+          <ImportLeavesMenu />
+        </div>
       </div>
       <Suspense fallback={<LoadingSpinner className="h-1/2 mt-20" />}>
         <Await resolve={leavesPromise}>
@@ -193,7 +213,7 @@ export default function LeavesIndex() {
             if (error) {
               clearCacheEntry(cacheKeyPrefix.leaves);
               return (
-                <ErrorBoundary error={error} message="Failed to load leaves" />
+                <ErrorBoundary error={error} message='Failed to load leaves' />
               );
             }
 
@@ -215,7 +235,7 @@ export default function LeavesIndex() {
           }}
         </Await>
       </Suspense>
-      {/* <ImportReimbursementModal /> */}
+      <ImportLeavesModal />
       <Outlet />
     </section>
   );

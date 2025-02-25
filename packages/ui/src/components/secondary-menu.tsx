@@ -13,20 +13,22 @@ export function SecondaryMenu({
 }) {
   return (
     <nav className={cn(className)}>
-      <ul className="flex space-x-6 text-sm overflow-auto no-scrollbar">
+      <ul className='flex space-x-6 text-sm overflow-auto no-scrollbar'>
         {items.map((item) => (
           <Link
-            prefetch="intent"
+            prefetch='intent'
             key={item.path}
             to={item.path}
             className={cn(
               "text-muted-foreground font-medium underline-offset-4",
               "hover:underline focus:underline focus:outline-none",
-              pathname.includes(item.path) &&
-                "text-primary hover:no-underline focus:no-underline",
+              item?.path && pathname.includes(item?.path) && "text-primary/80",
+              item?.path &&
+                pathname === item?.path &&
+                "text-primary no-underline hover:no-underline focus:no-underline"
             )}
           >
-            <span className="capitalize">{item.label}</span>
+            <span className='capitalize'>{item.label}</span>
           </Link>
         ))}
       </ul>

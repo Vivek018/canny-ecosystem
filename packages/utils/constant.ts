@@ -14,6 +14,7 @@ export const modalSearchParamNames = {
   import_exits: "import-exits",
   view_template_components: "view-template-components",
   view_relationship_terms: "view-relationship-terms",
+  import_leaves:"import-leaves"
 };
 
 export const statesAndUTs = [

@@ -133,3 +133,19 @@ export async function deleteLeaveTypeById({
 
   return { status, error: null };
 }
+
+export async function createLeavesFromImportedData({
+  supabase,
+  data,
+}: {
+  supabase: TypedSupabaseClient;
+  data: LeavesDatabaseInsert[];
+}) {
+  const { error, status } = await supabase.from("leaves").insert(data).select();
+
+  if (error) {
+    console.error("createLeavesFromImportedData Error:", error);
+  }
+
+  return { status, error };
+}

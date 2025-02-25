@@ -48,7 +48,7 @@ import {
   useParams,
 } from "@remix-run/react";
 import { useEffect, useState } from "react";
-import { UPDATE_LINK_TEMPLATE } from "./$templateId+/update-link-template";
+import { UPDATE_LINK_TEMPLATE } from "./$templateAssignmentId+/update-link-template";
 
 export const CREATE_LINK_TEMPLATE = "create-link-template";
 
@@ -230,7 +230,7 @@ export default function CreateEmployeeLinkTemplate({
                     placeholder: replaceUnderscore(fields.effective_from.name),
                     max: getValidDateForInput(new Date().toISOString()),
                     defaultValue: getValidDateForInput(
-                      fields.effective_from.initialValue as any
+                      fields.effective_from.initialValue
                     ),
                   }}
                   labelProps={{

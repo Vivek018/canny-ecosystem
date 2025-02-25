@@ -70,7 +70,11 @@ export function formatMonthYearDate(date: Date | string | number) {
   return format(new Date(date), "MMM yyyy");
 }
 
-export function formatDate(date: Date | string | number) {
+export function formatDate(date: Date | string | number | null) {
+  if (!date || !String(date)?.length) {
+    return null;
+  }
+
   return format(new Date(date), "dd MMM yyyy");
 }
 
