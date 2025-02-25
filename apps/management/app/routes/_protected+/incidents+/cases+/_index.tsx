@@ -30,6 +30,7 @@ import { FilterList } from "@/components/cases/filter-list";
 import { CasesTable } from "@/components/cases/table/cases-table";
 import { CaseSearchFilter } from "@/components/cases/case-search-filter";
 import { CaseActions } from "@/components/cases/case-actions";
+import LoadingSpinner from "@/components/loading-spinner";
 
 const pageSize = LAZY_LOADING_LIMIT;
 
@@ -112,7 +113,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
 
-  return await clientCaching(
+  return clientCaching(
     `${cacheKeyPrefix.case}${url.searchParams.toString()}`,
     args,
   );
@@ -136,7 +137,7 @@ export default function CasesIndex() {
         </div>
         <CaseActions />
       </div>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<LoadingSpinner className="mt-20" />}>
         <Await resolve={casesPromise}>
           {({ data, meta, error }) => {
             if (error) {

@@ -15,6 +15,7 @@ import { Suspense, useEffect, useState } from "react";
 import { UserAvatar } from "@/components/accounts/user-avatar";
 import { UserName } from "@/components/accounts/user-name";
 import { UserContact } from "@/components/accounts/user-contact";
+import LoadingSpinner from "@/components/loading-spinner";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {
@@ -48,7 +49,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return await clientCaching(cacheKeyPrefix.account, args);
+  return clientCaching(cacheKeyPrefix.account, args);
 }
 
 clientLoader.hydrate = true;
@@ -71,7 +72,7 @@ export default function AccountSettings() {
   return (
     <section key={resetKey}>
       <div className="flex flex-col gap-6 w-full lg:w-2/3 py-4">
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<LoadingSpinner className="my-20" />}>
           <Await resolve={userDataPromise}>
             {(resolvedData) => {
               if (!resolvedData || resolvedData.error) {

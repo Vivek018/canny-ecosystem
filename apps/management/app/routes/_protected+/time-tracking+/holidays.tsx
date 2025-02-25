@@ -76,9 +76,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
-  return await clientCaching(
+  return clientCaching(
     `${cacheKeyPrefix.holidays}${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 
@@ -119,13 +119,13 @@ export default function Holidays() {
                               "p-2 py-2 ml-auto mr-2 mt-2 rounded-md  grid place-items-center ",
                               !hasPermission(
                                 role,
-                                `${deleteRole}:${attribute.holidays}`
+                                `${deleteRole}:${attribute.holidays}`,
                               ) &&
                                 !hasPermission(
                                   role,
-                                  `${updateRole}:${attribute.holidays}`
+                                  `${updateRole}:${attribute.holidays}`,
                                 ) &&
-                                "hidden"
+                                "hidden",
                             )}
                           >
                             <Icon name="dots-vertical" size="xs" />
@@ -188,8 +188,8 @@ export default function Holidays() {
                         key !== "avatar" &&
                         String(value)
                           .toLowerCase()
-                          .includes(searchString.toLowerCase())
-                    )
+                          .includes(searchString.toLowerCase()),
+                    ),
                 );
 
                 setTableData(filteredData);
@@ -222,8 +222,8 @@ export default function Holidays() {
                         "flex items-center gap-1",
                         !hasPermission(
                           role,
-                          `${createRole}:${attribute.holidays}`
-                        ) && "hidden"
+                          `${createRole}:${attribute.holidays}`,
+                        ) && "hidden",
                       )}
                     >
                       <span>Add</span>

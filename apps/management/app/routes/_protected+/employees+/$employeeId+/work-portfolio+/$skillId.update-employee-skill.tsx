@@ -1,8 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
-  Await,
-  defer,
   json,
   useActionData,
   useLoaderData,
@@ -18,10 +16,9 @@ import {
 import { getEmployeeSkillById } from "@canny_ecosystem/supabase/queries";
 import { updateEmployeeSkill } from "@canny_ecosystem/supabase/mutations";
 import AddEmployeeSkill from "./add-employee-skill";
-import { Suspense, useEffect } from "react";
+import { useEffect } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { ErrorBoundary } from "@/components/error-boundary";
-import type { EmployeeSkillDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { safeRedirect } from "@/utils/server/http.server";
@@ -43,17 +40,20 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   try {
-    let skillPromise = null;
+    let skillData = null;
+    let skillError = null;
 
     if (skillId) {
-      skillPromise = getEmployeeSkillById({
+      ({ data: skillData, error: skillError } = await getEmployeeSkillById({
         supabase,
         id: skillId,
-      });
+      }));
     }
 
-    return defer({
-      skillPromise,
+    if (skillError) throw skillError;
+
+    return json({
+      skillData,
       employeeId,
       error: null,
     });
@@ -61,7 +61,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return json({
       error,
       employeeId,
-      skillPromise: null,
+      skillData: null,
     });
   }
 }
@@ -107,7 +107,7 @@ export async function action({
 }
 
 export default function UpdateEmployeeSkill() {
-  const { skillPromise, error, employeeId } = useLoaderData<typeof loader>();
+  const { skillData, error, employeeId } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -142,39 +142,5 @@ export default function UpdateEmployeeSkill() {
       />
     );
 
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Await resolve={skillPromise}>
-        {(resolvedData) => {
-          if (!resolvedData)
-            return (
-              <ErrorBoundary message="Failed to load employee skills data" />
-            );
-          return (
-            <UpdateEmployeeSkillWrapper
-              data={resolvedData?.data}
-              error={resolvedData?.error}
-            />
-          );
-        }}
-      </Await>
-    </Suspense>
-  );
-}
-
-export function UpdateEmployeeSkillWrapper({
-  data,
-  error,
-}: {
-  data: EmployeeSkillDatabaseUpdate | null;
-  error: Error | null | { message: string };
-}) {
-  if (error)
-    return (
-      <ErrorBoundary
-        error={error}
-        message="Failed to load employee skills data"
-      />
-    );
-  return <AddEmployeeSkill updateValues={data} />;
+  return <AddEmployeeSkill updateValues={skillData} />;
 }

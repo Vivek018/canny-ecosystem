@@ -9,11 +9,15 @@ import { ImportEmployeeStatutoryModal } from "@/components/employees/import-expo
 import { columns } from "@/components/employees/table/columns";
 import { DataTable } from "@/components/employees/table/data-table";
 import { ErrorBoundary } from "@/components/error-boundary";
+import LoadingSpinner from "@/components/loading-spinner";
 import { cacheKeyPrefix, VALID_FILTERS } from "@/constant";
 import { AIChat4o } from "@/utils/ai";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { LAZY_LOADING_LIMIT, MAX_QUERY_LIMIT } from "@canny_ecosystem/supabase/constant";
+import {
+  LAZY_LOADING_LIMIT,
+  MAX_QUERY_LIMIT,
+} from "@canny_ecosystem/supabase/constant";
 import {
   type EmployeeFilters,
   getEmployeesByCompanyId,
@@ -72,7 +76,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined
+        (value) => value !== null && value !== undefined,
       );
 
     const employeesPromise = getEmployeesByCompanyId({
@@ -126,9 +130,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
-  return await clientCaching(
+  return clientCaching(
     `${cacheKeyPrefix.employees}${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 
@@ -151,7 +155,7 @@ ${VALID_FILTERS.map(
   (filter) =>
     `name: "${filter.name}", type: "${
       filter.valueType
-    }", example: ${JSON.stringify(filter.example)}`
+    }", example: ${JSON.stringify(filter.example)}`,
 ).join(".")}`,
         },
         {
@@ -202,10 +206,10 @@ export default function EmployeesIndex() {
   const noFilters = Object.values(filterList).every((value) => !value);
 
   return (
-    <section className='p-4'>
-      <div className='w-full flex items-center justify-between pb-4'>
-        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-2 mr-4'>
-          <Suspense fallback={<div>Loading...</div>}>
+    <section className="p-4">
+      <div className="w-full flex items-center justify-between pb-4">
+        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-2 mr-4">
+          <Suspense fallback={<LoadingSpinner className="ml-20" />}>
             <Await resolve={projectPromise}>
               {(projectData) => (
                 <Await resolve={projectSitePromise}>
@@ -234,7 +238,7 @@ export default function EmployeesIndex() {
         </div>
         <EmployeesActions isEmpty={!projectPromise} />
       </div>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<LoadingSpinner className="h-1/3" />}>
         <Await resolve={employeesPromise}>
           {({ data, meta, error }) => {
             if (error) {
@@ -242,7 +246,7 @@ export default function EmployeesIndex() {
               return (
                 <ErrorBoundary
                   error={error}
-                  message='Failed to load employees'
+                  message="Failed to load employees"
                 />
               );
             }

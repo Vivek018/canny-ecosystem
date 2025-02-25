@@ -2,8 +2,6 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { getEmployeeStatutoryDetailsById } from "@canny_ecosystem/supabase/queries";
 import {
-  Await,
-  defer,
   Form,
   json,
   useActionData,
@@ -21,10 +19,9 @@ import {
 import { CreateEmployeeStatutoryDetails } from "@/components/employees/form/create-employee-statutory-details";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
 import { Card } from "@canny_ecosystem/ui/card";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import type { EmployeeStatutoryDetailsDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
@@ -47,19 +44,25 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   try {
-    let employeeStatutoryDetailsPromise = null;
+    let employeeStatutoryDetailsData = null;
+    let employeeStatutoryDetailsError = null;
 
     if (employeeId) {
-      employeeStatutoryDetailsPromise = getEmployeeStatutoryDetailsById({
+      ({
+        data: employeeStatutoryDetailsData,
+        error: employeeStatutoryDetailsError,
+      } = await getEmployeeStatutoryDetailsById({
         supabase,
         id: employeeId,
-      });
+      }));
     } else {
       throw new Error("No employeeId provided");
     }
 
-    return defer({
-      employeeStatutoryDetailsPromise,
+    if (employeeStatutoryDetailsError) throw employeeStatutoryDetailsError;
+
+    return json({
+      employeeStatutoryDetailsData,
       employeeId,
       error: null,
     });
@@ -67,7 +70,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return json({
       error,
       employeeId,
-      employeeStatutoryDetailsPromise: null,
+      employeeStatutoryDetailsData: null,
     });
   }
 }
@@ -116,42 +119,9 @@ export async function action({
 }
 
 export default function UpdateStatutoryDetails() {
-  const { employeeStatutoryDetailsPromise, error, employeeId } =
+  const { employeeStatutoryDetailsData, error, employeeId } =
     useLoaderData<typeof loader>();
-
-  if (error)
-    return (
-      <ErrorBoundary error={error} message="Failed to load statutory details" />
-    );
-
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Await resolve={employeeStatutoryDetailsPromise}>
-        {(resolvedData) => {
-          if (!resolvedData)
-            return <ErrorBoundary message="Failed to load statutory details" />;
-          return (
-            <UpdateStatutoryDetailsWrapper
-              data={resolvedData.data}
-              error={resolvedData.error}
-              employeeId={employeeId}
-            />
-          );
-        }}
-      </Await>
-    </Suspense>
-  );
-}
-
-export function UpdateStatutoryDetailsWrapper({
-  data,
-  error,
-  employeeId,
-}: {
-  data: EmployeeStatutoryDetailsDatabaseUpdate | null;
-  error: Error | null | { message: string };
-  employeeId: string | undefined;
-}) {
+  console.log(employeeStatutoryDetailsData, "dwefwe");
   const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
   const currentSchema = EmployeeStatutorySchema;
@@ -164,20 +134,13 @@ export function UpdateStatutoryDetailsWrapper({
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
-    defaultValue: data,
+    defaultValue: employeeStatutoryDetailsData,
   });
 
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (error) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to get statutory details",
-        variant: "destructive",
-      });
-    }
     if (actionData) {
       if (actionData?.status === "success") {
         clearExactCacheEntry(
@@ -198,6 +161,11 @@ export function UpdateStatutoryDetailsWrapper({
       navigate(`/employees/${employeeId}/overview`);
     }
   }, [actionData]);
+
+  if (error)
+    return (
+      <ErrorBoundary error={error} message="Failed to load statutory details" />
+    );
 
   return (
     <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">

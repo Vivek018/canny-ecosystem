@@ -1,4 +1,5 @@
 import { ErrorBoundary } from "@/components/error-boundary";
+import LoadingSpinner from "@/components/loading-spinner";
 import { ProjectOverviewWrapper } from "@/components/projects/project/project-overview-wrapper";
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
@@ -43,7 +44,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return await clientCaching(
+  return clientCaching(
     `${cacheKeyPrefix.project_overview}${args.params.projectId}`,
     args,
   );
@@ -61,7 +62,7 @@ export default function ProjectIndex() {
   }
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<LoadingSpinner className="h-1/3 mt-20" />}>
       <Await resolve={projectPromise}>
         {(resolvedData) => {
           if (!resolvedData) {

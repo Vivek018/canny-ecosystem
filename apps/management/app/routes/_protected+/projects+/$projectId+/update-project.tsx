@@ -5,8 +5,6 @@ import {
   getProjectById,
 } from "@canny_ecosystem/supabase/queries";
 import {
-  Await,
-  defer,
   json,
   useActionData,
   useLoaderData,
@@ -24,7 +22,7 @@ import {
 import CreateProject from "../create-project";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { Suspense, useEffect } from "react";
+import { useEffect } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
@@ -46,11 +44,22 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   try {
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-    let projectPromise = null;
-    if (projectId)
-      projectPromise = getProjectById({ supabase, id: projectId, companyId });
+    let projectData = null;
+    let projectError = null;
 
-    const companyOptionsPromise = getCompanies({ supabase }).then(
+    if (projectId) {
+      ({ data: projectData, error: projectError } = await getProjectById({
+        supabase,
+        id: projectId,
+        companyId,
+      }));
+
+      if (projectError) throw projectError;
+    } else {
+      throw new Error("Project ID not provided");
+    }
+
+    const companyOptionsPromise = await getCompanies({ supabase }).then(
       ({ data, error }) => {
         if (data) {
           const companyOptions = data
@@ -62,8 +71,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       },
     );
 
-    return defer({
-      projectPromise,
+    return json({
+      projectData,
       companyOptionsPromise,
       companyId,
       error: null,
@@ -73,7 +82,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       {
         error,
         companyId: null,
-        projectPromise: null,
+        projectData: null,
         companyOptionsPromise: null,
       },
       { status: 500 },
@@ -129,7 +138,7 @@ export async function action({
 }
 
 export default function UpdateProject() {
-  const { projectPromise, error } = useLoaderData<typeof loader>();
+  const { projectData, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
   const { projectId } = useParams();
@@ -162,11 +171,5 @@ export default function UpdateProject() {
   if (error)
     return <ErrorBoundary error={error} message="Failed to load project" />;
 
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Await resolve={projectPromise}>
-        {(projectData) => <CreateProject updateValues={projectData?.data} />}
-      </Await>
-    </Suspense>
-  );
+  return <CreateProject updateValues={projectData} />;
 }

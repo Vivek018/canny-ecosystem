@@ -1,4 +1,5 @@
 import { ErrorBoundary } from "@/components/error-boundary";
+import LoadingSpinner from "@/components/loading-spinner";
 import { StatutoryBonusWrapper } from "@/components/statutory-fields/statutory-bonus/statutory-bonus-wrapper";
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
@@ -40,7 +41,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return await clientCaching(cacheKeyPrefix.statutory_bonus, args);
+  return clientCaching(cacheKeyPrefix.statutory_bonus, args);
 }
 
 clientLoader.hydrate = true;
@@ -56,7 +57,7 @@ export default function StatutoryBonusIndex() {
   }
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<LoadingSpinner className="mt-40" />}>
       <Await resolve={statutoryBonusPromise}>
         {(resolvedData) => {
           if (!resolvedData) {

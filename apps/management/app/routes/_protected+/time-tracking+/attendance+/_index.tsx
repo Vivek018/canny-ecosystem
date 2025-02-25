@@ -32,6 +32,7 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { AttendanceSearchFilter } from "@/components/attendance/attendance-search-filter";
 import { FilterList } from "@/components/attendance/filter-list";
 import { AttendanceActions } from "@/components/attendance/attendance-actions";
+import LoadingSpinner from "@/components/loading-spinner";
 
 const pageSize = LAZY_LOADING_LIMIT;
 
@@ -134,7 +135,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
 
-  return await clientCaching(
+  return clientCaching(
     `${cacheKeyPrefix.attendance}${url.searchParams.toString()}`,
     args,
   );
@@ -252,13 +253,13 @@ export default function Attendance() {
   });
 
   const noFilters = Boolean(
-    filters && Object.values(filters).every((value) => !value)
+    filters && Object.values(filters).every((value) => !value),
   );
   return (
-    <section className='py-4'>
-      <div className='w-full flex items-center justify-between pb-4'>
-        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4'>
-          <Suspense fallback={<div>Loading...</div>}>
+    <section className="py-4">
+      <div className="w-full flex items-center justify-between pb-4">
+        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
+          <Suspense fallback={<LoadingSpinner className="w-1/3" />}>
             <Await resolve={projectPromise}>
               {(projectData) => (
                 <Await resolve={projectSitePromise}>
@@ -288,7 +289,7 @@ export default function Attendance() {
         </div>
         <AttendanceActions />
       </div>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<LoadingSpinner className="w-1/3 h-1/3" />}>
         <Await resolve={attendancePromise}>
           {({ data, meta, error }) => {
             if (error) {
@@ -296,7 +297,7 @@ export default function Attendance() {
               return (
                 <ErrorBoundary
                   error={error}
-                  message='Failed to load Attendance'
+                  message="Failed to load Attendance"
                 />
               );
             }

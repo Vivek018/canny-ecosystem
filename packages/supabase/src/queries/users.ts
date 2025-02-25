@@ -57,7 +57,6 @@ export async function getUserByEmail({
   supabase: TypedSupabaseClient;
   email: string;
 }) {
-
   return {
     data: {
       id: "1",
@@ -163,7 +162,6 @@ export async function getUserById({
   supabase: TypedSupabaseClient;
   id: string;
 }) {
-
   return {
     data: {
       id: "1",

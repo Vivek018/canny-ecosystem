@@ -64,7 +64,7 @@ export async function clientCaching<T extends Record<string, unknown>>(
   }
 
   const serverData = (await serverLoader()) as T;
-  const resolvedData = await setDeferCache(cacheKey, serverData);
+  await setDeferCache(cacheKey, serverData);
 
-  return resolvedData as T;
+  return serverLoader() as T;
 }

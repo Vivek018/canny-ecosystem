@@ -33,6 +33,7 @@ import { hasPermission, readRole } from "@canny_ecosystem/utils";
 import { safeRedirect } from "@/utils/server/http.server";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import LoadingSpinner from "@/components/loading-spinner";
 
 const pageSize = LAZY_LOADING_LIMIT;
 
@@ -71,7 +72,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined
+        (value) => value !== null && value !== undefined,
       );
 
     const reimbursementsPromise = getReimbursementsByCompanyId({
@@ -125,9 +126,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
-  return await clientCaching(
+  return clientCaching(
     `${cacheKeyPrefix.reimbursements}${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 
@@ -149,10 +150,10 @@ export default function ReimbursementsIndex() {
   const noFilters = Object.values(filterList).every((value) => !value);
 
   return (
-    <section className='p-4'>
-      <div className='w-full flex items-center justify-between pb-4'>
-        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4'>
-          <Suspense fallback={<div>Loading...</div>}>
+    <section className="p-4">
+      <div className="w-full flex items-center justify-between pb-4">
+        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
+          <Suspense fallback={<LoadingSpinner className="ml-14" />}>
             <Await resolve={projectPromise}>
               {(projectData) => (
                 <Await resolve={projectSitePromise}>
@@ -164,7 +165,7 @@ export default function ReimbursementsIndex() {
                           projectArray={
                             projectData?.data?.length
                               ? projectData?.data?.map(
-                                  (project) => project!.name
+                                  (project) => project!.name,
                                 )
                               : []
                           }
@@ -190,7 +191,7 @@ export default function ReimbursementsIndex() {
         </div>
         <ReimbursementActions isEmpty={!projectPromise} />
       </div>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<LoadingSpinner className="h-1/3" />}>
         <Await resolve={reimbursementsPromise}>
           {({ data, meta, error }) => {
             if (error) {
@@ -198,7 +199,7 @@ export default function ReimbursementsIndex() {
               return (
                 <ErrorBoundary
                   error={error}
-                  message='Failed to load reimbursements'
+                  message="Failed to load reimbursements"
                 />
               );
             }

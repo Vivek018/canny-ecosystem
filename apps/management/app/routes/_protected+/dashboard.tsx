@@ -135,7 +135,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return await clientCaching(cacheKeyPrefix.dashboard, args);
+  return clientCaching(cacheKeyPrefix.dashboard, args);
 }
 
 clientLoader.hydrate = true;
@@ -165,16 +165,16 @@ export default function Dashboard() {
     return <ErrorBoundary error={error} message="Failed to load data" />;
 
   return (
-    <section className='w-full p-4 flex flex-col gap-4'>
-      <div className='flex justify-end'>
-        <div className='flex justify-between gap-3'>
+    <section className="w-full p-4 flex flex-col gap-4">
+      <div className="flex justify-end">
+        <div className="flex justify-between gap-3">
           <FilterList filterList={filters} />
           <DashboardFilter />
         </div>
       </div>
-      <div className='w-full flex flex-col gap-4'>
+      <div className="w-full flex flex-col gap-4">
         <PayrollTrend chartData={payrollData} />
-        <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <PayrollInfoCard cardData={cardData} />
 
           <StatutoryRatio

@@ -1,4 +1,5 @@
 import { ErrorBoundary } from "@/components/error-boundary";
+import LoadingSpinner from "@/components/loading-spinner";
 import { LeaveEncashmentWrapper } from "@/components/statutory-fields/leave-encashment/leave-encashment-wrapper";
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
@@ -39,7 +40,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return await clientCaching(cacheKeyPrefix.leave_encashment, args);
+  return clientCaching(cacheKeyPrefix.leave_encashment, args);
 }
 
 clientLoader.hydrate = true;
@@ -56,7 +57,7 @@ export default function LeaveEncashmentIndex() {
 
   return (
     <div className="p-4 flex gap-3 place-content-center justify-between">
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<LoadingSpinner className="mt-40" />}>
         <Await resolve={leaveEncashmentPromise}>
           {(resolvedData) => {
             if (!resolvedData) {

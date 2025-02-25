@@ -1,5 +1,6 @@
 import { ErrorBoundary } from "@/components/error-boundary";
 import PaginationButton from "@/components/form/pagination-button";
+import LoadingSpinner from "@/components/loading-spinner";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
@@ -76,7 +77,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
-  return await clientCaching(
+  return clientCaching(
     `${cacheKeyPrefix.feedback_list}${url.searchParams.toString()}`,
     args,
   );
@@ -170,7 +171,7 @@ export default function FeedbackList() {
   return (
     <section className="pt-4 flex flex-col h-full">
       <div className="h-full flex flex-col w-full flex-grow justify-between items-end">
-        <Suspense fallback={<div>Loading feedback data...</div>}>
+        <Suspense fallback={<LoadingSpinner className="my-20" />}>
           <Await resolve={feedbackPromise}>
             {(feedbackResult) => {
               if (feedbackResult?.error || !feedbackResult?.data) {

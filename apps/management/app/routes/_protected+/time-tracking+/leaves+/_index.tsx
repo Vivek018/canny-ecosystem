@@ -32,6 +32,7 @@ import { columns } from "@/components/leaves/table/columns";
 import { LeavesSearchFilter } from "@/components/employees/leaves/leave-search-filter";
 import { FilterList } from "@/components/employees/leaves/filter-list";
 import { ColumnVisibility } from "@/components/employees/leaves/column-visibility";
+import LoadingSpinner from "@/components/loading-spinner";
 
 const pageSize = LAZY_LOADING_LIMIT;
 const isEmployeeRoute = false;
@@ -68,7 +69,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined
+        (value) => value !== null && value !== undefined,
       );
 
     const leavesPromise = getLeavesByCompanyId({
@@ -120,9 +121,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
-  return await clientCaching(
+  return clientCaching(
     `${cacheKeyPrefix.leaves}${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 
@@ -147,7 +148,7 @@ export default function LeavesIndex() {
     <section className="py-4">
       <div className="w-full flex items-center justify-between pb-4">
         <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<LoadingSpinner className="w-1/2" />}>
             <Await resolve={projectPromise}>
               {(projectData) => (
                 <Await resolve={projectSitePromise}>
@@ -160,7 +161,7 @@ export default function LeavesIndex() {
                           projectArray={
                             projectData?.data?.length
                               ? projectData?.data?.map(
-                                  (project) => project!.name
+                                  (project) => project!.name,
                                 )
                               : []
                           }
@@ -184,9 +185,9 @@ export default function LeavesIndex() {
           </Suspense>
           <FilterList filters={filterList} />
         </div>
-      <ColumnVisibility/>
+        <ColumnVisibility />
       </div>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<LoadingSpinner className="h-1/2 mt-20" />}>
         <Await resolve={leavesPromise}>
           {({ data, meta, error }) => {
             if (error) {

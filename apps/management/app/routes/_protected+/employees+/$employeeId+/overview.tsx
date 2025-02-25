@@ -18,7 +18,10 @@ import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { defer, type LoaderFunctionArgs } from "@remix-run/node";
 import {
-  Await, type ClientLoaderFunctionArgs, useLoaderData, useParams,
+  Await,
+  type ClientLoaderFunctionArgs,
+  useLoaderData,
+  useParams,
 } from "@remix-run/react";
 import { type ReactNode, Suspense, useEffect } from "react";
 
@@ -81,7 +84,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return await clientCaching(
+  return clientCaching(
     `${cacheKeyPrefix.employee_overview}${args.params.employeeId}`,
     args,
   );
@@ -103,7 +106,9 @@ export default function EmployeeIndex() {
 
   if (error) {
     clearExactCacheEntry(`${cacheKeyPrefix.employee_overview}${employeeId}`);
-    return <ErrorBoundary error={error} message="Failed to load employee details" />
+    return (
+      <ErrorBoundary error={error} message="Failed to load employee details" />
+    );
   }
 
   return (
@@ -112,18 +117,27 @@ export default function EmployeeIndex() {
         <Await resolve={employeePromise}>
           {(resolvedData) => {
             if (!resolvedData || !env) {
-              clearExactCacheEntry(`${cacheKeyPrefix.employee_overview}${employeeId}`);
+              clearExactCacheEntry(
+                `${cacheKeyPrefix.employee_overview}${employeeId}`,
+              );
               return <ErrorBoundary message="Failed to load employee" />;
             }
             return (
               <>
                 <CommonWrapper
                   error={resolvedData.error}
-                  Component={<EmployeePageHeader employee={resolvedData.data!} env={env} />}
+                  Component={
+                    <EmployeePageHeader
+                      employee={resolvedData.data!}
+                      env={env}
+                    />
+                  }
                 />
                 <CommonWrapper
                   error={resolvedData.error}
-                  Component={<EmployeeDetailsCard employee={resolvedData.data!} />}
+                  Component={
+                    <EmployeeDetailsCard employee={resolvedData.data!} />
+                  }
                 />
               </>
             );
@@ -135,13 +149,21 @@ export default function EmployeeIndex() {
         <Await resolve={employeeStatutoryDetailsPromise}>
           {(resolvedData) => {
             if (!resolvedData) {
-              clearExactCacheEntry(`${cacheKeyPrefix.employee_overview}${employeeId}`);
-              return <ErrorBoundary message="Failed to load employee statutory details" />
+              clearExactCacheEntry(
+                `${cacheKeyPrefix.employee_overview}${employeeId}`,
+              );
+              return (
+                <ErrorBoundary message="Failed to load employee statutory details" />
+              );
             }
             return (
               <CommonWrapper
                 error={resolvedData.error}
-                Component={<EmployeeStatutoryCard employeeStatutory={resolvedData.data} />}
+                Component={
+                  <EmployeeStatutoryCard
+                    employeeStatutory={resolvedData.data}
+                  />
+                }
               />
             );
           }}
@@ -152,13 +174,19 @@ export default function EmployeeIndex() {
         <Await resolve={employeeBankDetailsPromise}>
           {(resolvedData) => {
             if (!resolvedData) {
-              clearExactCacheEntry(`${cacheKeyPrefix.employee_overview}${employeeId}`);
-              return <ErrorBoundary message="Failed to load employee bank details" />
+              clearExactCacheEntry(
+                `${cacheKeyPrefix.employee_overview}${employeeId}`,
+              );
+              return (
+                <ErrorBoundary message="Failed to load employee bank details" />
+              );
             }
             return (
               <CommonWrapper
                 error={resolvedData.error}
-                Component={<EmployeeBankDetailsCard bankDetails={resolvedData.data} />}
+                Component={
+                  <EmployeeBankDetailsCard bankDetails={resolvedData.data} />
+                }
               />
             );
           }}
@@ -169,13 +197,21 @@ export default function EmployeeIndex() {
         <Await resolve={employeeAddressesPromise}>
           {(resolvedData) => {
             if (!resolvedData) {
-              clearExactCacheEntry(`${cacheKeyPrefix.employee_overview}${employeeId}`);
-              return <ErrorBoundary message="Failed to load employee addresses" />
+              clearExactCacheEntry(
+                `${cacheKeyPrefix.employee_overview}${employeeId}`,
+              );
+              return (
+                <ErrorBoundary message="Failed to load employee addresses" />
+              );
             }
             return (
               <CommonWrapper
                 error={resolvedData.error}
-                Component={<EmployeeAddressesCard employeeAddresses={resolvedData.data} />}
+                Component={
+                  <EmployeeAddressesCard
+                    employeeAddresses={resolvedData.data}
+                  />
+                }
               />
             );
           }}
@@ -186,13 +222,21 @@ export default function EmployeeIndex() {
         <Await resolve={employeeGuardiansPromise}>
           {(resolvedData) => {
             if (!resolvedData) {
-              clearExactCacheEntry(`${cacheKeyPrefix.employee_overview}${employeeId}`);
-              return <ErrorBoundary message="Failed to load employee guardians details" />
+              clearExactCacheEntry(
+                `${cacheKeyPrefix.employee_overview}${employeeId}`,
+              );
+              return (
+                <ErrorBoundary message="Failed to load employee guardians details" />
+              );
             }
             return (
               <CommonWrapper
                 error={resolvedData.error}
-                Component={<EmployeeGuardiansCard employeeGuardians={resolvedData.data} />}
+                Component={
+                  <EmployeeGuardiansCard
+                    employeeGuardians={resolvedData.data}
+                  />
+                }
               />
             );
           }}

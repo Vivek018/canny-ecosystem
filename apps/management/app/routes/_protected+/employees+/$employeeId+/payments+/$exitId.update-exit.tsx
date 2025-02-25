@@ -1,8 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
-  Await,
-  defer,
   json,
   useActionData,
   useLoaderData,
@@ -18,10 +16,8 @@ import {
 } from "@canny_ecosystem/utils";
 import { getExitsById } from "@canny_ecosystem/supabase/queries";
 import { updateExit } from "@canny_ecosystem/supabase/mutations";
-import { Suspense, useEffect } from "react";
+import { useEffect } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { ErrorBoundary } from "@/components/error-boundary";
-import type { ExitsUpdate } from "@canny_ecosystem/supabase/types";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
@@ -40,13 +36,20 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
 
   try {
-    let exitPromise = null;
+    let exitData = null;
+    let exitError = null;
 
-    if (exitId) exitPromise = getExitsById({ supabase, id: exitId });
+    if (exitId)
+      ({ data: exitData, error: exitError } = await getExitsById({
+        supabase,
+        id: exitId,
+      }));
 
-    return defer({ exitPromise, error: null });
+    if (exitError) throw exitError;
+
+    return json({ exitData, error: null });
   } catch (error) {
-    return defer({ error, exitPromise: null }, { status: 500 });
+    return json({ error, exitData: null }, { status: 500 });
   }
 }
 
@@ -61,7 +64,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
     const { status, error } = await updateExit({
@@ -76,7 +79,7 @@ export async function action({
 
     return json(
       { status: "error", message: "Exit update failed", error },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -85,13 +88,13 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export default function UpdateExit() {
-  const { exitPromise } = useLoaderData<typeof loader>();
+  const { exitData, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { employeeId } = useParams();
 
@@ -99,6 +102,13 @@ export default function UpdateExit() {
   const { toast } = useToast();
 
   useEffect(() => {
+    if (error) {
+      toast({
+        title: "Error",
+        description: (error as Error)?.message || "Could not load exit data",
+        variant: "destructive",
+      });
+    }
     if (!actionData) return;
     if (actionData?.status === "success") {
       clearCacheEntry(cacheKeyPrefix.exits);
@@ -117,41 +127,5 @@ export default function UpdateExit() {
     navigate(`/employees/${employeeId}/payments`, { replace: true });
   }, [actionData]);
 
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Await resolve={exitPromise}>
-        {(resolvedData) => {
-          if (!resolvedData)
-            return <ErrorBoundary message='Failed to load Exit' />;
-          return (
-            <UpdateExitWrapper
-              data={resolvedData?.data}
-              error={resolvedData?.error}
-            />
-          );
-        }}
-      </Await>
-    </Suspense>
-  );
-}
-
-export function UpdateExitWrapper({
-  data,
-  error,
-}: {
-  data: ExitsUpdate | null;
-  error: Error | null | { message: string };
-}) {
-  const { toast } = useToast();
-  useEffect(() => {
-    if (error) {
-      toast({
-        title: "Error",
-        description: error?.message,
-        variant: "destructive",
-      });
-    }
-  }, [error]);
-
-  return <CreateExit updateValues={data} />;
+  return <CreateExit updateValues={exitData} />;
 }

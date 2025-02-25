@@ -29,6 +29,7 @@ import { LeaveCountCards } from "@/components/employees/leaves/leave-count-cards
 import { LeavesDataTable } from "@/components/leaves/table/leaves-table";
 import { columns } from "@/components/leaves/table/columns";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import LoadingSpinner from "@/components/loading-spinner";
 
 const isEmployeeRoute = true;
 export async function loader({ request, params }: LoaderFunctionArgs) {
@@ -57,7 +58,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined
+        (value) => value !== null && value !== undefined,
       );
     const usersPromise = getUsersEmail({ supabase, companyId });
 
@@ -69,8 +70,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         to: hasFilters
           ? MAX_QUERY_LIMIT
           : page > 0
-          ? LAZY_LOADING_LIMIT
-          : LAZY_LOADING_LIMIT - 1,
+            ? LAZY_LOADING_LIMIT
+            : LAZY_LOADING_LIMIT - 1,
         filters,
         searchQuery: query ?? undefined,
         sort: sortParam?.split(":") as [string, "asc" | "desc"],
@@ -103,11 +104,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
 
-  return await clientCaching(
+  return clientCaching(
     `${cacheKeyPrefix.employee_leaves}${
       args.params.employeeId
     }${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 
@@ -140,7 +141,7 @@ export default function Leaves() {
   const noFilters = Object.values(filters).every((value) => !value);
   return (
     <section className="py-4" key={leavesPromise}>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<LoadingSpinner className="w-20 ml-10" />}>
         <Await
           resolve={usersPromise}
           errorElement={
@@ -148,7 +149,7 @@ export default function Leaves() {
           }
         >
           {(usersData) => (
-            <Suspense fallback={<div>Loading leaves...</div>}>
+            <Suspense fallback={<LoadingSpinner className="w-20 ml-10" />}>
               <Await
                 resolve={leavesPromise}
                 errorElement={
@@ -158,7 +159,7 @@ export default function Leaves() {
                 {({ data, meta, error }) => {
                   if (error) {
                     clearCacheEntry(
-                      `${cacheKeyPrefix.employee_leaves}${employeeId}`
+                      `${cacheKeyPrefix.employee_leaves}${employeeId}`,
                     );
                     toast({
                       variant: "destructive",
@@ -168,7 +169,7 @@ export default function Leaves() {
                     return null;
                   }
                   const hasNextPage = Boolean(
-                    meta?.count && meta.count / (0 + 1) > LAZY_LOADING_LIMIT
+                    meta?.count && meta.count / (0 + 1) > LAZY_LOADING_LIMIT,
                   );
 
                   const leaveType = data!.map((item: any) => {
@@ -179,7 +180,7 @@ export default function Leaves() {
                   });
 
                   return (
-                    <Suspense fallback={<div>Loading leave types...</div>}>
+                    <Suspense fallback={<LoadingSpinner className="h-1/3" />}>
                       <Await
                         resolve={leaveTypePromise}
                         errorElement={
@@ -206,7 +207,7 @@ export default function Leaves() {
                                     userEmails={
                                       usersData?.data
                                         ? usersData?.data?.map(
-                                            (user) => user!.email
+                                            (user) => user!.email,
                                           )
                                         : []
                                     }

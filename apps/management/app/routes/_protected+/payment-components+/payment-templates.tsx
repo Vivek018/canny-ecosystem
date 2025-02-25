@@ -1,4 +1,5 @@
 import { ErrorBoundary } from "@/components/error-boundary";
+import LoadingSpinner from "@/components/loading-spinner";
 import { PaymentTemplatesTableWrapper } from "@/components/payment-templates/payment-templates-table-wrapper";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
@@ -58,7 +59,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return await clientCaching(cacheKeyPrefix.payment_templates, args);
+  return clientCaching(cacheKeyPrefix.payment_templates, args);
 }
 
 clientLoader.hydrate = true;
@@ -115,7 +116,7 @@ export default function PaymentTemplates() {
             </Link>
           </div>
         </div>
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<LoadingSpinner className="mt-30" />}>
           <Await resolve={paymentTemplatesPromise}>
             {(resolvedData) => {
               if (!resolvedData) {

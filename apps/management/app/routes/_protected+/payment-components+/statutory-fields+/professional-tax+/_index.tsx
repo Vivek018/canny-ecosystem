@@ -14,6 +14,7 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { ProfessionalTaxWrapper } from "@/components/statutory-fields/professional-tax/professional-tax-wrapper";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
+import LoadingSpinner from "@/components/loading-spinner";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {
@@ -37,7 +38,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return await clientCaching(cacheKeyPrefix.professional_tax, args);
+  return clientCaching(cacheKeyPrefix.professional_tax, args);
 }
 
 export default function ProfessionalTaxIndex() {
@@ -54,7 +55,7 @@ export default function ProfessionalTaxIndex() {
   }
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<LoadingSpinner className="mt-40" />}>
       <Await resolve={professionTaxPromise}>
         {(resolvedData) => {
           if (!resolvedData) {

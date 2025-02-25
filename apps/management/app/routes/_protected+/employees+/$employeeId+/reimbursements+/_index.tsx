@@ -32,6 +32,7 @@ import { Suspense } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { EmployeeReimbursementActions } from "@/components/reimbursements/employee-reimbursement-actions";
+import LoadingSpinner from "@/components/loading-spinner";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const env = {
@@ -106,7 +107,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
 
-  return await clientCaching(
+  return clientCaching(
     `${cacheKeyPrefix.employee_reimbursements}${
       args.params.employeeId
     }${url.searchParams.toString()}`,
@@ -140,7 +141,7 @@ export default function ReimbursementsIndex() {
 
   return (
     <section className="py-4" key={reimbursementPromise}>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<LoadingSpinner />}>
         <Await
           resolve={usersPromise}
           errorElement={
@@ -148,7 +149,7 @@ export default function ReimbursementsIndex() {
           }
         >
           {(usersData) => (
-            <Suspense fallback={<div>Loading reimbursements...</div>}>
+            <Suspense fallback={<LoadingSpinner />}>
               <Await
                 resolve={reimbursementPromise}
                 errorElement={
