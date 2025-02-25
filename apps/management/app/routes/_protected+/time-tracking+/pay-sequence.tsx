@@ -1,4 +1,5 @@
 import { ErrorBoundary } from "@/components/error-boundary";
+import { LoadingSpinner } from "@/components/loading-spinner";
 import { PaySequenceCard } from "@/components/pay-sequence/pay-sequence-card";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";
@@ -76,7 +77,7 @@ export default function PaySequence() {
   const { paySequencePromise } = useLoaderData<typeof loader>();
   return (
     <div>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<LoadingSpinner />}>
         <Await resolve={paySequencePromise}>
           {({ data, error }) => {
             if (error) {

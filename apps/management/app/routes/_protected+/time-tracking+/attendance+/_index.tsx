@@ -83,7 +83,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
       filters &&
       Object.values(filters).some(
         (value) => value !== null && value !== undefined
-        (value) => value !== null && value !== undefined
       );
 
     const attendancePromise = getAttendanceByCompanyId({
@@ -98,12 +97,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
       },
     });
 
-    const projectPromise = await getProjectNamesByCompanyId({
+    const projectPromise = getProjectNamesByCompanyId({
       supabase,
       companyId,
     });
 
-    const paySequencePromise = await getPaySequenceNameByCompanyId({
+    const paySequencePromise = getPaySequenceNameByCompanyId({
       supabase,
       companyId,
     });
@@ -146,7 +145,6 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 
   return clientCaching(
     `${cacheKeyPrefix.attendance}${url.searchParams.toString()}`,
-    args
     args
   );
 }
@@ -272,7 +270,7 @@ export default function Attendance() {
     <section className="py-4">
       <div className="w-full flex items-center justify-between pb-4">
         <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<LoadingSpinner className="mt-20" />}>
             <Await resolve={projectPromise}>
               {(projectData) => (
                 <Await resolve={projectSitePromise}>
@@ -280,7 +278,7 @@ export default function Attendance() {
                     <Await resolve={paySequencePromise}>
                       {(paySequenceData) => (
                         <AttendanceSearchFilter
-                        days={days}
+                          days={days}
                           setMonth={setMonth}
                           setYear={setYear}
                           disabled={!projectData?.data?.length && noFilters}
@@ -317,7 +315,7 @@ export default function Attendance() {
         </div>
         <AttendanceActions />
       </div>
-      <Suspense fallback={<LoadingSpinner className='w-1/3 h-1/3' />}>
+      <Suspense fallback={<LoadingSpinner className="w-1/3 h-1/3" />}>
         <Await resolve={attendancePromise}>
           {({ data, meta, error }) => {
             if (error) {
