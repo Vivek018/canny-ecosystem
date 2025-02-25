@@ -1,3 +1,4 @@
+import { LoadingSpinner } from "@/components/loading-spinner";
 import { FilterList } from "@/components/payment-field/reports/filter-list";
 import { PaymentFieldsReportSearchFilter } from "@/components/payment-field/reports/report-search-filter";
 import { columns } from "@/components/payment-field/reports/table/columns";
@@ -67,7 +68,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined,
+        (value) => value !== null && value !== undefined
       );
 
     const reportPromise = getEmployeesReportByCompanyId({
@@ -128,11 +129,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
-  return await clientCaching(
+  return clientCaching(
     `${cacheKeyPrefix.payment_field_report}${
       args.params.paymentFieldId
     }${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 
@@ -175,10 +176,10 @@ export default function PaymentFieldsReport() {
   const noFilters = Object.values(filterList).every((value) => !value);
 
   return (
-    <section className="py-6 px-4">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
-          <Suspense fallback={<div>Loading...</div>}>
+    <section className='py-6 px-4'>
+      <div className='w-full flex items-center justify-between pb-4'>
+        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4'>
+          <Suspense fallback={<LoadingSpinner />}>
             <Await resolve={projectPromise}>
               {(projectData) => (
                 <Await resolve={projectSitePromise}>
@@ -201,12 +202,12 @@ export default function PaymentFieldsReport() {
         </div>
         <ColumnVisibility disabled={!projectPromise} />
       </div>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<LoadingSpinner />}>
         <Await resolve={Promise.all([reportPromise, paymentFieldPromise])}>
           {([{ data, meta, error }, paymentField]) => {
             if (error || paymentField.error || !data?.length) {
               clearCacheEntry(
-                `${cacheKeyPrefix.payment_field_report}${paymentFieldId}`,
+                `${cacheKeyPrefix.payment_field_report}${paymentFieldId}`
               );
               throw error || paymentField.error;
             }
@@ -220,7 +221,7 @@ export default function PaymentFieldsReport() {
                 amount: 4324,
                 start_date: new Date(),
                 end_date: new Date(),
-              }),
+              })
             );
 
             return (

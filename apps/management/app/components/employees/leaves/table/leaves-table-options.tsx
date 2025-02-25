@@ -29,7 +29,7 @@ export const LeavesOptionsDropdown = ({
 
   const handleEdit = () => {
     navigate(
-      `/employees/${employeeId}/leaves/${leavesId}/${isEmployeeRoute}/update-leave`
+      `/employees/${employeeId}/leaves/${leavesId}/update-leave`
     );
   };
 

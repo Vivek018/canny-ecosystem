@@ -33,6 +33,7 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { AttendanceSearchFilter } from "@/components/attendance/attendance-search-filter";
 import { FilterList } from "@/components/attendance/filter-list";
 import { AttendanceActions } from "@/components/attendance/attendance-actions";
+import { LoadingSpinner } from "@/components/loading-spinner";
 
 const pageSize = LAZY_LOADING_LIMIT;
 
@@ -82,9 +83,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
       filters &&
       Object.values(filters).some(
         (value) => value !== null && value !== undefined
+        (value) => value !== null && value !== undefined
       );
 
-    const attendancePromise = await getAttendanceByCompanyId({
+    const attendancePromise = getAttendanceByCompanyId({
       supabase,
       companyId,
       params: {
@@ -108,7 +110,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     let projectSitePromise = null;
     if (filters.project) {
-      projectSitePromise = await getSiteNamesByProjectName({
+      projectSitePromise = getSiteNamesByProjectName({
         supabase,
         projectName: filters.project,
       });
@@ -142,8 +144,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
 
-  return await clientCaching(
+  return clientCaching(
     `${cacheKeyPrefix.attendance}${url.searchParams.toString()}`,
+    args
     args
   );
 }
@@ -314,7 +317,7 @@ export default function Attendance() {
         </div>
         <AttendanceActions />
       </div>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<LoadingSpinner className='w-1/3 h-1/3' />}>
         <Await resolve={attendancePromise}>
           {({ data, meta, error }) => {
             if (error) {

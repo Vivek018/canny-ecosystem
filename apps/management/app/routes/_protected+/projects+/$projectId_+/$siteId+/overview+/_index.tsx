@@ -1,4 +1,6 @@
 import { ErrorBoundary } from "@/components/error-boundary";
+import { LoadingSpinner } from "@/components/loading-spinner";
+import { PaySequenceCard } from "@/components/sites/pay-sequence/pay-sequence-card";
 import { SiteDetailsCard } from "@/components/sites/site-details-card";
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
@@ -31,9 +33,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return await clientCaching(
+  return clientCaching(
     `${cacheKeyPrefix.site_overview}${args.params.siteId}`,
-    args
+    args,
   );
 }
 
@@ -46,22 +48,20 @@ export default function Overview() {
   const { siteId } = useParams();
 
   if (error) {
-    clearExactCacheEntry(
-      `${cacheKeyPrefix.site_overview}${siteId}`
-    );
+    clearExactCacheEntry(`${cacheKeyPrefix.site_overview}${siteId}`);
     return (
-      <ErrorBoundary error={error} message='Failed to load site details' />
+      <ErrorBoundary error={error} message="Failed to load site details" />
     );
   }
 
   return (
-    <div className='w-full py-4 flex flex-col gap-8'>
-      <Suspense fallback={<div>Loading...</div>}>
+    <div className="w-full py-4 flex flex-col gap-8 h-[100vw]">
+      <Suspense fallback={<LoadingSpinner className="h-1/2 mt-20" />}>
         <Await resolve={sitePromise}>
           {(resolvedSiteData) => {
             if (!resolvedSiteData) {
               clearExactCacheEntry(`${cacheKeyPrefix.site_overview}${siteId}`);
-              return <ErrorBoundary message='Failed to load link template' />;
+              return <ErrorBoundary message="Failed to load link template" />;
             }
             return <SiteDetailsCard siteData={resolvedSiteData.data} />;
           }}

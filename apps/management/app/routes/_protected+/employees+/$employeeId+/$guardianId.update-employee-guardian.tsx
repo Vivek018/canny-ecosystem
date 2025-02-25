@@ -1,8 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
-  Await,
-  defer,
   Form,
   json,
   useActionData,
@@ -18,14 +16,12 @@ import {
 } from "@canny_ecosystem/utils";
 import { getEmployeeGuardianById } from "@canny_ecosystem/supabase/queries";
 import { updateEmployeeGuardian } from "@canny_ecosystem/supabase/mutations";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
 import { Card } from "@canny_ecosystem/ui/card";
 import { CreateEmployeeGuardianDetails } from "@/components/employees/form/create-employee-guardian-details";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import type { EmployeeGuardianDatabaseUpdate } from "@canny_ecosystem/supabase/types";
-import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { safeRedirect } from "@/utils/server/http.server";
@@ -47,19 +43,23 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   try {
-    let employeeGuardian = null;
+    let employeeGuardianData = null;
+    let employeeGuardianError = null;
 
     if (guardianId) {
-      employeeGuardian = getEmployeeGuardianById({
-        supabase,
-        id: guardianId,
-      });
+      ({ data: employeeGuardianData, error: employeeGuardianError } =
+        await getEmployeeGuardianById({
+          supabase,
+          id: guardianId,
+        }));
     } else {
       throw new Error("No guardianId provided");
     }
 
-    return defer({
-      employeeGuardian,
+    if (employeeGuardianError) throw employeeGuardianError;
+
+    return json({
+      employeeGuardianData,
       employeeId,
       error: null,
     });
@@ -67,7 +67,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return json({
       error,
       employeeId,
-      employeeGuardian: null,
+      employeeGuardianData: null,
     });
   }
 }
@@ -121,36 +121,8 @@ export async function action({
 }
 
 export default function UpdateEmployeeGuardian() {
-  const { employeeGuardian, employeeId } = useLoaderData<typeof loader>();
-
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Await resolve={employeeGuardian}>
-        {(resolvedData) => {
-          if (!resolvedData)
-            return <ErrorBoundary message="Failed to load employee details" />;
-          return (
-            <UpdateEmployeeGuardianWrapper
-              data={resolvedData.data}
-              error={resolvedData.error}
-              employeeId={employeeId}
-            />
-          );
-        }}
-      </Await>
-    </Suspense>
-  );
-}
-
-export function UpdateEmployeeGuardianWrapper({
-  data,
-  error,
-  employeeId,
-}: {
-  data: EmployeeGuardianDatabaseUpdate | null;
-  error: Error | null | { message: string };
-  employeeId: string | undefined;
-}) {
+  const { employeeGuardianData, employeeId, error } =
+    useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
   const currentSchema = EmployeeGuardiansSchema;
@@ -163,7 +135,7 @@ export function UpdateEmployeeGuardianWrapper({
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
-    defaultValue: data,
+    defaultValue: employeeGuardianData,
   });
 
   const { toast } = useToast();
@@ -173,7 +145,7 @@ export function UpdateEmployeeGuardianWrapper({
     if (error) {
       toast({
         title: "Error",
-        description: error.message,
+        description: (error as any).message,
         variant: "destructive",
       });
     }

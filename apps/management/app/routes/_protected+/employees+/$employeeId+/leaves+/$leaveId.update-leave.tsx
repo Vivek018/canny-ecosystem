@@ -32,7 +32,7 @@ import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 export const UPDATE_LEAVES_TAG = "Update_Leave";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const leaveId = params.id;
+  const leaveId = params.leaveId;
   const { supabase, headers } = getSupabaseWithHeaders({ request });
 
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
@@ -63,7 +63,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     throw userError;
   }
   const userOptions = userData.map((userData) => ({
-    label: userData.email?.toLowerCase(),
+    label: userData.email!.toLowerCase(),
     value: userData.id,
   }));
   return json({ data: leaveData, error, userOptions });
@@ -73,8 +73,7 @@ export async function action({
   request,
   params,
 }: ActionFunctionArgs): Promise<Response> {
-  const leaveId = params.id;
-  const isEmployeeRoute = params.route;
+  const leaveId = params.leaveId;
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
   const submission = parseWithZod(formData, { schema: LeaveSchema });
@@ -97,14 +96,12 @@ export async function action({
       status: "success",
       message: "Employee Leave update successfully",
       error: null,
-      isEmployeeRoute,
     });
   }
   return json({
     status: "error",
     message: "Employee leave update failed",
     error,
-    isEmployeeRoute,
   });
 }
 
@@ -143,18 +140,14 @@ export default function UpdateLeaves() {
         });
       }
 
-      navigate(
-        actionData.isEmployeeRoute === "true"
-          ? `/employees/${employeeId}/leaves`
-          : "/time-tracking/leaves"
-      );
+      navigate(`/employees/${employeeId}/leaves`);
     }
   }, [actionData]);
 
   return (
     <AddLeaves
       updateValues={updatableData}
-      userOptionsFromUpdate={userOptions as any}
+      userOptionsFromUpdate={userOptions}
     />
   );
 }

@@ -230,7 +230,7 @@ export default function CreateEmployeeLinkTemplate({
                     placeholder: replaceUnderscore(fields.effective_from.name),
                     max: getValidDateForInput(new Date().toISOString()),
                     defaultValue: getValidDateForInput(
-                      fields.effective_from.initialValue as any
+                      fields.effective_from.initialValue
                     ),
                   }}
                   labelProps={{

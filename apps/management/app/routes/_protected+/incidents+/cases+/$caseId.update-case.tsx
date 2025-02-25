@@ -1,8 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
-  Await,
-  defer,
   json,
   useActionData,
   useLoaderData,
@@ -20,7 +18,7 @@ import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { Suspense, useEffect } from "react";
+import { useEffect } from "react";
 import { clearExactCacheEntry } from "@/utils/cache";
 import RegisterCase from "./create-case";
 import { updateCaseById } from "@canny_ecosystem/supabase/mutations";
@@ -51,14 +49,17 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const url = new URL(request.url);
     const urlSearchParams = new URLSearchParams(url.searchParams);
 
-    let casePromise = null;
+    let caseData = null;
+    let caseError = null;
 
     if (caseId) {
-      casePromise = getCasesById({
+      ({ data: caseData, error: caseError } = await getCasesById({
         supabase,
         caseId,
-      });
+      }));
     }
+
+    if (caseError) throw caseError;
 
     const reportedBy = urlSearchParams.get("reported_by");
     const reportedOn = urlSearchParams.get("reported_on");
@@ -141,29 +142,29 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const reportedByEmployeeOptions = reportedByEmployee?.map(
       (employee: any) => ({
         label: employee?.employee_code as string,
-        value: employee?.id ?? "",
+        value: employee?.id as string,
       }),
     );
 
     const reportedOnEmployeeOptions = reportedOnEmployee?.map(
       (employee: any) => ({
         label: employee?.employee_code as string,
-        value: employee?.id ?? "",
+        value: employee?.id as string,
       }),
     );
 
     const reportedBySiteOptions = reportedBySite?.map((item) => ({
       label: item?.name,
-      value: item?.id,
+      value: item?.id as string,
     }));
 
     const reportedOnSiteOptions = reportedOnSite?.map((item) => ({
       label: item?.name,
-      value: item?.id,
+      value: item?.id as string,
     }));
 
-    return defer({
-      casePromise,
+    return json({
+      caseData,
       companyOptions: companyOptions || null,
       projectOptions: projectOptions || null,
       reportedByEmployeeOptions: reportedByEmployeeOptions || null,
@@ -174,7 +175,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     });
   } catch (error) {
     return json({
-      casePromise: null,
+      caseData: null,
       companyOptions: null,
       projectOptions: null,
       reportedByEmployeeOptions: null,
@@ -264,7 +265,7 @@ export async function action({
 
 export default function UpdateCases() {
   const {
-    casePromise,
+    caseData,
     companyOptions,
     projectOptions,
     reportedByEmployeeOptions,
@@ -302,33 +303,16 @@ export default function UpdateCases() {
     return <ErrorBoundary error={error} message="Failed to load case" />;
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Await resolve={casePromise}>
-        {(resolvedData) => {
-          if (resolvedData?.error) {
-            clearExactCacheEntry(cacheKeyPrefix.case);
-            return (
-              <ErrorBoundary
-                error={resolvedData?.error}
-                message="Failed to load case"
-              />
-            );
-          }
-          return (
-            <RegisterCase
-              updateValues={resolvedData?.data}
-              options={{
-                companyOptions: companyOptions || null,
-                projectOptions: projectOptions || null,
-                reportedByEmployeeOptions: reportedByEmployeeOptions || null,
-                reportedOnEmployeeOptions: reportedOnEmployeeOptions || null,
-                reportedBySiteOptions: reportedBySiteOptions || null,
-                reportedOnSiteOptions: reportedOnSiteOptions || null,
-              }}
-            />
-          );
-        }}
-      </Await>
-    </Suspense>
+    <RegisterCase
+      updateValues={caseData}
+      options={{
+        companyOptions: companyOptions || null,
+        projectOptions: projectOptions || null,
+        reportedByEmployeeOptions: reportedByEmployeeOptions || null,
+        reportedOnEmployeeOptions: reportedOnEmployeeOptions || null,
+        reportedBySiteOptions: reportedBySiteOptions || null,
+        reportedOnSiteOptions: reportedOnSiteOptions || null,
+      }}
+    />
   );
 }

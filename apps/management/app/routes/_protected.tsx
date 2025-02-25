@@ -49,7 +49,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return await clientCaching(cacheKeyPrefix.protected, args);
+  return clientCaching(cacheKeyPrefix.protected, args);
 }
 
 clientLoader.hydrate = true;
@@ -60,10 +60,10 @@ export default function ProtectedRoute() {
 
   return (
     <>
-      <Sidebar className='flex-none' theme={theme ?? "system"} user={user} />
-      <div className='flex max-h-screen flex-grow flex-col overflow-scroll ml-20'>
-        <Header className='px-4' companies={companies ?? []} />
-        <div className='h-full'>
+      <Sidebar className="flex-none" theme={theme ?? "system"} user={user} />
+      <div className="flex max-h-screen flex-grow flex-col overflow-scroll ml-20">
+        <Header className="px-4" companies={companies ?? []} />
+        <div className="h-full">
           <Outlet />
         </div>
       </div>

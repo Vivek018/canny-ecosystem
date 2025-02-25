@@ -41,9 +41,11 @@ export const columns = (
       <Link
         to={`/employees/${row.original.employee_id}/leaves`}
         prefetch='intent'
-        className='group'
+        className={cn("group", isEmployeeRoute && "cursor-default")}
       >
-        <p className='truncate text-primary/80 w-28'>
+        <p
+          className={cn("truncate w-28", !isEmployeeRoute && "text-primary/80")}
+        >
           {row.original?.employees?.employee_code}
         </p>
       </Link>
@@ -58,13 +60,13 @@ export const columns = (
       <Link
         to={`/employees/${row.original.employee_id}/leaves`}
         prefetch='intent'
-        className='group'
+        className={cn("group", isEmployeeRoute && "cursor-default")}
       >
-        <p className='truncate text-primary/80 w-28'>{`${
-          row.original?.employees?.first_name
-        } ${row.original?.employees?.middle_name ?? ""} ${
-          row.original?.employees?.last_name ?? ""
-        }`}</p>
+        <p
+          className={cn("truncate w-28", !isEmployeeRoute && "text-primary/80")}
+        >{`${row.original?.employees?.first_name} ${
+          row.original?.employees?.middle_name ?? ""
+        } ${row.original?.employees?.last_name ?? ""}`}</p>
       </Link>
     ),
   },

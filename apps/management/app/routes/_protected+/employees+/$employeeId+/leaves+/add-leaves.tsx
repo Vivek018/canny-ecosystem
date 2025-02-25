@@ -43,9 +43,10 @@ import { attribute } from "@canny_ecosystem/utils/constant";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { clearCacheEntry } from "@/utils/cache";
 import { addLeavesFromData } from "@canny_ecosystem/supabase/mutations";
-import { UPDATE_LEAVES_TAG } from "./$id.$route.update-leave";
+import { UPDATE_LEAVES_TAG } from "./$leaveId.update-leave";
 import { getUsersByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 
 export const ADD_LEAVES_TAG = "Create_Leave";
 
@@ -69,7 +70,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   const userOptions = userData.map((userData) => ({
-    label: userData.email?.toLowerCase(),
+    label: userData.email!.toLowerCase(),
     value: userData.id,
   }));
 
@@ -114,7 +115,7 @@ export default function AddLeaves({
   userOptionsFromUpdate,
 }: {
   updateValues?: LeavesDatabaseUpdate | null;
-  userOptionsFromUpdate?: any;
+  userOptionsFromUpdate?: ComboboxSelectOption[] | null;
 }) {
   const { employeeId, userOptions } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
@@ -206,7 +207,7 @@ export default function AddLeaves({
                     placeholder: "Select an authority that approved",
                   }}
                   className='lowercase'
-                  options={(userOptions as any) ?? userOptionsFromUpdate}
+                  options={userOptions ?? userOptionsFromUpdate}
                   labelProps={{
                     children: "Approved By",
                   }}

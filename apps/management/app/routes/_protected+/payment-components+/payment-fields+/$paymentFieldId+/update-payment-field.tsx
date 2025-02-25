@@ -2,8 +2,6 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import CreatePaymentField from "../create-payment-field";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
-  Await,
-  defer,
   json,
   useActionData,
   useLoaderData,
@@ -20,10 +18,9 @@ import {
 } from "@canny_ecosystem/utils";
 import { getPaymentFieldById } from "@canny_ecosystem/supabase/queries";
 import { updatePaymentField } from "@canny_ecosystem/supabase/mutations";
-import { Suspense, useEffect } from "react";
+import { useEffect } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { ErrorBoundary } from "@/components/error-boundary";
-import type { PaymentFieldDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
@@ -42,24 +39,22 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   try {
-    let paymentFieldPromise = null;
+    const { data, error } = await getPaymentFieldById({
+      supabase,
+      id: paymentFieldId || "",
+    });
 
-    if (paymentFieldId) {
-      paymentFieldPromise = getPaymentFieldById({
-        supabase,
-        id: paymentFieldId,
-      });
-    }
+    if (error) throw error;
 
-    return defer({
-      paymentFieldPromise,
-      error: null,
+    return json({
+      data,
+      error,
     });
   } catch (error) {
     return json(
       {
         error,
-        paymentFieldPromise: null,
+        data: null,
       },
       { status: 500 },
     );
@@ -120,7 +115,7 @@ export async function action({
 }
 
 export default function UpdatePaymentField() {
-  const { paymentFieldPromise } = useLoaderData<typeof loader>();
+  const { data, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
   const { paymentFieldId } = useParams();
@@ -129,7 +124,6 @@ export default function UpdatePaymentField() {
 
   useEffect(() => {
     if (!actionData) return;
-
     if (actionData?.status === "success") {
       clearExactCacheEntry(cacheKeyPrefix.payment_fields);
       clearCacheEntry(
@@ -140,6 +134,9 @@ export default function UpdatePaymentField() {
         description: actionData?.message,
         variant: "success",
       });
+      navigate("/payment-components/payment-fields", {
+        replace: true,
+      });
     } else {
       toast({
         title: "Error",
@@ -148,47 +145,9 @@ export default function UpdatePaymentField() {
         variant: "destructive",
       });
     }
-
-    navigate("/payment-components/payment-fields", {
-      replace: true,
-    });
   }, [actionData]);
 
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Await resolve={paymentFieldPromise}>
-        {(resolvedData) => {
-          if (!resolvedData)
-            return <ErrorBoundary message="Failed to load payment field" />;
-          return (
-            <UpdatePaymentFieldWrapper
-              data={resolvedData?.data}
-              error={resolvedData?.error}
-            />
-          );
-        }}
-      </Await>
-    </Suspense>
-  );
-}
-
-export function UpdatePaymentFieldWrapper({
-  data,
-  error,
-}: {
-  data: PaymentFieldDatabaseUpdate | null;
-  error: Error | null | { message: string };
-}) {
-  const { toast } = useToast();
-
-  useEffect(() => {
-    if (error)
-      toast({
-        title: "Error",
-        description: error?.message,
-        variant: "destructive",
-      });
-  }, [error]);
+  if (error) return <ErrorBoundary error={error} message="Failed to load" />;
 
   return <CreatePaymentField updateValues={data} />;
 }

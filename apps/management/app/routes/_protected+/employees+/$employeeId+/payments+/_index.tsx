@@ -1,6 +1,7 @@
 import { ExitsCard } from "@/components/employees/exits/exits-card";
 import { LinkTemplateCard } from "@/components/employees/link-template/link-template-card";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { LoadingSpinner } from "@/components/loading-spinner";
 import { PaymentTemplateComponentsCard } from "@/components/payment-templates/payment-template-components-card";
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
@@ -59,9 +60,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 // caching
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return await clientCaching(
+  return clientCaching(
     `${cacheKeyPrefix.employee_payments}${args.params.employeeId}`,
-    args
+    args,
   );
 }
 clientLoader.hydrate = true;
@@ -77,19 +78,19 @@ export default function Payments() {
 
   if (error) {
     clearExactCacheEntry(`${cacheKeyPrefix.employee_payments}${employeeId}`);
-    return <ErrorBoundary error={error} message='Failed to load data' />;
+    return <ErrorBoundary error={error} message="Failed to load data" />;
   }
 
   return (
-    <div className='w-full py-4 flex flex-col gap-8'>
-      <Suspense fallback={<div>Loading...</div>}>
+    <div className="w-full py-4 flex flex-col gap-8">
+      <Suspense fallback={<LoadingSpinner className="h-1/4" />}>
         <Await resolve={paymentTemplateAssignmentPromise}>
           {(resolvedAssignment) => {
             if (!resolvedAssignment) {
               clearExactCacheEntry(
-                `${cacheKeyPrefix.employee_payments}${employeeId}`
+                `${cacheKeyPrefix.employee_payments}${employeeId}`,
               );
-              return <ErrorBoundary message='Failed to load link template' />;
+              return <ErrorBoundary message="Failed to load link template" />;
             }
 
             return (
@@ -113,14 +114,14 @@ export default function Payments() {
         </Await>
       </Suspense>
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<LoadingSpinner className="h-1/4" />}>
         <Await resolve={exitsPromise}>
           {(resolvedData) => {
             if (!resolvedData) {
               clearExactCacheEntry(
-                `${cacheKeyPrefix.employee_payments}${employeeId}`
+                `${cacheKeyPrefix.employee_payments}${employeeId}`,
               );
-              return <ErrorBoundary message='Failed to load link template' />;
+              return <ErrorBoundary message="Failed to load link template" />;
             }
             return (
               <ExitsCard

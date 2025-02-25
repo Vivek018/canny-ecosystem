@@ -18,6 +18,7 @@ import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Await, defer, useLoaderData } from "@remix-run/react";
 import { PayrollStatus } from "@/components/payroll/payroll-status";
 import { Suspense } from "react";
+import { LoadingSpinner } from "@/components/loading-spinner";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const projectId = params.projectId as string;
@@ -92,11 +93,7 @@ export default function SitesIndex() {
   return (
     <section className="p-4">
       <div className="w-full flex items-end justify-between">
-        <Suspense
-          fallback={
-            <div className="w-full py-40 text-center">Loading sites...</div>
-          }
-        >
+        <Suspense fallback={<LoadingSpinner className="my-20" />}>
           <Await
             resolve={dataPromise}
             errorElement={
