@@ -81,10 +81,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined,
+        (value) => value !== null && value !== undefined
       );
 
-    const attendancePromise = await getAttendanceByCompanyId({
+    const attendancePromise = getAttendanceByCompanyId({
       supabase,
       companyId,
       params: {
@@ -96,14 +96,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
       },
     });
 
-    const projectPromise = await getProjectNamesByCompanyId({
+    const projectPromise = getProjectNamesByCompanyId({
       supabase,
       companyId,
     });
 
     let projectSitePromise = null;
     if (filters.project) {
-      projectSitePromise = await getSiteNamesByProjectName({
+      projectSitePromise = getSiteNamesByProjectName({
         supabase,
         projectName: filters.project,
       });
@@ -137,7 +137,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 
   return clientCaching(
     `${cacheKeyPrefix.attendance}${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 
@@ -198,16 +198,16 @@ export default function Attendance() {
           acc[key] = { ...employeeDetails };
         }
 
-        const fullDate = formatDate(date.toISOString().split("T")[0]);
+        const fullDate = formatDate(date.toISOString().split("T")[0])!;
         acc[key][fullDate] = record.present
           ? "P"
           : record.holiday
-            ? record.holiday_type === "weekly"
-              ? "(WOF)"
-              : record.holiday_type === "paid"
-                ? "L"
-                : "A"
-            : "A";
+          ? record.holiday_type === "weekly"
+            ? "(WOF)"
+            : record.holiday_type === "paid"
+            ? "L"
+            : "A"
+          : "A";
       }
 
       return acc;
@@ -253,13 +253,13 @@ export default function Attendance() {
   });
 
   const noFilters = Boolean(
-    filters && Object.values(filters).every((value) => !value),
+    filters && Object.values(filters).every((value) => !value)
   );
   return (
-    <section className="py-4">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
-          <Suspense fallback={<LoadingSpinner className="w-1/3" />}>
+    <section className='py-4'>
+      <div className='w-full flex items-center justify-between pb-4'>
+        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4'>
+          <Suspense fallback={<LoadingSpinner className='w-1/3' />}>
             <Await resolve={projectPromise}>
               {(projectData) => (
                 <Await resolve={projectSitePromise}>
@@ -289,7 +289,7 @@ export default function Attendance() {
         </div>
         <AttendanceActions />
       </div>
-      <Suspense fallback={<LoadingSpinner className="w-1/3 h-1/3" />}>
+      <Suspense fallback={<LoadingSpinner className='w-1/3 h-1/3' />}>
         <Await resolve={attendancePromise}>
           {({ data, meta, error }) => {
             if (error) {
@@ -297,13 +297,13 @@ export default function Attendance() {
               return (
                 <ErrorBoundary
                   error={error}
-                  message="Failed to load Attendance"
+                  message='Failed to load Attendance'
                 />
               );
             }
 
             const attdData = transformAttendanceData(
-              data,
+              data
             ) as TransformedAttendanceDataType[];
 
             const hasNextPage = Boolean(meta?.count > pageSize);
