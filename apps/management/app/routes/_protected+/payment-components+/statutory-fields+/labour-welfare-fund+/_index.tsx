@@ -14,7 +14,7 @@ import { LWFWrapper } from "@/components/statutory-fields/labour-welfare-fund/lw
 import { ErrorBoundary } from "@/components/error-boundary";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
-import LoadingSpinner from "@/components/loading-spinner";
+import { LoadingSpinner } from "@/components/loading-spinner";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {

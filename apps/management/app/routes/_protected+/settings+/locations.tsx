@@ -13,7 +13,7 @@ import { LocationsWrapper } from "@/components/locations/locations-wrapper";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
-import LoadingSpinner from "@/components/loading-spinner";
+import { LoadingSpinner } from "@/components/loading-spinner";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {

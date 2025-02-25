@@ -30,7 +30,7 @@ import { FilterList } from "@/components/cases/filter-list";
 import { CasesTable } from "@/components/cases/table/cases-table";
 import { CaseSearchFilter } from "@/components/cases/case-search-filter";
 import { CaseActions } from "@/components/cases/case-actions";
-import LoadingSpinner from "@/components/loading-spinner";
+import { LoadingSpinner } from "@/components/loading-spinner";
 
 const pageSize = LAZY_LOADING_LIMIT;
 

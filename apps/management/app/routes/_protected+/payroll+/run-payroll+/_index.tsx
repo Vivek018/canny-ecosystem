@@ -20,7 +20,7 @@ import { Await, defer, Outlet, useLoaderData } from "@remix-run/react";
 import { PayrollProjectCard } from "@/components/payroll/payroll-project-card";
 import { Suspense } from "react";
 import type { TypedSupabaseClient } from "@canny_ecosystem/supabase/types";
-import LoadingSpinner from "@/components/loading-spinner";
+import { LoadingSpinner } from "@/components/loading-spinner";
 
 async function enrichProjectData(
   supabase: TypedSupabaseClient,

@@ -14,7 +14,7 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { ProfessionalTaxWrapper } from "@/components/statutory-fields/professional-tax/professional-tax-wrapper";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
-import LoadingSpinner from "@/components/loading-spinner";
+import { LoadingSpinner } from "@/components/loading-spinner";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {

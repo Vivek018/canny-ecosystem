@@ -33,7 +33,7 @@ import { hasPermission, readRole } from "@canny_ecosystem/utils";
 import { safeRedirect } from "@/utils/server/http.server";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
-import LoadingSpinner from "@/components/loading-spinner";
+import { LoadingSpinner } from "@/components/loading-spinner";
 
 const pageSize = LAZY_LOADING_LIMIT;
 

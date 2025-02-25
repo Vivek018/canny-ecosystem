@@ -2,6 +2,7 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { LeaveTypeOptionsDropdown } from "@/components/holidays/leave-types/leave-type-option-dropdown";
 import { columns } from "@/components/holidays/table/columns";
 import { HolidaysDataTable } from "@/components/holidays/table/data-table";
+import { LoadingSpinner } from "@/components/loading-spinner";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
@@ -89,9 +90,9 @@ export default function Holidays() {
   const { role } = useUser();
   const navigate = useNavigate();
   return (
-    <div className='py-4'>
-      <div className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4'>
-        <Suspense fallback={<div>Loading...</div>}>
+    <div className="py-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <Suspense fallback={<LoadingSpinner />}>
           <Await resolve={leaveTypePromise}>
             {({ data, error }) => {
               if (error) {
@@ -99,7 +100,7 @@ export default function Holidays() {
                 return (
                   <ErrorBoundary
                     error={error}
-                    message='Failed to load leave types'
+                    message="Failed to load leave types"
                   />
                 );
               }
@@ -125,17 +126,17 @@ export default function Holidays() {
                                 "hidden",
                             )}
                           >
-                            <Icon name='dots-vertical' size='xs' />
+                            <Icon name="dots-vertical" size="xs" />
                           </DropdownMenuTrigger>
                         }
                       />
-                      <CardHeader className='p-0'>
-                        <CardTitle className='text-lg text-center capitalize'>
+                      <CardHeader className="p-0">
+                        <CardTitle className="text-lg text-center capitalize">
                           {replaceUnderscore(leave.leave_type)}
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <p className='text-muted-foreground text-center'>
+                        <p className="text-muted-foreground text-center">
                           Available Days: {leave.leaves_per_year}
                         </p>
                       </CardContent>
@@ -144,13 +145,13 @@ export default function Holidays() {
 
                   {data.length < 5 && (
                     <Card
-                      className='h-28 bg-muted/40 dark:bg-muted/80 cursor-pointer grid place-items-center'
+                      className="h-28 bg-muted/40 dark:bg-muted/80 cursor-pointer grid place-items-center"
                       onClick={() => navigate("add-leave-type")}
                     >
                       <Icon
-                        name='plus'
-                        size='xl'
-                        className='shrink-0 flex justify-center items-center'
+                        name="plus"
+                        size="xl"
+                        className="shrink-0 flex justify-center items-center"
                       />
                     </Card>
                   )}
@@ -161,8 +162,8 @@ export default function Holidays() {
         </Suspense>
       </div>
 
-      <div className='my-5'>
-        <Suspense fallback={<div>Loading...</div>}>
+      <div className="my-5">
+        <Suspense fallback={<LoadingSpinner className="my-30" />}>
           <Await resolve={holidaysPromise}>
             {({ data, error }) => {
               if (error) {
@@ -170,7 +171,7 @@ export default function Holidays() {
                 return (
                   <ErrorBoundary
                     error={error}
-                    message='Failed to load holidays'
+                    message="Failed to load holidays"
                   />
                 );
               }
@@ -194,26 +195,26 @@ export default function Holidays() {
 
               return (
                 <div>
-                  <div className='relative w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4'>
-                    <div className='relative w-full my-4'>
-                      <div className='absolute inset-y-0 left-3 flex items-center pointer-events-none'>
+                  <div className="relative w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4">
+                    <div className="relative w-full my-4">
+                      <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
                         <Icon
-                          name='magnifying-glass'
-                          size='sm'
-                          className='text-gray-400'
+                          name="magnifying-glass"
+                          size="sm"
+                          className="text-gray-400"
                         />
                       </div>
                       <Input
-                        placeholder='Search Holidays'
+                        placeholder="Search Holidays"
                         value={searchString}
                         onChange={(e: {
                           target: { value: SetStateAction<string> };
                         }) => setSearchString(e.target.value)}
-                        className='pl-8 h-10 w-full focus-visible:ring-0 shadow-none'
+                        className="pl-8 h-10 w-full focus-visible:ring-0 shadow-none"
                       />
                     </div>
                     <Link
-                      to='/time-tracking/holidays/add-holiday'
+                      to="/time-tracking/holidays/add-holiday"
                       className={cn(
                         buttonVariants({ variant: "primary-outline" }),
                         "flex items-center gap-1",
@@ -224,7 +225,7 @@ export default function Holidays() {
                       )}
                     >
                       <span>Add</span>
-                      <span className='hidden md:flex justify-end'>
+                      <span className="hidden md:flex justify-end">
                         Holiday
                       </span>
                     </Link>

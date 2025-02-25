@@ -1,7 +1,7 @@
 import { ExitsCard } from "@/components/employees/exits/exits-card";
 import { LinkTemplateCard } from "@/components/employees/link-template/link-template-card";
 import { ErrorBoundary } from "@/components/error-boundary";
-import LoadingSpinner from "@/components/loading-spinner";
+import { LoadingSpinner } from "@/components/loading-spinner";
 import { PaymentTemplateComponentsCard } from "@/components/payment-templates/payment-template-components-card";
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";

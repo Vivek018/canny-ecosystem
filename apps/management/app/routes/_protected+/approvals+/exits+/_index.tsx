@@ -5,7 +5,7 @@ import { FilterList } from "@/components/exits/filter-list";
 import { ImportExitModal } from "@/components/exits/import-export/import-modal-exits";
 import { ExitPaymentColumns } from "@/components/exits/table/columns";
 import { ExitPaymentTable } from "@/components/exits/table/data-table";
-import LoadingSpinner from "@/components/loading-spinner";
+import { LoadingSpinner } from "@/components/loading-spinner";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";

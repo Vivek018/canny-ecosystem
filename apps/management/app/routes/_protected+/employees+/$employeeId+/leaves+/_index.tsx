@@ -29,7 +29,7 @@ import { LeaveCountCards } from "@/components/employees/leaves/leave-count-cards
 import { LeavesDataTable } from "@/components/leaves/table/leaves-table";
 import { columns } from "@/components/leaves/table/columns";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import LoadingSpinner from "@/components/loading-spinner";
+import { LoadingSpinner } from "@/components/loading-spinner";
 
 const isEmployeeRoute = true;
 export async function loader({ request, params }: LoaderFunctionArgs) {

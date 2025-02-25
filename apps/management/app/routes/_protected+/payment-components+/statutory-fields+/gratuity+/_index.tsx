@@ -1,5 +1,5 @@
 import { ErrorBoundary } from "@/components/error-boundary";
-import LoadingSpinner from "@/components/loading-spinner";
+import { LoadingSpinner } from "@/components/loading-spinner";
 import { GratuityWrapper } from "@/components/statutory-fields/gratuity/gratuity-wrapper";
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";

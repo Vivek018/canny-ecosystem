@@ -1,3 +1,4 @@
+import { LoadingSpinner } from "@/components/loading-spinner";
 import { columns } from "@/components/user/table/columns";
 import { UserDataTable } from "@/components/user/table/data-table";
 import { cacheKeyPrefix } from "@/constant";
@@ -7,6 +8,7 @@ import { useUser } from "@/utils/user";
 
 import { getUsersByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
+import type { UserDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
@@ -15,25 +17,22 @@ import { hasPermission, createRole } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import {
+  Await,
   type ClientLoaderFunctionArgs,
-  json,
+  defer,
   Link,
   useLoaderData,
 } from "@remix-run/react";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
 
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-  const { data, error } = await getUsersByCompanyId({ supabase, companyId });
+  const usersPromise = getUsersByCompanyId({ supabase, companyId });
 
-  if (error || !data) {
-    throw error;
-  }
-
-  return json({ data });
+  return defer({ usersPromise });
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
@@ -43,14 +42,28 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 clientLoader.hydrate = true;
 
 export default function Users() {
-  const { role } = useUser();
-  const { data } = useLoaderData<typeof loader>();
+  const { usersPromise } = useLoaderData<typeof loader>();
 
-  const [searchString, setSearchString] = useState("");
+  return (
+    <Suspense fallback={<LoadingSpinner className="my-20" />}>
+      <Await resolve={usersPromise}>
+        {(resolvedData: any) => {
+          return <UsersWrapper data={resolvedData?.data || []} />;
+        }}
+      </Await>
+    </Suspense>
+  );
+}
+
+export function UsersWrapper({
+  data,
+}: { data: Omit<UserDatabaseRow, "created_at" | "updated_at">[] }) {
+  const { role } = useUser();
   const [tableData, setTableData] = useState(data);
+  const [searchString, setSearchString] = useState("");
 
   useEffect(() => {
-    const filteredData = data?.filter((item) =>
+    const filteredData = data?.filter((item: any) =>
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&

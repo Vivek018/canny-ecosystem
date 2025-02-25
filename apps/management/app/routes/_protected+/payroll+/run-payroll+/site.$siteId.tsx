@@ -1,4 +1,4 @@
-import LoadingSpinner from "@/components/loading-spinner";
+import { LoadingSpinner } from "@/components/loading-spinner";
 import { PayrollComponent } from "@/components/payroll/payroll-component";
 import { CANNY_MANAGEMENT_SERVICES_COMPANY_ID } from "@/constant";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";

@@ -32,7 +32,7 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { AttendanceSearchFilter } from "@/components/attendance/attendance-search-filter";
 import { FilterList } from "@/components/attendance/filter-list";
 import { AttendanceActions } from "@/components/attendance/attendance-actions";
-import LoadingSpinner from "@/components/loading-spinner";
+import { LoadingSpinner } from "@/components/loading-spinner";
 
 const pageSize = LAZY_LOADING_LIMIT;
 

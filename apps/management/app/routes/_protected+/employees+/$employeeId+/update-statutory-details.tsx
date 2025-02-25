@@ -121,7 +121,6 @@ export async function action({
 export default function UpdateStatutoryDetails() {
   const { employeeStatutoryDetailsData, error, employeeId } =
     useLoaderData<typeof loader>();
-  console.log(employeeStatutoryDetailsData, "dwefwe");
   const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
   const currentSchema = EmployeeStatutorySchema;

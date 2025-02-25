@@ -32,7 +32,7 @@ import { columns } from "@/components/accidents/table/columns";
 import { FilterList } from "@/components/accidents/filter-list";
 import { AccidentSearchFilter } from "@/components/accidents/accident-search-filter";
 import { AccidentActions } from "@/components/accidents/accident-actions";
-import LoadingSpinner from "@/components/loading-spinner";
+import { LoadingSpinner } from "@/components/loading-spinner";
 
 const pageSize = LAZY_LOADING_LIMIT;
 

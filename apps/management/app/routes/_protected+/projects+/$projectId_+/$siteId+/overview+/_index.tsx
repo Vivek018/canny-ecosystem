@@ -1,5 +1,5 @@
 import { ErrorBoundary } from "@/components/error-boundary";
-import LoadingSpinner from "@/components/loading-spinner";
+import { LoadingSpinner } from "@/components/loading-spinner";
 import { PaySequenceCard } from "@/components/sites/pay-sequence/pay-sequence-card";
 import { SiteDetailsCard } from "@/components/sites/site-details-card";
 import { cacheKeyPrefix } from "@/constant";

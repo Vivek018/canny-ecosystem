@@ -32,7 +32,7 @@ import { Suspense } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { EmployeeReimbursementActions } from "@/components/reimbursements/employee-reimbursement-actions";
-import LoadingSpinner from "@/components/loading-spinner";
+import { LoadingSpinner } from "@/components/loading-spinner";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const env = {

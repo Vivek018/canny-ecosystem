@@ -15,7 +15,7 @@ import { Suspense, useEffect, useState } from "react";
 import { UserAvatar } from "@/components/accounts/user-avatar";
 import { UserName } from "@/components/accounts/user-name";
 import { UserContact } from "@/components/accounts/user-contact";
-import LoadingSpinner from "@/components/loading-spinner";
+import { LoadingSpinner } from "@/components/loading-spinner";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {

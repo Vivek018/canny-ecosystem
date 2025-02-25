@@ -9,7 +9,7 @@ import { ImportEmployeeStatutoryModal } from "@/components/employees/import-expo
 import { columns } from "@/components/employees/table/columns";
 import { DataTable } from "@/components/employees/table/data-table";
 import { ErrorBoundary } from "@/components/error-boundary";
-import LoadingSpinner from "@/components/loading-spinner";
+import { LoadingSpinner } from "@/components/loading-spinner";
 import { cacheKeyPrefix, VALID_FILTERS } from "@/constant";
 import { AIChat4o } from "@/utils/ai";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";

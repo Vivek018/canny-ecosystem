@@ -21,7 +21,7 @@ import { Await, defer, Outlet, useLoaderData } from "@remix-run/react";
 import { PayrollProjectCard } from "@/components/payroll/payroll-project-card";
 import { Suspense } from "react";
 import type { TypedSupabaseClient } from "@canny_ecosystem/supabase/types";
-import LoadingSpinner from "@/components/loading-spinner";
+import { LoadingSpinner } from "@/components/loading-spinner";
 
 async function enrichProjectData(
   supabase: TypedSupabaseClient,
@@ -117,11 +117,7 @@ export default function ProjectsIndex() {
   return (
     <section className="py-4 px-4">
       <div className="w-full flex items-end justify-between">
-        <Suspense
-          fallback={
-            <LoadingSpinner className="mt-20" />
-          }
-        >
+        <Suspense fallback={<LoadingSpinner className="mt-20" />}>
           <Await resolve={projectPromise}>
             {(projects) => <ProjectList projects={projects} />}
           </Await>

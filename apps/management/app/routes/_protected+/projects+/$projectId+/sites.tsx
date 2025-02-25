@@ -27,7 +27,7 @@ import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
-import LoadingSpinner from "@/components/loading-spinner";
+import { LoadingSpinner } from "@/components/loading-spinner";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const projectId = params.projectId;

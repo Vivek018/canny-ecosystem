@@ -1,5 +1,5 @@
 import { ErrorBoundary } from "@/components/error-boundary";
-import LoadingSpinner from "@/components/loading-spinner";
+import { LoadingSpinner } from "@/components/loading-spinner";
 import { SiteLinkedTemplates } from "@/components/sites/link-templates/site-linked-templates";
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";

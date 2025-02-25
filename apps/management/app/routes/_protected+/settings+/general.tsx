@@ -1,7 +1,7 @@
 import { CompanyDetailsWrapper } from "@/components/company/company-details-wrapper";
 import CompanyRegistrationDetailsWrapper from "@/components/company/company-registration-details-wrapper";
 import { ErrorBoundary } from "@/components/error-boundary";
-import LoadingSpinner from "@/components/loading-spinner";
+import { LoadingSpinner } from "@/components/loading-spinner";
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";

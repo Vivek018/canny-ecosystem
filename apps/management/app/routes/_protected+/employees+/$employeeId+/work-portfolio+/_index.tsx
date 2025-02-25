@@ -2,7 +2,7 @@ import { EmployeeProjectAssignmentCard } from "@/components/employees/work-portf
 import { EmployeeSkillsCard } from "@/components/employees/work-portfolio/skills-card";
 import { EmployeeWorkHistoriesCard } from "@/components/employees/work-portfolio/work-history-card";
 import { ErrorBoundary } from "@/components/error-boundary";
-import LoadingSpinner from "@/components/loading-spinner";
+import { LoadingSpinner } from "@/components/loading-spinner";
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import {

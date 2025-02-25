@@ -59,21 +59,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       throw new Error("Project ID not provided");
     }
 
-    const companyOptionsPromise = await getCompanies({ supabase }).then(
-      ({ data, error }) => {
-        if (data) {
-          const companyOptions = data
-            .filter((company) => company.id !== companyId)
-            .map((company) => ({ label: company.name, value: company.id }));
-          return { data: companyOptions, error };
-        }
-        return { data: null, error };
-      },
-    );
+    const { data, error } = await getCompanies({ supabase });
+
+    if (error) throw error;
 
     return json({
       projectData,
-      companyOptionsPromise,
+      companyOptions:
+        data
+          ?.filter((company) => company.id !== companyId)
+          .map((company) => ({ label: company.name, value: company.id })) || [],
       companyId,
       error: null,
     });
@@ -83,7 +78,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         error,
         companyId: null,
         projectData: null,
-        companyOptionsPromise: null,
+        companyOptions: null,
       },
       { status: 500 },
     );
@@ -138,7 +133,7 @@ export async function action({
 }
 
 export default function UpdateProject() {
-  const { projectData, error } = useLoaderData<typeof loader>();
+  const { projectData, companyOptions, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
   const { projectId } = useParams();
@@ -171,5 +166,10 @@ export default function UpdateProject() {
   if (error)
     return <ErrorBoundary error={error} message="Failed to load project" />;
 
-  return <CreateProject updateValues={projectData} />;
+  return (
+    <CreateProject
+      updateValues={projectData}
+      companyOptionsFromUpdate={companyOptions}
+    />
+  );
 }

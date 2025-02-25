@@ -2,7 +2,6 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import CreateSite from "./create-site";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
-  defer,
   json,
   useActionData,
   useLoaderData,
@@ -48,19 +47,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-    const locationOptionsPromise = getLocationsForSelectByCompanyId({
-      supabase,
-      companyId,
-    }).then(({ data, error }) => {
-      if (data) {
-        const locationOptions = data.map((location) => ({
-          label: location.name,
-          value: location.id,
-        }));
-        return { data: locationOptions, error };
-      }
-      return { data, error };
-    });
+    const { data: locationOptionsData, error: locationOptionsError } =
+      await getLocationsForSelectByCompanyId({
+        supabase,
+        companyId,
+      });
+
+    if (locationOptionsError) throw locationOptionsError;
 
     let siteData = null;
     let siteError = null;
@@ -73,10 +66,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
       if (siteError) throw siteError;
 
-      return defer({
+      return json({
         error: null,
         siteData,
-        locationOptionsPromise,
+        locationOptions: locationOptionsData?.map((location) => ({
+          label: location.name,
+          value: location.id,
+        })),
         projectId,
         siteId,
       });
@@ -88,7 +84,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       {
         error,
         siteData: null,
-        locationOptionsPromise: null,
+        locationOptions: null,
         projectId,
         siteId,
       },

@@ -1,5 +1,5 @@
 import { ErrorBoundary } from "@/components/error-boundary";
-import LoadingSpinner from "@/components/loading-spinner";
+import { LoadingSpinner } from "@/components/loading-spinner";
 import { PaymentTemplatesTableWrapper } from "@/components/payment-templates/payment-templates-table-wrapper";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";

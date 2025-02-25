@@ -19,7 +19,7 @@ import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Await, defer, useLoaderData } from "@remix-run/react";
 import { PayrollStatus } from "@/components/payroll/payroll-status";
 import { Suspense } from "react";
-import LoadingSpinner from "@/components/loading-spinner";
+import { LoadingSpinner } from "@/components/loading-spinner";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const projectId = params.projectId as string;

@@ -70,31 +70,27 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     if (!projectId) throw new Error("No projectId provided");
 
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-    const locationOptionsPromise = getLocationsForSelectByCompanyId({
+    const { data, error } = await getLocationsForSelectByCompanyId({
       supabase,
       companyId,
-    }).then(({ data, error }) => {
-      if (data) {
-        const locationOptions = data.map((location) => ({
-          label: location.name,
-          value: location.id,
-        }));
-        return { data: locationOptions, error };
-      }
-      return { data, error };
     });
 
-    return defer({
+    if (error) throw error;
+
+    return json({
       error: null,
       projectId,
-      locationOptionsPromise,
+      locationOptions: data?.map((location) => ({
+        label: location.name,
+        value: location.id,
+      })),
     });
   } catch (error) {
     return json(
       {
         error,
         projectId,
-        locationOptionsPromise: null,
+        locationOptions: null,
       },
       { status: 500 },
     );
@@ -164,8 +160,7 @@ export default function CreateSite({
 }: {
   updateValues?: SiteDatabaseUpdate | null;
 }) {
-  const { projectId, locationOptionsPromise, error } =
-    useLoaderData<typeof loader>();
+  const { projectId, locationOptions, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const SITE_TAG = updateValues ? UPDATE_SITE : CREATE_SITE;
 
@@ -256,24 +251,22 @@ export default function CreateSite({
                   }}
                   errors={fields.site_code.errors}
                 />
-                <Suspense fallback={<div>Loading...</div>}>
-                  <Await resolve={locationOptionsPromise}>
-                    {(resolvedData) => {
-                      if (!resolvedData)
-                        return (
-                          <ErrorBoundary message="Failed to load locations" />
-                        );
-                      return (
-                        <LocationsListWrapper
-                          data={resolvedData.data}
-                          error={resolvedData.error}
-                          fields={fields}
-                          resetKey={resetKey}
-                        />
-                      );
-                    }}
-                  </Await>
-                </Suspense>
+                <SearchableSelectField
+                  key={resetKey}
+                  className="capitalize"
+                  options={locationOptions ?? []}
+                  inputProps={{
+                    ...getInputProps(fields.company_location_id, {
+                      type: "text",
+                    }),
+                  }}
+                  placeholder={"Select Company Location"}
+                  labelProps={{
+                    children: "Company Location",
+                  }}
+                  errors={fields.company_location_id.errors}
+                />
+                
               </div>
               <CheckboxField
                 buttonProps={getInputProps(fields.is_active, {
