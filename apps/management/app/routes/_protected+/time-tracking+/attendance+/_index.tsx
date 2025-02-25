@@ -5,6 +5,7 @@ import {
 } from "@canny_ecosystem/supabase/constant";
 import {
   getAttendanceByCompanyId,
+  getPaySequenceNameByCompanyId,
   getProjectNamesByCompanyId,
   getSiteNamesByProjectName,
 } from "@canny_ecosystem/supabase/queries";
@@ -100,6 +101,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
       companyId,
     });
 
+    const paySequencePromise = await getPaySequenceNameByCompanyId({
+      supabase,
+      companyId,
+    });
+
     let projectSitePromise = null;
     if (filters.project) {
       projectSitePromise = await getSiteNamesByProjectName({
@@ -109,6 +115,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     }
     return defer({
       projectPromise,
+      paySequencePromise,
       projectSitePromise,
       attendancePromise: attendancePromise as any,
       filters,
@@ -122,6 +129,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return defer({
       attendancePromise: Promise.resolve({ data: [] }),
       projectPromise: Promise.resolve({ data: [] }),
+      paySequencePromise: Promise.resolve({ data: [] }),
       projectSitePromise: Promise.resolve({ data: [] }),
       query: "",
       filters: null,
@@ -163,6 +171,7 @@ export default function Attendance() {
     attendancePromise,
     projectPromise,
     projectSitePromise,
+    paySequencePromise,
     query,
     filters,
     companyId,
@@ -265,21 +274,36 @@ export default function Attendance() {
               {(projectData) => (
                 <Await resolve={projectSitePromise}>
                   {(projectSiteData) => (
-                    <AttendanceSearchFilter
-                      setMonth={setMonth}
-                      setYear={setYear}
-                      disabled={!projectData?.data?.length && noFilters}
-                      projectArray={
-                        projectData?.data?.length
-                          ? projectData?.data?.map((project) => project!.name)
-                          : []
-                      }
-                      projectSiteArray={
-                        projectSiteData?.data?.length
-                          ? projectSiteData?.data?.map((site) => site!.name)
-                          : []
-                      }
-                    />
+                    <Await resolve={paySequencePromise}>
+                      {(paySequenceData) => (
+                        <AttendanceSearchFilter
+                        days={days}
+                          setMonth={setMonth}
+                          setYear={setYear}
+                          disabled={!projectData?.data?.length && noFilters}
+                          projectArray={
+                            projectData?.data?.length
+                              ? projectData?.data?.map(
+                                  (project) => project!.name
+                                )
+                              : []
+                          }
+                          projectSiteArray={
+                            projectSiteData?.data?.length
+                              ? projectSiteData?.data?.map((site) => site!.name)
+                              : []
+                          }
+                          paySequenceArray={
+                            paySequenceData?.data?.length
+                              ? paySequenceData?.data?.map((pay) => [
+                                  pay!.name,
+                                  pay?.pay_day,
+                                ])
+                              : []
+                          }
+                        />
+                      )}
+                    </Await>
                   )}
                 </Await>
               )}

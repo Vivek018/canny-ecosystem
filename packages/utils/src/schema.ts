@@ -226,12 +226,12 @@ export const SiteSchema = z.object({
 const daySchema = z.number().int().min(0).max(6);
 export const payFrequencyArray = ["monthly"] as const;
 
-export const SitePaySequenceSchema = z.object({
-  id: z.string(),
-  pay_frequency: z.enum(payFrequencyArray),
+export const PaySequenceSchema = z.object({
+  name: z.string().min(3).max(20),
+  overtime_multiplier: z.number().default(1.0),
   working_days: z.array(daySchema),
   pay_day: z.number().int().min(1).max(15),
-  site_id: z.string(),
+  company_id: z.string(),
 });
 
 // Employees

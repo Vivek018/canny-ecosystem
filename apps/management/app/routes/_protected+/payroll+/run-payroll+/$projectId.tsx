@@ -1,6 +1,5 @@
 import {
   getPayrollsBySiteId,
-  getSitePaySequenceInSite,
   getSitesWithEmployeeCountByProjectId,
   type SitesWithLocation,
 } from "@canny_ecosystem/supabase/queries";
@@ -39,17 +38,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       // Process each site concurrently
       const processedSites = await Promise.all(
         siteData.map(async (site) => {
-          const [payrollsResult, sitePaySequenceResult] = await Promise.all([
+          const [payrollsResult] = await Promise.all([
             getPayrollsBySiteId({ supabase, site_id: site.id }),
-            getSitePaySequenceInSite({ supabase, siteId: site.id }),
           ]);
 
           const payrolls = payrollsResult.data ?? [];
-          const sitePaySequenceData = sitePaySequenceResult.data;
-
           // Check if we should add a recent payroll
-          let addRecentPayroll =
-            sitePaySequenceData?.pay_day === currentDate.getDate();
+          let addRecentPayroll =false;
 
           // Process existing payrolls
           const sitePayrolls = payrolls.map((payroll) => {

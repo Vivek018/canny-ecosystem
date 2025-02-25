@@ -185,6 +185,7 @@ export type AttendanceFilters = {
   year?: string | undefined | null;
   project?: string | undefined | null;
   project_site?: string | undefined | null;
+  range?: string | undefined | null;
 };
 
 export async function getAttendanceByCompanyId({

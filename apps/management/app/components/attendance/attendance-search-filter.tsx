@@ -20,7 +20,6 @@ import {
   useSearchParams,
   useSubmit,
 } from "@remix-run/react";
-
 import type { AttendanceFilters } from "@canny_ecosystem/supabase/queries";
 import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
 import { months } from "@canny_ecosystem/utils/constant";
@@ -30,12 +29,20 @@ export function AttendanceSearchFilter({
   disabled,
   projectArray,
   projectSiteArray,
+  paySequenceArray,
+  days,
   setYear,
   setMonth,
 }: {
+  days: {
+    day: number;
+    fullDate: string;
+  }[];
   disabled?: boolean;
   projectArray: string[];
   projectSiteArray: string[];
+  paySequenceArray: [name: string, pay_day?: number][];
+
   setMonth: (month: number) => void;
   setYear: (year: number) => void;
 }) {
@@ -57,6 +64,7 @@ export function AttendanceSearchFilter({
     year: "",
     project: "",
     project_site: "",
+    range: "",
   };
 
   const [filterParams, setFilterParams] = useState(initialFilterParams);
@@ -218,6 +226,75 @@ export function AttendanceSearchFilter({
         sideOffset={19}
         alignOffset={-11}
       >
+        <DropdownMenuGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <span>Range</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent
+                sideOffset={14}
+                alignOffset={-4}
+                className="p-0"
+              >
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>
+                    <span>Pay Sequence</span>
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuPortal>
+                    <DropdownMenuSubContent sideOffset={23} className="p-0">
+                      {paySequenceArray?.map(([name, pay_day], index) => (
+                        <DropdownMenuCheckboxItem
+                          key={name + index.toString()}
+                          className="capitalize"
+                          checked={filterParams?.project === pay_day}
+                          onCheckedChange={() => {
+                            setFilterParams((prev) => ({
+                              ...prev,
+                              range: pay_day?.toString(),
+                            }));
+                          }}
+                        >
+                          {name}
+                        </DropdownMenuCheckboxItem>
+                      ))}
+                    </DropdownMenuSubContent>
+                  </DropdownMenuPortal>
+                </DropdownMenuSub>
+
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>
+                    <span>Custom</span>
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuPortal>
+                    <DropdownMenuSubContent
+                      sideOffset={14}
+                      alignOffset={-4}
+                      className="p-0"
+                    >
+                      {days?.map(({ day, fullDate }) => (
+                        <DropdownMenuCheckboxItem
+                          key={fullDate.toString()}
+                          className="capitalize"
+                          checked={filterParams?.project === day.toString()}
+                          onCheckedChange={() => {
+                            setFilterParams((prev) => ({
+                              ...prev,
+                              range: day?.toString(),
+                            }));
+                          }}
+                        >
+                          {day}
+                        </DropdownMenuCheckboxItem>
+                      ))}
+                    </DropdownMenuSubContent>
+                  </DropdownMenuPortal>
+                </DropdownMenuSub>
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+        </DropdownMenuGroup>
+
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
