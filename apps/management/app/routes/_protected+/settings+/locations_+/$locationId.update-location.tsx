@@ -2,8 +2,6 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import CreateLocation from "./create-location";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
-  Await,
-  defer,
   json,
   useActionData,
   useLoaderData,
@@ -19,7 +17,7 @@ import {
 import { getLocationById } from "@canny_ecosystem/supabase/queries";
 import { updateLocation } from "@canny_ecosystem/supabase/mutations";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { Suspense, useEffect } from "react";
+import { useEffect } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
@@ -42,25 +40,27 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   try {
-    let locationPromise = null;
+    let locationData = null;
+    let locationError = null;
 
     if (locationId) {
-      locationPromise = getLocationById({
+      ({ data: locationData, error: locationError } = await getLocationById({
         supabase,
         id: locationId,
-      });
-    } else {
-      throw new Error("No locationId provided");
-    }
+      }));
 
-    return defer({
-      locationPromise,
-      error: null,
-    });
+      if (locationError) throw locationError;
+
+      return json({
+        locationData,
+        error: null,
+      });
+    }
+    throw new Error("No locationId provided");
   } catch (error) {
     return json({
       error,
-      locationPromise: null,
+      locationData: null,
     });
   }
 }
@@ -105,7 +105,7 @@ export async function action({
 }
 
 export default function UpdateLocation() {
-  const { locationPromise, error } = useLoaderData<typeof loader>();
+  const { locationData, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
   const { toast } = useToast();
@@ -136,17 +136,5 @@ export default function UpdateLocation() {
     return <ErrorBoundary error={error} message="Failed to load location" />;
   }
 
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Await resolve={locationPromise}>
-        {(resolvedData) => {
-          if (!resolvedData)
-            return <ErrorBoundary message="Failed to load location" />;
-          if (resolvedData.error)
-            return <ErrorBoundary error={resolvedData.error} />;
-          return <CreateLocation updateValues={resolvedData.data} />;
-        }}
-      </Await>
-    </Suspense>
-  );
+  return <CreateLocation updateValues={locationData} />;
 }

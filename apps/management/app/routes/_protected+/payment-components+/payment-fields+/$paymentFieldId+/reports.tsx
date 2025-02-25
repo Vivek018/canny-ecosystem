@@ -128,7 +128,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
-  return await clientCaching(
+  return clientCaching(
     `${cacheKeyPrefix.payment_field_report}${
       args.params.paymentFieldId
     }${url.searchParams.toString()}`,

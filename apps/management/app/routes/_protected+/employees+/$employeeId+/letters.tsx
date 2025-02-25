@@ -45,7 +45,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return await clientCaching(
+  return clientCaching(
     `${cacheKeyPrefix.employee_letters}${args.params.employeeId}`,
     args,
   );

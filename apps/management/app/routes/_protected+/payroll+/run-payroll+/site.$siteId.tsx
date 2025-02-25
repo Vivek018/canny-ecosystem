@@ -1,3 +1,4 @@
+import { LoadingSpinner } from "@/components/loading-spinner";
 import { PayrollComponent } from "@/components/payroll/payroll-component";
 import { CANNY_MANAGEMENT_SERVICES_COMPANY_ID } from "@/constant";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
@@ -329,11 +330,7 @@ export default function PayrollId() {
   const { payrollDataPromise } = useLoaderData<typeof loader>();
 
   return (
-    <Suspense
-      fallback={
-        <div className="w-full p-4 text-center">Loading payroll data...</div>
-      }
-    >
+    <Suspense fallback={<LoadingSpinner className="my-20" />}>
       <Await
         resolve={payrollDataPromise}
         errorElement={

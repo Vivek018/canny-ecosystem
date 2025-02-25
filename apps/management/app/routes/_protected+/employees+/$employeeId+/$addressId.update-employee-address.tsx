@@ -1,8 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
-  Await,
-  defer,
   Form,
   json,
   useActionData,
@@ -18,13 +16,12 @@ import {
 } from "@canny_ecosystem/utils";
 import { getEmployeeAddressById } from "@canny_ecosystem/supabase/queries";
 import { updateEmployeeAddress } from "@canny_ecosystem/supabase/mutations";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
 import { Card } from "@canny_ecosystem/ui/card";
 import { CreateEmployeeAddress } from "@/components/employees/form/create-employee-address";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import type { EmployeeAddressDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
@@ -47,17 +44,21 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   try {
-    let employeeAddressPromise = null;
+    let employeeAddressData = null;
+    let employeeAddressError = null;
 
     if (addressId) {
-      employeeAddressPromise = getEmployeeAddressById({
-        supabase,
-        id: addressId,
-      });
+      ({ data: employeeAddressData, error: employeeAddressError } =
+        await getEmployeeAddressById({
+          supabase,
+          id: addressId,
+        }));
     }
 
-    return defer({
-      employeeAddressPromise,
+    if (employeeAddressError) throw employeeAddressError;
+
+    return json({
+      employeeAddressData,
       employeeId,
       error: null,
     });
@@ -66,7 +67,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       {
         error,
         employeeId,
-        employeeAddressPromise: null,
+        employeeAddressData: null,
       },
       { status: 500 },
     );
@@ -122,42 +123,9 @@ export async function action({
 }
 
 export default function UpdateEmployeeAddress() {
-  const { employeeAddressPromise, employeeId, error } =
+  const { employeeAddressData, employeeId, error } =
     useLoaderData<typeof loader>();
 
-  if (error)
-    return (
-      <ErrorBoundary error={error} message="Failed to load employee details" />
-    );
-
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Await resolve={employeeAddressPromise}>
-        {(resolvedData) => {
-          if (!resolvedData)
-            return <ErrorBoundary message="Failed to load employee details" />;
-          return (
-            <UpdateEmployeeAddressWrapper
-              data={resolvedData.data}
-              error={resolvedData.error}
-              employeeId={employeeId}
-            />
-          );
-        }}
-      </Await>
-    </Suspense>
-  );
-}
-
-export function UpdateEmployeeAddressWrapper({
-  data,
-  error,
-  employeeId,
-}: {
-  data: EmployeeAddressDatabaseUpdate | null;
-  error: Error | null | { message: string };
-  employeeId: string | undefined;
-}) {
   const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
   const currentSchema = EmployeeAddressesSchema;
@@ -170,7 +138,7 @@ export function UpdateEmployeeAddressWrapper({
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
-    defaultValue: data,
+    defaultValue: employeeAddressData,
   });
 
   const { toast } = useToast();
@@ -180,7 +148,8 @@ export function UpdateEmployeeAddressWrapper({
     if (error) {
       toast({
         title: "Error",
-        description: error?.message || "Employee address update failed",
+        description:
+          (error as any)?.message || "Employee address update failed",
         variant: "destructive",
       });
     }
@@ -205,6 +174,11 @@ export function UpdateEmployeeAddressWrapper({
       navigate(`/employees/${employeeId}`);
     }
   }, [actionData]);
+
+  if (error)
+    return (
+      <ErrorBoundary error={error} message="Failed to load employee details" />
+    );
 
   return (
     <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">

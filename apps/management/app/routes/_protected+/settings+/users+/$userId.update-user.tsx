@@ -2,8 +2,6 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import CreateUser from "./create-user";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
-  Await,
-  defer,
   json,
   useActionData,
   useLoaderData,
@@ -19,8 +17,7 @@ import {
 import { getUserById } from "@canny_ecosystem/supabase/queries";
 import { updateUserById } from "@canny_ecosystem/supabase/mutations";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { Suspense, useEffect } from "react";
-import type { UserDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import { useEffect } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
@@ -40,24 +37,29 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   try {
-    let userPromise = null;
+    let userData = null;
+    let userError = null;
 
     if (userId) {
-      userPromise = getUserById({
+      ({ data: userData, error: userError } = await getUserById({
         supabase,
         id: userId,
+      }));
+
+      if (userError) throw userError;
+
+      return json({
+        userData,
+        error: null,
       });
     }
 
-    return defer({
-      userPromise,
-      error: null,
-    });
+    throw new Error("No identity key provided");
   } catch (error) {
     return json(
       {
         error,
-        userPromise: null,
+        userData: null,
       },
       { status: 500 },
     );
@@ -112,7 +114,7 @@ export async function action({
 }
 
 export default function UpdateUser() {
-  const { userPromise } = useLoaderData<typeof loader>();
+  const { userData, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -139,35 +141,8 @@ export default function UpdateUser() {
     });
   }, [actionData]);
 
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Await resolve={userPromise}>
-        {(resolvedData) => {
-          if (!resolvedData) {
-            return <ErrorBoundary message="Failed to load user" />;
-          }
-          return (
-            <UpdateUserWrapper
-              data={resolvedData.data}
-              error={resolvedData.error}
-            />
-          );
-        }}
-      </Await>
-    </Suspense>
-  );
-}
-
-export function UpdateUserWrapper({
-  data,
-  error,
-}: {
-  data: UserDatabaseUpdate | null;
-  error: Error | null | { message: string };
-}) {
-  if (error) {
+  if (error)
     return <ErrorBoundary error={error} message="Failed to load user" />;
-  }
 
-  return <CreateUser updateValues={data} />;
+  return <CreateUser updateValues={userData} />;
 }

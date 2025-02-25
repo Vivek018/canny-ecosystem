@@ -1,8 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
-  Await,
-  defer,
   json,
   useActionData,
   useLoaderData,
@@ -20,8 +18,7 @@ import { updateEmployeeStateInsurance } from "@canny_ecosystem/supabase/mutation
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import CreateEmployeeStateInsurance from "./create-employee-state-insurance";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { Suspense, useEffect } from "react";
-import type { EmployeeStateInsuranceDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import { useEffect } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
@@ -42,29 +39,36 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
   try {
-    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-    let esiPromise = null;
+    let esiData = null;
+    let esiError = null;
 
     if (esiId) {
-      esiPromise = getEmployeeStateInsuranceById({
-        supabase,
-        id: esiId,
-      });
+      ({ data: esiData, error: esiError } = await getEmployeeStateInsuranceById(
+        {
+          supabase,
+          id: esiId,
+        },
+      ));
+    } else {
+      throw new Error("Employee State Insurance ID not provided");
     }
 
-    return defer({
+    if (esiError) throw esiError;
+
+    return json({
       error: null,
-      esiPromise,
+      esiData,
       companyId,
     });
   } catch (error) {
     return json(
       {
         error,
-        esiPromise: null,
-        companyId: null,
+        esiData: null,
+        companyId,
       },
       { status: 500 },
     );
@@ -120,7 +124,7 @@ export async function action({
 }
 
 export default function UpdateEmployeeStateInsurance() {
-  const { esiPromise, error } = useLoaderData<typeof loader>();
+  const { esiData, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -134,6 +138,7 @@ export default function UpdateEmployeeStateInsurance() {
         description: actionData?.message || "Employee State Insurance updated",
         variant: "success",
       });
+      navigate("/payment-components/statutory-fields/employee-state-insurance");
     } else {
       toast({
         title: "Error",
@@ -143,48 +148,10 @@ export default function UpdateEmployeeStateInsurance() {
         variant: "destructive",
       });
     }
-    navigate("/payment-components/statutory-fields/employee-state-insurance");
   }, [actionData]);
 
   if (error)
     return <ErrorBoundary error={error} message="Failed to load ESI" />;
 
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Await resolve={esiPromise}>
-        {(resolvedData) => {
-          if (!resolvedData)
-            return <ErrorBoundary message="Failed to load ESI" />;
-          return (
-            <UpdateEmployeeStateInsuranceWrapper
-              data={resolvedData.data}
-              error={resolvedData.error}
-            />
-          );
-        }}
-      </Await>
-    </Suspense>
-  );
-}
-
-export function UpdateEmployeeStateInsuranceWrapper({
-  data,
-  error,
-}: {
-  data: EmployeeStateInsuranceDatabaseUpdate | null;
-  error: Error | null | { message: string };
-}) {
-  const { toast } = useToast();
-
-  useEffect(() => {
-    if (error) {
-      toast({
-        title: "Error",
-        description: error?.message || "Failed to load ESI",
-        variant: "destructive",
-      });
-    }
-  }, [error]);
-
-  return <CreateEmployeeStateInsurance updateValues={data} />;
+  return <CreateEmployeeStateInsurance updateValues={esiData} />;
 }

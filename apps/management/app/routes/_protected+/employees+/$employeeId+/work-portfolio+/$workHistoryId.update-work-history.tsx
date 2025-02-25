@@ -1,8 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
-  Await,
-  defer,
   json,
   useActionData,
   useLoaderData,
@@ -19,9 +17,8 @@ import {
 import { getEmployeeWorkHistoryById } from "@canny_ecosystem/supabase/queries";
 import { updateEmployeeWorkHistory } from "@canny_ecosystem/supabase/mutations";
 import AddEmployeeWorkHistory from "./add-work-history";
-import { Suspense, useEffect } from "react";
+import { useEffect } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import type { EmployeeWorkHistoryDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
@@ -35,7 +32,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const workHistoryId = params.workHistoryId;
   const employeeId = params.employeeId;
 
-  let workHistoryPromise = null;
   const { supabase, headers } = getSupabaseWithHeaders({ request });
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
@@ -51,22 +47,27 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   try {
     if (!employeeId) throw new Error("No employeeId provided");
+    let workHistoryData = null;
+    let workHistoryError = null;
 
     if (workHistoryId) {
-      workHistoryPromise = getEmployeeWorkHistoryById({
-        supabase,
-        id: workHistoryId,
-      });
+      ({ data: workHistoryData, error: workHistoryError } =
+        await getEmployeeWorkHistoryById({
+          supabase,
+          id: workHistoryId,
+        }));
     }
 
-    return defer({
-      workHistoryPromise,
+    if (workHistoryError) throw workHistoryError;
+
+    return json({
+      workHistoryData,
       error: null,
     });
   } catch (error) {
     return json({
       error,
-      workHistoryPromise: null,
+      workHistoryData: null,
     });
   }
 }
@@ -134,7 +135,7 @@ export async function action({
 }
 
 export default function UpdateEmployeeWorkHistory() {
-  const { workHistoryPromise } = useLoaderData<typeof loader>();
+  const { workHistoryData, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -162,33 +163,6 @@ export default function UpdateEmployeeWorkHistory() {
     }
   }, [actionData]);
 
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Await resolve={workHistoryPromise}>
-        {(resolvedData) => {
-          if (!resolvedData)
-            return (
-              <ErrorBoundary message="Failed to load employee work history data" />
-            );
-          return (
-            <UpdateEmployeeWorkHistoryWrapper
-              data={resolvedData.data}
-              error={resolvedData.error}
-            />
-          );
-        }}
-      </Await>
-    </Suspense>
-  );
-}
-
-export function UpdateEmployeeWorkHistoryWrapper({
-  data,
-  error,
-}: {
-  data: EmployeeWorkHistoryDatabaseUpdate | null;
-  error: Error | null | { message: string };
-}) {
   if (error)
     return (
       <ErrorBoundary
@@ -196,5 +170,6 @@ export function UpdateEmployeeWorkHistoryWrapper({
         message="Failed to load employee work history data"
       />
     );
-  return <AddEmployeeWorkHistory updateValues={data} />;
+
+  return <AddEmployeeWorkHistory updateValues={workHistoryData} />;
 }

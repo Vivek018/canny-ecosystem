@@ -1,4 +1,5 @@
 import { ErrorBoundary } from "@/components/error-boundary";
+import { LoadingSpinner } from "@/components/loading-spinner";
 import { EPFWrapper } from "@/components/statutory-fields/employee-provident-fund/epf-wrapper";
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
@@ -39,7 +40,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return await clientCaching(cacheKeyPrefix.statutory_field_epf, args);
+  return clientCaching(cacheKeyPrefix.statutory_field_epf, args);
 }
 
 clientLoader.hydrate = true;
@@ -54,7 +55,7 @@ export default function EmployeeProvidentFundIndex() {
 
   return (
     <div className="p-4 flex gap-3 place-content-center justify-between">
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<LoadingSpinner className="mt-40" />}>
         <Await resolve={epfPromise}>
           {(resolvedData) => {
             if (!resolvedData) {
@@ -62,10 +63,7 @@ export default function EmployeeProvidentFundIndex() {
               return <ErrorBoundary message="Failed to load data" />;
             }
             return (
-              <EPFWrapper
-                data={resolvedData.data}
-                error={resolvedData.error}
-              />
+              <EPFWrapper data={resolvedData.data} error={resolvedData.error} />
             );
           }}
         </Await>
