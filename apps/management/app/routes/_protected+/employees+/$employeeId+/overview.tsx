@@ -5,6 +5,7 @@ import { EmployeeGuardiansCard } from "@/components/employees/employee/guardians
 import { EmployeePageHeader } from "@/components/employees/employee/page-header";
 import { EmployeeStatutoryCard } from "@/components/employees/employee/statutory-card";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { LoadingSpinner } from "@/components/loading-spinner";
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import {
@@ -86,7 +87,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   return clientCaching(
     `${cacheKeyPrefix.employee_overview}${args.params.employeeId}`,
-    args,
+    args
   );
 }
 
@@ -107,20 +108,20 @@ export default function EmployeeIndex() {
   if (error) {
     clearExactCacheEntry(`${cacheKeyPrefix.employee_overview}${employeeId}`);
     return (
-      <ErrorBoundary error={error} message="Failed to load employee details" />
+      <ErrorBoundary error={error} message='Failed to load employee details' />
     );
   }
 
   return (
-    <div className="w-full py-6 flex flex-col gap-8">
-      <Suspense fallback={<div>Loading...</div>}>
+    <div className='w-full py-6 flex flex-col gap-8'>
+      <Suspense fallback={<LoadingSpinner />}>
         <Await resolve={employeePromise}>
           {(resolvedData) => {
             if (!resolvedData || !env) {
               clearExactCacheEntry(
-                `${cacheKeyPrefix.employee_overview}${employeeId}`,
+                `${cacheKeyPrefix.employee_overview}${employeeId}`
               );
-              return <ErrorBoundary message="Failed to load employee" />;
+              return <ErrorBoundary message='Failed to load employee' />;
             }
             return (
               <>
@@ -145,15 +146,15 @@ export default function EmployeeIndex() {
         </Await>
       </Suspense>
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<LoadingSpinner />}>
         <Await resolve={employeeStatutoryDetailsPromise}>
           {(resolvedData) => {
             if (!resolvedData) {
               clearExactCacheEntry(
-                `${cacheKeyPrefix.employee_overview}${employeeId}`,
+                `${cacheKeyPrefix.employee_overview}${employeeId}`
               );
               return (
-                <ErrorBoundary message="Failed to load employee statutory details" />
+                <ErrorBoundary message='Failed to load employee statutory details' />
               );
             }
             return (
@@ -170,15 +171,15 @@ export default function EmployeeIndex() {
         </Await>
       </Suspense>
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<LoadingSpinner />}>
         <Await resolve={employeeBankDetailsPromise}>
           {(resolvedData) => {
             if (!resolvedData) {
               clearExactCacheEntry(
-                `${cacheKeyPrefix.employee_overview}${employeeId}`,
+                `${cacheKeyPrefix.employee_overview}${employeeId}`
               );
               return (
-                <ErrorBoundary message="Failed to load employee bank details" />
+                <ErrorBoundary message='Failed to load employee bank details' />
               );
             }
             return (
@@ -193,15 +194,15 @@ export default function EmployeeIndex() {
         </Await>
       </Suspense>
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<LoadingSpinner />}>
         <Await resolve={employeeAddressesPromise}>
           {(resolvedData) => {
             if (!resolvedData) {
               clearExactCacheEntry(
-                `${cacheKeyPrefix.employee_overview}${employeeId}`,
+                `${cacheKeyPrefix.employee_overview}${employeeId}`
               );
               return (
-                <ErrorBoundary message="Failed to load employee addresses" />
+                <ErrorBoundary message='Failed to load employee addresses' />
               );
             }
             return (
@@ -218,15 +219,15 @@ export default function EmployeeIndex() {
         </Await>
       </Suspense>
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<LoadingSpinner />}>
         <Await resolve={employeeGuardiansPromise}>
           {(resolvedData) => {
             if (!resolvedData) {
               clearExactCacheEntry(
-                `${cacheKeyPrefix.employee_overview}${employeeId}`,
+                `${cacheKeyPrefix.employee_overview}${employeeId}`
               );
               return (
-                <ErrorBoundary message="Failed to load employee guardians details" />
+                <ErrorBoundary message='Failed to load employee guardians details' />
               );
             }
             return (
@@ -249,7 +250,10 @@ export default function EmployeeIndex() {
 export function CommonWrapper({
   Component,
   error,
-}: { Component: ReactNode; error: any }) {
+}: {
+  Component: ReactNode;
+  error: any;
+}) {
   const { toast } = useToast();
   const { employeeId } = useParams();
 
