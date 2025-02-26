@@ -1,7 +1,6 @@
 import { FormButtons } from "@/components/form/form-buttons";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clearCacheEntry } from "@/utils/cache";
-import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { addLeaveTypeFromData } from "@canny_ecosystem/supabase/mutations";
@@ -39,14 +38,10 @@ import {
   type LoaderFunctionArgs,
   type ActionFunctionArgs,
 } from "@remix-run/node";
-import {
-  Form,
-  useActionData,
-  useLoaderData,
-  useNavigate,
-} from "@remix-run/react";
+import { Form, useActionData, useNavigate } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { UPDATE_LEAVETYPE_TAG } from "./$leaveTypeId+/update-leave-type";
+import { useCompanyId } from "@/utils/company";
 
 const ADD_LEAVETYPE_TAG = "add-leave-type";
 
@@ -55,13 +50,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${createRole}:${attribute.holidays}`)) {
+  if (!hasPermission(user?.role!, `${createRole}:${attribute.leaves}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-  return json({ companyId });
+  return {};
 }
+
 export async function action({
   request,
 }: ActionFunctionArgs): Promise<Response> {
@@ -69,7 +64,7 @@ export async function action({
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.holidays}`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.leaves}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   const formData = await request.formData();
@@ -82,11 +77,10 @@ export async function action({
       { status: submission.status === "error" ? 400 : 200 }
     );
   }
-  const leaveTypeData = submission.value;
 
   const { status, error } = await addLeaveTypeFromData({
     supabase,
-    data: leaveTypeData,
+    data: submission.value,
   });
 
   if (isGoodStatus(status)) {
@@ -108,8 +102,9 @@ export default function AddLeaveType({
 }: {
   updatableData?: LeaveTypeDatabaseUpdate | null;
 }) {
-  const { companyId } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
+
+  const { companyId } = useCompanyId();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [resetKey, setResetKey] = useState(Date.now());
@@ -117,20 +112,22 @@ export default function AddLeaveType({
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(`${cacheKeyPrefix.holidays}`);
+        clearCacheEntry(cacheKeyPrefix.leaves);
         toast({
           title: "Success",
-          description: actionData?.message || "Leave Type updated",
+          description: actionData?.message || "Leave Type created",
           variant: "success",
         });
-      } else {
+      }
+      if (actionData?.status === "error") {
         toast({
           title: "Error",
           description: actionData?.error?.message || "Leave Type update failed",
           variant: "destructive",
         });
       }
-      navigate("/time-tracking/holidays");
+
+      navigate("/time-tracking/leaves", { replace: true });
     }
   }, [actionData]);
 
@@ -156,8 +153,9 @@ export default function AddLeaveType({
   });
 
   const onChange = () => {
-    navigate(-1);
+    navigate("/time-tracking/leaves");
   };
+
   return (
     <Dialog open={true} onOpenChange={onChange}>
       <DialogContent>

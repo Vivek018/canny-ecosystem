@@ -1,7 +1,6 @@
 import { FormButtons } from "@/components/form/form-buttons";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clearCacheEntry } from "@/utils/cache";
-import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { createPaySequence } from "@canny_ecosystem/supabase/mutations";
@@ -38,15 +37,11 @@ import {
   type LoaderFunctionArgs,
   type ActionFunctionArgs,
 } from "@remix-run/node";
-import {
-  Form,
-  useActionData,
-  useLoaderData,
-  useNavigate,
-} from "@remix-run/react";
+import { Form, useActionData, useNavigate } from "@remix-run/react";
 import { useEffect } from "react";
 import { UPDATE_PAYSEQUENCE_TAG } from "./$id.update-pay-sequence";
 import { WorkingDaysField } from "@/components/sites/pay-sequence/working-days-field";
+import { useCompanyId } from "@/utils/company";
 
 const ADD_PAYSEQUENCE_TAG = "add-paysequence";
 
@@ -58,9 +53,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
   if (!hasPermission(user?.role!, `${createRole}:${attribute.paySequence}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-  return json({ companyId });
+  return {};
 }
 
 export async function action({
@@ -109,7 +103,7 @@ export default function AddPaySequence({
 }: {
   updatableData?: PaySequenceDatabaseUpdate | null;
 }) {
-  const { companyId } = useLoaderData<typeof loader>();
+  const { companyId } = useCompanyId();
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -157,8 +151,9 @@ export default function AddPaySequence({
   });
 
   const onChange = () => {
-    navigate(-1);
+    navigate("/time-tracking/pay-sequence");
   };
+
   return (
     <Dialog open={true} onOpenChange={onChange}>
       <DialogContent>

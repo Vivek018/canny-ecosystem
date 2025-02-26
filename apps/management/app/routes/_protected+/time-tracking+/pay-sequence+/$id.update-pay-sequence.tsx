@@ -93,7 +93,6 @@ export default function UpdatePaySequence() {
   const { data, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const updatableData = data;
-  console.log(updatableData);
 
   const { toast } = useToast();
   const navigate = useNavigate();

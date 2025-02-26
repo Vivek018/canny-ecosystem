@@ -41,7 +41,7 @@ export const DeleteLeaveType = ({ id }: { id: string }) => {
         {},
         {
           method: "POST",
-          action: `/time-tracking/holidays/${id}/delete-leave-type`,
+          action: `/time-tracking/leaves/${id}/delete-leave-type`,
         }
       );
     } else {
@@ -56,7 +56,7 @@ export const DeleteLeaveType = ({ id }: { id: string }) => {
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "hidden text-[13px] h-9",
-          hasPermission(role, `${deleteRole}:${attribute.holidays}`) && "flex"
+          hasPermission(role, `${deleteRole}:${attribute.leaves}`) && "flex"
         )}
       >
         Delete Leave Type

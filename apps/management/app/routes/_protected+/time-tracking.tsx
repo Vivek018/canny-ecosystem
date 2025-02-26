@@ -30,7 +30,7 @@ export default function TimeTracking() {
             { label: "Pay Sequence", path: "/time-tracking/pay-sequence" },
             { label: "Leaves", path: "/time-tracking/leaves" },
             {
-              label: "Leave Types & Holidays",
+              label: "Holidays",
               path: "/time-tracking/holidays",
             },
           ]}

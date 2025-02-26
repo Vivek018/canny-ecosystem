@@ -32,7 +32,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.holidays}`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.leaves}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
@@ -92,7 +92,6 @@ export async function action({
 export default function UpdateLeaveTypes() {
   const { data, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
-  const updatableData = data;
 
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -110,7 +109,7 @@ export default function UpdateLeaveTypes() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(`${cacheKeyPrefix.holidays}`);
+        clearCacheEntry(cacheKeyPrefix.leaves);
         toast({
           title: "Success",
           description: actionData?.message || "Leave type updated successfully",
@@ -124,9 +123,10 @@ export default function UpdateLeaveTypes() {
           variant: "destructive",
         });
       }
-      navigate("/time-tracking/holidays");
+
+      navigate("/time-tracking/leaves", { replace: true });
     }
   }, [actionData]);
 
-  return <AddLeaveType updatableData={updatableData} />;
+  return <AddLeaveType updatableData={data} />;
 }
