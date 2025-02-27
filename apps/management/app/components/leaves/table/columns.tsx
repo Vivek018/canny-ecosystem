@@ -127,7 +127,7 @@ export const columns = (
     accessorKey: "reason",
     header: "Reason",
     cell: ({ row }) => {
-      return <p className='capitalize'>{row.original?.reason ?? "--"}</p>;
+      return <p className='capitalize w-96 truncate'>{row.original?.reason ?? "--"}</p>;
     },
   },
   {
