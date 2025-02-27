@@ -2,6 +2,7 @@ import { useUser } from "@/utils/user";
 import {
   Card,
   CardContent,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
@@ -19,7 +20,12 @@ import {
   TooltipTrigger,
 } from "@canny_ecosystem/ui/tooltip";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
+import {
+  deleteRole,
+  getOrdinalSuffix,
+  hasPermission,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { Link } from "@remix-run/react";
 import type { PaySequenceDataType } from "@canny_ecosystem/supabase/queries";
@@ -104,7 +110,10 @@ export function PaySequenceCard({
         </div>
       </CardHeader>
       <CardContent className="flex flex-col gap-4 py-2 pb-4 px-4">
-        <DetailItem label="Pay Day" value={paySequence.pay_day?.toString()} />
+        <DetailItem
+          label="Pay Day"
+          value={`${getOrdinalSuffix(paySequence.pay_day)} of every month`}
+        />
         <DetailItem
           label="Overtime Multiplier"
           value={paySequence.overtime_multiplier?.toString()}
@@ -134,6 +143,15 @@ export function PaySequenceCard({
             ))}
           </ToggleGroup>
         </div>
+        <CardFooter
+          className={cn(
+            "px-2 ml-auto bg-secondary text-foreground py-1 text-sm tracking-wide font-sem rounded-tl-md border-foreground flex gap-1 justify-center mt-auto",
+            !paySequence.is_default && "opacity-0"
+          )}
+        >
+          <Icon name="dot-filled" size="xs" />
+          Default
+        </CardFooter>
       </CardContent>
     </Card>
   );

@@ -1,4 +1,4 @@
-import { HARD_QUERY_LIMIT } from "../constant";
+import { HARD_QUERY_LIMIT, SINGLE_QUERY_LIMIT } from "../constant";
 import type {
   InferredType,
   PaySequenceDatabaseRow,
@@ -13,6 +13,7 @@ export type PaySequenceDataType = Pick<
   | "working_days"
   | "overtime_multiplier"
   | "name"
+  | "is_default"
 >;
 
 export async function getPaySequenceByCompanyId({
@@ -29,6 +30,7 @@ export async function getPaySequenceByCompanyId({
     "working_days",
     "pay_day",
     "company_id",
+    "is_default",
   ] as const;
 
   const { data, error } = await supabase
@@ -62,6 +64,7 @@ export async function getPaySequenceById({
     "working_days",
     "pay_day",
     "overtime_multiplier",
+    "is_default",
   ] as const;
 
   const { data, error } = await supabase
@@ -84,16 +87,45 @@ export async function getPaySequenceNameByCompanyId({
   supabase: TypedSupabaseClient;
   companyId: string;
 }) {
+  const columns = ["id", "name", "pay_day"] as const;
+
   const { data, error } = await supabase
     .from("pay_sequence")
-    .select("id, name,pay_day")
+    .select(columns.join(","))
     .eq("company_id", companyId)
     .limit(HARD_QUERY_LIMIT)
     .order("created_at", { ascending: false })
-    .returns<{ id: string; name: string; pay_day: number }[]>();
+    .returns<
+      InferredType<PaySequenceDatabaseRow, (typeof columns)[number]>[]
+    >();
 
   if (error) {
     console.error("getPaySequenceNamesByCompanyId Error", error);
+  }
+
+  return { data, error };
+}
+
+export async function getDefaultPaySequenceByCompanyId({
+  supabase,
+  companyId,
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+}) {
+  const columns = ["pay_day"] as const;
+
+  const { data, error } = await supabase
+    .from("pay_sequence")
+    .select(columns.join(","))
+    .eq("company_id", companyId)
+    .eq("is_default", true)
+    .order("created_at", { ascending: false })
+    .limit(SINGLE_QUERY_LIMIT)
+    .single<InferredType<PaySequenceDatabaseRow, (typeof columns)[number]>>();
+
+  if (error) {
+    console.error("getDefaultPaySequenceByCompanyId Error", error);
   }
 
   return { data, error };

@@ -229,9 +229,10 @@ export const payFrequencyArray = ["monthly"] as const;
 export const PaySequenceSchema = z.object({
   name: z.string().min(3).max(20),
   overtime_multiplier: z.number().default(1.0),
-  working_days: z.array(daySchema),
-  pay_day: z.number().int().min(1).max(15),
+  working_days: z.array(daySchema).default([1, 2, 3, 4, 5, 6]),
+  pay_day: z.number().int().min(1).max(15).default(1),
   company_id: z.string(),
+  is_default: z.boolean().default(false),
 });
 
 // Employees

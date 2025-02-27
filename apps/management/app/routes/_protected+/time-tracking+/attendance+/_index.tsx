@@ -5,6 +5,7 @@ import {
 } from "@canny_ecosystem/supabase/constant";
 import {
   getAttendanceByCompanyId,
+  getDefaultPaySequenceByCompanyId,
   getPaySequenceNameByCompanyId,
   getProjectNamesByCompanyId,
   getSiteNamesByProjectName,
@@ -18,6 +19,7 @@ import {
   defer,
   redirect,
   useLoaderData,
+  useSearchParams,
 } from "@remix-run/react";
 import { AttendanceTable } from "@/components/attendance/table/attendance-table";
 import { attendanceColumns } from "@/components/attendance/table/columns";
@@ -65,8 +67,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
     if (!hasPermission(user?.role!, `${readRole}:${attribute.attendance}`)) {
       return safeRedirect(DEFAULT_ROUTE, { headers });
     }
-
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    const { data } = await getDefaultPaySequenceByCompanyId({
+      supabase,
+      companyId,
+    });
+
+    const defaultPayDay = data?.pay_day;
+
     const searchParams = new URLSearchParams(url.searchParams);
     const sortParam = searchParams.get("sort");
     const query = searchParams.get("name") ?? undefined;
@@ -115,8 +123,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
         projectName: filters.project,
       });
     }
+
     return defer({
       projectPromise,
+      defaultPayDay,
       paySequencePromise,
       projectSitePromise,
       attendancePromise: attendancePromise as any,
@@ -133,6 +143,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       projectPromise: Promise.resolve({ data: [] }),
       paySequencePromise: Promise.resolve({ data: [] }),
       projectSitePromise: Promise.resolve({ data: [] }),
+      defaultPayDay: null,
       query: "",
       filters: null,
       companyId: "",
@@ -174,12 +185,94 @@ export default function Attendance() {
     projectPromise,
     projectSitePromise,
     paySequencePromise,
+    defaultPayDay,
     query,
     filters,
     companyId,
     env,
   } = useLoaderData<typeof loader>();
+  const [searchParams, setSearchParams] = useSearchParams();
+  useEffect(() => {
+    if (defaultPayDay && !searchParams.has("range")) {
+      searchParams.set("range", defaultPayDay.toString());
+      setSearchParams(searchParams);
+    }
+  }, [defaultPayDay, searchParams, setSearchParams]);
 
+  const calculateDateRange = (
+    range: string,
+    monthName: string | number | null | undefined,
+    yearValue: string | number | undefined
+  ) => {
+    let startDate: string;
+    let endDate: string;
+
+    if (range) {
+      const rangeNumber = Number.parseInt(String(range), 10);
+
+      if (!Number.isNaN(rangeNumber) && rangeNumber > 0) {
+        let endDateObj: Date;
+        let startDateObj: Date;
+
+        const monthNumber = monthName ? months[monthName] : month + 1;
+        const yearToUse = yearValue || year;
+
+        if (monthName) {
+          endDateObj = new Date(
+            Number(yearToUse),
+            monthNumber - 1,
+            rangeNumber + 1
+          );
+
+          let targetMonth = monthNumber - 2;
+          let targetYear = Number(yearToUse);
+
+          if (targetMonth < 0) {
+            targetMonth = 11;
+            targetYear -= 1;
+          }
+
+          startDateObj = new Date(targetYear, targetMonth, rangeNumber + 2);
+        } else {
+          endDateObj = new Date(Number(yearToUse), month, rangeNumber + 1);
+
+          let targetMonth = month - 1;
+          let targetYear = Number(yearToUse);
+
+          if (targetMonth < 0) {
+            targetMonth = 11;
+            targetYear -= 1;
+          }
+
+          startDateObj = new Date(
+            Number(targetYear),
+            targetMonth,
+            rangeNumber + 2
+          );
+        }
+
+        endDate = endDateObj.toISOString().split("T")[0];
+        startDate = startDateObj.toISOString().split("T")[0];
+      } else {
+        const monthStr = (month + 1).toString().padStart(2, "0");
+        const lastDay = new Date(year, month + 1, 0).getDate();
+        startDate = `${year}-${monthStr}-01`;
+        endDate = `${year}-${monthStr}-${lastDay}`;
+      }
+    } else {
+      const monthStr = (month + 1).toString().padStart(2, "0");
+      const lastDay = new Date(year, month + 1, 0).getDate();
+      startDate = `${year}-${monthStr}-01`;
+      endDate = `${year}-${monthStr}-${lastDay}`;
+    }
+
+    return { startDate, endDate };
+  };
+
+  const [dateRange, setDateRange] = useState<{
+    startDate: string | Date | undefined;
+    endDate: string | Date | undefined;
+  } | null>(null);
   const [month, setMonth] = useState<number>(() => {
     if (filters?.month) {
       return months[filters?.month] - 1;
@@ -203,24 +296,58 @@ export default function Attendance() {
     } else {
       setYear(new Date().getFullYear());
     }
+
+    if (filters?.range) {
+      const { startDate, endDate } = calculateDateRange(
+        filters?.range,
+        filters?.month
+          ? Object.keys(months).find(
+              (key) => months[key] === months[filters.month!]
+            )
+          : null,
+        filters?.year
+      );
+      setDateRange({ startDate, endDate });
+    }
   }, [filters]);
 
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  let days: any;
 
-  const days = Array.from({ length: daysInMonth }, (_, i) => {
-    const currentDate = new Date(year, month, i + 1);
-    currentDate.setHours(12, 0, 0, 0);
-    return {
-      day: i + 1,
-      fullDate: currentDate.toISOString().split("T")[0],
-    };
-  });
+  if (filters?.range) {
+    const startDateObj = new Date(dateRange?.startDate!);
+    const endDateObj = new Date(dateRange?.endDate!);
+
+    days = [];
+    for (
+      let d = new Date(startDateObj);
+      d <= endDateObj;
+      d.setDate(d.getDate() + 1)
+    ) {
+      const currentDate = new Date(d);
+      currentDate.setHours(12, 0, 0, 0);
+      days.push({
+        day: currentDate.getDate(),
+        fullDate: currentDate.toISOString().split("T")[0],
+      });
+    }
+  } else {
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    days = Array.from({ length: daysInMonth }, (_, i) => {
+      const currentDate = new Date(year, month, i + 1);
+      currentDate.setHours(12, 0, 0, 0);
+      return {
+        day: i + 1,
+        fullDate: currentDate.toISOString().split("T")[0],
+      };
+    });
+  }
 
   const transformAttendanceData = useMemo(() => {
     return (data: any[]) => {
-      const groupedByEmployeeAndMonth = data.reduce((acc, employee) => {
+      const groupedByEmployee = data.reduce((acc, employee) => {
         const empCode = employee.employee_code;
-        const employeeDetails = {
+        const employeeDetails = acc[empCode] || {
           employee_id: employee.id,
           employee_code: empCode,
           employee_name: `${employee.first_name} ${employee.middle_name} ${employee.last_name}`,
@@ -232,21 +359,15 @@ export default function Attendance() {
         };
 
         if (!employee?.attendance?.length) {
-          acc[empCode] = acc[empCode] || employeeDetails;
+          acc[empCode] = employeeDetails;
           return acc;
         }
 
-        for (const record of employee?.attendance ?? []) {
+        for (const record of employee.attendance) {
           const date = new Date(record.date);
-          const monthYear = `${date.getMonth()}-${date.getFullYear()}`;
-          const key = `${empCode}-${monthYear}`;
-
-          if (!acc[key]) {
-            acc[key] = { ...employeeDetails };
-          }
-
           const fullDate = formatDate(date.toISOString().split("T")[0]);
-          acc[key][fullDate!] = record.present
+
+          employeeDetails[fullDate!] = record.present
             ? "P"
             : record.holiday
             ? record.holiday_type === "weekly"
@@ -257,16 +378,18 @@ export default function Attendance() {
             : "A";
         }
 
+        acc[empCode] = employeeDetails;
         return acc;
-      }, {});
+      }, {} as Record<string, any>);
 
-      return Object.values(groupedByEmployeeAndMonth);
+      return Object.values(groupedByEmployee);
     };
   }, [month, year, days]);
 
   const noFilters = Boolean(
     filters && Object.values(filters).every((value) => !value)
   );
+
   return (
     <section className="py-4">
       <div className="w-full flex items-center justify-between pb-4">
@@ -298,7 +421,7 @@ export default function Attendance() {
                           paySequenceArray={
                             paySequenceData?.data?.length
                               ? paySequenceData?.data?.map((pay) => [
-                                  pay!.name,
+                                  pay!.name!,
                                   pay?.pay_day,
                                 ])
                               : []
@@ -328,7 +451,6 @@ export default function Attendance() {
                 />
               );
             }
-
             const transformedData = useMemo(() => {
               return transformAttendanceData(data);
             }, [data, transformAttendanceData]);

@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@canny_ecosystem/ui/dialog";
-import { Field } from "@canny_ecosystem/ui/forms";
+import { CheckboxField, Field } from "@canny_ecosystem/ui/forms";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import {
   createRole,
@@ -37,7 +37,12 @@ import {
   type LoaderFunctionArgs,
   type ActionFunctionArgs,
 } from "@remix-run/node";
-import { Form, useActionData, useNavigate } from "@remix-run/react";
+import {
+  Form,
+  useActionData,
+  useNavigate,
+  useRevalidator,
+} from "@remix-run/react";
 import { useEffect } from "react";
 import { UPDATE_PAYSEQUENCE_TAG } from "./$id.update-pay-sequence";
 import { WorkingDaysField } from "@/components/sites/pay-sequence/working-days-field";
@@ -103,6 +108,7 @@ export default function AddPaySequence({
 }: {
   updatableData?: PaySequenceDatabaseUpdate | null;
 }) {
+  const revalidator = useRevalidator();
   const { companyId } = useCompanyId();
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
@@ -112,6 +118,7 @@ export default function AddPaySequence({
     if (actionData) {
       if (actionData?.status === "success") {
         clearCacheEntry(`${cacheKeyPrefix.paySequence}`);
+        revalidator.revalidate();
         toast({
           title: "Success",
           description: actionData?.message || "Pay Sequence updated",
@@ -202,7 +209,15 @@ export default function AddPaySequence({
                 errors={fields.overtime_multiplier.errors}
               />
             </div>
-
+            <CheckboxField
+              buttonProps={getInputProps(fields.is_default, {
+                type: "checkbox",
+              })}
+              labelProps={{
+                htmlFor: fields.is_default.id,
+                children: "Is Default?",
+              }}
+            />
             <WorkingDaysField
               labelProps={{ htmlFor: fields.working_days.id }}
               errors={fields.working_days.errors}

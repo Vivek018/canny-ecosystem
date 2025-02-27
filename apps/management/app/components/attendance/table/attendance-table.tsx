@@ -58,6 +58,7 @@ export function AttendanceTable({
   companyId,
   initialColumnVisibility,
 }: DataTableProps) {
+
   const { rowSelection, setSelectedRows, setRowSelection, setColumns } =
     useAttendanceStore();
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
