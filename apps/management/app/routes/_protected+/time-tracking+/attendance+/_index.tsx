@@ -19,7 +19,6 @@ import {
   defer,
   redirect,
   useLoaderData,
-  useSearchParams,
 } from "@remix-run/react";
 import { AttendanceTable } from "@/components/attendance/table/attendance-table";
 import { attendanceColumns } from "@/components/attendance/table/columns";
@@ -191,13 +190,6 @@ export default function Attendance() {
     companyId,
     env,
   } = useLoaderData<typeof loader>();
-  const [searchParams, setSearchParams] = useSearchParams();
-  useEffect(() => {
-    if (defaultPayDay && !searchParams.has("range")) {
-      searchParams.set("range", defaultPayDay.toString());
-      setSearchParams(searchParams);
-    }
-  }, [defaultPayDay, searchParams, setSearchParams]);
 
   const calculateDateRange = (
     range: string,
@@ -391,10 +383,10 @@ export default function Attendance() {
   );
 
   return (
-    <section className="py-4">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
-          <Suspense fallback={<LoadingSpinner className="mt-20" />}>
+    <section className='py-4'>
+      <div className='w-full flex items-center justify-between pb-4'>
+        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4'>
+          <Suspense fallback={<LoadingSpinner className='mt-20' />}>
             <Await resolve={projectPromise}>
               {(projectData) => (
                 <Await resolve={projectSitePromise}>
@@ -426,6 +418,7 @@ export default function Attendance() {
                                 ])
                               : []
                           }
+                          defaultPayDay={defaultPayDay}
                         />
                       )}
                     </Await>
@@ -439,7 +432,7 @@ export default function Attendance() {
         </div>
         <AttendanceActions />
       </div>
-      <Suspense fallback={<LoadingSpinner className="w-1/3 h-1/3" />}>
+      <Suspense fallback={<LoadingSpinner className='w-1/3 h-1/3' />}>
         <Await resolve={attendancePromise}>
           {({ data, meta, error }) => {
             if (error) {
@@ -447,7 +440,7 @@ export default function Attendance() {
               return (
                 <ErrorBoundary
                   error={error}
-                  message="Failed to load Attendance"
+                  message='Failed to load Attendance'
                 />
               );
             }

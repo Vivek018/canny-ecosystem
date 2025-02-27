@@ -143,16 +143,16 @@ export function PaySequenceCard({
             ))}
           </ToggleGroup>
         </div>
+      </CardContent>
         <CardFooter
           className={cn(
-            "px-2 ml-auto bg-secondary text-foreground py-1 text-sm tracking-wide font-sem rounded-tl-md border-foreground flex gap-1 justify-center mt-auto",
+            "px-3 py-2 ml-auto bg-secondary text-foreground text-base tracking-wide font-sem rounded-tl-md border-foreground flex gap-1 justify-center mt-auto",
             !paySequence.is_default && "opacity-0"
           )}
         >
           <Icon name="dot-filled" size="xs" />
           Default
         </CardFooter>
-      </CardContent>
     </Card>
   );
 }

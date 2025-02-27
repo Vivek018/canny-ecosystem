@@ -30,6 +30,7 @@ export function AttendanceSearchFilter({
   projectArray,
   projectSiteArray,
   paySequenceArray,
+  defaultPayDay,
   days,
   setYear,
   setMonth,
@@ -42,7 +43,7 @@ export function AttendanceSearchFilter({
   projectArray: string[];
   projectSiteArray: string[];
   paySequenceArray: [name: string, pay_day?: number][];
-
+  defaultPayDay: number | null;
   setMonth: (month: number) => void;
   setYear: (year: number) => void;
 }) {
@@ -68,6 +69,13 @@ export function AttendanceSearchFilter({
   };
 
   const [filterParams, setFilterParams] = useState(initialFilterParams);
+
+  useEffect(() => {
+    if (defaultPayDay && !filterParams.range) {
+      searchParams.set("range", defaultPayDay.toString());
+      setSearchParams(searchParams);
+    }
+  }, []);
 
   const submit = useSubmit();
   const debounceSubmit = useDebounce((target: any, options?: SubmitOptions) => {
@@ -169,9 +177,9 @@ export function AttendanceSearchFilter({
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-      <div className="flex space-x-4 w-full md:w-auto items-center">
+      <div className='flex space-x-4 w-full md:w-auto items-center'>
         <form
-          className="relative w-full md:w-auto"
+          className='relative w-full md:w-auto'
           onSubmit={(e) => {
             e.preventDefault();
             handleSubmit();
@@ -193,19 +201,19 @@ export function AttendanceSearchFilter({
                 : "Search Attendance"
             }
             disabled={disabled}
-            className="pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70"
+            className='pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70'
             value={prompt}
             onChange={handleSearch}
-            autoComplete="on"
-            autoCapitalize="none"
-            autoCorrect="off"
-            spellCheck="false"
+            autoComplete='on'
+            autoCapitalize='none'
+            autoCorrect='off'
+            spellCheck='false'
           />
 
           <DropdownMenuTrigger disabled={disabled} asChild>
             <button
               onClick={() => setIsOpen((prev) => !prev)}
-              type="button"
+              type='button'
               disabled={disabled}
               className={cn(
                 "absolute z-10 right-3 top-[6px] opacity-70",
@@ -215,15 +223,15 @@ export function AttendanceSearchFilter({
                 isOpen && "opacity-100"
               )}
             >
-              <Icon name="mixer" />
+              <Icon name='mixer' />
             </button>
           </DropdownMenuTrigger>
         </form>
       </div>
 
       <DropdownMenuContent
-        className="w-full md:w-[480px]"
-        align="end"
+        className='w-full md:w-[480px]'
+        align='end'
         sideOffset={19}
         alignOffset={-11}
       >
@@ -236,18 +244,18 @@ export function AttendanceSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger>
                     <span>Pay Sequence</span>
                   </DropdownMenuSubTrigger>
                   <DropdownMenuPortal>
-                    <DropdownMenuSubContent sideOffset={23} className="p-0">
+                    <DropdownMenuSubContent sideOffset={23} className='p-0'>
                       {paySequenceArray?.map(([name, pay_day], index) => (
                         <DropdownMenuCheckboxItem
                           key={name + index.toString()}
-                          className="capitalize"
+                          className='capitalize'
                           checked={filterParams?.project === pay_day}
                           onCheckedChange={() => {
                             setFilterParams((prev) => ({
@@ -271,12 +279,12 @@ export function AttendanceSearchFilter({
                     <DropdownMenuSubContent
                       sideOffset={14}
                       alignOffset={-4}
-                      className="p-0"
+                      className='p-0'
                     >
                       {days?.map(({ day, fullDate }) => (
                         <DropdownMenuCheckboxItem
                           key={fullDate.toString()}
-                          className="capitalize"
+                          className='capitalize'
                           checked={filterParams?.project === day.toString()}
                           onCheckedChange={() => {
                             setFilterParams((prev) => ({
@@ -305,12 +313,12 @@ export function AttendanceSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 {projectArray?.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className="capitalize"
+                    className='capitalize'
                     checked={filterParams?.project === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
@@ -336,12 +344,12 @@ export function AttendanceSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 {!searchParamsList.project ? (
                   <DropdownMenuCheckboxItem
                     disabled={true}
-                    className="p-8 items-center justify-center"
+                    className='p-8 items-center justify-center'
                   >
                     Select Project First
                   </DropdownMenuCheckboxItem>
@@ -349,7 +357,7 @@ export function AttendanceSearchFilter({
                   projectSiteArray?.map((name, index) => (
                     <DropdownMenuCheckboxItem
                       key={name + index.toString()}
-                      className="capitalize"
+                      className='capitalize'
                       checked={filterParams?.project_site === name}
                       onCheckedChange={() => {
                         setFilterParams((prev) => ({
@@ -375,12 +383,12 @@ export function AttendanceSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 {getYears(25, new Date().getFullYear()).map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className="capitalize"
+                    className='capitalize'
                     checked={filterParams?.year === name.toString()}
                     onCheckedChange={() => {
                       setYear(Number(name));
@@ -407,12 +415,12 @@ export function AttendanceSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 {Object.keys(months).map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className="capitalize"
+                    className='capitalize'
                     checked={filterParams?.month === name.toString()}
                     onCheckedChange={() => {
                       setMonth(Number(index));

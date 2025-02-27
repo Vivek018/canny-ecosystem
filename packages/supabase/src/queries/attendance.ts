@@ -205,7 +205,6 @@ export async function getAttendanceByCompanyId({
 }) {
   const { from, to, sort, searchQuery, filters } = params;
   const { month, year, project, project_site, range } = filters ?? {};
-  console.log(range);
 
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth() + 1;
@@ -337,11 +336,9 @@ export async function getAttendanceByCompanyId({
     .select(
       `
       ${columns.join(",")},
-      employee_project_assignment!employee_project_assignments_employee_id_fkey!${
-        project ? "inner" : "left"
+      employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
       }(
-        project_sites!${project ? "inner" : "left"}(id, name, projects!${
-        project ? "inner" : "left"
+        project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
       }(id, name))),
       attendance(
         id,
