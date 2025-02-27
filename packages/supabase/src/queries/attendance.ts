@@ -8,6 +8,7 @@ import type {
   SiteDatabaseRow,
   TypedSupabaseClient,
 } from "../types";
+import { defaultYear } from "@canny_ecosystem/utils";
 
 export type AttendanceDataType = Pick<
   EmployeeDatabaseRow,
@@ -108,8 +109,6 @@ export async function getAttendanceByEmployeeId({
         return lastDay.toString().padStart(2, "0");
       };
 
-      const currentYear = new Date().getFullYear();
-
       if (year && monthNumber) {
         const yearNum = Number(year);
         const monthStr = monthNumber.toString().padStart(2, "0");
@@ -128,10 +127,10 @@ export async function getAttendanceByEmployeeId({
           .filter("date", "lte", `${yearNum}-12-31`);
       } else if (monthNumber) {
         const monthStr = monthNumber.toString().padStart(2, "0");
-        const lastDay = getLastDayOfMonth(currentYear, monthNumber);
+        const lastDay = getLastDayOfMonth(defaultYear, monthNumber);
 
-        const startOfMonth = `${currentYear}-${monthStr}-01`;
-        const endOfMonth = `${currentYear}-${monthStr}-${lastDay}`;
+        const startOfMonth = `${defaultYear}-${monthStr}-01`;
+        const endOfMonth = `${defaultYear}-${monthStr}-${lastDay}`;
 
         query = query
           .filter("date", "gte", startOfMonth)

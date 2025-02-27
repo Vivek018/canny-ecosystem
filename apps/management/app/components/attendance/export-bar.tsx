@@ -1,6 +1,6 @@
 import { Button } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { formatDate, formatDateTime } from "@canny_ecosystem/utils";
+import { defaultMonth, defaultYear, formatDate, formatDateTime } from "@canny_ecosystem/utils";
 import { months } from "@canny_ecosystem/utils/constant";
 import type { VisibilityState } from "@tanstack/react-table";
 import Papa from "papaparse";
@@ -21,8 +21,8 @@ export function ExportBar({
   fYear: string | undefined | null;
   columnVisibility: VisibilityState;
 }) {
-  const [month, setMonth] = useState<number>(new Date().getMonth());
-  const [year, setYear] = useState<number>(new Date().getFullYear());
+  const [month, setMonth] = useState<number>(defaultMonth);
+  const [year, setYear] = useState<number>(defaultYear);
 
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
@@ -64,13 +64,12 @@ export function ExportBar({
         }
       }
 
-      // biome-ignore lint/complexity/noForEach: <explanation>
-      days.forEach(({ fullDate }) => {
+      for (const { fullDate } of days) {
         const formattedDate = formatDate(fullDate);
         if (columnVisibility[formattedDate!] !== false) {
           formattedEntry[formattedDate!] = entry[formattedDate!] || "";
         }
-      });
+      }
 
       return formattedEntry;
     }
