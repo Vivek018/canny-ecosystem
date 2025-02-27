@@ -248,10 +248,14 @@ export function AttendanceSearchFilter({
               >
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger>
-                    <span>Pay Sequence</span>
+                    <span className='mr-3'>Pay Sequence</span>
                   </DropdownMenuSubTrigger>
                   <DropdownMenuPortal>
-                    <DropdownMenuSubContent sideOffset={23} className='p-0'>
+                    <DropdownMenuSubContent
+                      sideOffset={14}
+                      alignOffset={-4}
+                      className='p-0'
+                    >
                       {paySequenceArray?.map(([name, pay_day], index) => (
                         <DropdownMenuCheckboxItem
                           key={name + index.toString()}
@@ -273,7 +277,7 @@ export function AttendanceSearchFilter({
 
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger>
-                    <span>Custom</span>
+                    <span className='mr-3'>Custom</span>
                   </DropdownMenuSubTrigger>
                   <DropdownMenuPortal>
                     <DropdownMenuSubContent
@@ -281,7 +285,7 @@ export function AttendanceSearchFilter({
                       alignOffset={-4}
                       className='p-0'
                     >
-                      {days?.map(({ day, fullDate }) => (
+                      {days?.sort((a, b) => a.day - b.day).map(({ day, fullDate }) => (
                         <DropdownMenuCheckboxItem
                           key={fullDate.toString()}
                           className='capitalize'
