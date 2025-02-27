@@ -91,76 +91,74 @@ export default function Holidays() {
   const navigate = useNavigate();
   return (
     <div className="py-4">
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-        <Suspense fallback={<LoadingSpinner />}>
-          <Await resolve={leaveTypePromise}>
-            {({ data, error }) => {
-              if (error) {
-                clearCacheEntry(cacheKeyPrefix.holidays);
-                return (
-                  <ErrorBoundary
-                    error={error}
-                    message="Failed to load leave types"
-                  />
-                );
-              }
-
+      <Suspense fallback={<LoadingSpinner />}>
+        <Await resolve={leaveTypePromise}>
+          {({ data, error }) => {
+            if (error) {
+              clearCacheEntry(cacheKeyPrefix.holidays);
               return (
-                <>
-                  {data.map((leave: LeaveTypeDatabaseRow) => (
-                    <Card key={leave?.id}>
-                      <LeaveTypeOptionsDropdown
-                        id={leave?.id}
-                        triggerChild={
-                          <DropdownMenuTrigger
-                            className={cn(
-                              "p-2 py-2 ml-auto mr-2 mt-2 rounded-md  grid place-items-center",
+                <ErrorBoundary
+                  error={error}
+                  message="Failed to load leave types"
+                />
+              );
+            }
+
+            return (
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                {data.map((leave: LeaveTypeDatabaseRow) => (
+                  <Card key={leave?.id}>
+                    <LeaveTypeOptionsDropdown
+                      id={leave?.id}
+                      triggerChild={
+                        <DropdownMenuTrigger
+                          className={cn(
+                            "p-2 py-2 ml-auto mr-2 mt-2 rounded-md  grid place-items-center",
+                            !hasPermission(
+                              role,
+                              `${deleteRole}:${attribute.holidays}`,
+                            ) &&
                               !hasPermission(
                                 role,
-                                `${deleteRole}:${attribute.holidays}`,
+                                `${updateRole}:${attribute.holidays}`,
                               ) &&
-                                !hasPermission(
-                                  role,
-                                  `${updateRole}:${attribute.holidays}`,
-                                ) &&
-                                "hidden",
-                            )}
-                          >
-                            <Icon name="dots-vertical" size="xs" />
-                          </DropdownMenuTrigger>
-                        }
-                      />
-                      <CardHeader className="p-0">
-                        <CardTitle className="text-lg text-center capitalize">
-                          {replaceUnderscore(leave.leave_type)}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-muted-foreground text-center">
-                          Available Days: {leave.leaves_per_year}
-                        </p>
-                      </CardContent>
-                    </Card>
-                  ))}
+                              "hidden",
+                          )}
+                        >
+                          <Icon name="dots-vertical" size="xs" />
+                        </DropdownMenuTrigger>
+                      }
+                    />
+                    <CardHeader className="p-0">
+                      <CardTitle className="text-lg text-center capitalize">
+                        {replaceUnderscore(leave.leave_type)}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-muted-foreground text-center">
+                        Available Days: {leave.leaves_per_year}
+                      </p>
+                    </CardContent>
+                  </Card>
+                ))}
 
-                  {data.length < 5 && (
-                    <Card
-                      className="h-28 bg-muted/40 dark:bg-muted/80 cursor-pointer grid place-items-center"
-                      onClick={() => navigate("add-leave-type")}
-                    >
-                      <Icon
-                        name="plus"
-                        size="xl"
-                        className="shrink-0 flex justify-center items-center"
-                      />
-                    </Card>
-                  )}
-                </>
-              );
-            }}
-          </Await>
-        </Suspense>
-      </div>
+                {data.length < 5 && (
+                  <Card
+                    className="h-28 bg-muted/40 dark:bg-muted/80 cursor-pointer grid place-items-center"
+                    onClick={() => navigate("add-leave-type")}
+                  >
+                    <Icon
+                      name="plus"
+                      size="xl"
+                      className="shrink-0 flex justify-center items-center"
+                    />
+                  </Card>
+                )}
+              </div>
+            );
+          }}
+        </Await>
+      </Suspense>
 
       <div className="my-5">
         <Suspense fallback={<LoadingSpinner className="my-30" />}>

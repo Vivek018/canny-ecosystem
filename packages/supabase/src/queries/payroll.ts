@@ -67,10 +67,19 @@ export async function getPayrollWithSiteBySiteId({
         "run_date",
         formatUTCDate(end_date.toISOString().split("T")[0]),
       );
+  } else {
+    query.gte(
+      "run_date",
+      formatUTCDate(
+        new Date(new Date().setMonth(new Date().getMonth() - 1))
+          .toISOString()
+          .split("T")[0],
+      ),
+    );
   }
 
   const { data, error } = await query
-    .order("run_date", { ascending: true })
+    .order("run_date", { ascending: false })
     .returns<InferredType<PayrollDatabaseRow, (typeof columns)[number]>[]>();
 
   if (error) console.error("getPayrollWithSiteBySiteId Error", error);
@@ -181,37 +190,6 @@ export type PayrollEntriesWithTemplateComponents = Pick<
     "id" | "target_type" | "calculation_value"
   >;
 };
-
-export async function getPayrollEntriesWithTemplateComponentsByPayrollId({
-  supabase,
-  payrollIds,
-}: {
-  supabase: TypedSupabaseClient;
-  payrollIds: string[];
-}) {
-  const columns = ["id", "employee_id", "payment_status", "amount"] as const;
-
-  const { data, error } = await supabase
-    .from("payroll_entries")
-    .select(
-      `${columns.join(",")}, payment_template_components!inner(id, target_type, calculation_value)`,
-    )
-    .in("payroll_id", payrollIds)
-    .returns<
-      InferredType<
-        PayrollEntriesWithTemplateComponents,
-        (typeof columns)[number]
-      >[]
-    >();
-
-  if (error)
-    console.error(
-      "getPayrollEntriesWithTemplateComponentsByPayrollId Error",
-      error,
-    );
-
-  return { data, error };
-}
 
 export async function getPaymentTemplateComponentIdsByPayrollIdAndEmployeeId({
   supabase,

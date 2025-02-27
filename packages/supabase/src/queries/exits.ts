@@ -5,6 +5,7 @@ import type {
   InferredType,
   TypedSupabaseClient,
 } from "../types";
+import { RECENT_QUERY_LIMIT } from "../constant";
 
 export type ExitFilterType = {
   last_working_day_start?: string | undefined | null;
@@ -253,3 +254,53 @@ export const getExitByEmployeeId = async ({
 
   return { data, error };
 };
+
+export type RecentExitsType = Pick<
+  ExitsRow,
+  | "id"
+  | "net_pay"
+  | "last_working_day"
+  | "employee_payable_days"
+  | "final_settlement_date"
+  | "bonus"
+  | "leave_encashment"
+  | "gratuity"
+> & {
+  employees: Pick<
+    EmployeeDatabaseRow,
+    "id" | "first_name" | "middle_name" | "last_name" | "employee_code"
+  > & {};
+};
+export async function getRecentExitsByCompanyId({
+  supabase,
+}: {
+  supabase: TypedSupabaseClient;
+}) {
+  const columns = [
+    "id",
+    "employee_id",
+    "last_working_day",
+    "final_settlement_date",
+    "net_pay",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("exits")
+    .select(
+      `${columns.join(",")},
+        employees!inner(id, first_name, middle_name, last_name, employee_code)`,
+      { count: "exact" },
+    )
+    .order("created_at", { ascending: false })
+    .limit(RECENT_QUERY_LIMIT)
+    .returns<RecentExitsType[]>();
+
+  if (error) {
+    console.error("getExitsByCompanyId Error", error);
+  }
+
+  return {
+    data,
+    error,
+  };
+}
