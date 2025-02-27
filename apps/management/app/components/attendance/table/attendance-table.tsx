@@ -12,7 +12,7 @@ import {
   type VisibilityState,
 } from "@tanstack/react-table";
 import { AttendanceTableHeader } from "./attendance-table-header";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@canny_ecosystem/ui/button";
 import { useAttendanceStore } from "@/store/attendance";
 import type { AttendanceFilterType } from "@/routes/_protected+/dashboard";
@@ -73,51 +73,53 @@ export function AttendanceTable({
 
   const { ref, inView } = useInView();
 
-  function transformAttendanceData(data: any[]) {
-    const groupedByEmployeeAndMonth = data.reduce((acc, employee) => {
-      const empCode = employee.employee_code;
-      const employeeDetails = {
-        employee_id: employee.id,
-        employee_code: empCode,
-        employee_name: `${employee.first_name} ${employee.middle_name} ${employee.last_name}`,
-        project:
-          employee.employee_project_assignment?.project_sites?.projects?.name ||
-          null,
-        project_site:
-          employee.employee_project_assignment?.project_sites?.name || null,
-      };
+  const transformAttendanceData = useMemo(() => {
+    return (data: any[]) => {
+      const groupedByEmployeeAndMonth = data.reduce((acc, employee) => {
+        const empCode = employee.employee_code;
+        const employeeDetails = {
+          employee_id: employee.id,
+          employee_code: empCode,
+          employee_name: `${employee.first_name} ${employee.middle_name} ${employee.last_name}`,
+          project:
+            employee.employee_project_assignment?.project_sites?.projects
+              ?.name || null,
+          project_site:
+            employee.employee_project_assignment?.project_sites?.name || null,
+        };
 
-      if (!employee?.attendance?.length) {
-        acc[empCode] = acc[empCode] || employeeDetails;
-        return acc;
-      }
-
-      for (const record of employee?.attendance ?? []) {
-        const date = new Date(record.date);
-        const monthYear = `${date.getMonth()}-${date.getFullYear()}`;
-        const key = `${empCode}-${monthYear}`;
-
-        if (!acc[key]) {
-          acc[key] = { ...employeeDetails };
+        if (!employee?.attendance?.length) {
+          acc[empCode] = acc[empCode] || employeeDetails;
+          return acc;
         }
 
-        const fullDate = formatDate(date.toISOString().split("T")[0]);
-        acc[key][fullDate!] = record.present
-          ? "P"
-          : record.holiday
-          ? record.holiday_type === "weekly"
-            ? "(WOF)"
-            : record.holiday_type === "paid"
-            ? "L"
-            : "A"
-          : "A";
-      }
+        for (const record of employee?.attendance ?? []) {
+          const date = new Date(record.date);
+          const monthYear = `${date.getMonth()}-${date.getFullYear()}`;
+          const key = `${empCode}-${monthYear}`;
 
-      return acc;
-    }, {});
+          if (!acc[key]) {
+            acc[key] = { ...employeeDetails };
+          }
 
-    return Object.values(groupedByEmployeeAndMonth);
-  }
+          const fullDate = formatDate(date.toISOString().split("T")[0]);
+          acc[key][fullDate!] = record.present
+            ? "P"
+            : record.holiday
+            ? record.holiday_type === "weekly"
+              ? "(WOF)"
+              : record.holiday_type === "paid"
+              ? "L"
+              : "A"
+            : "A";
+        }
+
+        return acc;
+      }, {});
+
+      return Object.values(groupedByEmployeeAndMonth);
+    };
+  }, [days]);
 
   const loadMoreEmployees = async () => {
     const formattedFrom = from;
@@ -138,7 +140,9 @@ export function AttendanceTable({
       });
 
       if (newData && newData.length > 0) {
-        const transformedData = transformAttendanceData(newData);
+        const transformedData = useMemo(() => {
+          return transformAttendanceData(newData);
+        }, [newData, transformAttendanceData]);
         setData(
           (prevData) =>
             [...prevData, ...transformedData] as TransformedAttendanceDataType[]

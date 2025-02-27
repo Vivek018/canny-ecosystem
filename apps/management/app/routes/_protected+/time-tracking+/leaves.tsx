@@ -234,7 +234,6 @@ export default function LeavesIndex() {
 
                   {(data?.length ?? 0) < 5 && (
                     <Card
-                      key={data?.length.toString()}
                       className="h-28 bg-muted/40 dark:bg-muted/80 cursor-pointer grid place-items-center"
                       onClick={() => navigate("add-leave-type")}
                     >

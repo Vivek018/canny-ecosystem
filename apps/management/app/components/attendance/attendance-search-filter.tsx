@@ -96,6 +96,7 @@ export function AttendanceSearchFilter({
     year: searchParams.get("year"),
     project: searchParams.get("project"),
     project_site: searchParams.get("project_site"),
+    range: searchParams.get("range"),
   };
 
   useEffect(() => {

@@ -77,6 +77,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       name: query,
       project: searchParams.get("project") ?? undefined,
       project_site: searchParams.get("project_site") ?? undefined,
+      range: searchParams.get("range") ?? undefined,
     };
 
     const hasFilters =

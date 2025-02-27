@@ -18,11 +18,11 @@ import { updateLeaveTypeById } from "@canny_ecosystem/supabase/mutations";
 import { getLeaveTypeById } from "@canny_ecosystem/supabase/queries";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
-import { attribute } from "@canny_ecosystem/utils/constant";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { useEffect } from "react";
 import { clearCacheEntry } from "@/utils/cache";
 import AddLeaveType from "../add-leave-type";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const UPDATE_LEAVETYPE_TAG = "Update_LeaveType";
 
@@ -58,6 +58,8 @@ export async function action({
 }: ActionFunctionArgs): Promise<Response> {
   const id = params.leaveTypeId;
   const { supabase } = getSupabaseWithHeaders({ request });
+
+  const returnTo = "/time-tracking/leaves";
   const formData = await request.formData();
   const submission = parseWithZod(formData, { schema: LeaveTypeSchema });
 
@@ -78,6 +80,7 @@ export async function action({
     return json({
       status: "success",
       message: "Leave type updated successfully",
+      returnTo,
       error: null,
     });
   }
@@ -85,6 +88,7 @@ export async function action({
   return json({
     status: "error",
     message: "Leave Type update failed",
+    returnTo,
     error,
   });
 }
@@ -124,7 +128,9 @@ export default function UpdateLeaveTypes() {
         });
       }
 
-      navigate("/time-tracking/leaves", { replace: true });
+      navigate(actionData?.returnTo ?? "/time-tracking/leaves", {
+        replace: true,
+      });
     }
   }, [actionData]);
 

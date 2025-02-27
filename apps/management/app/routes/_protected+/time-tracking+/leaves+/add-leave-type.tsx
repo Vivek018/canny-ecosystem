@@ -38,7 +38,12 @@ import {
   type LoaderFunctionArgs,
   type ActionFunctionArgs,
 } from "@remix-run/node";
-import { Form, useActionData, useNavigate } from "@remix-run/react";
+import {
+  Form,
+  useActionData,
+  useNavigate,
+  useRevalidator,
+} from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { UPDATE_LEAVETYPE_TAG } from "./$leaveTypeId+/update-leave-type";
 import { useCompanyId } from "@/utils/company";
@@ -67,6 +72,8 @@ export async function action({
   if (!hasPermission(user?.role!, `${updateRole}:${attribute.leaves}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
+
+  const returnTo = "/time-tracking/leaves";
   const formData = await request.formData();
 
   const submission = parseWithZod(formData, { schema: LeaveTypeSchema });
@@ -87,12 +94,14 @@ export async function action({
     return json({
       status: "success",
       message: "Leave type added successfully",
+      returnTo,
       error: null,
     });
   }
   return json({
     status: "error",
     message: "Leave Type add failed",
+    returnTo,
     error,
   });
 }
@@ -103,7 +112,7 @@ export default function AddLeaveType({
   updatableData?: LeaveTypeDatabaseUpdate | null;
 }) {
   const actionData = useActionData<typeof action>();
-
+  const revalidator = useRevalidator();
   const { companyId } = useCompanyId();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -113,6 +122,7 @@ export default function AddLeaveType({
     if (actionData) {
       if (actionData?.status === "success") {
         clearCacheEntry(cacheKeyPrefix.leaves);
+        revalidator.revalidate();
         toast({
           title: "Success",
           description: actionData?.message || "Leave Type created",
@@ -127,7 +137,9 @@ export default function AddLeaveType({
         });
       }
 
-      navigate("/time-tracking/leaves", { replace: true });
+      navigate(actionData?.returnTo ?? "/time-tracking/leaves", {
+        replace: true,
+      });
     }
   }, [actionData]);
 
@@ -188,7 +200,7 @@ export default function AddLeaveType({
               className="w-full"
               inputProps={{
                 ...getInputProps(fields.leaves_per_year, { type: "number" }),
-                placeholder: "No Of Hours",
+                placeholder: "Leaves per Year",
               }}
               labelProps={{
                 children: replaceUnderscore(fields.leaves_per_year.name),
