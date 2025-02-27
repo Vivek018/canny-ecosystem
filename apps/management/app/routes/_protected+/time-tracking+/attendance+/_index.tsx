@@ -394,7 +394,11 @@ export default function Attendance() {
                     <Await resolve={paySequencePromise}>
                       {(paySequenceData) => (
                         <AttendanceSearchFilter
-                          days={days}
+                          lastDayOfMonth={new Date(
+                            year,
+                            month + 1,
+                            0
+                          ).getDate()}
                           setMonth={setMonth}
                           setYear={setYear}
                           disabled={!projectData?.data?.length && noFilters}

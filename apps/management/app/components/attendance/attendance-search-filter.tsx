@@ -31,19 +31,16 @@ export function AttendanceSearchFilter({
   projectSiteArray,
   paySequenceArray,
   defaultPayDay,
-  days,
+  lastDayOfMonth,
   setYear,
   setMonth,
 }: {
-  days: {
-    day: number;
-    fullDate: string;
-  }[];
+  lastDayOfMonth: number;
   disabled?: boolean;
   projectArray: string[];
   projectSiteArray: string[];
   paySequenceArray: [name: string, pay_day?: number][];
-  defaultPayDay: number | null;
+  defaultPayDay: number | null | undefined;
   setMonth: (month: number) => void;
   setYear: (year: number) => void;
 }) {
@@ -285,9 +282,12 @@ export function AttendanceSearchFilter({
                       alignOffset={-4}
                       className='p-0'
                     >
-                      {days?.sort((a, b) => a.day - b.day).map(({ day, fullDate }) => (
+                      {Array.from(
+                        { length: lastDayOfMonth },
+                        (_, i) => i + 1
+                      )?.map((day, index) => (
                         <DropdownMenuCheckboxItem
-                          key={fullDate.toString()}
+                          key={day.toString() + index.toString()}
                           className='capitalize'
                           checked={filterParams?.project === day.toString()}
                           onCheckedChange={() => {
