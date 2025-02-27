@@ -6,7 +6,7 @@ import {
   DropdownMenuSeparator,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { useNavigate} from "@remix-run/react";
+import { useNavigate } from "@remix-run/react";
 import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
@@ -30,11 +30,11 @@ export const LeaveTypeOptionsDropdown = ({
           <DropdownMenuItem
             className={cn(
               "",
-              !hasPermission(role, `${updateRole}:${attribute.holidays}`) &&
+              !hasPermission(role, `${updateRole}:${attribute.leaves}`) &&
                 "hidden"
             )}
             onClick={() => {
-              navigate(`/time-tracking/holidays/${id}/update-leave-type`);
+              navigate(`/time-tracking/leaves/${id}/update-leave-type`);
             }}
           >
             Edit
@@ -43,7 +43,7 @@ export const LeaveTypeOptionsDropdown = ({
           <DropdownMenuSeparator
             className={cn(
               "hidden",
-              hasPermission(role, `${deleteRole}:${attribute.holidays}`) &&
+              hasPermission(role, `${deleteRole}:${attribute.leaves}`) &&
                 "flex"
             )}
           />

@@ -22,7 +22,7 @@ export async function action({
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${deleteRole}:${attribute.holidays}`))
+  if (!hasPermission(user?.role!, `${deleteRole}:${attribute.leaves}`))
     return safeRedirect(DEFAULT_ROUTE, { headers });
 
   const leaveId = params.leaveTypeId;
@@ -68,7 +68,7 @@ export default function DeleteLeaveType() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(cacheKeyPrefix.holidays);
+        clearCacheEntry(cacheKeyPrefix.leaves);
         toast({
           title: "Success",
           description: actionData?.message || "Leave Type deleted",
@@ -84,7 +84,7 @@ export default function DeleteLeaveType() {
           variant: "destructive",
         });
       }
-      navigate("/time-tracking/holidays");
+      navigate("/time-tracking/leaves");
     }
   }, [actionData]);
 

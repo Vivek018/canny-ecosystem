@@ -4,7 +4,6 @@ import type {
   ProjectDatabaseUpdate,
   SiteDatabaseInsert,
   SiteDatabaseUpdate,
-  SitePaySequenceDatabaseUpdate,
   TypedSupabaseClient,
 } from "../types";
 
@@ -132,17 +131,6 @@ export async function createSite({
     data: projectSiteData,
   } = await supabase.from("project_sites").insert(data).select().single();
 
-  if (projectSiteData?.id) {
-    const { error: paySequenceError } = await supabase
-      .from("site_pay_sequence")
-      .insert({ site_id: projectSiteData.id })
-      .single();
-
-    if (paySequenceError) {
-      console.error("createSite PaySequence Error:", paySequenceError);
-    }
-  }
-
   if (error) {
     console.error("createSite Error:", error);
   }
@@ -214,36 +202,4 @@ export async function deleteSite({
   return { status, error };
 }
 
-// Project Site Pay Sequence
-export async function updateSitePaySequence({
-  supabase,
-  data,
-  bypassAuth = false,
-}: {
-  supabase: TypedSupabaseClient;
-  data: SitePaySequenceDatabaseUpdate;
-  bypassAuth?: boolean;
-}) {
-  if (!bypassAuth) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
 
-    if (!user?.email) {
-      return { status: 400, error: "Unauthorized User" };
-    }
-  }
-
-  const { error, status } = await supabase
-    .from("site_pay_sequence")
-    .update({ ...data, working_days: data.working_days?.sort() })
-    .eq("id", data.id!)
-    .select()
-    .single();
-
-  if (error) {
-    console.error("updateSitePaySequence Error:", error);
-  }
-
-  return { status, error };
-}
