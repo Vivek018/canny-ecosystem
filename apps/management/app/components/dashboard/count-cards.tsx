@@ -47,8 +47,8 @@ export function CountCards({ cardData }: { cardData: CardInfoData }) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Active Now</CardTitle>
+          <Icon name="stat" />
         </CardHeader>{" "}
-        <Icon name="stat" />
         <CardContent>
           <div className="text-2xl font-bold">+573</div>
           <p className="text-xs text-muted-foreground">+201 since last hour</p>
