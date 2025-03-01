@@ -1,17 +1,7 @@
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@canny_ecosystem/ui/avatar";
-import {
-  Card,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@canny_ecosystem/ui/card";
+import {Avatar,AvatarFallback,AvatarImage} from "@canny_ecosystem/ui/avatar";
+import {Card,CardDescription,CardFooter,CardHeader,CardTitle} from "@canny_ecosystem/ui/card";
 import { useRef } from "react";
 
 export const UserAvatar = ({

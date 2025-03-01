@@ -5,40 +5,31 @@ import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
-  getCompanyById,
-  getCompanyRegistrationDetailsByCompanyId,
+  getCompanyById, getCompanyRegistrationDetailsByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import {
-  Await,
-  type ClientLoaderFunctionArgs,
-  defer,
-  useLoaderData,
-} from "@remix-run/react";
+import { Await, type ClientLoaderFunctionArgs, defer, useLoaderData } from "@remix-run/react";
 import { Suspense, useEffect, useState } from "react";
+import { getCompanyLogoByCompanyId } from "../../../../../../packages/supabase/src/media/company";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-    const companyDetailsPromise = getCompanyById({
-      supabase,
-      id: companyId!,
-    });
+    const companyLogoPromise = getCompanyLogoByCompanyId({ supabase, companyId });
+    const companyDetailsPromise = getCompanyById({ supabase, id: companyId! });
 
     const companyRegistrationDetailsPromise =
-      getCompanyRegistrationDetailsByCompanyId({
-        supabase,
-        companyId,
-      });
+      getCompanyRegistrationDetailsByCompanyId({ supabase, companyId });
 
     return defer({
       status: "success",
       message: "Company found",
       error: null,
       companyDetailsPromise,
+      companyLogoPromise,
       companyRegistrationDetailsPromise,
     });
   } catch (error) {
@@ -47,6 +38,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       message: "Failed to get company",
       error,
       companyDetailsPromise: null,
+      companyLogoPromise: null,
       companyRegistrationDetailsPromise: null,
     });
   }
@@ -59,7 +51,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 clientLoader.hydrate = true;
 
 export default function SettingGeneral() {
-  const { companyDetailsPromise, companyRegistrationDetailsPromise, error } =
+  const { companyDetailsPromise, companyRegistrationDetailsPromise, companyLogoPromise, error } =
     useLoaderData<typeof loader>();
 
   const [resetKey, setResetKey] = useState(Date.now());
@@ -70,9 +62,7 @@ export default function SettingGeneral() {
 
   if (error) {
     clearExactCacheEntry(cacheKeyPrefix.general);
-    return (
-      <ErrorBoundary error={error} message="Failed to load company details" />
-    );
+    return <ErrorBoundary error={error} message="Failed to load company details" />
   }
 
   return (
@@ -83,16 +73,16 @@ export default function SettingGeneral() {
             {(resolvedData) => {
               if (!resolvedData) {
                 clearExactCacheEntry(cacheKeyPrefix.general);
-                return (
-                  <ErrorBoundary message="Failed to load company details" />
-                );
+                return <ErrorBoundary message="Failed to load company details" />
               }
-              return (
-                <CompanyDetailsWrapper
-                  data={resolvedData.data}
-                  error={resolvedData.error}
-                />
-              );
+              return <Await resolve={companyLogoPromise}>
+                {(resolvedCompanyLogoData) => {
+                  if (resolvedData.data)
+                    resolvedData.data.logo = resolvedCompanyLogoData?.data?.signedUrl ?? "";
+                  return <CompanyDetailsWrapper data={resolvedData.data} error={resolvedData.error} />
+                }}
+              </Await>
+
             }}
           </Await>
         </Suspense>
@@ -104,16 +94,9 @@ export default function SettingGeneral() {
             {(resolvedData) => {
               if (!resolvedData) {
                 clearExactCacheEntry(cacheKeyPrefix.general);
-                return (
-                  <ErrorBoundary message="Failed to load company registration details" />
-                );
+                return <ErrorBoundary message="Failed to load company registration details" />
               }
-              return (
-                <CompanyRegistrationDetailsWrapper
-                  data={resolvedData.data}
-                  error={resolvedData.error}
-                />
-              );
+              return <CompanyRegistrationDetailsWrapper data={resolvedData.data} error={resolvedData.error} />
             }}
           </Await>
         </Suspense>

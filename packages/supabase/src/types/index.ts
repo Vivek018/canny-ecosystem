@@ -73,11 +73,6 @@ export type SiteDatabaseInsert =
 export type SiteDatabaseUpdate =
   Database["public"]["Tables"]["project_sites"]["Update"];
 
-// Pay Sequences
-export type SitePaySequenceDatabaseRow =
-  Database["public"]["Tables"]["site_pay_sequence"]["Row"];
-export type SitePaySequenceDatabaseUpdate =
-  Database["public"]["Tables"]["site_pay_sequence"]["Update"];
 
 // Employees
 export type EmployeeDatabaseRow =
@@ -87,7 +82,7 @@ export type EmployeeDatabaseInsert =
 export type EmployeeDatabaseUpdate =
   Database["public"]["Tables"]["employees"]["Update"];
 
-// Attendance
+// Employee Attendance
 export type EmployeeAttendanceDatabaseRow =
   Database["public"]["Tables"]["attendance"]["Row"];
 export type EmployeeAttendanceDatabaseInsert =
@@ -150,6 +145,14 @@ export type EmployeeWorkHistoryDatabaseInsert =
   Database["public"]["Tables"]["employee_work_history"]["Insert"];
 export type EmployeeWorkHistoryDatabaseUpdate =
   Database["public"]["Tables"]["employee_work_history"]["Update"];
+
+// Employee Documents
+export type EmployeeDocumentsDatabaseRow =
+  Database["public"]["Tables"]["employee_documents"]["Row"];
+export type EmployeeDocumentsDatabaseInsert =
+  Database["public"]["Tables"]["employee_documents"]["Insert"];
+export type EmployeeDocumentsDatabaseUpdate =
+  Database["public"]["Tables"]["employee_documents"]["Update"];
 
 // Feedback
 export type FeedbackDatabaseRow =
@@ -318,7 +321,7 @@ export type LeaveTypeDatabaseInsert =
 export type LeaveTypeDatabaseUpdate =
   Database["public"]["Tables"]["leave_type"]["Update"];
 
-  export type HolidaysDatabaseRow =
+export type HolidaysDatabaseRow =
   Database["public"]["Tables"]["holidays"]["Row"];
 export type HolidaysDatabaseInsert =
   Database["public"]["Tables"]["holidays"]["Insert"];

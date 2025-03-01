@@ -14,6 +14,7 @@ import { attribute } from "@canny_ecosystem/utils/constant";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { json, useActionData, useNavigate, useParams } from "@remix-run/react";
 import { useEffect } from "react";
+import { deleteEmployeeProfilePhoto } from "../../../../../../../packages/supabase/src/media/employee";
 
 export async function action({
   request,
@@ -25,12 +26,14 @@ export async function action({
   if (!hasPermission(user?.role!, `${deleteRole}:${attribute.employees}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
-  const employeeId = params.employeeId;
+  const employeeId = params.employeeId ?? "";
   try {
     const { status, error } = await deleteEmployee({
       supabase,
       id: employeeId ?? "",
     });
+
+    await deleteEmployeeProfilePhoto({supabase,employeeId});
 
     if (isGoodStatus(status)) {
       return json({

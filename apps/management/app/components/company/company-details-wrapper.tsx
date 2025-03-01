@@ -34,7 +34,7 @@ export function CompanyDetailsWrapper({
 
   return (
     <>
-      <CompanyLogo name={data?.name ?? ""} logo={data?.logo ?? undefined} />
+      <CompanyLogo name={data?.name ?? ""} logo={data.logo ?? undefined} />
       <CompanyDetails updateValues={data} />
     </>
   );

@@ -114,8 +114,9 @@ export const attribute = {
   employeeLetters: "employee_letters",
   employeeReimbursements: "employee_reimbursements",
   employeeAttendance: "employee_attendance",
-  employeeExits:"employee_exits",
-  employeePaymentTemplateLink:"payment_template_link",
+  employeeExits: "employee_exits",
+  employeePaymentTemplateLink: "payment_template_link",
+  employeeDocuments:"employee_documents",
   reimbursements: "reimbursements",
   exits: "exits",
   paymentFields: "payment_fields",
@@ -259,4 +260,13 @@ export const DEFAULT_LETTER_CONTENT = {
   noc_letter: DEFAULT_NOC_LETTER,
   relieving_letter: DEFAULT_RELIEVING_LETTER,
   termination_letter: DEFAULT_TERMINATION_LETTER,
+};
+
+export const SUPABASE_STORAGE = {
+  LOGOS: "logos",
+  EMPLOYEE_PROFILE_PHOTO: "employees/profile-photo",
+};
+
+export const SUPABASE_BUCKET = {
+  CANNY_ECOSYSTEM: "canny-ecosystem",
 };

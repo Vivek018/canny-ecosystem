@@ -1,39 +1,26 @@
 import { DEFAULT_ROUTE } from "@/constant";
 import { useCompanyId } from "@/utils/company";
-import type { CompaniesDatabaseRow } from "@canny_ecosystem/supabase/types";
-import { Avatar, AvatarFallback } from "@canny_ecosystem/ui/avatar";
+import type { CompanyDatabaseRow } from "@canny_ecosystem/supabase/types";
+import { Avatar, AvatarFallback, AvatarImage } from "@canny_ecosystem/ui/avatar";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Link, useLocation, useSubmit } from "@remix-run/react";
 import { useRef, useState } from "react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@canny_ecosystem/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@canny_ecosystem/ui/popover";
 import { Button } from "@canny_ecosystem/ui/button";
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
+  Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList,
 } from "@canny_ecosystem/ui/command";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import {
-  hasPermission,
-  replaceUnderscore,
-  updateRole,
-} from "@canny_ecosystem/utils";
+import { hasPermission, replaceUnderscore, updateRole } from "@canny_ecosystem/utils";
 import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { clearAllCache } from "@/utils/cache";
 
-export const CompanySwitch = ({
-  companies,
-}: {
-  companies: CompaniesDatabaseRow;
+export const CompanySwitch = ({ companies }: {
+  companies: (CompanyDatabaseRow & {
+    logo: string;
+  })[]
 }) => {
   const { role } = useUser();
   const submit = useSubmit();
@@ -71,6 +58,7 @@ export const CompanySwitch = ({
         >
           <div className="flex items-center gap-2">
             <Avatar className="w-[34px] h-[34px] border border-muted-foreground/30 shadow-sm rounded-sm">
+              <AvatarImage src={currentCompany?.logo} />
               <AvatarFallback className="rounded-sm">
                 <span className="tracking-widest capitalize text-xs ml-[1.5px]">
                   {currentCompany?.name.charAt(0)}
@@ -87,7 +75,7 @@ export const CompanySwitch = ({
             className={cn(
               "ml-2 shrink-0 opacity-75",
               !hasPermission(role, `${updateRole}:${attribute.company}`) &&
-                "hidden",
+              "hidden",
             )}
           />
         </Button>
@@ -110,6 +98,7 @@ export const CompanySwitch = ({
                 >
                   <div className="flex items-center gap-1.5">
                     <Avatar className="w-8 h-8 border border-muted-foreground/30 shadow-sm rounded-sm">
+                      <AvatarImage src={company.logo} />
                       <AvatarFallback className="rounded-sm">
                         <span className="tracking-widest capitalize text-xs ml-[1.5px]">
                           {company.name.charAt(0)}

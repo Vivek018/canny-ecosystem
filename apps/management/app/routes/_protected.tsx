@@ -15,37 +15,30 @@ import { useTheme } from "@/utils/theme";
 import { Header } from "@/components/header";
 import { clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
+import { getCompanyLogoByCompanyId } from "../../../../packages/supabase/src/media/company";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { user: sessionUser } = await getSessionUser({ request });
 
-  if (!sessionUser?.email) {
-    return redirect("/login");
-  }
+  if (!sessionUser?.email) return redirect("/login");
 
   const { supabase } = getSupabaseWithHeaders({ request });
 
-  const { data: userData, error: userError } = await getUserByEmail({
-    supabase,
-    email: sessionUser.email,
-  });
+  const { data: userData, error: userError } = await getUserByEmail({ supabase, email: sessionUser.email });
 
-  if (!userData || userError) {
-    return redirect("/no-user-found");
+  if (!userData || userError) return redirect("/no-user-found");
+
+  const { data: companiesData, error: companiesError } = await getCompanies({ supabase });
+
+  if (companiesError) console.error("Protected Companies", companiesError);
+
+  // assigning logo to each company
+  for (const company of companiesData ?? []) {
+    const { data } = await getCompanyLogoByCompanyId({ supabase, companyId: company.id });
+    company.logo = (data?.signedUrl ? data?.signedUrl : undefined);
   }
 
-  const { data: companiesData, error: companiesError } = await getCompanies({
-    supabase,
-  });
-
-  if (companiesError) {
-    console.error("Protected Companies", companiesError);
-  }
-
-  return json({
-    user: userData,
-    companies: companiesData,
-  });
+  return json({ user: userData, companies: companiesData });
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
@@ -62,7 +55,7 @@ export default function ProtectedRoute() {
     <>
       <Sidebar className='flex-none' theme={theme ?? "system"} user={user} />
       <div className='flex max-h-screen flex-grow flex-col overflow-scroll ml-20'>
-        <Header className='px-4' companies={companies ?? []} />
+        <Header className='px-4' companies={companies ?? [] as any} />
         <div className='h-full'>
           <Outlet />
         </div>

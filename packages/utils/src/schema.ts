@@ -65,21 +65,21 @@ export const zImage = z
 export const zFile = z
   .any()
   .refine(
-    (file) => (typeof file !== "string" ? file.size < SIZE_1MB * 5 : true),
-    "File size must be less than 5MB",
+    (file) => (typeof file !== "string" ? file.size < SIZE_1MB * 2 : true),
+    "File size must be less than 2MB",
   )
   .refine(
     (file) =>
       typeof file !== "string"
         ? [
-          ...ACCEPTED_IMAGE_TYPES,
-          "image/pdf",
-          "image/doc",
-          "image/docx",
-          "application/pdf",
-          "application/doc",
-          "application/docx",
-        ].includes(file?.type)
+            ...ACCEPTED_IMAGE_TYPES,
+            "image/pdf",
+            "image/doc",
+            "image/docx",
+            "application/pdf",
+            "application/doc",
+            "application/docx",
+          ].includes(file?.type)
         : true,
     "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .docx formats are supported.",
   );
@@ -106,7 +106,6 @@ export const company_size = ["small", "medium", "large", "enterprise"] as const;
 export const CompanySchema = z.object({
   id: z.string().optional(),
   name: zNumberString.min(3).max(50),
-  logo: zImage.optional(),
   email_suffix: zEmailSuffix.max(20).optional(),
   company_type: z.enum(company_type).default("project_client"),
   company_size: z.enum(company_size).default("enterprise"),
@@ -395,6 +394,25 @@ export const EmployeeWorkHistorySchema = z.object({
   end_date: z.string(),
 });
 
+export const employeeDocuments = [
+  "aadhaar_card",
+  "address_proof",
+  "bank_document",
+  "birth_certificate",
+  "cv",
+  "driving_license",
+  "guardian_document",
+  "marriage_certificate",
+  "pan_card",
+  "passport",
+  "uan_card",
+] as const;
+
+export const EmployeeDocumentsSchema = z.object({
+  document_name: z.enum(employeeDocuments),
+  document_file: zFile,
+});
+
 export const paymentTypeArray = ["fixed", "variable"] as const;
 export const calculationTypeArray = ["fixed", "percentage_of_ctc"] as const;
 
@@ -653,7 +671,7 @@ export const EmployeeLinkSchema = z.object({
   effective_to: z.string().optional(),
   template_id: z.string(),
   employee_id: z.string(),
-  assignment_type: z.enum(paymentAssignmentTypesArray).default("employee")
+  assignment_type: z.enum(paymentAssignmentTypesArray).default("employee"),
 });
 
 export const PaymentTemplateFormSiteDialogSchema = z.object({

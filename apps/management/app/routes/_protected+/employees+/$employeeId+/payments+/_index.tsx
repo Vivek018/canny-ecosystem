@@ -100,9 +100,7 @@ export default function Payments() {
                       paymentTemplateAssignmentData={resolvedAssignment?.data}
                     />
                     <PaymentTemplateComponentsCard
-                      paymentTemplateComponents={
-                        resolvedPaymentTemplateComponents?.data
-                      }
+                      paymentTemplateComponents={resolvedPaymentTemplateComponents?.data}
                       returnTo={`/employees/${employeeId}/payments`}
                     />
                   </>
