@@ -141,8 +141,8 @@ export function DocumentsWrapper({ data, error }: {
     }, [error]);
 
     return (
-        <CommandGroup className="p-0 overflow-visible">
-            <div className="w-full grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+        <CommandGroup className="p-4">
+            <div className="w-full grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
                 {data?.map((documentData) => (
                     <CommandItem
                         key={documentData.name}
@@ -206,29 +206,31 @@ export function DocumentCard({ documentData }: {
     return (
         <Card
             key={documentData.name}
-            className="w-56 select-text cursor-auto dark:border-[1.5px] flex flex-col overflow-hidden"
+            className="w-full max-w-[200px] mx-auto select-text cursor-pointer dark:border-[1.5px] flex flex-col overflow-hidden rounded-lg shadow-md transition-transform duration-300 hover:scale-[1.02]"
         >
             <div
-                className="flex items-center justify-center bg-muted/30 hover:bg-muted/50 h-56 w-56"
+                className="flex items-center justify-center bg-muted/30 hover:bg-muted/50 h-48 w-full"
             >
                 <Avatar className="h-full w-full rounded-md">
                     <>
                         <AvatarImage src={documentData.url} alt={documentData.name} className="h-full w-full object-cover" />
-                        <AvatarFallback className="h-full w-full rounded-md bg-secondary/70 flex items-center justify-center capitalize">
+                        <AvatarFallback className="h-full w-full rounded-md bg-secondary/70 flex items-center justify-center capitalize text-sm font-medium">
                             {replaceUnderscore(documentData.name)}
                         </AvatarFallback>
                     </>
                 </Avatar>
             </div>
 
-            <div className="px-3 py-2 flex justify-between items-center border-t">
+            <div className="px-4 py-3 flex justify-between items-center border-t">
+                {/* Card Title */}
                 <CardTitle
-                    className="text-sm tracking-wide hover:cursor-pointer hover:text-primary capitalize truncate w-full"
+                    className="text-sm tracking-wide hover:text-primary capitalize truncate"
                     onClick={() => window.open(documentData.url, '_blank')}
                 >
                     {replaceUnderscore(documentData.name)}
                 </CardTitle>
 
+                {/* Dropdown Menu */}
                 <DropdownMenu>
                     <DropdownMenuTrigger className="p-1 rounded-full hover:bg-secondary grid place-items-center">
                         <Icon name="dots-vertical" size="xs" />
