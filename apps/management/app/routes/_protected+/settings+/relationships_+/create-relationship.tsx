@@ -212,6 +212,7 @@ export default function CreateRelationship({
         variant: "success",
       });
       setResetKey(Date.now());
+      navigate("/settings/relationships", { replace: true });
     } else {
       toast({
         title: "Error",
@@ -220,7 +221,6 @@ export default function CreateRelationship({
         variant: "destructive",
       });
     }
-    navigate("/settings/relationships", { replace: true });
   }, [actionData]);
 
   return (

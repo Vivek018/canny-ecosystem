@@ -20,6 +20,7 @@ import { Await, defer, useLoaderData } from "@remix-run/react";
 import { PayrollStatus } from "@/components/payroll/payroll-status";
 import { Suspense } from "react";
 import type { TypedSupabaseClient } from "@canny_ecosystem/supabase/types";
+import { LoadingSpinner } from "@/components/loading-spinner";
 
 async function enrichSiteData(
   supabase: TypedSupabaseClient,
@@ -76,11 +77,7 @@ export default function SitesIndex() {
   return (
     <section className="p-4">
       <div className="w-full flex items-end justify-between">
-        <Suspense
-          fallback={
-            <div className="w-full py-20 text-center">Loading sites...</div>
-          }
-        >
+        <Suspense fallback={<LoadingSpinner className="mt-40" />}>
           <Await resolve={sitePromise}>
             {(sites) => {
               const { isDocument } = useIsDocument();

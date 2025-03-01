@@ -23,7 +23,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return await clientCaching(cacheKeyPrefix.index, args);
+  return clientCaching(cacheKeyPrefix.index, args);
 }
 
 clientLoader.hydrate = true;

@@ -32,11 +32,11 @@ function getRedirectUrl(type: string, data: any, keyPrefix: string): string {
   const entity = data?.[`${keyPrefix}_${type}`];
   switch (type) {
     case "employee":
-      return `/employees/${entity?.id}`;
+      return `/employees/${entity?.id}/overview`;
     case "site":
-      return `/projects/${entity?.projects?.id}/sites/${entity?.id}`;
+      return `/projects/${entity?.projects?.id}/${entity?.id}/overview`;
     case "project":
-      return `/projects/${entity?.id}`;
+      return `/projects/${entity?.id}/overview`;
     default:
       return "?";
   }
@@ -53,8 +53,10 @@ function KeyValueRow({
 }) {
   return (
     <div className={`mx-5 flex justify-between ${className}`}>
-      <h3 className="my-3 text-muted-foreground font-semibold capitalize">{label}</h3>
-      <p className="my-3 font-bold">{value}</p>
+      <h3 className='my-3 text-muted-foreground font-semibold capitalize'>
+        {label}
+      </h3>
+      <p className='my-3 font-bold'>{value}</p>
     </div>
   );
 }
@@ -65,12 +67,12 @@ export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
   const redirectedToReportedOn = getRedirectUrl(
     rowData?.reported_on,
     rowData,
-    "reported_on",
+    "reported_on"
   );
   const redirectedToReportedBy = getRedirectUrl(
     rowData?.reported_by,
     rowData,
-    "reported_by",
+    "reported_by"
   );
 
   return (
@@ -78,7 +80,7 @@ export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
       <TableRow
         key={row.id}
         data-state={row.getIsSelected() && "selected"}
-        className="relative cursor-default select-text"
+        className='relative cursor-pointer select-text'
       >
         {row.getVisibleCells().map((cell: any) => {
           if (cell.column.id === "select" || cell.column.id === "actions") {
@@ -90,7 +92,7 @@ export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
                   cell.column.id === "select" &&
                     "sticky left-0 min-w-12 max-w-12 bg-card z-10",
                   cell.column.id === "actions" &&
-                    "sticky right-0 min-w-20 max-w-20 bg-card z-10",
+                    "sticky right-0 min-w-20 max-w-20 bg-card z-10"
                 )}
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -102,7 +104,7 @@ export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
               <TableCell
                 className={cn(
                   "px-3 md:px-4 py-4 hidden md:table-cell",
-                  cell.column.id === "title" && "sticky left-12 bg-card z-10",
+                  cell.column.id === "title" && "sticky left-12 bg-card z-10"
                 )}
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -112,31 +114,31 @@ export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
         })}
       </TableRow>
 
-      <SheetContent className="w-[600px]">
-        <SheetHeader className="m-5">
-          <SheetTitle className="text-primary text-3xl">
+      <SheetContent className='w-[600px]'>
+        <SheetHeader className='m-5'>
+          <SheetTitle className='text-3xl'>
             {rowData?.title ?? "--"}
           </SheetTitle>
-          <SheetDescription className="text-muted-foreground text-sm line-clamp-4">
+          <SheetDescription className='text-muted-foreground text-sm line-clamp-4'>
             {rowData?.description ?? ""}
           </SheetDescription>
         </SheetHeader>
 
         <hr />
         <KeyValueRow
-          label="Court Case Reference"
+          label='Court Case Reference'
           value={rowData?.court_case_reference ?? "--"}
         />
         <hr />
         <KeyValueRow
-          label="Status"
+          label='Status'
           value={
             <span
               className={cn(
                 "capitalize",
                 rowData?.status === "open" && "text-emerald-400",
                 rowData?.status === "closed" && "text-red-400",
-                rowData?.status === "resolved" && "text-green-400",
+                rowData?.status === "resolved" && "text-green-400"
               )}
             >
               {rowData?.status ?? "--"}
@@ -144,18 +146,18 @@ export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
           }
         />
         <KeyValueRow
-          label="Case Type"
+          label='Case Type'
           value={rowData?.case_type ?? "--"}
-          className="capitalize"
+          className='capitalize'
         />
         <KeyValueRow
-          label="Location"
+          label='Location'
           value={rowData?.location ?? "--"}
-          className="capitalize"
+          className='capitalize'
         />
-        <KeyValueRow label="Date" value={formatDate(rowData?.date) ?? "--"} />
+        <KeyValueRow label='Date' value={formatDate(rowData?.date) ?? "--"} />
         <KeyValueRow
-          label="Resolution Date"
+          label='Resolution Date'
           value={
             rowData?.resolution_date
               ? formatDate(rowData?.resolution_date)
@@ -163,7 +165,7 @@ export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
           }
         />
         <KeyValueRow
-          label="Incident Date"
+          label='Incident Date'
           value={
             rowData?.incident_date ? formatDate(rowData?.incident_date) : "--"
           }
@@ -171,9 +173,9 @@ export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
 
         <hr />
         <KeyValueRow
-          label="Reported On"
+          label='Reported On'
           value={rowData?.reported_on ?? "--"}
-          className="capitalize"
+          className='capitalize'
         />
         {rowData?.reported_on !== "other" && (
           <KeyValueRow
@@ -186,7 +188,7 @@ export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
                   rowData?.reported_on !== "company" &&
                     rowData?.reported_on !== "other" &&
                     rowData?.reported_on !== "canny" &&
-                    "text-primary/80 group-hover:text-primary cursor-pointer",
+                    "text-primary/80 group-hover:text-primary cursor-pointer"
                 )}
               >
                 {reportedOnName}
@@ -197,9 +199,9 @@ export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
 
         <hr />
         <KeyValueRow
-          label="Reported By"
+          label='Reported By'
           value={rowData?.reported_by ?? "--"}
-          className="capitalize"
+          className='capitalize'
         />
         {rowData?.reported_by !== "other" && (
           <KeyValueRow
@@ -212,7 +214,7 @@ export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
                   rowData?.reported_by !== "company" &&
                     rowData?.reported_by !== "other" &&
                     rowData?.reported_by !== "canny" &&
-                    "text-primary/80 group-hover:text-primary cursor-pointer",
+                    "text-primary/80 group-hover:text-primary cursor-pointer"
                 )}
               >
                 {reportedByName}
@@ -221,19 +223,19 @@ export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
           />
         )}
 
-        <hr className="my-3" />
-        <div className="flex justify-between mx-5">
+        <hr className='my-3' />
+        <div className='flex justify-between mx-5'>
           <div>
-            <h3 className="my-3 text-muted-foreground font-semibold">
+            <h3 className='my-3 text-muted-foreground font-semibold'>
               Amount Given (-)
             </h3>
-            <h3 className="my-3 text-muted-foreground font-semibold">
+            <h3 className='my-3 text-muted-foreground font-semibold'>
               Amount Received (+)
             </h3>
           </div>
-          <div className="text-end font-semibold">
-            <p className="my-3">Rs {rowData?.amount_given ?? "--"}</p>
-            <p className="my-3">Rs {rowData?.amount_received ?? "--"}</p>
+          <div className='text-end font-semibold'>
+            <p className='my-3'>Rs {rowData?.amount_given ?? "--"}</p>
+            <p className='my-3'>Rs {rowData?.amount_received ?? "--"}</p>
           </div>
         </div>
       </SheetContent>

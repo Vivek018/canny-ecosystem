@@ -1,11 +1,10 @@
 import { ErrorBoundary } from "@/components/error-boundary";
-import { PaySequenceCard } from "@/components/sites/pay-sequence/pay-sequence-card";
+import { LoadingSpinner } from "@/components/loading-spinner";
 import { SiteDetailsCard } from "@/components/sites/site-details-card";
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import {
   getSiteById,
-  getSitePaySequenceInSite,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { defer, type LoaderFunctionArgs } from "@remix-run/node";
@@ -22,63 +21,48 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const siteId = params.siteId as string;
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
-    const paySequencePromise = getSitePaySequenceInSite({ supabase, siteId });
     const sitePromise = getSiteById({ supabase, id: siteId });
-    return defer({ sitePromise, paySequencePromise, error: null });
+    return defer({ sitePromise, error: null });
   } catch (error) {
     return defer(
-      { sitePromise: null, paySequencePromise: null, error },
+      { sitePromise: null, error },
       { status: 500 }
     );
   }
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return await clientCaching(
+  return clientCaching(
     `${cacheKeyPrefix.site_overview}${args.params.siteId}`,
-    args
+    args,
   );
 }
 
 clientLoader.hydrate = true;
 
 export default function Overview() {
-  const { sitePromise, paySequencePromise, error } =
+  const { sitePromise, error } =
     useLoaderData<typeof loader>();
 
   const { siteId } = useParams();
 
   if (error) {
-    clearExactCacheEntry(
-      `${cacheKeyPrefix.site_overview}${siteId}`
-    );
+    clearExactCacheEntry(`${cacheKeyPrefix.site_overview}${siteId}`);
     return (
-      <ErrorBoundary error={error} message='Failed to load site details' />
+      <ErrorBoundary error={error} message="Failed to load site details" />
     );
   }
 
   return (
-    <div className='w-full py-4 flex flex-col gap-8'>
-      <Suspense fallback={<div>Loading...</div>}>
+    <div className="w-full py-4 flex flex-col gap-8 h-[100vw]">
+      <Suspense fallback={<LoadingSpinner className="h-1/2 mt-20" />}>
         <Await resolve={sitePromise}>
           {(resolvedSiteData) => {
             if (!resolvedSiteData) {
               clearExactCacheEntry(`${cacheKeyPrefix.site_overview}${siteId}`);
-              return <ErrorBoundary message='Failed to load link template' />;
+              return <ErrorBoundary message="Failed to load link template" />;
             }
             return <SiteDetailsCard siteData={resolvedSiteData.data} />;
-          }}
-        </Await>
-      </Suspense>
-
-      <Suspense fallback={<div>Loading...</div>}>
-        <Await resolve={paySequencePromise}>
-          {(resolvedPaySequence) => {
-            if (!resolvedPaySequence) {
-              clearExactCacheEntry(`${cacheKeyPrefix.site_overview}${siteId}`);
-              return <ErrorBoundary message='Failed to load link template' />;
-            }
-            return <PaySequenceCard paySequence={resolvedPaySequence?.data} />;
           }}
         </Await>
       </Suspense>

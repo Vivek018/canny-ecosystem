@@ -29,11 +29,10 @@ export const columns: ColumnDef<CasesDatabaseRow>[] = [
     enableHiding: false,
   },
   {
-    enableSorting: false,
     accessorKey: "title",
     header: "title",
     cell: ({ row }) => {
-      return <p className="truncate w-28">{row.original?.title ?? "--"}</p>;
+      return <p className="truncate w-28 text-primary">{row.original?.title ?? "--"}</p>;
     },
   },
   {

@@ -10,6 +10,14 @@ import type {
   TypedSupabaseClient,
   UserDatabaseRow,
 } from "../types";
+import { HARD_QUERY_LIMIT } from "../constant";
+
+export type ImportLeavesDataType = Pick<
+  LeavesDatabaseRow,
+  "start_date" | "end_date" | "reason" | "leave_type"
+> & { email: UserDatabaseRow["email"] } & {
+  employee_code: EmployeeDatabaseRow["employee_code"];
+};
 
 export type LeavesDataType = Pick<
   LeavesDatabaseRow,
@@ -81,7 +89,7 @@ export async function getLeavesByEmployeeId({
       `
         ${columns.join(
           ","
-        )},employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(project_sites!inner(id, name, projects!inner(id, name)))),
+        )},employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!left(project_sites!left(id, name, projects!left(id, name)))),
           users!${users ? "inner" : "left"}(id,email)
       
       `,
@@ -108,7 +116,7 @@ export async function getLeavesByEmployeeId({
       );
     }
     if (leave_type) {
-      query.eq("leave_type", leave_type.toLowerCase());
+      query.eq("leave_type", leave_type.toLowerCase() as any);
     }
     if (users) {
       query.eq("users.email", users);
@@ -218,7 +226,7 @@ export async function getLeavesByCompanyId({
     }
 
     if (leave_type) {
-      query.eq("leave_type", leave_type.toLowerCase());
+      query.eq("leave_type", leave_type.toLowerCase() as any);
     }
     if (project) {
       query.eq(
@@ -265,17 +273,17 @@ export async function getLeaveTypeByCompanyId({
     "leaves_per_year",
   ] as const;
 
-  const query = supabase
+  const { data, error } = await supabase
     .from("leave_type")
     .select(
       `
         ${columns.join(",")}
-      `,
-      { count: "exact" }
+      `
     )
-    .eq("company_id", companyId);
-
-  const { data, error } = await query;
+    .eq("company_id", companyId)
+    .order("created_at", { ascending: true })
+    .limit(HARD_QUERY_LIMIT)
+    .returns<InferredType<LeaveTypeDatabaseRow, (typeof columns)[number]>[]>();
 
   if (error) {
     console.error("getLeavesByEmployeeId Error", error);

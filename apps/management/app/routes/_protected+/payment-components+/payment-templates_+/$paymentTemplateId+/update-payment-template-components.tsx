@@ -1,8 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
-  Await,
-  defer,
   Form,
   json,
   useActionData,
@@ -16,7 +14,7 @@ import {
   PaymentTemplateComponentsSchema,
   updateRole,
 } from "@canny_ecosystem/utils";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
@@ -25,11 +23,9 @@ import { FormButtons } from "@/components/form/form-buttons";
 import {
   getPaymentFieldNamesByCompanyId,
   getPaymentTemplateWithComponentsById,
-  type PaymentTemplateWithComponentsType,
 } from "@canny_ecosystem/supabase/queries";
 import { CreatePaymentTemplateComponentDetails } from "@/components/payment-templates/form/create-payment-template-component";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { updatePaymentTemplateWithComponents } from "@canny_ecosystem/supabase/mutations";
 import {
@@ -80,17 +76,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       value: field.id,
     }));
 
-    let paymentTemplateWithComponentsPromise = null;
-    if (paymentTemplateId) {
-      paymentTemplateWithComponentsPromise =
-        getPaymentTemplateWithComponentsById({
-          supabase,
-          id: paymentTemplateId,
-        });
-    }
+    const { data, error } = await getPaymentTemplateWithComponentsById({
+      supabase,
+      id: paymentTemplateId || "",
+    });
 
-    return defer({
-      paymentTemplateWithComponentsPromise,
+    if (error) throw error;
+
+    return json({
+      data,
       paymentFieldOptions,
       env,
       error: null,
@@ -99,7 +93,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return json(
       {
         error,
-        paymentTemplateWithComponentsPromise: null,
+        data: null,
         paymentFieldOptions: null,
         env,
       },
@@ -162,70 +156,9 @@ export async function action({
   }
 }
 
-export default function UpdatePaymentTemplateComonents() {
-  const { paymentTemplateWithComponentsPromise, paymentFieldOptions, env } =
+export default function UpdatePaymentTemplateComponents() {
+  const { data, paymentFieldOptions, env, error } =
     useLoaderData<typeof loader>();
-  const actionData = useActionData<typeof action>();
-
-  const navigate = useNavigate();
-  const { toast } = useToast();
-
-  useEffect(() => {
-    if (!actionData) return;
-
-    if (actionData?.status === "success") {
-      clearExactCacheEntry(cacheKeyPrefix.payment_templates);
-      toast({
-        title: "Success",
-        description: actionData?.message,
-        variant: "success",
-      });
-    } else {
-      toast({
-        title: "Error",
-        description:
-          actionData?.error?.message ||
-          "Payment Template Components Update Failed",
-        variant: "destructive",
-      });
-    }
-
-    navigate("/payment-components/payment-templates", {
-      replace: true,
-    });
-  }, [actionData]);
-
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Await resolve={paymentTemplateWithComponentsPromise}>
-        {(resolvedData) => {
-          if (!resolvedData)
-            return <ErrorBoundary message="Failed to load payment template" />;
-          return (
-            <UpdatePaymentTemplateComponentsWrapper
-              data={resolvedData?.data}
-              paymentFieldOptions={paymentFieldOptions ?? []}
-              env={env}
-              error={resolvedData?.error}
-            />
-          );
-        }}
-      </Await>
-    </Suspense>
-  );
-}
-
-export function UpdatePaymentTemplateComponentsWrapper({
-  data,
-  paymentFieldOptions,
-  env,
-  error,
-}: {
-  data: PaymentTemplateWithComponentsType | null;
-  paymentFieldOptions: ComboboxSelectOption[];
-  env: SupabaseEnv;
-  error: Error | null | { message: string };
-}) {
   const actionData = useActionData<typeof action>();
 
   const { toast } = useToast();
@@ -234,20 +167,15 @@ export function UpdatePaymentTemplateComponentsWrapper({
   const [resetKey, setResetKey] = useState(Date.now());
 
   useEffect(() => {
-    if (error) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
     if (actionData) {
       if (actionData?.status === "success") {
+        clearExactCacheEntry(cacheKeyPrefix.payment_templates);
         toast({
           title: "Success",
           description: actionData?.message || "Template Components Updated",
           variant: "success",
         });
+        navigate("/payment-components/payment-templates", { replace: true });
       } else {
         toast({
           title: "Error",
@@ -255,7 +183,6 @@ export function UpdatePaymentTemplateComponentsWrapper({
           variant: "destructive",
         });
       }
-      navigate("/payment-components/payment-templates", { replace: true });
     }
   }, [actionData]);
 
@@ -369,6 +296,10 @@ export function UpdatePaymentTemplateComponentsWrapper({
     fields.monthly_ctc.value,
     fields.state.value,
   ]);
+
+  if (error) {
+    return <ErrorBoundary error={error} message="Failed to load user" />;
+  }
 
   return (
     <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">

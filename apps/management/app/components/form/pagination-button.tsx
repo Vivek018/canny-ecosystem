@@ -67,13 +67,13 @@ export default function PaginationButton({
   };
 
   return (
-    <Pagination className="mb-8 pt-6 mt-auto">
+    <Pagination className='mb-8 pt-6 mt-auto'>
       <PaginationContent>
-        <PaginationItem className="mx-2">
+        <PaginationItem className='mx-2'>
           <PaginationPrevious
             className={cn(
               "px-3",
-              currentPage === 1 && "opacity-50 cursor-not-allowed",
+              currentPage === 1 && "opacity-50 cursor-not-allowed"
             )}
             onClick={handlePrevious}
           />
@@ -87,7 +87,7 @@ export default function PaginationButton({
             );
           }
           return (
-            <PaginationItem key={pageNum} className="mx-0.5">
+            <PaginationItem key={pageNum} className='mx-0.5'>
               <PaginationLink
                 onClick={() => {
                   if (typeof pageNum === "number") {
@@ -102,11 +102,11 @@ export default function PaginationButton({
           );
         })}
 
-        <PaginationItem className="mx-2">
+        <PaginationItem className='mx-2'>
           <PaginationNext
             className={cn(
-              " px-3",
-              currentPage === totalPages && "opacity-50 cursor-not-allowed",
+              "px-3",
+              currentPage === totalPages && "opacity-50 cursor-not-allowed"
             )}
             onClick={handleNext}
           />

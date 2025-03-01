@@ -16,6 +16,7 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { LeavesOptionsDropdown } from "@/components/employees/leaves/table/leaves-table-options";
+import { Link } from "@remix-run/react";
 
 export const columns = (
   isEmployeeRoute?: boolean
@@ -36,28 +37,38 @@ export const columns = (
     enableSorting: false,
     accessorKey: "employee_code",
     header: "Employee Code",
-    cell: ({ row }) => {
-      return (
-        <p className="truncate  w-28">
+    cell: ({ row }) => (
+      <Link
+        to={`/employees/${row.original.employee_id}/leaves`}
+        prefetch='intent'
+        className={cn("group", isEmployeeRoute && "cursor-default")}
+      >
+        <p
+          className={cn("truncate w-28", !isEmployeeRoute && "text-primary/80")}
+        >
           {row.original?.employees?.employee_code}
         </p>
-      );
-    },
+      </Link>
+    ),
   },
   {
     enableSorting: false,
 
     accessorKey: "employee_name",
     header: "Employee Name",
-    cell: ({ row }) => {
-      return (
-        <p className="truncate  w-428">{`${
-          row.original?.employees?.first_name
-        } ${row.original?.employees?.middle_name ?? ""} ${
-          row.original?.employees?.last_name ?? ""
-        }`}</p>
-      );
-    },
+    cell: ({ row }) => (
+      <Link
+        to={`/employees/${row.original.employee_id}/leaves`}
+        prefetch='intent'
+        className={cn("group", isEmployeeRoute && "cursor-default")}
+      >
+        <p
+          className={cn("truncate w-28", !isEmployeeRoute && "text-primary/80")}
+        >{`${row.original?.employees?.first_name} ${
+          row.original?.employees?.middle_name ?? ""
+        } ${row.original?.employees?.last_name ?? ""}`}</p>
+      </Link>
+    ),
   },
   {
     enableSorting: false,
@@ -87,28 +98,36 @@ export const columns = (
     accessorKey: "leave_type",
     header: "Leave Type",
     cell: ({ row }) => {
-      return replaceUnderscore(row.original?.leave_type) ?? "--";
+      return (
+        <p className='w-max'>
+          {replaceUnderscore(row.original?.leave_type) ?? "--"}
+        </p>
+      );
     },
   },
   {
     accessorKey: "start_date",
     header: "Start Date",
     cell: ({ row }) => {
-      return formatDate(row.original?.start_date) ?? "--";
+      return (
+        <p className='w-max'>{formatDate(row.original?.start_date) ?? "--"}</p>
+      );
     },
   },
   {
     accessorKey: "end_date",
     header: "End Date",
     cell: ({ row }) => {
-      return row.original?.end_date ? formatDate(row.original?.end_date) : "--";
+      return (
+        <p className='w-max'>{formatDate(row.original?.end_date) ?? "--"}</p>
+      );
     },
   },
   {
     accessorKey: "reason",
     header: "Reason",
     cell: ({ row }) => {
-      return <p className="capitalize">{row.original?.reason ?? "--"}</p>;
+      return <p className='w-96 truncate capitalize'>{row.original?.reason ?? "--"}</p>;
     },
   },
   {
@@ -116,7 +135,7 @@ export const columns = (
     accessorKey: "email",
     header: "Approved By",
     cell: ({ row }) => {
-      return <p className=" truncate">{row.original?.users?.email ?? "--"}</p>;
+      return <p className='truncate'>{row.original?.users?.email ?? "--"}</p>;
     },
   },
 
@@ -147,9 +166,9 @@ export const columns = (
                   "hidden"
               )}
             >
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <Icon name="dots-vertical" />
+              <Button variant='ghost' className='h-8 w-8 p-0'>
+                <span className='sr-only'>Open menu</span>
+                <Icon name='dots-vertical' />
               </Button>
             </DropdownMenuTrigger>
           }

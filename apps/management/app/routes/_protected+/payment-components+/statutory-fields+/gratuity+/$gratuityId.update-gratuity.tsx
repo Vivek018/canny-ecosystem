@@ -1,8 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
-  Await,
-  defer,
   json,
   useActionData,
   useLoaderData,
@@ -19,8 +17,7 @@ import { getGratuityById } from "@canny_ecosystem/supabase/queries";
 import { updateGratuity } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { Suspense, useEffect } from "react";
-import type { GratuityDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import { useEffect } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import CreateGratuity from "./create-gratuity";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
@@ -47,25 +44,30 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   try {
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-    let gratuityPromise = null;
+    let gratuityData = null;
+    let gratuityError = null;
 
     if (gratuityId) {
-      gratuityPromise = getGratuityById({
+      ({ data: gratuityData, error: gratuityError } = await getGratuityById({
         supabase,
         id: gratuityId,
-      });
+      }));
+    } else {
+      throw new Error("Gratuity ID not provided");
     }
 
-    return defer({
+    if (gratuityError) throw gratuityError;
+
+    return json({
       error: null,
-      gratuityPromise,
+      gratuityData,
       companyId,
     });
   } catch (error) {
     return json(
       {
         error,
-        gratuityPromise: null,
+        gratuityData: null,
         companyId: null,
       },
       { status: 500 },
@@ -122,7 +124,7 @@ export async function action({
 }
 
 export default function UpdateEmployeeStateInsurance() {
-  const { gratuityPromise, error } = useLoaderData<typeof loader>();
+  const { gratuityData, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -136,6 +138,7 @@ export default function UpdateEmployeeStateInsurance() {
         description: actionData?.message || "Gratuity updated",
         variant: "success",
       });
+      navigate("/payment-components/statutory-fields/gratuity");
     } else {
       toast({
         title: "Error",
@@ -143,48 +146,10 @@ export default function UpdateEmployeeStateInsurance() {
         variant: "destructive",
       });
     }
-    navigate("/payment-components/statutory-fields/gratuity");
   }, [actionData]);
 
   if (error)
     return <ErrorBoundary error={error} message="Failed to load gratuity" />;
 
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Await resolve={gratuityPromise}>
-        {(resolvedData) => {
-          if (!resolvedData)
-            return <ErrorBoundary message="Failed to load gratuity" />;
-          return (
-            <UpdateGratuityWrapper
-              data={resolvedData.data}
-              error={resolvedData.error}
-            />
-          );
-        }}
-      </Await>
-    </Suspense>
-  );
-}
-
-export function UpdateGratuityWrapper({
-  data,
-  error,
-}: {
-  data: GratuityDatabaseUpdate | null;
-  error: Error | null | { message: string };
-}) {
-  const { toast } = useToast();
-
-  useEffect(() => {
-    if (error) {
-      toast({
-        title: "Error",
-        description: error?.message || "Failed to load gratuity",
-        variant: "destructive",
-      });
-    }
-  }, [error]);
-
-  return <CreateGratuity updateValues={data} />;
+  return <CreateGratuity updateValues={gratuityData} />;
 }

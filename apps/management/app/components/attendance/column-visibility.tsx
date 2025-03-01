@@ -1,4 +1,4 @@
-import { useCaseStore } from "@/store/cases";
+import { useAttendanceStore } from "@/store/attendance";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 import { Icon } from "@canny_ecosystem/ui/icon";
@@ -9,7 +9,7 @@ import {
 } from "@canny_ecosystem/ui/popover";
 
 export function ColumnVisibility({ disabled }: { disabled?: boolean }) {
-  const { columns } = useCaseStore();
+  const { columns } = useAttendanceStore();
 
   return (
     <Popover>

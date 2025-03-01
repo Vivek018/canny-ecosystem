@@ -1,4 +1,5 @@
 import { ErrorBoundary } from "@/components/error-boundary";
+import { LoadingSpinner } from "@/components/loading-spinner";
 import { ESIWrapper } from "@/components/statutory-fields/employee-state-insurance/esi-wrapper";
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
@@ -39,7 +40,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return await clientCaching(cacheKeyPrefix.statutory_field_esi, args);
+  return clientCaching(cacheKeyPrefix.statutory_field_esi, args);
 }
 
 clientLoader.hydrate = true;
@@ -53,7 +54,7 @@ export default function EmployeeStateInsuranceIndex() {
   }
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<LoadingSpinner className="mt-40" />}>
       <Await resolve={esiPromise}>
         {(resolvedData) => {
           if (!resolvedData) {

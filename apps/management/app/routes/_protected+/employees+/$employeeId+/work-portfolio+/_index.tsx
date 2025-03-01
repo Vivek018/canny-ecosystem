@@ -2,6 +2,7 @@ import { EmployeeProjectAssignmentCard } from "@/components/employees/work-portf
 import { EmployeeSkillsCard } from "@/components/employees/work-portfolio/skills-card";
 import { EmployeeWorkHistoriesCard } from "@/components/employees/work-portfolio/work-history-card";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { LoadingSpinner } from "@/components/loading-spinner";
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import {
@@ -59,7 +60,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return await clientCaching(
+  return clientCaching(
     `${cacheKeyPrefix.employee_work_portfolio}${args.params.employeeId}`,
     args,
   );
@@ -85,7 +86,7 @@ export default function WorkPortfolio() {
 
   return (
     <div className="w-full py-4 flex flex-col gap-8">
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<LoadingSpinner className="h-1/4 mt-20" />}>
         <Await resolve={employeeProjectAssignmentPromise}>
           {(resolvedData) => {
             if (!resolvedData) {
@@ -110,7 +111,7 @@ export default function WorkPortfolio() {
         </Await>
       </Suspense>
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<LoadingSpinner className="h-1/4 mt-20" />}>
         <Await resolve={employeeWorkHistoriesPromise}>
           {(resolvedData) => {
             if (!resolvedData) {
@@ -135,7 +136,7 @@ export default function WorkPortfolio() {
         </Await>
       </Suspense>
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<LoadingSpinner className="h-1/4 mt-20" />}>
         <Await resolve={employeeSkillsPromise}>
           {(resolvedData) => {
             if (!resolvedData) {

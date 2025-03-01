@@ -170,7 +170,6 @@
 
 .loading-bar {
   animation: loading 1.2s linear infinite;
-  background: hsl(0, 0%, 43.5%);
   border-radius: 6px;
   height: 8%;
   left: -10%;

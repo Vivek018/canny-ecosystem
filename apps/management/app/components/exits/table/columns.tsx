@@ -13,6 +13,8 @@ import type { ExitsRow } from "@canny_ecosystem/supabase/types";
 
 export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
   {
+    enableSorting: false,
+    enableHiding: false,
     id: "select",
     cell: ({ row }) => (
       <Checkbox
@@ -20,70 +22,69 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
         onCheckedChange={(value) => row.toggleSelected(!!value)}
       />
     ),
-    enableSorting: false,
-    enableHiding: false,
   },
   {
+    enableSorting: false,
+    enableHiding: false,
     accessorKey: "employee_code",
     header: "Employee Code",
     cell: ({ row }) => {
       return (
-        <p className="truncate text-primary/80 w-28 cursor-pointer">
+        <p className='truncate text-primary/80 w-28 cursor-pointer'>
           {row.original?.employees?.employee_code ?? "--"}
         </p>
       );
     },
-    enableSorting: false,
-    enableHiding: false,
   },
   {
+    enableSorting: false,
     accessorKey: "employee_name",
     header: "Employee Name",
     cell: ({ row }) => {
       return (
-        <p className="truncate text-primary/80 w-32 cursor-pointer">
-          {`${row.original?.employees?.first_name} ${row.original?.employees?.middle_name ?? ""}
-           ${row.original?.employees?.last_name ?? ""}`}
+        <p className='truncate text-primary/80 w-32 cursor-pointer'>
+          {`${row.original?.employees?.first_name} ${
+            row.original?.employees?.middle_name ?? ""
+          }
+          ${row.original?.employees?.last_name ?? ""}`}
         </p>
       );
     },
-    enableSorting: false,
-    enableHiding: false,
   },
   {
+    enableSorting: false,
     accessorKey: "project",
     header: "Project",
     cell: ({ row }) => {
       return (
-        <p className="truncate capitalize">
+        <p className='truncate capitalize'>
           {row.original?.employees?.employee_project_assignment?.project_sites
             ?.projects?.name ?? "--"}
         </p>
       );
     },
-    enableSorting: false,
-    enableHiding: false,
   },
   {
+    enableSorting: false,
     accessorKey: "project_site",
     header: "Project Site",
     cell: ({ row }) => {
       return (
-        <p className="truncate capitalize">
+        <p className='truncate capitalize'>
           {row.original?.employees?.employee_project_assignment?.project_sites
             ?.name ?? "--"}
         </p>
       );
     },
-    enableSorting: false,
-    enableHiding: false,
   },
   {
     accessorKey: "last_working_day",
     header: "Last Working Day ",
     cell: ({ row }) => {
       return (
-        <p className="truncate capitalize">{`${row.original?.last_working_day ?? "--"}`}</p>
+        <p className='truncate capitalize'>{`${
+          row.original?.last_working_day ?? "--"
+        }`}</p>
       );
     },
   },
@@ -92,7 +93,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     header: "Reason for Exit",
     cell: ({ row }) => {
       return (
-        <p className="truncate capitalize">{row.original?.reason ?? "--"}</p>
+        <p className='truncate capitalize'>{row.original?.reason ?? "--"}</p>
       );
     },
   },
@@ -101,7 +102,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     header: "Final Settlement Date",
     cell: ({ row }) => {
       return (
-        <p className="truncate  ">
+        <p className='truncate  '>
           {row.original?.final_settlement_date ?? "--"}
         </p>
       );
@@ -112,7 +113,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     header: "Organization Payable Days",
     cell: ({ row }) => {
       return (
-        <p className="truncate">
+        <p className='truncate'>
           {row.original?.organization_payable_days ?? "--"}
         </p>
       );
@@ -123,7 +124,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     header: "Employee Payable Days",
     cell: ({ row }) => {
       return (
-        <p className="truncate">
+        <p className='truncate'>
           {row.original?.employee_payable_days ?? "--"}
         </p>
       );
@@ -134,7 +135,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     header: "Bonus",
     cell: ({ row }) => {
       return (
-        <p className="capitalize truncate">{row.original?.bonus ?? "--"}</p>
+        <p className='capitalize truncate'>{row.original?.bonus ?? "--"}</p>
       );
     },
   },
@@ -143,7 +144,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     header: "Leave Encashment",
     cell: ({ row }) => {
       return (
-        <p className="capitalize truncate">
+        <p className='capitalize truncate'>
           {row.original.leave_encashment ?? "--"}
         </p>
       );
@@ -154,7 +155,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     header: "Gratuity",
     cell: ({ row }) => {
       return (
-        <p className="capitalize truncate">{row.original?.gratuity ?? "--"}</p>
+        <p className='capitalize truncate'>{row.original?.gratuity ?? "--"}</p>
       );
     },
   },
@@ -163,7 +164,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     header: "Deduction",
     cell: ({ row }) => {
       return (
-        <p className="capitalize truncate">{row.original?.deduction ?? "--"}</p>
+        <p className='capitalize truncate'>{row.original?.deduction ?? "--"}</p>
       );
     },
   },
@@ -176,7 +177,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
         Number(row.original?.leave_encashment) +
         Number(row.original?.gratuity) -
         Number(row.original?.deduction);
-      return <p className="capitalize truncate">{netPay ?? "--"}</p>;
+      return <p className='capitalize truncate'>{netPay ?? "--"}</p>;
     },
   },
   {
@@ -184,12 +185,14 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     header: "Note",
     cell: ({ row }) => {
       return (
-        <p className="capitalize truncate">{row.original?.note ?? "--"}</p>
+        <p className='capitalize truncate'>{row.original?.note ?? "--"}</p>
       );
     },
   },
 
   {
+    enableSorting: false,
+    enableHiding: false,
     id: "actions",
     cell: ({ row }) => {
       const { role } = useUser();
@@ -203,12 +206,12 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
               className={cn(
                 !hasPermission(role, `${updateRole}:${attribute.exits}`) &&
                   !hasPermission(role, `${deleteRole}:${attribute.exits}`) &&
-                  "hidden",
+                  "hidden"
               )}
             >
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <Icon name="dots-vertical" />
+              <Button variant='ghost' className='h-8 w-8 p-0'>
+                <span className='sr-only'>Open menu</span>
+                <Icon name='dots-vertical' />
               </Button>
             </DropdownMenuTrigger>
           }

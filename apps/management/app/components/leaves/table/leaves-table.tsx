@@ -26,8 +26,7 @@ import { useSupabase } from "@canny_ecosystem/supabase/client";
 import { useLeavesStore } from "@/store/leaves";
 import { useInView } from "react-intersection-observer";
 import { Button } from "@canny_ecosystem/ui/button";
-import { ExportBar } from "../export-bar";
-
+import { ExportBar } from "../import-export/export-bar";
 
 interface LeavesDataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -95,26 +94,26 @@ export function LeavesDataTable<TData, TValue>({
       }
     }
     if (employeeId) {
-          try {
-            const { data } = await getLeavesByEmployeeId({
-              supabase,
-              employeeId,
-              params: {
-                from: from,
-                to: to,
-                filters,
-                sort: sortParam?.split(":") as [string, "asc" | "desc"],
-              },
-            });
-            if (data) {
-              setData((prevData) => [...prevData, ...data] as TData[]);
-            }
-            setFrom(to + 1);
-            setHasNextPage(data?.length! > to);
-          } catch {
-            setHasNextPage(false);
-          }
+      try {
+        const { data } = await getLeavesByEmployeeId({
+          supabase,
+          employeeId,
+          params: {
+            from: from,
+            to: to,
+            filters,
+            sort: sortParam?.split(":") as [string, "asc" | "desc"],
+          },
+        });
+        if (data) {
+          setData((prevData) => [...prevData, ...data] as TData[]);
         }
+        setFrom(to + 1);
+        setHasNextPage(data?.length! > to);
+      } catch {
+        setHasNextPage(false);
+      }
+    }
   };
 
   const table = useReactTable({
@@ -160,14 +159,14 @@ export function LeavesDataTable<TData, TValue>({
   const tableLength = table.getRowModel().rows?.length;
 
   return (
-    <div className='relative mb-8'>
+    <div className="relative mb-8">
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
           !tableLength && "border-none"
         )}
       >
-        <div className='relative'>
+        <div className="relative">
           <Table>
             <LeavesTableHeader
               table={table}
@@ -179,7 +178,7 @@ export function LeavesDataTable<TData, TValue>({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    className='relative cursor-default select-text'
+                    className="relative cursor-default select-text"
                   >
                     {row.getVisibleCells().map((cell) => {
                       return (
@@ -189,6 +188,10 @@ export function LeavesDataTable<TData, TValue>({
                             "px-3 md:px-4 py-4 hidden md:table-cell",
                             cell.column.id === "select" &&
                               "sticky left-0 min-w-12 max-w-12 bg-card z-10",
+                            cell.column.id === "employee_code" &&
+                              "sticky left-12 bg-card z-10",
+                            cell.column.id === "employee_name" &&
+                              "sticky left-48 bg-card z-10",
                             cell.column.id === "actions" &&
                               "sticky right-0 min-w-20 max-w-20 bg-card z-10"
                           )}
@@ -206,10 +209,10 @@ export function LeavesDataTable<TData, TValue>({
                 <TableRow className={cn(!tableLength && "border-none")}>
                   <TableCell
                     colSpan={columns.length}
-                    className='h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize'
+                    className="h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize"
                   >
-                    <div className='flex flex-col items-center gap-1'>
-                      <h2 className='text-xl'>No Leaves Found.</h2>
+                    <div className="flex flex-col items-center gap-1">
+                      <h2 className="text-xl">No Leaves Found.</h2>
                       <p
                         className={cn(
                           "text-muted-foreground",
@@ -219,7 +222,7 @@ export function LeavesDataTable<TData, TValue>({
                         Try another search, or adjusting the filters
                       </p>
                       <Button
-                        variant='outline'
+                        variant="outline"
                         className={cn(
                           "mt-4",
                           !data?.length && noFilters && "hidden"
@@ -239,10 +242,10 @@ export function LeavesDataTable<TData, TValue>({
         </div>
       </div>
       {hasNextPage && initialData?.length && (
-        <div className='flex items-center justify-center mt-6' ref={ref}>
-          <div className='flex items-center space-x-2 px-6 py-5'>
+        <div className="flex items-center justify-center mt-6" ref={ref}>
+          <div className="flex items-center space-x-2 px-6 py-5">
             <Spinner />
-            <span className='text-sm text-[#606060]'>Loading more...</span>
+            <span className="text-sm text-[#606060]">Loading more...</span>
           </div>
         </div>
       )}

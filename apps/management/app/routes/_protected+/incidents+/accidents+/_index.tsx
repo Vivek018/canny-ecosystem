@@ -32,6 +32,7 @@ import { columns } from "@/components/accidents/table/columns";
 import { FilterList } from "@/components/accidents/filter-list";
 import { AccidentSearchFilter } from "@/components/accidents/accident-search-filter";
 import { AccidentActions } from "@/components/accidents/accident-actions";
+import { LoadingSpinner } from "@/components/loading-spinner";
 
 const pageSize = LAZY_LOADING_LIMIT;
 
@@ -127,7 +128,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
 
-  return await clientCaching(
+  return clientCaching(
     `${cacheKeyPrefix.accident}${url.searchParams.toString()}`,
     args,
   );
@@ -153,7 +154,7 @@ export default function AccidentsIndex() {
     <section className="p-4">
       <div className="w-full flex items-center justify-between pb-4">
         <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<LoadingSpinner className="w-1/2" />}>
             <Await resolve={projectPromise}>
               {(projectData) => (
                 <Await resolve={projectSitePromise}>
@@ -180,7 +181,7 @@ export default function AccidentsIndex() {
         </div>
         <AccidentActions />
       </div>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<LoadingSpinner className="mt-20" />}>
         <Await resolve={accidentsPromise}>
           {({ data, meta, error }) => {
             if (error) {

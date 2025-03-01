@@ -14,6 +14,7 @@ export const modalSearchParamNames = {
   import_exits: "import-exits",
   view_template_components: "view-template-components",
   view_relationship_terms: "view-relationship-terms",
+  import_leaves: "import-leaves",
 };
 
 export const statesAndUTs = [
@@ -114,8 +115,8 @@ export const attribute = {
   employeeLetters: "employee_letters",
   employeeReimbursements: "employee_reimbursements",
   employeeAttendance: "employee_attendance",
-  employeeExits: "employee_exits",
-  employeePaymentTemplateLink: "payment_template_link",
+  employeeExits:  "employee_exits",
+  employeePaymentTemplateLink:  "payment_template_link",
   employeeDocuments:"employee_documents",
   reimbursements: "reimbursements",
   exits: "exits",
@@ -152,6 +153,7 @@ export const attribute = {
   leaves: "leaves",
   timeTracking: "time_tracking",
   holidays: "holidays",
+  paySequence: "pay_sequence",
 };
 
 export const months: { [key: string]: number } = {

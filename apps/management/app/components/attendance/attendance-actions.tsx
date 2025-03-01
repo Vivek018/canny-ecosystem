@@ -1,10 +1,11 @@
-import { ColumnVisibility } from "@/components/employees/column-visibility";
+
 import { ImportAttendanceMenu } from "./import-attendance-menu";
 import { Button } from "@canny_ecosystem/ui/button";
 import { useNavigate } from "@remix-run/react";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useAttendanceStore } from "@/store/attendance";
+import { ColumnVisibility } from "./column-visibility";
 
 export function AttendanceActions({ isEmpty }: { isEmpty?: boolean }) {
   const navigate = useNavigate();

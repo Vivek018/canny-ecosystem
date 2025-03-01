@@ -1,64 +1,107 @@
 import { AttendanceComponent } from "@/components/employees/attendance/attendance-component";
+import { ErrorBoundary } from "@/components/error-boundary";
+import { LoadingSpinner } from "@/components/loading-spinner";
 import { cacheKeyPrefix } from "@/constant";
-import { clientCaching } from "@/utils/cache";
+import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import { getAttendanceByEmployeeId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import type { EmployeeAttendanceDatabaseRow } from "@canny_ecosystem/supabase/types";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import {
+  Await,
   type ClientLoaderFunctionArgs,
+  defer,
   Outlet,
   useLoaderData,
+  useParams,
 } from "@remix-run/react";
+import { Suspense } from "react";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const url = new URL(request.url);
-  const searchParams = new URLSearchParams(url.searchParams);
-  const employeeId = params.employeeId!;
-  const { supabase } = getSupabaseWithHeaders({ request });
+  try {
+    const url = new URL(request.url);
+    const employeeId = params.employeeId!;
+    const searchParams = new URLSearchParams(url.searchParams);
+    const { supabase } = getSupabaseWithHeaders({ request });
 
-  const filters = {
-    month: searchParams.get("month") ?? undefined,
-    year: searchParams.get("year") ?? undefined,
-  };
+    const filters = {
+      month: searchParams.get("month") ?? undefined,
+      year: searchParams.get("year") ?? undefined,
+    };
 
-  const { data, error } = await getAttendanceByEmployeeId({
-    employeeId: employeeId,
-    supabase,
-    params: {
+    const attendancePromise = getAttendanceByEmployeeId({
+      employeeId: employeeId,
+      supabase,
+      params: {
+        filters,
+      },
+    });
+
+    return defer({
+      attendancePromise: attendancePromise as any,
       filters,
-    },
-  });
-  if (error) {
-    console.error("Attendance Error", error);
+      error: null,
+    });
+  } catch (error) {
+    return defer({
+      attendancePromise: null,
+      filters: null,
+      error,
+    });
   }
-
-  return { data: data, employeeId, filters };
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
-  return await clientCaching(
+  return clientCaching(
     `${cacheKeyPrefix.attendance}${
       args.params.employeeId
     }${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 
 clientLoader.hydrate = true;
 
 export default function EmployeeAttendance() {
-  const { data, employeeId, filters } = useLoaderData<typeof loader>();
+  const { attendancePromise, filters, error } = useLoaderData<typeof loader>();
+
+  const { employeeId } = useParams();
+
+  if (error) {
+    return (
+      <ErrorBoundary
+        error={error}
+        message='Failed to load Employee Attendance'
+      />
+    );
+  }
 
   return (
-    <>
-      <AttendanceComponent
-        attendanceData={data as unknown as EmployeeAttendanceDatabaseRow[]}
-        employeeId={employeeId}
-        filters={filters}
-      />
-      <Outlet />
-    </>
+    <Suspense fallback={<LoadingSpinner />}>
+      <Await resolve={attendancePromise}>
+        {({ data, error }) => {
+          if (error) {
+            clearCacheEntry(`${cacheKeyPrefix.attendance}${employeeId}`);
+            return (
+              <ErrorBoundary
+                error={error}
+                message='Failed to load Employee Attendance'
+              />
+            );
+          }
+
+          return (
+            <>
+              <AttendanceComponent
+                attendanceData={data}
+                employeeId={employeeId}
+                filters={filters}
+              />
+              <Outlet />
+            </>
+          );
+        }}
+      </Await>
+    </Suspense>
   );
 }

@@ -1,3 +1,4 @@
+import { LoadingSpinner } from "@/components/loading-spinner";
 import { PayrollComponent } from "@/components/payroll/payroll-component";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
@@ -216,11 +217,7 @@ export default function PayrollId() {
   const { payrollEntriesPromise } = useLoaderData<typeof loader>();
 
   return (
-    <Suspense
-      fallback={
-        <div className="w-full py-20 text-center">Loading payroll data...</div>
-      }
-    >
+    <Suspense fallback={<LoadingSpinner className="mt-20" />}>
       <Await resolve={payrollEntriesPromise}>
         {(payrollEntries) => (
           <PayrollComponent data={payrollEntries as any} editable={false} />
