@@ -2,11 +2,11 @@ import type { MetaFunction } from "@remix-run/node";
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "Canny Site" },
-    { name: "description", content: "Welcome to Canny Site!" },
+    { title: "Canny Employee" },
+    { name: "description", content: "Welcome to Canny Employee!" },
   ];
 };
 
 export default function Index() {
-  return <>Site App Index</>;
+  return <>Employee App Index</>;
 }
