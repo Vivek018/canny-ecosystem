@@ -56,9 +56,9 @@ export const EmployeeBankDetailsCard = ({
             "bg-card",
             !hasPermission(
               role,
-              `${updateRole}:${attribute.employeeBankDetails}`,
+              `${updateRole}:${attribute.employeeBankDetails}`
             ) && "hidden",
-            !bankDetails?.employee_id && "hidden",
+            !bankDetails?.employee_id && "hidden"
           )}
         >
           <Icon name="edit" className="mr-2" />
@@ -72,9 +72,9 @@ export const EmployeeBankDetailsCard = ({
             "bg-card",
             !hasPermission(
               `${role}`,
-              `${createRole}:${attribute.employeeBankDetails}`,
+              `${createRole}:${attribute.employeeBankDetails}`
             ) && "hidden",
-            bankDetails?.employee_id && "hidden",
+            bankDetails?.employee_id && "hidden"
           )}
         >
           <Icon name="plus-circled" className="mr-2" />

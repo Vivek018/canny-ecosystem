@@ -212,52 +212,52 @@ export function ReimbursementSearchFilter({
         sideOffset={19}
         alignOffset={-11}
       >
-        <DropdownMenuGroup>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-              <span>Submitted Date</span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent
-                sideOffset={14}
-                alignOffset={-4}
-                className='p-0'
-              >
-                <Calendar
-                  mode='range'
-                  initialFocus
-                  today={
-                    filterParams.submitted_date_start
-                      ? new Date(filterParams.submitted_date_start)
-                      : new Date()
-                  }
-                  hidden={{ after: new Date() }}
-                  selected={{
-                    from: filterParams.submitted_date_start
-                      ? new Date(filterParams.submitted_date_start)
-                      : undefined,
-                    to: filterParams.submitted_date_end
-                      ? new Date(filterParams.submitted_date_end)
-                      : undefined,
-                  }}
-                  onSelect={(range) => {
-                    if (!range) return;
+          <DropdownMenuGroup>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>
+                <span>Submitted Date</span>
+              </DropdownMenuSubTrigger>
+              <DropdownMenuPortal>
+                <DropdownMenuSubContent
+                  sideOffset={14}
+                  alignOffset={-4}
+                  className='p-0'
+                >
+                  <Calendar
+                    mode='range'
+                    initialFocus
+                    today={
+                      filterParams.submitted_date_start
+                        ? new Date(filterParams.submitted_date_start)
+                        : new Date()
+                    }
+                    hidden={{ after: new Date() }}
+                    selected={{
+                      from: filterParams.submitted_date_start
+                        ? new Date(filterParams.submitted_date_start)
+                        : undefined,
+                      to: filterParams.submitted_date_end
+                        ? new Date(filterParams.submitted_date_end)
+                        : undefined,
+                    }}
+                    onSelect={(range) => {
+                      if (!range) return;
 
-                    const newRange = {
-                      submitted_date_start: range.from
-                        ? formatISO(range.from, { representation: "date" })
-                        : String(filterParams.submitted_date_start),
-                      submitted_date_end: range.to
-                        ? formatISO(range.to, { representation: "date" })
-                        : "",
-                    };
-                    setFilterParams((prev) => ({ ...prev, ...newRange }));
-                  }}
-                />
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-        </DropdownMenuGroup>
+                      const newRange = {
+                        submitted_date_start: range.from
+                          ? formatISO(range.from, { representation: "date" })
+                          : String(filterParams.submitted_date_start),
+                        submitted_date_end: range.to
+                          ? formatISO(range.to, { representation: "date" })
+                          : "",
+                      };
+                      setFilterParams((prev) => ({ ...prev, ...newRange }));
+                    }}
+                  />
+                </DropdownMenuSubContent>
+              </DropdownMenuPortal>
+            </DropdownMenuSub>
+          </DropdownMenuGroup>
 
         <DropdownMenuGroup>
           <DropdownMenuSub>

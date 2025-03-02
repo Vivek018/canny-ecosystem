@@ -20,7 +20,7 @@ import {
 } from "@remix-run/react";
 import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
 import { payoutMonths } from "@canny_ecosystem/utils/constant";
-import { getYears } from "@canny_ecosystem/utils";
+import { defaultYear, getYears } from "@canny_ecosystem/utils";
 import type { PayrollFilterType } from "@/routes/_protected+/dashboard";
 
 export function DashboardFilter({ disabled }: { disabled?: boolean }) {
@@ -173,7 +173,7 @@ export function DashboardFilter({ disabled }: { disabled?: boolean }) {
               >
                 {getYears(
                   10,
-                  endYear ? Number(endYear) : new Date().getFullYear()
+                  endYear ? Number(endYear) : defaultYear
                 ).map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}

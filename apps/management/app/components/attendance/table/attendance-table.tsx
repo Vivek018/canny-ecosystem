@@ -9,9 +9,10 @@ import {
   flexRender,
   getCoreRowModel,
   useReactTable,
+  type VisibilityState,
 } from "@tanstack/react-table";
 import { AttendanceTableHeader } from "./attendance-table-header";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@canny_ecosystem/ui/button";
 import { useAttendanceStore } from "@/store/attendance";
 import type { AttendanceFilterType } from "@/routes/_protected+/dashboard";
@@ -40,6 +41,7 @@ interface DataTableProps {
   companyId: string;
   env: SupabaseEnv;
   query?: string | null;
+  initialColumnVisibility?: VisibilityState;
 }
 
 export function AttendanceTable({
@@ -54,9 +56,14 @@ export function AttendanceTable({
   query,
   env,
   companyId,
+  initialColumnVisibility,
 }: DataTableProps) {
-  const { rowSelection, setSelectedRows, setRowSelection } =
+
+  const { rowSelection, setSelectedRows, setRowSelection, setColumns } =
     useAttendanceStore();
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+    initialColumnVisibility ?? {}
+  );
   const [searchParams, setSearchParams] = useSearchParams();
   const [data, setData] =
     useState<TransformedAttendanceDataType[]>(initialData);
@@ -67,51 +74,53 @@ export function AttendanceTable({
 
   const { ref, inView } = useInView();
 
-  function transformAttendanceData(data: any[]) {
-    const groupedByEmployeeAndMonth = data.reduce((acc, employee) => {
-      const empCode = employee.employee_code;
-      const employeeDetails = {
-        employee_id: employee.id,
-        employee_code: empCode,
-        employee_name: `${employee.first_name} ${employee.middle_name} ${employee.last_name}`,
-        project:
-          employee.employee_project_assignment?.project_sites?.projects?.name ||
-          null,
-        project_site:
-          employee.employee_project_assignment?.project_sites?.name || null,
-      };
+  const transformAttendanceData = useMemo(() => {
+    return (data: any[]) => {
+      const groupedByEmployeeAndMonth = data.reduce((acc, employee) => {
+        const empCode = employee.employee_code;
+        const employeeDetails = {
+          employee_id: employee.id,
+          employee_code: empCode,
+          employee_name: `${employee.first_name} ${employee.middle_name} ${employee.last_name}`,
+          project:
+            employee.employee_project_assignment?.project_sites?.projects
+              ?.name || null,
+          project_site:
+            employee.employee_project_assignment?.project_sites?.name || null,
+        };
 
-      if (!employee?.attendance?.length) {
-        acc[empCode] = acc[empCode] || employeeDetails;
-        return acc;
-      }
-
-      for (const record of employee?.attendance ?? []) {
-        const date = new Date(record.date);
-        const monthYear = `${date.getMonth()}-${date.getFullYear()}`;
-        const key = `${empCode}-${monthYear}`;
-
-        if (!acc[key]) {
-          acc[key] = { ...employeeDetails };
+        if (!employee?.attendance?.length) {
+          acc[empCode] = acc[empCode] || employeeDetails;
+          return acc;
         }
 
-        const fullDate = formatDate(date.toISOString().split("T")[0]);
-        acc[key][fullDate] = record.present
-          ? "P"
-          : record.holiday
-          ? record.holiday_type === "weekly"
-            ? "(WOF)"
-            : record.holiday_type === "paid"
-            ? "L"
-            : "A"
-          : "A";
-      }
+        for (const record of employee?.attendance ?? []) {
+          const date = new Date(record.date);
+          const monthYear = `${date.getMonth()}-${date.getFullYear()}`;
+          const key = `${empCode}-${monthYear}`;
 
-      return acc;
-    }, {});
+          if (!acc[key]) {
+            acc[key] = { ...employeeDetails };
+          }
 
-    return Object.values(groupedByEmployeeAndMonth);
-  }
+          const fullDate = formatDate(date.toISOString().split("T")[0]);
+          acc[key][fullDate!] = record.present
+            ? "P"
+            : record.holiday
+            ? record.holiday_type === "weekly"
+              ? "(WOF)"
+              : record.holiday_type === "paid"
+              ? "L"
+              : "A"
+            : "A";
+        }
+
+        return acc;
+      }, {});
+
+      return Object.values(groupedByEmployeeAndMonth);
+    };
+  }, [days]);
 
   const loadMoreEmployees = async () => {
     const formattedFrom = from;
@@ -132,7 +141,9 @@ export function AttendanceTable({
       });
 
       if (newData && newData.length > 0) {
-        const transformedData = transformAttendanceData(newData);
+        const transformedData = useMemo(() => {
+          return transformAttendanceData(newData);
+        }, [newData, transformAttendanceData]);
         setData(
           (prevData) =>
             [...prevData, ...transformedData] as TransformedAttendanceDataType[]
@@ -156,6 +167,10 @@ export function AttendanceTable({
   }, [initialData, initialHasNextPage, pageSize]);
 
   useEffect(() => {
+    setColumns(table.getAllLeafColumns());
+  }, [columnVisibility]);
+
+  useEffect(() => {
     if (inView) {
       loadMoreEmployees();
     }
@@ -166,8 +181,10 @@ export function AttendanceTable({
     columns,
     getCoreRowModel: getCoreRowModel(),
     onRowSelectionChange: setRowSelection,
+    onColumnVisibilityChange: setColumnVisibility,
     state: {
       rowSelection,
+      columnVisibility,
     },
   });
 
@@ -185,14 +202,14 @@ export function AttendanceTable({
 
   const tableLength = table.getRowModel().rows?.length;
   return (
-    <div className='relative mb-8'>
+    <div className="relative mb-8">
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
           !tableLength && "border-none"
         )}
       >
-        <div className='relative'>
+        <div className="relative">
           <Table>
             <AttendanceTableHeader
               table={table}
@@ -205,7 +222,7 @@ export function AttendanceTable({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    className='relative cursor-default select-text'
+                    className="relative cursor-default select-text"
                   >
                     {row.getVisibleCells().map((cell) => {
                       return (
@@ -234,10 +251,10 @@ export function AttendanceTable({
                 <TableRow className={cn(!tableLength && "border-none")}>
                   <TableCell
                     colSpan={columns.length}
-                    className='h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize'
+                    className="h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize"
                   >
-                    <div className='flex flex-col items-center gap-1'>
-                      <h2 className='text-xl'>No Attendance Found.</h2>
+                    <div className="flex flex-col items-center gap-1">
+                      <h2 className="text-xl">No Attendance Found.</h2>
                       <p
                         className={cn(
                           "text-muted-foreground",
@@ -247,7 +264,7 @@ export function AttendanceTable({
                         Try another search, or adjusting the filters
                       </p>
                       <Button
-                        variant='outline'
+                        variant="outline"
                         className={cn(
                           "mt-4",
                           !data?.length && noFilters && "hidden"
@@ -267,8 +284,8 @@ export function AttendanceTable({
         </div>
       </div>
       {hasNextPage && initialData?.length && (
-        <div className='flex items-center justify-center mt-6' ref={ref}>
-          <div className='flex items-center space-x-2 px-6 py-5'>
+        <div className="flex items-center justify-center mt-6" ref={ref}>
+          <div className="flex items-center space-x-2 px-6 py-5">
             <Spinner />
           </div>
         </div>
@@ -279,6 +296,7 @@ export function AttendanceTable({
         data={selectedRowsData}
         fMonth={filters?.month}
         fYear={filters?.year}
+        columnVisibility={columnVisibility}
       />
     </div>
   );

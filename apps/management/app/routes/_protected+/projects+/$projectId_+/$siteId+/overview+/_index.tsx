@@ -1,12 +1,10 @@
 import { ErrorBoundary } from "@/components/error-boundary";
 import { LoadingSpinner } from "@/components/loading-spinner";
-import { PaySequenceCard } from "@/components/sites/pay-sequence/pay-sequence-card";
 import { SiteDetailsCard } from "@/components/sites/site-details-card";
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import {
   getSiteById,
-  getSitePaySequenceInSite,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { defer, type LoaderFunctionArgs } from "@remix-run/node";
@@ -23,13 +21,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const siteId = params.siteId as string;
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
-    const paySequencePromise = getSitePaySequenceInSite({ supabase, siteId });
     const sitePromise = getSiteById({ supabase, id: siteId });
-    return defer({ sitePromise, paySequencePromise, error: null });
+    return defer({ sitePromise, error: null });
   } catch (error) {
     return defer(
-      { sitePromise: null, paySequencePromise: null, error },
-      { status: 500 },
+      { sitePromise: null, error },
+      { status: 500 }
     );
   }
 }
@@ -44,7 +41,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 clientLoader.hydrate = true;
 
 export default function Overview() {
-  const { sitePromise, paySequencePromise, error } =
+  const { sitePromise, error } =
     useLoaderData<typeof loader>();
 
   const { siteId } = useParams();
@@ -66,17 +63,6 @@ export default function Overview() {
               return <ErrorBoundary message="Failed to load link template" />;
             }
             return <SiteDetailsCard siteData={resolvedSiteData.data} />;
-          }}
-        </Await>
-      </Suspense>
-      <Suspense fallback={<LoadingSpinner className="h-1/2 mt-20" />}>
-        <Await resolve={paySequencePromise}>
-          {(resolvedPaySequence) => {
-            if (!resolvedPaySequence) {
-              clearExactCacheEntry(`${cacheKeyPrefix.site_overview}${siteId}`);
-              return <ErrorBoundary message="Failed to load link template" />;
-            }
-            return <PaySequenceCard paySequence={resolvedPaySequence?.data} />;
           }}
         </Await>
       </Suspense>

@@ -10,6 +10,7 @@ import type {
   TypedSupabaseClient,
   UserDatabaseRow,
 } from "../types";
+import { HARD_QUERY_LIMIT } from "../constant";
 
 export type ImportLeavesDataType = Pick<
   LeavesDatabaseRow,
@@ -87,12 +88,12 @@ export async function getLeavesByEmployeeId({
     .select(
       `
         ${columns.join(
-        ","
-      )},employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!left(project_sites!left(id, name, projects!left(id, name)))),
+          ","
+        )},employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!left(project_sites!left(id, name, projects!left(id, name)))),
           users!${users ? "inner" : "left"}(id,email)
       
       `,
-      { count: "exact" },
+      { count: "exact" }
     )
     .eq("employee_id", employeeId);
 
@@ -107,11 +108,11 @@ export async function getLeavesByEmployeeId({
     if (date_start && date_end) {
       query.or(
         `and(start_date.lte.${formatUTCDate(
-          date_end,
+          date_end
         )},end_date.gte.${formatUTCDate(date_start)}),` +
-        `and(start_date.gte.${formatUTCDate(
-          date_start
-        )},start_date.lte.${formatUTCDate(date_end)},end_date.is.null)`
+          `and(start_date.gte.${formatUTCDate(
+            date_start
+          )},start_date.lte.${formatUTCDate(date_end)},end_date.is.null)`
       );
     }
     if (leave_type) {
@@ -194,12 +195,14 @@ export async function getLeavesByCompanyId({
     .select(
       `
         ${columns.join(",")},
-        employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
-      }(project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
+        employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${
+          project ? "inner" : "left"
+        }(project_sites!${project ? "inner" : "left"}(id, name, projects!${
+        project ? "inner" : "left"
       }(id, name)))),
           users!${users ? "inner" : "left"}(id,email)
       `,
-      { count: "exact" },
+      { count: "exact" }
     )
     .eq("employees.company_id", companyId);
 
@@ -214,11 +217,11 @@ export async function getLeavesByCompanyId({
     if (date_start && date_end) {
       query.or(
         `and(start_date.lte.${formatUTCDate(
-          date_end,
+          date_end
         )},end_date.gte.${formatUTCDate(date_start)}),` +
-        `and(start_date.gte.${formatUTCDate(
-          date_start
-        )},start_date.lte.${formatUTCDate(date_end)},end_date.is.null)`
+          `and(start_date.gte.${formatUTCDate(
+            date_start
+          )},start_date.lte.${formatUTCDate(date_end)},end_date.is.null)`
       );
     }
 
@@ -228,13 +231,13 @@ export async function getLeavesByCompanyId({
     if (project) {
       query.eq(
         "employees.employee_project_assignment.project_sites.projects.name",
-        project,
+        project
       );
     }
     if (project_site) {
       query.eq(
         "employees.employee_project_assignment.project_sites.name",
-        project_site,
+        project_site
       );
     }
     if (users) {
@@ -270,17 +273,17 @@ export async function getLeaveTypeByCompanyId({
     "leaves_per_year",
   ] as const;
 
-  const query = supabase
+  const { data, error } = await supabase
     .from("leave_type")
     .select(
       `
         ${columns.join(",")}
-      `,
-      { count: "exact" },
+      `
     )
-    .eq("company_id", companyId);
-
-  const { data, error } = await query;
+    .eq("company_id", companyId)
+    .order("created_at", { ascending: true })
+    .limit(HARD_QUERY_LIMIT)
+    .returns<InferredType<LeaveTypeDatabaseRow, (typeof columns)[number]>[]>();
 
   if (error) {
     console.error("getLeavesByEmployeeId Error", error);

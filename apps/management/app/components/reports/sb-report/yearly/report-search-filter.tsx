@@ -22,7 +22,7 @@ import {
 } from "@remix-run/react";
 import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
 import { payoutMonths } from "@canny_ecosystem/utils/constant";
-import { getYears } from "@canny_ecosystem/utils";
+import { defaultYear, getYears } from "@canny_ecosystem/utils";
 import type { EmployeeReportFilters } from "@canny_ecosystem/supabase/queries";
 
 export function SBReportSearchFilter({
@@ -173,9 +173,9 @@ export function SBReportSearchFilter({
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-      <div className="flex space-x-4 w-full md:w-auto items-center">
+      <div className='flex space-x-4 w-full md:w-auto items-center'>
         <form
-          className="relative w-full md:w-auto"
+          className='relative w-full md:w-auto'
           onSubmit={(e) => {
             e.preventDefault();
             handleSubmit();
@@ -197,19 +197,19 @@ export function SBReportSearchFilter({
                 : "Search employee report"
             }
             disabled={disabled}
-            className="pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70"
+            className='pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70'
             value={prompt}
             onChange={handleSearch}
-            autoComplete="on"
-            autoCapitalize="none"
-            autoCorrect="off"
-            spellCheck="false"
+            autoComplete='on'
+            autoCapitalize='none'
+            autoCorrect='off'
+            spellCheck='false'
           />
 
           <DropdownMenuTrigger disabled={disabled} asChild>
             <button
               onClick={() => setIsOpen((prev) => !prev)}
-              type="button"
+              type='button'
               disabled={disabled}
               className={cn(
                 "absolute z-10 right-3 top-[6px] opacity-70",
@@ -219,15 +219,15 @@ export function SBReportSearchFilter({
                 isOpen && "opacity-100"
               )}
             >
-              <Icon name="mixer" />
+              <Icon name='mixer' />
             </button>
           </DropdownMenuTrigger>
         </form>
       </div>
 
       <DropdownMenuContent
-        className="w-full md:w-[480px]"
-        align="end"
+        className='w-full md:w-[480px]'
+        align='end'
         sideOffset={19}
         alignOffset={-11}
       >
@@ -240,17 +240,14 @@ export function SBReportSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
-                {getYears(
-                  10,
-                  endYear ? Number(endYear) : new Date().getFullYear()
-                )
+                {getYears(10, endYear ? Number(endYear) : defaultYear)
                   ?.sort((a, b) => b - a)
                   .map((name, index) => (
                     <DropdownMenuCheckboxItem
                       key={name + index.toString()}
-                      className="capitalize"
+                      className='capitalize'
                       checked={filterParams?.start_year === name.toString()}
                       onCheckedChange={() => {
                         setFilterParams((prev) => ({
@@ -276,12 +273,12 @@ export function SBReportSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 {!searchParamsList.start_year ? (
                   <DropdownMenuCheckboxItem
                     disabled={true}
-                    className="p-8 items-center justify-center"
+                    className='p-8 items-center justify-center'
                   >
                     Select Start Year First
                   </DropdownMenuCheckboxItem>
@@ -292,7 +289,7 @@ export function SBReportSearchFilter({
                     ?.map((name, index) => (
                       <DropdownMenuCheckboxItem
                         key={name + index.toString()}
-                        className="capitalize"
+                        className='capitalize'
                         checked={filterParams?.start_month === name}
                         onCheckedChange={() => {
                           setFilterParams((prev) => ({
@@ -319,12 +316,12 @@ export function SBReportSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 {getYears(10)?.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className="capitalize"
+                    className='capitalize'
                     checked={filterParams?.end_year === name.toString()}
                     disabled={startYear > name}
                     onCheckedChange={() => {
@@ -351,12 +348,12 @@ export function SBReportSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 {!searchParamsList.end_year ? (
                   <DropdownMenuCheckboxItem
                     disabled={true}
-                    className="p-8 items-center justify-center"
+                    className='p-8 items-center justify-center'
                   >
                     Select End Year First
                   </DropdownMenuCheckboxItem>
@@ -367,7 +364,7 @@ export function SBReportSearchFilter({
                     ?.map((name, index) => (
                       <DropdownMenuCheckboxItem
                         key={name + index.toString()}
-                        className="capitalize"
+                        className='capitalize'
                         checked={filterParams?.end_month === name}
                         onCheckedChange={() => {
                           setFilterParams((prev) => ({
@@ -394,12 +391,12 @@ export function SBReportSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 {projectArray?.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className="capitalize"
+                    className='capitalize'
                     checked={filterParams?.project === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
@@ -425,12 +422,12 @@ export function SBReportSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-0"
+                className='p-0'
               >
                 {!searchParamsList.project ? (
                   <DropdownMenuCheckboxItem
                     disabled={true}
-                    className="p-8 items-center justify-center"
+                    className='p-8 items-center justify-center'
                   >
                     Select Project First
                   </DropdownMenuCheckboxItem>
@@ -438,7 +435,7 @@ export function SBReportSearchFilter({
                   projectSiteArray?.map((name, index) => (
                     <DropdownMenuCheckboxItem
                       key={name + index.toString()}
-                      className="capitalize"
+                      className='capitalize'
                       checked={filterParams?.project_site === name}
                       onCheckedChange={() => {
                         setFilterParams((prev) => ({
