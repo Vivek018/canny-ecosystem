@@ -1,0 +1,24 @@
+{
+  "extends": "@canny_ecosystem/typescript/remix.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./app/*"
+      ]
+    },
+    "strict": true
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "tailwind.config.ts",
+    "types/index.d.ts",
+    "index.js",
+    "server/dev-server.js",
+    "server/index.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

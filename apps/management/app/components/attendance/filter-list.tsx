@@ -20,6 +20,7 @@ export function FilterList({ filters }: Props) {
     if (!value) return null;
 
     switch (key) {
+      case "range":
       case "name":
       case "month":
       case "year":

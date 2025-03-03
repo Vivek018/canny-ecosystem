@@ -1,8 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
-  Await,
-  defer,
   json,
   useActionData,
   useLoaderData,
@@ -19,8 +17,7 @@ import { getLeaveEncashmentById } from "@canny_ecosystem/supabase/queries";
 import { updateLeaveEncashment } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { Suspense, useEffect } from "react";
-import type { LeaveEncashmentDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import { useEffect } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
@@ -47,25 +44,31 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   try {
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-    let leaveEncashmentPromise = null;
+    let leaveEncashmentData = null;
+    let leaveEncashmentError = null;
 
     if (leaveEncashmentId) {
-      leaveEncashmentPromise = getLeaveEncashmentById({
-        supabase,
-        id: leaveEncashmentId,
+      ({ data: leaveEncashmentData, error: leaveEncashmentError } =
+        await getLeaveEncashmentById({
+          supabase,
+          id: leaveEncashmentId,
+        }));
+
+      if (leaveEncashmentError) throw leaveEncashmentError;
+
+      return json({
+        error: null,
+        leaveEncashmentData,
+        companyId,
       });
     }
 
-    return defer({
-      error: null,
-      leaveEncashmentPromise,
-      companyId,
-    });
+    throw new Error("No identity key provided");
   } catch (error) {
     return json(
       {
         error,
-        leaveEncashmentPromise: null,
+        leaveEncashmentData: null,
         companyId: null,
       },
       { status: 500 },
@@ -122,7 +125,7 @@ export async function action({
 }
 
 export default function UpdateLeaveEncashment() {
-  const { leaveEncashmentPromise, error } = useLoaderData<typeof loader>();
+  const { leaveEncashmentData, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -152,42 +155,5 @@ export default function UpdateLeaveEncashment() {
       <ErrorBoundary error={error} message="Failed to load leave encashment" />
     );
 
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Await resolve={leaveEncashmentPromise}>
-        {(resolvedData) => {
-          if (!resolvedData)
-            return <ErrorBoundary message="Failed to load leave encashment" />;
-          return (
-            <UpdateLeaveEncashmentWrapper
-              data={resolvedData.data}
-              error={resolvedData.error}
-            />
-          );
-        }}
-      </Await>
-    </Suspense>
-  );
-}
-
-export function UpdateLeaveEncashmentWrapper({
-  data,
-  error,
-}: {
-  data: LeaveEncashmentDatabaseUpdate | null;
-  error: Error | null | { message: string };
-}) {
-  const { toast } = useToast();
-
-  useEffect(() => {
-    if (error) {
-      toast({
-        title: "Error",
-        description: error?.message || "Failed to load leave encashment",
-        variant: "destructive",
-      });
-    }
-  }, [error]);
-
-  return <CreateLeaveEncashment updateValues={data} />;
+  return <CreateLeaveEncashment updateValues={leaveEncashmentData} />;
 }

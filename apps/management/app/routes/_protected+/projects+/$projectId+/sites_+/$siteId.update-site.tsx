@@ -2,8 +2,6 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import CreateSite from "./create-site";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
-  Await,
-  defer,
   json,
   useActionData,
   useLoaderData,
@@ -23,9 +21,8 @@ import {
 import { updateSite } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { Suspense, useEffect } from "react";
+import { useEffect } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
-import type { SiteDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
@@ -50,46 +47,48 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-    const locationOptionsPromise = getLocationsForSelectByCompanyId({
-      supabase,
-      companyId,
-    }).then(({ data, error }) => {
-      if (data) {
-        const locationOptions = data.map((location) => ({
-          label: location.name,
-          value: location.id,
-        }));
-        return { data: locationOptions, error };
-      }
-      return { data, error };
-    });
+    const { data: locationOptionsData, error: locationOptionsError } =
+      await getLocationsForSelectByCompanyId({
+        supabase,
+        companyId,
+      });
 
-    let sitePromise = null;
+    if (locationOptionsError) throw locationOptionsError;
+
+    let siteData = null;
+    let siteError = null;
 
     if (siteId) {
-      sitePromise = getSiteById({
+      ({ data: siteData, error: siteError } = await getSiteById({
         supabase,
         id: siteId,
+      }));
+
+      if (siteError) throw siteError;
+
+      return json({
+        error: null,
+        siteData,
+        locationOptions: locationOptionsData?.map((location) => ({
+          label: location.name,
+          value: location.id,
+        })),
+        projectId,
+        siteId,
       });
     }
 
-    return defer({
-      error: null,
-      sitePromise,
-      locationOptionsPromise,
-      projectId,
-      siteId,
-    });
+    throw new Error("Site ID not provided");
   } catch (error) {
     return json(
       {
         error,
-        sitePromise: null,
-        locationOptionsPromise: null,
+        siteData: null,
+        locationOptions: null,
         projectId,
         siteId,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -111,7 +110,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -141,14 +140,13 @@ export async function action({
         message: "Failed to update site",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export default function UpdateSite() {
-  const { sitePromise, error, projectId, siteId } =
-    useLoaderData<typeof loader>();
+  const { siteData, error, projectId, siteId } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
   const { toast } = useToast();
@@ -178,44 +176,7 @@ export default function UpdateSite() {
   }, [actionData]);
 
   if (error)
-    return <ErrorBoundary error={error} message='Failed to load site' />;
+    return <ErrorBoundary error={error} message="Failed to load site" />;
 
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Await resolve={sitePromise}>
-        {(resolvedData) => {
-          if (!resolvedData)
-            return <ErrorBoundary message='Failed to load site' />;
-          return (
-            <UpdateSiteWrapper
-              data={resolvedData.data}
-              error={resolvedData.error}
-            />
-          );
-        }}
-      </Await>
-    </Suspense>
-  );
-}
-
-export function UpdateSiteWrapper({
-  data,
-  error,
-}: {
-  data: SiteDatabaseUpdate | null;
-  error: Error | null | { message: string };
-}) {
-  const { toast } = useToast();
-
-  useEffect(() => {
-    if (error) {
-      toast({
-        title: "Error",
-        description: error?.message || "Failed to load site",
-        variant: "destructive",
-      });
-    }
-  }, [error]);
-
-  return <CreateSite updateValues={data} />;
+  return <CreateSite updateValues={siteData} />;
 }

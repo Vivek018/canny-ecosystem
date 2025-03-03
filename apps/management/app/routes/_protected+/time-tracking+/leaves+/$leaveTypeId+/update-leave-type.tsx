@@ -18,11 +18,11 @@ import { updateLeaveTypeById } from "@canny_ecosystem/supabase/mutations";
 import { getLeaveTypeById } from "@canny_ecosystem/supabase/queries";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
-import { attribute } from "@canny_ecosystem/utils/constant";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { useEffect } from "react";
 import { clearCacheEntry } from "@/utils/cache";
 import AddLeaveType from "../add-leave-type";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export const UPDATE_LEAVETYPE_TAG = "Update_LeaveType";
 
@@ -32,7 +32,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.holidays}`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.leaves}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
@@ -58,6 +58,8 @@ export async function action({
 }: ActionFunctionArgs): Promise<Response> {
   const id = params.leaveTypeId;
   const { supabase } = getSupabaseWithHeaders({ request });
+
+  const returnTo = "/time-tracking/leaves";
   const formData = await request.formData();
   const submission = parseWithZod(formData, { schema: LeaveTypeSchema });
 
@@ -78,6 +80,7 @@ export async function action({
     return json({
       status: "success",
       message: "Leave type updated successfully",
+      returnTo,
       error: null,
     });
   }
@@ -85,6 +88,7 @@ export async function action({
   return json({
     status: "error",
     message: "Leave Type update failed",
+    returnTo,
     error,
   });
 }
@@ -92,7 +96,6 @@ export async function action({
 export default function UpdateLeaveTypes() {
   const { data, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
-  const updatableData = data;
 
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -110,7 +113,7 @@ export default function UpdateLeaveTypes() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(`${cacheKeyPrefix.holidays}`);
+        clearCacheEntry(cacheKeyPrefix.leaves);
         toast({
           title: "Success",
           description: actionData?.message || "Leave type updated successfully",
@@ -124,9 +127,12 @@ export default function UpdateLeaveTypes() {
           variant: "destructive",
         });
       }
-      navigate("/time-tracking/holidays");
+
+      navigate(actionData?.returnTo ?? "/time-tracking/leaves", {
+        replace: true,
+      });
     }
   }, [actionData]);
 
-  return <AddLeaveType updatableData={updatableData} />;
+  return <AddLeaveType updatableData={data} />;
 }

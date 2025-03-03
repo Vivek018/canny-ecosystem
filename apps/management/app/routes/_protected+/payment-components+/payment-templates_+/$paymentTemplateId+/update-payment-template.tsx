@@ -1,8 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
-  Await,
-  defer,
   Form,
   json,
   useActionData,
@@ -16,13 +14,12 @@ import {
   PaymentTemplateSchema,
   updateRole,
 } from "@canny_ecosystem/utils";
-import { Suspense, useEffect } from "react";
+import { useEffect } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { ErrorBoundary } from "@/components/error-boundary";
 
 import { getPaymentTemplateById } from "@canny_ecosystem/supabase/queries";
 import { FormProvider, getFormProps, useForm } from "@conform-to/react";
-import type { PaymentTemplateDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { Card } from "@canny_ecosystem/ui/card";
 import { CreatePaymentTemplateDetails } from "@/components/payment-templates/form/create-payment-template-details";
 import { FormButtons } from "@/components/form/form-buttons";
@@ -48,24 +45,22 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   try {
-    let paymentTemplatePromise = null;
+    const { data, error } = await getPaymentTemplateById({
+      supabase,
+      id: paymentTemplateId ?? "",
+    });
 
-    if (paymentTemplateId) {
-      paymentTemplatePromise = getPaymentTemplateById({
-        supabase,
-        id: paymentTemplateId,
-      });
-    }
+    if (error) throw error;
 
-    return defer({
-      paymentTemplatePromise,
+    return json({
+      data,
       error: null,
     });
   } catch (error) {
     return json(
       {
         error,
-        paymentTemplatePromise: null,
+        data: null,
       },
       { status: 500 },
     );
@@ -123,62 +118,8 @@ export async function action({
   }
 }
 
-export default function UpdatePaymentTemplate() {
-  const { paymentTemplatePromise } = useLoaderData<typeof loader>();
-  const actionData = useActionData<typeof action>();
-
-  const navigate = useNavigate();
-  const { toast } = useToast();
-
-  useEffect(() => {
-    if (!actionData) return;
-
-    if (actionData?.status === "success") {
-      clearExactCacheEntry(cacheKeyPrefix.payment_templates);
-      toast({
-        title: "Success",
-        description: actionData?.message,
-        variant: "success",
-      });
-    } else {
-      toast({
-        title: "Error",
-        description:
-          actionData?.error?.message || "Payment Template Update Failed",
-        variant: "destructive",
-      });
-    }
-
-    navigate("/payment-components/payment-templates", {
-      replace: true,
-    });
-  }, [actionData]);
-
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Await resolve={paymentTemplatePromise}>
-        {(resolvedData) => {
-          if (!resolvedData)
-            return <ErrorBoundary message="Failed to load payment template" />;
-          return (
-            <UpdatePaymentTemplateWrapper
-              data={resolvedData?.data}
-              error={resolvedData?.error}
-            />
-          );
-        }}
-      </Await>
-    </Suspense>
-  );
-}
-
-export function UpdatePaymentTemplateWrapper({
-  data,
-  error,
-}: {
-  data: Omit<PaymentTemplateDatabaseRow, "created_at" | "updated_at"> | null;
-  error: Error | null | { message: string };
-}) {
+export default function UpdatePaymentTemplateWrapper() {
+  const { data, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const currentSchema = PaymentTemplateSchema;
 
@@ -197,14 +138,8 @@ export function UpdatePaymentTemplateWrapper({
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (error) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
     if (actionData) {
+      clearExactCacheEntry(cacheKeyPrefix.payment_templates);
       if (actionData?.status === "success") {
         toast({
           title: "Success",
@@ -221,6 +156,11 @@ export function UpdatePaymentTemplateWrapper({
       navigate("/payment-components/payment-templates", { replace: true });
     }
   }, [actionData]);
+
+  if (error)
+    return (
+      <ErrorBoundary error={error} message="Failed to load payment template" />
+    );
 
   return (
     <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">

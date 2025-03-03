@@ -1,8 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
-  Await,
-  defer,
   json,
   useActionData,
   useLoaderData,
@@ -17,10 +15,8 @@ import {
 } from "@canny_ecosystem/utils";
 import { getEmployeeLetterById } from "@canny_ecosystem/supabase/queries";
 import { updateEmployeeLetter } from "@canny_ecosystem/supabase/mutations";
-import { Suspense, useEffect } from "react";
+import { useEffect } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { ErrorBoundary } from "@/components/error-boundary";
-import type { EmployeeLetterDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
@@ -44,17 +40,21 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   try {
-    let employeeLetterPromise = null;
+    let employeeLetterData = null;
+    let employeeLetterError = null;
 
     if (letterId) {
-      employeeLetterPromise = getEmployeeLetterById({
-        supabase,
-        id: letterId,
-      });
+      ({ data: employeeLetterData, error: employeeLetterError } =
+        await getEmployeeLetterById({
+          supabase,
+          id: letterId,
+        }));
     }
 
-    return defer({
-      employeeLetterPromise,
+    if (employeeLetterError) throw employeeLetterError;
+
+    return json({
+      employeeLetterData,
       employeeId,
       letterId,
       error: null,
@@ -65,7 +65,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         error,
         employeeId,
         letterId,
-        employeeLetterPromise: null,
+        employeeLetterData: null,
       },
       { status: 500 },
     );
@@ -122,12 +122,20 @@ export async function action({
 }
 
 export default function UpdateEmployeeLetter() {
-  const { employeeLetterPromise, employeeId } = useLoaderData<typeof loader>();
+  const { employeeLetterData, employeeId, error } =
+    useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
+    if (error)
+      toast({
+        title: "Error",
+        description:
+          (error as Error)?.message || "Employee Letter update failed",
+        variant: "destructive",
+      });
     if (!actionData) return;
     if (actionData?.status === "success") {
       clearExactCacheEntry(`${cacheKeyPrefix.employee_letters}${employeeId}`);
@@ -148,41 +156,5 @@ export default function UpdateEmployeeLetter() {
     }
   }, [actionData]);
 
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Await resolve={employeeLetterPromise}>
-        {(resolvedData) => {
-          if (!resolvedData)
-            return <ErrorBoundary message="Failed to load Letter" />;
-          return (
-            <UpdateEmployeeLetterWrapper
-              data={resolvedData?.data}
-              error={resolvedData?.error}
-            />
-          );
-        }}
-      </Await>
-    </Suspense>
-  );
-}
-
-export function UpdateEmployeeLetterWrapper({
-  data,
-  error,
-}: {
-  data: EmployeeLetterDatabaseUpdate | null;
-  error: Error | null | { message: string };
-}) {
-  const { toast } = useToast();
-
-  useEffect(() => {
-    if (error)
-      toast({
-        title: "Error",
-        description: error?.message,
-        variant: "destructive",
-      });
-  }, [error]);
-
-  return <CreateEmployeeLetter updateValues={data} />;
+  return <CreateEmployeeLetter updateValues={employeeLetterData} />;
 }

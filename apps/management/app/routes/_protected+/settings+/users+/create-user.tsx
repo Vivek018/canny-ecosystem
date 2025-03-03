@@ -170,7 +170,6 @@ export default function CreateUser({
         description: actionData.message,
         variant: "success",
       });
-      setResetKey(Date.now());
     } else {
       toast({
         title: "Error",

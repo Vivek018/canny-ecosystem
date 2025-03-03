@@ -1,6 +1,7 @@
 import { CompanyDetailsWrapper } from "@/components/company/company-details-wrapper";
 import CompanyRegistrationDetailsWrapper from "@/components/company/company-registration-details-wrapper";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { LoadingSpinner } from "@/components/loading-spinner";
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
@@ -53,7 +54,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return await clientCaching(cacheKeyPrefix.general, args);
+  return clientCaching(cacheKeyPrefix.general, args);
 }
 
 clientLoader.hydrate = true;
@@ -78,7 +79,7 @@ export default function SettingGeneral() {
   return (
     <section key={resetKey}>
       <div className="flex flex-col gap-6 w-full lg:w-2/3 py-4">
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<LoadingSpinner className="my-20" />}>
           <Await resolve={companyDetailsPromise}>
             {(resolvedData) => {
               if (!resolvedData) {
@@ -99,7 +100,7 @@ export default function SettingGeneral() {
       </div>
 
       <div className="flex flex-col gap-6 w-full lg:w-2/3 py-4">
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<LoadingSpinner className="my-20" />}>
           <Await resolve={companyRegistrationDetailsPromise}>
             {(resolvedData) => {
               if (!resolvedData) {

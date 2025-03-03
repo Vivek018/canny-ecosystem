@@ -29,6 +29,7 @@ import { Button } from "@canny_ecosystem/ui/button";
 import { ExportBar } from "../export-bar";
 import { useReportsStore } from "@/store/reports";
 import { payoutMonths } from "@canny_ecosystem/utils/constant";
+import { defaultMonth } from "@canny_ecosystem/utils";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -92,7 +93,7 @@ export function DataTable<TData, TValue>({
         return {
           ...employee,
           bonus_amount: 4324,
-          payout_month: payoutMonths[new Date().getMonth()].label,
+          payout_month: payoutMonths[defaultMonth].label,
           start_date: new Date(),
           end_date: new Date(),
         };

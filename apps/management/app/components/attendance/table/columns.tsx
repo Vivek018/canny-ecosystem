@@ -68,7 +68,7 @@ export const attendanceColumns = (
   ...days.map((day) => ({
     enableSorting: false,
     accessorKey: `${formatDate(day.fullDate.toString())}`,
-    header: formatDate(day.fullDate.toString()),
+    header: formatDate(day.fullDate.toString()) || '',
     cell: ({ row }: { row: any }) => (
       <p className="truncate">
         {row.original[`${formatDate(day.fullDate)}`] ?? "--"}

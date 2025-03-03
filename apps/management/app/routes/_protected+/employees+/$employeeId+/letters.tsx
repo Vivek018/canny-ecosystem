@@ -1,5 +1,6 @@
 import { EmployeeLetterTableWrapper } from "@/components/employees/employee/letters/employee-letter-table-wrapper";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { LoadingSpinner } from "@/components/loading-spinner";
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { useUser } from "@/utils/user";
@@ -39,15 +40,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   } catch (error) {
     return json(
       { employeeLettersPromise: null, employeeId, error },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return await clientCaching(
+  return clientCaching(
     `${cacheKeyPrefix.employee_letters}${args.params.employeeId}`,
-    args,
+    args
   );
 }
 
@@ -63,27 +64,27 @@ export default function Letters() {
   if (error) {
     clearExactCacheEntry(`${cacheKeyPrefix.employee_letters}${employeeId}`);
     return (
-      <ErrorBoundary error={error} message="Failed to load payment fields" />
+      <ErrorBoundary error={error} message='Failed to load payment fields' />
     );
   }
 
   return (
-    <section className="py-4">
-      <div className="w-full flex items-center justify-between pb-4">
-        <div className="w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4">
-          <div className="relative w-full">
-            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+    <section className='py-4'>
+      <div className='w-full flex items-center justify-between pb-4'>
+        <div className='w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4'>
+          <div className='relative w-full'>
+            <div className='absolute inset-y-0 left-3 flex items-center pointer-events-none'>
               <Icon
-                name="magnifying-glass"
-                size="sm"
-                className="text-gray-400"
+                name='magnifying-glass'
+                size='sm'
+                className='text-gray-400'
               />
             </div>
             <Input
-              placeholder="Search Letters"
+              placeholder='Search Letters'
               value={searchString}
               onChange={(e) => setSearchString(e.target.value)}
-              className="pl-8 h-10 w-full focus-visible:ring-0 shadow-none"
+              className='pl-8 h-10 w-full focus-visible:ring-0 shadow-none'
             />
           </div>
           <Link
@@ -93,23 +94,23 @@ export default function Letters() {
               "flex items-center gap-1",
               !hasPermission(
                 role,
-                `${createRole}:${attribute.employeeLetters}`,
-              ) && "hidden",
+                `${createRole}:${attribute.employeeLetters}`
+              ) && "hidden"
             )}
           >
             <span>Add</span>
-            <span className="hidden md:flex justify-end">Letter</span>
+            <span className='hidden md:flex justify-end'>Letter</span>
           </Link>
         </div>
       </div>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<LoadingSpinner />}>
         <Await resolve={employeeLettersPromise}>
           {(resolvedData) => {
             if (!resolvedData) {
               clearExactCacheEntry(
-                `${cacheKeyPrefix.employee_letters}${employeeId}`,
+                `${cacheKeyPrefix.employee_letters}${employeeId}`
               );
-              return <ErrorBoundary message="Failed to load letters" />;
+              return <ErrorBoundary message='Failed to load letters' />;
             }
             return (
               <EmployeeLetterTableWrapper

@@ -211,12 +211,11 @@ export default function CreateRelationship({
         description: actionData.message,
         variant: "success",
       });
-      setResetKey(Date.now());
     } else {
       toast({
         title: "Error",
         description:
-          actionData.error?.message || "Relationship creation failed",
+        actionData.error?.message || "Relationship creation failed",
         variant: "destructive",
       });
     }

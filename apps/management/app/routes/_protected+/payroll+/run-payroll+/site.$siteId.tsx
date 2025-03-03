@@ -1,3 +1,4 @@
+import { LoadingSpinner } from "@/components/loading-spinner";
 import { PayrollComponent } from "@/components/payroll/payroll-component";
 import { CANNY_MANAGEMENT_SERVICES_COMPANY_ID } from "@/constant";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
@@ -18,7 +19,6 @@ import {
   getPayrollEntryAmountByEmployeeIdAndPayrollIdAndPaymentTemplateComponentId,
   getRelationshipIdByParentIdAndChildId,
   getRelationshipTermsById,
-  getSitePaySequenceInSite,
   type PaymentTemplateComponentType,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -27,7 +27,6 @@ import type {
   TypedSupabaseClient,
 } from "@canny_ecosystem/supabase/types";
 import {
-  getWorkingDaysInCurrentMonth,
   newAmount,
   type PayrollEmployeeData,
 } from "@canny_ecosystem/utils";
@@ -79,7 +78,6 @@ async function processPayrollEntries(
   supabase: TypedSupabaseClient,
   siteId: string,
   companyId: string,
-  workingDays: number,
 ) {
   const { data: employeeData } = await getEmployeeIdsByProjectSiteId({
     supabase,
@@ -185,16 +183,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const payrollDataPromise = Promise.all([
     getCompanyIdOrFirstCompany(request, supabase),
     getEarliestPayrollBySiteId({ supabase, site_id: siteId }),
-    getSitePaySequenceInSite({ supabase, siteId }),
-  ]).then(async ([companyData, payrollData, sitePaySequenceData]) => {
-    const workingDays = getWorkingDaysInCurrentMonth(
-      sitePaySequenceData.data?.working_days,
-    );
+  ]).then(async ([companyData, payrollData]) => {
     const payrollEntries = await processPayrollEntries(
       supabase,
       siteId,
       companyData.companyId,
-      workingDays,
     );
 
     const PAYROLL_ID = payrollData.data?.id;
@@ -207,7 +200,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 component.amount = newAmount(
                   component.value ?? 0,
                   entry.present_days,
-                  workingDays,
+                  2
                 );
               } else {
                 component.amount = component.value ?? 0;
@@ -239,22 +232,17 @@ export async function action({ request, params }: ActionFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
   const siteId = params.siteId as string;
 
-  const [companyData, payrollData, sitePaySequenceData] = await Promise.all([
+  const [companyData, payrollData] = await Promise.all([
     getCompanyIdOrFirstCompany(request, supabase),
     getEarliestPayrollBySiteId({ supabase, site_id: siteId }),
-    getSitePaySequenceInSite({ supabase, siteId }),
   ]);
 
   if (payrollData.data) return null;
 
-  const workingDays = getWorkingDaysInCurrentMonth(
-    sitePaySequenceData.data?.working_days,
-  );
   const payrollEntries = await processPayrollEntries(
     supabase,
     siteId,
     companyData.companyId,
-    workingDays,
   );
 
   // Create payroll
@@ -311,7 +299,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
               ? newAmount(
                   templateComponent.value ?? 0,
                   payrollEntry.present_days,
-                  workingDays,
+                  2
                 )
               : templateComponent.value ?? 0,
           };
@@ -329,11 +317,7 @@ export default function PayrollId() {
   const { payrollDataPromise } = useLoaderData<typeof loader>();
 
   return (
-    <Suspense
-      fallback={
-        <div className="w-full p-4 text-center">Loading payroll data...</div>
-      }
-    >
+    <Suspense fallback={<LoadingSpinner className="my-20" />}>
       <Await
         resolve={payrollDataPromise}
         errorElement={

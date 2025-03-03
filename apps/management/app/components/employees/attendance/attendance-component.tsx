@@ -4,7 +4,7 @@ import type { EmployeeAttendanceDatabaseRow } from "@canny_ecosystem/supabase/ty
 import { AttendanceFilter } from "./attendance-filter";
 import { useNavigate } from "@remix-run/react";
 import { FilterList } from "./filter-list";
-import { hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { defaultMonth, defaultYear, hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { attribute, months } from "@canny_ecosystem/utils/constant";
 import { useUser } from "@/utils/user";
 
@@ -15,39 +15,39 @@ export const AttendanceComponent = ({
   employeeId,
   filters,
 }: {
-  employeeId: string;
+  employeeId?: string;
   attendanceData: EmployeeAttendanceDatabaseRow[];
   disabled?: boolean;
-  filters: {
+  filters?: {
     month?: string | undefined;
     year?: string | undefined;
-  };
+  } | null;
 }) => {
   const { role } = useUser();
   const navigate = useNavigate();
 
   const [month, setMonth] = useState<number>(() => {
-    if (filters.month) {
-      return months[filters.month] - 1;
+    if (filters?.month) {
+      return months[filters?.month] - 1;
     }
-    return new Date().getMonth();
+    return defaultMonth;
   });
 
   const [year, setYear] = useState<number>(() => {
-    return filters.year ? Number(filters.year) : new Date().getFullYear();
+    return filters?.year ? Number(filters?.year) : defaultYear;
   });
 
   useEffect(() => {
-    if (filters.month) {
-      setMonth(months[filters.month] - 1);
+    if (filters?.month) {
+      setMonth(months[filters?.month] - 1);
     } else {
-      setMonth(new Date().getMonth());
+      setMonth(defaultMonth);
     }
 
-    if (filters.year) {
-      setYear(Number(filters.year));
+    if (filters?.year) {
+      setYear(Number(filters?.year));
     } else {
-      setYear(new Date().getFullYear());
+      setYear(defaultYear);
     }
   }, [filters]);
 

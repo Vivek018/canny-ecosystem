@@ -14,6 +14,7 @@ import { LWFWrapper } from "@/components/statutory-fields/labour-welfare-fund/lw
 import { ErrorBoundary } from "@/components/error-boundary";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
+import { LoadingSpinner } from "@/components/loading-spinner";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {
@@ -40,7 +41,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return await clientCaching(cacheKeyPrefix.labour_welfare_fund, args);
+  return clientCaching(cacheKeyPrefix.labour_welfare_fund, args);
 }
 
 clientLoader.hydrate = true;
@@ -59,7 +60,7 @@ export default function LabourWelfareFundIndex() {
   }
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<LoadingSpinner className="mt-30" />}>
       <Await resolve={labourWelfareFundPromise}>
         {(resolvedData) => {
           if (!resolvedData) {

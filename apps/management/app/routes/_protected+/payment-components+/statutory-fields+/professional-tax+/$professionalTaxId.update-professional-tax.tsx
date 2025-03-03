@@ -1,8 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
-  Await,
-  defer,
   json,
   useActionData,
   useLoaderData,
@@ -19,9 +17,8 @@ import { getProfessionalTaxById } from "@canny_ecosystem/supabase/queries";
 import { updateProfessionalTax } from "@canny_ecosystem/supabase/mutations";
 import CreateProfessionalTax from "./create-professional-tax";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { Suspense, useEffect } from "react";
+import { useEffect } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
-import type { ProfessionalTaxDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
@@ -43,24 +40,30 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   try {
     const professionalTaxId = params.professionalTaxId;
 
-    let professionalTaxPromise = null;
+    let professionalTaxData = null;
+    let professionalTaxError = null;
 
     if (professionalTaxId) {
-      professionalTaxPromise = getProfessionalTaxById({
-        supabase,
-        id: professionalTaxId,
+      ({ data: professionalTaxData, error: professionalTaxError } =
+        await getProfessionalTaxById({
+          supabase,
+          id: professionalTaxId,
+        }));
+
+      if (professionalTaxError) throw professionalTaxError;
+
+      return json({
+        professionalTaxData,
+        error: null,
       });
     }
 
-    return defer({
-      professionalTaxPromise,
-      error: null,
-    });
+    throw new Error("No identity key provided");
   } catch (error) {
     return json(
       {
         error,
-        professionalTaxPromise: null,
+        professionalTaxData: null,
       },
       { status: 500 },
     );
@@ -105,7 +108,7 @@ export async function action({
 }
 
 export default function UpdateProfessionalTax() {
-  const { professionalTaxPromise, error } = useLoaderData<typeof loader>();
+  const { professionalTaxData, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -137,44 +140,5 @@ export default function UpdateProfessionalTax() {
       />
     );
 
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Await resolve={professionalTaxPromise}>
-        {(resolvedData) => {
-          if (!resolvedData)
-            return (
-              <ErrorBoundary message="Failed to load Professional Taxes" />
-            );
-          return (
-            <UpdateProfessionalTaxWrapper
-              data={resolvedData.data}
-              error={resolvedData.error}
-            />
-          );
-        }}
-      </Await>
-    </Suspense>
-  );
-}
-
-export function UpdateProfessionalTaxWrapper({
-  data,
-  error,
-}: {
-  data: ProfessionalTaxDatabaseUpdate | null;
-  error: Error | null | { message: string };
-}) {
-  const { toast } = useToast();
-
-  useEffect(() => {
-    if (error) {
-      toast({
-        title: "Error",
-        description: error?.message || "Failed to load Professional Taxes",
-        variant: "destructive",
-      });
-    }
-  }, [error]);
-
-  return <CreateProfessionalTax updateValues={data} />;
+  return <CreateProfessionalTax updateValues={professionalTaxData} />;
 }
