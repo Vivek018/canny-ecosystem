@@ -23,7 +23,7 @@ import {
 import type { AttendanceFilters } from "@canny_ecosystem/supabase/queries";
 import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
 import { months } from "@canny_ecosystem/utils/constant";
-import { getYears } from "@canny_ecosystem/utils";
+import { defaultYear, getYears } from "@canny_ecosystem/utils";
 
 export function AttendanceSearchFilter({
   disabled,
@@ -389,7 +389,7 @@ export function AttendanceSearchFilter({
                 alignOffset={-4}
                 className='p-0'
               >
-                {getYears(25, new Date().getFullYear()).map((name, index) => (
+                {getYears(25, defaultYear).map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
                     className='capitalize'

@@ -11,7 +11,6 @@ import {
   getSiteNamesByProjectName,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import {
   Await,
@@ -24,7 +23,14 @@ import { AttendanceTable } from "@/components/attendance/table/attendance-table"
 import { attendanceColumns } from "@/components/attendance/table/columns";
 import { ImportEmployeeAttendanceModal } from "@/components/employees/import-export/import-modal-attendance";
 import { Suspense, useEffect, useMemo, useState } from "react";
-import { formatDate, hasPermission, readRole } from "@canny_ecosystem/utils";
+import {
+  calculateDateRange,
+  defaultMonth,
+  defaultYear,
+  formatDate,
+  hasPermission,
+  readRole,
+} from "@canny_ecosystem/utils";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
@@ -47,10 +53,7 @@ export type TransformedAttendanceDataType = {
   project_site: string | null;
 };
 
-export type DayType = {
-  day: number;
-  fullDate: string;
-};
+export type DayType = { day: number; fullDate: string };
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const env = {
@@ -60,68 +63,49 @@ export async function loader({ request }: LoaderFunctionArgs) {
   try {
     const url = new URL(request.url);
     const { supabase, headers } = getSupabaseWithHeaders({ request });
-    const page = 0;
     const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-    if (!hasPermission(user?.role!, `${readRole}:${attribute.attendance}`)) {
+    if (!hasPermission(user?.role!, `${readRole}:${attribute.attendance}`))
       return safeRedirect(DEFAULT_ROUTE, { headers });
-    }
+
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
     const { data } = await getDefaultPaySequenceByCompanyId({
       supabase,
       companyId,
     });
-
     const defaultPayDay = data?.pay_day;
 
     const searchParams = new URLSearchParams(url.searchParams);
-    const sortParam = searchParams.get("sort");
-    const query = searchParams.get("name") ?? undefined;
-
     const filters = {
       month: searchParams.get("month") ?? undefined,
       year: searchParams.get("year") ?? undefined,
-      name: query,
+      name: searchParams.get("name") ?? undefined,
       project: searchParams.get("project") ?? undefined,
       project_site: searchParams.get("project_site") ?? undefined,
       range: searchParams.get("range") ?? undefined,
     };
 
-    const hasFilters =
-      filters &&
-      Object.values(filters).some(
-        (value) => value !== null && value !== undefined
-      );
-
+    const hasFilters = Object.values(filters).some((value) => value);
     const attendancePromise = getAttendanceByCompanyId({
       supabase,
       companyId,
       params: {
         from: 0,
-        to: hasFilters ? MAX_QUERY_LIMIT : page > 0 ? pageSize : pageSize - 1,
+        to: hasFilters ? MAX_QUERY_LIMIT : pageSize - 1,
         filters,
-        searchQuery: query ?? undefined,
-        sort: sortParam?.split(":") as [string, "asc" | "desc"],
+        searchQuery: filters.name,
+        sort: searchParams.get("sort")?.split(":") as [string, "asc" | "desc"],
       },
     });
 
-    const projectPromise = getProjectNamesByCompanyId({
-      supabase,
-      companyId,
-    });
-
+    const projectPromise = getProjectNamesByCompanyId({ supabase, companyId });
     const paySequencePromise = getPaySequenceNameByCompanyId({
       supabase,
       companyId,
     });
-
-    let projectSitePromise = null;
-    if (filters.project) {
-      projectSitePromise = getSiteNamesByProjectName({
-        supabase,
-        projectName: filters.project,
-      });
-    }
+    const projectSitePromise = filters.project
+      ? getSiteNamesByProjectName({ supabase, projectName: filters.project })
+      : null;
 
     return defer({
       projectPromise,
@@ -130,13 +114,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
       projectSitePromise,
       attendancePromise: attendancePromise as any,
       filters,
-      query,
+      query: filters.name,
       env,
       companyId,
     });
   } catch (error) {
     console.error("Attendance Error in loader function:", error);
-
     return defer({
       attendancePromise: Promise.resolve({ data: [] }),
       projectPromise: Promise.resolve({ data: [] }),
@@ -153,7 +136,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
-
   return clientCaching(
     `${cacheKeyPrefix.attendance}${url.searchParams.toString()}`,
     args
@@ -165,16 +147,10 @@ clientLoader.hydrate = true;
 export async function action({ request }: ActionFunctionArgs) {
   const url = new URL(request.url);
   const formData = await request.formData();
-
   const prompt = formData.get("prompt") as string | null;
-
   const searchParams = new URLSearchParams();
-  if (prompt && prompt.trim().length > 0) {
-    searchParams.append("name", prompt.trim());
-  }
-
+  if (prompt?.trim()) searchParams.append("name", prompt.trim());
   url.search = searchParams.toString();
-
   return redirect(url.toString());
 }
 
@@ -191,113 +167,27 @@ export default function Attendance() {
     env,
   } = useLoaderData<typeof loader>();
 
-  const calculateDateRange = (
-    range: string,
-    monthName: string | number | null | undefined,
-    yearValue: string | number | undefined
-  ) => {
-    let startDate: string;
-    let endDate: string;
-
-    if (range) {
-      const rangeNumber = Number.parseInt(String(range), 10);
-
-      if (!Number.isNaN(rangeNumber) && rangeNumber > 0) {
-        let endDateObj: Date;
-        let startDateObj: Date;
-
-        const monthNumber = monthName ? months[monthName] : month + 1;
-        const yearToUse = yearValue || year;
-
-        if (monthName) {
-          endDateObj = new Date(
-            Number(yearToUse),
-            monthNumber - 1,
-            rangeNumber + 1
-          );
-
-          let targetMonth = monthNumber - 2;
-          let targetYear = Number(yearToUse);
-
-          if (targetMonth < 0) {
-            targetMonth = 11;
-            targetYear -= 1;
-          }
-
-          startDateObj = new Date(targetYear, targetMonth, rangeNumber + 2);
-        } else {
-          endDateObj = new Date(Number(yearToUse), month, rangeNumber + 1);
-
-          let targetMonth = month - 1;
-          let targetYear = Number(yearToUse);
-
-          if (targetMonth < 0) {
-            targetMonth = 11;
-            targetYear -= 1;
-          }
-
-          startDateObj = new Date(
-            Number(targetYear),
-            targetMonth,
-            rangeNumber + 2
-          );
-        }
-
-        endDate = endDateObj.toISOString().split("T")[0];
-        startDate = startDateObj.toISOString().split("T")[0];
-      } else {
-        const monthStr = (month + 1).toString().padStart(2, "0");
-        const lastDay = new Date(year, month + 1, 0).getDate();
-        startDate = `${year}-${monthStr}-01`;
-        endDate = `${year}-${monthStr}-${lastDay}`;
-      }
-    } else {
-      const monthStr = (month + 1).toString().padStart(2, "0");
-      const lastDay = new Date(year, month + 1, 0).getDate();
-      startDate = `${year}-${monthStr}-01`;
-      endDate = `${year}-${monthStr}-${lastDay}`;
-    }
-
-    return { startDate, endDate };
-  };
-
   const [dateRange, setDateRange] = useState<{
     startDate: string | Date | undefined;
     endDate: string | Date | undefined;
   } | null>(null);
-  const [month, setMonth] = useState<number>(() => {
-    if (filters?.month) {
-      return months[filters?.month] - 1;
-    }
-    return new Date().getMonth();
-  });
-
-  const [year, setYear] = useState<number>(() => {
-    return filters?.year ? Number(filters?.year) : new Date().getFullYear();
-  });
+  const [month, setMonth] = useState<number>(
+    filters?.month ? months[filters.month] - 1 : defaultMonth
+  );
+  const [year, setYear] = useState<number>(
+    filters?.year ? Number(filters.year) : defaultYear
+  );
 
   useEffect(() => {
-    if (filters?.month) {
-      setMonth(months[filters?.month] - 1);
-    } else {
-      setMonth(new Date().getMonth());
-    }
-
-    if (filters?.year) {
-      setYear(Number(filters?.year));
-    } else {
-      setYear(new Date().getFullYear());
-    }
-
     if (filters?.range) {
       const { startDate, endDate } = calculateDateRange(
-        filters?.range,
-        filters?.month
+        filters.range,
+        filters.month
           ? Object.keys(months).find(
               (key) => months[key] === months[filters.month!]
             )
           : null,
-        filters?.year
+        filters.year
       );
       setDateRange({ startDate, endDate });
     }
@@ -322,10 +212,8 @@ export default function Attendance() {
         fullDate: currentDate.toISOString().split("T")[0],
       });
     }
-  } else {
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-    days = Array.from({ length: daysInMonth }, (_, i) => {
+    return Array.from({ length: daysInMonth }, (_, i) => {
       const currentDate = new Date(year, month, i + 1);
       currentDate.setHours(12, 0, 0, 0);
       return {
@@ -333,54 +221,48 @@ export default function Attendance() {
         fullDate: currentDate.toISOString().split("T")[0],
       };
     });
-  }
+  }, [filters, dateRange, month, year]);
 
-  const transformAttendanceData = useMemo(() => {
-    return (data: any[]) => {
-      const groupedByEmployee = data.reduce((acc, employee) => {
-        const empCode = employee.employee_code;
-        const employeeDetails = acc[empCode] || {
-          employee_id: employee.id,
-          employee_code: empCode,
-          employee_name: `${employee.first_name} ${employee.middle_name} ${employee.last_name}`,
-          project:
-            employee.employee_project_assignment?.project_sites?.projects
-              ?.name || null,
-          project_site:
-            employee.employee_project_assignment?.project_sites?.name || null,
-        };
+  const transformAttendanceData = useMemo(
+    () => (data: any[]) => {
+      return Object.values(
+        data.reduce((acc, employee) => {
+          const empCode = employee.employee_code;
+          const employeeDetails = acc[empCode] || {
+            employee_id: employee.id,
+            employee_code: empCode,
+            employee_name: `${employee.first_name} ${employee.middle_name} ${employee.last_name}`,
+            project:
+              employee.employee_project_assignment?.project_sites?.projects
+                ?.name || null,
+            project_site:
+              employee.employee_project_assignment?.project_sites?.name || null,
+          };
 
-        if (!employee?.attendance?.length) {
+          for (const record of employee?.attendance ?? []) {
+            const fullDate = formatDate(
+              new Date(record.date).toISOString().split("T")[0]
+            );
+            employeeDetails[fullDate as string] = record.present
+              ? "P"
+              : record.holiday
+              ? record.holiday_type === "weekly"
+                ? "WOF"
+                : record.holiday_type === "paid"
+                ? "L"
+                : "A"
+              : "A";
+          }
+
           acc[empCode] = employeeDetails;
           return acc;
-        }
-
-        for (const record of employee.attendance) {
-          const date = new Date(record.date);
-          const fullDate = formatDate(date.toISOString().split("T")[0]);
-
-          employeeDetails[fullDate!] = record.present
-            ? "P"
-            : record.holiday
-            ? record.holiday_type === "weekly"
-              ? "(WOF)"
-              : record.holiday_type === "paid"
-              ? "L"
-              : "A"
-            : "A";
-        }
-
-        acc[empCode] = employeeDetails;
-        return acc;
-      }, {} as Record<string, any>);
-
-      return Object.values(groupedByEmployee);
-    };
-  }, [month, year, days]);
-
-  const noFilters = Boolean(
-    filters && Object.values(filters).every((value) => !value)
+        }, {} as Record<string, any>)
+      );
+    },
+    [month, year, days]
   );
+
+  const noFilters = Object.values(filters ?? {}).every((value) => !value);
 
   return (
     <section className="py-4">
@@ -403,24 +285,19 @@ export default function Attendance() {
                           setYear={setYear}
                           disabled={!projectData?.data?.length && noFilters}
                           projectArray={
-                            projectData?.data?.length
-                              ? projectData?.data?.map(
-                                  (project) => project!.name
-                                )
-                              : []
+                            projectData?.data?.map(
+                              (project) => project!.name
+                            ) || []
                           }
                           projectSiteArray={
-                            projectSiteData?.data?.length
-                              ? projectSiteData?.data?.map((site) => site!.name)
-                              : []
+                            projectSiteData?.data?.map((site) => site!.name) ||
+                            []
                           }
                           paySequenceArray={
-                            paySequenceData?.data?.length
-                              ? paySequenceData?.data?.map((pay) => [
-                                  pay!.name!,
-                                  pay?.pay_day,
-                                ])
-                              : []
+                            paySequenceData?.data?.map((pay) => [
+                              pay!.name!,
+                              pay?.pay_day,
+                            ]) || []
                           }
                           defaultPayDay={defaultPayDay}
                         />
@@ -431,7 +308,6 @@ export default function Attendance() {
               )}
             </Await>
           </Suspense>
-
           <FilterList filters={filters ?? undefined} />
         </div>
         <AttendanceActions />
@@ -448,18 +324,12 @@ export default function Attendance() {
                 />
               );
             }
-            const transformedData = useMemo(() => {
-              return transformAttendanceData(data);
-            }, [data, transformAttendanceData]);
-
-            const hasNextPage = Boolean(meta?.count > pageSize);
-
+            const transformedData = transformAttendanceData(data);
+            const hasNextPage = meta?.count > pageSize;
             return (
               <AttendanceTable
                 days={days}
-                data={
-                  transformedData as unknown as TransformedAttendanceDataType[]
-                }
+                data={transformedData as TransformedAttendanceDataType[]}
                 hasNextPage={hasNextPage}
                 pageSize={pageSize}
                 query={query}
@@ -474,7 +344,6 @@ export default function Attendance() {
           }}
         </Await>
       </Suspense>
-
       <ImportEmployeeAttendanceModal />
     </section>
   );

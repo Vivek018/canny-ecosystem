@@ -28,6 +28,7 @@ import {
 import { Button } from "@canny_ecosystem/ui/button";
 import { ExportBar } from "../export-bar";
 import { useReportsStore } from "@/store/reports";
+import { defaultYear } from "@canny_ecosystem/utils";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -96,8 +97,7 @@ export function DataTable<TData, TValue>({
             : new Date();
           const totalDays = gratuityEligibleYears * 365.25;
 
-          const employeeWorkingYears =
-            new Date().getFullYear() - joining_date.getFullYear();
+          const employeeWorkingYears = defaultYear - joining_date.getFullYear();
 
           const presentDaysInYears = {
             first_year: 230,

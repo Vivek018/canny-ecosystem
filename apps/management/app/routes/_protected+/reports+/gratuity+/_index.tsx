@@ -14,6 +14,7 @@ import {
   getSiteNamesByProjectName,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
+import { defaultYear } from "@canny_ecosystem/utils";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json, Outlet, redirect, useLoaderData } from "@remix-run/react";
 
@@ -97,8 +98,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     );
     const totalDays = gratuityEligibleYears * 365.25;
 
-    const employeeWorkingYears =
-      new Date().getFullYear() - joining_date.getFullYear();
+    const employeeWorkingYears = defaultYear - joining_date.getFullYear();
 
     const presentDaysInYears = {
       first_year: 230,
