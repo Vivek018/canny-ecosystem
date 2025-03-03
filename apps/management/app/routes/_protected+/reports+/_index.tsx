@@ -65,6 +65,19 @@ export default function ReportsIndex() {
           </Link>
         </div>
       </div>
+      <div>
+        <h1 className="flex items-center tracking-wide font-bold justify-between pb-4 text-xl">
+          Attendance Reports
+        </h1>
+        <div className="flex flex-col items-start">
+          <Link
+            to="/reports/attendance"
+            className={cn(buttonVariants({ variant: "link" }), "px-0")}
+          >
+            Attendance
+          </Link>
+        </div>
+      </div>
     </section>
   );
 }

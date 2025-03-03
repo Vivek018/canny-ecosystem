@@ -1,4 +1,4 @@
-import { formatDate, formatMonthYearDate } from "@canny_ecosystem/utils";
+import {formatMonthYearDate } from "@canny_ecosystem/utils";
 import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 
 import type { ColumnDef } from "@tanstack/react-table";
