@@ -20,12 +20,14 @@ import { useSearchParams } from "@remix-run/react";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
 import {
-  type EmployeeFilters,
+  type AttendanceReportDataType,
+  type AttendanceReportFilters,
   getAttendanceReportByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
 import { useReportsStore } from "@/store/reports";
 import { DataTableHeader } from "./data-table-header";
+import { ExportBar } from "../export-bar";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -33,7 +35,7 @@ interface DataTableProps<TData, TValue> {
   count: number;
   hasNextPage: boolean;
   query?: string | null;
-  filters?: EmployeeFilters;
+  filters?: AttendanceReportFilters;
   noFilters?: boolean;
   pageSize: number;
   initialColumnVisibility?: VisibilityState;
@@ -220,14 +222,13 @@ export function DataTable<TData, TValue>({
           </div>
         </div>
       )}
-      {/* <ExportBar
-            className={cn(!table.getSelectedRowModel().rows.length && "hidden")}
-            rows={table.getSelectedRowModel().rows.length}
-            data={selectedRowsData}
-            fMonth={filters?.month}
-            fYear={filters?.year}
-            columnVisibility={columnVisibility}
-          /> */}
+      <ExportBar
+        className={cn(!table.getSelectedRowModel().rows.length && "hidden")}
+        rows={table.getSelectedRowModel().rows.length}
+        data={selectedRowsData as unknown as AttendanceReportDataType[]}
+        columnVisibility={columnVisibility}
+        monthYearsRange={monthYearsRange}
+      />
     </div>
   );
 }

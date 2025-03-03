@@ -25,6 +25,7 @@ import { FilterList } from "@/components/reports/attendance/filter-list";
 import { columns } from "@/components/reports/attendance/table/columns";
 import { DataTable } from "@/components/reports/attendance/table/data-table";
 import { months } from "@canny_ecosystem/utils/constant";
+import { ColumnVisibility } from "@/components/reports/column-visibility";
 
 const pageSize = 20;
 
@@ -180,7 +181,7 @@ export default function AttendanceReport() {
 
           <FilterList filterList={filters ?? undefined} />
         </div>
-        {/* <ColumnVisibility /> */}
+        <ColumnVisibility />
       </div>
       <Suspense fallback={<LoadingSpinner className="w-1/3 h-1/3" />}>
         <Await resolve={attendanceReportPromise}>
@@ -231,7 +232,7 @@ export default function AttendanceReport() {
 
               return monthYearArray;
             }
-
+            const currentYear = new Date().getFullYear();
             const monthYearsRange =
               filters?.start_year && filters?.end_year
                 ? getMonthYearRange(
@@ -240,8 +241,12 @@ export default function AttendanceReport() {
                     filters.end_month,
                     Number(filters.end_year)
                   )
-                : [];
-
+                : getMonthYearRange(
+                    "January",
+                    Number(currentYear),
+                    "December",
+                    Number(currentYear)
+                  );
             const hasNextPage = Boolean(meta?.count > pageSize);
             return (
               <DataTable

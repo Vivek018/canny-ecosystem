@@ -22,7 +22,6 @@ export function AttendanceTableHeader({
 }: Props) {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // make sure the order is same as header order
   const AttendanceColumnIdArray = [
     "employee_code",
     "employee_name",

@@ -1,61 +1,120 @@
-import type { EmployeeReportDataType } from "@canny_ecosystem/supabase/queries";
+import type { AttendanceReportDataType } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { formatDateTime } from "@canny_ecosystem/utils";
 import type { VisibilityState } from "@tanstack/react-table";
 import Papa from "papaparse";
-import { esiReportColumnIdArray } from "./table/data-table-header";
 
 export function ExportBar({
   rows,
   data,
   className,
   columnVisibility,
+  monthYearsRange,
 }: {
   rows: number;
-  data: (EmployeeReportDataType & {
-    start_range: string;
-    end_range: string;
-  })[];
+  data: AttendanceReportDataType[];
   className: string;
   columnVisibility: VisibilityState;
+  monthYearsRange: any;
 }) {
-  const toBeExportedData = data.map((element) => {
-    const exportedData: {
-      [key: (typeof esiReportColumnIdArray)[number]]: string | number | boolean;
-    } = {};
+  function transformEmployeeData(
+    data: any[],
+    columnVisibility: Record<string, boolean>
+  ) {
+    const toBeExportedData = data.map((element) => {
+      const exportedData: {
+        [key: string]: string | number | boolean | undefined;
+      } = {};
 
-    for (const key of esiReportColumnIdArray) {
-      if (columnVisibility[key] === false) {
-        continue;
+      if (columnVisibility.employee_code !== false) {
+        exportedData.employee_code = element.employee_code;
       }
-      if (key === "employee_code") {
-        exportedData[key] = element?.employee_code;
-      } else if (key === "employee_name") {
-        exportedData[
-          key
-        ] = `${element?.first_name} ${element?.middle_name} ${element?.last_name}`;
-      } else if (key === "project") {
-        exportedData[key] =
-          element?.employee_project_assignment?.project_sites?.projects?.name;
-      } else if (key === "project_site") {
-        exportedData[key] =
-          element?.employee_project_assignment?.project_sites?.name;
-      } else if (key === "start_range") {
-        exportedData[key] = element?.start_range;
-      } else if (key === "end_range") {
-        exportedData[key] = element?.end_range ?? "";
-      } else {
-        exportedData[key] = element[key as keyof EmployeeReportDataType] as string | boolean | number;
+
+      if (columnVisibility.employee_name !== false) {
+        const firstName = element.first_name || "";
+        const middleName = element.middle_name ? ` ${element.middle_name}` : "";
+        const lastName = element.last_name ? ` ${element.last_name}` : "";
+        exportedData.employee_name =
+          `${firstName}${middleName}${lastName}`.trim();
+      }
+
+      if (columnVisibility.project !== false) {
+        exportedData.project =
+          element.employee_project_assignment?.project_sites?.projects?.name ||
+          null;
+      }
+
+      if (columnVisibility.project_site !== false) {
+        exportedData.project_site =
+          element.employee_project_assignment?.project_sites?.name || null;
+      }
+
+      if (element.attendance) {
+        for (const monthYear of monthYearsRange) {
+          if (columnVisibility[monthYear] !== false) {
+            exportedData[monthYear] =
+              element.attendance[monthYear]?.length || null;
+          }
+        }
+      }
+      if (columnVisibility.start_range !== false) {
+        exportedData.start_range = monthYearsRange[0];
+      }
+      if (columnVisibility.end_range !== false) {
+        exportedData.end_range = monthYearsRange[monthYearsRange.length - 1];
+      }
+
+      for (const key in columnVisibility) {
+        if (columnVisibility[key] === false) {
+          continue;
+        }
+
+        if (
+          key === "employee_code" ||
+          key === "employee_name" ||
+          key === "project" ||
+          key === "project_site" ||
+          key === "start_range" ||
+          key === "end_range" ||
+          (element.attendance && key in element.attendance)
+        ) {
+          continue;
+        }
+
+        if (key in element) {
+          exportedData[key] = element[key];
+        }
+      }
+
+      return exportedData;
+    });
+
+    return toBeExportedData;
+  }
+
+  const formattedData = transformEmployeeData(data, columnVisibility);
+
+  function calculateAvgPresenceByEmployees(data: any) {
+    let totalDays = 0;
+    const totalEmployees = data.length;
+
+    for (const employee of data) {
+      for (const key in employee) {
+        if (
+          key.endsWith("2025") &&
+          !["start_range", "end_range"].includes(key)
+        ) {
+          totalDays += employee[key] ?? 0;
+        }
       }
     }
 
-    return exportedData;
-  });
-
+    return totalEmployees > 0 ? (totalDays / totalEmployees).toFixed(2) : "0";
+  }
   const handleExport = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-    const csv = Papa.unparse(toBeExportedData);
+    const csv = Papa.unparse(formattedData);
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
@@ -63,7 +122,7 @@ export function ExportBar({
 
     link.setAttribute(
       "download",
-      `Gratuity Report - ${formatDateTime(Date.now())}`
+      `Attendance Report - ${formatDateTime(Date.now())}`
     );
 
     document.body.appendChild(link);
@@ -83,6 +142,12 @@ export function ExportBar({
         <p className="font-semibold">{rows} Selected</p>
       </div>
       <div className="h-full flex justify-center items-center gap-2">
+        <div className="h-full tracking-wide font-medium rounded-full flex justify-between items-center px-6 border dark:border-muted-foreground/30 ">
+          Avg Presents:{" "}
+          <span className="ml-1.5">
+            {calculateAvgPresenceByEmployees(formattedData)}
+          </span>
+        </div>
         <Button
           onClick={handleExport}
           variant="default"

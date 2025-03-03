@@ -64,11 +64,11 @@ export type AttendanceReportDataType = Pick<
     };
   };
 } & {
-  attendance: Pick<
-    EmployeeAttendanceDatabaseRow,
-    "id" | "employee_id" | "date" | "present"
-  >;
-};
+    attendance: Pick<
+      EmployeeAttendanceDatabaseRow,
+      "id" | "employee_id" | "date" | "present"
+    >;
+  }[];
 
 export async function getAttendanceByEmployeeId({
   supabase,
@@ -457,6 +457,9 @@ export async function getAttendanceReportByCompanyId({
     filters?: AttendanceReportFilters;
   };
 }) {
+  const currentYear = new Date().getFullYear();
+  const startDate = `${currentYear}-01-01`;
+  const endDate = `${currentYear}-12-31`;
   const { sort, from, to, filters, searchQuery } = params;
   const {
     project,
@@ -496,7 +499,9 @@ export async function getAttendanceReportByCompanyId({
       { count: "exact" }
     )
     .eq("company_id", companyId)
-    .eq("attendance.present", true);
+    .eq("attendance.present", true)
+    .gte("attendance.date", startDate)
+    .lte("attendance.date", endDate);
 
   if (sort) {
     const [column, direction] = sort;
@@ -556,7 +561,7 @@ export async function getAttendanceReportByCompanyId({
 
   const { data, count, error } = await query
     .range(from, to)
-    .returns<AttendanceReportDataType[]>();
+    .returns<AttendanceReportDataType>();
   if (error) {
     console.error("getAttendanceReportByCompanyId Error", error);
     return { data: null, error };
@@ -571,7 +576,7 @@ export async function getAttendanceReportByCompanyId({
     const { attendance, ...employeeInfo } = employee;
     const attendanceByMonth: Record<string, any[]> = {};
 
-    if (attendance && attendance.length > 0) {
+    if (Array.isArray(attendance) && attendance.length > 0) {
       for (const record of attendance) {
         if (record.date) {
           const recordDate = new Date(record.date);

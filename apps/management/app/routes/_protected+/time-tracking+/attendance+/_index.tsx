@@ -303,7 +303,7 @@ export default function Attendance() {
     }
   }, [filters]);
 
-  let days: any;
+  let days: { day: number; fullDate: string }[];
 
   if (filters?.range) {
     const startDateObj = new Date(dateRange?.startDate!);
@@ -383,10 +383,10 @@ export default function Attendance() {
   );
 
   return (
-    <section className='py-4'>
-      <div className='w-full flex items-center justify-between pb-4'>
-        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4'>
-          <Suspense fallback={<LoadingSpinner className='mt-20' />}>
+    <section className="py-4">
+      <div className="w-full flex items-center justify-between pb-4">
+        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
+          <Suspense fallback={<LoadingSpinner className="mt-20" />}>
             <Await resolve={projectPromise}>
               {(projectData) => (
                 <Await resolve={projectSitePromise}>
@@ -436,7 +436,7 @@ export default function Attendance() {
         </div>
         <AttendanceActions />
       </div>
-      <Suspense fallback={<LoadingSpinner className='w-1/3 h-1/3' />}>
+      <Suspense fallback={<LoadingSpinner className="w-1/3 h-1/3" />}>
         <Await resolve={attendancePromise}>
           {({ data, meta, error }) => {
             if (error) {
@@ -444,7 +444,7 @@ export default function Attendance() {
               return (
                 <ErrorBoundary
                   error={error}
-                  message='Failed to load Attendance'
+                  message="Failed to load Attendance"
                 />
               );
             }
