@@ -4,7 +4,7 @@ import { useActionData, useNavigate } from "@remix-run/react";
 import { json } from "@remix-run/node";
 import { useEffect } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { uploadEmployeeProfilePhoto } from "../../../../../../../../packages/supabase/src/media/employee";
+import { uploadEmployeeProfilePhoto } from "@canny_ecosystem/supabase/media";
 
 export async function action({
   request,

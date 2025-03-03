@@ -266,7 +266,7 @@ export const DEFAULT_LETTER_CONTENT = {
 
 export const SUPABASE_STORAGE = {
   LOGOS: "logos",
-  EMPLOYEE_PROFILE_PHOTO: "employees/profile-photo",
+  EMPLOYEE_PROFILE_PHOTO: "employees/profile_photo",
 };
 
 export const SUPABASE_BUCKET = {

@@ -11,7 +11,7 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { FormButtons } from "@/components/form/form-buttons";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { uploadEmployeeDocument } from "../../../../../../../../packages/supabase/src/media/employee";
+import { uploadEmployeeDocument } from "@canny_ecosystem/supabase/media";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     const employeeId = params.employeeId;
@@ -43,7 +43,7 @@ export async function action({
 
         const { status, error } = await uploadEmployeeDocument({
             supabase,
-            file: document_file,
+            file: document_file as File,
             employeeId,
             documentName: document_name as string
         });

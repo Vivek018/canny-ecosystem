@@ -25,7 +25,6 @@ import {
   useParams,
 } from "@remix-run/react";
 import { type ReactNode, Suspense, useEffect } from "react";
-import { getEmployeeProfilePhotoByEmployeeId } from "../../../../../../../packages/supabase/src/media/employee";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -58,8 +57,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       employeeId: employeeId ?? "",
     });
 
-    const employeeProfilePhotoPromise = getEmployeeProfilePhotoByEmployeeId({ supabase, employeeId });
-
     const env = {
       SUPABASE_URL: process.env.SUPABASE_URL!,
       SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
@@ -71,7 +68,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       employeeBankDetailsPromise,
       employeeAddressesPromise,
       employeeGuardiansPromise,
-      employeeProfilePhotoPromise,
       env,
       error: null,
     });
@@ -84,7 +80,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       employeeBankDetailsPromise: null,
       employeeAddressesPromise: null,
       employeeGuardiansPromise: null,
-      employeeProfilePhotoPromise: null
     });
   }
 }
@@ -107,7 +102,6 @@ export default function EmployeeIndex() {
     employeeBankDetailsPromise,
     employeeAddressesPromise,
     employeeGuardiansPromise,
-    employeeProfilePhotoPromise
   } = useLoaderData<typeof loader>();
   const { employeeId } = useParams();
 
@@ -124,26 +118,15 @@ export default function EmployeeIndex() {
         <Await resolve={employeePromise}>
           {(resolvedData) => {
             if (!resolvedData || !env) {
-              clearExactCacheEntry(
-                `${cacheKeyPrefix.employee_overview}${employeeId}`
-              );
+              clearExactCacheEntry(`${cacheKeyPrefix.employee_overview}${employeeId}`);
               return <ErrorBoundary message='Failed to load employee' />;
             }
             return (
               <>
-                <Await resolve={employeeProfilePhotoPromise}>
-                  {
-                    (resolvedEmployeeProfilePhotoData: any) => {
-                      if (resolvedData.data)
-                        resolvedData.data.photo = resolvedEmployeeProfilePhotoData.data?.signedUrl;
-                      return <CommonWrapper
-                        error={resolvedData.error}
-                        Component={<EmployeePageHeader employee={resolvedData.data!} env={env} />}
-                      />
-                    }
-                  }
-                </Await>
-
+                <CommonWrapper
+                  error={resolvedData.error}
+                  Component={<EmployeePageHeader employee={resolvedData.data!} env={env} />}
+                />
                 <CommonWrapper
                   error={resolvedData.error}
                   Component={

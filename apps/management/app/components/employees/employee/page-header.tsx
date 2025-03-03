@@ -75,7 +75,7 @@ export function EmployeePageHeader({
         <div className="flex flex-row gap-6 items-center">
           <div>
             <Avatar
-              className="w-28 h-28 border border-muted-foreground/30 shadow-sm hover:z-40"
+              className="w-28 h-28 border border-muted-foreground/30 shadow-sm hover:z-40 cursor-pointer"
               onClick={() => inputRef?.current?.click()}
             >
               <>

@@ -12,14 +12,12 @@ import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Await, type ClientLoaderFunctionArgs, defer, useLoaderData } from "@remix-run/react";
 import { Suspense, useEffect, useState } from "react";
-import { getCompanyLogoByCompanyId } from "../../../../../../packages/supabase/src/media/company";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-    const companyLogoPromise = getCompanyLogoByCompanyId({ supabase, companyId });
     const companyDetailsPromise = getCompanyById({ supabase, id: companyId! });
 
     const companyRegistrationDetailsPromise =
@@ -30,7 +28,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
       message: "Company found",
       error: null,
       companyDetailsPromise,
-      companyLogoPromise,
       companyRegistrationDetailsPromise,
     });
   } catch (error) {
@@ -39,7 +36,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
       message: "Failed to get company",
       error,
       companyDetailsPromise: null,
-      companyLogoPromise: null,
       companyRegistrationDetailsPromise: null,
     });
   }
@@ -52,7 +48,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 clientLoader.hydrate = true;
 
 export default function SettingGeneral() {
-  const { companyDetailsPromise, companyRegistrationDetailsPromise, companyLogoPromise, error } =
+  const { companyDetailsPromise, companyRegistrationDetailsPromise, error } =
     useLoaderData<typeof loader>();
 
   const [resetKey, setResetKey] = useState(Date.now());
@@ -76,14 +72,7 @@ export default function SettingGeneral() {
                 clearExactCacheEntry(cacheKeyPrefix.general);
                 return <ErrorBoundary message="Failed to load company details" />
               }
-              return <Await resolve={companyLogoPromise}>
-                {(resolvedCompanyLogoData) => {
-                  if (resolvedData.data)
-                    resolvedData.data.logo = resolvedCompanyLogoData?.data?.signedUrl ?? "";
-                  return <CompanyDetailsWrapper data={resolvedData.data} error={resolvedData.error} />
-                }}
-              </Await>
-
+              return <CompanyDetailsWrapper data={resolvedData.data} error={resolvedData.error} />
             }}
           </Await>
         </Suspense>

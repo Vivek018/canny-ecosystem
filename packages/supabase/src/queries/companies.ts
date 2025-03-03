@@ -11,7 +11,7 @@ import { HARD_QUERY_LIMIT, SINGLE_QUERY_LIMIT } from "../constant";
 export async function getCompanies({
   supabase,
 }: { supabase: TypedSupabaseClient }) {
-  const columns = ["id", "name"] as const;
+  const columns = ["id", "name", "logo"] as const;
 
   const { data, error } = await supabase
     .from("companies")

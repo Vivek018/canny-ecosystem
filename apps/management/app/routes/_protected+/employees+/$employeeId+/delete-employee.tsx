@@ -14,7 +14,7 @@ import { attribute } from "@canny_ecosystem/utils/constant";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { json, useActionData, useNavigate, useParams } from "@remix-run/react";
 import { useEffect } from "react";
-import { deleteEmployeeProfilePhoto } from "../../../../../../../packages/supabase/src/media/employee";
+import { deleteEmployeeProfilePhoto } from "@canny_ecosystem/supabase/media";
 
 export async function action({
   request,

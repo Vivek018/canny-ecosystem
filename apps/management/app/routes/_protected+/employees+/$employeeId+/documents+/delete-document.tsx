@@ -6,7 +6,7 @@ import { clearExactCacheEntry } from "@/utils/cache";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { deleteEmployeeDocument } from "../../../../../../../../packages/supabase/src/media/employee";
+import { deleteEmployeeDocument } from "@canny_ecosystem/supabase/media";
 
 export async function action({
     request,

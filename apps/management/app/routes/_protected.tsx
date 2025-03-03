@@ -15,7 +15,6 @@ import { useTheme } from "@/utils/theme";
 import { Header } from "@/components/header";
 import { clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
-import { getCompanyLogoByCompanyId } from "../../../../packages/supabase/src/media/company";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { user: sessionUser } = await getSessionUser({ request });
@@ -31,12 +30,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { data: companiesData, error: companiesError } = await getCompanies({ supabase });
 
   if (companiesError) console.error("Protected Companies", companiesError);
-
-  // assigning logo to each company
-  for (const company of companiesData ?? []) {
-    const { data } = await getCompanyLogoByCompanyId({ supabase, companyId: company.id });
-    company.logo = (data?.signedUrl ? data?.signedUrl : undefined);
-  }
 
   return json({ user: userData, companies: companiesData });
 }

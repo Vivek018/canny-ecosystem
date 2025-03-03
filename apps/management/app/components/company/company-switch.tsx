@@ -18,9 +18,7 @@ import { attribute } from "@canny_ecosystem/utils/constant";
 import { clearAllCache } from "@/utils/cache";
 
 export const CompanySwitch = ({ companies }: {
-  companies: (CompanyDatabaseRow & {
-    logo: string;
-  })[]
+  companies: CompanyDatabaseRow[]
 }) => {
   const { role } = useUser();
   const submit = useSubmit();
@@ -58,7 +56,7 @@ export const CompanySwitch = ({ companies }: {
         >
           <div className="flex items-center gap-2">
             <Avatar className="w-[34px] h-[34px] border border-muted-foreground/30 shadow-sm rounded-sm">
-              <AvatarImage src={currentCompany?.logo} />
+              <AvatarImage src={currentCompany?.logo ?? undefined} />
               <AvatarFallback className="rounded-sm">
                 <span className="tracking-widest capitalize text-xs ml-[1.5px]">
                   {currentCompany?.name.charAt(0)}
@@ -98,7 +96,7 @@ export const CompanySwitch = ({ companies }: {
                 >
                   <div className="flex items-center gap-1.5">
                     <Avatar className="w-8 h-8 border border-muted-foreground/30 shadow-sm rounded-sm">
-                      <AvatarImage src={company.logo} />
+                      <AvatarImage src={company.logo ?? undefined} />
                       <AvatarFallback className="rounded-sm">
                         <span className="tracking-widest capitalize text-xs ml-[1.5px]">
                           {company.name.charAt(0)}

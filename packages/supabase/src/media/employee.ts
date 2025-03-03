@@ -8,48 +8,24 @@ import type {
   TypedSupabaseClient,
 } from "../types";
 import { updateEmployee } from "../mutations";
-import { getEmployeeById } from "../queries";
 import { convertToNull } from "@canny_ecosystem/utils";
 
 // employee profile photo
-export async function getEmployeeProfilePhotoByEmployeeId({
-  supabase,
-  employeeId,
-}: { supabase: TypedSupabaseClient; employeeId: string }) {
-  const { data: employeeData, error: employeeError } = await getEmployeeById({
-    supabase,
-    id: employeeId,
-  });
-
-  if (employeeError || !employeeData?.photo) {
-    console.error("getEmployeeById Error", employeeError);
-    return { data: employeeData, error: employeeError };
-  }
-
-  const { data, error } = await supabase.storage
-    .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
-    .createSignedUrl(employeeData?.photo, 60 * 60);
-
-  if (error) {
-    console.error("getEmployeeProfilePhotoByEmployeeId Error", error);
-    return { data, error };
-  }
-  return { data, error };
-}
-
 export async function uploadEmployeeProfilePhoto({
   supabase,
   profilePhoto,
   employeeId,
 }: {
   supabase: TypedSupabaseClient;
-  profilePhoto: any;
+  profilePhoto: File;
   employeeId: string;
 }) {
   if (profilePhoto instanceof File) {
     const filePath = `${SUPABASE_STORAGE.EMPLOYEE_PROFILE_PHOTO}/${employeeId}`;
     const buffer = await profilePhoto.arrayBuffer();
     const fileData = new Uint8Array(buffer);
+
+    // Storing file in bucket
     const { error } = await supabase.storage
       .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
       .update(filePath, fileData, {
@@ -63,9 +39,15 @@ export async function uploadEmployeeProfilePhoto({
       return { status: 500, error };
     }
 
+    // Generating the public URL
+    const { data } = supabase.storage
+      .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
+      .getPublicUrl(filePath);
+
+    // Updating photo path in employees
     const { error: updateEmployeeError } = await updateEmployee({
       supabase,
-      data: { id: employeeId, photo: filePath },
+      data: { id: employeeId, photo: data.publicUrl },
     });
 
     if (updateEmployeeError) {
@@ -73,8 +55,9 @@ export async function uploadEmployeeProfilePhoto({
       return { status: 500, error: updateEmployeeError };
     }
 
-    return { status: 200, error };
+    return { status: 200 };
   }
+
   return { status: 400, error: "File not uploaded by the user" };
 }
 
@@ -118,7 +101,13 @@ export async function getEmployeeDocuments({
     .select(columns.join(","))
     .eq("employee_id", employeeId)
     .single<
-      InferredType<EmployeeDocumentsDatabaseRow, (typeof columns)[number]>
+      InferredType<
+        Omit<
+          EmployeeDocumentsDatabaseRow,
+          "updated_at" | "created_at" | "employee_id"
+        >,
+        (typeof columns)[number]
+      >
     >();
 
   if (error) {
@@ -126,21 +115,7 @@ export async function getEmployeeDocuments({
     return null;
   }
 
-  const entriesWithPaths = Object.entries(data).filter(
-    ([_, path]) => path !== null,
-  );
-
-  const signedUrls = await Promise.all(
-    entriesWithPaths.map(async ([key, path]) => {
-      const { data: urlData, error: urlError } = await supabase.storage
-        .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
-        .createSignedUrl(path as string, 60 * 60);
-
-      if (!urlError) return { name: key, url: urlData.signedUrl };
-    }),
-  );
-
-  return { data: signedUrls, error };
+  return { data, error };
 }
 
 export async function uploadEmployeeDocument({
@@ -159,10 +134,29 @@ export async function uploadEmployeeDocument({
     const buffer = await file.arrayBuffer();
     const fileData = new Uint8Array(buffer);
 
-    // updating path in employee_documents table
+    // Storing file in Supabase storage
+    const { error } = await supabase.storage
+      .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
+      .update(filePath, fileData, {
+        contentType: file.type,
+        cacheControl: "3600",
+        upsert: false,
+      });
+
+    if (error) {
+      console.error("uploadEmployeeDocument Error", error);
+      return { status: 500, error: error.message || "Error storing file" };
+    }
+
+    // Generating the public URL for the uploaded document
+    const { data } = supabase.storage
+      .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
+      .getPublicUrl(filePath);
+
+    // Updating the path in employee_documents table
     const updatedData = convertToNull({
       employee_id: employeeId,
-      [documentName]: filePath,
+      [documentName]: data.publicUrl,
     });
 
     const { error: updateError } = await supabase
@@ -180,22 +174,9 @@ export async function uploadEmployeeDocument({
       };
     }
 
-    // storing file in supabase
-    const { error } = await supabase.storage
-      .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
-      .update(filePath, fileData, {
-        contentType: file.type,
-        cacheControl: "3600",
-        upsert: false,
-      });
-
-    if (error) {
-      console.error("uploadEmployeeDocument Error", error);
-      return { status: 500, error: error.message || "Error storing file" };
-    }
-
     return { status: 200, error: null };
   }
+
   return { status: 400, error: "File not uploaded by the user" };
 }
 

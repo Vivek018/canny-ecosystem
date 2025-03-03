@@ -3,7 +3,7 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { createRole, hasPermission, replaceUnderscore, updateRole } from "@canny_ecosystem/utils";
 import { defer, type LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { getEmployeeDocuments } from "../../../../../../../../packages/supabase/src/media/employee";
+import { getEmployeeDocuments } from "@canny_ecosystem/supabase/media";
 import { Await, type ClientLoaderFunctionArgs, Link, Outlet, useLoaderData, useNavigate, useParams } from "@remix-run/react";
 import { Suspense, useEffect } from "react";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
@@ -19,6 +19,7 @@ import { attribute } from "@canny_ecosystem/utils/constant";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
 import { DeleteEmployeeDocument } from "@/components/employees/documents/delete-employee-document";
 import { Avatar, AvatarFallback, AvatarImage } from "@canny_ecosystem/ui/avatar";
+import type { EmployeeDocumentsDatabaseRow } from "@canny_ecosystem/supabase/types";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     const employeeId = params.employeeId ?? "";
@@ -120,10 +121,7 @@ export default function Documents() {
 
 // document wrapper
 export function DocumentsWrapper({ data, error }: {
-    data: {
-        name: string,
-        url: string
-    }[];
+    data: Omit<EmployeeDocumentsDatabaseRow, "updated_at" | "created_at" | "employee_id">;
     error: unknown;
 }) {
     const { employeeId } = useParams();
@@ -143,15 +141,19 @@ export function DocumentsWrapper({ data, error }: {
     return (
         <CommandGroup className="p-4">
             <div className="w-full grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
-                {data?.map((documentData) => (
-                    <CommandItem
-                        key={documentData.name}
-                        value={documentData?.name}
-                        className="data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0"
-                    >
-                        <DocumentCard documentData={documentData} />
-                    </CommandItem>
-                ))}
+                {
+                    Object.entries(data).map(([name, url]: any) => {
+                        if (url) {
+                            return <CommandItem
+                                key={name}
+                                value={name}
+                                className="data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0"
+                            >
+                                <DocumentCard documentData={{ name, url }} />
+                            </CommandItem>
+                        }
+                    })
+                }
             </div>
         </CommandGroup>
     );
@@ -206,7 +208,7 @@ export function DocumentCard({ documentData }: {
     return (
         <Card
             key={documentData.name}
-            className="w-full max-w-[200px] mx-auto select-text cursor-pointer dark:border-[1.5px] flex flex-col overflow-hidden rounded-lg shadow-md transition-transform duration-300 hover:scale-[1.02]"
+            className="w-full max-w-[200px] mx-auto select-text cursor-pointer dark:border-[1.5px] flex flex-col overflow-hidden rounded-lg shadow-md transition-transform duration-300"
         >
             <div
                 className="flex items-center justify-center bg-muted/30 hover:bg-muted/50 h-48 w-full"

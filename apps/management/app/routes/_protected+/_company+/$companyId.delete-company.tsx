@@ -11,7 +11,7 @@ import { useEffect } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { clearAllCache } from "@/utils/cache";
 import { DEFAULT_ROUTE } from "@/constant";
-import { deleteCompanyLogo } from "../../../../../../packages/supabase/src/media/company";
+import {deleteCompanyLogo} from "@canny_ecosystem/supabase/media"
 
 export async function action({
   request,

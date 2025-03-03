@@ -5,8 +5,7 @@ import { json } from "@remix-run/node";
 import { useEffect } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { uploadCompanyLogo } from "../../../../../../packages/supabase/src/media/company";
-
+import { uploadCompanyLogo } from "@canny_ecosystem/supabase/media";
 
 export async function action({ request }: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });

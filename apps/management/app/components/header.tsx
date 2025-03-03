@@ -8,7 +8,7 @@ export function Header({
   companies,
 }: {
   className?: string;
-  companies: (CompanyDatabaseRow & { logo: string })[];
+  companies: CompanyDatabaseRow[];
 }) {
   return (
     <header

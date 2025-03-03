@@ -3,21 +3,7 @@ import {
   SUPABASE_STORAGE,
 } from "@canny_ecosystem/utils/constant";
 import type { TypedSupabaseClient } from "../types";
-
-export async function getCompanyLogoByCompanyId({
-  supabase,
-  companyId,
-}: { supabase: TypedSupabaseClient; companyId: string }) {
-  const { data, error } = await supabase.storage
-    .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
-    .createSignedUrl(`${SUPABASE_STORAGE.LOGOS}/${companyId}`, 60 * 60);
-
-  if (error) {
-    console.error("getRelationshipTermsById Error", error);
-    return { data, error };
-  }
-  return { data, error };
-}
+import { updateCompany } from "../mutations";
 
 export async function uploadCompanyLogo({
   supabase,
@@ -32,6 +18,8 @@ export async function uploadCompanyLogo({
     const filePath = `${SUPABASE_STORAGE.LOGOS}/${companyId}`;
     const buffer = await logo.arrayBuffer();
     const fileData = new Uint8Array(buffer);
+
+    // Storing company logo in bucket
     const { error } = await supabase.storage
       .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
       .update(filePath, fileData, {
@@ -45,8 +33,25 @@ export async function uploadCompanyLogo({
       return { status: 500, error };
     }
 
-    return { status: 200, error };
+    // Generating public URL for the uploaded logo
+    const { data } = supabase.storage
+      .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
+      .getPublicUrl(filePath);
+
+    // Setting company logo path in 'companies' table
+    const { error: updateError } = await updateCompany({
+      supabase,
+      data: { id: companyId, logo: data.publicUrl },
+    });
+
+    if (updateError) {
+      console.error("updateCompany Error", updateError);
+      return { status: 500, error: updateError };
+    }
+
+    return { status: 200, error: null };
   }
+
   return { status: 400, error: "File not uploaded by the user" };
 }
 
