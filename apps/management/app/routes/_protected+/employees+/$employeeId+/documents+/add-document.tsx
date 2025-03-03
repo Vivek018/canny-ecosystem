@@ -43,7 +43,7 @@ export async function action({
             supabase,
             file: document_file as File,
             employeeId,
-            documentName: document_name as string
+            documentName: document_name as (typeof employeeDocuments)[number]
         });
 
         if (isGoodStatus(status)) {

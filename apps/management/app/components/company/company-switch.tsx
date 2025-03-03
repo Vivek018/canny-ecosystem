@@ -18,7 +18,7 @@ import { attribute } from "@canny_ecosystem/utils/constant";
 import { clearAllCache } from "@/utils/cache";
 
 export const CompanySwitch = ({ companies }: {
-  companies: CompanyDatabaseRow[]
+  companies: Pick<CompanyDatabaseRow, "id" | "name" | "logo">[];
 }) => {
   const { role } = useUser();
   const submit = useSubmit();

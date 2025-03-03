@@ -8,7 +8,7 @@ export function Header({
   companies,
 }: {
   className?: string;
-  companies: CompanyDatabaseRow[];
+  companies: Pick<CompanyDatabaseRow, "id" | "name" | "logo">[];
 }) {
   return (
     <header

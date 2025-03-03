@@ -100,7 +100,7 @@ export default function Documents() {
                         <Suspense fallback={<div>Loading...</div>}>
                             <Await resolve={documentsPromise}>
                                 {(resolvedData) => {
-                                    if (!resolvedData) {
+                                    if (!resolvedData || !resolvedData.data) {
                                         clearExactCacheEntry(`${cacheKeyPrefix.employee_documents}${employeeId}`);
                                         return <ErrorBoundary message="Failed to fetch documents" />;
                                     }
@@ -121,7 +121,7 @@ export default function Documents() {
 
 // document wrapper
 export function DocumentsWrapper({ data, error }: {
-    data: Omit<EmployeeDocumentsDatabaseRow, "updated_at" | "created_at" | "employee_id">;
+    data: EmployeeDocumentsDatabaseRow[];
     error: unknown;
 }) {
     const { employeeId } = useParams();
@@ -140,18 +140,16 @@ export function DocumentsWrapper({ data, error }: {
 
     return (
         <CommandGroup>
-            <div className="w-full grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+            <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-0">
                 {
-                    Object.entries(data).map(([name, url]: any) => {
-                        if (url) {
-                            return <CommandItem
-                                key={name}
-                                value={name}
-                                className="data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0"
-                            >
-                                <DocumentCard documentData={{ name, url }} />
-                            </CommandItem>
-                        }
+                    data.map((document) => {
+                        return <CommandItem
+                            key={document.document_type}
+                            value={document.document_type as string}
+                            className="data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0"
+                        >
+                            <DocumentCard documentData={{ name: document.document_type as string, url: document.url as string }} />
+                        </CommandItem>
                     })
                 }
             </div>
