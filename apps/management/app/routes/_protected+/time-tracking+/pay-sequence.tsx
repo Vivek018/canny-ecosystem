@@ -63,7 +63,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
-  return await clientCaching(
+  return clientCaching(
     `${cacheKeyPrefix.paySequence}${url.searchParams.toString()}`,
     args
   );
