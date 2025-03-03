@@ -172,7 +172,7 @@ export default function Attendance() {
     endDate: string | Date | undefined;
   } | null>(null);
   const [month, setMonth] = useState<number>(
-    filters?.month ? months[filters.month] - 1 : defaultMonth
+    filters?.month ? months[filters.month] - 1 : defaultMonth + 1
   );
   const [year, setYear] = useState<number>(
     filters?.year ? Number(filters.year) : defaultYear
@@ -193,28 +193,32 @@ export default function Attendance() {
     }
   }, [filters]);
 
-  let days: { day: number; fullDate: string }[];
-
-  if (filters?.range) {
-    const startDateObj = new Date(dateRange?.startDate!);
-    const endDateObj = new Date(dateRange?.endDate!);
-
-    days = [];
-    for (
-      let d = new Date(startDateObj);
-      d <= endDateObj;
-      d.setDate(d.getDate() + 1)
-    ) {
-      const currentDate = new Date(d);
-      currentDate.setHours(12, 0, 0, 0);
-      days.push({
-        day: currentDate.getDate(),
-        fullDate: currentDate.toISOString().split("T")[0],
-      });
+  const days = useMemo(() => {
+    if (filters?.range && dateRange) {
+      const startDateObj = new Date(dateRange.startDate as string);
+      const endDateObj = new Date(dateRange.endDate as string);
+      return Array.from(
+        {
+          length:
+            (endDateObj.getTime() - startDateObj.getTime()) /
+              (1000 * 3600 * 24) +
+            1,
+        },
+        (_, i) => {
+          const currentDate = new Date(startDateObj);
+          currentDate.setDate(startDateObj.getDate() + i);
+          currentDate.setHours(12, 0, 0, 0);
+          return {
+            day: currentDate.getDate(),
+            fullDate: currentDate.toISOString().split("T")[0],
+          };
+        }
+      );
     }
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     return Array.from({ length: daysInMonth }, (_, i) => {
       const currentDate = new Date(year, month, i + 1);
+
       currentDate.setHours(12, 0, 0, 0);
       return {
         day: i + 1,
@@ -324,6 +328,7 @@ export default function Attendance() {
                 />
               );
             }
+
             const transformedData = transformAttendanceData(data);
             const hasNextPage = meta?.count > pageSize;
             return (
