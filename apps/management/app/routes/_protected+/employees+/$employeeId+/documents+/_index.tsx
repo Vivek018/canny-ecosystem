@@ -65,7 +65,7 @@ export default function Documents() {
     }
 
     return (
-        <section className="pb-4">
+        <section>
             <div className="w-full flex items-end justify-between">
                 <Command className="overflow-visible">
                     <div className="w-full md:w-3/4 lg:w-1/2 2xl:w-1/3 py-4 flex items-center gap-4">
@@ -139,7 +139,7 @@ export function DocumentsWrapper({ data, error }: {
     }, [error]);
 
     return (
-        <CommandGroup className="p-4">
+        <CommandGroup>
             <div className="w-full grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
                 {
                     Object.entries(data).map(([name, url]: any) => {
@@ -208,7 +208,7 @@ export function DocumentCard({ documentData }: {
     return (
         <Card
             key={documentData.name}
-            className="w-full max-w-[200px] mx-auto select-text cursor-pointer dark:border-[1.5px] flex flex-col overflow-hidden rounded-lg shadow-md transition-transform duration-300"
+            className="w-full max-w-[200px] select-text cursor-pointer flex flex-col overflow-hidden rounded-lg shadow-md transition-transform duration-300"
         >
             <div
                 className="flex items-center justify-center bg-muted/30 hover:bg-muted/50 h-48 w-full"
