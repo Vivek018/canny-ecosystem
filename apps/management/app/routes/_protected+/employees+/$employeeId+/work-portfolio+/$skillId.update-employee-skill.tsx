@@ -121,7 +121,7 @@ export default function UpdateEmployeeSkill() {
         toast({
           title: "Success",
           description: actionData?.message,
-          variant: "default",
+          variant: "success",
         });
       } else {
         toast({
