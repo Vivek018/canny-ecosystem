@@ -133,7 +133,7 @@ export default function UpdateEmployeeLetter() {
       toast({
         title: "Error",
         description:
-          (error as Error)?.message || "Employee Letter update failed",
+          (error as Error)?.message || "Employee Letter load failed",
         variant: "destructive",
       });
     if (!actionData) return;
@@ -150,7 +150,7 @@ export default function UpdateEmployeeLetter() {
     } else {
       toast({
         title: "Error",
-        description: actionData?.error?.message,
+        description: actionData?.error?.message ?? "Employee Letter update failed",
         variant: "destructive",
       });
     }

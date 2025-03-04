@@ -14,7 +14,7 @@ export const modalSearchParamNames = {
   import_exits: "import-exits",
   view_template_components: "view-template-components",
   view_relationship_terms: "view-relationship-terms",
-  import_leaves:"import-leaves"
+  import_leaves: "import-leaves",
 };
 
 export const statesAndUTs = [
@@ -115,8 +115,8 @@ export const attribute = {
   employeeLetters: "employee_letters",
   employeeReimbursements: "employee_reimbursements",
   employeeAttendance: "employee_attendance",
-  employeeExits:"employee_exits",
-  employeePaymentTemplateLink:"payment_template_link",
+  employeeExits: "employee_exits",
+  employeePaymentTemplateLink: "payment_template_link",
   reimbursements: "reimbursements",
   exits: "exits",
   paymentFields: "payment_fields",
@@ -169,7 +169,7 @@ export const months: { [key: string]: number } = {
   December: 12,
 };
 
-export const DEFAULT_APPOINTMENT_LETTER = `Dear **Mr. Ayden Kai Marks**,
+export const DEFAULT_APPOINTMENT_LETTER = `Dear **Mr. \${employeeName}**,
 
 With reference to your application and subsequent interview and discussion that you had with us, we are pleased to offer you the position of "**\${employeePosition}**" in our organization Contract at \${companyName} w.e.f. **\${employeeJoiningDate}**.&#x20;
 
@@ -196,60 +196,85 @@ With reference to your application and subsequent interview and discussion that 
 If the above terms and conditions are acceptable to you, please sign the duplicate copy of the appointment letter as an acknowledgment and submit the same along with the recruitment papers. With the best wishes for a happy and long association with Canny Management Services Pvt. Ltd.`;
 
 export const DEFAULT_OFFER_LETTER = `
-Dear \${employeeName},
-Congratulations! Canny Management Services Pvt Ltd is pleased to offer you the position of "\${employeePosition}" in our contract
-in \${companyName} \${companyCity}. We trust that this offer will meet with your approval.
-Reporting to your Manager/Supervisor, your starting salary will be 22,000=00/- in hand monthly including Bonus. Your
-first day of work will be \${employeeJoiningDate}. You are eligible for the employee benefit program as outlined in the attachment to
-this job offer.
-This offer is conditional upon our satisfactory completion of your reference checks.
-Please sign the enclosed copy of this letter and return it to us before your joining to indicate your acceptance of this
-offer.
-The entire team at Canny Management Services Pvt Ltd is looking forward to working with you, and we are confident
-you will be able to make a significant contribution to the success of our organization.
+Dear $\{employeeName},
+
+
+Congratulations! $\{companyName} is pleased to offer you the position of “$\{employeePosition}” in our contract with $\{clientCompany} at $\{location}. We trust that this offer will meet with your approval.&#x20;
+
+Below are the details of your employment offer:
+1. Position: $\{employeePosition}
+2. Reporting To: Your Manager/Supervisor
+3. Starting Salary: ₹$\{startingSalary}/- per month (in hand, including bonus)
+4. Joining Date: $\{employeeJoiningDate}
+5. Location: $\{location}
+6. Employee Benefits: You are eligible for the employee benefit program as outlined in the attachment to this job offer.
+
+This offer is conditional upon the satisfactory completion of your reference checks.&#x20;
+
+Please sign the enclosed copy of this letter and return it to us before your joining date to indicate your acceptance of this offer.&#x20;
+
+The entire team at $\{companyName} is looking forward to working with you. We are confident that you will make a significant contribution to the success of our organization.&#x20;
+
+Sincerely,
 `;
 
 export const DEFAULT_TERMINATION_LETTER = `
 Dear \${employeeName},
+
 You are working with us as "\${employeePosition}" in our contract with \${companyName}, \${companyCity} (Industries &
-Environment).
+Environment).&#x20;
+
 Since your services are no longer required, your employment stands terminated with immediate effect i.e. from
 \${employeeLeavingDate} with the close of working hours in accordance with the terms of your employment contract.
-All your legal dues, including notice pay, will be settled as per the terms of your employment contract.
+All your legal dues, including notice pay, will be settled as per the terms of your employment contract.&#x20;
+
 You are advised to hand over the \${companyName}'s property, if any, to the authorized person and obtain a
-clearance certificate to enable us to process your dues settlement.
+clearance certificate to enable us to process your dues settlement.&#x20;
+
 We thank you for your services and wish you all the best in the future.
 `;
 
-export const DEFAULT_EXPERIENCE_LETTER = `Dear \${employeeName},
+export const DEFAULT_EXPERIENCE_LETTER = `
+Dear \${employeeName},
+
 Congratulations! Canny Management Services Pvt Ltd is pleased to offer you the position of "\${employeePosition}" in our contract
 in \${companyName} \${companyCity}. We trust that this offer will meet with your approval.
+
 Reporting to your Manager/Supervisor, your starting salary will be 22,000=00/- in hand monthly including Bonus. Your
 first day of work will be \${employeeJoiningDate}. You are eligible for the employee benefit program as outlined in the attachment to
 this job offer.
+
 This offer is conditional upon our satisfactory completion of your reference checks.
+
 Please sign the enclosed copy of this letter and return it to us before your joining to indicate your acceptance of this
 offer.
+
 The entire team at Canny Management Services Pvt Ltd is looking forward to working with you, and we are confident
 you will be able to make a significant contribution to the success of our organization.`;
 
 export const DEFAULT_NOC_LETTER = `Dear Sir/Madam,
-This is in regard to the above-mentioned subject; we have no objection in recruiting \${employeeName} into your
-company.
-\${employeeName} has been working in our company since \${employeeJoiningDate}.
-She is sincere and honest in her work. We wish her all the best in her future career.
-Her gross salary is Rs. 25,802/- per month as of July 2024. She is receiving benefits of PF, ESIC, and Statutory Bonus
-from our company.
-Thanking you,
-`;
+
+This is in regard to the above-mentioned subject; we have no objection in recruiting \${employeeName} into your company.
+
+\${employeeName} has been working in our company since \${employeeJoiningDate}. During her tenure, she has demonstrated sincerity, dedication, and honesty in her work ethic. We highly appreciate her contributions and wish her all the best in her future endeavors.
+
+For your reference, her employment details are as follows:
+* Gross Salary (as of July 2024): ₹\${grossSalary}/- per month
+* Benefits Provided: Provident Fund (PF), Employee State Insurance Corporation (ESIC), and Statutory Bonus
+
+Thank you,`;
 
 export const DEFAULT_RELIEVING_LETTER = `
 Dear \${employeeName},
+
 With reference to your resignation letter dated \${employeeLeavingDate}, we hereby accept your resignation and agree to relieve you
 from your duties on \${employeeLeavingDate}.
+
 We confirm that you have been working with our company from \${employeeJoiningDate} to \${employeeLeavingDate}.
 During your employment with us, we found you to be hardworking and honest.
+
 We wish you all the best in your future endeavors.
+
 Thanking you,
 `;
 

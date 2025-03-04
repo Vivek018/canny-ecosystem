@@ -82,7 +82,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
     const employeeLetterData = submission.value;
@@ -105,7 +105,7 @@ export async function action({
         message: "Employee Letter creation failed",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -114,7 +114,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -173,12 +173,12 @@ export default function CreateEmployeeLetter({
   });
 
   return (
-    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
       <FormProvider context={form.context}>
-        <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
+        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
           <Card>
             <CardHeader>
-              <CardTitle className='text-3xl capitalize'>
+              <CardTitle className="text-3xl capitalize">
                 {replaceDash(LETTERS_TAG)}
               </CardTitle>
               <CardDescription>
@@ -190,18 +190,18 @@ export default function CreateEmployeeLetter({
               <input
                 {...getInputProps(fields.employee_id, { type: "hidden" })}
               />
-              <div className='grid grid-cols-2 place-content-center justify-between gap-x-8 mt-5'>
+              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-5">
                 <SearchableSelectField
                   key={resetKey}
-                  className='w-full capitalize flex-1'
+                  className="w-full capitalize flex-1"
                   options={transformStringArrayIntoOptions(
-                    employeeLetterTypesArray as unknown as string[]
+                    employeeLetterTypesArray as unknown as string[],
                   )}
                   inputProps={{
                     ...getInputProps(fields.letter_type, { type: "text" }),
                   }}
                   placeholder={`Select ${replaceUnderscore(
-                    fields.letter_type.name
+                    fields.letter_type.name,
                   )}`}
                   labelProps={{
                     children: "Letter Type",
@@ -223,12 +223,12 @@ export default function CreateEmployeeLetter({
                 />
               </div>
 
-              <div className='grid grid-cols-1 place-content-center justify-between gap-x-8 mt-4'>
+              <div className="grid grid-cols-1 place-content-center justify-between gap-x-8 mt-4">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.subject, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.subject.name
+                      fields.subject.name,
                     )}`,
                     className: "capitalize",
                   }}
@@ -243,13 +243,11 @@ export default function CreateEmployeeLetter({
                   textareaProps={{
                     ...getTextareaProps(fields.content),
                     placeholder: "Write your letter content here...",
-                    defaultValue: LETTERS_TAG.toLowerCase().startsWith("create")
-                      ? String(
-                          DEFAULT_LETTER_CONTENT[
-                            fields.letter_type
-                              .value as keyof typeof DEFAULT_LETTER_CONTENT
-                          ]
-                        ) ?? fields.content.value
+                    defaultValue: !updateValues
+                      ? DEFAULT_LETTER_CONTENT[
+                          fields.letter_type
+                            .value as keyof typeof DEFAULT_LETTER_CONTENT
+                        ] ?? fields.content.value
                       : fields.content.value ??
                         DEFAULT_LETTER_CONTENT[
                           fields.letter_type
@@ -264,9 +262,9 @@ export default function CreateEmployeeLetter({
                 />
               </div>
 
-              <div className='grid grid-cols-3 place-content-center justify-between gap-x-8 px-2'>
+              <div className="grid grid-cols-3 place-content-center justify-between gap-x-8 px-2">
                 <CheckboxField
-                  className='mt-8'
+                  className="mt-8"
                   buttonProps={getInputProps(fields.include_letter_head, {
                     type: "checkbox",
                   })}
@@ -275,7 +273,7 @@ export default function CreateEmployeeLetter({
                   }}
                 />
                 <CheckboxField
-                  className='mt-8'
+                  className="mt-8"
                   buttonProps={getInputProps(fields.include_client_address, {
                     type: "checkbox",
                   })}
@@ -284,7 +282,7 @@ export default function CreateEmployeeLetter({
                   }}
                 />
                 <CheckboxField
-                  className='mt-8'
+                  className="mt-8"
                   buttonProps={getInputProps(fields.include_employee_address, {
                     type: "checkbox",
                   })}
@@ -293,7 +291,7 @@ export default function CreateEmployeeLetter({
                   }}
                 />
                 <CheckboxField
-                  className='mt-8'
+                  className="mt-8"
                   buttonProps={getInputProps(fields.include_signatuory, {
                     type: "checkbox",
                   })}
@@ -302,12 +300,12 @@ export default function CreateEmployeeLetter({
                   }}
                 />
                 <CheckboxField
-                  className='mt-8'
+                  className="mt-8"
                   buttonProps={getInputProps(
                     fields.include_employee_signature,
                     {
                       type: "checkbox",
-                    }
+                    },
                   )}
                   labelProps={{
                     children: "Include Employee Signature",

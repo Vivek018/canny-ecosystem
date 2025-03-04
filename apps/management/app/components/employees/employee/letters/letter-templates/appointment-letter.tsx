@@ -25,8 +25,9 @@ export function AppointmentLetter({
   companyData: CompanyInfoDataType | null;
   salaryData: any;
 }) {
+
   const replacements = {
-    employeeName: `${data?.employees.gender === "female" ? "Ms." : "Mr."} ${data?.employees.first_name} ${data?.employees.middle_name} ${data?.employees?.last_name}`,
+    employeeName: `${data?.employees.gender === "female" ? "Ms." : "Mr."} ${data?.employees.first_name} ${data?.employees.middle_name ?? ""} ${data?.employees?.last_name}`,
     employeeGender: data?.employees.gender ?? "",
     employeeJoiningDate: new Date(
       data?.employees.employee_project_assignment?.start_date ?? "",
@@ -99,8 +100,6 @@ export function AppointmentLetter({
               content={replacePlaceholders(data?.content, replacements) ?? ""}
             />
           </View>
-          <View style={styles.section} />
-          <View style={styles.section} />
           <View style={styles.signatureSection}>
             {data?.include_signatuory && (
               <View style={styles.signatureBox}>
@@ -174,36 +173,40 @@ export function AppointmentLetter({
           {/* Salary Table */}
           {salaryData && (
             <View style={styles.tableContainer}>
+              <View>
+                <Text style={[styles.boldText, { marginHorizontal: "auto" }]}>
+                  YOUR TOTAL COST OF COMPANY WILL BE AS BELOW:
+                </Text>
+              </View>
               <View style={styles.table}>
-                <View>
-                  <Text style={[styles.boldText, { marginHorizontal: "auto" }]}>
-                    YOUR TOTAL COST OF COMPANY WILL BE AS BELOW:
-                  </Text>
-                </View>
                 <View style={styles.tableHeader}>
-                  <Text style={styles.boldText}>GROSS SALARY</Text>
+                  <View style={styles.tableRow}>
+                    <Text style={styles.th}>GROSS SALARY</Text>
+                  </View>
                 </View>
-                {Object.entries(
-                  Object.assign(
-                    {},
-                    salaryData?.earning ? salaryData?.earning : {},
-                    salaryData?.statutory_contribution
-                      ? salaryData?.statutory_contribution
-                      : {},
-                    salaryData?.others ? salaryData?.others : {},
-                  ),
-                ).map((salary) => {
-                  return (
-                    <View key={salary[0]} style={styles.tableRow}>
-                      <Text style={styles.tableCell}>
-                        {replaceUnderscore(salary[0]) as string}
-                      </Text>
-                      <Text style={styles.tableCell}>
-                        Rs. {salary[1] ? `${salary[1].toString()}/-` : "--"}
-                      </Text>
-                    </View>
-                  );
-                })}
+                <View style={styles.tableBody}>
+                  {Object.entries(
+                    Object.assign(
+                      {},
+                      salaryData?.earning ? salaryData?.earning : {},
+                      salaryData?.statutory_contribution
+                        ? salaryData?.statutory_contribution
+                        : {},
+                      salaryData?.others ? salaryData?.others : {},
+                    ),
+                  ).map((salary) => {
+                    return (
+                      <View key={salary[0]} style={styles.tableRow}>
+                        <Text style={styles.tableCell}>
+                          {replaceUnderscore(salary[0]) as string}
+                        </Text>
+                        <Text style={styles.tableCell}>
+                          Rs. {salary[1] ? `${salary[1].toString()}/-` : "--"}
+                        </Text>
+                      </View>
+                    );
+                  })}
+                </View>
                 <View style={styles.tableRow}>
                   <Text style={[styles.tableCell, styles.boldText]}>
                     Gross Salary
@@ -211,6 +214,13 @@ export function AppointmentLetter({
                   <Text style={[styles.tableCell, styles.boldText]}>
                     Rs. 14127/-
                   </Text>
+                </View>
+                <View style={styles.tableHeader}>
+                  <View style={styles.tableRow}>
+                    <Text style={styles.th}>
+                      CTC
+                    </Text>
+                  </View>
                 </View>
                 {Object.entries(
                   Object.assign(

@@ -94,31 +94,46 @@ export const styles = StyleSheet.create({
     marginBottom: 10,
   },
   table: {
-    marginVertical: 10,
-    borderColor: "#000",
-    width: "70%",
+    marginHorizontal: "auto",
+    marginVertical: "5px",
+    width: "60%",
+    maxWidth: "80%",
+    borderTop: "1px solid #000",
+    borderLeft: "1px solid #000",
   },
   tableHeader: {
-    borderBottomWidth: 1,
-    borderColor: "#000",
-    padding: "3px",
     textAlign: "center",
-    fontWeight: "bold",
-    border: "1px solid #000",
+    fontFamily: "Helvetica-Bold",
+    backgroundColor: "white",
+  },
+  tableBody: {
+    display: "flex",
+    backgroundColor: "white",
+    flexDirection: "column",
   },
   tableRow: {
-    justifyContent: "space-between",
+    display: "flex",
     flexDirection: "row",
-    borderBottomWidth: 1,
-    borderColor: "#000",
-    padding: "3px",
-    border: "1px solid #000",
+    justifyContent: "space-between",
+    margin: 0
+  },
+  th: {
+    textTransform: "capitalize",
+    textAlign: "center",
+    flex: 1,
+    paddingTop: "2px",
+    paddingHorizontal: "3px",
+    borderBottom: "1px solid #000",
+    borderRight: "1px solid #000",
   },
   tableCell: {
     textTransform: "capitalize",
     textAlign: "center",
     flex: 1,
+    paddingTop: "2px",
     paddingHorizontal: "3px",
+    borderBottom: "1px solid #000",
+    borderRight: "1px solid #000",
   },
   tableCellAmount: {
     width: 100,
@@ -128,7 +143,7 @@ export const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 10,
+    marginTop: 20,
   },
   signatureBox: {
     width: "40%",
@@ -147,7 +162,6 @@ export const styles = StyleSheet.create({
     marginBottom: 10,
   },
   listItem: {
-    fontSize: 12,
     marginBottom: 4,
     color: "#333", // Dark gray for list items
   },
@@ -196,9 +210,9 @@ export const styles = StyleSheet.create({
   },
   // Image Styles
   image: {
-    width: "100%", // Full-width images by default
-    height: "auto", // Maintain aspect ratio
-    marginBottom: 10,
+    width: "100%",
+    height: "auto",
+    // marginBottom: 10,
   },
   boldText: {
     fontFamily: "Helvetica-Bold",
@@ -221,13 +235,21 @@ export const styles = StyleSheet.create({
   centerText: {
     textAlign: "center",
   },
+
 });
 
 export const replacePlaceholders = (
   content: string | null | undefined,
-  replacements: any,
+  replacements: Record<string, any>,
 ) => {
   return (
-    content?.replace(/\$\{(\w+)\}/g, (_, key) => replacements[key] || "") ?? ""
+    content?.replace(/\$\{(\w+)\}/g, (_, key) => {
+      let value = replacements[key];
+
+      if (value === "Invalid Date") {
+        value = "";
+      }
+      return value || "";
+    }) || ""
   );
 };

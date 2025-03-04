@@ -209,7 +209,7 @@ export default function EmployeesIndex() {
     <section className="p-4">
       <div className="w-full flex items-center justify-between pb-4">
         <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-2 mr-4">
-          <Suspense fallback={<LoadingSpinner className="ml-20" />}>
+          <Suspense fallback={<LoadingSpinner />}>
             <Await resolve={projectPromise}>
               {(projectData) => (
                 <Await resolve={projectSitePromise}>
