@@ -47,11 +47,11 @@ export function AppointmentLetter({
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        {data?.include_letter_head && (
+        {data?.include_letter_head ? (
           <View style={styles.header} fixed>
             <LetterHeader />
           </View>
-        )}
+        ) : <View fixed style={styles.indent} />}
         <View style={styles.wrapper}>
           {/* Date Section */}
           <View>

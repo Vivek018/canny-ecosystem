@@ -4,6 +4,9 @@ export const styles = StyleSheet.create({
   page: {
     paddingBottom: 75,
   },
+  indent: {
+    padding: 20,
+  },
   wrapper: {
     paddingBottom: 40,
     paddingHorizontal: 40,

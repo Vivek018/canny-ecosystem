@@ -194,90 +194,123 @@ With reference to your application and subsequent interview and discussion that 
 
 8\. **ABSENCE OR UNAUTHORIZED LEAVE**: Unauthorized leave or absence for a continuous period of 8 days would make you lose your lien in the service, and you will be considered to have abandoned your service of your own accord, and the same shall automatically come to an end without any notice or intimation to you.&#x20;
 
-If the above terms and conditions are acceptable to you, please sign the duplicate copy of the appointment letter as an acknowledgment and submit the same along with the recruitment papers. With the best wishes for a happy and long association with Canny Management Services Pvt. Ltd.`;
+If the above terms and conditions are acceptable to you, please sign the duplicate copy of the appointment letter as an acknowledgment and submit the same along with the recruitment papers. With the best wishes for a happy and long association with Canny Management Services Pvt. Ltd.
 
-export const DEFAULT_OFFER_LETTER = `
-Dear $\{employeeName},
+# YOUR TOTAL COST OF COMPANY WILL BE AS BELOW:
+| **Basic + D.A Salary**    | Rs.                 13234/-   |
+| ------------------------- | ----------------------------- |
+| Allowance                 | Rs.                       -   |
+| **Gross Salary**          | **Rs.               14127/-** |
+| PF Employee               | Rs.                 1589/-    |
+| **Net Salary**            | **Rs.              12,232/-** |
+| Basic Salary              | Rs.                 13234/-   |
+| **Total Gross C.T.C**     | **Rs.              17,408/-** |
+`;
 
+export const DEFAULT_OFFER_LETTER = `Dear **$\{employeeName}**,
 
-Congratulations! $\{companyName} is pleased to offer you the position of “$\{employeePosition}” in our contract with $\{clientCompany} at $\{location}. We trust that this offer will meet with your approval.&#x20;
+We are pleased to extend an offer of employment to you for the position of $\{employeePosition} with $\{companyName}. This role will be based at $\{companyLocation} , and we are confident that your skills and experience will contribute significantly to the success of the project and our organization.
 
 Below are the details of your employment offer:
+
 1. Position: $\{employeePosition}
 2. Reporting To: Your Manager/Supervisor
 3. Starting Salary: ₹$\{startingSalary}/- per month (in hand, including bonus)
 4. Joining Date: $\{employeeJoiningDate}
-5. Location: $\{location}
-6. Employee Benefits: You are eligible for the employee benefit program as outlined in the attachment to this job offer.
+5. Work Location: $\{companyLocation}
+6. Nature of Employment: \[Full-Time/Part-Time/Contractual]
 
-This offer is conditional upon the satisfactory completion of your reference checks.&#x20;
+###### **Employee Benefits**
 
-Please sign the enclosed copy of this letter and return it to us before your joining date to indicate your acceptance of this offer.&#x20;
+You will be eligible for the following benefits as per the policies outlined in the attached document:
 
-The entire team at $\{companyName} is looking forward to working with you. We are confident that you will make a significant contribution to the success of our organization.&#x20;
+* Health Insurance
+* Provident Fund (PF) Contributions
+* Gratuity (if applicable)
+* Leave Policy (Earned Leaves, Sick Leaves, etc.)
+* Other Perks (e.g., Meal Vouchers, Transportation Allowance, etc.)
 
-Sincerely,
-`;
+Please review the attached Employee Handbook or Benefits Summary for further details.
 
-export const DEFAULT_TERMINATION_LETTER = `
-Dear \${employeeName},
+###### **Conditions of Employment**
 
-You are working with us as "\${employeePosition}" in our contract with \${companyName}, \${companyCity} (Industries &
-Environment).&#x20;
+This offer is contingent upon the following:
 
-Since your services are no longer required, your employment stands terminated with immediate effect i.e. from
-\${employeeLeavingDate} with the close of working hours in accordance with the terms of your employment contract.
-All your legal dues, including notice pay, will be settled as per the terms of your employment contract.&#x20;
+1. Successful completion of reference checks and background verification.
+2. Submission of all required documents, including proof of identity, address, educational qualifications, and previous employment records.
+3. Signing and returning this offer letter by **\[Acceptance Deadline Date]** .
 
-You are advised to hand over the \${companyName}'s property, if any, to the authorized person and obtain a
-clearance certificate to enable us to process your dues settlement.&#x20;
+Failure to meet any of the above conditions may result in the withdrawal of this offer.
 
-We thank you for your services and wish you all the best in the future.
-`;
+Sincerely,`
 
-export const DEFAULT_EXPERIENCE_LETTER = `
-Dear \${employeeName},
+export const DEFAULT_TERMINATION_LETTER = `Dear **\${employeeName}**,
 
-Congratulations! Canny Management Services Pvt Ltd is pleased to offer you the position of "\${employeePosition}" in our contract
-in \${companyName} \${companyCity}. We trust that this offer will meet with your approval.
+We regret to inform you that your services as "**\${employeePosition}**" under our contract with \${companyName} , \${companyLocation} (\${siteName}), are no longer required. In accordance with the terms of your employment contract, your employment stands terminated with immediate effect from October 10, 2023 , at the close of working hours.
 
-Reporting to your Manager/Supervisor, your starting salary will be 22,000=00/- in hand monthly including Bonus. Your
-first day of work will be \${employeeJoiningDate}. You are eligible for the employee benefit program as outlined in the attachment to
-this job offer.
+**As per the terms of your employment contract:**
 
-This offer is conditional upon our satisfactory completion of your reference checks.
+All your legal dues, including notice pay (if applicable), will be settled in due course.
+You are required to return any property belonging to ABC Corporation (e.g., ID cards, laptops, access badges, etc.) to the authorized person by October 12, 2023 .
+Upon returning the company property, you will receive a clearance certificate, which will enable us to process your final dues settlement without delay.
+We appreciate your contributions during your tenure with us and thank you for your services. We wish you all the best in your future endeavors.
 
-Please sign the enclosed copy of this letter and return it to us before your joining to indicate your acceptance of this
-offer.
+If you have any questions or need clarification regarding this communication, please feel free to contact us at [hr@cannymgmt.com](mailto:hr@cannymgmt.com) or +91 1234567890 .
 
-The entire team at Canny Management Services Pvt Ltd is looking forward to working with you, and we are confident
-you will be able to make a significant contribution to the success of our organization.`;
+Yours sincerely,`;
 
-export const DEFAULT_NOC_LETTER = `Dear Sir/Madam,
+export const DEFAULT_EXPERIENCE_LETTER = `Dear **$\{employeeName}**,
 
-This is in regard to the above-mentioned subject; we have no objection in recruiting \${employeeName} into your company.
+This is to certify that **$\{employeeName}** has been employed with **Canny Management Services Pvt Ltd** as a **$\{employeePosition}** from **$\{employeeJoiningDate}** to **$\{employeeLeavingDate}** . During this period, \[he/she/they] have worked under our contract with **$\{companyName}** located in **$\{companyLocation}**.
 
-\${employeeName} has been working in our company since \${employeeJoiningDate}. During her tenure, she has demonstrated sincerity, dedication, and honesty in her work ethic. We highly appreciate her contributions and wish her all the best in her future endeavors.
+**Key Responsibilities and Contributions:**
+During his tenure, John reported directly to the Team Lead and was responsible for:
 
-For your reference, her employment details are as follows:
-* Gross Salary (as of July 2024): ₹\${grossSalary}/- per month
-* Benefits Provided: Provident Fund (PF), Employee State Insurance Corporation (ESIC), and Statutory Bonus
+* Managing customer queries and ensuring timely resolution of issues.
+* Collaborating with internal teams to improve service quality and client satisfaction.
+* Maintaining accurate records of customer interactions and feedback.
 
-Thank you,`;
+John demonstrated professionalism, dedication, and a strong work ethic throughout his employment. His contributions were instrumental in enhancing customer satisfaction and achieving team objectives.
 
-export const DEFAULT_RELIEVING_LETTER = `
-Dear \${employeeName},
+**Employment Details:**
 
-With reference to your resignation letter dated \${employeeLeavingDate}, we hereby accept your resignation and agree to relieve you
-from your duties on \${employeeLeavingDate}.
+* **Position Held:** $\{employeePosition}
+* **Duration of Employment:** $\{employeeJoiningDate}, to $\{employeeLeavingDate}
+* **Location:** $\{companyLocation}
+* **Salary:** ₹22,000/- per month (in hand, including all applicable allowances and bonuses)
 
-We confirm that you have been working with our company from \${employeeJoiningDate} to \${employeeLeavingDate}.
-During your employment with us, we found you to be hardworking and honest.
+We wish John all the best in his future endeavors and are confident that he will continue to excel in his professional journey.
 
-We wish you all the best in your future endeavors.
+For any further clarification or verification, please feel free to contact us at [**hr@cannymgmt.com** ](mailto:hr@cannymgmt.com)or **+91 1234567890** .`
 
-Thanking you,
-`;
+export const DEFAULT_NOC_LETTER = `Dear **Sir/Madam**,
+
+This is with reference to the above-mentioned subject. We hereby confirm that we have no objection to the recruitment of **$\{employeeName}** into your esteemed organization.
+
+$\{employeeName} has been associated with $\{companyName} since $\{companyJoiningDate} . During her tenure with us, she has consistently demonstrated sincerity, dedication, and honesty in her work ethic. Her contributions have been highly valued, and we appreciate her commitment to excellence. We wish her all the best in her future endeavors.
+
+**For your reference, below are her employment details:**
+
+* Position Held: Customer Support Executive
+*  Gross Salary (as of July 2024): ₹30,000/- per month
+*  Benefits Provided: Provident Fund (PF), Employee State Insurance Corporation (ESIC), and Statutory Bonus
+* Should you require any further information or clarification regarding her employment, please feel free to contact us at [hr@cannymgmt.com](mailto:hr@cannymgmt.com) or +91 1234567890 .
+
+Thank you for considering this communication.
+
+Yours sincerely,`
+
+export const DEFAULT_RELIEVING_LETTER = `Dear **$\{employeeName}**,
+
+With reference to your resignation letter dated $\{employeeLeavingDate} , we hereby accept your resignation and confirm that you will be relieved from your duties on $\{employeeLeavingDate}.
+
+We would like to confirm that you have been associated with $\{companyName} from **$\{employeeJoiningDate}** to **$\{employeeLeavingDate}**. During your tenure with us, you have demonstrated dedication, hard work, and integrity in all your responsibilities. Your contributions have been valuable, and we sincerely appreciate your efforts during your time with the company.
+
+We wish you all the best in your future endeavors and are confident that you will continue to achieve great success in your professional journey.
+
+Thank you for your service and commitment to $\{companyName} . Should you require any assistance or documentation in the future, please do not hesitate to reach out to us at \[Contact Information] .
+
+Yours sincerely,`
 
 export const DEFAULT_LETTER_CONTENT = {
   appointment_letter: DEFAULT_APPOINTMENT_LETTER,

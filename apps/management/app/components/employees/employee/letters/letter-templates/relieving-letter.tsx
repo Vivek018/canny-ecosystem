@@ -36,11 +36,11 @@ export function RelievingLetter({
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        {data?.include_letter_head && (
-          <View style={styles.header} fixed>
+        {data?.include_letter_head ? (
+          <View fixed style={styles.header}>
             <LetterHeader />
           </View>
-        )}
+        ) : <View fixed style={styles.indent} />}
         <View style={styles.wrapper}>
           {/* Date Section */}
           <View style={styles.headerDate}>
