@@ -5,133 +5,83 @@ import {
   TableCell,
   TableRow,
 } from "@canny_ecosystem/ui/table";
+import { Spinner } from "@canny_ecosystem/ui/spinner";
 import {
+  type ColumnDef,
+  type VisibilityState,
   flexRender,
   getCoreRowModel,
   useReactTable,
-  type VisibilityState,
 } from "@tanstack/react-table";
-import { AttendanceTableHeader } from "./attendance-table-header";
-import { useEffect, useMemo, useState } from "react";
-import { Button } from "@canny_ecosystem/ui/button";
-import { useAttendanceStore } from "@/store/attendance";
-import type { AttendanceFilterType } from "@/routes/_protected+/dashboard";
-import { ExportBar } from "../export-bar";
-import type {
-  DayType,
-  TransformedAttendanceDataType,
-} from "@/routes/_protected+/time-tracking+/attendance+/_index";
-import { useSearchParams } from "@remix-run/react";
-import { useSupabase } from "@canny_ecosystem/supabase/client";
+import { useEffect } from "react";
+import { useState } from "react";
 import { useInView } from "react-intersection-observer";
-import { getAttendanceByCompanyId } from "@canny_ecosystem/supabase/queries";
+import { useSearchParams } from "@remix-run/react";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
-import { Spinner } from "@canny_ecosystem/ui/spinner";
-import { formatDate } from "@canny_ecosystem/utils";
+import { useSupabase } from "@canny_ecosystem/supabase/client";
+import {
+  type AttendanceReportDataType,
+  type AttendanceReportFilters,
+  getAttendanceReportByCompanyId,
+} from "@canny_ecosystem/supabase/queries";
+import { Button } from "@canny_ecosystem/ui/button";
+import { useReportsStore } from "@/store/reports";
+import { DataTableHeader } from "./data-table-header";
+import { ExportBar } from "../export-bar";
 
-interface DataTableProps {
-  days: DayType[];
-  columns: any;
-  data: TransformedAttendanceDataType[];
-  noFilters?: boolean;
-  hasNextPage: boolean;
+interface DataTableProps<TData, TValue> {
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
   count: number;
+  hasNextPage: boolean;
+  query?: string | null;
+  filters?: AttendanceReportFilters;
+  noFilters?: boolean;
   pageSize: number;
-  filters?: AttendanceFilterType;
+  initialColumnVisibility?: VisibilityState;
   companyId: string;
   env: SupabaseEnv;
-  query?: string | null;
-  initialColumnVisibility?: VisibilityState;
+  monthYearsRange: any;
 }
 
-export function AttendanceTable({
-  days,
+export function DataTable<TData, TValue>({
   columns,
   data: initialData,
-  hasNextPage: initialHasNextPage,
-  noFilters,
-  pageSize,
-  filters,
   count,
   query,
-  env,
-  companyId,
+  filters,
+  noFilters,
+  pageSize,
+  hasNextPage: initialHasNextPage,
   initialColumnVisibility,
-}: DataTableProps) {
-  const { rowSelection, setSelectedRows, setRowSelection, setColumns } =
-    useAttendanceStore();
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    initialColumnVisibility ?? {}
-  );
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [data, setData] =
-    useState<TransformedAttendanceDataType[]>(initialData);
+  companyId,
+  env,
+  monthYearsRange,
+}: DataTableProps<TData, TValue>) {
+  const [data, setData] = useState(initialData);
   const [from, setFrom] = useState(pageSize);
   const [hasNextPage, setHasNextPage] = useState(initialHasNextPage);
-
+  const [searchParams, setSearchParams] = useSearchParams();
   const { supabase } = useSupabase({ env });
 
   const { ref, inView } = useInView();
+  const { rowSelection, setRowSelection, setColumns } = useReportsStore();
 
-  const transformAttendanceData = useMemo(() => {
-    return (data: any[]) => {
-      const groupedByEmployeeAndMonth = data.reduce((acc, employee) => {
-        const empCode = employee.employee_code;
-        const employeeDetails = {
-          employee_id: employee.id,
-          employee_code: empCode,
-          employee_name: `${employee.first_name} ${employee.middle_name} ${employee.last_name}`,
-          project:
-            employee.employee_project_assignment?.project_sites?.projects
-              ?.name || null,
-          project_site:
-            employee.employee_project_assignment?.project_sites?.name || null,
-        };
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+    initialColumnVisibility ?? {}
+  );
 
-        if (!employee?.attendance?.length) {
-          acc[empCode] = acc[empCode] || employeeDetails;
-          return acc;
-        }
-
-        for (const record of employee?.attendance ?? []) {
-          const date = new Date(record.date);
-          const monthYear = `${date.getMonth()}-${date.getFullYear()}`;
-          const key = `${empCode}-${monthYear}`;
-
-          if (!acc[key]) {
-            acc[key] = { ...employeeDetails };
-          }
-
-          const fullDate = formatDate(date.toISOString().split("T")[0]);
-          acc[key][fullDate!] = record.present
-            ? "P"
-            : record.holiday
-            ? record.holiday_type === "weekly"
-              ? "(WOF)"
-              : record.holiday_type === "paid"
-              ? "L"
-              : "A"
-            : "A";
-        }
-
-        return acc;
-      }, {});
-
-      return Object.values(groupedByEmployeeAndMonth);
-    };
-  }, [days]);
-
-  const loadMoreEmployees = async () => {
+  const loadMoreReport = async () => {
     const formattedFrom = from;
-    const to = formattedFrom + pageSize - 1;
+    const to = formattedFrom + pageSize;
     const sortParam = searchParams.get("sort");
 
     try {
-      const { data: newData } = await getAttendanceByCompanyId({
+      const { data } = await getAttendanceReportByCompanyId({
         supabase,
         companyId,
         params: {
-          from: formattedFrom,
+          from: from,
           to: to,
           filters,
           searchQuery: query ?? undefined,
@@ -139,22 +89,12 @@ export function AttendanceTable({
         },
       });
 
-      if (newData && newData.length > 0) {
-        const transformedData = useMemo(() => {
-          return transformAttendanceData(newData);
-        }, [newData, transformAttendanceData]);
-        setData(
-          (prevData) =>
-            [...prevData, ...transformedData] as TransformedAttendanceDataType[]
-        );
-        setFrom(to + 1);
-
-        setHasNextPage(count > to + 1);
-      } else {
-        setHasNextPage(false);
+      if (data) {
+        setData((prevData) => [...prevData, ...(data ?? [])] as TData[]);
       }
-    } catch (error) {
-      console.error("Error loading more employees:", error);
+      setFrom(to + 1);
+      setHasNextPage(count > to);
+    } catch {
       setHasNextPage(false);
     }
   };
@@ -171,35 +111,28 @@ export function AttendanceTable({
     },
   });
 
-  useEffect(() => {
-    setData(initialData);
-    setFrom(pageSize);
-    setHasNextPage(initialHasNextPage);
-  }, [initialData, initialHasNextPage, pageSize]);
-
-  useEffect(() => {
-    setColumns(table.getAllLeafColumns());
-  }, [columnVisibility, days]);
-
-  useEffect(() => {
-    if (inView) {
-      loadMoreEmployees();
-    }
-  }, [inView]);
-
   const selectedRowsData = table
     .getSelectedRowModel()
     .rows?.map((row) => row.original);
 
   useEffect(() => {
-    const rowArray = [];
-    for (const row of table.getSelectedRowModel().rows) {
-      rowArray.push(row.original);
+    setColumns(table.getAllLeafColumns());
+  }, [columnVisibility]);
+
+  useEffect(() => {
+    if (inView) {
+      loadMoreReport();
     }
-    setSelectedRows(rowArray as unknown as TransformedAttendanceDataType[]);
-  }, [rowSelection]);
+  }, [inView]);
+
+  useEffect(() => {
+    setData(initialData);
+    setFrom(pageSize);
+    setHasNextPage(initialHasNextPage);
+  }, [initialData]);
 
   const tableLength = table.getRowModel().rows?.length;
+
   return (
     <div className="relative mb-8">
       <div
@@ -210,10 +143,10 @@ export function AttendanceTable({
       >
         <div className="relative">
           <Table>
-            <AttendanceTableHeader
+            <DataTableHeader
               table={table}
               className={cn(!tableLength && "hidden")}
-              days={days}
+              monthYearsRange={monthYearsRange}
             />
             <TableBody>
               {tableLength ? (
@@ -292,8 +225,9 @@ export function AttendanceTable({
       <ExportBar
         className={cn(!table.getSelectedRowModel().rows.length && "hidden")}
         rows={table.getSelectedRowModel().rows.length}
-        data={selectedRowsData}
+        data={selectedRowsData as unknown as AttendanceReportDataType[]}
         columnVisibility={columnVisibility}
+        monthYearsRange={monthYearsRange}
       />
     </div>
   );
