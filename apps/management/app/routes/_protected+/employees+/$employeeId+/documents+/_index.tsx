@@ -61,10 +61,10 @@ export default function Documents() {
     }
 
     return (
-        <section>
-            <div className="w-full flex items-end justify-between">
-                <Command className="overflow-visible">
-                    <div className="w-full md:w-3/4 lg:w-1/2 2xl:w-1/3 py-4 flex items-center gap-4">
+        <section className="w-full px-0">
+            <div className="w-full mb-6">
+                <Command className="overflow-visible w-full">
+                <div className="w-full md:w-3/4 lg:w-1/2 2xl:w-1/3 py-4 flex items-center gap-4">
                         <CommandInput
                             divClassName="border border-input rounded-md h-10 flex-1"
                             placeholder="Search Documents"
@@ -74,7 +74,7 @@ export default function Documents() {
                             to={`/employees/${employeeId}/documents/add-document`}
                             className={cn(
                                 buttonVariants({ variant: "primary-outline" }),
-                                "flex items-center gap-1",
+                                "flex items-center gap-1 whitespace-nowrap",
                                 !hasPermission(
                                     role,
                                     `${createRole}:${attribute.employeeDocuments}`,
@@ -92,8 +92,8 @@ export default function Documents() {
                     >
                         No document found.
                     </CommandEmpty>
-                    <CommandList className="max-h-full py-2 overflow-x-visible overflow-y-visible">
-                        <Suspense fallback={<div>Loading...</div>}>
+                    <CommandList className="max-h-full py-2 px-0 overflow-x-visible overflow-y-visible">
+                        <Suspense fallback={<div className="w-full text-center py-10">Loading...</div>}>
                             <Await resolve={documentsPromise}>
                                 {(resolvedData) => {
                                     if (!resolvedData || !resolvedData.data) {
@@ -135,8 +135,8 @@ export function DocumentsWrapper({ data, error }: {
     }, [error]);
 
     return (
-        <CommandGroup>
-            <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-10">
+        <CommandGroup className="w-full px-0">
+            <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 px-0">
                 {
                     data.map((document) => {
                         return <CommandItem
