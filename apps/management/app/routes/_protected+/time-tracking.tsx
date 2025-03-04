@@ -27,8 +27,12 @@ export default function TimeTracking() {
         <SecondaryMenu
           items={[
             { label: "Attendance", path: "/time-tracking/attendance" },
+            { label: "Pay Sequence", path: "/time-tracking/pay-sequence" },
             { label: "Leaves", path: "/time-tracking/leaves" },
-            { label: "Holidays", path: "/time-tracking/holidays" },
+            {
+              label: "Holidays",
+              path: "/time-tracking/holidays",
+            },
           ]}
           pathname={pathname}
           Link={Link}

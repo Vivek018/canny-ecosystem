@@ -8,6 +8,7 @@ import type {
   SiteDatabaseRow,
   TypedSupabaseClient,
 } from "../types";
+import { defaultYear } from "@canny_ecosystem/utils";
 
 export type AttendanceDataType = Pick<
   EmployeeDatabaseRow,
@@ -108,8 +109,6 @@ export async function getAttendanceByEmployeeId({
         return lastDay.toString().padStart(2, "0");
       };
 
-      const currentYear = new Date().getFullYear();
-
       if (year && monthNumber) {
         const yearNum = Number(year);
         const monthStr = monthNumber.toString().padStart(2, "0");
@@ -128,10 +127,10 @@ export async function getAttendanceByEmployeeId({
           .filter("date", "lte", `${yearNum}-12-31`);
       } else if (monthNumber) {
         const monthStr = monthNumber.toString().padStart(2, "0");
-        const lastDay = getLastDayOfMonth(currentYear, monthNumber);
+        const lastDay = getLastDayOfMonth(defaultYear, monthNumber);
 
-        const startOfMonth = `${currentYear}-${monthStr}-01`;
-        const endOfMonth = `${currentYear}-${monthStr}-${lastDay}`;
+        const startOfMonth = `${defaultYear}-${monthStr}-01`;
+        const endOfMonth = `${defaultYear}-${monthStr}-${lastDay}`;
 
         query = query
           .filter("date", "gte", startOfMonth)
@@ -185,6 +184,7 @@ export type AttendanceFilters = {
   year?: string | undefined | null;
   project?: string | undefined | null;
   project_site?: string | undefined | null;
+  range?: string | undefined | null;
 };
 
 export async function getAttendanceByCompanyId({
@@ -203,7 +203,7 @@ export async function getAttendanceByCompanyId({
   };
 }) {
   const { from, to, sort, searchQuery, filters } = params;
-  const { month, year, project, project_site } = filters ?? {};
+  const { month, year, project, project_site, range } = filters ?? {};
 
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth() + 1;
@@ -214,11 +214,112 @@ export async function getAttendanceByCompanyId({
     return lastDay.toString().padStart(2, "0");
   };
 
-  const monthStr = currentMonth.toString().padStart(2, "0");
-  const lastDay = getLastDayOfMonth(currentYear, currentMonth);
+  let startDate: string;
+  let endDate: string;
 
-  const defaultStartDate = `${currentYear}-${monthStr}-01`;
-  const defaultEndDate = `${currentYear}-${monthStr}-${lastDay}`;
+  if (range) {
+    let endDateObj: Date;
+    let startDateObj: Date;
+    const rangeNumber = Number.parseInt(String(range), 10);
+
+    if (!Number.isNaN(rangeNumber) && rangeNumber > 0) {
+      if (month) {
+        const monthNumber = months[month];
+        if (year) {
+          endDateObj = new Date(Number(year), monthNumber - 1, rangeNumber + 1);
+          let targetMonth = monthNumber - 2;
+          let targetYear = Number(year);
+
+          if (targetMonth < 0) {
+            targetMonth = 11;
+            targetYear -= 1;
+          }
+          startDateObj = new Date(targetYear, targetMonth, rangeNumber + 2);
+        } else {
+          endDateObj = new Date(
+            currentDate.getFullYear(),
+            monthNumber - 1,
+            rangeNumber + 1
+          );
+          let targetMonth = monthNumber - 2;
+          let targetYear = currentDate.getFullYear();
+
+          if (targetMonth < 0) {
+            targetMonth = 11;
+            targetYear -= 1;
+          }
+          startDateObj = new Date(targetYear, targetMonth, rangeNumber + 2);
+        }
+      } else if (year) {
+        endDateObj = new Date(
+          Number(year),
+          currentDate.getMonth(),
+          rangeNumber + 1
+        );
+        let targetMonth = currentDate.getMonth() - 1;
+        let targetYear = Number(year);
+
+        if (targetMonth < 0) {
+          targetMonth = 11;
+          targetYear -= 1;
+        }
+        startDateObj = new Date(targetYear, targetMonth, rangeNumber + 2);
+      } else {
+        endDateObj = new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          rangeNumber + 1
+        );
+        let targetMonth = currentDate.getMonth() - 1;
+        let targetYear = currentDate.getFullYear();
+
+        if (targetMonth < 0) {
+          targetMonth = 11;
+          targetYear -= 1;
+        }
+        startDateObj = new Date(targetYear, targetMonth, rangeNumber + 2);
+      }
+
+      endDate = endDateObj.toISOString().split("T")[0];
+      startDate = startDateObj?.toISOString().split("T")[0];
+    } else {
+      const monthStr = currentMonth.toString().padStart(2, "0");
+      const lastDay = getLastDayOfMonth(currentYear, currentMonth);
+      startDate = `${currentYear}-${monthStr}-01`;
+      endDate = `${currentYear}-${monthStr}-${lastDay}`;
+    }
+  } else if (month || year) {
+    const monthNumber = months[month!];
+
+    if (year && monthNumber) {
+      const yearNum = Number(year);
+      const monthStr = monthNumber.toString().padStart(2, "0");
+      const lastDay = getLastDayOfMonth(yearNum, monthNumber);
+
+      startDate = `${yearNum}-${monthStr}-01`;
+      endDate = `${yearNum}-${monthStr}-${lastDay}`;
+    } else if (year) {
+      const yearNum = Number(year);
+      startDate = `${yearNum}-01-01`;
+      endDate = `${yearNum}-12-31`;
+    } else if (monthNumber) {
+      const monthStr = monthNumber.toString().padStart(2, "0");
+      const lastDay = getLastDayOfMonth(currentYear, monthNumber);
+
+      startDate = `${currentYear}-${monthStr}-01`;
+      endDate = `${currentYear}-${monthStr}-${lastDay}`;
+    } else {
+      const monthStr = currentMonth.toString().padStart(2, "0");
+      const lastDay = getLastDayOfMonth(currentYear, currentMonth);
+      startDate = `${currentYear}-${monthStr}-01`;
+      endDate = `${currentYear}-${monthStr}-${lastDay}`;
+    }
+  } else {
+    const monthStr = currentMonth.toString().padStart(2, "0");
+    const lastDay = getLastDayOfMonth(currentYear, currentMonth);
+    startDate = `${currentYear}-${monthStr}-01`;
+    endDate = `${currentYear}-${monthStr}-${lastDay}`;
+  }
 
   const columns = [
     "id",
@@ -234,11 +335,9 @@ export async function getAttendanceByCompanyId({
     .select(
       `
       ${columns.join(",")},
-      employee_project_assignment!employee_project_assignments_employee_id_fkey!${
-        project ? "inner" : "left"
+      employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
       }(
-        project_sites!${project ? "inner" : "left"}(id, name, projects!${
-        project ? "inner" : "left"
+        project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
       }(id, name))),
       attendance(
         id,
@@ -255,11 +354,10 @@ export async function getAttendanceByCompanyId({
     )
     .eq("company_id", companyId);
 
-  if (!filters?.month && !filters?.year) {
-    query = query
-      .filter("attendance.date", "gte", defaultStartDate)
-      .filter("attendance.date", "lte", defaultEndDate);
-  }
+  // Apply date filters
+  query = query
+    .filter("attendance.date", "gte", startDate)
+    .filter("attendance.date", "lte", endDate);
 
   if (sort) {
     const [column, direction] = sort;
@@ -298,45 +396,8 @@ export async function getAttendanceByCompanyId({
     );
   }
 
-  if (month || year) {
-    const monthNumber = months[month!];
-    const getLastDayOfMonth = (year: number, month: number): string => {
-      const lastDay = new Date(year, month, 0).getDate();
-      return lastDay.toString().padStart(2, "0");
-    };
-
-    const currentYear = new Date().getFullYear();
-
-    if (year && monthNumber) {
-      const yearNum = Number(year);
-      const monthStr = monthNumber.toString().padStart(2, "0");
-      const lastDay = getLastDayOfMonth(yearNum, monthNumber);
-
-      const startOfMonth = `${yearNum}-${monthStr}-01`;
-      const endOfMonth = `${yearNum}-${monthStr}-${lastDay}`;
-
-      query = query
-        .filter("attendance.date", "gte", startOfMonth)
-        .filter("attendance.date", "lte", endOfMonth);
-    } else if (year) {
-      const yearNum = Number(year);
-      query = query
-        .filter("attendance.date", "gte", `${yearNum}-01-01`)
-        .filter("attendance.date", "lte", `${yearNum}-12-31`);
-    } else if (monthNumber) {
-      const monthStr = monthNumber.toString().padStart(2, "0");
-      const lastDay = getLastDayOfMonth(currentYear, monthNumber);
-
-      const startOfMonth = `${currentYear}-${monthStr}-01`;
-      const endOfMonth = `${currentYear}-${monthStr}-${lastDay}`;
-
-      query = query
-        .filter("attendance.date", "gte", startOfMonth)
-        .filter("attendance.date", "lte", endOfMonth);
-    }
-  }
-
   const { data, count, error } = await query.range(from, to);
+
   if (error) {
     console.error("getAttendanceByCompanyId Error", error);
   }

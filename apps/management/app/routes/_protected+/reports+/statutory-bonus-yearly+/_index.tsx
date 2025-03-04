@@ -16,6 +16,7 @@ import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json, Outlet, redirect, useLoaderData } from "@remix-run/react";
 import { payoutMonths } from "@canny_ecosystem/utils/constant";
+import { defaultMonth } from "@canny_ecosystem/utils";
 
 const pageSize = 20;
 
@@ -88,7 +89,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return {
       ...employee,
       bonus_amount: 4324,
-      payout_month: payoutMonths[new Date().getMonth()].label,
+      payout_month: payoutMonths[defaultMonth].label,
       start_date: new Date(),
       end_date: new Date(),
     };

@@ -74,10 +74,12 @@ export type SiteDatabaseUpdate =
   Database["public"]["Tables"]["project_sites"]["Update"];
 
 // Pay Sequences
-export type SitePaySequenceDatabaseRow =
-  Database["public"]["Tables"]["site_pay_sequence"]["Row"];
-export type SitePaySequenceDatabaseUpdate =
-  Database["public"]["Tables"]["site_pay_sequence"]["Update"];
+export type PaySequenceDatabaseRow =
+  Database["public"]["Tables"]["pay_sequence"]["Row"];
+export type PaySequenceDatabaseInsert =
+  Database["public"]["Tables"]["pay_sequence"]["Insert"];
+export type PaySequenceDatabaseUpdate =
+  Database["public"]["Tables"]["pay_sequence"]["Update"];
 
 // Employees
 export type EmployeeDatabaseRow =
@@ -318,7 +320,7 @@ export type LeaveTypeDatabaseInsert =
 export type LeaveTypeDatabaseUpdate =
   Database["public"]["Tables"]["leave_type"]["Update"];
 
-  export type HolidaysDatabaseRow =
+export type HolidaysDatabaseRow =
   Database["public"]["Tables"]["holidays"]["Row"];
 export type HolidaysDatabaseInsert =
   Database["public"]["Tables"]["holidays"]["Insert"];

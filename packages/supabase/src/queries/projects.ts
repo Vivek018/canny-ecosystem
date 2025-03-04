@@ -1,8 +1,6 @@
 import type {
-  InferredType,
   ProjectDatabaseRow,
   SiteDatabaseRow,
-  SitePaySequenceDatabaseRow,
   TypedSupabaseClient,
 } from "../types";
 import { HARD_QUERY_LIMIT, MID_QUERY_LIMIT } from "../constant";
@@ -330,33 +328,9 @@ export async function getSiteById({
   return { data, error };
 }
 
-// Pay Sequences
-export async function getSitePaySequenceInSite({
-  supabase,
-  siteId,
-}: {
-  supabase: TypedSupabaseClient;
-  siteId: string;
-}) {
-  const columns = [
-    "id",
-    "pay_frequency",
-    "working_days",
-    "pay_day",
-    "site_id",
-  ] as const;
 
-  const { data, error } = await supabase
-    .from("site_pay_sequence")
-    .select(columns.join(","))
-    .eq("site_id", siteId)
-    .single<
-      InferredType<SitePaySequenceDatabaseRow, (typeof columns)[number]>
-    >();
 
-  if (error) {
-    console.error("getSitePaySequenceInSite Error", error);
-  }
 
-  return { data, error };
-}
+
+
+

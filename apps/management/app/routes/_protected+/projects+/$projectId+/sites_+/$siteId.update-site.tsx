@@ -162,9 +162,6 @@ export default function UpdateSite() {
           description: actionData?.message || "Site updated",
           variant: "success",
         });
-        navigate(`/projects/${projectId}/sites`, {
-          replace: true,
-        });
       } else {
         toast({
           title: "Error",
@@ -172,6 +169,9 @@ export default function UpdateSite() {
           variant: "destructive",
         });
       }
+      navigate(`/projects/${projectId}/sites`, {
+        replace: true,
+      });
     }
   }, [actionData]);
 

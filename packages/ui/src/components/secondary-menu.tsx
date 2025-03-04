@@ -25,7 +25,7 @@ export function SecondaryMenu({
               item?.path && pathname.includes(item?.path) && "text-primary/80",
               item?.path &&
                 pathname === item?.path &&
-                "text-primary no-underline hover:no-underline focus:no-underline"
+                "text-primary no-underline hover:no-underline focus:no-underline cursor-default"
             )}
           >
             <span className='capitalize'>{item.label}</span>

@@ -14,7 +14,6 @@ type Props = {
   days: DayType[];
 };
 
-
 export function AttendanceTableHeader({
   table,
   className,
@@ -47,6 +46,14 @@ export function AttendanceTableHeader({
     }
     setSearchParams(searchParams);
   };
+  const isVisible = (id: string) =>
+    loading ||
+    table
+      ?.getAllLeafColumns()
+      ?.find((col: any) => {
+        return col.id === id;
+      })
+      ?.getIsVisible();
 
   const isEnableSorting = (id: string) =>
     (
@@ -65,8 +72,8 @@ export function AttendanceTableHeader({
 
   return (
     <TableHeader className={className}>
-      <TableRow className='h-[45px] hover:bg-transparent'>
-        <TableHead className='hidden md:table-cell px-3 md:px-4 py-2 sticky left-0 min-w-12 max-w-12 bg-card z-10'>
+      <TableRow className="h-[45px] hover:bg-transparent">
+        <TableHead className="hidden md:table-cell px-3 md:px-4 py-2 sticky left-0 min-w-12 max-w-12 bg-card z-10">
           <Checkbox
             checked={
               table?.getIsAllPageRowsSelected() ||
@@ -79,40 +86,42 @@ export function AttendanceTableHeader({
         </TableHead>
         {AttendanceColumnIdArray?.map((id) => {
           return (
-            <TableHead
-              key={id}
-              className={cn(
-                "px-4 py-2 min-w-32",
-                id === "employee_code" && "sticky left-12 bg-card z-10",
-                id === "employee_name" && "sticky left-48 bg-card z-10"
-              )}
-            >
-              <Button
-                className='p-0 hover:bg-transparent space-x-2 disabled:opacity-100'
-                variant='ghost'
-                disabled={!isEnableSorting(id)}
-                onClick={(e) => {
-                  e.preventDefault();
-                  createSortQuery(id);
-                }}
+            isVisible(id!) && (
+              <TableHead
+                key={id}
+                className={cn(
+                  "px-4 py-2 min-w-32",
+                  id === "employee_code" && "sticky left-12 bg-card z-10",
+                  id === "employee_name" && "sticky left-48 bg-card z-10"
+                )}
               >
-                <span className='capitalize'>{columnName(id)}</span>
-                <Icon
-                  name='chevron-up'
-                  className={cn(
-                    "hidden",
-                    id === column && value === "desc" && "flex"
-                  )}
-                />
-                <Icon
-                  name='chevron-down'
-                  className={cn(
-                    "hidden",
-                    id === column && value === "asc" && "flex"
-                  )}
-                />
-              </Button>
-            </TableHead>
+                <Button
+                  className="p-0 hover:bg-transparent space-x-2 disabled:opacity-100"
+                  variant="ghost"
+                  disabled={!isEnableSorting(id!)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    createSortQuery(id!);
+                  }}
+                >
+                  <span className="capitalize">{columnName(id!)}</span>
+                  <Icon
+                    name="chevron-up"
+                    className={cn(
+                      "hidden",
+                      id === column && value === "desc" && "flex"
+                    )}
+                  />
+                  <Icon
+                    name="chevron-down"
+                    className={cn(
+                      "hidden",
+                      id === column && value === "asc" && "flex"
+                    )}
+                  />
+                </Button>
+              </TableHead>
+            )
           );
         })}
       </TableRow>
