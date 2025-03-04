@@ -143,7 +143,7 @@ export function ExportBar({
       </div>
       <div className="h-full flex justify-center items-center gap-2">
         <div className="h-full tracking-wide font-medium rounded-full flex justify-between items-center px-6 border dark:border-muted-foreground/30 ">
-          Avg Presents:{" "}
+          Avg Present:{" "}
           <span className="ml-1.5">
             {calculateAvgPresenceByEmployees(formattedData)}
           </span>

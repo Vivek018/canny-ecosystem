@@ -172,7 +172,7 @@ export default function Attendance() {
     endDate: string | Date | undefined;
   } | null>(null);
   const [month, setMonth] = useState<number>(
-    filters?.month ? months[filters.month] - 1 : defaultMonth + 1
+    filters?.month ? months[filters.month] - 1 : defaultMonth
   );
   const [year, setYear] = useState<number>(
     filters?.year ? Number(filters.year) : defaultYear
