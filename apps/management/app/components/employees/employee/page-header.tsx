@@ -4,7 +4,7 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Link } from "@remix-run/react";
 import { EmployeeOptionsDropdown } from "../employee-option-dropdown";
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@canny_ecosystem/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@canny_ecosystem/ui/avatar";
 import type {
   EmployeeDatabaseRow,
   SupabaseEnv,
@@ -40,9 +40,9 @@ export function EmployeePageHeader({
                 "w-28 h-28 border border-muted-foreground/30 shadow-sm hover:z-40",
               )}
             >
-              {employee?.photo && (
-                <img src={employee?.photo} alt={employee?.first_name} />
-              )}
+              {employee?.photo ? (
+                <AvatarImage src={employee?.photo} alt={employee?.first_name} />
+              ) : null}
               <AvatarFallback>
                 <span className="text-lg tracking-wider uppercase">
                   {employee?.first_name?.charAt(0)}

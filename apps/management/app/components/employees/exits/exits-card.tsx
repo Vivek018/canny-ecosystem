@@ -19,18 +19,16 @@ import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
 type DetailItemProps = {
   label: string;
   value: string | null | undefined;
-  formatter?: (value: string) => string;
 };
 
-const DetailItem: React.FC<DetailItemProps> = ({ label, value, formatter }) => {
-  const formattedValue = value ? (formatter ? formatter(value) : value) : "--";
+const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => {
 
   return (
     <div className='flex flex-col'>
       <h3 className='text-muted-foreground text-[13px] tracking-wide capitalize'>
         {label}
       </h3>
-      <p className='truncate w-80'>{formattedValue}</p>
+      <p className='truncate w-80'>{value ?? "--"}</p>
     </div>
   );
 };

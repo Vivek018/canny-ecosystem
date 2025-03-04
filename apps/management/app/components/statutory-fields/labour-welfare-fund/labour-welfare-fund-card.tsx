@@ -34,18 +34,15 @@ import { attribute } from "@canny_ecosystem/utils/constant";
 type DetailItemProps = {
   label: string;
   value: string | number | null | undefined;
-  formatter?: (value: string | number) => string;
 };
 
-const DetailItem: React.FC<DetailItemProps> = ({ label, value, formatter }) => {
-  const formattedValue = value ? (formatter ? formatter(value) : value) : "--";
-
+const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => {
   return (
     <div className="flex flex-row items-center gap-4 text-base">
       <h3 className="text-muted-foreground tracking-wide capitalize w-44 truncate">
         {label}
       </h3>
-      <p className="w-44 truncate">{formattedValue}</p>
+      <p className="w-44 truncate">{value ?? "--"}</p>
     </div>
   );
 };

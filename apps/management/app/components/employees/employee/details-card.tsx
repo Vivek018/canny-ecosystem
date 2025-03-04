@@ -5,22 +5,15 @@ import { formatDate, replaceUnderscore } from "@canny_ecosystem/utils";
 type DetailItemProps = {
   label: string;
   value: string | null | undefined;
-  formatter?: (value: string) => string;
 };
 
-export const DetailItem: React.FC<DetailItemProps> = ({
-  label,
-  value,
-  formatter,
-}) => {
-  const formattedValue = value ? (formatter ? formatter(value) : value) : "--";
-
+export const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => {
   return (
     <div className="flex flex-col items-start">
       <h3 className="text-muted-foreground text-[13px] tracking-wide capitalize">
         {label}
       </h3>
-      <p>{formattedValue}</p>
+      <p>{value ?? "--"}</p>
     </div>
   );
 };
@@ -42,14 +35,12 @@ export const EmployeeDetailsCard: React.FC<{
           <DetailItem label="Gender" value={employee.gender} />
           <DetailItem
             label="Education"
-            value={employee.education}
-            formatter={replaceUnderscore}
+            value={replaceUnderscore(employee.education)}
           />
           <DetailItem label="Marital Status" value={employee.marital_status} />
           <DetailItem
             label="Date of birth"
-            value={employee.date_of_birth}
-            formatter={formatDate}
+            value={formatDate(employee.date_of_birth)}
           />
           <DetailItem label="Personal Email" value={employee.personal_email} />
           <DetailItem
