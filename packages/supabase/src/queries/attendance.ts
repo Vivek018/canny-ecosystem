@@ -241,6 +241,16 @@ export async function getAttendanceByCompanyId({
   let startDate: string;
   let endDate: string;
 
+  function isValidDate(year: number, month: number, day: number): boolean {
+    const date = new Date(year, month - 1, day);
+
+    return (
+      date.getFullYear() === year &&
+      date.getMonth() === month - 1 &&
+      date.getDate() === day
+    );
+  }
+
   if (range) {
     let endDateObj: Date;
     let startDateObj: Date;
@@ -250,7 +260,16 @@ export async function getAttendanceByCompanyId({
       if (month) {
         const monthNumber = months[month];
         if (year) {
-          endDateObj = new Date(Number(year), monthNumber - 1, rangeNumber + 1);
+          if (!isValidDate(Number(year), monthNumber, rangeNumber)) {
+            endDateObj = new Date(Number(year), monthNumber, 0, 24);
+          } else {
+            endDateObj = new Date(
+              Number(year),
+              monthNumber - 1,
+              rangeNumber + 1
+            );
+          }
+
           let targetMonth = monthNumber - 2;
           let targetYear = Number(year);
 
@@ -258,13 +277,22 @@ export async function getAttendanceByCompanyId({
             targetMonth = 11;
             targetYear -= 1;
           }
-          startDateObj = new Date(targetYear, targetMonth, rangeNumber + 2);
+          if (!isValidDate(targetYear, targetMonth + 1, rangeNumber)) {
+            startDateObj = new Date(targetYear, targetMonth + 1, 1, 24);
+          } else {
+            startDateObj = new Date(targetYear, targetMonth, rangeNumber + 2);
+          }
         } else {
-          endDateObj = new Date(
-            currentDate.getFullYear(),
-            monthNumber - 1,
-            rangeNumber + 1
-          );
+          if (!isValidDate(currentYear, monthNumber, rangeNumber)) {
+            endDateObj = new Date(currentYear, monthNumber, 0, 24);
+          } else {
+            endDateObj = new Date(
+              currentDate.getFullYear(),
+              monthNumber - 1,
+              rangeNumber + 1
+            );
+          }
+
           let targetMonth = monthNumber - 2;
           let targetYear = currentDate.getFullYear();
 
@@ -272,14 +300,30 @@ export async function getAttendanceByCompanyId({
             targetMonth = 11;
             targetYear -= 1;
           }
-          startDateObj = new Date(targetYear, targetMonth, rangeNumber + 2);
+          if (!isValidDate(targetYear, targetMonth + 1, rangeNumber)) {
+            startDateObj = new Date(targetYear, targetMonth + 1, 1, 24);
+          } else {
+            startDateObj = new Date(targetYear, targetMonth, rangeNumber + 2);
+          }
         }
       } else if (year) {
-        endDateObj = new Date(
-          Number(year),
-          currentDate.getMonth(),
-          rangeNumber + 1
-        );
+        if (
+          !isValidDate(Number(year), currentDate.getMonth() + 1, rangeNumber)
+        ) {
+          endDateObj = new Date(
+            Number(year),
+            currentDate.getMonth() + 1,
+            0,
+            24
+          );
+        } else {
+          endDateObj = new Date(
+            Number(year),
+            currentDate.getMonth(),
+            rangeNumber + 1
+          );
+        }
+
         let targetMonth = currentDate.getMonth() - 1;
         let targetYear = Number(year);
 
@@ -287,21 +331,64 @@ export async function getAttendanceByCompanyId({
           targetMonth = 11;
           targetYear -= 1;
         }
-        startDateObj = new Date(targetYear, targetMonth, rangeNumber + 2);
+        if (!isValidDate(targetYear, targetMonth + 1, rangeNumber)) {
+          startDateObj = new Date(targetYear, targetMonth + 1, 1, 24);
+        } else {
+          startDateObj = new Date(targetYear, targetMonth, rangeNumber + 2);
+        }
       } else {
-        endDateObj = new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth(),
-          rangeNumber + 1
-        );
+        const targetDate = currentDate.getDate();
         let targetMonth = currentDate.getMonth() - 1;
         let targetYear = currentDate.getFullYear();
-
         if (targetMonth < 0) {
           targetMonth = 11;
           targetYear -= 1;
         }
-        startDateObj = new Date(targetYear, targetMonth, rangeNumber + 2);
+
+        if (targetDate > rangeNumber) {
+          endDateObj = new Date(
+            currentDate.getFullYear(),
+            currentDate.getMonth(),
+            rangeNumber + 1
+          );
+
+          if (!isValidDate(targetYear, targetMonth + 1, rangeNumber)) {
+            startDateObj = new Date(targetYear, targetMonth + 1, 1, 24);
+          } else {
+            startDateObj = new Date(targetYear, targetMonth, rangeNumber + 2);
+          }
+        } else {
+          if (
+            !isValidDate(
+              currentDate.getFullYear(),
+              currentDate.getMonth(),
+              rangeNumber
+            )
+          ) {
+            endDateObj = new Date(
+              currentDate.getFullYear(),
+              currentDate.getMonth(),
+              0,
+              24
+            );
+          } else {
+            endDateObj = new Date(
+              currentDate.getFullYear(),
+              currentDate.getMonth() - 1,
+              rangeNumber + 1
+            );
+          }
+
+          if (!isValidDate(targetYear, targetMonth, rangeNumber)) {
+            startDateObj = new Date(targetYear, targetMonth, 1, 24);
+          } else {
+            startDateObj = new Date(
+              targetYear,
+              targetMonth - 1,
+              rangeNumber + 2
+            );
+          }
+        }
       }
 
       endDate = endDateObj.toISOString().split("T")[0];
@@ -323,9 +410,10 @@ export async function getAttendanceByCompanyId({
       startDate = `${yearNum}-${monthStr}-01`;
       endDate = `${yearNum}-${monthStr}-${lastDay}`;
     } else if (year) {
+      const lastDay = getLastDayOfMonth(Number(year), currentMonth);
       const yearNum = Number(year);
-      startDate = `${yearNum}-01-01`;
-      endDate = `${yearNum}-12-31`;
+      startDate = `${yearNum}-${currentMonth}-01`;
+      endDate = `${yearNum}-${currentMonth}-${lastDay}`;
     } else if (monthNumber) {
       const monthStr = monthNumber.toString().padStart(2, "0");
       const lastDay = getLastDayOfMonth(currentYear, monthNumber);
@@ -339,8 +427,8 @@ export async function getAttendanceByCompanyId({
       endDate = `${currentYear}-${monthStr}-${lastDay}`;
     }
   } else {
-    const monthStr = currentMonth.toString().padStart(2, "0");
-    const lastDay = getLastDayOfMonth(currentYear, currentMonth);
+    const monthStr = (currentMonth - 1).toString().padStart(2, "0");
+    const lastDay = getLastDayOfMonth(currentYear, currentMonth - 1);
     startDate = `${currentYear}-${monthStr}-01`;
     endDate = `${currentYear}-${monthStr}-${lastDay}`;
   }
@@ -428,7 +516,12 @@ export async function getAttendanceByCompanyId({
     console.error("getAttendanceByCompanyId Error", error);
   }
 
-  return { data, meta: { count: count ?? data?.length }, error };
+  return {
+    data,
+    meta: { count: count ?? data?.length },
+    error,
+    dateRange: { startDate, endDate },
+  };
 }
 
 export type AttendanceReportFilters = {

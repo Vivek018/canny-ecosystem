@@ -22,9 +22,8 @@ import {
 import { AttendanceTable } from "@/components/attendance/table/attendance-table";
 import { attendanceColumns } from "@/components/attendance/table/columns";
 import { ImportEmployeeAttendanceModal } from "@/components/employees/import-export/import-modal-attendance";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import {
-  calculateDateRange,
   defaultMonth,
   defaultYear,
   formatDate,
@@ -167,65 +166,12 @@ export default function Attendance() {
     env,
   } = useLoaderData<typeof loader>();
 
-  const [dateRange, setDateRange] = useState<{
-    startDate: string | Date | undefined;
-    endDate: string | Date | undefined;
-  } | null>(null);
   const [month, setMonth] = useState<number>(
     filters?.month ? months[filters.month] - 1 : defaultMonth
   );
   const [year, setYear] = useState<number>(
     filters?.year ? Number(filters.year) : defaultYear
   );
-
-  useEffect(() => {
-    if (filters?.range) {
-      const { startDate, endDate } = calculateDateRange(
-        filters.range,
-        filters.month
-          ? Object.keys(months).find(
-              (key) => months[key] === months[filters.month!]
-            )
-          : null,
-        filters.year
-      );
-      setDateRange({ startDate, endDate });
-    }
-  }, [filters]);
-
-  const days = useMemo(() => {
-    if (filters?.range && dateRange) {
-      const startDateObj = new Date(dateRange.startDate as string);
-      const endDateObj = new Date(dateRange.endDate as string);
-      return Array.from(
-        {
-          length:
-            (endDateObj.getTime() - startDateObj.getTime()) /
-              (1000 * 3600 * 24) +
-            1,
-        },
-        (_, i) => {
-          const currentDate = new Date(startDateObj);
-          currentDate.setDate(startDateObj.getDate() + i);
-          currentDate.setHours(12, 0, 0, 0);
-          return {
-            day: currentDate.getDate(),
-            fullDate: currentDate.toISOString().split("T")[0],
-          };
-        }
-      );
-    }
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    return Array.from({ length: daysInMonth }, (_, i) => {
-      const currentDate = new Date(year, month, i + 1);
-
-      currentDate.setHours(12, 0, 0, 0);
-      return {
-        day: i + 1,
-        fullDate: currentDate.toISOString().split("T")[0],
-      };
-    });
-  }, [filters, dateRange, month, year]);
 
   const transformAttendanceData = useMemo(
     () => (data: any[]) => {
@@ -263,7 +209,7 @@ export default function Attendance() {
         }, {} as Record<string, any>)
       );
     },
-    [month, year, days]
+    [month, year]
   );
 
   const noFilters = Object.values(filters ?? {}).every((value) => !value);
@@ -318,7 +264,7 @@ export default function Attendance() {
       </div>
       <Suspense fallback={<LoadingSpinner className="w-1/3 h-1/3" />}>
         <Await resolve={attendancePromise}>
-          {({ data, meta, error }) => {
+          {({ data, meta, error, dateRange }) => {
             if (error) {
               clearCacheEntry(cacheKeyPrefix.attendance);
               return (
@@ -328,6 +274,40 @@ export default function Attendance() {
                 />
               );
             }
+
+            const days = useMemo(() => {
+              if (filters?.range && dateRange) {
+                const startDateObj = new Date(dateRange.startDate as string);
+                const endDateObj = new Date(dateRange.endDate as string);
+                return Array.from(
+                  {
+                    length:
+                      (endDateObj.getTime() - startDateObj.getTime()) /
+                        (1000 * 3600 * 24) +
+                      1,
+                  },
+                  (_, i) => {
+                    const currentDate = new Date(startDateObj);
+                    currentDate.setDate(startDateObj.getDate() + i);
+                    currentDate.setHours(12, 0, 0, 0);
+                    return {
+                      day: currentDate.getDate(),
+                      fullDate: currentDate.toISOString().split("T")[0],
+                    };
+                  }
+                );
+              }
+              const daysInMonth = new Date(year, month + 1, 0).getDate();
+              return Array.from({ length: daysInMonth }, (_, i) => {
+                const currentDate = new Date(year, month, i + 1);
+
+                currentDate.setHours(12, 0, 0, 0);
+                return {
+                  day: i + 1,
+                  fullDate: currentDate.toISOString().split("T")[0],
+                };
+              });
+            }, [filters, dateRange, month, year]);
 
             const transformedData = transformAttendanceData(data);
             const hasNextPage = meta?.count > pageSize;
