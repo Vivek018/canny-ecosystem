@@ -115,9 +115,9 @@ export const attribute = {
   employeeLetters: "employee_letters",
   employeeReimbursements: "employee_reimbursements",
   employeeAttendance: "employee_attendance",
-  employeeExits:  "employee_exits",
-  employeePaymentTemplateLink:  "payment_template_link",
-  employeeDocuments:"employee_documents",
+  employeeExits: "employee_exits",
+  employeePaymentTemplateLink: "payment_template_link",
+  employeeDocuments: "employee_documents",
   reimbursements: "reimbursements",
   exits: "exits",
   paymentFields: "payment_fields",
@@ -272,3 +272,17 @@ export const SUPABASE_STORAGE = {
 export const SUPABASE_BUCKET = {
   CANNY_ECOSYSTEM: "canny-ecosystem",
 };
+
+export const SUPABASE_MEDIA_URL_PREFIX =
+  "https://oghojvhpbxanipiuxwbu.supabase.co/storage/v1/object/public/";
+
+export function getFilePathFromUrl(url: string) {
+  return url.startsWith(
+    `${SUPABASE_MEDIA_URL_PREFIX}${SUPABASE_BUCKET.CANNY_ECOSYSTEM}/`,
+  )
+    ? url.slice(
+        `${SUPABASE_MEDIA_URL_PREFIX}${SUPABASE_BUCKET.CANNY_ECOSYSTEM}/`
+          .length,
+      )
+    : url;
+}

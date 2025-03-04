@@ -1,9 +1,10 @@
-import { formatUTCDate } from "@canny_ecosystem/utils";
+import { type employeeDocuments, formatUTCDate } from "@canny_ecosystem/utils";
 import type {
   EmployeeAddressDatabaseRow,
   EmployeeAttendanceDatabaseRow,
   EmployeeBankDetailsDatabaseRow,
   EmployeeDatabaseRow,
+  EmployeeDocumentsDatabaseRow,
   EmployeeGuardianDatabaseRow,
   EmployeeProjectAssignmentDatabaseRow,
   EmployeeSkillDatabaseRow,
@@ -1007,6 +1008,60 @@ export async function getEmployeesReportByCompanyId({
     meta: { count: count ?? data?.length },
     error: null,
   };
+}
+
+// employee documents
+export async function getEmployeeDocuments({
+  supabase,
+  employeeId,
+}: { supabase: TypedSupabaseClient; employeeId: string }) {
+  const columns = ["document_type", "url"] as const;
+
+  const { data, error } = await supabase
+    .from("employee_documents")
+    .select(columns.join(","))
+    .eq("employee_id", employeeId)
+    .order("created_at", { ascending: false })
+    .limit(HARD_QUERY_LIMIT)
+    .returns<
+      InferredType<EmployeeDocumentsDatabaseRow, (typeof columns)[number]>[]
+    >();
+
+  if (error) {
+    console.error("getEmployeeDocuments Error", error);
+    return null;
+  }
+
+  return { data, error };
+}
+
+export async function getEmployeeDocumentUrlByEmployeeIdAndDocumentName({
+  supabase,
+  employeeId,
+  documentName,
+}: {
+  supabase: TypedSupabaseClient;
+  employeeId: string;
+  documentName: (typeof employeeDocuments)[number];
+}) {
+  const columns = ["url"] as const;
+
+  const { data, error } = await supabase
+    .from("employee_documents")
+    .select(columns.join(","))
+    .eq("employee_id", employeeId)
+    .eq("document_type", documentName)
+    .single<EmployeeDocumentsDatabaseRow>();
+
+  if (error) {
+    console.error(
+      "getEmployeeDocumentUrlByEmployeeIdAndDocumentName Error",
+      error,
+    );
+    return { data, error };
+  }
+
+  return { data, error };
 }
 
 export type ImportEmployeeDetailsDataType = Pick<

@@ -1,14 +1,17 @@
 import {
+  getFilePathFromUrl,
   SUPABASE_BUCKET,
+  SUPABASE_MEDIA_URL_PREFIX,
   SUPABASE_STORAGE,
 } from "@canny_ecosystem/utils/constant";
-import type {
-  EmployeeDocumentsDatabaseRow,
-  InferredType,
-  TypedSupabaseClient,
-} from "../types";
-import { updateEmployee } from "../mutations";
-import { convertToNull, type employeeDocuments } from "@canny_ecosystem/utils";
+import type { TypedSupabaseClient } from "../types";
+import {
+  addEmployeeDocument,
+  deleteEmployeeDocumentByEmployeeId,
+  updateEmployee,
+} from "../mutations";
+import { isGoodStatus, type employeeDocuments } from "@canny_ecosystem/utils";
+import { getEmployeeDocumentUrlByEmployeeIdAndDocumentName } from "../queries";
 
 // employee profile photo
 export async function uploadEmployeeProfilePhoto({
@@ -25,12 +28,11 @@ export async function uploadEmployeeProfilePhoto({
     const buffer = await profilePhoto.arrayBuffer();
     const fileData = new Uint8Array(buffer);
 
-    // Storing file in bucket
-    const { error } = await supabase.storage
+    const { data, error } = await supabase.storage
       .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
-      .update(filePath, fileData, {
+      .upload(filePath, fileData, {
         contentType: profilePhoto.type,
-        cacheControl: "3600",
+        cacheControl: "0",
         upsert: false,
       });
 
@@ -39,23 +41,20 @@ export async function uploadEmployeeProfilePhoto({
       return { status: 500, error };
     }
 
-    // Generating the public URL
-    const { data } = supabase.storage
-      .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
-      .getPublicUrl(filePath);
-
-    // Updating photo path in employees
-    const { error: updateEmployeeError } = await updateEmployee({
+    const { status, error: updateEmployeeError } = await updateEmployee({
       supabase,
-      data: { id: employeeId, photo: data.publicUrl },
+      data: {
+        id: employeeId,
+        photo: `${SUPABASE_MEDIA_URL_PREFIX}${data.fullPath}`,
+      },
     });
 
     if (updateEmployeeError) {
       console.error("updateEmployee Error", updateEmployeeError);
-      return { status: 500, error: updateEmployeeError };
+      return { status, error: updateEmployeeError };
     }
 
-    return { status: 200 };
+    return { status, error: null };
   }
 
   return { status: 400, error: "File not uploaded by the user" };
@@ -73,31 +72,13 @@ export async function deleteEmployeeProfilePhoto({
     .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
     .remove([filePath]);
 
-  if (error) return { status: 500, error };
+  if (error) {
+    console.error("deleteEmployeeProfilePhoto error", error);
+  }
   return { status: 200, error };
 }
 
-// documents
-export async function getEmployeeDocuments({
-  supabase,
-  employeeId,
-}: { supabase: TypedSupabaseClient; employeeId: string }) {
-  const columns = ["document_type", "url"] as const;
-
-  const { data, error } = await supabase
-    .from("employee_documents")
-    .select(columns.join(","))
-    .eq("employee_id", employeeId)
-    .returns<EmployeeDocumentsDatabaseRow[]>();
-
-  if (error) {
-    console.error("getEmployeeDocuments Error", error);
-    return null;
-  }
-
-  return { data, error };
-}
-
+// employee documents
 export async function uploadEmployeeDocument({
   supabase,
   file,
@@ -109,34 +90,28 @@ export async function uploadEmployeeDocument({
   employeeId: string;
   documentName: (typeof employeeDocuments)[number];
 }) {
-  const columns = ["id"] as const;
-  const { data: documentData } = await supabase
-    .from("employee_documents")
-    .select(columns.join(","))
-    .eq("employee_id", employeeId)
-    .eq("document_type", documentName)
-    .single<
-      InferredType<
-        Omit<
-          EmployeeDocumentsDatabaseRow,
-          "updated_at" | "created_at" | "employee_id"
-        >,
-        (typeof columns)[number]
-      >
-    >();
-
-  // document already exists!
-  if (documentData) return { status: 403, error: "Document already exists" };
-
   if (file instanceof File) {
-    const filePath = `employees/${documentName}/${employeeId}`;
+    const filePath = `employees/${documentName}/${employeeId}${file.name}`;
+    const { data: documentData } =
+      await getEmployeeDocumentUrlByEmployeeIdAndDocumentName({
+        supabase,
+        documentName,
+        employeeId,
+      });
+
+    if (
+      (documentData?.url ?? "").includes(
+        `employees/${documentName}/${employeeId}`,
+      )
+    )
+      return { status: 400, error: "File already exists" };
+
     const buffer = await file.arrayBuffer();
     const fileData = new Uint8Array(buffer);
 
-    // Storing file in Supabase storage
-    const { error } = await supabase.storage
+    const { data, error } = await supabase.storage
       .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
-      .update(filePath, fileData, {
+      .upload(filePath, fileData, {
         contentType: file.type,
         cacheControl: "3600",
         upsert: false,
@@ -147,33 +122,22 @@ export async function uploadEmployeeDocument({
       return { status: 500, error: error.message || "Error storing file" };
     }
 
-    // Generating the public URL for the uploaded document
-    const { data } = supabase.storage
-      .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
-      .getPublicUrl(filePath);
-
-    // Updating the path in employee_documents table
-    const dataToBeInserted = convertToNull({
+    const { status, error: insertError } = await addEmployeeDocument({
+      supabase,
       employee_id: employeeId,
       document_type: documentName,
-      url: data.publicUrl,
+      url: `${SUPABASE_MEDIA_URL_PREFIX}${data.fullPath}`,
     });
-
-    const { error: insertError } = await supabase
-      .from("employee_documents")
-      .insert(dataToBeInserted)
-      .select()
-      .single();
 
     if (insertError) {
       console.error("uploadEmployeeDocument Error", insertError);
       return {
-        status: 500,
+        status,
         error: insertError.message || "Error uploading document record",
       };
     }
 
-    return { status: 200, error: null };
+    return { status, error: null };
   }
 
   return { status: 400, error: "File not uploaded by the user" };
@@ -190,16 +154,22 @@ export async function updateEmployeeDocument({
   employeeId: string;
   documentName: (typeof employeeDocuments)[number];
 }) {
-  await deleteEmployeeDocument({ supabase, documentName, employeeId });
-  const { error } = await uploadEmployeeDocument({
+  const { status } = await deleteEmployeeDocument({
     supabase,
-    file,
-    employeeId,
     documentName,
+    employeeId,
   });
-  if (!error) return { status: 200, error: null };
 
-  return { status: 400, error: "File not uploaded by the user" };
+  if (isGoodStatus(status)) {
+    return await uploadEmployeeDocument({
+      supabase,
+      employeeId,
+      file,
+      documentName,
+    });
+  }
+
+  return { status, error: "File not uploaded by the user" };
 }
 
 export async function deleteEmployeeDocument({
@@ -209,22 +179,34 @@ export async function deleteEmployeeDocument({
 }: {
   supabase: TypedSupabaseClient;
   employeeId: string;
-  documentName: string;
+  documentName: (typeof employeeDocuments)[number];
 }) {
-  // deleting from bucket
-  const filePath = `employees/${documentName}/${employeeId}`;
+  const { data, error } =
+    await getEmployeeDocumentUrlByEmployeeIdAndDocumentName({
+      supabase,
+      documentName,
+      employeeId,
+    });
+  if (!data || error) return { status: 400, error };
+
+  const filePath = getFilePathFromUrl(data.url ?? "");
   const { error: bucketError } = await supabase.storage
     .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
     .remove([filePath]);
+
   if (bucketError) return { status: 500, error: bucketError };
 
-  // deleting entry from table
-  const { error: deleteError } = await supabase
-    .from("employee_documents")
-    .delete()
-    .eq("employee_id", employeeId)
-    .eq("document_type", documentName);
+  const { error: deleteEmployeeDocumentError, status } =
+    await deleteEmployeeDocumentByEmployeeId({
+      supabase,
+      documentName,
+      employeeId,
+    });
 
-  if (deleteError) return { status: 500, error: deleteError };
-  return { status: 200, error: null };
+  if (deleteEmployeeDocumentError)
+    console.error(
+      "deleteEmployeeDocumentByEmployeeId error",
+      deleteEmployeeDocumentError,
+    );
+  return { status, error: null };
 }

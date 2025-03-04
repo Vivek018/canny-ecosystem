@@ -52,7 +52,7 @@ export default function DocumentCard({ documentData }: {
     };
 
     const handleEdit = (documentName: string) => {
-        navigate(`/employees/${employeeId}/documents/edit-document?documentName=${documentName}`);
+        navigate(`/employees/${employeeId}/documents/add-document?documentName=${documentName}`);
     }
 
     return (

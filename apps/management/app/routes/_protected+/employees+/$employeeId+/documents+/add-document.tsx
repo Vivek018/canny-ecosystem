@@ -1,4 +1,4 @@
-import { EmployeeDocumentsSchema, employeeDocuments, isGoodStatus, replaceUnderscore, transformStringArrayIntoOptions } from "@canny_ecosystem/utils";
+import { EmployeeDocumentsSchema, SIZE_1MB, employeeDocuments, isGoodStatus, replaceUnderscore, transformStringArrayIntoOptions } from "@canny_ecosystem/utils";
 import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import { FormProvider, getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
@@ -11,11 +11,15 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { FormButtons } from "@/components/form/form-buttons";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { uploadEmployeeDocument } from "@canny_ecosystem/supabase/media";
+import { updateEmployeeDocument, uploadEmployeeDocument } from "@canny_ecosystem/supabase/media";
+import { parseMultipartFormData } from "@remix-run/server-runtime/dist/formData";
+import { createMemoryUploadHandler } from "@remix-run/server-runtime/dist/upload/memoryUploadHandler";
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
     const employeeId = params.employeeId;
-    return { employeeId };
+    const url = new URL(request.url);
+    const documentName = url.searchParams.get("documentName");
+    return { employeeId, documentName };
 }
 
 export async function action({
@@ -23,13 +27,15 @@ export async function action({
     params,
 }: ActionFunctionArgs): Promise<Response> {
     const employeeId = params.employeeId ?? "";
+    const url = new URL(request.url);
+    const documentName = url.searchParams.get("documentName");
     const { supabase } = getSupabaseWithHeaders({ request });
 
     try {
-        const formData = await request.formData();
-        const document_name = formData.get("document_name");
-        const document_file = formData.get("document_file");
-
+        const formData = await parseMultipartFormData(
+            request,
+            createMemoryUploadHandler({ maxPartSize: SIZE_1MB }),
+        );
         const submission = parseWithZod(formData, { schema: EmployeeDocumentsSchema });
 
         if (submission.status !== "success") {
@@ -38,12 +44,36 @@ export async function action({
                 { status: submission.status === "error" ? 400 : 200 },
             );
         }
-
+        if (documentName) {
+            const { status, error } = await updateEmployeeDocument({
+                supabase,
+                file: submission.value.document_file as File,
+                employeeId,
+                documentName: submission.value.document_name as (typeof employeeDocuments)[number]
+            });
+            if (isGoodStatus(status)) {
+                return json({
+                    status: "success",
+                    message: "Document updated successfully",
+                    error: null,
+                    returnTo: `/employees/${employeeId}/documents`,
+                });
+            }
+            return json(
+                {
+                    status: "error",
+                    message: "Document update failed",
+                    error,
+                    returnTo: `/employees/${employeeId}/documents`,
+                },
+                { status: 500 },
+            );
+        }
         const { status, error } = await uploadEmployeeDocument({
             supabase,
-            file: document_file as File,
+            file: submission.value.document_file as File,
             employeeId,
-            documentName: document_name as (typeof employeeDocuments)[number]
+            documentName: submission.value.document_name as (typeof employeeDocuments)[number]
         });
 
         if (isGoodStatus(status)) {
@@ -77,7 +107,7 @@ export async function action({
 }
 
 export default function AddDocument() {
-    const { employeeId } = useLoaderData<typeof loader>();
+    const { employeeId, documentName } = useLoaderData<typeof loader>();
     const actionData = useActionData<typeof action>();
     const [resetKey, setResetKey] = useState(Date.now());
     const { toast } = useToast();
@@ -91,6 +121,7 @@ export default function AddDocument() {
         },
         shouldValidate: "onInput",
         shouldRevalidate: "onInput",
+        defaultValue: { document_name: documentName }
     });
 
     useEffect(() => {
@@ -120,10 +151,10 @@ export default function AddDocument() {
                     <Card>
                         <CardHeader>
                             <CardTitle className="text-3xl capitalize">
-                                Add Document
+                                {documentName ? "Update" : "Add"} Document
                             </CardTitle>
                             <CardDescription>
-                                Add document of employee that will be central in all of canny apps
+                                {documentName ? "Update" : "Add"} document of employee that will be central in all of canny apps
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -131,7 +162,7 @@ export default function AddDocument() {
                                 key={resetKey}
                                 className="capitalize"
                                 options={transformStringArrayIntoOptions(employeeDocuments as unknown as string[])}
-                                inputProps={{ ...getInputProps(fields.document_name, { type: "text" }) }}
+                                inputProps={{ ...getInputProps(fields.document_name, { type: "text" }), disabled: !!documentName }}
                                 placeholder={`Select ${replaceUnderscore(fields.document_name.name)}`}
                                 labelProps={{ children: replaceUnderscore(fields.document_name.name) }}
                                 errors={fields.document_name.errors}
