@@ -12,25 +12,6 @@ export type ProjectsWithCompany = ProjectDatabaseRow & {
   primary_contractor: { id: string; name: string; logo: string };
 };
 
-export async function getProjectsCountByCompanyId({
-  supabase,
-  companyId,
-}: {
-  supabase: TypedSupabaseClient;
-  companyId: string;
-}) {
-  const { count, error } = await supabase
-    .from("projects")
-    .select("", { count: "exact", head: true })
-    .eq("project_client_id", companyId);
-
-  if (error) {
-    console.error("getProjectsCountByCompanyId Error", error);
-  }
-
-  return { count, error };
-}
-
 export async function getProjectsByCompanyId({
   supabase,
   companyId,

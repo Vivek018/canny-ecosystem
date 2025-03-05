@@ -4,11 +4,13 @@ import {
   Form,
   json,
   useActionData,
+  useLoaderData,
   useNavigate,
   useParams,
 } from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import {
+  bringDefaultLetterContent,
   createRole,
   EmployeeLetterSchema,
   employeeLetterTypesArray,
@@ -24,7 +26,6 @@ import {
   FormProvider,
   getFormProps,
   getInputProps,
-  getTextareaProps,
   useForm,
 } from "@conform-to/react";
 import {
@@ -50,25 +51,107 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { clearCacheEntry } from "@/utils/cache";
 import {
   attribute,
-  DEFAULT_LETTER_CONTENT,
 } from "@canny_ecosystem/utils/constant";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { useTheme } from "@/utils/theme";
+import { getDefaultTemplateIdByCompanyId, getPaymentTemplateBySiteId, getPaymentTemplateComponentsByTemplateId, getSiteIdByEmployeeId, getTemplateIdByEmployeeId } from "@canny_ecosystem/supabase/queries";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
 export const CREATE_LETTER_TAG = "create-letter";
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  const employeeId = params.employeeId;
   const { supabase, headers } = getSupabaseWithHeaders({ request });
 
-  const { user } = await getUserCookieOrFetchUser(request, supabase);
+  try {
 
-  if (
-    !hasPermission(user?.role!, `${createRole}:${attribute.employeeLetters}`)
-  ) {
-    return safeRedirect(DEFAULT_ROUTE, { headers });
+    const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+    if (
+      !hasPermission(user?.role!, `${createRole}:${attribute.employeeLetters}`)
+    ) {
+      return safeRedirect(DEFAULT_ROUTE, { headers });
+    }
+
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase,)
+
+    let templateId = null;
+
+    const { data: employeeData } = await getSiteIdByEmployeeId({ supabase, employeeId: employeeId ?? "" });
+
+    let templateComponentData = null;
+    let employeeSalaryData = null;
+    const employeeSiteId =
+      employeeData?.employee_project_assignment?.project_sites?.id;
+
+    if (employeeSiteId) {
+      const { data: templateAssignmentData, error: templateAssignmentError } =
+        await getTemplateIdByEmployeeId({
+          supabase,
+          employeeId: employeeId ?? "",
+        });
+
+      templateId = templateAssignmentData?.template_id;
+
+      if (!templateId || templateAssignmentError) {
+        const { data } = await getPaymentTemplateBySiteId({
+          supabase,
+          site_id: employeeSiteId ?? "",
+        });
+
+        templateId = data?.template_id;
+      }
+    }
+
+    if (!templateId) {
+      const { data, error } = await getDefaultTemplateIdByCompanyId({
+        supabase,
+        companyId: companyId ?? "",
+      });
+
+      templateId = data?.id;
+      if (error || !templateId) throw new Error("No template found");
+    }
+
+    ({ data: templateComponentData } =
+      await getPaymentTemplateComponentsByTemplateId({
+        supabase,
+        templateId: templateId ?? "",
+      }));
+
+    employeeSalaryData = templateComponentData?.reduce(
+      (acc, curr) => {
+        const category = curr.component_type;
+
+        if (!acc[category]) {
+          acc[category] = {};
+        }
+
+        if (
+          curr.target_type === "payment_field" &&
+          curr.payment_fields.name
+        ) {
+          const fieldName =
+            curr.payment_fields.name + "".replaceAll(" ", "_");
+          acc[category][fieldName] = curr.calculation_value ?? 0;
+        } else {
+          acc[category][curr.target_type] = curr.calculation_value ?? 0;
+        }
+
+        return acc;
+      },
+      {} as Record<string, Record<string, number>>,
+    );
+
+
+    return json({ employeeSalaryData, error: null });
+  } catch (error) {
+    return json({
+      error,
+      employeeSalaryData: null
+    })
   }
-  return {};
 }
 
 export async function action({
@@ -82,7 +165,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
     const employeeLetterData = submission.value;
@@ -105,7 +188,7 @@ export async function action({
         message: "Employee Letter creation failed",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -114,7 +197,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -127,6 +210,7 @@ export default function CreateEmployeeLetter({
   userOptionsFromUpdate?: any;
 }) {
   const [resetKey, setResetKey] = useState(Date.now());
+  const { employeeSalaryData, } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { employeeId } = useParams();
   const { toast } = useToast();
@@ -173,12 +257,12 @@ export default function CreateEmployeeLetter({
   });
 
   return (
-    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
       <FormProvider context={form.context}>
-        <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
+        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
           <Card>
             <CardHeader>
-              <CardTitle className='text-3xl capitalize'>
+              <CardTitle className="text-3xl capitalize">
                 {replaceDash(LETTERS_TAG)}
               </CardTitle>
               <CardDescription>
@@ -190,18 +274,18 @@ export default function CreateEmployeeLetter({
               <input
                 {...getInputProps(fields.employee_id, { type: "hidden" })}
               />
-              <div className='grid grid-cols-2 place-content-center justify-between gap-x-8 mt-5'>
+              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-5">
                 <SearchableSelectField
                   key={resetKey}
-                  className='w-full capitalize flex-1'
+                  className="w-full capitalize flex-1"
                   options={transformStringArrayIntoOptions(
-                    employeeLetterTypesArray as unknown as string[]
+                    employeeLetterTypesArray as unknown as string[],
                   )}
                   inputProps={{
                     ...getInputProps(fields.letter_type, { type: "text" }),
                   }}
                   placeholder={`Select ${replaceUnderscore(
-                    fields.letter_type.name
+                    fields.letter_type.name,
                   )}`}
                   labelProps={{
                     children: "Letter Type",
@@ -223,12 +307,12 @@ export default function CreateEmployeeLetter({
                 />
               </div>
 
-              <div className='grid grid-cols-1 place-content-center justify-between gap-x-8 mt-4'>
+              <div className="grid grid-cols-1 place-content-center justify-between gap-x-8 mt-4">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.subject, { type: "text" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.subject.name
+                      fields.subject.name,
                     )}`,
                     className: "capitalize",
                   }}
@@ -238,23 +322,17 @@ export default function CreateEmployeeLetter({
                   errors={fields.subject.errors}
                 />
                 <MarkdownField
-                  key={fields.letter_type.value}
+                  key={
+                    fields.letter_type.value ?? fields.letter_type.initialValue
+                  }
                   theme={theme}
-                  textareaProps={{
-                    ...getTextareaProps(fields.content),
+                  inputProps={{
+                    ...getInputProps(fields.content, { type: "hidden" }),
                     placeholder: "Write your letter content here...",
-                    defaultValue: LETTERS_TAG.toLowerCase().startsWith("create")
-                      ? String(
-                          DEFAULT_LETTER_CONTENT[
-                            fields.letter_type
-                              .value as keyof typeof DEFAULT_LETTER_CONTENT
-                          ]
-                        ) ?? fields.content.value
+                    defaultValue: !updateValues
+                      ? bringDefaultLetterContent(fields.letter_type.value, employeeSalaryData) ?? fields.content.value
                       : fields.content.value ??
-                        DEFAULT_LETTER_CONTENT[
-                          fields.letter_type
-                            .value as keyof typeof DEFAULT_LETTER_CONTENT
-                        ],
+                      bringDefaultLetterContent(fields.letter_type.value, employeeSalaryData),
                   }}
                   labelProps={{
                     children: "Content",
@@ -264,9 +342,9 @@ export default function CreateEmployeeLetter({
                 />
               </div>
 
-              <div className='grid grid-cols-3 place-content-center justify-between gap-x-8 px-2'>
+              <div className="grid grid-cols-3 place-content-center justify-between gap-x-8 px-2">
                 <CheckboxField
-                  className='mt-8'
+                  className="mt-8"
                   buttonProps={getInputProps(fields.include_letter_head, {
                     type: "checkbox",
                   })}
@@ -275,7 +353,7 @@ export default function CreateEmployeeLetter({
                   }}
                 />
                 <CheckboxField
-                  className='mt-8'
+                  className="mt-8"
                   buttonProps={getInputProps(fields.include_client_address, {
                     type: "checkbox",
                   })}
@@ -284,7 +362,7 @@ export default function CreateEmployeeLetter({
                   }}
                 />
                 <CheckboxField
-                  className='mt-8'
+                  className="mt-8"
                   buttonProps={getInputProps(fields.include_employee_address, {
                     type: "checkbox",
                   })}
@@ -293,7 +371,7 @@ export default function CreateEmployeeLetter({
                   }}
                 />
                 <CheckboxField
-                  className='mt-8'
+                  className="mt-8"
                   buttonProps={getInputProps(fields.include_signatuory, {
                     type: "checkbox",
                   })}
@@ -302,12 +380,12 @@ export default function CreateEmployeeLetter({
                   }}
                 />
                 <CheckboxField
-                  className='mt-8'
+                  className="mt-8"
                   buttonProps={getInputProps(
                     fields.include_employee_signature,
                     {
                       type: "checkbox",
-                    }
+                    },
                   )}
                   labelProps={{
                     children: "Include Employee Signature",
