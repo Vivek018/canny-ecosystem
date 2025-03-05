@@ -1,4 +1,5 @@
 import { StyleSheet } from "@react-pdf/renderer";
+import { DEFAULT_APPOINTMENT_LETTER, DEFAULT_EXPERIENCE_LETTER, DEFAULT_NOC_LETTER, DEFAULT_OFFER_LETTER, DEFAULT_RELIEVING_LETTER, DEFAULT_TERMINATION_LETTER } from "../constant";
 
 export const styles = StyleSheet.create({
   page: {
@@ -255,4 +256,70 @@ export const replacePlaceholders = (
       return value || "";
     }) || ""
   );
+};
+
+export const bringDefaultLetterContent = (letterType: string | undefined, data: any) => {
+  const salaryTablemarkdownLines = [
+    "| **Particulars**           | **Amount (Rs.)** |",
+    "|---------------------------|-----------------|"
+  ];
+  let totalGrossEarning = 0;
+  let totalDeductions = 0;
+
+  if (data?.earning) {
+    for (const [key, value] of Object.entries(data.earning)) {
+      const amount = value as number;
+      salaryTablemarkdownLines.push(`| ${key.charAt(0).toUpperCase() + key.slice(1)}                     | ${amount.toLocaleString()}/-           |`);
+      totalGrossEarning += amount;
+    }
+
+    salaryTablemarkdownLines.push(`| **Gross Earning**         | **${totalGrossEarning.toLocaleString()}/-**     |`);
+  }
+
+  if (data?.statutory_contribution) {
+    for (const [key, value] of Object.entries(data.statutory_contribution)) {
+      const amount = value as number;
+      salaryTablemarkdownLines.push(`| ${key.toUpperCase()}                       | ${amount.toLocaleString()}/-           |`);
+      totalDeductions += amount;
+    }
+  }
+
+  if (data?.deduction) {
+    for (const [key, value] of Object.entries(data.deduction)) {
+      const amount = value as number;
+      salaryTablemarkdownLines.push(`| ${key}                 | ${amount.toLocaleString()}/-           |`);
+      totalDeductions += amount;
+    }
+  }
+
+  const netSalary = totalGrossEarning - totalDeductions;
+  salaryTablemarkdownLines.push(`| **Net Salary**            | **${netSalary.toLocaleString()}/-** |`);
+
+  const salaryTableMarkdown = `\n
+  # YOUR TOTAL COST OF COMPANY WILL BE AS BELOW:
+
+    ${salaryTablemarkdownLines.join('\n')}`
+
+  switch (letterType) {
+    case "appointment_letter":
+      return DEFAULT_APPOINTMENT_LETTER + salaryTableMarkdown;
+
+    case "experience_letter":
+      return DEFAULT_EXPERIENCE_LETTER;
+
+    case "offer_letter":
+      return DEFAULT_OFFER_LETTER;
+
+    case "noc_letter":
+      return DEFAULT_NOC_LETTER;
+
+    case "relieving_letter":
+      return DEFAULT_RELIEVING_LETTER;
+
+    case "termination_letter":
+      return DEFAULT_TERMINATION_LETTER;
+
+    default:
+      return ""
+  }
 };

@@ -2,8 +2,8 @@ import { useInputControl } from "@conform-to/react";
 import type React from "react";
 import {
   type ChangeEventHandler,
+  type InputHTMLAttributes,
   type LabelHTMLAttributes,
-  type TextareaHTMLAttributes,
   useEffect,
   useId,
   useState,
@@ -628,59 +628,66 @@ export const RangeField = ({
 
 export function MarkdownField({
   labelProps,
-  textareaProps,
+  inputProps,
   theme = "light",
   errors,
   className,
   errorClassName,
 }: {
   labelProps: LabelHTMLAttributes<HTMLLabelElement>;
-  textareaProps: TextareaHTMLAttributes<HTMLTextAreaElement>;
+  inputProps: InputHTMLAttributes<HTMLInputElement>;
   theme?: "dark" | "light" | "system";
   errors?: string[];
   className?: string;
   errorClassName?: string;
 }) {
   const { isDocument } = useIsDocument();
+  const [markdownValue, setMarkdownValue] = useState<string>(
+    String(inputProps.defaultValue ?? ""),
+  );
+
   const fallbackId = useId();
-  const id = textareaProps.id ?? fallbackId;
+  const id = inputProps.id ?? fallbackId;
   const errorId = errors?.length ? `${id}-error` : undefined;
 
-  const input = useInputControl({
-    name: textareaProps.name!,
-    formId: textareaProps.form!,
-    initialValue: String(textareaProps.defaultValue),
-  });
+  const handleMarkdownChange = (value: string | undefined) => {
+    const finalValue = value ?? "";
+    setMarkdownValue(finalValue);
+
+    if (inputProps.onChange) {
+      inputProps.onChange({
+        target: {
+          name: inputProps.name,
+          value: finalValue,
+        },
+      } as React.ChangeEvent<HTMLInputElement>);
+    }
+  };
 
   return isDocument ? (
     <div className={className}>
-      {/* Label */}
       <Label htmlFor={id} {...labelProps} />
       <sub
         className={cn(
           "hidden text-primary",
-          textareaProps?.children && textareaProps.required && "inline",
+          inputProps?.children && inputProps.required && "inline",
         )}
       >
         *
       </sub>
+
       <input
         type="hidden"
         id={id}
-        name={textareaProps.name}
-        value={String(input.value ?? "")}
-        onChange={
-          input.change as unknown as ChangeEventHandler<HTMLInputElement>
-        }
-        onBlur={input.blur}
+        name={inputProps.name}
+        value={markdownValue}
+        onChange={inputProps.onChange}
       />
-      {/* Markdown Editor */}
+
       <MDXEditor
-        placeholder={textareaProps.placeholder}
-        markdown={input.value ?? ""}
-        onChange={(value) => {
-          input.change(value ?? "");
-        }}
+        placeholder={inputProps.placeholder}
+        markdown={markdownValue}
+        onChange={handleMarkdownChange}
         plugins={[
           toolbarPlugin({ toolbarContents: () => <KitchenSinkToolbar /> }),
           listsPlugin(),
@@ -706,12 +713,9 @@ export function MarkdownField({
         className={cn("border rounded", theme === "dark" && "dark-theme")}
       />
 
-      {/* Errors */}
       <div className={cn("min-h-6 px-4 pb-2", errorClassName)}>
         {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
       </div>
     </div>
-  ) : (
-    <></>
-  );
+  ) : null;
 }

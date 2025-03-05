@@ -1114,3 +1114,32 @@ export async function getRecentEmployeesByCompanyId({
     error,
   };
 }
+
+export async function getSiteIdByEmployeeId({
+  supabase,
+  employeeId,
+}: {
+  supabase: TypedSupabaseClient;
+  employeeId: string;
+}) {
+  const columns = [
+    "id",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("employees")
+    .select(`${columns.join(",")}, employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(project_sites!inner(id))`, { count: "exact" })
+    .order("created_at", { ascending: false })
+    .eq("id", employeeId)
+    .single<Pick<EmployeeDatabaseRow, "id">
+      & { employee_project_assignment: { project_sites: Pick<SiteDatabaseRow, "id"> } }>();
+
+  if (error) {
+    console.error("getSiteIdByEmployeeId Error", error);
+  }
+
+  return {
+    data,
+    error,
+  };
+}

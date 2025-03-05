@@ -195,16 +195,6 @@ With reference to your application and subsequent interview and discussion that 
 8\. **ABSENCE OR UNAUTHORIZED LEAVE**: Unauthorized leave or absence for a continuous period of 8 days would make you lose your lien in the service, and you will be considered to have abandoned your service of your own accord, and the same shall automatically come to an end without any notice or intimation to you.&#x20;
 
 If the above terms and conditions are acceptable to you, please sign the duplicate copy of the appointment letter as an acknowledgment and submit the same along with the recruitment papers. With the best wishes for a happy and long association with Canny Management Services Pvt. Ltd.
-
-# YOUR TOTAL COST OF COMPANY WILL BE AS BELOW:
-| **Basic + D.A Salary**    | Rs.                 13234/-   |
-| ------------------------- | ----------------------------- |
-| Allowance                 | Rs.                       -   |
-| **Gross Salary**          | **Rs.               14127/-** |
-| PF Employee               | Rs.                 1589/-    |
-| **Net Salary**            | **Rs.              12,232/-** |
-| Basic Salary              | Rs.                 13234/-   |
-| **Total Gross C.T.C**     | **Rs.              17,408/-** |
 `;
 
 export const DEFAULT_OFFER_LETTER = `Dear **$\{employeeName}**,
@@ -311,12 +301,3 @@ We wish you all the best in your future endeavors and are confident that you wil
 Thank you for your service and commitment to $\{companyName} . Should you require any assistance or documentation in the future, please do not hesitate to reach out to us at \[Contact Information] .
 
 Yours sincerely,`
-
-export const DEFAULT_LETTER_CONTENT = {
-  appointment_letter: DEFAULT_APPOINTMENT_LETTER,
-  experience_letter: DEFAULT_EXPERIENCE_LETTER,
-  offer_letter: DEFAULT_OFFER_LETTER,
-  noc_letter: DEFAULT_NOC_LETTER,
-  relieving_letter: DEFAULT_RELIEVING_LETTER,
-  termination_letter: DEFAULT_TERMINATION_LETTER,
-};

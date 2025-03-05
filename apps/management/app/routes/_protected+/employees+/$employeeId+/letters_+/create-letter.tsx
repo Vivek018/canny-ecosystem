@@ -4,11 +4,13 @@ import {
   Form,
   json,
   useActionData,
+  useLoaderData,
   useNavigate,
   useParams,
 } from "@remix-run/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import {
+  bringDefaultLetterContent,
   createRole,
   EmployeeLetterSchema,
   employeeLetterTypesArray,
@@ -24,7 +26,6 @@ import {
   FormProvider,
   getFormProps,
   getInputProps,
-  getTextareaProps,
   useForm,
 } from "@conform-to/react";
 import {
@@ -50,25 +51,107 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { clearCacheEntry } from "@/utils/cache";
 import {
   attribute,
-  DEFAULT_LETTER_CONTENT,
 } from "@canny_ecosystem/utils/constant";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { useTheme } from "@/utils/theme";
+import { getDefaultTemplateIdByCompanyId, getPaymentTemplateBySiteId, getPaymentTemplateComponentsByTemplateId, getSiteIdByEmployeeId, getTemplateIdByEmployeeId } from "@canny_ecosystem/supabase/queries";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
 export const CREATE_LETTER_TAG = "create-letter";
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  const employeeId = params.employeeId;
   const { supabase, headers } = getSupabaseWithHeaders({ request });
 
-  const { user } = await getUserCookieOrFetchUser(request, supabase);
+  try {
 
-  if (
-    !hasPermission(user?.role!, `${createRole}:${attribute.employeeLetters}`)
-  ) {
-    return safeRedirect(DEFAULT_ROUTE, { headers });
+    const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+    if (
+      !hasPermission(user?.role!, `${createRole}:${attribute.employeeLetters}`)
+    ) {
+      return safeRedirect(DEFAULT_ROUTE, { headers });
+    }
+
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase,)
+
+    let templateId = null;
+
+    const { data: employeeData } = await getSiteIdByEmployeeId({ supabase, employeeId: employeeId ?? "" });
+
+    let templateComponentData = null;
+    let employeeSalaryData = null;
+    const employeeSiteId =
+      employeeData?.employee_project_assignment?.project_sites?.id;
+
+    if (employeeSiteId) {
+      const { data: templateAssignmentData, error: templateAssignmentError } =
+        await getTemplateIdByEmployeeId({
+          supabase,
+          employeeId: employeeId ?? "",
+        });
+
+      templateId = templateAssignmentData?.template_id;
+
+      if (!templateId || templateAssignmentError) {
+        const { data } = await getPaymentTemplateBySiteId({
+          supabase,
+          site_id: employeeSiteId ?? "",
+        });
+
+        templateId = data?.template_id;
+      }
+    }
+
+    if (!templateId) {
+      const { data, error } = await getDefaultTemplateIdByCompanyId({
+        supabase,
+        companyId: companyId ?? "",
+      });
+
+      templateId = data?.id;
+      if (error || !templateId) throw new Error("No template found");
+    }
+
+    ({ data: templateComponentData } =
+      await getPaymentTemplateComponentsByTemplateId({
+        supabase,
+        templateId: templateId ?? "",
+      }));
+
+    employeeSalaryData = templateComponentData?.reduce(
+      (acc, curr) => {
+        const category = curr.component_type;
+
+        if (!acc[category]) {
+          acc[category] = {};
+        }
+
+        if (
+          curr.target_type === "payment_field" &&
+          curr.payment_fields.name
+        ) {
+          const fieldName =
+            curr.payment_fields.name + "".replaceAll(" ", "_");
+          acc[category][fieldName] = curr.calculation_value ?? 0;
+        } else {
+          acc[category][curr.target_type] = curr.calculation_value ?? 0;
+        }
+
+        return acc;
+      },
+      {} as Record<string, Record<string, number>>,
+    );
+
+
+    return json({ employeeSalaryData, error: null });
+  } catch (error) {
+    return json({
+      error,
+      employeeSalaryData: null
+    })
   }
-  return {};
 }
 
 export async function action({
@@ -127,6 +210,7 @@ export default function CreateEmployeeLetter({
   userOptionsFromUpdate?: any;
 }) {
   const [resetKey, setResetKey] = useState(Date.now());
+  const { employeeSalaryData, } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { employeeId } = useParams();
   const { toast } = useToast();
@@ -238,21 +322,17 @@ export default function CreateEmployeeLetter({
                   errors={fields.subject.errors}
                 />
                 <MarkdownField
-                  key={fields.letter_type.value}
+                  key={
+                    fields.letter_type.value ?? fields.letter_type.initialValue
+                  }
                   theme={theme}
-                  textareaProps={{
-                    ...getTextareaProps(fields.content),
+                  inputProps={{
+                    ...getInputProps(fields.content, { type: "hidden" }),
                     placeholder: "Write your letter content here...",
                     defaultValue: !updateValues
-                      ? DEFAULT_LETTER_CONTENT[
-                          fields.letter_type
-                            .value as keyof typeof DEFAULT_LETTER_CONTENT
-                        ] ?? fields.content.value
+                      ? bringDefaultLetterContent(fields.letter_type.value, employeeSalaryData) ?? fields.content.value
                       : fields.content.value ??
-                        DEFAULT_LETTER_CONTENT[
-                          fields.letter_type
-                            .value as keyof typeof DEFAULT_LETTER_CONTENT
-                        ],
+                      bringDefaultLetterContent(fields.letter_type.value, employeeSalaryData),
                   }}
                   labelProps={{
                     children: "Content",
