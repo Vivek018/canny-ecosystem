@@ -17,7 +17,6 @@ import { attribute } from "@canny_ecosystem/utils/constant";
 type DetailItemProps = {
   label: string;
   value: string | null | undefined;
-  formatter?: (value: string) => string;
 };
 
 type EmployeeProjectAssignment = Omit<
@@ -25,19 +24,13 @@ type EmployeeProjectAssignment = Omit<
   "created_at" | "updated_at"
 >;
 
-export const DetailItem: React.FC<DetailItemProps> = ({
-  label,
-  value,
-  formatter,
-}) => {
-  const formattedValue = value ? (formatter ? formatter(value) : value) : "--";
-
+export const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => {
   return (
     <div className="flex flex-col items-start">
       <h3 className="text-muted-foreground text-[13px] tracking-wide capitalize">
         {label}
       </h3>
-      <p>{formattedValue}</p>
+      <p>{value ?? "--"}</p>
     </div>
   );
 };
@@ -104,28 +97,23 @@ export const EmployeeProjectAssignmentCard = ({
           />
           <DetailItem
             label="Assignment Type"
-            value={projectAssignment?.assignment_type}
-            formatter={replaceUnderscore}
+            value={replaceUnderscore(projectAssignment?.assignment_type)}
           />
           <DetailItem
             label="Position"
-            value={projectAssignment?.position}
-            formatter={replaceUnderscore}
+            value={replaceUnderscore(projectAssignment?.position)}
           />
           <DetailItem
             label="Skill Level"
-            value={projectAssignment?.skill_level}
-            formatter={replaceUnderscore}
+            value={replaceUnderscore(projectAssignment?.skill_level)}
           />
           <DetailItem
             label="Start Date"
-            value={projectAssignment?.start_date}
-            formatter={formatDate}
+            value={formatDate(projectAssignment?.start_date)}
           />
           <DetailItem
             label="End Date"
-            value={projectAssignment?.end_date}
-            formatter={formatDate}
+            value={formatDate(projectAssignment?.end_date)}
           />
           <DetailItem
             label="Probation Period"
@@ -133,8 +121,7 @@ export const EmployeeProjectAssignmentCard = ({
           />
           <DetailItem
             label="Probation End Date"
-            value={projectAssignment?.probation_end_date}
-            formatter={formatDate}
+            value={formatDate(projectAssignment?.probation_end_date)}
           />
         </div>
       ) : (
