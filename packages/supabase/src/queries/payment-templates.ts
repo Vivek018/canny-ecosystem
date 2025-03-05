@@ -100,7 +100,7 @@ export async function getPaymentTemplateComponentsByTemplateId({
 
   const { data, error } = await supabase
     .from("payment_template_components")
-    .select(`${columns.join(",")}, payment_fields(id, name))`)
+    .select(`${columns.join(",")}, payment_fields(id, name, amount))`)
     .eq("template_id", templateId)
     .order("created_at", { ascending: true })
     .limit(HARD_QUERY_LIMIT)
@@ -253,6 +253,7 @@ export type PaymentTemplateComponentType = Omit<
   payment_fields: {
     id: Pick<PaymentFieldDatabaseRow, "id">;
     name: Pick<PaymentFieldDatabaseRow, "name">;
+    amount: Pick<PaymentFieldDatabaseRow, "amount">;
   };
 };
 

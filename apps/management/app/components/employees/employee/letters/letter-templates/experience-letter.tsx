@@ -23,7 +23,7 @@ export function ExperienceLetter({
   companyData: CompanyInfoDataType | null;
 }) {
   const replacements = {
-    employeeName: `${data?.employees.gender === "female" ? "Ms." : "Mr."} ${data?.employees.first_name} ${data?.employees.middle_name} ${data?.employees?.last_name}`,
+    employeeName: `${data?.employees.gender === "female" ? "Ms." : "Mr."} ${data?.employees.first_name} ${data?.employees.middle_name ?? ""} ${data?.employees?.last_name}`,
     employeeGender: data?.employees.gender ?? "",
     employeeJoiningDate: new Date(
       data?.employees.employee_project_assignment?.start_date ?? "",
@@ -44,11 +44,11 @@ export function ExperienceLetter({
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        {data?.include_letter_head && (
+        {data?.include_letter_head ? (
           <View style={styles.header} fixed>
             <LetterHeader />
           </View>
-        )}
+        ) : <View fixed style={styles.indent} />}
 
         <View style={styles.wrapper}>
           {/* Header Section */}
