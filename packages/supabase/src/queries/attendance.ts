@@ -8,7 +8,7 @@ import type {
   SiteDatabaseRow,
   TypedSupabaseClient,
 } from "../types";
-import { defaultYear } from "@canny_ecosystem/utils";
+import { defaultYear, formatUTCDate } from "@canny_ecosystem/utils";
 
 export type AttendanceDataType = Pick<
   EmployeeDatabaseRow,
@@ -45,6 +45,30 @@ export type AttendanceDataType = Pick<
     | "holiday_type"
   >;
 };
+
+export type AttendanceReportDataType = Pick<
+  EmployeeDatabaseRow,
+  "id" | "first_name" | "middle_name" | "last_name" | "employee_code"
+> & {
+  employee_project_assignment: Pick<
+    EmployeeProjectAssignmentDatabaseRow,
+    "employee_id"
+  > & {
+    project_sites: {
+      id: SiteDatabaseRow["id"];
+      name: SiteDatabaseRow["name"];
+      projects: {
+        id: ProjectDatabaseRow["id"];
+        name: ProjectDatabaseRow["name"];
+      };
+    };
+  };
+} & {
+    attendance: Pick<
+      EmployeeAttendanceDatabaseRow,
+      "id" | "employee_id" | "date" | "present"
+    >;
+  }[];
 
 export async function getAttendanceByEmployeeId({
   supabase,
@@ -217,6 +241,16 @@ export async function getAttendanceByCompanyId({
   let startDate: string;
   let endDate: string;
 
+  function isValidDate(year: number, month: number, day: number): boolean {
+    const date = new Date(year, month - 1, day);
+
+    return (
+      date.getFullYear() === year &&
+      date.getMonth() === month - 1 &&
+      date.getDate() === day
+    );
+  }
+
   if (range) {
     let endDateObj: Date;
     let startDateObj: Date;
@@ -226,7 +260,16 @@ export async function getAttendanceByCompanyId({
       if (month) {
         const monthNumber = months[month];
         if (year) {
-          endDateObj = new Date(Number(year), monthNumber - 1, rangeNumber + 1);
+          if (!isValidDate(Number(year), monthNumber, rangeNumber)) {
+            endDateObj = new Date(Number(year), monthNumber, 0, 24);
+          } else {
+            endDateObj = new Date(
+              Number(year),
+              monthNumber - 1,
+              rangeNumber + 1
+            );
+          }
+
           let targetMonth = monthNumber - 2;
           let targetYear = Number(year);
 
@@ -234,13 +277,22 @@ export async function getAttendanceByCompanyId({
             targetMonth = 11;
             targetYear -= 1;
           }
-          startDateObj = new Date(targetYear, targetMonth, rangeNumber + 2);
+          if (!isValidDate(targetYear, targetMonth + 1, rangeNumber)) {
+            startDateObj = new Date(targetYear, targetMonth + 1, 1, 24);
+          } else {
+            startDateObj = new Date(targetYear, targetMonth, rangeNumber + 2);
+          }
         } else {
-          endDateObj = new Date(
-            currentDate.getFullYear(),
-            monthNumber - 1,
-            rangeNumber + 1
-          );
+          if (!isValidDate(currentYear, monthNumber, rangeNumber)) {
+            endDateObj = new Date(currentYear, monthNumber, 0, 24);
+          } else {
+            endDateObj = new Date(
+              currentDate.getFullYear(),
+              monthNumber - 1,
+              rangeNumber + 1
+            );
+          }
+
           let targetMonth = monthNumber - 2;
           let targetYear = currentDate.getFullYear();
 
@@ -248,14 +300,30 @@ export async function getAttendanceByCompanyId({
             targetMonth = 11;
             targetYear -= 1;
           }
-          startDateObj = new Date(targetYear, targetMonth, rangeNumber + 2);
+          if (!isValidDate(targetYear, targetMonth + 1, rangeNumber)) {
+            startDateObj = new Date(targetYear, targetMonth + 1, 1, 24);
+          } else {
+            startDateObj = new Date(targetYear, targetMonth, rangeNumber + 2);
+          }
         }
       } else if (year) {
-        endDateObj = new Date(
-          Number(year),
-          currentDate.getMonth(),
-          rangeNumber + 1
-        );
+        if (
+          !isValidDate(Number(year), currentDate.getMonth() + 1, rangeNumber)
+        ) {
+          endDateObj = new Date(
+            Number(year),
+            currentDate.getMonth() + 1,
+            0,
+            24
+          );
+        } else {
+          endDateObj = new Date(
+            Number(year),
+            currentDate.getMonth(),
+            rangeNumber + 1
+          );
+        }
+
         let targetMonth = currentDate.getMonth() - 1;
         let targetYear = Number(year);
 
@@ -263,21 +331,64 @@ export async function getAttendanceByCompanyId({
           targetMonth = 11;
           targetYear -= 1;
         }
-        startDateObj = new Date(targetYear, targetMonth, rangeNumber + 2);
+        if (!isValidDate(targetYear, targetMonth + 1, rangeNumber)) {
+          startDateObj = new Date(targetYear, targetMonth + 1, 1, 24);
+        } else {
+          startDateObj = new Date(targetYear, targetMonth, rangeNumber + 2);
+        }
       } else {
-        endDateObj = new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth(),
-          rangeNumber + 1
-        );
+        const targetDate = currentDate.getDate();
         let targetMonth = currentDate.getMonth() - 1;
         let targetYear = currentDate.getFullYear();
-
         if (targetMonth < 0) {
           targetMonth = 11;
           targetYear -= 1;
         }
-        startDateObj = new Date(targetYear, targetMonth, rangeNumber + 2);
+
+        if (targetDate > rangeNumber) {
+          endDateObj = new Date(
+            currentDate.getFullYear(),
+            currentDate.getMonth(),
+            rangeNumber + 1
+          );
+
+          if (!isValidDate(targetYear, targetMonth + 1, rangeNumber)) {
+            startDateObj = new Date(targetYear, targetMonth + 1, 1, 24);
+          } else {
+            startDateObj = new Date(targetYear, targetMonth, rangeNumber + 2);
+          }
+        } else {
+          if (
+            !isValidDate(
+              currentDate.getFullYear(),
+              currentDate.getMonth(),
+              rangeNumber
+            )
+          ) {
+            endDateObj = new Date(
+              currentDate.getFullYear(),
+              currentDate.getMonth(),
+              0,
+              24
+            );
+          } else {
+            endDateObj = new Date(
+              currentDate.getFullYear(),
+              currentDate.getMonth() - 1,
+              rangeNumber + 1
+            );
+          }
+
+          if (!isValidDate(targetYear, targetMonth, rangeNumber)) {
+            startDateObj = new Date(targetYear, targetMonth, 1, 24);
+          } else {
+            startDateObj = new Date(
+              targetYear,
+              targetMonth - 1,
+              rangeNumber + 2
+            );
+          }
+        }
       }
 
       endDate = endDateObj.toISOString().split("T")[0];
@@ -299,9 +410,10 @@ export async function getAttendanceByCompanyId({
       startDate = `${yearNum}-${monthStr}-01`;
       endDate = `${yearNum}-${monthStr}-${lastDay}`;
     } else if (year) {
+      const lastDay = getLastDayOfMonth(Number(year), currentMonth);
       const yearNum = Number(year);
-      startDate = `${yearNum}-01-01`;
-      endDate = `${yearNum}-12-31`;
+      startDate = `${yearNum}-${currentMonth}-01`;
+      endDate = `${yearNum}-${currentMonth}-${lastDay}`;
     } else if (monthNumber) {
       const monthStr = monthNumber.toString().padStart(2, "0");
       const lastDay = getLastDayOfMonth(currentYear, monthNumber);
@@ -315,8 +427,8 @@ export async function getAttendanceByCompanyId({
       endDate = `${currentYear}-${monthStr}-${lastDay}`;
     }
   } else {
-    const monthStr = currentMonth.toString().padStart(2, "0");
-    const lastDay = getLastDayOfMonth(currentYear, currentMonth);
+    const monthStr = (currentMonth - 1).toString().padStart(2, "0");
+    const lastDay = getLastDayOfMonth(currentYear, currentMonth - 1);
     startDate = `${currentYear}-${monthStr}-01`;
     endDate = `${currentYear}-${monthStr}-${lastDay}`;
   }
@@ -335,9 +447,11 @@ export async function getAttendanceByCompanyId({
     .select(
       `
       ${columns.join(",")},
-      employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
+      employee_project_assignment!employee_project_assignments_employee_id_fkey!${
+        project ? "inner" : "left"
       }(
-        project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
+        project_sites!${project ? "inner" : "left"}(id, name, projects!${
+        project ? "inner" : "left"
       }(id, name))),
       attendance(
         id,
@@ -402,5 +516,183 @@ export async function getAttendanceByCompanyId({
     console.error("getAttendanceByCompanyId Error", error);
   }
 
-  return { data, meta: { count: count ?? data?.length }, error };
+  return {
+    data,
+    meta: { count: count ?? data?.length },
+    error,
+    dateRange: { startDate, endDate },
+  };
+}
+
+export type AttendanceReportFilters = {
+  start_month?: string | undefined | null;
+  end_month?: string | undefined | null;
+  start_year?: string | undefined | null;
+  end_year?: string | undefined | null;
+  project?: string | undefined | null;
+  project_site?: string | undefined | null;
+};
+
+export async function getAttendanceReportByCompanyId({
+  supabase,
+  companyId,
+  params,
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+  params: {
+    from: number;
+    to: number;
+    sort?: [string, "asc" | "desc"];
+    searchQuery?: string;
+    filters?: AttendanceReportFilters;
+  };
+}) {
+  const currentYear = new Date().getFullYear();
+  const startDate = `${currentYear}-01-01`;
+  const endDate = `${currentYear}-12-31`;
+  const { sort, from, to, filters, searchQuery } = params;
+  const {
+    project,
+    project_site,
+    start_year,
+    start_month,
+    end_year,
+    end_month,
+  } = filters ?? {};
+
+  const columns = [
+    "id",
+    "employee_code",
+    "first_name",
+    "middle_name",
+    "last_name",
+  ] as const;
+
+  const query = supabase
+    .from("employees")
+    .select(
+      `
+      ${columns.join(",")},
+      employee_project_assignment!employee_project_assignments_employee_id_fkey!${
+        project ? "inner" : "left"
+      }(
+        project_sites!${project ? "inner" : "left"}(id, name, projects!${
+        project ? "inner" : "left"
+      }(id, name))),
+      attendance(
+        id,
+        date,
+        present,
+        employee_id
+      )
+    `,
+      { count: "exact" }
+    )
+    .eq("company_id", companyId)
+    .eq("attendance.present", true)
+    .gte("attendance.date", startDate)
+    .lte("attendance.date", endDate);
+
+  if (sort) {
+    const [column, direction] = sort;
+    if (column === "employee_name") {
+      query.order("first_name", { ascending: direction === "asc" });
+    } else {
+      query.order(column, { ascending: direction === "asc" });
+    }
+  } else {
+    query.order("created_at", { ascending: false });
+  }
+  if (searchQuery) {
+    const searchQueryArray = searchQuery.split(" ");
+    if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
+      for (const searchQueryElement of searchQueryArray) {
+        query.or(
+          `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*,employee_code.ilike.*${searchQueryElement}*`
+        );
+      }
+    } else {
+      query.or(
+        `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`
+      );
+    }
+  }
+  if (start_year || end_year) {
+    let endDateLastDay = 30;
+    if (end_year) {
+      const year = Number.parseInt(end_year, 10);
+      const month = new Date(`${end_month} 1, ${end_year}`).getMonth();
+      endDateLastDay = new Date(year, month + 1, 0).getDate();
+    }
+    const start_date = new Date(`${start_month} 1, ${start_year} 12:00:00`);
+    const end_date = new Date(
+      `${end_month} ${endDateLastDay}, ${end_year} 12:00:00`
+    );
+    if (start_year)
+      query.gte(
+        "attendance.date",
+        formatUTCDate(start_date.toISOString().split("T")[0])
+      );
+    if (end_year)
+      query.lte(
+        "attendance.date",
+        formatUTCDate(end_date.toISOString().split("T")[0])
+      );
+  }
+  if (project) {
+    query.eq(
+      "employee_project_assignment.project_sites.projects.name",
+      project
+    );
+  }
+  if (project_site) {
+    query.eq("employee_project_assignment.project_sites.name", project_site);
+  }
+
+  const { data, count, error } = await query
+    .range(from, to)
+    .returns<AttendanceReportDataType>();
+  if (error) {
+    console.error("getAttendanceReportByCompanyId Error", error);
+    return { data: null, error };
+  }
+
+  const monthNames = Object.entries(months).reduce((acc, [name, num]) => {
+    acc[num] = name;
+    return acc;
+  }, {} as { [key: number]: string });
+
+  const processedData = data?.map((employee) => {
+    const { attendance, ...employeeInfo } = employee;
+    const attendanceByMonth: Record<string, any[]> = {};
+
+    if (Array.isArray(attendance) && attendance.length > 0) {
+      for (const record of attendance) {
+        if (record.date) {
+          const recordDate = new Date(record.date);
+          const month = monthNames[recordDate.getMonth() + 1];
+          const year = recordDate.getFullYear();
+          const monthYearKey = `${month} ${year}`;
+
+          if (!attendanceByMonth[monthYearKey]) {
+            attendanceByMonth[monthYearKey] = [];
+          }
+
+          attendanceByMonth[monthYearKey].push(record);
+        }
+      }
+    }
+
+    return {
+      ...employeeInfo,
+      attendance: attendanceByMonth,
+    };
+  });
+
+  return {
+    data: processedData,
+    meta: { count: count ?? data?.length },
+    error: null,
+  };
 }

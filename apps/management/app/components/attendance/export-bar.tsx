@@ -1,80 +1,31 @@
 import { Button } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { defaultMonth, defaultYear, formatDate, formatDateTime } from "@canny_ecosystem/utils";
-import { months } from "@canny_ecosystem/utils/constant";
+import { formatDateTime } from "@canny_ecosystem/utils";
 import type { VisibilityState } from "@tanstack/react-table";
 import Papa from "papaparse";
-import { useEffect, useState } from "react";
 
 export function ExportBar({
   rows,
   data,
   className,
-  fMonth,
-  fYear,
   columnVisibility,
 }: {
   rows: number;
   data: any;
   className: string;
-  fMonth: string | undefined | null;
-  fYear: string | undefined | null;
   columnVisibility: VisibilityState;
 }) {
-  const [month, setMonth] = useState<number>(defaultMonth);
-  const [year, setYear] = useState<number>(defaultYear);
+  const formattedData = data.map((entry: Record<string, string>) => {
+    const formattedEntry: Record<string, string> = {};
 
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-  const days = Array.from({ length: daysInMonth }, (_, i) => {
-    const currentDate = new Date(year, month, i + 1);
-    currentDate.setHours(12, 0, 0, 0);
-    return {
-      day: i + 1,
-      fullDate: currentDate.toISOString().split("T")[0],
-    };
+    for (const key of Object.keys(entry)) {
+      if (columnVisibility[key] !== false) {
+        formattedEntry[key] = entry[key];
+      }
+    }
+    const { employee_id, ...rest } = formattedEntry;
+    return rest;
   });
-  useEffect(() => {
-    if (fMonth && months[fMonth] !== undefined) {
-      setMonth(months[fMonth] - 1);
-    }
-    if (fYear && Number(fYear)) {
-      setYear(Number(fYear));
-    }
-  }, [fMonth, fYear]);
-
-  const formattedData = data.map(
-    (entry: {
-      [x: string]: string;
-      employee_code: string;
-      employee_name: string;
-      project: string;
-      project_site: string;
-    }) => {
-      const formattedEntry: any = {};
-
-      for (const key of [
-        "employee_code",
-        "employee_name",
-        "project",
-        "project_site",
-      ]) {
-        if (columnVisibility[key] !== false) {
-          formattedEntry[key] = entry[key];
-        }
-      }
-
-      for (const { fullDate } of days) {
-        const formattedDate = formatDate(fullDate);
-        if (columnVisibility[formattedDate!] !== false) {
-          formattedEntry[formattedDate!] = entry[formattedDate!] || "";
-        }
-      }
-
-      return formattedEntry;
-    }
-  );
-
   function calculateMonthlyAvgPresence(data: any) {
     let totalDays = 0;
     let totalP = 0;
