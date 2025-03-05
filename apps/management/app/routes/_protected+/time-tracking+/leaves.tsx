@@ -92,7 +92,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined
+        (value) => value !== null && value !== undefined,
       );
 
     const leavesPromise = getLeavesByCompanyId({
@@ -154,7 +154,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
     `${cacheKeyPrefix.leaves}${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 
@@ -206,13 +206,13 @@ export default function LeavesIndex() {
                               "p-2 py-2 ml-auto mr-2 mt-2 rounded-md  grid place-items-center",
                               !hasPermission(
                                 role,
-                                `${deleteRole}:${attribute.leaves}`
+                                `${deleteRole}:${attribute.leaves}`,
                               ) &&
                                 !hasPermission(
                                   role,
-                                  `${updateRole}:${attribute.leaves}`
+                                  `${updateRole}:${attribute.leaves}`,
                                 ) &&
-                                "hidden"
+                                "hidden",
                             )}
                           >
                             <Icon name="dots-vertical" size="xs" />
@@ -266,21 +266,21 @@ export default function LeavesIndex() {
                             projectArray={
                               projectData?.data?.length
                                 ? projectData?.data?.map(
-                                    (project) => project!.name
+                                    (project) => project!.name,
                                   )
                                 : []
                             }
                             projectSiteArray={
                               projectSiteData?.data?.length
                                 ? projectSiteData?.data?.map(
-                                    (site) => site!.name
+                                    (site) => site!.name,
                                   )
                                 : []
                             }
                             userEmails={
                               userEmailsData?.data?.length
                                 ? userEmailsData?.data?.map(
-                                    (user) => user!.email
+                                    (user) => user!.email,
                                   )
                                 : []
                             }
@@ -321,7 +321,7 @@ export default function LeavesIndex() {
                 );
               }
 
-              const hasNextPage = Boolean(meta?.count > pageSize);
+              const hasNextPage = Boolean(meta?.count > data?.length);
 
               return (
                 <LeavesDataTable

@@ -73,7 +73,7 @@ export function LeavesDataTable<TData, TValue>({
     const sortParam = searchParams.get("sort");
     if (companyId) {
       try {
-        const { data } = await getLeavesByCompanyId({
+        const { data, meta } = await getLeavesByCompanyId({
           supabase,
           companyId,
           params: {
@@ -88,14 +88,14 @@ export function LeavesDataTable<TData, TValue>({
           setData((prevData) => [...prevData, ...data] as TData[]);
         }
         setFrom(to + 1);
-        setHasNextPage(data?.length! > to);
+        setHasNextPage(meta?.count! > to);
       } catch {
         setHasNextPage(false);
       }
     }
     if (employeeId) {
       try {
-        const { data } = await getLeavesByEmployeeId({
+        const { data, meta } = await getLeavesByEmployeeId({
           supabase,
           employeeId,
           params: {
@@ -109,7 +109,7 @@ export function LeavesDataTable<TData, TValue>({
           setData((prevData) => [...prevData, ...data] as TData[]);
         }
         setFrom(to + 1);
-        setHasNextPage(data?.length! > to);
+        setHasNextPage(meta?.count! > to);
       } catch {
         setHasNextPage(false);
       }

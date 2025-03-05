@@ -251,13 +251,13 @@ export default function EmployeesIndex() {
               );
             }
 
-            const hasNextPage = Boolean(meta?.count > pageSize);
+            const hasNextPage = Boolean(meta?.count > data?.length);
 
             return (
               <DataTable
                 data={data ?? []}
                 columns={columns({ env, companyId })}
-                count={meta?.count ?? data?.length ?? 0}
+                count={meta?.count ?? 0}
                 query={query}
                 filters={filters}
                 noFilters={noFilters}

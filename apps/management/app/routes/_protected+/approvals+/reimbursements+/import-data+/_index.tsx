@@ -26,9 +26,6 @@ import type { z } from "zod";
 import { useImportStoreForReimbursement } from "@/store/import";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { ReimbursementImportData } from "@/components/reimbursements/import-export/reimbursement-import-data";
-import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 
 type FieldConfig = {
   key: keyof z.infer<typeof ImportReimbursementHeaderSchema>;
@@ -57,18 +54,16 @@ const FIELD_CONFIGS: FieldConfig[] = [
   },
 ];
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
+export async function loader() {
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  return json({ env, companyId });
+  return json({ env });
 }
 
 export default function ReimbursementFieldMapping() {
-  const { env, companyId } = useLoaderData<typeof loader>();
+  const { env } = useLoaderData<typeof loader>();
 
   const { setImportData } = useImportStoreForReimbursement();
 
@@ -248,7 +243,7 @@ export default function ReimbursementFieldMapping() {
   return (
     <section className="py-4 ">
       {loadNext ? (
-        <ReimbursementImportData env={env} companyId={companyId} />
+        <ReimbursementImportData env={env} />
       ) : (
         <Card className="m-4 px-40">
           <CardHeader>

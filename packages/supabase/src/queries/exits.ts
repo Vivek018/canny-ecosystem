@@ -106,11 +106,9 @@ export const getExitsByCompanyId = async ({
     .from("exits")
     .select(
       `${columns.join(",")},
-          employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${
-            project ? "inner" : "left"
-          }(project_sites!${project ? "inner" : "left"}(id, name, projects!${
-            project ? "inner" : "left"
-          }(id, name))))`,
+          employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
+      }(project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
+      }(id, name))))`,
       { count: "exact" },
     )
     .eq("employees.company_id", companyId);
@@ -184,7 +182,7 @@ export const getExitsByCompanyId = async ({
     console.error("getExits Error", error);
   }
 
-  return { data, meta: { count: count ?? data?.length }, error };
+  return { data, meta: { count: count }, error };
 };
 
 export const getExitsById = async ({

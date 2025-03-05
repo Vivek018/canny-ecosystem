@@ -693,7 +693,6 @@ export const ReimbursementSchema = z.object({
   amount: z.number().min(1).max(100000000),
   user_id: z.string().optional(),
   is_deductible: z.boolean().optional().default(false),
-  company_id: z.string(),
   employee_id: z.string(),
 });
 

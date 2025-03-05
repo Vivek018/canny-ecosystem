@@ -71,7 +71,7 @@ export function CasesTable<TData, TValue>({
     const sortParam = searchParams.get("sort");
     if (companyId) {
       try {
-        const { data } = await getCasesByCompanyId({
+        const { data, meta } = await getCasesByCompanyId({
           supabase,
           companyId,
           params: {
@@ -86,7 +86,7 @@ export function CasesTable<TData, TValue>({
           setData((prevData) => [...prevData, ...data] as TData[]);
         }
         setFrom(to + 1);
-        setHasNextPage(data?.length! > to);
+        setHasNextPage(meta?.count! > to);
       } catch {
         setHasNextPage(false);
       }

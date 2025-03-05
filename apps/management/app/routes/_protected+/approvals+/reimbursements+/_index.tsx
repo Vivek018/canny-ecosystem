@@ -204,7 +204,7 @@ export default function ReimbursementsIndex() {
               );
             }
 
-            const hasNextPage = Boolean(meta?.count > pageSize);
+            const hasNextPage = Boolean(meta?.count > data?.length);
 
             return (
               <ReimbursementsTable

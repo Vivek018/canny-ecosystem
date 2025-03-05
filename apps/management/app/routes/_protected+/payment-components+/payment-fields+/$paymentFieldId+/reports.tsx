@@ -68,7 +68,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined
+        (value) => value !== null && value !== undefined,
       );
 
     const reportPromise = getEmployeesReportByCompanyId({
@@ -133,7 +133,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
     `${cacheKeyPrefix.payment_field_report}${
       args.params.paymentFieldId
     }${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 
@@ -176,9 +176,9 @@ export default function PaymentFieldsReport() {
   const noFilters = Object.values(filterList).every((value) => !value);
 
   return (
-    <section className='py-6 px-4'>
-      <div className='w-full flex items-center justify-between pb-4'>
-        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4'>
+    <section className="py-6 px-4">
+      <div className="w-full flex items-center justify-between pb-4">
+        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
           <Suspense fallback={<LoadingSpinner />}>
             <Await resolve={projectPromise}>
               {(projectData) => (
@@ -207,12 +207,12 @@ export default function PaymentFieldsReport() {
           {([{ data, meta, error }, paymentField]) => {
             if (error || paymentField.error || !data?.length) {
               clearCacheEntry(
-                `${cacheKeyPrefix.payment_field_report}${paymentFieldId}`
+                `${cacheKeyPrefix.payment_field_report}${paymentFieldId}`,
               );
               throw error || paymentField.error;
             }
 
-            const hasNextPage = Boolean(meta?.count > pageSize);
+            const hasNextPage = Boolean(meta?.count > data?.length);
 
             const paymentFieldsReportData = data?.map(
               (employee: EmployeeReportDataType) => ({
@@ -221,14 +221,14 @@ export default function PaymentFieldsReport() {
                 amount: 4324,
                 start_date: new Date(),
                 end_date: new Date(),
-              })
+              }),
             );
 
             return (
               <DataTable
                 data={paymentFieldsReportData ?? []}
                 columns={columns()}
-                count={meta?.count ?? data?.length ?? 0}
+                count={meta?.count ?? 0}
                 query={query}
                 filters={filters}
                 noFilters={noFilters}

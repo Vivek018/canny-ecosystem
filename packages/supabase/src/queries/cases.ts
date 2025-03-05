@@ -179,7 +179,7 @@ export async function getCasesByCompanyId({
     console.error("getCasesByCompanyId Error", error);
   }
 
-  return { data, meta: { count: count ?? data?.length }, error };
+  return { data, meta: { count: count }, error };
 }
 
 export async function getCasesById({
