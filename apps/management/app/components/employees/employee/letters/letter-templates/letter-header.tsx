@@ -1,9 +1,7 @@
 import { styles } from "@canny_ecosystem/utils";
 import { Image } from "@react-pdf/renderer";
-import Img from "@canny_ecosystem/management/public/image.png";
+import Img from "./canny-header.png";
 
 export const LetterHeader = () => (
-  <>
-    <Image src={Img} style={styles.image} />
-  </>
+  <Image src={Img} style={styles.image} />
 );

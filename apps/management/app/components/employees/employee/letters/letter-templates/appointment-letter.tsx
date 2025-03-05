@@ -6,7 +6,7 @@ import {
   replaceUnderscore,
   styles,
 } from "@canny_ecosystem/utils";
-import { Document, Page, View, Text } from "@react-pdf/renderer";
+import { Document, Page, View, Text, Svg, Path } from "@react-pdf/renderer";
 import { LetterHeader } from "./letter-header";
 import type { EmployeeAddressDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { MarkdownRenderer } from "../markdown-renderer";
@@ -49,7 +49,7 @@ export function AppointmentLetter({
       <Page size="A4" style={styles.page}>
         {data?.include_letter_head ? (
           <View style={styles.header} fixed>
-            <LetterHeader />
+            <LetterHeader /> 
           </View>
         ) : <View fixed style={styles.indent} />}
         <View style={styles.wrapper}>
