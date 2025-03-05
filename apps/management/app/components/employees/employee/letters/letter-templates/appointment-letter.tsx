@@ -14,7 +14,6 @@ export function AppointmentLetter({
   data,
   employeeAddressData,
   companyData,
-  salaryData,
 }: {
   data: EmployeeWithLetterDataType | null;
   employeeAddressData: Omit<
@@ -22,7 +21,6 @@ export function AppointmentLetter({
     "created_at" | "updated_at"
   > | null;
   companyData: CompanyInfoDataType | null;
-  salaryData: any;
 }) {
 
   const replacements = {
