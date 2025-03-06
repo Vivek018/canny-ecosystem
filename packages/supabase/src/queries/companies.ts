@@ -343,7 +343,7 @@ export async function getCompanyDocumentById({
   supabase,
   id,
 }: { supabase: TypedSupabaseClient; id: string }) {
-  const columns = ["name"] as const;
+  const columns = ["name", "url"] as const;
 
   const { data, error } = await supabase
     .from("company_documents")

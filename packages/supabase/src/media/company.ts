@@ -34,7 +34,7 @@ export async function uploadCompanyLogo({
   }
 
   if (logo instanceof File) {
-    const filePath = `${SUPABASE_STORAGE.LOGOS}/${companyId}_${logo.name}`;
+    const filePath = `${SUPABASE_STORAGE.LOGOS}/${companyId}${logo.name}`;
     const buffer = await logo.arrayBuffer();
     const fileData = new Uint8Array(buffer);
 
@@ -116,7 +116,7 @@ export async function uploadCompanyDocument({
   documentName: string;
 }) {
   if (file instanceof File) {
-    const filePath = `company/${companyId}/${file.name}`;
+    const filePath = `company/${companyId}/${documentName}`;
     const { data: existingData } =
       await getCompanyDocumentUrlByCompanyIdAndDocumentName({
         supabase,
@@ -167,15 +167,17 @@ export async function updateCompanyDocument({
   file,
   companyId,
   documentName,
+  existingDocumentName,
 }: {
   supabase: TypedSupabaseClient;
   file: File;
   companyId: string;
   documentName: string;
+  existingDocumentName: string;
 }) {
   const { status } = await deleteCompanyDocument({
     supabase,
-    documentName,
+    documentName: existingDocumentName,
     companyId,
   });
 

@@ -14,7 +14,7 @@ export default function DocumentCard({ documentData }: {
     documentData: {
         name: string;
         url: string;
-        id:string;
+        id: string;
     }
 }) {
     const { role } = useUser();
@@ -52,7 +52,7 @@ export default function DocumentCard({ documentData }: {
     };
 
     const handleEdit = () => {
-        navigate(`/settings/documents/add-document?documentId=${documentData.id}`);
+        navigate(`/settings/documents/${documentData.id}/update-document`);
     }
 
     return (

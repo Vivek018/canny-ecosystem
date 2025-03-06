@@ -1679,17 +1679,17 @@ export async function addEmployeeDocument({
 export async function deleteEmployeeDocumentByEmployeeId({
   supabase,
   employeeId,
-  documentName,
+  documentType,
 }: {
   supabase: TypedSupabaseClient;
   employeeId: string;
-  documentName: (typeof employeeDocuments)[number];
+  documentType: (typeof employeeDocuments)[number];
 }) {
   const { error, status } = await supabase
     .from("employee_documents")
     .delete()
     .eq("employee_id", employeeId)
-    .eq("document_type", documentName);
+    .eq("document_type", documentType);
 
   return { status, error };
 }

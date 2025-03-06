@@ -21,10 +21,10 @@ import { useState } from "react";
 
 export const DeleteEmployeeDocument = ({
   employeeId,
-  documentName
+  documentType
 }: {
   employeeId:string;
-  documentName:string;
+  documentType:string;
 }) => {
   const { role } = useUser();
   const [isLoading, setLoading] = useState(false);
@@ -47,7 +47,7 @@ export const DeleteEmployeeDocument = ({
         {},
         {
           method: "post",
-          action: `/employees/${employeeId}/documents/delete-document?documentName=${documentName}`,
+          action: `/employees/${employeeId}/documents/delete-document?documentType=${documentType}`,
           replace: true,
         },
       );

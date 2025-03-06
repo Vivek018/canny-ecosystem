@@ -10,11 +10,10 @@ import { deleteCompanyDocument } from "@canny_ecosystem/supabase/media";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getCompanyDocumentById } from "@canny_ecosystem/supabase/queries";
 
-export async function action({request}: ActionFunctionArgs): Promise<Response> {
+export async function action({request, params}: ActionFunctionArgs): Promise<Response> {
     const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-    const url = new URL(request.url);
-    const documentId = url.searchParams.get("documentId") ?? "";
+    const documentId = params.documentId ?? "";
     const { data } = await getCompanyDocumentById({ supabase, id: documentId });
 
     try {

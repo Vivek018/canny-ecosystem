@@ -150,7 +150,7 @@ export function DocumentsWrapper({
           return (
             <CommandItem
               key={document.id}
-              value={document.id as string}
+              value={document.name + document.id + document.url}
               className='data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0'
             >
               <DocumentCard documentData={{ name: document.name, url: document.url, id: document.id }} />

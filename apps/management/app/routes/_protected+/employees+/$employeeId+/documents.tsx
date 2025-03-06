@@ -125,7 +125,7 @@ export default function Documents() {
                     </Await>
                 </Suspense>
             </div>
-                <Outlet />
+            <Outlet />
         </section >
     );
 }
@@ -134,7 +134,7 @@ export function DocumentsWrapper({
     data,
     error,
 }: {
-    data: Pick<EmployeeDocumentsDatabaseRow, "document_type" | "url">[];
+    data: Pick<EmployeeDocumentsDatabaseRow, "document_type" | "url" | "id">[];
     error: unknown;
 }) {
     const { employeeId } = useParams();
@@ -158,13 +158,14 @@ export function DocumentsWrapper({
                     return (
                         <CommandItem
                             key={document.document_type}
-                            value={document.document_type as string}
+                            value={document.document_type + document.url}
                             className='data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0'
                         >
                             <DocumentCard
                                 documentData={{
-                                    name: document.document_type as string,
-                                    url: document.url as string,
+                                    name: document.document_type,
+                                    url: document.url,
+                                    documentId: document.id
                                 }}
                             />
                         </CommandItem>

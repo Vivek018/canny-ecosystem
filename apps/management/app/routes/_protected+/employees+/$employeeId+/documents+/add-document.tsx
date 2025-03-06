@@ -1,4 +1,4 @@
-import { EmployeeDocumentsSchema, SIZE_1MB, employeeDocuments, isGoodStatus, replaceUnderscore, transformStringArrayIntoOptions } from "@canny_ecosystem/utils";
+import { EmployeeDocumentsSchema, SIZE_1MB, employeeDocuments, getInitialValueFromZod, isGoodStatus, replaceUnderscore, transformStringArrayIntoOptions } from "@canny_ecosystem/utils";
 import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import { FormProvider, getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
@@ -10,16 +10,18 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { FormButtons } from "@/components/form/form-buttons";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { updateEmployeeDocument, uploadEmployeeDocument } from "@canny_ecosystem/supabase/media";
+import { uploadEmployeeDocument } from "@canny_ecosystem/supabase/media";
 import { parseMultipartFormData } from "@remix-run/server-runtime/dist/formData";
 import { createMemoryUploadHandler } from "@remix-run/server-runtime/dist/upload/memoryUploadHandler";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@canny_ecosystem/ui/dialog";
+import { UPDATE_EMPLOYEE_DOCUMENT } from "./$documentId.update-document";
+import type { EmployeeDocumentsDatabaseRow } from "@canny_ecosystem/supabase/types";
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export const CREATE_EMPLOYEE_DOCUMENT = "create-employee-document";
+
+export async function loader({ params }: LoaderFunctionArgs) {
     const employeeId = params.employeeId;
-    const url = new URL(request.url);
-    const documentName = url.searchParams.get("documentName");
-    return { employeeId, documentName };
+    return { employeeId };
 }
 
 export async function action({
@@ -27,8 +29,6 @@ export async function action({
     params,
 }: ActionFunctionArgs): Promise<Response> {
     const employeeId = params.employeeId ?? "";
-    const url = new URL(request.url);
-    const documentName = url.searchParams.get("documentName");
     const { supabase } = getSupabaseWithHeaders({ request });
 
     try {
@@ -44,36 +44,12 @@ export async function action({
                 { status: submission.status === "error" ? 400 : 200 },
             );
         }
-        if (documentName) {
-            const { status, error } = await updateEmployeeDocument({
-                supabase,
-                file: submission.value.document_file as File,
-                employeeId,
-                documentName: submission.value.document_name as (typeof employeeDocuments)[number]
-            });
-            if (isGoodStatus(status)) {
-                return json({
-                    status: "success",
-                    message: "Document updated successfully",
-                    error: null,
-                    returnTo: `/employees/${employeeId}/documents`,
-                });
-            }
-            return json(
-                {
-                    status: "error",
-                    message: "Document update failed",
-                    error,
-                    returnTo: `/employees/${employeeId}/documents`,
-                },
-                { status: 500 },
-            );
-        }
+
         const { status, error } = await uploadEmployeeDocument({
             supabase,
             file: submission.value.document_file as File,
             employeeId,
-            documentName: submission.value.document_name as (typeof employeeDocuments)[number]
+            documentType: submission.value.document_type as (typeof employeeDocuments)[number]
         });
 
         if (isGoodStatus(status)) {
@@ -106,22 +82,33 @@ export async function action({
     }
 }
 
-export default function AddDocument() {
-    const { employeeId, documentName } = useLoaderData<typeof loader>();
+export default function AddDocument({
+    updatedValues
+}: {
+    updatedValues: EmployeeDocumentsDatabaseRow
+}) {
+    const { employeeId } = useLoaderData<typeof loader>();
     const actionData = useActionData<typeof action>();
+    const EMPLOYEE_DOCUMENT_TAG = updatedValues ? UPDATE_EMPLOYEE_DOCUMENT : CREATE_EMPLOYEE_DOCUMENT;
+
+    const initialValues = updatedValues ?? getInitialValueFromZod(EmployeeDocumentsSchema);
+
     const [resetKey, setResetKey] = useState(Date.now());
     const { toast } = useToast();
     const navigate = useNavigate();
 
     const [form, fields] = useForm({
-        id: "add-document",
+        id: EMPLOYEE_DOCUMENT_TAG,
         constraint: getZodConstraint(EmployeeDocumentsSchema),
         onValidate({ formData }) {
             return parseWithZod(formData, { schema: EmployeeDocumentsSchema });
         },
         shouldValidate: "onInput",
         shouldRevalidate: "onInput",
-        defaultValue: { document_name: documentName }
+        defaultValue: {
+            ...initialValues,
+            existing_document_type: initialValues.document_type
+        }
     });
 
     useEffect(() => {
@@ -148,18 +135,19 @@ export default function AddDocument() {
         <Dialog open={true} onOpenChange={() => navigate(`/employees/${employeeId}/documents`)}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>{documentName ? "Update" : "Add"} Document</DialogTitle>
+                    <DialogTitle>{updatedValues ? "Update" : "Add"} Document</DialogTitle>
                 </DialogHeader>
                 <FormProvider context={form.context}>
                     <Form method="POST" {...getFormProps(form)} className="flex flex-col" encType="multipart/form-data">
+                        <input {...getInputProps(fields.existing_document_type, { type: "hidden" })} />
                         <SearchableSelectField
                             key={resetKey}
                             className="capitalize"
                             options={transformStringArrayIntoOptions(employeeDocuments as unknown as string[])}
-                            inputProps={{ ...getInputProps(fields.document_name, { type: "text" }), readOnly: !!documentName }}
-                            placeholder={`Select ${replaceUnderscore(fields.document_name.name)}`}
-                            labelProps={{ children: replaceUnderscore(fields.document_name.name) }}
-                            errors={fields.document_name.errors}
+                            inputProps={{ ...getInputProps(fields.document_type, { type: "text" }) }}
+                            placeholder={`Select ${replaceUnderscore(fields.document_type.name)}`}
+                            labelProps={{ children: replaceUnderscore(fields.document_type.name) }}
+                            errors={fields.document_type.errors}
                         />
                         <Field
                             inputProps={{

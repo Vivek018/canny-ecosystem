@@ -14,6 +14,7 @@ export default function DocumentCard({ documentData }: {
     documentData: {
         name: string;
         url: string;
+        documentId: string;
     }
 }) {
     const { role } = useUser();
@@ -51,13 +52,13 @@ export default function DocumentCard({ documentData }: {
         }
     };
 
-    const handleEdit = (documentName: string) => {
-        navigate(`/employees/${employeeId}/documents/add-document?documentName=${documentName}`);
+    const handleEdit = () => {
+        navigate(`/employees/${employeeId}/documents/${documentData.documentId}/update-document`);
     }
 
     return (
         <Card
-            key={documentData.name}
+            key={documentData.documentId}
             className="w-full select-text cursor-pointer flex flex-col overflow-hidden rounded-lg shadow-md transition-transform duration-300"
         >
             <div
@@ -100,7 +101,7 @@ export default function DocumentCard({ documentData }: {
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
-                            onClick={() => handleEdit(documentData.name)}
+                            onClick={handleEdit}
                             className={cn(
                                 "hidden",
                                 hasPermission(role, `${updateRole}:${attribute.employeeDocuments}`) &&
@@ -110,7 +111,7 @@ export default function DocumentCard({ documentData }: {
                             Edit document
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DeleteEmployeeDocument employeeId={employeeId as string} documentName={documentData.name} />
+                        <DeleteEmployeeDocument employeeId={employeeId as string} documentType={documentData.name} />
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>

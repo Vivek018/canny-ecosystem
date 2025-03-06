@@ -993,11 +993,28 @@ export async function getEmployeesReportByCompanyId({
 }
 
 // employee documents
+export async function getEmployeeDocumentById({
+  supabase,
+  id,
+}: { supabase: TypedSupabaseClient; id: string }) {
+  const columns = ["document_type", "url"] as const;
+
+  const { data, error } = await supabase
+    .from("employee_documents")
+    .select(columns.join(","))
+    .eq("id", id)
+    .single<Pick<EmployeeDocumentsDatabaseRow, "document_type" | "url">>();
+
+  if (error) console.error("getEmployeeDocumentById Error", error);
+
+  return { data, error };
+}
+
 export async function getEmployeeDocuments({
   supabase,
   employeeId,
 }: { supabase: TypedSupabaseClient; employeeId: string }) {
-  const columns = ["document_type", "url"] as const;
+  const columns = ["document_type", "url", "id"] as const;
 
   const { data, error } = await supabase
     .from("employee_documents")
@@ -1009,10 +1026,7 @@ export async function getEmployeeDocuments({
       InferredType<EmployeeDocumentsDatabaseRow, (typeof columns)[number]>[]
     >();
 
-  if (error) {
-    console.error("getEmployeeDocuments Error", error);
-    return null;
-  }
+  if (error) console.error("getEmployeeDocuments Error", error);
 
   return { data, error };
 }
@@ -1020,11 +1034,11 @@ export async function getEmployeeDocuments({
 export async function getEmployeeDocumentUrlByEmployeeIdAndDocumentName({
   supabase,
   employeeId,
-  documentName,
+  documentType,
 }: {
   supabase: TypedSupabaseClient;
   employeeId: string;
-  documentName: (typeof employeeDocuments)[number];
+  documentType: (typeof employeeDocuments)[number];
 }) {
   const columns = ["url"] as const;
 
@@ -1032,7 +1046,7 @@ export async function getEmployeeDocumentUrlByEmployeeIdAndDocumentName({
     .from("employee_documents")
     .select(columns.join(","))
     .eq("employee_id", employeeId)
-    .eq("document_type", documentName)
+    .eq("document_type", documentType)
     .single<EmployeeDocumentsDatabaseRow>();
 
   if (error) {
@@ -1177,17 +1191,23 @@ export async function getSiteIdByEmployeeId({
   supabase: TypedSupabaseClient;
   employeeId: string;
 }) {
-  const columns = [
-    "id",
-  ] as const;
+  const columns = ["id"] as const;
 
   const { data, error } = await supabase
     .from("employees")
-    .select(`${columns.join(",")}, employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(project_sites!inner(id))`, { count: "exact" })
+    .select(
+      `${columns.join(",")}, employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(project_sites!inner(id))`,
+      { count: "exact" },
+    )
     .order("created_at", { ascending: false })
     .eq("id", employeeId)
-    .single<Pick<EmployeeDatabaseRow, "id">
-      & { employee_project_assignment: { project_sites: Pick<SiteDatabaseRow, "id"> } }>();
+    .single<
+      Pick<EmployeeDatabaseRow, "id"> & {
+        employee_project_assignment: {
+          project_sites: Pick<SiteDatabaseRow, "id">;
+        };
+      }
+    >();
 
   if (error) {
     console.error("getSiteIdByEmployeeId Error", error);

@@ -41,7 +41,7 @@ export const DeleteCompanyDocument = ({ documentId }: { documentId: string }) =>
         {},
         {
           method: "post",
-          action: `/settings/documents/delete-document?documentId=${documentId}`,
+          action: `/settings/documents/${documentId}/delete-document`,
           replace: true,
         },
       );

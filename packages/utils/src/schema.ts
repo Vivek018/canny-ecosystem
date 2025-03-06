@@ -173,8 +173,9 @@ export const RelationshipSchema = z.object({
 
 // Company Documents
 export const CompanyDocumentsSchema = z.object({
-  document_name: zString,
+  name: zString,
   document_file: zFile,
+  existing_document_name: z.string().optional(),
 });
 
 // Project
@@ -416,8 +417,9 @@ export const employeeDocuments = [
 ] as const;
 
 export const EmployeeDocumentsSchema = z.object({
-  document_name: z.enum(employeeDocuments),
+  document_type: z.enum(employeeDocuments),
   document_file: zFile,
+  existing_document_type: z.enum(employeeDocuments).optional(),
 });
 
 export const paymentTypeArray = ["fixed", "variable"] as const;

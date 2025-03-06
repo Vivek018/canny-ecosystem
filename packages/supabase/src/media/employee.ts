@@ -37,7 +37,7 @@ export async function uploadEmployeeProfilePhoto({
   }
 
   if (profilePhoto instanceof File) {
-    const filePath = `${SUPABASE_STORAGE.EMPLOYEE_PROFILE_PHOTO}/${employeeId}_${profilePhoto.name}`;
+    const filePath = `${SUPABASE_STORAGE.EMPLOYEE_PROFILE_PHOTO}/${employeeId}${profilePhoto.name}`;
     const buffer = await profilePhoto.arrayBuffer();
     const fileData = new Uint8Array(buffer);
 
@@ -109,19 +109,19 @@ export async function uploadEmployeeDocument({
   supabase,
   file,
   employeeId,
-  documentName,
+  documentType,
 }: {
   supabase: TypedSupabaseClient;
   file: File;
   employeeId: string;
-  documentName: (typeof employeeDocuments)[number];
+  documentType: (typeof employeeDocuments)[number];
 }) {
   if (file instanceof File) {
-    const filePath = `employees/${documentName}/${employeeId}${file.name}`;
+    const filePath = `employees/${documentType}/${employeeId}${file.name}`;
     const { data: documentData } =
       await getEmployeeDocumentUrlByEmployeeIdAndDocumentName({
         supabase,
-        documentName,
+        documentType,
         employeeId,
       });
 
@@ -146,7 +146,7 @@ export async function uploadEmployeeDocument({
     const { status, error: insertError } = await addEmployeeDocument({
       supabase,
       employee_id: employeeId,
-      document_type: documentName,
+      document_type: documentType,
       url: `${SUPABASE_MEDIA_URL_PREFIX}${data.fullPath}`,
     });
 
@@ -168,26 +168,29 @@ export async function updateEmployeeDocument({
   supabase,
   file,
   employeeId,
-  documentName,
+  documentType,
+  existingDocumentType,
 }: {
   supabase: TypedSupabaseClient;
   file: File;
   employeeId: string;
-  documentName: (typeof employeeDocuments)[number];
+  documentType: (typeof employeeDocuments)[number];
+  existingDocumentType: (typeof employeeDocuments)[number];
 }) {
   const { status } = await deleteEmployeeDocument({
     supabase,
-    documentName,
+    documentType: existingDocumentType,
     employeeId,
   });
 
   if (isGoodStatus(status)) {
-    return await uploadEmployeeDocument({
+    const { status, error } = await uploadEmployeeDocument({
       supabase,
       employeeId,
       file,
-      documentName,
+      documentType,
     });
+    if (isGoodStatus(status)) return { status, error };
   }
 
   return { status, error: "File not uploaded by the user" };
@@ -196,16 +199,16 @@ export async function updateEmployeeDocument({
 export async function deleteEmployeeDocument({
   supabase,
   employeeId,
-  documentName,
+  documentType,
 }: {
   supabase: TypedSupabaseClient;
   employeeId: string;
-  documentName: (typeof employeeDocuments)[number];
+  documentType: (typeof employeeDocuments)[number];
 }) {
   const { data, error } =
     await getEmployeeDocumentUrlByEmployeeIdAndDocumentName({
       supabase,
-      documentName,
+      documentType,
       employeeId,
     });
   if (!data || error) return { status: 400, error };
@@ -220,7 +223,7 @@ export async function deleteEmployeeDocument({
   const { error: deleteEmployeeDocumentError, status } =
     await deleteEmployeeDocumentByEmployeeId({
       supabase,
-      documentName,
+      documentType,
       employeeId,
     });
 

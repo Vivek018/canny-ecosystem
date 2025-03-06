@@ -31,7 +31,7 @@ export async function uploadAvatar({
   }
 
   if (avatar instanceof File) {
-    const filePath = `${SUPABASE_STORAGE.AVATAR}/${userData?.id}_${avatar.name}`;
+    const filePath = `${SUPABASE_STORAGE.AVATAR}/${userData?.id}${avatar.name}`;
     const buffer = await avatar.arrayBuffer();
     const fileData = new Uint8Array(buffer);
 
