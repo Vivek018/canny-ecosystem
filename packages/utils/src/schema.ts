@@ -1158,22 +1158,6 @@ export const PayrollSchema = z
   })
   .catchall(z.any());
 
-export type PayrollEmployeeData = {
-  deductions: number;
-  employee_code: string;
-  employee_id: string;
-  gross_pay: number;
-  name: string;
-  net_pay: number;
-  present_days: number;
-  site_id: string;
-  status: string;
-  designation: string;
-  payment_template_components_id: string;
-  templateComponents: any;
-  payrollId: string;
-};
-
 // Exits
 export const exitReasonArray = [
   "Resignation",

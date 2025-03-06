@@ -39,7 +39,7 @@ export function PayrollDataTable<TData, TValue>({
     const dynamicHeaders: string[] = [];
 
     const isAccessorKeyExists = (accessorKey: string) => {
-      return newColumns.some((column) => column.accessorKey === accessorKey);
+      return newColumns.some((column) => column?.accessorKey === accessorKey);
     };
 
     newData.map((newDataEntry) => {
@@ -77,7 +77,7 @@ export function PayrollDataTable<TData, TValue>({
       cell: ({ row }) => {
         return (
           <PayrollEntryDropdown
-            payrollId={row.original.payrollId}
+            payrollId={row.original.payroll_id}
             employeeId={row.original.employee_id}
             triggerChild={
               <DropdownMenuTrigger asChild>
@@ -123,7 +123,7 @@ export function PayrollDataTable<TData, TValue>({
           />
           <TableBody>
             {tableLength ? (
-              table.getRowModel().rows.map((row) => {
+              table.getRowModel()?.rows?.map((row) => {
                 const rowData = row.original;
                 return (
                   <PayrollSheet

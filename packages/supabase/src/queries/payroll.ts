@@ -95,12 +95,14 @@ export async function getPayrollEntriesByPayrollId({
     "exit_id",
     "payment_status",
     "amount",
+    "payroll_id",
   ] as const;
 
   const { data, error } = await supabase
     .from("payroll_entries")
     .select(columns.join(","))
-    .eq("payroll_id", payrollId);
+    .eq("payroll_id", payrollId)
+    .returns<InferredType<PayrollEntriesDatabaseRow, typeof columns[number]>[]>();
 
   if (error) console.error("getPayrollEntriesByPayrollId Error", error);
 

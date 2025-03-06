@@ -6,14 +6,14 @@ import { payrollColumns } from "@/components/payroll/table/columns";
 import { Outlet, useNavigation, useSubmit } from "@remix-run/react";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useState, useEffect } from "react";
-import type { PayrollEmployeeData } from "@canny_ecosystem/utils";
 import { PayrollActions } from "./payroll-actions";
+import type { PayrollEntriesDatabaseRow } from "@canny_ecosystem/supabase/types";
 
 export function PayrollComponent({
   data,
   editable,
 }: {
-  data: PayrollEmployeeData[];
+  data: Omit<PayrollEntriesDatabaseRow, "created_at" | "updated_at">[];
   editable: boolean;
 }) {
   const navigation = useNavigation();
@@ -40,10 +40,9 @@ export function PayrollComponent({
     submit(
       {
         data: JSON.stringify({
-          payrollId: data[0].payrollId,
-          siteId: data[0].site_id,
+          payrollId: data[0]?.payroll_id,
         }),
-        returnTo: "/payroll/run-payroll/site/",
+        returnTo: "/payroll/run-payroll",
       },
       {
         method: "POST",
@@ -72,7 +71,7 @@ export function PayrollComponent({
                 className="pl-8 h-10 w-full focus-visible:ring-0"
               />
             </div>
-            <PayrollActions payrollId={data[0].payrollId} />
+            <PayrollActions payrollId={data[0].payroll_id} />
             <div className={cn(editable ? "" : "hidden")}>
               <Button onClick={(e) => approvePayroll(e)} disabled={disable}>
                 Submit & Approve

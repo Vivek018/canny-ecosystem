@@ -91,7 +91,7 @@ export function PayrollSheet({
   const deductions: deductionAndEarning[] = [];
 
   // populating earnings and deductions from templateComponents
-  rowData.templateComponents?.map((row: any) => {
+  rowData?.templateComponents?.map((row: any) => {
     const { paymentTemplateComponentId, name } = row;
     const paymentFieldData = {
       title: name,
@@ -116,17 +116,13 @@ export function PayrollSheet({
     setNetPay(newNetPay);
   }, [
     fields.gross_pay.value,
-    ...rowData.templateComponents.map(
-      (row: { paymentTemplateComponentId: string }) =>
-        fields[row.paymentTemplateComponentId].value,
-    ),
   ]);
 
   return (
     <Sheet>
       <SheetTrigger asChild>
         <TableRow key={row.id} className="relative cursor-pointer select-text">
-          {row.getVisibleCells().map((cell: any) => (
+          {row.getVisibleCells()?.map((cell: any) => (
             <TableCell
               key={cell.id || Date.now()}
               className={cn(
