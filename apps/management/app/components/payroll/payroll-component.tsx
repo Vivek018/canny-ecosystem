@@ -1,28 +1,32 @@
-import { PayrollDataTable } from "@/components/payroll/table/data-table";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
-import { payrollColumns } from "@/components/payroll/table/columns";
-import { Outlet, useNavigation, useSubmit } from "@remix-run/react";
+import { Outlet, useNavigation, useParams, useSubmit } from "@remix-run/react";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useState, useEffect } from "react";
 import { PayrollActions } from "./payroll-actions";
-import type { PayrollEntriesDatabaseRow } from "@canny_ecosystem/supabase/types";
+import type { PayrollEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
+import type { PayrollDatabaseRow } from "@canny_ecosystem/supabase/types";
 
 export function PayrollComponent({
   data,
+  payrollData,
   editable,
 }: {
-  data: Omit<PayrollEntriesDatabaseRow, "created_at" | "updated_at">[];
+  data: PayrollEntriesWithEmployee[];
+  payrollData: Omit<PayrollDatabaseRow, "created_at" | "updated_at">;
   editable: boolean;
 }) {
+  const { payrollId } = useParams();
+  const submit = useSubmit();
+
   const navigation = useNavigation();
   const disable =
     navigation.state === "submitting" || navigation.state === "loading";
 
-  // searching functionality
   const [searchString, setSearchString] = useState("");
   const [tableData, setTableData] = useState(data);
+
   useEffect(() => {
     const filteredData = data?.filter(
       (item: { [s: string]: unknown } | ArrayLike<unknown>) =>
@@ -33,20 +37,16 @@ export function PayrollComponent({
     setTableData(filteredData);
   }, [searchString, data]);
 
-  // approve payroll
-  const submit = useSubmit();
   const approvePayroll = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     submit(
       {
-        data: JSON.stringify({
-          payrollId: data[0]?.payroll_id,
-        }),
-        returnTo: "/payroll/run-payroll",
+        payrollId: payrollId ?? payrollData?.id,
+        currentStatus: payrollData?.status,
       },
       {
         method: "POST",
-        action: "/payroll/run-payroll/approve-payroll",
+        action: `/payroll/run-payroll/${payrollId}`,
       },
     );
   };
@@ -74,16 +74,11 @@ export function PayrollComponent({
             <PayrollActions payrollId={data[0].payroll_id} />
             <div className={cn(editable ? "" : "hidden")}>
               <Button onClick={(e) => approvePayroll(e)} disabled={disable}>
-                Submit & Approve
+                Submit
               </Button>
             </div>
           </div>
         </div>
-        <PayrollDataTable
-          data={tableData ?? []}
-          columns={payrollColumns}
-          editable={editable}
-        />
       </div>
       <Outlet />
     </section>

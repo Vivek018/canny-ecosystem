@@ -5,6 +5,7 @@ import type {
   TypedSupabaseClient,
   PayrollEntriesDatabaseRow,
   PaymentTemplateComponentDatabaseRow,
+  EmployeeDatabaseRow,
 } from "../types";
 
 
@@ -80,6 +81,8 @@ export type PayrollEntriesWithTemplateComponents = Pick<
   >;
 };
 
+export type PayrollEntriesWithEmployee = Omit<PayrollEntriesDatabaseRow, "created_at" | "updated_at"> & { employees: Pick<EmployeeDatabaseRow, "first_name" | "middle_name" | "last_name" | "employee_code"> }
+
 export async function getPayrollEntriesByPayrollId({
   supabase,
   payrollId,
@@ -100,9 +103,9 @@ export async function getPayrollEntriesByPayrollId({
 
   const { data, error } = await supabase
     .from("payroll_entries")
-    .select(columns.join(","))
+    .select(`${columns.join(",")}, employees!inner(id,company_id,first_name, middle_name, last_name, employee_code)`)
     .eq("payroll_id", payrollId)
-    .returns<InferredType<PayrollEntriesDatabaseRow, typeof columns[number]>[]>();
+    .returns<PayrollEntriesWithEmployee[]>();
 
   if (error) console.error("getPayrollEntriesByPayrollId Error", error);
 
