@@ -147,7 +147,7 @@ export default function CasesIndex() {
               );
             }
 
-            const hasNextPage = Boolean(meta?.count > pageSize);
+            const hasNextPage = Boolean(meta?.count > data?.length);
 
             return (
               <CasesTable

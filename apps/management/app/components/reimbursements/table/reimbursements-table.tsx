@@ -73,7 +73,7 @@ export function ReimbursementsTable<TData, TValue>({
     const sortParam = searchParams.get("sort");
     if (companyId) {
       try {
-        const { data } = await getReimbursementsByCompanyId({
+        const { data, meta } = await getReimbursementsByCompanyId({
           supabase,
           companyId,
           params: {
@@ -88,14 +88,14 @@ export function ReimbursementsTable<TData, TValue>({
           setData((prevData) => [...prevData, ...data] as TData[]);
         }
         setFrom(to + 1);
-        setHasNextPage(data?.length! > to);
+        setHasNextPage(meta?.count! > to);
       } catch {
         setHasNextPage(false);
       }
     }
-    if (employeeId) {
+    else if (employeeId) {
       try {
-        const { data } = await getReimbursementsByEmployeeId({
+        const { data, meta } = await getReimbursementsByEmployeeId({
           supabase,
           employeeId,
           params: {
@@ -109,7 +109,7 @@ export function ReimbursementsTable<TData, TValue>({
           setData((prevData) => [...prevData, ...data] as TData[]);
         }
         setFrom(to + 1);
-        setHasNextPage(data?.length! > to);
+        setHasNextPage(meta?.count! > to);
       } catch {
         setHasNextPage(false);
       }

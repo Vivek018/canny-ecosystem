@@ -194,7 +194,7 @@ export default function AccidentsIndex() {
               );
             }
 
-            const hasNextPage = Boolean(meta?.count > pageSize);
+            const hasNextPage = Boolean(meta?.count > data?.length);
 
             return (
               <AccidentsTable

@@ -159,7 +159,7 @@ export default function ESIReport() {
       <DataTable
         data={data ?? []}
         columns={columns()}
-        count={count ?? data?.length ?? 0}
+        count={count ?? 0}
         query={query}
         filters={filters}
         noFilters={noFilters}

@@ -1,7 +1,9 @@
-export function Logo() {
-  return (
-    <h1 className="w-max text-3xl font-extrabold uppercase tracking-wider">
-      💰
-    </h1>
+import { Icon } from "./icon";
+
+export function Logo({ theme }: { theme?: "dark" | "light" | "system" }) {
+  return theme === "dark" ? (
+    <Icon name="logo-dark" className="w-9 h-9" />
+  ) : (
+    <Icon name="logo-light" className="w-9 h-9" />
   );
 }

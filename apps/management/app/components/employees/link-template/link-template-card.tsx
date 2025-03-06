@@ -18,18 +18,16 @@ import { LinkTemplateDropdown } from "../link-template-dropdown";
 type DetailItemProps = {
   label: string;
   value: string | null | undefined;
-  formatter?: (value: string) => string;
 };
 
-const DetailItem: React.FC<DetailItemProps> = ({ label, value, formatter }) => {
-  const formattedValue = value ? (formatter ? formatter(value) : value) : "--";
+const DetailItem: React.FC<DetailItemProps> = ({ label, value}) => {
 
   return (
     <div className='flex flex-col'>
       <h3 className='text-muted-foreground text-[13px] tracking-wide capitalize'>
         {label}
       </h3>
-      <p>{formattedValue}</p>
+      <p>{value ?? "--"}</p>
     </div>
   );
 };
@@ -43,37 +41,35 @@ export const LinkTemplateItem = ({
   >;
 }) => {
   return (
-    <section className='w-full select-text cursor-auto h-full flex flex-col justify-start p-4'>
-      <ul className='grid grid-cols-3 gap-4'>
+    <section className="w-full select-text cursor-auto h-full flex flex-col justify-start p-4">
+      <ul className="grid grid-cols-3 gap-4">
         <li>
           <DetailItem
-            label='Template Name'
+            label="Template Name"
             value={paymentTemplateAssignmentData.name}
           />
         </li>
         <li>
           <DetailItem
-            label='Assignment Type'
+            label="Assignment Type"
             value={paymentTemplateAssignmentData.assignment_type}
           />
         </li>
         <li>
           <DetailItem
-            label='Effective From'
-            value={paymentTemplateAssignmentData.effective_from}
-            formatter={formatDate}
+            label="Effective From"
+            value={formatDate(paymentTemplateAssignmentData.effective_from)}
           />
         </li>
         <li>
           <DetailItem
-            label='Effective To'
-            value={paymentTemplateAssignmentData.effective_to}
-            formatter={formatDate}
+            label="Effective To"
+            value={formatDate(paymentTemplateAssignmentData.effective_to)}
           />
         </li>
         <li>
           <DetailItem
-            label='Is Active'
+            label="Is Active"
             value={paymentTemplateAssignmentData.is_active ? "Yes" : "No"}
           />
         </li>

@@ -72,7 +72,7 @@ export function AccidentsTable<TData, TValue>({
     const sortParam = searchParams.get("sort");
     if (companyId) {
       try {
-        const { data } = await getAccidentsByCompanyId({
+        const { data, meta } = await getAccidentsByCompanyId({
           supabase,
           companyId,
           params: {
@@ -87,7 +87,7 @@ export function AccidentsTable<TData, TValue>({
           setData((prevData) => [...prevData, ...data] as TData[]);
         }
         setFrom(to + 1);
-        setHasNextPage(data?.length! > to);
+        setHasNextPage(meta?.count! > to);
       } catch {
         setHasNextPage(false);
       }

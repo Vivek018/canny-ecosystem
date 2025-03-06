@@ -9,12 +9,8 @@ import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
   getCompanyById,
   getDefaultEmployeeAddressesByEmployeeId,
-  getDefaultTemplateIdByCompanyId,
   getEmployeeLetterWithEmployeeById,
-  getPaymentTemplateBySiteId,
-  getPaymentTemplateComponentsByTemplateId,
   getPrimaryLocationByCompanyId,
-  getTemplateIdByEmployeeId,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type {
@@ -71,83 +67,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       });
     if (companyLocationError) throw companyLocationError;
 
-    let templateId = null;
-
-    let templateComponentData = null;
-    let employeeSalaryData = null;
-    if (
-      employeeLetterData?.letter_type === "appointment_letter" ||
-      employeeLetterData?.letter_type === "offer_letter" ||
-      employeeLetterData?.letter_type === "noc_letter"
-    ) {
-      const employeeSiteId =
-        employeeLetterData?.employees?.employee_project_assignment
-          ?.project_sites?.id;
-
-      if (employeeSiteId) {
-        const { data: templateAssignmentData, error: templateAssignmentError } =
-          await getTemplateIdByEmployeeId({
-            supabase,
-            employeeId: employeeId ?? "",
-          });
-
-        templateId = templateAssignmentData?.template_id;
-
-        if (!templateId || templateAssignmentError) {
-          const { data } = await getPaymentTemplateBySiteId({
-            supabase,
-            site_id: employeeSiteId ?? "",
-          });
-
-          templateId = data?.template_id;
-        }
-      }
-
-      if (!templateId) {
-        const { data, error } = await getDefaultTemplateIdByCompanyId({
-          supabase,
-          companyId: companyId ?? "",
-        });
-
-        templateId = data?.id;
-        if (error || !templateId) throw new Error("No template found");
-      }
-
-      ({ data: templateComponentData } =
-        await getPaymentTemplateComponentsByTemplateId({
-          supabase,
-          templateId: templateId ?? "",
-        }));
-
-      employeeSalaryData = templateComponentData?.reduce(
-        (acc, curr) => {
-          const category = curr.component_type;
-
-          if (!acc[category]) {
-            acc[category] = {};
-          }
-
-          if (
-            curr.target_type === "payment_field" &&
-            curr.payment_fields.name
-          ) {
-            const fieldName =
-              curr.payment_fields.name + "".replaceAll(" ", "_");
-            acc[category][fieldName] = curr.calculation_value ?? 0;
-          } else {
-            acc[category][curr.target_type] = curr.calculation_value ?? 0;
-          }
-
-          return acc;
-        },
-        {} as Record<string, Record<string, number>>,
-      );
-    }
-
     return json({
       employeeLetterData,
       employeeAddressData,
-      employeeSalaryData,
       companyData: {
         data: companyData,
         locationData: companyLocationData,
@@ -159,7 +81,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       error,
       employeeLetterData: null,
       employeeAddressData: null,
-      employeeSalaryData: null,
       companyData: {
         data: null,
         locationData: null,
@@ -172,7 +93,6 @@ export default function LetterPreview() {
   const {
     employeeLetterData,
     employeeAddressData,
-    employeeSalaryData,
     companyData,
     error,
   } = useLoaderData<typeof loader>();
@@ -188,7 +108,6 @@ export default function LetterPreview() {
             data={employeeLetterData}
             employeeAddressData={employeeAddressData}
             companyData={companyData}
-            salaryData={employeeSalaryData}
           />
         );
 

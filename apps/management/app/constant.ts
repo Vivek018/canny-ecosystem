@@ -277,8 +277,10 @@ export const cacheKeyPrefix = {
   leaves: "leaves",
   holidays: "holidays",
   paySequence: "pay-sequence",
-  company_document:"company-document"
+  company_document:"company-document",
+  attendanceReport:"attendance-report"
 };
+
 export const SALARY_SLIP_TITLE = "Salary Slip Form IV B [Rule 26(2)(b)]";
 
 export function numberToWordsIndian(num: number) {

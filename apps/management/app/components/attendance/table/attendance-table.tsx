@@ -58,7 +58,6 @@ export function AttendanceTable({
   companyId,
   initialColumnVisibility,
 }: DataTableProps) {
-
   const { rowSelection, setSelectedRows, setRowSelection, setColumns } =
     useAttendanceStore();
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
@@ -124,7 +123,7 @@ export function AttendanceTable({
 
   const loadMoreEmployees = async () => {
     const formattedFrom = from;
-    const to = formattedFrom + pageSize - 1;
+    const to = formattedFrom + pageSize;
     const sortParam = searchParams.get("sort");
 
     try {
@@ -148,9 +147,9 @@ export function AttendanceTable({
           (prevData) =>
             [...prevData, ...transformedData] as TransformedAttendanceDataType[]
         );
-        setFrom(to + 1);
+        setFrom(to);
 
-        setHasNextPage(count > to + 1);
+        setHasNextPage(count > to);
       } else {
         setHasNextPage(false);
       }
@@ -159,22 +158,6 @@ export function AttendanceTable({
       setHasNextPage(false);
     }
   };
-
-  useEffect(() => {
-    setData(initialData);
-    setFrom(pageSize);
-    setHasNextPage(initialHasNextPage);
-  }, [initialData, initialHasNextPage, pageSize]);
-
-  useEffect(() => {
-    setColumns(table.getAllLeafColumns());
-  }, [columnVisibility]);
-
-  useEffect(() => {
-    if (inView) {
-      loadMoreEmployees();
-    }
-  }, [inView]);
 
   const table = useReactTable({
     data,
@@ -187,6 +170,22 @@ export function AttendanceTable({
       columnVisibility,
     },
   });
+
+  useEffect(() => {
+    setData(initialData);
+    setFrom(pageSize);
+    setHasNextPage(initialHasNextPage);
+  }, [initialData, initialHasNextPage, pageSize]);
+
+  useEffect(() => {
+    setColumns(table.getAllLeafColumns());
+  }, [columnVisibility, days]);
+
+  useEffect(() => {
+    if (inView) {
+      loadMoreEmployees();
+    }
+  }, [inView]);
 
   const selectedRowsData = table
     .getSelectedRowModel()
@@ -294,8 +293,6 @@ export function AttendanceTable({
         className={cn(!table.getSelectedRowModel().rows.length && "hidden")}
         rows={table.getSelectedRowModel().rows.length}
         data={selectedRowsData}
-        fMonth={filters?.month}
-        fYear={filters?.year}
         columnVisibility={columnVisibility}
       />
     </div>

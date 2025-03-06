@@ -2,6 +2,7 @@
 
 export type IconName =
   | "calendar"
+  | "card"
   | "caret-sort"
   | "chart"
   | "check-circle"
@@ -14,6 +15,7 @@ export type IconName =
   | "column"
   | "cross"
   | "dashboard"
+  | "dollar"
   | "dot-filled"
   | "dots-horizontal"
   | "dots-vertical"
@@ -26,6 +28,8 @@ export type IconName =
   | "input"
   | "lab-timer"
   | "laptop"
+  | "logo-dark"
+  | "logo-light"
   | "magnifying-glass"
   | "mixer"
   | "moon"
@@ -37,6 +41,8 @@ export type IconName =
   | "search"
   | "select-drop"
   | "setting"
+  | "stat"
+  | "subscriptions"
   | "sun"
   | "table"
   | "trash"

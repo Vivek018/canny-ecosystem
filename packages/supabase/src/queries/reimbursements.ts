@@ -9,6 +9,7 @@ import type {
   TypedSupabaseClient,
   UserDatabaseRow,
 } from "../types";
+import { RECENT_QUERY_LIMIT } from "../constant";
 
 export type ImportReimbursementDataType = Pick<
   ReimbursementRow,
@@ -21,7 +22,6 @@ export type ReimbursementDataType = Pick<
   ReimbursementRow,
   | "id"
   | "employee_id"
-  | "company_id"
   | "is_deductible"
   | "status"
   | "amount"
@@ -30,7 +30,7 @@ export type ReimbursementDataType = Pick<
 > & {
   employees: Pick<
     EmployeeDatabaseRow,
-    "id" | "first_name" | "middle_name" | "last_name" | "employee_code"
+    "first_name" | "middle_name" | "last_name" | "employee_code" | "company_id"
   > & {
     employee_project_assignment: Pick<
       EmployeeProjectAssignmentDatabaseRow,
@@ -79,26 +79,24 @@ export async function getReimbursementsByCompanyId({
 
   const columns = [
     "id",
-    "company_id",
     "is_deductible",
     "status",
     "amount",
     "submitted_date",
+    "employee_id",
   ] as const;
 
   const query = supabase
     .from("reimbursements")
     .select(
       `${columns.join(",")},
-          employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${
-            project ? "inner" : "left"
-          }(project_sites!${project ? "inner" : "left"}(id, name, projects!${
-        project ? "inner" : "left"
+          employees!inner(first_name, middle_name, last_name, employee_code, company_id, employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
+      }(project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
       }(id, name)))),
           users!${users ? "inner" : "left"}(id,email)`,
-      { count: "exact" }
+      { count: "exact" },
     )
-    .eq("company_id", companyId);
+    .eq("employees.company_id", companyId);
 
   if (sort) {
     const [column, direction] = sort;
@@ -115,7 +113,7 @@ export async function getReimbursementsByCompanyId({
           `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*,employee_code.ilike.*${searchQueryElement}*`,
           {
             referencedTable: "employees",
-          }
+          },
         );
       }
     } else {
@@ -123,7 +121,7 @@ export async function getReimbursementsByCompanyId({
         `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`,
         {
           referencedTable: "employees",
-        }
+        },
       );
     }
   }
@@ -151,13 +149,13 @@ export async function getReimbursementsByCompanyId({
   if (project) {
     query.eq(
       "employees.employee_project_assignment.project_sites.projects.name",
-      project
+      project,
     );
   }
   if (project_site) {
     query.eq(
       "employees.employee_project_assignment.project_sites.name",
-      project_site
+      project_site,
     );
   }
   if (users) {
@@ -169,7 +167,7 @@ export async function getReimbursementsByCompanyId({
     console.error("getReimbursementsByCompanyId Error", error);
   }
 
-  return { data, meta: { count: count ?? data?.length }, error };
+  return { data, meta: { count }, error };
 }
 
 export async function getReimbursementsById({
@@ -182,7 +180,6 @@ export async function getReimbursementsById({
   const columns = [
     "id",
     "employee_id",
-    "company_id",
     "is_deductible",
     "status",
     "amount",
@@ -241,7 +238,7 @@ export async function getReimbursementsByEmployeeId({
 
   const columns = [
     "id",
-    "company_id",
+    "employee_id",
     "is_deductible",
     "status",
     "amount",
@@ -255,7 +252,7 @@ export async function getReimbursementsByEmployeeId({
         ${columns.join(",")},
           employees!inner(id, first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!left(project_sites!left(id, name, projects!left(id, name)))),
           users!${users ? "inner" : "left"}(id,email)`,
-      { count: "exact" }
+      { count: "exact" },
     )
     .eq("employee_id", employeeId);
 
@@ -293,5 +290,52 @@ export async function getReimbursementsByEmployeeId({
     console.error("getReimbursementsByEmployeeId Error", error);
   }
 
-  return { data, meta: { count: count ?? data?.length }, error };
+  return { data, meta: { count: count }, error };
+}
+
+export type RecentReimbursementType = Pick<
+  ReimbursementRow,
+  "id" | "amount" | "status" | "submitted_date"
+> & {
+  employees: Pick<
+    EmployeeDatabaseRow,
+    "id" | "first_name" | "middle_name" | "last_name" | "employee_code"
+  > & {};
+};
+export async function getRecentReimbursementsByCompanyId({
+  supabase,
+  companyId,
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+}) {
+  const columns = [
+    "id",
+    "employee_id",
+    "is_deductible",
+    "status",
+    "amount",
+    "submitted_date",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("reimbursements")
+    .select(
+      `${columns.join(",")},
+        employees!inner(id, first_name, middle_name, last_name, employee_code, company_id)`,
+      { count: "exact" },
+    )
+    .order("created_at", { ascending: false })
+    .limit(RECENT_QUERY_LIMIT)
+    .eq("employees.company_id", companyId)
+    .returns<RecentReimbursementType[]>();
+
+  if (error) {
+    console.error("getRecentReimbursementsByCompanyId Error", error);
+  }
+
+  return {
+    data,
+    error,
+  };
 }

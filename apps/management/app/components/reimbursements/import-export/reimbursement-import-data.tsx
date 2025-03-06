@@ -26,10 +26,8 @@ import { cacheKeyPrefix } from "@/constant";
 
 export function ReimbursementImportData({
   env,
-  companyId,
 }: {
   env: SupabaseEnv;
-  companyId: string;
 }) {
   const navigate = useNavigate();
   const { supabase } = useSupabase({ env });
@@ -97,7 +95,6 @@ export function ReimbursementImportData({
           ...rest,
           ...(employeeId ? { employee_id: employeeId } : {}),
           ...(userId ? { user_id: userId } : {}),
-          company_id: companyId,
         };
       });
 

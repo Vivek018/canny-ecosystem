@@ -19,6 +19,7 @@ import type {
 import {
   HARD_QUERY_LIMIT,
   MID_QUERY_LIMIT,
+  RECENT_QUERY_LIMIT,
   SINGLE_QUERY_LIMIT,
 } from "../constant";
 
@@ -79,25 +80,6 @@ export type EmployeeDataType = Pick<
     };
   };
 };
-
-export async function getEmployeesCountByCompanyId({
-  supabase,
-  companyId,
-}: {
-  supabase: TypedSupabaseClient;
-  companyId: string;
-}) {
-  const { count, error } = await supabase
-    .from("employees")
-    .select("", { count: "exact", head: true })
-    .eq("company_id", companyId);
-
-  if (error) {
-    console.error("getEmployeesCountByCompanyId Error", error);
-  }
-
-  return { count, error };
-}
 
 export async function getEmployeesByCompanyId({
   supabase,
@@ -1150,3 +1132,69 @@ export type ImportEmployeeAttendanceDataType = Pick<
 > & {
   employee_code: EmployeeDatabaseRow["employee_code"];
 };
+
+export async function getRecentEmployeesByCompanyId({
+  supabase,
+  companyId,
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+}) {
+  const columns = [
+    "id",
+    "employee_code",
+    "first_name",
+    "middle_name",
+    "last_name",
+    "date_of_birth",
+    "primary_mobile_number",
+    "secondary_mobile_number",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("employees")
+    .select(columns.join(","), { count: "exact" })
+    .order("created_at", { ascending: false })
+    .limit(RECENT_QUERY_LIMIT)
+    .eq("is_active", true)
+    .eq("company_id", companyId)
+    .returns<InferredType<EmployeeDatabaseRow, (typeof columns)[number]>[]>();
+
+  if (error) {
+    console.error("getRecentEmployeesByCompanyId Error", error);
+  }
+
+  return {
+    data,
+    error,
+  };
+}
+
+export async function getSiteIdByEmployeeId({
+  supabase,
+  employeeId,
+}: {
+  supabase: TypedSupabaseClient;
+  employeeId: string;
+}) {
+  const columns = [
+    "id",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("employees")
+    .select(`${columns.join(",")}, employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(project_sites!inner(id))`, { count: "exact" })
+    .order("created_at", { ascending: false })
+    .eq("id", employeeId)
+    .single<Pick<EmployeeDatabaseRow, "id">
+      & { employee_project_assignment: { project_sites: Pick<SiteDatabaseRow, "id"> } }>();
+
+  if (error) {
+    console.error("getSiteIdByEmployeeId Error", error);
+  }
+
+  return {
+    data,
+    error,
+  };
+}

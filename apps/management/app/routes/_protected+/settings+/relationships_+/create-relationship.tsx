@@ -211,16 +211,15 @@ export default function CreateRelationship({
         description: actionData.message,
         variant: "success",
       });
-      setResetKey(Date.now());
-      navigate("/settings/relationships", { replace: true });
     } else {
       toast({
         title: "Error",
         description:
-          actionData.error?.message || "Relationship creation failed",
+        actionData.error?.message || "Relationship creation failed",
         variant: "destructive",
       });
     }
+    navigate("/settings/relationships", { replace: true });
   }, [actionData]);
 
   return (

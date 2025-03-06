@@ -1,23 +1,48 @@
 import { useUser } from "@/utils/user";
+import type { ReimbursementDataType } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { createRole, hasPermission } from "@canny_ecosystem/utils";
+import { createRole, extractKeys, hasPermission } from "@canny_ecosystem/utils";
 import {
   attribute,
   modalSearchParamNames,
 } from "@canny_ecosystem/utils/constant";
-import { useSearchParams } from "@remix-run/react";
+import { useSearchParams, useSubmit } from "@remix-run/react";
 
-export function ImportReimbursementMenu() {
+export function ReimbursementMenu({
+  selectedRows,
+  className,
+}: { selectedRows: ReimbursementDataType[]; className?: string }) {
   const { role } = useUser();
+  const submit = useSubmit();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  const reimbursementForPayroll = extractKeys(selectedRows, [
+    "id",
+    "employee_id",
+    "amount",
+  ]);
+
+  const handleCreatePayroll = () => {
+    submit(
+      {
+        type: "reimbursement",
+        reimbursementData: reimbursementForPayroll,
+      },
+      {
+        method: "POST",
+        action: "/create-payroll",
+      },
+    );
+  };
 
   return (
     <DropdownMenu>
@@ -26,6 +51,7 @@ export function ImportReimbursementMenu() {
         className={cn(
           !hasPermission(role, `${createRole}:${attribute.reimbursements}`) &&
             "hidden",
+          className,
         )}
       >
         <Button variant="outline" size="icon" className="h-10 w-[2.5rem]">
@@ -33,6 +59,21 @@ export function ImportReimbursementMenu() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent sideOffset={10} align="end">
+        <DropdownMenuItem
+          onClick={handleCreatePayroll}
+          className={cn(
+            "space-x-2 flex items-center",
+            !hasPermission(role, `${createRole}:${attribute.payroll}`) &&
+              "hidden",
+            !selectedRows.length && "hidden",
+          )}
+        >
+          <Icon name="plus-circled" size="sm" />
+          <span>Create Payroll</span>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator
+          className={cn("flex", !selectedRows.length && "hidden")}
+        />
         <DropdownMenuItem
           onClick={() => {
             searchParams.set(

@@ -84,7 +84,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     value: userData.id,
   }));
 
-  return json({ userOptions, companyId, employeeId });
+  return json({ userOptions, employeeId });
 }
 
 export async function action({
@@ -128,7 +128,7 @@ export default function AddReimbursements({
   userOptionsFromUpdate?: any;
   reimbursementId?: string;
 }) {
-  const { userOptions, employeeId, companyId } = useLoaderData<typeof loader>();
+  const { userOptions, employeeId } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
 
@@ -175,7 +175,6 @@ export default function AddReimbursements({
     shouldRevalidate: "onInput",
     defaultValue: {
       ...initialValues,
-      company_id: initialValues.company_id ?? companyId,
       employee_id: initialValues.employee_id ?? employeeId,
     },
   });
@@ -197,9 +196,6 @@ export default function AddReimbursements({
             </CardHeader>
             <CardContent>
               <input {...getInputProps(fields.id, { type: "hidden" })} />
-              <input
-                {...getInputProps(fields.company_id, { type: "hidden" })}
-              />
               <input
                 {...getInputProps(fields.employee_id, { type: "hidden" })}
               />

@@ -184,7 +184,7 @@ export default function GratuityReport() {
         data={data ?? []}
         gratuityEligibleYears={gratuityData?.eligibility_years ?? 0}
         columns={columns()}
-        count={count ?? data?.length ?? 0}
+        count={count ?? 0}
         query={query}
         filters={filters}
         noFilters={noFilters}

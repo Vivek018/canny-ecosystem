@@ -235,7 +235,7 @@ export const PaySequenceSchema = z.object({
   name: z.string().min(3).max(20),
   overtime_multiplier: z.number().default(1.0),
   working_days: z.array(daySchema).default([1, 2, 3, 4, 5, 6]),
-  pay_day: z.number().int().min(1).max(15).default(1),
+  pay_day: z.number().int().min(1).max(28).default(1),
   company_id: z.string(),
   is_default: z.boolean().default(false),
 });
@@ -717,7 +717,6 @@ export const ReimbursementSchema = z.object({
   amount: z.number().min(1).max(100000000),
   user_id: z.string().optional(),
   is_deductible: z.boolean().optional().default(false),
-  company_id: z.string(),
   employee_id: z.string(),
 });
 

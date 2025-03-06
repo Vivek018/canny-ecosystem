@@ -22,9 +22,8 @@ import {
 import { AttendanceTable } from "@/components/attendance/table/attendance-table";
 import { attendanceColumns } from "@/components/attendance/table/columns";
 import { ImportEmployeeAttendanceModal } from "@/components/employees/import-export/import-modal-attendance";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import {
-  calculateDateRange,
   defaultMonth,
   defaultYear,
   formatDate,
@@ -138,7 +137,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
     `${cacheKeyPrefix.attendance}${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 
@@ -167,111 +166,63 @@ export default function Attendance() {
     env,
   } = useLoaderData<typeof loader>();
 
-  const [dateRange, setDateRange] = useState<{
-    startDate: string | Date | undefined;
-    endDate: string | Date | undefined;
-  } | null>(null);
   const [month, setMonth] = useState<number>(
-    filters?.month ? months[filters.month] - 1 : defaultMonth
+    filters?.month ? months[filters.month] - 1 : defaultMonth,
   );
   const [year, setYear] = useState<number>(
-    filters?.year ? Number(filters.year) : defaultYear
+    filters?.year ? Number(filters.year) : defaultYear,
   );
-
-  useEffect(() => {
-    if (filters?.range) {
-      const { startDate, endDate } = calculateDateRange(
-        filters.range,
-        filters.month
-          ? Object.keys(months).find(
-              (key) => months[key] === months[filters.month!]
-            )
-          : null,
-        filters.year
-      );
-      setDateRange({ startDate, endDate });
-    }
-  }, [filters]);
-
-  const days = useMemo(() => {
-    if (filters?.range && dateRange) {
-      const startDateObj = new Date(dateRange.startDate as string);
-      const endDateObj = new Date(dateRange.endDate as string);
-      return Array.from(
-        {
-          length:
-            (endDateObj.getTime() - startDateObj.getTime()) /
-              (1000 * 3600 * 24) +
-            1,
-        },
-        (_, i) => {
-          const currentDate = new Date(startDateObj);
-          currentDate.setDate(startDateObj.getDate() + i);
-          currentDate.setHours(12, 0, 0, 0);
-          return {
-            day: currentDate.getDate(),
-            fullDate: currentDate.toISOString().split("T")[0],
-          };
-        }
-      );
-    }
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    return Array.from({ length: daysInMonth }, (_, i) => {
-      const currentDate = new Date(year, month, i + 1);
-      currentDate.setHours(12, 0, 0, 0);
-      return {
-        day: i + 1,
-        fullDate: currentDate.toISOString().split("T")[0],
-      };
-    });
-  }, [filters, dateRange, month, year]);
 
   const transformAttendanceData = useMemo(
     () => (data: any[]) => {
       return Object.values(
-        data.reduce((acc, employee) => {
-          const empCode = employee.employee_code;
-          const employeeDetails = acc[empCode] || {
-            employee_id: employee.id,
-            employee_code: empCode,
-            employee_name: `${employee.first_name} ${employee.middle_name} ${employee.last_name}`,
-            project:
-              employee.employee_project_assignment?.project_sites?.projects
-                ?.name || null,
-            project_site:
-              employee.employee_project_assignment?.project_sites?.name || null,
-          };
+        data.reduce(
+          (acc, employee) => {
+            const empCode = employee.employee_code;
+            const employeeDetails = acc[empCode] || {
+              employee_id: employee.id,
+              employee_code: empCode,
+              employee_name: `${employee.first_name} ${employee.middle_name} ${employee.last_name}`,
+              project:
+                employee.employee_project_assignment?.project_sites?.projects
+                  ?.name || null,
+              project_site:
+                employee.employee_project_assignment?.project_sites?.name ||
+                null,
+            };
 
-          for (const record of employee?.attendance ?? []) {
-            const fullDate = formatDate(
-              new Date(record.date).toISOString().split("T")[0]
-            );
-            employeeDetails[fullDate as string] = record.present
-              ? "P"
-              : record.holiday
-              ? record.holiday_type === "weekly"
-                ? "WOF"
-                : record.holiday_type === "paid"
-                ? "L"
-                : "A"
-              : "A";
-          }
+            for (const record of employee?.attendance ?? []) {
+              const fullDate = formatDate(
+                new Date(record.date).toISOString().split("T")[0],
+              );
+              employeeDetails[fullDate as string] = record.present
+                ? "P"
+                : record.holiday
+                  ? record.holiday_type === "weekly"
+                    ? "WOF"
+                    : record.holiday_type === "paid"
+                      ? "L"
+                      : "A"
+                  : "A";
+            }
 
-          acc[empCode] = employeeDetails;
-          return acc;
-        }, {} as Record<string, any>)
+            acc[empCode] = employeeDetails;
+            return acc;
+          },
+          {} as Record<string, any>,
+        ),
       );
     },
-    [month, year, days]
+    [month, year],
   );
 
   const noFilters = Object.values(filters ?? {}).every((value) => !value);
 
   return (
-    <section className='py-4'>
-      <div className='w-full flex items-center justify-between pb-4'>
-        <div className='flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4'>
-          <Suspense fallback={<LoadingSpinner className='mt-20' />}>
+    <section className="py-4">
+      <div className="w-full flex items-center justify-between pb-4">
+        <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-4">
+          <Suspense fallback={<LoadingSpinner className="mt-20" />}>
             <Await resolve={projectPromise}>
               {(projectData) => (
                 <Await resolve={projectSitePromise}>
@@ -282,14 +233,14 @@ export default function Attendance() {
                           lastDayOfMonth={new Date(
                             year,
                             month + 1,
-                            0
+                            0,
                           ).getDate()}
                           setMonth={setMonth}
                           setYear={setYear}
                           disabled={!projectData?.data?.length && noFilters}
                           projectArray={
                             projectData?.data?.map(
-                              (project) => project!.name
+                              (project) => project!.name,
                             ) || []
                           }
                           projectSiteArray={
@@ -315,20 +266,56 @@ export default function Attendance() {
         </div>
         <AttendanceActions />
       </div>
-      <Suspense fallback={<LoadingSpinner className='w-1/3 h-1/3' />}>
+      <Suspense fallback={<LoadingSpinner className="w-1/3 h-1/3" />}>
         <Await resolve={attendancePromise}>
-          {({ data, meta, error }) => {
+          {({ data, meta, error, dateRange }) => {
             if (error) {
               clearCacheEntry(cacheKeyPrefix.attendance);
               return (
                 <ErrorBoundary
                   error={error}
-                  message='Failed to load Attendance'
+                  message="Failed to load Attendance"
                 />
               );
             }
+
+            const days = useMemo(() => {
+              if (filters?.range && dateRange) {
+                const startDateObj = new Date(dateRange.startDate as string);
+                const endDateObj = new Date(dateRange.endDate as string);
+                return Array.from(
+                  {
+                    length:
+                      (endDateObj.getTime() - startDateObj.getTime()) /
+                        (1000 * 3600 * 24) +
+                      1,
+                  },
+                  (_, i) => {
+                    const currentDate = new Date(startDateObj);
+                    currentDate.setDate(startDateObj.getDate() + i);
+                    currentDate.setHours(12, 0, 0, 0);
+                    return {
+                      day: currentDate.getDate(),
+                      fullDate: currentDate.toISOString().split("T")[0],
+                    };
+                  },
+                );
+              }
+              const daysInMonth = new Date(year, month + 1, 0).getDate();
+              return Array.from({ length: daysInMonth }, (_, i) => {
+                const currentDate = new Date(year, month, i + 1);
+
+                currentDate.setHours(12, 0, 0, 0);
+                return {
+                  day: i + 1,
+                  fullDate: currentDate.toISOString().split("T")[0],
+                };
+              });
+            }, [filters, dateRange, month, year]);
+
             const transformedData = transformAttendanceData(data);
-            const hasNextPage = meta?.count > pageSize;
+
+            const hasNextPage = Boolean(meta?.count > data?.length);
             return (
               <AttendanceTable
                 days={days}
@@ -336,7 +323,7 @@ export default function Attendance() {
                 hasNextPage={hasNextPage}
                 pageSize={pageSize}
                 query={query}
-                count={meta?.count ?? data?.length ?? 0}
+                count={meta?.count ?? 0}
                 columns={attendanceColumns(days)}
                 filters={filters ?? undefined}
                 noFilters={noFilters}
