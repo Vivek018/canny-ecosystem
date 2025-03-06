@@ -35,7 +35,7 @@ export function ReimbursementMenu({
     submit(
       {
         type: "reimbursement",
-        reimbursementData: reimbursementForPayroll,
+        reimbursementData: JSON.stringify(reimbursementForPayroll),
       },
       {
         method: "POST",
@@ -62,7 +62,7 @@ export function ReimbursementMenu({
         <DropdownMenuItem
           onClick={handleCreatePayroll}
           className={cn(
-            "space-x-2 flex items-center",
+            "space-x-2 flex items-center bg-muted/70 text-muted-foreground",
             !hasPermission(role, `${createRole}:${attribute.payroll}`) &&
               "hidden",
             !selectedRows.length && "hidden",
