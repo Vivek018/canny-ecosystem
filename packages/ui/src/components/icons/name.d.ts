@@ -28,6 +28,8 @@ export type IconName =
   | "input"
   | "lab-timer"
   | "laptop"
+  | "logo-dark"
+  | "logo-light"
   | "magnifying-glass"
   | "mixer"
   | "moon"

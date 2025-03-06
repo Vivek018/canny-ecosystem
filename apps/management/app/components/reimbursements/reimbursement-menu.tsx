@@ -10,7 +10,7 @@ import {
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { createRole, hasPermission } from "@canny_ecosystem/utils";
+import { createRole, extractKeys, hasPermission } from "@canny_ecosystem/utils";
 import {
   attribute,
   modalSearchParamNames,
@@ -25,15 +25,24 @@ export function ReimbursementMenu({
   const submit = useSubmit();
   const [searchParams, setSearchParams] = useSearchParams();
 
+  const reimbursementForPayroll = extractKeys(selectedRows, [
+    "id",
+    "employee_id",
+    "amount",
+  ]);
+
   const handleCreatePayroll = () => {
     submit(
-      {},
+      {
+        type: "reimbursement",
+        reimbursementData: reimbursementForPayroll,
+      },
       {
         method: "POST",
         action: "/create-payroll",
       },
     );
-  }
+  };
 
   return (
     <DropdownMenu>
@@ -51,7 +60,7 @@ export function ReimbursementMenu({
       </DropdownMenuTrigger>
       <DropdownMenuContent sideOffset={10} align="end">
         <DropdownMenuItem
-          onClick={() => {}}
+          onClick={handleCreatePayroll}
           className={cn(
             "space-x-2 flex items-center",
             !hasPermission(role, `${createRole}:${attribute.payroll}`) &&

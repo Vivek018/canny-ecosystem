@@ -9,7 +9,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export async function action({ request }: ActionFunctionArgs) {
   try {
     const formData = await request.formData();
+    const type = formData.get("type") as string;
 
+    if (type === "reimbursment") {
+      
+    }
     
   } catch (error) {
     console.error("Create Payroll", error);
