@@ -162,7 +162,10 @@ export default function UpdateEmployeeGuardian() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.error?.message || "Guardian update failed",
+          description:
+            actionData?.error ||
+            actionData?.error?.message ||
+            "Guardian update failed",
           variant: "destructive",
         });
       }

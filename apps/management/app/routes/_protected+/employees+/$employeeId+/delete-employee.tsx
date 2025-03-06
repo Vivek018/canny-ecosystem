@@ -77,7 +77,10 @@ export default function DeleteEmployee() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.error?.message || "Employee delete failed",
+          description:
+            actionData?.error ||
+            actionData?.error?.message ||
+            "Employee delete failed",
           variant: "destructive",
         });
       }

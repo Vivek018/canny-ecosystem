@@ -179,7 +179,10 @@ export default function UpdatePaymentTemplateComponents() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.error?.message || "Template Update Failed",
+          description:
+            actionData?.error ||
+            actionData?.error?.message ||
+            "Template Update Failed",
           variant: "destructive",
         });
       }

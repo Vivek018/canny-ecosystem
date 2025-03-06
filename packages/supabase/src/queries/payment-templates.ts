@@ -182,27 +182,6 @@ export async function getPaymentTemplateWithComponentsById({
   return { data: returnData, error, componentsError };
 }
 
-export async function getPaymentTemplateByEmployeeId({
-  supabase,
-  employeeId,
-}: { supabase: TypedSupabaseClient; employeeId: string }) {
-  const columns = ["template_id"] as const;
-
-  const { data, error } = await supabase
-    .from("payment_template_assignments")
-    .select(columns.join(","))
-    .eq("employee_id", employeeId)
-    .single<
-      InferredType<
-        PaymentTemplateAssignmentsDatabaseRow,
-        (typeof columns)[number]
-      >
-    >();
-
-  if (error) console.error("getPaymentTemplateByEmployeeId Error", error);
-
-  return { data, error };
-}
 
 export async function getPaymentTemplateBySiteId({
   supabase,

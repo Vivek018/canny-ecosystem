@@ -1,5 +1,4 @@
-import { formatUTCDate } from "@canny_ecosystem/utils";
-import { SINGLE_QUERY_LIMIT } from "../constant";
+import { HARD_QUERY_LIMIT } from "../constant";
 import type {
   PayrollDatabaseRow,
   InferredType,
@@ -8,237 +7,36 @@ import type {
   PaymentTemplateComponentDatabaseRow,
 } from "../types";
 
-export async function getPayrollWithSiteBySiteId({
-  supabase,
 
-  params,
+export async function getPendingOrSubmittedPayrollsByCompanyId({
+  supabase,
+  companyId,
 }: {
   supabase: TypedSupabaseClient;
-
-  params: {
-    filters?: {
-      start_month?: string | undefined | null;
-      end_month?: string | undefined | null;
-      start_year?: string | undefined | null;
-      end_year?: string | undefined | null;
-    };
-  };
+  companyId: string;
 }) {
-  const { filters } = params;
-
   const columns = [
     "id",
-    "commission",
-    "run_date",
-    "status",
-    "payroll_type",
     "total_employees",
+    "payroll_type",
+    "status",
+    "run_date",
     "total_net_amount",
+    "commission",
+    "company_id",
+    "created_at"
   ] as const;
 
-  const query = supabase
+  const { data, error } = await supabase
     .from("payroll")
-    .select(`${columns.join(",")}`);
-
-  // Filters
-  if (filters?.start_year || filters?.end_year) {
-    const { start_month, start_year, end_year, end_month } = filters;
-
-    let endDateLastDay = 30;
-
-    if (end_year) {
-      const year = Number.parseInt(end_year, 10);
-      const month = new Date(`${end_month} 1, ${end_year}`).getMonth();
-
-      endDateLastDay = new Date(year, month + 1, 0).getDate();
-    }
-
-    const start_date = new Date(`${start_month} 1, ${start_year}`);
-    const end_date = new Date(`${end_month} ${endDateLastDay}, ${end_year}`);
-
-    if (start_year)
-      query.gte(
-        "run_date",
-        formatUTCDate(start_date.toISOString().split("T")[0]),
-      );
-    if (end_year)
-      query.lte(
-        "run_date",
-        formatUTCDate(end_date.toISOString().split("T")[0]),
-      );
-  } else {
-    query.gte(
-      "run_date",
-      formatUTCDate(
-        new Date(new Date().setMonth(new Date().getMonth() - 1))
-          .toISOString()
-          .split("T")[0],
-      ),
-    );
-  }
-
-  const { data, error } = await query
-    .order("run_date", { ascending: false })
+    .select(columns.join(","))
+    .eq("company_id", companyId)
+    .in("status", ["pending", "submitted"])
+    .order("created_at", { ascending: false })
+    .limit(HARD_QUERY_LIMIT)
     .returns<InferredType<PayrollDatabaseRow, (typeof columns)[number]>[]>();
 
-  if (error) console.error("getPayrollWithSiteBySiteId Error", error);
-
-  return { data, error };
-}
-
-export async function getEarliestPayrollBySiteId({
-  supabase,
-}: {
-  supabase: TypedSupabaseClient;
-
-}) {
-  const columns = [
-    "id",
-    "commission",
-    "run_date",
-    "status",
-    "total_employees",
-    "total_net_amount",
-  ] as const;
-
-  const { data, error } = await supabase
-    .from("payroll")
-    .select(columns.join(","))
-    .eq("status", "pending")
-    .order("created_at", { ascending: true })
-    .single<InferredType<PayrollDatabaseRow, (typeof columns)[number]>>();
-
-  if (error) console.error("getEarliestPayrollBySiteId Error", error);
-
-  return { data, error };
-}
-
-export async function getPayrollEntriesByPayrollId({
-  supabase,
-  payrollId,
-}: {
-  supabase: TypedSupabaseClient;
-  payrollId: string;
-}) {
-  const columns = [
-    "id",
-    "employee_id",
-    "payment_template_components_id",
-    "payment_status",
-    "amount",
-  ] as const;
-
-  const { data, error } = await supabase
-    .from("payroll_entries")
-    .select(columns.join(","))
-    .eq("payroll_id", payrollId);
-
-  if (error) console.error("getPayrollEntriesByPayrollId Error", error);
-
-  return { data, error };
-}
-
-export async function getUniqueEmployeeIdsByPayrollId({
-  supabase,
-  payrollId,
-}: {
-  supabase: TypedSupabaseClient;
-  payrollId: string;
-}) {
-  const { data, error } = await supabase
-    .from("payroll_entries")
-    .select("employee_id")
-    .eq("payroll_id", payrollId)
-    .then((result) => ({
-      ...result,
-      data: result.data
-        ? [...new Set(result.data.map((item) => item.employee_id))]
-        : null,
-    }));
-
-  if (error) console.error("getUniqueEmployeeIdsByPayrollId Error", error);
-  return { data, error };
-}
-
-export async function getPendingPayrollCountBySiteId({
-  supabase,
-  siteId,
-}: {
-  supabase: TypedSupabaseClient;
-  siteId: string;
-}) {
-  const { data, error } = await supabase
-    .from("payroll")
-    .select("id", { count: "exact" })
-    .eq("site_id", siteId);
-
-  if (error) console.error("getPendingPayrollCountBySiteId Error", error);
-
-  return { data: data?.length, error };
-}
-
-export type PayrollEntriesWithTemplateComponents = Pick<
-  PayrollEntriesDatabaseRow,
-  "id" | "employee_id" | "payment_status" | "amount"
-> & {
-  payment_template_components: Pick<
-    PaymentTemplateComponentDatabaseRow,
-    "id" | "target_type" | "calculation_value"
-  >;
-};
-
-export async function getPaymentTemplateComponentIdsByPayrollIdAndEmployeeId({
-  supabase,
-  payrollId,
-  employeeId,
-}: {
-  supabase: TypedSupabaseClient;
-  payrollId: string;
-  employeeId: string;
-}) {
-  const columns = ["payment_template_components_id"] as const;
-
-  const { data, error } = await supabase
-    .from("payroll_entries")
-    .select(columns.join(","))
-    .eq("payroll_id", payrollId)
-    .eq("employee_id", employeeId)
-    .returns<PayrollEntriesDatabaseRow[]>();
-
-  if (error)
-    console.error(
-      "getPaymentTemplateComponentIdsByPayrollIdAndEmployeeId Error",
-      error,
-    );
-
-  return { data, error };
-}
-
-export async function getPayrollsBySiteId({
-  supabase,
-  site_id,
-}: {
-  supabase: TypedSupabaseClient;
-  site_id: string;
-}) {
-  const columns = [
-    "id",
-    "commission",
-    "run_date",
-    "site_id",
-    "status",
-    "total_employees",
-    "total_net_amount",
-  ] as const;
-
-  const { data, error } = await supabase
-    .from("payroll")
-    .select(columns.join(","))
-    .eq("site_id", site_id)
-    .order("created_at", { ascending: false })
-    .returns<PayrollDatabaseRow[]>();
-
-  if (error) console.error("getPayrollsBySiteId Error", error);
+  if (error) console.error("getPayrollById Error", error);
 
   return { data, error };
 }
@@ -251,12 +49,14 @@ export async function getPayrollById({
   payrollId: string;
 }) {
   const columns = [
-
+    "id",
     "total_employees",
+    "payroll_type",
     "status",
     "run_date",
     "total_net_amount",
     "commission",
+    "company_id",
   ] as const;
 
   const { data, error } = await supabase
@@ -270,64 +70,39 @@ export async function getPayrollById({
   return { data, error };
 }
 
-export async function getPayrollEntryAmountByEmployeeIdAndPayrollIdAndPaymentTemplateComponentId({
+export type PayrollEntriesWithTemplateComponents = Pick<
+  PayrollEntriesDatabaseRow,
+  "id" | "employee_id" | "payment_status" | "amount"
+> & {
+  payment_template_components: Pick<
+    PaymentTemplateComponentDatabaseRow,
+    "id" | "target_type" | "calculation_value"
+  >;
+};
+
+export async function getPayrollEntriesByPayrollId({
   supabase,
-  employeeId,
   payrollId,
-  templateComponentId,
 }: {
   supabase: TypedSupabaseClient;
-  employeeId: string;
   payrollId: string;
-  templateComponentId: string;
 }) {
-  const columns = ["amount"] as const;
+  const columns = [
+    "id",
+    "employee_id",
+    "payment_template_components_id",
+    "reimbursement_id",
+    "exit_id",
+    "payment_status",
+    "amount",
+  ] as const;
 
   const { data, error } = await supabase
     .from("payroll_entries")
     .select(columns.join(","))
-    .eq("employee_id", employeeId)
-    .eq("payroll_id", payrollId)
-    .eq("payment_template_components_id", templateComponentId)
-    .order("created_at", { ascending: false })
-    .limit(SINGLE_QUERY_LIMIT)
-    .single<
-      InferredType<PayrollEntriesDatabaseRow, (typeof columns)[number]>
-    >();
+    .eq("payroll_id", payrollId);
 
-  if (error)
-    console.error(
-      "getPayrollEntryAmountByEmployeeIdAndPayrollIdAndPaymentTemplateComponentId Error",
-      error,
-    );
-
-  return { data, error };
-}
-
-export async function getPaymentTemplateComponentIdsAndAmountByPayrollIdAndEmployeeId({
-  supabase,
-  employeeId,
-  payrollId,
-}: {
-  supabase: TypedSupabaseClient;
-  employeeId: string;
-  payrollId: string;
-}) {
-  const columns = ["payment_template_components_id", "amount"] as const;
-
-  const { data, error } = await supabase
-    .from("payroll_entries")
-    .select(columns.join(","))
-    .eq("employee_id", employeeId)
-    .eq("payroll_id", payrollId)
-    .order("created_at", { ascending: false })
-    .returns<PayrollEntriesDatabaseRow[]>();
-
-  if (error)
-    console.error(
-      "getPaymentTemplateComponentIdsAndAmountByPayrollIdAndEmployeeId Error",
-      error,
-    );
+  if (error) console.error("getPayrollEntriesByPayrollId Error", error);
 
   return { data, error };
 }

@@ -13,7 +13,14 @@ import {
   isGoodStatus,
   updateRole,
 } from "@canny_ecosystem/utils";
-import { getDefaultTemplateIdByCompanyId, getEmployeeLetterById, getPaymentTemplateBySiteId, getPaymentTemplateComponentsByTemplateId, getSiteIdByEmployeeId, getTemplateIdByEmployeeId } from "@canny_ecosystem/supabase/queries";
+import {
+  getDefaultTemplateIdByCompanyId,
+  getEmployeeLetterById,
+  getPaymentTemplateBySiteId,
+  getPaymentTemplateComponentsByTemplateId,
+  getSiteIdByEmployeeId,
+  getTemplateIdByEmployeeId,
+} from "@canny_ecosystem/supabase/queries";
 import { updateEmployeeLetter } from "@canny_ecosystem/supabase/mutations";
 import { useEffect } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
@@ -54,11 +61,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     if (employeeLetterError) throw employeeLetterError;
 
-    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase,)
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
     let templateId = null;
 
-    const { data: employeeData } = await getSiteIdByEmployeeId({ supabase, employeeId: employeeId ?? "" });
+    const { data: employeeData } = await getSiteIdByEmployeeId({
+      supabase,
+      employeeId: employeeId ?? "",
+    });
 
     let templateComponentData = null;
     let employeeSalaryData = null;
@@ -108,12 +118,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
           acc[category] = {};
         }
 
-        if (
-          curr.target_type === "payment_field" &&
-          curr.payment_fields.name
-        ) {
-          const fieldName =
-            curr.payment_fields.name + "".replaceAll(" ", "_");
+        if (curr.target_type === "payment_field" && curr.payment_fields.name) {
+          const fieldName = curr.payment_fields.name + "".replaceAll(" ", "_");
           acc[category][fieldName] = curr.calculation_value ?? 0;
         } else {
           acc[category][curr.target_type] = curr.calculation_value ?? 0;
@@ -205,8 +211,7 @@ export default function UpdateEmployeeLetter() {
     if (error)
       toast({
         title: "Error",
-        description:
-          (error as Error)?.message || "Employee Letter load failed",
+        description: (error as Error)?.message || "Employee Letter load failed",
         variant: "destructive",
       });
     if (!actionData) return;
@@ -223,7 +228,9 @@ export default function UpdateEmployeeLetter() {
     } else {
       toast({
         title: "Error",
-        description: actionData?.error?.message ?? "Employee Letter update failed",
+        description:
+          (actionData?.error || actionData?.error?.message) ??
+          "Employee Letter update failed",
         variant: "destructive",
       });
     }

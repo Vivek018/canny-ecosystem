@@ -31,11 +31,20 @@ export function ReimbursementMenu({
     "amount",
   ]);
 
+  const totalEmployees = reimbursementForPayroll?.length;
+  const totalNetAmount = reimbursementForPayroll?.reduce(
+    (sum, item) => sum + item?.amount,
+    0,
+  );
+
   const handleCreatePayroll = () => {
     submit(
       {
         type: "reimbursement",
-        reimbursementData: reimbursementForPayroll,
+        reimbursementData: JSON.stringify(reimbursementForPayroll),
+        totalEmployees,
+        totalNetAmount,
+        failedRedirect: "/approvals/reimbursements",
       },
       {
         method: "POST",

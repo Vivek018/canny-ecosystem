@@ -84,7 +84,10 @@ export default function DeleteEmployeeGuardian() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.error?.message || "Guardian delete failed",
+          description:
+            actionData?.error ||
+            actionData?.error?.message ||
+            "Guardian delete failed",
           variant: "destructive",
         });
       }

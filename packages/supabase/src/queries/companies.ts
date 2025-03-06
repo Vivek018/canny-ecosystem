@@ -293,30 +293,6 @@ export async function getRelationshipById({
   return { data, error };
 }
 
-export async function getRelationshipIdByParentIdAndChildId({
-  supabase,
-  parentCompanyId,
-  childCompanyId,
-}: {
-  supabase: TypedSupabaseClient;
-  parentCompanyId: string;
-  childCompanyId: string;
-}) {
-  const columns = ["id"] as const;
-
-  const { data, error } = await supabase
-    .from("company_relationships")
-    .select(columns.join(","))
-    .eq("parent_company_id", parentCompanyId)
-    .eq("child_company_id", childCompanyId)
-    .single<Omit<RelationshipWithCompany, "created_at" | "updated_at">>();
-
-  if (error)
-    console.error("getRelationshipIdByParentIdAndChildId Error", error);
-
-  return { data, error };
-}
-
 export async function getRelationshipTermsById({
   supabase,
   id,

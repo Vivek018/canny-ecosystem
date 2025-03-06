@@ -246,6 +246,7 @@ export const cacheKeyPrefix = {
   employee_reimbursements: "employee-reimbursements",
   employee_letters: "employee-letters",
   employee_payments: "employee_payments",
+  run_payroll: "run_payroll",
   reimbursements: "reimbursements",
   payment_fields: "payment-fields",
   payment_field_report: "payment-field-report",
@@ -276,7 +277,7 @@ export const cacheKeyPrefix = {
   leaves: "leaves",
   holidays: "holidays",
   paySequence: "pay-sequence",
-  attendanceReport:"attendance-report"
+  attendanceReport: "attendance-report"
 };
 
 export const SALARY_SLIP_TITLE = "Salary Slip Form IV B [Rule 26(2)(b)]";
@@ -334,9 +335,8 @@ export function numberToWordsIndian(num: number) {
       return (
         tens[Math.floor(n / 10)] + (n % 10 ? ` ${belowTwenty[n % 10]}` : "")
       );
-    return `${belowTwenty[Math.floor(n / 100)]} hundred${
-      n % 100 ? ` ${convertBelowThousand(n % 100)}` : ""
-    }`;
+    return `${belowTwenty[Math.floor(n / 100)]} hundred${n % 100 ? ` ${convertBelowThousand(n % 100)}` : ""
+      }`;
   }
 
   function convertIntegerToWordsIndian(n: number) {

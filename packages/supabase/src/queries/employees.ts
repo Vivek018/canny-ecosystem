@@ -211,7 +211,7 @@ export async function getEmployeesByCompanyId({
 
   return {
     data,
-    meta: { count: count ?? data?.length },
+    meta: { count: count },
     error,
   };
 }
@@ -300,32 +300,6 @@ export async function getEmployeeIdsByEmployeeCodes({
   if (error) {
     console.error("getEmployeeIdsByEmployeeCodes Error", error);
   }
-
-  return { data, error };
-}
-
-export async function getEmployeeIdsByProjectSiteId({
-  supabase,
-  projectSiteId,
-}: {
-  supabase: TypedSupabaseClient;
-  projectSiteId: string;
-}) {
-  const columns = ["employee_id"] as const;
-
-  const { data, error } = await supabase
-    .from("employee_project_assignment")
-    .select(`${columns.join(",")}`)
-    .eq("project_site_id", projectSiteId)
-    .limit(MID_QUERY_LIMIT)
-    .returns<
-      InferredType<
-        EmployeeProjectAssignmentDatabaseRow,
-        (typeof columns)[number]
-      >[]
-    >();
-
-  if (error) console.error("getEmployeeIdsByProjectSiteId Error", error);
 
   return { data, error };
 }
@@ -986,7 +960,7 @@ export async function getEmployeesReportByCompanyId({
 
   return {
     data,
-    meta: { count: count ?? data?.length },
+    meta: { count: count  },
     error: null,
   };
 }

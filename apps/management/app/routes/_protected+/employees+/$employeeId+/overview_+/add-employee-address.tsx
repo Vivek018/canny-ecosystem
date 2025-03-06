@@ -126,7 +126,10 @@ export default function AddEmployeeAddress() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.error?.message || "Address add failed",
+          description:
+            actionData?.error ||
+            actionData?.error?.message ||
+            "Address add failed",
           variant: "destructive",
         });
       }

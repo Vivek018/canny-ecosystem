@@ -101,7 +101,10 @@ export default function UpdateCompleted() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.error?.message || "Project update failed",
+          description:
+            actionData?.error ||
+            actionData?.error?.message ||
+            "Project update failed",
           variant: "destructive",
         });
       }

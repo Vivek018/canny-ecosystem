@@ -107,7 +107,10 @@ export default function DeleteCompany() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.error?.message || "Company delete failed",
+          description:
+            actionData?.error ||
+            actionData?.error?.message ||
+            "Company delete failed",
           variant: "destructive",
         });
       }

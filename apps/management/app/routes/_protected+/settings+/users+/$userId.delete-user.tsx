@@ -124,7 +124,10 @@ export default function DeleteUser() {
     } else {
       toast({
         title: "Error",
-        description: actionData?.error?.message || "User deletion failed",
+        description:
+          actionData?.error ||
+          actionData?.error?.message ||
+          "User deletion failed",
         variant: "destructive",
       });
     }

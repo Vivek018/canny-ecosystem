@@ -81,7 +81,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 
@@ -135,7 +135,10 @@ export default function UpdateLeaves() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.error?.message || "Leave update failed",
+          description:
+            actionData?.error ||
+            actionData?.error?.message ||
+            "Leave update failed",
           variant: "destructive",
         });
       }

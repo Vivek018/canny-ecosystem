@@ -160,7 +160,7 @@ export default function CreateGratuity({
     } else {
       toast({
         title: "Error",
-        description: actionData?.error?.message,
+        description: actionData?.error || actionData?.error?.message,
         variant: "destructive",
       });
     }

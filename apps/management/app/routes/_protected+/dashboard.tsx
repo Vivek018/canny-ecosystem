@@ -14,7 +14,6 @@ import { cacheKeyPrefix } from "@/constant";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
-  getPayrollWithSiteBySiteId,
   getRecentEmployeesByCompanyId,
   getRecentExitsByCompanyId,
   getRecentReimbursementsByCompanyId,
@@ -71,15 +70,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     if (sitesError) throw sitesError;
 
-    const { data: payrollData, error: payrollError } =
-      await getPayrollWithSiteBySiteId({
-        supabase,
-        params: {
-          filters,
-        },
-      });
+    
 
-    if (payrollError) throw payrollError;
 
     const recentEmployeesPromise = getRecentEmployeesByCompanyId({
       supabase,
@@ -96,7 +88,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
 
     return defer({
-      payrollData,
+      payrollData: null,
       sitesCount,
       recentEmployeesPromise,
       recentReimbursementsPromise,
