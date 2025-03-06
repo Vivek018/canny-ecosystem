@@ -64,11 +64,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   try {
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-    const {
-      data: sitesData,
-      count: sitesCount,
-      error: sitesError,
-    } = await getSitesByCompanyId({
+    const { count: sitesCount, error: sitesError } = await getSitesByCompanyId({
       supabase,
       companyId,
     });
@@ -78,7 +74,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const { data: payrollData, error: payrollError } =
       await getPayrollWithSiteBySiteId({
         supabase,
-        site_id: sitesData?.map((site) => site.id) || [],
         params: {
           filters,
         },

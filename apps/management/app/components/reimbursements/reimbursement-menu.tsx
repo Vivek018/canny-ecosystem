@@ -35,7 +35,7 @@ export function ReimbursementMenu({
     submit(
       {
         type: "reimbursement",
-        reimbursementData: reimbursementForPayroll,
+        reimbursementData: JSON.stringify(reimbursementForPayroll),
       },
       {
         method: "POST",

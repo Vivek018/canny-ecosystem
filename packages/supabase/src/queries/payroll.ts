@@ -10,11 +10,11 @@ import type {
 
 export async function getPayrollWithSiteBySiteId({
   supabase,
-  site_id,
+
   params,
 }: {
   supabase: TypedSupabaseClient;
-  site_id: string[];
+
   params: {
     filters?: {
       start_month?: string | undefined | null;
@@ -30,16 +30,15 @@ export async function getPayrollWithSiteBySiteId({
     "id",
     "commission",
     "run_date",
-    "site_id",
     "status",
+    "payroll_type",
     "total_employees",
     "total_net_amount",
   ] as const;
 
   const query = supabase
     .from("payroll")
-    .select(`${columns.join(",")}, project_sites!inner(id, name)`)
-    .in("site_id", Array.isArray(site_id) ? site_id : [site_id]);
+    .select(`${columns.join(",")}`);
 
   // Filters
   if (filters?.start_year || filters?.end_year) {
@@ -89,16 +88,14 @@ export async function getPayrollWithSiteBySiteId({
 
 export async function getEarliestPayrollBySiteId({
   supabase,
-  site_id,
 }: {
   supabase: TypedSupabaseClient;
-  site_id: string;
+
 }) {
   const columns = [
     "id",
     "commission",
     "run_date",
-    "site_id",
     "status",
     "total_employees",
     "total_net_amount",
@@ -107,7 +104,6 @@ export async function getEarliestPayrollBySiteId({
   const { data, error } = await supabase
     .from("payroll")
     .select(columns.join(","))
-    .eq("site_id", site_id)
     .eq("status", "pending")
     .order("created_at", { ascending: true })
     .single<InferredType<PayrollDatabaseRow, (typeof columns)[number]>>();
@@ -255,7 +251,7 @@ export async function getPayrollById({
   payrollId: string;
 }) {
   const columns = [
-    "site_id",
+
     "total_employees",
     "status",
     "run_date",
