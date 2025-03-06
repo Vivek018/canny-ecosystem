@@ -1,10 +1,12 @@
 import {
+  getFilePathFromUrl,
   SUPABASE_BUCKET,
   SUPABASE_STORAGE,
 } from "@canny_ecosystem/utils/constant";
 import type { TypedSupabaseClient } from "../types";
 import { updateUserById } from "../mutations";
 import { getUserByEmail } from "../queries";
+import { isGoodStatus } from "@canny_ecosystem/utils";
 
 export async function uploadAvatar({
   supabase,
@@ -21,8 +23,15 @@ export async function uploadAvatar({
     email: user?.email ?? "",
   });
 
+  // delete old logo if exists
+  const { status, error } = await deleteAvatar({ supabase });
+  if (!isGoodStatus(status)) {
+    console.log("deleteAvatar Error", error);
+    return { status, error };
+  }
+
   if (avatar instanceof File) {
-    const filePath = `${SUPABASE_STORAGE.AVATAR}/${userData?.id}`;
+    const filePath = `${SUPABASE_STORAGE.AVATAR}/${userData?.id}_${avatar.name}`;
     const buffer = await avatar.arrayBuffer();
     const fileData = new Uint8Array(buffer);
 
@@ -75,10 +84,25 @@ export async function deleteAvatar({
     supabase,
     email: user?.email ?? "",
   });
-  const filePath = `${SUPABASE_STORAGE.AVATAR}/${userData?.id}`;
+  const filePath = getFilePathFromUrl(userData?.avatar ?? "");
+
+  // deleting from bucket
   const { error } = await supabase.storage
     .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
     .remove([filePath]);
+
+  // setting avatar=NULL in user table
+  const { error: updateError } = await updateUserById({
+    supabase,
+    data: {
+      id: userData?.id,
+      avatar: null,
+    },
+  });
+  if (updateError) {
+    console.error("updateUserById Error", updateError);
+    return { status: 500, error: updateError };
+  }
 
   if (error) return { status: 500, error };
   return { status: 200, error };

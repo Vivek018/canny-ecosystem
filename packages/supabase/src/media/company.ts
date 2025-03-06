@@ -11,7 +11,10 @@ import {
   updateCompany,
 } from "../mutations";
 import { isGoodStatus } from "@canny_ecosystem/utils";
-import { getCompanyDocumentUrlByCompanyIdAndDocumentName } from "../queries";
+import {
+  getCompanyById,
+  getCompanyDocumentUrlByCompanyIdAndDocumentName,
+} from "../queries";
 
 // Company Logo
 export async function uploadCompanyLogo({
@@ -23,8 +26,15 @@ export async function uploadCompanyLogo({
   logo: File;
   companyId: string;
 }) {
+  // delete old logo if exists
+  const { status, error } = await deleteCompanyLogo({ supabase, companyId });
+  if (!isGoodStatus(status)) {
+    console.log("deleteCompanyLogo Error", error);
+    return { status, error };
+  }
+
   if (logo instanceof File) {
-    const filePath = `${SUPABASE_STORAGE.LOGOS}/${companyId}`;
+    const filePath = `${SUPABASE_STORAGE.LOGOS}/${companyId}_${logo.name}`;
     const buffer = await logo.arrayBuffer();
     const fileData = new Uint8Array(buffer);
 
@@ -71,10 +81,23 @@ export async function deleteCompanyLogo({
   supabase: TypedSupabaseClient;
   companyId: string;
 }) {
-  const filePath = `${SUPABASE_STORAGE.LOGOS}/${companyId}`;
+  const { data } = await getCompanyById({ supabase, id: companyId });
+  const filePath = getFilePathFromUrl(data?.logo ?? "");
+
+  // deleting from bucket
   const { error } = await supabase.storage
     .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
     .remove([filePath]);
+
+  // setting logo=NULL in companies table
+  const { error: updateError } = await updateCompany({
+    supabase,
+    data: { id: companyId, logo: null },
+  });
+  if (updateError) {
+    console.error("updateCompany Error", updateError);
+    return { status: 500, error: updateError };
+  }
 
   if (error) return { status: 500, error };
   return { status: 200, error };
@@ -101,6 +124,7 @@ export async function uploadCompanyDocument({
         documentName,
       });
     if (existingData) return { status: 400, error: "Document already exists" };
+
     const buffer = await file.arrayBuffer();
     const fileData = new Uint8Array(buffer);
 
@@ -162,7 +186,7 @@ export async function updateCompanyDocument({
       file,
       supabase,
     });
-    
+
     if (isGoodStatus(status)) return { status, error };
   }
 

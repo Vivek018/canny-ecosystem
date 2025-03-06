@@ -11,7 +11,10 @@ import {
   updateEmployee,
 } from "../mutations";
 import { isGoodStatus, type employeeDocuments } from "@canny_ecosystem/utils";
-import { getEmployeeDocumentUrlByEmployeeIdAndDocumentName } from "../queries";
+import {
+  getEmployeeById,
+  getEmployeeDocumentUrlByEmployeeIdAndDocumentName,
+} from "../queries";
 
 // employee profile photo
 export async function uploadEmployeeProfilePhoto({
@@ -23,16 +26,27 @@ export async function uploadEmployeeProfilePhoto({
   profilePhoto: File;
   employeeId: string;
 }) {
+  // delete old profile photo if exists
+  const { status, error } = await deleteEmployeeProfilePhoto({
+    supabase,
+    employeeId,
+  });
+  if (!isGoodStatus(status)) {
+    console.log("deleteEmployeeProfilePhoto Error", error);
+    return { status, error };
+  }
+
   if (profilePhoto instanceof File) {
-    const filePath = `${SUPABASE_STORAGE.EMPLOYEE_PROFILE_PHOTO}/${employeeId}`;
+    const filePath = `${SUPABASE_STORAGE.EMPLOYEE_PROFILE_PHOTO}/${employeeId}_${profilePhoto.name}`;
     const buffer = await profilePhoto.arrayBuffer();
     const fileData = new Uint8Array(buffer);
 
+    // Storing profile photo in bucket
     const { data, error } = await supabase.storage
       .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
       .upload(filePath, fileData, {
         contentType: profilePhoto.type,
-        cacheControl: "0",
+        cacheControl: "3600",
         upsert: false,
       });
 
@@ -67,14 +81,26 @@ export async function deleteEmployeeProfilePhoto({
   supabase: TypedSupabaseClient;
   employeeId: string;
 }) {
-  const filePath = `${SUPABASE_STORAGE.EMPLOYEE_PROFILE_PHOTO}/${employeeId}`;
+  const { data } = await getEmployeeById({ supabase, id: employeeId });
+  const filePath = getFilePathFromUrl(data?.photo ?? "");
+
+  // deleting from bucket
   const { error } = await supabase.storage
     .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
     .remove([filePath]);
 
-  if (error) {
-    console.error("deleteEmployeeProfilePhoto error", error);
+  // setting logo=NULL in employees table
+  const { error: updateError } = await updateEmployee({
+    supabase,
+    data: { id: employeeId, photo: null },
+  });
+  if (updateError) {
+    console.error("updateEmployee Error", updateError);
+    return { status: 500, error: updateError };
   }
+
+  if (error) console.error("deleteEmployeeProfilePhoto error", error);
+
   return { status: 200, error };
 }
 
@@ -99,12 +125,7 @@ export async function uploadEmployeeDocument({
         employeeId,
       });
 
-    if (
-      (documentData?.url ?? "").includes(
-        `employees/${documentName}/${employeeId}`,
-      )
-    )
-      return { status: 400, error: "File already exists" };
+    if (documentData) return { status: 400, error: "File already exists" };
 
     const buffer = await file.arrayBuffer();
     const fileData = new Uint8Array(buffer);
