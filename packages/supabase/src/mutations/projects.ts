@@ -64,8 +64,7 @@ export async function updateProject({
     .from("projects")
     .update(updateData)
     .eq("id", data.id!)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("updateProject Error:", error);
@@ -161,8 +160,7 @@ export async function updateSite({
     .from("project_sites")
     .update(data)
     .eq("id", data.id!)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("updateSite Error:", error);

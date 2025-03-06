@@ -27,8 +27,7 @@ export async function createProfessionalTax({
   const { error, status } = await supabase
     .from("professional_tax")
     .insert(data)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("createProfessionalTax Error:", error);
@@ -62,8 +61,7 @@ export async function updateProfessionalTax({
     .from("professional_tax")
     .update(updateData)
     .eq("id", data.id!)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("updateProfessionalTax Error:", error);

@@ -64,7 +64,7 @@ export async function createReimbursementPayroll({ supabase, data, companyId, by
     );
 
     if (data?.totalEmployees !== payrollEntriesEmployeeLength || data?.totalNetAmount !== payrollEntriesNetAmount) {
-      updatePayroll({
+      await updatePayroll({
         supabase, data: {
           id: payrollData?.id,
           total_employees: payrollEntriesEmployeeLength,
@@ -139,12 +139,41 @@ export async function updatePayroll({
   const { error, status } = await supabase
     .from("payroll")
     .update(updateData)
-    .eq("id", data.id!)
-    .select()
-    .single();
+    .eq("id", data.id!);
 
   if (error) {
-    console.error("updateProject Error:", error);
+    console.error("updatePayroll Error:", error);
+  }
+
+  return { status, error };
+}
+
+export async function deletePayroll({
+  supabase,
+  id,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+  bypassAuth?: boolean;
+}) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
+  const { error, status } = await supabase
+    .from("payroll")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    console.error("deletePayroll Error:", error);
   }
 
   return { status, error };

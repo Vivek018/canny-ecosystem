@@ -213,7 +213,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -276,7 +276,7 @@ export async function action({
         error,
         returnTo: DEFAULT_ROUTE,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -286,7 +286,7 @@ export async function action({
         error,
         returnTo: DEFAULT_ROUTE,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -353,7 +353,7 @@ export default function CreateCase({
         clearCacheEntry(cacheKeyPrefix.case);
         toast({
           title: "Success",
-          description: actionData.message,
+          description: actionData?.message,
           variant: "success",
         });
       }
@@ -370,28 +370,28 @@ export default function CreateCase({
     if (updateValues) {
       searchParams.set(
         "reported_by_project",
-        updateValues.reported_by_project_id ?? ""
+        updateValues.reported_by_project_id ?? "",
       );
       searchParams.set(
         "reported_by_site",
-        updateValues.reported_by_site_id ?? ""
+        updateValues.reported_by_site_id ?? "",
       );
       searchParams.set(
         "reported_on_project",
-        updateValues.reported_on_project_id ?? ""
+        updateValues.reported_on_project_id ?? "",
       );
       searchParams.set(
         "reported_on_site",
-        updateValues.reported_on_site_id ?? ""
+        updateValues.reported_on_site_id ?? "",
       );
     }
     setSearchParams(searchParams);
   }, [fields.reported_by.value, fields.reported_on.value]);
 
   return (
-    <section className='flex flex-col w-full mx-auto lg:px-10 xl:px-14 2xl:px-40 py-4'>
+    <section className="flex flex-col w-full mx-auto lg:px-10 xl:px-14 2xl:px-40 py-4">
       <FormProvider context={form.context}>
-        <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
+        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
           <Card>
             <CardHeader>
               <CardTitle>{updateValues ? "Update" : "Register"} Case</CardTitle>
@@ -404,7 +404,7 @@ export default function CreateCase({
               <input
                 {...getInputProps(fields.company_id, { type: "hidden" })}
               />
-              <div className='grid grid-cols-2 gap-4'>
+              <div className="grid grid-cols-2 gap-4">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.date, { type: "date" }),
@@ -417,9 +417,9 @@ export default function CreateCase({
                 />
                 <SearchableSelectField
                   key={resetKey + 1}
-                  className='capitalize'
+                  className="capitalize"
                   options={transformStringArrayIntoOptions(
-                    caseTypeArray as unknown as string[]
+                    caseTypeArray as unknown as string[],
                   )}
                   inputProps={{
                     ...getInputProps(fields.case_type, { type: "text" }),
@@ -451,12 +451,12 @@ export default function CreateCase({
                 labelProps={{ children: fields.description.name }}
                 errors={fields.description.errors}
               />
-              <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
+              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
                 <SearchableSelectField
                   key={resetKey}
-                  className='capitalize'
+                  className="capitalize"
                   options={transformStringArrayIntoOptions(
-                    caseLocationTypeArray as unknown as string[]
+                    caseLocationTypeArray as unknown as string[],
                   )}
                   inputProps={{
                     ...getInputProps(fields.location_type, { type: "text" }),
@@ -479,13 +479,13 @@ export default function CreateCase({
                 />
               </div>
 
-              <hr className='mb-7 mt-1' />
-              <div className='grid grid-cols-3 place-content-center justify-between gap-6'>
+              <hr className="mb-7 mt-1" />
+              <div className="grid grid-cols-3 place-content-center justify-between gap-6">
                 <SearchableSelectField
                   key={resetKey + 1}
-                  className='capitalize col-span-2'
+                  className="capitalize col-span-2"
                   options={transformStringArrayIntoOptions(
-                    reportedByArray as unknown as string[]
+                    reportedByArray as unknown as string[],
                   )}
                   inputProps={{
                     ...getInputProps(fields.reported_by, { type: "text" }),
@@ -498,7 +498,7 @@ export default function CreateCase({
                 />
                 <SearchableSelectField
                   key={resetKey + 3}
-                  className='capitalize'
+                  className="capitalize"
                   options={companyOptions ?? options?.companyOptions ?? []}
                   inputProps={{
                     ...getInputProps(fields.reported_by_company_id, {
@@ -513,7 +513,7 @@ export default function CreateCase({
                 />
                 <SearchableSelectField
                   key={resetKey + 4}
-                  className='capitalize'
+                  className="capitalize"
                   options={projectOptions ?? options?.projectOptions ?? []}
                   inputProps={{
                     ...getInputProps(fields.reported_by_project_id, {
@@ -539,7 +539,7 @@ export default function CreateCase({
                 />
                 <SearchableSelectField
                   key={resetKey + 5}
-                  className='capitalize'
+                  className="capitalize"
                   options={
                     reportedBySiteOptions ??
                     options?.reportedBySiteOptions ??
@@ -569,7 +569,7 @@ export default function CreateCase({
                 />
                 <SearchableSelectField
                   key={resetKey + 6}
-                  className='capitalize'
+                  className="capitalize"
                   options={
                     reportedByEmployeeOptions ??
                     options?.reportedByEmployeeOptions ??
@@ -587,13 +587,13 @@ export default function CreateCase({
                   errors={fields.reported_by_employee_id.errors}
                 />
               </div>
-              <hr className='mb-7 mt-1' />
-              <div className='grid grid-cols-3 place-content-center justify-between gap-6'>
+              <hr className="mb-7 mt-1" />
+              <div className="grid grid-cols-3 place-content-center justify-between gap-6">
                 <SearchableSelectField
                   key={resetKey + 7}
-                  className='capitalize col-span-2'
+                  className="capitalize col-span-2"
                   options={transformStringArrayIntoOptions(
-                    reportedOnArray as unknown as string[]
+                    reportedOnArray as unknown as string[],
                   )}
                   inputProps={{
                     ...getInputProps(fields.reported_on, { type: "text" }),
@@ -606,7 +606,7 @@ export default function CreateCase({
                 />
                 <SearchableSelectField
                   key={resetKey + 8}
-                  className='capitalize'
+                  className="capitalize"
                   options={companyOptions ?? options?.companyOptions ?? []}
                   inputProps={{
                     ...getInputProps(fields.reported_on_company_id, {
@@ -621,7 +621,7 @@ export default function CreateCase({
                 />
                 <SearchableSelectField
                   key={resetKey + 9}
-                  className='capitalize'
+                  className="capitalize"
                   options={projectOptions ?? options?.projectOptions ?? []}
                   inputProps={{
                     ...getInputProps(fields.reported_on_project_id, {
@@ -647,7 +647,7 @@ export default function CreateCase({
                 />
                 <SearchableSelectField
                   key={resetKey + 10}
-                  className='capitalize'
+                  className="capitalize"
                   options={
                     reportedOnSiteOptions ??
                     options?.reportedOnSiteOptions ??
@@ -678,7 +678,7 @@ export default function CreateCase({
 
                 <SearchableSelectField
                   key={resetKey + 11}
-                  className='capitalize'
+                  className="capitalize"
                   options={
                     reportedOnEmployeeOptions ??
                     options?.reportedOnEmployeeOptions ??
@@ -696,13 +696,13 @@ export default function CreateCase({
                   errors={fields.reported_on_employee_id.errors}
                 />
               </div>
-              <hr className='mb-7 mt-1' />
-              <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
+              <hr className="mb-7 mt-1" />
+              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
                 <SearchableSelectField
                   key={resetKey + 12}
-                  className='capitalize'
+                  className="capitalize"
                   options={transformStringArrayIntoOptions(
-                    caseStatusArray as unknown as string[]
+                    caseStatusArray as unknown as string[],
                   )}
                   inputProps={{
                     ...getInputProps(fields.status, { type: "text" }),
@@ -718,7 +718,7 @@ export default function CreateCase({
                     ...getInputProps(fields.document, { type: "file" }),
 
                     placeholder: replaceUnderscore(
-                      `Enter ${fields.document.name}`
+                      `Enter ${fields.document.name}`,
                     ),
                   }}
                   labelProps={{
@@ -733,7 +733,7 @@ export default function CreateCase({
                     type: "text",
                   }),
                   placeholder: replaceUnderscore(
-                    `Enter ${fields.court_case_reference.name}`
+                    `Enter ${fields.court_case_reference.name}`,
                   ),
                   required: false,
                 }}
@@ -742,12 +742,12 @@ export default function CreateCase({
                 }}
                 errors={fields.court_case_reference.errors}
               />
-              <div className='grid grid-cols-2 gap-4'>
+              <div className="grid grid-cols-2 gap-4">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.amount_given, { type: "number" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.amount_given.name
+                      fields.amount_given.name,
                     )}`,
                     required: false,
                   }}
@@ -762,7 +762,7 @@ export default function CreateCase({
                       type: "number",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.amount_received.name
+                      fields.amount_received.name,
                     )}`,
                     required: false,
                   }}

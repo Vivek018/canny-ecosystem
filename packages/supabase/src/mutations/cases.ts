@@ -26,9 +26,7 @@ export async function createCase({
 
   const { error, status } = await supabase
     .from("cases")
-    .insert(data)
-    .select()
-    .single();
+    .insert(data);
 
   if (error) {
     console.error("createCases error:", error);

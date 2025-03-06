@@ -228,7 +228,11 @@ export default function CreateCompany() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.message || "Failed to create company",
+          description:
+            actionData?.error ||
+            actionData?.error?.message ||
+            actionData?.message ||
+            "Failed to create company",
           variant: "destructive",
         });
       }

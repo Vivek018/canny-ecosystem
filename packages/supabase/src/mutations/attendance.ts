@@ -134,7 +134,7 @@ export async function createEmployeeAttendanceFromImportedData({
 
   const existingSet = new Set(
     existingRecords?.map((record) => `${record.employee_id}-${record.date}`) ||
-      [],
+    [],
   );
 
   if (import_type === "skip") {
@@ -156,7 +156,7 @@ export async function createEmployeeAttendanceFromImportedData({
       const { error: insertError } = await supabase
         .from("attendance")
         .insert(batch)
-        .select();
+        ;
 
       if (insertError) {
         console.error("Error inserting batch:", insertError);

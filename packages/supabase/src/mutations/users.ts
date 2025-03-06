@@ -15,8 +15,7 @@ export async function createUserById({
   const { error, status } = await supabase
     .from("users")
     .insert(data)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("createUserById Error:", error);

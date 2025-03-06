@@ -352,7 +352,11 @@ export default function CreateEmployee() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.message || "Failed to create employee",
+          description:
+            actionData?.error ||
+            actionData?.error?.message ||
+            actionData?.message ||
+            "Failed to create employee",
           variant: "destructive",
         });
       }

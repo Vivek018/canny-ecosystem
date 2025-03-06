@@ -2,7 +2,7 @@ import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
-import { deleteProject } from "@canny_ecosystem/supabase/mutations";
+import { deletePayroll } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import {
@@ -12,36 +12,36 @@ import {
 } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import type { ActionFunctionArgs } from "@remix-run/node";
-import { json, useActionData, useNavigate, useParams } from "@remix-run/react";
+import { json, useActionData, useNavigate } from "@remix-run/react";
 import { useEffect } from "react";
 
-export async function action({ request, params }: ActionFunctionArgs): Promise<Response> {
+export async function action({ request, params }: ActionFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${deleteRole}:${attribute.projects}`)) {
+  if (!hasPermission(user?.role!, `${deleteRole}:${attribute.payroll}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
-  const projectId = params.projectId;
+  const payrollId = params.payrollId;
 
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
 
-    const { status, error } = await deleteProject({
+    const { status, error } = await deletePayroll({
       supabase,
-      id: projectId ?? "",
+      id: payrollId ?? "",
     });
 
     if (isGoodStatus(status)) {
       return json({
         status: "success",
-        message: "Project deleted",
+        message: "Payroll deleted",
         error: null,
       });
     }
 
     return json(
-      { status: "error", message: "Failed to delete project", error },
+      { status: "error", message: "Failed to delete payroll", error },
       { status: 500 },
     );
   } catch (error) {
@@ -56,17 +56,15 @@ export async function action({ request, params }: ActionFunctionArgs): Promise<R
   }
 }
 
-export default function DeleteProject() {
+export default function DeletePayroll() {
   const actionData = useActionData<typeof action>();
-  const { projectId } = useParams();
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearExactCacheEntry(cacheKeyPrefix.projects);
-        clearExactCacheEntry(`${cacheKeyPrefix.project_overview}${projectId}`);
+        clearExactCacheEntry(cacheKeyPrefix.run_payroll);
         toast({
           title: "Success",
           description: actionData?.message,
@@ -75,11 +73,11 @@ export default function DeleteProject() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.error || actionData?.error?.message,
+          description: actionData?.error,
           variant: "destructive",
         });
       }
-      navigate("/projects", { replace: true });
+      navigate("/payroll/run-payroll", { replace: true });
     }
   }, [actionData]);
 

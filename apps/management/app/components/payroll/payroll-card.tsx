@@ -4,6 +4,7 @@ import { Button } from "@canny_ecosystem/ui/button";
 import { Card, CardContent } from "@canny_ecosystem/ui/card";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useNavigate } from "@remix-run/react";
+import { DeletePayroll } from "./delete-payroll";
 
 export function PayrollCard({
   data,
@@ -27,9 +28,13 @@ export function PayrollCard({
       <CardContent className="h-full flex flex-row gap-0.5 justify-center items-center p-6">
         <div className="flex items-center flex-1 gap-10 justify-start">
           <div className="text-md tracking-wide flex-col justify-center items-center text-center">
-            <h2>Created Date</h2>
-            <p className="p-2 w-auto font-bold text-md rounded-md">
-              {formatDate(data.created_at ?? "-")}
+            Type
+            <p
+              className={
+                "p-2 w-auto font-semibold text-center text-base rounded-md capitalize"
+              }
+            >
+              {data.payroll_type}
             </p>
           </div>
           <div className="text-md tracking-wide flex-col justify-center items-center text-center">
@@ -55,10 +60,22 @@ export function PayrollCard({
               ₹{data.total_net_amount}
             </p>
           </div>
+          <div className="text-md tracking-wide flex-col justify-center items-center text-center">
+            <h2>Created Date</h2>
+            <p className="p-2 w-auto font-bold text-md rounded-md">
+              {formatDate(data.created_at ?? "-")}
+            </p>
+          </div>
         </div>
-        <Button onClick={handleClick}>
-          {is_approved ? "View" : "Create"} Pay Run
-        </Button>
+        <div className="h-full flex flex-col items-center justify-between gap-3">
+          <Button onClick={handleClick} className="border-2 border-primary">
+            View {is_approved ? "Pay History" : "Pay Run"}
+          </Button>
+          <DeletePayroll
+            payrollId={data.id}
+            className={cn(is_approved && "hidden")}
+          />
+        </div>
       </CardContent>
     </Card>
   );

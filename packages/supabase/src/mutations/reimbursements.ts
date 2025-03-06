@@ -14,8 +14,7 @@ export async function createReimbursementsFromData({
   const { error, status } = await supabase
     .from("reimbursements")
     .insert(data)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("createReimbursementsFromData Error:", error);

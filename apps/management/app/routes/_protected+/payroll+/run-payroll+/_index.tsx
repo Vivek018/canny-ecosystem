@@ -19,6 +19,7 @@ import { getPendingOrSubmittedPayrollsByCompanyId } from "@canny_ecosystem/supab
 import { ErrorBoundary } from "@/components/error-boundary";
 import { clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
+import { formatDate } from "@canny_ecosystem/utils";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {
@@ -94,11 +95,11 @@ export default function ProjectsIndex() {
                               payroll.id +
                               payroll?.commission +
                               payroll?.payroll_type +
-                              payroll?.run_date +
+                              formatDate(payroll?.run_date) +
                               payroll?.status +
                               payroll?.total_employees +
                               payroll?.total_net_amount + 
-                              payroll?.created_at
+                              formatDate(payroll?.created_at)
                             }
                             className="data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0"
                           >
