@@ -1,5 +1,5 @@
-import { EmployeeDocumentsSchema, SIZE_1MB, employeeDocuments, isGoodStatus, replaceUnderscore, transformStringArrayIntoOptions } from "@canny_ecosystem/utils";
-import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
+import { CompanyDocumentsSchema, SIZE_1MB, isGoodStatus, replaceUnderscore } from "@canny_ecosystem/utils";
+import { Field } from "@canny_ecosystem/ui/forms";
 import { FormProvider, getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { Form, json, useActionData, useLoaderData, useNavigate } from "@remix-run/react";
@@ -10,33 +10,34 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { FormButtons } from "@/components/form/form-buttons";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { updateEmployeeDocument, uploadEmployeeDocument } from "@canny_ecosystem/supabase/media";
+import { updateCompanyDocument, uploadCompanyDocument } from "@canny_ecosystem/supabase/media";
 import { parseMultipartFormData } from "@remix-run/server-runtime/dist/formData";
 import { createMemoryUploadHandler } from "@remix-run/server-runtime/dist/upload/memoryUploadHandler";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@canny_ecosystem/ui/dialog";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import { getCompanyDocumentById } from "@canny_ecosystem/supabase/queries";
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
-    const employeeId = params.employeeId;
+export async function loader({ request }: LoaderFunctionArgs) {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
     const url = new URL(request.url);
-    const documentName = url.searchParams.get("documentName");
-    return { employeeId, documentName };
+    const documentId = url.searchParams.get("documentId") ?? "";
+    const { data } = await getCompanyDocumentById({ supabase, id: documentId });
+    return { companyId, documentName: data?.name };
 }
 
-export async function action({
-    request,
-    params,
-}: ActionFunctionArgs): Promise<Response> {
-    const employeeId = params.employeeId ?? "";
-    const url = new URL(request.url);
-    const documentName = url.searchParams.get("documentName");
+export async function action({ request }: ActionFunctionArgs): Promise<Response> {
     const { supabase } = getSupabaseWithHeaders({ request });
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    const url = new URL(request.url);
+    const documentId = url.searchParams.get("documentId") ?? "";
 
     try {
         const formData = await parseMultipartFormData(
             request,
             createMemoryUploadHandler({ maxPartSize: SIZE_1MB }),
         );
-        const submission = parseWithZod(formData, { schema: EmployeeDocumentsSchema });
+        const submission = parseWithZod(formData, { schema: CompanyDocumentsSchema });
 
         if (submission.status !== "success") {
             return json(
@@ -44,19 +45,21 @@ export async function action({
                 { status: submission.status === "error" ? 400 : 200 },
             );
         }
-        if (documentName) {
-            const { status, error } = await updateEmployeeDocument({
+
+        // edit document case
+        if (documentId) {
+            const { status, error } = await updateCompanyDocument({
                 supabase,
                 file: submission.value.document_file as File,
-                employeeId,
-                documentName: submission.value.document_name as (typeof employeeDocuments)[number]
+                companyId,
+                documentName: submission.value.document_name
             });
             if (isGoodStatus(status)) {
                 return json({
                     status: "success",
                     message: "Document updated successfully",
                     error: null,
-                    returnTo: `/employees/${employeeId}/documents`,
+                    returnTo: "/settings/documents",
                 });
             }
             return json(
@@ -64,16 +67,18 @@ export async function action({
                     status: "error",
                     message: "Document update failed",
                     error,
-                    returnTo: `/employees/${employeeId}/documents`,
+                    returnTo: "/settings/documents",
                 },
                 { status: 500 },
             );
         }
-        const { status, error } = await uploadEmployeeDocument({
+
+        // add document case
+        const { status, error } = await uploadCompanyDocument({
             supabase,
             file: submission.value.document_file as File,
-            employeeId,
-            documentName: submission.value.document_name as (typeof employeeDocuments)[number]
+            companyId,
+            documentName: submission.value.document_name
         });
 
         if (isGoodStatus(status)) {
@@ -81,7 +86,7 @@ export async function action({
                 status: "success",
                 message: "Document uploaded successfully",
                 error: null,
-                returnTo: `/employees/${employeeId}/documents`,
+                returnTo: "/settings/documents",
             });
         }
         return json(
@@ -89,7 +94,7 @@ export async function action({
                 status: "error",
                 message: "Document upload failed",
                 error,
-                returnTo: `/employees/${employeeId}/documents`,
+                returnTo: "/settings/documents",
             },
             { status: 500 },
         );
@@ -99,7 +104,7 @@ export async function action({
                 status: "error",
                 message: "An unexpected error occurred",
                 error,
-                returnTo: `/employees/${employeeId}/documents`,
+                returnTo: "/settings/documents",
             },
             { status: 500 },
         );
@@ -107,27 +112,27 @@ export async function action({
 }
 
 export default function AddDocument() {
-    const { employeeId, documentName } = useLoaderData<typeof loader>();
+    const { documentName } = useLoaderData<typeof loader>();
     const actionData = useActionData<typeof action>();
-    const [resetKey, setResetKey] = useState(Date.now());
+    const [_resetKey, setResetKey] = useState(Date.now());
     const { toast } = useToast();
     const navigate = useNavigate();
 
     const [form, fields] = useForm({
         id: "add-document",
-        constraint: getZodConstraint(EmployeeDocumentsSchema),
+        constraint: getZodConstraint(CompanyDocumentsSchema),
         onValidate({ formData }) {
-            return parseWithZod(formData, { schema: EmployeeDocumentsSchema });
+            return parseWithZod(formData, { schema: CompanyDocumentsSchema });
         },
         shouldValidate: "onInput",
         shouldRevalidate: "onInput",
-        defaultValue: { document_name: documentName }
+        defaultValue: { document_name: documentName },
     });
 
     useEffect(() => {
         if (actionData) {
             if (actionData?.status === "success") {
-                clearExactCacheEntry(`${cacheKeyPrefix.employee_documents}${employeeId}`);
+                clearExactCacheEntry(`${cacheKeyPrefix.company_document}`);
                 toast({
                     title: "Success",
                     description: actionData.message,
@@ -145,19 +150,19 @@ export default function AddDocument() {
     }, [actionData]);
 
     return (
-        <Dialog open={true} onOpenChange={() => navigate(`/employees/${employeeId}/documents`)}>
+        <Dialog open={true} onOpenChange={() => navigate("/settings/documents")}>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>{documentName ? "Update" : "Add"} Document</DialogTitle>
                 </DialogHeader>
                 <FormProvider context={form.context}>
                     <Form method="POST" {...getFormProps(form)} className="flex flex-col" encType="multipart/form-data">
-                        <SearchableSelectField
-                            key={resetKey}
-                            className="capitalize"
-                            options={transformStringArrayIntoOptions(employeeDocuments as unknown as string[])}
-                            inputProps={{ ...getInputProps(fields.document_name, { type: "text" }), readOnly: !!documentName }}
-                            placeholder={`Select ${replaceUnderscore(fields.document_name.name)}`}
+                        <Field
+                            inputProps={{
+                                ...getInputProps(fields.document_name, { type: "text" }),
+                                placeholder: `Enter ${replaceUnderscore(fields.document_name.name)}`,
+                                readOnly: !!documentName
+                            }}
                             labelProps={{ children: replaceUnderscore(fields.document_name.name) }}
                             errors={fields.document_name.errors}
                         />

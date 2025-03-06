@@ -124,8 +124,8 @@ export default function Documents() {
                         }}
                     </Await>
                 </Suspense>
-                <Outlet />
             </div>
+                <Outlet />
         </section >
     );
 }

@@ -154,6 +154,7 @@ export const attribute = {
   timeTracking: "time_tracking",
   holidays: "holidays",
   paySequence: "pay_sequence",
+  companyDocuments:"company_documents"
 };
 
 export const months: { [key: string]: number } = {
@@ -267,6 +268,7 @@ export const DEFAULT_LETTER_CONTENT = {
 export const SUPABASE_STORAGE = {
   LOGOS: "logos",
   EMPLOYEE_PROFILE_PHOTO: "employees/profile_photo",
+  AVATAR: "avatar",
 };
 
 export const SUPABASE_BUCKET = {

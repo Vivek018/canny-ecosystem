@@ -57,6 +57,14 @@ export type RelationshipDatabaseInsert =
 export type RelationshipDatabaseUpdate =
   Database["public"]["Tables"]["company_relationships"]["Update"];
 
+// Company Documents
+export type DocumentsDatabaseRow =
+  Database["public"]["Tables"]["company_documents"]["Row"];
+export type DocumentsDatabaseInsert =
+  Database["public"]["Tables"]["company_documents"]["Insert"];
+export type DocumentDatabaseUpdate =
+  Database["public"]["Tables"]["company_documents"]["Update"];
+
 // Projects
 export type ProjectDatabaseRow =
   Database["public"]["Tables"]["projects"]["Row"];

@@ -1,6 +1,7 @@
 import type {
   CompanyDatabaseRow,
   CompanyRegistrationDetailsRow,
+  DocumentsDatabaseRow,
   InferredType,
   LocationDatabaseRow,
   RelationshipDatabaseRow,
@@ -349,6 +350,70 @@ export async function getRelationshipTermsById({
   if (error) {
     console.error("getRelationshipTermsById Error", error);
   }
+
+  return { data, error };
+}
+
+// Company Documents
+export async function getCompanyDocumentById({
+  supabase,
+  id,
+}: { supabase: TypedSupabaseClient; id: string }) {
+  const columns = ["name"] as const;
+
+  const { data, error } = await supabase
+    .from("company_documents")
+    .select(columns.join(","))
+    .eq("id", id)
+    .single<InferredType<DocumentsDatabaseRow, (typeof columns)[number]>>();
+
+  if (error) console.error("getCompanyDocumentById Error", error);
+
+  return { data, error };
+}
+
+export async function getCompanyDocumentsByCompanyId({
+  supabase,
+  companyId,
+}: { supabase: TypedSupabaseClient; companyId: string }) {
+  const columns = ["name", "url", "id"] as const;
+
+  const { data, error } = await supabase
+    .from("company_documents")
+    .select(columns.join(","))
+    .eq("company_id", companyId)
+    .order("created_at", { ascending: false })
+    .limit(HARD_QUERY_LIMIT)
+    .returns<InferredType<DocumentsDatabaseRow, (typeof columns)[number]>[]>();
+
+  if (error) console.error("getCompanyDocumentsByCompanyId Error", error);
+
+  return { data, error };
+}
+
+export async function getCompanyDocumentUrlByCompanyIdAndDocumentName({
+  supabase,
+  companyId,
+  documentName,
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+  documentName: string;
+}) {
+  const columns = ["url"] as const;
+
+  const { data, error } = await supabase
+    .from("company_documents")
+    .select(columns.join(","))
+    .eq("company_id", companyId)
+    .eq("name", documentName)
+    .single<DocumentsDatabaseRow>();
+
+  if (error)
+    console.error(
+      "getCompanyDocumentUrlByCompanyIdAndDocumentName Error",
+      error,
+    );
 
   return { data, error };
 }

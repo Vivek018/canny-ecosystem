@@ -27,9 +27,7 @@ export function CompanyDetailsWrapper({
 
   if (!data) {
     clearExactCacheEntry(cacheKeyPrefix.general);
-    return (
-      <ErrorBoundary error={error} message="Failed to load company details" />
-    );
+    return <ErrorBoundary error={error} message="Failed to load company details" />
   }
 
   return (
