@@ -114,10 +114,7 @@ export default function Documents() {
                                         No document found.
                                     </CommandEmpty>
                                     <CommandList className='max-h-full py-2 px-0 overflow-x-visible overflow-y-visible'>
-                                        <DocumentsWrapper
-                                            data={resolvedData.data}
-                                            error={resolvedData.error}
-                                        />
+                                        <DocumentsWrapper data={resolvedData.data} error={resolvedData.error} />
                                     </CommandList>
                                 </Command>
                             );

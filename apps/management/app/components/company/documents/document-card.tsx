@@ -76,7 +76,7 @@ export default function DocumentCard({ documentData }: {
             <div className="px-4 py-3 flex justify-between items-center border-t">
                 {/* Card Title */}
                 <CardTitle
-                    className="text-sm tracking-wide hover:text-primary capitalize truncate"
+                    className="text-sm tracking-wide hover:text-primary truncate"
                     onClick={() => window.open(documentData.url, '_blank')}
                 >
                     {replaceUnderscore(documentData.name)}

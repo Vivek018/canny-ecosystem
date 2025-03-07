@@ -73,50 +73,51 @@ export default function Documents() {
   return (
     <section className='w-full px-0'>
       <div className='w-full mb-6'>
-        <Command className='overflow-visible w-full'>
-          <div className='w-full md:w-3/4 lg:w-1/2 2xl:w-1/3 py-4 flex items-center gap-4'>
-            <CommandInput
-              divClassName='border border-input rounded-md h-10 flex-1'
-              placeholder='Search Documents'
-              autoFocus={true}
-            />
-            <Link
-              to={"/settings/documents/add-document"}
-              className={cn(
-                buttonVariants({ variant: "primary-outline" }),
-                "flex items-center gap-1 whitespace-nowrap",
-                !hasPermission(
-                  role,
-                  `${createRole}:${attribute.companyDocuments}`
-                ) && "hidden"
-              )}
-            >
-              <span>Add Document</span>
-            </Link>
-          </div>
-          <CommandEmpty
-            className={cn(
-              "w-full py-40 capitalize text-lg tracking-wide text-center",
-              !isDocument && "hidden"
-            )}
-          >
-            No document found.
-          </CommandEmpty>
-          <CommandList className='max-h-full py-2 px-0 overflow-x-visible overflow-y-visible'>
-            <Suspense fallback={<LoadingSpinner />}>
-              <Await resolve={documentsPromise}>
-                {(resolvedData) => {
+        <Suspense fallback={<LoadingSpinner />}>
+          <Await resolve={documentsPromise}>
+            {(resolvedData) => {
+              if (!resolvedData || !resolvedData.data) {
+                clearExactCacheEntry(`${cacheKeyPrefix.company_document}`);
+                return <ErrorBoundary message='Failed to fetch documents' />;
+              }
+              return <Command className='overflow-visible w-full'>
+                <div className='w-full md:w-3/4 lg:w-1/2 2xl:w-1/3 py-4 flex items-center gap-4'>
+                  <CommandInput
+                    divClassName='border border-input rounded-md h-10 flex-1'
+                    placeholder='Search Documents'
+                    autoFocus={true}
+                  />
+                  <Link
+                    to={"/settings/documents/add-document"}
+                    className={cn(
+                      buttonVariants({ variant: "primary-outline" }),
+                      "flex items-center gap-1 whitespace-nowrap",
+                      !hasPermission(
+                        role,
+                        `${createRole}:${attribute.companyDocuments}`
+                      ) && "hidden"
+                    )}
+                  >
+                    <span>Add Document</span>
+                  </Link>
+                </div>
+                <CommandEmpty
+                  className={cn(
+                    "w-full py-40 capitalize text-lg tracking-wide text-center",
+                    !isDocument && "hidden"
+                  )}
+                >
+                  No document found.
+                </CommandEmpty>
+                <CommandList className='max-h-full py-2 px-0 overflow-x-visible overflow-y-visible'>
 
-                  if (!resolvedData || !resolvedData.data) {
-                    clearExactCacheEntry(`${cacheKeyPrefix.company_document}`);
-                    return <ErrorBoundary message='Failed to fetch documents' />;
-                  }
-                  return <DocumentsWrapper data={resolvedData.data} error={resolvedData.error} />
-                }}
-              </Await>
-            </Suspense>
-          </CommandList>
-        </Command>
+                  <DocumentsWrapper data={resolvedData.data} error={resolvedData.error} />
+
+                </CommandList>
+              </Command>
+            }}
+          </Await>
+        </Suspense>
       </div>
       <Outlet />
     </section >

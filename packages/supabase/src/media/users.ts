@@ -38,7 +38,7 @@ export async function uploadAvatar({
     // Storing avatar in bucket
     const { error } = await supabase.storage
       .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
-      .update(filePath, fileData, {
+      .upload(filePath, fileData, {
         contentType: avatar.type,
         cacheControl: "3600",
         upsert: true,

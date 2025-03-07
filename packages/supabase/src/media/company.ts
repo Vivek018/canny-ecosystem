@@ -41,7 +41,7 @@ export async function uploadCompanyLogo({
     // Storing company logo in bucket
     const { error } = await supabase.storage
       .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
-      .update(filePath, fileData, {
+      .upload(filePath, fileData, {
         contentType: logo.type,
         cacheControl: "3600",
         upsert: false,
