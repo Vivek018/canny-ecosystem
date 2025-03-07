@@ -64,17 +64,24 @@ export async function createReimbursementPayroll({ supabase, data, companyId, by
     );
 
     if (data?.totalEmployees !== payrollEntriesEmployeeLength || data?.totalNetAmount !== payrollEntriesNetAmount) {
-      await updatePayroll({
+      const { status, error } = await updatePayroll({
         supabase, data: {
           id: payrollData?.id,
           total_employees: payrollEntriesEmployeeLength,
           total_net_amount: payrollEntriesNetAmount,
         }
       })
+      if (isGoodStatus(status)) {
+        return {
+          status,
+          message: `Skipped ${data?.totalEmployees - (payrollEntriesEmployeeLength ?? 0)} Employees cause they already exist in other payroll`,
+          error
+        }
+      }
     }
   }
 
-  return { status: payrollStatus ?? payrollEntriesStatus, error: payrollError ?? payrollEntriesError }
+  return { status: payrollStatus ?? payrollEntriesStatus, error: payrollError ?? payrollEntriesError, message: null }
 }
 
 export async function createPayrollEntries({

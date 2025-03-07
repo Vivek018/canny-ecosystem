@@ -25,12 +25,12 @@ export async function action({ request }: ActionFunctionArgs): Promise<Response>
       const totalEmployees = Number.parseInt(formData.get("totalEmployees") as string);
       const totalNetAmount = Number.parseFloat(formData.get("totalNetAmount") as string);
 
-      const { status, error: reimbursementError } = await createReimbursementPayroll({ supabase, data: { type, reimbursementData, totalEmployees, totalNetAmount }, companyId: companyId ?? "" })
+      const { status, error: reimbursementError, message } = await createReimbursementPayroll({ supabase, data: { type, reimbursementData, totalEmployees, totalNetAmount }, companyId: companyId ?? "" })
 
       if (isGoodStatus(status)) {
         return json({
           status: "success",
-          message: "Reimbursement Payroll created successfully",
+          message: message ?? "Reimbursement Payroll Created Successfully",
           failedRedirect,
           error: null,
         });
@@ -38,7 +38,7 @@ export async function action({ request }: ActionFunctionArgs): Promise<Response>
       error = reimbursementError;
     }
     return json(
-      { status: "error", message: "Failed to create reimbursement payroll", failedRedirect, error },
+      { status: "error", message: "Failed to Create Reimbursement payroll", failedRedirect, error },
       { status: 500 },
     );
   } catch (error) {
