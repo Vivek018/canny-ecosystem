@@ -15,6 +15,9 @@
       "dependsOn": ["^build"],
       "outputs": ["build/**"]
     },
+    "build:icons": {
+      "outputs": []
+    },
     "db:generate": {
       "outputs": []
     },
