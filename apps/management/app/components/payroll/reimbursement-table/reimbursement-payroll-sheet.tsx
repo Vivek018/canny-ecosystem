@@ -1,8 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  type PayrollEmployeeData,
-  PayrollSchema,
-} from "@canny_ecosystem/utils";
+import { PayrollSchema } from "@canny_ecosystem/utils";
 import {
   FormProvider,
   getFormProps,
@@ -24,7 +21,7 @@ import { TableCell, TableRow } from "@canny_ecosystem/ui/table";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { flexRender } from "@tanstack/react-table";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { FormButtons } from "../form/form-buttons";
+import { FormButtons } from "../../form/form-buttons";
 
 type deductionAndEarning = {
   title: string;
@@ -34,7 +31,7 @@ type deductionAndEarning = {
   value: any;
 };
 
-export function PayrollSheet({
+export function ReimbursementPayrollSheet({
   row,
   rowData,
   editable,
@@ -114,9 +111,7 @@ export function PayrollSheet({
     for (const earning of earnings) newNetPay += Number(earning.value);
     for (const deduction of deductions) newNetPay -= Number(deduction.value);
     setNetPay(newNetPay);
-  }, [
-    fields.gross_pay.value,
-  ]);
+  }, [fields.gross_pay.value]);
 
   return (
     <Sheet>

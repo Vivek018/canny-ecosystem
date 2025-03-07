@@ -7,6 +7,9 @@ import { useState, useEffect } from "react";
 import { PayrollActions } from "./payroll-actions";
 import type { PayrollEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
 import type { PayrollDatabaseRow } from "@canny_ecosystem/supabase/types";
+import { useUser } from "@/utils/user";
+import { approveRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export function PayrollComponent({
   data,
@@ -17,6 +20,7 @@ export function PayrollComponent({
   payrollData: Omit<PayrollDatabaseRow, "created_at" | "updated_at">;
   editable: boolean;
 }) {
+  const { role } = useUser();
   const { payrollId } = useParams();
   const submit = useSubmit();
 
@@ -36,6 +40,20 @@ export function PayrollComponent({
     );
     setTableData(filteredData);
   }, [searchString, data]);
+
+  const submitPayroll = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    submit(
+      {
+        payrollId: payrollId ?? payrollData?.id,
+        currentStatus: payrollData?.status,
+      },
+      {
+        method: "POST",
+        action: `/payroll/run-payroll/${payrollId}`,
+      },
+    );
+  };
 
   const approvePayroll = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -73,8 +91,32 @@ export function PayrollComponent({
             </div>
             <PayrollActions payrollId={data[0].payroll_id} />
             <div className={cn(editable ? "" : "hidden")}>
-              <Button onClick={(e) => approvePayroll(e)} disabled={disable}>
+              <Button
+                onClick={(e) => submitPayroll(e)}
+                className={cn(
+                  "hidden",
+                  payrollData.status === "pending" &&
+                    hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
+                    "flex",
+                )}
+                disabled={disable}
+              >
                 Submit
+              </Button>
+              <Button
+                onClick={(e) => approvePayroll(e)}
+                className={cn(
+                  "hidden",
+                  payrollData.status === "submitted" &&
+                    hasPermission(
+                      role,
+                      `${approveRole}:${attribute.payroll}`,
+                    ) &&
+                    "flex",
+                )}
+                disabled={disable}
+              >
+                Approve
               </Button>
             </div>
           </div>
