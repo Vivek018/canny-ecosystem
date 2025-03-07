@@ -150,7 +150,7 @@ export default function AddHolidays({
   });
 
   const onChange = () => {
-    navigate(-1);
+    navigate("/time-tracking/holidays");
   };
   return (
     <Dialog open={true} onOpenChange={onChange}>
@@ -209,7 +209,6 @@ export default function AddHolidays({
             />
           </Form>
         </FormProvider>
-
         <FormButtons className="mr-[-29px] pb-0" form={form} isSingle={true} />
       </DialogContent>
     </Dialog>

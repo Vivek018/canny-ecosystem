@@ -29,10 +29,8 @@ export default function Employee() {
             { label: "Letters", path: `/employees/${employeeId}/letters` },
             { label: "Attendance", path: `/employees/${employeeId}/attendance` },
             { label: "Payments", path: `/employees/${employeeId}/payments` },
-            {
-              label: "Leaves",
-              path: `/employees/${employeeId}/leaves`,
-            },
+            { label: "Leaves", path: `/employees/${employeeId}/leaves` },
+            { label: "Documents", path: `/employees/${employeeId}/documents` },
           ]}
           pathname={pathname}
           Link={Link}

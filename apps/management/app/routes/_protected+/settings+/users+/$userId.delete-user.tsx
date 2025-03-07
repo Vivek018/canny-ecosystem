@@ -3,6 +3,7 @@ import { clearExactCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { getSessionUser } from "@canny_ecosystem/supabase/cached-queries";
+import { deleteAvatar } from "@canny_ecosystem/supabase/media";
 import { deleteUserById } from "@canny_ecosystem/supabase/mutations";
 import { getUserByEmail } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -63,6 +64,9 @@ export async function action({
         { status: 500 },
       );
     }
+
+    // deleting avatar
+    await deleteAvatar({supabase});
 
     // Handle current user deletion
     if (dbUser?.id === userId) {
