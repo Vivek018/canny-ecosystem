@@ -84,9 +84,7 @@ export async function updateUserById({
     .eq("id", data.id ?? "")
     .single();
 
-  if (error) {
-    console.error("updateUserById Error:", error);
-  }
+  if (error) console.error("updateUserById Error:", error);
 
   return { error, status };
 }

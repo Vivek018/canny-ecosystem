@@ -29,7 +29,7 @@ import { type ReactNode, Suspense, useEffect } from "react";
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
 
-  const employeeId = params.employeeId;
+  const employeeId = params.employeeId ?? "";
 
   try {
     const employeePromise = getEmployeeById({
@@ -118,21 +118,14 @@ export default function EmployeeIndex() {
         <Await resolve={employeePromise}>
           {(resolvedData) => {
             if (!resolvedData || !env) {
-              clearExactCacheEntry(
-                `${cacheKeyPrefix.employee_overview}${employeeId}`
-              );
+              clearExactCacheEntry(`${cacheKeyPrefix.employee_overview}${employeeId}`);
               return <ErrorBoundary message='Failed to load employee' />;
             }
             return (
               <>
                 <CommonWrapper
                   error={resolvedData.error}
-                  Component={
-                    <EmployeePageHeader
-                      employee={resolvedData.data!}
-                      env={env}
-                    />
-                  }
+                  Component={<EmployeePageHeader employee={resolvedData.data!} env={env} />}
                 />
                 <CommonWrapper
                   error={resolvedData.error}

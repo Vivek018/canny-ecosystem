@@ -415,3 +415,45 @@ export async function deleteRelationship({
 
   return { status, error };
 }
+
+// Company Documents
+export async function addCompanyDocument({
+  supabase,
+  companyId,
+  documentName,
+  url,
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+  documentName: string;
+  url: string;
+}) {
+  const dataToBeInserted = convertToNull({
+    company_id: companyId,
+    name: documentName,
+    url,
+  });
+  const { status, error } = await supabase
+    .from("company_documents")
+    .insert(dataToBeInserted);
+
+  return { status, error };
+}
+
+export async function deleteCompanyDocumentByCompanyId({
+  supabase,
+  companyId,
+  documentName,
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+  documentName: string;
+}) {
+  const { error, status } = await supabase
+    .from("company_documents")
+    .delete()
+    .eq("company_id", companyId)
+    .eq("name", documentName);
+
+  return { status, error };
+}

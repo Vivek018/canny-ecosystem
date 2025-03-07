@@ -1,6 +1,6 @@
 import { AssistantButton } from "./assistant/assistant-button";
 import { CompanySwitch } from "./company/company-switch";
-import type { CompaniesDatabaseRow } from "@canny_ecosystem/supabase/types";
+import type { CompanyDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 
 export function Header({
@@ -8,7 +8,7 @@ export function Header({
   companies,
 }: {
   className?: string;
-  companies: CompaniesDatabaseRow;
+  companies: Pick<CompanyDatabaseRow, "id" | "name" | "logo">[];
 }) {
   return (
     <header

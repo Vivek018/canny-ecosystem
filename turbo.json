@@ -1,8 +1,6 @@
 {
   "$schema": "https://turborepo.org/schema.json",
-  "globalDependencies": [
-    "**/.env"
-  ],
+  "globalDependencies": ["**/.env"],
   "ui": "stream",
   "tasks": {
     "build": {
@@ -13,15 +11,12 @@
         "OPENAI_KEY",
         "SESSION_SECRET"
       ],
-      "inputs": [
-        ".env"
-      ],
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "build/**"
-      ]
+      "inputs": [".env"],
+      "dependsOn": ["^build"],
+      "outputs": ["build/**"]
+    },
+    "db:generate": {
+      "outputs": []
     },
     "start": {
       "cache": false
@@ -30,9 +25,7 @@
       "outputs": []
     },
     "dev": {
-      "inputs": [
-        ".env"
-      ],
+      "inputs": [".env"],
       "persistent": true,
       "cache": false
     }
