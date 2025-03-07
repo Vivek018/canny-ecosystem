@@ -5,8 +5,10 @@ import {
 } from "@canny_ecosystem/supabase/constant";
 import {
   getAttendanceByCompanyId,
+  getCompanyNameByCompanyId,
   getDefaultPaySequenceByCompanyId,
   getPaySequenceNameByCompanyId,
+  getPrimaryLocationByCompanyId,
   getProjectNamesByCompanyId,
   getSiteNamesByProjectName,
 } from "@canny_ecosystem/supabase/queries";
@@ -40,6 +42,7 @@ import { AttendanceSearchFilter } from "@/components/attendance/attendance-searc
 import { FilterList } from "@/components/attendance/filter-list";
 import { AttendanceActions } from "@/components/attendance/attendance-actions";
 import { LoadingSpinner } from "@/components/loading-spinner";
+import type{ CompanyDatabaseRow, LocationDatabaseRow } from "@canny_ecosystem/supabase/types";
 
 const pageSize = LAZY_LOADING_LIMIT;
 
@@ -68,6 +71,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
       return safeRedirect(DEFAULT_ROUTE, { headers });
 
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    const { data: companyName } = await getCompanyNameByCompanyId({
+      supabase,
+      id: companyId,
+    });
+    const { data: companyAddress } = await getPrimaryLocationByCompanyId({
+      supabase,
+      companyId,
+    });
+
     const { data } = await getDefaultPaySequenceByCompanyId({
       supabase,
       companyId,
@@ -113,6 +125,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
       projectSitePromise,
       attendancePromise: attendancePromise as any,
       filters,
+      companyName,
+      companyAddress,
       query: filters.name,
       env,
       companyId,
@@ -128,6 +142,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
       query: "",
       filters: null,
       companyId: "",
+      companyName: null,
+      companyAddress: null,
       env,
     });
   }
@@ -163,6 +179,8 @@ export default function Attendance() {
     query,
     filters,
     companyId,
+    companyName,
+    companyAddress,
     env,
   } = useLoaderData<typeof loader>();
 
@@ -260,7 +278,10 @@ export default function Attendance() {
           </Suspense>
           <FilterList filters={filters ?? undefined} />
         </div>
-        <AttendanceActions />
+        <AttendanceActions
+          companyName={companyName as unknown as CompanyDatabaseRow}
+          companyAddress={companyAddress as unknown as LocationDatabaseRow}
+        />
       </div>
       <Suspense fallback={<LoadingSpinner className="w-1/3 h-1/3" />}>
         <Await resolve={attendancePromise}>

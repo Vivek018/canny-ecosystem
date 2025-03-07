@@ -15,17 +15,55 @@ export function ExportBar({
   className: string;
   columnVisibility: VisibilityState;
 }) {
-  const formattedData = data.map((entry: Record<string, string>) => {
-    const formattedEntry: Record<string, string> = {};
+  const allHeaders = new Set<string>();
+  const dateHeaders = new Set<string>();
 
+  for (const entry of data) {
     for (const key of Object.keys(entry)) {
       if (columnVisibility[key] !== false) {
-        formattedEntry[key] = entry[key];
+        allHeaders.add(key);
+        if (
+          ![
+            "employee_id",
+            "employee_code",
+            "employee_name",
+            "project",
+            "project_site",
+          ].includes(key)
+        ) {
+          dateHeaders.add(key);
+        }
       }
     }
-    const { employee_id, ...rest } = formattedEntry;
-    return rest;
-  });
+  }
+
+  const sortedDateHeaders = [...dateHeaders].sort(
+    (a, b) => new Date(a).getTime() - new Date(b).getTime()
+  );
+
+  const formattedData: any[] | Papa.UnparseObject<any> = [];
+
+  for (const entry of data) {
+    const {
+      employee_id,
+      employee_code,
+      employee_name,
+      project,
+      project_site,
+      ...attendance
+    } = entry;
+
+    const fixedFields = { employee_code, employee_name, project, project_site };
+
+    const formattedEntry: Record<string, string> = { ...fixedFields };
+
+    for (const date of sortedDateHeaders) {
+      formattedEntry[date] = attendance[date] || ""; 
+    }
+
+    formattedData.push(formattedEntry);
+  }
+
   function calculateMonthlyAvgPresence(data: any) {
     let totalDays = 0;
     let totalP = 0;

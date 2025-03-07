@@ -300,7 +300,7 @@ export default function LeavesIndex() {
               size="icon"
               className={cn("h-10 w-10", !selectedRows.length && "hidden")}
               disabled={!selectedRows.length}
-              onClick={() => navigate("/time-tracking/leaves/analytics")}
+              onClick={() => navigate("analytics")}
             >
               <Icon name="chart" className="h-[18px] w-[18px]" />
             </Button>
