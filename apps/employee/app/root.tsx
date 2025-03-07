@@ -53,6 +53,7 @@ export const headers: HeadersFunction = ({ loaderHeaders }) => {
 export async function loader({ request }: LoaderFunctionArgs) {
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
+    console.log("first")
 
     const { user, setCookie } = await getUserCookieOrFetchUser(
       request,
@@ -147,7 +148,7 @@ function App() {
     },
   } = useLoaderData<typeof loader>();
 
-  if (error) return <ErrorBoundary error={error} />;
+  // if (error) return <ErrorBoundary error={error} />;
 
   const nonce = useNonce();
   const { theme } = useTheme();

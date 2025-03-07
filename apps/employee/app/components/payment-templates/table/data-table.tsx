@@ -18,7 +18,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
 }
 
-export function RecentReimbursementDataTable<TData, TValue>({
+export function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
@@ -56,7 +56,9 @@ export function RecentReimbursementDataTable<TData, TValue>({
                         <TableCell
                           key={cell.id}
                           className={cn(
-                            "px-3 md:px-4 py-2 md:table-cell",
+                            "px-3 md:px-4 py-2 hidden md:table-cell",
+                            cell.column.id === "actions" &&
+                              "sticky right-0 min-w-20 max-w-20 bg-card z-10",
                           )}
                         >
                           {flexRender(
@@ -74,7 +76,7 @@ export function RecentReimbursementDataTable<TData, TValue>({
                     colSpan={columns.length}
                     className="h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize"
                   >
-                    No Reimbursement Found.
+                    No Payment Templates Found.
                   </TableCell>
                 </TableRow>
               )}
