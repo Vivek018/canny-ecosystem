@@ -318,7 +318,11 @@ export default function CreatePaymentTemplate() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.message || "Failed to create company",
+          description:
+            actionData?.error ||
+            actionData?.error?.message ||
+            actionData?.message ||
+            "Failed to create company",
           variant: "destructive",
         });
       }

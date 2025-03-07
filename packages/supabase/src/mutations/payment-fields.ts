@@ -28,8 +28,7 @@ export async function createPaymentField({
   const { error, status } = await supabase
     .from("payment_fields")
     .insert(data)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("createPaymentField Error", error);
@@ -63,8 +62,7 @@ export async function updatePaymentField({
     .from("payment_fields")
     .update(updateData)
     .eq("id", data.id!)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("updatePaymentField Error", error);

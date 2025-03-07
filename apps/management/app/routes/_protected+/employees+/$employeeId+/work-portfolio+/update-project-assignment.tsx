@@ -238,7 +238,10 @@ export default function UpdateEmployeeProjectAssignment() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.error?.message || "Employee update failed",
+          description:
+            actionData?.error ||
+            actionData?.error?.message ||
+            "Employee update failed",
           variant: "destructive",
         });
       }

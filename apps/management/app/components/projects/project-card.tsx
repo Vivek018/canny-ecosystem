@@ -9,7 +9,7 @@ import {
 import { Link } from "@remix-run/react";
 import { Card, CardContent, CardTitle } from "@canny_ecosystem/ui/card";
 import type { ProjectsWithCompany } from "@canny_ecosystem/supabase/queries";
-import { Avatar, AvatarFallback } from "@canny_ecosystem/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@canny_ecosystem/ui/avatar";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Progress } from "@canny_ecosystem/ui/progress";
 import {
@@ -61,7 +61,7 @@ export function ProjectCard({
           <div className="flex flex-col items-center gap-1">
             <TooltipProvider>
               <div className="flex items-center">
-                {companies.map((company, index) =>
+                {companies?.map((company, index) =>
                   company?.id ? (
                     <Tooltip key={company?.id} delayDuration={100}>
                       <TooltipTrigger asChild>
@@ -72,7 +72,7 @@ export function ProjectCard({
                           )}
                         >
                           {company?.logo && (
-                            <img src={company?.logo} alt={company?.name} />
+                            <AvatarImage src={company?.logo} alt={company?.name} />
                           )}
                           <AvatarFallback>
                             <span className="tracking-widest text-sm">

@@ -82,7 +82,10 @@ export default function DeleteRelationship() {
     } else {
       toast({
         title: "Error",
-        description: actionData?.error?.message || "Relationship delete failed",
+        description:
+          actionData?.error ||
+          actionData?.error?.message ||
+          "Relationship delete failed",
         variant: "destructive",
       });
     }

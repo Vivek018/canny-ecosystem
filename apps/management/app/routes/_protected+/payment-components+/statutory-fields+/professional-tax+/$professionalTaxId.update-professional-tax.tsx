@@ -119,13 +119,13 @@ export default function UpdateProfessionalTax() {
       clearExactCacheEntry(cacheKeyPrefix.professional_tax);
       toast({
         title: "Success",
-        description: actionData.message,
+        description: actionData?.message,
         variant: "success",
       });
     } else {
       toast({
         title: "Error",
-        description: actionData.message,
+        description: actionData?.message,
         variant: "destructive",
       });
     }

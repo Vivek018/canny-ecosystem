@@ -44,14 +44,6 @@ export function CreateCompanyDetails({ fields }: { fields: FieldsType }) {
         />
         <Field
           inputProps={{
-            ...getInputProps(fields.logo, { type: "file" }),
-            placeholder: `Enter ${fields.logo.name}`,
-          }}
-          labelProps={{ children: fields.logo.name }}
-          errors={fields.logo.errors}
-        />
-        <Field
-          inputProps={{
             ...getInputProps(fields.email_suffix, { type: "text" }),
             placeholder: `Enter ${replaceUnderscore(fields.email_suffix.name)}`,
           }}

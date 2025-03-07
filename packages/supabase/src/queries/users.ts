@@ -5,22 +5,6 @@ import type {
   UserDatabaseRow,
 } from "../types";
 
-export async function getUsersCount({
-  supabase,
-}: {
-  supabase: TypedSupabaseClient;
-}) {
-  const { count, error } = await supabase
-    .from("users")
-    .select("", { count: "exact", head: true });
-
-  if (error) {
-    console.error("getUsersCount Error", error);
-  }
-
-  return { count, error };
-}
-
 export async function getUsers({
   supabase,
 }: {
@@ -57,16 +41,16 @@ export async function getUserByEmail({
   supabase: TypedSupabaseClient;
   email: string;
 }) {
-  return {
-    data: {
-      id: "1",
-      email: "demo@gmail.com",
-      first_name: "Demo",
-      last_name: "User",
-      role: "master",
-    },
-    error: null,
-  };
+  // return {
+  //   data: {
+  //     id: "1",
+  //     email: "demo@gmail.com",
+  //     first_name: "Demo",
+  //     last_name: "User",
+  //     role: "master",
+  //   },
+  //   error: null,
+  // };
 
   const columns = [
     "id",
@@ -94,7 +78,7 @@ export async function getUserByEmail({
     console.error("getUserByEmail Error", error);
   }
 
-  // return { data, error };
+  return { data, error };
 }
 
 export async function getUsersByCompanyId({
@@ -162,16 +146,16 @@ export async function getUserById({
   supabase: TypedSupabaseClient;
   id: string;
 }) {
-  return {
-    data: {
-      id: "1",
-      email: "demo@gmail.com",
-      first_name: "Demo",
-      last_name: "User",
-      role: "master",
-    },
-    error: null,
-  };
+  // return {
+  //   data: {
+  //     id: "1",
+  //     email: "demo@gmail.com",
+  //     first_name: "Demo",
+  //     last_name: "User",
+  //     role: "master",
+  //   },
+  //   error: null,
+  // };
 
   const columns = [
     "id",
@@ -199,7 +183,7 @@ export async function getUserById({
     console.error("getUserById Error", error);
   }
 
-  // return { data, error };
+  return { data, error };
 }
 
 export async function getUserIdsByUserEmails({

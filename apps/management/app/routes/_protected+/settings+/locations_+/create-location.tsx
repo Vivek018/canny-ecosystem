@@ -95,7 +95,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -113,7 +113,7 @@ export async function action({
 
     return json(
       { status: "error", message: "Location creation failed", error },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -122,7 +122,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -168,7 +168,10 @@ export default function CreateLocation({
     } else {
       toast({
         title: "Error",
-        description: actionData?.error?.message || "Location creation failed",
+        description:
+          actionData?.error ||
+          actionData?.error?.message ||
+          "Location creation failed",
         variant: "destructive",
       });
     }
@@ -178,12 +181,12 @@ export default function CreateLocation({
   }, [actionData, toast, navigate]);
 
   return (
-    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
       <FormProvider context={form.context}>
-        <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
+        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
           <Card>
             <CardHeader>
-              <CardTitle className='text-3xl capitalize'>
+              <CardTitle className="text-3xl capitalize">
                 {replaceDash(LOCATION_TAG)}
               </CardTitle>
               <CardDescription>
@@ -229,7 +232,7 @@ export default function CreateLocation({
                 errors={fields.address_line_1.errors}
               />
               <Field
-                className='-mt-4'
+                className="-mt-4"
                 inputProps={{
                   ...getInputProps(fields.address_line_2, { type: "text" }),
                   placeholder: replaceUnderscore(fields.address_line_2.name),
@@ -237,7 +240,7 @@ export default function CreateLocation({
                 }}
                 errors={fields.address_line_2.errors}
               />
-              <div className='grid grid-cols-3 place-content-center justify-between gap-6'>
+              <div className="grid grid-cols-3 place-content-center justify-between gap-6">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.city, { type: "text" }),
@@ -251,7 +254,7 @@ export default function CreateLocation({
                 />
                 <SearchableSelectField
                   key={resetKey}
-                  className='capitalize'
+                  className="capitalize"
                   options={statesAndUTs}
                   inputProps={{
                     ...getInputProps(fields.state, { type: "text" }),
@@ -267,7 +270,7 @@ export default function CreateLocation({
                     ...getInputProps(fields.pincode, { type: "text" }),
                     className: "capitalize",
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.pincode.name
+                      fields.pincode.name,
                     )}`,
                   }}
                   labelProps={{
@@ -276,7 +279,7 @@ export default function CreateLocation({
                   errors={fields.pincode.errors}
                 />
               </div>
-              <div className='grid grid-cols-2 place-content-center justify-between gap-6'>
+              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.latitude, { type: "number" }),
@@ -293,7 +296,7 @@ export default function CreateLocation({
                     ...getInputProps(fields.longitude, { type: "number" }),
                     className: "capitalize",
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.longitude.name
+                      fields.longitude.name,
                     )}`,
                   }}
                   labelProps={{

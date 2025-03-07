@@ -1,9 +1,4 @@
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import {
-  getAllSitesByProjectId,
-  getPendingPayrollCountBySiteId,
-  getProjectsByCompanyId,
-} from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
   Command,
@@ -16,74 +11,61 @@ import {
 import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Await, defer, Outlet, useLoaderData } from "@remix-run/react";
-import { PayrollProjectCard } from "@/components/payroll/payroll-project-card";
+import { Await, type ClientLoaderFunctionArgs, defer, Outlet, useLoaderData } from "@remix-run/react";
 import { Suspense } from "react";
-import type { TypedSupabaseClient } from "@canny_ecosystem/supabase/types";
 import { LoadingSpinner } from "@/components/loading-spinner";
-
-async function enrichProjectData(
-  supabase: TypedSupabaseClient,
-  projectData: any,
-) {
-  return await Promise.all(
-    (projectData ?? []).map(async (project: any) => {
-      // Get sites data
-      const { data: siteData } = await getAllSitesByProjectId({
-        supabase,
-        projectId: project.id,
-      });
-
-      // Get pending payroll counts for all sites
-      const payrollCounts = await Promise.all(
-        (siteData ?? []).map(async (site) => {
-          const { data } = await getPendingPayrollCountBySiteId({
-            supabase,
-            siteId: site.id,
-          });
-          return data ?? 0;
-        }),
-      );
-
-      return {
-        ...project,
-        totalSites: siteData?.length || 0,
-        pendingPayroll: payrollCounts.reduce((sum, count) => sum + count, 0),
-      };
-    }),
-  );
-}
+import { PayrollCard } from "@/components/payroll/payroll-card";
+import { getPendingOrSubmittedPayrollsByCompanyId } from "@canny_ecosystem/supabase/queries";
+import { ErrorBoundary } from "@/components/error-boundary";
+import { clientCaching } from "@/utils/cache";
+import { cacheKeyPrefix } from "@/constant";
+import { formatDate } from "@canny_ecosystem/utils";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-
   try {
-    const { data: projectData, error: projectError } =
-      await getProjectsByCompanyId({
-        supabase,
-        companyId,
-      });
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-    if (projectError) throw projectError;
+    const payrollsPromise = getPendingOrSubmittedPayrollsByCompanyId({
+      supabase,
+      companyId: companyId ?? "",
+    });
 
-    const enrichedDataPromise = enrichProjectData(supabase, projectData ?? []);
-
-    return defer({ projectPromise: enrichedDataPromise });
+    return defer({
+      payrollsPromise,
+    });
   } catch (error) {
-    return defer({ projectPromise: null });
+    console.error("Run Payroll Error", error);
+    return defer({
+      payrollsPromise: Promise.resolve({ data: [], error: null }),
+    });
   }
 }
 
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+  return clientCaching(cacheKeyPrefix.run_payroll, args);
+}
+
+clientLoader.hydrate = true;
+
 export default function ProjectsIndex() {
-  const { projectPromise } = useLoaderData<typeof loader>();
+  const { payrollsPromise } = useLoaderData<typeof loader>();
 
   return (
     <section className="py-4 px-4">
       <div className="w-full flex items-end justify-between">
         <Suspense fallback={<LoadingSpinner className="my-20" />}>
-          <Await resolve={projectPromise}>
-            {(projects) => {
+          <Await resolve={payrollsPromise}>
+            {({ data, error }) => {
+              if (error) {
+                return (
+                  <ErrorBoundary
+                    error={error}
+                    message="Error in fetching payroll"
+                  />
+                );
+              }
+
               const { isDocument } = useIsDocument();
 
               return (
@@ -91,7 +73,7 @@ export default function ProjectsIndex() {
                   <div className="w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4">
                     <CommandInput
                       divClassName="border border-input rounded-md h-10 flex-1"
-                      placeholder="Search Projects"
+                      placeholder="Search Payroll"
                       autoFocus={true}
                     />
                   </div>
@@ -101,26 +83,27 @@ export default function ProjectsIndex() {
                       !isDocument && "hidden",
                     )}
                   >
-                    No project found
+                    No payrolls found
                   </CommandEmpty>
                   <CommandList className="max-h-full py-6 overflow-x-visible overflow-y-visible">
                     <CommandGroup className="p-0 overflow-visible">
                       <div className="w-full grid gap-8 grid-cols-1">
-                        {projects?.map((project: any) => (
+                        {data?.map((payroll) => (
                           <CommandItem
-                            key={project.id}
+                            key={payroll.id}
                             value={
-                              project?.name +
-                              project?.status +
-                              project?.project_type +
-                              project?.project_code +
-                              project?.primary_contractor?.name +
-                              project?.project_client?.name +
-                              project?.end_client?.name
+                              payroll.id +
+                              payroll?.commission +
+                              payroll?.payroll_type +
+                              formatDate(payroll?.run_date) +
+                              payroll?.status +
+                              payroll?.total_employees +
+                              payroll?.total_net_amount + 
+                              formatDate(payroll?.created_at)
                             }
                             className="data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0"
                           >
-                            <PayrollProjectCard project={project} />
+                            <PayrollCard data={payroll} />
                           </CommandItem>
                         ))}
                       </div>

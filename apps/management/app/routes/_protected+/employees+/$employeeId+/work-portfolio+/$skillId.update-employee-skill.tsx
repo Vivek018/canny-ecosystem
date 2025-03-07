@@ -126,7 +126,10 @@ export default function UpdateEmployeeSkill() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.error?.message || "Failed to update",
+          description:
+            actionData?.error ||
+            actionData?.error?.message ||
+            "Failed to update",
           variant: "destructive",
         });
       }

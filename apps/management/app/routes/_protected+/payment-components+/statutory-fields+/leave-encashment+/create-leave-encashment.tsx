@@ -167,7 +167,7 @@ export default function CreateLeaveEncashment({
     } else {
       toast({
         title: "Error",
-        description: actionData?.error?.message,
+        description: actionData?.error || actionData?.error?.message,
         variant: "destructive",
       });
     }

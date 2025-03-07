@@ -57,6 +57,14 @@ export type RelationshipDatabaseInsert =
 export type RelationshipDatabaseUpdate =
   Database["public"]["Tables"]["company_relationships"]["Update"];
 
+// Company Documents
+export type DocumentsDatabaseRow =
+  Database["public"]["Tables"]["company_documents"]["Row"];
+export type DocumentsDatabaseInsert =
+  Database["public"]["Tables"]["company_documents"]["Insert"];
+export type DocumentDatabaseUpdate =
+  Database["public"]["Tables"]["company_documents"]["Update"];
+
 // Projects
 export type ProjectDatabaseRow =
   Database["public"]["Tables"]["projects"]["Row"];
@@ -89,7 +97,7 @@ export type EmployeeDatabaseInsert =
 export type EmployeeDatabaseUpdate =
   Database["public"]["Tables"]["employees"]["Update"];
 
-// Attendance
+// Employee Attendance
 export type EmployeeAttendanceDatabaseRow =
   Database["public"]["Tables"]["attendance"]["Row"];
 export type EmployeeAttendanceDatabaseInsert =
@@ -152,6 +160,14 @@ export type EmployeeWorkHistoryDatabaseInsert =
   Database["public"]["Tables"]["employee_work_history"]["Insert"];
 export type EmployeeWorkHistoryDatabaseUpdate =
   Database["public"]["Tables"]["employee_work_history"]["Update"];
+
+// Employee Documents
+export type EmployeeDocumentsDatabaseRow =
+  Database["public"]["Tables"]["employee_documents"]["Row"];
+export type EmployeeDocumentsDatabaseInsert =
+  Database["public"]["Tables"]["employee_documents"]["Insert"];
+export type EmployeeDocumentsDatabaseUpdate =
+  Database["public"]["Tables"]["employee_documents"]["Update"];
 
 // Feedback
 export type FeedbackDatabaseRow =

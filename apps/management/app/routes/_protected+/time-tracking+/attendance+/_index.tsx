@@ -153,7 +153,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
     `${cacheKeyPrefix.attendance}${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 
@@ -185,49 +185,53 @@ export default function Attendance() {
   } = useLoaderData<typeof loader>();
 
   const [month, setMonth] = useState<number>(
-    filters?.month ? months[filters.month] - 1 : defaultMonth
+    filters?.month ? months[filters.month] - 1 : defaultMonth,
   );
   const [year, setYear] = useState<number>(
-    filters?.year ? Number(filters.year) : defaultYear
+    filters?.year ? Number(filters.year) : defaultYear,
   );
 
   const transformAttendanceData = useMemo(
     () => (data: any[]) => {
       return Object.values(
-        data.reduce((acc, employee) => {
-          const empCode = employee.employee_code;
-          const employeeDetails = acc[empCode] || {
-            employee_id: employee.id,
-            employee_code: empCode,
-            employee_name: `${employee.first_name} ${employee.middle_name} ${employee.last_name}`,
-            project:
-              employee.employee_project_assignment?.project_sites?.projects
-                ?.name || null,
-            project_site:
-              employee.employee_project_assignment?.project_sites?.name || null,
-          };
+        data.reduce(
+          (acc, employee) => {
+            const empCode = employee.employee_code;
+            const employeeDetails = acc[empCode] || {
+              employee_id: employee.id,
+              employee_code: empCode,
+              employee_name: `${employee.first_name} ${employee.middle_name} ${employee.last_name}`,
+              project:
+                employee.employee_project_assignment?.project_sites?.projects
+                  ?.name || null,
+              project_site:
+                employee.employee_project_assignment?.project_sites?.name ||
+                null,
+            };
 
-          for (const record of employee?.attendance ?? []) {
-            const fullDate = formatDate(
-              new Date(record.date).toISOString().split("T")[0]
-            );
-            employeeDetails[fullDate as string] = record.present
-              ? "P"
-              : record.holiday
-              ? record.holiday_type === "weekly"
-                ? "WOF"
-                : record.holiday_type === "paid"
-                ? "L"
-                : "A"
-              : "A";
-          }
+            for (const record of employee?.attendance ?? []) {
+              const fullDate = formatDate(
+                new Date(record.date).toISOString().split("T")[0],
+              );
+              employeeDetails[fullDate as string] = record.present
+                ? "P"
+                : record.holiday
+                  ? record.holiday_type === "weekly"
+                    ? "WOF"
+                    : record.holiday_type === "paid"
+                      ? "L"
+                      : "A"
+                  : "A";
+            }
 
-          acc[empCode] = employeeDetails;
-          return acc;
-        }, {} as Record<string, any>)
+            acc[empCode] = employeeDetails;
+            return acc;
+          },
+          {} as Record<string, any>,
+        ),
       );
     },
-    [month, year]
+    [month, year],
   );
 
   const noFilters = Object.values(filters ?? {}).every((value) => !value);
@@ -247,14 +251,14 @@ export default function Attendance() {
                           lastDayOfMonth={new Date(
                             year,
                             month + 1,
-                            0
+                            0,
                           ).getDate()}
                           setMonth={setMonth}
                           setYear={setYear}
                           disabled={!projectData?.data?.length && noFilters}
                           projectArray={
                             projectData?.data?.map(
-                              (project) => project!.name
+                              (project) => project!.name,
                             ) || []
                           }
                           projectSiteArray={
@@ -315,7 +319,7 @@ export default function Attendance() {
                       day: currentDate.getDate(),
                       fullDate: currentDate.toISOString().split("T")[0],
                     };
-                  }
+                  },
                 );
               }
               const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -331,7 +335,8 @@ export default function Attendance() {
             }, [filters, dateRange, month, year]);
 
             const transformedData = transformAttendanceData(data);
-            const hasNextPage = meta?.count > pageSize;
+
+            const hasNextPage = Boolean(meta?.count > data?.length);
             return (
               <AttendanceTable
                 days={days}
@@ -339,7 +344,7 @@ export default function Attendance() {
                 hasNextPage={hasNextPage}
                 pageSize={pageSize}
                 query={query}
-                count={meta?.count ?? data?.length ?? 0}
+                count={meta?.count ?? 0}
                 columns={attendanceColumns(days)}
                 filters={filters ?? undefined}
                 noFilters={noFilters}

@@ -19,15 +19,13 @@ import {
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import {
-  Await,
-  defer,
   Form,
   json,
   useActionData,
   useLoaderData,
   useNavigate,
 } from "@remix-run/react";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 
@@ -47,7 +45,6 @@ import { getLocationsForSelectByCompanyId } from "@canny_ecosystem/supabase/quer
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { LocationsListWrapper } from "@/components/sites/locations-list-wrapper";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
@@ -189,13 +186,13 @@ export default function CreateSite({
         clearExactCacheEntry(`${cacheKeyPrefix.sites}${projectId}`);
         toast({
           title: "Success",
-          description: actionData.message,
+          description: actionData?.message,
           variant: "success",
         });
       } else {
         toast({
           title: "Error",
-          description: actionData.error,
+          description: actionData?.error || actionData?.error?.message,
           variant: "destructive",
         });
       }
@@ -266,7 +263,6 @@ export default function CreateSite({
                   }}
                   errors={fields.company_location_id.errors}
                 />
-                
               </div>
               <CheckboxField
                 buttonProps={getInputProps(fields.is_active, {

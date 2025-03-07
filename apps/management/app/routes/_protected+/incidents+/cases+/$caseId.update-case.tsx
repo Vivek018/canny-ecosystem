@@ -291,7 +291,10 @@ export default function UpdateCases() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.error?.message || "Failed to update case",
+          description:
+            actionData?.error ||
+            actionData?.error?.message ||
+            "Failed to update case",
           variant: "destructive",
         });
       }

@@ -2,44 +2,23 @@ import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { TableHead, TableHeader, TableRow } from "@canny_ecosystem/ui/table";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { useState, useMemo } from "react";
-import { type ColumnDef } from "@tanstack/react-table";
+import { useState } from "react";
 
 interface Props {
   table?: any;
-  className?: string;
   loading?: boolean;
-  dynamicHeaders: string[];
-  allColumns: ColumnDef<any, any>[];
+  className?: string;
 }
 
-export function PayrollTableHeader({
-  table,
-  className,
-  loading,
-  dynamicHeaders,
-  allColumns,
-}: Props) {
-  const columnName = (id: string) => {
-    if (loading) return id;
-    const column = allColumns.find((col: any) => col.accessorKey === id);
-    return column?.header || id;
-  };
+// make sure the order is same as header order
+export const reimbursementPayrollColumnIdArray = [
+  "employee_code",
+  "name",
+  "amount",
+  "payment_status",
+];
 
-  // Combine static and dynamic headers
-  const payrollFieldsColumnIdArray = useMemo(() => {
-    const staticHeaders = [
-      "name",
-      "employee_code",
-      "present_days",
-      "designation",
-      "gross_pay",
-      "deductions",
-      "net_pay",
-    ];
-    return [...staticHeaders, ...dynamicHeaders];
-  }, [dynamicHeaders]);
-
+export function PayrollTableHeader({ table, loading, className }: Props) {
   const [sortingOrder, setSortingOrder] = useState("");
   const [sortingId, setSortingId] = useState("");
 
@@ -61,10 +40,24 @@ export function PayrollTableHeader({
     }
   };
 
+  const isEnableSorting = (id: string) =>
+    (
+      loading ||
+      table?.getAllLeafColumns()?.find((col: any) => {
+        return col.id === id;
+      })
+    )?.getCanSort();
+
+  const columnName = (id: string) =>
+    loading ||
+    table?.getAllLeafColumns()?.find((col: any) => {
+      return col.id === id;
+    })?.columnDef?.header;
+
   return (
     <TableHeader className={className}>
       <TableRow className="h-[45px] hover:bg-transparent">
-        {payrollFieldsColumnIdArray.map((id) => (
+        {reimbursementPayrollColumnIdArray.map((id) => (
           <TableHead
             key={id}
             className={cn(
@@ -75,6 +68,7 @@ export function PayrollTableHeader({
             <Button
               className="p-0 hover:bg-transparent space-x-2 disabled:opacity-100"
               variant="ghost"
+              disabled={!isEnableSorting(id)}
               onClick={() => sort(id)}
             >
               <span className="capitalize">{columnName(id)}</span>

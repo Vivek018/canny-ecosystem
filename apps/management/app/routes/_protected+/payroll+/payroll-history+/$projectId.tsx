@@ -17,7 +17,7 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { replaceUnderscore } from "@canny_ecosystem/utils";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Await, defer, useLoaderData } from "@remix-run/react";
-import { PayrollStatus } from "@/components/payroll/payroll-status";
+import { PayrollStatus } from "@/components/payroll/payroll-card";
 import { Suspense } from "react";
 import type { TypedSupabaseClient } from "@canny_ecosystem/supabase/types";
 import { LoadingSpinner } from "@/components/loading-spinner";

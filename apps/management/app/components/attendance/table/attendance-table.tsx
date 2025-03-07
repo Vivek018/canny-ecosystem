@@ -127,8 +127,7 @@ export function AttendanceTable({
       return;
     }
     const formattedFrom = from;
-    const to = formattedFrom + pageSize - 1;
-
+    const to = formattedFrom + pageSize;
     const sortParam = searchParams.get("sort");
     
     try {
@@ -150,8 +149,9 @@ export function AttendanceTable({
           (prevData) =>
             [...prevData, ...transformedData] as TransformedAttendanceDataType[]
         );
-        setFrom(to + 1);
-        setHasNextPage(count > to + 1);
+        setFrom(to);
+
+        setHasNextPage(count > to);
       } else {
         setHasNextPage(false);
       }

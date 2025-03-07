@@ -124,7 +124,10 @@ export default function UpdateExit() {
     } else {
       toast({
         title: "Error",
-        description: actionData?.error?.message || "Exit update failed",
+        description:
+          actionData?.error ||
+          actionData?.error?.message ||
+          "Exit update failed",
         variant: "destructive",
       });
     }

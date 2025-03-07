@@ -1,28 +1,36 @@
-import { PayrollDataTable } from "@/components/payroll/table/data-table";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
-import { payrollColumns } from "@/components/payroll/table/columns";
-import { Outlet, useNavigation, useSubmit } from "@remix-run/react";
+import { Outlet, useNavigation, useParams, useSubmit } from "@remix-run/react";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useState, useEffect } from "react";
-import type { PayrollEmployeeData } from "@canny_ecosystem/utils";
 import { PayrollActions } from "./payroll-actions";
+import type { PayrollEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
+import type { PayrollDatabaseRow } from "@canny_ecosystem/supabase/types";
+import { useUser } from "@/utils/user";
+import { approveRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
 
 export function PayrollComponent({
   data,
+  payrollData,
   editable,
 }: {
-  data: PayrollEmployeeData[];
+  data: PayrollEntriesWithEmployee[];
+  payrollData: Omit<PayrollDatabaseRow, "created_at" | "updated_at">;
   editable: boolean;
 }) {
+  const { role } = useUser();
+  const { payrollId } = useParams();
+  const submit = useSubmit();
+
   const navigation = useNavigation();
   const disable =
     navigation.state === "submitting" || navigation.state === "loading";
 
-  // searching functionality
   const [searchString, setSearchString] = useState("");
   const [tableData, setTableData] = useState(data);
+
   useEffect(() => {
     const filteredData = data?.filter(
       (item: { [s: string]: unknown } | ArrayLike<unknown>) =>
@@ -33,21 +41,30 @@ export function PayrollComponent({
     setTableData(filteredData);
   }, [searchString, data]);
 
-  // approve payroll
-  const submit = useSubmit();
+  const submitPayroll = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    submit(
+      {
+        payrollId: payrollId ?? payrollData?.id,
+        currentStatus: payrollData?.status,
+      },
+      {
+        method: "POST",
+        action: `/payroll/run-payroll/${payrollId}`,
+      },
+    );
+  };
+
   const approvePayroll = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     submit(
       {
-        data: JSON.stringify({
-          payrollId: data[0].payrollId,
-          siteId: data[0].site_id,
-        }),
-        returnTo: "/payroll/run-payroll/site/",
+        payrollId: payrollId ?? payrollData?.id,
+        currentStatus: payrollData?.status,
       },
       {
         method: "POST",
-        action: "/payroll/run-payroll/approve-payroll",
+        action: `/payroll/run-payroll/${payrollId}`,
       },
     );
   };
@@ -72,19 +89,38 @@ export function PayrollComponent({
                 className="pl-8 h-10 w-full focus-visible:ring-0"
               />
             </div>
-            <PayrollActions payrollId={data[0].payrollId} />
+            <PayrollActions payrollId={data[0].payroll_id} />
             <div className={cn(editable ? "" : "hidden")}>
-              <Button onClick={(e) => approvePayroll(e)} disabled={disable}>
-                Submit & Approve
+              <Button
+                onClick={(e) => submitPayroll(e)}
+                className={cn(
+                  "hidden",
+                  payrollData.status === "pending" &&
+                    hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
+                    "flex",
+                )}
+                disabled={disable}
+              >
+                Submit
+              </Button>
+              <Button
+                onClick={(e) => approvePayroll(e)}
+                className={cn(
+                  "hidden",
+                  payrollData.status === "submitted" &&
+                    hasPermission(
+                      role,
+                      `${approveRole}:${attribute.payroll}`,
+                    ) &&
+                    "flex",
+                )}
+                disabled={disable}
+              >
+                Approve
               </Button>
             </div>
           </div>
         </div>
-        <PayrollDataTable
-          data={tableData ?? []}
-          columns={payrollColumns}
-          editable={editable}
-        />
       </div>
       <Outlet />
     </section>

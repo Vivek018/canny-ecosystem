@@ -30,6 +30,7 @@ export default function Settings() {
             { label: "Locations", path: "/settings/locations" },
             { label: "Relationships", path: "/settings/relationships" },
             { label: "Users", path: "/settings/users" },
+            { label: "Documents", path: "/settings/documents" },
           ]}
           pathname={pathname}
           Link={Link}

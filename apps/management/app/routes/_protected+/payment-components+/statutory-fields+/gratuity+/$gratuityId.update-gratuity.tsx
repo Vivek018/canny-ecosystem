@@ -142,7 +142,10 @@ export default function UpdateEmployeeStateInsurance() {
     } else {
       toast({
         title: "Error",
-        description: actionData?.error?.message || "Gratuity update failed",
+        description:
+          actionData?.error ||
+          actionData?.error?.message ||
+          "Gratuity update failed",
         variant: "destructive",
       });
     }

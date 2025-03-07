@@ -12,25 +12,6 @@ export type ProjectsWithCompany = ProjectDatabaseRow & {
   primary_contractor: { id: string; name: string; logo: string };
 };
 
-export async function getProjectsCountByCompanyId({
-  supabase,
-  companyId,
-}: {
-  supabase: TypedSupabaseClient;
-  companyId: string;
-}) {
-  const { count, error } = await supabase
-    .from("projects")
-    .select("", { count: "exact", head: true })
-    .eq("project_client_id", companyId);
-
-  if (error) {
-    console.error("getProjectsCountByCompanyId Error", error);
-  }
-
-  return { count, error };
-}
-
 export async function getProjectsByCompanyId({
   supabase,
   companyId,
@@ -180,63 +161,6 @@ export async function getSitesByProjectId({
   if (error) {
     console.error("getSitesByProjectId Error", error);
   }
-
-  return { data, error };
-}
-
-export async function getAllSitesByProjectId({
-  supabase,
-  projectId,
-}: {
-  supabase: TypedSupabaseClient;
-  projectId: string;
-}) {
-  const columns = ["id"] as const;
-  const { data, error } = await supabase
-    .from("project_sites")
-    .select(columns.join(","))
-    .eq("project_id", projectId)
-    .returns<{ id: string }[]>();
-
-  if (error) console.error("getAllSitesByProjectId Error", error);
-
-  return { data, error };
-}
-
-export async function getSitesWithEmployeeCountByProjectId({
-  supabase,
-  projectId,
-}: {
-  supabase: TypedSupabaseClient;
-  projectId: string;
-}) {
-  const columns = [
-    "id",
-    "name",
-    "site_code",
-    "address_line_1",
-    "address_line_2",
-    "city",
-    "state",
-    "pincode",
-    "latitude",
-    "longitude",
-    "company_location_id",
-    "is_active",
-    "company_location:company_locations!company_location_id (id, name)",
-    "project_id",
-    "employees_count:employee_project_assignment!project_site_id(count)",
-  ] as const;
-
-  const { data, error } = await supabase
-    .from("project_sites")
-    .select(columns.join(","))
-    .eq("project_id", projectId)
-    .limit(HARD_QUERY_LIMIT)
-    .order("created_at", { ascending: false })
-    .returns<SitesWithLocation[]>();
-
-  if (error) console.error("getSitesWithEmployeeCountByProjectId Error", error);
 
   return { data, error };
 }

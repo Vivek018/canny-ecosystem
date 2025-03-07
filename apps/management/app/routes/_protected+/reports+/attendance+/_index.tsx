@@ -58,7 +58,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined
+        (value) => value !== null && value !== undefined,
       );
 
     const attendanceReportPromise = getAttendanceReportByCompanyId({
@@ -115,7 +115,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 
   return clientCaching(
     `${cacheKeyPrefix.attendanceReport}${url.searchParams.toString()}`,
-    args
+    args,
   );
 }
 
@@ -199,7 +199,7 @@ export default function AttendanceReport() {
               startMonth: string | null | undefined,
               startYear: number,
               endMonth: string | null | undefined,
-              endYear: number
+              endYear: number,
             ): string[] {
               const monthYearArray: string[] = [];
               const reversedMonths = Object.entries(months).reduce(
@@ -207,7 +207,7 @@ export default function AttendanceReport() {
                   acc[num] = name;
                   return acc;
                 },
-                {} as { [key: number]: string }
+                {} as { [key: number]: string },
               );
 
               let currentYear = startYear;
@@ -218,7 +218,7 @@ export default function AttendanceReport() {
                 (currentYear === endYear && currentMonth <= months[endMonth!])
               ) {
                 monthYearArray.push(
-                  `${reversedMonths[currentMonth]} ${currentYear}`
+                  `${reversedMonths[currentMonth]} ${currentYear}`,
                 );
 
                 if (currentMonth === 12 && currentYear === endYear) break;
@@ -239,25 +239,27 @@ export default function AttendanceReport() {
                     filters.start_month,
                     Number(filters.start_year),
                     filters.end_month,
-                    Number(filters.end_year)
+                    Number(filters.end_year),
                   )
                 : getMonthYearRange(
                     "January",
                     Number(currentYear),
                     "December",
-                    Number(currentYear)
+                    Number(currentYear),
                   );
-            const hasNextPage = Boolean(meta?.count > pageSize);
+
+            const hasNextPage = Boolean(meta?.count > data?.length);
+
             return (
               <DataTable
                 data={data}
                 hasNextPage={hasNextPage}
                 pageSize={pageSize}
                 query={query}
-                count={meta?.count ?? data?.length ?? 0}
+                count={meta?.count ?? 0}
                 columns={columns(
                   monthYearsRange as any,
-                  filters as AttendanceReportFilters
+                  filters as AttendanceReportFilters,
                 )}
                 filters={filters ?? undefined}
                 noFilters={noFilters}

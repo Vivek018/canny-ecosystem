@@ -209,7 +209,7 @@ export default function EmployeesIndex() {
     <section className="p-4">
       <div className="w-full flex items-center justify-between pb-4">
         <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-2 mr-4">
-          <Suspense fallback={<LoadingSpinner className="ml-20" />}>
+          <Suspense fallback={<LoadingSpinner />}>
             <Await resolve={projectPromise}>
               {(projectData) => (
                 <Await resolve={projectSitePromise}>
@@ -251,13 +251,13 @@ export default function EmployeesIndex() {
               );
             }
 
-            const hasNextPage = Boolean(meta?.count > pageSize);
+            const hasNextPage = Boolean(meta?.count > data?.length);
 
             return (
               <DataTable
                 data={data ?? []}
                 columns={columns({ env, companyId })}
-                count={meta?.count ?? data?.length ?? 0}
+                count={meta?.count ?? 0}
                 query={query}
                 filters={filters}
                 noFilters={noFilters}

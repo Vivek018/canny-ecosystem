@@ -64,7 +64,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
 
@@ -119,7 +119,10 @@ export default function UpdateHolidays() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.error?.message || "Failed to update holiday",
+          description:
+            actionData?.error ||
+            actionData?.error?.message ||
+            "Failed to update holiday",
           variant: "destructive",
         });
       }

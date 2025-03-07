@@ -3,6 +3,7 @@ import { clearExactCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { getSessionUser } from "@canny_ecosystem/supabase/cached-queries";
+import { deleteAvatar } from "@canny_ecosystem/supabase/media";
 import { deleteUserById } from "@canny_ecosystem/supabase/mutations";
 import { getUserByEmail } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -64,6 +65,9 @@ export async function action({
       );
     }
 
+    // deleting avatar
+    await deleteAvatar({supabase});
+
     // Handle current user deletion
     if (dbUser?.id === userId) {
       const { error: signOutError } = await supabase.auth.signOut();
@@ -124,7 +128,10 @@ export default function DeleteUser() {
     } else {
       toast({
         title: "Error",
-        description: actionData?.error?.message || "User deletion failed",
+        description:
+          actionData?.error ||
+          actionData?.error?.message ||
+          "User deletion failed",
         variant: "destructive",
       });
     }

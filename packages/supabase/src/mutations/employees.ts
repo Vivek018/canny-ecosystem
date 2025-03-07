@@ -1,4 +1,4 @@
-import { convertToNull } from "@canny_ecosystem/utils";
+import { convertToNull, type employeeDocuments } from "@canny_ecosystem/utils";
 import type {
   EmployeeAddressDatabaseInsert,
   EmployeeAddressDatabaseUpdate,
@@ -100,38 +100,38 @@ export async function createEmployee({
   ] = await Promise.all([
     employeeStatutoryDetailsData
       ? createEmployeeStatutoryDetails({
-        supabase,
-        data: { ...employeeStatutoryDetailsData, employee_id: data.id },
-        bypassAuth,
-      })
+          supabase,
+          data: { ...employeeStatutoryDetailsData, employee_id: data.id },
+          bypassAuth,
+        })
       : { error: null, status: null },
     employeeBankDetailsData
       ? createEmployeeBankDetails({
-        supabase,
-        data: { ...employeeBankDetailsData, employee_id: data.id },
-        bypassAuth,
-      })
+          supabase,
+          data: { ...employeeBankDetailsData, employee_id: data.id },
+          bypassAuth,
+        })
       : { error: null, status: null },
     employeeProjectAssignmentData
       ? createEmployeeProjectAssignment({
-        supabase,
-        data: { ...employeeProjectAssignmentData, employee_id: data.id },
-        bypassAuth,
-      })
+          supabase,
+          data: { ...employeeProjectAssignmentData, employee_id: data.id },
+          bypassAuth,
+        })
       : { error: null, status: null },
     employeeAddressesData
       ? createEmployeeAddresses({
-        supabase,
-        data: { ...employeeAddressesData, employee_id: data.id },
-        bypassAuth,
-      })
+          supabase,
+          data: { ...employeeAddressesData, employee_id: data.id },
+          bypassAuth,
+        })
       : { error: null, status: null },
     employeeGuardiansData
       ? createEmployeeGuardians({
-        supabase,
-        data: { ...employeeGuardiansData, employee_id: data.id },
-        bypassAuth,
-      })
+          supabase,
+          data: { ...employeeGuardiansData, employee_id: data.id },
+          bypassAuth,
+        })
       : { error: null, status: null },
   ]);
 
@@ -180,8 +180,7 @@ export async function updateEmployee({
     .from("employees")
     .update(updateData)
     .eq("id", data.id!)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("updateEmployee Error:", error);
@@ -370,8 +369,7 @@ export async function updateEmployeeStatutoryDetails({
     .from("employee_statutory_details")
     .update(updateData)
     .eq("employee_id", data.employee_id!)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("updateEmployeeStatutoryDetails Error:", error);
@@ -405,8 +403,7 @@ export async function updateEmployeeBankDetails({
     .from("employee_bank_details")
     .update(updateData)
     .eq("employee_id", data.employee_id!)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("updateEmployeeBankDetails Error:", error);
@@ -440,8 +437,7 @@ export async function updateEmployeeAddress({
     .from("employee_addresses")
     .update(updateData)
     .eq("id", data.id!)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("updateEmployeeAddress Error:", error);
@@ -506,8 +502,7 @@ export async function updateEmployeeGuardian({
     .from("employee_guardians")
     .update(updateData)
     .eq("id", data.id!)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("updateEmployeeGuardian Error:", error);
@@ -603,8 +598,7 @@ export async function updateEmployeeSkill({
     .from("employee_skills")
     .update(updateData)
     .eq("id", data.id!)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("updateEmployeeSkill Error:", error);
@@ -700,8 +694,7 @@ export async function updateEmployeeWorkHistory({
     .from("employee_work_history")
     .update(updateData)
     .eq("id", data.id!)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("updateEmployeeWorkHistory Error:", error);
@@ -797,8 +790,7 @@ export async function updateEmployeeProjectAssignment({
     .from("employee_project_assignment")
     .update(updateData)
     .eq("employee_id", data.employee_id!)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("updateEmployeeProjectAssignment Error:", error);
@@ -951,7 +943,7 @@ export async function createEmployeeDetailsFromImportedData({
       const { error: insertError } = await supabase
         .from("employees")
         .insert(batch)
-        .select();
+        ;
 
       if (insertError) {
         console.error("Error inserting batch:", insertError);
@@ -972,7 +964,7 @@ export async function createEmployeeDetailsFromImportedData({
             existing.employee_code === record.employee_code ||
             existing.primary_mobile_number === record.primary_mobile_number ||
             existing.secondary_mobile_number ===
-            record.secondary_mobile_number ||
+              record.secondary_mobile_number ||
             existing.personal_email === record.personal_email,
         );
 
@@ -1190,7 +1182,7 @@ export async function createEmployeeStatutoryFromImportedData({
       const { error: insertError } = await supabase
         .from("employee_statutory_details")
         .insert(batch)
-        .select();
+        ;
 
       if (insertError) {
         console.error("Error inserting batch:", insertError);
@@ -1211,24 +1203,24 @@ export async function createEmployeeStatutoryFromImportedData({
             normalize(existing.employee_id) === normalize(record.employee_id) ||
             (record.aadhaar_number &&
               normalize(existing.aadhaar_number) ===
-              normalize(record.aadhaar_number)) ||
+                normalize(record.aadhaar_number)) ||
             (record.pan_number &&
               normalize(existing.pan_number) ===
-              normalize(record.pan_number)) ||
+                normalize(record.pan_number)) ||
             (record.uan_number &&
               normalize(existing.uan_number) ===
-              normalize(record.uan_number)) ||
+                normalize(record.uan_number)) ||
             (record.pf_number &&
               normalize(existing.pf_number) === normalize(record.pf_number)) ||
             (record.esic_number &&
               normalize(existing.esic_number) ===
-              normalize(record.esic_number)) ||
+                normalize(record.esic_number)) ||
             (record.driving_license_number &&
               normalize(existing.driving_license_number) ===
-              normalize(record.driving_license_number)) ||
+                normalize(record.driving_license_number)) ||
             (record.passport_number &&
               normalize(existing.passport_number) ===
-              normalize(record.passport_number)),
+                normalize(record.passport_number)),
         );
 
         if (existingRecord) {
@@ -1386,7 +1378,7 @@ export async function createEmployeeBankDetailsFromImportedData({
       const { error: insertError } = await supabase
         .from("employee_bank_details")
         .insert(batch)
-        .select();
+        ;
 
       if (insertError) {
         console.error("Error inserting batch:", insertError);
@@ -1407,7 +1399,7 @@ export async function createEmployeeBankDetailsFromImportedData({
             normalize(existing.employee_id) === normalize(record.employee_id) ||
             (record.account_number &&
               normalize(existing.account_number) ===
-              normalize(record.account_number)),
+                normalize(record.account_number)),
         );
 
         if (existingRecord) {
@@ -1455,7 +1447,7 @@ export async function createEmployeeAddressFromImportedData({
   const { error, status } = await supabase
     .from("employee_addresses")
     .insert(data)
-    .select();
+    ;
 
   if (error) {
     console.error("createEmployeeAddressFromImportedData Error", error);
@@ -1608,7 +1600,7 @@ export async function createEmployeeGuardiansFromImportedData({
         (record) =>
           normalize(record.mobile_number) === normalize(entry.mobile_number) ||
           normalize(record.alternate_mobile_number) ===
-          normalize(entry.alternate_mobile_number) ||
+            normalize(entry.alternate_mobile_number) ||
           normalize(record.email) === normalize(entry.email),
       );
 
@@ -1621,7 +1613,7 @@ export async function createEmployeeGuardiansFromImportedData({
           if (entry[key!] !== existing[key!]) {
             updateData = {
               ...updateData,
-              [key]: entry[key!]
+              [key]: entry[key!],
             };
           }
         }
@@ -1654,4 +1646,42 @@ export async function createEmployeeGuardiansFromImportedData({
     status: "Invalid import_type specified",
     error: new Error("Invalid import_type"),
   };
+}
+
+// employee documents
+export async function addEmployeeDocument({
+  supabase,
+  employee_id,
+  document_type,
+  url,
+}: {
+  supabase: TypedSupabaseClient;
+  employee_id: string;
+  document_type: (typeof employeeDocuments)[number];
+  url: string;
+}) {
+  const dataToBeInserted = convertToNull({ employee_id, document_type, url });
+  const { status, error } = await supabase
+    .from("employee_documents")
+    .insert(dataToBeInserted);
+
+  return { status, error };
+}
+
+export async function deleteEmployeeDocumentByEmployeeId({
+  supabase,
+  employeeId,
+  documentType,
+}: {
+  supabase: TypedSupabaseClient;
+  employeeId: string;
+  documentType: (typeof employeeDocuments)[number];
+}) {
+  const { error, status } = await supabase
+    .from("employee_documents")
+    .delete()
+    .eq("employee_id", employeeId)
+    .eq("document_type", documentType);
+
+  return { status, error };
 }

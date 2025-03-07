@@ -208,14 +208,14 @@ export default function CreateRelationship({
       clearExactCacheEntry(cacheKeyPrefix.relationships);
       toast({
         title: "Success",
-        description: actionData.message,
+        description: actionData?.message,
         variant: "success",
       });
     } else {
       toast({
         title: "Error",
         description:
-        actionData.error?.message || "Relationship creation failed",
+          actionData.error?.message || "Relationship creation failed",
         variant: "destructive",
       });
     }

@@ -100,7 +100,7 @@ export async function getPaymentTemplateComponentsByTemplateId({
 
   const { data, error } = await supabase
     .from("payment_template_components")
-    .select(`${columns.join(",")}, payment_fields(id, name))`)
+    .select(`${columns.join(",")}, payment_fields(id, name, amount))`)
     .eq("template_id", templateId)
     .order("created_at", { ascending: true })
     .limit(HARD_QUERY_LIMIT)
@@ -182,27 +182,6 @@ export async function getPaymentTemplateWithComponentsById({
   return { data: returnData, error, componentsError };
 }
 
-export async function getPaymentTemplateByEmployeeId({
-  supabase,
-  employeeId,
-}: { supabase: TypedSupabaseClient; employeeId: string }) {
-  const columns = ["template_id"] as const;
-
-  const { data, error } = await supabase
-    .from("payment_template_assignments")
-    .select(columns.join(","))
-    .eq("employee_id", employeeId)
-    .single<
-      InferredType<
-        PaymentTemplateAssignmentsDatabaseRow,
-        (typeof columns)[number]
-      >
-    >();
-
-  if (error) console.error("getPaymentTemplateByEmployeeId Error", error);
-
-  return { data, error };
-}
 
 export async function getPaymentTemplateBySiteId({
   supabase,
@@ -253,6 +232,7 @@ export type PaymentTemplateComponentType = Omit<
   payment_fields: {
     id: Pick<PaymentFieldDatabaseRow, "id">;
     name: Pick<PaymentFieldDatabaseRow, "name">;
+    amount: Pick<PaymentFieldDatabaseRow, "amount">;
   };
 };
 

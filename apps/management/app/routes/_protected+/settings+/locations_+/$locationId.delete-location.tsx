@@ -74,7 +74,10 @@ export default function DeleteLocation() {
     } else {
       toast({
         title: "Error",
-        description: actionData?.error?.message || "Location delete failed",
+        description:
+          actionData?.error ||
+          actionData?.error?.message ||
+          "Location delete failed",
         variant: "destructive",
       });
     }

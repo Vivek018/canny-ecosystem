@@ -40,7 +40,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   if (
     !hasPermission(
       user?.role!,
-      `${updateRole}:${attribute.employeeProjectAssignment}`
+      `${updateRole}:${attribute.employeeProjectAssignment}`,
     )
   )
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -89,7 +89,7 @@ export async function action({
   if (submission.status !== "success")
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
 
   try {
@@ -129,7 +129,7 @@ export default function UpdateEmployeeLinkTemplate() {
     if (actionData) {
       if (actionData?.status === "success") {
         clearExactCacheEntry(
-          `${cacheKeyPrefix.employee_payments}${employeeId}`
+          `${cacheKeyPrefix.employee_payments}${employeeId}`,
         );
         toast({
           title: "Success",
@@ -138,8 +138,11 @@ export default function UpdateEmployeeLinkTemplate() {
         });
       } else {
         toast({
-          title: "error",
-          description: actionData?.message,
+          title: "Error",
+          description:
+            actionData?.error ||
+            actionData?.error?.message ||
+            actionData?.message,
           variant: "destructive",
         });
       }

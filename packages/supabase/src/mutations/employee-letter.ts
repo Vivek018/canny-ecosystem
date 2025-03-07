@@ -62,8 +62,7 @@ export async function updateEmployeeLetter({
     .from("employee_letter")
     .update(updateData)
     .eq("id", data.id!)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("updateEmployeeLetter Error", error);

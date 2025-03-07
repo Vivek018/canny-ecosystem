@@ -105,10 +105,8 @@ export async function getAccidentsByCompanyId({
     .select(
       `${columns.join(
         ",",
-      )},employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${
-        project ? "inner" : "left"
-      }(project_sites!${project ? "inner" : "left"}(id, name, projects!${
-        project ? "inner" : "left"
+      )},employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
+      }(project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
       }(id, name))))`,
       {
         count: "exact",
@@ -184,7 +182,7 @@ export async function getAccidentsByCompanyId({
   if (error) {
     console.error("getAccidentsByCompanyId Error", error);
   }
-  return { data, meta: { count: count ?? data?.length }, error };
+  return { data, meta: { count: count }, error };
 }
 
 export async function getAccidentsById({

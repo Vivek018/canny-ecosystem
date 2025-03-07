@@ -207,6 +207,18 @@ export const newAmount = (
   return (amount * presentDays) / totalWorkingDaysOfCurrentMonth;
 };
 
-export const capitalizeFirstLetter = (val) => {
+export const capitalizeFirstLetter = (val: any) => {
   return String(val).charAt(0).toUpperCase() + String(val).slice(1);
 };
+
+export function extractKeys<T extends Record<string, any>, K extends string>(
+  arr: T[],
+  keys: K[]
+): Partial<Record<K, any>>[] {
+  return arr.map(obj =>
+    keys.reduce((acc, key) => {
+      acc[key] = key.split('.').reduce((o, k) => o?.[k], obj);
+      return acc;
+    }, {} as Partial<Record<K, any>>)
+  );
+}

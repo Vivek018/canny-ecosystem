@@ -123,7 +123,10 @@ export default function UpdateLocation() {
     } else {
       toast({
         title: "Error",
-        description: actionData?.error?.message || "Location update failed",
+        description:
+          actionData?.error ||
+          actionData?.error?.message ||
+          "Location update failed",
         variant: "destructive",
       });
     }

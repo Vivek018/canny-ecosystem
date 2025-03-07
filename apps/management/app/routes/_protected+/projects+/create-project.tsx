@@ -182,7 +182,10 @@ export default function CreateProject({
       } else {
         toast({
           title: "Error",
-          description: actionData?.error?.message || "Project creation failed",
+          description:
+            actionData?.error ||
+            actionData?.error?.message ||
+            "Project creation failed",
           variant: "destructive",
         });
       }

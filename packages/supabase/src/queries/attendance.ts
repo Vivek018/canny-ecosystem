@@ -64,11 +64,11 @@ export type AttendanceReportDataType = Pick<
     };
   };
 } & {
-    attendance: Pick<
-      EmployeeAttendanceDatabaseRow,
-      "id" | "employee_id" | "date" | "present"
-    >;
-  }[];
+  attendance: Pick<
+    EmployeeAttendanceDatabaseRow,
+    "id" | "employee_id" | "date" | "present"
+  >;
+}[];
 
 export async function getAttendanceByEmployeeId({
   supabase,
@@ -447,11 +447,9 @@ export async function getAttendanceByCompanyId({
     .select(
       `
       ${columns.join(",")},
-      employee_project_assignment!employee_project_assignments_employee_id_fkey!${
-        project ? "inner" : "left"
+      employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
       }(
-        project_sites!${project ? "inner" : "left"}(id, name, projects!${
-        project ? "inner" : "left"
+        project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
       }(id, name))),
       attendance(
         id,
@@ -518,7 +516,7 @@ export async function getAttendanceByCompanyId({
 
   return {
     data,
-    meta: { count: count ?? data?.length },
+    meta: { count: count },
     error,
     dateRange: { startDate, endDate },
   };
@@ -574,11 +572,9 @@ export async function getAttendanceReportByCompanyId({
     .select(
       `
       ${columns.join(",")},
-      employee_project_assignment!employee_project_assignments_employee_id_fkey!${
-        project ? "inner" : "left"
+      employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
       }(
-        project_sites!${project ? "inner" : "left"}(id, name, projects!${
-        project ? "inner" : "left"
+        project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
       }(id, name))),
       attendance(
         id,
@@ -692,7 +688,7 @@ export async function getAttendanceReportByCompanyId({
 
   return {
     data: processedData,
-    meta: { count: count ?? data?.length },
+    meta: { count: count },
     error: null,
   };
 }

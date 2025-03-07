@@ -2,7 +2,6 @@ import { FilterList } from "@/components/reimbursements/filter-list";
 import { ReimbursementSearchFilter } from "@/components/reimbursements/reimbursement-search-filter";
 import { columns } from "@/components/reimbursements/table/columns";
 import { ReimbursementsTable } from "@/components/reimbursements/table/reimbursements-table";
-import { useUser } from "@/utils/user";
 import { cacheKeyPrefix } from "@/constant";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import {
@@ -14,16 +13,11 @@ import {
   getUsersEmail,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { buttonVariants } from "@canny_ecosystem/ui/button";
-import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { createRole, hasPermission } from "@canny_ecosystem/utils";
-import { attribute } from "@canny_ecosystem/utils/constant";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import {
   Await,
   type ClientLoaderFunctionArgs,
   defer,
-  Link,
   Outlet,
   redirect,
   useLoaderData,
@@ -134,7 +128,6 @@ export async function action({ request }: ActionFunctionArgs) {
 export default function ReimbursementsIndex() {
   const { reimbursementPromise, usersPromise, employeeId, filters, env } =
     useLoaderData<typeof loader>();
-  const { role } = useUser();
   const { toast } = useToast();
 
   const noFilters = Object.values(filters).every((value) => !value);

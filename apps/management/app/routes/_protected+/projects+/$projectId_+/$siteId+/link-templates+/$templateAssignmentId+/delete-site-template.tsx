@@ -59,8 +59,11 @@ export default function DeleteSiteLink() {
         });
       } else {
         toast({
-          title: "error",
-          description: actionData?.message,
+          title: "Error",
+          description:
+            actionData?.error ||
+            actionData?.error?.message ||
+            actionData?.message,
           variant: "destructive",
         });
       }

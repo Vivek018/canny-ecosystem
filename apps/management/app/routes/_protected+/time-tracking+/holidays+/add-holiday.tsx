@@ -77,7 +77,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
   }
   const holidaysData = submission.value;
@@ -123,7 +123,10 @@ export default function AddHolidays({
       } else {
         toast({
           title: "Error",
-          description: actionData?.error?.message || "Holiday update failed",
+          description:
+            actionData?.error ||
+            actionData?.error?.message ||
+            "Holiday update failed",
           variant: "destructive",
         });
       }
@@ -150,7 +153,7 @@ export default function AddHolidays({
   });
 
   const onChange = () => {
-    navigate(-1);
+    navigate("/time-tracking/holidays");
   };
   return (
     <Dialog open={true} onOpenChange={onChange}>
@@ -209,7 +212,6 @@ export default function AddHolidays({
             />
           </Form>
         </FormProvider>
-
         <FormButtons className="mr-[-29px] pb-0" form={form} isSingle={true} />
       </DialogContent>
     </Dialog>

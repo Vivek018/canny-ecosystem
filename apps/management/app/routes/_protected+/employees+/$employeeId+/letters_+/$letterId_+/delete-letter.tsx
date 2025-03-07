@@ -86,7 +86,7 @@ export default function DeleteLetter() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.error?.message,
+          description: actionData?.error || actionData?.error?.message,
           variant: "destructive",
         });
       }

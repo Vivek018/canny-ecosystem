@@ -131,7 +131,10 @@ export default function UpdateUser() {
     } else {
       toast({
         title: "Error",
-        description: actionData?.error?.message || "User update failed",
+        description:
+          actionData?.error ||
+          actionData?.error?.message ||
+          "User update failed",
         variant: "destructive",
       });
     }
