@@ -5,6 +5,7 @@ import { columns } from "./table/columns";
 import type { PaymentFieldDataType } from "@canny_ecosystem/supabase/queries";
 import { clearExactCacheEntry } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
+import { searchInObject } from "@canny_ecosystem/utils";
 
 export function PaymentFieldTableWrapper({
   data,
@@ -28,11 +29,10 @@ export function PaymentFieldTableWrapper({
       });
     }
 
-    const filteredData = data?.filter((item) =>
-      Object.values(item).some((value) =>
-        String(value).toLowerCase().includes(searchString.toLowerCase()),
-      ),
+    const filteredData = data?.filter((item: any) =>
+      searchInObject(item, searchString),
     );
+
     setTableData(filteredData ?? []);
   }, [searchString, data]);
 

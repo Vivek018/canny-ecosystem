@@ -14,7 +14,7 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { createRole, hasPermission, readRole } from "@canny_ecosystem/utils";
+import { createRole, hasPermission, readRole, searchInObject } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { defer, type LoaderFunctionArgs } from "@remix-run/node";
 import {
@@ -79,18 +79,11 @@ export default function Holidays() {
             const [tableData, setTableData] = useState(data);
 
             useEffect(() => {
-              const filteredData = data?.filter(
-                (item: { [s: string]: unknown } | ArrayLike<unknown>) =>
-                  Object.entries(item).some(
-                    ([key, value]) =>
-                      key !== "avatar" &&
-                      String(value)
-                        .toLowerCase()
-                        .includes(searchString.toLowerCase())
-                  )
-              );
-
-              setTableData(filteredData);
+              const filteredData = data?.filter((item: any) =>
+                    searchInObject(item, searchString),
+                  );
+              
+                  setTableData(filteredData);
             }, [searchString, data]);
 
             return (

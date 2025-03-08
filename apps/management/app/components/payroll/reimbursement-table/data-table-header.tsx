@@ -25,7 +25,7 @@ export function PayrollTableHeader({ table, loading, className }: Props) {
   const sort = (id: string) => {
     const column = table
       ?.getAllLeafColumns()
-      ?.find((col: any) => col.accessorKey === id);
+      ?.find((col: any) => col?.columnDef.accessorKey === id);
     column?.toggleSorting();
 
     if (sortingOrder === "") {
