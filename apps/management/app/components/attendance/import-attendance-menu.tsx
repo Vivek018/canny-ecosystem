@@ -17,7 +17,11 @@ import {
 } from "@canny_ecosystem/utils/constant";
 import { useSearchParams } from "@remix-run/react";
 import { AttendanceRegister } from "./attendance-register";
-import type { CompanyDatabaseRow, LocationDatabaseRow } from "@canny_ecosystem/supabase/types";
+import type {
+  CompanyDatabaseRow,
+  LocationDatabaseRow,
+} from "@canny_ecosystem/supabase/types";
+import { AttendanceHourlyRegister } from "./attendance-hourly-register";
 
 export function ImportAttendanceMenu({
   selectedRows,
@@ -64,6 +68,14 @@ export function ImportAttendanceMenu({
           )}
         />
         <AttendanceRegister
+          selectedRows={selectedRows}
+          companyName={companyName}
+          companyAddress={companyAddress}
+        />
+        <DropdownMenuSeparator
+          className={cn(!selectedRows.length && "hidden")}
+        />
+        <AttendanceHourlyRegister
           selectedRows={selectedRows}
           companyName={companyName}
           companyAddress={companyAddress}

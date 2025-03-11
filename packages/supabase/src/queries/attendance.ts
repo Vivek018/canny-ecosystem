@@ -64,11 +64,11 @@ export type AttendanceReportDataType = Pick<
     };
   };
 } & {
-  attendance: Pick<
-    EmployeeAttendanceDatabaseRow,
-    "id" | "employee_id" | "date" | "present"
-  >;
-}[];
+    attendance: Pick<
+      EmployeeAttendanceDatabaseRow,
+      "id" | "employee_id" | "date" | "present"
+    >;
+  }[];
 
 export async function getAttendanceByEmployeeId({
   supabase,
@@ -95,11 +95,12 @@ export async function getAttendanceByEmployeeId({
     return lastDay.toString().padStart(2, "0");
   };
 
-  const monthStr = currentMonth.toString().padStart(2, "0");
-  const lastDay = getLastDayOfMonth(currentYear, currentMonth);
+  const monthStr = (currentMonth - 1).toString().padStart(2, "0");
+  const lastDay = getLastDayOfMonth(currentYear, currentMonth - 1);
 
   const defaultStartDate = `${currentYear}-${monthStr}-01`;
   const defaultEndDate = `${currentYear}-${monthStr}-${lastDay}`;
+
   const columns = [
     "date",
     "employee_id",
@@ -447,9 +448,11 @@ export async function getAttendanceByCompanyId({
     .select(
       `
       ${columns.join(",")},
-      employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
+      employee_project_assignment!employee_project_assignments_employee_id_fkey!${
+        project ? "inner" : "left"
       }(
-        project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
+        project_sites!${project ? "inner" : "left"}(id, name, projects!${
+        project ? "inner" : "left"
       }(id, name))),
       attendance(
         id,
@@ -572,9 +575,11 @@ export async function getAttendanceReportByCompanyId({
     .select(
       `
       ${columns.join(",")},
-      employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
+      employee_project_assignment!employee_project_assignments_employee_id_fkey!${
+        project ? "inner" : "left"
       }(
-        project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
+        project_sites!${project ? "inner" : "left"}(id, name, projects!${
+        project ? "inner" : "left"
       }(id, name))),
       attendance(
         id,

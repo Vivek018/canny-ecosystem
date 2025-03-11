@@ -42,7 +42,10 @@ import { AttendanceSearchFilter } from "@/components/attendance/attendance-searc
 import { FilterList } from "@/components/attendance/filter-list";
 import { AttendanceActions } from "@/components/attendance/attendance-actions";
 import { LoadingSpinner } from "@/components/loading-spinner";
-import type{ CompanyDatabaseRow, LocationDatabaseRow } from "@canny_ecosystem/supabase/types";
+import type {
+  CompanyDatabaseRow,
+  LocationDatabaseRow,
+} from "@canny_ecosystem/supabase/types";
 
 const pageSize = LAZY_LOADING_LIMIT;
 
@@ -153,7 +156,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
     `${cacheKeyPrefix.attendance}${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 
@@ -185,53 +188,53 @@ export default function Attendance() {
   } = useLoaderData<typeof loader>();
 
   const [month, setMonth] = useState<number>(
-    filters?.month ? months[filters.month] - 1 : defaultMonth,
+    filters?.month ? months[filters.month] - 1 : defaultMonth
   );
   const [year, setYear] = useState<number>(
-    filters?.year ? Number(filters.year) : defaultYear,
+    filters?.year ? Number(filters.year) : defaultYear
   );
 
   const transformAttendanceData = useMemo(
     () => (data: any[]) => {
       return Object.values(
-        data.reduce(
-          (acc, employee) => {
-            const empCode = employee.employee_code;
-            const employeeDetails = acc[empCode] || {
-              employee_id: employee.id,
-              employee_code: empCode,
-              employee_name: `${employee.first_name} ${employee.middle_name} ${employee.last_name}`,
-              project:
-                employee.employee_project_assignment?.project_sites?.projects
-                  ?.name || null,
-              project_site:
-                employee.employee_project_assignment?.project_sites?.name ||
-                null,
-            };
+        data.reduce((acc, employee) => {
+          const empCode = employee.employee_code;
+          const employeeDetails = acc[empCode] || {
+            employee_id: employee.id,
+            employee_code: empCode,
+            employee_name: `${employee.first_name} ${employee.middle_name} ${employee.last_name}`,
+            project:
+              employee.employee_project_assignment?.project_sites?.projects
+                ?.name || null,
+            project_site:
+              employee.employee_project_assignment?.project_sites?.name || null,
+          };
 
-            for (const record of employee?.attendance ?? []) {
-              const fullDate = formatDate(
-                new Date(record.date).toISOString().split("T")[0],
-              );
-              employeeDetails[fullDate as string] = record.present
+          for (const record of employee?.attendance ?? []) {
+            const fullDate = formatDate(
+              new Date(record.date).toISOString().split("T")[0]
+            );
+            employeeDetails[fullDate as string] = {
+              present: record.present
                 ? "P"
                 : record.holiday
-                  ? record.holiday_type === "weekly"
-                    ? "WOF"
-                    : record.holiday_type === "paid"
-                      ? "L"
-                      : "A"
-                  : "A";
-            }
+                ? record.holiday_type === "weekly"
+                  ? "WOF"
+                  : record.holiday_type === "paid"
+                  ? "L"
+                  : "A"
+                : "A",
 
-            acc[empCode] = employeeDetails;
-            return acc;
-          },
-          {} as Record<string, any>,
-        ),
+              hours: record.no_of_hours || 0,
+            };
+          }
+
+          acc[empCode] = employeeDetails;
+          return acc;
+        }, {} as Record<string, any>)
       );
     },
-    [month, year],
+    [month, year]
   );
 
   const noFilters = Object.values(filters ?? {}).every((value) => !value);
@@ -251,14 +254,14 @@ export default function Attendance() {
                           lastDayOfMonth={new Date(
                             year,
                             month + 1,
-                            0,
+                            0
                           ).getDate()}
                           setMonth={setMonth}
                           setYear={setYear}
                           disabled={!projectData?.data?.length && noFilters}
                           projectArray={
                             projectData?.data?.map(
-                              (project) => project!.name,
+                              (project) => project!.name
                             ) || []
                           }
                           projectSiteArray={
@@ -319,7 +322,7 @@ export default function Attendance() {
                       day: currentDate.getDate(),
                       fullDate: currentDate.toISOString().split("T")[0],
                     };
-                  },
+                  }
                 );
               }
               const daysInMonth = new Date(year, month + 1, 0).getDate();

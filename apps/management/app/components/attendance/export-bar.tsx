@@ -58,7 +58,8 @@ export function ExportBar({
     const formattedEntry: Record<string, string> = { ...fixedFields };
 
     for (const date of sortedDateHeaders) {
-      formattedEntry[date] = attendance[date] || ""; 
+      const dayData = attendance[date];
+      formattedEntry[date] = dayData ? `${dayData.present}` : "";
     }
 
     formattedData.push(formattedEntry);
