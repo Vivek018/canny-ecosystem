@@ -148,7 +148,7 @@ export const AttendanceHourlyRegister = ({
       ];
       const newRow = worksheet.addRow(row);
 
-      for (let i = 4; i < newRow.cellCount - 1  ; i++) {
+      for (let i = 4; i < newRow.cellCount - 1; i++) {
         const cell = newRow.getCell(i + 1);
         if (Number(cell.value) > 8) {
           cell.fill = {
@@ -162,6 +162,12 @@ export const AttendanceHourlyRegister = ({
             pattern: "solid",
             fgColor: { argb: "FF8596A6" },
           }; // Gray
+        } else if (Number(cell.value) === 0) {
+          cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "FFFFC0C0" },
+          }; // Red
         }
 
         cell.alignment = { horizontal: "center" };

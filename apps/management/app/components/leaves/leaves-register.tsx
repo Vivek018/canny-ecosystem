@@ -209,8 +209,18 @@ export const LeavesRegister = ({
 
     headerRow1.font = { bold: true, size: 12 };
     headerRow1.alignment = { horizontal: "center", vertical: "middle" };
+    for (let i = 4; i <= 63; i++) {
+      const cell = headerRow1.getCell(i + 1);
+      cell.border = {
+        top: { style: "thin" },
+        bottom: { style: "thin" },
+        left: { style: "thin" },
+        right: { style: "thin" },
+      };
+    }
     headerRow2.font = { bold: true };
     headerRow2.alignment = { horizontal: "center" };
+   
 
     for (const emp of updatedData) {
       const rowData = [
