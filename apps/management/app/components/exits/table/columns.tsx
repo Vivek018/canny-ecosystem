@@ -43,9 +43,8 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     cell: ({ row }) => {
       return (
         <p className='truncate text-primary/80 w-32 cursor-pointer'>
-          {`${row.original?.employees?.first_name} ${
-            row.original?.employees?.middle_name ?? ""
-          }
+          {`${row.original?.employees?.first_name} ${row.original?.employees?.middle_name ?? ""
+            }
           ${row.original?.employees?.last_name ?? ""}`}
         </p>
       );
@@ -82,9 +81,8 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     header: "Last Working Day ",
     cell: ({ row }) => {
       return (
-        <p className='truncate capitalize'>{`${
-          row.original?.last_working_day ?? "--"
-        }`}</p>
+        <p className='truncate capitalize'>{`${row.original?.last_working_day ?? "--"
+          }`}</p>
       );
     },
   },
@@ -172,12 +170,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     accessorKey: "net_pay",
     header: "Net Pay",
     cell: ({ row }) => {
-      const netPay =
-        Number(row.original?.bonus) +
-        Number(row.original?.leave_encashment) +
-        Number(row.original?.gratuity) -
-        Number(row.original?.deduction);
-      return <p className='capitalize truncate'>{netPay ?? "--"}</p>;
+      return <p className='capitalize truncate'>{row.original?.net_pay ?? "--"}</p>;
     },
   },
   {
@@ -205,8 +198,8 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
               asChild
               className={cn(
                 !hasPermission(role, `${updateRole}:${attribute.exits}`) &&
-                  !hasPermission(role, `${deleteRole}:${attribute.exits}`) &&
-                  "hidden"
+                !hasPermission(role, `${deleteRole}:${attribute.exits}`) &&
+                "hidden"
               )}
             >
               <Button variant='ghost' className='h-8 w-8 p-0'>

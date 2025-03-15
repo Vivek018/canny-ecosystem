@@ -3,20 +3,27 @@ import { LoadingSpinner } from "@/components/loading-spinner";
 import { PayrollComponent } from "@/components/payroll/payroll-component";
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
+import { updatePayroll } from "@canny_ecosystem/supabase/mutations";
 import {
   getPayrollById,
   getPayrollEntriesByPayrollId,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
+import type { PayrollDatabaseRow } from "@canny_ecosystem/supabase/types";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { isGoodStatus } from "@canny_ecosystem/utils";
 
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import {
   Await,
   type ClientLoaderFunctionArgs,
   defer,
+  json,
+  useActionData,
   useLoaderData,
+  useParams,
 } from "@remix-run/react";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const payrollId = params.payrollId;
@@ -42,14 +49,85 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return clientCaching(cacheKeyPrefix.run_payroll_id, args);
+  return clientCaching(
+    `${cacheKeyPrefix.run_payroll_id}${args.params.payrollId}`,
+    args,
+  );
 }
 
 clientLoader.hydrate = true;
 
+export async function action({ request, params }: ActionFunctionArgs) {
+  try {
+    const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
+    const payrollId = params.payrollId;
+    const parsedData = JSON.parse(formData.get("data") as string);
+
+    const data = {
+      id: (parsedData.id ?? payrollId) as PayrollDatabaseRow["id"],
+      status: parsedData.status as PayrollDatabaseRow["status"],
+      run_date: new Date().toISOString() as PayrollDatabaseRow["run_date"],
+      total_employees:
+        parsedData.total_employees as PayrollDatabaseRow["total_employees"],
+      total_net_amount:
+        parsedData.total_net_amount as PayrollDatabaseRow["total_net_amount"],
+    };
+
+    const { status, error } = await updatePayroll({ supabase, data });
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Payroll updated successfully",
+        error: null,
+      });
+    }
+    return json(
+      { status: "error", message: "Payroll update failed", error },
+      { status: 500 },
+    );
+  } catch (error) {
+    console.error("Payroll Id Action error", error);
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+        data: null,
+      },
+      { status: 500 },
+    );
+  }
+}
+
 export default function PayrollId() {
   const { payrollPromise, payrollEntriesPromise } =
     useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
+
+  const { payrollId } = useParams();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (actionData) {
+      if (actionData?.status === "success") {
+        clearExactCacheEntry(cacheKeyPrefix.run_payroll);
+        clearExactCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
+        toast({
+          title: "Success",
+          description: actionData?.message || "Payroll updated",
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description:
+            actionData?.error || actionData?.message || "Payroll update failed",
+          variant: "destructive",
+        });
+      }
+    }
+  }, [actionData]);
 
   return (
     <Suspense fallback={<LoadingSpinner className="my-20" />}>
@@ -77,11 +155,7 @@ export default function PayrollId() {
                   );
                 }
                 return (
-                  <PayrollComponent
-                    payrollData={payrollData}
-                    data={data}
-                    editable={true}
-                  />
+                  <PayrollComponent payrollData={payrollData} data={data} />
                 );
               }}
             </Await>

@@ -1,8 +1,14 @@
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { createReimbursementPayroll } from "@canny_ecosystem/supabase/mutations";
-import type { ReimbursementDataType } from "@canny_ecosystem/supabase/queries";
+import {
+  createExitPayroll,
+  createReimbursementPayroll,
+} from "@canny_ecosystem/supabase/mutations";
+import type {
+  ExitDataType,
+  ReimbursementDataType,
+} from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { isGoodStatus } from "@canny_ecosystem/utils";
@@ -10,7 +16,9 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { json, useActionData, useNavigate } from "@remix-run/react";
 import { useEffect } from "react";
 
-export async function action({ request }: ActionFunctionArgs): Promise<Response> {
+export async function action({
+  request,
+}: ActionFunctionArgs): Promise<Response> {
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
@@ -21,11 +29,25 @@ export async function action({ request }: ActionFunctionArgs): Promise<Response>
     let error = null;
 
     if (type === "reimbursement") {
-      const reimbursementData = JSON.parse(formData.get("reimbursementData") as string) as Pick<ReimbursementDataType, "id" | "employee_id" | "amount">[];
-      const totalEmployees = Number.parseInt(formData.get("totalEmployees") as string);
-      const totalNetAmount = Number.parseFloat(formData.get("totalNetAmount") as string);
+      const reimbursementData = JSON.parse(
+        formData.get("reimbursementData") as string,
+      ) as Pick<ReimbursementDataType, "id" | "employee_id" | "amount">[];
+      const totalEmployees = Number.parseInt(
+        formData.get("totalEmployees") as string,
+      );
+      const totalNetAmount = Number.parseFloat(
+        formData.get("totalNetAmount") as string,
+      );
 
-      const { status, error: reimbursementError, message } = await createReimbursementPayroll({ supabase, data: { type, reimbursementData, totalEmployees, totalNetAmount }, companyId: companyId ?? "" })
+      const {
+        status,
+        error: reimbursementError,
+        message,
+      } = await createReimbursementPayroll({
+        supabase,
+        data: { type, reimbursementData, totalEmployees, totalNetAmount },
+        companyId: companyId ?? "",
+      });
 
       if (isGoodStatus(status)) {
         return json({
@@ -36,9 +58,45 @@ export async function action({ request }: ActionFunctionArgs): Promise<Response>
         });
       }
       error = reimbursementError;
+    } else if (type === "exit") {
+      const exitData = JSON.parse(formData.get("exitData") as string) as Pick<
+        ExitDataType,
+        "id" | "employee_id" | "net_pay"
+      >[];
+      const totalEmployees = Number.parseInt(
+        formData.get("totalEmployees") as string,
+      );
+      const totalNetAmount = Number.parseFloat(
+        formData.get("totalNetAmount") as string,
+      );
+
+      const {
+        status,
+        error: exitError,
+        message,
+      } = await createExitPayroll({
+        supabase,
+        data: { type, exitData, totalEmployees, totalNetAmount },
+        companyId: companyId ?? "",
+      });
+
+      if (isGoodStatus(status)) {
+        return json({
+          status: "success",
+          message: message ?? "Exit Payroll Created Successfully",
+          failedRedirect,
+          error: null,
+        });
+      }
+      error = exitError;
     }
     return json(
-      { status: "error", message: "Failed to Create Reimbursement payroll", failedRedirect, error },
+      {
+        status: "error",
+        message: "Failed to Create Reimbursement payroll",
+        failedRedirect,
+        error,
+      },
       { status: 500 },
     );
   } catch (error) {
@@ -48,10 +106,9 @@ export async function action({ request }: ActionFunctionArgs): Promise<Response>
       message: "An unexpected error occurred in create payroll",
       failedRedirect: null,
       error,
-    })
+    });
   }
 }
-
 
 export default function CreatePayroll() {
   const actionData = useActionData<typeof action>();
@@ -71,7 +128,10 @@ export default function CreatePayroll() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.error || actionData?.error?.message || "Payroll Creation failed",
+          description:
+            actionData?.error ||
+            actionData?.error?.message ||
+            "Payroll Creation failed",
           variant: "destructive",
         });
         navigate(actionData?.failedRedirect ?? DEFAULT_ROUTE);

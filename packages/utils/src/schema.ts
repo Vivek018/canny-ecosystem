@@ -620,6 +620,7 @@ export const ExitFormSchema = z.object({
   leave_encashment: z.number().default(0),
   gratuity: z.number().default(0),
   deduction: z.number().default(0),
+  net_pay: z.number().default(0),
 });
 
 // Payment Templates

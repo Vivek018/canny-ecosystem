@@ -13,7 +13,7 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { hasPermission, createRole } from "@canny_ecosystem/utils";
+import { hasPermission, createRole, searchInObject } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import {
@@ -61,14 +61,7 @@ export function UsersWrapper({ data }: { data: UserDatabaseRow[] }) {
   const [searchString, setSearchString] = useState("");
 
   useEffect(() => {
-    const filteredData = data?.filter((item: any) =>
-      Object.entries(item).some(
-        ([key, value]) =>
-          key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase())
-      )
-    );
-
+    const filteredData = data?.filter((item: any) => searchInObject(item, searchString));
     setTableData(filteredData);
   }, [searchString, data]);
 
@@ -97,7 +90,7 @@ export function UsersWrapper({ data }: { data: UserDatabaseRow[] }) {
               buttonVariants({ variant: "primary-outline" }),
               "flex items-center gap-1",
               !hasPermission(role, `${createRole}:${attribute.settingUsers}`) &&
-                "hidden"
+              "hidden"
             )}
           >
             <span>Add</span>

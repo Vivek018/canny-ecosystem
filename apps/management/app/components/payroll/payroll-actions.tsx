@@ -7,10 +7,14 @@ import {
   DropdownMenuTrigger,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { replaceDash } from "@canny_ecosystem/utils";
 import { useNavigate } from "@remix-run/react";
 
-export function PayrollActions({ payrollId }: { payrollId: string }) {
+export function PayrollActions({
+  payrollId,
+  className,
+}: { payrollId: string; className?: string }) {
   const navigate = useNavigate();
 
   const previewSalaryRegister = () => {
@@ -35,8 +39,12 @@ export function PayrollActions({ payrollId }: { payrollId: string }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" className="h-10 w-10">
-          <Icon name="plus" className="h-[18px] w-[18px]" />
+        <Button
+          variant="outline"
+          size="icon"
+          className={cn("h-10", className)}
+        >
+          <Icon name="dots-horizontal" className="h-[18px] w-[18px]" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent sideOffset={10} align="end">

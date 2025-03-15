@@ -13,8 +13,9 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { PayrollTableHeader } from "./data-table-header";
-import { PayrollSheet } from "./reimbursement-payroll-sheet";
+import { ReimbursementPayrollSheet } from "./reimbursement-payroll-sheet";
 import { useState } from "react";
+import type { PayrollEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
 
 interface PayrollTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -22,7 +23,7 @@ interface PayrollTableProps<TData, TValue> {
   editable: boolean;
 }
 
-export function PayrollDataTable<TData, TValue>({
+export function ReimbursementPayrollDataTable<TData, TValue>({
   columns,
   data,
   editable,
@@ -58,10 +59,10 @@ export function PayrollDataTable<TData, TValue>({
               table.getRowModel()?.rows?.map((row) => {
                 const rowData = row.original;
                 return (
-                  <PayrollSheet
+                  <ReimbursementPayrollSheet
                     key={row.id}
                     row={row}
-                    rowData={rowData}
+                    rowData={rowData as PayrollEntriesWithEmployee}
                     editable={editable}
                   />
                 );

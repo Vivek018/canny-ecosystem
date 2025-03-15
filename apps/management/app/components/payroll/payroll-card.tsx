@@ -1,27 +1,17 @@
 import type { PayrollDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { formatDate } from "@canny_ecosystem/utils";
-import { Button } from "@canny_ecosystem/ui/button";
 import { Card, CardContent } from "@canny_ecosystem/ui/card";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { useNavigate } from "@remix-run/react";
+import { Link } from "@remix-run/react";
 import { DeletePayroll } from "./delete-payroll";
+import { buttonVariants } from "@canny_ecosystem/ui/button";
 
 export function PayrollCard({
   data,
 }: {
   data: Omit<PayrollDatabaseRow, "updated_at">;
 }) {
-  const navigate = useNavigate();
-
   const is_approved = data.status === "approved";
-
-  const handleClick = () => {
-    navigate(
-      data?.status === "approved"
-        ? `/payroll/payroll-history/${data.id}`
-        : `/payroll/run-payroll/${data.id}`,
-    );
-  };
 
   return (
     <Card className="w-full select-text cursor-auto dark:border-[1.5px] flex flex-col justify-between">
@@ -68,9 +58,17 @@ export function PayrollCard({
           </div>
         </div>
         <div className="h-full flex flex-col items-center justify-between gap-3">
-          <Button onClick={handleClick} className="border-2 border-primary">
+          <Link
+            prefetch="intent"
+            to={
+              data?.status === "approved"
+                ? `/payroll/payroll-history/${data.id}`
+                : `/payroll/run-payroll/${data.id}`
+            }
+            className={cn(buttonVariants(), "border-2 border-primary")}
+          >
             View {is_approved ? "Pay History" : "Pay Run"}
-          </Button>
+          </Link>
           <DeletePayroll
             payrollId={data.id}
             className={cn(is_approved && "hidden")}

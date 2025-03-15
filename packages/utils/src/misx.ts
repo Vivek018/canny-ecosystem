@@ -15,8 +15,8 @@ export function replaceUnderscore(str: string | null | undefined) {
 
 export const pipe =
   (...fns: any[]) =>
-  (val: any) =>
-    fns.reduce((prev, fn) => fn(prev), val);
+    (val: any) =>
+      fns.reduce((prev, fn) => fn(prev), val);
 
 export function getInitialValueFromZod<T extends z.ZodTypeAny>(
   schema: T
@@ -182,7 +182,9 @@ export function toCamelCase(str: string) {
     .join("");
 }
 
-export function getWorkingDaysInCurrentMonth(working_days) {
+export function getWorkingDaysInCurrentMonth({ working_days }: {
+  working_days: number[];
+}): number {
   const now = new Date();
   const year = now.getFullYear();
   const month = now.getMonth();
@@ -198,12 +200,21 @@ export function getWorkingDaysInCurrentMonth(working_days) {
   return workingDayCount;
 }
 
+export const searchInObject = (obj: any, searchString: string): boolean => {
+  if (!obj || typeof obj !== "object") {
+    return String(obj).toLowerCase().includes(searchString.toLowerCase());
+  }
+
+  return Object.values(obj).some((value) =>
+    searchInObject(value, searchString),
+  );
+};
+
 export const newAmount = (
   amount: number,
   presentDays: number,
   totalWorkingDaysOfCurrentMonth: number
 ) => {
-  // new amount according to working days
   return (amount * presentDays) / totalWorkingDaysOfCurrentMonth;
 };
 
