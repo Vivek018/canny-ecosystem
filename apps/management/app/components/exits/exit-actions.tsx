@@ -22,7 +22,10 @@ export function ExitActions({ isEmpty }: { isEmpty: boolean }) {
         <Icon name='chart' className='h-[18px] w-[18px]' />
       </Button>
       <ColumnVisibility disabled={isEmpty} />
-      <ImportExitMenu />
+      <ImportExitMenu
+        selectedRows={selectedRows}
+        className={selectedRows?.length ? "bg-muted/70 text-muted-foreground" : undefined}
+      />
     </div>
   );
 }

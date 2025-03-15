@@ -71,9 +71,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     const hasFilters =
       filters &&
-      Object.values(filters).some(
-        (value) => value !== null && value !== undefined,
-      );
+      Object.values(filters).some((value) => value !== null && value !== undefined);
 
     const reimbursementsPromise = getReimbursementsByCompanyId({
       supabase,
@@ -165,8 +163,8 @@ export default function ReimbursementsIndex() {
                           projectArray={
                             projectData?.data?.length
                               ? projectData?.data?.map(
-                                  (project) => project!.name,
-                                )
+                                (project) => project!.name,
+                              )
                               : []
                           }
                           projectSiteArray={
