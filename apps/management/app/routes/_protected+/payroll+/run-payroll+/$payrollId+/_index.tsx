@@ -22,6 +22,7 @@ import {
   useActionData,
   useLoaderData,
   useParams,
+  useRevalidator,
 } from "@remix-run/react";
 import { Suspense, useEffect } from "react";
 
@@ -105,6 +106,7 @@ export default function PayrollId() {
     useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
+  const revalidator = useRevalidator();
   const { payrollId } = useParams();
   const { toast } = useToast();
 
@@ -126,6 +128,7 @@ export default function PayrollId() {
           variant: "destructive",
         });
       }
+      revalidator.revalidate();
     }
   }, [actionData]);
 

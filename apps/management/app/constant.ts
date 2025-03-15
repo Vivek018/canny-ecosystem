@@ -280,7 +280,7 @@ export const cacheKeyPrefix = {
   holidays: "holidays",
   paySequence: "pay-sequence",
   company_document: "company-document",
-  attendanceReport: "attendance-report",
+  attendance_report: "attendance-report",
 };
 
 export const SALARY_SLIP_TITLE = "Salary Slip Form IV B [Rule 26(2)(b)]";

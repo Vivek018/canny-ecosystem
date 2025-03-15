@@ -1,7 +1,12 @@
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
-import { Outlet, useNavigation, useParams, useSubmit } from "@remix-run/react";
+import {
+  Outlet,
+  useNavigation,
+  useParams,
+  useSubmit,
+} from "@remix-run/react";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useState, useEffect } from "react";
 import { PayrollActions } from "./payroll-actions";
@@ -29,6 +34,7 @@ export function PayrollComponent({
   const { payrollId } = useParams();
   const submit = useSubmit();
 
+
   const navigation = useNavigation();
   const disable =
     navigation.state === "submitting" || navigation.state === "loading";
@@ -48,10 +54,12 @@ export function PayrollComponent({
     e.preventDefault();
     submit(
       {
-        id: payrollId ?? payrollData?.id,
-        status: "submitted",
-        total_employees: payrollData?.total_employees,
-        total_net_amount: payrollData?.total_net_amount,
+        data: JSON.stringify({
+          id: payrollId ?? payrollData?.id,
+          status: "submitted",
+          total_employees: payrollData?.total_employees,
+          total_net_amount: payrollData?.total_net_amount,
+        }),
       },
       {
         method: "POST",
@@ -64,10 +72,12 @@ export function PayrollComponent({
     e.preventDefault();
     submit(
       {
-        id: payrollId ?? payrollData?.id,
-        status: "approved",
-        total_employees: payrollData?.total_employees,
-        total_net_amount: payrollData?.total_net_amount,
+        data: JSON.stringify({
+          id: payrollId ?? payrollData?.id,
+          status: "approved",
+          total_employees: payrollData?.total_employees,
+          total_net_amount: payrollData?.total_net_amount,
+        }),
       },
       {
         method: "POST",
@@ -84,7 +94,7 @@ export function PayrollComponent({
             <Icon name="magnifying-glass" size="sm" className="text-gray-400" />
           </div>
           <Input
-            placeholder="Search Reimbursement Payroll Entries"
+            placeholder="Search Payroll Entries"
             value={searchString}
             onChange={(e) => setSearchString(e.target.value)}
             className="pl-8 h-10 w-full focus-visible:ring-0 shadow-none"

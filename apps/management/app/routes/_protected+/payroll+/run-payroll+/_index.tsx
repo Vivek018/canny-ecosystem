@@ -4,6 +4,7 @@ import {
   Command,
   CommandEmpty,
   CommandGroup,
+  CommandInput,
   CommandItem,
   CommandList,
 } from "@canny_ecosystem/ui/command";
@@ -20,8 +21,6 @@ import { clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix, PayrollTypes } from "@/constant";
 import { formatDate, transformStringArrayIntoOptions } from "@canny_ecosystem/utils";
 import { Combobox } from "@canny_ecosystem/ui/combobox";
-import { Icon } from "@canny_ecosystem/ui/icon";
-import { Input } from "@canny_ecosystem/ui/input";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {
@@ -60,7 +59,6 @@ export default function ProjectsIndex() {
 
               const { isDocument } = useIsDocument();
 
-              // dropdown search
               const [tableData, setTableData] = useState(data);
               useEffect(() => {
                 const filteredData = data?.filter((item) =>
@@ -74,24 +72,14 @@ export default function ProjectsIndex() {
               }, [searchString, data]);
               return (
                 <Command className="overflow-visible">
-                  <div className="w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4">
-                    {/* <CommandInput
+                  <div className="w-full lg:w-3/4 2xl:w-1/2 flex items-center gap-4">
+                    <CommandInput
                       divClassName="border border-input rounded-md h-10 flex-1"
                       placeholder="Search Payroll"
                       autoFocus={true}
-                    /> */}
-                    <div className="relative w-[30rem] ">
-                      <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                        <Icon name="magnifying-glass" size="sm" className="text-gray-400" />
-                      </div>
-                      <Input
-                        placeholder="Search Employees"
-                        onChange={(e) => setSearchString(e.target.value)}
-                        className="pl-8 h-10 w-full focus-visible:ring-0"
-                      />
-                    </div>
+                    />
                     <Combobox
-                      className={cn("w-52 h-10")}
+                      className={cn("w-52 h-10 capitalize")}
                       options={transformStringArrayIntoOptions(PayrollTypes)}
                       value={searchString}
                       onChange={(value: string) => { setSearchString(value) }}

@@ -4,7 +4,7 @@ import { Icon } from "@canny_ecosystem/ui/icon";
 import { useNavigate } from "@remix-run/react";
 import { ColumnVisibility } from "./column-visibility";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { ImportExitMenu } from "./import-menu";
+import { ExitMenu } from "./exit-menu";
 
 export function ExitActions({ isEmpty }: { isEmpty: boolean }) {
   const { selectedRows } = useExitsStore();
@@ -22,7 +22,7 @@ export function ExitActions({ isEmpty }: { isEmpty: boolean }) {
         <Icon name='chart' className='h-[18px] w-[18px]' />
       </Button>
       <ColumnVisibility disabled={isEmpty} />
-      <ImportExitMenu
+      <ExitMenu
         selectedRows={selectedRows}
         className={selectedRows?.length ? "bg-muted/70 text-muted-foreground" : undefined}
       />

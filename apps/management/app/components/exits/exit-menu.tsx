@@ -17,7 +17,7 @@ import {
 } from "@canny_ecosystem/utils/constant";
 import { useSearchParams, useSubmit } from "@remix-run/react";
 
-export function ImportExitMenu({ selectedRows, className }: { selectedRows: ExitDataType[]; className?: string }) {
+export function ExitMenu({ selectedRows, className }: { selectedRows: ExitDataType[]; className?: string }) {
   const { role } = useUser();
   const submit = useSubmit();
   const [searchParams, setSearchParams] = useSearchParams();

@@ -103,7 +103,7 @@ export async function getPayrollEntriesByPayrollId({
 
   const { data, error } = await supabase
     .from("payroll_entries")
-    .select(`${columns.join(",")}, employees!inner(id,company_id,first_name, middle_name, last_name, employee_code)`)
+    .select(`${columns.join(",")}, employees!left(id,company_id,first_name, middle_name, last_name, employee_code)`)
     .eq("payroll_id", payrollId)
     .returns<PayrollEntriesWithEmployee[]>();
 
