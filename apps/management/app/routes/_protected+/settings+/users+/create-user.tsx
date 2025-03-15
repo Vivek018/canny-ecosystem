@@ -181,7 +181,9 @@ export default function CreateUser({
   const USER_TAG = updateValues ? UPDATE_USER_TAG : CREATE_USER_TAG;
   const [resetKey, setResetKey] = useState(Date.now());
   const [searchParams, setSearchParams] = useSearchParams();
-  const [supervisor, setSupervisor] = useState("");
+  const [supervisor, setSupervisor] = useState(
+    updateValues ? updateValues.role : ""
+  );
   const initialValues = updateValues ?? getInitialValueFromZod(UserSchema);
 
   const [form, fields] = useForm({
