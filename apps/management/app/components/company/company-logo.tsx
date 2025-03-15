@@ -12,16 +12,50 @@ import {
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
+import { toast } from "@canny_ecosystem/ui/use-toast";
+import { zImage } from "@canny_ecosystem/utils";
+import { useSubmit } from "@remix-run/react";
 import { useRef } from "react";
 
 export const CompanyLogo = ({
   name,
   logo,
-}: { name: string; logo?: string | undefined }) => {
+}: {
+  name: string;
+  logo?: string | undefined;
+}) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const submit = useSubmit();
 
   const handleUpload = async (evt: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(evt.target.files);
+    const file = evt?.target?.files?.[0];
+    
+    if (!file) {
+      toast({
+        title: "Error",
+        description: "File not uploaded, please try again!",
+        variant: "destructive",
+      });
+      return;
+    }
+    const validationResult = zImage.safeParse(file);
+    if (!validationResult.success) {
+      toast({
+        title: "Error",
+        description: validationResult.error.errors.map((err) => err.message).join("\n"),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const formData = new FormData();
+    formData.set("file", file);
+    formData.set("returnTo", "/settings/general");
+    submit(formData, {
+      method: "post",
+      action: "/upload-logo",
+      encType: "multipart/form-data",
+    });
     clearExactCacheEntry(cacheKeyPrefix.general);
   };
 
@@ -62,3 +96,4 @@ export const CompanyLogo = ({
     </Card>
   );
 };
+

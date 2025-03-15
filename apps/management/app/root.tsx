@@ -161,7 +161,7 @@ function App() {
             <header className="flex justify-between items-center mx-5 mt-4 md:mx-10 md:mt-10">
               <div>
                 <Link to={DEFAULT_ROUTE}>
-                  <Logo theme={theme} />
+                  <Logo />
                 </Link>
               </div>
               <div>

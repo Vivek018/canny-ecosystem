@@ -100,9 +100,7 @@ export async function updateCompany({
   const { error, status } = await supabase
     .from("companies")
     .update(updateData)
-    .eq("id", data.id!)
-    .select()
-    .single();
+    .eq("id", data.id!);
 
   if (error) {
     console.error("updateCompany error:", error);
@@ -163,9 +161,7 @@ export async function createCompanyRegistrationDetails({
 
   const { error, status } = await supabase
     .from("company_registration_details")
-    .insert(data)
-    .select()
-    .single();
+    .insert(data);
 
   if (error) {
     console.error("createCompanyRegistrationDetails error:", error);
@@ -215,9 +211,7 @@ export async function updateOrCreateCompanyRegistrationDetails({
   const { error, status } = await supabase
     .from("company_registration_details")
     .update(updateData)
-    .eq("company_id", data.company_id!)
-    .select()
-    .single();
+    .eq("company_id", data.company_id!);
 
   if (error) {
     console.error("updateOrCreateCompanyRegistrationDetails Error", error);
@@ -247,9 +241,7 @@ export async function createLocation({
 
   const { error, status } = await supabase
     .from("company_locations")
-    .insert(data)
-    .select()
-    .single();
+    .insert(data);
 
   if (error) {
     console.error("createLocation Error", error);
@@ -286,9 +278,7 @@ export async function updateLocation({
   const { error, status } = await supabase
     .from("company_locations")
     .update(updateData)
-    .eq("id", data.id!)
-    .select()
-    .single();
+    .eq("id", data.id!);
 
   if (error) {
     console.error("updateLocation Error", error);
@@ -386,8 +376,7 @@ export async function updateRelationship({
     .from("company_relationships")
     .update(updateData)
     .eq("id", data.id!)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("updateRelationship Error", error);
@@ -423,6 +412,48 @@ export async function deleteRelationship({
   if (error) {
     console.error("deleteRelationship Error", error);
   }
+
+  return { status, error };
+}
+
+// Company Documents
+export async function addCompanyDocument({
+  supabase,
+  companyId,
+  documentName,
+  url,
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+  documentName: string;
+  url: string;
+}) {
+  const dataToBeInserted = convertToNull({
+    company_id: companyId,
+    name: documentName,
+    url,
+  });
+  const { status, error } = await supabase
+    .from("company_documents")
+    .insert(dataToBeInserted);
+
+  return { status, error };
+}
+
+export async function deleteCompanyDocumentByCompanyId({
+  supabase,
+  companyId,
+  documentName,
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+  documentName: string;
+}) {
+  const { error, status } = await supabase
+    .from("company_documents")
+    .delete()
+    .eq("company_id", companyId)
+    .eq("name", documentName);
 
   return { status, error };
 }

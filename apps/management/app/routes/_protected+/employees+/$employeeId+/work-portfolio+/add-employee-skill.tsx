@@ -189,14 +189,17 @@ export default function AddEmployeeSkill({
       if (actionData.status === "success") {
         toast({
           title: "Success",
-          description: actionData.message,
+          description: actionData?.message,
           variant: "success",
         });
         navigate(actionData.returnTo);
       } else {
         toast({
           title: "Error",
-          description: actionData.message,
+          description:
+            actionData?.error ||
+            actionData?.error?.message ||
+            actionData?.message,
           variant: "destructive",
         });
       }

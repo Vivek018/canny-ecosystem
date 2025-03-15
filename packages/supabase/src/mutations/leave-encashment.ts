@@ -27,8 +27,7 @@ export const createLeaveEncashment = async ({
   const { error, status } = await supabase
     .from("leave_encashment")
     .insert(data)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("createLeaveEncashment Error", error);
@@ -65,8 +64,7 @@ export const updateLeaveEncashment = async ({
     .from("leave_encashment")
     .update(updateData)
     .eq("id", data.id!)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("updateLeaveEncashment Error", error);

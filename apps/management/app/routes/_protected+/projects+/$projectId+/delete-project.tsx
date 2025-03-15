@@ -15,7 +15,7 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { json, useActionData, useNavigate, useParams } from "@remix-run/react";
 import { useEffect } from "react";
 
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({ request, params }: ActionFunctionArgs): Promise<Response> {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
@@ -69,13 +69,13 @@ export default function DeleteProject() {
         clearExactCacheEntry(`${cacheKeyPrefix.project_overview}${projectId}`);
         toast({
           title: "Success",
-          description: actionData.message,
+          description: actionData?.message,
           variant: "success",
         });
       } else {
         toast({
           title: "Error",
-          description: actionData.error,
+          description: actionData?.error || actionData?.error?.message,
           variant: "destructive",
         });
       }

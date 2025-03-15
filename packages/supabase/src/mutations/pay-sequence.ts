@@ -26,8 +26,7 @@ export async function createPaySequence({
   const { error, status } = await supabase
     .from("pay_sequence")
     .insert(data)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("createPaySequence Error:", error);

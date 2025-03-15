@@ -6,6 +6,7 @@ import { DataTable } from "./table/data-table";
 import { columns } from "./table/columns";
 import { clearExactCacheEntry } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
+import { searchInObject } from "@canny_ecosystem/utils";
 
 export function PaymentTemplatesTableWrapper({
   data,
@@ -29,12 +30,11 @@ export function PaymentTemplatesTableWrapper({
       });
     }
 
-    const filteredData = data?.filter((item) =>
-      Object.values(item).some((value) =>
-        String(value).toLowerCase().includes(searchString.toLowerCase()),
-      ),
-    );
-    setTableData(filteredData ?? []);
+    const filteredData = data?.filter((item: any) =>
+          searchInObject(item, searchString),
+        );
+    
+        setTableData(filteredData ?? []);
   }, [searchString, data]);
 
   return <DataTable columns={columns} data={tableData ?? []} />;

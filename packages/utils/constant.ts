@@ -119,6 +119,7 @@ export const attribute = {
   employeeAttendance: "employee_attendance",
   employeeExits: "employee_exits",
   employeePaymentTemplateLink: "payment_template_link",
+  employeeDocuments: "employee_documents",
   reimbursements: "reimbursements",
   exits: "exits",
   paymentFields: "payment_fields",
@@ -155,6 +156,7 @@ export const attribute = {
   timeTracking: "time_tracking",
   holidays: "holidays",
   paySequence: "pay_sequence",
+  companyDocuments:"company_documents"
 };
 
 export const months: { [key: string]: number } = {
@@ -303,3 +305,26 @@ We wish you all the best in your future endeavors and are confident that you wil
 Thank you for your service and commitment to $\{companyName} . Should you require any assistance or documentation in the future, please do not hesitate to reach out to us at \[Contact Information] .
 
 Yours sincerely,`
+export const SUPABASE_STORAGE = {
+  LOGOS: "logos",
+  EMPLOYEE_PROFILE_PHOTO: "employees/profile_photo",
+  AVATAR: "avatar",
+};
+
+export const SUPABASE_BUCKET = {
+  CANNY_ECOSYSTEM: "canny-ecosystem",
+};
+
+export const SUPABASE_MEDIA_URL_PREFIX =
+  "https://oghojvhpbxanipiuxwbu.supabase.co/storage/v1/object/public/";
+
+export function getFilePathFromUrl(url: string) {
+  return url.startsWith(
+    `${SUPABASE_MEDIA_URL_PREFIX}${SUPABASE_BUCKET.CANNY_ECOSYSTEM}/`,
+  )
+    ? url.slice(
+        `${SUPABASE_MEDIA_URL_PREFIX}${SUPABASE_BUCKET.CANNY_ECOSYSTEM}/`
+          .length,
+      )
+    : url;
+}

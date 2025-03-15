@@ -49,7 +49,7 @@ export function Sidebar({
         )}
       >
         <Link prefetch="intent" to="/" className="">
-          <Logo theme={theme} />
+          <Logo />
         </Link>
       </div>
       <nav

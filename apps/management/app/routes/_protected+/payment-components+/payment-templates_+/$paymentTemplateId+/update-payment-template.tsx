@@ -149,7 +149,10 @@ export default function UpdatePaymentTemplateWrapper() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.error?.message || "Template Update Failed",
+          description:
+            actionData?.error ||
+            actionData?.error?.message ||
+            "Template Update Failed",
           variant: "destructive",
         });
       }

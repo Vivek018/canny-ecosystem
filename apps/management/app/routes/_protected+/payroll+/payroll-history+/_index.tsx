@@ -1,7 +1,5 @@
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
-  getAllSitesByProjectId,
-  getPendingPayrollCountBySiteId,
   getProjectsByCompanyId,
   type ProjectsWithCompany,
 } from "@canny_ecosystem/supabase/queries";
@@ -18,7 +16,6 @@ import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Await, defer, Outlet, useLoaderData } from "@remix-run/react";
-import { PayrollProjectCard } from "@/components/payroll/payroll-project-card";
 import { Suspense } from "react";
 import type { TypedSupabaseClient } from "@canny_ecosystem/supabase/types";
 import { LoadingSpinner } from "@/components/loading-spinner";
@@ -101,7 +98,7 @@ function ProjectList({ projects }: { projects: any[] }) {
                 }
                 className="data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0"
               >
-                <PayrollProjectCard project={project} />
+                a
               </CommandItem>
             ))}
           </div>

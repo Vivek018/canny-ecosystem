@@ -58,7 +58,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       {
         supabase,
         companyId,
-      }
+      },
     );
 
     const paymentTemplatesOptions =
@@ -77,7 +77,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         error,
         paymentTemplatesOptions: [],
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -101,7 +101,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 }
+        { status: submission.status === "error" ? 400 : 200 },
       );
     }
 
@@ -125,7 +125,7 @@ export async function action({
         error,
         returnTo,
       },
-      { status: 500 }
+      { status: 500 },
     );
   } catch (error) {
     return json(
@@ -135,7 +135,7 @@ export async function action({
         error,
         returnTo,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -181,13 +181,13 @@ export default function CreateSiteTemplate({
         clearExactCacheEntry(`${cacheKeyPrefix.site_link_templates}${siteId}`);
         toast({
           title: "Success",
-          description: actionData.message,
+          description: actionData?.message,
           variant: "success",
         });
       } else {
         toast({
           title: "Error",
-          description: actionData.error,
+          description: actionData?.error || actionData?.error?.message,
           variant: "destructive",
         });
       }
@@ -197,17 +197,17 @@ export default function CreateSiteTemplate({
 
   if (error) {
     return (
-      <ErrorBoundary error={error} message='Failed to create site template' />
+      <ErrorBoundary error={error} message="Failed to create site template" />
     );
   }
 
   return (
-    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
       <FormProvider context={form.context}>
-        <Form method='POST' {...getFormProps(form)}>
+        <Form method="POST" {...getFormProps(form)}>
           <Card>
             <CardHeader>
-              <CardTitle className='text-3xl capitalize'>
+              <CardTitle className="text-3xl capitalize">
                 {TEMPLATE_TAG.split("-").join(" ")}
               </CardTitle>
               <CardDescription>
@@ -221,7 +221,7 @@ export default function CreateSiteTemplate({
                 {...getInputProps(fields.assignment_type, { type: "hidden" })}
               />
               <Field
-                className='w-full'
+                className="w-full"
                 inputProps={{
                   ...getInputProps(fields.name, { type: "text" }),
                   placeholder: "Name",
@@ -230,15 +230,15 @@ export default function CreateSiteTemplate({
                 labelProps={{ children: replaceUnderscore(fields.name.name) }}
                 errors={fields.name.errors}
               />
-              <div className='grid grid-cols-2 gap-4'>
+              <div className="grid grid-cols-2 gap-4">
                 <Field
-                  className='w-full'
+                  className="w-full"
                   inputProps={{
                     ...getInputProps(fields.effective_from, { type: "date" }),
                     placeholder: replaceUnderscore(fields.effective_from.name),
                     max: getValidDateForInput(new Date().toISOString()),
                     defaultValue: getValidDateForInput(
-                      fields.effective_from.initialValue as string
+                      fields.effective_from.initialValue as string,
                     ),
                   }}
                   labelProps={{
@@ -247,15 +247,15 @@ export default function CreateSiteTemplate({
                   errors={fields.effective_from.errors}
                 />
                 <Field
-                  className='w-full'
+                  className="w-full"
                   inputProps={{
                     ...getInputProps(fields.effective_to, { type: "date" }),
                     placeholder: replaceUnderscore(fields.effective_to.name),
                     min: getValidDateForInput(
-                      fields.effective_from.value as string
+                      fields.effective_from.value as string,
                     ),
                     defaultValue: getValidDateForInput(
-                      fields.effective_to.initialValue as string
+                      fields.effective_to.initialValue as string,
                     ),
                   }}
                   labelProps={{
@@ -264,10 +264,10 @@ export default function CreateSiteTemplate({
                   errors={fields.effective_to.errors}
                 />
               </div>
-              <div className='grid grid-cols-2 gap-4'>
+              <div className="grid grid-cols-2 gap-4">
                 <SearchableSelectField
                   key={resetKey}
-                  className='capitalize'
+                  className="capitalize"
                   options={
                     updatePaymentTemplatesOptions ?? paymentTemplatesOptions
                   }
@@ -275,15 +275,15 @@ export default function CreateSiteTemplate({
                     ...getInputProps(fields.template_id, { type: "text" }),
                     defaultValue: fields.template_id.initialValue,
                   }}
-                  placeholder='Select payment templates'
+                  placeholder="Select payment templates"
                   labelProps={{ children: "Payment templates" }}
                   errors={fields.template_id.errors}
                 />
                 <SearchableSelectField
                   key={resetKey + 1}
-                  className='capitalize'
+                  className="capitalize"
                   options={transformStringArrayIntoOptions(
-                    eligibilityOptionsArray as unknown as string[]
+                    eligibilityOptionsArray as unknown as string[],
                   )}
                   inputProps={{
                     ...getInputProps(fields.eligibility_option, {
@@ -298,12 +298,12 @@ export default function CreateSiteTemplate({
                   errors={fields.eligibility_option.errors}
                 />
               </div>
-              <div className='grid grid-cols-2 gap-4'>
+              <div className="grid grid-cols-2 gap-4">
                 <SearchableSelectField
                   key={resetKey + 2}
-                  className='capitalize'
+                  className="capitalize"
                   options={transformStringArrayIntoOptions(
-                    positionArray as unknown as string[]
+                    positionArray as unknown as string[],
                   )}
                   inputProps={{
                     ...getInputProps(fields.position, { type: "text" }),
@@ -318,9 +318,9 @@ export default function CreateSiteTemplate({
                 />
                 <SearchableSelectField
                   key={resetKey + 3}
-                  className='capitalize'
+                  className="capitalize"
                   options={transformStringArrayIntoOptions(
-                    skillLevelArray as unknown as string[]
+                    skillLevelArray as unknown as string[],
                   )}
                   inputProps={{
                     ...getInputProps(fields.skill_level, { type: "text" }),

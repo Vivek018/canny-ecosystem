@@ -153,7 +153,11 @@ export default function UpdateProject() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.message || "Project update failed",
+          description:
+            actionData?.error ||
+            actionData?.error?.message ||
+            actionData?.message ||
+            "Project update failed",
           variant: "destructive",
         });
       }

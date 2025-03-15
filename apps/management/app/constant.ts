@@ -246,6 +246,9 @@ export const cacheKeyPrefix = {
   employee_reimbursements: "employee-reimbursements",
   employee_letters: "employee-letters",
   employee_payments: "employee_payments",
+  run_payroll: "run_payroll",
+  run_payroll_id: "run_payroll_id",
+  employee_documents: "employee_documents",
   reimbursements: "reimbursements",
   payment_fields: "payment-fields",
   payment_field_report: "payment-field-report",
@@ -276,6 +279,7 @@ export const cacheKeyPrefix = {
   leaves: "leaves",
   holidays: "holidays",
   paySequence: "pay-sequence",
+  company_document:"company-document",
   attendanceReport:"attendance-report"
 };
 
@@ -334,9 +338,8 @@ export function numberToWordsIndian(num: number) {
       return (
         tens[Math.floor(n / 10)] + (n % 10 ? ` ${belowTwenty[n % 10]}` : "")
       );
-    return `${belowTwenty[Math.floor(n / 100)]} hundred${
-      n % 100 ? ` ${convertBelowThousand(n % 100)}` : ""
-    }`;
+    return `${belowTwenty[Math.floor(n / 100)]} hundred${n % 100 ? ` ${convertBelowThousand(n % 100)}` : ""
+      }`;
   }
 
   function convertIntegerToWordsIndian(n: number) {
@@ -350,7 +353,7 @@ export function numberToWordsIndian(num: number) {
       if (remainder > 0) {
         const groupName = i > 0 ? units[i] : ""; // Add lakh, crore, etc.
         parts.unshift(
-          convertBelowThousand(remainder) + (groupName ? ` ${groupName}` : "")
+          convertBelowThousand(remainder) + (groupName ? ` ${groupName}` : ""),
         );
       }
       n = Math.floor(n / (i === 0 ? 1000 : 100)); // Reduce the number based on the group
@@ -370,7 +373,7 @@ export function numberToWordsIndian(num: number) {
   // Split integer and decimal parts
   const [integerPart, decimalPart] = num.toString().split(".");
   const integerWords = convertIntegerToWordsIndian(
-    Number.parseInt(integerPart, 10)
+    Number.parseInt(integerPart, 10),
   );
   const decimalWords = decimalPart
     ? `point ${convertDecimalPart(decimalPart)}`
@@ -378,5 +381,3 @@ export function numberToWordsIndian(num: number) {
 
   return `${integerWords}${decimalPart ? ` ${decimalWords}` : ""}`;
 }
-
-

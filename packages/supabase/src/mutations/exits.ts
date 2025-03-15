@@ -23,8 +23,7 @@ export const createExit = async ({
   const { error, status } = await supabase
     .from("exits")
     .insert(data)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("createExit Error:", error);
@@ -58,8 +57,7 @@ export const updateExit = async ({
     .from("exits")
     .update(updateData)
     .eq("id", data.id!)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("updateExit Error:", error);
@@ -203,7 +201,7 @@ export async function createExitsFromImportedData({
       const { error: insertError } = await supabase
         .from("exits")
         .insert(batch)
-        .select();
+        ;
 
       if (insertError) {
         console.error("Error inserting batch:", insertError);

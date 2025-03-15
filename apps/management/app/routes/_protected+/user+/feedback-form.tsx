@@ -105,13 +105,16 @@ export default function FeedbackForm() {
         clearCacheEntry(cacheKeyPrefix.feedback_list);
         toast({
           title: "Success",
-          description: actionData.message,
+          description: actionData?.message,
           variant: "success",
         });
       } else {
         toast({
           title: "Error",
-          description: actionData.message,
+          description:
+            actionData?.error ||
+            actionData?.error?.message ||
+            actionData?.message,
           variant: "destructive",
         });
       }

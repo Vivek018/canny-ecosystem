@@ -15,8 +15,7 @@ export async function createUserById({
   const { error, status } = await supabase
     .from("users")
     .insert(data)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("createUserById Error:", error);
@@ -85,9 +84,7 @@ export async function updateUserById({
     .eq("id", data.id ?? "")
     .single();
 
-  if (error) {
-    console.error("updateUserById Error:", error);
-  }
+  if (error) console.error("updateUserById Error:", error);
 
   return { error, status };
 }

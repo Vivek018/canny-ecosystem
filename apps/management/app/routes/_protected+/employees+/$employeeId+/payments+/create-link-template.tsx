@@ -60,7 +60,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   if (
     !hasPermission(
       user?.role!,
-      `${createRole}:${attribute.employeeProjectAssignment}`
+      `${createRole}:${attribute.employeeProjectAssignment}`,
     )
   )
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -100,7 +100,7 @@ export async function action({
   if (submission.status !== "success")
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 }
+      { status: submission.status === "error" ? 400 : 200 },
     );
 
   try {
@@ -173,17 +173,20 @@ export default function CreateEmployeeLinkTemplate({
     if (actionData) {
       if (actionData.status === "success") {
         clearExactCacheEntry(
-          `${cacheKeyPrefix.employee_payments}${employeeId}`
+          `${cacheKeyPrefix.employee_payments}${employeeId}`,
         );
         toast({
           title: "Success",
-          description: actionData.message,
+          description: actionData?.message,
           variant: "success",
         });
       } else {
         toast({
-          title: "error",
-          description: actionData.message,
+          title: "Error",
+          description:
+            actionData?.error ||
+            actionData?.error?.message ||
+            actionData?.message,
           variant: "destructive",
         });
       }
@@ -192,12 +195,12 @@ export default function CreateEmployeeLinkTemplate({
   }, [actionData]);
 
   return (
-    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
       <FormProvider context={form.context}>
-        <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
+        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
           <Card>
             <CardHeader>
-              <CardTitle className='text-3xl capitalize'>
+              <CardTitle className="text-3xl capitalize">
                 {updateValues ? "Update" : "Create"} Link Template
               </CardTitle>
               <CardDescription>
@@ -214,7 +217,7 @@ export default function CreateEmployeeLinkTemplate({
                 {...getInputProps(fields.assignment_type, { type: "hidden" })}
               />
               <Field
-                className='w-full mb-6'
+                className="w-full mb-6"
                 inputProps={{
                   ...getInputProps(fields.name, { type: "text" }),
                   placeholder: "Name",
@@ -222,15 +225,15 @@ export default function CreateEmployeeLinkTemplate({
                 labelProps={{ children: fields.name.name }}
                 errors={fields.name.errors}
               />
-              <div className='grid grid-cols-2 place-content-center justify-between gap-6 mb-6'>
+              <div className="grid grid-cols-2 place-content-center justify-between gap-6 mb-6">
                 <Field
-                  className='w-full'
+                  className="w-full"
                   inputProps={{
                     ...getInputProps(fields.effective_from, { type: "date" }),
                     placeholder: replaceUnderscore(fields.effective_from.name),
                     max: getValidDateForInput(new Date().toISOString()),
                     defaultValue: getValidDateForInput(
-                      fields.effective_from.initialValue
+                      fields.effective_from.initialValue,
                     ),
                   }}
                   labelProps={{
@@ -239,13 +242,13 @@ export default function CreateEmployeeLinkTemplate({
                   errors={fields.effective_from.errors}
                 />
                 <Field
-                  className='w-full'
+                  className="w-full"
                   inputProps={{
                     ...getInputProps(fields.effective_to, { type: "date" }),
                     placeholder: replaceUnderscore(fields.effective_to.name),
                     min: getValidDateForInput(fields.effective_from.value),
                     defaultValue: getValidDateForInput(
-                      fields.effective_to.initialValue
+                      fields.effective_to.initialValue,
                     ),
                   }}
                   labelProps={{
@@ -256,7 +259,7 @@ export default function CreateEmployeeLinkTemplate({
               </div>
               <SearchableSelectField
                 key={resetKey}
-                className='capitalize w-full'
+                className="capitalize w-full"
                 options={updatePaymentTemplateOptions ?? paymentTemplateOptions}
                 inputProps={{
                   ...getInputProps(fields.template_id, { type: "text" }),

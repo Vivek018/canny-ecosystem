@@ -167,7 +167,7 @@ export default function CreateUser({
       clearExactCacheEntry(cacheKeyPrefix.users);
       toast({
         title: "Success",
-        description: actionData.message,
+        description: actionData?.message,
         variant: "success",
       });
     } else {

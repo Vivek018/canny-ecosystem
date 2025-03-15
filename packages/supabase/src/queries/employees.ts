@@ -1,9 +1,10 @@
-import { formatUTCDate } from "@canny_ecosystem/utils";
+import { type employeeDocuments, formatUTCDate } from "@canny_ecosystem/utils";
 import type {
   EmployeeAddressDatabaseRow,
   EmployeeAttendanceDatabaseRow,
   EmployeeBankDetailsDatabaseRow,
   EmployeeDatabaseRow,
+  EmployeeDocumentsDatabaseRow,
   EmployeeGuardianDatabaseRow,
   EmployeeProjectAssignmentDatabaseRow,
   EmployeeSkillDatabaseRow,
@@ -211,7 +212,7 @@ export async function getEmployeesByCompanyId({
 
   return {
     data,
-    meta: { count: count ?? data?.length },
+    meta: { count: count },
     error,
   };
 }
@@ -300,32 +301,6 @@ export async function getEmployeeIdsByEmployeeCodes({
   if (error) {
     console.error("getEmployeeIdsByEmployeeCodes Error", error);
   }
-
-  return { data, error };
-}
-
-export async function getEmployeeIdsByProjectSiteId({
-  supabase,
-  projectSiteId,
-}: {
-  supabase: TypedSupabaseClient;
-  projectSiteId: string;
-}) {
-  const columns = ["employee_id"] as const;
-
-  const { data, error } = await supabase
-    .from("employee_project_assignment")
-    .select(`${columns.join(",")}`)
-    .eq("project_site_id", projectSiteId)
-    .limit(MID_QUERY_LIMIT)
-    .returns<
-      InferredType<
-        EmployeeProjectAssignmentDatabaseRow,
-        (typeof columns)[number]
-      >[]
-    >();
-
-  if (error) console.error("getEmployeeIdsByProjectSiteId Error", error);
 
   return { data, error };
 }
@@ -986,9 +961,77 @@ export async function getEmployeesReportByCompanyId({
 
   return {
     data,
-    meta: { count: count ?? data?.length },
+    meta: { count: count  },
     error: null,
   };
+}
+
+// employee documents
+export async function getEmployeeDocumentById({
+  supabase,
+  id,
+}: { supabase: TypedSupabaseClient; id: string }) {
+  const columns = ["document_type", "url"] as const;
+
+  const { data, error } = await supabase
+    .from("employee_documents")
+    .select(columns.join(","))
+    .eq("id", id)
+    .single<Pick<EmployeeDocumentsDatabaseRow, "document_type" | "url">>();
+
+  if (error) console.error("getEmployeeDocumentById Error", error);
+
+  return { data, error };
+}
+
+export async function getEmployeeDocuments({
+  supabase,
+  employeeId,
+}: { supabase: TypedSupabaseClient; employeeId: string }) {
+  const columns = ["document_type", "url", "id"] as const;
+
+  const { data, error } = await supabase
+    .from("employee_documents")
+    .select(columns.join(","))
+    .eq("employee_id", employeeId)
+    .order("created_at", { ascending: false })
+    .limit(HARD_QUERY_LIMIT)
+    .returns<
+      InferredType<EmployeeDocumentsDatabaseRow, (typeof columns)[number]>[]
+    >();
+
+  if (error) console.error("getEmployeeDocuments Error", error);
+
+  return { data, error };
+}
+
+export async function getEmployeeDocumentUrlByEmployeeIdAndDocumentName({
+  supabase,
+  employeeId,
+  documentType,
+}: {
+  supabase: TypedSupabaseClient;
+  employeeId: string;
+  documentType: (typeof employeeDocuments)[number];
+}) {
+  const columns = ["url"] as const;
+
+  const { data, error } = await supabase
+    .from("employee_documents")
+    .select(columns.join(","))
+    .eq("employee_id", employeeId)
+    .eq("document_type", documentType)
+    .single<EmployeeDocumentsDatabaseRow>();
+
+  if (error) {
+    console.error(
+      "getEmployeeDocumentUrlByEmployeeIdAndDocumentName Error",
+      error,
+    );
+    return { data, error };
+  }
+
+  return { data, error };
 }
 
 export type ImportEmployeeDetailsDataType = Pick<
@@ -1122,17 +1165,23 @@ export async function getSiteIdByEmployeeId({
   supabase: TypedSupabaseClient;
   employeeId: string;
 }) {
-  const columns = [
-    "id",
-  ] as const;
+  const columns = ["id"] as const;
 
   const { data, error } = await supabase
     .from("employees")
-    .select(`${columns.join(",")}, employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(project_sites!inner(id))`, { count: "exact" })
+    .select(
+      `${columns.join(",")}, employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(project_sites!inner(id))`,
+      { count: "exact" },
+    )
     .order("created_at", { ascending: false })
     .eq("id", employeeId)
-    .single<Pick<EmployeeDatabaseRow, "id">
-      & { employee_project_assignment: { project_sites: Pick<SiteDatabaseRow, "id"> } }>();
+    .single<
+      Pick<EmployeeDatabaseRow, "id"> & {
+        employee_project_assignment: {
+          project_sites: Pick<SiteDatabaseRow, "id">;
+        };
+      }
+    >();
 
   if (error) {
     console.error("getSiteIdByEmployeeId Error", error);

@@ -138,7 +138,10 @@ export default function AddEmployeeGuardian() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.message,
+          description:
+            actionData?.error ||
+            actionData?.error?.message ||
+            actionData?.message,
           variant: "destructive",
         });
       }

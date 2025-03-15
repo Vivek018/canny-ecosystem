@@ -2,11 +2,7 @@ import { setCompanyId } from "@/utils/server/company.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { deleteCompany } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import {
-  deleteRole,
-  hasPermission,
-  isGoodStatus,
-} from "@canny_ecosystem/utils";
+import { deleteRole, hasPermission, isGoodStatus } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
@@ -15,6 +11,7 @@ import { useEffect } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { clearAllCache } from "@/utils/cache";
 import { DEFAULT_ROUTE } from "@/constant";
+import {deleteCompanyLogo} from "@canny_ecosystem/supabase/media"
 
 export async function action({
   request,
@@ -38,13 +35,15 @@ export async function action({
     );
   }
 
-  const companyId = params.companyId;
+  const companyId = params.companyId ?? "";
 
   try {
     const { status, error } = await deleteCompany({
       supabase,
       id: companyId ?? "",
     });
+
+    await deleteCompanyLogo({ supabase, companyId });
 
     if (isGoodStatus(status)) {
       setCompanyId(undefined, true);
@@ -107,7 +106,10 @@ export default function DeleteCompany() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.error?.message || "Company delete failed",
+          description:
+            actionData?.error ||
+            actionData?.error?.message ||
+            "Company delete failed",
           variant: "destructive",
         });
       }

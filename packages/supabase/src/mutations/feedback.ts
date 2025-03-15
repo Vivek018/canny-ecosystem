@@ -22,8 +22,7 @@ export async function createFeedback({
   const { error, status } = await supabase
     .from("feedback")
     .insert(data)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("createFeedback Error", error);

@@ -15,8 +15,7 @@ export async function addLeavesFromData({
   const { error, status } = await supabase
     .from("leaves")
     .insert(data)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("createLeavesFromData Error:", error);
@@ -78,8 +77,7 @@ export async function addLeaveTypeFromData({
   const { error, status } = await supabase
     .from("leave_type")
     .insert(data)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("createLeaveTypeFromData Error:", error);
@@ -141,7 +139,7 @@ export async function createLeavesFromImportedData({
   supabase: TypedSupabaseClient;
   data: LeavesDatabaseInsert[];
 }) {
-  const { error, status } = await supabase.from("leaves").insert(data).select();
+  const { error, status } = await supabase.from("leaves").insert(data);
 
   if (error) {
     console.error("createLeavesFromImportedData Error:", error);

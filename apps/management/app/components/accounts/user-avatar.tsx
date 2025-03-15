@@ -1,17 +1,10 @@
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@canny_ecosystem/ui/avatar";
-import {
-  Card,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@canny_ecosystem/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@canny_ecosystem/ui/avatar";
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@canny_ecosystem/ui/card";
+import { toast } from "@canny_ecosystem/ui/use-toast";
+import { zImage } from "@canny_ecosystem/utils";
+import { useSubmit } from "@remix-run/react";
 import { useRef } from "react";
 
 export const UserAvatar = ({
@@ -22,11 +15,39 @@ export const UserAvatar = ({
   avatar?: string | undefined;
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const submit = useSubmit();
 
   const handleUpload = async (evt: React.ChangeEvent<HTMLInputElement>) => {
     clearExactCacheEntry(cacheKeyPrefix.account);
-    console.log(evt.target.files);
+    const file = evt?.target?.files?.[0];
+    if (!file) {
+      toast({
+        title: "Error",
+        description: "File not uploaded, please try again!",
+        variant: "destructive",
+      });
+      return;
+    }
+    const validationResult = zImage.safeParse(file);
+    if (!validationResult.success) {
+      toast({
+        title: "Error",
+        description: validationResult.error.errors.map((err) => err.message).join("\n"),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const formData = new FormData();
+    formData.set("file", file);
+    formData.set("returnTo", "/user/account");
+    submit(formData, {
+      method: "post",
+      action: "/settings/users/upload-avatar",
+      encType: "multipart/form-data",
+    });
   };
+
   return (
     <div>
       <Card>

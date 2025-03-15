@@ -153,7 +153,10 @@ export default function UpdateRelationship() {
     } else {
       toast({
         title: "Error",
-        description: actionData?.error?.message || "Relationship update failed",
+        description:
+          actionData?.error ||
+          actionData?.error?.message ||
+          "Relationship update failed",
         variant: "destructive",
       });
     }
