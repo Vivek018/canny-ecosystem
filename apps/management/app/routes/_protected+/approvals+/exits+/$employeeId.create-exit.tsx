@@ -70,6 +70,7 @@ export async function action({
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
     const formData = await request.formData();
+    formData.set("net_pay", String(Number(formData.get('bonus')) + Number(formData.get('leave_encashment')) + Number(formData.get('gratuity')) - Number(formData.get('deduction'))));
     const submission = parseWithZod(formData, { schema: ExitFormSchema });
 
     if (submission.status !== "success") {

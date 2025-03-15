@@ -26,7 +26,7 @@ export async function uploadAvatar({
   // delete old logo if exists
   const { status, error } = await deleteAvatar({ supabase });
   if (!isGoodStatus(status)) {
-    console.log("deleteAvatar Error", error);
+    console.error("deleteAvatar Error", error);
     return { status, error };
   }
 

@@ -32,7 +32,7 @@ export async function uploadEmployeeProfilePhoto({
     employeeId,
   });
   if (!isGoodStatus(status)) {
-    console.log("deleteEmployeeProfilePhoto Error", error);
+    console.error("deleteEmployeeProfilePhoto Error", error);
     return { status, error };
   }
 

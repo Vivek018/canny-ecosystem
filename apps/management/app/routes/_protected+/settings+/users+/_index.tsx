@@ -73,11 +73,8 @@ export function UsersWrapper({
   const [searchString, setSearchString] = useState("");
 
   useEffect(() => {
-    const filteredData = data?.filter((item: any) =>
-          searchInObject(item, searchString),
-        );
-    
-        setTableData(filteredData);
+    const filteredData = data?.filter((item: any) => searchInObject(item, searchString));
+    setTableData(filteredData);
   }, [searchString, data]);
 
   return (
@@ -105,7 +102,7 @@ export function UsersWrapper({
               buttonVariants({ variant: "primary-outline" }),
               "flex items-center gap-1",
               !hasPermission(role, `${createRole}:${attribute.settingUsers}`) &&
-                "hidden"
+              "hidden"
             )}
           >
             <span>Add</span>

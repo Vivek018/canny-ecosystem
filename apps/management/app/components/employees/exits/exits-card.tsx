@@ -119,7 +119,7 @@ export const ExitsCard = ({
                   "bg-card",
                   !hasPermission(
                     `${role}`,
-                    `${createRole}:${attribute.employeeExits}`
+                    `${updateRole}:${attribute.employeeExits}`
                   ) && "hidden"
                 )}
               >

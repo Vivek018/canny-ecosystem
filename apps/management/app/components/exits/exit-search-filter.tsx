@@ -180,9 +180,7 @@ export function ExitsSearchFilter({
           <Input
             tabIndex={-1}
             ref={inputRef}
-            placeholder={
-              disabled ? "No Exits Data to Search And Filter" : "Search Exits"
-            }
+            placeholder={disabled ? "No Exits Data to Search And Filter" : "Search Exits"}
             disabled={disabled}
             className='pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70'
             value={prompt}
@@ -201,7 +199,7 @@ export function ExitsSearchFilter({
               className={cn(
                 "absolute z-10 right-3 top-[6px] opacity-70",
                 !disabled &&
-                  "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
+                "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 hasValidFilters && "opacity-100",
                 isOpen && "opacity-100"
               )}

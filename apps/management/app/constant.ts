@@ -279,8 +279,8 @@ export const cacheKeyPrefix = {
   leaves: "leaves",
   holidays: "holidays",
   paySequence: "pay-sequence",
-  company_document:"company-document",
-  attendanceReport:"attendance-report"
+  company_document: "company-document",
+  attendanceReport: "attendance-report",
 };
 
 export const SALARY_SLIP_TITLE = "Salary Slip Form IV B [Rule 26(2)(b)]";
@@ -338,8 +338,9 @@ export function numberToWordsIndian(num: number) {
       return (
         tens[Math.floor(n / 10)] + (n % 10 ? ` ${belowTwenty[n % 10]}` : "")
       );
-    return `${belowTwenty[Math.floor(n / 100)]} hundred${n % 100 ? ` ${convertBelowThousand(n % 100)}` : ""
-      }`;
+    return `${belowTwenty[Math.floor(n / 100)]} hundred${
+      n % 100 ? ` ${convertBelowThousand(n % 100)}` : ""
+    }`;
   }
 
   function convertIntegerToWordsIndian(n: number) {
@@ -381,3 +382,5 @@ export function numberToWordsIndian(num: number) {
 
   return `${integerWords}${decimalPart ? ` ${decimalWords}` : ""}`;
 }
+
+export const PayrollTypes = ["reimbursement", "exit","salary","others"];

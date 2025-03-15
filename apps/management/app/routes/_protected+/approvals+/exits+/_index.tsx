@@ -222,7 +222,7 @@ export default function ExitsIndex() {
             }
             const hasNextPage = Boolean(
               exitsData?.meta?.count &&
-                exitsData.meta.count > LAZY_LOADING_LIMIT,
+              exitsData.meta.count > LAZY_LOADING_LIMIT,
             );
 
             return (
