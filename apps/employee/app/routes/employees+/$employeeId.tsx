@@ -24,7 +24,7 @@ export default function Employee() {
 
   return (
     <section className="relative w-full">
-      <div className="flex items-center gap-4 py-2.5 px-4 border-b">
+      <div className="flex items-center gap-4 py-2.5 px-4 mt-5 md:border-b border-t">
         <div className="hidden md:flex md:items-center md:gap-4">
           <Link
             prefetch="intent"

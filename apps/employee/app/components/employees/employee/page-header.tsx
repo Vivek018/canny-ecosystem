@@ -5,7 +5,6 @@ import type {
   EmployeeDatabaseRow,
   SupabaseEnv,
 } from "@canny_ecosystem/supabase/types";
-import { useUser } from "@/utils/user";
 
 export function EmployeePageHeader({
   employee,

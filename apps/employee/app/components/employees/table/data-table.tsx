@@ -5,7 +5,6 @@ import {
   TableCell,
   TableRow,
 } from "@canny_ecosystem/ui/table";
-import { Spinner } from "@canny_ecosystem/ui/spinner";
 import {
   type ColumnDef,
   type VisibilityState,
@@ -17,83 +16,31 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { DataTableHeader } from "./data-table-header";
 import { useEmployeesStore } from "@/store/employees";
-import { useInView } from "react-intersection-observer";
-import { useSearchParams } from "@remix-run/react";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
-import { useSupabase } from "@canny_ecosystem/supabase/client";
-import {
-  type EmployeeFilters,
-  getEmployeesByCompanyId,
-} from "@canny_ecosystem/supabase/queries";
-import { Button } from "@canny_ecosystem/ui/button";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   count: number;
-  hasNextPage: boolean;
-  query?: string | null;
-  filters?: EmployeeFilters | null;
-  noFilters?: boolean;
-  pageSize: number;
   initialColumnVisibility?: VisibilityState;
   companyId: string;
   env: SupabaseEnv;
+  searchString: string;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data: initialData,
-  count,
-  query,
-  filters,
-  noFilters,
-  pageSize,
-  hasNextPage: initialHasNextPage,
   initialColumnVisibility,
-  companyId,
-  env,
+  searchString,
 }: DataTableProps<TData, TValue>) {
   const [data, setData] = useState(initialData);
-  const [from, setFrom] = useState(pageSize);
-  const [hasNextPage, setHasNextPage] = useState(initialHasNextPage);
-  const [searchParams, setSearchParams] = useSearchParams();
-  const { supabase } = useSupabase({ env });
 
-  const { ref, inView } = useInView();
   const { rowSelection, setRowSelection, setColumns } = useEmployeesStore();
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
     initialColumnVisibility ?? {}
   );
-
-  const loadMoreEmployees = async () => {
-    const formattedFrom = from;
-
-    const to = formattedFrom + pageSize;
-    const sortParam = searchParams.get("sort");
-
-    try {
-      const { data } = await getEmployeesByCompanyId({
-        supabase,
-        companyId,
-        params: {
-          from: from,
-          to: to,
-          filters,
-          searchQuery: query ?? undefined,
-          sort: sortParam?.split(":") as [string, "asc" | "desc"],
-        },
-      });
-      if (data) {
-        setData((prevData) => [...prevData, ...data] as TData[]);
-      }
-      setFrom(to + 1);
-      setHasNextPage(count > to);
-    } catch {
-      setHasNextPage(false);
-    }
-  };
 
   const table = useReactTable({
     data,
@@ -107,27 +54,28 @@ export function DataTable<TData, TValue>({
     },
   });
 
-  const selectedRowsData = table
-    .getSelectedRowModel()
-    .rows?.map((row) => row.original);
-
   useEffect(() => {
     setColumns(table.getAllLeafColumns());
   }, [columnVisibility]);
 
   useEffect(() => {
-    if (inView) {
-      loadMoreEmployees();
-    }
-  }, [inView]);
-
-  useEffect(() => {
     setData(initialData);
-    setFrom(pageSize);
-    setHasNextPage(initialHasNextPage);
   }, [initialData]);
 
   const tableLength = table.getRowModel().rows?.length;
+
+  useEffect(() => {
+    if (!searchString) {
+      setData(initialData)
+    } else {
+      const filteredData = initialData?.filter((item) => Object.values(item as Record<string, unknown>).some((value) =>
+        String(value).toLowerCase().includes(searchString.toLowerCase()),
+      ),
+      );
+
+      setData(filteredData);
+    }
+  }, [searchString, data]);
 
   return (
     <div className="relative mb-8">
@@ -166,12 +114,10 @@ export function DataTable<TData, TValue>({
                               cell.column.id === "gender" ||
                               cell.column.id === "is_active") &&
                             " md:table-cell",
-                            cell.column.id === "select" &&
-                            "sticky left-0 overflow-hidden min-w-12 max-w-12 bg-card z-10",
                             cell.column.id === "employee_code" &&
-                            "md:sticky left-12 bg-card z-10",
+                            "md:sticky left-0 bg-card z-10",
                             cell.column.id === "full_name" &&
-                            "md:sticky left-48 bg-card z-10",
+                            "md:sticky left-12 bg-card z-10",
                             cell.column.id === "actions" &&
                             "sticky right-0 min-w-20 max-w-20 bg-card z-10"
                           )}
@@ -200,23 +146,11 @@ export function DataTable<TData, TValue>({
                       <p
                         className={cn(
                           "text-muted-foreground",
-                          !data?.length && noFilters && "hidden"
+                          !data?.length && "hidden"
                         )}
                       >
                         Try another search, or adjusting the filters
                       </p>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "mt-4",
-                          !data?.length && noFilters && "hidden"
-                        )}
-                        onClick={() => {
-                          setSearchParams();
-                        }}
-                      >
-                        Clear Filters
-                      </Button>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -225,15 +159,6 @@ export function DataTable<TData, TValue>({
           </Table>
         </div>
       </div>
-
-      {hasNextPage && initialData?.length && (
-        <div className="flex items-center justify-center mt-6" ref={ref}>
-          <div className="flex items-center space-x-2 px-6 py-5">
-            <Spinner />
-            <span className="text-sm text-[#606060]">Loading more...</span>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

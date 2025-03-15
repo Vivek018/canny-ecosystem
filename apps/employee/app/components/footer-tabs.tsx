@@ -35,7 +35,7 @@ export function FooterTabs({
 				className
 			)}
 		>
-			<ul className="overflow-x-scroll mx-auto flex justify-between md:text-sm text-sm overflow-auto no-scrollbar border-secondary-foreground border-1 rounded-md p-3 dark:bg-card">
+			<ul className="overflow-x-scroll mx-auto flex justify-between md:text-sm text-sm overflow-auto no-scrollbar border-secondary-foreground border-1 rounded-md p-3 pr-10 dark:bg-card">
 				{visibleItems.map((item) => (
 					<Link
 						prefetch="intent"

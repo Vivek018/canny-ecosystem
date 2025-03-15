@@ -104,6 +104,8 @@ export const attribute = {
   company: "company",
   employees: "employees",
   employee: "employee",
+  employeeWorkPortfolio: "employee_work_portfolio",
+  employeePayments: "employee_payments",
   employeeDetails: "employee_details",
   employeeStatutory: "employee_statutory",
   employeeBankDetails: "employee_bank_details",

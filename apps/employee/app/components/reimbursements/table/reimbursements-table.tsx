@@ -13,25 +13,17 @@ import {
   type VisibilityState,
 } from "@tanstack/react-table";
 import { ReimbursementsTableHeader } from "./reimbursements-table-header";
-import { useInView } from "react-intersection-observer";
 import { useEffect, useState } from "react";
-import {
-  getReimbursementsByCompanyId,
-  getReimbursementsByEmployeeId,
-  type ReimbursementDataType,
-  type ReimbursementFilters,
+import type {
+  ReimbursementDataType,
+  ReimbursementFilters,
 } from "@canny_ecosystem/supabase/queries";
-import { useSupabase } from "@canny_ecosystem/supabase/client";
-import { Spinner } from "@canny_ecosystem/ui/spinner";
-import { useSearchParams } from "@remix-run/react";
 import { Button } from "@canny_ecosystem/ui/button";
 import { useReimbursementStore } from "@/store/reimbursements";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  hasNextPage: boolean;
-  pageSize: number;
   env: any;
   companyId?: string;
   employeeId?: string;
@@ -44,76 +36,16 @@ interface DataTableProps<TData, TValue> {
 export function ReimbursementsTable<TData, TValue>({
   columns,
   data: initialData,
-  hasNextPage: initialHasNextPage,
-  pageSize,
-  env,
-  companyId,
   noFilters,
-  employeeId,
-  filters,
   initialColumnVisibility,
-  query,
 }: DataTableProps<TData, TValue>) {
   const [data, setData] = useState(initialData);
-  const [from, setFrom] = useState(pageSize);
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [hasNextPage, setHasNextPage] = useState(initialHasNextPage);
-  const { supabase } = useSupabase({ env });
 
-  const { ref, inView } = useInView();
   const { rowSelection, setSelectedRows, setRowSelection, setColumns } =
     useReimbursementStore();
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
     initialColumnVisibility ?? {}
   );
-  const loadMoreEmployees = async () => {
-    const formattedFrom = from;
-    const to = formattedFrom + pageSize;
-    const sortParam = searchParams.get("sort");
-    if (companyId) {
-      try {
-        const { data, meta } = await getReimbursementsByCompanyId({
-          supabase,
-          companyId,
-          params: {
-            from: from,
-            to: to,
-            filters,
-            searchQuery: query ?? undefined,
-            sort: sortParam?.split(":") as [string, "asc" | "desc"],
-          },
-        });
-        if (data) {
-          setData((prevData) => [...prevData, ...data] as TData[]);
-        }
-        setFrom(to + 1);
-        setHasNextPage(meta?.count! > to);
-      } catch {
-        setHasNextPage(false);
-      }
-    }
-    else if (employeeId) {
-      try {
-        const { data, meta } = await getReimbursementsByEmployeeId({
-          supabase,
-          employeeId,
-          params: {
-            from: from,
-            to: to,
-            filters,
-            sort: sortParam?.split(":") as [string, "asc" | "desc"],
-          },
-        });
-        if (data) {
-          setData((prevData) => [...prevData, ...data] as TData[]);
-        }
-        setFrom(to + 1);
-        setHasNextPage(meta?.count! > to);
-      } catch {
-        setHasNextPage(false);
-      }
-    }
-  };
 
   const table = useReactTable({
     data,
@@ -126,10 +58,6 @@ export function ReimbursementsTable<TData, TValue>({
       columnVisibility,
     },
   });
-
-  const selectedRowsData = table
-    .getSelectedRowModel()
-    .rows?.map((row) => row.original);
 
   useEffect(() => {
     const rowArray = [];
@@ -144,15 +72,7 @@ export function ReimbursementsTable<TData, TValue>({
   }, [columnVisibility]);
 
   useEffect(() => {
-    if (inView) {
-      loadMoreEmployees();
-    }
-  }, [inView]);
-
-  useEffect(() => {
     setData(initialData);
-    setFrom(pageSize);
-    setHasNextPage(initialHasNextPage);
   }, [initialData]);
 
   const tableLength = table.getRowModel().rows?.length;
@@ -186,9 +106,9 @@ export function ReimbursementsTable<TData, TValue>({
                           className={cn(
                             "px-3 md:px-4 py-4 md:table-cell",
                             cell.column.id === "select" &&
-                              "sticky left-0 min-w-12 max-w-12 bg-card z-10",
+                            "sticky left-0 min-w-12 max-w-12 bg-card z-10",
                             cell.column.id === "actions" &&
-                              "sticky right-0 min-w-20 max-w-20 bg-card z-10"
+                            "sticky right-0 min-w-20 max-w-20 bg-card z-10"
                           )}
                         >
                           {flexRender(
@@ -222,9 +142,6 @@ export function ReimbursementsTable<TData, TValue>({
                           "mt-4",
                           !data?.length && noFilters && "hidden"
                         )}
-                        onClick={() => {
-                          setSearchParams();
-                        }}
                       >
                         Clear Filters
                       </Button>
@@ -236,14 +153,6 @@ export function ReimbursementsTable<TData, TValue>({
           </Table>
         </div>
       </div>
-      {hasNextPage && initialData?.length && (
-        <div className="flex items-center justify-center mt-6" ref={ref}>
-          <div className="flex items-center space-x-2 px-6 py-5">
-            <Spinner />
-            <span className="text-sm text-[#606060]">Loading more...</span>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { cacheKeyPrefix } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import {
   getLeavesByEmployeeId,
@@ -29,19 +29,31 @@ import { LeavesDataTable } from "@/components/leaves/table/leaves-table";
 import { columns } from "@/components/leaves/table/columns";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { LoadingSpinner } from "@/components/loading-spinner";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { hasPermission, readRole } from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
+import { safeRedirect } from "@/utils/server/http.server";
 
 const isEmployeeRoute = true;
 export async function loader({ request, params }: LoaderFunctionArgs) {
+  const employeeId = params.employeeId;
+  const url = new URL(request.url);
+  const searchParams = new URLSearchParams(url.searchParams);
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
-  const { supabase } = getSupabaseWithHeaders({ request });
+
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+  
   try {
-    const employeeId = params.employeeId;
-    const url = new URL(request.url);
-    const searchParams = new URLSearchParams(url.searchParams);
+    const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+    if (!hasPermission(user?.role!, `${readRole}:${attribute.employeeLeaves}`)) {
+      return safeRedirect(DEFAULT_ROUTE, { headers });
+    }
+
     const sortParam = searchParams.get("sort");
     const query = searchParams.get("name") ?? undefined;
     const page = 0;

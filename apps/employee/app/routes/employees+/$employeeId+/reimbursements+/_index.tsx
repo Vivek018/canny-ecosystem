@@ -2,7 +2,7 @@ import { FilterList } from "@/components/reimbursements/filter-list";
 import { ReimbursementSearchFilter } from "@/components/reimbursements/reimbursement-search-filter";
 import { columns } from "@/components/reimbursements/table/columns";
 import { ReimbursementsTable } from "@/components/reimbursements/table/reimbursements-table";
-import { cacheKeyPrefix } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import {
   LAZY_LOADING_LIMIT,
@@ -26,6 +26,10 @@ import { Suspense } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { LoadingSpinner } from "@/components/loading-spinner";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { hasPermission, readRole } from "@canny_ecosystem/utils";
+import { attribute } from "@canny_ecosystem/utils/constant";
+import { safeRedirect } from "@/utils/server/http.server";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const env = {
@@ -34,7 +38,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   };
 
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
+    const { supabase, headers } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
     const url = new URL(request.url);
@@ -59,6 +63,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       Object.values(filters).some(
         (value) => value !== null && value !== undefined,
       );
+
+    const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+    if (!hasPermission(user?.role!, `${readRole}:${attribute.employeeReimbursements}`)) {
+      return safeRedirect(DEFAULT_ROUTE, { headers });
+    }
 
     const usersPromise = getUsersEmail({ supabase, companyId });
 
@@ -149,7 +159,7 @@ export default function ReimbursementsIndex() {
                   </div>
                 }
               >
-                {({ data, meta, error }) => {
+                {({ data, error }) => {
                   if (error) {
                     clearCacheEntry(
                       `${cacheKeyPrefix.employee_reimbursements}${employeeId}`,
@@ -162,10 +172,6 @@ export default function ReimbursementsIndex() {
                     });
                     return null;
                   }
-
-                  const hasNextPage = Boolean(
-                    meta?.count && meta.count / (0 + 1) > LAZY_LOADING_LIMIT,
-                  );
 
                   return (
                     <>
@@ -190,8 +196,6 @@ export default function ReimbursementsIndex() {
                         data={data}
                         noFilters={noFilters}
                         columns={columns()}
-                        hasNextPage={hasNextPage}
-                        pageSize={LAZY_LOADING_LIMIT}
                         env={env}
                         employeeId={employeeId}
                       />

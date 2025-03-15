@@ -1,7 +1,8 @@
 import { safeRedirect } from "@/utils/server/http.server";
 import { getSessionUser } from "@canny_ecosystem/supabase/cached-queries";
 import type { MetaFunction } from "@remix-run/node";
-import { type LoaderFunctionArgs, Outlet } from "react-router-dom";
+import { type LoaderFunctionArgs, Outlet, } from "react-router-dom";
+import { getEmployeeIdFromCookie } from "@/utils/server/user.server";
 
 export const meta: MetaFunction = () => {
   return [
@@ -11,7 +12,16 @@ export const meta: MetaFunction = () => {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  // const { user } = await getSessionUser({ request });
+  const { user } = await getSessionUser({ request });
+  const employeeId = await getEmployeeIdFromCookie(request);
+
+  if (employeeId) {
+    return safeRedirect(`/employees/${employeeId}/overview`, { status: 303 });
+  }
+
+  if (!user) {
+    return safeRedirect("/choose-role", { status: 303 });
+  }
 
   return safeRedirect("/employees", { status: 303 });
 }

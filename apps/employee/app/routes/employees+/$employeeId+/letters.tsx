@@ -1,8 +1,10 @@
 import { EmployeeLetterTableWrapper } from "@/components/employees/employee/letters/employee-letter-table-wrapper";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { LoadingSpinner } from "@/components/loading-spinner";
-import { cacheKeyPrefix } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
+import { safeRedirect } from "@/utils/server/http.server";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { useUser } from "@/utils/user";
 import { getEmployeeLettersByEmployeeId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -10,7 +12,7 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { createRole, hasPermission } from "@canny_ecosystem/utils";
+import { createRole, hasPermission, readRole } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { defer, json, type LoaderFunctionArgs } from "@remix-run/node";
 import {
@@ -24,9 +26,15 @@ import { Suspense, useState } from "react";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { employeeId } = params;
-  const { supabase } = getSupabaseWithHeaders({ request });
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
 
   try {
+    const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+    if (!hasPermission(user?.role!, `${readRole}:${attribute.employeeLetters}`)) {
+      return safeRedirect(DEFAULT_ROUTE, { headers });
+    }
+
     const employeeLettersPromise = getEmployeeLettersByEmployeeId({
       supabase,
       employeeId: employeeId ?? "",
