@@ -23,6 +23,7 @@ import {
   CANNY_MANAGEMENT_SERVICES_ADDRESS,
   CANNY_MANAGEMENT_SERVICES_NAME,
 } from "@/constant";
+import { Icon } from "@canny_ecosystem/ui/icon";
 
 export const AttendanceHourlyRegister = ({
   selectedRows,
@@ -191,12 +192,13 @@ export const AttendanceHourlyRegister = ({
     <AlertDialog>
       <AlertDialogTrigger
         className={cn(
-          buttonVariants({ variant: "ghost", size: "full" }),
-          "text-[13px] h-9 hidden",
+          buttonVariants({ variant: "muted" }),
+          "w-full justify-start text-[13px] h-9 hidden px-2 gap-2",
           selectedRows.length && "flex"
         )}
       >
-        Attendance Hourly Register
+        <Icon name="plus-circled" />
+        <p>Hourly Register</p>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

@@ -50,7 +50,8 @@
     "react-markdown": "^9.0.3",
     "xlsx": "^0.18.5",
     "xlsx-style": "^0.8.13",
-    "zustand": "^5.0.0-rc.2"
+    "zustand": "^5.0.0-rc.2",
+    "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
     "@remix-run/dev": "^2.15.3",

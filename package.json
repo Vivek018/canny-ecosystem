@@ -34,8 +34,5 @@
   "engines": {
     "node": "22.14.0"
   },
-  "packageManager": "npm@10.8.3",
-  "dependencies": {
-    "remark-gfm": "^4.0.1"
-  }
+  "packageManager": "npm@10.8.3"
 }

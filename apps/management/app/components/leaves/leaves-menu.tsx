@@ -1,5 +1,9 @@
-import type { TransformedAttendanceDataType } from "@/routes/_protected+/time-tracking+/attendance+/_index";
+import { useLeavesStore } from "@/store/leaves";
 import { useUser } from "@/utils/user";
+import type {
+  CompanyDatabaseRow,
+  LocationDatabaseRow,
+} from "@canny_ecosystem/supabase/types";
 import { Button } from "@canny_ecosystem/ui/button";
 import {
   DropdownMenu,
@@ -16,28 +20,27 @@ import {
   modalSearchParamNames,
 } from "@canny_ecosystem/utils/constant";
 import { useSearchParams } from "@remix-run/react";
-import { AttendanceRegister } from "./attendance-register";
-import type {
-  CompanyDatabaseRow,
-  LocationDatabaseRow,
-} from "@canny_ecosystem/supabase/types";
-import { AttendanceHourlyRegister } from "./attendance-hourly-register";
+import { LeavesRegister } from "./leaves-register";
 
-export function ImportAttendanceMenu({
-  selectedRows,
-  companyName,
+export function LeavesMenu({
   companyAddress,
+  companyName,
 }: {
-  selectedRows: TransformedAttendanceDataType[];
   companyName?: CompanyDatabaseRow;
   companyAddress?: LocationDatabaseRow;
 }) {
   const { role } = useUser();
   const [searchParams, setSearchParams] = useSearchParams();
-
+  const { selectedRows } = useLeavesStore();
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger
+        asChild
+        className={cn(
+          selectedRows?.length ? "bg-muted/70 text-muted-foreground" : undefined,
+          !hasPermission(role, `${createRole}:${attribute.leaves}`) && "hidden"
+        )}
+      >
         <Button variant="outline" size="icon" className="h-10 w-[2.5rem]">
           <Icon name="plus" className="h-[18px] w-[18px]" />
         </Button>
@@ -45,42 +48,27 @@ export function ImportAttendanceMenu({
       <DropdownMenuContent sideOffset={10} align="end">
         <DropdownMenuItem
           onClick={() => {
-            searchParams.set(
-              "step",
-              modalSearchParamNames.import_employee_attendance
-            );
+            searchParams.set("step", modalSearchParamNames.import_leaves);
             setSearchParams(searchParams);
           }}
-          className={cn(
-            "space-x-2 flex items-center",
-            !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
-              "hidden"
-          )}
+          className="space-x-2 flex items-center"
         >
           <Icon name="import" size="sm" className="mb-0.5" />
-          <span>Import Attendance</span>
+          <span>Import/backfill</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator
           className={cn(
-            !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
-              "hidden",
+            !hasPermission(role, `${createRole}:${attribute.leaves}`) &&
+            "hidden",
             !selectedRows.length && "hidden"
           )}
         />
-        <AttendanceRegister
-          selectedRows={selectedRows}
-          companyName={companyName}
-          companyAddress={companyAddress}
-        />
-        <DropdownMenuSeparator
-          className={cn(!selectedRows.length && "hidden")}
-        />
-        <AttendanceHourlyRegister
+        <LeavesRegister
           selectedRows={selectedRows}
           companyName={companyName}
           companyAddress={companyAddress}
         />
       </DropdownMenuContent>
-    </DropdownMenu>
+    </DropdownMenu >
   );
 }

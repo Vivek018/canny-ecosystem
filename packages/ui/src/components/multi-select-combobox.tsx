@@ -63,7 +63,7 @@ export const MultiSelectCombobox = ({
           }
         }}
       >
-        <Icon name="select-drop" size="sm" className="mb-[3px]" />
+        <Icon name="import" size="sm" className="mb-[3px]" />
         {value.length > 0 && (
           <span className="text-muted-foreground">{label}</span>
         )}

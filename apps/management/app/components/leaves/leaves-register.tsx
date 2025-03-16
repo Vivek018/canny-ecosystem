@@ -25,6 +25,7 @@ import {
 import type { LeavesDataType } from "@canny_ecosystem/supabase/queries";
 import { months } from "@canny_ecosystem/utils/constant";
 import { useSearchParams } from "@remix-run/react";
+import { Icon } from "@canny_ecosystem/ui/icon";
 
 export const LeavesRegister = ({
   selectedRows,
@@ -146,9 +147,8 @@ export const LeavesRegister = ({
     };
 
     worksheet.mergeCells("F1:BH4");
-    worksheet.getCell("F1").value = `Attendance Register for ${
-      refYear ? refYear : new Date().getFullYear()
-    }`;
+    worksheet.getCell("F1").value = `Attendance Register for ${refYear ? refYear : new Date().getFullYear()
+      }`;
     worksheet.getCell("F1").font = { bold: true, size: 20 };
     worksheet.getCell("F1").alignment = {
       horizontal: "center",
@@ -196,7 +196,6 @@ export const LeavesRegister = ({
     ]);
 
     let colIndex = fixedHeaders.length + 1;
-    // biome-ignore lint/correctness/noUnusedVariables: <explanation>
     for (const month of months) {
       worksheet.mergeCells(5, colIndex, 5, colIndex + 4);
       colIndex += 5;
@@ -220,7 +219,6 @@ export const LeavesRegister = ({
     }
     headerRow2.font = { bold: true };
     headerRow2.alignment = { horizontal: "center" };
-   
 
     for (const emp of updatedData) {
       const rowData = [
@@ -273,12 +271,13 @@ export const LeavesRegister = ({
     <AlertDialog>
       <AlertDialogTrigger
         className={cn(
-          buttonVariants({ variant: "ghost", size: "full" }),
-          "text-[13px] h-9 hidden",
+          buttonVariants({ variant: "muted" }),
+          "w-full justify-start text-[13px] h-9 hidden px-2 gap-2",
           selectedRows.length && "flex"
         )}
       >
-        Leaves Register
+        <Icon name="plus-circled" />
+        <p>Leaves Register</p>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

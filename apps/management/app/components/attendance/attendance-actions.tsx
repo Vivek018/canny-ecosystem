@@ -1,4 +1,4 @@
-import { ImportAttendanceMenu } from "./import-attendance-menu";
+import { AttendanceMenu } from "./attendance-menu";
 import { Button } from "@canny_ecosystem/ui/button";
 import { useNavigate } from "@remix-run/react";
 import { Icon } from "@canny_ecosystem/ui/icon";
@@ -30,7 +30,7 @@ export function AttendanceActions({
         <Icon name="chart" className="h-[18px] w-[18px]" />
       </Button>
       <ColumnVisibility disabled={isEmpty} />
-      <ImportAttendanceMenu
+      <AttendanceMenu
         selectedRows={selectedRows}
         companyName={companyName}
         companyAddress={companyAddress}

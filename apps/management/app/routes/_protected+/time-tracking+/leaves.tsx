@@ -47,7 +47,7 @@ import { Icon } from "@canny_ecosystem/ui/icon";
 import { useLeavesStore } from "@/store/leaves";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Button } from "@canny_ecosystem/ui/button";
-import { ImportLeavesMenu } from "@/components/leaves/import-menu";
+import { LeavesMenu } from "@/components/leaves/leaves-menu";
 import { ImportLeavesModal } from "@/components/leaves/import-export/import-modal-leaves";
 import {
   Card,
@@ -327,7 +327,7 @@ export default function LeavesIndex() {
               <Icon name="chart" className="h-[18px] w-[18px]" />
             </Button>
             <ColumnVisibility />
-            <ImportLeavesMenu
+            <LeavesMenu
               companyName={companyName as unknown as CompanyDatabaseRow}
               companyAddress={companyAddress as unknown as LocationDatabaseRow}
             />

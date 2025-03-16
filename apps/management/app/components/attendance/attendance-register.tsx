@@ -23,6 +23,7 @@ import {
   CANNY_MANAGEMENT_SERVICES_ADDRESS,
   CANNY_MANAGEMENT_SERVICES_NAME,
 } from "@/constant";
+import { Icon } from "@canny_ecosystem/ui/icon";
 
 export const AttendanceRegister = ({
   selectedRows,
@@ -33,7 +34,6 @@ export const AttendanceRegister = ({
   companyName?: CompanyDatabaseRow;
   companyAddress?: LocationDatabaseRow;
 }) => {
-
 
   const updatedData = selectedRows.map((employee) => {
     const totalPresents = Object.values(employee).filter(
@@ -204,12 +204,13 @@ export const AttendanceRegister = ({
     <AlertDialog>
       <AlertDialogTrigger
         className={cn(
-          buttonVariants({ variant: "ghost", size: "full" }),
-          "text-[13px] h-9 hidden",
+          buttonVariants({ variant: "muted" }),
+          "w-full justify-start text-[13px] h-9 hidden px-2 gap-2",
           selectedRows.length && "flex"
         )}
       >
-        Attendance Register
+        <Icon name="plus-circled" />
+        <p>Monthly Register</p>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
