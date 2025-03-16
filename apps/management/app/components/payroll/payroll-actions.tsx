@@ -44,7 +44,7 @@ export function PayrollActions({
           size="icon"
           className={cn("h-10", className)}
         >
-          <Icon name="dots-horizontal" className="h-[18px] w-[18px]" />
+          <Icon name="dots-vertical" className="h-[18px] w-[18px]" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent sideOffset={10} align="end">
