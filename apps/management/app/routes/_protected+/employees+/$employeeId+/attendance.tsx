@@ -71,7 +71,7 @@ export default function EmployeeAttendance() {
     return (
       <ErrorBoundary
         error={error}
-        message='Failed to load Employee Attendance'
+        message="Failed to load Employee Attendance"
       />
     );
   }
@@ -85,7 +85,7 @@ export default function EmployeeAttendance() {
             return (
               <ErrorBoundary
                 error={error}
-                message='Failed to load Employee Attendance'
+                message="Failed to load Employee Attendance"
               />
             );
           }

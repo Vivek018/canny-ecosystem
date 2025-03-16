@@ -16,7 +16,7 @@
     "dev:management": "turbo dev --filter=@canny_ecosystem/management",
     "start:management": "turbo start --filter=@canny_ecosystem/management",
     "build:icons": "turbo build:icons --filter=@canny_ecosystem/ui",
-    "db:generate":"turbo db:generate --filter=@canny_ecosystem/supabase",
+    "db:generate": "turbo db:generate --filter=@canny_ecosystem/supabase",
     "build:employee": "turbo build --filter=@canny_ecosystem/employee",
     "dev:employee": "turbo dev --filter=@canny_ecosystem/employee",
     "start:employee": "turbo start --filter=@canny_ecosystem/employee",
@@ -34,5 +34,8 @@
   "engines": {
     "node": "22.14.0"
   },
-  "packageManager": "npm@10.8.3"
+  "packageManager": "npm@10.8.3",
+  "dependencies": {
+    "remark-gfm": "^4.0.1"
+  }
 }
