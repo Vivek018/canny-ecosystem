@@ -30,7 +30,9 @@ export async function getCompanies({
 
 export async function getFirstCompany({
   supabase,
-}: { supabase: TypedSupabaseClient }) {
+}: {
+  supabase: TypedSupabaseClient;
+}) {
   const columns = ["id", "name"] as const;
 
   const { data, error } = await supabase
@@ -47,10 +49,35 @@ export async function getFirstCompany({
   return { data, error };
 }
 
+export async function getCompanyNameByCompanyId({
+  supabase,
+  id,
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+}) {
+  const columns = ["name"] as const;
+
+  const { data, error } = await supabase
+    .from("companies")
+    .select(columns.join(","))
+    .eq("id", id)
+    .single<InferredType<CompanyDatabaseRow, (typeof columns)[number]>>();
+
+  if (error) {
+    console.error("getCompanyNameById Error", error);
+  }
+
+  return { data, error };
+}
+
 export async function getCompanyById({
   supabase,
   id,
-}: { supabase: TypedSupabaseClient; id: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+}) {
   const columns = [
     "id",
     "name",
@@ -77,7 +104,10 @@ export async function getCompanyById({
 export async function getCompanyRegistrationDetailsByCompanyId({
   supabase,
   companyId,
-}: { supabase: TypedSupabaseClient; companyId: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+}) {
   const columns = [
     "company_id",
     "gst_number",
@@ -108,7 +138,10 @@ export async function getCompanyRegistrationDetailsByCompanyId({
 export async function getLocationsForSelectByCompanyId({
   supabase,
   companyId,
-}: { supabase: TypedSupabaseClient; companyId: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+}) {
   const columns = ["id", "name"] as const;
 
   const { data, error } = await supabase
@@ -129,7 +162,10 @@ export async function getLocationsForSelectByCompanyId({
 export async function getLocationsByCompanyId({
   supabase,
   companyId,
-}: { supabase: TypedSupabaseClient; companyId: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+}) {
   const columns = [
     "id",
     "company_id",
@@ -162,7 +198,10 @@ export async function getLocationsByCompanyId({
 export async function getLocationById({
   supabase,
   id,
-}: { supabase: TypedSupabaseClient; id: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+}) {
   const columns = [
     "id",
     "company_id",
@@ -193,7 +232,10 @@ export async function getLocationById({
 export async function getPrimaryLocationByCompanyId({
   supabase,
   companyId,
-}: { supabase: TypedSupabaseClient; companyId: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+}) {
   const columns = [
     "id",
     "company_id",
@@ -233,7 +275,10 @@ export type RelationshipWithCompany = RelationshipDatabaseRow & {
 export async function getRelationshipsByCompanyId({
   supabase,
   companyId,
-}: { supabase: TypedSupabaseClient; companyId: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+}) {
   const columns = [
     "id",
     "parent_company_id",
@@ -266,7 +311,11 @@ export async function getRelationshipById({
   supabase,
   id,
   companyId,
-}: { supabase: TypedSupabaseClient; id: string; companyId: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+  companyId: string;
+}) {
   const columns = [
     "id",
     "parent_company_id",
@@ -298,7 +347,11 @@ export async function getRelationshipTermsById({
   supabase,
   id,
   companyId,
-}: { supabase: TypedSupabaseClient; id: string; companyId: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+  companyId: string;
+}) {
   const columns = ["terms"] as const;
   const { data, error } = await supabase
     .from("company_relationships")

@@ -70,11 +70,11 @@ export const attendanceColumns = (
         enableSorting: false,
         accessorKey: formatDate(day.fullDate),
         header: formatDate(day.fullDate) || "",
-        cell: ({ row }: { row: any }) => (
-          <p className="truncate">
-            {row.original?.[formatDate(day.fullDate)!] ?? "--"}
-          </p>
-        ),
+
+        cell: ({ row }: { row: any }) => {
+          const attendance = row.original?.[formatDate(day.fullDate)!] || {};
+          return <p className="truncate">{attendance.present ?? "--"}</p>;
+        },
       })),
     ],
     [days]

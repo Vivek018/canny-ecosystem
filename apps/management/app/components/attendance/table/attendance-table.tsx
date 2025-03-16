@@ -122,10 +122,14 @@ export function AttendanceTable({
   }, [days]);
 
   const loadMoreEmployees = async () => {
+    if (data.length >= count) {
+      setHasNextPage(false);
+      return;
+    }
     const formattedFrom = from;
     const to = formattedFrom + pageSize;
     const sortParam = searchParams.get("sort");
-
+    
     try {
       const { data: newData } = await getAttendanceByCompanyId({
         supabase,
@@ -140,9 +144,7 @@ export function AttendanceTable({
       });
 
       if (newData && newData.length > 0) {
-        const transformedData = useMemo(() => {
-          return transformAttendanceData(newData);
-        }, [newData, transformAttendanceData]);
+        const transformedData = transformAttendanceData(newData);
         setData(
           (prevData) =>
             [...prevData, ...transformedData] as TransformedAttendanceDataType[]
@@ -159,6 +161,16 @@ export function AttendanceTable({
     }
   };
 
+  useEffect(() => {
+    setData(initialData);
+    setFrom(pageSize);
+    setHasNextPage(initialHasNextPage);
+  }, [initialData, initialHasNextPage, pageSize]);
+
+  useEffect(() => {
+    setColumns(table.getAllLeafColumns());
+  }, [columnVisibility, days]);
+
   const table = useReactTable({
     data,
     columns,
@@ -172,21 +184,10 @@ export function AttendanceTable({
   });
 
   useEffect(() => {
-    setData(initialData);
-    setFrom(pageSize);
-    setHasNextPage(initialHasNextPage);
-  }, [initialData, initialHasNextPage, pageSize]);
-
-  useEffect(() => {
-    setColumns(table.getAllLeafColumns());
-  }, [columnVisibility, days]);
-
-  useEffect(() => {
     if (inView) {
       loadMoreEmployees();
     }
   }, [inView]);
-
   const selectedRowsData = table
     .getSelectedRowModel()
     .rows?.map((row) => row.original);
