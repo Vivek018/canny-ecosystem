@@ -15,10 +15,10 @@ import {
   updateRole,
 } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
-import { ReimbursementPayrollDataTable } from "./reimbursement-table/data-table";
-import { payrollColumns } from "./reimbursement-table/columns";
+import { PayrollEntryDataTable } from "./payroll-entry-table/data-table";
+import { payrollEntryColumns } from "./payroll-entry-table/columns";
 
-export function PayrollComponent({
+export function PayrollEntryComponent({
   data,
   payrollData,
 }: {
@@ -85,8 +85,8 @@ export function PayrollComponent({
             className={cn(
               "hidden h-10",
               payrollData.status === "pending" &&
-                hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
-                "flex",
+              hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
+              "flex",
             )}
             disabled={disable}
           >
@@ -98,8 +98,8 @@ export function PayrollComponent({
             className={cn(
               "hidden h-10",
               payrollData.status === "submitted" &&
-                hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
-                "flex",
+              hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
+              "flex",
             )}
             disabled={disable}
           >
@@ -110,8 +110,8 @@ export function PayrollComponent({
             className={cn(
               "hidden h-10",
               payrollData.status === "submitted" &&
-                hasPermission(role, `${approveRole}:${attribute.payroll}`) &&
-                "flex",
+              hasPermission(role, `${approveRole}:${attribute.payroll}`) &&
+              "flex",
             )}
             disabled={disable}
           >
@@ -123,13 +123,11 @@ export function PayrollComponent({
           />
         </div>
       </div>
-      {payrollData?.payroll_type === "reimbursement" && (
-        <ReimbursementPayrollDataTable
-          data={tableData}
-          columns={payrollColumns}
-          editable={payrollData?.status === "pending"}
-        />
-      )}
+      <PayrollEntryDataTable
+        data={tableData}
+        columns={payrollEntryColumns}
+        editable={payrollData?.status === "pending"}
+      />
       <Outlet />
     </section>
   );

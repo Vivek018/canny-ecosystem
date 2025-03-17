@@ -1,7 +1,7 @@
 import type { PayrollEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
 import type { ColumnDef } from "@tanstack/react-table";
 
-export const payrollColumns: ColumnDef<PayrollEntriesWithEmployee>[] = [
+export const payrollEntryColumns: ColumnDef<PayrollEntriesWithEmployee>[] = [
   {
     enableSorting: false,
     accessorKey: "employee_code",

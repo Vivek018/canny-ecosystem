@@ -1,5 +1,5 @@
 import { LoadingSpinner } from "@/components/loading-spinner";
-import { PayrollComponent } from "@/components/payroll/payroll-component";
+import { PayrollComponent } from "@/components/payroll/payroll-entry-component";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
   getDefaultTemplateIdByCompanyId,

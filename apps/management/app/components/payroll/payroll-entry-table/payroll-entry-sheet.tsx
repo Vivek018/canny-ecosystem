@@ -24,7 +24,7 @@ import type { PayrollEntriesWithEmployee } from "@canny_ecosystem/supabase/queri
 import { PayrollEntrySchema, payrollPaymentStatusArray, replaceUnderscore, transformStringArrayIntoOptions } from "@canny_ecosystem/utils";
 import { useState } from "react";
 
-export function ReimbursementPayrollSheet({
+export function PayrollEntrySheet({
   row,
   rowData,
   editable,

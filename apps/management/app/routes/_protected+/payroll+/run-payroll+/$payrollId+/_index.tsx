@@ -1,6 +1,6 @@
 import { ErrorBoundary } from "@/components/error-boundary";
 import { LoadingSpinner } from "@/components/loading-spinner";
-import { PayrollComponent } from "@/components/payroll/payroll-component";
+import { PayrollEntryComponent } from "@/components/payroll/payroll-entry-component";
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { updatePayroll } from "@canny_ecosystem/supabase/mutations";
@@ -157,9 +157,10 @@ export default function PayrollId() {
                     />
                   );
                 }
-                return (
-                  <PayrollComponent payrollData={payrollData} data={data} />
-                );
+                if (payrollData.payroll_type === "reimbursement" || payrollData.payroll_type === "exit")
+                  return (
+                    <PayrollEntryComponent payrollData={payrollData} data={data} />
+                  );
               }}
             </Await>
           );

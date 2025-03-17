@@ -11,7 +11,7 @@ interface Props {
 }
 
 // make sure the order is same as header order
-export const reimbursementPayrollColumnIdArray = [
+export const payrollEntryColumnIdArray = [
   "employee_code",
   "name",
   "amount",
@@ -57,7 +57,7 @@ export function PayrollTableHeader({ table, loading, className }: Props) {
   return (
     <TableHeader className={className}>
       <TableRow className="h-[45px] hover:bg-transparent">
-        {reimbursementPayrollColumnIdArray.map((id) => (
+        {payrollEntryColumnIdArray.map((id) => (
           <TableHead
             key={id}
             className={cn(
