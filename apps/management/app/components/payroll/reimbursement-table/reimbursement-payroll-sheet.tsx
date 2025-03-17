@@ -133,13 +133,12 @@ export function ReimbursementPayrollSheet({
         </div>
         <SheetFooter className="mt-auto flex-shrink-0">
           <SheetClose asChild>
-            {editable && (
-              <FormButtons
-                form={form}
-                setResetKey={setResetKey}
-                isSingle={true}
-              />
-            )}
+            <FormButtons
+              form={form}
+              setResetKey={setResetKey}
+              isSingle={true}
+              className={cn(!editable && "hidden")}
+            />
           </SheetClose>
         </SheetFooter>
       </SheetContent>
