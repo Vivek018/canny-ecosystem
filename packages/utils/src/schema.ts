@@ -72,14 +72,14 @@ export const zFile = z
     (file) =>
       typeof file !== "string"
         ? [
-            ...ACCEPTED_IMAGE_TYPES,
-            "image/pdf",
-            "image/doc",
-            "image/docx",
-            "application/pdf",
-            "application/doc",
-            "application/docx",
-          ].includes(file?.type)
+          ...ACCEPTED_IMAGE_TYPES,
+          "image/pdf",
+          "image/doc",
+          "image/docx",
+          "application/pdf",
+          "application/doc",
+          "application/docx",
+        ].includes(file?.type)
         : true,
     "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .docx formats are supported."
   );
@@ -114,6 +114,7 @@ export const CompanySchema = z.object({
 export const CompanyDetailsSchema = z.object({
   id: z.string().optional(),
   name: zNumberString.min(3).max(32),
+  logo: z.string().optional(),
   email_suffix: zEmailSuffix.max(32).optional(),
   company_type: z.enum(company_type).optional(),
   company_size: z.enum(company_size).optional(),
@@ -1171,21 +1172,21 @@ export const ImportEmployeeGuardiansDataSchema = z.object({
   data: z.array(ImportSingleEmployeeGuardiansDataSchema),
 });
 
+export const payrollPaymentStatusArray = ["pending", "submitted", "approved"] as const;
+
 // Payroll
-export const PayrollSchema = z
-  .object({
-    employee_id: z.string().optional(),
-    site_id: z.string().optional(),
-    payrollId: z.string().optional(),
-    gross_pay: z.number().optional(),
-    statutoryBonus: z.number().optional(),
-    epf: z.number().optional(),
-    esi: z.number().optional(),
-    pt: z.number().optional(),
-    lwf: z.number().optional(),
-    templateComponents: z.any(),
-  })
-  .catchall(z.any());
+
+export const payrollTypesArray = ["reimbursement", "exit", "salary", "others"];
+
+export const PayrollEntrySchema = z.object({
+  id: z.string().optional(),
+  amount: z.number(),
+  payment_status: z.enum(payrollPaymentStatusArray),
+  reimbursement_id: z.string().optional(),
+  exit_id: z.string().optional(),
+  employee_id: z.string(),
+  payroll_id: z.string(),
+});
 
 // Exits
 export const exitReasonArray = [

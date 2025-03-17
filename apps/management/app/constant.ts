@@ -382,5 +382,3 @@ export function numberToWordsIndian(num: number) {
 
   return `${integerWords}${decimalPart ? ` ${decimalWords}` : ""}`;
 }
-
-export const PayrollTypes = ["reimbursement", "exit","salary","others"];

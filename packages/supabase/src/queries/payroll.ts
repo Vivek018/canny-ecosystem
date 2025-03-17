@@ -93,7 +93,6 @@ export async function getPayrollEntriesByPayrollId({
   const columns = [
     "id",
     "employee_id",
-    "payment_template_components_id",
     "reimbursement_id",
     "exit_id",
     "payment_status",

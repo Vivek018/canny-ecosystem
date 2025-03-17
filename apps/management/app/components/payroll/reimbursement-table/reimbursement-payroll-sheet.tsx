@@ -1,12 +1,10 @@
-import { useEffect, useState } from "react";
-import { PayrollSchema } from "@canny_ecosystem/utils";
 import {
   FormProvider,
   getFormProps,
   getInputProps,
   useForm,
 } from "@conform-to/react";
-import { Field, type ListOfErrors } from "@canny_ecosystem/ui/forms";
+import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import { Form } from "@remix-run/react";
 import {
   Sheet,
@@ -23,15 +21,30 @@ import { flexRender } from "@tanstack/react-table";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { FormButtons } from "../../form/form-buttons";
 import type { PayrollEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
+import { PayrollEntrySchema, payrollPaymentStatusArray, replaceUnderscore, transformStringArrayIntoOptions } from "@canny_ecosystem/utils";
+import { useState } from "react";
 
 export function ReimbursementPayrollSheet({
   row,
   rowData,
   editable,
 }: { row: any; rowData: PayrollEntriesWithEmployee; editable: boolean }) {
-  const name = `${row.original?.employees?.first_name} ${row.original?.employees?.middle_name ?? ""} ${
-    row.original?.employees?.last_name ?? ""
-  }`;
+  const name = `${rowData?.employees?.first_name} ${rowData?.employees?.middle_name ?? ""} ${rowData?.employees?.last_name ?? ""
+    }`;
+
+  const [resetKey, setResetKey] = useState(Date.now());
+
+  const [form, fields] = useForm({
+    id: "UPDATE_PAYROLL_ENTRY",
+    constraint: getZodConstraint(PayrollEntrySchema),
+    onValidate({ formData }) {
+      return parseWithZod(formData, { schema: PayrollEntrySchema });
+    },
+    shouldValidate: "onInput",
+    shouldRevalidate: "onInput",
+    defaultValue: rowData,
+
+  });
 
   return (
     <Sheet>
@@ -43,7 +56,7 @@ export function ReimbursementPayrollSheet({
               className={cn(
                 "px-3 md:px-4 py-2 hidden md:table-cell",
                 cell.column.id === "name" &&
-                  "sticky left-0 min-w-12 max-w-12 bg-card z-10",
+                "sticky left-0 min-w-12 max-w-12 bg-card z-10",
               )}
             >
               {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -51,8 +64,8 @@ export function ReimbursementPayrollSheet({
           ))}
         </TableRow>
       </SheetTrigger>
-      <SheetContent className="w-[600px]">
-        <SheetHeader className="m-5 flex-shrink-0">
+      <SheetContent className="flex flex-col w-[600px] h-full">
+        <SheetHeader className="px-6 pt-4 pb-8 flex-shrink-0">
           <SheetTitle className="flex justify-between">
             <div>
               <h1 className="text-primary text-3xl">{name}</h1>
@@ -67,38 +80,65 @@ export function ReimbursementPayrollSheet({
             </div>
           </SheetTitle>
         </SheetHeader>
-        <div className="flex-1 overflow-y-auto px-5">
-          {/* <FormProvider context={form.context}>
+        <div className="flex-1 overflow-y-auto px-6">
+          <FormProvider context={form.context}>
             <Form
               method="POST"
               {...getFormProps(form)}
               className="flex flex-col"
-              action="/payroll/run-payroll/update-payroll-entry"
-            > */}
-          {/* <input
+              action={`/payroll/run-payroll/${rowData.payroll_id}/${rowData.id}/update-payroll-entry`}
+            >
+              <input
+                {...getInputProps(fields.id, { type: "hidden" })}
+              />
+              <input
+                {...getInputProps(fields.reimbursement_id, { type: "hidden" })}
+              />
+              <input
+                {...getInputProps(fields.exit_id, { type: "hidden" })}
+              />
+              <input
                 {...getInputProps(fields.employee_id, { type: "hidden" })}
               />
-              <input {...getInputProps(fields.payrollId, { type: "hidden" })} />
-              */}
-
-          <div className="flex justify-between">
-            <h3 className="my-3 text-muted-foreground font-semibold">
-              Net Pay
-            </h3>
-            <p className="font-bold">Rs {rowData?.amount}</p>
-          </div>
-          {/* </Form>
-          </FormProvider> */}
+              <input {...getInputProps(fields.payroll_id, { type: "hidden" })} />
+              <Field
+                inputProps={{
+                  ...getInputProps(fields.amount, { type: "number" }),
+                  autoFocus: true,
+                  placeholder: "Enter amount",
+                  className: "capitalize",
+                  readOnly: !editable,
+                }}
+                labelProps={{
+                  children: "Amount",
+                }}
+                errors={fields.amount.errors}
+              />
+              <SearchableSelectField
+                key={resetKey}
+                className="capitalize"
+                options={transformStringArrayIntoOptions(payrollPaymentStatusArray as unknown as string[])}
+                inputProps={{
+                  ...getInputProps(fields.payment_status, { type: "text" }),
+                }}
+                placeholder={`Select ${replaceUnderscore(fields.payment_status.name)}`}
+                labelProps={{
+                  children: replaceUnderscore(fields.payment_status.name),
+                }}
+                errors={fields.payment_status.errors}
+              />
+            </Form>
+          </FormProvider>
         </div>
-        <SheetFooter className="mt-6 flex-shrink-0">
+        <SheetFooter className="mt-auto flex-shrink-0">
           <SheetClose asChild>
-            {/* {editable && (
+            {editable && (
               <FormButtons
                 form={form}
                 setResetKey={setResetKey}
                 isSingle={true}
               />
-            )} */}
+            )}
           </SheetClose>
         </SheetFooter>
       </SheetContent>

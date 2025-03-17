@@ -1,6 +1,7 @@
 import type {
   PayrollDatabaseUpdate,
   PayrollEntriesDatabaseInsert,
+  PayrollEntriesDatabaseUpdate,
   TypedSupabaseClient,
 } from "../types";
 import type { ExitDataType, ReimbursementDataType } from "../queries";
@@ -158,44 +159,6 @@ export async function createExitPayroll({ supabase, data, companyId, bypassAuth 
   return { status: payrollStatus ?? payrollEntriesStatus, error: payrollError ?? payrollEntriesError, message: null }
 }
 
-export async function createPayrollEntries({
-  supabase,
-  data,
-  onConflict,
-  bypassAuth = false,
-}: {
-  supabase: TypedSupabaseClient;
-  data: PayrollEntriesDatabaseInsert[];
-  onConflict?: string,
-  bypassAuth?: boolean;
-}) {
-
-  if (!bypassAuth) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user?.email) {
-      return { status: 400, error: "Unauthorized User" };
-    }
-  }
-
-  const {
-    data: payrollEntriesData,
-    status,
-    error,
-  } = await supabase.from("payroll_entries").upsert(data, {
-    ignoreDuplicates: true,
-    onConflict
-  }).select("id, amount");
-
-  if (error) {
-    console.error("createPayrollEntry Error", error);
-  }
-
-  return { data: payrollEntriesData, status, error };
-}
-
 export async function updatePayroll({
   supabase,
   data,
@@ -255,6 +218,77 @@ export async function deletePayroll({
 
   if (error) {
     console.error("deletePayroll Error:", error);
+  }
+
+  return { status, error };
+}
+
+export async function createPayrollEntries({
+  supabase,
+  data,
+  onConflict,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  data: PayrollEntriesDatabaseInsert[];
+  onConflict?: string,
+  bypassAuth?: boolean;
+}) {
+
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
+  const {
+    data: payrollEntriesData,
+    status,
+    error,
+  } = await supabase.from("payroll_entries").upsert(data, {
+    ignoreDuplicates: true,
+    onConflict
+  }).select("id, amount");
+
+  if (error) {
+    console.error("createPayrollEntry Error", error);
+  }
+
+  return { data: payrollEntriesData, status, error };
+}
+
+export async function updatePayrollEntry({
+  supabase,
+  data,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  data: PayrollEntriesDatabaseUpdate;
+  bypassAuth?: boolean;
+}) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
+  const updateData = convertToNull(data);
+
+  const { error, status } = await supabase
+    .from("payroll_entries")
+    .update(updateData)
+    .eq("id", data.id!);
+
+  if (error) {
+    console.error("updatePayrollEntry Error:", error);
   }
 
   return { status, error };
