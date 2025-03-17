@@ -21,9 +21,11 @@ import { payrollEntryColumns } from "./payroll-entry-table/columns";
 export function PayrollEntryComponent({
   data,
   payrollData,
+  noButtons = false,
 }: {
   data: PayrollEntriesWithEmployee[];
   payrollData: Omit<PayrollDatabaseRow, "created_at" | "updated_at">;
+  noButtons?: boolean;
 }) {
   const { role } = useUser();
   const { payrollId } = useParams();
@@ -79,18 +81,19 @@ export function PayrollEntryComponent({
             className="pl-8 h-10 w-full focus-visible:ring-0 shadow-none"
           />
         </div>
-        <div className="ml-auto flex flex-row gap-3">
+        <div className={cn("ml-auto flex flex-row gap-3", noButtons && "hidden")}>
           <Button
+            variant={payrollData.status === "approved" ? "muted" : "default"}
             onClick={(e) => updateStatusPayroll(e, "submitted")}
             className={cn(
               "hidden h-10",
-              payrollData.status === "pending" &&
+              (payrollData.status === "pending" || payrollData.status === "approved") &&
               hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
               "flex",
             )}
             disabled={disable}
           >
-            Submit
+            {payrollData.status === "pending" ? "Submit" : "Undo Approval"}
           </Button>
           <Button
             variant="muted"
@@ -103,7 +106,7 @@ export function PayrollEntryComponent({
             )}
             disabled={disable}
           >
-            Undo
+            Undo Submit
           </Button>
           <Button
             onClick={(e) => updateStatusPayroll(e, "approved")}
@@ -117,11 +120,11 @@ export function PayrollEntryComponent({
           >
             Approve
           </Button>
-          <PayrollActions
-            className={cn(payrollData?.status === "pending" && "hidden")}
-            payrollId={payrollId ?? payrollData?.id}
-          />
         </div>
+        <PayrollActions
+          className={cn(payrollData?.status === "pending" && "hidden")}
+          payrollId={payrollId ?? payrollData?.id}
+        />
       </div>
       <PayrollEntryDataTable
         data={tableData}

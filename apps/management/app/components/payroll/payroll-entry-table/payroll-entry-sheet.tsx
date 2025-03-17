@@ -48,22 +48,38 @@ export function PayrollEntrySheet({
 
   return (
     <Sheet>
-      <SheetTrigger asChild>
-        <TableRow key={row.id} className="relative cursor-pointer select-text">
-          {row.getVisibleCells()?.map((cell: any) => (
-            <TableCell
-              key={cell.id || Date.now()}
-              className={cn(
-                "px-3 md:px-4 py-2 hidden md:table-cell",
-                cell.column.id === "name" &&
-                "sticky left-0 min-w-12 max-w-12 bg-card z-10",
-              )}
-            >
-              {flexRender(cell.column.columnDef.cell, cell.getContext())}
-            </TableCell>
-          ))}
-        </TableRow>
-      </SheetTrigger>
+      <TableRow
+        key={row.id}
+        data-state={row.getIsSelected() && "selected"}
+        className='relative cursor-pointer select-text'
+      >
+        {row.getVisibleCells().map((cell: any) => {
+          if (cell.column.id === "actions") {
+            return (
+              <TableCell
+                key={cell.id}
+                className={cn(
+                  cell.column.id === "actions" &&
+                  "sticky right-0 min-w-20 max-w-20 bg-card z-10"
+                )}
+              >
+                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+              </TableCell>
+            );
+          }
+          return (
+            <SheetTrigger asChild key={cell.id}>
+              <TableCell
+                className={cn(
+                  "px-3 md:px-4 py-4 hidden md:table-cell",
+                )}
+              >
+                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+              </TableCell>
+            </SheetTrigger>
+          );
+        })}
+      </TableRow>
       <SheetContent className="flex flex-col w-[600px] h-full">
         <SheetHeader className="px-6 pt-4 pb-8 flex-shrink-0">
           <SheetTitle className="flex justify-between">

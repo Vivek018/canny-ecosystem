@@ -58,8 +58,6 @@ export const CompanyDetails = ({
     defaultValue: updateValues,
   });
 
-  console.log(form.initialValue, form.value);
-
   return (
     <FormProvider context={form.context}>
       <Form

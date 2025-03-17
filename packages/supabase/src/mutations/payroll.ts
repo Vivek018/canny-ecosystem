@@ -4,7 +4,7 @@ import type {
   PayrollEntriesDatabaseUpdate,
   TypedSupabaseClient,
 } from "../types";
-import type { ExitDataType, ReimbursementDataType } from "../queries";
+import { getPayrollById, getPayrollEntryById, type ExitDataType, type ReimbursementDataType } from "../queries";
 import { convertToNull, isGoodStatus } from "@canny_ecosystem/utils";
 
 // Reimbrusement Payroll
@@ -99,7 +99,7 @@ export async function createExitPayroll({ supabase, data, companyId, bypassAuth 
 }) {
 
   if (!bypassAuth) {
-    const {data: { user }} = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
 
     if (!user?.email) return { status: 400, error: "Unauthorized User" };
   }
@@ -280,6 +280,8 @@ export async function updatePayrollEntry({
     }
   }
 
+  const { data: payrollEntryData } = await getPayrollEntryById({ supabase, id: data?.id ?? "" });
+
   const updateData = convertToNull(data);
 
   const { error, status } = await supabase
@@ -287,8 +289,66 @@ export async function updatePayrollEntry({
     .update(updateData)
     .eq("id", data.id!);
 
+  if (isGoodStatus(status)) {
+    const { data: payrollData } = await getPayrollById({ supabase, payrollId: data?.payroll_id ?? "" });
+
+    await updatePayroll({
+      supabase, data: {
+        id: payrollData?.id,
+        total_net_amount: payrollData?.total_net_amount! - payrollEntryData?.amount! + updateData?.amount!
+      }
+    })
+  }
+
   if (error) {
     console.error("updatePayrollEntry Error:", error);
+  }
+
+  return { status, error };
+}
+
+export async function deletePayrollEntry({
+  supabase,
+  id,
+  payrollId,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+  payrollId: string;
+  bypassAuth?: boolean;
+}) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
+  const { data: payrollEntryData } = await getPayrollEntryById({ supabase, id });
+
+  const { error, status } = await supabase
+    .from("payroll_entries")
+    .delete()
+    .eq("id", id);
+
+  if (isGoodStatus(status)) {
+    const { data: payrollData } = await getPayrollById({ supabase, payrollId });
+
+    await updatePayroll({
+      supabase, data: {
+        id: payrollData?.id,
+        total_employees: payrollData?.total_employees! - 1,
+        total_net_amount: payrollData?.total_net_amount! - payrollEntryData?.amount!
+      }
+    })
+  }
+
+  if (error) {
+    console.error("deletePayrollEntry Error:", error);
   }
 
   return { status, error };

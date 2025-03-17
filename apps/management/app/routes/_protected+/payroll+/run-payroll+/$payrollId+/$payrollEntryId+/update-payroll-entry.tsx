@@ -66,7 +66,8 @@ export default function UpdatePayrollEntry() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearExactCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`,);
+        clearExactCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
+        clearExactCacheEntry(cacheKeyPrefix.run_payroll);
         toast({
           title: "Success",
           description: actionData?.message,

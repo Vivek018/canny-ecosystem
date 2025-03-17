@@ -89,6 +89,8 @@ export function PayrollTableHeader({ table, loading, className }: Props) {
             </Button>
           </TableHead>
         ))}
+
+        <TableHead className="sticky right-0 min-w-20 max-w-20 bg-card z-10" />
       </TableRow>
     </TableHeader>
   );

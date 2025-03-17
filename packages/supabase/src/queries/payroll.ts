@@ -110,3 +110,30 @@ export async function getPayrollEntriesByPayrollId({
 
   return { data, error };
 }
+export async function getPayrollEntryById({
+  supabase,
+  id,
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+}) {
+  const columns = [
+    "id",
+    "employee_id",
+    "reimbursement_id",
+    "exit_id",
+    "payment_status",
+    "amount",
+    "payroll_id",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("payroll_entries")
+    .select(`${columns.join(",")}, employees!left(id,company_id,first_name, middle_name, last_name, employee_code)`)
+    .eq("id", id)
+    .single<PayrollEntriesWithEmployee>();
+
+  if (error) console.error("getPayrollEntryById Error", error);
+
+  return { data, error };
+}
