@@ -67,7 +67,7 @@ export function AttendanceMenu({
             !selectedRows.length && "hidden"
           )}
         />
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1">
           <AttendanceRegister
             selectedRows={selectedRows}
             companyName={companyName}
