@@ -120,6 +120,7 @@ export function ReimbursementPayrollSheet({
                 options={transformStringArrayIntoOptions(payrollPaymentStatusArray as unknown as string[])}
                 inputProps={{
                   ...getInputProps(fields.payment_status, { type: "text" }),
+                  readOnly: !editable,
                 }}
                 placeholder={`Select ${replaceUnderscore(fields.payment_status.name)}`}
                 labelProps={{
