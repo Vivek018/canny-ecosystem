@@ -7,8 +7,10 @@ import {
   MAX_QUERY_LIMIT,
 } from "@canny_ecosystem/supabase/constant";
 import {
+  getCompanyNameByCompanyId,
   getLeavesByCompanyId,
   getLeaveTypeByCompanyId,
+  getPrimaryLocationByCompanyId,
   getProjectNamesByCompanyId,
   getSiteNamesByProjectName,
   getUsersEmail,
@@ -45,7 +47,7 @@ import { Icon } from "@canny_ecosystem/ui/icon";
 import { useLeavesStore } from "@/store/leaves";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Button } from "@canny_ecosystem/ui/button";
-import { ImportLeavesMenu } from "@/components/leaves/import-menu";
+import { LeavesMenu } from "@/components/leaves/leaves-menu";
 import { ImportLeavesModal } from "@/components/leaves/import-export/import-modal-leaves";
 import {
   Card,
@@ -56,6 +58,10 @@ import {
 import { LeaveTypeOptionsDropdown } from "@/components/leaves/leave-types/leave-type-option-dropdown";
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
 import { useUser } from "@/utils/user";
+import type {
+  CompanyDatabaseRow,
+  LocationDatabaseRow,
+} from "@canny_ecosystem/supabase/types";
 
 const pageSize = LAZY_LOADING_LIMIT;
 const isEmployeeRoute = false;
@@ -87,13 +93,23 @@ export async function loader({ request }: LoaderFunctionArgs) {
       project: searchParams.get("project") ?? undefined,
       project_site: searchParams.get("project_site") ?? undefined,
       users: searchParams.get("users") ?? undefined,
+      year: searchParams.get("year") ?? undefined,
     };
 
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined,
+        (value) => value !== null && value !== undefined
       );
+
+    const { data: companyName } = await getCompanyNameByCompanyId({
+      supabase,
+      id: companyId,
+    });
+    const { data: companyAddress } = await getPrimaryLocationByCompanyId({
+      supabase,
+      companyId,
+    });
 
     const leavesPromise = getLeavesByCompanyId({
       supabase,
@@ -132,6 +148,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
       filters,
       companyId,
       env,
+      companyName,
+      companyAddress,
     });
   } catch (error) {
     console.error("Leaves Error in loader function:", error);
@@ -146,6 +164,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
       filters: null,
       companyId: "",
       env,
+      companyName: null,
+      companyAddress: null,
     });
   }
 }
@@ -154,7 +174,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
     `${cacheKeyPrefix.leaves}${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 
@@ -171,6 +191,8 @@ export default function LeavesIndex() {
     filters,
     companyId,
     env,
+    companyName,
+    companyAddress,
   } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
   const { role } = useUser();
@@ -206,13 +228,13 @@ export default function LeavesIndex() {
                               "p-2 py-2 ml-auto mr-2 mt-2 rounded-md  grid place-items-center",
                               !hasPermission(
                                 role,
-                                `${deleteRole}:${attribute.leaves}`,
+                                `${deleteRole}:${attribute.leaves}`
                               ) &&
                                 !hasPermission(
                                   role,
-                                  `${updateRole}:${attribute.leaves}`,
+                                  `${updateRole}:${attribute.leaves}`
                                 ) &&
-                                "hidden",
+                                "hidden"
                             )}
                           >
                             <Icon name="dots-vertical" size="xs" />
@@ -266,21 +288,21 @@ export default function LeavesIndex() {
                             projectArray={
                               projectData?.data?.length
                                 ? projectData?.data?.map(
-                                    (project) => project!.name,
+                                    (project) => project!.name
                                   )
                                 : []
                             }
                             projectSiteArray={
                               projectSiteData?.data?.length
                                 ? projectSiteData?.data?.map(
-                                    (site) => site!.name,
+                                    (site) => site!.name
                                   )
                                 : []
                             }
                             userEmails={
                               userEmailsData?.data?.length
                                 ? userEmailsData?.data?.map(
-                                    (user) => user!.email,
+                                    (user) => user!.email
                                   )
                                 : []
                             }
@@ -300,12 +322,15 @@ export default function LeavesIndex() {
               size="icon"
               className={cn("h-10 w-10", !selectedRows.length && "hidden")}
               disabled={!selectedRows.length}
-              onClick={() => navigate("/time-tracking/leaves/analytics")}
+              onClick={() => navigate("analytics")}
             >
               <Icon name="chart" className="h-[18px] w-[18px]" />
             </Button>
             <ColumnVisibility />
-            <ImportLeavesMenu />
+            <LeavesMenu
+              companyName={companyName as unknown as CompanyDatabaseRow}
+              companyAddress={companyAddress as unknown as LocationDatabaseRow}
+            />
           </div>
         </div>
         <Suspense fallback={<LoadingSpinner className="h-1/2 mt-20" />}>

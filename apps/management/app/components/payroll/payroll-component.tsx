@@ -44,30 +44,19 @@ export function PayrollComponent({
     setTableData(filteredData);
   }, [searchString, data]);
 
-  const submitPayroll = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const updateStatusPayroll = (
+    e: React.MouseEvent<HTMLButtonElement>,
+    status: PayrollDatabaseRow["status"],
+  ) => {
     e.preventDefault();
     submit(
       {
-        id: payrollId ?? payrollData?.id,
-        status: "submitted",
-        total_employees: payrollData?.total_employees,
-        total_net_amount: payrollData?.total_net_amount,
-      },
-      {
-        method: "POST",
-        action: `/payroll/run-payroll/${payrollId}`,
-      },
-    );
-  };
-
-  const approvePayroll = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    submit(
-      {
-        id: payrollId ?? payrollData?.id,
-        status: "approved",
-        total_employees: payrollData?.total_employees,
-        total_net_amount: payrollData?.total_net_amount,
+        data: JSON.stringify({
+          id: payrollId ?? payrollData?.id,
+          status: status,
+          total_employees: payrollData?.total_employees,
+          total_net_amount: payrollData?.total_net_amount,
+        }),
       },
       {
         method: "POST",
@@ -79,44 +68,55 @@ export function PayrollComponent({
   return (
     <section className="p-4">
       <div className="w-full flex items-center justify-between gap-4 pb-4">
-        <div className="relative w-full lg:w-3/5 2xl:w-1/3">
+        <div className="relative w-full">
           <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
             <Icon name="magnifying-glass" size="sm" className="text-gray-400" />
           </div>
           <Input
-            placeholder="Search Reimbursement Payroll Entries"
+            placeholder="Search Payroll Entries"
             value={searchString}
             onChange={(e) => setSearchString(e.target.value)}
             className="pl-8 h-10 w-full focus-visible:ring-0 shadow-none"
           />
         </div>
         <div className="ml-auto flex flex-row gap-3">
-          <div className={cn(payrollData?.status !== "pending" && "hidden")}>
-            <Button
-              onClick={(e) => submitPayroll(e)}
-              className={cn(
-                "hidden h-10",
-                payrollData.status === "pending" &&
-                  hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
-                  "flex",
-              )}
-              disabled={disable}
-            >
-              Submit
-            </Button>
-            <Button
-              onClick={(e) => approvePayroll(e)}
-              className={cn(
-                "hidden h-10",
-                payrollData.status === "submitted" &&
-                  hasPermission(role, `${approveRole}:${attribute.payroll}`) &&
-                  "flex",
-              )}
-              disabled={disable}
-            >
-              Approve
-            </Button>
-          </div>
+          <Button
+            onClick={(e) => updateStatusPayroll(e, "submitted")}
+            className={cn(
+              "hidden h-10",
+              payrollData.status === "pending" &&
+                hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
+                "flex",
+            )}
+            disabled={disable}
+          >
+            Submit
+          </Button>
+          <Button
+            variant="muted"
+            onClick={(e) => updateStatusPayroll(e, "pending")}
+            className={cn(
+              "hidden h-10",
+              payrollData.status === "submitted" &&
+                hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
+                "flex",
+            )}
+            disabled={disable}
+          >
+            Undo
+          </Button>
+          <Button
+            onClick={(e) => updateStatusPayroll(e, "approved")}
+            className={cn(
+              "hidden h-10",
+              payrollData.status === "submitted" &&
+                hasPermission(role, `${approveRole}:${attribute.payroll}`) &&
+                "flex",
+            )}
+            disabled={disable}
+          >
+            Approve
+          </Button>
           <PayrollActions
             className={cn(payrollData?.status === "pending" && "hidden")}
             payrollId={payrollId ?? payrollData?.id}

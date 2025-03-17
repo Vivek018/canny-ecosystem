@@ -26,10 +26,9 @@ export async function uploadCompanyLogo({
   logo: File;
   companyId: string;
 }) {
-  // delete old logo if exists
   const { status, error } = await deleteCompanyLogo({ supabase, companyId });
   if (!isGoodStatus(status)) {
-    console.log("deleteCompanyLogo Error", error);
+    console.error("deleteCompanyLogo Error", error);
     return { status, error };
   }
 

@@ -17,7 +17,7 @@ export function PayrollCard({
     <Card className="w-full select-text cursor-auto dark:border-[1.5px] flex flex-col justify-between">
       <CardContent className="h-full flex flex-row gap-0.5 justify-center items-center p-6">
         <div className="flex items-center flex-1 gap-10 justify-start">
-          <div className="text-md tracking-wide flex-col justify-center items-center text-center">
+          <div className="lg:w-32 text-md tracking-wide flex-col justify-center items-center text-center">
             Type
             <p
               className={

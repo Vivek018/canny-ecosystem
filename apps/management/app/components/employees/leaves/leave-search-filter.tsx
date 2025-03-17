@@ -17,7 +17,12 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useNavigation, useSearchParams } from "@remix-run/react";
 import { Calendar } from "@canny_ecosystem/ui/calendar";
-import { leaveTypeArray, replaceUnderscore } from "@canny_ecosystem/utils";
+import {
+  defaultYear,
+  getYears,
+  leaveTypeArray,
+  replaceUnderscore,
+} from "@canny_ecosystem/utils";
 
 import type { LeavesFilters } from "@canny_ecosystem/supabase/queries";
 
@@ -57,6 +62,7 @@ export function LeavesSearchFilter({
     project: "",
     project_site: "",
     users: "",
+    year: "",
   };
 
   const [filterParams, setFilterParams] = useState(initialFilterParams);
@@ -84,6 +90,7 @@ export function LeavesSearchFilter({
     project: searchParams.get("project"),
     project_site: searchParams.get("project_site"),
     users: searchParams.get("users"),
+    year: searchParams.get("year"),
   };
 
   useEffect(() => {
@@ -147,9 +154,9 @@ export function LeavesSearchFilter({
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-      <div className='flex space-x-4 w-full md:w-auto items-center'>
+      <div className="flex space-x-4 w-full md:w-auto items-center">
         <form
-          className='relative w-full md:w-auto'
+          className="relative w-full md:w-auto"
           onSubmit={(e) => {
             e.preventDefault();
             handleSubmit(e);
@@ -169,19 +176,19 @@ export function LeavesSearchFilter({
               disabled ? "No Leaves Data to Search And Filter" : "Search Leaves"
             }
             disabled={disabled}
-            className='pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70'
+            className="pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70"
             value={prompt}
             onChange={handleSearch}
-            autoComplete='on'
-            autoCapitalize='none'
-            autoCorrect='off'
-            spellCheck='false'
+            autoComplete="on"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck="false"
           />
 
           <DropdownMenuTrigger disabled={disabled} asChild>
             <button
               onClick={() => setIsOpen((prev) => !prev)}
-              type='button'
+              type="button"
               disabled={disabled}
               className={cn(
                 "absolute z-10 right-3 top-[6px] opacity-70",
@@ -191,15 +198,15 @@ export function LeavesSearchFilter({
                 isOpen && "opacity-100"
               )}
             >
-              <Icon name='mixer' />
+              <Icon name="mixer" />
             </button>
           </DropdownMenuTrigger>
         </form>
       </div>
 
       <DropdownMenuContent
-        className='w-full md:w-[480px]'
-        align='end'
+        className="w-full md:w-[480px]"
+        align="end"
         sideOffset={19}
         alignOffset={-11}
       >
@@ -212,10 +219,10 @@ export function LeavesSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className='p-0'
+                className="p-0"
               >
                 <Calendar
-                  mode='range'
+                  mode="range"
                   today={
                     filterParams.date_start
                       ? new Date(filterParams.date_start)
@@ -258,12 +265,12 @@ export function LeavesSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className='p-0'
+                className="p-0"
               >
                 {leaveTypeArray.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className='capitalize'
+                    className="capitalize"
                     checked={filterParams?.leave_type === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
@@ -288,12 +295,12 @@ export function LeavesSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className='p-0'
+                className="p-0"
               >
                 {projectArray?.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
-                    className='capitalize'
+                    className="capitalize"
                     checked={filterParams?.project === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
@@ -319,12 +326,12 @@ export function LeavesSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className='p-0'
+                className="p-0"
               >
                 {!searchParamsList.project ? (
                   <DropdownMenuCheckboxItem
                     disabled={true}
-                    className='p-8 items-center justify-center'
+                    className="p-8 items-center justify-center"
                   >
                     Select Project First
                   </DropdownMenuCheckboxItem>
@@ -332,7 +339,7 @@ export function LeavesSearchFilter({
                   projectSiteArray?.map((name, index) => (
                     <DropdownMenuCheckboxItem
                       key={name + index.toString()}
-                      className='capitalize'
+                      className="capitalize"
                       checked={filterParams?.project_site === name}
                       onCheckedChange={() => {
                         setFilterParams((prev) => ({
@@ -358,7 +365,7 @@ export function LeavesSearchFilter({
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className='p-0'
+                className="p-0"
               >
                 {userEmails?.map((name, index) => (
                   <DropdownMenuCheckboxItem
@@ -368,6 +375,36 @@ export function LeavesSearchFilter({
                       setFilterParams((prev) => ({
                         ...prev,
                         users: name,
+                      }));
+                    }}
+                  >
+                    {name}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+        </DropdownMenuGroup>
+        <DropdownMenuGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <span>Year</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent
+                sideOffset={14}
+                alignOffset={-4}
+                className="p-0"
+              >
+                {getYears(25, defaultYear).map((name, index) => (
+                  <DropdownMenuCheckboxItem
+                    key={name + index.toString()}
+                    className="capitalize"
+                    checked={filterParams?.year === name.toString()}
+                    onCheckedChange={() => {
+                      setFilterParams((prev) => ({
+                        ...prev,
+                        year: name.toString(),
                       }));
                     }}
                   >

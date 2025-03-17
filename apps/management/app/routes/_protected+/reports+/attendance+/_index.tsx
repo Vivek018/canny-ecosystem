@@ -114,7 +114,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
 
   return clientCaching(
-    `${cacheKeyPrefix.attendanceReport}${url.searchParams.toString()}`,
+    `${cacheKeyPrefix.attendance_report}${url.searchParams.toString()}`,
     args,
   );
 }
@@ -187,7 +187,7 @@ export default function AttendanceReport() {
         <Await resolve={attendanceReportPromise}>
           {({ data, meta, error }) => {
             if (error) {
-              clearCacheEntry(cacheKeyPrefix.attendanceReport);
+              clearCacheEntry(cacheKeyPrefix.attendance_report);
               return (
                 <ErrorBoundary
                   error={error}

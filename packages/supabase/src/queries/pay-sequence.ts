@@ -122,7 +122,7 @@ export async function getDefaultPaySequenceByCompanyId({
     .eq("is_default", true)
     .order("created_at", { ascending: false })
     .limit(SINGLE_QUERY_LIMIT)
-    .single<InferredType<PaySequenceDatabaseRow, (typeof columns)[number]>>();
+    .maybeSingle<InferredType<PaySequenceDatabaseRow, (typeof columns)[number]>>();
 
   if (error) {
     console.error("getDefaultPaySequenceByCompanyId Error", error);

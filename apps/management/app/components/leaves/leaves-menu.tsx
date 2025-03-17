@@ -1,9 +1,15 @@
+import { useLeavesStore } from "@/store/leaves";
 import { useUser } from "@/utils/user";
+import type {
+  CompanyDatabaseRow,
+  LocationDatabaseRow,
+} from "@canny_ecosystem/supabase/types";
 import { Button } from "@canny_ecosystem/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
@@ -14,18 +20,25 @@ import {
   modalSearchParamNames,
 } from "@canny_ecosystem/utils/constant";
 import { useSearchParams } from "@remix-run/react";
+import { LeavesRegister } from "./leaves-register";
 
-export function ImportLeavesMenu() {
+export function LeavesMenu({
+  companyAddress,
+  companyName,
+}: {
+  companyName?: CompanyDatabaseRow;
+  companyAddress?: LocationDatabaseRow;
+}) {
   const { role } = useUser();
   const [searchParams, setSearchParams] = useSearchParams();
-
+  const { selectedRows } = useLeavesStore();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
         asChild
         className={cn(
-          !hasPermission(role, `${createRole}:${attribute.leaves}`) &&
-            "hidden",
+          selectedRows?.length ? "bg-muted/70 text-muted-foreground" : undefined,
+          !hasPermission(role, `${createRole}:${attribute.leaves}`) && "hidden"
         )}
       >
         <Button variant="outline" size="icon" className="h-10 w-[2.5rem]">
@@ -35,10 +48,7 @@ export function ImportLeavesMenu() {
       <DropdownMenuContent sideOffset={10} align="end">
         <DropdownMenuItem
           onClick={() => {
-            searchParams.set(
-              "step",
-              modalSearchParamNames.import_leaves,
-            );
+            searchParams.set("step", modalSearchParamNames.import_leaves);
             setSearchParams(searchParams);
           }}
           className="space-x-2 flex items-center"
@@ -46,7 +56,19 @@ export function ImportLeavesMenu() {
           <Icon name="import" size="sm" className="mb-0.5" />
           <span>Import/backfill</span>
         </DropdownMenuItem>
+        <DropdownMenuSeparator
+          className={cn(
+            !hasPermission(role, `${createRole}:${attribute.leaves}`) &&
+            "hidden",
+            !selectedRows.length && "hidden"
+          )}
+        />
+        <LeavesRegister
+          selectedRows={selectedRows}
+          companyName={companyName}
+          companyAddress={companyAddress}
+        />
       </DropdownMenuContent>
-    </DropdownMenu>
+    </DropdownMenu >
   );
 }

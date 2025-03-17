@@ -210,14 +210,6 @@ export const searchInObject = (obj: any, searchString: string): boolean => {
   );
 };
 
-export const newAmount = (
-  amount: number,
-  presentDays: number,
-  totalWorkingDaysOfCurrentMonth: number
-) => {
-  return (amount * presentDays) / totalWorkingDaysOfCurrentMonth;
-};
-
 export const capitalizeFirstLetter = (val: any) => {
   return String(val).charAt(0).toUpperCase() + String(val).slice(1);
 };

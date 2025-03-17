@@ -38,6 +38,7 @@ export function FilterList({ filters }: Props) {
       case "project":
       case "project_site":
       case "users":
+      case "year":
         return value;
       default:
         return null;
