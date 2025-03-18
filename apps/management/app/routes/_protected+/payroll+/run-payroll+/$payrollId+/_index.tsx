@@ -101,7 +101,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   }
 }
 
-export default function PayrollId() {
+export default function RunPayrollId() {
   const { payrollPromise, payrollEntriesPromise } =
     useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
@@ -115,6 +115,7 @@ export default function PayrollId() {
       if (actionData?.status === "success") {
         clearExactCacheEntry(cacheKeyPrefix.run_payroll);
         clearExactCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
+        clearExactCacheEntry(cacheKeyPrefix.payroll_history);
         toast({
           title: "Success",
           description: actionData?.message || "Payroll updated",
@@ -137,11 +138,11 @@ export default function PayrollId() {
       <Await resolve={payrollPromise}>
         {({ data: payrollData, error: payrollError }) => {
           if (payrollError || !payrollData) {
-            clearExactCacheEntry(cacheKeyPrefix.run_payroll_id);
+            clearExactCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
             return (
               <ErrorBoundary
                 error={payrollError}
-                message="Failed to load Payroll Data in Id"
+                message="Failed to load Payroll Data in Run Payroll Id"
               />
             );
           }
@@ -149,11 +150,11 @@ export default function PayrollId() {
             <Await resolve={payrollEntriesPromise}>
               {({ data, error }) => {
                 if (error || !data) {
-                  clearExactCacheEntry(cacheKeyPrefix.run_payroll_id);
+                  clearExactCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
                   return (
                     <ErrorBoundary
                       error={error}
-                      message="Failed to load Payroll Entries"
+                      message="Failed to load Payroll Entries in Run Payroll"
                     />
                   );
                 }

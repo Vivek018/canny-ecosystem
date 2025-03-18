@@ -45,7 +45,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 
 clientLoader.hydrate = true;
 
-export default function ProjectsIndex() {
+export default function RunPayrollIndex() {
   const { payrollsPromise } = useLoaderData<typeof loader>();
   const [searchString, setSearchString] = useState("");
 

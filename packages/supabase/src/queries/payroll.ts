@@ -37,7 +37,40 @@ export async function getPendingOrSubmittedPayrollsByCompanyId({
     .limit(HARD_QUERY_LIMIT)
     .returns<InferredType<PayrollDatabaseRow, (typeof columns)[number]>[]>();
 
-  if (error) console.error("getPayrollById Error", error);
+  if (error) console.error("getPendingOrSubmittedPayrollsByCompanyId Error", error);
+
+  return { data, error };
+}
+
+export async function getApprovedPayrollsByCompanyId({
+  supabase,
+  companyId,
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+}) {
+  const columns = [
+    "id",
+    "total_employees",
+    "payroll_type",
+    "status",
+    "run_date",
+    "total_net_amount",
+    "commission",
+    "company_id",
+    "created_at"
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("payroll")
+    .select(columns.join(","))
+    .eq("company_id", companyId)
+    .in("status", ["approved"])
+    .order("created_at", { ascending: false })
+    .limit(HARD_QUERY_LIMIT)
+    .returns<InferredType<PayrollDatabaseRow, (typeof columns)[number]>[]>();
+
+  if (error) console.error("getApprovedPayrollsByCompanyId Error", error);
 
   return { data, error };
 }

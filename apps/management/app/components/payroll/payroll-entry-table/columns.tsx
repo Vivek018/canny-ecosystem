@@ -57,6 +57,9 @@ export const payrollEntryColumns: ColumnDef<PayrollEntriesWithEmployee>[] = [
       return <PayrollEntryDropdown data={row.original} triggerChild={<DropdownMenuTrigger
         asChild
         className={cn(
+          "hidden",
+          row.original.payment_status === "pending" &&
+          "flex",
           !hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
           !hasPermission(
             role,
