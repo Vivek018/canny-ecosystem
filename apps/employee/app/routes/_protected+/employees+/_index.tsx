@@ -5,14 +5,17 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { cacheKeyPrefix } from "@/constant";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { MAX_QUERY_LIMIT } from "@canny_ecosystem/supabase/constant";
-import { getEmployeesByCompanyId, getProjectNamesByCompanyId } from "@canny_ecosystem/supabase/queries";
+import { safeRedirect } from "@/utils/server/http.server";
+import { getEmployeeIdFromCookie } from "@/utils/server/user.server";
+import { getSessionUser } from "@canny_ecosystem/supabase/cached-queries";
+import { getEmployeesByProjectSiteId, getProjectNamesByCompanyId, getUserByEmail } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Await, type ClientLoaderFunctionArgs, defer, Outlet, useLoaderData } from "@remix-run/react";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -22,22 +25,24 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	};
 
 	try {
-		const url = new URL(request.url);
 		const { supabase } = getSupabaseWithHeaders({ request });
 		const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+		const { user } = await getSessionUser({ request });
 
-		const searchParams = new URLSearchParams(url.searchParams);
-		const sortParam = searchParams.get("sort");
+		const { data: userProfile, error: userProfileError } = await getUserByEmail({ email: user?.email || "", supabase });
+		if (userProfileError) throw userProfileError;
 
+		const employeeId = await getEmployeeIdFromCookie(request);
 
-		const employeesPromise = getEmployeesByCompanyId({
+		if (employeeId) {
+			return safeRedirect(`/employees/${employeeId}/overview`, { status: 303 });
+		}
+
+		if (!userProfile?.site_id) throw new Error("No site id found");
+
+		const employeesPromise = getEmployeesByProjectSiteId({
 			supabase,
-			companyId,
-			params: {
-				from: 0,
-				to: MAX_QUERY_LIMIT,
-				sort: sortParam?.split(":") as [string, "asc" | "desc"],
-			},
+			projectSiteId: userProfile?.site_id || "",
 		});
 
 		const projectPromise = getProjectNamesByCompanyId({
@@ -51,6 +56,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 			projectPromise,
 			companyId,
 			env,
+			error: null
 		});
 	} catch (error) {
 		console.error("Employees Error in loader function:", error);
@@ -60,6 +66,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 			projectPromise: Promise.resolve({ data: [] }),
 			companyId: "",
 			env,
+			error,
 		});
 	}
 }
@@ -80,9 +87,20 @@ export default function EmployeesIndex() {
 		projectPromise,
 		companyId,
 		env,
+		error
 	} = useLoaderData<typeof loader>();
 	const [searchString, setSearchString] = useState("");
+	const { toast } = useToast();
 
+	useEffect(() => {
+		if (error) {
+			toast({
+				title: "Error",
+				description: (error as Error)?.message || "Failed to load employees",
+				variant: "destructive",
+			})
+		}
+	}, [error])
 
 	return (
 		<section className="p-4 w-full border-t mt-4">
@@ -124,6 +142,7 @@ export default function EmployeesIndex() {
 						return (
 							<DataTable
 								data={data ?? []}
+								error={error}
 								columns={columns({ env, companyId })}
 								count={meta?.count ?? 0}
 								companyId={companyId}

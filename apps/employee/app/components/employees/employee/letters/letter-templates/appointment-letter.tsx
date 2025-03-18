@@ -1,4 +1,4 @@
-import type { CompanyInfoDataType } from "@/routes/employees+/$employeeId+/letters+/$letterId";
+import type { CompanyInfoDataType } from "@/routes/_protected+/employees+/$employeeId+/letters+/$letterId";
 import type { EmployeeWithLetterDataType } from "@canny_ecosystem/supabase/queries";
 import {
   formatDate,

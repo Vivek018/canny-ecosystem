@@ -115,8 +115,8 @@ export default function EmployeeIndex() {
     employeeAddressesPromise,
     employeeGuardiansPromise,
   } = useLoaderData<typeof loader>();
-  const { employeeId } = useParams();
 
+  const { employeeId } = useParams();
   if (error) {
     clearExactCacheEntry(`${cacheKeyPrefix.employee_overview}${employeeId}`);
     return (

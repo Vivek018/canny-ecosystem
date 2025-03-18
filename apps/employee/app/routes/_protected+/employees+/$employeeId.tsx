@@ -1,13 +1,31 @@
 import { FooterTabs } from "@/components/footer-tabs";
-import { Link, Outlet, useLocation, useParams } from "@remix-run/react";
+import { json, Link, Outlet, useLoaderData, useLocation, useParams } from "@remix-run/react";
 import { SecondaryMenu } from "@canny_ecosystem/ui/secondary-menu";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
+import { getEmployeeIdFromCookie, getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
+import { safeRedirect } from "@/utils/server/http.server";
+import { DEFAULT_ROUTE } from "@/constant";
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+  const cookieEmployeeId = await getEmployeeIdFromCookie(request);
+
+  if (!cookieEmployeeId && user?.role !== "supervisor") {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
+
+  return json({ user })
+}
 
 export default function Employee() {
   const { employeeId } = useParams();
   const { pathname } = useLocation();
+  const { user } = useLoaderData<typeof loader>();
 
   const items = [
     { label: "Overview", path: `/employees/${employeeId}/overview` },
@@ -26,7 +44,7 @@ export default function Employee() {
     <section className="relative w-full">
       <div className="flex items-center gap-4 py-2.5 px-4 mt-5 md:border-b border-t">
         <div className="hidden md:flex md:items-center md:gap-4">
-          <Link
+          {user && <Link
             prefetch="intent"
             to="/employees"
             className={cn(
@@ -35,11 +53,12 @@ export default function Employee() {
             )}
           >
             <Icon name="chevron-left" size="sm" />
-          </Link>
+          </Link>}
           <SecondaryMenu
             items={items}
             pathname={pathname}
             Link={Link}
+            className="h-9 mx-3 mt-2 "
           />
         </div>
 

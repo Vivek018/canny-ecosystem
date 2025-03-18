@@ -17,10 +17,12 @@ import { useState } from "react";
 import { DataTableHeader } from "./data-table-header";
 import { useEmployeesStore } from "@/store/employees";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  error: string | null;
   count: number;
   initialColumnVisibility?: VisibilityState;
   companyId: string;
@@ -31,6 +33,7 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
   columns,
   data: initialData,
+  error,
   initialColumnVisibility,
   searchString,
 }: DataTableProps<TData, TValue>) {
@@ -41,6 +44,7 @@ export function DataTable<TData, TValue>({
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
     initialColumnVisibility ?? {}
   );
+  const { toast } = useToast();
 
   const table = useReactTable({
     data,
@@ -53,6 +57,15 @@ export function DataTable<TData, TValue>({
       columnVisibility,
     },
   });
+
+  useEffect(() => {
+    if (!error && !data?.length) {
+      toast({
+        description: "No employees found",
+      })
+    }
+  }, [data, error]);
+
 
   useEffect(() => {
     setColumns(table.getAllLeafColumns());

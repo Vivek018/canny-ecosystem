@@ -1561,5 +1561,5 @@ export const ImportLeavesDataSchema = z.object({
 });
 
 export const EmployeeLoginSchema = z.object({
-  employee_code: z.string(),
+  employee_code: z.string().optional(),
 });

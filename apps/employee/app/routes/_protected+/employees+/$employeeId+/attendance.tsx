@@ -1,14 +1,10 @@
 import { AttendanceComponent } from "@/components/employees/attendance/attendance-component";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { LoadingSpinner } from "@/components/loading-spinner";
-import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix } from "@/constant";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";
-import { safeRedirect } from "@/utils/server/http.server";
-import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { getAttendanceByEmployeeId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { hasPermission, readRole } from "@canny_ecosystem/utils";
-import { attribute } from "@canny_ecosystem/utils/constant";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import {
   Await,
@@ -25,18 +21,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const url = new URL(request.url);
     const employeeId = params.employeeId!;
     const searchParams = new URLSearchParams(url.searchParams);
-    const { supabase, headers } = getSupabaseWithHeaders({ request });
+    const { supabase } = getSupabaseWithHeaders({ request });
 
     const filters = {
       month: searchParams.get("month") ?? undefined,
       year: searchParams.get("year") ?? undefined,
     };
-
-    const { user } = await getUserCookieOrFetchUser(request, supabase);
-
-    if (!hasPermission(user?.role!, `${readRole}:${attribute.employeeAttendance}`)) {
-      return safeRedirect(DEFAULT_ROUTE, { headers });
-    }
 
     const attendancePromise = getAttendanceByEmployeeId({
       employeeId: employeeId,

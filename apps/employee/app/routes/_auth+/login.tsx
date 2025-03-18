@@ -1,8 +1,18 @@
 import { DEFAULT_ROUTE } from "@/constant";
 import { safeRedirect } from "@/utils/server/http.server";
+import { employeeRoleCookie, getEmployeeIdFromCookie } from "@/utils/server/user.server";
 import { getSessionUser } from "@canny_ecosystem/supabase/cached-queries";
+import { getEmployeeIdsByEmployeeCodes } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Button } from "@canny_ecosystem/ui/button";
+import { Field } from "@canny_ecosystem/ui/forms";
+import { Icon } from "@canny_ecosystem/ui/icon";
+import { StatusButton } from "@canny_ecosystem/ui/status-button";
+import { useToast } from "@canny_ecosystem/ui/use-toast";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { EmployeeLoginSchema } from "@canny_ecosystem/utils";
+import { FormProvider, getFormProps, getInputProps, useForm } from "@conform-to/react";
+import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import {
   json,
   redirect,
@@ -10,13 +20,15 @@ import {
   type LoaderFunctionArgs,
 } from "@remix-run/node";
 import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
+import { useEffect } from "react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const error = url.searchParams.get("error");
   const { user } = await getSessionUser({ request });
+  const employeeId = await getEmployeeIdFromCookie(request);
 
-  if (user) {
+  if (user || employeeId) {
     return safeRedirect(DEFAULT_ROUTE, { status: 303 });
   }
 
@@ -24,9 +36,45 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+  const formData = await request.formData();
   const { supabase, headers } = getSupabaseWithHeaders({
     request,
   });
+
+  const submission = parseWithZod(formData, { schema: EmployeeLoginSchema });
+
+  if (formData.get("_action") === "employee_login") {
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
+    }
+
+    const employeeData = submission.value;
+
+    const { data, error } = await getEmployeeIdsByEmployeeCodes({
+      supabase,
+      employeeCodes: [employeeData?.employee_code ?? ""],
+    });
+
+    if (error || !data || data.length === 0) {
+      return json({ error: error || "No employee data found", employeeId: null }, { status: 400 });
+    }
+
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("employeeId", JSON.stringify(data?.[0].id));
+    }
+
+    return safeRedirect(`/employees/${data[0].id}/overview`, {
+      headers: {
+        "Set-Cookie": await employeeRoleCookie.serialize({
+          role: "employee",
+          employeeId: data[0].id,
+        }),
+      },
+    });
+  }
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
@@ -39,8 +87,6 @@ export async function action({ request }: ActionFunctionArgs) {
     },
   });
 
-  console.log(data.url)
-
   if (error) {
     console.error("Login - OAuth error:", error);
     return json({ error: error.message }, { status: 500 });
@@ -50,21 +96,42 @@ export async function action({ request }: ActionFunctionArgs) {
     return redirect(data.url, { headers });
   }
 
+
   return json({ error: "Failed to get login URL" }, { status: 500 });
 }
 
 export default function Login() {
   const actionData = useActionData<typeof action>();
   const loaderData = useLoaderData<typeof loader>();
+  const { toast } = useToast();
+  const error = (actionData && 'error' in actionData ? actionData.error : null) || loaderData.error;
 
-  const error = actionData?.error || loaderData.error;
+  const [form, fields] = useForm({
+    id: "login",
+    constraint: getZodConstraint(EmployeeLoginSchema),
+    onValidate({ formData }) {
+      return parseWithZod(formData, { schema: EmployeeLoginSchema });
+    },
+    shouldValidate: "onInput",
+    shouldRevalidate: "onInput",
+  });
+
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: "Error",
+        description: error ?? "Failed to load employee details",
+        variant: "destructive",
+      })
+    }
+  }, [error, actionData]);
 
   return (
-    <section className="flex min-h-screen justify-center items-center overflow-hidden p-6 -mt-20 md:p-0">
+    <section className="flex min-h-screen justify-center items-center overflow-hidden p-6 mt-1 md:p-0">
       <div className="relative z-20 m-auto flex w-full max-w-[450px] flex-col py-8">
         <div className="flex w-full flex-col justify-center relative">
           <div className="pb-4 bg-gradient-to-r from-primary dark:via-primary dark:to-[#848484] to-[#000] inline-block text-transparent bg-clip-text mx-auto">
-            <h1 className="font-extrabold uppercase pb-1 tracking-widest text-4xl">
+            <h1 className="font-extrabold uppercase pb-1 tracking-widest text-4xl max-sm:text-center">
               CANNY ECOSYSTEM
             </h1>
           </div>
@@ -75,13 +142,53 @@ export default function Login() {
             ecosystem.
           </p>
 
-          <div className="pointer-events-auto my-6 flex flex-col">
-            <Form method="POST">
-              <Button type="submit" variant="default" className="w-full">
-                Continue with Google
-              </Button>
-            </Form>
-            {error && <p className="text-destructive text-sm mt-2">{error}</p>}
+          <div className="flex flex-col items-center my-5 ">
+
+            <div className="pointer-events-auto flex flex-col mx-auto ">
+              <FormProvider context={form.context}>
+                {/* Employee Login Form */}
+                <Form method="POST" {...getFormProps(form)} className="flex flex-col">
+                  <div className="flex items-start gap-2">
+                    <Field
+                      inputProps={{
+                        ...getInputProps(fields.employee_code, {
+                          type: "text",
+                        }),
+                        className: "p-5 text-md w-56",
+                        placeholder: "Employee Code",
+                      }}
+                      errors={fields.employee_code.errors}
+                    />
+                    <StatusButton
+                      form={form.id}
+                      disabled={!form.valid}
+                      variant="default"
+                      size="full"
+                      type="submit"
+                      name="_action"
+                      value="employee_login"
+                      className={cn("mt-[7px] px-4 py-5")}
+                    >
+                      <Icon name="chevron-right" className="mb-1" />
+                    </StatusButton>
+                  </div>
+                </Form>
+              </FormProvider>
+            </div>
+
+            <span className="mx-auto">or</span>
+
+            <div className="pointer-events-auto my-6 flex flex-col">
+              <Form method="POST">
+                <Button
+                  type="submit"
+                  name="_action"
+                  value="supervisor_login"
+                  className="p-5 cursor-pointer w-64"
+                >
+                  Login as Supervisor
+                </Button>
+              </Form></div>
           </div>
 
           <p className="text-xs text-[#878787]">

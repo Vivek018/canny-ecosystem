@@ -961,7 +961,7 @@ export async function getEmployeesReportByCompanyId({
 
   return {
     data,
-    meta: { count: count  },
+    meta: { count: count },
     error: null,
   };
 }
