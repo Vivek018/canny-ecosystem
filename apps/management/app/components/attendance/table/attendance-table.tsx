@@ -9,7 +9,6 @@ import {
   flexRender,
   getCoreRowModel,
   useReactTable,
-  type VisibilityState,
 } from "@tanstack/react-table";
 import { AttendanceTableHeader } from "./attendance-table-header";
 import { useEffect, useMemo, useState } from "react";
@@ -41,7 +40,6 @@ interface DataTableProps {
   companyId: string;
   env: SupabaseEnv;
   query?: string | null;
-  initialColumnVisibility?: VisibilityState;
 }
 
 export function AttendanceTable({
@@ -56,19 +54,21 @@ export function AttendanceTable({
   query,
   env,
   companyId,
-  initialColumnVisibility,
 }: DataTableProps) {
-  const { rowSelection, setSelectedRows, setRowSelection, setColumns } =
-    useAttendanceStore();
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    initialColumnVisibility ?? {}
-  );
+  const {
+    rowSelection,
+    setSelectedRows,
+    setRowSelection,
+    setColumns,
+    columnVisibility,
+    setColumnVisibility,
+  } = useAttendanceStore();
+
   const [searchParams, setSearchParams] = useSearchParams();
   const [data, setData] =
     useState<TransformedAttendanceDataType[]>(initialData);
   const [from, setFrom] = useState(pageSize);
   const [hasNextPage, setHasNextPage] = useState(initialHasNextPage);
-
   const { supabase } = useSupabase({ env });
 
   const { ref, inView } = useInView();
@@ -129,7 +129,7 @@ export function AttendanceTable({
     const formattedFrom = from;
     const to = formattedFrom + pageSize;
     const sortParam = searchParams.get("sort");
-    
+
     try {
       const { data: newData } = await getAttendanceByCompanyId({
         supabase,
@@ -188,6 +188,7 @@ export function AttendanceTable({
       loadMoreEmployees();
     }
   }, [inView]);
+  
   const selectedRowsData = table
     .getSelectedRowModel()
     .rows?.map((row) => row.original);

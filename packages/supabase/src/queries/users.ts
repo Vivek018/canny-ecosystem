@@ -41,17 +41,6 @@ export async function getUserByEmail({
   supabase: TypedSupabaseClient;
   email: string;
 }) {
-  // return {
-  //   data: {
-  //     id: "1",
-  //     email: "demo@gmail.com",
-  //     first_name: "Demo",
-  //     last_name: "User",
-  //     role: "master",
-  //   },
-  //   error: null,
-  // };
-
   const columns = [
     "id",
     "first_name",
@@ -77,8 +66,17 @@ export async function getUserByEmail({
   if (error) {
     console.error("getUserByEmail Error", error);
   }
-
-  return { data, error };
+  return {
+    data: {
+      id: "1",
+      email: "demo@gmail.com",
+      first_name: "Demo",
+      last_name: "User",
+      role: "master",
+    },
+    error: null,
+  };
+  // return { data, error };
 }
 
 export async function getUsersByCompanyId({
@@ -126,7 +124,7 @@ export async function getUsersEmail({
 
   const { data, error } = await supabase
     .from("users")
-    .select(`${columns.join(",")},email`)
+    .select(`${columns.join(",")}`)
     .eq("company_id", companyId)
     .order("created_at", { ascending: false })
     .limit(HARD_QUERY_LIMIT)
@@ -146,16 +144,7 @@ export async function getUserById({
   supabase: TypedSupabaseClient;
   id: string;
 }) {
-  // return {
-  //   data: {
-  //     id: "1",
-  //     email: "demo@gmail.com",
-  //     first_name: "Demo",
-  //     last_name: "User",
-  //     role: "master",
-  //   },
-  //   error: null,
-  // };
+  
 
   const columns = [
     "id",
@@ -182,8 +171,17 @@ export async function getUserById({
   if (error) {
     console.error("getUserById Error", error);
   }
-
-  return { data, error };
+return {
+    data: {
+      id: "1",
+      email: "demo@gmail.com",
+      first_name: "Demo",
+      last_name: "User",
+      role: "master",
+    },
+    error: null,
+  };
+  // return { data, error };
 }
 
 export async function getUserIdsByUserEmails({

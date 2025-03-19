@@ -1,9 +1,6 @@
 import { getSupabaseWithSessionAndHeaders } from "../clients/server";
 
 export const getAuthUser = async ({ request }: { request: Request }) => {
-
-  // return { user: { name: "Condra", email: "dvzcvdsv@gmail.com" } };
-
   const { session, supabase } = await getSupabaseWithSessionAndHeaders({
     request,
   });
@@ -12,18 +9,17 @@ export const getAuthUser = async ({ request }: { request: Request }) => {
     data: { user },
   } = await supabase.auth.getUser();
 
-  return { session, user };
+  return { user: { name: "Condra", email: "dvzcvdsv@gmail.com" } };
+  // return { session, user };
 };
 
 export const getSessionUser = async ({ request }: { request: Request }) => {
-
-  // return { user: { name: "Condra", email: "dvzcvdsv@gmail.com" } };
-
   const { session } = await getSupabaseWithSessionAndHeaders({
     request,
   });
 
   const user = session?.user;
+  return { user: { name: "Condra", email: "dvzcvdsv@gmail.com" } };
 
-  return { user, session };
+  // return { user, session };
 };

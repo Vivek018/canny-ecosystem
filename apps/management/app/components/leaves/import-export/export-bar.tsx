@@ -82,18 +82,18 @@ export function ExportBar({
         className
       )}
     >
-      <div className='ml-2 flex items-center space-x-1 rounded-md'>
-        <p className='font-semibold'>{rows} Selected</p>
+      <div className="ml-2 flex items-center space-x-1 rounded-md">
+        <p className="font-semibold">{rows} Selected</p>
       </div>
-      <div className='h-full flex justify-center items-center gap-2'>
-        <div className='h-full tracking-wide font-medium rounded-full flex justify-between items-center px-6 border dark:border-muted-foreground/30 '>
-          On Leave: <span className='ml-1.5'>{count}</span>
+      <div className="h-full flex justify-center items-center gap-2">
+        <div className="h-full tracking-wide font-medium rounded-full flex justify-between items-center px-6 border dark:border-muted-foreground/30 ">
+          On Leave: <span className="ml-1.5">{count}</span>
         </div>
         <Button
           onClick={handleExport}
-          variant='default'
-          size='lg'
-          className='h-full rounded-full'
+          variant="default"
+          size="lg"
+          className="h-full rounded-full"
         >
           Export
         </Button>
