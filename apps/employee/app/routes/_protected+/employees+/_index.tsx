@@ -3,12 +3,11 @@ import { columns } from "@/components/employees/table/columns";
 import { DataTable } from "@/components/employees/table/data-table";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { cacheKeyPrefix } from "@/constant";
-import { clearCacheEntry, clientCaching } from "@/utils/cache";
-import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getEmployeeIdFromCookie } from "@/utils/server/user.server";
 import { getSessionUser } from "@canny_ecosystem/supabase/cached-queries";
-import { getEmployeesByProjectSiteId, getProjectNamesByCompanyId, getUserByEmail } from "@canny_ecosystem/supabase/queries";
+import { getEmployeesByProjectSiteId, getUserByEmail } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
@@ -19,14 +18,8 @@ import { Suspense, useEffect, useState } from "react";
 
 
 export async function loader({ request }: LoaderFunctionArgs) {
-	const env = {
-		SUPABASE_URL: process.env.SUPABASE_URL!,
-		SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
-	};
-
 	try {
 		const { supabase } = getSupabaseWithHeaders({ request });
-		const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 		const { user } = await getSessionUser({ request });
 
 		const { data: userProfile, error: userProfileError } = await getUserByEmail({ email: user?.email || "", supabase });
@@ -38,43 +31,30 @@ export async function loader({ request }: LoaderFunctionArgs) {
 			return safeRedirect(`/employees/${employeeId}/overview`, { status: 303 });
 		}
 
-		if (!userProfile?.site_id) throw new Error("No site id found");
+		// if (!userProfile?.site_id) throw new Error("No site id found");
 
 		const employeesPromise = getEmployeesByProjectSiteId({
 			supabase,
-			projectSiteId: userProfile?.site_id || "",
+			projectSiteId: "129d75cd-0062-4d4c-bd61-21e9b0dfd0a9" || userProfile?.site_id || "",
 		});
-
-		const projectPromise = getProjectNamesByCompanyId({
-			supabase,
-			companyId,
-		});
-
 
 		return defer({
-			employeesPromise: employeesPromise as any,
-			projectPromise,
-			companyId,
-			env,
+			employeesPromise,
 			error: null
 		});
 	} catch (error) {
 		console.error("Employees Error in loader function:", error);
 
 		return defer({
-			employeesPromise: Promise.resolve({ data: [] }),
-			projectPromise: Promise.resolve({ data: [] }),
-			companyId: "",
-			env,
+			employeesPromise: Promise.resolve({ data: [], error }),
 			error,
 		});
 	}
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-	const url = new URL(args.request.url);
 	return clientCaching(
-		`${cacheKeyPrefix.employees}${url.searchParams.toString()}`,
+		cacheKeyPrefix.employees,
 		args,
 	);
 }
@@ -84,9 +64,6 @@ clientLoader.hydrate = true;
 export default function EmployeesIndex() {
 	const {
 		employeesPromise,
-		projectPromise,
-		companyId,
-		env,
 		error
 	} = useLoaderData<typeof loader>();
 	const [searchString, setSearchString] = useState("");
@@ -94,6 +71,7 @@ export default function EmployeesIndex() {
 
 	useEffect(() => {
 		if (error) {
+			clearExactCacheEntry(cacheKeyPrefix.employees);
 			toast({
 				title: "Error",
 				description: (error as Error)?.message || "Failed to load employees",
@@ -123,14 +101,14 @@ export default function EmployeesIndex() {
 					</div>
 				</div>
 				<div className="space-x-2 hidden md:flex">
-					<ColumnVisibility disabled={!projectPromise} />
+					<ColumnVisibility />
 				</div>
 			</div>
 			<Suspense fallback={<div className="h-1/3" />}>
 				<Await resolve={employeesPromise}>
-					{({ data, meta, error }) => {
+					{({ data, error }) => {
 						if (error) {
-							clearCacheEntry(cacheKeyPrefix.employees);
+							clearExactCacheEntry(cacheKeyPrefix.employees);
 							return (
 								<ErrorBoundary
 									error={error}
@@ -141,12 +119,9 @@ export default function EmployeesIndex() {
 
 						return (
 							<DataTable
-								data={data ?? []}
+								data={data || []}
 								error={error}
-								columns={columns({ env, companyId })}
-								count={meta?.count ?? 0}
-								companyId={companyId}
-								env={env}
+								columns={columns()}
 								searchString={searchString}
 							/>
 						);

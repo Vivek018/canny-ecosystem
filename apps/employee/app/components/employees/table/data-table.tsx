@@ -16,17 +16,12 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { DataTableHeader } from "./data-table-header";
 import { useEmployeesStore } from "@/store/employees";
-import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
+  columns: ColumnDef<TData, TValue>[] | unknown | any;
   data: TData[];
-  error: string | null;
-  count: number;
-  initialColumnVisibility?: VisibilityState;
-  companyId: string;
-  env: SupabaseEnv;
+  error: { message: string } | null | unknown;
   searchString: string;
 }
 
@@ -34,16 +29,13 @@ export function DataTable<TData, TValue>({
   columns,
   data: initialData,
   error,
-  initialColumnVisibility,
   searchString,
 }: DataTableProps<TData, TValue>) {
   const [data, setData] = useState(initialData);
 
   const { rowSelection, setRowSelection, setColumns } = useEmployeesStore();
 
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    initialColumnVisibility ?? {}
-  );
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const { toast } = useToast();
 
   const table = useReactTable({
@@ -118,8 +110,7 @@ export function DataTable<TData, TValue>({
                           key={cell.id}
                           className={cn(
                             "px-3 py-1 md:px-4 md:py-2",
-                            (cell.column.id === "select" ||
-                              cell.column.id === "employee_code" ||
+                            ( cell.column.id === "employee_code" ||
                               cell.column.id === "full_name" ||
                               cell.column.id === "primary_mobile_number" ||
                               cell.column.id === "date_of_birth" ||
@@ -130,7 +121,7 @@ export function DataTable<TData, TValue>({
                             cell.column.id === "employee_code" &&
                             "md:sticky left-0 bg-card z-10",
                             cell.column.id === "full_name" &&
-                            "md:sticky left-12 bg-card z-10",
+                            "md:sticky left-32 bg-card z-10",
                             cell.column.id === "actions" &&
                             "sticky right-0 min-w-20 max-w-20 bg-card z-10"
                           )}
@@ -149,7 +140,7 @@ export function DataTable<TData, TValue>({
                   className={cn("flex flex-col", !tableLength && "border-none")}
                 >
                   <TableCell
-                    colSpan={columns.length}
+                    colSpan={columns?.length}
                     className={cn(
                       "h-96 bg-background grid place-items-center text-center tracking-wide"
                     )}
