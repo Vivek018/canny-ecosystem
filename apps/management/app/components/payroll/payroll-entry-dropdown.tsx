@@ -1,3 +1,4 @@
+import { usePayrollEntriesStore } from "@/store/payroll-entry";
 import type { PayrollEntriesDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@canny_ecosystem/ui/alert-dialog";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
@@ -19,6 +20,7 @@ export const PayrollEntryDropdown = ({
   data: Omit<PayrollEntriesDatabaseRow, "created_at" | "updated_at">;
   triggerChild: React.ReactElement;
 }) => {
+  const { skipPayrollEntries, setSkipPayrollEntries } = usePayrollEntriesStore();
   const navigate = useNavigate();
 
   const handleClick = (
@@ -27,6 +29,14 @@ export const PayrollEntryDropdown = ({
   ) => {
     e.preventDefault();
     navigate(`/payroll/payroll-history/${data?.payroll_id}/${data?.employee_id}/${document}`);
+  };
+
+  const handleFreezePayment = () => {
+    setSkipPayrollEntries([...skipPayrollEntries, data.id]);
+  };
+
+  const handleUnFreezePayment = () => {
+    setSkipPayrollEntries(skipPayrollEntries.filter(entryId => entryId !== data.id));
   };
 
   const employeeDocuments = [
@@ -47,7 +57,21 @@ export const PayrollEntryDropdown = ({
             </DropdownMenuItem>
           ))}
         </DropdownMenuGroup>
-        <DropdownMenuSeparator className={cn(data.payment_status === "pending" && "hidden")} />
+        <DropdownMenuGroup className={cn(data.payment_status !== "pending" && "hidden")}>
+          <DropdownMenuItem
+            className={cn(skipPayrollEntries?.includes(data.id) && "hidden")}
+            onClick={handleFreezePayment}
+          >
+            Freeze Payment
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className={cn(!skipPayrollEntries?.includes(data.id) && "hidden")}
+            onClick={handleUnFreezePayment}
+          >
+            UnFreeze Payment
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator className={cn(data.payment_status !== "pending" && "hidden")} />
         <DropdownMenuGroup>
           <DeletePayrollEntry payrollId={data?.payroll_id} id={data?.id} />
         </DropdownMenuGroup>

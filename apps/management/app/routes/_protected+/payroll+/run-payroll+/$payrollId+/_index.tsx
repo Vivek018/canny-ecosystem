@@ -64,6 +64,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     const formData = await request.formData();
     const payrollId = params.payrollId;
     const parsedData = JSON.parse(formData.get("data") as string);
+    const parsedSkipPayrollEntries = JSON.parse(formData.get("skipPayrollEntries") as string);
 
     const data = {
       id: (parsedData.id ?? payrollId) as PayrollDatabaseRow["id"],
@@ -75,7 +76,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         parsedData.total_net_amount as PayrollDatabaseRow["total_net_amount"],
     };
 
-    const { status, error } = await updatePayroll({ supabase, data });
+    const { status, error } = await updatePayroll({ supabase, data, skipPayrollEntries: parsedSkipPayrollEntries });
     if (isGoodStatus(status)) {
       return json({
         status: "success",
