@@ -1,22 +1,13 @@
 import { json, useLoaderData, useNavigate } from "@remix-run/react";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { getUniqueEmployeeIdsByPayrollId } from "@canny_ecosystem/supabase/queries";
 import { useEffect, useRef } from "react";
 import { formatDateTime } from "@canny_ecosystem/utils";
 import Papa from "papaparse";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const payrollId = params.payrollId as string;
-  const { data: employeeIds } = await getUniqueEmployeeIdsByPayrollId({
-    supabase,
-    payrollId,
-  });
 
-  const accidentRegister = employeeIds;
-
-  return json({ accidentRegister });
+  return json({ accidentRegister: [] });
 }
 
 export default function DownloadRoute() {
