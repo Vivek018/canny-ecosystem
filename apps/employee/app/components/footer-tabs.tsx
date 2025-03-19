@@ -35,7 +35,7 @@ export function FooterTabs({
 				className
 			)}
 		>
-			<ul className="overflow-x-scroll mx-auto flex justify-between md:text-sm text-sm overflow-auto no-scrollbar border-secondary-foreground border-1 rounded-md p-3 pr-10 dark:bg-card">
+			<ul className="bg-card overflow-x-scroll mx-auto flex justify-between md:text-sm text-sm overflow-auto no-scrollbar border-secondary-foreground border-1 rounded-md p-3 pr-10 dark:bg-card rounded-br-md shadow-[-4px_0_20px_-1px_rgba(0,0,0,0.3)]">
 				{visibleItems.map((item) => (
 					<Link
 						prefetch="intent"
@@ -57,8 +57,8 @@ export function FooterTabs({
 						type="button"
 						onClick={() => setIsDropdownOpen(!isDropdownOpen)}
 						className={cn(
-							"fixed right-0 bottom-0 p-3 h-[83px] text-center text-primary font-medium underline-offset-4 border-outset rounded-tr-md rounded-br-md shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.3)]",
-							"active:text-primary active:text-white dark:text-foreground dark:bg-accent dark:[&:active]:bg-text-primary dark:[&:active]:text-foreground",
+							"fixed right-0 z-50 bottom-0 p-3 h-[83px] text-center text-primary font-medium underline-offset-4 border-outset rounded-tr-md rounded-br-md shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.3)]",
+							"active:text-primary active:text-white dark:text-foreground bg-primary-foreground dark:bg-accent dark:[&:active]:bg-text-primary dark:[&:active]:text-foreground",
 							"hover:bg-muted hover:out"
 						)}
 					>
@@ -69,7 +69,7 @@ export function FooterTabs({
 
 			{isDropdownOpen && (
 				<div
-					className="absolute bottom-full right-1 mb-2 w-1/3 dark:bg-card border border-muted rounded-md shadow-lg"
+					className="absolute  bottom-full right-1 mb-2 w-1/3 dark:bg-card border border-muted rounded-md shadow-lg"
 				>
 					{dropdownItems.map((item) => (
 						<Link
@@ -77,7 +77,7 @@ export function FooterTabs({
 							key={item.path}
 							to={item.path}
 							className={cn(
-								"block p-3 text-sm hover:bg-muted",
+								"block p-3 text-sm bg-card text-muted-foreground font-medium underline-offset-4 hover:bg-muted",
 								item?.path && pathname.includes(item?.path) && "text-primary/80",
 								item?.path && pathname === item?.path && "text-primary no-underline hover:no-underline focus:no-underline cursor-default"
 							)}

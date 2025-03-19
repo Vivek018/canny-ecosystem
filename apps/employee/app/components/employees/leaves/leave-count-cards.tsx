@@ -46,7 +46,7 @@ export function LeaveCountCards({
   );
 
   return (
-    <div className="mb-5 grid grid-cols-5 max-sm:grid-cols-2 gap-5">
+    <div className="mb-5 grid grid-cols-5 max-sm:grid-cols-2 gap-5 max-sm:hidden">
       {cardInfo.map(({ title, key }) => (
         <Card
           key={title}

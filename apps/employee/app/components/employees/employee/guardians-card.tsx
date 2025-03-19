@@ -42,7 +42,7 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
         </CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col px-4 pt-1 pb-4 gap-3">
-        <div className="grid grid-cols-2">
+        <div className="grid grid-cols-2 max-sm:gap-2">
           <DetailItem
             label="Name"
             value={`${guardian.first_name ?? "--"} ${guardian.last_name ?? "--"
@@ -56,7 +56,7 @@ export const GuardianItem = ({ guardian }: { guardian: EmployeeGuardian }) => {
             value={guardian.alternate_mobile_number}
           />
         </div>
-        <div className="mt-1.5 flex flex-row items-center justify-between">
+        <div className="mt-1.5 flex flex-row items-center justify-between max-sm:flex-col max-sm:items-start">
           <div className="flex items-center gap-1 text-muted-foreground text-sm">
             <Icon
               name={guardian.is_emergency_contact ? "check" : "cross"}

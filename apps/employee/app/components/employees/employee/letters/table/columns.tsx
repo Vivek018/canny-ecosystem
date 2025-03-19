@@ -1,11 +1,7 @@
 import { replaceUnderscore } from "@canny_ecosystem/utils";
-import { Button } from "@canny_ecosystem/ui/button";
-import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
-import { Icon } from "@canny_ecosystem/ui/icon";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { EmployeeLetterDataType } from "@canny_ecosystem/supabase/queries";
 import { Link } from "@remix-run/react";
-import { EmployeeLetterOptionsDropdown } from "../employee-letter-options-dropdown";
 
 export const columns: ColumnDef<EmployeeLetterDataType>[] = [
   {
@@ -40,7 +36,7 @@ export const columns: ColumnDef<EmployeeLetterDataType>[] = [
     header: "Subject",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-96 capitalize">
+        <p className="truncate w-96 max-sm:w-72 capitalize">
           {replaceUnderscore(row.original?.subject ?? "")}
         </p>
       );

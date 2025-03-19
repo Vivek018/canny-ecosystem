@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import type { EmployeeAttendanceDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { AttendanceFilter } from "./attendance-filter";
 import { FilterList } from "./filter-list";
-import { defaultMonth, defaultYear, } from "@canny_ecosystem/utils";
+import { defaultMonth, defaultYear } from "@canny_ecosystem/utils";
 import { months } from "@canny_ecosystem/utils/constant";
 
 const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -19,7 +19,6 @@ export const AttendanceComponent = ({
     year?: string | undefined;
   } | null;
 }) => {
-
   const [month, setMonth] = useState<number>(() => {
     if (filters?.month) {
       return months[filters?.month] - 1;
@@ -30,6 +29,18 @@ export const AttendanceComponent = ({
   const [year, setYear] = useState<number>(() => {
     return filters?.year ? Number(filters?.year) : defaultYear;
   });
+
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 640); // Adjust the breakpoint as needed
+    };
+
+    handleResize(); // Initial check
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     if (filters?.month) {
@@ -63,7 +74,7 @@ export const AttendanceComponent = ({
   });
 
   return (
-    <div className='p-4'>
+    <div className='p-4 max-sm:px-0'>
       <div className='flex justify-end items-center mb-4 gap-x-2'>
         <FilterList filters={filters} />
         <AttendanceFilter setMonth={setMonth} setYear={setYear} />
@@ -86,7 +97,7 @@ export const AttendanceComponent = ({
             {emptyFirstDays?.map((_, index) => (
               <div
                 key={`empty-${index.toString()}`}
-                className='h-32 max-sm:h-24 border first:border-l  bg-[repeating-linear-gradient(-60deg,#DBDBDB,#DBDBDB_1px,transparent_1px,transparent_5px)] dark:bg-[repeating-linear-gradient(-60deg,#2C2C2C,#2C2C2C_1px,transparent_1px,transparent_5px)]'
+                className='h-32 max-sm:h-36 border first:border-l  bg-[repeating-linear-gradient(-60deg,#DBDBDB,#DBDBDB_1px,transparent_1px,transparent_5px)] dark:bg-[repeating-linear-gradient(-60deg,#2C2C2C,#2C2C2C_1px,transparent_1px,transparent_5px)]'
               />
             ))}
 
@@ -94,15 +105,15 @@ export const AttendanceComponent = ({
               <div
                 key={date?.fullDate}
                 className={cn(
-                  "h-32 max-sm:h-24 border p-2 bg-card flex flex-col justify-between"
+                  "h-32 max-sm:h-36 border p-2 bg-card flex flex-col justify-between max-sm:items-center"
                 )}
               >
-                <div className='flex justify-between items-center'>
-                  <div className='font-extrabold text-lg'>{date.day}</div>
-                  <div className='text-xs flex flex-col items-end'>
+                <div className='flex justify-between items-center max-sm:flex-col'>
+                  <div className='font-extrabold text-lg mb-2'>{date.day}</div>
+                  <div className='text-xs flex flex-col items-end gap-1 max-sm:items-center max-sm:text-[8px]'>
                     <div
                       className={cn(
-                        "py-0.5 px-1 rounded-sm text-center",
+                        "py-0.5 px-1 rounded-sm text-center max-sm:w-10",
                         attendanceData.find(
                           (entry) => entry.date === date.fullDate
                         )?.holiday
@@ -119,49 +130,54 @@ export const AttendanceComponent = ({
                     >
                       {attendanceData.find(
                         (entry) => entry.date === date.fullDate
-                      )?.present
-                        ? "Present"
-                        : "Absent"}
+                      )?.present ? "Present" : "Absent"}
                     </div>
-                    {attendanceData?.find(
-                      (entry) => entry?.date === date?.fullDate
-                    )?.holiday && (
-                        <div className='capitalize mt-1 py-0.5 px-1 rounded-sm text-center bg-muted text-muted-foreground'>
-                          {
-                            attendanceData.find(
-                              (entry) => entry?.date === date?.fullDate
-                            )?.holiday_type
-                          }
-                        </div>
+                    <div
+                      className={cn(
+                        "py-0.5 px-1 rounded-sm text-center max-sm:w-10",
+                        attendanceData?.find(
+                          (entry) => entry?.date === date?.fullDate
+                        )?.no_of_hours === 8
+                          ? "bg-muted text-muted-foreground"
+                          : "bg-muted-foreground text-muted",
+                        !attendanceData?.find(
+                          (entry) => entry?.date === date?.fullDate
+                        )?.id && "hidden p-0"
                       )}
+                    >
+                      {attendanceData?.find(
+                        (entry) => entry?.date === date?.fullDate
+                      )?.no_of_hours &&
+                        `${attendanceData?.find(
+                          (entry) => entry?.date === date?.fullDate
+                        )?.no_of_hours
+                        }${isMobile ? " hrs" : " hours"}`}
+                    </div>
+
                   </div>
                 </div>
 
-                <div className='flex justify-between items-center text-xs'>
-                  <div
-                    className={cn(
-                      "rounded-sm px-1 py-0.5",
-                      attendanceData?.find(
-                        (entry) => entry?.date === date?.fullDate
-                      )?.no_of_hours === 8
-                        ? "bg-muted text-muted-foreground"
-                        : "bg-muted-foreground text-muted",
-                      !attendanceData?.find(
-                        (entry) => entry?.date === date?.fullDate
-                      )?.id && "hidden p-0"
+                <div className='flex justify-between items-center text-xs max-sm:flex-col gap-1 max-lg:flex-col max-lg:items-start'>
+                  {attendanceData?.find(
+                    (entry) => entry?.date === date?.fullDate
+                  )?.holiday && (
+                      <div className='capitalize mt-1 max-sm:mt-0 py-0.5 px-1 rounded-sm text-center bg-muted text-muted-foreground max-sm:text-[7px] w-16 max-sm:w-10'>
+                        {
+                          attendanceData.find(
+                            (entry) => entry?.date === date?.fullDate
+                          )?.holiday_type
+                        }
+                      </div>
                     )}
-                  >
-                    {attendanceData?.find(
+                  <div className={cn('capitalize text-xs text-center rounded-sm bg-muted text-muted-foreground max-sm:text-[7px] w-16 max-sm:mx-auto max-sm:w-10',
+                    attendanceData?.find(
                       (entry) => entry?.date === date?.fullDate
-                    )?.no_of_hours &&
-                      `${attendanceData?.find(
-                        (entry) => entry?.date === date?.fullDate
-                      )?.no_of_hours
-                      } hours`}
-                  </div>
-                  <div className='text-xs px-1 rounded-sm bg-muted text-muted-foreground'>
+                    )?.working_shift && 'py-0.5 px-1'
+                  )}>
                     {
                       attendanceData?.find(
+                        (entry) => entry?.date === date?.fullDate
+                      )?.working_shift === "afternoon" ? "noon" : attendanceData?.find(
                         (entry) => entry?.date === date?.fullDate
                       )?.working_shift
                     }
@@ -173,7 +189,7 @@ export const AttendanceComponent = ({
             {emptyLastDays?.map((_, index) => (
               <div
                 key={`empty-${index.toString()}`}
-                className='h-32 max-sm:h-24 border first:border-l bg-[repeating-linear-gradient(-60deg,#DBDBDB,#DBDBDB_1px,transparent_1px,transparent_5px)] dark:bg-[repeating-linear-gradient(-60deg,#2C2C2C,#2C2C2C_1px,transparent_1px,transparent_5px)]'
+                className='h-32 max-sm:h-36 border first:border-l bg-[repeating-linear-gradient(-60deg,#DBDBDB,#DBDBDB_1px,transparent_1px,transparent_5px)] dark:bg-[repeating-linear-gradient(-60deg,#2C2C2C,#2C2C2C_1px,transparent_1px,transparent_5px)]'
               />
             ))}
           </div>

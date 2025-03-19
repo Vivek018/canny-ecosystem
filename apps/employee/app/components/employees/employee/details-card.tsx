@@ -10,10 +10,10 @@ type DetailItemProps = {
 export const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => {
   return (
     <div className="flex flex-col items-start">
-      <h3 className="text-muted-foreground text-[13px] tracking-wide capitalize">
+      <h3 className="text-muted-foreground text-[13px] tracking-wide capitalize text-wrap">
         {label}
       </h3>
-      <p>{value ?? "--"}</p>
+      <p className="max-sm:text-wrap max-sm:break-all max-sm:break-words;">{value ?? "--"}</p>
     </div>
   );
 };

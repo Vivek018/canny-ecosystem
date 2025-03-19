@@ -2,8 +2,6 @@ import {
   formatDate,
   replaceUnderscore,
 } from "@canny_ecosystem/utils";
-import { Checkbox } from "@canny_ecosystem/ui/checkbox";
-
 import type { ColumnDef } from "@tanstack/react-table";
 import type { LeavesDataType } from "@canny_ecosystem/supabase/queries";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
@@ -24,7 +22,7 @@ export const columns = (
           className={cn("group", isEmployeeRoute && "cursor-default")}
         >
           <p
-            className={cn("truncate w-28", !isEmployeeRoute && "text-primary/80")}
+            className={cn("truncate", !isEmployeeRoute && "text-primary/80")}
           >
             {row.original?.employees?.employee_code}
           </p>
@@ -43,7 +41,7 @@ export const columns = (
           className={cn("group", isEmployeeRoute && "cursor-default")}
         >
           <p
-            className={cn("truncate w-28", !isEmployeeRoute && "text-primary/80")}
+            className={cn("truncate w-48 group-hover:text-primary", !isEmployeeRoute && "text-primary/80")}
           >{`${row.original?.employees?.first_name} ${row.original?.employees?.middle_name ?? ""
             } ${row.original?.employees?.last_name ?? ""}`}</p>
         </Link>

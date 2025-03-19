@@ -79,13 +79,11 @@ export function EmployeeLetterTableWrapper({
   }, [data, searchString, sortType]);
 
   return (
-    <>
-      <DataTable
-        columns={columns}
-        data={tableData}
-        sortType={sortType}
-        handleSortType={setSortType}
-      />
-    </>
+    <DataTable
+      columns={columns}
+      data={tableData}
+      sortType={sortType}
+      handleSortType={setSortType}
+    />
   );
 }

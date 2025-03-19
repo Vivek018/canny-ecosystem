@@ -1,12 +1,10 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 import type { ReimbursementDataType } from "@canny_ecosystem/supabase/queries";
 import {
   formatDate,
 } from "@canny_ecosystem/utils";
 
 export const columns = (): ColumnDef<ReimbursementDataType>[] => [
-
   {
     enableSorting: false,
     accessorKey: "employee_code",

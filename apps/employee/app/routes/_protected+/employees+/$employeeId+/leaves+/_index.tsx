@@ -199,7 +199,7 @@ export default function Leaves() {
                             />
                             <div className="w-full flex items-center justify-between pb-4">
                               <div className="w-full flex justify-start items-center gap-x-3">
-                                <div className="flex w-[90%] flex-col md:flex-row items-start md:items-center gap-4 mr-14">
+                                <div className="flex w-full flex-col md:flex-row items-start md:items-center gap-4 mr-4 max-sm:mr-0">
                                   <LeavesSearchFilter
                                     disabled={!data?.length && noFilters}
                                     employeeId={employeeId}
