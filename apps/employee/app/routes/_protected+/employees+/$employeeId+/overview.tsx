@@ -6,10 +6,8 @@ import { EmployeePageHeader } from "@/components/employees/employee/page-header"
 import { EmployeeStatutoryCard } from "@/components/employees/employee/statutory-card";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { LoadingSpinner } from "@/components/loading-spinner";
-import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
-import { safeRedirect } from "@/utils/server/http.server";
-import { getEmployeeIdFromCookie, getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import {
   getEmployeeAddressesByEmployeeId,
   getEmployeeBankDetailsById,
@@ -19,8 +17,6 @@ import {
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { hasPermission, readRole } from "@canny_ecosystem/utils";
-import { attribute } from "@canny_ecosystem/utils/constant";
 import { defer, type LoaderFunctionArgs } from "@remix-run/node";
 import {
   Await,
@@ -33,17 +29,9 @@ import { type ReactNode, Suspense, useEffect } from "react";
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const employeeId = params.employeeId;
 
-  const { supabase, headers } = getSupabaseWithHeaders({ request });
-
+  const { supabase } = getSupabaseWithHeaders({ request });
 
   try {
-    const { user } = await getUserCookieOrFetchUser(request, supabase);
-    const cookieEmployeeId = await getEmployeeIdFromCookie(request);
-
-    if (!cookieEmployeeId && !hasPermission(user?.role!, `${readRole}:${attribute.employee}`)) {
-      return safeRedirect(DEFAULT_ROUTE, { headers });
-    }
-
     const employeePromise = getEmployeeById({
       supabase,
       id: employeeId ?? "",

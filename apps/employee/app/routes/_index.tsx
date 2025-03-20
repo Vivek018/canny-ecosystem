@@ -1,6 +1,6 @@
 import { safeRedirect } from "@/utils/server/http.server";
 import type { MetaFunction } from "@remix-run/node";
-import type { LoaderFunctionArgs } from "react-router-dom";
+import { Outlet, type LoaderFunctionArgs } from "react-router-dom";
 import { getEmployeeIdFromCookie, getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
@@ -29,6 +29,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   if (employeeId) {
     return safeRedirect(`/employees/${employeeId}/overview`, { status: 303 });
   }
+  console.log("first second")
   return safeRedirect("/employees", { status: 303 });
 }
 

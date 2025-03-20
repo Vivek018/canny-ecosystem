@@ -25,8 +25,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 	const employeeId = await getEmployeeIdFromCookie(request);
 
-	if(!(userData || employeeId)) {
-		return redirect(DEFAULT_ROUTE, { status: 303})
+	if (!(userData || employeeId)) {
+		return redirect(DEFAULT_ROUTE, { status: 303 })
 	}
 
 	return json({ user: userData, employeeId });

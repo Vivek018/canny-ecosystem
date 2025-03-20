@@ -15,7 +15,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { user } = await getUserCookieOrFetchUser(request, supabase);
   const cookieEmployeeId = await getEmployeeIdFromCookie(request);
 
-  if (!cookieEmployeeId && user?.role !== "supervisor") {
+  if (!(cookieEmployeeId || user?.role === "supervisor")) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
