@@ -246,8 +246,10 @@ export const cacheKeyPrefix = {
   employee_reimbursements: "employee-reimbursements",
   employee_letters: "employee-letters",
   employee_payments: "employee_payments",
-  run_payroll: "run_payroll",
-  run_payroll_id: "run_payroll_id",
+  run_payroll: "run-payroll",
+  run_payroll_id: "run-payroll-id",
+  payroll_history: "payroll-history",
+  payroll_history_id: "payroll-history-id",
   employee_documents: "employee_documents",
   reimbursements: "reimbursements",
   payment_fields: "payment-fields",
@@ -338,9 +340,8 @@ export function numberToWordsIndian(num: number) {
       return (
         tens[Math.floor(n / 10)] + (n % 10 ? ` ${belowTwenty[n % 10]}` : "")
       );
-    return `${belowTwenty[Math.floor(n / 100)]} hundred${
-      n % 100 ? ` ${convertBelowThousand(n % 100)}` : ""
-    }`;
+    return `${belowTwenty[Math.floor(n / 100)]} hundred${n % 100 ? ` ${convertBelowThousand(n % 100)}` : ""
+      }`;
   }
 
   function convertIntegerToWordsIndian(n: number) {
@@ -382,5 +383,3 @@ export function numberToWordsIndian(num: number) {
 
   return `${integerWords}${decimalPart ? ` ${decimalWords}` : ""}`;
 }
-
-export const PayrollTypes = ["reimbursement", "exit","salary","others"];

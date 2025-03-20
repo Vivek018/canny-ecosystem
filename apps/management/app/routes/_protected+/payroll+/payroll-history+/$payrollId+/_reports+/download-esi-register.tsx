@@ -1,7 +1,6 @@
 import { json, useLoaderData, useNavigate } from "@remix-run/react";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { getUniqueEmployeeIdsByPayrollId } from "@canny_ecosystem/supabase/queries";
 import { useEffect, useRef } from "react";
 import { formatDateTime } from "@canny_ecosystem/utils";
 import Papa from "papaparse";
@@ -9,31 +8,27 @@ import Papa from "papaparse";
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
   const payrollId = params.payrollId as string;
-  const { data: employeeIds } = await getUniqueEmployeeIdsByPayrollId({
-    supabase,
-    payrollId,
-  });
 
-  const dispensary = employeeIds;
-
-  return json({ dispensary });
+  return json({ esiRegister: [] });
 }
 
 export default function DownloadRoute() {
-  const { dispensary } = useLoaderData<typeof loader>();
+  const { esiRegister } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
   const hasDownloaded = useRef(false);
 
-  const data = (dispensary ?? []).map((dispensaryEntry, index) => ({
-    sr_no: index + 1,
-    date: "123",
-    name_of_employee: "Chris",
-    age: "123",
-    residence: "Chicago",
-    disease: "123",
-    treatement: "123",
-    cash: "123",
-    credit: "123",
+  // preparing data according to esiRegister format
+  const data = (esiRegister ?? []).map(() => ({
+    employee_name: "sahil",
+    employee_code: "123",
+    esi_number: "123",
+    date: "Jan 2024",
+    gross_wages: "20000",
+    employee_contribution: "123",
+    employer_contribution: "123",
+    total_contribution: "123",
+    payment_date: "15-Feb-2023",
+    challan_number: "123",
     remarks: "",
   }));
 
@@ -48,7 +43,10 @@ export default function DownloadRoute() {
     const link = document.createElement("a");
     link.href = url;
 
-    link.setAttribute("download", `Dispensary - ${formatDateTime(Date.now())}`);
+    link.setAttribute(
+      "download",
+      `ESI Register - ${formatDateTime(Date.now())}`,
+    );
 
     document.body.appendChild(link);
     link.click();

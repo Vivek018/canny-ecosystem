@@ -1,7 +1,6 @@
 import { json, useLoaderData, useNavigate } from "@remix-run/react";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { getUniqueEmployeeIdsByPayrollId } from "@canny_ecosystem/supabase/queries";
 import { useEffect, useRef } from "react";
 import { formatDateTime } from "@canny_ecosystem/utils";
 import Papa from "papaparse";
@@ -9,37 +8,29 @@ import Papa from "papaparse";
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
   const payrollId = params.payrollId as string;
-  const { data: employeeIds } = await getUniqueEmployeeIdsByPayrollId({
-    supabase,
-    payrollId,
-  });
 
-  const wagesRegister = employeeIds;
-
-  return json({ wagesRegister });
+  return json({ healthAndSafetyRegister: [] });
 }
 
 export default function DownloadRoute() {
-  const { wagesRegister } = useLoaderData<typeof loader>();
+  const { healthAndSafetyRegister } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
   const hasDownloaded = useRef(false);
 
-  const data = (wagesRegister ?? []).map(() => ({
-    employee_name: "ihae",
-    employee_code: "123",
-    department: "123",
-    date: "31",
-    present_days: "43",
-    basic_salary: "34",
-    overtime_hours: "342",
-    overtime_wages: "34",
-    allowances: "3",
-    gross_wages: "43",
-    deductions: "3",
-    net_wages: "432",
-    mode_of_payment: "2",
-    date_of_payment: "43",
-    leaves_taken: "4",
+  const data = (healthAndSafetyRegister ?? []).map(() => ({
+    date_of_inspection: "34",
+    department: "342",
+    inspector_name: "34",
+    type_of_inspection: "2",
+    hazards_indentified: "34",
+    risk_level: "342",
+    corrective_actions_taken: "34",
+    responsible_person: "32",
+    status_of_action: "3",
+    employee_health_monitoring: "3",
+    ppe_provided: "3",
+    training_conducted: "43",
+    follow_up_date: "423",
     remarks: "",
   }));
 
@@ -56,7 +47,7 @@ export default function DownloadRoute() {
 
     link.setAttribute(
       "download",
-      `Wages Register - ${formatDateTime(Date.now())}`,
+      `Health & Safety Register - ${formatDateTime(Date.now())}`,
     );
 
     document.body.appendChild(link);

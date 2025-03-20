@@ -1,7 +1,6 @@
 import { json, useLoaderData, useNavigate } from "@remix-run/react";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { getUniqueEmployeeIdsByPayrollId } from "@canny_ecosystem/supabase/queries";
 import { useEffect, useRef } from "react";
 import { formatDateTime } from "@canny_ecosystem/utils";
 import Papa from "papaparse";
@@ -9,36 +8,29 @@ import Papa from "papaparse";
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
   const payrollId = params.payrollId as string;
-  const { data: employeeIds } = await getUniqueEmployeeIdsByPayrollId({
-    supabase,
-    payrollId,
-  });
 
-  const compensationRegister = employeeIds;
-
-  return json({ compensationRegister });
+  return json({ overtimeRegister: [] });
 }
 
 export default function DownloadRoute() {
-  const { compensationRegister } = useLoaderData<typeof loader>();
+  const { overtimeRegister } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
   const hasDownloaded = useRef(false);
 
-  const data = (compensationRegister ?? []).map(() => ({
-    employee_name: "John",
-    employee_code: "123",
+  const data = (overtimeRegister ?? []).map(() => ({
+    employee_name: "Chris",
+    employee_code: "231",
     department: "IT",
-    date_of_accident: "123",
-    nature_of_injury: "123",
-    cause_of_accident: "124",
-    type_of_compensation: "123",
-    amount_paid: "123",
-    mode_of_payment: "123",
-    date_of_payment: "123",
-    medical_expense: "123",
-    disability_type: "123",
-    death: "No",
-    dependents_details: "123",
+    date: "34",
+    date_of_overtime: "34",
+    normal_working_hours: "3",
+    total_hours_worked: "3",
+    overtime_hours: "34",
+    overtime_rate_per_hour: "342",
+    overtime_wages: "34",
+    reason_for_overtime: "34",
+    mode_of_payment: "34",
+    date_of_payment: "34",
     remarks: "",
   }));
 
@@ -55,7 +47,7 @@ export default function DownloadRoute() {
 
     link.setAttribute(
       "download",
-      `Compensation Register - ${formatDateTime(Date.now())}`,
+      `Overtime Register - ${formatDateTime(Date.now())}`,
     );
 
     document.body.appendChild(link);

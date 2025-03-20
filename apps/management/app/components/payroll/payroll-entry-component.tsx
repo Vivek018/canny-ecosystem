@@ -15,15 +15,18 @@ import {
   updateRole,
 } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
-import { ReimbursementPayrollDataTable } from "./reimbursement-table/data-table";
-import { payrollColumns } from "./reimbursement-table/columns";
+import { PayrollEntryDataTable } from "./payroll-entry-table/data-table";
+import { payrollEntryColumns } from "./payroll-entry-table/columns";
+import { usePayrollEntriesStore } from "@/store/payroll-entry";
 
-export function PayrollComponent({
+export function PayrollEntryComponent({
   data,
   payrollData,
+  noButtons = false,
 }: {
   data: PayrollEntriesWithEmployee[];
   payrollData: Omit<PayrollDatabaseRow, "created_at" | "updated_at">;
+  noButtons?: boolean;
 }) {
   const { role } = useUser();
   const { payrollId } = useParams();
@@ -35,6 +38,7 @@ export function PayrollComponent({
 
   const [searchString, setSearchString] = useState("");
   const [tableData, setTableData] = useState(data);
+  const { skipPayrollEntries } = usePayrollEntriesStore();
 
   useEffect(() => {
     const filteredData = data?.filter((item: any) =>
@@ -57,6 +61,7 @@ export function PayrollComponent({
           total_employees: payrollData?.total_employees,
           total_net_amount: payrollData?.total_net_amount,
         }),
+        skipPayrollEntries: JSON.stringify(skipPayrollEntries),
       },
       {
         method: "POST",
@@ -79,18 +84,19 @@ export function PayrollComponent({
             className="pl-8 h-10 w-full focus-visible:ring-0 shadow-none"
           />
         </div>
-        <div className="ml-auto flex flex-row gap-3">
+        <div className={cn("ml-auto flex flex-row gap-3", noButtons && "hidden")}>
           <Button
+            variant={payrollData.status === "approved" ? "muted" : "default"}
             onClick={(e) => updateStatusPayroll(e, "submitted")}
             className={cn(
               "hidden h-10",
-              payrollData.status === "pending" &&
-                hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
-                "flex",
+              (payrollData.status === "pending" || payrollData.status === "approved") &&
+              hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
+              "flex",
             )}
             disabled={disable}
           >
-            Submit
+            {payrollData.status === "pending" ? "Submit" : "Undo Approval"}
           </Button>
           <Button
             variant="muted"
@@ -98,38 +104,36 @@ export function PayrollComponent({
             className={cn(
               "hidden h-10",
               payrollData.status === "submitted" &&
-                hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
-                "flex",
+              hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
+              "flex",
             )}
             disabled={disable}
           >
-            Undo
+            Undo Submit
           </Button>
           <Button
             onClick={(e) => updateStatusPayroll(e, "approved")}
             className={cn(
               "hidden h-10",
               payrollData.status === "submitted" &&
-                hasPermission(role, `${approveRole}:${attribute.payroll}`) &&
-                "flex",
+              hasPermission(role, `${approveRole}:${attribute.payroll}`) &&
+              "flex",
             )}
             disabled={disable}
           >
             Approve
           </Button>
-          <PayrollActions
-            className={cn(payrollData?.status === "pending" && "hidden")}
-            payrollId={payrollId ?? payrollData?.id}
-          />
         </div>
-      </div>
-      {payrollData?.payroll_type === "reimbursement" && (
-        <ReimbursementPayrollDataTable
-          data={tableData}
-          columns={payrollColumns}
-          editable={payrollData?.status === "pending"}
+        <PayrollActions
+          className={cn(payrollData?.status === "pending" && "hidden")}
+          payrollId={payrollId ?? payrollData?.id}
         />
-      )}
+      </div>
+      <PayrollEntryDataTable
+        data={tableData}
+        columns={payrollEntryColumns}
+        editable={payrollData?.status === "pending"}
+      />
       <Outlet />
     </section>
   );

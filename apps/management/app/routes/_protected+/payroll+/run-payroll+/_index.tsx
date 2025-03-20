@@ -18,8 +18,8 @@ import { PayrollCard } from "@/components/payroll/payroll-card";
 import { getPendingOrSubmittedPayrollsByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { clientCaching } from "@/utils/cache";
-import { cacheKeyPrefix, PayrollTypes } from "@/constant";
-import { formatDate, transformStringArrayIntoOptions } from "@canny_ecosystem/utils";
+import { cacheKeyPrefix } from "@/constant";
+import { formatDate, payrollTypesArray, transformStringArrayIntoOptions } from "@canny_ecosystem/utils";
 import { Combobox } from "@canny_ecosystem/ui/combobox";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -45,7 +45,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 
 clientLoader.hydrate = true;
 
-export default function ProjectsIndex() {
+export default function RunPayrollIndex() {
   const { payrollsPromise } = useLoaderData<typeof loader>();
   const [searchString, setSearchString] = useState("");
 
@@ -80,7 +80,7 @@ export default function ProjectsIndex() {
                     />
                     <Combobox
                       className={cn("w-52 h-10 capitalize")}
-                      options={transformStringArrayIntoOptions(PayrollTypes)}
+                      options={transformStringArrayIntoOptions(payrollTypesArray)}
                       value={searchString}
                       onChange={(value: string) => { setSearchString(value) }}
                       placeholder={"Select Payroll Type"}

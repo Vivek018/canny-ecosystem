@@ -58,10 +58,10 @@ export const DeletePayroll = ({
     <AlertDialog>
       <AlertDialogTrigger
         className={cn(
+          "w-36",
           buttonVariants({ variant: "destructive-outline" }),
-          "hidden",
+          !hasPermission(role, `${deleteRole}:${attribute.payroll}`) && "hidden",
           className,
-          hasPermission(role, `${deleteRole}:${attribute.payroll}`) && "flex",
         )}
       >
         Delete Payroll

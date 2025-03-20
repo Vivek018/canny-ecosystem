@@ -14,7 +14,7 @@ type Props = {
 // make sure the order is same as header order
 export const employeeColumnIdArray = [
   "employee_code",
-  "full_name",
+  "first_name",
   "primary_mobile_number",
   "date_of_birth",
   "education",
