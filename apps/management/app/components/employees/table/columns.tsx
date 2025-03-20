@@ -51,7 +51,7 @@ export const columns = ({
       },
     },
     {
-      accessorKey: "full_name",
+      accessorKey: "first_name",
       header: "Full Name",
       cell: ({ row }) => {
         return (

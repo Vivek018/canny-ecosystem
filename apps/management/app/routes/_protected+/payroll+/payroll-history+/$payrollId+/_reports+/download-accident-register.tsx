@@ -1,43 +1,36 @@
 import { json, useLoaderData, useNavigate } from "@remix-run/react";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { getUniqueEmployeeIdsByPayrollId } from "@canny_ecosystem/supabase/queries";
 import { useEffect, useRef } from "react";
 import { formatDateTime } from "@canny_ecosystem/utils";
 import Papa from "papaparse";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const { supabase } = getSupabaseWithHeaders({ request });
-  const payrollId = params.payrollId as string;
-  const { data: employeeIds } = await getUniqueEmployeeIdsByPayrollId({
-    supabase,
-    payrollId,
-  });
 
-  const healthAndSafetyRegister = employeeIds; // map on employeeIds to get healthAndSafetyRegister
-
-  return json({ healthAndSafetyRegister });
+  return json({ accidentRegister: [] });
 }
 
 export default function DownloadRoute() {
-  const { healthAndSafetyRegister } = useLoaderData<typeof loader>();
+  const { accidentRegister } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
   const hasDownloaded = useRef(false);
 
-  const data = (healthAndSafetyRegister ?? []).map(() => ({
-    date_of_inspection: "34",
-    department: "342",
-    inspector_name: "34",
-    type_of_inspection: "2",
-    hazards_indentified: "34",
-    risk_level: "342",
-    corrective_actions_taken: "34",
-    responsible_person: "32",
-    status_of_action: "3",
-    employee_health_monitoring: "3",
-    ppe_provided: "3",
-    training_conducted: "43",
-    follow_up_date: "423",
+  const data = (accidentRegister ?? []).map(() => ({
+    date: "342",
+    name_of_injured_person: "ddf",
+    employee_code: "3",
+    department: "34",
+    loaction: "Chicago",
+    nature_of_injury: "4",
+    cause_of_accident: "42",
+    type_of_accident: "2",
+    severity: "major",
+    medical_treatement: "342",
+    days_lost: "42",
+    compensation_paid: "432",
+    investigation_details: "NIL",
+    corrective_actions: "fsd",
+    reported_by_authorities: "zc",
     remarks: "",
   }));
 
@@ -54,7 +47,7 @@ export default function DownloadRoute() {
 
     link.setAttribute(
       "download",
-      `Health & Safety Register - ${formatDateTime(Date.now())}`,
+      `Accident Register - ${formatDateTime(Date.now())}`,
     );
 
     document.body.appendChild(link);

@@ -1,6 +1,6 @@
 import { ErrorBoundary } from "@/components/error-boundary";
 import { LoadingSpinner } from "@/components/loading-spinner";
-import { PayrollComponent } from "@/components/payroll/payroll-component";
+import { PayrollEntryComponent } from "@/components/payroll/payroll-entry-component";
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { updatePayroll } from "@canny_ecosystem/supabase/mutations";
@@ -64,6 +64,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     const formData = await request.formData();
     const payrollId = params.payrollId;
     const parsedData = JSON.parse(formData.get("data") as string);
+    const parsedSkipPayrollEntries = JSON.parse(formData.get("skipPayrollEntries") as string);
 
     const data = {
       id: (parsedData.id ?? payrollId) as PayrollDatabaseRow["id"],
@@ -75,7 +76,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         parsedData.total_net_amount as PayrollDatabaseRow["total_net_amount"],
     };
 
-    const { status, error } = await updatePayroll({ supabase, data });
+    const { status, error } = await updatePayroll({ supabase, data, skipPayrollEntries: parsedSkipPayrollEntries });
     if (isGoodStatus(status)) {
       return json({
         status: "success",
@@ -101,7 +102,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   }
 }
 
-export default function PayrollId() {
+export default function RunPayrollId() {
   const { payrollPromise, payrollEntriesPromise } =
     useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
@@ -115,6 +116,7 @@ export default function PayrollId() {
       if (actionData?.status === "success") {
         clearExactCacheEntry(cacheKeyPrefix.run_payroll);
         clearExactCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
+        clearExactCacheEntry(cacheKeyPrefix.payroll_history);
         toast({
           title: "Success",
           description: actionData?.message || "Payroll updated",
@@ -137,11 +139,11 @@ export default function PayrollId() {
       <Await resolve={payrollPromise}>
         {({ data: payrollData, error: payrollError }) => {
           if (payrollError || !payrollData) {
-            clearExactCacheEntry(cacheKeyPrefix.run_payroll_id);
+            clearExactCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
             return (
               <ErrorBoundary
                 error={payrollError}
-                message="Failed to load Payroll Data in Id"
+                message="Failed to load Payroll Data in Run Payroll Id"
               />
             );
           }
@@ -149,17 +151,18 @@ export default function PayrollId() {
             <Await resolve={payrollEntriesPromise}>
               {({ data, error }) => {
                 if (error || !data) {
-                  clearExactCacheEntry(cacheKeyPrefix.run_payroll_id);
+                  clearExactCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
                   return (
                     <ErrorBoundary
                       error={error}
-                      message="Failed to load Payroll Entries"
+                      message="Failed to load Payroll Entries in Run Payroll"
                     />
                   );
                 }
-                return (
-                  <PayrollComponent payrollData={payrollData} data={data} />
-                );
+                if (payrollData.payroll_type === "reimbursement" || payrollData.payroll_type === "exit")
+                  return (
+                    <PayrollEntryComponent payrollData={payrollData} data={data} />
+                  );
               }}
             </Await>
           );

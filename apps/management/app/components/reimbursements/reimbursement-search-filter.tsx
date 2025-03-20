@@ -44,9 +44,9 @@ export function ReimbursementSearchFilter({
     navigation.state === "submitting" ||
     (navigation.state === "loading" &&
       navigation.location.pathname ===
-        (employeeId
-          ? `/employees/${employeeId}/reimbursements`
-          : "/approvals/reimbursements") &&
+      (employeeId
+        ? `/employees/${employeeId}/reimbursements`
+        : "/approvals/reimbursements") &&
       navigation.location.search.length);
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -195,7 +195,7 @@ export function ReimbursementSearchFilter({
               className={cn(
                 "absolute z-10 right-3 top-[6px] opacity-70",
                 !disabled &&
-                  "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
+                "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 hasValidFilters && "opacity-100",
                 isOpen && "opacity-100"
               )}
@@ -212,52 +212,52 @@ export function ReimbursementSearchFilter({
         sideOffset={19}
         alignOffset={-11}
       >
-          <DropdownMenuGroup>
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger>
-                <span>Submitted Date</span>
-              </DropdownMenuSubTrigger>
-              <DropdownMenuPortal>
-                <DropdownMenuSubContent
-                  sideOffset={14}
-                  alignOffset={-4}
-                  className='p-0'
-                >
-                  <Calendar
-                    mode='range'
-                    initialFocus
-                    today={
-                      filterParams.submitted_date_start
-                        ? new Date(filterParams.submitted_date_start)
-                        : new Date()
-                    }
-                    hidden={{ after: new Date() }}
-                    selected={{
-                      from: filterParams.submitted_date_start
-                        ? new Date(filterParams.submitted_date_start)
-                        : undefined,
-                      to: filterParams.submitted_date_end
-                        ? new Date(filterParams.submitted_date_end)
-                        : undefined,
-                    }}
-                    onSelect={(range) => {
-                      if (!range) return;
+        <DropdownMenuGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <span>Submitted Date</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent
+                sideOffset={14}
+                alignOffset={-4}
+                className='p-0'
+              >
+                <Calendar
+                  mode='range'
+                  initialFocus
+                  today={
+                    filterParams.submitted_date_start
+                      ? new Date(filterParams.submitted_date_start)
+                      : new Date()
+                  }
+                  hidden={{ after: new Date() }}
+                  selected={{
+                    from: filterParams.submitted_date_start
+                      ? new Date(filterParams.submitted_date_start)
+                      : undefined,
+                    to: filterParams.submitted_date_end
+                      ? new Date(filterParams.submitted_date_end)
+                      : undefined,
+                  }}
+                  onSelect={(range) => {
+                    if (!range) return;
 
-                      const newRange = {
-                        submitted_date_start: range.from
-                          ? formatISO(range.from, { representation: "date" })
-                          : String(filterParams.submitted_date_start),
-                        submitted_date_end: range.to
-                          ? formatISO(range.to, { representation: "date" })
-                          : "",
-                      };
-                      setFilterParams((prev) => ({ ...prev, ...newRange }));
-                    }}
-                  />
-                </DropdownMenuSubContent>
-              </DropdownMenuPortal>
-            </DropdownMenuSub>
-          </DropdownMenuGroup>
+                    const newRange = {
+                      submitted_date_start: range.from
+                        ? formatISO(range.from, { representation: "date" })
+                        : String(filterParams.submitted_date_start),
+                      submitted_date_end: range.to
+                        ? formatISO(range.to, { representation: "date" })
+                        : "",
+                    };
+                    setFilterParams((prev) => ({ ...prev, ...newRange }));
+                  }}
+                />
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+        </DropdownMenuGroup>
 
         <DropdownMenuGroup>
           <DropdownMenuSub>
@@ -320,6 +320,7 @@ export function ReimbursementSearchFilter({
             </DropdownMenuPortal>
           </DropdownMenuSub>
         </DropdownMenuGroup>
+
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
@@ -381,7 +382,7 @@ export function ReimbursementSearchFilter({
           </DropdownMenuSub>
         </DropdownMenuGroup>
 
-        <DropdownMenuGroup>
+        <DropdownMenuGroup className={cn(!projectArray?.length && "hidden")}>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
               <span>Project Site</span>

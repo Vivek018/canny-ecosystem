@@ -12,7 +12,7 @@ import {
 } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import type { ActionFunctionArgs } from "@remix-run/node";
-import { json, useActionData, useNavigate } from "@remix-run/react";
+import { json, useActionData, useNavigate, useParams } from "@remix-run/react";
 import { useEffect } from "react";
 
 export async function action({ request, params }: ActionFunctionArgs) {
@@ -61,9 +61,12 @@ export default function DeletePayroll() {
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  const { payrollId } = useParams();
+
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
+        clearExactCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
         clearExactCacheEntry(cacheKeyPrefix.run_payroll);
         toast({
           title: "Success",

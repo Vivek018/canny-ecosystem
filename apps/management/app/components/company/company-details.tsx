@@ -75,6 +75,7 @@ export const CompanyDetails = ({
           <CardContent className="pb-2">
             <div className="grid grid-cols-1 md:grid-cols-2 items-center justify-center md:gap-x-8">
               <input {...getInputProps(fields.id, { type: "hidden" })} />
+              <input {...getInputProps(fields.logo, { type: "hidden" })} />
               <Field
                 inputProps={{
                   ...getInputProps(fields.name, { type: "text" }),

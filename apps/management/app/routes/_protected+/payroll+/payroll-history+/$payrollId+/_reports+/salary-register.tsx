@@ -21,10 +21,8 @@ import {
   getEmployeeStatutoryDetailsById,
   getPaymentFieldById,
   getPaymentTemplateComponentById,
-  getPaymentTemplateComponentIdsAndAmountByPayrollIdAndEmployeeId,
   getPayrollById,
   getPrimaryLocationByCompanyId,
-  getUniqueEmployeeIdsByPayrollId,
 } from "@canny_ecosystem/supabase/queries";
 import {
   CANNY_MANAGEMENT_SERVICES_ADDRESS,
@@ -313,7 +311,7 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
 
             <View
               style={[styles.tableCell, { flex: 1, borderRight: "none" }]}
-            ></View>
+            >a</View>
           </View>
         ))}
 
@@ -337,9 +335,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   });
   const { data: employeeCompanyLocationData } =
     await getPrimaryLocationByCompanyId({ supabase, companyId });
-  const { data: uniqueEmployeeIdsData } = await getUniqueEmployeeIdsByPayrollId(
-    { supabase, payrollId },
-  );
+
   const { data: companyData } = await getCompanyById({
     supabase,
     id: companyId,
@@ -354,93 +350,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     employeeData: [],
   };
 
-  if (uniqueEmployeeIdsData?.length) {
-    const employeeDataPromises = uniqueEmployeeIdsData.map(
-      async (employeeId) => {
-        const { data: employeeData } = await getEmployeeById({
-          supabase,
-          id: employeeId as string,
-        });
-        const { data: employeeProjectAssignmentData } =
-          await getEmployeeProjectAssignmentByEmployeeId({
-            supabase,
-            employeeId: employeeId as string,
-          });
-        const { data: employeeStatutoryDetails } =
-          await getEmployeeStatutoryDetailsById({
-            supabase,
-            id: employeeId as string,
-          });
-
-        const earnings: { amount: number; name: string }[] = [];
-        const deductions: { amount: number; name: string }[] = [];
-
-        const { data: payrollEntriesData } =
-          await getPaymentTemplateComponentIdsAndAmountByPayrollIdAndEmployeeId(
-            { supabase, employeeId: employeeId as string, payrollId },
-          );
-
-        if (payrollEntriesData?.length) {
-          await Promise.all(
-            payrollEntriesData.map(async (payrollEntryData) => {
-              if (payrollEntryData?.payment_template_components_id) {
-                const { data: paymentTemplateComponentData } =
-                  await getPaymentTemplateComponentById({
-                    supabase,
-                    id: payrollEntryData.payment_template_components_id,
-                  });
-
-                if (!paymentTemplateComponentData) return;
-
-                let name = "";
-                const amount = payrollEntryData.amount as number;
-                const componentType =
-                  paymentTemplateComponentData.component_type;
-
-                if (
-                  paymentTemplateComponentData.target_type === "payment_field"
-                ) {
-                  const { data: paymentFieldData } = await getPaymentFieldById({
-                    supabase,
-                    id: paymentTemplateComponentData.payment_field_id as string,
-                  });
-                  name = paymentFieldData?.name || "";
-                } else if (paymentTemplateComponentData.target_type === "bonus")
-                  name = "Bonus";
-                else if (paymentTemplateComponentData.target_type === "epf")
-                  name = "Employee Provident Fund";
-                else if (paymentTemplateComponentData.target_type === "esi")
-                  name = "Employee State Insurance";
-                else if (paymentTemplateComponentData.target_type === "lwf")
-                  name = "Labour Welfare Fund";
-                else if (paymentTemplateComponentData.target_type === "pt")
-                  name = "Professional Tax";
-
-                if (
-                  componentType === "deduction" ||
-                  componentType === "statutory_contribution"
-                )
-                  deductions.push({ name, amount });
-                else earnings.push({ name, amount });
-              }
-            }),
-          );
-        }
-
-        return {
-          employeeData,
-          employeeProjectAssignmentData,
-          employeeStatutoryDetails,
-          earnings,
-          deductions,
-        };
-      },
-    );
-
-    salaryRegister.employeeData = (await Promise.all(
-      employeeDataPromises,
-    )) as any;
-  }
 
   return { salaryRegister };
 }

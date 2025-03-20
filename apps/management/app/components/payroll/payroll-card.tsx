@@ -61,11 +61,11 @@ export function PayrollCard({
           <Link
             prefetch="intent"
             to={
-              data?.status === "approved"
+              is_approved
                 ? `/payroll/payroll-history/${data.id}`
                 : `/payroll/run-payroll/${data.id}`
             }
-            className={cn(buttonVariants(), "border-2 border-primary")}
+            className={cn(buttonVariants(), "border-2 border-primary w-36")}
           >
             View {is_approved ? "Pay History" : "Pay Run"}
           </Link>

@@ -18,9 +18,6 @@ import {
   getEmployeeById,
   getEmployeeProjectAssignmentByEmployeeId,
   getEmployeeStatutoryDetailsById,
-  getPaymentFieldById,
-  getPaymentTemplateComponentById,
-  getPaymentTemplateComponentIdsAndAmountByPayrollIdAndEmployeeId,
   getPayrollById,
   getPrimaryLocationByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
@@ -30,7 +27,7 @@ import {
   numberToWordsIndian,
   SALARY_SLIP_TITLE,
 } from "@/constant";
-import { formatDateTime, formatDateToMonthYear } from "@canny_ecosystem/utils";
+import { formatDateTime } from "@canny_ecosystem/utils";
 import type {
   CompanyDatabaseRow,
   EmployeeDatabaseRow,
@@ -252,7 +249,7 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
           <View>
             <Text style={styles.monthTitle}>
               For The Month Of{" "}
-              {formatDateToMonthYear(data.payrollData.run_date)}
+              2025
             </Text>
           </View>
         </View>
@@ -420,57 +417,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const earnings: { amount: number; name: string }[] = [];
   const deductions: { amount: number; name: string }[] = [];
 
-  const { data: payrollEntriesData } =
-    await getPaymentTemplateComponentIdsAndAmountByPayrollIdAndEmployeeId({
-      supabase,
-      employeeId,
-      payrollId,
-    });
-
-  if (payrollEntriesData) {
-    await Promise.all(
-      payrollEntriesData.map(async (payrollEntryData) => {
-        if (payrollEntryData?.payment_template_components_id) {
-          const { data: paymentTemplateComponentData } =
-            await getPaymentTemplateComponentById({
-              supabase,
-              id: payrollEntryData.payment_template_components_id,
-            });
-          if (!paymentTemplateComponentData) return;
-
-          let name = "";
-          const amount = payrollEntryData.amount as number;
-          const componentType = paymentTemplateComponentData.component_type;
-
-          // Determine the name based on target type
-          if (paymentTemplateComponentData.target_type === "payment_field") {
-            const { data: paymentFieldData } = await getPaymentFieldById({
-              supabase,
-              id: paymentTemplateComponentData.payment_field_id as string,
-            });
-            name = paymentFieldData?.name || "";
-          } else if (paymentTemplateComponentData.target_type === "bonus")
-            name = "Bonus";
-          else if (paymentTemplateComponentData.target_type === "epf")
-            name = "Employee Provident Fund";
-          else if (paymentTemplateComponentData.target_type === "esi")
-            name = "Employee State Insurance";
-          else if (paymentTemplateComponentData.target_type === "lwf")
-            name = "Labour Welfare Fund";
-          else if (paymentTemplateComponentData.target_type === "pt")
-            name = "Professional Tax";
-
-          // Categorize into deductions or earnings
-          if (
-            componentType === "deduction" ||
-            componentType === "statutory_contribution"
-          )
-            deductions.push({ name, amount });
-          else earnings.push({ name, amount });
-        }
-      }),
-    );
-  }
 
   return {
     data: {
