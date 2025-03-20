@@ -42,7 +42,7 @@ export default function Employee() {
 
   return (
     <section className="relative w-full">
-      <div className="flex items-center gap-4 py-2.5 px-4 mt-5 md:border-b border-t">
+      <div className="flex items-center gap-4 md:py-2.5 px-4 md:border-b border-t">
         <div className="hidden md:flex md:items-center md:gap-4">
           {user && <Link
             prefetch="intent"
@@ -58,7 +58,7 @@ export default function Employee() {
             items={items}
             pathname={pathname}
             Link={Link}
-            className="h-9 mx-3 mt-2 "
+            className="py-2"
           />
         </div>
 

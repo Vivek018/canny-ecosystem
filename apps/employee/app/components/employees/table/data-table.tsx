@@ -16,7 +16,6 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { DataTableHeader } from "./data-table-header";
 import { useEmployeesStore } from "@/store/employees";
-import { useToast } from "@canny_ecosystem/ui/use-toast";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[] | unknown | any;
@@ -27,16 +26,11 @@ interface DataTableProps<TData, TValue> {
 
 export function DataTable<TData, TValue>({
   columns,
-  data: initialData,
-  error,
-  searchString,
+  data,
 }: DataTableProps<TData, TValue>) {
-  const [data, setData] = useState(initialData);
-
   const { rowSelection, setRowSelection, setColumns } = useEmployeesStore();
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const { toast } = useToast();
 
   const table = useReactTable({
     data,
@@ -51,36 +45,10 @@ export function DataTable<TData, TValue>({
   });
 
   useEffect(() => {
-    if (!error && !data?.length) {
-      toast({
-        description: "No employees found",
-      })
-    }
-  }, [error]);
-
-
-  useEffect(() => {
     setColumns(table.getAllLeafColumns());
   }, [columnVisibility]);
 
-  useEffect(() => {
-    setData(initialData);
-  }, [initialData]);
-
   const tableLength = table.getRowModel().rows?.length;
-
-  useEffect(() => {
-    if (!searchString) {
-      setData(initialData)
-    } else {
-      const filteredData = initialData?.filter((item) => Object.values(item as Record<string, unknown>).some((value) =>
-        String(value).toLowerCase().includes(searchString.toLowerCase()),
-      ),
-      );
-
-      setData(filteredData);
-    }
-  }, [searchString, data]);
 
   return (
     <div className="relative mb-8">
@@ -110,7 +78,7 @@ export function DataTable<TData, TValue>({
                           key={cell.id}
                           className={cn(
                             "px-3 py-1 md:px-4 md:py-2",
-                            ( cell.column.id === "employee_code" ||
+                            (cell.column.id === "employee_code" ||
                               cell.column.id === "full_name" ||
                               cell.column.id === "primary_mobile_number" ||
                               cell.column.id === "date_of_birth" ||

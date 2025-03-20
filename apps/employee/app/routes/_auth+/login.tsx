@@ -7,9 +7,7 @@ import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Field } from "@canny_ecosystem/ui/forms";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import { StatusButton } from "@canny_ecosystem/ui/status-button";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { EmployeeLoginSchema } from "@canny_ecosystem/utils";
 import { FormProvider, getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
@@ -128,10 +126,10 @@ export default function Login() {
 
   return (
     <section className="flex min-h-screen justify-center items-center overflow-hidden p-6 mt-1 md:p-0">
-      <div className="relative z-20 m-auto flex w-full max-w-[450px] flex-col py-8">
+      <div className="relative z-20 m-auto flex w-full max-w-[450px] flex-col">
         <div className="flex w-full flex-col justify-center relative">
           <div className="pb-4 bg-gradient-to-r from-primary dark:via-primary dark:to-[#848484] to-[#000] inline-block text-transparent bg-clip-text mx-auto">
-            <h1 className="font-extrabold uppercase pb-1 tracking-widest text-4xl max-sm:text-center">
+            <h1 className="font-extrabold uppercase pb-1 tracking-widest text-3xl md:text-4xl max-sm:text-center">
               CANNY ECOSYSTEM
             </h1>
           </div>
@@ -142,49 +140,48 @@ export default function Login() {
             ecosystem.
           </p>
 
-          <div className="flex flex-col items-center my-5 ">
-
-            <div className="pointer-events-auto flex flex-col mx-auto ">
+          <div className="flex flex-col items-center my-4">
+            <div className="pointer-events-auto flex flex-col mx-auto w-60">
               <FormProvider context={form.context}>
                 {/* Employee Login Form */}
-                <Form method="POST" {...getFormProps(form)} className="flex flex-col">
-                  <div className="flex items-start gap-2">
+                <Form method="POST" {...getFormProps(form)}>
+                  <div className="flex items-start gap-1">
                     <Field
+                      className="-mt-1.5"
                       inputProps={{
                         ...getInputProps(fields.employee_code, {
                           type: "text",
                         }),
-                        className: "p-5 text-md w-56",
                         placeholder: "Employee Code",
                       }}
                       errors={fields.employee_code.errors}
                     />
-                    <StatusButton
+                    <Button
                       form={form.id}
                       disabled={!form.valid}
                       variant="default"
-                      size="full"
+                      size="icon"
                       type="submit"
                       name="_action"
                       value="employee_login"
-                      className={cn("mt-[7px] px-4 py-5")}
+                      className="w-11 rounded-md"
                     >
-                      <Icon name="chevron-right" className="mb-1" />
-                    </StatusButton>
+                      <Icon name="chevron-right" />
+                    </Button>
                   </div>
                 </Form>
               </FormProvider>
             </div>
 
-            <span className="mx-auto">or</span>
+            <span className="mx-auto -mt-0.5 my-4">or</span>
 
-            <div className="pointer-events-auto my-6 flex flex-col">
+            <div className="pointer-events-auto my-5 flex flex-col">
               <Form method="POST">
                 <Button
                   type="submit"
                   name="_action"
                   value="supervisor_login"
-                  className="p-5 cursor-pointer w-64"
+                  className="cursor-pointer w-60"
                 >
                   Login as Supervisor
                 </Button>

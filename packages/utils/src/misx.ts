@@ -200,7 +200,7 @@ export function getWorkingDaysInCurrentMonth({ working_days }: {
   return workingDayCount;
 }
 
-export const searchInObject = (obj: any, searchString: string): boolean => {
+export const searchInObject = (obj: any, searchString: string): any => {
   if (!obj || typeof obj !== "object") {
     return String(obj).toLowerCase().includes(searchString.toLowerCase());
   }

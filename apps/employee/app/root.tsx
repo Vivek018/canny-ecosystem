@@ -78,7 +78,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
         path: new URL(request.url).pathname,
         userPrefs: {
           theme: null,
-          companyId: null,
           user: null,
           employeeId: null,
         },
@@ -123,9 +122,6 @@ function Document({
 function App() {
   const {
     error,
-    requestInfo: {
-      userPrefs: { theme: initialTheme, user },
-    },
   } = useLoaderData<typeof loader>();
 
 
@@ -140,7 +136,6 @@ function App() {
         <div className='w-full h-full'>
           <Outlet />
         </div>
-
         <Toaster />
       </main>
     </Document >

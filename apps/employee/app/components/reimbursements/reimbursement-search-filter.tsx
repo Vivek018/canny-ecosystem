@@ -381,7 +381,7 @@ export function ReimbursementSearchFilter({
           </DropdownMenuSub>
         </DropdownMenuGroup>
 
-        <DropdownMenuGroup>
+        <DropdownMenuGroup className={cn(!projectArray?.length && "hidden")}>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
               <span>Project Site</span>
