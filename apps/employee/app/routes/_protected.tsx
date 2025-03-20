@@ -1,20 +1,17 @@
-import { redirect, type LoaderFunctionArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 import {
 	type ClientLoaderFunctionArgs,
 	json,
 	Link,
 	Outlet,
+	redirect,
 	useLoaderData,
 	useSubmit,
 } from "@remix-run/react";
-import { getSessionUser } from "@canny_ecosystem/supabase/cached-queries";
-import {
-	getUserByEmail,
-} from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { clearAllCache, clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
-import { getEmployeeIdFromCookie } from "@/utils/server/user.server";
+import { getEmployeeIdFromCookie, getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { useRequestInfo } from "@/utils/request-info";
 import { Logo } from "@canny_ecosystem/ui/logo";
 import { ThemeSwitch } from "@/components/theme-switch";
@@ -23,14 +20,14 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useState } from "react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-	const { user: sessionUser } = await getSessionUser({ request });
 	const { supabase } = getSupabaseWithHeaders({ request });
+	const { user: userData } = await getUserCookieOrFetchUser(request, supabase);
 
 	const employeeId = await getEmployeeIdFromCookie(request);
-	
-	const { data: userData, } = await getUserByEmail({ supabase, email: sessionUser?.email ?? "" });
-	
-	if (!sessionUser?.email && !employeeId) return redirect("/no-user-found");
+
+	if(!(userData || employeeId)) {
+		return redirect(DEFAULT_ROUTE, { status: 303})
+	}
 
 	return json({ user: userData, employeeId });
 

@@ -56,7 +56,7 @@ export function DataTable<TData, TValue>({
         description: "No employees found",
       })
     }
-  }, [data, error]);
+  }, [error]);
 
 
   useEffect(() => {

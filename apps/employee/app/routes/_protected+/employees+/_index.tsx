@@ -22,20 +22,21 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		const { supabase } = getSupabaseWithHeaders({ request });
 		const { user } = await getSessionUser({ request });
 
-		const { data: userProfile, error: userProfileError } = await getUserByEmail({ email: user?.email || "", supabase });
-		if (userProfileError) throw userProfileError;
-
 		const employeeId = await getEmployeeIdFromCookie(request);
 
 		if (employeeId) {
 			return safeRedirect(`/employees/${employeeId}/overview`, { status: 303 });
 		}
 
-		// if (!userProfile?.site_id) throw new Error("No site id found");
+		const { data: userProfile, error: userProfileError } = await getUserByEmail({ email: user?.email || "", supabase });
+		if (userProfileError) throw userProfileError;
+
+
+		if (!userProfile?.site_id) throw new Error("No site id found");
 
 		const employeesPromise = getEmployeesByProjectSiteId({
 			supabase,
-			projectSiteId: "129d75cd-0062-4d4c-bd61-21e9b0dfd0a9" || userProfile?.site_id || "",
+			projectSiteId: userProfile?.site_id || "",
 		});
 
 		return defer({
@@ -106,8 +107,8 @@ export default function EmployeesIndex() {
 			</div>
 			<Suspense fallback={<div className="h-1/3" />}>
 				<Await resolve={employeesPromise}>
-					{({ data, error }) => {
-						if (error) {
+					{({ data, error }: any) => {
+						if (error?.message) {
 							clearExactCacheEntry(cacheKeyPrefix.employees);
 							return (
 								<ErrorBoundary

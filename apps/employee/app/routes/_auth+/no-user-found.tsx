@@ -21,7 +21,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       email: sessionUser.email,
     });
 
-    if (userData && !userError) {
+    if (userError && !userData) {
       return safeRedirect(DEFAULT_ROUTE);
     }
   }
