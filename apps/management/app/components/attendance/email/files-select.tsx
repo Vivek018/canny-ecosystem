@@ -1,9 +1,12 @@
 import { MultiSelectCombobox } from "@canny_ecosystem/ui/multi-select-combobox";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useState } from "react";
 
 export const FilesSelect = ({
   setFiles,
+  files: fls,
 }: {
+  files?: string[];
   setFiles: React.Dispatch<React.SetStateAction<string[] | undefined>>;
 }) => {
   const files = [
@@ -60,10 +63,14 @@ export const FilesSelect = ({
         aria-multiselectable="true"
         aria-describedby="files-description"
       />
-      <span id="files-description" className="sr-only">
-        Select one or more files. Shows individual email names when 3 or fewer
-        are selected.
-      </span>
+      <p
+        className={cn(
+          "text-xs text-destructive mt-1 hidden",
+          (fls?.length === 0 || fls?.length === undefined) && "flex"
+        )}
+      >
+        Required
+      </p>
     </div>
   );
 };

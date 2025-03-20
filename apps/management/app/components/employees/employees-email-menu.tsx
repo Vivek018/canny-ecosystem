@@ -1,4 +1,4 @@
-import { Button, buttonVariants } from "@canny_ecosystem/ui/button";
+import { Button } from "@canny_ecosystem/ui/button";
 import Papa from "papaparse";
 import {
   Dialog,
@@ -122,15 +122,15 @@ export default function EmployeesEmailMenu({
             <DialogTitle>Email Employees Data</DialogTitle>
             <DialogDescription>Send email of Employees data</DialogDescription>
           </DialogHeader>
-          <UserEmailSelect options={userEmails} setTo={setTo} />
-
+          <UserEmailSelect to={to} options={userEmails} setTo={setTo} />
           <DialogFooter className="mt-2">
-            <DialogClose className="border px-2 rounded-sm bg-muted">
+            <DialogClose className="border px-2 rounded-sm bg-muted text-sm hover:bg-muted/90">
               Cancel
             </DialogClose>
             <Button
-              className={cn(buttonVariants({ variant: "ghost" }))}
+              variant={"default"}
               onClick={() => handleEmail()}
+              disabled={to?.length === 0 || to?.length === undefined}
             >
               Send
             </Button>

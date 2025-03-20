@@ -1,10 +1,13 @@
 import { MultiSelectCombobox } from "@canny_ecosystem/ui/multi-select-combobox";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useState } from "react";
 
 export const UserEmailSelect = ({
   options,
   setTo,
+  to,
 }: {
+  to?: string[];
   options: any[];
   setTo: React.Dispatch<React.SetStateAction<string[] | undefined>>;
 }) => {
@@ -58,10 +61,14 @@ export const UserEmailSelect = ({
         aria-multiselectable="true"
         aria-describedby="user-email-description"
       />
-      <span id="user-email-description" className="sr-only">
-        Select one or more user-email. Shows individual email names when 3 or
-        fewer are selected.
-      </span>
+      <p
+        className={cn(
+          "text-xs text-destructive mt-1 hidden",
+          (to?.length === 0 || to?.length === undefined) && "flex"
+        )}
+      >
+        Required
+      </p>
     </div>
   );
 };

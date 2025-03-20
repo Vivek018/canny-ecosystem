@@ -12,16 +12,19 @@ export function ReimbursementActions({ isEmpty }: { isEmpty: boolean }) {
 
   return (
     <div className="space-x-2 hidden md:flex">
+      <ColumnVisibility disabled={isEmpty} />
       <Button
         variant="outline"
         size="icon"
-        className={cn("h-10 w-10", !selectedRows?.length && "hidden")}
+        className={cn(
+          "h-10 w-10 bg-muted/70 text-muted-foreground",
+          !selectedRows?.length && "hidden"
+        )}
         disabled={!selectedRows.length}
         onClick={() => navigate("/approvals/reimbursements/analytics")}
       >
         <Icon name="chart" className="h-[18px] w-[18px]" />
       </Button>
-      <ColumnVisibility disabled={isEmpty} />
       <ReimbursementMenu
         selectedRows={selectedRows}
         className={
