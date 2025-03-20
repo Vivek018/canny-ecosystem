@@ -3,7 +3,6 @@ import type { PaymentTemplateAssignmentsDatabaseRow } from "@canny_ecosystem/sup
 import {
   formatDate,
 } from "@canny_ecosystem/utils";
-import { useUser } from "@/utils/user";
 
 type DetailItemProps = {
   label: string;
@@ -76,7 +75,6 @@ export const LinkTemplateCard = ({
     "created_at" | "updated_at"
   > | null;
 }) => {
-  const { role } = useUser();
 
   return (
     <Card className='rounded w-full h-full p-4'>

@@ -1,7 +1,14 @@
-import type { TransformedAttendanceDataType } from "@/routes/time-tracking+/attendance+/_index";
 import type { RowSelectionState, Updater } from "@tanstack/react-table";
 import { create } from "zustand";
 
+export type TransformedAttendanceDataType = {
+  attendance: any[];
+  employee_id: string;
+  employee_code: string;
+  employee_name: string;
+  project: string | null;
+  project_site: string | null;
+};
 
 interface AttendanceState {
   columns: string[];

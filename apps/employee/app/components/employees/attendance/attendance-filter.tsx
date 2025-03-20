@@ -1,4 +1,3 @@
-import type { AttendanceFilterType } from "@/routes/_protected+/dashboard";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -17,6 +16,13 @@ import { months } from "@canny_ecosystem/utils/constant";
 import { useSearchParams } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+
+export type AttendanceFilterType = {
+  year?: string | undefined | null;
+  month?: string | undefined | null;
+  project?: string | undefined | null;
+  project_site?: string | undefined | null;
+};
 
 export const AttendanceFilter = ({
   disabled,

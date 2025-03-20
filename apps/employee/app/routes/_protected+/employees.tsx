@@ -16,6 +16,5 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function Employees() {
-
 	return <Outlet />
 }
