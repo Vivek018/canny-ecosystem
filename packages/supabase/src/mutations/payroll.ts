@@ -272,7 +272,7 @@ export async function createPayrollEntries({
   }).select("id, amount");
 
   if (error) {
-    console.error("createPayrollEntry Error", error);
+    console.error("createPayrollEntries Error", error);
   }
 
   return { data: payrollEntriesData, status, error };
