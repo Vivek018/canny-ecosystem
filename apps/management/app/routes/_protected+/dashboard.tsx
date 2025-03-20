@@ -70,9 +70,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     if (sitesError) throw sitesError;
 
-    
-
-
     const recentEmployeesPromise = getRecentEmployeesByCompanyId({
       supabase,
       companyId,

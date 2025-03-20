@@ -6,7 +6,6 @@ import {
 } from "@remix-run/node";
 import {
   type ClientLoaderFunctionArgs,
-  Link,
   Links,
   Meta,
   Outlet,
@@ -21,18 +20,12 @@ import { useTheme } from "./utils/theme";
 import { href as iconsHref } from "@canny_ecosystem/ui/icon";
 import { ClientHintCheck, getHints } from "./utils/client-hints";
 import { useNonce } from "./utils/providers/nonce-provider";
-import { Logo } from "@canny_ecosystem/ui/logo";
-import { ThemeSwitch } from "./components/theme-switch";
-import { safeRedirect } from "./utils/server/http.server";
-import {
-  getCompanyIdOrFirstCompany,
-  setCompanyId,
-} from "./utils/server/company.server";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { cacheKeyPrefix, DEFAULT_ROUTE } from "./constant";
+import { cacheKeyPrefix } from "./constant";
 import { Toaster } from "@canny_ecosystem/ui/toaster";
 import { ErrorBoundary } from "./components/error-boundary";
 import {
+  getEmployeeIdFromCookie,
   getUserCookieOrFetchUser,
   setUserCookie,
 } from "./utils/server/user.server";
@@ -58,24 +51,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
       request,
       supabase,
     );
+    const employeeId = await getEmployeeIdFromCookie(request);
 
     const headers = new Headers();
     if (setCookie) {
       headers.append("Set-Cookie", setUserCookie(user));
-    }
-
-    let companyId = null;
-
-    if (companyId) {
-      headers.append("Set-Cookie", setCompanyId(companyId));
-      return safeRedirect(DEFAULT_ROUTE, { headers });
-    }
-    const companyResult = await getCompanyIdOrFirstCompany(request, supabase);
-    companyId = companyResult.companyId;
-
-    if (companyResult.setCookie) {
-      headers.append("Set-Cookie", setCompanyId(companyId));
-      return safeRedirect(DEFAULT_ROUTE, { headers });
     }
 
     return json({
@@ -84,8 +64,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
         path: new URL(request.url).pathname,
         userPrefs: {
           theme: getTheme(request),
-          companyId,
           user,
+          employeeId,
         },
       },
       error: null,
@@ -100,6 +80,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
           theme: null,
           companyId: null,
           user: null,
+          employeeId: null,
         },
       },
     });
@@ -147,6 +128,7 @@ function App() {
     },
   } = useLoaderData<typeof loader>();
 
+
   if (error) return <ErrorBoundary error={error} />;
 
   const nonce = useNonce();
@@ -155,26 +137,13 @@ function App() {
   return (
     <Document nonce={nonce} theme={theme}>
       <main className="flex h-full w-full bg-background text-foreground ">
-        {!user?.email ? (
-          <div className="w-full h-full">
-            <header className="flex justify-between items-center mx-5 mt-4 md:mx-10 md:mt-10">
-              <div>
-                <Link to={DEFAULT_ROUTE}>
-                  <Logo />
-                </Link>
-              </div>
-              <div>
-                <ThemeSwitch theme={initialTheme ?? "system"} />
-              </div>
-            </header>
-            <Outlet />
-          </div>
-        ) : (
+        <div className='w-full h-full'>
           <Outlet />
-        )}
+        </div>
+
         <Toaster />
       </main>
-    </Document>
+    </Document >
   );
 }
 
