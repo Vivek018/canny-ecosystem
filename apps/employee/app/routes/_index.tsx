@@ -29,7 +29,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
   if (employeeId) {
     return safeRedirect(`/employees/${employeeId}/overview`, { status: 303 });
   }
-  console.log("first second")
   return safeRedirect("/employees", { status: 303 });
 }
 
