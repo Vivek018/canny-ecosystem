@@ -133,7 +133,6 @@ const generalRateLimit = rateLimit(rateLimitDefault)
 app.use((req, res, next) => {
   const strongPaths = [
     '/login',
-    '/signup',
   ]
   if (req.method !== 'GET' && req.method !== 'HEAD') {
     if (strongPaths.some((p) => req.path.includes(p))) {
@@ -204,7 +203,7 @@ if (!portAvailable && !IS_DEV) {
 const server = app.listen(portToUse, () => {
   if (!portAvailable) {
     console.warn(
-      'yellow', `⚠️  Port ${desiredPort} is not available, using ${portToUse} instead.`,
+      `⚠️  Port ${desiredPort} is not available, using ${portToUse} instead.`,
     )
   }
   console.log("🚀  We have liftoff!")

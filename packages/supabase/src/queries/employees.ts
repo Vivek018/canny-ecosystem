@@ -278,6 +278,7 @@ export async function getEmployeesByProjectSiteId({
         project_sites!inner(id, name, projects!inner(id, name)))`,
     )
     .eq("employee_project_assignment.project_site_id", projectSiteId)
+    .order("created_at", { ascending: false })
     .limit(MID_QUERY_LIMIT)
     .returns<
       EmployeeDataType[]
