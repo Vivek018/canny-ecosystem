@@ -197,7 +197,7 @@ export default function Leaves() {
                                 leaveTypeData?.data as unknown as LeaveTypeDataType
                               }
                             />
-                            <div className="w-full flex items-center justify-between pb-4">
+                            <div className="w-full flex items-center justify-between md:pb-4">
                               <div className="w-full flex justify-start items-center gap-x-3">
                                 <div className="flex w-full flex-col md:flex-row items-start md:items-center gap-4">
                                   <LeavesSearchFilter
@@ -214,7 +214,7 @@ export default function Leaves() {
                                   />
                                   <FilterList filters={filters} />
                                 </div>
-                                <div className="space-x-2 hidden md:flex ">
+                                <div className="space-x-2 hidden md:flex">
                                   <ColumnVisibility disabled={!leavesPromise} />
                                 </div>
                               </div>

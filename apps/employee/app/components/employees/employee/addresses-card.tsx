@@ -21,7 +21,7 @@ export const AddressItem = ({ address }: { address: EmployeeAddress }) => {
   return (
     <Card
       key={address.id}
-      className="w-[420px] max-sm:w-72 max-sm:h-48 shadow-none select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start"
+      className="w-[420px] max-sm:w-11/12 shadow-none select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start"
     >
       <CardHeader className="flex flex-row space-y-0 items-center justify-between p-4">
         <CardTitle className="text-lg tracking-wide">

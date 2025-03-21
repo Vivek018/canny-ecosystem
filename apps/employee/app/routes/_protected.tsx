@@ -6,6 +6,7 @@ import {
   Outlet,
   redirect,
   useLoaderData,
+  useLocation,
   useSubmit,
 } from "@remix-run/react";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -15,9 +16,10 @@ import { getEmployeeIdFromCookie, getUserCookieOrFetchUser } from "@/utils/serve
 import { useRequestInfo } from "@/utils/request-info";
 import { Logo } from "@canny_ecosystem/ui/logo";
 import { ThemeSwitch } from "@/components/theme-switch";
-import { Button } from "@canny_ecosystem/ui/button";
+import { Button, buttonVariants } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useState } from "react";
+import { Icon } from "@canny_ecosystem/ui/icon";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -42,6 +44,7 @@ clientLoader.hydrate = true;
 export default function ProtectedRoute() {
   const { user, employeeId } = useLoaderData<typeof loader>();
   const requestInfo = useRequestInfo();
+  const { pathname } = useLocation();
   const [isLoading, setLoading] = useState(false);
   const submit = useSubmit();
 
@@ -55,14 +58,25 @@ export default function ProtectedRoute() {
   return (
     <>
       <header className='flex justify-between items-center p-4'>
-        <div>
+        <div className="flex items-center justify-center gap-2">
+          {user && <Link
+            prefetch="intent"
+            to="/employees"
+            className={cn(
+              buttonVariants({ variant: "outline" }),
+              "bg-card w-12 h-12 px-0 rounded-full md:hidden",
+              pathname === "/employees" && "hidden"
+            )}
+          >
+            <Icon name="chevron-left" size="sm" />
+          </Link>}
           <Link to={DEFAULT_ROUTE}>
-            <Logo />
+            <Logo className="w-11 h-11" />
           </Link>
         </div>
         <div className="flex items-center gap-3">
           <ThemeSwitch theme={requestInfo?.userPrefs.theme ?? "system"} />
-          <Button className={cn("h-12 rounded-full",!(employeeId || user) && "hidden")} variant="outline" onClick={handleLogout}>{isLoading ? "Loading..." : "Logout"}</Button>
+          <Button className={cn("h-12 rounded-full", !(employeeId || user) && "hidden")} variant="outline" onClick={handleLogout}>{isLoading ? "Loading..." : "Logout"}</Button>
         </div>
       </header>
       <Outlet />

@@ -141,11 +141,11 @@ export default function Login() {
           </p>
 
           <div className="flex flex-col items-center my-4">
-            <div className="pointer-events-auto flex flex-col mx-auto w-60">
+            <div className="pointer-events-auto flex flex-col mx-auto w-full sm:w-80">
               <FormProvider context={form.context}>
                 {/* Employee Login Form */}
                 <Form method="POST" {...getFormProps(form)}>
-                  <div className="flex items-start gap-1">
+                  <div className="flex items-start gap-2">
                     <Field
                       className="-mt-1.5"
                       inputProps={{
@@ -173,15 +173,18 @@ export default function Login() {
               </FormProvider>
             </div>
 
-            <span className="mx-auto -mt-0.5 my-4">or</span>
+            <div className="w-full sm:w-80 flex flex-col items-center my-2">
+              <div className="w-full h-0.5 bg-border" />
+              <span className="mx-auto -mt-3.5 px-4 bg-background">or</span>
+            </div>
 
-            <div className="pointer-events-auto my-5 flex flex-col">
+            <div className="max-sm:w-full pointer-events-auto my-5 flex flex-col">
               <Form method="POST">
                 <Button
                   type="submit"
                   name="_action"
                   value="supervisor_login"
-                  className="cursor-pointer w-60"
+                  className="cursor-pointer w-full sm:w-80"
                 >
                   Login as Supervisor
                 </Button>

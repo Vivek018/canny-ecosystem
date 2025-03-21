@@ -62,14 +62,11 @@ export default function Employee() {
           />
         </div>
 
-        {/* Mobile: FooterTabs */}
-        <div className="block md:hidden">
-          <FooterTabs
-            items={items}
-            pathname={pathname}
-            Link={Link}
-          />
-        </div>
+        <FooterTabs
+          items={items}
+          pathname={pathname}
+          Link={Link}
+        />
       </div>
       <div className="px-4 pb-20"><Outlet /></div>
     </section>

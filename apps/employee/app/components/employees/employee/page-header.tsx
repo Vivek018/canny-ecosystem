@@ -55,7 +55,7 @@ export function EmployeePageHeader({
               </p>
             </div>
             <div className="mt-3">
-              <h1 className="text-3xl tracking-wide font-bold capitalize">
+              <h1 className="text-3xl tracking-wide font-bold capitalize text-center max-sm:mb-2">
                 {`${employee?.first_name} ${employee?.middle_name ?? ""} ${employee?.last_name ?? ""
                   }`}
               </h1>

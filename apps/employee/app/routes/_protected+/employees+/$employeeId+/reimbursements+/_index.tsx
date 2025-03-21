@@ -165,7 +165,7 @@ export default function ReimbursementsIndex() {
 
                   return (
                     <>
-                      <div className="w-full flex items-center justify-between pb-4">
+                      <div className="w-full flex items-center justify-between md:pb-4">
                         <div className="w-full flex justify-between items-center">
                           <div className="flex w-full flex-col md:flex-row items-start md:items-center gap-4">
                             <ReimbursementSearchFilter

@@ -1,6 +1,7 @@
 import type { ReimbursementFilters } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { formatDate, formatDateRange } from "@canny_ecosystem/utils";
 import { useSearchParams } from "@remix-run/react";
 
@@ -55,7 +56,7 @@ export function FilterList({ filters }: Props) {
   };
 
   return (
-    <ul className="flex flex-0 space-x-2 w-full overflow-scroll no-scrollbar">
+    <ul className={cn("flex flex-0 space-x-2 w-full overflow-scroll no-scrollbar", filters && Object.entries(filters)?.length && "pb-4")}>
       {filters &&
         Object.entries(filters)
           .filter(([key, value]) => value != null && !key.endsWith("end"))
