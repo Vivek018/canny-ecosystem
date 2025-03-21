@@ -248,8 +248,7 @@ export async function getReimbursementsByEmployeeId({
   const query = supabase
     .from("reimbursements")
     .select(
-      `
-        ${columns.join(",")},
+      `${columns.join(",")},
           employees!inner(id, first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!left(project_sites!left(id, name, projects!left(id, name)))),
           users!${users ? "inner" : "left"}(id,email)`,
       { count: "exact" },

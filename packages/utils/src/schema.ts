@@ -1560,3 +1560,7 @@ export const ImportSingleLeavesDataSchema = z.object({
 export const ImportLeavesDataSchema = z.object({
   data: z.array(ImportSingleLeavesDataSchema),
 });
+
+export const EmployeeLoginSchema = z.object({
+  employee_code: z.string().optional(),
+});

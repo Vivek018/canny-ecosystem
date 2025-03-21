@@ -6,6 +6,7 @@ import type {
 } from "@canny_ecosystem/supabase/types";
 import { SECONDS_IN_A_MONTH } from "@canny_ecosystem/utils/constant";
 import * as cookie from "cookie";
+import { createCookie } from "@remix-run/node";
 
 const cookieName = "user";
 
@@ -63,6 +64,29 @@ export function setUserCookie(user: UserCookieType | null, deleteUser = false) {
     });
   }
   return cookie.serialize(cookieName, JSON.stringify(user), {
+    path: "/",
+    maxAge: SECONDS_IN_A_MONTH,
+  });
+}
+
+export const employeeRoleCookie = createCookie("employee_role", {
+  path: "/",
+});
+
+export async function getEmployeeIdFromCookie(request: Request): Promise<string | null> {
+  const cookieHeader = request.headers.get("Cookie");
+  const cookie = (await employeeRoleCookie.parse(cookieHeader)) || {};
+  return cookie.employeeId || null;
+}
+
+export function setEmployeeCookie(user: UserCookieType | null, deleteUser = false) {
+  if (!user || deleteUser) {
+    return cookie.serialize("employeeId", "", {
+      path: "/",
+      expires: new Date(0),
+    });
+  }
+  return cookie.serialize("employeeId", JSON.stringify(user), {
     path: "/",
     maxAge: SECONDS_IN_A_MONTH,
   });

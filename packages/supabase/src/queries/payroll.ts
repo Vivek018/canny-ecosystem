@@ -130,7 +130,7 @@ export async function getPayrollEntriesByPayrollId({
     "exit_id",
     "payment_status",
     "amount",
-    "payroll_id",
+    "payroll_id"
   ] as const;
 
   const { data, error } = await supabase

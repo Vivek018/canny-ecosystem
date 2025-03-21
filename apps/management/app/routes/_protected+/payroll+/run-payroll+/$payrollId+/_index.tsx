@@ -38,6 +38,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       supabase,
       payrollId: payrollId ?? "",
     });
+
     return defer({ payrollPromise, payrollEntriesPromise, error: null });
   } catch (error) {
     console.error("Payroll Id Index Error", error);
