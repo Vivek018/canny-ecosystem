@@ -54,7 +54,7 @@ export default function Overview() {
   }
 
   return (
-    <div className="w-full py-4 flex flex-col gap-8 h-[100vw]">
+    <div className="w-full py-4 flex flex-col gap-8">
       <Suspense fallback={<LoadingSpinner className="h-1/2 mt-20" />}>
         <Await resolve={sitePromise}>
           {(resolvedSiteData) => {

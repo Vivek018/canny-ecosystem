@@ -34,7 +34,7 @@ const SiteDetails = ({
   siteData: Omit<SitesWithLocation, "created_at" | "updated_at"> | null;
 }) => {
   return (
-    <section className='w-full select-text cursor-auto h-full flex flex-col justify-start p-4'>
+    <section className='w-full select-text cursor-auto flex flex-col justify-start p-4'>
       <ul className='grid grid-cols-3 gap-4'>
         <li>
           <DetailItem label='Site Name' value={siteData?.name} />
@@ -89,7 +89,7 @@ export const SiteDetailsCard = ({
   const { projectId, siteId } = useParams();
 
   return (
-    <Card className='rounded w-full h-full p-4'>
+    <Card className='rounded w-full p-4'>
       <div className='flex justify-between items-center mb-6'>
         <h2 className='text-xl font-semibold'>Site Details</h2>
         <div className='flex gap-4'>
