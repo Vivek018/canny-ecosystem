@@ -130,13 +130,14 @@ export async function getPayrollEntriesByPayrollId({
     "exit_id",
     "payment_status",
     "amount",
-    "payroll_id",
+    "payroll_id"
   ] as const;
 
   const { data, error } = await supabase
     .from("payroll_entries")
     .select(`${columns.join(",")}, employees!left(id,company_id,first_name, middle_name, last_name, employee_code)`)
     .eq("payroll_id", payrollId)
+    .order("created_at", { ascending: false })
     .returns<PayrollEntriesWithEmployee[]>();
 
   if (error) console.error("getPayrollEntriesByPayrollId Error", error);
