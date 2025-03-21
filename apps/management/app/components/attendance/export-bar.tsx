@@ -1,6 +1,8 @@
 import { Button } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { formatDateTime } from "@canny_ecosystem/utils";
+import {
+  formatDateTime,
+} from "@canny_ecosystem/utils";
 import type { VisibilityState } from "@tanstack/react-table";
 import Papa from "papaparse";
 
@@ -15,11 +17,15 @@ export function ExportBar({
   className: string;
   columnVisibility: VisibilityState;
 }) {
+  
+ 
+
   const allHeaders = new Set<string>();
   const dateHeaders = new Set<string>();
 
   for (const entry of data) {
     for (const key of Object.keys(entry)) {
+      
       if (columnVisibility[key] !== false) {
         allHeaders.add(key);
         if (
@@ -109,6 +115,8 @@ export function ExportBar({
     document.body.removeChild(link);
   };
 
+  
+  
   return (
     <div
       className={cn(
@@ -135,6 +143,7 @@ export function ExportBar({
           Export
         </Button>
       </div>
+      
     </div>
   );
 }

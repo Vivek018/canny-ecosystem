@@ -37,7 +37,9 @@ export function LeavesMenu({
       <DropdownMenuTrigger
         asChild
         className={cn(
-          selectedRows?.length ? "bg-muted/70 text-muted-foreground" : undefined,
+          selectedRows?.length
+            ? "bg-muted/70 text-muted-foreground"
+            : undefined,
           !hasPermission(role, `${createRole}:${attribute.leaves}`) && "hidden"
         )}
       >
@@ -46,6 +48,18 @@ export function LeavesMenu({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent sideOffset={10} align="end">
+        <LeavesRegister
+          selectedRows={selectedRows}
+          companyName={companyName}
+          companyAddress={companyAddress}
+        />
+        <DropdownMenuSeparator
+          className={cn(
+            !hasPermission(role, `${createRole}:${attribute.leaves}`) &&
+              "hidden",
+            !selectedRows.length && "hidden"
+          )}
+        />
         <DropdownMenuItem
           onClick={() => {
             searchParams.set("step", modalSearchParamNames.import_leaves);
@@ -56,19 +70,7 @@ export function LeavesMenu({
           <Icon name="import" size="sm" className="mb-0.5" />
           <span>Import/backfill</span>
         </DropdownMenuItem>
-        <DropdownMenuSeparator
-          className={cn(
-            !hasPermission(role, `${createRole}:${attribute.leaves}`) &&
-            "hidden",
-            !selectedRows.length && "hidden"
-          )}
-        />
-        <LeavesRegister
-          selectedRows={selectedRows}
-          companyName={companyName}
-          companyAddress={companyAddress}
-        />
       </DropdownMenuContent>
-    </DropdownMenu >
+    </DropdownMenu>
   );
 }

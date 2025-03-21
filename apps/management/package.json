@@ -23,12 +23,14 @@
     "@manypkg/cli": "^0.23.0",
     "@mdxeditor/editor": "^3.24.0",
     "@nichtsam/helmet": "^0.3.0",
+    "@react-email/components": "^0.0.33",
     "@react-pdf/renderer": "^4.1.6",
     "@remix-run/node": "^2.15.3",
     "@remix-run/react": "^2.15.3",
     "@remix-run/serve": "^2.15.3",
     "@tanstack/react-table": "^8.20.5",
     "address": "^2.0.3",
+    "buffer": "^6.0.3",
     "clear": "^0.1.0",
     "close-with-grace": "^2.2.0",
     "compression": "^1.8.0",
@@ -48,10 +50,11 @@
     "react-hotkeys-hook": "^4.5.1",
     "react-intersection-observer": "^9.13.1",
     "react-markdown": "^9.0.3",
+    "remark-gfm": "^4.0.1",
+    "resend": "^4.1.2",
     "xlsx": "^0.18.5",
     "xlsx-style": "^0.8.13",
-    "zustand": "^5.0.0-rc.2",
-    "remark-gfm": "^4.0.1"
+    "zustand": "^5.0.0-rc.2"
   },
   "devDependencies": {
     "@remix-run/dev": "^2.15.3",

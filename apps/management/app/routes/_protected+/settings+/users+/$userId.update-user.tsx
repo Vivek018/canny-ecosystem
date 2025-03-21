@@ -14,7 +14,11 @@ import {
   UserSchema,
   updateRole,
 } from "@canny_ecosystem/utils";
-import { getUserById } from "@canny_ecosystem/supabase/queries";
+import {
+  getProjectsByCompanyId,
+  getSitesByProjectId,
+  getUserById,
+} from "@canny_ecosystem/supabase/queries";
 import { updateUserById } from "@canny_ecosystem/supabase/mutations";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { useEffect } from "react";
@@ -24,19 +28,48 @@ import { safeRedirect } from "@/utils/server/http.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import { PROJECT_PARAM } from "@/components/employees/form/create-employee-project-assignment";
 
 export const UPDATE_USER_TAG = "update-user";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const userId = params.userId;
+  const url = new URL(request.url);
+  const urlSearchParams = new URLSearchParams(url.searchParams);
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
   if (!hasPermission(user?.role!, `${updateRole}:${attribute.settingUsers}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
-
   try {
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    const { data: projects } = await getProjectsByCompanyId({
+      supabase,
+      companyId,
+    });
+
+    const projectOptions = projects?.map((project) => ({
+      label: project?.name,
+      value: project?.id,
+    }));
+
+    let projectSiteOptions: any = [];
+
+    const projectParamId = urlSearchParams.get(PROJECT_PARAM);
+
+    if (projectParamId?.length) {
+      const { data: projectSites } = await getSitesByProjectId({
+        supabase,
+        projectId: projectParamId,
+      });
+
+      projectSiteOptions = projectSites?.map((projectSite) => ({
+        label: projectSite?.name,
+        value: projectSite?.id,
+      }));
+    }
     let userData = null;
     let userError = null;
 
@@ -50,6 +83,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
       return json({
         userData,
+        projectOptions,
+        projectSiteOptions,
         error: null,
       });
     }
@@ -60,8 +95,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       {
         error,
         userData: null,
+        projectOptions: null,
+        projectSiteOptions: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -80,7 +117,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -108,13 +145,14 @@ export async function action({
         message: "Failed to update user",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
 
 export default function UpdateUser() {
-  const { userData, error } = useLoaderData<typeof loader>();
+  const { userData, error, projectOptions, projectSiteOptions } =
+    useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -147,5 +185,11 @@ export default function UpdateUser() {
   if (error)
     return <ErrorBoundary error={error} message="Failed to load user" />;
 
-  return <CreateUser updateValues={userData} />;
+  return (
+    <CreateUser
+      updateValues={userData}
+      projectOptions={projectOptions as unknown as any}
+      projectSiteOptions={projectSiteOptions as unknown as any}
+    />
+  );
 }

@@ -11,6 +11,7 @@ import {
   getPrimaryLocationByCompanyId,
   getProjectNamesByCompanyId,
   getSiteNamesByProjectName,
+  getUsersEmail,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
@@ -121,6 +122,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       ? getSiteNamesByProjectName({ supabase, projectName: filters.project })
       : null;
 
+    const { data: userEmails } = await getUsersEmail({ companyId, supabase });
     return defer({
       projectPromise,
       defaultPayDay,
@@ -129,6 +131,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       attendancePromise: attendancePromise as any,
       filters,
       companyName,
+      userEmails,
       companyAddress,
       query: filters.name,
       env,
@@ -144,6 +147,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       defaultPayDay: null,
       query: "",
       filters: null,
+      userEmails: null,
       companyId: "",
       companyName: null,
       companyAddress: null,
@@ -185,6 +189,7 @@ export default function Attendance() {
     companyName,
     companyAddress,
     env,
+    userEmails,
   } = useLoaderData<typeof loader>();
 
   const [month, setMonth] = useState<number>(
@@ -288,6 +293,7 @@ export default function Attendance() {
         <AttendanceActions
           companyName={companyName as unknown as CompanyDatabaseRow}
           companyAddress={companyAddress as unknown as LocationDatabaseRow}
+          userEmails={userEmails as unknown as any}
         />
       </div>
       <Suspense fallback={<LoadingSpinner className="w-1/3 h-1/3" />}>
