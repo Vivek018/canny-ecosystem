@@ -37,36 +37,17 @@ export function AttendanceMenu({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild className={selectedRows?.length ? "bg-muted/70 text-muted-foreground" : undefined}>
+      <DropdownMenuTrigger
+        asChild
+        className={
+          selectedRows?.length ? "bg-muted/70 text-muted-foreground" : undefined
+        }
+      >
         <Button variant="outline" size="icon" className="h-10 w-[2.5rem]">
           <Icon name="plus" className="h-[18px] w-[18px]" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent sideOffset={10} align="end">
-        <DropdownMenuItem
-          onClick={() => {
-            searchParams.set(
-              "step",
-              modalSearchParamNames.import_employee_attendance
-            );
-            setSearchParams(searchParams);
-          }}
-          className={cn(
-            "space-x-2 flex items-center",
-            !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
-            "hidden"
-          )}
-        >
-          <Icon name="import" size="sm" className="mb-0.5" />
-          <span>Import Attendance</span>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator
-          className={cn(
-            !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
-            "hidden",
-            !selectedRows.length && "hidden"
-          )}
-        />
         <div className="flex flex-col gap-1">
           <AttendanceRegister
             selectedRows={selectedRows}
@@ -79,6 +60,30 @@ export function AttendanceMenu({
             companyAddress={companyAddress}
           />
         </div>
+        <DropdownMenuSeparator
+          className={cn(
+            !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
+              "hidden",
+            !selectedRows.length && "hidden"
+          )}
+        />
+        <DropdownMenuItem
+          onClick={() => {
+            searchParams.set(
+              "step",
+              modalSearchParamNames.import_employee_attendance
+            );
+            setSearchParams(searchParams);
+          }}
+          className={cn(
+            "space-x-2 flex items-center",
+            !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
+              "hidden"
+          )}
+        >
+          <Icon name="import" size="sm" className="mb-0.5" />
+          <span>Import Attendance</span>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

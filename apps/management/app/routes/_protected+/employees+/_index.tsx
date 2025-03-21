@@ -23,6 +23,7 @@ import {
   getEmployeesByCompanyId,
   getProjectNamesByCompanyId,
   getSiteNamesByProjectName,
+  getUsersEmail,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { extractJsonFromString } from "@canny_ecosystem/utils";
@@ -76,7 +77,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined,
+        (value) => value !== null && value !== undefined
       );
 
     const employeesPromise = getEmployeesByCompanyId({
@@ -103,7 +104,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         projectName: filters.project,
       });
     }
-
+    const { data: userEmails } = await getUsersEmail({ companyId, supabase });
     return defer({
       employeesPromise: employeesPromise as any,
       projectPromise,
@@ -111,6 +112,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       query,
       filters,
       companyId,
+      userEmails,
       env,
     });
   } catch (error) {
@@ -122,6 +124,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       projectSitePromise: Promise.resolve({ data: [] }),
       query: "",
       filters: null,
+      userEmails: null,
       companyId: "",
       env,
     });
@@ -132,7 +135,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
     `${cacheKeyPrefix.employees}${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 
@@ -155,7 +158,7 @@ ${VALID_FILTERS.map(
   (filter) =>
     `name: "${filter.name}", type: "${
       filter.valueType
-    }", example: ${JSON.stringify(filter.example)}`,
+    }", example: ${JSON.stringify(filter.example)}`
 ).join(".")}`,
         },
         {
@@ -200,6 +203,7 @@ export default function EmployeesIndex() {
     filters,
     companyId,
     env,
+    userEmails,
   } = useLoaderData<typeof loader>();
 
   const filterList = { ...filters, name: query };
@@ -236,7 +240,10 @@ export default function EmployeesIndex() {
             </Await>
           </Suspense>
         </div>
-        <EmployeesActions isEmpty={!projectPromise} />
+        <EmployeesActions
+          isEmpty={!projectPromise}
+          emails={userEmails as unknown as any}
+        />
       </div>
       <Suspense fallback={<LoadingSpinner className="h-1/3" />}>
         <Await resolve={employeesPromise}>

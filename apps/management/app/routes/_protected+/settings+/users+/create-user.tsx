@@ -172,11 +172,16 @@ export async function action({
 
 export default function CreateUser({
   updateValues,
+  projectOptions: updateProjectOptions,
+  projectSiteOptions: updateProjectSiteOptions,
 }: {
+  projectSiteOptions: [];
+  projectOptions: [] | undefined | null;
   updateValues?: UserDatabaseUpdate | null;
 }) {
   const { companyId, projectOptions, projectSiteOptions } =
     useLoaderData<typeof loader>();
+
   const actionData = useActionData<typeof action>();
   const USER_TAG = updateValues ? UPDATE_USER_TAG : CREATE_USER_TAG;
   const [resetKey, setResetKey] = useState(Date.now());
@@ -326,7 +331,7 @@ export default function CreateUser({
                       <Label>Projects</Label>
                     </div>
                     <Combobox
-                      options={projectOptions ?? []}
+                      options={projectOptions ?? updateProjectOptions ?? []}
                       value={searchParams.get(PROJECT_PARAM) ?? ""}
                       className="w-full"
                       onChange={(project) => {
@@ -342,7 +347,9 @@ export default function CreateUser({
                   </div>
                   <SearchableSelectField
                     className="capitalize"
-                    options={projectSiteOptions ?? []}
+                    options={
+                      projectSiteOptions ?? updateProjectSiteOptions ?? []
+                    }
                     inputProps={{
                       ...getInputProps(fields.site_id, {
                         type: "text",

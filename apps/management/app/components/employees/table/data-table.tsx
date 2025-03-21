@@ -63,7 +63,8 @@ export function DataTable<TData, TValue>({
   const { supabase } = useSupabase({ env });
 
   const { ref, inView } = useInView();
-  const { rowSelection, setRowSelection, setColumns } = useEmployeesStore();
+  const { rowSelection, setRowSelection, setColumns, setSelectedRows } =
+    useEmployeesStore();
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
     initialColumnVisibility ?? {}
@@ -128,6 +129,14 @@ export function DataTable<TData, TValue>({
     setFrom(pageSize);
     setHasNextPage(initialHasNextPage);
   }, [initialData]);
+
+  useEffect(() => {
+    const rowArray = [];
+    for (const row of table.getSelectedRowModel().rows) {
+      rowArray.push(row.original);
+    }
+    setSelectedRows(rowArray as unknown as EmployeeDataType[]);
+  }, [rowSelection]);
 
   const tableLength = table.getRowModel().rows?.length;
 

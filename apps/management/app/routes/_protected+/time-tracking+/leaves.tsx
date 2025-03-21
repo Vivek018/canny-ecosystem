@@ -62,6 +62,7 @@ import type {
   CompanyDatabaseRow,
   LocationDatabaseRow,
 } from "@canny_ecosystem/supabase/types";
+import LeavesEmailMenu from "@/components/leaves/leaves-email-menu";
 
 const pageSize = LAZY_LOADING_LIMIT;
 const isEmployeeRoute = false;
@@ -138,6 +139,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
         projectName: filters.project,
       });
 
+    const { data: userEmails } = await getUsersEmail({ companyId, supabase });
+
     return defer({
       leavesPromise: leavesPromise as any,
       projectPromise,
@@ -149,6 +152,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       companyId,
       env,
       companyName,
+      userEmails,
       companyAddress,
     });
   } catch (error) {
@@ -164,6 +168,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       filters: null,
       companyId: "",
       env,
+      userEmails: null,
       companyName: null,
       companyAddress: null,
     });
@@ -190,13 +195,14 @@ export default function LeavesIndex() {
     query,
     filters,
     companyId,
+    userEmails,
     env,
     companyName,
     companyAddress,
   } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
   const { role } = useUser();
-  const { selectedRows } = useLeavesStore();
+  const { selectedRows, columnVisibility } = useLeavesStore();
   const filterList = { ...filters, name: query };
   const noFilters = Object.values(filterList).every((value) => !value);
 
@@ -317,16 +323,26 @@ export default function LeavesIndex() {
             <FilterList filters={filterList} />
           </div>
           <div className="space-x-2 hidden md:flex">
+            <ColumnVisibility />
+            <LeavesEmailMenu
+              columnVisibility={columnVisibility}
+              selectedRows={selectedRows}
+              emails={userEmails as unknown as any}
+              companyName={companyName as unknown as CompanyDatabaseRow}
+              companyAddress={companyAddress as unknown as LocationDatabaseRow}
+            />
             <Button
               variant="outline"
               size="icon"
-              className={cn("h-10 w-10", !selectedRows.length && "hidden")}
+              className={cn(
+                "h-10 w-10 bg-muted/70 text-muted-foreground",
+                !selectedRows.length && "hidden"
+              )}
               disabled={!selectedRows.length}
               onClick={() => navigate("analytics")}
             >
               <Icon name="chart" className="h-[18px] w-[18px]" />
             </Button>
-            <ColumnVisibility />
             <LeavesMenu
               companyName={companyName as unknown as CompanyDatabaseRow}
               companyAddress={companyAddress as unknown as LocationDatabaseRow}
@@ -359,6 +375,10 @@ export default function LeavesIndex() {
                   pageSize={pageSize}
                   companyId={companyId}
                   env={env}
+                  companyName={companyName as unknown as CompanyDatabaseRow}
+                  companyAddress={
+                    companyAddress as unknown as LocationDatabaseRow
+                  }
                 />
               );
             }}
