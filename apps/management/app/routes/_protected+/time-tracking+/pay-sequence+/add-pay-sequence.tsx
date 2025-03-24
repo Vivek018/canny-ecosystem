@@ -117,7 +117,7 @@ export default function AddPaySequence({
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(`${cacheKeyPrefix.paySequence}`);
+        clearCacheEntry(`${cacheKeyPrefix.pay_sequence}`);
         revalidator.revalidate();
         toast({
           title: "Success",

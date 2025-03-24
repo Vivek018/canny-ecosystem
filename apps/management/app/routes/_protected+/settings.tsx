@@ -1,4 +1,5 @@
-import { DEFAULT_ROUTE } from "@/constant";
+import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
+import { clientCaching } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -6,7 +7,7 @@ import { SecondaryMenu } from "@canny_ecosystem/ui/secondary-menu";
 import { hasPermission, readRole } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Link, Outlet, useLocation } from "@remix-run/react";
+import { type ClientLoaderFunctionArgs, Link, Outlet, useLocation } from "@remix-run/react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
@@ -17,6 +18,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
   }
   return {};
 }
+
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+  return clientCaching(cacheKeyPrefix.settings, args);
+}
+
+clientLoader.hydrate = true;
 
 export default function Settings() {
   const { pathname } = useLocation();

@@ -110,7 +110,7 @@ export default function UpdatePaySequence() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(`${cacheKeyPrefix.paySequence}`);
+        clearCacheEntry(`${cacheKeyPrefix.pay_sequence}`);
         toast({
           title: "Success",
           description:
