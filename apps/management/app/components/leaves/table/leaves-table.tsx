@@ -40,6 +40,7 @@ interface LeavesDataTableProps<TData, TValue> {
   filters?: LeavesFilters | null;
   query?: string | null;
   initialColumnVisibility?: VisibilityState;
+  
 }
 
 export function LeavesDataTable<TData, TValue>({

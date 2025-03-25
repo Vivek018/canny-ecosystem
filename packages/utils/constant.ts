@@ -15,6 +15,7 @@ export const modalSearchParamNames = {
   view_template_components: "view-template-components",
   view_relationship_terms: "view-relationship-terms",
   import_leaves: "import-leaves",
+  import_payroll: "import-payroll",
 };
 
 export const statesAndUTs = [
@@ -154,7 +155,7 @@ export const attribute = {
   timeTracking: "time_tracking",
   holidays: "holidays",
   paySequence: "pay_sequence",
-  companyDocuments:"company_documents"
+  companyDocuments: "company_documents",
 };
 
 export const months: { [key: string]: number } = {
@@ -234,7 +235,7 @@ This offer is contingent upon the following:
 
 Failure to meet any of the above conditions may result in the withdrawal of this offer.
 
-Sincerely,`
+Sincerely,`;
 
 export const DEFAULT_TERMINATION_LETTER = `Dear **\${employeeName}**,
 
@@ -273,7 +274,7 @@ John demonstrated professionalism, dedication, and a strong work ethic throughou
 
 We wish John all the best in his future endeavors and are confident that he will continue to excel in his professional journey.
 
-For any further clarification or verification, please feel free to contact us at [**hr@cannymgmt.com** ](mailto:hr@cannymgmt.com)or **+91 1234567890** .`
+For any further clarification or verification, please feel free to contact us at [**hr@cannymgmt.com** ](mailto:hr@cannymgmt.com)or **+91 1234567890** .`;
 
 export const DEFAULT_NOC_LETTER = `Dear **Sir/Madam**,
 
@@ -290,7 +291,7 @@ $\{employeeName} has been associated with $\{companyName} since $\{companyJoinin
 
 Thank you for considering this communication.
 
-Yours sincerely,`
+Yours sincerely,`;
 
 export const DEFAULT_RELIEVING_LETTER = `Dear **$\{employeeName}**,
 
@@ -302,7 +303,7 @@ We wish you all the best in your future endeavors and are confident that you wil
 
 Thank you for your service and commitment to $\{companyName} . Should you require any assistance or documentation in the future, please do not hesitate to reach out to us at \[Contact Information] .
 
-Yours sincerely,`
+Yours sincerely,`;
 export const SUPABASE_STORAGE = {
   LOGOS: "logos",
   EMPLOYEE_PROFILE_PHOTO: "employees/profile_photo",
@@ -318,11 +319,10 @@ export const SUPABASE_MEDIA_URL_PREFIX =
 
 export function getFilePathFromUrl(url: string) {
   return url.startsWith(
-    `${SUPABASE_MEDIA_URL_PREFIX}${SUPABASE_BUCKET.CANNY_ECOSYSTEM}/`,
+    `${SUPABASE_MEDIA_URL_PREFIX}${SUPABASE_BUCKET.CANNY_ECOSYSTEM}/`
   )
     ? url.slice(
-        `${SUPABASE_MEDIA_URL_PREFIX}${SUPABASE_BUCKET.CANNY_ECOSYSTEM}/`
-          .length,
+        `${SUPABASE_MEDIA_URL_PREFIX}${SUPABASE_BUCKET.CANNY_ECOSYSTEM}/`.length
       )
     : url;
 }

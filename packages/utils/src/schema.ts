@@ -72,14 +72,14 @@ export const zFile = z
     (file) =>
       typeof file !== "string"
         ? [
-          ...ACCEPTED_IMAGE_TYPES,
-          "image/pdf",
-          "image/doc",
-          "image/docx",
-          "application/pdf",
-          "application/doc",
-          "application/docx",
-        ].includes(file?.type)
+            ...ACCEPTED_IMAGE_TYPES,
+            "image/pdf",
+            "image/doc",
+            "image/docx",
+            "application/pdf",
+            "application/doc",
+            "application/docx",
+          ].includes(file?.type)
         : true,
     "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .docx formats are supported."
   );
@@ -1172,11 +1172,20 @@ export const ImportEmployeeGuardiansDataSchema = z.object({
   data: z.array(ImportSingleEmployeeGuardiansDataSchema),
 });
 
-export const payrollPaymentStatusArray = ["pending", "submitted", "approved"] as const;
+export const payrollPaymentStatusArray = [
+  "pending",
+  "submitted",
+  "approved",
+] as const;
 
 // Payroll
 
-export const payrollTypesArray = ["reimbursement", "exit", "salary", "others"];
+export const payrollTypesArray = [
+  "reimbursement",
+  "exit",
+  "salary",
+  "others",
+] ;
 
 export const PayrollEntrySchema = z.object({
   id: z.string().optional(),
@@ -1559,4 +1568,35 @@ export const ImportSingleLeavesDataSchema = z.object({
 
 export const ImportLeavesDataSchema = z.object({
   data: z.array(ImportSingleLeavesDataSchema),
+});
+
+export const ImportPayrollHeaderSchemaObject = z.object({
+  employee_code: z.string(),
+  amount: z.string(),
+});
+
+export const ImportPayrollHeaderSchema = ImportPayrollHeaderSchemaObject.refine(
+  (data) => {
+    const values = [data.employee_code, data.amount].filter(Boolean);
+
+    const uniqueValues = new Set(values);
+    return uniqueValues.size === values.length;
+  },
+  {
+    message:
+      "Some fields have the same value. Please select different options.",
+    path: ["employee_code", "amount"],
+  }
+);
+
+export const ImportSinglePayrollDataSchema = z.object({
+  employee_code: zNumberString.min(3),
+  amount: z.preprocess((value) => {
+    const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
+    return Number.isNaN(parsed) ? undefined : parsed;
+  }, z.number()),
+});
+
+export const ImportPayrollDataSchema = z.object({
+  data: z.array(ImportSinglePayrollDataSchema),
 });

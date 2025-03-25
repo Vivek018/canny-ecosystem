@@ -375,10 +375,6 @@ export default function LeavesIndex() {
                   pageSize={pageSize}
                   companyId={companyId}
                   env={env}
-                  companyName={companyName as unknown as CompanyDatabaseRow}
-                  companyAddress={
-                    companyAddress as unknown as LocationDatabaseRow
-                  }
                 />
               );
             }}

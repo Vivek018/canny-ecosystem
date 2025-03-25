@@ -8,6 +8,12 @@ import type {
   EmployeeDatabaseRow,
 } from "../types";
 
+export type ImportPayrollDataType = Pick<
+  PayrollEntriesDatabaseRow,
+  "employee_id" | "amount"
+> & {
+  employee_code: EmployeeDatabaseRow["employee_code"];
+};
 
 export async function getPendingOrSubmittedPayrollsByCompanyId({
   supabase,
@@ -25,7 +31,7 @@ export async function getPendingOrSubmittedPayrollsByCompanyId({
     "total_net_amount",
     "commission",
     "company_id",
-    "created_at"
+    "created_at",
   ] as const;
 
   const { data, error } = await supabase
@@ -37,7 +43,8 @@ export async function getPendingOrSubmittedPayrollsByCompanyId({
     .limit(HARD_QUERY_LIMIT)
     .returns<InferredType<PayrollDatabaseRow, (typeof columns)[number]>[]>();
 
-  if (error) console.error("getPendingOrSubmittedPayrollsByCompanyId Error", error);
+  if (error)
+    console.error("getPendingOrSubmittedPayrollsByCompanyId Error", error);
 
   return { data, error };
 }
@@ -58,7 +65,7 @@ export async function getApprovedPayrollsByCompanyId({
     "total_net_amount",
     "commission",
     "company_id",
-    "created_at"
+    "created_at",
   ] as const;
 
   const { data, error } = await supabase
@@ -91,6 +98,7 @@ export async function getPayrollById({
     "total_net_amount",
     "commission",
     "company_id",
+    "created_at",
   ] as const;
 
   const { data, error } = await supabase
@@ -114,7 +122,15 @@ export type PayrollEntriesWithTemplateComponents = Pick<
   >;
 };
 
-export type PayrollEntriesWithEmployee = Omit<PayrollEntriesDatabaseRow, "created_at" | "updated_at"> & { employees: Pick<EmployeeDatabaseRow, "first_name" | "middle_name" | "last_name" | "employee_code"> }
+export type PayrollEntriesWithEmployee = Omit<
+  PayrollEntriesDatabaseRow,
+  "created_at" | "updated_at"
+> & {
+  employees: Pick<
+    EmployeeDatabaseRow,
+    "first_name" | "middle_name" | "last_name" | "employee_code"
+  >;
+};
 
 export async function getPayrollEntriesByPayrollId({
   supabase,
@@ -131,11 +147,16 @@ export async function getPayrollEntriesByPayrollId({
     "payment_status",
     "amount",
     "payroll_id",
+    "created_at",
   ] as const;
 
   const { data, error } = await supabase
     .from("payroll_entries")
-    .select(`${columns.join(",")}, employees!left(id,company_id,first_name, middle_name, last_name, employee_code)`)
+    .select(
+      `${columns.join(
+        ","
+      )}, employees!left(id,company_id,first_name, middle_name, last_name, employee_code)`
+    )
     .eq("payroll_id", payrollId)
     .returns<PayrollEntriesWithEmployee[]>();
 
@@ -162,7 +183,11 @@ export async function getPayrollEntryById({
 
   const { data, error } = await supabase
     .from("payroll_entries")
-    .select(`${columns.join(",")}, employees!left(id,company_id,first_name, middle_name, last_name, employee_code)`)
+    .select(
+      `${columns.join(
+        ","
+      )}, employees!left(id,company_id,first_name, middle_name, last_name, employee_code)`
+    )
     .eq("id", id)
     .single<PayrollEntriesWithEmployee>();
 

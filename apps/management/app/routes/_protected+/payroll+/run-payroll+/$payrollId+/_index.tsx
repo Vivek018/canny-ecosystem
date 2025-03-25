@@ -52,7 +52,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   return clientCaching(
     `${cacheKeyPrefix.run_payroll_id}${args.params.payrollId}`,
-    args,
+    args
   );
 }
 
@@ -64,7 +64,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
     const formData = await request.formData();
     const payrollId = params.payrollId;
     const parsedData = JSON.parse(formData.get("data") as string);
-    const parsedSkipPayrollEntries = JSON.parse(formData.get("skipPayrollEntries") as string);
+    const parsedSkipPayrollEntries = JSON.parse(
+      formData.get("skipPayrollEntries") as string
+    );
 
     const data = {
       id: (parsedData.id ?? payrollId) as PayrollDatabaseRow["id"],
@@ -76,7 +78,11 @@ export async function action({ request, params }: ActionFunctionArgs) {
         parsedData.total_net_amount as PayrollDatabaseRow["total_net_amount"],
     };
 
-    const { status, error } = await updatePayroll({ supabase, data, skipPayrollEntries: parsedSkipPayrollEntries });
+    const { status, error } = await updatePayroll({
+      supabase,
+      data,
+      skipPayrollEntries: parsedSkipPayrollEntries,
+    });
     if (isGoodStatus(status)) {
       return json({
         status: "success",
@@ -86,7 +92,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     }
     return json(
       { status: "error", message: "Payroll update failed", error },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     console.error("Payroll Id Action error", error);
@@ -97,7 +103,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         error,
         data: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -139,7 +145,9 @@ export default function RunPayrollId() {
       <Await resolve={payrollPromise}>
         {({ data: payrollData, error: payrollError }) => {
           if (payrollError || !payrollData) {
-            clearExactCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
+            clearExactCacheEntry(
+              `${cacheKeyPrefix.run_payroll_id}${payrollId}`
+            );
             return (
               <ErrorBoundary
                 error={payrollError}
@@ -151,7 +159,9 @@ export default function RunPayrollId() {
             <Await resolve={payrollEntriesPromise}>
               {({ data, error }) => {
                 if (error || !data) {
-                  clearExactCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
+                  clearExactCacheEntry(
+                    `${cacheKeyPrefix.run_payroll_id}${payrollId}`
+                  );
                   return (
                     <ErrorBoundary
                       error={error}
@@ -159,9 +169,16 @@ export default function RunPayrollId() {
                     />
                   );
                 }
-                if (payrollData.payroll_type === "reimbursement" || payrollData.payroll_type === "exit")
+
+                if (
+                  payrollData.payroll_type === "reimbursement" ||
+                  payrollData.payroll_type === "exit"
+                )
                   return (
-                    <PayrollEntryComponent payrollData={payrollData} data={data} />
+                    <PayrollEntryComponent
+                      payrollData={payrollData}
+                      data={data}
+                    />
                   );
               }}
             </Await>
