@@ -134,7 +134,7 @@ export const createAttendanceHourlyWorkbook = async ({
       emp.employee_code || "N/A",
       emp.project || "N/A",
       emp.project_site || "N/A",
-      ...sortedDates.map((date) => emp[date]?.hours || 0),
+      ...sortedDates.map((date) => (emp[date as "attendance"] as any)?.hours || 0),
       emp.total_hours || 0,
     ];
     const newRow = worksheet.addRow(row);
@@ -175,10 +175,12 @@ export const AttendanceHourlyRegister = ({
   selectedRows,
   companyName,
   companyAddress,
+  className,
 }: {
   selectedRows: TransformedAttendanceDataType[];
   companyName?: CompanyDatabaseRow;
   companyAddress?: LocationDatabaseRow;
+  className?: string;
 }) => {
   const generateAttendanceHourlyExcel = async (
     selectedRows: TransformedAttendanceDataType[]
@@ -204,8 +206,8 @@ export const AttendanceHourlyRegister = ({
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "muted" }),
-          "w-full justify-start text-[13px] h-9 hidden px-2 gap-2",
-          selectedRows.length && "flex"
+          "w-full justify-start text-[13px] h-9 px-2 gap-2",
+          className
         )}
       >
         <Icon name="plus-circled" />

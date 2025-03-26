@@ -4,9 +4,9 @@ import { Link } from "@remix-run/react";
 
 export default function ReportsIndex() {
   return (
-    <section className="grid grid-cols-4 py-8">
+    <section className="grid grid-cols-4 py-4">
       <div>
-        <h1 className="flex items-center tracking-wide font-bold justify-between pb-4 text-xl">
+        <h1 className="flex items-center tracking-wide font-bold justify-between pb-2 text-xl">
           Gratuity Reports
         </h1>
         <Link
@@ -18,7 +18,7 @@ export default function ReportsIndex() {
       </div>
 
       <div>
-        <h1 className="flex items-center tracking-wide font-bold justify-between pb-4 text-xl">
+        <h1 className="flex items-center tracking-wide font-bold justify-between pb-2 text-xl">
           Statutory Reports
         </h1>
         <div className="flex flex-col items-start">
@@ -66,7 +66,7 @@ export default function ReportsIndex() {
         </div>
       </div>
       <div>
-        <h1 className="flex items-center tracking-wide font-bold justify-between pb-4 text-xl">
+        <h1 className="flex items-center tracking-wide font-bold justify-between pb-2 text-xl">
           Attendance Reports
         </h1>
         <div className="flex flex-col items-start">

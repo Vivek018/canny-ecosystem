@@ -1,6 +1,6 @@
 import type { TransformedAttendanceDataType } from "@/routes/_protected+/time-tracking+/attendance+/_index";
 import { useUser } from "@/utils/user";
-import { Button } from "@canny_ecosystem/ui/button";
+import { Button, buttonVariants } from "@canny_ecosystem/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,12 +10,12 @@ import {
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { createRole, hasPermission } from "@canny_ecosystem/utils";
+import { createRole, extractKeys, hasPermission } from "@canny_ecosystem/utils";
 import {
   attribute,
   modalSearchParamNames,
 } from "@canny_ecosystem/utils/constant";
-import { useSearchParams } from "@remix-run/react";
+import { useSearchParams, useSubmit } from "@remix-run/react";
 import { AttendanceRegister } from "./attendance-register";
 import type {
   CompanyDatabaseRow,
@@ -33,7 +33,27 @@ export function AttendanceMenu({
   companyAddress?: LocationDatabaseRow;
 }) {
   const { role } = useUser();
+  const submit = useSubmit();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  console.log(selectedRows);
+
+  const handleCreatePayroll = () => {
+    // submit(
+    //   {
+    //     type: "salary",
+    //     attendanceData: JSON.stringify(attendanceForPayroll),
+    //     totalEmployees,
+    //     totalNetAmount,
+    //     failedRedirect: "/time-tracking/attendance",
+    //   },
+    //   {
+    //     method: "POST",
+    //     action: "/create-payroll",
+    //   },
+    // );
+  };
+
 
   return (
     <DropdownMenu>
@@ -48,7 +68,27 @@ export function AttendanceMenu({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent sideOffset={10} align="end">
-        <div className="flex flex-col gap-1">
+        <div className={cn("flex flex-col", !selectedRows?.length && "hidden")}>
+          <DropdownMenuItem
+            onClick={handleCreatePayroll}
+            className={cn(
+              buttonVariants({ variant: "muted" }),
+              "w-full justify-start text-[13px] h-9 px-2 gap-2",
+              !hasPermission(role, `${createRole}:${attribute.payroll}`) &&
+              "hidden",
+            )}
+          >
+            <Icon name="plus-circled" />
+            <span>Create Payroll</span>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator
+            className={cn(
+              !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
+              "hidden",
+              !selectedRows.length && "hidden"
+            )}
+          />
+          <div className={cn("flex flex-col gap-1", !selectedRows?.length && "hidden")}>
           <AttendanceRegister
             selectedRows={selectedRows}
             companyName={companyName}
@@ -59,11 +99,12 @@ export function AttendanceMenu({
             companyName={companyName}
             companyAddress={companyAddress}
           />
+          </div>
         </div>
         <DropdownMenuSeparator
           className={cn(
             !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
-              "hidden",
+            "hidden",
             !selectedRows.length && "hidden"
           )}
         />
@@ -78,7 +119,7 @@ export function AttendanceMenu({
           className={cn(
             "space-x-2 flex items-center",
             !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
-              "hidden"
+            "hidden"
           )}
         >
           <Icon name="import" size="sm" className="mb-0.5" />
