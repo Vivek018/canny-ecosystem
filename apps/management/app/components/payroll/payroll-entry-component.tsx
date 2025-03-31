@@ -17,7 +17,6 @@ import {
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { PayrollEntryDataTable } from "./payroll-entry-table/data-table";
 import { payrollEntryColumns } from "./payroll-entry-table/columns";
-import { usePayrollEntriesStore } from "@/store/payroll-entry";
 
 export function PayrollEntryComponent({
   data,
@@ -38,7 +37,6 @@ export function PayrollEntryComponent({
 
   const [searchString, setSearchString] = useState("");
   const [tableData, setTableData] = useState(data);
-  const { skipPayrollEntries } = usePayrollEntriesStore();
 
   useEffect(() => {
     const filteredData = data?.filter((item: any) =>
@@ -61,7 +59,6 @@ export function PayrollEntryComponent({
           total_employees: payrollData?.total_employees,
           total_net_amount: payrollData?.total_net_amount,
         }),
-        skipPayrollEntries: JSON.stringify(skipPayrollEntries),
       },
       {
         method: "POST",

@@ -50,12 +50,12 @@ export const CompanySwitch = ({ companies }: {
           aria-expanded={open}
           disabled={!hasPermission(role, `${updateRole}:${attribute.company}`)}
           className={cn(
-            "bg-card truncate justify-between capitalize rounded pl-1.5 pr-3 w-72 h-12 disabled:opacity-100",
+            "bg-card truncate justify-between capitalize rounded pl-1.5 pr-3 w-[350px] py-1.5 h-full disabled:opacity-100",
             !currentCompany && "text-muted-foreground",
           )}
         >
           <div className="flex items-center gap-2">
-            <Avatar className="w-[34px] h-[34px] border border-muted-foreground/30 shadow-sm rounded-sm">
+            <Avatar className="w-14 h-11 border border-muted-foreground/30 shadow-sm rounded-sm">
               <AvatarImage src={currentCompany?.logo ?? undefined} />
               <AvatarFallback className="rounded-sm">
                 <span className="tracking-widest capitalize text-xs ml-[1.5px]">
@@ -63,7 +63,7 @@ export const CompanySwitch = ({ companies }: {
                 </span>
               </AvatarFallback>
             </Avatar>
-            <p className="w-48 text-start truncate">
+            <p className="w-56 text-start truncate">
               {currentCompany ? currentCompany?.name : "Select a company"}
             </p>
           </div>
@@ -78,13 +78,13 @@ export const CompanySwitch = ({ companies }: {
           />
         </Button>
       </PopoverTrigger>
-      <PopoverContent sideOffset={10} align="end" className="p-0 w-72">
+      <PopoverContent sideOffset={7} align="end" className="p-0 w-[350px]">
         <Command>
-          <CommandInput placeholder="Search companies..." />
+          <CommandInput className="h-12" placeholder="Search companies..." />
           <CommandEmpty className="w-full py-6 text-center">
             No company found.
           </CommandEmpty>
-          <CommandList>
+          <CommandList className="lg:max-h-96">
             <CommandGroup>
               {companies.map((company) => (
                 <CommandItem
@@ -92,10 +92,10 @@ export const CompanySwitch = ({ companies }: {
                   value={company.id + company.name}
                   onSelect={() => onValueChange(company.id)}
                   disabled={currentCompany?.id === company.id}
-                  className={cn("py-2 px-2")}
+                  className={cn("py-1.5 px-2")}
                 >
                   <div className="flex items-center gap-1.5">
-                    <Avatar className="w-8 h-8 border border-muted-foreground/30 shadow-sm rounded-sm">
+                    <Avatar className="w-14 h-11 border border-muted-foreground/30 shadow-sm rounded-sm">
                       <AvatarImage src={company.logo ?? undefined} />
                       <AvatarFallback className="rounded-sm">
                         <span className="tracking-widest capitalize text-xs ml-[1.5px]">
@@ -103,7 +103,7 @@ export const CompanySwitch = ({ companies }: {
                         </span>
                       </AvatarFallback>
                     </Avatar>
-                    <p className="font-medium tracking-wide ml-1 truncate w-48">
+                    <p className="font-medium tracking-wide ml-1 truncate w-56">
                       {replaceUnderscore(company.name)}
                     </p>
                   </div>
@@ -112,13 +112,13 @@ export const CompanySwitch = ({ companies }: {
             </CommandGroup>
           </CommandList>
         </Command>
-        <div className="p-1.5 border-t">
+        <div className="p-1 border-t-2">
           <Link
             ref={linkRef}
             to="/create-company"
             className={cn(
               buttonVariants({ variant: "primary-ghost" }),
-              "w-full cursor-pointer capitalize",
+              "w-full cursor-pointer capitalize h-11",
             )}
             onClick={() => setOpen(false)}
           >

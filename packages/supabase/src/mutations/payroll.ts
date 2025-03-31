@@ -162,12 +162,10 @@ export async function createExitPayroll({ supabase, data, companyId, bypassAuth 
 export async function updatePayroll({
   supabase,
   data,
-  skipPayrollEntries,
   bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
   data: PayrollDatabaseUpdate;
-  skipPayrollEntries?: string[];
   bypassAuth?: boolean;
 }) {
   if (!bypassAuth) {
@@ -192,7 +190,6 @@ export async function updatePayroll({
 
     if (payrollEntriesData) {
       const transformedPayrollEntriesData = payrollEntriesData
-        .filter(({ id }) => !skipPayrollEntries?.includes(id))
         .map(({ employees, ...entryData }) => ({
           ...entryData,
           payment_status: updatedData?.status ?? entryData.payment_status
