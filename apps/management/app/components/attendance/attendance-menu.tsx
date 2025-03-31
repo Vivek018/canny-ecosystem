@@ -10,7 +10,7 @@ import {
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { createRole, extractKeys, hasPermission } from "@canny_ecosystem/utils";
+import { createRole, hasPermission } from "@canny_ecosystem/utils";
 import {
   attribute,
   modalSearchParamNames,
@@ -36,22 +36,52 @@ export function AttendanceMenu({
   const submit = useSubmit();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  console.log(selectedRows);
+  function extractAttendanceData(employees: { [key: string]: any }[]) {
+    return employees?.map(({ employee_id, ...rest }) => {
+      let present_days = 0;
+      let overtime_hours = 0;
+      let latestDate: Date | null = null;
+
+      for (const [key, value] of Object.entries(rest)) {
+        if (typeof value === "object" && value !== null) {
+          if (value.present === "P") {
+            present_days++;
+            overtime_hours += (value.hours - 8);
+          }
+
+          const [day, monthStr, yearStr] = key.split(" ");
+          const monthIndex = new Date(`${monthStr} 1, 2025`).getMonth();
+          const dateObj = new Date(Number.parseInt(yearStr), monthIndex, Number.parseInt(day));
+
+          if (!latestDate || dateObj > latestDate) {
+            latestDate = dateObj;
+          }
+        }
+      }
+
+      const month = latestDate ? latestDate.toLocaleString("en-US", { month: "long" }) : null;
+      const year = latestDate ? latestDate.getFullYear() : null;
+
+      return { employee_id, present_days, overtime_hours, month, year };
+    });
+  }
+
+
+  const attendanceForPayroll = extractAttendanceData(selectedRows);
 
   const handleCreatePayroll = () => {
-    // submit(
-    //   {
-    //     type: "salary",
-    //     attendanceData: JSON.stringify(attendanceForPayroll),
-    //     totalEmployees,
-    //     totalNetAmount,
-    //     failedRedirect: "/time-tracking/attendance",
-    //   },
-    //   {
-    //     method: "POST",
-    //     action: "/create-payroll",
-    //   },
-    // );
+    submit(
+      {
+        type: "salary",
+        attendanceData: JSON.stringify(attendanceForPayroll),
+        totalEmployees: attendanceForPayroll.length,
+        failedRedirect: "/time-tracking/attendance",
+      },
+      {
+        method: "POST",
+        action: "/create-payroll",
+      },
+    );
   };
 
 
@@ -89,16 +119,16 @@ export function AttendanceMenu({
             )}
           />
           <div className={cn("flex flex-col gap-1", !selectedRows?.length && "hidden")}>
-          <AttendanceRegister
-            selectedRows={selectedRows}
-            companyName={companyName}
-            companyAddress={companyAddress}
-          />
-          <AttendanceHourlyRegister
-            selectedRows={selectedRows}
-            companyName={companyName}
-            companyAddress={companyAddress}
-          />
+            <AttendanceRegister
+              selectedRows={selectedRows}
+              companyName={companyName}
+              companyAddress={companyAddress}
+            />
+            <AttendanceHourlyRegister
+              selectedRows={selectedRows}
+              companyName={companyName}
+              companyAddress={companyAddress}
+            />
           </div>
         </div>
         <DropdownMenuSeparator

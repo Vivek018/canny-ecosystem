@@ -84,7 +84,7 @@ export function SampleEPFCalculationCard({
   }
 
   return (
-    <Card className="flex flex-col gap-5 min-w-[400px] max-w-[500px] border-t-primary border-2 max-lg:hidden">
+    <Card className="flex flex-col gap-5 min-w-[400px] max-w-[500px] max-lg:hidden">
       <div className="p-6 w-full">
         <div className="flex flex-col gap-4">
           <h2 className="text-lg font-semibold">Sample EPF Calculation</h2>

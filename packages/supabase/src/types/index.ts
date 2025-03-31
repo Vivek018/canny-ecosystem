@@ -275,6 +275,14 @@ export type PayrollEntriesDatabaseInsert =
 export type PayrollEntriesDatabaseUpdate =
   Database["public"]["Tables"]["payroll_entries"]["Update"];
 
+// Salary Entries
+export type SalaryEntriesDatabaseRow =
+  Database["public"]["Tables"]["salary_entries"]["Row"];
+export type SalaryEntriesDatabaseInsert =
+  Database["public"]["Tables"]["salary_entries"]["Insert"];
+export type SalaryEntriesDatabaseUpdate =
+  Database["public"]["Tables"]["salary_entries"]["Update"];
+
 // Reimbursement
 export type ReimbursementInsert =
   Database["public"]["Tables"]["reimbursements"]["Insert"];

@@ -28,9 +28,9 @@ export function getSelectedPaymentComponentFromField<
   field: T | undefined | null;
   monthlyCtc: number;
   priortizedComponent?:
-    | Omit<PaymentTemplateComponentDatabaseRow, "created_at" | "updated_at">
-    | null
-    | undefined;
+  | Omit<PaymentTemplateComponentDatabaseRow, "created_at" | "updated_at">
+  | null
+  | undefined;
   existingComponent?: Omit<
     PaymentTemplateComponentDatabaseRow,
     "created_at" | "updated_at"
@@ -116,7 +116,7 @@ export function getESIComponentFromField<
   if (!field) return null;
 
   const calculationValue =
-    value * (field.employees_contribution ?? ESI_EMPLOYEE_CONTRIBUTION);
+    value * (field.employee_contribution ?? ESI_EMPLOYEE_CONTRIBUTION);
 
   return {
     id: existingComponent?.id,

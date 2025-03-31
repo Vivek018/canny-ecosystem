@@ -816,7 +816,6 @@ export type EmployeeProjectAssignmentDataType = Omit<
   "created_at" | "updated_at"
 > & {
   project_sites: { id: string; name: string; projects: { name: string } };
-  supervisor: { id: string; employee_code: string };
 };
 
 export async function getEmployeeProjectAssignmentByEmployeeId({
@@ -832,7 +831,6 @@ export async function getEmployeeProjectAssignmentByEmployeeId({
     "position",
     "start_date",
     "end_date",
-    "supervisor_id",
     "assignment_type",
     "skill_level",
     "probation_period",
@@ -844,7 +842,7 @@ export async function getEmployeeProjectAssignmentByEmployeeId({
     .select(
       `${columns.join(
         ",",
-      )}, project_sites(id, name, projects(name)), supervisor:employees!employee_project_assignments_supervisor_id_fkey(id, employee_code)`,
+      )}, project_sites(id, name, projects(name))`,
     )
     .eq("employee_id", employeeId)
     .maybeSingle<EmployeeProjectAssignmentDataType>();

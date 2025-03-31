@@ -92,10 +92,6 @@ export const EmployeeProjectAssignmentCard = ({
             value={projectAssignment?.project_sites?.name}
           />
           <DetailItem
-            label={`Supervisor's Emp. Code`}
-            value={projectAssignment?.supervisor?.employee_code}
-          />
-          <DetailItem
             label="Assignment Type"
             value={replaceUnderscore(projectAssignment?.assignment_type)}
           />

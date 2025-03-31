@@ -47,8 +47,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
   if (
     !hasPermission(
-      `${user?.role!}`,
-      `${createRole}:${attribute.statutoryFieldsStatutoryBonus} `,
+      user?.role!,
+      `${createRole}:${attribute.statutoryFieldsStatutoryBonus}`,
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });

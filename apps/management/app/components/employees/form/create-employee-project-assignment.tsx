@@ -43,13 +43,11 @@ export const CreateEmployeeProjectAssignment = ({
   isUpdate = false,
   projectOptions,
   projectSiteOptions,
-  siteEmployeeOptions,
 }: {
   fields: FieldsType;
   isUpdate?: boolean;
   projectOptions: ComboboxSelectOption[] | undefined;
   projectSiteOptions: ComboboxSelectOption[] | undefined;
-  siteEmployeeOptions: ComboboxSelectOption[] | undefined;
 }) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -65,7 +63,7 @@ export const CreateEmployeeProjectAssignment = ({
       </CardHeader>
       <CardContent>
         <input {...getInputProps(fields.employee_id, { type: "hidden" })} />
-        <div className="grid grid-cols-3 place-content-center justify-between gap-6">
+        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
           <div className="w-full flex flex-col gap-1.5">
             <div className="flex">
               <Label>Projects</Label>
@@ -107,18 +105,6 @@ export const CreateEmployeeProjectAssignment = ({
               setSearchParams(searchParams);
             }}
             errors={fields.project_site_id.errors}
-          />
-          <SearchableSelectField
-            className="capitalize"
-            options={siteEmployeeOptions ?? []}
-            inputProps={{
-              ...getInputProps(fields.supervisor_id, { type: "text" }),
-            }}
-            placeholder={"Select Supervisor"}
-            labelProps={{
-              children: "Supervisor",
-            }}
-            errors={fields.supervisor_id.errors}
           />
         </div>
         <div className="grid grid-cols-3 place-content-center justify-between gap-6">
