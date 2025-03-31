@@ -1,3 +1,7 @@
+import type {
+  PayrollDatabaseRow,
+  SupabaseEnv,
+} from "@canny_ecosystem/supabase/types";
 import { Button } from "@canny_ecosystem/ui/button";
 import {
   DropdownMenu,
@@ -10,11 +14,21 @@ import { Icon } from "@canny_ecosystem/ui/icon";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { replaceDash } from "@canny_ecosystem/utils";
 import { useNavigate } from "@remix-run/react";
+import { DownloadBankAdvice } from "./download-bank-advice";
+import type { PayrollEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
+import { DownloadEsiFormat } from "./download-esi-format";
+import { DownloadEpfFormat } from "./download-epf-format";
 
 export function PayrollActions({
   payrollId,
   className,
+  env,
+  data,
+  payrollData,
 }: {
+  payrollData: Omit<PayrollDatabaseRow, "created_at" | "updated_at">;
+  data: PayrollEntriesWithEmployee[];
+  env: SupabaseEnv;
   payrollId: string;
   className?: string;
 }) {
@@ -48,15 +62,26 @@ export function PayrollActions({
       </DropdownMenuTrigger>
       <DropdownMenuContent sideOffset={10} align="end">
         <DropdownMenuItem
+          onClick={previewSalaryRegister}
           className="space-x-2 flex items-center"
-          onClick={() => {
-            console.log("Payroll-excell");
-          }}
         >
-          <Icon name="import" size="sm" className="mb-0.5" />
-          <span>Download Bank Advice</span>
+          <DownloadBankAdvice env={env} data={data} payrollData={payrollData} />
+        </DropdownMenuItem>
+
+        <DropdownMenuItem
+          onClick={previewSalaryRegister}
+          className="space-x-2 flex items-center"
+        >
+          <DownloadEsiFormat env={env} />
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={previewSalaryRegister}
+          className="space-x-2 flex items-center"
+        >
+          <DownloadEpfFormat env={env} />
         </DropdownMenuItem>
         <DropdownMenuSeparator />
+
         <DropdownMenuItem
           onClick={previewSalaryRegister}
           className="space-x-2 flex items-center"

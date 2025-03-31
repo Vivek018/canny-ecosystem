@@ -9,7 +9,10 @@ import {
   getPayrollEntriesByPayrollId,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import type { PayrollDatabaseRow } from "@canny_ecosystem/supabase/types";
+import type {
+  PayrollDatabaseRow,
+  SupabaseEnv,
+} from "@canny_ecosystem/supabase/types";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { isGoodStatus } from "@canny_ecosystem/utils";
 
@@ -28,6 +31,10 @@ import { Suspense, useEffect } from "react";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const payrollId = params.payrollId;
+  const env = {
+    SUPABASE_URL: process.env.SUPABASE_URL!,
+    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
+  };
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
     const payrollPromise = getPayrollById({
@@ -38,13 +45,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       supabase,
       payrollId: payrollId ?? "",
     });
-    return defer({ payrollPromise, payrollEntriesPromise, error: null });
+    return defer({ payrollPromise, payrollEntriesPromise, env, error: null });
   } catch (error) {
     console.error("Payroll Id Index Error", error);
     return defer({
       payrollPromise: Promise.resolve({ data: null, error: null }),
       payrollEntriesPromise: Promise.resolve({ data: null, error: null }),
       error,
+      env: null,
     });
   }
 }
@@ -109,7 +117,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export default function RunPayrollId() {
-  const { payrollPromise, payrollEntriesPromise } =
+  const { payrollPromise, payrollEntriesPromise, env } =
     useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
@@ -178,6 +186,7 @@ export default function RunPayrollId() {
                     <PayrollEntryComponent
                       payrollData={payrollData}
                       data={data}
+                      env={env as unknown as SupabaseEnv}
                     />
                   );
               }}

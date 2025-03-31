@@ -6,7 +6,10 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useState, useEffect } from "react";
 import { PayrollActions } from "./payroll-actions";
 import type { PayrollEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
-import type { PayrollDatabaseRow } from "@canny_ecosystem/supabase/types";
+import type {
+  PayrollDatabaseRow,
+  SupabaseEnv,
+} from "@canny_ecosystem/supabase/types";
 import { useUser } from "@/utils/user";
 import {
   approveRole,
@@ -30,13 +33,13 @@ export function PayrollEntryComponent({
   data,
   payrollData,
   noButtons = false,
+  env,
 }: {
+  env: SupabaseEnv;
   data: PayrollEntriesWithEmployee[];
   payrollData: Omit<PayrollDatabaseRow, "created_at" | "updated_at">;
   noButtons?: boolean;
 }) {
-  console.log(payrollData);
-
   const payrollCardDetails = [
     { title: "Payroll Type", value: "payroll_type" },
     { title: "Status", value: "status" },
@@ -176,8 +179,11 @@ export function PayrollEntryComponent({
           </Button>
         </div>
         <PayrollActions
+          payrollData={payrollData}
+          data={data}
           className={cn(payrollData?.status === "pending" && "hidden")}
           payrollId={payrollId ?? payrollData?.id}
+          env={env}
         />
       </div>
       <PayrollEntryDataTable
