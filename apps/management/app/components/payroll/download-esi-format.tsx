@@ -16,7 +16,6 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { formatDateTime } from "@canny_ecosystem/utils";
 import type {
   SupabaseEnv,
-  TypedSupabaseClient,
 } from "@canny_ecosystem/supabase/types";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
