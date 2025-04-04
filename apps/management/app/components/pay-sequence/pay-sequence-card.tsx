@@ -117,7 +117,7 @@ export function PaySequenceCard({
           value={paySequence.overtime_multiplier?.toString()}
         />
         <div className="flex flex-row items-center gap-4 text-base">
-          <h3 className="text-muted-foreground tracking-wide capitalize w-40 truncate text-xs">
+          <h3 className="text-muted-foreground tracking-wide capitalize w-40 truncate">
             Working Days
           </h3>
 
