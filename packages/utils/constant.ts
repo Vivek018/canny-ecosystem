@@ -91,6 +91,7 @@ export const EMPLOYER_EPF_PERCENTAGE = 0.12;
 export const EMPLOYER_EDLI_PERCENTAGE = 0.005;
 export const EMPLOYER_EPS_PERCENTAGE = 0.0833;
 export const EMPLOYER_ADMIN_CHARGES_PERCENTAGE = 0.005;
+export const BONUS_PERCENTAGE = 8.33;
 
 export const exitPaymentFields = [
   "bonus",

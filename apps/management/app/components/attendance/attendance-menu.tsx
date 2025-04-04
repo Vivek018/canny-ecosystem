@@ -59,7 +59,7 @@ export function AttendanceMenu({
         }
       }
 
-      const month = latestDate ? latestDate.toLocaleString("en-US", { month: "long" }) : null;
+      const month = latestDate ? Number.parseInt(latestDate.toLocaleString("en-US", { month: "2-digit" })) : null;
       const year = latestDate ? latestDate.getFullYear() : null;
 
       return { employee_id, present_days, overtime_hours, month, year };
@@ -74,7 +74,6 @@ export function AttendanceMenu({
       {
         type: "salary",
         attendanceData: JSON.stringify(attendanceForPayroll),
-        totalEmployees: attendanceForPayroll.length,
         failedRedirect: "/time-tracking/attendance",
       },
       {

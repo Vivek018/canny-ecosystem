@@ -63,7 +63,7 @@ export function getSelectedPaymentComponentFromField<
       existingComponent?.component_type ??
       componentTypeArray[0],
     calculation_value:
-      calculationValue?.toFixed(2) ??
+      calculationValue?.toFixed(3) ??
       priortizedComponent?.calculation_value ??
       existingComponent?.calculation_value,
   };
@@ -95,7 +95,7 @@ export function getEPFComponentFromField<
     target_type: "epf",
     component_type: "statutory_contribution",
     calculation_value:
-      calculationValue?.toFixed(2) ?? existingComponent?.calculation_value,
+      calculationValue?.toFixed(3) ?? existingComponent?.calculation_value,
   };
 }
 
@@ -125,7 +125,7 @@ export function getESIComponentFromField<
     target_type: "esi",
     component_type: "statutory_contribution",
     calculation_value:
-      calculationValue?.toFixed(2) ?? existingComponent?.calculation_value,
+      calculationValue?.toFixed(3) ?? existingComponent?.calculation_value,
   };
 }
 
@@ -168,7 +168,7 @@ export function getPTComponentFromField<
     target_type: "pt",
     component_type: "statutory_contribution",
     calculation_value:
-      calculationValue?.toFixed(2) || existingComponent?.calculation_value,
+      calculationValue?.toFixed(3) || existingComponent?.calculation_value,
   };
 }
 
@@ -205,7 +205,7 @@ export function getLWFComponentFromField<
     target_type: "lwf",
     component_type: "statutory_contribution",
     calculation_value:
-      calculationValue?.toFixed(2) || existingComponent?.calculation_value,
+      calculationValue?.toFixed(3) || existingComponent?.calculation_value,
   };
 }
 
@@ -236,7 +236,7 @@ export function getBonusComponentFromField<T extends StatutoryBonusDataType>({
     target_type: "bonus",
     component_type: "earning",
     calculation_value:
-      calculationValue?.toFixed(2) ?? existingComponent?.calculation_value,
+      calculationValue?.toFixed(3) ?? existingComponent?.calculation_value,
   };
 }
 
@@ -259,7 +259,7 @@ export function getValueforEPF({
     }
   }
 
-  return value;
+  return Number.parseFloat(value.toFixed(3));
 }
 
 export function getValueforESI({
@@ -278,7 +278,7 @@ export function getValueforESI({
     return 0;
   }
 
-  return value;
+  return Number.parseFloat(value.toFixed(3));
 }
 
 export function getGrossValue({
@@ -292,5 +292,23 @@ export function getGrossValue({
     value += values[key];
   }
 
-  return value;
+  return Number.parseFloat(value.toFixed(3));
+}
+
+export function calculateProRataAmount({
+  baseAmount,
+  presentDays,
+  totalWorkingDays,
+  overtimeHours,
+  overtimeRate,
+}: {
+  baseAmount: number;
+  presentDays: number;
+  totalWorkingDays: number;
+  overtimeHours: number;
+  overtimeRate: number;
+}): number {
+  const proRataAmount = (baseAmount / totalWorkingDays) * presentDays;
+  const overtimeAmount = overtimeHours * overtimeRate;
+  return Number.parseFloat((proRataAmount + overtimeAmount).toFixed(3));
 }
