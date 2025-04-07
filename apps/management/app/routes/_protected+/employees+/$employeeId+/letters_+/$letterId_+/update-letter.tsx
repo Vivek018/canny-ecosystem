@@ -14,12 +14,9 @@ import {
   updateRole,
 } from "@canny_ecosystem/utils";
 import {
-  getDefaultTemplateIdByCompanyId,
   getEmployeeLetterById,
-  getPaymentTemplateBySiteId,
+  getLinkedPaymentTemplateIdByEmployeeId,
   getPaymentTemplateComponentsByTemplateId,
-  getSiteIdByEmployeeId,
-  getTemplateIdByEmployeeId,
 } from "@canny_ecosystem/supabase/queries";
 import { updateEmployeeLetter } from "@canny_ecosystem/supabase/mutations";
 import { useEffect } from "react";
@@ -35,7 +32,7 @@ import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 export const UPDATE_LETTER_TAG = "update-letter";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const employeeId = params.employeeId;
+  const employeeId = params.employeeId ?? "";
   const letterId = params.letterId;
 
   const { supabase, headers } = getSupabaseWithHeaders({ request });
@@ -65,43 +62,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     let templateId = null;
 
-    const { data: employeeData } = await getSiteIdByEmployeeId({
-      supabase,
-      employeeId: employeeId ?? "",
-    });
-
     let templateComponentData = null;
     let employeeSalaryData = null;
-    const employeeSiteId =
-      employeeData?.employee_project_assignment?.project_sites?.id;
 
-    if (employeeSiteId) {
-      const { data: templateAssignmentData, error: templateAssignmentError } =
-        await getTemplateIdByEmployeeId({
-          supabase,
-          employeeId: employeeId ?? "",
-        });
+    const { data, error } = await getLinkedPaymentTemplateIdByEmployeeId({ supabase, employeeId, companyId });
 
-      templateId = templateAssignmentData?.template_id;
-
-      if (!templateId || templateAssignmentError) {
-        const { data } = await getPaymentTemplateBySiteId({
-          supabase,
-          site_id: employeeSiteId ?? "",
-        });
-
-        templateId = data?.template_id;
-      }
-    }
-
-    if (!templateId) {
-      const { data, error } = await getDefaultTemplateIdByCompanyId({
-        supabase,
-        companyId: companyId ?? "",
-      });
-
-      templateId = data?.id;
-      if (error || !templateId) throw new Error("No template found");
+    if (!error && data?.template_id) {
+      templateId = data.template_id;
     }
 
     ({ data: templateComponentData } =

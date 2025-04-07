@@ -56,7 +56,7 @@ export function RecentReimbursementDataTable<TData, TValue>({
                         <TableCell
                           key={cell.id}
                           className={cn(
-                            "px-3 md:px-4 py-2 hidden md:table-cell",
+                            "px-3 md:px-4 py-2 md:table-cell",
                           )}
                         >
                           {flexRender(

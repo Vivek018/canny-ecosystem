@@ -69,7 +69,7 @@ export default function DeletePaySequence() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(cacheKeyPrefix.paySequence);
+        clearCacheEntry(cacheKeyPrefix.pay_sequence);
         toast({
           title: "Success",
           description: actionData?.message || "Pay Sequence deleted",

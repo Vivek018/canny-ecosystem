@@ -47,6 +47,8 @@ export const ROLES: { [key in (typeof userRoles)[number]]: readonly string[] } =
     executive: attributeValues
       .filter((value) => !value.includes(attribute.feedbackList))
       .flatMap((value) => [`${readRole}:${value}`]),
+
+    supervisor: [],
   } as const;
 
 export function hasPermission(

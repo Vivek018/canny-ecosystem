@@ -25,7 +25,7 @@ import { updateCaseById } from "@canny_ecosystem/supabase/mutations";
 import {
   getCasesById,
   getCompanies,
-  getEmployeesByProjectSiteId,
+  getEmployeeIdentityByProjectSiteId,
   getProjectsByCompanyId,
   getSitesByProjectId,
 } from "@canny_ecosystem/supabase/queries";
@@ -116,14 +116,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     if (reportedBySiteId && reportedBy === "employee") {
-      ({ data: reportedByEmployee } = await getEmployeesByProjectSiteId({
+      ({ data: reportedByEmployee } = await getEmployeeIdentityByProjectSiteId({
         supabase,
         projectSiteId: reportedBySiteId,
       }));
     }
 
     if (reportedOnSiteId && reportedOn === "employee") {
-      ({ data: reportedOnEmployee } = await getEmployeesByProjectSiteId({
+      ({ data: reportedOnEmployee } = await getEmployeeIdentityByProjectSiteId({
         supabase,
         projectSiteId: reportedOnSiteId,
       }));

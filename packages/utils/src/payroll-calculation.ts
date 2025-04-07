@@ -49,12 +49,12 @@ export const calculateEPF = (epf, grossPay) => {
 export const calculateESI = (esi, grossPay) => {
   if (!esi) return 0;
   const {
-    employees_contribution,
-    employers_contribution,
+    employee_contribution,
+    employer_contribution,
     include_employer_contribution,
   } = esi;
-  const employeesContributionAmount = grossPay * employees_contribution;
-  let employersContributionAmount = grossPay * employers_contribution;
+  const employeesContributionAmount = grossPay * employee_contribution;
+  let employersContributionAmount = grossPay * employer_contribution;
 
   if (!include_employer_contribution) employersContributionAmount = 0;
 

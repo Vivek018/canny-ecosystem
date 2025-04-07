@@ -17,7 +17,6 @@ import {
 } from "@canny_ecosystem/utils";
 import {
   getEmployeeProjectAssignmentByEmployeeId,
-  getEmployeesByPositionAndProjectSiteId,
   getProjectsByCompanyId,
   getSitesByProjectId,
 } from "@canny_ecosystem/supabase/queries";
@@ -29,7 +28,6 @@ import { Card } from "@canny_ecosystem/ui/card";
 import {
   CreateEmployeeProjectAssignment,
   PROJECT_PARAM,
-  PROJECT_SITE_PARAM,
 } from "@/components/employees/form/create-employee-project-assignment";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
@@ -108,33 +106,12 @@ export async function loader({
       }));
     }
 
-    let siteEmployeeOptions: any = [];
-
-    const projectSiteParamId = urlSearchParams.get(PROJECT_SITE_PARAM);
-
-    if (projectSiteParamId?.length) {
-      const { data: siteEmployees } =
-        await getEmployeesByPositionAndProjectSiteId({
-          supabase,
-          position: "supervisor",
-          projectSiteId: projectSiteParamId,
-        });
-
-      siteEmployeeOptions = siteEmployees
-        ?.filter((siteEmployee) => siteEmployee.id !== employeeId)
-        .map((siteEmployee) => ({
-          label: siteEmployee?.employee_code,
-          value: siteEmployee?.id,
-        }));
-    }
-
     return json({
       status: "success",
       message: "Employee project assignment found",
       data: projectAssignmentData?.data,
       projectOptions,
       projectSiteOptions,
-      siteEmployeeOptions,
     });
   } catch (error) {
     return json({
@@ -194,7 +171,6 @@ export default function UpdateEmployeeProjectAssignment() {
     data,
     projectOptions,
     projectSiteOptions,
-    siteEmployeeOptions,
     status,
     error,
   } = useLoaderData<typeof loader>();
@@ -265,7 +241,6 @@ export default function UpdateEmployeeProjectAssignment() {
               isUpdate={true}
               projectOptions={projectOptions}
               projectSiteOptions={projectSiteOptions}
-              siteEmployeeOptions={siteEmployeeOptions}
             />
             <FormButtons
               form={form}

@@ -64,7 +64,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
-    `${cacheKeyPrefix.paySequence}${url.searchParams.toString()}`,
+    `${cacheKeyPrefix.pay_sequence}${url.searchParams.toString()}`,
     args
   );
 }
@@ -81,7 +81,7 @@ export default function PaySequence() {
         <Await resolve={paySequencePromise}>
           {({ data, error }) => {
             if (error) {
-              clearCacheEntry(cacheKeyPrefix.paySequence);
+              clearCacheEntry(cacheKeyPrefix.pay_sequence);
               return (
                 <ErrorBoundary
                   error={error}

@@ -23,7 +23,6 @@ import { FormButtons } from "../../form/form-buttons";
 import type { PayrollEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
 import { PayrollEntrySchema, payrollPaymentStatusArray, replaceUnderscore, transformStringArrayIntoOptions } from "@canny_ecosystem/utils";
 import { useState } from "react";
-import { usePayrollEntriesStore } from "@/store/payroll-entry";
 
 export function PayrollEntrySheet({
   row,
@@ -34,7 +33,6 @@ export function PayrollEntrySheet({
     }`;
 
   const [resetKey, setResetKey] = useState(Date.now());
-  const { skipPayrollEntries } = usePayrollEntriesStore();
 
   const [form, fields] = useForm({
     id: "UPDATE_PAYROLL_ENTRY",
@@ -62,8 +60,7 @@ export function PayrollEntrySheet({
                 key={cell.id}
                 className={cn(
                   cell.column.id === "actions" &&
-                  "sticky right-0 min-w-20 max-w-20 bg-card z-10",
-                  skipPayrollEntries?.includes(rowData.id) && "bg-muted/50",
+                  "sticky right-0 min-w-20 max-w-20 bg-card z-10"
                 )}
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -74,8 +71,7 @@ export function PayrollEntrySheet({
             <SheetTrigger asChild key={cell.id}>
               <TableCell
                 className={cn(
-                  "px-3 md:px-4 py-4 hidden md:table-cell",
-                  skipPayrollEntries?.includes(rowData.id) && "bg-muted/50",
+                  "px-3 md:px-4 py-4 hidden md:table-cell"
                 )}
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}

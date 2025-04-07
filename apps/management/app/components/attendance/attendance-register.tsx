@@ -134,7 +134,7 @@ export const prepareAttendanceWorkbook = async ({
       emp.employee_code || "N/A",
       emp.project || "N/A",
       emp.project_site || "N/A",
-      ...sortedDates.map((date) => emp[date]?.present || ""),
+      ...sortedDates.map((date) => (emp[date as 'attendance'] as any)?.present || ""),
       emp.total_presents || 0,
       emp.total_leaves || 0,
     ];
@@ -181,10 +181,12 @@ export const AttendanceRegister = ({
   selectedRows,
   companyName,
   companyAddress,
+  className,
 }: {
   selectedRows: TransformedAttendanceDataType[];
   companyName?: CompanyDatabaseRow;
   companyAddress?: LocationDatabaseRow;
+  className?: string;
 }) => {
   const generateAttendanceExcel = async (
     selectedRows: TransformedAttendanceDataType[]
@@ -210,8 +212,8 @@ export const AttendanceRegister = ({
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "muted" }),
-          "w-full justify-start text-[13px] h-9 hidden px-2 gap-2",
-          selectedRows.length && "flex"
+          "w-full justify-start text-[13px] h-9 px-2 gap-2",
+          className,
         )}
       >
         <Icon name="plus-circled" />

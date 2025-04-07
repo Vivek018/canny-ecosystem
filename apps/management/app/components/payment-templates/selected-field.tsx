@@ -63,7 +63,7 @@ export const SelectedPaymentField = ({
 
       setGrossValue(fieldId, componentType === "earning" ? value : 0);
 
-      if (fieldName === "basic") {
+      if (fieldName.toLowerCase() === "basic") {
         setBasicValue(value);
       }
     }
@@ -79,7 +79,7 @@ export const SelectedPaymentField = ({
 
       setGrossValue(fieldId, 0);
 
-      if (fieldName === "basic") {
+      if (fieldName.toLowerCase() === "basic") {
         setBasicValue(0);
       }
     };

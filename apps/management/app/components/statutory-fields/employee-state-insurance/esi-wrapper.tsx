@@ -77,11 +77,11 @@ export function ESIWrapper({
           />
           <DetailItem
             label="Employees' Contribution"
-            value={`${data?.employees_contribution * 100}% of Gross Pay`}
+            value={`${data?.employee_contribution * 100}% of Gross Pay`}
           />
           <DetailItem
             label="Employer's Contribution"
-            value={`${data?.employers_contribution * 100}% of Gross Pay`}
+            value={`${data?.employer_contribution * 100}% of Gross Pay`}
           />
           <DetailItem label="Max Limit" value={data?.max_limit} />
         </div>

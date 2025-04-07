@@ -24,6 +24,7 @@ export function AttendanceActions({
 }) {
   const navigate = useNavigate();
   const { selectedRows, columnVisibility } = useAttendanceStore();
+  
   return (
     <div className="space-x-2 hidden md:flex">
       <ColumnVisibility disabled={isEmpty} />

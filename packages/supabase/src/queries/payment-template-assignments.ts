@@ -1,9 +1,69 @@
-import { HARD_QUERY_LIMIT } from "../constant";
+import { HARD_QUERY_LIMIT, SINGLE_QUERY_LIMIT } from "../constant";
 import type {
   InferredType,
   PaymentTemplateAssignmentsDatabaseRow,
   TypedSupabaseClient,
 } from "../types";
+import { getEmployeeProjectAssignmentByEmployeeId } from "./employees";
+import { getDefaultTemplateIdByCompanyId } from "./payment-templates";
+
+export async function getLinkedPaymentTemplateIdByEmployeeId({
+  supabase,
+  employeeId,
+  companyId,
+}: {
+  supabase: TypedSupabaseClient;
+  employeeId: string;
+  companyId: string;
+}) {
+  try {
+    const { data: templateData, error: templateError } = await getTemplateIdByEmployeeId({ supabase, employeeId });
+
+    if (templateError) {
+      console.error("getLinkedPaymentTemplateIdByEmployeeId Error (templateData)", templateError);
+      return { data: null, error: templateError };
+    }
+
+    if (templateData?.template_id) {
+      return { data: { template_id: templateData.template_id }, error: null };
+    }
+
+    const { data: employeeProjectAssignment, error: employeeProjectError } = await getEmployeeProjectAssignmentByEmployeeId({ supabase, employeeId });
+
+    if (employeeProjectError) {
+      console.error("getLinkedPaymentTemplateIdByEmployeeId Error (employeeProjectAssignment)", employeeProjectError);
+      return { data: null, error: employeeProjectError };
+    }
+
+    const { data: sitePaymentTemplateAssignment, error: sitePaymentError } = await getPaymentTemplateAssignmentBySiteAndPositionOrSkillType({
+      supabase,
+      site_id: employeeProjectAssignment?.project_site_id!,
+      position: employeeProjectAssignment?.position!,
+      skill_level: employeeProjectAssignment?.skill_level!,
+    });
+
+    if (sitePaymentError) {
+      console.error("getLinkedPaymentTemplateIdByEmployeeId Error (sitePaymentTemplateAssignment)", sitePaymentError);
+      return { data: null, error: sitePaymentError };
+    }
+
+    if (sitePaymentTemplateAssignment?.template_id) {
+      return { data: { template_id: sitePaymentTemplateAssignment.template_id }, error: null };
+    }
+
+    const { data: defaultTemplateData, error: defaultTemplateError } = await getDefaultTemplateIdByCompanyId({ supabase, companyId });
+
+    if (defaultTemplateError) {
+      console.error("getLinkedPaymentTemplateIdByEmployeeId Error (defaultTemplateData)", defaultTemplateError);
+      return { data: null, error: defaultTemplateError };
+    }
+
+    return { data: { template_id: defaultTemplateData?.id }, error: null };
+  } catch (error) {
+    console.error("getLinkedPaymentTemplateIdByEmployeeId Unexpected Error", error);
+    return { data: null, error };
+  }
+}
 
 export async function getTemplateIdByEmployeeId({
   supabase,
@@ -50,6 +110,7 @@ export async function getPaymentTemplateAssignmentByEmployeeId({
   const { data, error } = await supabase
     .from("payment_template_assignments")
     .select(columns.join(","))
+    .order("created_at", { ascending: false })
     .eq("employee_id", employeeId)
     .maybeSingle<
       InferredType<
@@ -115,6 +176,96 @@ export type PaymentTemplateAssignmentsType = Pick<
   | "is_active"
   | "name"
 >;
+
+export async function getPaymentTemplateAssignmentBySiteId({
+  supabase,
+  site_id,
+}: { supabase: TypedSupabaseClient; site_id: string }) {
+  const columns = [
+    "id",
+    "template_id",
+    "assignment_type",
+    "employee_id",
+    "site_id",
+    "eligibility_option",
+    "position",
+    "skill_level",
+    "effective_from",
+    "effective_to",
+    "is_active",
+    "name",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("payment_template_assignments")
+    .select(columns.join(","))
+    .eq("site_id", site_id)
+    .order("created_at", { ascending: false })
+    .limit(SINGLE_QUERY_LIMIT)
+    .single<
+      InferredType<
+        PaymentTemplateAssignmentsDatabaseRow,
+        (typeof columns)[number]
+      >
+    >();
+
+  if (error) console.error("getPaymentTemplateAssignmentBySiteId Error", error);
+
+  return { data, error };
+}
+
+export async function getPaymentTemplateAssignmentBySiteAndPositionOrSkillType({
+  supabase,
+  site_id,
+  position,
+  skill_level,
+}: {
+  supabase: TypedSupabaseClient;
+  site_id: string;
+  position?: string;
+  skill_level?: string;
+}) {
+  const columns = [
+    "id",
+    "template_id",
+    "assignment_type",
+    "employee_id",
+    "site_id",
+    "eligibility_option",
+    "position",
+    "skill_level",
+    "effective_from",
+    "effective_to",
+    "is_active",
+    "name",
+  ] as const;
+
+  let query = supabase
+    .from("payment_template_assignments")
+    .select(columns.join(","))
+    .eq("site_id", site_id)
+    .order("created_at", { ascending: false })
+    .limit(SINGLE_QUERY_LIMIT);
+
+  if (position) {
+    query = query.eq("position", position);
+  } else if (skill_level) {
+    query = query.eq("skill_level", skill_level);
+  }
+
+  const { data, error } = await query.maybeSingle<
+    InferredType<
+      PaymentTemplateAssignmentsDatabaseRow,
+      (typeof columns)[number]
+    >
+  >();
+
+  if (error) {
+    console.error("getPaymentTemplateAssignmentBySiteAndPositionOrSkillType Error", error);
+  }
+
+  return { data, error };
+}
 
 export async function getPaymentTemplateAssignmentsBySiteId({
   supabase,

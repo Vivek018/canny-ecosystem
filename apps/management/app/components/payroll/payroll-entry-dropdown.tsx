@@ -1,4 +1,3 @@
-import { usePayrollEntriesStore } from "@/store/payroll-entry";
 import type { PayrollEntriesDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@canny_ecosystem/ui/alert-dialog";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
@@ -7,7 +6,6 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuSeparator,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { replaceDash } from "@canny_ecosystem/utils";
@@ -20,7 +18,6 @@ export const PayrollEntryDropdown = ({
   data: Omit<PayrollEntriesDatabaseRow, "created_at" | "updated_at">;
   triggerChild: React.ReactElement;
 }) => {
-  const { skipPayrollEntries, setSkipPayrollEntries } = usePayrollEntriesStore();
   const navigate = useNavigate();
 
   const handleClick = (
@@ -31,14 +28,6 @@ export const PayrollEntryDropdown = ({
     navigate(`/payroll/payroll-history/${data?.payroll_id}/${data?.employee_id}/${document}`);
   };
 
-  const handleFreezePayment = () => {
-    setSkipPayrollEntries([...skipPayrollEntries, data.id]);
-  };
-
-  const handleUnFreezePayment = () => {
-    setSkipPayrollEntries(skipPayrollEntries.filter(entryId => entryId !== data.id));
-  };
-
   const employeeDocuments = [
     "salary-slip"
   ];
@@ -46,7 +35,7 @@ export const PayrollEntryDropdown = ({
   return (
     <DropdownMenu>
       {triggerChild}
-      <DropdownMenuContent sideOffset={10} align="end">
+      <DropdownMenuContent align="end">
         <DropdownMenuGroup className={cn(data.payment_status === "pending" && "hidden")}>
           {employeeDocuments.map((document) => (
             <DropdownMenuItem
@@ -57,21 +46,6 @@ export const PayrollEntryDropdown = ({
             </DropdownMenuItem>
           ))}
         </DropdownMenuGroup>
-        <DropdownMenuGroup className={cn(data.payment_status !== "pending" && "hidden")}>
-          <DropdownMenuItem
-            className={cn(skipPayrollEntries?.includes(data.id) && "hidden")}
-            onClick={handleFreezePayment}
-          >
-            Freeze Payment
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            className={cn(!skipPayrollEntries?.includes(data.id) && "hidden")}
-            onClick={handleUnFreezePayment}
-          >
-            UnFreeze Payment
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator className={cn(data.payment_status !== "pending" && "hidden")} />
         <DropdownMenuGroup>
           <DeletePayrollEntry payrollId={data?.payroll_id} id={data?.id} />
         </DropdownMenuGroup>

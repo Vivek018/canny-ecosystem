@@ -105,7 +105,7 @@ export async function getPayrollById({
     .from("payroll")
     .select(columns.join(","))
     .eq("id", payrollId)
-    .single<InferredType<PayrollDatabaseRow, (typeof columns)[number]>>();
+    .maybeSingle<InferredType<PayrollDatabaseRow, (typeof columns)[number]>>();
 
   if (error) console.error("getPayrollById Error", error);
 
@@ -158,6 +158,7 @@ export async function getPayrollEntriesByPayrollId({
       )}, employees!left(id,company_id,first_name, middle_name, last_name, employee_code)`
     )
     .eq("payroll_id", payrollId)
+    .order("created_at", { ascending: false })
     .returns<PayrollEntriesWithEmployee[]>();
 
   if (error) console.error("getPayrollEntriesByPayrollId Error", error);

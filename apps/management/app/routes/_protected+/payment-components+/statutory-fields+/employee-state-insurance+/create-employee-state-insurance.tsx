@@ -224,7 +224,7 @@ export default function CreateEmployeeStateInsurance({
                 <Field
                   className=""
                   inputProps={{
-                    ...getInputProps(fields.employees_contribution, {
+                    ...getInputProps(fields.employee_contribution, {
                       type: "number",
                     }),
                     disabled: true,
@@ -235,10 +235,10 @@ export default function CreateEmployeeStateInsurance({
                   labelProps={{
                     className: "capitalize",
                     children: replaceUnderscore(
-                      fields.employees_contribution.name,
+                      fields.employee_contribution.name,
                     ),
                   }}
-                  errors={fields.employees_contribution.errors}
+                  errors={fields.employee_contribution.errors}
                 />
                 <p className="mb-5 w-1/2 font-light text-sm">of Gross Pay</p>
               </div>
@@ -246,7 +246,7 @@ export default function CreateEmployeeStateInsurance({
                 <Field
                   className=""
                   inputProps={{
-                    ...getInputProps(fields.employers_contribution, {
+                    ...getInputProps(fields.employer_contribution, {
                       type: "number",
                     }),
                     disabled: true,
@@ -257,10 +257,10 @@ export default function CreateEmployeeStateInsurance({
                   labelProps={{
                     className: "capitalize",
                     children: replaceUnderscore(
-                      fields.employers_contribution.name,
+                      fields.employer_contribution.name,
                     ),
                   }}
-                  errors={fields.employers_contribution.errors}
+                  errors={fields.employer_contribution.errors}
                 />
                 <p className="w-1/2 mb-5 font-light text-sm">of Gross Pay</p>
               </div>

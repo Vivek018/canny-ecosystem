@@ -217,7 +217,7 @@ export async function getEmployeesByCompanyId({
   };
 }
 
-export async function getEmployeesByProjectSiteId({
+export async function getEmployeeIdentityByProjectSiteId({
   supabase,
   projectSiteId,
 }: {
@@ -237,6 +237,51 @@ export async function getEmployeesByProjectSiteId({
     .limit(MID_QUERY_LIMIT)
     .returns<
       InferredType<EmployeeDatabaseRow, (typeof columns)[number]>[] | null
+    >();
+
+  if (error) {
+    console.error("getEmployeesByProjectSiteId Error", error);
+  }
+
+  return {
+    data,
+    error,
+  };
+}
+
+export async function getEmployeesByProjectSiteId({
+  supabase,
+  projectSiteId,
+}: {
+  supabase: TypedSupabaseClient;
+  projectSiteId: string;
+}) {
+  const columns = [
+    "id",
+    "employee_code",
+    "first_name",
+    "middle_name",
+    "last_name",
+    "date_of_birth",
+    "education",
+    "primary_mobile_number",
+    "is_active",
+    "gender",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("employees")
+    .select(
+      `${columns.join(
+        ",",
+      )}, employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(employee_id, assignment_type, skill_level, position, start_date, end_date,
+        project_sites!inner(id, name, projects!inner(id, name)))`,
+    )
+    .eq("employee_project_assignment.project_site_id", projectSiteId)
+    .order("created_at", { ascending: false })
+    .limit(MID_QUERY_LIMIT)
+    .returns<
+      EmployeeDataType[]
     >();
 
   if (error) {
@@ -771,7 +816,6 @@ export type EmployeeProjectAssignmentDataType = Omit<
   "created_at" | "updated_at"
 > & {
   project_sites: { id: string; name: string; projects: { name: string } };
-  supervisor: { id: string; employee_code: string };
 };
 
 export async function getEmployeeProjectAssignmentByEmployeeId({
@@ -787,7 +831,6 @@ export async function getEmployeeProjectAssignmentByEmployeeId({
     "position",
     "start_date",
     "end_date",
-    "supervisor_id",
     "assignment_type",
     "skill_level",
     "probation_period",
@@ -799,7 +842,7 @@ export async function getEmployeeProjectAssignmentByEmployeeId({
     .select(
       `${columns.join(
         ",",
-      )}, project_sites(id, name, projects(name)), supervisor:employees!employee_project_assignments_supervisor_id_fkey(id, employee_code)`,
+      )}, project_sites(id, name, projects(name))`,
     )
     .eq("employee_id", employeeId)
     .maybeSingle<EmployeeProjectAssignmentDataType>();
@@ -961,7 +1004,7 @@ export async function getEmployeesReportByCompanyId({
 
   return {
     data,
-    meta: { count: count  },
+    meta: { count: count },
     error: null,
   };
 }

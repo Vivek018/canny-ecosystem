@@ -100,12 +100,12 @@ export function CreatePaymentTemplateComponentDetails({
         existingValues: string[],
         newValues: (string | undefined)[]
       ): string[] => [
-        ...existingValues,
-        ...newValues.filter(
-          (val): val is string =>
-            val !== undefined && !existingValues.includes(val)
-        ),
-      ];
+          ...existingValues,
+          ...newValues.filter(
+            (val): val is string =>
+              val !== undefined && !existingValues.includes(val)
+          ),
+        ];
 
       setSelectFieldDefaultValues((prev) => ({
         paymentFieldDefaultValue: mergeUniqueValues(
@@ -254,7 +254,7 @@ export function CreatePaymentTemplateComponentDetails({
                       esi={{
                         esiName: "Employee State Insurance",
                         employeesContribution:
-                          selectedStatutoryFields.esi?.employees_contribution,
+                          selectedStatutoryFields.esi?.employee_contribution,
                       }}
                     />
                   )}

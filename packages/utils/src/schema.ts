@@ -376,7 +376,6 @@ export const EmployeeProjectAssignmentSchema = z.object({
   position: z.enum(positionArray).default("sampler"),
   skill_level: z.enum(skillLevelArray).default("unskilled"),
   assignment_type: z.enum(assignmentTypeArray).default("full_time"),
-  supervisor_id: z.string().optional(),
   start_date: z.string().default(new Date().toISOString().split("T")[0]),
   end_date: z.string().optional(),
   probation_period: z.boolean().default(false),
@@ -482,8 +481,8 @@ export const EmployeeStateInsuranceSchema = z.object({
   company_id: z.string(),
   esi_number: zNumberString,
   deduction_cycle: z.enum(deductionCycleArray).default(deductionCycleArray[0]),
-  employees_contribution: z.number().default(ESI_EMPLOYEE_CONTRIBUTION),
-  employers_contribution: z.number().default(ESI_EMPLOYER_CONTRIBUTION),
+  employee_contribution: z.number().default(ESI_EMPLOYEE_CONTRIBUTION),
+  employer_contribution: z.number().default(ESI_EMPLOYER_CONTRIBUTION),
   include_employer_contribution: z.boolean().default(false),
   is_default: z.boolean().default(true),
   max_limit: z.number().default(ESI_MAX_LIMIT),
@@ -527,6 +526,7 @@ export const StatutoryBonusSchema = z
       .default(statutoryBonusPayFrequencyArray[0]),
     percentage: z.number().min(0).default(8.33),
     payout_month: z.number().optional(),
+    is_default: z.boolean().default(true),
   })
   .superRefine((data, ctx) => {
     if (data.payment_frequency === "yearly" && !data.payout_month) {
@@ -1599,4 +1599,8 @@ export const ImportSinglePayrollDataSchema = z.object({
 
 export const ImportPayrollDataSchema = z.object({
   data: z.array(ImportSinglePayrollDataSchema),
+});
+
+export const EmployeeLoginSchema = z.object({
+  employee_code: z.string().optional(),
 });
