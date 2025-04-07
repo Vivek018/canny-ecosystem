@@ -61,25 +61,22 @@ export function PayrollActions({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent sideOffset={10} align="end">
-        <DropdownMenuItem
-          onClick={previewSalaryRegister}
-          className="space-x-2 flex items-center"
-        >
-          <DownloadBankAdvice env={env} data={data} payrollData={payrollData} />
-        </DropdownMenuItem>
+        <div className="flex flex-col">
+          <Button variant={"ghost"}>
+            <DownloadBankAdvice
+              env={env}
+              data={data}
+              payrollData={payrollData}
+            />
+          </Button>
+          <Button variant={"ghost"}>
+            <DownloadEsiFormat env={env} />
+          </Button>
+          <Button variant={"ghost"}>
+            <DownloadEpfFormat env={env} />
+          </Button>
+        </div>
 
-        <DropdownMenuItem
-          onClick={previewSalaryRegister}
-          className="space-x-2 flex items-center"
-        >
-          <DownloadEsiFormat env={env} />
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={previewSalaryRegister}
-          className="space-x-2 flex items-center"
-        >
-          <DownloadEpfFormat env={env} />
-        </DropdownMenuItem>
         <DropdownMenuSeparator />
 
         <DropdownMenuItem
