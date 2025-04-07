@@ -1,3 +1,4 @@
+import { HARD_QUERY_LIMIT } from "../constant";
 import type {
   HolidaysDatabaseRow,
   InferredType,
@@ -25,17 +26,15 @@ export async function getHolidaysByCompanyId({
     "no_of_days",
   ] as const;
 
-  const query = supabase
+  const { data, error } = await supabase
     .from("holidays")
     .select(
-      `
-        ${columns.join(",")}
-      `,
-      { count: "exact" }
+      `${columns.join(",")}`,
     )
-    .eq("company_id", companyId);
-
-  const { data, error } = await query;
+    .eq("company_id", companyId)
+    .order("created_at", { ascending: false })
+    .limit(HARD_QUERY_LIMIT)
+    .returns<InferredType<HolidaysDatabaseRow, typeof columns[number]>[]>();
 
   if (error) {
     console.error("getHolidaysByEmployeeId Error", error);

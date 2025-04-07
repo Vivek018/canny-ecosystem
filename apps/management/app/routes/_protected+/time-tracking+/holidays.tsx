@@ -3,7 +3,7 @@ import { columns } from "@/components/holidays/table/columns";
 import { HolidaysDataTable } from "@/components/holidays/table/data-table";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
-import { clearCacheEntry, clientCaching } from "@/utils/cache";
+import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
@@ -38,22 +38,18 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     const holidaysPromise = getHolidaysByCompanyId({ supabase, companyId });
     return defer({
-      holidaysPromise: holidaysPromise as any,
+      holidaysPromise: holidaysPromise,
     });
   } catch (error) {
     console.error("Leave Types Error in loader function:", error);
 
     return defer({
-      holidaysPromise: Promise.resolve({ data: [] }),
+      holidaysPromise: Promise.resolve({ data: [], error: null }),
     });
   }
 }
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  const url = new URL(args.request.url);
-  return clientCaching(
-    `${cacheKeyPrefix.holidays}${url.searchParams.toString()}`,
-    args
-  );
+  return clientCaching(cacheKeyPrefix.holidays, args);
 }
 
 clientLoader.hydrate = true;
@@ -67,7 +63,7 @@ export default function Holidays() {
         <Await resolve={holidaysPromise}>
           {({ data, error }) => {
             if (error) {
-              clearCacheEntry(cacheKeyPrefix.holidays);
+              clearExactCacheEntry(cacheKeyPrefix.holidays);
               return (
                 <ErrorBoundary
                   error={error}
@@ -79,11 +75,11 @@ export default function Holidays() {
             const [tableData, setTableData] = useState(data);
 
             useEffect(() => {
-              const filteredData = data?.filter((item: any) =>
-                    searchInObject(item, searchString),
-                  );
-              
-                  setTableData(filteredData);
+              const filteredData = data?.filter((item) =>
+                searchInObject(item, searchString),
+              );
+
+              setTableData(filteredData ?? []);
             }, [searchString, data]);
 
             return (
@@ -121,7 +117,7 @@ export default function Holidays() {
                     <span className="hidden md:flex justify-end">Holiday</span>
                   </Link>
                 </div>
-                <HolidaysDataTable data={tableData} columns={columns} />
+                <HolidaysDataTable data={tableData ?? []} columns={columns} />
               </div>
             );
           }}

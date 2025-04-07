@@ -6,3 +6,4 @@ export * from "./payroll-calculation";
 export * from "./generate";
 export * from "./auth";
 export * from "./generate";
+export * from "./payment";

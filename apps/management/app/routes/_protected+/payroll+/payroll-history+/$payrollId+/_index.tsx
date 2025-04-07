@@ -1,6 +1,6 @@
 import { ErrorBoundary } from "@/components/error-boundary";
 import { LoadingSpinner } from "@/components/loading-spinner";
-import { PayrollEntryComponent } from "@/components/payroll/payroll-entry-component";
+import { PayrollEntryComponent } from "@/components/payroll/payroll-entry/payroll-entry-component";
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import {

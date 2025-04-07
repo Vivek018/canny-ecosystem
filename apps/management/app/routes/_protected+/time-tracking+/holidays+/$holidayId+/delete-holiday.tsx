@@ -1,5 +1,5 @@
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
-import { clearCacheEntry } from "@/utils/cache";
+import { clearExactCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import {
@@ -70,7 +70,7 @@ export default function DeleteHoliday() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(cacheKeyPrefix.holidays);
+        clearExactCacheEntry(cacheKeyPrefix.holidays);
         toast({
           title: "Success",
           description: actionData?.message || "Holiday deleted",

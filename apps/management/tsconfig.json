@@ -7,6 +7,6 @@
     },
     "strict": true
   },
-  "include": ["**/*.ts", "**/*.tsx", "tailwind.config.ts", "types/index.d.ts", "index.js", "server/dev-server.js", "server/index.ts"],
+  "include": ["**/*.ts", "**/*.tsx", "tailwind.config.ts", "types/index.d.ts", "index.js", "server/dev-server.js", "server/index.ts", "../../packages/utils/src/payment.ts"],
   "exclude": ["node_modules"]
 }

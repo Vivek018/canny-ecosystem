@@ -5,8 +5,8 @@ import type {
   SalaryEntriesDatabaseInsert,
   TypedSupabaseClient,
 } from "../types";
-import { getPayrollById, getPayrollEntriesByPayrollId, getPayrollEntryById, type ExitDataType, type ReimbursementDataType } from "../queries";
-import { convertToNull, isGoodStatus } from "@canny_ecosystem/utils";
+import { getPayrollById, getPayrollEntriesByPayrollId, getPayrollEntryById, getSalaryEntriesByPayrollAndEmployeeId, type ExitDataType, type ReimbursementDataType } from "../queries";
+import { calculateSalaryTotalNetAmount, convertToNull, isGoodStatus } from "@canny_ecosystem/utils";
 
 // Salary Payroll
 export async function createSalaryPayroll({ supabase, data, companyId, bypassAuth = false, }: {
@@ -59,19 +59,7 @@ export async function createSalaryPayroll({ supabase, data, companyId, bypassAut
     const uniqueEmployeeIds = new Set(salaryEntriesData?.map(entry => entry?.employee_id));
     const salaryEntriesEmployeeLength = uniqueEmployeeIds.size;
 
-    let salaryEntriesNetAmount = 0;
-
-    for (const entry of salaryEntriesData ?? []) {
-      if (entry.type === "earning") {
-        salaryEntriesNetAmount += entry.amount ?? 0;
-      } else if (entry.type === "deduction") {
-        salaryEntriesNetAmount -= entry.amount ?? 0;
-      } else if (entry.type === "statutory_contribution") {
-        salaryEntriesNetAmount -= entry.amount ?? 0;
-      } else if (entry.type === "bonus") {
-        salaryEntriesNetAmount += entry.amount ?? 0;
-      }
-    }
+    const salaryEntriesNetAmount = calculateSalaryTotalNetAmount(salaryEntriesData!);
 
     if (salaryEntriesEmployeeLength === 0 || salaryEntriesNetAmount === 0) {
       const { status, error } = await deletePayroll({ supabase, id: payrollData?.id ?? "" });
@@ -462,6 +450,63 @@ export async function updatePayrollEntries({
   }
 
   return { status, error };
+}
+
+export async function deleteSalaryEntriesFromPayrollAndEmployeeId({
+  supabase,
+  payrollId,
+  employeeId,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  payrollId: string;
+  employeeId: string;
+  bypassAuth?: boolean;
+}) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
+  const { data: salaryEntriesData } = await getSalaryEntriesByPayrollAndEmployeeId({ supabase, employeeId, payrollId });
+
+
+  if (salaryEntriesData) {
+    const { error, status } = await supabase
+      .from("salary_entries")
+      .delete()
+      .in("id", salaryEntriesData.salary_entries.map(entry => entry.id));
+
+    if (isGoodStatus(status)) {
+      const { data: payrollData } = await getPayrollById({ supabase, payrollId });
+
+      const totalNetAmountReduction = calculateSalaryTotalNetAmount(salaryEntriesData.salary_entries);
+
+      await updatePayroll({
+        supabase, data: {
+          id: payrollData?.id,
+          total_employees: payrollData?.total_employees! - 1,
+          total_net_amount: payrollData?.total_net_amount! - totalNetAmountReduction
+        }
+      });
+    }
+
+    if (error) {
+      console.error("deleteSalaryEntriesFromPayrollAndEmployeeId Error:", error);
+    }
+
+    return { status, error };
+  }
+
+  console.error("deleteSalaryEntriesFromPayrollAndEmployeeId Error:", "No Salary Entries Found");
+
+
+  return { status: 404, error: "No Salary Entries Found" };
 }
 
 export async function updatePayrollEntry({

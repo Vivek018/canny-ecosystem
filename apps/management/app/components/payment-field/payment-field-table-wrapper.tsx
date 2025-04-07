@@ -29,7 +29,7 @@ export function PaymentFieldTableWrapper({
       });
     }
 
-    const filteredData = data?.filter((item: any) =>
+    const filteredData = data?.filter((item) =>
       searchInObject(item, searchString),
     );
 

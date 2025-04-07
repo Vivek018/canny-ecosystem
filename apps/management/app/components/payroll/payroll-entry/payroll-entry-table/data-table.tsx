@@ -17,7 +17,7 @@ import { PayrollEntrySheet } from "./payroll-entry-sheet";
 import { useState } from "react";
 import type { PayrollEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
 
-interface PayrollTableProps<TData, TValue> {
+interface PayrollEntryTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   editable: boolean;
@@ -27,7 +27,7 @@ export function PayrollEntryDataTable<TData, TValue>({
   columns,
   data,
   editable,
-}: PayrollTableProps<TData, TValue>) {
+}: PayrollEntryTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
 
   const table = useReactTable({
@@ -70,7 +70,7 @@ export function PayrollEntryDataTable<TData, TValue>({
             ) : (
               <TableRow className={cn(!tableLength && "border-none")}>
                 <TableCell className="h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize">
-                  No Reimbursement Payroll Found
+                  No Payroll Entry Found
                 </TableCell>
               </TableRow>
             )}

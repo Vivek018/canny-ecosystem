@@ -1,6 +1,5 @@
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
-import { calculateProRataAmount, getValueforEPF, getValueforESI } from "@/utils/payment";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
   createExitPayroll,
@@ -16,7 +15,7 @@ import {
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { SalaryEntriesDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { ESI_EMPLOYEE_CONTRIBUTION, isGoodStatus } from "@canny_ecosystem/utils";
+import { calculateSalaryTotalNetAmount, calculateProRataAmount, getValueforEPF, getValueforESI, ESI_EMPLOYEE_CONTRIBUTION, isGoodStatus } from "@canny_ecosystem/utils";
 import { BONUS_PERCENTAGE, EMPLOYEE_EPF_PERCENTAGE } from "@canny_ecosystem/utils/constant";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { json, useActionData, useNavigate } from "@remix-run/react";
@@ -198,20 +197,7 @@ export async function action({
 
       let totalNetAmount = 0;
 
-      for (const entry of salaryData) {
-        if (entry.type === "earning") {
-          totalNetAmount += entry.amount;
-        }
-        else if (entry.type === "deduction") {
-          totalNetAmount -= entry.amount;
-        }
-        else if (entry.type === "statutory_contribution") {
-          totalNetAmount -= entry.amount;
-        }
-        else if (entry.type === "bonus") {
-          totalNetAmount += entry.amount;
-        }
-      }
+      totalNetAmount = calculateSalaryTotalNetAmount(salaryData);
 
       const {
         status,

@@ -61,7 +61,7 @@ export function UsersWrapper({ data }: { data: UserDatabaseRow[] }) {
   const [searchString, setSearchString] = useState("");
 
   useEffect(() => {
-    const filteredData = data?.filter((item: any) => searchInObject(item, searchString));
+    const filteredData = data?.filter((item) => searchInObject(item, searchString));
     setTableData(filteredData);
   }, [searchString, data]);
 

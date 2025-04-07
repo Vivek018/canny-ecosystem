@@ -44,7 +44,7 @@ import {
   getSelectedPaymentComponentFromField,
   getValueforEPF,
   getValueforESI,
-} from "@/utils/payment";
+} from "@canny_ecosystem/utils";
 import { createPaymentTemplateWithComponents } from "@canny_ecosystem/supabase/mutations";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
@@ -284,13 +284,13 @@ export default function CreatePaymentTemplate() {
     step === 1
       ? stepData[step - 1]
         ? {
-            ...stepData[step - 1],
-            company_id: companyId,
-          }
+          ...stepData[step - 1],
+          company_id: companyId,
+        }
         : {
-            ...initialValues,
-            company_id: companyId,
-          }
+          ...initialValues,
+          company_id: companyId,
+        }
       : stepData[step - 1] ?? initialValues;
 
   const [form, fields] = useForm({
