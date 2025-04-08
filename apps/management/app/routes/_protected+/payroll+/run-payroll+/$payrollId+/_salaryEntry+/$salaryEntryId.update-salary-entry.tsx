@@ -1,38 +1,46 @@
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
-import { deleteSalaryEntriesFromPayrollAndEmployeeId } from "@canny_ecosystem/supabase/mutations";
+import { updateSalaryEntry } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { isGoodStatus } from "@canny_ecosystem/utils";
+import { isGoodStatus, SalaryEntrySchema } from "@canny_ecosystem/utils";
+import { parseWithZod } from "@conform-to/zod";
 import { json, type ActionFunctionArgs } from "@remix-run/node";
 import { useActionData, useNavigate, useParams } from "@remix-run/react";
 import { useEffect } from "react";
 
 export async function action({
   request,
-  params
 }: ActionFunctionArgs) {
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
+    const formData = await request.formData();
 
-    const employeeId = params.employeeId;
-    const payrollId = params.payrollId;
+    const submission = parseWithZod(formData, {
+      schema: SalaryEntrySchema,
+    });
 
-    const { status, error } = await deleteSalaryEntriesFromPayrollAndEmployeeId({
+    if (submission.status !== "success") {
+      return json(
+        { status: "error", message: "Salary Entry update failed", error: submission.error },
+        { status: 500 },
+      );
+    }
+
+    const { status, error } = await updateSalaryEntry({
       supabase,
-      payrollId: payrollId ?? "",
-      employeeId: employeeId ?? "",
+      data: submission.value,
     });
 
     if (isGoodStatus(status)) {
       return json({
         status: "success",
-        message: "Payroll Entry deleted successfully",
+        message: "Salary Entry updated successfully",
         error: null,
       });
     }
     return json(
-      { status: "error", message: "Payroll Entry delete failed", error },
+      { status: "error", message: "Salary Entry update failed", error },
       { status: 500 },
     );
   } catch (error) {
@@ -49,7 +57,7 @@ export async function action({
 }
 
 
-export default function DeleteSalaryEntry() {
+export default function UpdateSalaryEntry() {
   const actionData = useActionData<typeof action>();
   const { payrollId } = useParams();
   const { toast } = useToast();

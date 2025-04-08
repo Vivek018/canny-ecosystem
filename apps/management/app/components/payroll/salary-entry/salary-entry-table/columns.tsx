@@ -1,37 +1,74 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
-import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { deleteRole, getMonthNameFromNumber, hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import type { SalaryEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
-import { SalaryEntryDropdown } from "../salary-entry-dropdown";
 
-export const salaryEntryColumns: ColumnDef<SalaryEntriesWithEmployee>[] = [
+import { SalaryEntryDropdown } from "../salary-entry-dropdown";
+import type { SalaryEntriesDatabaseRow } from "@canny_ecosystem/supabase/types";
+import type { SalaryEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
+import { SalaryEntrySheet } from "./salary-entry-sheet";
+
+export const salaryEntryColumns = ({ salaryEntries }: { salaryEntries: Omit<SalaryEntriesDatabaseRow, "created_at" | "updated_at">[] }): ColumnDef<SalaryEntriesWithEmployee>[] => [
   {
-    enableSorting: false,
     accessorKey: "employee_code",
     header: "Employee Code",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-28 text-primary">{`${row.original?.employee_code ?? "--"}`}</p>
+        <p className="truncate w-28">{`${row.original?.employee_code ?? "--"}`}</p>
       );
     },
   },
   {
-    enableSorting: false,
     accessorKey: "name",
     header: "Employee Name",
     cell: ({ row }) => {
       return (
-        <p className="truncate capitalize w-48 text-primary">{`${row.original?.first_name
+        <p className="truncate capitalize w-48">{`${row.original?.first_name
           } ${row.original?.middle_name ?? ""} ${row.original?.last_name ?? ""
           }`}</p>
       );
     },
   },
+  {
+    accessorKey: "present_days",
+    header: "P. Days",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate">{row.original.salary_entries[0].present_days}</p>
+      );
+    },
+  },
+  {
+    accessorKey: "overtime_hours",
+    header: "OT Hours",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate">{row.original.salary_entries[0].overtime_hours}</p>
+      );
+    },
+  },
+  {
+    accessorKey: "period",
+    header: "Period",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate">{getMonthNameFromNumber(row.original.salary_entries[0].month, true)}{" "}{row.original.salary_entries[0].year}</p>
+      );
+    },
+  },
+  ...salaryEntries.map((salaryEntry) => ({
+    accessorKey: salaryEntry.template_component_id ?? salaryEntry.field_name,
+    header: salaryEntry.field_name,
+    cell: ({ row }: { row: any }) => {
+      return (
+        <SalaryEntrySheet editable={true} employee={row.original} salaryEntry={salaryEntry} triggerChild={<p className={cn("truncate opacity-80 hover:opacity-100 focus:opacity-100", salaryEntry.type === "earning" && "text-green", (salaryEntry.type === "deduction" || salaryEntry.type === "statutory_contribution") && "text-destructive")}>{salaryEntry.amount}</p>} />
+      );
+    },
+  })),
   {
     accessorKey: "actions",
     cell: ({ row }) => {

@@ -16,6 +16,7 @@ export const payrollEntryColumnIdArray = [
   "name",
   "amount",
   "payment_status",
+  "actions",
 ];
 
 export function PayrollTableHeader({ table, loading, className }: Props) {
@@ -62,7 +63,6 @@ export function PayrollTableHeader({ table, loading, className }: Props) {
             key={id}
             className={cn(
               "px-4 py-2",
-              id === "name" && "sticky left-0 bg-card z-10",
             )}
           >
             <Button
@@ -89,8 +89,6 @@ export function PayrollTableHeader({ table, loading, className }: Props) {
             </Button>
           </TableHead>
         ))}
-
-        <TableHead className="sticky right-0 min-w-20 max-w-20 bg-card z-10" />
       </TableRow>
     </TableHeader>
   );

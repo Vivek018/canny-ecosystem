@@ -126,7 +126,6 @@ export async function getSalaryEntriesByPayrollId({
     "template_component_id",
     "payroll_id",
     "field_name",
-    "status",
     "type",
     "amount",
     "is_pro_rata",
@@ -138,7 +137,7 @@ export async function getSalaryEntriesByPayrollId({
     .from("employees")
     .select(`id, company_id, first_name, middle_name, last_name, employee_code, salary_entries!inner(${columns.join(",")})`)
     .eq("salary_entries.payroll_id", payrollId)
-    .order("created_at", { ascending: false })
+    .order("type, field_name", { ascending: true, referencedTable: "salary_entries" })
     .returns<SalaryEntriesWithEmployee[]>();
 
   if (error) { console.error("getSalaryEntriesByPayrollId Error", error); }
@@ -165,7 +164,6 @@ export async function getSalaryEntriesByPayrollAndEmployeeId({
     "template_component_id",
     "payroll_id",
     "field_name",
-    "status",
     "type",
     "amount",
     "is_pro_rata",
@@ -183,6 +181,41 @@ export async function getSalaryEntriesByPayrollAndEmployeeId({
   if (error) {
     console.error("getSalaryEntriesByPayrollAndEmployeeId Error", error);
   }
+
+  return { data, error };
+}
+
+export async function getSalaryEntryById({
+  supabase,
+  id,
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+}) {
+  const columns = [
+    "id",
+    "month",
+    "year",
+    "present_days",
+    "overtime_hours",
+    "employee_id",
+    "template_component_id",
+    "payroll_id",
+    "field_name",
+    "type",
+    "amount",
+    "is_pro_rata",
+    "consider_for_epf",
+    "consider_for_esic",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("salary_entries")
+    .select(`${columns.join(",")}`)
+    .eq("id", id)
+    .single<InferredType<SalaryEntriesDatabaseRow, typeof columns[number]>>();
+
+  if (error) console.error("getSalaryEntryById Error", error);
 
   return { data, error };
 }

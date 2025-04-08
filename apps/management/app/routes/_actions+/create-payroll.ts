@@ -109,12 +109,12 @@ export async function action({
             employee_id,
             template_component_id: component.id,
             field_name: component.target_type === "payment_field" ? component.payment_fields?.name : (component.target_type.toUpperCase() ?? component.component_type),
-            status: "pending",
             type: component.component_type,
             is_pro_rata: component.payment_fields?.is_pro_rata ?? false,
             consider_for_epf: component.payment_fields?.consider_for_epf ?? false,
             consider_for_esic: component.payment_fields?.consider_for_esic ?? false,
             amount,
+            is_overtime: component.target_type === "payment_field" ? component.payment_fields?.is_overtime ?? false : false,
           });
         }
       }

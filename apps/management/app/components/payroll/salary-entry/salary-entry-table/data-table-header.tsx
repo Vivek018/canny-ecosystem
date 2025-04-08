@@ -1,3 +1,4 @@
+import type { SalaryEntriesDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { TableHead, TableHeader, TableRow } from "@canny_ecosystem/ui/table";
@@ -10,15 +11,24 @@ interface Props {
   className?: string;
 }
 
-// make sure the order is same as header order
-export const salaryEntryColumnIdArray = [
-  "employee_code",
-  "name",
-  "amount",
-  "payment_status",
-];
 
 export function SalaryTableHeader({ table, loading, className }: Props) {
+  const salaryEntries: SalaryEntriesDatabaseRow[] = table.getRowModel()?.rows[0]?.original?.salary_entries;
+
+
+  // make sure the order is same as header order
+  const salaryEntryColumnIdArray = [
+    "employee_code",
+    "name",
+    "present_days",
+    "overtime_hours",
+    "period",
+    ...(salaryEntries?.map((salaryEntry) => {
+      return salaryEntry.template_component_id ?? salaryEntry.field_name;
+    }) ?? []),
+    "actions"
+  ];
+
   const [sortingOrder, setSortingOrder] = useState("");
   const [sortingId, setSortingId] = useState("");
 
@@ -62,7 +72,6 @@ export function SalaryTableHeader({ table, loading, className }: Props) {
             key={id}
             className={cn(
               "px-4 py-2",
-              id === "name" && "sticky left-0 bg-card z-10",
             )}
           >
             <Button
@@ -89,8 +98,6 @@ export function SalaryTableHeader({ table, loading, className }: Props) {
             </Button>
           </TableHead>
         ))}
-
-        <TableHead className="sticky right-0 min-w-20 max-w-20 bg-card z-10" />
       </TableRow>
     </TableHeader>
   );

@@ -225,3 +225,16 @@ export function extractKeys<T extends Record<string, any>, K extends string>(
     }, {} as Partial<Record<K, any>>)
   );
 }
+
+export function getMonthNameFromNumber(monthNumber: number, shortName = false): string {
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  if (monthNumber < 1 || monthNumber > 12) {
+    throw new Error("Month number must be between 1 and 12");
+  }
+
+  return shortName ? monthNames[monthNumber - 1].slice(0, 3) : monthNames[monthNumber - 1];
+}

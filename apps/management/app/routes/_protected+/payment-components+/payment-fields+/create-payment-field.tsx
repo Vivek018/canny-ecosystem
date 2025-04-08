@@ -278,7 +278,7 @@ export default function CreatePaymentField({
                 errors={fields.amount.errors}
                 prefix={
                   fields.calculation_type.value === calculationTypeArray[0] ||
-                  fields.calculation_type.value === undefined
+                    fields.calculation_type.value === undefined
                     ? "Rs"
                     : undefined
                 }
@@ -292,21 +292,31 @@ export default function CreatePaymentField({
                 )}
               />
 
+              <CheckboxField
+              className="pt-2 pb-4"
+                buttonProps={getInputProps(fields.is_active, {
+                  type: "checkbox",
+                })}
+                labelProps={{
+                  children: "Mark this as Active",
+                }}
+              />
               <div className='grid grid-cols-2 place-content-center justify-between gap-x-4'>
-                <CheckboxField
-                  buttonProps={getInputProps(fields.is_active, {
-                    type: "checkbox",
-                  })}
-                  labelProps={{
-                    children: "Mark this as Active",
-                  }}
-                />
                 <CheckboxField
                   buttonProps={getInputProps(fields.is_pro_rata, {
                     type: "checkbox",
                   })}
                   labelProps={{
                     children: "Calculate on pro-rata basis",
+                  }}
+                />
+
+                <CheckboxField
+                  buttonProps={getInputProps(fields.is_overtime, {
+                    type: "checkbox",
+                  })}
+                  labelProps={{
+                    children: "Calculate on overtime basis",
                   }}
                 />
 

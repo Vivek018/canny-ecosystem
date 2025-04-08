@@ -189,7 +189,6 @@ export default function RunPayrollId() {
                       />
                     );
                   }
-
                   return (
                     <SalaryEntryComponent payrollData={payrollData} data={data} />
                   );

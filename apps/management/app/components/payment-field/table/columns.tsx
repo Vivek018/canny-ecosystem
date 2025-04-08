@@ -95,6 +95,15 @@ export const columns: ColumnDef<PaymentFieldDataType>[] = [
     },
   },
   {
+    accessorKey: "is_overtime",
+    header: "Is overtime",
+    cell: ({ row }) => {
+      return (
+        <p className="capitalize">{row.original?.is_overtime ? "Yes" : "No"}</p>
+      );
+    },
+  },
+  {
     id: "actions",
     enableSorting: false,
     enableHiding: false,

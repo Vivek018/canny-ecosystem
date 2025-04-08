@@ -3,9 +3,10 @@ import type {
   PayrollEntriesDatabaseInsert,
   PayrollEntriesDatabaseUpdate,
   SalaryEntriesDatabaseInsert,
+  SalaryEntriesDatabaseUpdate,
   TypedSupabaseClient,
 } from "../types";
-import { getPayrollById, getPayrollEntriesByPayrollId, getPayrollEntryById, getSalaryEntriesByPayrollAndEmployeeId, type ExitDataType, type ReimbursementDataType } from "../queries";
+import { getPayrollById, getPayrollEntriesByPayrollId, getPayrollEntryById, getSalaryEntriesByPayrollAndEmployeeId, getSalaryEntryById, type ExitDataType, type ReimbursementDataType } from "../queries";
 import { calculateSalaryTotalNetAmount, convertToNull, isGoodStatus } from "@canny_ecosystem/utils";
 
 // Salary Payroll
@@ -507,6 +508,67 @@ export async function deleteSalaryEntriesFromPayrollAndEmployeeId({
 
 
   return { status: 404, error: "No Salary Entries Found" };
+}
+
+export async function updateSalaryEntry({
+  supabase,
+  data,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  data: SalaryEntriesDatabaseUpdate;
+  bypassAuth?: boolean;
+}) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
+  const { data: salaryEntryData } = await getSalaryEntryById({ supabase, id: data?.id ?? "" });
+
+  const updateData = convertToNull(data);
+
+  const { error, status } = await supabase
+    .from("salary_entries")
+    .update(updateData)
+    .eq("id", data.id!);
+
+  if (isGoodStatus(status)) {
+
+    const { data: payrollData } = await getPayrollById({ supabase, payrollId: data?.payroll_id ?? "" });
+
+    let totalNetAmount = payrollData?.total_net_amount!;
+
+    if (salaryEntryData?.type === "earning") {
+      totalNetAmount -= salaryEntryData?.amount;
+    } else if (salaryEntryData?.type === "deduction" || salaryEntryData?.type === "statutory_contribution") {
+      totalNetAmount += salaryEntryData?.amount;
+    }
+
+    if (updateData?.type === "earning") {
+      totalNetAmount += updateData?.amount!;
+    } else if (updateData?.type === "deduction" || updateData?.type === "statutory_contribution") {
+      totalNetAmount -= updateData?.amount!;
+    }
+
+    await updatePayroll({
+      supabase, data: {
+        id: payrollData?.id,
+        total_net_amount: totalNetAmount,
+      }
+    })
+  }
+
+  if (error) {
+    console.error("updatePayrollEntry Error:", error);
+  }
+
+  return { status, error };
 }
 
 export async function updatePayrollEntry({
