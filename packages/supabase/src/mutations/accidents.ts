@@ -11,7 +11,7 @@ export async function createAccident({
   bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
-  data: AccidentsDatabaseInsert;
+  data: AccidentsDatabaseInsert[];
   bypassAuth?: boolean;
 }) {
   if (!bypassAuth) {

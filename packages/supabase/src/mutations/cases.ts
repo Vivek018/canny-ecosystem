@@ -11,7 +11,7 @@ export async function createCase({
   bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
-  data: CasesDatabaseInsert;
+  data: CasesDatabaseInsert[];
   bypassAuth?: boolean;
 }) {
   if (!bypassAuth) {
