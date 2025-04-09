@@ -11,9 +11,6 @@ type Props = {
 // make sure the order is same as header order
 export const ImportExitDataArray = [
   "employee_code",
-  "employee_name",
-  "project_name",
-  "project_site_name",
   "last_working_day",
   "reason",
   "final_settlement_date",

@@ -77,7 +77,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: submission.status === "error" ? 400 : 200 }
     );
   }
   const holidaysData = submission.value;
@@ -124,8 +124,8 @@ export default function AddHolidays({
         toast({
           title: "Error",
           description:
-            actionData?.error ||
             actionData?.error?.message ||
+            actionData?.error ||
             "Holiday update failed",
           variant: "destructive",
         });

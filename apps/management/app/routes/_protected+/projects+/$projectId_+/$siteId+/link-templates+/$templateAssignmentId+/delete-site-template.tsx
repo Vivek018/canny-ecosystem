@@ -61,8 +61,8 @@ export default function DeleteSiteLink() {
         toast({
           title: "Error",
           description:
-            actionData?.error ||
             actionData?.error?.message ||
+            actionData?.error ||
             actionData?.message,
           variant: "destructive",
         });

@@ -80,7 +80,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         projectData: null,
         companyOptions: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -99,7 +99,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -117,7 +117,7 @@ export async function action({
     }
     return json(
       { status: "error", message: "Project update failed", error },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json(
@@ -127,7 +127,7 @@ export async function action({
         error,
         data: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -154,8 +154,8 @@ export default function UpdateProject() {
         toast({
           title: "Error",
           description:
-            actionData?.error ||
             actionData?.error?.message ||
+            actionData?.error ||
             actionData?.message ||
             "Project update failed",
           variant: "destructive",

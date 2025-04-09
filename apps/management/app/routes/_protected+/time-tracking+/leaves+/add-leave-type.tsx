@@ -81,7 +81,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: submission.status === "error" ? 400 : 200 }
     );
   }
 
@@ -133,8 +133,8 @@ export default function AddLeaveType({
         toast({
           title: "Error",
           description:
-            actionData?.error ||
             actionData?.error?.message ||
+            actionData?.error ||
             "Leave Type update failed",
           variant: "destructive",
         });
@@ -187,7 +187,7 @@ export default function AddLeaveType({
               key={resetKey}
               className="capitalize"
               options={transformStringArrayIntoOptions(
-                leaveTypeArray as unknown as string[],
+                leaveTypeArray as unknown as string[]
               )}
               inputProps={{
                 ...getInputProps(fields.leave_type, { type: "text" }),

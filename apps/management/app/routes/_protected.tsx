@@ -15,19 +15,27 @@ import { useTheme } from "@/utils/theme";
 import { Header } from "@/components/header";
 import { clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { user: sessionUser } = await getSessionUser({ request });
+  const { supabase } = getSupabaseWithHeaders({ request });
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (user?.role === "supervisor") return redirect("/no-user-found");
 
   if (!sessionUser?.email) return redirect("/login");
 
-  const { supabase } = getSupabaseWithHeaders({ request });
-
-  const { data: userData, error: userError } = await getUserByEmail({ supabase, email: sessionUser.email });
+  const { data: userData, error: userError } = await getUserByEmail({
+    supabase,
+    email: sessionUser.email,
+  });
 
   if (!userData || userError) return redirect("/no-user-found");
 
-  const { data: companiesData, error: companiesError } = await getCompanies({ supabase });
+  const { data: companiesData, error: companiesError } = await getCompanies({
+    supabase,
+  });
 
   if (companiesError) console.error("Protected Companies", companiesError);
 
@@ -46,10 +54,10 @@ export default function ProtectedRoute() {
 
   return (
     <>
-      <Sidebar className='flex-none' theme={theme ?? "system"} user={user} />
-      <div className='flex max-h-screen flex-grow flex-col overflow-scroll ml-20'>
-        <Header className='px-4' companies={companies ?? []} />
-        <div className='h-full'>
+      <Sidebar className="flex-none" theme={theme ?? "system"} user={user} />
+      <div className="flex max-h-screen flex-grow flex-col overflow-scroll ml-20">
+        <Header className="px-4" companies={companies ?? []} />
+        <div className="h-full">
           <Outlet />
         </div>
       </div>

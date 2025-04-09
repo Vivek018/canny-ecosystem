@@ -79,7 +79,7 @@ export async function action({
 
   const formData = await parseMultipartFormData(
     request,
-    createMemoryUploadHandler({ maxPartSize: SIZE_1MB }),
+    createMemoryUploadHandler({ maxPartSize: SIZE_1MB })
   );
   const actionType = formData.get("_action") as string;
   const submission = parseWithZod(formData, { schema: currentSchema });
@@ -93,7 +93,7 @@ export async function action({
             message: "Form validation failed",
             returnTo: `/create-company?step=${step}`,
           },
-          { status: 400 },
+          { status: 400 }
         );
       }
 
@@ -117,7 +117,7 @@ export async function action({
             message: "Failed to create company",
             returnTo: "/companies",
           },
-          { status: 500 },
+          { status: 500 }
         );
       }
 
@@ -128,7 +128,7 @@ export async function action({
             message: "Failed to save company registration details",
             returnTo: DEFAULT_ROUTE,
           },
-          { status: 500 },
+          { status: 500 }
         );
       }
 
@@ -149,7 +149,7 @@ export async function action({
           {
             status: status,
             headers: headers,
-          },
+          }
         );
       }
     } else if (
@@ -168,7 +168,7 @@ export async function action({
             message: "Form validation failed",
             returnTo: `/create-company?step=${step}`,
           },
-          { status: 400 },
+          { status: 400 }
         );
       }
 
@@ -193,7 +193,7 @@ export async function action({
         message: `An unexpected error occurred${error}`,
         returnTo: "/companies",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 
@@ -229,8 +229,8 @@ export default function CreateCompany() {
         toast({
           title: "Error",
           description:
-            actionData?.error ||
             actionData?.error?.message ||
+            actionData?.error ||
             actionData?.message ||
             "Failed to create company",
           variant: "destructive",

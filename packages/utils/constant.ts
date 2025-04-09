@@ -142,6 +142,7 @@ export const attribute = {
   settingLocations: "setting_locations",
   settingRelationships: "setting_relationships",
   settingUsers: "setting_users",
+  settingDocuments: "setting_documents",
   feedbackList: "feedback_list",
   reports: "reports",
   approvals: "approvals",

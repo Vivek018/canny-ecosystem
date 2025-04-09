@@ -2,7 +2,11 @@ import { setCompanyId } from "@/utils/server/company.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { deleteCompany } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { deleteRole, hasPermission, isGoodStatus } from "@canny_ecosystem/utils";
+import {
+  deleteRole,
+  hasPermission,
+  isGoodStatus,
+} from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
@@ -11,7 +15,7 @@ import { useEffect } from "react";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { clearAllCache } from "@/utils/cache";
 import { DEFAULT_ROUTE } from "@/constant";
-import {deleteCompanyLogo} from "@canny_ecosystem/supabase/media"
+import { deleteCompanyLogo } from "@canny_ecosystem/supabase/media";
 
 export async function action({
   request,
@@ -31,7 +35,7 @@ export async function action({
       {
         status: 403,
         headers,
-      },
+      }
     );
   }
 
@@ -57,7 +61,7 @@ export async function action({
         {
           status: 200,
           headers,
-        },
+        }
       );
     }
 
@@ -65,12 +69,17 @@ export async function action({
       {
         status: "error",
         message: "Failed to delete company",
-        error: { message: error?.toString() },
+        error: {
+          message:
+            typeof error === "string"
+              ? error
+              : error?.message || "Unknown error",
+        },
       },
       {
         status: 500,
         headers,
-      },
+      }
     );
   } catch (error) {
     return json(
@@ -84,7 +93,7 @@ export async function action({
       {
         status: 500,
         headers,
-      },
+      }
     );
   }
 }
@@ -107,8 +116,8 @@ export default function DeleteCompany() {
         toast({
           title: "Error",
           description:
-            actionData?.error ||
             actionData?.error?.message ||
+            actionData?.error ||
             "Company delete failed",
           variant: "destructive",
         });

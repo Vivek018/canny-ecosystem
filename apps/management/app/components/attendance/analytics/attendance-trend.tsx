@@ -55,26 +55,26 @@ export function AttendanceTrend({
   }, [chartData]);
 
   return (
-    <Card className='overflow-hidden'>
-      <CardHeader className='flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row'>
-        <div className='flex flex-1 flex-col justify-center gap-1 px-6'>
+    <Card className="overflow-hidden">
+      <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
+        <div className="flex flex-1 flex-col justify-center gap-1 px-6">
           <CardTitle>Attendance Trend Over Time</CardTitle>
           <CardDescription>
             Showing total presents over the period.
           </CardDescription>
         </div>
-        <div className='flex'>
+        <div className="flex">
           {["presents"].map((key) => {
             const chart = key as keyof typeof chartConfig;
             return (
               <button
                 key={chart}
                 data-active={activeChart === chart}
-                className='flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-l sm:border-t-0 sm:px-8 sm:py-6'
+                className="flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-l sm:border-t-0 sm:px-8 sm:py-6"
                 onClick={() => setActiveChart(chart)}
-                type='button'
+                type="button"
               >
-                <span className='text-xs text-muted-foreground'>
+                <span className="text-xs text-muted-foreground">
                   {chartConfig[chart]?.label}
                 </span>
               </button>
@@ -82,10 +82,10 @@ export function AttendanceTrend({
           })}
         </div>
       </CardHeader>
-      <CardContent className='px-2 sm:px-6'>
+      <CardContent className="px-2 sm:px-6">
         <ChartContainer
           config={chartConfig}
-          className='aspect-auto h-[250px] w-full'
+          className="aspect-auto h-[250px] w-full"
         >
           <LineChart
             accessibilityLayer
@@ -97,7 +97,7 @@ export function AttendanceTrend({
           >
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey='date'
+              dataKey="date"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
@@ -112,8 +112,8 @@ export function AttendanceTrend({
             <ChartTooltip
               content={
                 <ChartTooltipContent
-                  className='w-[160px]'
-                  nameKey='presents'
+                  className="w-[160px]"
+                  nameKey="presents"
                   labelFormatter={(value) =>
                     new Date(value).toLocaleDateString("en-US", {
                       month: "short",
@@ -126,7 +126,7 @@ export function AttendanceTrend({
             />
             <Line
               dataKey={activeChart}
-              type='monotone'
+              type="monotone"
               stroke={chartConfig[activeChart].color}
               strokeWidth={2}
               dot={false}

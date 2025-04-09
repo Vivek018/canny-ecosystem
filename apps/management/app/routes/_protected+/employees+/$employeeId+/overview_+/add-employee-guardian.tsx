@@ -55,7 +55,7 @@ export async function action({
           message: "Invalid employee id",
           returnTo: "/employees",
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -66,7 +66,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -90,7 +90,7 @@ export async function action({
         error,
         returnTo: `/employees/${employeeId}`,
       },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json({
@@ -128,7 +128,7 @@ export default function AddEmployeeGuardian() {
     if (actionData) {
       if (actionData?.status === "success") {
         clearExactCacheEntry(
-          `${cacheKeyPrefix.employee_overview}${employeeId}`,
+          `${cacheKeyPrefix.employee_overview}${employeeId}`
         );
         toast({
           title: "Success",
@@ -139,8 +139,8 @@ export default function AddEmployeeGuardian() {
         toast({
           title: "Error",
           description:
-            actionData?.error ||
             actionData?.error?.message ||
+            actionData?.error ||
             actionData?.message,
           variant: "destructive",
         });

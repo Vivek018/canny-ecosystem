@@ -24,6 +24,7 @@ import {
   AttendanceDataSchema,
   attendanceHolidayTypeArray,
   attendanceWorkShiftArray,
+  deleteRole,
   getInitialValueFromZod,
   getValidDateForInput,
   hasPermission,
@@ -52,6 +53,7 @@ import {
 } from "@remix-run/react";
 import { useState } from "react";
 import { clearCacheEntry } from "@/utils/cache";
+import { useUser } from "@/utils/user";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
@@ -95,7 +97,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: submission.status === "error" ? 400 : 200 }
     );
   }
   const attendanceData = submission.value;
@@ -122,6 +124,7 @@ export async function action({
 }
 
 export default function UpdateAttendance() {
+  const { role } = useUser();
   const submit = useSubmit();
 
   const actionData = useActionData<typeof action>();
@@ -180,7 +183,7 @@ export default function UpdateAttendance() {
         method: "post",
         action: `/employees/${employeeId}/attendance/${date}/delete-attendance`,
         replace: true,
-      },
+      }
     );
   };
 
@@ -261,7 +264,7 @@ export default function UpdateAttendance() {
                 key={resetKey}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  attendanceWorkShiftArray as unknown as string[],
+                  attendanceWorkShiftArray as unknown as string[]
                 )}
                 inputProps={{
                   ...getInputProps(fields.working_shift, { type: "text" }),
@@ -276,7 +279,7 @@ export default function UpdateAttendance() {
                 key={resetKey + 1}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  attendanceHolidayTypeArray as unknown as string[],
+                  attendanceHolidayTypeArray as unknown as string[]
                 )}
                 inputProps={{
                   ...getInputProps(fields.holiday_type, { type: "text" }),
@@ -293,12 +296,20 @@ export default function UpdateAttendance() {
         <div
           className={cn(
             "flex  pb-0 h-10",
-            updatableData ? "justify-between" : "justify-end",
+            updatableData ? "justify-between" : "justify-end"
           )}
         >
           {updatableData && (
             <Button
-              className="h-10"
+              className={
+                cn(
+                  "h-10",
+                  !hasPermission(
+                    role,
+                    `${deleteRole}:${attribute.employeeAddresses}`
+                  )
+                ) && "hidden"
+              }
               variant={"destructive-outline"}
               onClick={handleDelete}
             >
@@ -306,7 +317,7 @@ export default function UpdateAttendance() {
             </Button>
           )}
           <FormButtons
-            className="mr-[-29px] pb-0"
+            className="mr-[-29px] pb-0 relative left-52"
             form={form}
             setResetKey={setResetKey}
             isSingle={true}

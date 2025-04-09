@@ -1,6 +1,7 @@
 import { ThemeSwitch } from "@/components/theme-switch";
 import { DEFAULT_ROUTE } from "@/constant";
 import { safeRedirect } from "@/utils/server/http.server";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { useTheme } from "@/utils/theme";
 import { getSessionUser } from "@canny_ecosystem/supabase/cached-queries";
 import { getUserByEmail } from "@canny_ecosystem/supabase/queries";
@@ -14,6 +15,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { user: sessionUser } = await getSessionUser({ request });
 
   const { supabase } = getSupabaseWithHeaders({ request });
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+  if (user?.role === "supervisor") return{};
 
   if (sessionUser?.email) {
     const { data: userData, error: userError } = await getUserByEmail({

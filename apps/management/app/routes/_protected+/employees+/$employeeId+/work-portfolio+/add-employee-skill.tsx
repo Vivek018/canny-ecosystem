@@ -106,7 +106,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -184,7 +184,7 @@ export default function AddEmployeeSkill({
     }
     if (actionData) {
       clearExactCacheEntry(
-        `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`,
+        `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
       );
       if (actionData.status === "success") {
         toast({
@@ -197,8 +197,8 @@ export default function AddEmployeeSkill({
         toast({
           title: "Error",
           description:
-            actionData?.error ||
             actionData?.error?.message ||
+            actionData?.error ||
             actionData?.message,
           variant: "destructive",
         });
@@ -235,7 +235,7 @@ export default function AddEmployeeSkill({
                   ...getInputProps(fields.skill_name, { type: "text" }),
                   autoFocus: true,
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.skill_name.name,
+                    fields.skill_name.name
                   )}`,
                   className: "capitalize",
                 }}
@@ -248,7 +248,7 @@ export default function AddEmployeeSkill({
                 key={resetKey}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  proficiencyArray as unknown as string[],
+                  proficiencyArray as unknown as string[]
                 )}
                 inputProps={{
                   ...getInputProps(fields.proficiency, { type: "text" }),
@@ -266,7 +266,7 @@ export default function AddEmployeeSkill({
                   }),
                   autoFocus: true,
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.years_of_experience.name,
+                    fields.years_of_experience.name
                   )}`,
                   className: "capitalize",
                 }}

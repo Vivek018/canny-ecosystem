@@ -79,7 +79,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
     `${cacheKeyPrefix.feedback_list}${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 
@@ -96,8 +96,8 @@ function FeedbackCard({ feedback }: { feedback: any }) {
             feedback.severity === "urgent"
               ? "text-destructive"
               : feedback.severity === "normal"
-                ? "text-purple-500"
-                : "text-yellow-400",
+              ? "text-purple-500"
+              : "text-yellow-400"
           )}
         >
           {feedback.severity}
@@ -191,6 +191,11 @@ export default function FeedbackList() {
                       <FeedbackCard key={feedback.id} feedback={feedback} />
                     ))}
                   </div>
+                    {feedbackResult?.data.length === 0 && (
+                      <div className="flex  justify-center items-center w-full h-full text-lg">
+                        No feedbacks found
+                      </div>
+                    )}
                   <PaginationButton
                     page={page}
                     totalCount={feedbackResult?.totalCount ?? 0}

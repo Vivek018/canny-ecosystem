@@ -28,6 +28,7 @@ import {
 } from "@remix-run/react";
 import { Suspense } from "react";
 import {
+  createRole,
   deleteRole,
   hasPermission,
   readRole,
@@ -263,7 +264,15 @@ export default function LeavesIndex() {
                   {(data?.length ?? 0) < 5 && (
                     <Card
                       className="h-28 bg-muted/40 dark:bg-muted/80 cursor-pointer grid place-items-center"
-                      onClick={() => navigate("add-leave-type")}
+                      onClick={() => {
+                        if (
+                          hasPermission(
+                            role,
+                            `${createRole}:${attribute.leaves}`
+                          )
+                        )
+                          navigate("add-leave-type");
+                      }}
                     >
                       <Icon
                         name="plus"

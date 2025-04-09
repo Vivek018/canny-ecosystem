@@ -65,8 +65,8 @@ export const zImage = z
 export const zFile = z
   .any()
   .refine(
-    (file) => (typeof file !== "string" ? file.size < SIZE_1MB * 2 : true),
-    "File size must be less than 2MB"
+    (file) => (typeof file !== "string" ? file.size < SIZE_1MB : true),
+    "File size must be less than 1MB"
   )
   .refine(
     (file) =>
@@ -1180,12 +1180,7 @@ export const payrollPaymentStatusArray = [
 
 // Payroll
 
-export const payrollTypesArray = [
-  "reimbursement",
-  "exit",
-  "salary",
-  "others",
-] ;
+export const payrollTypesArray = ["reimbursement", "exit", "salary", "others"];
 
 export const PayrollEntrySchema = z.object({
   id: z.string().optional(),
