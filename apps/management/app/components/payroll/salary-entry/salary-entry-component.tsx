@@ -133,14 +133,15 @@ export function SalaryEntryComponent({
           className={cn(payrollData?.status === "pending" && "hidden")}
           payrollId={payrollId ?? payrollData?.id}
           data={data as unknown as any}
-          env={env}
+          env={env as SupabaseEnv}
           payrollData={payrollData}
         />
       </div>
+
       <SalaryEntryDataTable
         data={tableData}
         columns={salaryEntryColumns({
-          salaryEntries: data[0]?.salary_entries || [],
+          salaryEntries: data[0].salary_entries,
           editable: payrollData?.status === "pending",
         })}
       />

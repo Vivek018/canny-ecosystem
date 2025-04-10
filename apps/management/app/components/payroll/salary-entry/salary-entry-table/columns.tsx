@@ -1,6 +1,11 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
-import { deleteRole, getMonthNameFromNumber, hasPermission, updateRole } from "@canny_ecosystem/utils";
+import {
+  deleteRole,
+  getMonthNameFromNumber,
+  hasPermission,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
@@ -12,13 +17,21 @@ import type { SalaryEntriesDatabaseRow } from "@canny_ecosystem/supabase/types";
 import type { SalaryEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
 import { SalaryEntrySheet } from "./salary-entry-sheet";
 
-export const salaryEntryColumns = ({ salaryEntries, editable = false }: { salaryEntries: Omit<SalaryEntriesDatabaseRow, "created_at" | "updated_at">[], editable?: boolean }): ColumnDef<SalaryEntriesWithEmployee>[] => [
+export const salaryEntryColumns = ({
+  salaryEntries,
+  editable = false,
+}: {
+  salaryEntries: Omit<SalaryEntriesDatabaseRow, "created_at" | "updated_at">[];
+  editable?: boolean;
+}): ColumnDef<SalaryEntriesWithEmployee>[] => [
   {
     accessorKey: "employee_code",
     header: "Employee Code",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-28">{`${row.original?.employee_code ?? "--"}`}</p>
+        <p className="truncate w-28">{`${
+          row.original?.employee_code ?? "--"
+        }`}</p>
       );
     },
   },
@@ -27,9 +40,9 @@ export const salaryEntryColumns = ({ salaryEntries, editable = false }: { salary
     header: "Employee Name",
     cell: ({ row }) => {
       return (
-        <p className="truncate capitalize w-48">{`${row.original?.first_name
-          } ${row.original?.middle_name ?? ""} ${row.original?.last_name ?? ""
-          }`}</p>
+        <p className="truncate capitalize w-48">{`${row.original?.first_name} ${
+          row.original?.middle_name ?? ""
+        } ${row.original?.last_name ?? ""}`}</p>
       );
     },
   },
@@ -38,7 +51,9 @@ export const salaryEntryColumns = ({ salaryEntries, editable = false }: { salary
     header: "P. Days",
     cell: ({ row }) => {
       return (
-        <p className="truncate">{row.original.salary_entries[0].present_days}</p>
+        <p className="truncate">
+          {row.original.salary_entries[0].present_days}
+        </p>
       );
     },
   },
@@ -47,7 +62,9 @@ export const salaryEntryColumns = ({ salaryEntries, editable = false }: { salary
     header: "OT Hours",
     cell: ({ row }) => {
       return (
-        <p className="truncate">{row.original.salary_entries[0].overtime_hours}</p>
+        <p className="truncate">
+          {row.original.salary_entries[0].overtime_hours}
+        </p>
       );
     },
   },
@@ -56,7 +73,10 @@ export const salaryEntryColumns = ({ salaryEntries, editable = false }: { salary
     header: "Period",
     cell: ({ row }) => {
       return (
-        <p className="truncate">{getMonthNameFromNumber(row.original.salary_entries[0].month, true)}{" "}{row.original.salary_entries[0].year}</p>
+        <p className="truncate">
+          {getMonthNameFromNumber(row.original.salary_entries[0].month, true)}{" "}
+          {row.original.salary_entries[0].year}
+        </p>
       );
     },
   },
@@ -64,8 +84,32 @@ export const salaryEntryColumns = ({ salaryEntries, editable = false }: { salary
     accessorKey: salaryEntry.template_component_id ?? salaryEntry.field_name,
     header: salaryEntry.field_name,
     cell: ({ row }: { row: any }) => {
+      const entry = row.original.salary_entries.find(
+        (e: { template_component_id: string | null }) =>
+          e.template_component_id === salaryEntry.template_component_id
+      );
+
       return (
-        <SalaryEntrySheet editable={editable} employee={row.original} salaryEntry={salaryEntry} triggerChild={<p className={cn("truncate", "hover:opacity-80 focus:opacity-80", "dark:hover:opacity-100 dark:focus:opacity-100 dark:hover:brightness-125 dark:focus:brightness-125", salaryEntry.type === "earning" && "text-green", (salaryEntry.type === "deduction" || salaryEntry.type === "statutory_contribution") && "text-destructive")}>{salaryEntry.amount}</p>} />
+        <SalaryEntrySheet
+          editable={editable}
+          employee={row.original}
+          salaryEntry={salaryEntry}
+          triggerChild={
+            <p
+              className={cn(
+                "truncate",
+                "hover:opacity-80 focus:opacity-80",
+                "dark:hover:opacity-100 dark:focus:opacity-100 dark:hover:brightness-125 dark:focus:brightness-125",
+                salaryEntry.type === "earning" && "text-green",
+                (salaryEntry.type === "deduction" ||
+                  salaryEntry.type === "statutory_contribution") &&
+                  "text-destructive"
+              )}
+            >
+              {entry?.amount ?? "--"}
+            </p>
+          }
+        />
       );
     },
   })),
@@ -73,23 +117,30 @@ export const salaryEntryColumns = ({ salaryEntries, editable = false }: { salary
     accessorKey: "actions",
     cell: ({ row }) => {
       const { role } = useUser();
-      return <SalaryEntryDropdown data={row.original} triggerChild={<DropdownMenuTrigger
-        asChild
-        className={cn(
-          "flex",
-          !hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
-          !hasPermission(
-            role,
-            `${deleteRole}:${attribute.employees}`
-          ) &&
-          "hidden",
-        )}
-      >
-        <Button variant="ghost" className="h-8 w-8 p-0">
-          <span className="sr-only">Open menu</span>
-          <Icon name="dots-vertical" />
-        </Button>
-      </DropdownMenuTrigger>} />
-    }
-  }
+      return (
+        <SalaryEntryDropdown
+          data={row.original}
+          triggerChild={
+            <DropdownMenuTrigger
+              asChild
+              className={cn(
+                "flex",
+                !hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
+                  !hasPermission(
+                    role,
+                    `${deleteRole}:${attribute.employees}`
+                  ) &&
+                  "hidden"
+              )}
+            >
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <Icon name="dots-vertical" />
+              </Button>
+            </DropdownMenuTrigger>
+          }
+        />
+      );
+    },
+  },
 ];

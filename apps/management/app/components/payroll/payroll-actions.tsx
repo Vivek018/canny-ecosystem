@@ -70,10 +70,10 @@ export function PayrollActions({
             />
           </Button>
           <Button variant={"ghost"}>
-            <DownloadEsiFormat env={env} />
+            <DownloadEsiFormat env={env} data={data}/>
           </Button>
           <Button variant={"ghost"}>
-            <DownloadEpfFormat env={env} />
+            <DownloadEpfFormat env={env} data={data}/>
           </Button>
         </div>
 

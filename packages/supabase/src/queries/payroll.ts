@@ -146,7 +146,6 @@ export async function getSalaryEntriesByPayrollId({
   supabase: TypedSupabaseClient;
   payrollId: string;
 }) {
-  console.log("Backend Id", payrollId);
   
   const columns = [
     "id",
@@ -182,7 +181,6 @@ export async function getSalaryEntriesByPayrollId({
   if (error) {
     console.error("getSalaryEntriesByPayrollId Error", error);
   }
-  console.log("Backend Data", data);
 
   return { data, error };
 }

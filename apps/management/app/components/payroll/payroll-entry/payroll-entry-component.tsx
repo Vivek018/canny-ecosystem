@@ -39,7 +39,6 @@ export function PayrollEntryComponent({
   noButtons?: boolean;
   env: SupabaseEnv;
 }) {
-  console.log("hello");
   
   const payrollCardDetails = [
     { title: "Payroll Type", value: "payroll_type" },
@@ -55,7 +54,6 @@ export function PayrollEntryComponent({
     payrollData.payroll_type === "salary"
       ? payrollCardDetails.filter((_, index) => index !== 2)
       : payrollCardDetails;
-  console.log("===>", updatedPayrollCardDetails);
 
   const { role } = useUser();
   const { payrollId } = useParams();

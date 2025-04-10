@@ -21,10 +21,7 @@ import type {
 } from "@canny_ecosystem/supabase/types";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
-import {
-  getEmployeeBankDetailsById,
-  type PayrollEntriesWithEmployee,
-} from "@canny_ecosystem/supabase/queries";
+import { getEmployeeBankDetailsById } from "@canny_ecosystem/supabase/queries";
 
 export const prepareBankAdviceWorkbook = async ({
   data,
@@ -150,16 +147,50 @@ export const DownloadBankAdvice = ({
   payrollData,
 }: {
   env: SupabaseEnv;
-  data: PayrollEntriesWithEmployee[];
+  data: any[];
   payrollData: Omit<PayrollDatabaseRow, "created_at" | "updated_at">;
 }) => {
   const { supabase } = useSupabase({ env });
 
+  function transformSalaryData(data: any) {
+    const earningsFields = ["BASIC", "BONUS", "HRA", "Others"];
+    const deductionsFields = ["EPF", "ESI", "LWF", "PT"];
+
+    return data.map((emp: any) => {
+      const earnings = emp.salary_entries
+        .filter((e: { field_name: string; amount: number }) =>
+          earningsFields.includes(e.field_name)
+        )
+        .reduce((sum: number, e: { amount: number }) => sum + e.amount, 0);
+
+      const deductions = emp.salary_entries
+        .filter((e: { field_name: string; amount: number }) =>
+          deductionsFields.includes(e.field_name)
+        )
+        .reduce((sum: number, e: { amount: number }) => sum + e.amount, 0);
+
+      return {
+        amount: earnings - deductions,
+        employee_id: emp.id,
+        employees: {
+          company_id: emp.company_id,
+          employee_code: emp.employee_code,
+          first_name: emp.first_name,
+          middle_name: emp.middle_name,
+          last_name: emp.last_name,
+        },
+      };
+    });
+  }
+  
   const generateBankAdviceExcel = async (selectedRows: any[]) => {
     if (!selectedRows.length) return;
 
     const workbook = await prepareBankAdviceWorkbook({
-      data,
+      data:
+        payrollData.payroll_type === "salary"
+          ? transformSalaryData(data)
+          : data,
       supabase,
       payrollType: payrollData.payroll_type,
     });
@@ -175,9 +206,7 @@ export const DownloadBankAdvice = ({
   return (
     <AlertDialog>
       <AlertDialogTrigger
-        className={cn(
-          "w-full flex items-center justify-start  gap-2"
-        )}
+        className={cn("w-full flex items-center justify-start  gap-2")}
       >
         <Icon name="import" />
         <p>Download Bank Advice</p>

@@ -16,79 +16,44 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { formatDateTime } from "@canny_ecosystem/utils";
 import type {
   SupabaseEnv,
+  TypedSupabaseClient,
 } from "@canny_ecosystem/supabase/types";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
-const data = [
-  {
-    ip_number: "2017702958",
-    ip_name: "Rakesh Kumar",
-    days: 30,
-    wages: 19500,
-    code: 0,
-    last_day: null,
-  },
-  {
-    ip_number: "2017702971",
-    ip_name: "Deepak Singh",
-    days: 30,
-    wages: 19800,
-    code: 0,
-    last_day: null,
-  },
-  {
-    ip_number: "2017703002",
-    ip_name: "Ajay Narang",
-    days: 29,
-    wages: 15113,
-    code: 0,
-    last_day: null,
-  },
-  {
-    ip_number: "2017702959",
-    ip_name: "Prem Prakash",
-    days: 30,
-    wages: 18000,
-    code: 0,
-    last_day: null,
-  },
-  {
-    ip_number: "2017702972",
-    ip_name: "Deepak",
-    days: 30,
-    wages: 18000,
-    code: 0,
-    last_day: null,
-  },
-  {
-    ip_number: "2017703003",
-    ip_name: "Rajnish Singh",
-    days: 30,
-    wages: 16000,
-    code: 0,
-    last_day: null,
-  },
-  {
-    ip_number: "2017702961",
-    ip_name: "Dilawar Singh",
-    days: 0,
-    wages: 0,
-    code: 2,
-    last_day: "31-08-2021",
-  },
-  {
-    ip_number: "2017703008",
-    ip_name: "Sonu",
-    days: 0,
-    wages: 0,
-    code: 1,
-    last_day: null,
-  },
-];
+import { getEmployeeStatutoryDetailsById } from "@canny_ecosystem/supabase/queries";
 
-export const prepareEsiFormatWorkbook = async () => {
+export const prepareEsiFormatWorkbook = async ({
+  data,
+  supabase,
+}: {
+  data: any[];
+  supabase: TypedSupabaseClient;
+}) => {
+  const statutoryDetailsResults = await Promise.all(
+    data.map(({ employee_id }) =>
+      getEmployeeStatutoryDetailsById({ id: employee_id, supabase })
+    )
+  );
+
+  const updatedData = data.map((entry, index) => ({
+    ...entry,
+    statutoryDetails: statutoryDetailsResults[index]?.data || null,
+  }));
+
+  const extractedData = updatedData.map((formatData) => ({
+    wages: formatData?.amount,
+    ip_number: formatData?.statutoryDetails?.esic_number || null,
+    ip_name:
+      `${formatData?.employees?.first_name} ${
+        formatData?.employees?.middle_name || ""
+      } ${formatData?.employees?.last_name}` || null,
+    days: formatData?.presentDays || 0,
+    code: null,
+    last_day: null,
+  }));
+
   const workbook = new ExcelJS.Workbook();
-  const worksheet = workbook.addWorksheet("Bank Advice");
+  const worksheet = workbook.addWorksheet("ESI Format");
 
   const headerRow = worksheet.addRow([
     "IP Number",
@@ -123,7 +88,7 @@ export const prepareEsiFormatWorkbook = async () => {
   for (let col = 0; col < columnWidths.length; col++) {
     worksheet.getColumn(col + 1).width = columnWidths[col];
   }
-  for (const emp of data) {
+  for (const emp of extractedData) {
     const row = [
       emp.ip_number || null,
       emp.ip_name || null,
@@ -144,11 +109,47 @@ export const prepareEsiFormatWorkbook = async () => {
   return await workbook.xlsx.writeBuffer();
 };
 
-export const DownloadEsiFormat = ({ env }: { env: SupabaseEnv }) => {
+export const DownloadEsiFormat = ({
+  env,
+  data,
+}: {
+  env: SupabaseEnv;
+  data: any[];
+}) => {
   const { supabase } = useSupabase({ env });
 
+  function transformSalaryData(data: any) {
+    const earningsFields = ["BASIC", "BONUS", "HRA", "Others"];
+    return data.map((emp: any) => {
+      const earnings = emp.salary_entries
+        .filter((e: { field_name: string; amount: number }) =>
+          earningsFields.includes(e.field_name)
+        )
+        .reduce((sum: number, e: { amount: number }) => sum + e.amount, 0);
+      const presentDays =
+        emp.salary_entries.length > 0
+          ? emp.salary_entries[0].present_days
+          : null;
+      return {
+        amount: earnings,
+        presentDays: presentDays,
+        employee_id: emp.id,
+        employees: {
+          company_id: emp.company_id,
+          employee_code: emp.employee_code,
+          first_name: emp.first_name,
+          middle_name: emp.middle_name,
+          last_name: emp.last_name,
+        },
+      };
+    });
+  }
+
   const generateEsiFormatExcel = async () => {
-    const workbook = await prepareEsiFormatWorkbook();
+    const workbook = await prepareEsiFormatWorkbook({
+      data: transformSalaryData(data),
+      supabase,
+    });
     if (!workbook) return;
     saveAs(
       new Blob([workbook], {

@@ -218,7 +218,6 @@ export default function RunPayrollId() {
                       />
                     );
                   }
-                  console.log("Issue",data);
 
                   return (
                     <SalaryEntryComponent
