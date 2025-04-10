@@ -4,7 +4,7 @@ import { Input } from "@canny_ecosystem/ui/input";
 import { Outlet, useNavigation, useParams, useSubmit } from "@remix-run/react";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useState, useEffect } from "react";
-import { PayrollActions } from "./payroll-actions";
+import { PayrollActions } from "../payroll-actions";
 import type { PayrollEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
 import type {
   PayrollDatabaseRow,
@@ -67,8 +67,13 @@ export function PayrollEntryComponent({
   const [tableData, setTableData] = useState(data);
 
   useEffect(() => {
+<<<<<<< HEAD:apps/management/app/components/payroll/payroll-entry-component.tsx
     const filteredData = data?.filter((item: any) =>
       searchInObject(item, searchString)
+=======
+    const filteredData = data?.filter((item) =>
+      searchInObject(item, searchString),
+>>>>>>> dev:apps/management/app/components/payroll/payroll-entry/payroll-entry-component.tsx
     );
 
     setTableData(filteredData);

@@ -38,7 +38,7 @@ import {
   getSelectedPaymentComponentFromField,
   getValueforEPF,
   getValueforESI,
-} from "@/utils/payment";
+} from "@canny_ecosystem/utils";
 import { usePaymentComponentsStore } from "@/store/payment-components";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";

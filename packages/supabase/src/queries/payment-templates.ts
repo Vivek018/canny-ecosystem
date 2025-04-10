@@ -108,7 +108,7 @@ export async function getPaymentTemplateComponentsByTemplateId({
     .from("payment_template_components")
     .select(
       `${columns.join(",")}, 
-      payment_fields(id, name, amount, payment_type, calculation_type, is_pro_rata, consider_for_epf, consider_for_esic), 
+      payment_fields(id, name, amount, payment_type, calculation_type, is_pro_rata, consider_for_epf, consider_for_esic, is_overtime), 
       employee_provident_fund(id, epf_number, deduction_cycle, employee_contribution, employer_contribution, employee_restrict_value, employer_restrict_value, include_employer_edli_contribution, edli_restrict_value, restrict_employee_contribution, restrict_employer_contribution, include_admin_charges, company_id, include_employer_contribution, is_default), 
       employee_state_insurance(id, esi_number, deduction_cycle, employee_contribution, employer_contribution, max_limit, include_employer_contribution, company_id), 
       professional_tax(id, pt_number, deduction_cycle, state, gross_salary_range), 
@@ -230,6 +230,7 @@ export type PaymentTemplateComponentType = Omit<
     | "is_pro_rata"
     | "consider_for_epf"
     | "consider_for_esic"
+    | "is_overtime"
   >;
   employee_provident_fund: Pick<
     EmployeeProvidentFundDatabaseRow,

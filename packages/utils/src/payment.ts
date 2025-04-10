@@ -8,6 +8,7 @@ import type {
   LabourWelfareFundDatabaseRow,
   PaymentTemplateComponentDatabaseRow,
   ProfessionalTaxDatabaseRow,
+  SalaryEntriesDatabaseUpdate,
 } from "@canny_ecosystem/supabase/types";
 import {
   componentTypeArray,
@@ -38,7 +39,7 @@ export function getSelectedPaymentComponentFromField<
 }) {
   if (!field) return null;
 
-  let calculationValue = null;
+  let calculationValue: number | null = null;
 
   if (field.payment_type === "fixed") {
     if (field.calculation_type === "fixed" && field.amount) {
@@ -223,7 +224,7 @@ export function getBonusComponentFromField<T extends StatutoryBonusDataType>({
 }) {
   if (!field) return null;
 
-  let calculationValue = null;
+  let calculationValue: number | null = null;
 
   if (field.percentage) {
     calculationValue = (field.percentage * value) / 100;
@@ -311,4 +312,16 @@ export function calculateProRataAmount({
   const proRataAmount = (baseAmount / totalWorkingDays) * presentDays;
   const overtimeAmount = overtimeHours * overtimeRate;
   return Number.parseFloat((proRataAmount + overtimeAmount).toFixed(3));
+}
+
+export function calculateSalaryTotalNetAmount(salaryData: SalaryEntriesDatabaseUpdate[]): number {
+  return salaryData.reduce((total, entry) => {
+    if (entry.type === "earning" || entry.type === "bonus") {
+      return total + (entry?.amount ?? 0);
+    }
+    if (entry.type === "deduction" || entry.type === "statutory_contribution") {
+      return total - (entry?.amount ?? 0);
+    }
+    return total;
+  }, 0);
 }

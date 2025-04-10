@@ -19,7 +19,7 @@ import { TableCell, TableRow } from "@canny_ecosystem/ui/table";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { flexRender } from "@tanstack/react-table";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { FormButtons } from "../../form/form-buttons";
+import { FormButtons } from "../../../form/form-buttons";
 import type { PayrollEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
 import { PayrollEntrySchema, payrollPaymentStatusArray, replaceUnderscore, transformStringArrayIntoOptions } from "@canny_ecosystem/utils";
 import { useState } from "react";

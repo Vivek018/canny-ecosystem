@@ -1,12 +1,14 @@
 import { ErrorBoundary } from "@/components/error-boundary";
 import { LoadingSpinner } from "@/components/loading-spinner";
-import { PayrollEntryComponent } from "@/components/payroll/payroll-entry-component";
+import { PayrollEntryComponent } from "@/components/payroll/payroll-entry/payroll-entry-component";
+import { SalaryEntryComponent } from "@/components/payroll/salary-entry/salary-entry-component";
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { updatePayroll } from "@canny_ecosystem/supabase/mutations";
 import {
   getPayrollById,
   getPayrollEntriesByPayrollId,
+  getSalaryEntriesByPayrollId,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type {
@@ -41,15 +43,21 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       supabase,
       payrollId: payrollId ?? "",
     });
+    const salaryEntriesPromise = getSalaryEntriesByPayrollId({
+      supabase,
+      payrollId: payrollId ?? "",
+    });
     const payrollEntriesPromise = getPayrollEntriesByPayrollId({
       supabase,
       payrollId: payrollId ?? "",
     });
-    return defer({ payrollPromise, payrollEntriesPromise, env, error: null });
+
+    return defer({ payrollPromise, salaryEntriesPromise, payrollEntriesPromise, error: null });
   } catch (error) {
     console.error("Payroll Id Index Error", error);
     return defer({
       payrollPromise: Promise.resolve({ data: null, error: null }),
+      salaryEntriesPromise: Promise.resolve({ data: null, error: null }),
       payrollEntriesPromise: Promise.resolve({ data: null, error: null }),
       error,
       env: null,
@@ -117,7 +125,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export default function RunPayrollId() {
-  const { payrollPromise, payrollEntriesPromise, env } =
+  const { payrollPromise, salaryEntriesPromise,payrollEntriesPromise } =
     useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
@@ -163,35 +171,48 @@ export default function RunPayrollId() {
               />
             );
           }
-          return (
-            <Await resolve={payrollEntriesPromise}>
-              {({ data, error }) => {
-                if (error || !data) {
-                  clearExactCacheEntry(
-                    `${cacheKeyPrefix.run_payroll_id}${payrollId}`
-                  );
-                  return (
-                    <ErrorBoundary
-                      error={error}
-                      message="Failed to load Payroll Entries in Run Payroll"
-                    />
-                  );
-                }
+          if (payrollData.payroll_type === "reimbursement" || payrollData.payroll_type === "exit") {
+            return (
+              <Await resolve={payrollEntriesPromise}>
+                {({ data, error }) => {
+                  if (error || !data) {
+                    clearExactCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
+                    return (
+                      <ErrorBoundary
+                        error={error}
+                        message="Failed to load Payroll Entries in Run Payroll"
+                      />
+                    );
+                  }
 
-                if (
-                  payrollData.payroll_type === "reimbursement" ||
-                  payrollData.payroll_type === "exit"
-                )
                   return (
-                    <PayrollEntryComponent
-                      payrollData={payrollData}
-                      data={data}
-                      env={env as unknown as SupabaseEnv}
-                    />
+                    <PayrollEntryComponent payrollData={payrollData} data={data} />
                   );
-              }}
-            </Await>
-          );
+
+                }}
+              </Await>
+            );
+          }
+          if (payrollData.payroll_type === "salary") {
+            return (
+              <Await resolve={salaryEntriesPromise}>
+                {({ data, error }) => {
+                  if (error || !data) {
+                    clearExactCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
+                    return (
+                      <ErrorBoundary
+                        error={error}
+                        message="Failed to load Salary Entries in Run Payroll"
+                      />
+                    );
+                  }
+                  return (
+                    <SalaryEntryComponent payrollData={payrollData} data={data} />
+                  );
+                }}
+              </Await>
+            );
+          }
         }}
       </Await>
     </Suspense>

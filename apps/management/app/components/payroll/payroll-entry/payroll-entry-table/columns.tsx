@@ -16,7 +16,7 @@ export const payrollEntryColumns: ColumnDef<PayrollEntriesWithEmployee>[] = [
     header: "Employee Code",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-28 text-primary">{`${row.original?.employees.employee_code ?? "--"}`}</p>
+        <p className="truncate w-28 text-primary">{`${row.original?.employees?.employee_code ?? "--"}`}</p>
       );
     },
   },

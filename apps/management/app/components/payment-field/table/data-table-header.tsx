@@ -18,6 +18,7 @@ export const paymentFieldsColumnIdArray = [
   "consider_for_epf",
   "consider_for_esic",
   "is_pro_rata",
+  "is_overtime",
 ];
 
 export function DataTableHeader({ table, className, loading }: Props) {

@@ -4,8 +4,8 @@ import type {
   InferredType,
   TypedSupabaseClient,
   PayrollEntriesDatabaseRow,
-  PaymentTemplateComponentDatabaseRow,
   EmployeeDatabaseRow,
+  SalaryEntriesDatabaseRow,
 } from "../types";
 
 export type ImportPayrollDataType = Pick<
@@ -112,25 +112,121 @@ export async function getPayrollById({
   return { data, error };
 }
 
-export type PayrollEntriesWithTemplateComponents = Pick<
-  PayrollEntriesDatabaseRow,
-  "id" | "employee_id" | "payment_status" | "amount"
-> & {
-  payment_template_components: Pick<
-    PaymentTemplateComponentDatabaseRow,
-    "id" | "target_type" | "calculation_value"
-  >;
-};
 
-export type PayrollEntriesWithEmployee = Omit<
-  PayrollEntriesDatabaseRow,
-  "created_at" | "updated_at"
-> & {
-  employees: Pick<
-    EmployeeDatabaseRow,
-    "first_name" | "middle_name" | "last_name" | "employee_code"
-  >;
-};
+export type PayrollEntriesWithEmployee = Omit<PayrollEntriesDatabaseRow, "created_at" | "updated_at"> & { employees: Pick<EmployeeDatabaseRow, "first_name" | "middle_name" | "last_name" | "employee_code" | "company_id" | "id"> }
+
+export type SalaryEntriesWithEmployee = Pick<EmployeeDatabaseRow, "first_name" | "middle_name" | "last_name" | "employee_code" | "company_id" | "id"> & { salary_entries: Omit<SalaryEntriesDatabaseRow, "created_at" | "updated_at">[] }
+
+export async function getSalaryEntriesByPayrollId({
+  supabase,
+  payrollId,
+}: {
+  supabase: TypedSupabaseClient;
+  payrollId: string;
+}) {
+  const columns = [
+    "id",
+    "month",
+    "year",
+    "present_days",
+    "overtime_hours",
+    "employee_id",
+    "template_component_id",
+    "payroll_id",
+    "field_name",
+    "type",
+    "amount",
+    "is_pro_rata",
+    "consider_for_epf",
+    "consider_for_esic",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("employees")
+    .select(`id, company_id, first_name, middle_name, last_name, employee_code, salary_entries!inner(${columns.join(",")})`)
+    .eq("salary_entries.payroll_id", payrollId)
+    .order("type, field_name", { ascending: true, referencedTable: "salary_entries" })
+    .returns<SalaryEntriesWithEmployee[]>();
+
+  if (error) { console.error("getSalaryEntriesByPayrollId Error", error); }
+
+  return { data, error };
+}
+
+export async function getSalaryEntriesByPayrollAndEmployeeId({
+  supabase,
+  payrollId,
+  employeeId,
+}: {
+  supabase: TypedSupabaseClient;
+  payrollId: string;
+  employeeId: string;
+}) {
+  const columns = [
+    "id",
+    "month",
+    "year",
+    "present_days",
+    "overtime_hours",
+    "employee_id",
+    "template_component_id",
+    "payroll_id",
+    "field_name",
+    "type",
+    "amount",
+    "is_pro_rata",
+    "consider_for_epf",
+    "consider_for_esic",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("employees")
+    .select(`id, company_id, first_name, middle_name, last_name, employee_code, salary_entries!inner(${columns.join(",")})`)
+    .eq("salary_entries.payroll_id", payrollId)
+    .eq("id", employeeId)
+    .single<SalaryEntriesWithEmployee>();
+
+  if (error) {
+    console.error("getSalaryEntriesByPayrollAndEmployeeId Error", error);
+  }
+
+  return { data, error };
+}
+
+export async function getSalaryEntryById({
+  supabase,
+  id,
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+}) {
+  const columns = [
+    "id",
+    "month",
+    "year",
+    "present_days",
+    "overtime_hours",
+    "employee_id",
+    "template_component_id",
+    "payroll_id",
+    "field_name",
+    "type",
+    "amount",
+    "is_pro_rata",
+    "consider_for_epf",
+    "consider_for_esic",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("salary_entries")
+    .select(`${columns.join(",")}`)
+    .eq("id", id)
+    .single<InferredType<SalaryEntriesDatabaseRow, typeof columns[number]>>();
+
+  if (error) console.error("getSalaryEntryById Error", error);
+
+  return { data, error };
+}
 
 export async function getPayrollEntriesByPayrollId({
   supabase,
@@ -165,6 +261,8 @@ export async function getPayrollEntriesByPayrollId({
 
   return { data, error };
 }
+
+
 export async function getPayrollEntryById({
   supabase,
   id,

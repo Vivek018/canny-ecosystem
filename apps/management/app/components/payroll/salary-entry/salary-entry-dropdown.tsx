@@ -1,4 +1,4 @@
-import type { PayrollEntriesDatabaseRow } from "@canny_ecosystem/supabase/types";
+import type { SalaryEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@canny_ecosystem/ui/alert-dialog";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import {
@@ -11,21 +11,24 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { replaceDash } from "@canny_ecosystem/utils";
 import { useNavigate, useSubmit } from "@remix-run/react";
 
-export const PayrollEntryDropdown = ({
+export const SalaryEntryDropdown = ({
   data,
   triggerChild,
 }: {
-  data: Omit<PayrollEntriesDatabaseRow, "created_at" | "updated_at">;
+  data: SalaryEntriesWithEmployee;
   triggerChild: React.ReactElement;
 }) => {
   const navigate = useNavigate();
+
+  const payrollId = data?.salary_entries[0].payroll_id;
+  const employeeId = data?.id;
 
   const handleClick = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
     document: string,
   ) => {
     e.preventDefault();
-    navigate(`/payroll/payroll-history/${data?.payroll_id}/${data?.employee_id}/${document}`);
+    navigate(`${payrollId}/${employeeId}/${document}`);
   };
 
   const employeeDocuments = [
@@ -36,7 +39,7 @@ export const PayrollEntryDropdown = ({
     <DropdownMenu>
       {triggerChild}
       <DropdownMenuContent align="end">
-        <DropdownMenuGroup className={cn(data.payment_status === "pending" && "hidden")}>
+        <DropdownMenuGroup>
           {employeeDocuments.map((document) => (
             <DropdownMenuItem
               key={document}
@@ -47,7 +50,7 @@ export const PayrollEntryDropdown = ({
           ))}
         </DropdownMenuGroup>
         <DropdownMenuGroup>
-          <DeletePayrollEntry payrollId={data?.payroll_id} id={data?.id} />
+          <DeleteSalaryEntry payrollId={payrollId} employeeId={employeeId} />
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -55,18 +58,18 @@ export const PayrollEntryDropdown = ({
 };
 
 
-export const DeletePayrollEntry = ({ payrollId, id }: { payrollId: string, id: string }) => {
+export const DeleteSalaryEntry = ({ payrollId, employeeId }: { payrollId: string, employeeId: string, }) => {
   const submit = useSubmit();
 
   const handleDelete = () => {
     submit(
       {
         is_active: false,
-        returnTo: "/employees",
+        returnTo: `/payroll/run-payroll/${payrollId}`,
       },
       {
         method: "POST",
-        action: `/payroll/run-payroll/${payrollId}/${id}/delete-payroll-entry`,
+        action: `/payroll/run-payroll/${payrollId}/${employeeId}/delete-salary-entry`,
       },
     );
   };
@@ -79,14 +82,14 @@ export const DeletePayrollEntry = ({ payrollId, id }: { payrollId: string, id: s
           "text-[13px] h-9",
         )}
       >
-        Delete Payroll Entry
+        Delete Salary Entry
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
             This action cannot be undone. This will permanently delete your
-            payroll entry and remove it's data from our servers.
+            salary entry and remove it's data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
