@@ -127,6 +127,7 @@ export function SalaryEntrySheet({
                 <CheckboxField
                   buttonProps={getInputProps(fields.is_pro_rata, {
                     type: "checkbox",
+                    readOnly: !editable,
                   })}
                   labelProps={{
                     children: "Calculate on pro-rata basis",
@@ -136,6 +137,7 @@ export function SalaryEntrySheet({
                 <CheckboxField
                   buttonProps={getInputProps(fields.is_overtime, {
                     type: "checkbox",
+                    
                   })}
                   labelProps={{
                     children: "Calculate on overtime basis",

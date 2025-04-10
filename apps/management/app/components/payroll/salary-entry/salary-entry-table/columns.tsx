@@ -12,7 +12,7 @@ import type { SalaryEntriesDatabaseRow } from "@canny_ecosystem/supabase/types";
 import type { SalaryEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
 import { SalaryEntrySheet } from "./salary-entry-sheet";
 
-export const salaryEntryColumns = ({ salaryEntries }: { salaryEntries: Omit<SalaryEntriesDatabaseRow, "created_at" | "updated_at">[] }): ColumnDef<SalaryEntriesWithEmployee>[] => [
+export const salaryEntryColumns = ({ salaryEntries, editable = false }: { salaryEntries: Omit<SalaryEntriesDatabaseRow, "created_at" | "updated_at">[], editable?: boolean }): ColumnDef<SalaryEntriesWithEmployee>[] => [
   {
     accessorKey: "employee_code",
     header: "Employee Code",
@@ -65,7 +65,7 @@ export const salaryEntryColumns = ({ salaryEntries }: { salaryEntries: Omit<Sala
     header: salaryEntry.field_name,
     cell: ({ row }: { row: any }) => {
       return (
-        <SalaryEntrySheet editable={true} employee={row.original} salaryEntry={salaryEntry} triggerChild={<p className={cn("truncate opacity-80 hover:opacity-100 focus:opacity-100", salaryEntry.type === "earning" && "text-green", (salaryEntry.type === "deduction" || salaryEntry.type === "statutory_contribution") && "text-destructive")}>{salaryEntry.amount}</p>} />
+        <SalaryEntrySheet editable={editable} employee={row.original} salaryEntry={salaryEntry} triggerChild={<p className={cn("truncate", "hover:opacity-80 focus:opacity-80", "dark:hover:opacity-100 dark:focus:opacity-100 dark:hover:brightness-125 dark:focus:brightness-125", salaryEntry.type === "earning" && "text-green", (salaryEntry.type === "deduction" || salaryEntry.type === "statutory_contribution") && "text-destructive")}>{salaryEntry.amount}</p>} />
       );
     },
   })),

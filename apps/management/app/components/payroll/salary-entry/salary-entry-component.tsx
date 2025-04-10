@@ -128,7 +128,7 @@ export function SalaryEntryComponent({
       </div>
       <SalaryEntryDataTable
         data={tableData}
-        columns={salaryEntryColumns({ salaryEntries: data[0].salary_entries })}
+        columns={salaryEntryColumns({ salaryEntries: data[0].salary_entries, editable: payrollData?.status === "pending" })}
       />
       <Outlet />
     </section>
