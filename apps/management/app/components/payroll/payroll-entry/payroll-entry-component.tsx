@@ -21,7 +21,6 @@ import {
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { PayrollEntryDataTable } from "./payroll-entry-table/data-table";
 import { payrollEntryColumns } from "./payroll-entry-table/columns";
-import { usePayrollEntriesStore } from "@/store/payroll-entry";
 import {
   Card,
   CardContent,
@@ -32,13 +31,13 @@ import {
 export function PayrollEntryComponent({
   data,
   payrollData,
-  noButtons = false,
   env,
+  noButtons = false,
 }: {
-  env: SupabaseEnv;
   data: PayrollEntriesWithEmployee[];
   payrollData: Omit<PayrollDatabaseRow, "created_at" | "updated_at">;
   noButtons?: boolean;
+  env: SupabaseEnv;
 }) {
   const payrollCardDetails = [
     { title: "Payroll Type", value: "payroll_type" },
@@ -67,13 +66,8 @@ export function PayrollEntryComponent({
   const [tableData, setTableData] = useState(data);
 
   useEffect(() => {
-<<<<<<< HEAD:apps/management/app/components/payroll/payroll-entry-component.tsx
-    const filteredData = data?.filter((item: any) =>
-      searchInObject(item, searchString)
-=======
     const filteredData = data?.filter((item) =>
-      searchInObject(item, searchString),
->>>>>>> dev:apps/management/app/components/payroll/payroll-entry/payroll-entry-component.tsx
+      searchInObject(item, searchString)
     );
 
     setTableData(filteredData);
@@ -182,11 +176,11 @@ export function PayrollEntryComponent({
           </Button>
         </div>
         <PayrollActions
-          payrollData={payrollData}
-          data={data}
           className={cn(payrollData?.status === "pending" && "hidden")}
           payrollId={payrollId ?? payrollData?.id}
           env={env}
+          data={data}
+          payrollData={payrollData}
         />
       </div>
       <PayrollEntryDataTable
