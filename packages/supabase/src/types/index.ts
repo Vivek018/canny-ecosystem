@@ -57,6 +57,14 @@ export type RelationshipDatabaseInsert =
 export type RelationshipDatabaseUpdate =
   Database["public"]["Tables"]["company_relationships"]["Update"];
 
+// Company Documents
+export type DocumentsDatabaseRow =
+  Database["public"]["Tables"]["company_documents"]["Row"];
+export type DocumentsDatabaseInsert =
+  Database["public"]["Tables"]["company_documents"]["Insert"];
+export type DocumentDatabaseUpdate =
+  Database["public"]["Tables"]["company_documents"]["Update"];
+
 // Projects
 export type ProjectDatabaseRow =
   Database["public"]["Tables"]["projects"]["Row"];
@@ -74,10 +82,12 @@ export type SiteDatabaseUpdate =
   Database["public"]["Tables"]["project_sites"]["Update"];
 
 // Pay Sequences
-export type SitePaySequenceDatabaseRow =
-  Database["public"]["Tables"]["site_pay_sequence"]["Row"];
-export type SitePaySequenceDatabaseUpdate =
-  Database["public"]["Tables"]["site_pay_sequence"]["Update"];
+export type PaySequenceDatabaseRow =
+  Database["public"]["Tables"]["pay_sequence"]["Row"];
+export type PaySequenceDatabaseInsert =
+  Database["public"]["Tables"]["pay_sequence"]["Insert"];
+export type PaySequenceDatabaseUpdate =
+  Database["public"]["Tables"]["pay_sequence"]["Update"];
 
 // Employees
 export type EmployeeDatabaseRow =
@@ -87,7 +97,7 @@ export type EmployeeDatabaseInsert =
 export type EmployeeDatabaseUpdate =
   Database["public"]["Tables"]["employees"]["Update"];
 
-// Attendance
+// Employee Attendance
 export type EmployeeAttendanceDatabaseRow =
   Database["public"]["Tables"]["attendance"]["Row"];
 export type EmployeeAttendanceDatabaseInsert =
@@ -150,6 +160,14 @@ export type EmployeeWorkHistoryDatabaseInsert =
   Database["public"]["Tables"]["employee_work_history"]["Insert"];
 export type EmployeeWorkHistoryDatabaseUpdate =
   Database["public"]["Tables"]["employee_work_history"]["Update"];
+
+// Employee Documents
+export type EmployeeDocumentsDatabaseRow =
+  Database["public"]["Tables"]["employee_documents"]["Row"];
+export type EmployeeDocumentsDatabaseInsert =
+  Database["public"]["Tables"]["employee_documents"]["Insert"];
+export type EmployeeDocumentsDatabaseUpdate =
+  Database["public"]["Tables"]["employee_documents"]["Update"];
 
 // Feedback
 export type FeedbackDatabaseRow =
@@ -257,6 +275,14 @@ export type PayrollEntriesDatabaseInsert =
 export type PayrollEntriesDatabaseUpdate =
   Database["public"]["Tables"]["payroll_entries"]["Update"];
 
+// Salary Entries
+export type SalaryEntriesDatabaseRow =
+  Database["public"]["Tables"]["salary_entries"]["Row"];
+export type SalaryEntriesDatabaseInsert =
+  Database["public"]["Tables"]["salary_entries"]["Insert"];
+export type SalaryEntriesDatabaseUpdate =
+  Database["public"]["Tables"]["salary_entries"]["Update"];
+
 // Reimbursement
 export type ReimbursementInsert =
   Database["public"]["Tables"]["reimbursements"]["Insert"];
@@ -298,3 +324,29 @@ export type AccidentsDatabaseInsert =
   Database["public"]["Tables"]["accidents"]["Insert"];
 export type AccidentsDatabaseUpdate =
   Database["public"]["Tables"]["accidents"]["Update"];
+
+export type CasesDatabaseRow = Database["public"]["Tables"]["cases"]["Row"];
+export type CasesDatabaseInsert =
+  Database["public"]["Tables"]["cases"]["Insert"];
+export type CasesDatabaseUpdate =
+  Database["public"]["Tables"]["cases"]["Update"];
+
+export type LeavesDatabaseRow = Database["public"]["Tables"]["leaves"]["Row"];
+export type LeavesDatabaseInsert =
+  Database["public"]["Tables"]["leaves"]["Insert"];
+export type LeavesDatabaseUpdate =
+  Database["public"]["Tables"]["leaves"]["Update"];
+
+export type LeaveTypeDatabaseRow =
+  Database["public"]["Tables"]["leave_type"]["Row"];
+export type LeaveTypeDatabaseInsert =
+  Database["public"]["Tables"]["leave_type"]["Insert"];
+export type LeaveTypeDatabaseUpdate =
+  Database["public"]["Tables"]["leave_type"]["Update"];
+
+export type HolidaysDatabaseRow =
+  Database["public"]["Tables"]["holidays"]["Row"];
+export type HolidaysDatabaseInsert =
+  Database["public"]["Tables"]["holidays"]["Insert"];
+export type HolidaysDatabaseUpdate =
+  Database["public"]["Tables"]["holidays"]["Update"];

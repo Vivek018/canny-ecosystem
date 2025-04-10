@@ -11,8 +11,8 @@ export type EmployeeStateInsuranceDataType = Pick<
   | "company_id"
   | "esi_number"
   | "deduction_cycle"
-  | "employees_contribution"
-  | "employers_contribution"
+  | "employee_contribution"
+  | "employer_contribution"
   | "include_employer_contribution"
   | "max_limit"
 >;
@@ -29,8 +29,8 @@ export const getEmployeeStateInsuranceById = async ({
     "company_id",
     "esi_number",
     "deduction_cycle",
-    "employees_contribution",
-    "employers_contribution",
+    "employee_contribution",
+    "employer_contribution",
     "include_employer_contribution",
   ] as const;
 
@@ -61,8 +61,8 @@ export const getEmployeeStateInsuranceByESINumber = async ({
     "company_id",
     "esi_number",
     "deduction_cycle",
-    "employees_contribution",
-    "employers_contribution",
+    "employee_contribution",
+    "employer_contribution",
     "include_employer_contribution",
   ] as const;
 
@@ -91,8 +91,8 @@ export const getEmployeeStateInsuranceByCompanyId = async ({
     "company_id",
     "esi_number",
     "deduction_cycle",
-    "employees_contribution",
-    "employers_contribution",
+    "employee_contribution",
+    "employer_contribution",
     "include_employer_contribution",
     "max_limit",
     "is_default",

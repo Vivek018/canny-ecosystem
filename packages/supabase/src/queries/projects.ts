@@ -1,8 +1,6 @@
 import type {
-  InferredType,
   ProjectDatabaseRow,
   SiteDatabaseRow,
-  SitePaySequenceDatabaseRow,
   TypedSupabaseClient,
 } from "../types";
 import { HARD_QUERY_LIMIT, MID_QUERY_LIMIT } from "../constant";
@@ -13,25 +11,6 @@ export type ProjectsWithCompany = ProjectDatabaseRow & {
   end_client: { id: string; name: string; logo: string };
   primary_contractor: { id: string; name: string; logo: string };
 };
-
-export async function getProjectsCountByCompanyId({
-  supabase,
-  companyId,
-}: {
-  supabase: TypedSupabaseClient;
-  companyId: string;
-}) {
-  const { count, error } = await supabase
-    .from("projects")
-    .select("", { count: "exact", head: true })
-    .eq("project_client_id", companyId);
-
-  if (error) {
-    console.error("getProjectsCountByCompanyId Error", error);
-  }
-
-  return { count, error };
-}
 
 export async function getProjectsByCompanyId({
   supabase,
@@ -186,63 +165,6 @@ export async function getSitesByProjectId({
   return { data, error };
 }
 
-export async function getAllSitesByProjectId({
-  supabase,
-  projectId,
-}: {
-  supabase: TypedSupabaseClient;
-  projectId: string;
-}) {
-  const columns = ["id"] as const;
-  const { data, error } = await supabase
-    .from("project_sites")
-    .select(columns.join(","))
-    .eq("project_id", projectId)
-    .returns<{ id: string }[]>();
-
-  if (error) console.error("getAllSitesByProjectId Error", error);
-
-  return { data, error };
-}
-
-export async function getSitesWithEmployeeCountByProjectId({
-  supabase,
-  projectId,
-}: {
-  supabase: TypedSupabaseClient;
-  projectId: string;
-}) {
-  const columns = [
-    "id",
-    "name",
-    "site_code",
-    "address_line_1",
-    "address_line_2",
-    "city",
-    "state",
-    "pincode",
-    "latitude",
-    "longitude",
-    "company_location_id",
-    "is_active",
-    "company_location:company_locations!company_location_id (id, name)",
-    "project_id",
-    "employees_count:employee_project_assignment!project_site_id(count)",
-  ] as const;
-
-  const { data, error } = await supabase
-    .from("project_sites")
-    .select(columns.join(","))
-    .eq("project_id", projectId)
-    .limit(HARD_QUERY_LIMIT)
-    .order("created_at", { ascending: false })
-    .returns<SitesWithLocation[]>();
-
-  if (error) console.error("getSitesWithEmployeeCountByProjectId Error", error);
-
-  return { data, error };
-}
-
 export async function getSiteNamesByProjectName({
   supabase,
   projectName,
@@ -349,33 +271,9 @@ export async function getSiteById({
   return { data, error };
 }
 
-// Pay Sequences
-export async function getSitePaySequenceInSite({
-  supabase,
-  siteId,
-}: {
-  supabase: TypedSupabaseClient;
-  siteId: string;
-}) {
-  const columns = [
-    "id",
-    "pay_frequency",
-    "working_days",
-    "pay_day",
-    "site_id",
-  ] as const;
 
-  const { data, error } = await supabase
-    .from("site_pay_sequence")
-    .select(columns.join(","))
-    .eq("site_id", siteId)
-    .single<
-      InferredType<SitePaySequenceDatabaseRow, (typeof columns)[number]>
-    >();
 
-  if (error) {
-    console.error("getSitePaySequenceInSite Error", error);
-  }
 
-  return { data, error };
-}
+
+
+

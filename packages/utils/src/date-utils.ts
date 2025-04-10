@@ -6,9 +6,13 @@ import {
   differenceInMonths,
   differenceInDays,
 } from "date-fns";
+import { months } from "../constant";
 
 export { UTCDate } from "@date-fns/utc";
 export { formatDateRange } from "little-date";
+
+export const defaultMonth = new Date().getMonth() - 1;
+export const defaultYear = new Date().getFullYear();
 
 export function formatUTCDate(date?: string): string | undefined {
   return date ? new UTCDate(date).toISOString() : undefined;
@@ -70,7 +74,11 @@ export function formatMonthYearDate(date: Date | string | number) {
   return format(new Date(date), "MMM yyyy");
 }
 
-export function formatDate(date: Date | string | number) {
+export function formatDate(date: Date | string | number | null) {
+  if (!date || !String(date)?.length) {
+    return null;
+  }
+
   return format(new Date(date), "dd MMM yyyy");
 }
 
@@ -80,7 +88,7 @@ export function formatDateTime(date: Date | string | number) {
 
 export function getYears(
   numberOfYears = 30,
-  currentYear: number | null = new Date().getFullYear(),
+  currentYear: number | null = defaultYear,
 ) {
   if (numberOfYears <= 0) {
     throw new Error("Number of years must be greater than 0");
@@ -89,15 +97,49 @@ export function getYears(
   const years: number[] = [];
 
   for (let i = 0; i < numberOfYears; i++) {
-    years.push((currentYear ?? new Date().getFullYear()) - i);
+    years.push((currentYear ?? defaultYear) - i);
   }
 
   return years;
 }
 
-export const formatDateToMonthYear = (dateString) => {
+export const formatDateToMonthYear = (dateString: string | number | Date) => {
   return new Date(dateString).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
   });
+};
+
+export const calculateDateRange = (
+  range: string,
+  monthName: string | number | null | undefined,
+  yearValue: string | number | undefined
+) => {
+  const rangeNumber = Number.parseInt(String(range), 10);
+  const monthNumber = monthName
+    ? months[monthName]
+    : defaultMonth + 1;
+  const yearToUse =
+    Number.parseInt(yearValue as string) || defaultYear;
+
+  if (rangeNumber > 0) {
+    const endDateObj = new Date(yearToUse, monthNumber, rangeNumber + 1);
+    let targetMonth = monthNumber - 1;
+    let targetYear = yearToUse;
+    if (targetMonth < 0) {
+      targetMonth = 11;
+      targetYear -= 1;
+    }
+    const startDateObj = new Date(targetYear, targetMonth, rangeNumber + 2);
+    return {
+      startDate: startDateObj.toISOString().split("T")[0],
+      endDate: endDateObj.toISOString().split("T")[0],
+    };
+  }
+  const monthStr = monthNumber.toString().padStart(2, "0");
+  const lastDay = new Date(yearToUse, monthNumber, 0).getDate();
+  return {
+    startDate: `${yearToUse}-${monthStr}-01`,
+    endDate: `${yearToUse}-${monthStr}-${lastDay}`,
+  };
 };

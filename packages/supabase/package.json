@@ -27,6 +27,7 @@
     "./server": "./src/clients/server.ts",
     "./client": "./src/clients/client.ts",
     "./queries": "./src/queries/index.ts",
+    "./media": "./src/media/index.ts",
     "./cached-queries": "./src/queries/cached-queries.ts",
     "./mutations": "./src/mutations/index.ts",
     "./types": "./src/types/index.ts",

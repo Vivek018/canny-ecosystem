@@ -4,6 +4,9 @@ import type {
   AccidentsDatabaseRow,
   TypedSupabaseClient,
   InferredType,
+  EmployeeProjectAssignmentDatabaseRow,
+  SiteDatabaseRow,
+  ProjectDatabaseRow,
 } from "../types";
 
 export type AccidentFilters = {
@@ -14,6 +17,8 @@ export type AccidentFilters = {
   category?: AccidentsDatabaseRow["category"];
   severity?: AccidentsDatabaseRow["severity"];
   name?: string | undefined | null;
+  project?: string | undefined | null;
+  project_site?: string | undefined | null;
 };
 
 export type AccidentsDatabaseType = Pick<
@@ -29,13 +34,28 @@ export type AccidentsDatabaseType = Pick<
   | "description"
   | "medical_diagnosis"
 > & {
-  employees: {
-    id: EmployeeDatabaseRow["id"];
-    company_id: EmployeeDatabaseRow["company_id"];
-    employee_code: EmployeeDatabaseRow["employee_code"];
-    first_name: EmployeeDatabaseRow["first_name"];
-    middle_name: EmployeeDatabaseRow["middle_name"];
-    last_name: EmployeeDatabaseRow["last_name"];
+  employees: Pick<
+    EmployeeDatabaseRow,
+    | "id"
+    | "first_name"
+    | "middle_name"
+    | "last_name"
+    | "employee_code"
+    | "company_id"
+  > & {
+    employee_project_assignment: Pick<
+      EmployeeProjectAssignmentDatabaseRow,
+      "employee_id"
+    > & {
+      project_sites: {
+        id: SiteDatabaseRow["id"];
+        name: SiteDatabaseRow["name"];
+        projects: {
+          id: ProjectDatabaseRow["id"];
+          name: ProjectDatabaseRow["name"];
+        };
+      };
+    };
   };
 };
 
@@ -56,8 +76,16 @@ export async function getAccidentsByCompanyId({
 }) {
   const { from, to, sort, searchQuery, filters } = params;
 
-  const { date_start, date_end, status, location_type, category, severity } =
-    filters ?? {};
+  const {
+    date_start,
+    date_end,
+    status,
+    location_type,
+    category,
+    severity,
+    project,
+    project_site,
+  } = filters ?? {};
 
   const columns = [
     "id",
@@ -77,7 +105,9 @@ export async function getAccidentsByCompanyId({
     .select(
       `${columns.join(
         ",",
-      )}, employees(id,company_id, employee_code,first_name,middle_name,last_name)`,
+      )},employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
+      }(project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
+      }(id, name))))`,
       {
         count: "exact",
       },
@@ -135,13 +165,24 @@ export async function getAccidentsByCompanyId({
   if (severity) {
     query.eq("severity", severity);
   }
+  if (project) {
+    query.eq(
+      "employees.employee_project_assignment.project_sites.projects.name",
+      project,
+    );
+  }
+  if (project_site) {
+    query.eq(
+      "employees.employee_project_assignment.project_sites.name",
+      project_site,
+    );
+  }
 
   const { data, count, error } = await query.range(from, to);
   if (error) {
     console.error("getAccidentsByCompanyId Error", error);
   }
-
-  return { data, meta: { count: count ?? data?.length }, error };
+  return { data, meta: { count: count }, error };
 }
 
 export async function getAccidentsById({

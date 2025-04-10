@@ -1,16 +1,25 @@
 {
   "name": "canny_ecosystem",
   "private": true,
-  "workspaces": ["tooling/*", "packages/*", "apps/*"],
+  "workspaces": [
+    "tooling/*",
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
     "build": "turbo build",
     "clean": "git clean -xdf .turbo node_modules",
     "clean:workspaces": "turbo clean",
     "dev": "turbo dev --parallel",
     "start": "turbo start",
-    "build:payroll": "turbo build --filter=@canny_ecosystem/payroll",
-    "dev:payroll": "turbo dev --filter=@canny_ecosystem/payroll",
-    "start:payroll": "turbo start --filter=@canny_ecosystem/payroll",
+    "build:management": "turbo build --filter=@canny_ecosystem/management",
+    "dev:management": "turbo dev --filter=@canny_ecosystem/management",
+    "start:management": "turbo start --filter=@canny_ecosystem/management",
+    "build:icons": "turbo build:icons --filter=@canny_ecosystem/ui",
+    "db:generate": "turbo db:generate --filter=@canny_ecosystem/supabase",
+    "build:employee": "turbo build --filter=@canny_ecosystem/employee",
+    "dev:employee": "turbo dev --filter=@canny_ecosystem/employee",
+    "start:employee": "turbo start --filter=@canny_ecosystem/employee",
     "test": "turbo test --parallel",
     "format": "biome format --write .",
     "lint": "turbo lint && manypkg check",
@@ -23,7 +32,7 @@
     "typescript": "^5.5.4"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": "22.14.0"
   },
   "packageManager": "npm@10.8.3"
 }

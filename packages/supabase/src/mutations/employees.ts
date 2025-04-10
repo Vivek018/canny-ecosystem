@@ -1,4 +1,4 @@
-import { convertToNull } from "@canny_ecosystem/utils";
+import { convertToNull, type employeeDocuments } from "@canny_ecosystem/utils";
 import type {
   EmployeeAddressDatabaseInsert,
   EmployeeAddressDatabaseUpdate,
@@ -180,8 +180,7 @@ export async function updateEmployee({
     .from("employees")
     .update(updateData)
     .eq("id", data.id!)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("updateEmployee Error:", error);
@@ -370,8 +369,7 @@ export async function updateEmployeeStatutoryDetails({
     .from("employee_statutory_details")
     .update(updateData)
     .eq("employee_id", data.employee_id!)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("updateEmployeeStatutoryDetails Error:", error);
@@ -405,8 +403,7 @@ export async function updateEmployeeBankDetails({
     .from("employee_bank_details")
     .update(updateData)
     .eq("employee_id", data.employee_id!)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("updateEmployeeBankDetails Error:", error);
@@ -440,8 +437,7 @@ export async function updateEmployeeAddress({
     .from("employee_addresses")
     .update(updateData)
     .eq("id", data.id!)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("updateEmployeeAddress Error:", error);
@@ -506,8 +502,7 @@ export async function updateEmployeeGuardian({
     .from("employee_guardians")
     .update(updateData)
     .eq("id", data.id!)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("updateEmployeeGuardian Error:", error);
@@ -603,8 +598,7 @@ export async function updateEmployeeSkill({
     .from("employee_skills")
     .update(updateData)
     .eq("id", data.id!)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("updateEmployeeSkill Error:", error);
@@ -700,8 +694,7 @@ export async function updateEmployeeWorkHistory({
     .from("employee_work_history")
     .update(updateData)
     .eq("id", data.id!)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("updateEmployeeWorkHistory Error:", error);
@@ -797,8 +790,7 @@ export async function updateEmployeeProjectAssignment({
     .from("employee_project_assignment")
     .update(updateData)
     .eq("employee_id", data.employee_id!)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("updateEmployeeProjectAssignment Error:", error);
@@ -951,7 +943,7 @@ export async function createEmployeeDetailsFromImportedData({
       const { error: insertError } = await supabase
         .from("employees")
         .insert(batch)
-        .select();
+        ;
 
       if (insertError) {
         console.error("Error inserting batch:", insertError);
@@ -1190,7 +1182,7 @@ export async function createEmployeeStatutoryFromImportedData({
       const { error: insertError } = await supabase
         .from("employee_statutory_details")
         .insert(batch)
-        .select();
+        ;
 
       if (insertError) {
         console.error("Error inserting batch:", insertError);
@@ -1386,7 +1378,7 @@ export async function createEmployeeBankDetailsFromImportedData({
       const { error: insertError } = await supabase
         .from("employee_bank_details")
         .insert(batch)
-        .select();
+        ;
 
       if (insertError) {
         console.error("Error inserting batch:", insertError);
@@ -1455,7 +1447,7 @@ export async function createEmployeeAddressFromImportedData({
   const { error, status } = await supabase
     .from("employee_addresses")
     .insert(data)
-    .select();
+    ;
 
   if (error) {
     console.error("createEmployeeAddressFromImportedData Error", error);
@@ -1531,7 +1523,7 @@ export async function createEmployeeGuardiansFromImportedData({
   import_type,
 }: {
   supabase: TypedSupabaseClient;
-  data: EmployeeGuardianDatabaseInsert[];
+  data: EmployeeGuardianDatabaseInsert[] | EmployeeGuardianDatabaseUpdate[];
   import_type?: string;
 }) {
   if (!data || data.length === 0) {
@@ -1593,7 +1585,7 @@ export async function createEmployeeGuardiansFromImportedData({
 
     const { error, status } = await supabase
       .from("employee_guardians")
-      .upsert(newData);
+      .upsert(newData as EmployeeAddressDatabaseInsert[]);
 
     if (error) {
       console.error("Error inserting employee guardians data:", error);
@@ -1613,13 +1605,16 @@ export async function createEmployeeGuardiansFromImportedData({
       );
 
       if (existing) {
-        const updateData: EmployeeAddressDatabaseUpdate = {};
+        let updateData: typeof entry = {};
 
         const keys = Object.keys(entry);
         for (let i = 0; i < keys.length; i++) {
           const key = keys[i] as keyof typeof entry;
-          if (entry[key] !== existing[key]) {
-            (updateData as any)[key] = entry[key];
+          if (entry[key!] !== existing[key!]) {
+            updateData = {
+              ...updateData,
+              [key]: entry[key!],
+            };
           }
         }
 
@@ -1636,7 +1631,7 @@ export async function createEmployeeGuardiansFromImportedData({
       } else {
         const { error: insertError } = await supabase
           .from("employee_guardians")
-          .insert(entry);
+          .insert(entry as EmployeeGuardianDatabaseInsert);
 
         if (insertError) {
           console.error("Error inserting new record:", insertError);
@@ -1651,4 +1646,42 @@ export async function createEmployeeGuardiansFromImportedData({
     status: "Invalid import_type specified",
     error: new Error("Invalid import_type"),
   };
+}
+
+// employee documents
+export async function addEmployeeDocument({
+  supabase,
+  employee_id,
+  document_type,
+  url,
+}: {
+  supabase: TypedSupabaseClient;
+  employee_id: string;
+  document_type: (typeof employeeDocuments)[number];
+  url: string;
+}) {
+  const dataToBeInserted = convertToNull({ employee_id, document_type, url });
+  const { status, error } = await supabase
+    .from("employee_documents")
+    .insert(dataToBeInserted);
+
+  return { status, error };
+}
+
+export async function deleteEmployeeDocumentByEmployeeId({
+  supabase,
+  employeeId,
+  documentType,
+}: {
+  supabase: TypedSupabaseClient;
+  employeeId: string;
+  documentType: (typeof employeeDocuments)[number];
+}) {
+  const { error, status } = await supabase
+    .from("employee_documents")
+    .delete()
+    .eq("employee_id", employeeId)
+    .eq("document_type", documentType);
+
+  return { status, error };
 }

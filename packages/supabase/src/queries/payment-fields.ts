@@ -17,6 +17,7 @@ export type PaymentFieldDataType = Pick<
   | "name"
   | "is_active"
   | "payment_type"
+  | "is_overtime"
 >;
 
 export async function getPaymentFieldById({
@@ -37,6 +38,7 @@ export async function getPaymentFieldById({
     "consider_for_epf",
     "consider_for_esic",
     "is_pro_rata",
+    "is_overtime",
   ] as const;
 
   const { data, error } = await supabase
@@ -99,6 +101,7 @@ export async function getPaymentFieldsByCompanyId({
     "consider_for_epf",
     "consider_for_esic",
     "is_pro_rata",
+    "is_overtime",
   ] as const;
 
   const { data, error } = await supabase

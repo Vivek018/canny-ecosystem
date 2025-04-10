@@ -5,21 +5,21 @@ export function isGoodStatus(status: number | string) {
   return statusString.startsWith("2");
 }
 
-export function replaceDash(str: string) {
+export function replaceDash(str: string | null | undefined) {
   return str?.replaceAll("-", " ");
 }
 
-export function replaceUnderscore(str: string) {
+export function replaceUnderscore(str: string | null | undefined) {
   return str?.replaceAll("_", " ");
 }
 
 export const pipe =
   (...fns: any[]) =>
-  (val: any) =>
-    fns.reduce((prev, fn) => fn(prev), val);
+    (val: any) =>
+      fns.reduce((prev, fn) => fn(prev), val);
 
 export function getInitialValueFromZod<T extends z.ZodTypeAny>(
-  schema: T,
+  schema: T
 ): z.infer<T> {
   let unwrappedSchema = schema;
   while (unwrappedSchema instanceof z.ZodEffects) {
@@ -36,12 +36,12 @@ export function getInitialValueFromZod<T extends z.ZodTypeAny>(
         return [key, value._def.defaultValue()];
       }
       return [key, undefined];
-    }),
+    })
   ) as z.infer<T>;
 }
 
 export function transformStringArrayIntoOptions(
-  arr: string[],
+  arr: string[]
 ): { value: string; label: string }[] {
   return arr.map((str) => ({
     value: str,
@@ -60,7 +60,7 @@ export function getOrdinalSuffix(n: number): string {
 
 export function deepEqualCheck(
   obj1: { [x: string]: any } | null | undefined,
-  obj2: { [x: string]: any } | null | undefined,
+  obj2: { [x: string]: any } | null | undefined
 ) {
   if (obj1 === obj2) {
     return true;
@@ -156,7 +156,7 @@ export function extractJsonFromString(str: string): any | null {
 }
 
 export function debounce<
-  Callback extends (...args: Parameters<Callback>) => void,
+  Callback extends (...args: Parameters<Callback>) => void
 >(fn: Callback, delay: number) {
   let timer: ReturnType<typeof setTimeout> | null = null;
   return (...args: Parameters<Callback>) => {
@@ -177,12 +177,14 @@ export function toCamelCase(str: string) {
     .toLowerCase()
     .split(" ")
     .map((word, index) =>
-      index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1),
+      index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1)
     )
     .join("");
 }
 
-export function getWorkingDaysInCurrentMonth(working_days) {
+export function getWorkingDaysInCurrentMonth({ working_days }: {
+  working_days: number[];
+}): number {
   const now = new Date();
   const year = now.getFullYear();
   const month = now.getMonth();
@@ -198,15 +200,41 @@ export function getWorkingDaysInCurrentMonth(working_days) {
   return workingDayCount;
 }
 
-export const newAmount = (
-  amount: number,
-  presentDays: number,
-  totalWorkingDaysOfCurrentMonth: number,
-) => {
-  // new amount according to working days
-  return (amount * presentDays) / totalWorkingDaysOfCurrentMonth;
+export const searchInObject = (obj: any, searchString: string): any => {
+  if (!obj || typeof obj !== "object") {
+    return String(obj).toLowerCase().includes(searchString.toLowerCase());
+  }
+
+  return Object.values(obj).some((value) =>
+    searchInObject(value, searchString),
+  );
 };
 
-export const capitalizeFirstLetter = (val) => {
+export const capitalizeFirstLetter = (val: any) => {
   return String(val).charAt(0).toUpperCase() + String(val).slice(1);
 };
+
+export function extractKeys<T extends Record<string, any>, K extends string>(
+  arr: T[],
+  keys: K[]
+): Partial<Record<K, any>>[] {
+  return arr.map(obj =>
+    keys.reduce((acc, key) => {
+      acc[key] = key.split('.').reduce((o, k) => o?.[k], obj);
+      return acc;
+    }, {} as Partial<Record<K, any>>)
+  );
+}
+
+export function getMonthNameFromNumber(monthNumber: number, shortName = false): string {
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  if (monthNumber < 1 || monthNumber > 12) {
+    throw new Error("Month number must be between 1 and 12");
+  }
+
+  return shortName ? monthNames[monthNumber - 1].slice(0, 3) : monthNames[monthNumber - 1];
+}

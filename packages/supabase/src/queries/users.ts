@@ -5,22 +5,6 @@ import type {
   UserDatabaseRow,
 } from "../types";
 
-export async function getUsersCount({
-  supabase,
-}: {
-  supabase: TypedSupabaseClient;
-}) {
-  const { count, error } = await supabase
-    .from("users")
-    .select("", { count: "exact", head: true });
-
-  if (error) {
-    console.error("getUsersCount Error", error);
-  }
-
-  return { count, error };
-}
-
 export async function getUsers({
   supabase,
 }: {
@@ -70,6 +54,7 @@ export async function getUserByEmail({
     "last_login",
     "preferred_language",
     "company_id",
+    "site_id",
     "is_active",
   ] as const;
 
@@ -82,18 +67,8 @@ export async function getUserByEmail({
   if (error) {
     console.error("getUserByEmail Error", error);
   }
-
+ 
   return { data, error };
-  // return {
-  //   data: {
-  //     id: "1",
-  //     email: "demo@gmail.com",
-  //     first_name: "Demo",
-  //     last_name: "User",
-  //     role: "master",
-  //   },
-  //   error: null,
-  // };
 }
 
 export async function getUsersByCompanyId({
@@ -141,7 +116,7 @@ export async function getUsersEmail({
 
   const { data, error } = await supabase
     .from("users")
-    .select(`${columns.join(",")},email`)
+    .select(`${columns.join(",")}`)
     .eq("company_id", companyId)
     .order("created_at", { ascending: false })
     .limit(HARD_QUERY_LIMIT)
@@ -161,6 +136,8 @@ export async function getUserById({
   supabase: TypedSupabaseClient;
   id: string;
 }) {
+  
+
   const columns = [
     "id",
     "first_name",
@@ -186,18 +163,17 @@ export async function getUserById({
   if (error) {
     console.error("getUserById Error", error);
   }
-
+// return {
+//     data: {
+//       id: "1",
+//       email: "demo@gmail.com",
+//       first_name: "Demo",
+//       last_name: "User",
+//       role: "master",
+//     },
+//     error: null,
+//   };
   return { data, error };
-  // return {
-  //   data: {
-  //     id: "1",
-  //     email: "demo@gmail.com",
-  //     first_name: "Demo",
-  //     last_name: "User",
-  //     role: "master",
-  //   },
-  //   error: null,
-  // };
 }
 
 export async function getUserIdsByUserEmails({

@@ -1,12 +1,18 @@
 import type {
+  EmployeeProvidentFundDatabaseRow,
+  EmployeeStateInsuranceDatabaseRow,
   InferredType,
+  LabourWelfareFundDatabaseRow,
   PaymentFieldDatabaseRow,
-  PaymentTemplateAssignmentsDatabaseRow,
   PaymentTemplateComponentDatabaseRow,
   PaymentTemplateDatabaseRow,
+  ProfessionalTaxDatabaseRow,
+  StatutoryBonusDatabaseRow,
   TypedSupabaseClient,
 } from "../types";
 import { HARD_QUERY_LIMIT } from "../constant";
+
+
 
 export async function getPaymentTemplatesByCompanyId({
   supabase,
@@ -100,7 +106,15 @@ export async function getPaymentTemplateComponentsByTemplateId({
 
   const { data, error } = await supabase
     .from("payment_template_components")
-    .select(`${columns.join(",")}, payment_fields(id, name))`)
+    .select(
+      `${columns.join(",")}, 
+      payment_fields(id, name, amount, payment_type, calculation_type, is_pro_rata, consider_for_epf, consider_for_esic, is_overtime), 
+      employee_provident_fund(id, epf_number, deduction_cycle, employee_contribution, employer_contribution, employee_restrict_value, employer_restrict_value, include_employer_edli_contribution, edli_restrict_value, restrict_employee_contribution, restrict_employer_contribution, include_admin_charges, company_id, include_employer_contribution, is_default), 
+      employee_state_insurance(id, esi_number, deduction_cycle, employee_contribution, employer_contribution, max_limit, include_employer_contribution, company_id), 
+      professional_tax(id, pt_number, deduction_cycle, state, gross_salary_range), 
+      labour_welfare_fund(id, state, employee_contribution, employer_contribution, deduction_cycle), 
+      statutory_bonus(id, percentage, payment_frequency, payout_month)`
+    )
     .eq("template_id", templateId)
     .order("created_at", { ascending: true })
     .limit(HARD_QUERY_LIMIT)
@@ -182,50 +196,6 @@ export async function getPaymentTemplateWithComponentsById({
   return { data: returnData, error, componentsError };
 }
 
-export async function getPaymentTemplateByEmployeeId({
-  supabase,
-  employeeId,
-}: { supabase: TypedSupabaseClient; employeeId: string }) {
-  const columns = ["template_id"] as const;
-
-  const { data, error } = await supabase
-    .from("payment_template_assignments")
-    .select(columns.join(","))
-    .eq("employee_id", employeeId)
-    .single<
-      InferredType<
-        PaymentTemplateAssignmentsDatabaseRow,
-        (typeof columns)[number]
-      >
-    >();
-
-  if (error) console.error("getPaymentTemplateByEmployeeId Error", error);
-
-  return { data, error };
-}
-
-export async function getPaymentTemplateBySiteId({
-  supabase,
-  site_id,
-}: { supabase: TypedSupabaseClient; site_id: string }) {
-  const columns = ["template_id"] as const;
-
-  const { data, error } = await supabase
-    .from("payment_template_assignments")
-    .select(columns.join(","))
-    .eq("site_id", site_id)
-    .single<
-      InferredType<
-        PaymentTemplateAssignmentsDatabaseRow,
-        (typeof columns)[number]
-      >
-    >();
-
-  if (error) console.error("getPaymentTemplateBySiteId Error", error);
-
-  return { data, error };
-}
-
 export async function getDefaultTemplateIdByCompanyId({
   supabase,
   companyId,
@@ -250,10 +220,70 @@ export type PaymentTemplateComponentType = Omit<
   PaymentTemplateComponentDatabaseRow,
   "created_at" | "updated_at"
 > & {
-  payment_fields: {
-    id: Pick<PaymentFieldDatabaseRow, "id">;
-    name: Pick<PaymentFieldDatabaseRow, "name">;
-  };
+  payment_fields: Pick<
+    PaymentFieldDatabaseRow,
+    | "id"
+    | "name"
+    | "amount"
+    | "payment_type"
+    | "calculation_type"
+    | "is_pro_rata"
+    | "consider_for_epf"
+    | "consider_for_esic"
+    | "is_overtime"
+  >;
+  employee_provident_fund: Pick<
+    EmployeeProvidentFundDatabaseRow,
+    | "id"
+    | "epf_number"
+    | "deduction_cycle"
+    | "employee_contribution"
+    | "employer_contribution"
+    | "employee_restrict_value"
+    | "employer_restrict_value"
+    | "include_employer_edli_contribution"
+    | "edli_restrict_value"
+    | "restrict_employee_contribution"
+    | "restrict_employer_contribution"
+    | "include_admin_charges"
+    | "company_id"
+    | "include_employer_contribution"
+    | "is_default"
+  >;
+  employee_state_insurance: Pick<
+    EmployeeStateInsuranceDatabaseRow,
+    | "id"
+    | "esi_number"
+    | "deduction_cycle"
+    | "employee_contribution"
+    | "employer_contribution"
+    | "max_limit"
+    | "include_employer_contribution"
+    | "company_id"
+  >;
+  professional_tax: Pick<
+    ProfessionalTaxDatabaseRow,
+    | "id"
+    | "pt_number"
+    | "deduction_cycle"
+    | "state"
+    | "gross_salary_range"
+  >;
+  labour_welfare_fund: Pick<
+    LabourWelfareFundDatabaseRow,
+    | "id"
+    | "state"
+    | "employee_contribution"
+    | "employer_contribution"
+    | "deduction_cycle"
+  >;
+  statutory_bonus: Pick<
+    StatutoryBonusDatabaseRow,
+    | "id"
+    | "percentage"
+    | "payment_frequency"
+    | "payout_month"
+  >;
 };
 
 export type PaymentTemplateWithComponentsType = Pick<

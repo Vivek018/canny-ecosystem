@@ -1,7 +1,6 @@
-export function Logo() {
-  return (
-    <h1 className="w-max text-3xl font-extrabold uppercase tracking-wider">
-      💰
-    </h1>
-  );
+import { cn } from "@/utils";
+import { Icon } from "./icon";
+
+export function Logo({ className }: { className?: string }) {
+  return <Icon name="logo" className={cn("w-9 h-9", className)} />;
 }

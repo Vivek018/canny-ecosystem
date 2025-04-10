@@ -4,8 +4,22 @@
   "ui": "stream",
   "tasks": {
     "build": {
+      "env": [
+        "SUPABASE_DATABASE_URL",
+        "SUPABASE_URL",
+        "SUPABASE_ANON_KEY",
+        "OPENAI_KEY",
+        "SESSION_SECRET"
+      ],
+      "inputs": [".env"],
       "dependsOn": ["^build"],
       "outputs": ["build/**"]
+    },
+    "build:icons": {
+      "outputs": []
+    },
+    "db:generate": {
+      "outputs": []
     },
     "start": {
       "cache": false
@@ -14,7 +28,7 @@
       "outputs": []
     },
     "dev": {
-      "inputs": ["$TURBO_DEFAULT$", ".env"],
+      "inputs": [".env"],
       "persistent": true,
       "cache": false
     }

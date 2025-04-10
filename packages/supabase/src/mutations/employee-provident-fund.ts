@@ -27,8 +27,7 @@ export const createEmployeeProvidentFund = async ({
   const { error, status } = await supabase
     .from("employee_provident_fund")
     .insert(data)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("createEmployeeProvidentFund Error", error);
@@ -65,8 +64,7 @@ export const updateEmployeeProvidentFund = async ({
     .from("employee_provident_fund")
     .update(updateData)
     .eq("id", data.id!)
-    .select()
-    .single();
+    ;
 
   if (error) {
     console.error("updateEmployeeProvidentFund Error", error);

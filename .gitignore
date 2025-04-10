@@ -31,7 +31,7 @@ coverage
 out/
 build
 dist
-
+server-build
 
 # Debug
 npm-debug.log*
@@ -44,4 +44,3 @@ yarn-error.log*
 
 # Files
 packages/supabase/src/types/db.ts
-

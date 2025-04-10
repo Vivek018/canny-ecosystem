@@ -1,6 +1,7 @@
 import type {
   CompanyDatabaseRow,
   CompanyRegistrationDetailsRow,
+  DocumentsDatabaseRow,
   InferredType,
   LocationDatabaseRow,
   RelationshipDatabaseRow,
@@ -11,7 +12,7 @@ import { HARD_QUERY_LIMIT, SINGLE_QUERY_LIMIT } from "../constant";
 export async function getCompanies({
   supabase,
 }: { supabase: TypedSupabaseClient }) {
-  const columns = ["id", "name"] as const;
+  const columns = ["id", "name", "logo"] as const;
 
   const { data, error } = await supabase
     .from("companies")
@@ -29,7 +30,9 @@ export async function getCompanies({
 
 export async function getFirstCompany({
   supabase,
-}: { supabase: TypedSupabaseClient }) {
+}: {
+  supabase: TypedSupabaseClient;
+}) {
   const columns = ["id", "name"] as const;
 
   const { data, error } = await supabase
@@ -46,10 +49,35 @@ export async function getFirstCompany({
   return { data, error };
 }
 
+export async function getCompanyNameByCompanyId({
+  supabase,
+  id,
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+}) {
+  const columns = ["name"] as const;
+
+  const { data, error } = await supabase
+    .from("companies")
+    .select(columns.join(","))
+    .eq("id", id)
+    .single<InferredType<CompanyDatabaseRow, (typeof columns)[number]>>();
+
+  if (error) {
+    console.error("getCompanyNameById Error", error);
+  }
+
+  return { data, error };
+}
+
 export async function getCompanyById({
   supabase,
   id,
-}: { supabase: TypedSupabaseClient; id: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+}) {
   const columns = [
     "id",
     "name",
@@ -76,7 +104,10 @@ export async function getCompanyById({
 export async function getCompanyRegistrationDetailsByCompanyId({
   supabase,
   companyId,
-}: { supabase: TypedSupabaseClient; companyId: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+}) {
   const columns = [
     "company_id",
     "gst_number",
@@ -103,27 +134,14 @@ export async function getCompanyRegistrationDetailsByCompanyId({
   return { data, error };
 }
 
-export async function getLocationsCountByCompanyId({
-  supabase,
-  companyId,
-}: { supabase: TypedSupabaseClient; companyId: string }) {
-  const { count, error } = await supabase
-    .from("company_locations")
-    .select("", { count: "exact", head: true })
-    .eq("company_id", companyId);
-
-  if (error) {
-    console.error("getLocationsCountByCompanyId Error", error);
-  }
-
-  return { count, error };
-}
-
 // Company Locations
 export async function getLocationsForSelectByCompanyId({
   supabase,
   companyId,
-}: { supabase: TypedSupabaseClient; companyId: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+}) {
   const columns = ["id", "name"] as const;
 
   const { data, error } = await supabase
@@ -144,7 +162,10 @@ export async function getLocationsForSelectByCompanyId({
 export async function getLocationsByCompanyId({
   supabase,
   companyId,
-}: { supabase: TypedSupabaseClient; companyId: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+}) {
   const columns = [
     "id",
     "company_id",
@@ -177,7 +198,10 @@ export async function getLocationsByCompanyId({
 export async function getLocationById({
   supabase,
   id,
-}: { supabase: TypedSupabaseClient; id: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+}) {
   const columns = [
     "id",
     "company_id",
@@ -208,7 +232,10 @@ export async function getLocationById({
 export async function getPrimaryLocationByCompanyId({
   supabase,
   companyId,
-}: { supabase: TypedSupabaseClient; companyId: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+}) {
   const columns = [
     "id",
     "company_id",
@@ -248,7 +275,10 @@ export type RelationshipWithCompany = RelationshipDatabaseRow & {
 export async function getRelationshipsByCompanyId({
   supabase,
   companyId,
-}: { supabase: TypedSupabaseClient; companyId: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+}) {
   const columns = [
     "id",
     "parent_company_id",
@@ -281,7 +311,11 @@ export async function getRelationshipById({
   supabase,
   id,
   companyId,
-}: { supabase: TypedSupabaseClient; id: string; companyId: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+  companyId: string;
+}) {
   const columns = [
     "id",
     "parent_company_id",
@@ -309,35 +343,15 @@ export async function getRelationshipById({
   return { data, error };
 }
 
-export async function getRelationshipIdByParentIdAndChildId({
-  supabase,
-  parentCompanyId,
-  childCompanyId,
-}: {
-  supabase: TypedSupabaseClient;
-  parentCompanyId: string;
-  childCompanyId: string;
-}) {
-  const columns = ["id"] as const;
-
-  const { data, error } = await supabase
-    .from("company_relationships")
-    .select(columns.join(","))
-    .eq("parent_company_id", parentCompanyId)
-    .eq("child_company_id", childCompanyId)
-    .single<Omit<RelationshipWithCompany, "created_at" | "updated_at">>();
-
-  if (error)
-    console.error("getRelationshipIdByParentIdAndChildId Error", error);
-
-  return { data, error };
-}
-
 export async function getRelationshipTermsById({
   supabase,
   id,
   companyId,
-}: { supabase: TypedSupabaseClient; id: string; companyId: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+  companyId: string;
+}) {
   const columns = ["terms"] as const;
   const { data, error } = await supabase
     .from("company_relationships")
@@ -349,6 +363,70 @@ export async function getRelationshipTermsById({
   if (error) {
     console.error("getRelationshipTermsById Error", error);
   }
+
+  return { data, error };
+}
+
+// Company Documents
+export async function getCompanyDocumentById({
+  supabase,
+  id,
+}: { supabase: TypedSupabaseClient; id: string }) {
+  const columns = ["name", "url"] as const;
+
+  const { data, error } = await supabase
+    .from("company_documents")
+    .select(columns.join(","))
+    .eq("id", id)
+    .single<InferredType<DocumentsDatabaseRow, (typeof columns)[number]>>();
+
+  if (error) console.error("getCompanyDocumentById Error", error);
+
+  return { data, error };
+}
+
+export async function getCompanyDocumentsByCompanyId({
+  supabase,
+  companyId,
+}: { supabase: TypedSupabaseClient; companyId: string }) {
+  const columns = ["name", "url", "id"] as const;
+
+  const { data, error } = await supabase
+    .from("company_documents")
+    .select(columns.join(","))
+    .eq("company_id", companyId)
+    .order("created_at", { ascending: false })
+    .limit(HARD_QUERY_LIMIT)
+    .returns<InferredType<DocumentsDatabaseRow, (typeof columns)[number]>[]>();
+
+  if (error) console.error("getCompanyDocumentsByCompanyId Error", error);
+
+  return { data, error };
+}
+
+export async function getCompanyDocumentUrlByCompanyIdAndDocumentName({
+  supabase,
+  companyId,
+  documentName,
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+  documentName: string;
+}) {
+  const columns = ["url"] as const;
+
+  const { data, error } = await supabase
+    .from("company_documents")
+    .select(columns.join(","))
+    .eq("company_id", companyId)
+    .eq("name", documentName)
+    .single<DocumentsDatabaseRow>();
+
+  if (error)
+    console.error(
+      "getCompanyDocumentUrlByCompanyIdAndDocumentName Error",
+      error,
+    );
 
   return { data, error };
 }
