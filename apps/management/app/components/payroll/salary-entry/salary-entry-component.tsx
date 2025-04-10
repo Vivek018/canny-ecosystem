@@ -13,7 +13,10 @@ import {
 } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import type { SalaryEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
-import type { PayrollDatabaseRow } from "@canny_ecosystem/supabase/types";
+import type {
+  PayrollDatabaseRow,
+  SupabaseEnv,
+} from "@canny_ecosystem/supabase/types";
 import { PayrollActions } from "../payroll-actions";
 import { SalaryEntryDataTable } from "./salary-entry-table/data-table";
 import { salaryEntryColumns } from "./salary-entry-table/columns";
@@ -22,10 +25,12 @@ export function SalaryEntryComponent({
   data,
   payrollData,
   noButtons = false,
+  env,
 }: {
   data: SalaryEntriesWithEmployee[];
   payrollData: Omit<PayrollDatabaseRow, "created_at" | "updated_at">;
   noButtons?: boolean;
+  env: SupabaseEnv;
 }) {
   const { role } = useUser();
   const { payrollId } = useParams();
@@ -40,7 +45,7 @@ export function SalaryEntryComponent({
 
   useEffect(() => {
     const filteredData = data?.filter((item) =>
-      searchInObject(item, searchString),
+      searchInObject(item, searchString)
     );
 
     setTableData(filteredData);
@@ -48,7 +53,7 @@ export function SalaryEntryComponent({
 
   const updateStatusPayroll = (
     e: React.MouseEvent<HTMLButtonElement>,
-    status: PayrollDatabaseRow["status"],
+    status: PayrollDatabaseRow["status"]
   ) => {
     e.preventDefault();
     submit(
@@ -63,7 +68,7 @@ export function SalaryEntryComponent({
       {
         method: "POST",
         action: `/payroll/run-payroll/${payrollId}`,
-      },
+      }
     );
   };
 
@@ -81,15 +86,18 @@ export function SalaryEntryComponent({
             className="pl-8 h-10 w-full focus-visible:ring-0 shadow-none"
           />
         </div>
-        <div className={cn("ml-auto flex flex-row gap-3", noButtons && "hidden")}>
+        <div
+          className={cn("ml-auto flex flex-row gap-3", noButtons && "hidden")}
+        >
           <Button
             variant={payrollData.status === "approved" ? "muted" : "default"}
             onClick={(e) => updateStatusPayroll(e, "submitted")}
             className={cn(
               "hidden h-10",
-              (payrollData.status === "pending" || payrollData.status === "approved") &&
-              hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
-              "flex",
+              (payrollData.status === "pending" ||
+                payrollData.status === "approved") &&
+                hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
+                "flex"
             )}
             disabled={disable}
           >
@@ -101,8 +109,8 @@ export function SalaryEntryComponent({
             className={cn(
               "hidden h-10",
               payrollData.status === "submitted" &&
-              hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
-              "flex",
+                hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
+                "flex"
             )}
             disabled={disable}
           >
@@ -113,8 +121,8 @@ export function SalaryEntryComponent({
             className={cn(
               "hidden h-10",
               payrollData.status === "submitted" &&
-              hasPermission(role, `${approveRole}:${attribute.payroll}`) &&
-              "flex",
+                hasPermission(role, `${approveRole}:${attribute.payroll}`) &&
+                "flex"
             )}
             disabled={disable}
           >
@@ -124,11 +132,17 @@ export function SalaryEntryComponent({
         <PayrollActions
           className={cn(payrollData?.status === "pending" && "hidden")}
           payrollId={payrollId ?? payrollData?.id}
+          data={data as unknown as any}
+          env={env}
+          payrollData={payrollData}
         />
       </div>
       <SalaryEntryDataTable
         data={tableData}
-        columns={salaryEntryColumns({ salaryEntries: data[0].salary_entries, editable: payrollData?.status === "pending" })}
+        columns={salaryEntryColumns({
+          salaryEntries: data[0]?.salary_entries || [],
+          editable: payrollData?.status === "pending",
+        })}
       />
       <Outlet />
     </section>

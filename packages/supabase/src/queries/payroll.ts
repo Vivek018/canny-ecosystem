@@ -112,10 +112,32 @@ export async function getPayrollById({
   return { data, error };
 }
 
+export type PayrollEntriesWithEmployee = Omit<
+  PayrollEntriesDatabaseRow,
+  "created_at" | "updated_at"
+> & {
+  employees: Pick<
+    EmployeeDatabaseRow,
+    | "first_name"
+    | "middle_name"
+    | "last_name"
+    | "employee_code"
+    | "company_id"
+    | "id"
+  >;
+};
 
-export type PayrollEntriesWithEmployee = Omit<PayrollEntriesDatabaseRow, "created_at" | "updated_at"> & { employees: Pick<EmployeeDatabaseRow, "first_name" | "middle_name" | "last_name" | "employee_code" | "company_id" | "id"> }
-
-export type SalaryEntriesWithEmployee = Pick<EmployeeDatabaseRow, "first_name" | "middle_name" | "last_name" | "employee_code" | "company_id" | "id"> & { salary_entries: Omit<SalaryEntriesDatabaseRow, "created_at" | "updated_at">[] }
+export type SalaryEntriesWithEmployee = Pick<
+  EmployeeDatabaseRow,
+  | "first_name"
+  | "middle_name"
+  | "last_name"
+  | "employee_code"
+  | "company_id"
+  | "id"
+> & {
+  salary_entries: Omit<SalaryEntriesDatabaseRow, "created_at" | "updated_at">[];
+};
 
 export async function getSalaryEntriesByPayrollId({
   supabase,
@@ -124,6 +146,8 @@ export async function getSalaryEntriesByPayrollId({
   supabase: TypedSupabaseClient;
   payrollId: string;
 }) {
+  console.log("Backend Id", payrollId);
+  
   const columns = [
     "id",
     "month",
@@ -143,12 +167,22 @@ export async function getSalaryEntriesByPayrollId({
 
   const { data, error } = await supabase
     .from("employees")
-    .select(`id, company_id, first_name, middle_name, last_name, employee_code, salary_entries!inner(${columns.join(",")})`)
+    .select(
+      `id, company_id, first_name, middle_name, last_name, employee_code, salary_entries!inner(${columns.join(
+        ","
+      )})`
+    )
     .eq("salary_entries.payroll_id", payrollId)
-    .order("type, field_name", { ascending: true, referencedTable: "salary_entries" })
+    .order("type, field_name", {
+      ascending: true,
+      referencedTable: "salary_entries",
+    })
     .returns<SalaryEntriesWithEmployee[]>();
 
-  if (error) { console.error("getSalaryEntriesByPayrollId Error", error); }
+  if (error) {
+    console.error("getSalaryEntriesByPayrollId Error", error);
+  }
+  console.log("Backend Data", data);
 
   return { data, error };
 }
@@ -181,7 +215,11 @@ export async function getSalaryEntriesByPayrollAndEmployeeId({
 
   const { data, error } = await supabase
     .from("employees")
-    .select(`id, company_id, first_name, middle_name, last_name, employee_code, salary_entries!inner(${columns.join(",")})`)
+    .select(
+      `id, company_id, first_name, middle_name, last_name, employee_code, salary_entries!inner(${columns.join(
+        ","
+      )})`
+    )
     .eq("salary_entries.payroll_id", payrollId)
     .eq("id", employeeId)
     .single<SalaryEntriesWithEmployee>();
@@ -221,7 +259,7 @@ export async function getSalaryEntryById({
     .from("salary_entries")
     .select(`${columns.join(",")}`)
     .eq("id", id)
-    .single<InferredType<SalaryEntriesDatabaseRow, typeof columns[number]>>();
+    .single<InferredType<SalaryEntriesDatabaseRow, (typeof columns)[number]>>();
 
   if (error) console.error("getSalaryEntryById Error", error);
 
@@ -261,7 +299,6 @@ export async function getPayrollEntriesByPayrollId({
 
   return { data, error };
 }
-
 
 export async function getPayrollEntryById({
   supabase,

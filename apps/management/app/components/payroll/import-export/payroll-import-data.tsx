@@ -29,7 +29,6 @@ export function PayrollImportData({
   const validateImportData = (data: any[]) => {
     try {
       const result = ImportPayrollDataSchema.safeParse({ data });
-
       if (!result.success) {
         console.error("Payroll Data validation error");
         return false;
@@ -143,6 +142,9 @@ export function PayrollImportData({
             action: "/create-payroll",
           }
         );
+      }
+      if (payrollType === "salary") {
+        console.log("Salary");
       }
     }
   };

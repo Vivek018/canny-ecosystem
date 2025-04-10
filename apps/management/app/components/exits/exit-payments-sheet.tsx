@@ -33,7 +33,6 @@ export function ExitPaymentsSheet({
       >
         {row.getVisibleCells().map((cell: any) => {
           if (cell.column.id === "select" || cell.column.id === "actions") {
-            console.log(cell.column.id);
 
             return (
               <TableCell

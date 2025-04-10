@@ -13,7 +13,6 @@ export function ExportBar({
   data: Omit<CasesDatabaseRow, "created_at" | "updated_at">[];
   className: string;
 }) {
-  console.log(data);
 
   const toBeExportedData = data.map((element) => ({
     title: element?.title,

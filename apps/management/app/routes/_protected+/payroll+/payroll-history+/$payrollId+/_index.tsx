@@ -11,7 +11,10 @@ import {
   getSalaryEntriesByPayrollId,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import type { PayrollDatabaseRow } from "@canny_ecosystem/supabase/types";
+import type {
+  PayrollDatabaseRow,
+  SupabaseEnv,
+} from "@canny_ecosystem/supabase/types";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { isGoodStatus } from "@canny_ecosystem/utils";
 
@@ -30,6 +33,10 @@ import { Suspense, useEffect } from "react";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const payrollId = params.payrollId;
+  const env = {
+    SUPABASE_URL: process.env.SUPABASE_URL!,
+    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
+  };
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
     const payrollPromise = getPayrollById({
@@ -45,7 +52,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       payrollId: payrollId ?? "",
     });
 
-    return defer({ payrollPromise, salaryEntriesPromise, payrollEntriesPromise, error: null });
+    return defer({
+      payrollPromise,
+      salaryEntriesPromise,
+      payrollEntriesPromise,
+      error: null,
+      env,
+    });
   } catch (error) {
     console.error("Payroll Id Index Error", error);
     return defer({
@@ -53,6 +66,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       salaryEntriesPromise: Promise.resolve({ data: null, error: null }),
       payrollEntriesPromise: Promise.resolve({ data: null, error: null }),
       error,
+      env: null,
     });
   }
 }
@@ -60,7 +74,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   return clientCaching(
     `${cacheKeyPrefix.run_payroll_id}${args.params.payrollId}`,
-    args,
+    args
   );
 }
 
@@ -93,7 +107,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     }
     return json(
       { status: "error", message: "Payroll update failed", error },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     console.error("Payroll Id Action error", error);
@@ -104,13 +118,13 @@ export async function action({ request, params }: ActionFunctionArgs) {
         error,
         data: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
 
 export default function HistoryPayrollId() {
-  const { payrollPromise, salaryEntriesPromise,payrollEntriesPromise } =
+  const { payrollPromise, salaryEntriesPromise, payrollEntriesPromise, env } =
     useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
@@ -146,7 +160,9 @@ export default function HistoryPayrollId() {
       <Await resolve={payrollPromise}>
         {({ data: payrollData, error: payrollError }) => {
           if (payrollError || !payrollData) {
-            clearExactCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
+            clearExactCacheEntry(
+              `${cacheKeyPrefix.run_payroll_id}${payrollId}`
+            );
             return (
               <ErrorBoundary
                 error={payrollError}
@@ -154,12 +170,17 @@ export default function HistoryPayrollId() {
               />
             );
           }
-          if (payrollData.payroll_type === "reimbursement" || payrollData.payroll_type === "exit") {
+          if (
+            payrollData.payroll_type === "reimbursement" ||
+            payrollData.payroll_type === "exit"
+          ) {
             return (
               <Await resolve={payrollEntriesPromise}>
                 {({ data, error }) => {
                   if (error || !data) {
-                    clearExactCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
+                    clearExactCacheEntry(
+                      `${cacheKeyPrefix.run_payroll_id}${payrollId}`
+                    );
                     return (
                       <ErrorBoundary
                         error={error}
@@ -169,9 +190,13 @@ export default function HistoryPayrollId() {
                   }
 
                   return (
-                    <PayrollEntryComponent payrollData={payrollData} data={data} noButtons={true} />
+                    <PayrollEntryComponent
+                      payrollData={payrollData}
+                      data={data}
+                      noButtons={true}
+                      env={env as SupabaseEnv}
+                    />
                   );
-
                 }}
               </Await>
             );
@@ -181,7 +206,9 @@ export default function HistoryPayrollId() {
               <Await resolve={salaryEntriesPromise}>
                 {({ data, error }) => {
                   if (error || !data) {
-                    clearExactCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
+                    clearExactCacheEntry(
+                      `${cacheKeyPrefix.run_payroll_id}${payrollId}`
+                    );
                     return (
                       <ErrorBoundary
                         error={error}
@@ -190,7 +217,12 @@ export default function HistoryPayrollId() {
                     );
                   }
                   return (
-                    <SalaryEntryComponent payrollData={payrollData} data={data} noButtons={true} />
+                    <SalaryEntryComponent
+                      payrollData={payrollData}
+                      data={data}
+                      noButtons={true}
+                      env={env as SupabaseEnv}
+                    />
                   );
                 }}
               </Await>

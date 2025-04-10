@@ -39,6 +39,8 @@ export function PayrollEntryComponent({
   noButtons?: boolean;
   env: SupabaseEnv;
 }) {
+  console.log("hello");
+  
   const payrollCardDetails = [
     { title: "Payroll Type", value: "payroll_type" },
     { title: "Status", value: "status" },
@@ -47,12 +49,13 @@ export function PayrollEntryComponent({
     { title: "No of Employees", value: "total_employees" },
     { title: "Pay Day", value: "created_at" },
   ];
-
   const updatedPayrollCardDetails =
     payrollData.payroll_type === "reimbursement" ||
-    payrollData.payroll_type === "exit"
+    payrollData.payroll_type === "exit" ||
+    payrollData.payroll_type === "salary"
       ? payrollCardDetails.filter((_, index) => index !== 2)
       : payrollCardDetails;
+  console.log("===>", updatedPayrollCardDetails);
 
   const { role } = useUser();
   const { payrollId } = useParams();

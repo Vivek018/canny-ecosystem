@@ -52,7 +52,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       payrollId: payrollId ?? "",
     });
 
-    return defer({ payrollPromise, salaryEntriesPromise, payrollEntriesPromise, error: null });
+    return defer({
+      payrollPromise,
+      salaryEntriesPromise,
+      payrollEntriesPromise,
+      error: null,
+      env,
+    });
   } catch (error) {
     console.error("Payroll Id Index Error", error);
     return defer({
@@ -80,9 +86,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
     const formData = await request.formData();
     const payrollId = params.payrollId;
     const parsedData = JSON.parse(formData.get("data") as string);
-    const parsedSkipPayrollEntries = JSON.parse(
-      formData.get("skipPayrollEntries") as string
-    );
 
     const data = {
       id: (parsedData.id ?? payrollId) as PayrollDatabaseRow["id"],
@@ -97,7 +100,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
     const { status, error } = await updatePayroll({
       supabase,
       data,
-      skipPayrollEntries: parsedSkipPayrollEntries,
     });
     if (isGoodStatus(status)) {
       return json({
@@ -125,7 +127,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export default function RunPayrollId() {
-  const { payrollPromise, salaryEntriesPromise,payrollEntriesPromise } =
+  const { payrollPromise, salaryEntriesPromise, payrollEntriesPromise, env } =
     useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
@@ -171,12 +173,17 @@ export default function RunPayrollId() {
               />
             );
           }
-          if (payrollData.payroll_type === "reimbursement" || payrollData.payroll_type === "exit") {
+          if (
+            payrollData.payroll_type === "reimbursement" ||
+            payrollData.payroll_type === "exit"
+          ) {
             return (
               <Await resolve={payrollEntriesPromise}>
                 {({ data, error }) => {
                   if (error || !data) {
-                    clearExactCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
+                    clearExactCacheEntry(
+                      `${cacheKeyPrefix.run_payroll_id}${payrollId}`
+                    );
                     return (
                       <ErrorBoundary
                         error={error}
@@ -186,9 +193,12 @@ export default function RunPayrollId() {
                   }
 
                   return (
-                    <PayrollEntryComponent payrollData={payrollData} data={data} />
+                    <PayrollEntryComponent
+                      payrollData={payrollData}
+                      data={data}
+                      env={env as SupabaseEnv}
+                    />
                   );
-
                 }}
               </Await>
             );
@@ -198,7 +208,9 @@ export default function RunPayrollId() {
               <Await resolve={salaryEntriesPromise}>
                 {({ data, error }) => {
                   if (error || !data) {
-                    clearExactCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
+                    clearExactCacheEntry(
+                      `${cacheKeyPrefix.run_payroll_id}${payrollId}`
+                    );
                     return (
                       <ErrorBoundary
                         error={error}
@@ -206,8 +218,14 @@ export default function RunPayrollId() {
                       />
                     );
                   }
+                  console.log("Issue",data);
+
                   return (
-                    <SalaryEntryComponent payrollData={payrollData} data={data} />
+                    <SalaryEntryComponent
+                      payrollData={payrollData}
+                      data={data}
+                      env={env as SupabaseEnv}
+                    />
                   );
                 }}
               </Await>
