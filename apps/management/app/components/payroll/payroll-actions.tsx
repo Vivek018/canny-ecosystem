@@ -69,11 +69,23 @@ export function PayrollActions({
               payrollData={payrollData}
             />
           </Button>
-          <Button variant={"ghost"}>
-            <DownloadEsiFormat env={env} data={data}/>
+          <Button
+            variant={"ghost"}
+            className={cn(
+              "hidden",
+              payrollData.payroll_type === "salary" && "flex"
+            )}
+          >
+            <DownloadEsiFormat env={env} data={data} />
           </Button>
-          <Button variant={"ghost"}>
-            <DownloadEpfFormat env={env} data={data}/>
+          <Button
+            variant={"ghost"}
+            className={cn(
+              "hidden",
+              payrollData.payroll_type === "salary" && "flex"
+            )}
+          >
+            <DownloadEpfFormat env={env} data={data} />
           </Button>
         </div>
 
