@@ -87,7 +87,7 @@ export async function getEmployeeAttendanceConflicts({
       const hasConflict = existingRecords?.some(
         (existing) =>
           existing.employee_id === record.employee_id &&
-          existing.date === record.date,
+          existing.date === record.date
       );
 
       if (hasConflict) {
@@ -95,7 +95,7 @@ export async function getEmployeeAttendanceConflicts({
       }
       return indices;
     },
-    [],
+    []
   );
 
   return { conflictingIndices, error: null };
@@ -124,7 +124,7 @@ export async function createEmployeeAttendanceFromImportedData({
     .select("employee_id, date")
     .in(
       "employee_id",
-      identifiers.map((entry) => entry.employee_id).filter(Boolean),
+      identifiers.map((entry) => entry.employee_id).filter(Boolean)
     );
 
   if (existingError) {
@@ -134,12 +134,12 @@ export async function createEmployeeAttendanceFromImportedData({
 
   const existingSet = new Set(
     existingRecords?.map((record) => `${record.employee_id}-${record.date}`) ||
-    [],
+      []
   );
 
   if (import_type === "skip") {
     const newData = data.filter(
-      (entry) => !existingSet.has(`${entry.employee_id}-${entry.date}`),
+      (entry) => !existingSet.has(`${entry.employee_id}-${entry.date}`)
     );
 
     if (newData.length === 0) {
@@ -155,9 +155,7 @@ export async function createEmployeeAttendanceFromImportedData({
 
       const { error: insertError } = await supabase
         .from("attendance")
-        .insert(batch)
-        ;
-
+        .insert(batch);
       if (insertError) {
         console.error("Error inserting batch:", insertError);
       }
@@ -189,7 +187,7 @@ export async function createEmployeeAttendanceFromImportedData({
           .insert(record);
 
         return { type: "insert", error: insertError };
-      }),
+      })
     );
 
     const errors = results.filter((r) => r.error);
@@ -207,5 +205,68 @@ export async function createEmployeeAttendanceFromImportedData({
   return {
     status: "Invalid import_type specified",
     error: new Error("Invalid import_type"),
+  };
+}
+
+export async function createEmployeeAttendanceByPresentsFromImportedData({
+  supabase,
+  data,
+}: {
+  supabase: TypedSupabaseClient;
+  data: EmployeeAttendanceDatabaseInsert[];
+}) {
+  if (!data || data.length === 0) {
+    return { status: "No data provided", error: null };
+  }
+
+  const identifiers = data.map((entry) => ({
+    employee_id: entry.employee_id,
+    date: entry.date,
+  }));
+
+  const { data: existingRecords, error: existingError } = await supabase
+    .from("attendance")
+    .select("employee_id, date")
+    .in(
+      "employee_id",
+      identifiers.map((entry) => entry.employee_id).filter(Boolean)
+    );
+
+  if (existingError) {
+    console.error("Error fetching existing records:", existingError);
+    return { status: "Error fetching existing records", error: existingError };
+  }
+
+  const existingSet = new Set(
+    existingRecords?.map((record) => `${record.employee_id}-${record.date}`) ||
+      []
+  );
+
+  const newData = data.filter(
+    (entry) => !existingSet.has(`${entry.employee_id}-${entry.date}`)
+  );
+
+  if (newData.length === 0) {
+    return {
+      status: "No new data to insert after filtering duplicates",
+      error: null,
+    };
+  }
+
+  const BATCH_SIZE = 50;
+  for (let i = 0; i < newData.length; i += BATCH_SIZE) {
+    const batch = newData.slice(i, Math.min(i + BATCH_SIZE, newData.length));
+
+    const { error: insertError } = await supabase
+      .from("attendance")
+      .insert(batch);
+    if (insertError) {
+      console.error("Error inserting batch:", insertError);
+    }
+  }
+
+  return {
+    status: "Successfully inserted new records",
+    error: null,
   };
 }

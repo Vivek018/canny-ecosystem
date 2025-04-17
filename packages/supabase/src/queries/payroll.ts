@@ -14,6 +14,10 @@ export type ImportPayrollDataType = Pick<
 > & {
   employee_code: EmployeeDatabaseRow["employee_code"];
 };
+export type ImportSalaryPayrollDataType = {
+  employee_code: EmployeeDatabaseRow["employee_code"];
+  present_days: number;
+};
 
 export async function getPendingOrSubmittedPayrollsByCompanyId({
   supabase,
@@ -146,7 +150,6 @@ export async function getSalaryEntriesByPayrollId({
   supabase: TypedSupabaseClient;
   payrollId: string;
 }) {
-  
   const columns = [
     "id",
     "month",

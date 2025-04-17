@@ -1194,7 +1194,7 @@ export const SalaryEntrySchema = z.object({
   is_overtime: z.boolean().default(false),
 });
 
-export const payrollTypesArray = ["reimbursement", "exit", "salary", "others"];
+export const payrollTypesArray = ["reimbursement", "exit", "others"];
 
 export const PayrollEntrySchema = z.object({
   id: z.string().optional(),
@@ -1364,6 +1364,38 @@ export const ImportSingleEmployeeAttendanceDataSchema = z.object({
 
 export const ImportEmployeeAttendanceDataSchema = z.object({
   data: z.array(ImportSingleEmployeeAttendanceDataSchema),
+});
+
+export const ImportEmployeeAttendanceByPresentsHeaderSchemaObject = z.object({
+  employee_code: z.string(),
+  present_days: z.string(),
+});
+
+export const ImportEmployeeAttendanceByPresentsHeaderSchema =
+  ImportEmployeeAttendanceByPresentsHeaderSchemaObject.refine(
+    (data) => {
+      const values = [data.employee_code, data.present_days].filter(Boolean);
+
+      const uniqueValues = new Set(values);
+      return uniqueValues.size === values.length;
+    },
+    {
+      message:
+        "Some fields have the same value. Please select different options.",
+      path: ["employee_code", "present_days"],
+    }
+  );
+
+export const ImportSingleEmployeeAttendanceByPresentsDataSchema = z.object({
+  employee_code: zNumberString.min(3),
+  present_days: z.preprocess((value) => {
+    const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
+    return Number.isNaN(parsed) ? undefined : parsed;
+  }, z.number()),
+});
+
+export const ImportEmployeeAttendanceByPresentsDataSchema = z.object({
+  data: z.array(ImportSingleEmployeeAttendanceByPresentsDataSchema),
 });
 
 export const employeeLetterTypesArray = [
@@ -1608,6 +1640,38 @@ export const ImportSinglePayrollDataSchema = z.object({
 
 export const ImportPayrollDataSchema = z.object({
   data: z.array(ImportSinglePayrollDataSchema),
+});
+
+export const ImportSalaryPayrollHeaderSchemaObject = z.object({
+  employee_code: z.string(),
+  present_days: z.string(),
+});
+
+export const ImportSalaryPayrollHeaderSchema =
+  ImportSalaryPayrollHeaderSchemaObject.refine(
+    (data) => {
+      const values = [data.employee_code, data.present_days].filter(Boolean);
+
+      const uniqueValues = new Set(values);
+      return uniqueValues.size === values.length;
+    },
+    {
+      message:
+        "Some fields have the same value. Please select different options.",
+      path: ["employee_code", "present_days"],
+    }
+  );
+
+export const ImportSingleSalaryPayrollDataSchema = z.object({
+  employee_code: zNumberString.min(3),
+  present_days: z.preprocess((value) => {
+    const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
+    return Number.isNaN(parsed) ? undefined : parsed;
+  }, z.number()),
+});
+
+export const ImportSalaryPayrollDataSchema = z.object({
+  data: z.array(ImportSingleSalaryPayrollDataSchema),
 });
 
 export const EmployeeLoginSchema = z.object({

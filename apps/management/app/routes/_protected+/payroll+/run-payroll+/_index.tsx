@@ -33,6 +33,7 @@ import {
 import { Combobox } from "@canny_ecosystem/ui/combobox";
 import { ImportPayrollDialog } from "@/components/payroll/import-payroll-dialog";
 import { ImportPayrollModal } from "@/components/payroll/import-export/import-modal-payroll";
+import { ImportSalaryPayrollModal } from "@/components/payroll/import-export/import-modal-salary-payroll";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {
@@ -155,6 +156,7 @@ export default function RunPayrollIndex() {
       </div>
 
       <ImportPayrollModal />
+      <ImportSalaryPayrollModal />
       <Outlet />
     </section>
   );

@@ -62,6 +62,7 @@ export function PayrollImportData({
           supabase,
           employeeCodes,
         });
+      
 
       if (codeError) throw codeError;
       if (payrollType === "reimbursement") {
@@ -142,9 +143,6 @@ export function PayrollImportData({
             action: "/create-payroll",
           }
         );
-      }
-      if (payrollType === "salary") {
-        console.log("Salary");
       }
     }
   };

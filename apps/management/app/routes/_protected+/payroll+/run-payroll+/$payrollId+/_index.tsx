@@ -37,6 +37,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
+
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
     const payrollPromise = getPayrollById({
@@ -173,6 +174,7 @@ export default function RunPayrollId() {
               />
             );
           }
+          
           if (
             payrollData.payroll_type === "reimbursement" ||
             payrollData.payroll_type === "exit"

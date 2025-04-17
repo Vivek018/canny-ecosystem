@@ -10,12 +10,15 @@ export const modalSearchParamNames = {
   import_employee_address: "import-employee-address",
   import_employee_guardians: "import-employee-guardians",
   import_employee_attendance: "import-employee-attendance",
+  import_employee_attendance_by_present_days:
+    "import-employee-attendance-by-present-days",
   import_reimbursement: "import-reimbursement",
   import_exits: "import-exits",
   view_template_components: "view-template-components",
   view_relationship_terms: "view-relationship-terms",
   import_leaves: "import-leaves",
   import_payroll: "import-payroll",
+  import_salary_payroll: "import-salary-payroll",
 };
 
 export const statesAndUTs = [

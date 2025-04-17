@@ -47,6 +47,7 @@ import type {
   CompanyDatabaseRow,
   LocationDatabaseRow,
 } from "@canny_ecosystem/supabase/types";
+import { ImportEmployeeAttendanceByPresentsModal } from "@/components/employees/import-export/import-modal-attendance-by-presents";
 
 const pageSize = LAZY_LOADING_LIMIT;
 
@@ -365,6 +366,7 @@ export default function Attendance() {
         </Await>
       </Suspense>
       <ImportEmployeeAttendanceModal />
+      <ImportEmployeeAttendanceByPresentsModal/>
     </section>
   );
 }

@@ -46,12 +46,16 @@ export function AttendanceMenu({
         if (typeof value === "object" && value !== null) {
           if (value.present === "P") {
             present_days++;
-            overtime_hours += (value.hours - 8);
+            overtime_hours += value.hours - 8;
           }
 
           const [day, monthStr, yearStr] = key.split(" ");
           const monthIndex = new Date(`${monthStr} 1, 2025`).getMonth();
-          const dateObj = new Date(Number.parseInt(yearStr), monthIndex, Number.parseInt(day));
+          const dateObj = new Date(
+            Number.parseInt(yearStr),
+            monthIndex,
+            Number.parseInt(day)
+          );
 
           if (!latestDate || dateObj > latestDate) {
             latestDate = dateObj;
@@ -59,13 +63,16 @@ export function AttendanceMenu({
         }
       }
 
-      const month = latestDate ? Number.parseInt(latestDate.toLocaleString("en-US", { month: "2-digit" })) : null;
+      const month = latestDate
+        ? Number.parseInt(
+            latestDate.toLocaleString("en-US", { month: "2-digit" })
+          )
+        : null;
       const year = latestDate ? latestDate.getFullYear() : null;
 
       return { employee_id, present_days, overtime_hours, month, year };
     });
   }
-
 
   const attendanceForPayroll = extractAttendanceData(selectedRows);
 
@@ -79,10 +86,9 @@ export function AttendanceMenu({
       {
         method: "POST",
         action: "/create-payroll",
-      },
+      }
     );
   };
-
 
   return (
     <DropdownMenu>
@@ -104,7 +110,7 @@ export function AttendanceMenu({
               buttonVariants({ variant: "muted" }),
               "w-full justify-start text-[13px] h-9 px-2 gap-2",
               !hasPermission(role, `${createRole}:${attribute.payroll}`) &&
-              "hidden",
+                "hidden"
             )}
           >
             <Icon name="plus-circled" />
@@ -113,11 +119,16 @@ export function AttendanceMenu({
           <DropdownMenuSeparator
             className={cn(
               !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
-              "hidden",
+                "hidden",
               !selectedRows.length && "hidden"
             )}
           />
-          <div className={cn("flex flex-col gap-1", !selectedRows?.length && "hidden")}>
+          <div
+            className={cn(
+              "flex flex-col gap-1",
+              !selectedRows?.length && "hidden"
+            )}
+          >
             <AttendanceRegister
               selectedRows={selectedRows}
               companyName={companyName}
@@ -133,7 +144,7 @@ export function AttendanceMenu({
         <DropdownMenuSeparator
           className={cn(
             !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
-            "hidden",
+              "hidden",
             !selectedRows.length && "hidden"
           )}
         />
@@ -148,11 +159,29 @@ export function AttendanceMenu({
           className={cn(
             "space-x-2 flex items-center",
             !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
-            "hidden"
+              "hidden"
           )}
         >
           <Icon name="import" size="sm" className="mb-0.5" />
           <span>Import Attendance</span>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={() => {
+            searchParams.set(
+              "step",
+              modalSearchParamNames.import_employee_attendance_by_present_days
+            );
+            setSearchParams(searchParams);
+          }}
+          className={cn(
+            "space-x-2 flex items-center",
+            !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
+              "hidden"
+          )}
+        >
+          <Icon name="import" size="sm" className="mb-0.5" />
+          <span>Attendance Days Import</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

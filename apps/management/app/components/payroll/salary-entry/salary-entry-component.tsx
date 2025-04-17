@@ -71,7 +71,6 @@ export function SalaryEntryComponent({
       }
     );
   };
-
   return (
     <section className="p-4">
       <div className="w-full flex items-center justify-between gap-4 pb-4">
@@ -141,7 +140,7 @@ export function SalaryEntryComponent({
       <SalaryEntryDataTable
         data={tableData}
         columns={salaryEntryColumns({
-          salaryEntries: data[0].salary_entries,
+          data,
           editable: payrollData?.status === "pending",
         })}
       />

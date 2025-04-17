@@ -4,6 +4,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
@@ -13,7 +14,7 @@ import {
   attribute,
   modalSearchParamNames,
 } from "@canny_ecosystem/utils/constant";
-import {useSearchParams } from "@remix-run/react";
+import { useSearchParams } from "@remix-run/react";
 
 export function ImportPayrollDialog() {
   const { role } = useUser();
@@ -32,6 +33,20 @@ export function ImportPayrollDialog() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent sideOffset={10} align="end">
+        <DropdownMenuItem
+          onClick={() => {
+            searchParams.set(
+              "step",
+              modalSearchParamNames.import_salary_payroll
+            );
+            setSearchParams(searchParams);
+          }}
+          className="space-x-2 flex items-center"
+        >
+          <Icon name="import" size="sm" className="mb-0.5" />
+          <span>Import Salary Payroll</span>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => {
             searchParams.set("step", modalSearchParamNames.import_payroll);
