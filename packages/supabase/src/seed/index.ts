@@ -52,12 +52,12 @@ import {
   seedEmployeeStatutoryDetails,
   seedEmployeeWorkHistory,
 } from "./employees";
-import { getEmployeeProjectAssignmentByEmployeeId, getEmployeesByCompanyId, getLatestLocationByCompanyId } from "../queries";
+import { getEmployeeProjectAssignmentByEmployeeId, getEmployeesByCompanyId } from "../queries";
 import { DEFAULT_APPOINTMENT_LETTER, DEFAULT_EXPERIENCE_LETTER, DEFAULT_NOC_LETTER, DEFAULT_OFFER_LETTER, DEFAULT_RELIEVING_LETTER, DEFAULT_TERMINATION_LETTER, publicHolidays, stateLWFContributions, stateProfessionalTax } from "@canny_ecosystem/utils/constant";
 import { faker } from "@faker-js/faker";
 import { employeeLetterTypesArray, encashmentFreqArray, reportedByArray, reportedOnArray } from "@canny_ecosystem/utils";
 import { MAX_QUERY_LIMIT } from "../constant";
-import type { CasesDatabaseRow, EmployeeLetterDatabaseInsert, EmployeeLetterDatabaseRow } from "../types";
+import type { CasesDatabaseRow, EmployeeLetterDatabaseInsert } from "../types";
 
 dotenv.config();
 
@@ -94,10 +94,7 @@ export async function seed(newCompanyId?: string) {
         bypassAuth: true,
       });
 
-      const { data: location } = await getLatestLocationByCompanyId({
-        supabase,
-        companyId: companyId!,
-      });
+      
 
       await createRelationship({
         supabase,
@@ -122,7 +119,6 @@ export async function seed(newCompanyId?: string) {
             data: {
               ...seedProjectSite(),
               project_id: projectId!,
-              company_location_id: (location as any)?.id!,
             },
             bypassAuth: true,
           });
@@ -318,7 +314,7 @@ export async function seed(newCompanyId?: string) {
           state: stateLWFContributions[index].state.toLowerCase(),
           employee_contribution: stateLWFContributions[index].employee_contribution,
           employer_contribution: stateLWFContributions[index].employer_contribution,
-          deduction_cycle: stateLWFContributions[index].deduction_cycle,
+          deduction_cycle: stateLWFContributions[index].deduction_cycle as "monthly" | "quarterly" | "half_yearly" | "yearly",
           company_id: companyId!,
           status: true
         },
@@ -348,8 +344,8 @@ export async function seed(newCompanyId?: string) {
       data: {
         deduction_cycle: ["monthly", "quarterly", "half_yearly", "yearly"][faker.number.int({ min: 0, max: 3 })],
         esi_number: faker.string.alphanumeric(10),
-        employees_contribution: 0.0075,
-        employers_contribution: 0.0325,
+        employee_contribution: 0.0075,
+        employer_contribution: 0.0325,
         include_employer_contribution: true,
         is_default: true,
         max_limit: 25000,

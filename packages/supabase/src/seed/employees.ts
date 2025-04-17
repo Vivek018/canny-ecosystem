@@ -26,13 +26,10 @@ import {
   positionArray,
   proficiencyArray,
   relationshipArray,
-  reportedByArray,
-  reportedOnArray,
   severityTypeArray,
   skillLevelArray,
   statusArray,
 } from "@canny_ecosystem/utils";
-import { getEmployeesByCompanyId } from "../queries";
 
 export function seedEmployees(): Omit<EmployeeDatabaseInsert, "company_id"> {
   return {
