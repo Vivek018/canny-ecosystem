@@ -23,12 +23,12 @@ export async function createProfessionalTax({
       return { status: 400, error: "Unauthorized User" };
     }
   }
-
+  
   const { error, status } = await supabase
-    .from("professional_tax")
-    .insert(data)
-    ;
-
+  .from("professional_tax")
+  .insert(data)
+  ;
+  
   if (error) {
     console.error("createProfessionalTax Error:", error);
   }

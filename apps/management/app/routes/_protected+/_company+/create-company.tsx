@@ -35,6 +35,7 @@ import { FormStepHeader } from "@/components/form/form-step-header";
 import { useIsomorphicLayoutEffect } from "@canny_ecosystem/utils/hooks/isomorphic-layout-effect";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { clearAllCache } from "@/utils/cache";
+import { seedRequisites } from "@canny_ecosystem/supabase/seed";
 
 export const CREATE_COMPANY = [
   "create-company",
@@ -110,6 +111,10 @@ export async function action({
           companyRegistrationDetails,
         });
 
+      if (id) {
+        await seedRequisites({ companyId: id });
+      }
+
       if (companyError) {
         return json(
           {
@@ -133,6 +138,7 @@ export async function action({
       }
 
       if (isGoodStatus(status)) {
+
         for (let i = 1; i <= totalSteps; i++) {
           session.unset(`${SESSION_KEY_PREFIX}${i}`);
         }

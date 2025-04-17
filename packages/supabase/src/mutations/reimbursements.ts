@@ -9,7 +9,7 @@ export async function createReimbursementsFromData({
   data,
 }: {
   supabase: TypedSupabaseClient;
-  data: ReimbursementInsert;
+  data: ReimbursementInsert[];
 }) {
   const { error, status } = await supabase
     .from("reimbursements")

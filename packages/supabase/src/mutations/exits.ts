@@ -7,7 +7,7 @@ export const createExit = async ({
   bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
-  data: ExitsInsert;
+  data: ExitsInsert[];
   bypassAuth?: boolean;
 }) => {
   if (!bypassAuth) {

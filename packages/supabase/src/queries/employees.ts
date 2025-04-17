@@ -819,7 +819,11 @@ export type EmployeeProjectAssignmentDataType = Omit<
   EmployeeProjectAssignmentDatabaseRow,
   "created_at" | "updated_at"
 > & {
-  project_sites: { id: string; name: string; projects: { name: string } };
+  project_sites: {
+    id: string;
+    name: string;
+    projects: { id: string; name: string };
+  };
 };
 
 export async function getEmployeeProjectAssignmentByEmployeeId({

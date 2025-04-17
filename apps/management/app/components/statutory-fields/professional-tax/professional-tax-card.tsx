@@ -67,10 +67,9 @@ export function ProfessionalTaxCard({
     "created_at" | "updated_at"
   >;
 }) {
+
   const { role } = useUser();
-  const grossSalaryRangeJson = JSON.parse(
-    String(professionalTax?.gross_salary_range) ?? "",
-  ) as ProfessionalTaxGrossSalaryRangeType;
+  const grossSalaryRangeJson = professionalTax.gross_salary_range as ProfessionalTaxGrossSalaryRangeType;
 
   return (
     <Card

@@ -1,6 +1,10 @@
 import { faker } from "@faker-js/faker";
 import type {
+  AccidentsDatabaseInsert,
+  CasesDatabaseInsert,
+  CasesDatabaseRow,
   EmployeeAddressDatabaseInsert,
+  EmployeeAttendanceDatabaseInsert,
   EmployeeBankDetailsDatabaseInsert,
   EmployeeDatabaseInsert,
   EmployeeGuardianDatabaseInsert,
@@ -8,15 +12,23 @@ import type {
   EmployeeSkillDatabaseInsert,
   EmployeeStatutoryDetailsDatabaseInsert,
   EmployeeWorkHistoryDatabaseInsert,
+  LeavesDatabaseInsert,
 } from "../types";
 import {
   accountTypeArray,
   assignmentTypeArray,
+  caseLocationTypeArray,
+  caseStatusArray,
+  caseTypeArray,
+  categoryOfAccidentArray,
   genderArray,
+  locationTypeArray,
   positionArray,
   proficiencyArray,
   relationshipArray,
+  severityTypeArray,
   skillLevelArray,
+  statusArray,
 } from "@canny_ecosystem/utils";
 
 export function seedEmployees(): Omit<EmployeeDatabaseInsert, "company_id"> {
@@ -117,7 +129,7 @@ export function seedEmployeeProjectAssignmentDetails(): Omit<
   return {
     assignment_type:
       assignmentTypeArray[
-        Math.floor(Math.random() * assignmentTypeArray.length)
+      Math.floor(Math.random() * assignmentTypeArray.length)
       ],
     position: positionArray[Math.floor(Math.random() * positionArray.length)],
     skill_level:
@@ -152,4 +164,135 @@ export function seedEmployeeSkills(): Omit<
       proficiencyArray[Math.floor(Math.random() * proficiencyArray.length)],
     years_of_experience: faker.number.int({ min: 0, max: 10 }),
   };
+}
+
+export function seedEmployeeAttendance(employeeId: string): EmployeeAttendanceDatabaseInsert[] {
+  const today = new Date();
+  const oneYearAgo = new Date();
+  oneYearAgo.setFullYear(today.getFullYear() - 1);
+
+  const dates = [];
+  for (let d = new Date(oneYearAgo); d <= today; d.setDate(d.getDate() + 1)) {
+    dates.push(new Date(d));
+  }
+
+  const employeeAttendances = dates.map(date => ({
+    employee_id: employeeId,
+    date: date.toISOString(),
+    holiday: faker.datatype.boolean(),
+    present: faker.datatype.boolean(),
+    no_of_hours: faker.number.int({ min: 0, max: 10 }),
+  }));
+
+  return employeeAttendances;
+}
+
+export function seedEmployeeLeaves(employeeId: string): LeavesDatabaseInsert[] {
+  const year = 2024;
+  const numLeaves = faker.number.int({ min: 10, max: 20 });
+  const employeeLeaves = [];
+
+  for (let i = 0; i < numLeaves; i++) {
+    const startDate = faker.date.between({ from: new Date(year, 0, 1), to: new Date(year, 11, 27) }); // Ensuring space for max leave days
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + faker.number.int({ min: 1, max: 4 })); // Ensuring 1 to 4 days gap
+
+    if (endDate > new Date(year, 11, 31)) endDate.setFullYear(year, 11, 31);
+
+    employeeLeaves.push({
+      employee_id: employeeId,
+      start_date: startDate.toISOString(),
+      end_date: endDate.toISOString(),
+      reason: faker.lorem.words(5),
+      leave_type: (["sick_leave", "casual_leave", "paid_leave", "unpaid_leave", "paternity_leave"] as const)[faker.number.int({ min: 0, max: 4 })],
+    });
+  }
+
+  return employeeLeaves;
+}
+
+export function seedEmployeeReimbursements(employeeId: string) {
+  const employeeReimbursements = [];
+
+  for (let i = 0; i < (Math.random() < 0.85 ? 0 : faker.number.int({ min: 1, max: 3 })); i++) {
+    employeeReimbursements.push({
+      employee_id: employeeId,
+      is_deductible: [true, false][faker.number.int({ min: 0, max: 1 })],
+      amount: faker.number.int({ min: 1000, max: 5000 }),
+      status: ["approved", "pending", "rejected"][faker.number.int({ min: 0, max: 2 })],
+      submitted_date: faker.date.past().toISOString(),
+    });
+  }
+
+
+  return employeeReimbursements;
+}
+
+export function seedEmployeeExits(employeeId: string) {
+  const employeeExits = [];
+
+  for (let i = 0; i < (Math.random() < 0.90 ? 0 : 1); i++) {
+    employeeExits.push({
+      employee_payable_days: faker.number.int({ min: 1, max: 30 }),
+      organization_payable_days: faker.number.int({ min: 1000, max: 5000 }),
+      final_settlement_date: faker.date.past().toISOString(),
+      last_working_day: faker.date.past().toISOString(),
+      reason: ["Resignation", "Termination", "Retirement"][faker.number.int({ min: 0, max: 2 })],
+      bonus: faker.number.int({ min: 1000, max: 5000 }),
+      gratuity: faker.number.int({ min: 1000, max: 5000 }),
+      deduction: faker.number.int({ min: 1000, max: 5000 }),
+      leave_encashment: faker.number.int({ min: 1000, max: 5000 }),
+      net_pay: faker.number.int({ min: 1000, max: 5000 }),
+      note: faker.lorem.words(5),
+      employee_id: employeeId,
+    });
+  }
+
+  return employeeExits;
+}
+
+export function seedEmployeeAccidents(employeeId: string) {
+  const employeeAccidents: AccidentsDatabaseInsert[] = [];
+
+  for (let i = 0; i < faker.number.int({ min: 0, max: 2 }); i++) {
+    employeeAccidents.push({
+      employee_id: employeeId,
+      category: categoryOfAccidentArray[
+        faker.number.int({ min: 0, max: categoryOfAccidentArray.length - 1 })],
+      date: faker.date.past().toISOString(),
+      description: faker.lorem.words(5),
+      location: faker.location.streetAddress(),
+      location_type: locationTypeArray[faker.number.int({ min: 0, max: 1 })],
+      medical_diagnosis: faker.lorem.words(5),
+      severity: severityTypeArray[faker.number.int({ min: 0, max: 1 })],
+      status: statusArray[faker.number.int({ min: 0, max: statusArray.length - 1 })],
+      title: faker.lorem.words(5),
+    });
+  }
+
+  return employeeAccidents;
+}
+
+export function seedEmployeeCases(caseData: Partial<CasesDatabaseRow>) {
+  const employeeCases: Omit<CasesDatabaseInsert, "company_id">[] = [];
+
+  for (let i = 0; i < faker.number.int({ min: 0, max: 3 }); i++) {
+    employeeCases.push({
+      title: faker.lorem.sentence(),
+      amount_given: faker.number.int({ min: 1000, max: 5000 }),
+      amount_received: faker.number.int({ min: 1000, max: 5000 }),
+      case_type: caseTypeArray[faker.number.int({ min: 0, max: caseTypeArray.length - 1 })],
+      status: caseStatusArray[faker.number.int({ min: 0, max: caseStatusArray.length - 1 })],
+      court_case_reference: faker.string.alphanumeric(10),
+      date: faker.date.past().toISOString(),
+      incident_date: faker.date.past().toISOString(),
+      description: faker.lorem.paragraph(),
+      location: faker.location.streetAddress(),
+      location_type: caseLocationTypeArray[faker.number.int({ min: 0, max: 1 })],
+      resolution_date: faker.date.future().toISOString(),
+      ...caseData,
+    });
+  }
+
+  return employeeCases;
 }

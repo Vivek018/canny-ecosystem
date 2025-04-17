@@ -72,7 +72,7 @@ export async function addLeaveTypeFromData({
   data,
 }: {
   supabase: TypedSupabaseClient;
-  data: LeaveTypeDatabaseInsert;
+  data: LeaveTypeDatabaseInsert[];
 }) {
   const { error, status } = await supabase
     .from("leave_type")
