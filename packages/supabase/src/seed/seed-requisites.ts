@@ -1,6 +1,4 @@
 import { createClient } from "@supabase/supabase-js";
-import { MAX_QUERY_LIMIT } from "../constant";
-import { getEmployeesByCompanyId } from "../queries";
 import {
   employeeLetterTypesArray,
   encashmentFreqArray,
@@ -28,17 +26,63 @@ import {
   createLabourWelfareFund,
   createLeaveEncashment,
   createPaymentField,
-  createPaymentTemplateWithComponents,
   createPaySequence,
   createProfessionalTax,
   createStatutoryBonus,
 } from "../mutations";
+import { getDefaultEmployeeAddressesByEmployeeId } from "../queries";
 
-export async function seedRequisites({ companyId }: { companyId: string }) {
+export async function seedRequisitesForCompanyCreation({
+  companyId,
+}: {
+  companyId: string;
+}) {
   const supabase = createClient(
     process.env.SUPABASE_URL!,
     process.env.SUPABASE_ANON_KEY!
   );
+
+  console.time("Created Payment Fields...");
+  await createPaymentField({
+    supabase,
+    data: [
+      {
+        name: "BASIC",
+        calculation_type: "percentage_of_ctc",
+        amount: 50,
+        payment_type: "fixed",
+        consider_for_epf: true,
+        consider_for_esic: true,
+        is_pro_rata: true,
+        is_active: true,
+        company_id: companyId!,
+      },
+      {
+        name: "HRA",
+        calculation_type: "percentage_of_ctc",
+        amount: 15,
+        payment_type: "fixed",
+        consider_for_epf: true,
+        consider_for_esic: true,
+        is_pro_rata: true,
+        is_active: true,
+        company_id: companyId!,
+      },
+      {
+        name: "Others",
+        calculation_type: "percentage_of_ctc",
+        amount: 25,
+        payment_type: "fixed",
+        consider_for_epf: true,
+        consider_for_esic: true,
+        is_pro_rata: true,
+        is_active: true,
+        company_id: companyId!,
+      },
+    ],
+    bypassAuth: true,
+  });
+  console.timeEnd("Created Payment Fields...");
 
   console.time("Created Taxes...");
   for (let index = 0; index < stateLWFContributions.length; index++) {
@@ -170,84 +214,6 @@ export async function seedRequisites({ companyId }: { companyId: string }) {
   });
   console.timeEnd("Created Taxes...");
 
-  console.time("Created Payment Fields...");
-  const { paymentFieldData } = await createPaymentField({
-    supabase,
-    data: [
-      {
-        name: "BASIC",
-        calculation_type: "percentage_of_ctc",
-        amount: 50,
-        payment_type: "fixed",
-        consider_for_epf: true,
-        consider_for_esic: true,
-        is_pro_rata: true,
-        is_active: true,
-        company_id: companyId!,
-      },
-      {
-        name: "HRA",
-        calculation_type: "percentage_of_ctc",
-        amount: 15,
-        payment_type: "fixed",
-        consider_for_epf: true,
-        consider_for_esic: true,
-        is_pro_rata: true,
-        is_active: true,
-        company_id: companyId!,
-      },
-      {
-        name: "Others",
-        calculation_type: "percentage_of_ctc",
-        amount: 25,
-        payment_type: "fixed",
-        consider_for_epf: true,
-        consider_for_esic: true,
-        is_pro_rata: true,
-        is_active: true,
-        company_id: companyId!,
-      },
-    ],
-    bypassAuth: true,
-  });
-  console.timeEnd("Created Payment Fields...");
-
-  console.time("Created Payment Template with Components...");
-  await createPaymentTemplateWithComponents({
-    supabase,
-    templateData: {
-      name: "Employee Salary",
-      description: "Employee Salary Template",
-      monthly_ctc: 50000,
-      state: "Maharashtra",
-      is_default: true,
-      is_active: true,
-      company_id: companyId!,
-    },
-    templateComponentsData: [
-      {
-        component_type: "earning",
-        target_type: "payment_field",
-        calculation_value: 0.5,
-        payment_field_id: paymentFieldData?.[0].id,
-      },
-      {
-        component_type: "earning",
-        target_type: "payment_field",
-        calculation_value: 0.15,
-        payment_field_id: paymentFieldData?.[1].id,
-      },
-      {
-        component_type: "earning",
-        target_type: "payment_field",
-        calculation_value: 0.25,
-        payment_field_id: paymentFieldData?.[2].id,
-      },
-    ],
-    bypassAuth: true,
-  });
-  console.timeEnd("Created Payment Template with Components...");
-
   await addLeaveTypeFromData({
     supabase,
     data: [
@@ -299,73 +265,63 @@ export async function seedRequisites({ companyId }: { companyId: string }) {
     },
     bypassAuth: true,
   });
+}
 
-  const { data: employeeData, error } = await getEmployeesByCompanyId({
-    companyId,
-    supabase,
-    params: { from: 0, to: MAX_QUERY_LIMIT },
-  });
+export async function seedRequisitesForEmployeeCreation({
+  employeeId,
+}: {
+  employeeId: string;
+}) {
+  const supabase = createClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_ANON_KEY!
+  );
+  for (let index = 0; index < employeeLetterTypesArray.length - 1; index++) {
+    const letterType = employeeLetterTypesArray[index];
+    const content =
+      letterType === "appointment_letter"
+        ? DEFAULT_APPOINTMENT_LETTER
+        : letterType === "experience_letter"
+        ? DEFAULT_EXPERIENCE_LETTER
+        : letterType === "noc_letter"
+        ? DEFAULT_NOC_LETTER
+        : letterType === "offer_letter"
+        ? DEFAULT_OFFER_LETTER
+        : letterType === "relieving_letter"
+        ? DEFAULT_RELIEVING_LETTER
+        : letterType === "termination_letter"
+        ? DEFAULT_TERMINATION_LETTER
+        : null;
 
-  if (error) {
-    console.error("Error fetching employee data:", error);
-    return;
-  }
+    const letterData: Omit<
+      EmployeeLetterDatabaseInsert,
+      "created_at" | "updated_at"
+    > = {
+      letter_type: letterType,
+      subject: faker.lorem.sentence(3),
+      date: faker.date.past().toISOString(),
+      content,
+      include_client_address: [true, false][
+        faker.number.int({ min: 0, max: 1 })
+      ],
+      include_employee_signature: [true, false][
+        faker.number.int({ min: 0, max: 1 })
+      ],
+      include_letter_head: [true, false][faker.number.int({ min: 0, max: 1 })],
+      include_our_address: [true, false][faker.number.int({ min: 0, max: 1 })],
+      include_signatuory: [true, false][faker.number.int({ min: 0, max: 1 })],
+      employee_id: employeeId,
+    };
+    // const { data: employeeAddressData } =
+    //   await getDefaultEmployeeAddressesByEmployeeId({
+    //     supabase,
+    //     employeeId: employeeId ?? "",
+    //   });
 
-  if (employeeData && Array.isArray(employeeData)) {
-    for (let index = 0; index < employeeData?.length - 1; index++) {
-      for (
-        let index = 0;
-        index < employeeLetterTypesArray.length - 1;
-        index++
-      ) {
-        const letterType = employeeLetterTypesArray[index];
-        const content =
-          letterType === "appointment_letter"
-            ? DEFAULT_APPOINTMENT_LETTER
-            : letterType === "experience_letter"
-            ? DEFAULT_EXPERIENCE_LETTER
-            : letterType === "noc_letter"
-            ? DEFAULT_NOC_LETTER
-            : letterType === "offer_letter"
-            ? DEFAULT_OFFER_LETTER
-            : letterType === "relieving_letter"
-            ? DEFAULT_RELIEVING_LETTER
-            : letterType === "termination_letter"
-            ? DEFAULT_TERMINATION_LETTER
-            : null;
-
-        const letterData: Omit<
-          EmployeeLetterDatabaseInsert,
-          "created_at" | "updated_at"
-        > = {
-          letter_type: letterType,
-          subject: faker.lorem.sentence(3),
-          date: faker.date.past().toISOString(),
-          content,
-          include_client_address: [true, false][
-            faker.number.int({ min: 0, max: 1 })
-          ],
-          include_employee_signature: [true, false][
-            faker.number.int({ min: 0, max: 1 })
-          ],
-          include_letter_head: [true, false][
-            faker.number.int({ min: 0, max: 1 })
-          ],
-          include_our_address: [true, false][
-            faker.number.int({ min: 0, max: 1 })
-          ],
-          include_signatuory: [true, false][
-            faker.number.int({ min: 0, max: 1 })
-          ],
-          employee_id: employeeData[index].id,
-        };
-
-        await createEmployeeLetter({
-          supabase,
-          letterData,
-          bypassAuth: true,
-        });
-      }
-    }
+    await createEmployeeLetter({
+      supabase,
+      letterData,
+      bypassAuth: true,
+    });
   }
 }

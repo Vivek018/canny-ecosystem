@@ -448,7 +448,12 @@ export const PaymentFieldSchema = PaymentFieldSchemaObject.refine(
   }
 );
 
-export const deductionCycleArray = ["monthly"] as const;
+export const deductionCycleArray = [
+  "monthly",
+  "yearly",
+  "half_yearly",
+] as const;
+
 export const EMPLOYEE_RESTRICTED_VALUE = 15000;
 export const EMPLOYER_RESTRICTED_VALUE = 15000;
 export const EDLI_RESTRICTED_VALUE = 75;

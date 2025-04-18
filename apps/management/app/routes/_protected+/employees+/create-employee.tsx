@@ -57,6 +57,7 @@ import { clearCacheEntry } from "@/utils/cache";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { safeRedirect } from "@/utils/server/http.server";
+import { seedRequisitesForEmployeeCreation } from "@canny_ecosystem/supabase/seed";
 
 export const CREATE_EMPLOYEE = [
   "create-employee",
@@ -205,6 +206,7 @@ export async function action({
         submission.value as EmployeeGuardianDatabaseInsert;
 
       const {
+        id,
         status,
         employeeError,
         employeeStatutoryDetailsError,
@@ -221,7 +223,9 @@ export async function action({
         employeeAddressesData,
         employeeGuardiansData,
       });
-
+      if (id) {
+        await seedRequisitesForEmployeeCreation({ employeeId: id });
+      }
       if (employeeError) {
         return json(
           {

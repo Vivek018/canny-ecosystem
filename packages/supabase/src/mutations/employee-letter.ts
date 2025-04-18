@@ -23,7 +23,6 @@ export async function createEmployeeLetter({
       return { status: 400, error: "Unauthorized User" };
     }
   }
-
   const { status, error } = await supabase
     .from("employee_letter")
     .insert(letterData)
