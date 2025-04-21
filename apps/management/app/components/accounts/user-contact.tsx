@@ -1,6 +1,5 @@
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
-import { Button } from "@canny_ecosystem/ui/button";
 import {
   Card,
   CardContent,
@@ -70,6 +69,8 @@ export const UserContact = ({ updateValues }: UserContactProps) => {
                   type: "text",
                 }),
                 placeholder: `Enter ${replaceUnderscore(fields.email.name)}`,
+                className: "disabled:opacity-100",
+                disabled: true,
               }}
               errors={fields.email.errors}
             />
@@ -80,8 +81,10 @@ export const UserContact = ({ updateValues }: UserContactProps) => {
                   type: "text",
                 }),
                 placeholder: `Enter ${replaceUnderscore(
-                  fields.mobile_number.name,
+                  fields.mobile_number.name
                 )}`,
+                className: "disabled:opacity-100",
+                disabled: true,
               }}
               errors={fields.mobile_number.errors}
             />
@@ -90,25 +93,6 @@ export const UserContact = ({ updateValues }: UserContactProps) => {
             <div>
               This is your primary email address and mobile number for
               notifications and more.
-            </div>
-            <div className="flex gap-4">
-              <Button
-                variant="secondary"
-                type="reset"
-                {...form.reset.getButtonProps()}
-              >
-                Reset
-              </Button>
-              <Button
-                form={form.id}
-                disabled={
-                  !form.valid || deepEqualCheck(form.initialValue, form.value)
-                }
-                variant="default"
-                type="submit"
-              >
-                Save
-              </Button>
             </div>
           </CardFooter>
         </Form>

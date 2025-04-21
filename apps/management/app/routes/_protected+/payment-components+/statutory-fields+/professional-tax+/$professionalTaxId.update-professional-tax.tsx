@@ -22,7 +22,7 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
-import { attribute } from "@canny_ecosystem/utils/constant";
+import { attribute, statesAndUTs } from "@canny_ecosystem/utils/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
 
 export const UPDATE_PROFESSIONAL_TAX = "update-professional-tax";
@@ -65,7 +65,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         error,
         professionalTaxData: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -83,7 +83,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: submission.status === "error" ? 400 : 200 }
     );
   }
 
@@ -112,6 +112,16 @@ export default function UpdateProfessionalTax() {
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  const matchedState = statesAndUTs.find(
+    (state) =>
+      state.label.toLowerCase() === professionalTaxData?.state.toLowerCase()
+  );
+
+  if (matchedState && professionalTaxData) {
+    professionalTaxData.state = matchedState.value;
+  }
+
 
   useEffect(() => {
     if (!actionData) return;

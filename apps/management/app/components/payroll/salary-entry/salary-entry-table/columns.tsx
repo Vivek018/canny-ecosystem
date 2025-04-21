@@ -14,9 +14,15 @@ import { Icon } from "@canny_ecosystem/ui/icon";
 
 import { SalaryEntryDropdown } from "../salary-entry-dropdown";
 import type { SalaryEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
+import { SalaryEntrySheet } from "./salary-entry-sheet";
+import type {
+  EmployeeDatabaseRow,
+  SalaryEntriesDatabaseRow,
+} from "@canny_ecosystem/supabase/types";
 
 export const salaryEntryColumns = ({
   data,
+  editable = false,
 }: {
   data: any;
   editable?: boolean;
@@ -109,7 +115,14 @@ export const salaryEntryColumns = ({
         const displayValue =
           valueObj?.amount !== undefined ? valueObj.amount : "--";
 
-        return <p className={displayColor}>{displayValue}</p>;
+        return (
+          <SalaryEntrySheet
+            triggerChild={<p className={displayColor}>{displayValue}</p>}
+            editable={editable}
+            employee={row.original as unknown as EmployeeDatabaseRow}
+            salaryEntry={valueObj as SalaryEntriesDatabaseRow}
+          />
+        );
       },
     })),
     {

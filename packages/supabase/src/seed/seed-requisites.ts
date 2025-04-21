@@ -30,7 +30,6 @@ import {
   createProfessionalTax,
   createStatutoryBonus,
 } from "../mutations";
-import { getDefaultEmployeeAddressesByEmployeeId } from "../queries";
 
 export async function seedRequisitesForCompanyCreation({
   companyId,

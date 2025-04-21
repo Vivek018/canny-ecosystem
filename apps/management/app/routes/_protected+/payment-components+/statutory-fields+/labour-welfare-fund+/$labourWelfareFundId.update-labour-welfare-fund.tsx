@@ -22,7 +22,7 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
-import { attribute } from "@canny_ecosystem/utils/constant";
+import { attribute, statesAndUTs } from "@canny_ecosystem/utils/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
 
 export const UPDATE_LABOUR_WELFARE_FUND = "update-labour-welfare-fund";
@@ -63,7 +63,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         error,
         lwfData: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -82,7 +82,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -110,7 +110,7 @@ export async function action({
         message: "Failed to update Labour Welfare Fund",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -121,6 +121,13 @@ export default function UpdateLabourWelfareFund() {
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  const matchedState = statesAndUTs.find(
+    (state) => state.label.toLowerCase() === lwfData?.state.toLowerCase()
+  );
+
+  if (matchedState && lwfData) {
+    lwfData.state = matchedState.value;
+  }
   useEffect(() => {
     if (!actionData) return;
 

@@ -284,13 +284,13 @@ export default function CreatePaymentTemplate() {
     step === 1
       ? stepData[step - 1]
         ? {
-          ...stepData[step - 1],
-          company_id: companyId,
-        }
+            ...stepData[step - 1],
+            company_id: companyId,
+          }
         : {
-          ...initialValues,
-          company_id: companyId,
-        }
+            ...initialValues,
+            company_id: companyId,
+          }
       : stepData[step - 1] ?? initialValues;
 
   const [form, fields] = useForm({
