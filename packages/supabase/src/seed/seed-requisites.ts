@@ -264,6 +264,7 @@ export async function seedRequisitesForCompanyCreation({
     },
     bypassAuth: true,
   });
+  
 }
 
 export async function seedRequisitesForEmployeeCreation({
@@ -311,11 +312,6 @@ export async function seedRequisitesForEmployeeCreation({
       include_signatuory: [true, false][faker.number.int({ min: 0, max: 1 })],
       employee_id: employeeId,
     };
-    // const { data: employeeAddressData } =
-    //   await getDefaultEmployeeAddressesByEmployeeId({
-    //     supabase,
-    //     employeeId: employeeId ?? "",
-    //   });
 
     await createEmployeeLetter({
       supabase,

@@ -6,13 +6,11 @@ import { Button } from "@canny_ecosystem/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { replaceDash } from "@canny_ecosystem/utils";
 import { useNavigate } from "@remix-run/react";
 import { DownloadBankAdvice } from "./download-bank-advice";
 import type { PayrollEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
@@ -34,25 +32,6 @@ export function PayrollActions({
 }) {
   const navigate = useNavigate();
 
-  const previewSalaryRegister = () => {
-    navigate(`/payroll/payroll-history/${payrollId}/salary-register`);
-  };
-
-  const handleDownload = (document: string) => {
-    navigate(`/payroll/payroll-history/${payrollId}/download-${document}`);
-  };
-
-  const epfDocuments = ["epf-return", "epf-register"];
-  const esiDocuments = ["esi-return", "esi-register", "dispensary"];
-  const otherDocuments = [
-    "compensation-register",
-    "gratuity-register",
-    "wages-register",
-    "overtime-register",
-    "accident-register",
-    "health-and-safety-register",
-  ];
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -61,81 +40,50 @@ export function PayrollActions({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent sideOffset={10} align="end">
-        <div className="flex flex-col">
-          <Button variant={"ghost"}>
+        <div className="flex flex-col pl-1">
+          <Button variant={"ghost"} className="w-full p-0">
             <DownloadBankAdvice
               env={env}
               data={data}
               payrollData={payrollData}
             />
           </Button>
+          <DropdownMenuSeparator />
           <Button
             variant={"ghost"}
             className={cn(
-              "hidden",
+              "hidden w-full p-0",
               payrollData.payroll_type === "salary" && "flex"
             )}
           >
             <DownloadEsiFormat env={env} data={data} />
           </Button>
+
           <Button
             variant={"ghost"}
             className={cn(
-              "hidden",
+              "hidden w-full p-0",
               payrollData.payroll_type === "salary" && "flex"
             )}
           >
             <DownloadEpfFormat env={env} data={data} />
           </Button>
+          <DropdownMenuSeparator />
+          <div>
+            <Button
+              variant={"ghost"}
+              className="p-0 pr-1 flex flex-row justify-start gap-2"
+              onClick={() =>
+                navigate(
+                  `/payroll/payroll-history/${payrollId}/salary-register`
+                )
+              }
+            >
+              <Icon name="import" />
+              Download Salary Register
+            </Button>
+          </div>
         </div>
-
-        <DropdownMenuSeparator />
-
-        <DropdownMenuItem
-          onClick={previewSalaryRegister}
-          className="space-x-2 flex items-center"
-        >
-          <Icon name="import" size="sm" className="mb-0.5" />
-          <span>Preview Salary register</span>
-        </DropdownMenuItem>
-        {otherDocuments.map((document) => (
-          <DropdownMenuItem
-            key={document}
-            onClick={() => handleDownload(document)}
-            className="space-x-2 flex items-center"
-          >
-            <Icon name="import" size="sm" className="mb-0.5" />
-            <span className="capitalize">
-              Download {`${replaceDash(document)}`}
-            </span>
-          </DropdownMenuItem>
-        ))}
-        <DropdownMenuSeparator />
-        {epfDocuments.map((document) => (
-          <DropdownMenuItem
-            key={document}
-            onClick={() => handleDownload(document)}
-            className="space-x-2 flex items-center"
-          >
-            <Icon name="import" size="sm" className="mb-0.5" />
-            <span className="capitalize">
-              Download {`${replaceDash(document)}`}
-            </span>
-          </DropdownMenuItem>
-        ))}
-        <DropdownMenuSeparator />
-        {esiDocuments.map((document) => (
-          <DropdownMenuItem
-            key={document}
-            onClick={() => handleDownload(document)}
-            className="space-x-2 flex items-center"
-          >
-            <Icon name="import" size="sm" className="mb-0.5" />
-            <span className="capitalize">
-              Download {`${replaceDash(document)}`}
-            </span>
-          </DropdownMenuItem>
-        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   );

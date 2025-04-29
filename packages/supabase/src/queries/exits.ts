@@ -1,12 +1,16 @@
-import { formatUTCDate } from "@canny_ecosystem/utils";
+import { defaultYear, formatUTCDate } from "@canny_ecosystem/utils";
 import type {
   EmployeeDatabaseRow,
   ExitsRow,
   InferredType,
   TypedSupabaseClient,
 } from "../types";
-import { RECENT_QUERY_LIMIT } from "../constant";
+import { months } from "@canny_ecosystem/utils/constant";
 
+export type DashboardFilters = {
+  month?: string | undefined | null;
+  year?: string | undefined | null;
+};
 export type ExitFilterType = {
   last_working_day_start?: string | undefined | null;
   last_working_day_end?: string | undefined | null;
@@ -106,10 +110,12 @@ export const getExitsByCompanyId = async ({
     .from("exits")
     .select(
       `${columns.join(",")},
-          employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
-      }(project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
+          employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${
+            project ? "inner" : "left"
+          }(project_sites!${project ? "inner" : "left"}(id, name, projects!${
+        project ? "inner" : "left"
       }(id, name))))`,
-      { count: "exact" },
+      { count: "exact" }
     )
     .eq("employees.company_id", companyId);
 
@@ -130,7 +136,7 @@ export const getExitsByCompanyId = async ({
           `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*,employee_code.ilike.*${searchQueryElement}*`,
           {
             referencedTable: "employees",
-          },
+          }
         );
       }
     } else {
@@ -138,7 +144,7 @@ export const getExitsByCompanyId = async ({
         `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`,
         {
           referencedTable: "employees",
-        },
+        }
       );
     }
   }
@@ -166,13 +172,13 @@ export const getExitsByCompanyId = async ({
   if (project) {
     query.eq(
       "employees.employee_project_assignment.project_sites.projects.name",
-      project,
+      project
     );
   }
   if (project_site) {
     query.eq(
       "employees.employee_project_assignment.project_sites.name",
-      project_site,
+      project_site
     );
   }
 
@@ -269,36 +275,76 @@ export type RecentExitsType = Pick<
     "id" | "first_name" | "middle_name" | "last_name" | "employee_code"
   > & {};
 };
-export async function getRecentExitsByCompanyId({
+
+export const getExitsByCompanyIdByMonths = async ({
   supabase,
+  companyId,
+  filters,
 }: {
   supabase: TypedSupabaseClient;
-}) {
-  const columns = [
-    "id",
-    "employee_id",
-    "last_working_day",
-    "final_settlement_date",
-    "net_pay",
-  ] as const;
+  companyId: string;
+  filters?: DashboardFilters;
+}) => {
+  const columns = ["id"] as const;
+  const defMonth = new Date().getMonth();
+  const filterMonth = filters?.month && Number(months[filters.month]);
+  const filterYear = filters?.year && Number(filters.year);
 
-  const { data, error } = await supabase
+  //For Current Month
+  const startOfCurrentMonth = filterMonth
+    ? new Date(Date.UTC(Number(filterYear ?? defaultYear), filterMonth - 1, 1))
+    : new Date(Date.UTC(Number(filterYear ?? defaultYear), defMonth, 1));
+
+  const endOfCurrentMonth = filterMonth
+    ? new Date(Number(filterYear ?? defaultYear), filterMonth, 1)
+    : new Date(Number(filterYear ?? defaultYear), defMonth + 1, 1);
+
+  const currentQuery = supabase
     .from("exits")
     .select(
       `${columns.join(",")},
-        employees!inner(id, first_name, middle_name, last_name, employee_code)`,
-      { count: "exact" },
+          employees!inner(employee_code)`
     )
-    .order("created_at", { ascending: false })
-    .limit(RECENT_QUERY_LIMIT)
-    .returns<RecentExitsType[]>();
+    .eq("employees.company_id", companyId)
+    .gte("created_at", startOfCurrentMonth.toISOString())
+    .lt("created_at", endOfCurrentMonth.toISOString());
 
-  if (error) {
-    console.error("getExitsByCompanyId Error", error);
+  const { data: currentMonthExits, error: currentMonthExitErrors } =
+    await currentQuery;
+
+  if (currentMonthExitErrors) {
+    console.error("getExitsFor CurrentMonth Error", currentMonthExitErrors);
+  }
+
+  //For Previous Month
+  const startOfPrevMonth = filterMonth
+    ? new Date(Date.UTC(Number(filterYear ?? defaultYear), filterMonth - 2, 1))
+    : new Date(Date.UTC(Number(filterYear ?? defaultYear), defMonth - 1, 1));
+  const endOfPrevMonth = filterMonth
+    ? new Date(Number(filterYear ?? defaultYear), filterMonth - 1, 1)
+    : new Date(Number(filterYear ?? defaultYear), defMonth, 1);
+
+  const prevQuery = supabase
+    .from("exits")
+    .select(
+      `${columns.join(",")},
+          employees!inner(employee_code)`
+    )
+    .eq("employees.company_id", companyId)
+    .gte("created_at", startOfPrevMonth.toISOString())
+    .lt("created_at", endOfPrevMonth.toISOString());
+
+  const { data: previousMonthExits, error: previousMonthExitErrors } =
+    await prevQuery;
+
+  if (previousMonthExitErrors) {
+    console.error("getExitsFor previousMonth Error", previousMonthExitErrors);
   }
 
   return {
-    data,
-    error,
+    currentMonthExits,
+    currentMonthExitErrors,
+    previousMonthExits,
+    previousMonthExitErrors,
   };
-}
+};

@@ -30,6 +30,8 @@ export async function createSalaryPayroll({
 }: {
   supabase: TypedSupabaseClient;
   data: {
+    run_date: string;
+    status: "pending" | "approved" | "submitted";
     type: "salary";
     salaryData: Omit<SalaryEntriesDatabaseInsert, "payroll_id">[];
     totalEmployees: number;
@@ -55,8 +57,9 @@ export async function createSalaryPayroll({
   } = await supabase
     .from("payroll")
     .insert({
+      run_date: data.run_date ?? "",
+      status: data?.status ?? "pending",
       payroll_type: data.type ?? "salary",
-      status: "pending",
       total_employees: data.totalEmployees,
       total_net_amount: data.totalNetAmount,
       company_id: companyId,
@@ -74,7 +77,6 @@ export async function createSalaryPayroll({
     payroll_id: payrollData.id,
   }));
 
-
   const {
     data: salaryEntriesData,
     status: salaryEntriesStatus,
@@ -83,6 +85,7 @@ export async function createSalaryPayroll({
     supabase,
     data: salaryPayrollEntries,
     onConflict: "month, year, employee_id, template_component_id",
+    bypassAuth,
   });
 
   if (isGoodStatus(salaryEntriesStatus)) {
@@ -99,6 +102,7 @@ export async function createSalaryPayroll({
       const { status, error } = await deletePayroll({
         supabase,
         id: payrollData?.id ?? "",
+        bypassAuth,
       });
       if (isGoodStatus(status)) {
         return {
@@ -119,6 +123,7 @@ export async function createSalaryPayroll({
           total_employees: salaryEntriesEmployeeLength,
           total_net_amount: salaryEntriesNetAmount,
         },
+        bypassAuth,
       });
       if (isGoodStatus(status)) {
         return {
@@ -148,11 +153,10 @@ export async function createReimbursementPayroll({
 }: {
   supabase: TypedSupabaseClient;
   data: {
+    run_date: string;
+    status: "pending" | "approved" | "submitted";
     type: "reimbursement";
-    reimbursementData: Pick<
-      ReimbursementDataType,
-      "id" | "employee_id" | "amount"
-    >[];
+    reimbursementData: Partial<ReimbursementDataType>[];
     totalEmployees: number;
     totalNetAmount: number;
   };
@@ -176,8 +180,9 @@ export async function createReimbursementPayroll({
   } = await supabase
     .from("payroll")
     .insert({
+      run_date: data.run_date ?? "",
+      status: data?.status ?? "pending",
       payroll_type: data.type ?? "reimbursement",
-      status: "pending",
       total_employees: data.totalEmployees,
       total_net_amount: data.totalNetAmount,
       company_id: companyId,
@@ -206,6 +211,7 @@ export async function createReimbursementPayroll({
     supabase,
     data: reimbursementPayrollEntries,
     onConflict: "reimbursement_id",
+    bypassAuth,
   });
 
   if (isGoodStatus(payrollEntriesStatus)) {
@@ -219,6 +225,7 @@ export async function createReimbursementPayroll({
       const { status, error } = await deletePayroll({
         supabase,
         id: payrollData?.id ?? "",
+        bypassAuth,
       });
       if (isGoodStatus(status)) {
         return {
@@ -239,6 +246,7 @@ export async function createReimbursementPayroll({
           total_employees: payrollEntriesEmployeeLength,
           total_net_amount: payrollEntriesNetAmount,
         },
+        bypassAuth,
       });
       if (isGoodStatus(status)) {
         return {
@@ -268,8 +276,10 @@ export async function createExitPayroll({
 }: {
   supabase: TypedSupabaseClient;
   data: {
+    run_date: string;
+    status: "pending" | "approved" | "submitted";
     type: "exit";
-    exitData: Pick<ExitDataType, "id" | "employee_id" | "net_pay">[];
+    exitData: Partial<ExitDataType>[];
     totalEmployees: number;
     totalNetAmount: number;
   };
@@ -291,8 +301,9 @@ export async function createExitPayroll({
   } = await supabase
     .from("payroll")
     .insert({
+      run_date: data.run_date ?? "",
+      status: data?.status ?? "pending",
       payroll_type: data.type ?? "exit",
-      status: "pending",
       total_employees: data.totalEmployees,
       total_net_amount: data.totalNetAmount,
       company_id: companyId,
@@ -321,6 +332,7 @@ export async function createExitPayroll({
     supabase,
     data: exitPayrollEntries,
     onConflict: "exit_id",
+    bypassAuth,
   });
 
   if (isGoodStatus(payrollEntriesStatus)) {

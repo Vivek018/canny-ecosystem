@@ -13,7 +13,12 @@ import {
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { useEffect } from "react";
 import { json, type ActionFunctionArgs } from "@remix-run/node";
-import { useActionData, useNavigate, useParams } from "@remix-run/react";
+import {
+  useActionData,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "@remix-run/react";
 
 export async function action({
   params,
@@ -56,7 +61,7 @@ export async function action({
         error,
         employeeId,
       },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json(
@@ -66,16 +71,19 @@ export async function action({
         error,
         employeeId,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
 
 export default function DeleteAttendance() {
   const actionData = useActionData<typeof action>();
+  const [searchParams] = useSearchParams();
   const { employeeId } = useParams();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const month = searchParams.get("month");
+  const year = searchParams.get("year");
 
   useEffect(() => {
     if (actionData) {
@@ -93,7 +101,18 @@ export default function DeleteAttendance() {
           variant: "destructive",
         });
       }
-      navigate(`/employees/${actionData?.employeeId}/attendance`);
+      let query = "";
+
+      if (month && year) {
+        query = `?month=${month}&year=${year}`;
+      } else if (month) {
+        query = `?month=${month}`;
+      } else if (year) {
+        query = `?year=${year}`;
+      }
+
+      const url = `/employees/${employeeId}/attendance${query}`;
+      navigate(url);
     }
   }, [actionData]);
 

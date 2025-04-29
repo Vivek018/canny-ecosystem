@@ -4,7 +4,12 @@ import type { EmployeeAttendanceDatabaseRow } from "@canny_ecosystem/supabase/ty
 import { AttendanceFilter } from "./attendance-filter";
 import { useNavigate } from "@remix-run/react";
 import { FilterList } from "./filter-list";
-import { defaultMonth, defaultYear, hasPermission, updateRole } from "@canny_ecosystem/utils";
+import {
+  defaultMonth,
+  defaultYear,
+  hasPermission,
+  updateRole,
+} from "@canny_ecosystem/utils";
 import { attribute, months } from "@canny_ecosystem/utils/constant";
 import { useUser } from "@/utils/user";
 
@@ -69,46 +74,63 @@ export const AttendanceComponent = ({
   });
 
   const handleUpdate = (date: string) => {
-    navigate(`/employees/${employeeId}/attendance/${date}/update-attendance`);
+    let query = "";
+
+    if (filters?.month && filters?.year) {
+      query = `?month=${filters.month}&year=${filters.year}`;
+    } else if (filters?.month) {
+      query = `?month=${filters.month}`;
+    } else if (filters?.year) {
+      query = `?year=${filters.year}`;
+    }
+
+    const url = `/employees/${employeeId}/attendance/${date}/update-attendance${query}`;
+    navigate(url);
   };
 
   return (
-    <div className='p-4'>
-      <div className='flex justify-end items-center mb-4 gap-x-2'>
+    <div className="p-4">
+      <div className="flex justify-end items-center mb-4 gap-x-2">
         <FilterList filters={filters} />
         <AttendanceFilter setMonth={setMonth} setYear={setYear} />
       </div>
 
-      <div className='w-full mx-auto pb-8'>
-        <div className='border rounded-lg'>
-          <div className='grid grid-cols-7'>
+      <div className="w-full mx-auto pb-8">
+        <div className="border rounded-lg">
+          <div className="grid grid-cols-7">
             {weekDays.map((day) => (
               <div
                 key={day}
-                className='bg-border p-2 text-center font-semibold text-muted-foreground'
+                className="bg-border p-2 text-center font-semibold text-muted-foreground"
               >
                 {day}
               </div>
             ))}
           </div>
 
-          <div className='grid grid-cols-7'>
+          <div className="grid grid-cols-7">
             {emptyFirstDays?.map((_, index) => (
               <div
                 key={`empty-${index.toString()}`}
-                className='h-32 border first:border-l  bg-[repeating-linear-gradient(-60deg,#DBDBDB,#DBDBDB_1px,transparent_1px,transparent_5px)] dark:bg-[repeating-linear-gradient(-60deg,#2C2C2C,#2C2C2C_1px,transparent_1px,transparent_5px)]'
+                className="h-32 border first:border-l  bg-[repeating-linear-gradient(-60deg,#DBDBDB,#DBDBDB_1px,transparent_1px,transparent_5px)] dark:bg-[repeating-linear-gradient(-60deg,#2C2C2C,#2C2C2C_1px,transparent_1px,transparent_5px)]"
               />
             ))}
 
             {days?.map((date) => (
               <div
                 onClick={
-                  hasPermission(role, `${updateRole}:${attribute.attendance}`)
+                  hasPermission(
+                    role,
+                    `${updateRole}:${attribute.attendance}`
+                  ) && new Date(date.fullDate) <= new Date()
                     ? () => handleUpdate(date?.fullDate)
                     : undefined
                 }
                 onKeyDown={
-                  hasPermission(role, `${updateRole}:${attribute.attendance}`)
+                  hasPermission(
+                    role,
+                    `${updateRole}:${attribute.attendance}`
+                  ) && new Date(date.fullDate) <= new Date()
                     ? () => handleUpdate(date?.fullDate)
                     : undefined
                 }
@@ -117,9 +139,9 @@ export const AttendanceComponent = ({
                   "h-32 border p-2 bg-card flex flex-col justify-between cursor-pointer"
                 )}
               >
-                <div className='flex justify-between items-center'>
-                  <div className='font-extrabold text-lg'>{date.day}</div>
-                  <div className='text-xs flex flex-col items-end'>
+                <div className="flex justify-between items-center">
+                  <div className="font-extrabold text-lg">{date.day}</div>
+                  <div className="text-xs flex flex-col items-end">
                     <div
                       className={cn(
                         "py-0.5 px-1 rounded-sm text-center",
@@ -146,7 +168,7 @@ export const AttendanceComponent = ({
                     {attendanceData?.find(
                       (entry) => entry?.date === date?.fullDate
                     )?.holiday && (
-                      <div className='capitalize mt-1 py-0.5 px-1 rounded-sm text-center bg-muted text-muted-foreground'>
+                      <div className="capitalize mt-1 py-0.5 px-1 rounded-sm text-center bg-muted text-muted-foreground">
                         {
                           attendanceData.find(
                             (entry) => entry?.date === date?.fullDate
@@ -157,7 +179,7 @@ export const AttendanceComponent = ({
                   </div>
                 </div>
 
-                <div className='flex justify-between items-center text-xs'>
+                <div className="flex justify-between items-center text-xs">
                   <div
                     className={cn(
                       "rounded-sm px-1 py-0.5",
@@ -180,7 +202,7 @@ export const AttendanceComponent = ({
                         )?.no_of_hours
                       } hours`}
                   </div>
-                  <div className='text-xs px-1 rounded-sm bg-muted text-muted-foreground'>
+                  <div className="text-xs px-1 rounded-sm bg-muted text-muted-foreground">
                     {
                       attendanceData?.find(
                         (entry) => entry?.date === date?.fullDate
@@ -194,7 +216,7 @@ export const AttendanceComponent = ({
             {emptyLastDays?.map((_, index) => (
               <div
                 key={`empty-${index.toString()}`}
-                className='h-32 border first:border-l bg-[repeating-linear-gradient(-60deg,#DBDBDB,#DBDBDB_1px,transparent_1px,transparent_5px)] dark:bg-[repeating-linear-gradient(-60deg,#2C2C2C,#2C2C2C_1px,transparent_1px,transparent_5px)]'
+                className="h-32 border first:border-l bg-[repeating-linear-gradient(-60deg,#DBDBDB,#DBDBDB_1px,transparent_1px,transparent_5px)] dark:bg-[repeating-linear-gradient(-60deg,#2C2C2C,#2C2C2C_1px,transparent_1px,transparent_5px)]"
               />
             ))}
           </div>

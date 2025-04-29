@@ -19,7 +19,6 @@ import type {
 import {
   HARD_QUERY_LIMIT,
   MID_QUERY_LIMIT,
-  RECENT_QUERY_LIMIT,
   SINGLE_QUERY_LIMIT,
 } from "../constant";
 
@@ -1185,43 +1184,6 @@ export type ImportEmployeeAttendanceByPresentsDataType = {
   year?: number;
 };
 
-export async function getRecentEmployeesByCompanyId({
-  supabase,
-  companyId,
-}: {
-  supabase: TypedSupabaseClient;
-  companyId: string;
-}) {
-  const columns = [
-    "id",
-    "employee_code",
-    "first_name",
-    "middle_name",
-    "last_name",
-    "date_of_birth",
-    "primary_mobile_number",
-    "secondary_mobile_number",
-  ] as const;
-
-  const { data, error } = await supabase
-    .from("employees")
-    .select(columns.join(","), { count: "exact" })
-    .order("created_at", { ascending: false })
-    .limit(RECENT_QUERY_LIMIT)
-    .eq("is_active", true)
-    .eq("company_id", companyId)
-    .returns<InferredType<EmployeeDatabaseRow, (typeof columns)[number]>[]>();
-
-  if (error) {
-    console.error("getRecentEmployeesByCompanyId Error", error);
-  }
-
-  return {
-    data,
-    error,
-  };
-}
-
 export async function getSiteIdByEmployeeId({
   supabase,
   employeeId,
@@ -1256,5 +1218,71 @@ export async function getSiteIdByEmployeeId({
   return {
     data,
     error,
+  };
+}
+
+export async function getActiveEmployeesByCompanyId({
+  supabase,
+  companyId,
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+}) {
+  const columns = ["employee_code"] as const;
+
+  //Active Employee
+  const activeQuery = supabase
+    .from("employees")
+    .select(columns.join(","))
+    .eq("company_id", companyId)
+    .in("is_active", [true]);
+
+  const { data: activeEmployees, error: activeEmployeeError } =
+    await activeQuery;
+
+  if (activeEmployeeError) {
+    console.error("getActiveEmployeesByCompanyId Error", activeEmployeeError);
+  }
+
+  //Total Employee
+  const totalQuery = supabase
+    .from("employees")
+    .select(columns.join(","))
+    .eq("company_id", companyId);
+
+  const { data: totalEmployees, error: totalEmployeeError } = await totalQuery;
+
+  if (totalEmployeeError) {
+    console.error("getTotalEmployeesByCompanyId Error", totalEmployeeError);
+  }
+
+  //Active Employee By Sites
+  const activeQueryBySites = supabase
+    .from("employees")
+    .select(
+      `${columns.join(
+        ","
+      )},employee_project_assignment!employee_project_assignments_employee_id_fkey!left(project_sites!left(id, name))`
+    )
+    .eq("company_id", companyId)
+    .in("is_active", [true]);
+
+  const { data: activeEmployeesBySites, error: activeEmployeeErrorBySites } =
+    await activeQueryBySites;
+
+  if (activeEmployeeErrorBySites) {
+    console.error(
+      "getActiveEmployeesByCompanyId Error",
+      activeEmployeeErrorBySites
+    );
+  }
+
+  return {
+    activeEmployees,
+    activeEmployeeError,
+    totalEmployees,
+    totalEmployeeError,
+    activeEmployeeErrorBySites,
+    activeEmployeesBySites,
   };
 }

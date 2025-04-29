@@ -182,7 +182,7 @@ export const DownloadBankAdvice = ({
       };
     });
   }
-  
+
   const generateBankAdviceExcel = async (selectedRows: any[]) => {
     if (!selectedRows.length) return;
 
@@ -206,7 +206,7 @@ export const DownloadBankAdvice = ({
   return (
     <AlertDialog>
       <AlertDialogTrigger
-        className={cn("w-full flex items-center justify-start  gap-2")}
+        className={cn("w-full flex items-center justify-start gap-2")}
       >
         <Icon name="import" />
         <p>Download Bank Advice</p>

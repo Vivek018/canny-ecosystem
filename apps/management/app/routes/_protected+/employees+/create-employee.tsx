@@ -43,14 +43,12 @@ import type { EmployeeGuardianDatabaseInsert } from "@canny_ecosystem/supabase/t
 import { CreateEmployeeGuardianDetails } from "@/components/employees/form/create-employee-guardian-details";
 import { FormStepHeader } from "@/components/form/form-step-header";
 import {
-  getEmployeesByPositionAndProjectSiteId,
   getProjectsByCompanyId,
   getSitesByProjectId,
 } from "@canny_ecosystem/supabase/queries";
 import {
   CreateEmployeeProjectAssignment,
   PROJECT_PARAM,
-  PROJECT_SITE_PARAM,
 } from "@/components/employees/form/create-employee-project-assignment";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { clearCacheEntry } from "@/utils/cache";
@@ -110,7 +108,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   let projectOptions: any = [];
   let projectSiteOptions: any = [];
-  let siteEmployeeOptions: any = [];
   if (step === 4) {
     const { data: projects } = await getProjectsByCompanyId({
       supabase,
@@ -136,21 +133,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
       }));
     }
 
-    const projectSiteParamId = urlSearchParams.get(PROJECT_SITE_PARAM);
 
-    if (projectSiteParamId?.length) {
-      const { data: siteEmployees } =
-        await getEmployeesByPositionAndProjectSiteId({
-          supabase,
-          position: "supervisor",
-          projectSiteId: projectSiteParamId,
-        });
-
-      siteEmployeeOptions = siteEmployees?.map((siteEmployee) => ({
-        label: siteEmployee?.employee_code,
-        value: siteEmployee?.id,
-      }));
-    }
+   
   }
 
   return json({
@@ -160,7 +144,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
     companyId,
     projectOptions,
     projectSiteOptions,
-    siteEmployeeOptions,
   });
 }
 
@@ -328,7 +311,6 @@ export default function CreateEmployee() {
     companyId,
     projectOptions,
     projectSiteOptions,
-    siteEmployeeOptions,
   } = useLoaderData<typeof loader>();
   const [resetKey, setResetKey] = useState(Date.now());
 
@@ -421,7 +403,6 @@ export default function CreateEmployee() {
                   fields={fields as any}
                   projectOptions={projectOptions}
                   projectSiteOptions={projectSiteOptions}
-                  siteEmployeeOptions={siteEmployeeOptions}
                 />
               ) : null}
               {step === 5 ? (

@@ -255,7 +255,6 @@ export async function action({
       let totalNetAmount = 0;
 
       totalNetAmount = calculateSalaryTotalNetAmount(salaryData);
-
       const {
         status,
         error: salaryError,
@@ -379,7 +378,6 @@ export async function action({
       let totalNetAmount = 0;
 
       totalNetAmount = calculateSalaryTotalNetAmount(transformedData);
-
       const {
         status,
         error: salaryError,

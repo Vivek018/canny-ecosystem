@@ -9,7 +9,6 @@ import type {
   TypedSupabaseClient,
   UserDatabaseRow,
 } from "../types";
-import { RECENT_QUERY_LIMIT } from "../constant";
 
 export type ImportReimbursementDataType = Pick<
   ReimbursementRow,
@@ -304,40 +303,4 @@ export type RecentReimbursementType = Pick<
     "id" | "first_name" | "middle_name" | "last_name" | "employee_code"
   > & {};
 };
-export async function getRecentReimbursementsByCompanyId({
-  supabase,
-  companyId,
-}: {
-  supabase: TypedSupabaseClient;
-  companyId: string;
-}) {
-  const columns = [
-    "id",
-    "employee_id",
-    "is_deductible",
-    "status",
-    "amount",
-    "submitted_date",
-  ] as const;
 
-  const { data, error } = await supabase
-    .from("reimbursements")
-    .select(
-      `${columns.join(",")},
-        employees!inner(id, first_name, middle_name, last_name, employee_code, company_id)`,
-      { count: "exact" }
-    )
-    .order("created_at", { ascending: false })
-    .limit(RECENT_QUERY_LIMIT)
-    .eq("employees.company_id", companyId)
-    .returns<RecentReimbursementType[]>();
-
-  if (error) {
-    console.error("getRecentReimbursementsByCompanyId Error", error);
-  }
-
-  return {
-    data,
-    error,
-  };
-}
