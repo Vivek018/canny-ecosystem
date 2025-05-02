@@ -1,4 +1,8 @@
-import type { CardInfoData } from "@/routes/_protected+/dashboard";
+import type {
+  EmployeeDatabaseRow,
+  ExitsRow,
+  PayrollDatabaseRow,
+} from "@canny_ecosystem/supabase/types";
 import {
   Card,
   CardContent,
@@ -6,52 +10,167 @@ import {
   CardTitle,
 } from "@canny_ecosystem/ui/card";
 import { Icon } from "@canny_ecosystem/ui/icon";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
 
-export function CountCards({ cardData }: { cardData: CardInfoData }) {
+export function CountCards({
+  currentExits,
+  previousExits,
+  currentData,
+  previousData,
+  activeEmployeeCount,
+  totalEmployeeCount,
+}: {
+  currentExits: ExitsRow[];
+  previousExits: ExitsRow[];
+  currentData: PayrollDatabaseRow[];
+  previousData: PayrollDatabaseRow[];
+  activeEmployeeCount: EmployeeDatabaseRow[];
+  totalEmployeeCount: EmployeeDatabaseRow[];
+}) {
+  const currentResult = currentData.reduce(
+    (acc: Record<string, number>, item) => {
+      const type = item.payroll_type;
+      acc[type] = (acc[type] || 0) + (item?.total_net_amount ?? 0);
+      return acc;
+    },
+    {} as Record<string, number>
+  );
+  const previousResult = previousData.reduce(
+    (acc: Record<string, number>, item) => {
+      const type = item.payroll_type;
+      acc[type] = (acc[type] || 0) + (item?.total_net_amount ?? 0);
+      return acc;
+    },
+    {} as Record<string, number>
+  );
+
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-          <Icon name="dollar" />
+          <CardTitle className="text-sm font-medium">Salary Payment</CardTitle>
+          <Icon name="rupees" size="xs" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">$45,231.89</div>
-          <p className="text-xs text-muted-foreground">
-            +20.1% from last month
+          <div className="text-2xl font-bold">{currentResult.salary ?? 0}</div>
+          <p
+            className={cn(
+              "text-xs text-muted-foreground flex",
+              (previousResult.salary
+                ? ((currentResult.salary - previousResult.salary) /
+                    previousResult.salary) *
+                  100
+                : 100) > 0
+                ? "text-green"
+                : "text-destructive"
+            )}
+          >
+            {previousResult.salary
+              ? (
+                  ((currentResult.salary ?? 0 - previousResult.salary ?? 0) /
+                    previousResult.salary) *
+                  100
+                ).toFixed(2)
+              : currentResult.salary ?? 0}
+            %
+            <p className="text-xs text-muted-foreground ml-1">
+              {(previousResult.salary
+                ? ((currentResult.salary - previousResult.salary) /
+                    previousResult.salary) *
+                  100
+                : 100) > 0
+                ? "more"
+                : "less"}{" "}
+              than last month
+            </p>
           </p>
         </CardContent>
       </Card>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Subscriptions</CardTitle>
-          <Icon name="subscriptions" />
+          <CardTitle className="text-sm font-medium">
+            Reimbursement Payment
+          </CardTitle>
+          <Icon name="rupees" size="xs" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">+2350</div>
-          <p className="text-xs text-muted-foreground">
-            +180.1% from last month
+          <div className="text-2xl font-bold">
+            {currentResult.reimbursement ?? 0}
+          </div>
+          <p
+            className={cn(
+              "text-xs text-muted-foreground flex",
+              (previousResult.reimbursement
+                ? ((currentResult.reimbursement -
+                    previousResult.reimbursement) /
+                    previousResult.reimbursement) *
+                  100
+                : 100) > 0
+                ? "text-green"
+                : "text-destructive"
+            )}
+          >
+            {previousResult.reimbursement
+              ? (
+                  ((currentResult.reimbursement ??
+                    0 - previousResult.reimbursement ??
+                    0) /
+                    previousResult.reimbursement) *
+                  100
+                ).toFixed(2)
+              : currentResult.reimbursement ?? 0}
+            %
+            <p className="text-xs text-muted-foreground ml-1">
+              {(previousResult.reimbursement
+                ? ((currentResult.reimbursement -
+                    previousResult.reimbursement) /
+                    previousResult.reimbursement) *
+                  100
+                : 100) > 0
+                ? "more"
+                : "less"}{" "}
+              than last month
+            </p>
           </p>
         </CardContent>
       </Card>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Sales</CardTitle>
-          <Icon name="card" />
+          <CardTitle className="text-sm font-medium">
+            Active Employees
+          </CardTitle>
+          <Icon name="employee" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">+12,234</div>
-          <p className="text-xs text-muted-foreground">+19% from last month</p>
+          <div className="text-2xl font-bold">{activeEmployeeCount.length}</div>
+          <p className="text-xs text-muted-foreground">
+            {totalEmployeeCount.length} total employees
+          </p>
         </CardContent>
       </Card>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Active Now</CardTitle>
-          <Icon name="stat" />
+          <CardTitle className="text-sm font-medium">
+            Exited Employees
+          </CardTitle>
+          <Icon name="employee" />
         </CardHeader>{" "}
         <CardContent>
-          <div className="text-2xl font-bold">+573</div>
-          <p className="text-xs text-muted-foreground">+201 since last hour</p>
+          <div className="text-2xl font-bold">{currentExits.length}</div>
+          <p
+            className={cn(
+              "text-xs text-muted-foreground flex",
+              currentExits.length - previousExits.length > 0
+                ? "text-green"
+                : "text-destructive"
+            )}
+          >
+            {currentExits.length - previousExits.length}
+            <p className="text-xs text-muted-foreground ml-1">
+              {currentExits.length - previousExits.length > 0 ? "more" : "less"}{" "}
+              than last month
+            </p>
+          </p>
         </CardContent>
       </Card>
     </div>

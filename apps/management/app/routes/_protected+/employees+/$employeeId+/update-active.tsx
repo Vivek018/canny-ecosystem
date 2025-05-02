@@ -46,7 +46,6 @@ export async function action({
         { status: submission.status === "error" ? 400 : 200 }
       );
     }
-
     const { status, error } = await updateEmployee({
       supabase,
       data: submission.value,

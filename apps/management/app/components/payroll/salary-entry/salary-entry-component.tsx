@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { useUser } from "@/utils/user";
 import {
   approveRole,
+  formatDate,
   hasPermission,
   searchInObject,
   updateRole,
@@ -20,6 +21,12 @@ import type {
 import { PayrollActions } from "../payroll-actions";
 import { SalaryEntryDataTable } from "./salary-entry-table/data-table";
 import { salaryEntryColumns } from "./salary-entry-table/columns";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@canny_ecosystem/ui/card";
 
 export function SalaryEntryComponent({
   data,
@@ -32,6 +39,21 @@ export function SalaryEntryComponent({
   noButtons?: boolean;
   env: SupabaseEnv;
 }) {
+  const payrollCardDetails = [
+    { title: "Payroll Type", value: "payroll_type" },
+    { title: "Status", value: "status" },
+    { title: "Payroll Cost", value: "cost" },
+    { title: "Net Pay", value: "total_net_amount" },
+    { title: "No of Employees", value: "total_employees" },
+    { title: "Pay Day", value: "created_at" },
+  ];
+  const updatedPayrollCardDetails =
+    payrollData.payroll_type === "reimbursement" ||
+    payrollData.payroll_type === "exit" ||
+    payrollData.payroll_type === "salary"
+      ? payrollCardDetails.filter((_, index) => index !== 2)
+      : payrollCardDetails;
+
   const { role } = useUser();
   const { payrollId } = useParams();
   const submit = useSubmit();
@@ -71,8 +93,33 @@ export function SalaryEntryComponent({
       }
     );
   };
+
   return (
     <section className="p-4">
+      <div
+        className={cn(
+          "h-24 mb-5 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4"
+        )}
+      >
+        {updatedPayrollCardDetails?.map((details, index) => (
+          <Card key={index.toString()} className="flex flex-col justify-around">
+            <CardHeader className="p-0">
+              <CardTitle className="text-lg text-center">
+                {details.title}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="py-0">
+              <p className="text-muted-foreground text-center">
+                {details.value === "created_at"
+                  ? formatDate(
+                      payrollData[details.value as keyof typeof payrollData]
+                    )
+                  : payrollData[details.value as keyof typeof payrollData]}
+              </p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
       <div className="w-full flex items-center justify-between gap-4 pb-4">
         <div className="relative w-full">
           <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">

@@ -89,10 +89,10 @@ function FeedbackCard({ feedback }: { feedback: any }) {
   return (
     <Card className="w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-between">
       <CardHeader className="flex flex-row space-y-0 items-center justify-between py-4">
-        <CardTitle className="font-bold">{feedback.category}</CardTitle>
+        <CardTitle className="font-bold capitalize">{feedback.category}</CardTitle>
         <CardTitle
           className={cn(
-            "px-1",
+            "px-1 capitalize",
             feedback.severity === "urgent"
               ? "text-destructive"
               : feedback.severity === "normal"

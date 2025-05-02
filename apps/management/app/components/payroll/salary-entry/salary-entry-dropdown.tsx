@@ -1,11 +1,22 @@
 import type { SalaryEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@canny_ecosystem/ui/alert-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@canny_ecosystem/ui/alert-dialog";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuSeparator,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { replaceDash } from "@canny_ecosystem/utils";
@@ -25,15 +36,13 @@ export const SalaryEntryDropdown = ({
 
   const handleClick = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    document: string,
+    document: string
   ) => {
     e.preventDefault();
-    navigate(`${payrollId}/${employeeId}/${document}`);
+    navigate(`${employeeId}/${document}`);
   };
 
-  const employeeDocuments = [
-    "salary-slip"
-  ];
+  const employeeDocuments = ["salary-slip"];
 
   return (
     <DropdownMenu>
@@ -49,6 +58,7 @@ export const SalaryEntryDropdown = ({
             </DropdownMenuItem>
           ))}
         </DropdownMenuGroup>
+        <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DeleteSalaryEntry payrollId={payrollId} employeeId={employeeId} />
         </DropdownMenuGroup>
@@ -57,8 +67,13 @@ export const SalaryEntryDropdown = ({
   );
 };
 
-
-export const DeleteSalaryEntry = ({ payrollId, employeeId }: { payrollId: string, employeeId: string, }) => {
+export const DeleteSalaryEntry = ({
+  payrollId,
+  employeeId,
+}: {
+  payrollId: string;
+  employeeId: string;
+}) => {
   const submit = useSubmit();
 
   const handleDelete = () => {
@@ -70,7 +85,7 @@ export const DeleteSalaryEntry = ({ payrollId, employeeId }: { payrollId: string
       {
         method: "POST",
         action: `/payroll/run-payroll/${payrollId}/${employeeId}/delete-salary-entry`,
-      },
+      }
     );
   };
 
@@ -79,7 +94,7 @@ export const DeleteSalaryEntry = ({ payrollId, employeeId }: { payrollId: string
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
-          "text-[13px] h-9",
+          "text-[13px] h-9"
         )}
       >
         Delete Salary Entry
@@ -93,10 +108,7 @@ export const DeleteSalaryEntry = ({ payrollId, employeeId }: { payrollId: string
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel
-          >
-            Cancel
-          </AlertDialogCancel>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
             className={cn(buttonVariants({ variant: "destructive" }))}
             onClick={handleDelete}
@@ -109,4 +121,3 @@ export const DeleteSalaryEntry = ({ payrollId, employeeId }: { payrollId: string
     </AlertDialog>
   );
 };
-

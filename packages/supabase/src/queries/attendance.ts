@@ -165,6 +165,7 @@ export async function getAttendanceByEmployeeId({
   }
 
   const { data, error } = await query;
+
   if (error) {
     console.error("getAttendanceByEmployeeId Error", error);
   }

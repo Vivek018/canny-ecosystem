@@ -259,7 +259,6 @@ export const EmployeeSchema = z.object({
   middle_name: zString.min(3).optional(),
   last_name: zString.min(3),
   employee_code: zNumberString.min(3),
-  photo: zImage.optional(),
   marital_status: z.enum(maritalStatusArray).default("unmarried"),
   date_of_birth: z.string(),
   gender: z.enum(genderArray).default("male"),

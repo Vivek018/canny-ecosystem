@@ -30,11 +30,26 @@
     --green: 120 40% 50%;
     --radius: 0.4rem;
     --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --chart-6: 0 0% 63%;
+--chart-2: 173 58% 39%;
+--chart-3: 197 37% 24%;
+--chart-4: 43 74% 66%;
+--chart-5: 27 87% 67%;
+--chart-6: 0 0% 63%;
+--chart-7: 271 64% 66%;
+--chart-8: 200 100% 45%;
+--chart-9: 120 39% 45%;
+--chart-10: 300 58% 53%;
+--chart-11: 180 76% 44%;
+--chart-12: 90 60% 40%;
+--chart-13: 24 100% 50%;
+--chart-14: 350 70% 60%;
+--chart-15: 210 100% 60%;
+--chart-16: 38 92% 55%;
+--chart-17: 160 62% 45%;
+--chart-18: 280 45% 50%;
+--chart-19: 48 89% 60%;
+--chart-20: 6 78% 55%;
+
 
     /* Custom scrollbar colors for light mode */
     --scrollbar-bg: 210 40% 96.1%;
@@ -67,6 +82,7 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    --chart-20: 6 78% 55%;
 
     /* Custom scrollbar colors for dark mode */
     --scrollbar-bg: 217.2 32.6% 17.5%;
