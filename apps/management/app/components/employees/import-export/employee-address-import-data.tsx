@@ -11,15 +11,11 @@ import type {
   SupabaseEnv,
 } from "@canny_ecosystem/supabase/types";
 import { Button } from "@canny_ecosystem/ui/button";
-import { Combobox } from "@canny_ecosystem/ui/combobox";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
-import { cn } from "@canny_ecosystem/ui/utils/cn";
 import {
-  duplicationTypeArray,
   ImportEmployeeAddressDataSchema,
   isGoodStatus,
-  transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
 import { useNavigate } from "@remix-run/react";
 
@@ -31,7 +27,6 @@ export function EmployeeAddressImportData({ env }: { env: SupabaseEnv }) {
   const { importData } = useImportStoreForEmployeeAddress();
 
   const [searchString, setSearchString] = useState("");
-  const [importType, setImportType] = useState<string>("skip");
   const [tableData, setTableData] = useState(importData.data);
 
   const validateImportData = (data: any[]) => {
@@ -54,8 +49,8 @@ export function EmployeeAddressImportData({ env }: { env: SupabaseEnv }) {
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase()),
-      ),
+          String(value).toLowerCase().includes(searchString.toLowerCase())
+      )
     );
     setTableData(filteredData);
   }, [searchString, importData]);
@@ -63,7 +58,7 @@ export function EmployeeAddressImportData({ env }: { env: SupabaseEnv }) {
   const handleFinalImport = async () => {
     if (validateImportData(importData.data)) {
       const employeeCodes = importData.data!.map(
-        (value: { employee_code: any }) => value.employee_code,
+        (value: { employee_code: any }) => value.employee_code
       );
 
       const { data: employees, error: idByCodeError } =
@@ -78,7 +73,7 @@ export function EmployeeAddressImportData({ env }: { env: SupabaseEnv }) {
 
       const updatedData = importData.data!.map((item: any) => {
         const employeeId = employees?.find(
-          (e: { employee_code: any }) => e.employee_code === item.employee_code,
+          (e: { employee_code: any }) => e.employee_code === item.employee_code
         )?.id;
 
         const { employee_code, ...rest } = item;
@@ -124,24 +119,12 @@ export function EmployeeAddressImportData({ env }: { env: SupabaseEnv }) {
             />
           </div>
           <div className="flex items-center gap-3">
-            <Combobox
-              className={cn("w-52 h-10")}
-              options={transformStringArrayIntoOptions(
-                duplicationTypeArray as unknown as string[],
-              )}
-              value={importType}
-              onChange={(value: string) => {
-                setImportType(value);
-              }}
-              placeholder={"Select Import Type"}
-            />
             <Button variant={"default"} onClick={handleFinalImport}>
               Import
             </Button>
           </div>
         </div>
       </div>
-      <input type="hidden" name="import_type" value={importType} />
       <input
         name="stringified_data"
         type="hidden"

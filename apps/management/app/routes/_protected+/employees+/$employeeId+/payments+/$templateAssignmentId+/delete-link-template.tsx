@@ -48,7 +48,7 @@ export default function DeleteEmployeeLinkTemplate() {
     if (actionData) {
       if (actionData.status === "success") {
         clearExactCacheEntry(
-          `${cacheKeyPrefix.employee_payments}${employeeId}`,
+          `${cacheKeyPrefix.employee_payments}${employeeId}`
         );
         toast({
           title: "Success",
@@ -59,8 +59,8 @@ export default function DeleteEmployeeLinkTemplate() {
         toast({
           title: "Error",
           description:
-            actionData?.error ||
             actionData?.error?.message ||
+            actionData?.error ||
             actionData?.message,
           variant: "destructive",
         });

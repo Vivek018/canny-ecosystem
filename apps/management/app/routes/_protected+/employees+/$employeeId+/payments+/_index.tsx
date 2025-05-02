@@ -62,7 +62,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   return clientCaching(
     `${cacheKeyPrefix.employee_payments}${args.params.employeeId}`,
-    args,
+    args
   );
 }
 clientLoader.hydrate = true;
@@ -88,7 +88,7 @@ export default function Payments() {
           {(resolvedAssignment) => {
             if (!resolvedAssignment) {
               clearExactCacheEntry(
-                `${cacheKeyPrefix.employee_payments}${employeeId}`,
+                `${cacheKeyPrefix.employee_payments}${employeeId}`
               );
               return <ErrorBoundary message="Failed to load link template" />;
             }
@@ -101,7 +101,9 @@ export default function Payments() {
                       paymentTemplateAssignmentData={resolvedAssignment?.data}
                     />
                     <PaymentTemplateComponentsCard
-                      paymentTemplateComponents={resolvedPaymentTemplateComponents?.data}
+                      paymentTemplateComponents={
+                        resolvedPaymentTemplateComponents?.data as unknown as any
+                      }
                       returnTo={`/employees/${employeeId}/payments`}
                     />
                   </>
@@ -117,7 +119,7 @@ export default function Payments() {
           {(resolvedData) => {
             if (!resolvedData) {
               clearExactCacheEntry(
-                `${cacheKeyPrefix.employee_payments}${employeeId}`,
+                `${cacheKeyPrefix.employee_payments}${employeeId}`
               );
               return <ErrorBoundary message="Failed to load link template" />;
             }

@@ -79,7 +79,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
     `${cacheKeyPrefix.feedback_list}${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 
@@ -89,15 +89,15 @@ function FeedbackCard({ feedback }: { feedback: any }) {
   return (
     <Card className="w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-between">
       <CardHeader className="flex flex-row space-y-0 items-center justify-between py-4">
-        <CardTitle className="font-bold">{feedback.category}</CardTitle>
+        <CardTitle className="font-bold capitalize">{feedback.category}</CardTitle>
         <CardTitle
           className={cn(
-            "px-1",
+            "px-1 capitalize",
             feedback.severity === "urgent"
               ? "text-destructive"
               : feedback.severity === "normal"
-                ? "text-purple-500"
-                : "text-yellow-400",
+              ? "text-purple-500"
+              : "text-yellow-400"
           )}
         >
           {feedback.severity}
@@ -191,6 +191,11 @@ export default function FeedbackList() {
                       <FeedbackCard key={feedback.id} feedback={feedback} />
                     ))}
                   </div>
+                    {feedbackResult?.data.length === 0 && (
+                      <div className="flex  justify-center items-center w-full h-full text-lg">
+                        No feedbacks found
+                      </div>
+                    )}
                   <PaginationButton
                     page={page}
                     totalCount={feedbackResult?.totalCount ?? 0}

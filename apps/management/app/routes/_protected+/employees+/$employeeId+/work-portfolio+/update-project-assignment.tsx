@@ -52,7 +52,7 @@ export async function loader({
   if (
     !hasPermission(
       `${user?.role!}`,
-      `${updateRole}:${attribute.employeeProjectAssignment}`,
+      `${updateRole}:${attribute.employeeProjectAssignment}`
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -136,7 +136,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -167,13 +167,8 @@ export async function action({
 }
 
 export default function UpdateEmployeeProjectAssignment() {
-  const {
-    data,
-    projectOptions,
-    projectSiteOptions,
-    status,
-    error,
-  } = useLoaderData<typeof loader>();
+  const { data, projectOptions, projectSiteOptions, status, error } =
+    useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
   const currentSchema = EmployeeProjectAssignmentSchema;
@@ -204,7 +199,7 @@ export default function UpdateEmployeeProjectAssignment() {
       if (actionData?.status === "success") {
         clearCacheEntry(cacheKeyPrefix.employees);
         clearExactCacheEntry(
-          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`,
+          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
         );
         toast({
           title: "Success",
@@ -215,8 +210,8 @@ export default function UpdateEmployeeProjectAssignment() {
         toast({
           title: "Error",
           description:
-            actionData?.error ||
             actionData?.error?.message ||
+            actionData?.error ||
             "Employee update failed",
           variant: "destructive",
         });

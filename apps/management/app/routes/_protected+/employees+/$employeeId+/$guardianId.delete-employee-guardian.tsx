@@ -52,7 +52,7 @@ export async function action({
         error,
         employeeId,
       },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json({
@@ -74,7 +74,7 @@ export default function DeleteEmployeeGuardian() {
     if (actionData) {
       if (actionData?.status === "success") {
         clearExactCacheEntry(
-          `${cacheKeyPrefix.employee_overview}${employeeId}`,
+          `${cacheKeyPrefix.employee_overview}${employeeId}`
         );
         toast({
           title: "Success",
@@ -85,8 +85,8 @@ export default function DeleteEmployeeGuardian() {
         toast({
           title: "Error",
           description:
-            actionData?.error ||
             actionData?.error?.message ||
+            actionData?.error ||
             "Guardian delete failed",
           variant: "destructive",
         });

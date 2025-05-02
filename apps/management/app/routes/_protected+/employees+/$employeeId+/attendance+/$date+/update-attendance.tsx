@@ -24,6 +24,7 @@ import {
   AttendanceDataSchema,
   attendanceHolidayTypeArray,
   attendanceWorkShiftArray,
+  deleteRole,
   getInitialValueFromZod,
   getValidDateForInput,
   hasPermission,
@@ -48,10 +49,12 @@ import {
   useActionData,
   useLoaderData,
   useNavigate,
+  useSearchParams,
   useSubmit,
 } from "@remix-run/react";
 import { useState } from "react";
 import { clearCacheEntry } from "@/utils/cache";
+import { useUser } from "@/utils/user";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
@@ -95,7 +98,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: submission.status === "error" ? 400 : 200 }
     );
   }
   const attendanceData = submission.value;
@@ -122,8 +125,22 @@ export async function action({
 }
 
 export default function UpdateAttendance() {
-  const submit = useSubmit();
+  const [searchParams] = useSearchParams();
+  const month = searchParams.get("month");
+  const year = searchParams.get("year");
 
+  let query = "";
+
+  if (month && year) {
+    query = `?month=${month}&year=${year}`;
+  } else if (month) {
+    query = `?month=${month}`;
+  } else if (year) {
+    query = `?year=${year}`;
+  }
+
+  const { role } = useUser();
+  const submit = useSubmit();
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -147,7 +164,9 @@ export default function UpdateAttendance() {
           variant: "destructive",
         });
       }
-      navigate(`/employees/${employeeId}/attendance`);
+      const url = `/employees/${employeeId}/attendance${query}`;
+
+      navigate(url);
     }
   }, [actionData]);
 
@@ -178,15 +197,16 @@ export default function UpdateAttendance() {
       },
       {
         method: "post",
-        action: `/employees/${employeeId}/attendance/${date}/delete-attendance`,
+        action: `/employees/${employeeId}/attendance/${date}/delete-attendance${query}`,
         replace: true,
-      },
+      }
     );
   };
 
   const onChange = () => {
     navigate(-1);
   };
+
   return (
     <Dialog open={true} onOpenChange={onChange}>
       <DialogContent>
@@ -261,7 +281,7 @@ export default function UpdateAttendance() {
                 key={resetKey}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  attendanceWorkShiftArray as unknown as string[],
+                  attendanceWorkShiftArray as unknown as string[]
                 )}
                 inputProps={{
                   ...getInputProps(fields.working_shift, { type: "text" }),
@@ -276,7 +296,7 @@ export default function UpdateAttendance() {
                 key={resetKey + 1}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  attendanceHolidayTypeArray as unknown as string[],
+                  attendanceHolidayTypeArray as unknown as string[]
                 )}
                 inputProps={{
                   ...getInputProps(fields.holiday_type, { type: "text" }),
@@ -292,13 +312,19 @@ export default function UpdateAttendance() {
         </FormProvider>
         <div
           className={cn(
-            "flex  pb-0 h-10",
-            updatableData ? "justify-between" : "justify-end",
+            "flex pb-0 h-10",
+            updatableData ? "justify-between" : "justify-end"
           )}
         >
           {updatableData && (
             <Button
-              className="h-10"
+              className={cn(
+                "h-10",
+                !hasPermission(
+                  role,
+                  `${deleteRole}:${attribute.employeeAddresses}`
+                ) && "hidden"
+              )}
               variant={"destructive-outline"}
               onClick={handleDelete}
             >
@@ -306,7 +332,7 @@ export default function UpdateAttendance() {
             </Button>
           )}
           <FormButtons
-            className="mr-[-29px] pb-0"
+            className="p-0 "
             form={form}
             setResetKey={setResetKey}
             isSingle={true}

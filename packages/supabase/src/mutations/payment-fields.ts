@@ -12,7 +12,7 @@ export async function createPaymentField({
   bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
-  data: PaymentFieldDatabaseInsert;
+  data: PaymentFieldDatabaseInsert[];
   bypassAuth?: boolean;
 }) {
   if (!bypassAuth) {
@@ -25,16 +25,16 @@ export async function createPaymentField({
     }
   }
 
-  const { error, status } = await supabase
+  const { error, status, data: paymentFieldData } = await supabase
     .from("payment_fields")
     .insert(data)
-    ;
+    .select("*");
 
   if (error) {
     console.error("createPaymentField Error", error);
   }
 
-  return { status, error };
+  return { status, error, paymentFieldData };
 }
 
 export async function updatePaymentField({

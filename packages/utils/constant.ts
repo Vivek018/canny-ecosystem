@@ -10,11 +10,15 @@ export const modalSearchParamNames = {
   import_employee_address: "import-employee-address",
   import_employee_guardians: "import-employee-guardians",
   import_employee_attendance: "import-employee-attendance",
+  import_employee_attendance_by_present_days:
+    "import-employee-attendance-by-present-days",
   import_reimbursement: "import-reimbursement",
   import_exits: "import-exits",
   view_template_components: "view-template-components",
   view_relationship_terms: "view-relationship-terms",
   import_leaves: "import-leaves",
+  import_payroll: "import-payroll",
+  import_salary_payroll: "import-salary-payroll",
 };
 
 export const statesAndUTs = [
@@ -91,7 +95,6 @@ export const EMPLOYER_EPF_PERCENTAGE = 0.12;
 export const EMPLOYER_EDLI_PERCENTAGE = 0.005;
 export const EMPLOYER_EPS_PERCENTAGE = 0.0833;
 export const EMPLOYER_ADMIN_CHARGES_PERCENTAGE = 0.005;
-export const BONUS_PERCENTAGE = 8.33;
 
 export const exitPaymentFields = [
   "bonus",
@@ -141,6 +144,7 @@ export const attribute = {
   settingLocations: "setting_locations",
   settingRelationships: "setting_relationships",
   settingUsers: "setting_users",
+  settingDocuments: "setting_documents",
   feedbackList: "feedback_list",
   reports: "reports",
   approvals: "approvals",
@@ -157,7 +161,7 @@ export const attribute = {
   timeTracking: "time_tracking",
   holidays: "holidays",
   paySequence: "pay_sequence",
-  companyDocuments:"company_documents"
+  companyDocuments: "company_documents",
 };
 
 export const months: { [key: string]: number } = {
@@ -237,7 +241,7 @@ This offer is contingent upon the following:
 
 Failure to meet any of the above conditions may result in the withdrawal of this offer.
 
-Sincerely,`
+Sincerely,`;
 
 export const DEFAULT_TERMINATION_LETTER = `Dear **\${employeeName}**,
 
@@ -276,7 +280,7 @@ John demonstrated professionalism, dedication, and a strong work ethic throughou
 
 We wish John all the best in his future endeavors and are confident that he will continue to excel in his professional journey.
 
-For any further clarification or verification, please feel free to contact us at [**hr@cannymgmt.com** ](mailto:hr@cannymgmt.com)or **+91 1234567890** .`
+For any further clarification or verification, please feel free to contact us at [**hr@cannymgmt.com** ](mailto:hr@cannymgmt.com)or **+91 1234567890** .`;
 
 export const DEFAULT_NOC_LETTER = `Dear **Sir/Madam**,
 
@@ -293,7 +297,7 @@ $\{employeeName} has been associated with $\{companyName} since $\{companyJoinin
 
 Thank you for considering this communication.
 
-Yours sincerely,`
+Yours sincerely,`;
 
 export const DEFAULT_RELIEVING_LETTER = `Dear **$\{employeeName}**,
 
@@ -305,7 +309,7 @@ We wish you all the best in your future endeavors and are confident that you wil
 
 Thank you for your service and commitment to $\{companyName} . Should you require any assistance or documentation in the future, please do not hesitate to reach out to us at \[Contact Information] .
 
-Yours sincerely,`
+Yours sincerely,`;
 export const SUPABASE_STORAGE = {
   LOGOS: "logos",
   EMPLOYEE_PROFILE_PHOTO: "employees/profile_photo",
@@ -321,11 +325,774 @@ export const SUPABASE_MEDIA_URL_PREFIX =
 
 export function getFilePathFromUrl(url: string) {
   return url.startsWith(
-    `${SUPABASE_MEDIA_URL_PREFIX}${SUPABASE_BUCKET.CANNY_ECOSYSTEM}/`,
+    `${SUPABASE_MEDIA_URL_PREFIX}${SUPABASE_BUCKET.CANNY_ECOSYSTEM}/`
   )
     ? url.slice(
-        `${SUPABASE_MEDIA_URL_PREFIX}${SUPABASE_BUCKET.CANNY_ECOSYSTEM}/`
-          .length,
+        `${SUPABASE_MEDIA_URL_PREFIX}${SUPABASE_BUCKET.CANNY_ECOSYSTEM}/`.length
       )
     : url;
 }
+
+export const stateLWFContributions = [
+  {
+    state: "Andhra Pradesh",
+    label: "AP",
+    employee_contribution: 30,
+    employer_contribution: 70,
+    deduction_cycle: "yearly",
+  },
+  {
+    state: "Chandigarh",
+    label: "CH",
+    employee_contribution: 5,
+    employer_contribution: 20,
+    deduction_cycle: "half_yearly",
+  },
+  {
+    state: "Chhattisgarh",
+    label: "CG",
+    employee_contribution: 15,
+    employer_contribution: 45,
+    deduction_cycle: "half_yearly",
+  },
+  {
+    state: "Delhi",
+    label: "DL",
+    employee_contribution: 0.75,
+    employer_contribution: 2.25,
+    deduction_cycle: "half_yearly",
+  },
+  {
+    state: "Goa",
+    label: "GA",
+    employee_contribution: 60,
+    employer_contribution: 180,
+    deduction_cycle: "half_yearly",
+  },
+  {
+    state: "Gujarat",
+    label: "GJ",
+    employee_contribution: 6,
+    employer_contribution: 12,
+    deduction_cycle: "half_yearly",
+  },
+  {
+    state: "Haryana",
+    label: "HR",
+    employee_contribution: 34, // 0.2% of salary, max Rs. 34
+    employer_contribution: 68, // Twice the employee contribution
+    deduction_cycle: "monthly",
+  },
+  {
+    state: "Karnataka",
+    label: "KA",
+    employee_contribution: 50,
+    employer_contribution: 100,
+    deduction_cycle: "yearly",
+  },
+  {
+    state: "Kerala",
+    label: "KL",
+    employee_contribution: 20,
+    employer_contribution: 20,
+    deduction_cycle: "monthly",
+  },
+  {
+    state: "Madhya Pradesh",
+    label: "MP",
+    employee_contribution: 10,
+    employer_contribution: 30,
+    deduction_cycle: "half_yearly",
+  },
+  {
+    state: "Maharashtra",
+    label: "MH",
+    employee_contribution: 25,
+    employer_contribution: 75,
+    deduction_cycle: "half_yearly",
+  },
+  {
+    state: "Odisha",
+    label: "OR",
+    employee_contribution: 10,
+    employer_contribution: 20,
+    deduction_cycle: "half_yearly",
+  },
+  {
+    state: "Punjab",
+    label: "PB",
+    employee_contribution: 5,
+    employer_contribution: 20,
+    deduction_cycle: "monthly",
+  },
+  {
+    state: "Tamil Nadu",
+    label: "TN",
+    employee_contribution: 20,
+    employer_contribution: 40,
+    deduction_cycle: "yearly",
+  },
+  {
+    state: "Telangana",
+    label: "TG",
+    employee_contribution: 2,
+    employer_contribution: 5,
+    deduction_cycle: "yearly",
+  },
+  {
+    state: "West Bengal",
+    label: "WB",
+    employee_contribution: 3,
+    employer_contribution: 15,
+    deduction_cycle: "half_yearly",
+  },
+];
+
+const pfMultiplier = 10000;
+const maxNumber = 999999999;
+
+export const stateProfessionalTax = [
+  {
+    state: "Andhra Pradesh",
+    label: "AP",
+    deduction_cycle: "monthly",
+    gross_salary_range: [
+      { start: 0, end: 15000, value: 0 },
+      { start: 15001, end: 20000, value: 150 },
+      { start: 20001, end: maxNumber, value: 200 },
+    ],
+    pt_number: String(Math.floor(Math.random() * pfMultiplier)),
+  },
+  {
+    state: "Assam",
+    label: "AS",
+    deduction_cycle: "monthly",
+    gross_salary_range: [
+      { start: 0, end: 10000, value: 0 },
+      { start: 10001, end: 15000, value: 150 },
+      { start: 15001, end: 25000, value: 180 },
+      { start: 25001, end: maxNumber, value: 208 },
+    ],
+    pt_number: String(Math.floor(Math.random() * pfMultiplier)),
+  },
+  {
+    state: "Bihar",
+    label: "BR",
+    deduction_cycle: "yearly",
+    gross_salary_range: [
+      { start: 0, end: 300000, value: 0 },
+      { start: 300001, end: 500000, value: 1000 },
+      { start: 500001, end: pfMultiplier, value: 2000 },
+      { start: 1000001, end: maxNumber, value: 2500 },
+    ],
+    pt_number: String(Math.floor(Math.random() * pfMultiplier)),
+  },
+  {
+    state: "Chhattisgarh",
+    label: "CG",
+    deduction_cycle: "monthly",
+    gross_salary_range: [
+      { start: 0, end: 5000, value: 0 },
+      { start: 5001, end: 10000, value: 60 },
+      { start: 10001, end: maxNumber, value: 80 },
+    ],
+    pt_number: String(Math.floor(Math.random() * pfMultiplier)),
+  },
+  {
+    state: "Gujarat",
+    label: "GJ",
+    deduction_cycle: "monthly",
+    gross_salary_range: [
+      { start: 0, end: 6000, value: 0 },
+      { start: 6001, end: 9000, value: 80 },
+      { start: 9001, end: 12000, value: 150 },
+      { start: 12001, end: maxNumber, value: 200 },
+    ],
+    pt_number: String(Math.floor(Math.random() * pfMultiplier)),
+  },
+  {
+    state: "Jharkhand",
+    label: "JH",
+    deduction_cycle: "monthly",
+    gross_salary_range: [
+      { start: 0, end: 25000, value: 0 },
+      { start: 25001, end: 30000, value: 125 },
+      { start: 30001, end: 40000, value: 167 },
+      { start: 40001, end: 50000, value: 200 },
+      { start: 50001, end: maxNumber, value: 208 },
+    ],
+    pt_number: String(Math.floor(Math.random() * pfMultiplier)),
+  },
+  {
+    state: "Karnataka",
+    label: "KA",
+    deduction_cycle: "monthly",
+    gross_salary_range: [
+      { start: 0, end: 15000, value: 0 },
+      { start: 15001, end: maxNumber, value: 200 },
+    ],
+    pt_number: String(Math.floor(Math.random() * pfMultiplier)),
+  },
+  {
+    state: "Kerala",
+    label: "KL",
+    deduction_cycle: "half_yearly",
+    gross_salary_range: [
+      { start: 0, end: 12000, value: 0 },
+      { start: 12001, end: 18000, value: 120 },
+      { start: 18001, end: 30000, value: 180 },
+      { start: 30001, end: 45000, value: 300 },
+      { start: 12500, end: maxNumber, value: 1250 },
+    ],
+    pt_number: String(Math.floor(Math.random() * pfMultiplier)),
+  },
+  {
+    state: "Madhya Pradesh",
+    label: "MP",
+    deduction_cycle: "monthly",
+    gross_salary_range: [
+      { start: 0, end: 18750, value: 0 },
+      { start: 18751, end: 25000, value: 125 },
+      { start: 25001, end: 33333, value: 167 },
+      { start: 33334, end: maxNumber, value: 208 },
+    ],
+    pt_number: String(Math.floor(Math.random() * pfMultiplier)),
+  },
+  {
+    state: "Maharashtra",
+    label: "MH",
+    deduction_cycle: "monthly",
+    gross_salary_range: [
+      { start: 0, end: 7500, value: 0 },
+      { start: 7501, end: 10000, value: 175 },
+      { start: 10001, end: maxNumber, value: 200 },
+    ],
+    pt_number: String(Math.floor(Math.random() * pfMultiplier)),
+  },
+  {
+    state: "Odisha",
+    label: "OD",
+    deduction_cycle: "monthly",
+    gross_salary_range: [
+      { start: 0, end: 15000, value: 0 },
+      { start: 15001, end: 25000, value: 200 },
+      { start: 25001, end: 35000, value: 250 },
+      { start: 35001, end: 45000, value: 300 },
+      { start: 45001, end: 100000, value: 350 },
+      { start: 100001, end: maxNumber, value: 500 },
+    ],
+    pt_number: String(Math.floor(Math.random() * pfMultiplier)),
+  },
+  {
+    state: "Puducherry",
+    label: "PY",
+    deduction_cycle: "half_yearly",
+    gross_salary_range: [
+      { start: 0, end: 3000, value: 0 },
+      { start: 3001, end: 6000, value: 60 },
+      { start: 15001, end: maxNumber, value: 180 },
+    ],
+    pt_number: String(Math.floor(Math.random() * pfMultiplier)),
+  },
+  {
+    state: "Sikkim",
+    label: "SK",
+    deduction_cycle: "monthly",
+    gross_salary_range: [
+      { start: 0, end: 15000, value: 0 },
+      { start: 15001, end: 30000, value: 125 },
+      { start: 30001, end: 50000, value: 200 },
+      { start: 50001, end: 75000, value: 300 },
+      { start: 75001, end: maxNumber, value: 400 },
+    ],
+    pt_number: String(Math.floor(Math.random() * pfMultiplier)),
+  },
+  {
+    state: "Tamil Nadu",
+    label: "TN",
+    deduction_cycle: "half_yearly",
+    gross_salary_range: [
+      { start: 0, end: 21000, value: 0 },
+      { start: 21001, end: 30000, value: 150 },
+      { start: 30001, end: 45000, value: 350 },
+      { start: 45001, end: 60000, value: 700 },
+      { start: 60001, end: 75000, value: 1050 },
+      { start: 75001, end: maxNumber, value: 1250 },
+    ],
+    pt_number: String(Math.floor(Math.random() * pfMultiplier)),
+  },
+  {
+    state: "Telangana",
+    label: "TG",
+    deduction_cycle: "monthly",
+    gross_salary_range: [
+      { start: 0, end: 15000, value: 0 },
+      { start: 15001, end: 20000, value: 150 },
+      { start: 20001, end: maxNumber, value: 200 },
+    ],
+    pt_number: String(Math.floor(Math.random() * pfMultiplier)),
+  },
+  {
+    state: "Tripura",
+    label: "TR",
+    deduction_cycle: "monthly",
+    gross_salary_range: [
+      { start: 0, end: 5000, value: 0 },
+      { start: 5001, end: 10000, value: 130 },
+      { start: 10001, end: 15000, value: 165 },
+      { start: 15001, end: 20000, value: 200 },
+      { start: 20001, end: maxNumber, value: 208 },
+    ],
+    pt_number: String(Math.floor(Math.random() * pfMultiplier)),
+  },
+  {
+    state: "West Bengal",
+    label: "WB",
+    deduction_cycle: "monthly",
+    gross_salary_range: [
+      { start: 0, end: 10000, value: 0 },
+      { start: 10001, end: 15000, value: 110 },
+      { start: 15001, end: 25000, value: 130 },
+      { start: 25001, end: 40000, value: 150 },
+      { start: 40001, end: maxNumber, value: 200 },
+    ],
+    pt_number: String(Math.floor(Math.random() * pfMultiplier)),
+  },
+  {
+    state: "Meghalaya",
+    label: "ML",
+    deduction_cycle: "monthly",
+    gross_salary_range: [
+      { start: 0, end: 12000, value: 0 },
+      { start: 12001, end: 18000, value: 150 },
+      { start: 18001, end: 30000, value: 175 },
+      { start: 30001, end: 50000, value: 200 },
+      { start: 50001, end: maxNumber, value: 250 },
+    ],
+    pt_number: String(Math.floor(Math.random() * pfMultiplier)),
+  },
+];
+
+export const publicHolidays = [
+  {
+    is_mandatory: true,
+    no_of_days: 1,
+    name: "Makar Sankranti",
+    start_date: "2024-01-14",
+  },
+  {
+    is_mandatory: true,
+    no_of_days: 1,
+    name: "Republic Day",
+    start_date: "2024-01-26",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Guru Gobind Singh Jayanti",
+    start_date: "2024-01-17",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Shivaji Jayanti",
+    start_date: "2024-02-19",
+  },
+  {
+    is_mandatory: true,
+    no_of_days: 1,
+    name: "Maha Shivratri",
+    start_date: "2024-03-08",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Swami Dayanand Saraswati Jayanti",
+    start_date: "2024-03-10",
+  },
+  {
+    is_mandatory: true,
+    no_of_days: 1,
+    name: "Holi 2nd Day (Dhuleti)",
+    start_date: "2024-03-25",
+  },
+  {
+    is_mandatory: true,
+    no_of_days: 1,
+    name: "Good Friday",
+    start_date: "2024-03-29",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Chetichand",
+    start_date: "2024-03-30",
+  },
+  {
+    is_mandatory: true,
+    no_of_days: 1,
+    name: "Ramzan-Eid (Eid-Ul-Fitra) (1st Shawaal)",
+    start_date: "2024-03-31",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Easter Sunday",
+    start_date: "2024-03-31",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Dr. Babasaheb Ambedkar Jayanti",
+    start_date: "2024-04-14",
+  },
+  {
+    is_mandatory: true,
+    no_of_days: 1,
+    name: "Ram Navami",
+    start_date: "2024-04-17",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Mahavir Janma Kalyanak",
+    start_date: "2024-04-21",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Hanuman Jayanti",
+    start_date: "2024-04-23",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "May Day",
+    start_date: "2024-05-01",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Buddha Purnima",
+    start_date: "2024-05-23",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Jamat Ul-Vida",
+    start_date: "2024-06-14",
+  },
+  {
+    is_mandatory: true,
+    no_of_days: 1,
+    name: "Bakri Eid (Eid al-Adha)",
+    start_date: "2024-06-17",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Guru Purnima",
+    start_date: "2024-07-21",
+  },
+  {
+    is_mandatory: true,
+    no_of_days: 1,
+    name: "Muharram",
+    start_date: "2024-07-17",
+  },
+  {
+    is_mandatory: true,
+    no_of_days: 1,
+    name: "Independence Day",
+    start_date: "2024-08-15",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Parsi New Year (Navroz)",
+    start_date: "2024-08-16",
+  },
+  {
+    is_mandatory: true,
+    no_of_days: 1,
+    name: "Raksha Bandhan",
+    start_date: "2024-08-19",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Onam",
+    start_date: "2024-09-15",
+  },
+  {
+    is_mandatory: true,
+    no_of_days: 1,
+    name: "Janmashtami",
+    start_date: "2024-08-26",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Ganesh Chaturthi",
+    start_date: "2024-09-07",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Samvatsari (Chaturthi Paksha)",
+    start_date: "2024-09-11",
+  },
+  {
+    is_mandatory: true,
+    no_of_days: 1,
+    name: "Gandhi Jayanti",
+    start_date: "2024-10-02",
+  },
+  {
+    is_mandatory: true,
+    no_of_days: 1,
+    name: "Vijaya Dashami (Dussehra)",
+    start_date: "2024-10-12",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Eid-e-Milad",
+    start_date: "2024-10-16",
+  },
+  {
+    is_mandatory: true,
+    no_of_days: 1,
+    name: "Diwali",
+    start_date: "2024-10-31",
+  },
+  {
+    is_mandatory: true,
+    no_of_days: 1,
+    name: "Vikram Samvat New Year",
+    start_date: "2024-11-01",
+  },
+  {
+    is_mandatory: true,
+    no_of_days: 1,
+    name: "Bhai Bij",
+    start_date: "2024-11-02",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Chhath Puja",
+    start_date: "2024-11-07",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Guru Nanak Jayanti",
+    start_date: "2024-11-15",
+  },
+  {
+    is_mandatory: true,
+    no_of_days: 1,
+    name: "Christmas",
+    start_date: "2024-12-25",
+  },
+  // Additional state-specific holidays
+  {
+    is_mandatory: true,
+    no_of_days: 1,
+    name: "Pongal",
+    start_date: "2024-01-15",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Thiruvalluvar Day",
+    start_date: "2024-01-16",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Uzhavar Thirunal",
+    start_date: "2024-01-17",
+  },
+  {
+    is_mandatory: true,
+    no_of_days: 1,
+    name: "Bihu (Bohag Bihu)",
+    start_date: "2024-04-14",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Magh Bihu",
+    start_date: "2024-01-15",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Kati Bihu",
+    start_date: "2024-10-18",
+  },
+  {
+    is_mandatory: true,
+    no_of_days: 1,
+    name: "Gudi Padwa",
+    start_date: "2024-04-09",
+  },
+  {
+    is_mandatory: true,
+    no_of_days: 1,
+    name: "Ugadi",
+    start_date: "2024-04-09",
+  },
+  {
+    is_mandatory: true,
+    no_of_days: 1,
+    name: "Baisakhi",
+    start_date: "2024-04-14",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Vishu",
+    start_date: "2024-04-14",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Bengali New Year (Poila Boishakh)",
+    start_date: "2024-04-15",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Rath Yatra",
+    start_date: "2024-07-07",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Teej",
+    start_date: "2024-08-07",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Paryushana Parva",
+    start_date: "2024-09-04",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Karnataka Rajyotsava",
+    start_date: "2024-11-01",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Kerala Piravi",
+    start_date: "2024-11-01",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Andhra Pradesh Formation Day",
+    start_date: "2024-11-01",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Chhattisgarh Foundation Day",
+    start_date: "2024-11-01",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Haryana Day",
+    start_date: "2024-11-01",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Madhya Pradesh Foundation Day",
+    start_date: "2024-11-01",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Punjab Formation Day",
+    start_date: "2024-11-01",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Tamil Nadu Day",
+    start_date: "2024-11-01",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Maharshi Valmiki Jayanti",
+    start_date: "2024-10-17",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Kali Puja",
+    start_date: "2024-10-31",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Kannada Rajyotsava",
+    start_date: "2024-11-01",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Guru Tegh Bahadur's Martyrdom Day",
+    start_date: "2024-11-24",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Arunachal Pradesh Foundation Day",
+    start_date: "2024-02-20",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Mizoram State Day",
+    start_date: "2024-02-20",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Bihar Day",
+    start_date: "2024-03-22",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Telangana Formation Day",
+    start_date: "2024-06-02",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Jharkhand Foundation Day",
+    start_date: "2024-11-15",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Pondicherry Liberation Day",
+    start_date: "2024-11-01",
+  },
+  {
+    is_mandatory: false,
+    no_of_days: 1,
+    name: "Uttarakhand Formation Day",
+    start_date: "2024-11-09",
+  },
+];

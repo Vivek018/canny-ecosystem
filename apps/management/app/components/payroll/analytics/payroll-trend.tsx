@@ -14,11 +14,10 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@canny_ecosystem/ui/chart";
-import type { PayrollDatabaseRow } from "@canny_ecosystem/supabase/types";
 
 const chartConfig = {
   date: {
-    label: "Date",
+    label: "Month",
     color: "hsl(var(--chart-0))",
   },
   amount: {
@@ -27,67 +26,43 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function PayrollTrend({
-  chartData,
-}: {
-  chartData: Omit<PayrollDatabaseRow, "created_at" | "updated_at">[] | null;
-}) {
+export function PayrollTrend({ chartData }: { chartData: any[] | null }) {
   const [activeChart, setActiveChart] =
     React.useState<keyof typeof chartConfig>("amount");
 
-  const years = new Set(
-    chartData
-      ?.map((item) =>
-        item.run_date ? new Date(item.run_date).getFullYear() : null,
-      )
-      ?.filter((year): year is number => year !== null) ?? [],
-  );
-
-  let trendData = [];
-
-  if (years.size > 1) {
-    trendData = Object.values(
-      chartData?.reduce<{ [year: number]: { date: string; amount: number } }>(
-        (acc, { run_date, total_net_amount }) => {
-          if (!run_date) return acc;
-
-          const date = new Date(run_date);
-          if (Number.isNaN(date.getTime())) return acc;
-
-          const year = date.getFullYear();
-          if (!acc[year]) {
-            acc[year] = {
-              date: year.toString(),
-              amount: 0,
-            };
-          }
-
-          acc[year].amount += total_net_amount ?? 0;
-          return acc;
-        },
-        {},
-      ) ?? {},
-    ).sort((a, b) => Number.parseInt(a.date) - Number.parseInt(b.date));
-  } else {
-    trendData =
-      chartData?.map((row) => ({
-        date: row.run_date,
-        amount: row.total_net_amount ?? 0,
-      })) ?? [];
+  interface ChartDataItem {
+    total_net_amount?: number;
   }
 
-  const total = React.useMemo(
-    () => ({
-      amount: trendData?.reduce((acc, curr) => acc + curr.amount, 0),
-    }),
-    [],
+  interface ChartData {
+    month: string;
+    data: ChartDataItem[];
+  }
+
+  interface TrendData {
+    month: string;
+    amount: number;
+  }
+
+  const trendData: TrendData[] | undefined = chartData?.map(
+    ({ month, data }: ChartData) => ({
+      month,
+      amount: data.reduce(
+        (total, item: ChartDataItem) => total + (item.total_net_amount || 0),
+        0
+      ),
+    })
+  );
+  const totalAmount = trendData?.reduce(
+    (amount, item) => amount + item.amount,
+    0
   );
 
   return (
     <Card className="overflow-hidden">
       <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
         <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
-          <CardTitle>Payroll Over Time</CardTitle>
+          <CardTitle>Payroll Over Months</CardTitle>
           <CardDescription>
             Showing trend of payrolls for the period.
           </CardDescription>
@@ -104,11 +79,9 @@ export function PayrollTrend({
                 type="button"
               >
                 <span className="text-xs text-muted-foreground">
-                  {chartConfig[chart]?.label}
+                  Total Payroll Amount
                 </span>
-                <span className="text-lg font-bold leading-none sm:text-3xl">
-                  {total[key as keyof typeof total]?.toLocaleString()}
-                </span>
+                <span>{totalAmount ?? 0}</span>
               </button>
             );
           })}
@@ -129,7 +102,7 @@ export function PayrollTrend({
           >
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="date"
+              dataKey="month"
               tickLine={false}
               axisLine={false}
               tickMargin={8}

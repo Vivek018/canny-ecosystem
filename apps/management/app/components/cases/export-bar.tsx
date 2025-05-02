@@ -2,7 +2,6 @@ import type { CasesDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { Button } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { formatDateTime } from "@canny_ecosystem/utils";
-import type { VisibilityState } from "@tanstack/react-table";
 import Papa from "papaparse";
 
 export function ExportBar({
@@ -13,11 +12,37 @@ export function ExportBar({
   rows: number;
   data: Omit<CasesDatabaseRow, "created_at" | "updated_at">[];
   className: string;
-  columnVisibility: VisibilityState;
 }) {
+
+  const toBeExportedData = data.map((element) => ({
+    title: element?.title,
+    description: element?.description,
+    date: element?.date,
+    case_type: element?.case_type,
+    status: element?.status,
+    incident_date: element?.incident_date,
+    resolution_date: element?.resolution_date,
+    location: element?.location,
+    location_type: element?.location_type,
+    reported_by: element?.reported_by,
+    reported_on: element?.reported_on,
+    amount_given: element?.amount_given,
+    amount_received: element?.amount_received,
+    court_case_reference: element?.court_case_reference,
+    document: element?.document,
+    reported_by_project: element?.reported_by_project?.name,
+    reported_on_project: element?.reported_on_project?.name,
+    reported_by_employee: element?.reported_by_employee?.employee_code,
+    reported_on_employee: element?.reported_on_employee?.employee_code,
+    reported_by_site: element?.reported_by_site?.name,
+    reported_on_site: element?.reported_on_site?.name,
+    reported_by_company: element?.reported_by_company?.name,
+    reported_on_company: element?.reported_on_company?.name,
+  }));
+
   const handleExport = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-    const csv = Papa.unparse(data);
+    const csv = Papa.unparse(toBeExportedData);
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
@@ -35,7 +60,7 @@ export function ExportBar({
     <div
       className={cn(
         "z-40 fixed bottom-8 left-0 right-0 mx-auto h-14 w-max shadow-md rounded-full flex gap-10 justify-between items-center p-2 text-sm border dark:border-muted-foreground/30 bg-card text-card-foreground",
-        className,
+        className
       )}
     >
       <div className="ml-2 flex items-center space-x-1 rounded-md">

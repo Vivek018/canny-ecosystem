@@ -39,7 +39,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   if (
     !hasPermission(
       user?.role!,
-      `${updateRole}:${attribute.employeeWorkHistory}`,
+      `${updateRole}:${attribute.employeeWorkHistory}`
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -84,7 +84,7 @@ export async function action({
   if (
     !hasPermission(
       user?.role!,
-      `${updateRole}:${attribute.employeeWorkHistory}`,
+      `${updateRole}:${attribute.employeeWorkHistory}`
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -100,7 +100,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -145,7 +145,7 @@ export default function UpdateEmployeeWorkHistory() {
     if (actionData) {
       if (actionData?.status === "success") {
         clearExactCacheEntry(
-          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`,
+          `${cacheKeyPrefix.employee_work_portfolio}${employeeId}`
         );
         toast({
           title: "Success",
@@ -156,8 +156,8 @@ export default function UpdateEmployeeWorkHistory() {
         toast({
           title: "Error",
           description:
-            actionData?.error ||
             actionData?.error?.message ||
+            actionData?.error ||
             "Failed to update",
           variant: "destructive",
         });

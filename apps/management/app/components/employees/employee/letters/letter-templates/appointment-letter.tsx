@@ -9,6 +9,7 @@ import { Document, Page, View, Text } from "@react-pdf/renderer";
 import { LetterHeader } from "./letter-header";
 import type { EmployeeAddressDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { MarkdownRenderer } from "../markdown-renderer";
+import { LetterFooter } from "./letter-footer";
 
 export function AppointmentLetter({
   data,
@@ -22,15 +23,16 @@ export function AppointmentLetter({
   > | null;
   companyData: CompanyInfoDataType | null;
 }) {
-
   const replacements = {
-    employeeName: `${data?.employees.gender === "female" ? "Ms." : "Mr."} ${data?.employees.first_name} ${data?.employees.middle_name ?? ""} ${data?.employees?.last_name}`,
+    employeeName: `${data?.employees.gender === "female" ? "Ms." : "Mr."} ${
+      data?.employees.first_name
+    } ${data?.employees.middle_name ?? ""} ${data?.employees?.last_name}`,
     employeeGender: data?.employees.gender ?? "",
     employeeJoiningDate: new Date(
-      data?.employees.employee_project_assignment?.start_date ?? "",
+      data?.employees.employee_project_assignment?.start_date ?? ""
     ).toLocaleDateString("en-IN"),
     employeeLeavingDate: new Date(
-      data?.employees.employee_project_assignment?.end_date ?? "",
+      data?.employees.employee_project_assignment?.end_date ?? ""
     ).toLocaleDateString("en-IN"),
     employeePosition:
       data?.employees.employee_project_assignment?.position ?? "",
@@ -48,7 +50,9 @@ export function AppointmentLetter({
           <View style={styles.header} fixed>
             <LetterHeader />
           </View>
-        ) : <View fixed style={styles.indent} />}
+        ) : (
+          <View fixed style={styles.indent} />
+        )}
         <View style={styles.wrapper}>
           {/* Date Section */}
           <View>
@@ -124,7 +128,7 @@ export function AppointmentLetter({
         </View>
         {data?.include_letter_head && (
           <View style={styles.footer} fixed>
-            <LetterHeader />
+            <LetterFooter />
           </View>
         )}
       </Page>

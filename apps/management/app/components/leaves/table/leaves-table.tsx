@@ -34,12 +34,13 @@ interface LeavesDataTableProps<TData, TValue> {
   hasNextPage: boolean;
   pageSize: number;
   env: any;
-  companyId: string;
+  companyId?: string;
   employeeId?: string;
   noFilters?: boolean;
   filters?: LeavesFilters | null;
   query?: string | null;
   initialColumnVisibility?: VisibilityState;
+  
 }
 
 export function LeavesDataTable<TData, TValue>({

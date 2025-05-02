@@ -31,9 +31,10 @@ export const StatutoryFieldsSelect: FC<StatutoryFieldsSelectProps> = ({
   state,
   disabled,
 }) => {
+
   const { companyId } = useCompanyId();
   const [selectedFields, setSelectedFields] = useState<string[]>(
-    defaultValue ?? [],
+    defaultValue ?? []
   );
   const { selectedStatutoryFields, setSelectedStatutoryFields } =
     usePaymentComponentsStore();
@@ -53,13 +54,10 @@ export const StatutoryFieldsSelect: FC<StatutoryFieldsSelectProps> = ({
     };
 
     // Initialize updates object with null values for all fields
-    const updates = statutoryFieldsArray.reduce(
-      (acc, field) => {
-        acc[field] = null;
-        return acc;
-      },
-      {} as Record<string, any>,
-    );
+    const updates = statutoryFieldsArray.reduce((acc, field) => {
+      acc[field] = null;
+      return acc;
+    }, {} as Record<string, any>);
 
     // Fetch data for selected fields
     await Promise.all(
@@ -70,7 +68,7 @@ export const StatutoryFieldsSelect: FC<StatutoryFieldsSelectProps> = ({
           const { data } = await fetchFunction();
           updates[field] = data;
         }
-      }),
+      })
     );
 
     setSelectedStatutoryFields({

@@ -26,8 +26,7 @@ export async function action({
   if (
     !hasPermission(
       `${user?.role!}`,
-      `${deleteRole}:  "${attribute.statutoryFieldsPf}",
-`,
+      `${deleteRole}:${attribute.statutoryFieldsPf}`,
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });

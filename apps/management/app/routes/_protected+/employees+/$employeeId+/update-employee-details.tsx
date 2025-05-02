@@ -86,7 +86,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -105,7 +105,7 @@ export async function action({
 
     return json(
       { status: "error", message: "Failed to update employee", error },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json({
@@ -141,7 +141,7 @@ export default function UpdateEmployeeDetails() {
       if (actionData?.status === "success") {
         clearCacheEntry(cacheKeyPrefix.employees);
         clearExactCacheEntry(
-          `${cacheKeyPrefix.employee_overview}${employeeId}`,
+          `${cacheKeyPrefix.employee_overview}${employeeId}`
         );
         toast({
           title: "Success",
@@ -152,8 +152,8 @@ export default function UpdateEmployeeDetails() {
         toast({
           title: "Error",
           description:
-            actionData?.error ||
             actionData?.error?.message ||
+            actionData?.error ||
             "Employee update failed",
           variant: "destructive",
         });

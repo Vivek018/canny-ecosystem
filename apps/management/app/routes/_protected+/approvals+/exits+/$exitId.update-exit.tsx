@@ -61,13 +61,21 @@ export async function action({
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
     const formData = await request.formData();
-    formData.set("net_pay", String(Number(formData.get('bonus')) + Number(formData.get('leave_encashment')) + Number(formData.get('gratuity')) - Number(formData.get('deduction'))));
+    formData.set(
+      "net_pay",
+      String(
+        Number(formData.get("bonus")) +
+          Number(formData.get("leave_encashment")) +
+          Number(formData.get("gratuity")) -
+          Number(formData.get("deduction"))
+      )
+    );
     const submission = parseWithZod(formData, { schema: ExitFormSchema });
 
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -84,7 +92,7 @@ export async function action({
 
     return json(
       { status: "error", message: "Exit update failed", error },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json(
@@ -93,7 +101,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

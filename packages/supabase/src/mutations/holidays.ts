@@ -5,12 +5,11 @@ export async function addHolidaysFromData({
   data,
 }: {
   supabase: TypedSupabaseClient;
-  data: HolidaysDatabaseInsert;
+  data: HolidaysDatabaseInsert[];
 }) {
   const { error, status } = await supabase
     .from("holidays")
-    .insert(data)
-    ;
+    .insert(data);
 
   if (error) {
     console.error("createHolidaysFromData Error:", error);

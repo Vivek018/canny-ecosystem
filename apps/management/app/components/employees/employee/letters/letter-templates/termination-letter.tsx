@@ -9,6 +9,7 @@ import { MarkdownRenderer } from "../markdown-renderer";
 import type { CompanyInfoDataType } from "@/routes/_protected+/employees+/$employeeId+/letters+/$letterId";
 import { LetterHeader } from "./letter-header";
 import type { EmployeeAddressDatabaseRow } from "@canny_ecosystem/supabase/types";
+import { LetterFooter } from "./letter-footer";
 
 export function TerminationLetter({
   data,
@@ -23,7 +24,9 @@ export function TerminationLetter({
   companyData: CompanyInfoDataType | null;
 }) {
   const replacements = {
-    employeeName: `${data?.employees.first_name} ${data?.employees.middle_name ?? ""} ${data?.employees?.last_name}`,
+    employeeName: `${data?.employees.first_name} ${
+      data?.employees.middle_name ?? ""
+    } ${data?.employees?.last_name}`,
     employeePosition:
       data?.employees.employee_project_assignment?.position ?? "",
     employeeJoiningDate:
@@ -45,7 +48,9 @@ export function TerminationLetter({
           <View fixed style={styles.header}>
             <LetterHeader />
           </View>
-        ) : <View fixed style={styles.indent} />}
+        ) : (
+          <View fixed style={styles.indent} />
+        )}
 
         <View style={styles.wrapper}>
           {/* Date Section */}
@@ -129,7 +134,7 @@ export function TerminationLetter({
         </View>
         {data?.include_letter_head && (
           <View style={styles.footer} fixed>
-            <LetterHeader />
+            <LetterFooter />
           </View>
         )}
       </Page>

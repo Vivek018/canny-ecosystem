@@ -5,7 +5,6 @@ import {
   useActionData,
   useLoaderData,
   useNavigate,
-  useParams,
 } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
 import { safeRedirect } from "@/utils/server/http.server";
@@ -96,14 +95,14 @@ export async function action({
   if (isGoodStatus(status)) {
     return json({
       status: "success",
-      message: "Employee reimbursement updated successfully",
+      message: "Reimbursement updated successfully",
       error: null,
     });
   }
 
   return json({
     status: "error",
-    message: "Employee reimbursement update failed",
+    message: "Reimbursement update failed",
     error,
   });
 }
@@ -116,7 +115,6 @@ export default function UpdateReimbursements() {
 
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { employeeId } = useParams();
 
   useEffect(() => {
     if (error) {
@@ -146,7 +144,7 @@ export default function UpdateReimbursements() {
           variant: "destructive",
         });
       }
-      navigate(`/employees/${employeeId}/reimbursements`);
+      navigate(`/employees/${updatableData?.employee_id}/reimbursements`);
     }
   }, [actionData]);
 

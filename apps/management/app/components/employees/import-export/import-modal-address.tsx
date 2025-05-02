@@ -1,4 +1,6 @@
 import { Button } from "@canny_ecosystem/ui/button";
+import Papa from "papaparse";
+
 import {
   Dialog,
   DialogContent,
@@ -61,22 +63,77 @@ export const ImportEmployeeAddressModal = () => {
     return `${(size / SIZE_1MB).toFixed(2)} MB`;
   };
 
+  const demo: any[] | Papa.UnparseObject<any> = [
+    {
+      employee_code: null,
+      address_type: null,
+      address_line_1: null,
+      address_line_2: null,
+      city: null,
+      pincode: null,
+      state: null,
+      country: null,
+      is_primary: null,
+      latitude: null,
+      longitude: null,
+    },
+  ];
+  const downloadDemoCsv = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    const csv = Papa.unparse(demo);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+
+    link.setAttribute(
+      "download",
+      "Employee-Address-Format"
+    );
+
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogTitle>Choose the file to be imported</DialogTitle>
         <div className="flex justify-between">
           <DialogDescription className="text-muted-foreground">
-            Only .csv format is supported! <br />
+            Only .csv format is supported! 
+            <span
+              className="text-primary cursor-pointer ml-2"
+              onClick={downloadDemoCsv}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  downloadDemoCsv(
+                    e as unknown as React.MouseEvent<
+                      HTMLButtonElement,
+                      MouseEvent
+                    >
+                  );
+                }
+              }}
+            >
+              download csv format
+            </span>
+            <br />
             Maximum upload size is 3MB!
           </DialogDescription>
-          <Button
-            className={selectedFile ? "flex" : "hidden"}
-            onClick={handleFileSubmit}
-            disabled={!eligibleFileSize}
-          >
-            Confirm file
-          </Button>
+          <div className="flex flex-col justify-end">
+            <Button
+              className={cn(selectedFile ? "flex" : "hidden")}
+              onClick={handleFileSubmit}
+              disabled={!eligibleFileSize}
+            >
+              Confirm file
+            </Button>
+          </div>
         </div>
 
         <Input type="file" accept=".csv" onChange={handleFileSelect} />
@@ -85,7 +142,7 @@ export const ImportEmployeeAddressModal = () => {
           className={cn(
             "text-sm",
             selectedFile ? "flex" : "hidden",
-            !eligibleFileSize ? "text-destructive" : "text-muted-foreground",
+            !eligibleFileSize ? "text-destructive" : "text-muted-foreground"
           )}
         >
           {!eligibleFileSize

@@ -11,7 +11,13 @@ import {
 import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Await, type ClientLoaderFunctionArgs, defer, Outlet, useLoaderData } from "@remix-run/react";
+import {
+  Await,
+  type ClientLoaderFunctionArgs,
+  defer,
+  Outlet,
+  useLoaderData,
+} from "@remix-run/react";
 import { Suspense, useEffect, useState } from "react";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { PayrollCard } from "@/components/payroll/payroll-card";
@@ -19,8 +25,15 @@ import { getPendingOrSubmittedPayrollsByCompanyId } from "@canny_ecosystem/supab
 import { ErrorBoundary } from "@/components/error-boundary";
 import { clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
-import { formatDate, payrollTypesArray, transformStringArrayIntoOptions } from "@canny_ecosystem/utils";
+import {
+  formatDate,
+  payrollTypesArray,
+  transformStringArrayIntoOptions,
+} from "@canny_ecosystem/utils";
 import { Combobox } from "@canny_ecosystem/ui/combobox";
+import { ImportPayrollDialog } from "@/components/payroll/import-payroll-dialog";
+import { ImportPayrollModal } from "@/components/payroll/import-export/import-modal-payroll";
+import { ImportSalaryPayrollModal } from "@/components/payroll/import-export/import-modal-salary-payroll";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {
@@ -35,7 +48,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return defer({ payrollsPromise });
   } catch (error) {
     console.error("Run Payroll Error", error);
-    return defer({ payrollsPromise: Promise.resolve({ data: [], error: null }) });
+    return defer({
+      payrollsPromise: Promise.resolve({ data: [], error: null }),
+    });
   }
 }
 
@@ -55,7 +70,13 @@ export default function RunPayrollIndex() {
         <Suspense fallback={<LoadingSpinner className="my-20" />}>
           <Await resolve={payrollsPromise}>
             {({ data, error }) => {
-              if (error) return <ErrorBoundary error={error} message="Error in fetching payroll" />
+              if (error)
+                return (
+                  <ErrorBoundary
+                    error={error}
+                    message="Error in fetching payroll"
+                  />
+                );
 
               const { isDocument } = useIsDocument();
 
@@ -65,31 +86,40 @@ export default function RunPayrollIndex() {
                   Object.entries(item).some(
                     ([key, value]) =>
                       key !== "avatar" &&
-                      String(value).toLowerCase().includes(searchString.toLowerCase())
+                      String(value)
+                        .toLowerCase()
+                        .includes(searchString.toLowerCase())
                   )
                 );
                 setTableData(filteredData as any);
               }, [searchString, data]);
               return (
                 <Command className="overflow-visible">
-                  <div className="w-full lg:w-3/4 2xl:w-1/2 flex items-center gap-4">
-                    <CommandInput
-                      divClassName="border border-input rounded-md h-10 flex-1"
-                      placeholder="Search Payroll"
-                      autoFocus={true}
-                    />
-                    <Combobox
-                      className={cn("w-52 h-10 capitalize")}
-                      options={transformStringArrayIntoOptions(payrollTypesArray)}
-                      value={searchString}
-                      onChange={(value: string) => { setSearchString(value) }}
-                      placeholder={"Select Payroll Type"}
-                    />
+                  <div className="w-full flex items-center justify-between">
+                    <div className="w-1/2 flex gap-4">
+                      <CommandInput
+                        divClassName="border border-input rounded-md h-10 flex-1"
+                        placeholder="Search Payroll"
+                        autoFocus={true}
+                      />
+                      <Combobox
+                        className={cn("w-52 h-10 capitalize")}
+                        options={transformStringArrayIntoOptions(
+                          payrollTypesArray
+                        )}
+                        value={searchString}
+                        onChange={(value: string) => {
+                          setSearchString(value);
+                        }}
+                        placeholder={"Select Payroll Type"}
+                      />
+                    </div>
+                    <ImportPayrollDialog />
                   </div>
                   <CommandEmpty
                     className={cn(
                       "w-full py-40 capitalize text-lg tracking-wide text-center",
-                      !isDocument && "hidden",
+                      !isDocument && "hidden"
                     )}
                   >
                     No payrolls found
@@ -124,6 +154,9 @@ export default function RunPayrollIndex() {
           </Await>
         </Suspense>
       </div>
+
+      <ImportPayrollModal />
+      <ImportSalaryPayrollModal />
       <Outlet />
     </section>
   );

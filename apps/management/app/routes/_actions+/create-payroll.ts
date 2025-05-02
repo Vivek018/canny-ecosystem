@@ -15,8 +15,18 @@ import {
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { SalaryEntriesDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
-import { calculateSalaryTotalNetAmount, calculateProRataAmount, getValueforEPF, getValueforESI, ESI_EMPLOYEE_CONTRIBUTION, isGoodStatus } from "@canny_ecosystem/utils";
-import { BONUS_PERCENTAGE, EMPLOYEE_EPF_PERCENTAGE } from "@canny_ecosystem/utils/constant";
+import {
+  calculateSalaryTotalNetAmount,
+  calculateProRataAmount,
+  getValueforEPF,
+  getValueforESI,
+  ESI_EMPLOYEE_CONTRIBUTION,
+  isGoodStatus,
+} from "@canny_ecosystem/utils";
+import {
+  BONUS_PERCENTAGE,
+  EMPLOYEE_EPF_PERCENTAGE,
+} from "@canny_ecosystem/utils/constant";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { json, useActionData, useNavigate } from "@remix-run/react";
 import { useEffect } from "react";
@@ -35,10 +45,16 @@ export async function action({
 
     if (type === "salary") {
       const attendanceData = JSON.parse(
-        formData.get("attendanceData") as string,
-      ) as Pick<SalaryEntriesDatabaseRow, "employee_id" | "present_days" | "overtime_hours" | "month" | "year">[];
+        formData.get("attendanceData") as string
+      ) as Pick<
+        SalaryEntriesDatabaseRow,
+        "employee_id" | "present_days" | "overtime_hours" | "month" | "year"
+      >[];
 
-      const salaryEntries: Omit<SalaryEntriesDatabaseRow, "id" | "created_at" | "updated_at" | "payroll_id">[] = [];
+      const salaryEntries: Omit<
+        SalaryEntriesDatabaseRow,
+        "id" | "created_at" | "updated_at" | "payroll_id"
+      >[] = [];
 
       let epfField = null;
       let esiField = null;
@@ -48,7 +64,8 @@ export async function action({
       const uniqueEmployeeIds = new Set<string>();
 
       for (const attendance of attendanceData) {
-        const { employee_id, present_days, overtime_hours, month, year } = attendance;
+        const { employee_id, present_days, overtime_hours, month, year } =
+          attendance;
 
         if (!employee_id || !month || !year || !present_days) {
           continue;
@@ -56,20 +73,22 @@ export async function action({
 
         uniqueEmployeeIds.add(employee_id);
 
-        const { data: linkedPaymentTemplate } = await getLinkedPaymentTemplateIdByEmployeeId({
-          supabase,
-          employeeId: employee_id,
-          companyId,
-        });
+        const { data: linkedPaymentTemplate } =
+          await getLinkedPaymentTemplateIdByEmployeeId({
+            supabase,
+            employeeId: employee_id,
+            companyId,
+          });
 
         if (!linkedPaymentTemplate?.template_id) {
           continue;
         }
 
-        const { data: paymentTemplateComponents } = await getPaymentTemplateComponentsByTemplateId({
-          supabase,
-          templateId: linkedPaymentTemplate.template_id,
-        });
+        const { data: paymentTemplateComponents } =
+          await getPaymentTemplateComponentsByTemplateId({
+            supabase,
+            templateId: linkedPaymentTemplate.template_id,
+          });
 
         if (!paymentTemplateComponents) {
           continue;
@@ -94,11 +113,20 @@ export async function action({
             bonusField = component.statutory_bonus;
           }
 
-          if (component.target_type === "payment_field" && component.payment_fields?.is_pro_rata) {
+          if (
+            component.target_type === "payment_field" &&
+            component.payment_fields?.is_pro_rata
+          ) {
             const baseAmount = component.calculation_value ?? 0;
             const totalWorkingDays = 26;
             const overtimeRate = 1;
-            amount = calculateProRataAmount({ baseAmount, presentDays: present_days, totalWorkingDays, overtimeHours: overtime_hours ?? 0, overtimeRate });
+            amount = calculateProRataAmount({
+              baseAmount,
+              presentDays: present_days,
+              totalWorkingDays,
+              overtimeHours: overtime_hours ?? 0,
+              overtimeRate,
+            });
           }
 
           salaryEntries.push({
@@ -108,13 +136,22 @@ export async function action({
             overtime_hours: overtime_hours ?? 0,
             employee_id,
             template_component_id: component.id,
-            field_name: component.target_type === "payment_field" ? component.payment_fields?.name : (component.target_type.toUpperCase() ?? component.component_type),
+            field_name:
+              component.target_type === "payment_field"
+                ? component.payment_fields?.name
+                : component.target_type.toUpperCase() ??
+                  component.component_type,
             type: component.component_type,
             is_pro_rata: component.payment_fields?.is_pro_rata ?? false,
-            consider_for_epf: component.payment_fields?.consider_for_epf ?? false,
-            consider_for_esic: component.payment_fields?.consider_for_esic ?? false,
+            consider_for_epf:
+              component.payment_fields?.consider_for_epf ?? false,
+            consider_for_esic:
+              component.payment_fields?.consider_for_esic ?? false,
             amount,
-            is_overtime: component.target_type === "payment_field" ? component.payment_fields?.is_overtime ?? false : false,
+            is_overtime:
+              component.target_type === "payment_field"
+                ? component.payment_fields?.is_overtime ?? false
+                : false,
           });
         }
       }
@@ -136,47 +173,60 @@ export async function action({
         if (entry.consider_for_epf) {
           if (entry.type === "earning") {
             valueForEPF += entry.amount;
-          }
-          else if (entry.type === "deduction") {
+          } else if (entry.type === "deduction") {
             valueForEPF -= entry.amount;
           }
         }
         if (entry.consider_for_esic) {
           if (entry.type === "earning") {
             valueForESIC += entry.amount;
-          }
-          else if (entry.type === "deduction") {
+          } else if (entry.type === "deduction") {
             valueForESIC -= entry.amount;
           }
         }
       }
 
       const salaryData = salaryEntries.map((entry) => {
-        if (entry.type === "statutory_contribution" || entry.type === "earning" || entry.type === "bonus") {
+        if (
+          entry.type === "statutory_contribution" ||
+          entry.type === "earning" ||
+          entry.type === "bonus"
+        ) {
           let amount = null;
           if (entry.field_name.toLowerCase().includes("pf")) {
-            amount = Number.parseFloat((getValueforEPF({
-              epf: epfField!, values: {
-                valueForEPF
-              }
-            }) * (epfField?.employee_contribution ?? EMPLOYEE_EPF_PERCENTAGE)).toFixed(3));
-          }
-          else if (entry.field_name.toLowerCase().includes("esi")) {
-            amount = Number.parseFloat((getValueforESI({
-              esi: esiField!, values: {
-                valueForESIC
-              }
-            }) * (esiField?.employee_contribution ?? ESI_EMPLOYEE_CONTRIBUTION)).toFixed(3));
-          }
-          else if (entry.field_name.toLowerCase().includes("pt")) {
-            for (const range of JSON.parse(ptField?.gross_salary_range as string)) {
+            amount = Number.parseFloat(
+              (
+                getValueforEPF({
+                  epf: epfField!,
+                  values: {
+                    valueForEPF,
+                  },
+                }) *
+                (epfField?.employee_contribution ?? EMPLOYEE_EPF_PERCENTAGE)
+              ).toFixed(3)
+            );
+          } else if (entry.field_name.toLowerCase().includes("esi")) {
+            amount = Number.parseFloat(
+              (
+                getValueforESI({
+                  esi: esiField!,
+                  values: {
+                    valueForESIC,
+                  },
+                }) *
+                (esiField?.employee_contribution ?? ESI_EMPLOYEE_CONTRIBUTION)
+              ).toFixed(3)
+            );
+          } else if (entry.field_name.toLowerCase().includes("pt")) {
+            for (const range of JSON.parse(
+              ptField?.gross_salary_range as string
+            )) {
               if (range.start <= grossValue && grossValue <= range.end) {
                 amount = range.value;
                 break;
               }
             }
-          }
-          else if (entry.field_name.toLowerCase().includes("lwf")) {
+          } else if (entry.field_name.toLowerCase().includes("lwf")) {
             if (lwfField?.deduction_cycle === "monthly") {
               amount = lwfField?.employee_contribution ?? 0;
             } else if (lwfField?.deduction_cycle === "yearly") {
@@ -186,19 +236,25 @@ export async function action({
             } else if (lwfField?.deduction_cycle === "quarterly") {
               amount = (lwfField?.employee_contribution ?? 0) / 3;
             }
-          }
-          else if (entry.field_name.toLowerCase() === "bonus" || entry.field_name.toLowerCase() === "statutory_bonus") {
-            amount = Number.parseFloat((((bonusField?.percentage ?? BONUS_PERCENTAGE) * basicValue) / 100).toFixed(3));
+          } else if (
+            entry.field_name.toLowerCase() === "bonus" ||
+            entry.field_name.toLowerCase() === "statutory_bonus"
+          ) {
+            amount = Number.parseFloat(
+              (
+                ((bonusField?.percentage ?? BONUS_PERCENTAGE) * basicValue) /
+                100
+              ).toFixed(3)
+            );
           }
           return { ...entry, amount: amount ?? entry.amount };
         }
         return entry;
-      })
+      });
 
       let totalNetAmount = 0;
 
       totalNetAmount = calculateSalaryTotalNetAmount(salaryData);
-
       const {
         status,
         error: salaryError,
@@ -222,13 +278,13 @@ export async function action({
     }
     if (type === "reimbursement") {
       const reimbursementData = JSON.parse(
-        formData.get("reimbursementData") as string,
+        formData.get("reimbursementData") as string
       ) as Pick<ReimbursementDataType, "id" | "employee_id" | "amount">[];
       const totalEmployees = Number.parseInt(
-        formData.get("totalEmployees") as string,
+        formData.get("totalEmployees") as string
       );
       const totalNetAmount = Number.parseFloat(
-        formData.get("totalNetAmount") as string,
+        formData.get("totalNetAmount") as string
       );
 
       const {
@@ -257,10 +313,10 @@ export async function action({
         "id" | "employee_id" | "net_pay"
       >[];
       const totalEmployees = Number.parseInt(
-        formData.get("totalEmployees") as string,
+        formData.get("totalEmployees") as string
       );
       const totalNetAmount = Number.parseFloat(
-        formData.get("totalNetAmount") as string,
+        formData.get("totalNetAmount") as string
       );
 
       const {
@@ -283,6 +339,72 @@ export async function action({
       }
       error = exitError;
     }
+    if (type === "salary-import") {
+      const salaryImportData = JSON.parse(
+        formData.get("salaryImportData") as string
+      );
+
+      const transformedData: any[] = salaryImportData.flatMap((entry: any) => {
+        const {
+          month,
+          year,
+          present_days,
+          overtime_hours,
+          employee_id,
+          ...components
+        } = entry;
+
+        return Object.entries(components)
+          .filter(
+            ([, value]) =>
+              typeof value === "object" && value !== null && "amount" in value
+          )
+          .map(([key, value]: [string, any]) => ({
+            month,
+            year,
+            present_days: Number(present_days),
+            overtime_hours,
+            employee_id,
+            field_name: key.toUpperCase(),
+            type: value.type,
+            is_pro_rata: false,
+            consider_for_epf: false,
+            consider_for_esic: false,
+            amount: value.amount,
+            is_overtime: false,
+          }));
+      });
+
+      let totalNetAmount = 0;
+
+      totalNetAmount = calculateSalaryTotalNetAmount(transformedData);
+      const {
+        status,
+        error: salaryError,
+        message,
+      } = await createSalaryPayroll({
+        supabase,
+        data: {
+          type: "salary",
+          salaryData: transformedData,
+          totalEmployees: salaryImportData.length,
+          totalNetAmount,
+        },
+        companyId: companyId ?? "",
+      });
+
+      if (isGoodStatus(status)) {
+        return json({
+          status: "success",
+          message: message ?? "Import Salary Payroll Created Successfully",
+          failedRedirect,
+          error: null,
+        });
+      }
+
+      error = salaryError;
+    }
+
     return json(
       {
         status: "error",
@@ -290,7 +412,7 @@ export async function action({
         failedRedirect,
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     console.error("Create Payroll error", error);
@@ -322,8 +444,8 @@ export default function CreatePayroll() {
         toast({
           title: "Error",
           description:
-            actionData?.error ||
             actionData?.error?.message ||
+            actionData?.error ||
             "Payroll Creation failed",
           variant: "destructive",
         });

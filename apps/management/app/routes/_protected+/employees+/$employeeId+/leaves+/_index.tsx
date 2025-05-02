@@ -53,12 +53,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       leave_type: searchParams.get("leave_type") ?? undefined,
       name: query,
       users: searchParams.get("users") ?? undefined,
+      year: searchParams.get("year") ?? undefined,
     };
 
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined,
+        (value) => value !== null && value !== undefined
       );
     const usersPromise = getUsersEmail({ supabase, companyId });
 
@@ -70,8 +71,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         to: hasFilters
           ? MAX_QUERY_LIMIT
           : page > 0
-            ? LAZY_LOADING_LIMIT
-            : LAZY_LOADING_LIMIT - 1,
+          ? LAZY_LOADING_LIMIT
+          : LAZY_LOADING_LIMIT - 1,
         filters,
         searchQuery: query ?? undefined,
         sort: sortParam?.split(":") as [string, "asc" | "desc"],
@@ -108,7 +109,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
     `${cacheKeyPrefix.employee_leaves}${
       args.params.employeeId
     }${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 
@@ -159,7 +160,7 @@ export default function Leaves() {
                 {({ data, meta, error }) => {
                   if (error) {
                     clearCacheEntry(
-                      `${cacheKeyPrefix.employee_leaves}${employeeId}`,
+                      `${cacheKeyPrefix.employee_leaves}${employeeId}`
                     );
                     toast({
                       variant: "destructive",
@@ -169,7 +170,7 @@ export default function Leaves() {
                     return null;
                   }
                   const hasNextPage = Boolean(
-                    meta?.count && meta.count / (0 + 1) > LAZY_LOADING_LIMIT,
+                    meta?.count && meta.count / (0 + 1) > LAZY_LOADING_LIMIT
                   );
 
                   const leaveType = data!.map((item: any) => {
@@ -207,7 +208,7 @@ export default function Leaves() {
                                     userEmails={
                                       usersData?.data
                                         ? usersData?.data?.map(
-                                            (user) => user!.email,
+                                            (user) => user!.email
                                           )
                                         : []
                                     }

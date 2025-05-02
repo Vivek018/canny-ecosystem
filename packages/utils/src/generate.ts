@@ -1,9 +1,16 @@
 import { StyleSheet } from "@react-pdf/renderer";
-import { DEFAULT_APPOINTMENT_LETTER, DEFAULT_EXPERIENCE_LETTER, DEFAULT_NOC_LETTER, DEFAULT_OFFER_LETTER, DEFAULT_RELIEVING_LETTER, DEFAULT_TERMINATION_LETTER } from "../constant";
+import {
+  DEFAULT_APPOINTMENT_LETTER,
+  DEFAULT_EXPERIENCE_LETTER,
+  DEFAULT_NOC_LETTER,
+  DEFAULT_OFFER_LETTER,
+  DEFAULT_RELIEVING_LETTER,
+  DEFAULT_TERMINATION_LETTER,
+} from "../constant";
 
 export const styles = StyleSheet.create({
   page: {
-    paddingBottom: 75,
+    paddingBottom: 50,
   },
   indent: {
     padding: 20,
@@ -20,12 +27,12 @@ export const styles = StyleSheet.create({
   header: {
     textAlign: "center",
     fontFamily: "Helvetica-Bold",
-    marginBottom: 10,
+    marginBottom: 25,
+    marginTop: 15,
   },
   headerDate: {
     textAlign: "right",
     fontFamily: "Helvetica-Bold",
-    marginBottom: 20,
     marginTop: 10,
   },
   recipient: {
@@ -66,7 +73,8 @@ export const styles = StyleSheet.create({
     marginVertical: 10,
   },
   section: {
-    marginBottom: 10,
+    marginTop: 5,
+    marginBottom: 15,
   },
   keyPoints: {
     marginLeft: 15,
@@ -75,8 +83,11 @@ export const styles = StyleSheet.create({
     gap: 5,
   },
   footer: {
-    position: "absolute",
-    bottom: -20,
+    textAlign: "center",
+    marginBottom: 0,
+    paddingBottom: 0,
+    marginTop: 30,
+    paddingHorizontal: 5,
   },
   addressSection: {
     marginBottom: 15,
@@ -119,7 +130,7 @@ export const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
-    margin: 0
+    margin: 0,
   },
   th: {
     textTransform: "capitalize",
@@ -147,7 +158,7 @@ export const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 20,
+    marginTop: 30,
   },
   signatureBox: {
     width: "40%",
@@ -216,7 +227,7 @@ export const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: "auto",
-    // marginBottom: 10,
+    objectFit: "contain",
   },
   boldText: {
     fontFamily: "Helvetica-Bold",
@@ -239,12 +250,11 @@ export const styles = StyleSheet.create({
   centerText: {
     textAlign: "center",
   },
-
 });
 
 export const replacePlaceholders = (
   content: string | null | undefined,
-  replacements: Record<string, any>,
+  replacements: Record<string, any>
 ) => {
   return (
     content?.replace(/\$\{(\w+)\}/g, (_, key) => {
@@ -258,10 +268,13 @@ export const replacePlaceholders = (
   );
 };
 
-export const bringDefaultLetterContent = (letterType: string | undefined, data: any) => {
+export const bringDefaultLetterContent = (
+  letterType: string | undefined,
+  data: any
+) => {
   const salaryTablemarkdownLines = [
     "| **Particulars**           | **Amount (Rs.)** |",
-    "|---------------------------|-----------------|"
+    "|---------------------------|-----------------|",
   ];
   let totalGrossEarning = 0;
   let totalDeductions = 0;
@@ -269,17 +282,25 @@ export const bringDefaultLetterContent = (letterType: string | undefined, data: 
   if (data?.earning) {
     for (const [key, value] of Object.entries(data.earning)) {
       const amount = value as number;
-      salaryTablemarkdownLines.push(`| ${key.charAt(0).toUpperCase() + key.slice(1)}                     | ${amount.toLocaleString()}/-           |`);
+      salaryTablemarkdownLines.push(
+        `| ${
+          key.charAt(0).toUpperCase() + key.slice(1)
+        }                     | ${amount.toLocaleString()}/-           |`
+      );
       totalGrossEarning += amount;
     }
 
-    salaryTablemarkdownLines.push(`| **Gross Earning**         | **${totalGrossEarning.toLocaleString()}/-**     |`);
+    salaryTablemarkdownLines.push(
+      `| **Gross Earning**         | **${totalGrossEarning.toLocaleString()}/-**     |`
+    );
   }
 
   if (data?.statutory_contribution) {
     for (const [key, value] of Object.entries(data.statutory_contribution)) {
       const amount = value as number;
-      salaryTablemarkdownLines.push(`| ${key.toUpperCase()}                       | ${amount.toLocaleString()}/-           |`);
+      salaryTablemarkdownLines.push(
+        `| ${key.toUpperCase()}                       | ${amount.toLocaleString()}/-           |`
+      );
       totalDeductions += amount;
     }
   }
@@ -287,18 +308,22 @@ export const bringDefaultLetterContent = (letterType: string | undefined, data: 
   if (data?.deduction) {
     for (const [key, value] of Object.entries(data.deduction)) {
       const amount = value as number;
-      salaryTablemarkdownLines.push(`| ${key}                 | ${amount.toLocaleString()}/-           |`);
+      salaryTablemarkdownLines.push(
+        `| ${key}                 | ${amount.toLocaleString()}/-           |`
+      );
       totalDeductions += amount;
     }
   }
 
   const netSalary = totalGrossEarning - totalDeductions;
-  salaryTablemarkdownLines.push(`| **Net Salary**            | **${netSalary.toLocaleString()}/-** |`);
+  salaryTablemarkdownLines.push(
+    `| **Net Salary**            | **${netSalary.toLocaleString()}/-** |`
+  );
 
   const salaryTableMarkdown = `\n
   # YOUR TOTAL COST OF COMPANY WILL BE AS BELOW:
 
-    ${salaryTablemarkdownLines.join('\n')}`
+    ${salaryTablemarkdownLines.join("\n")}`;
 
   switch (letterType) {
     case "appointment_letter":
@@ -320,6 +345,6 @@ export const bringDefaultLetterContent = (letterType: string | undefined, data: 
       return DEFAULT_TERMINATION_LETTER;
 
     default:
-      return ""
+      return "";
   }
 };

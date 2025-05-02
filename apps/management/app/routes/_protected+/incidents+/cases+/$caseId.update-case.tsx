@@ -143,14 +143,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       (employee: any) => ({
         label: employee?.employee_code as string,
         value: employee?.id as string,
-      }),
+      })
     );
 
     const reportedOnEmployeeOptions = reportedOnEmployee?.map(
       (employee: any) => ({
         label: employee?.employee_code as string,
         value: employee?.id as string,
-      }),
+      })
     );
 
     const reportedBySiteOptions = reportedBySite?.map((item) => ({
@@ -199,7 +199,7 @@ export async function action({
   if (submission.status !== "success") {
     return json(
       { result: submission.reply() },
-      { status: submission.status === "error" ? 400 : 200 },
+      { status: submission.status === "error" ? 400 : 200 }
     );
   }
 
@@ -292,8 +292,8 @@ export default function UpdateCases() {
         toast({
           title: "Error",
           description:
-            actionData?.error ||
             actionData?.error?.message ||
+            actionData?.error ||
             "Failed to update case",
           variant: "destructive",
         });

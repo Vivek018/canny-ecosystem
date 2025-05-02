@@ -65,21 +65,21 @@ export const zImage = z
 export const zFile = z
   .any()
   .refine(
-    (file) => (typeof file !== "string" ? file.size < SIZE_1MB * 2 : true),
-    "File size must be less than 2MB"
+    (file) => (typeof file !== "string" ? file.size < SIZE_1MB : true),
+    "File size must be less than 1MB"
   )
   .refine(
     (file) =>
       typeof file !== "string"
         ? [
-          ...ACCEPTED_IMAGE_TYPES,
-          "image/pdf",
-          "image/doc",
-          "image/docx",
-          "application/pdf",
-          "application/doc",
-          "application/docx",
-        ].includes(file?.type)
+            ...ACCEPTED_IMAGE_TYPES,
+            "image/pdf",
+            "image/doc",
+            "image/docx",
+            "application/pdf",
+            "application/doc",
+            "application/docx",
+          ].includes(file?.type)
         : true,
     "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .docx formats are supported."
   );
@@ -259,7 +259,6 @@ export const EmployeeSchema = z.object({
   middle_name: zString.min(3).optional(),
   last_name: zString.min(3),
   employee_code: zNumberString.min(3),
-  photo: zImage.optional(),
   marital_status: z.enum(maritalStatusArray).default("unmarried"),
   date_of_birth: z.string(),
   gender: z.enum(genderArray).default("male"),
@@ -448,7 +447,12 @@ export const PaymentFieldSchema = PaymentFieldSchemaObject.refine(
   }
 );
 
-export const deductionCycleArray = ["monthly"] as const;
+export const deductionCycleArray = [
+  "monthly",
+  "yearly",
+  "half_yearly",
+] as const;
+
 export const EMPLOYEE_RESTRICTED_VALUE = 15000;
 export const EMPLOYER_RESTRICTED_VALUE = 15000;
 export const EDLI_RESTRICTED_VALUE = 75;
@@ -1173,7 +1177,11 @@ export const ImportEmployeeGuardiansDataSchema = z.object({
   data: z.array(ImportSingleEmployeeGuardiansDataSchema),
 });
 
-export const payrollPaymentStatusArray = ["pending", "submitted", "approved"] as const;
+export const payrollPaymentStatusArray = [
+  "pending",
+  "submitted",
+  "approved",
+] as const;
 
 // Payroll
 export const SalaryEntrySchema = z.object({
@@ -1190,7 +1198,7 @@ export const SalaryEntrySchema = z.object({
   is_overtime: z.boolean().default(false),
 });
 
-export const payrollTypesArray = ["reimbursement", "exit", "salary", "others"];
+export const payrollTypesArray = ["reimbursement", "exit", "others"];
 
 export const PayrollEntrySchema = z.object({
   id: z.string().optional(),
@@ -1360,6 +1368,38 @@ export const ImportSingleEmployeeAttendanceDataSchema = z.object({
 
 export const ImportEmployeeAttendanceDataSchema = z.object({
   data: z.array(ImportSingleEmployeeAttendanceDataSchema),
+});
+
+export const ImportEmployeeAttendanceByPresentsHeaderSchemaObject = z.object({
+  employee_code: z.string(),
+  present_days: z.string(),
+});
+
+export const ImportEmployeeAttendanceByPresentsHeaderSchema =
+  ImportEmployeeAttendanceByPresentsHeaderSchemaObject.refine(
+    (data) => {
+      const values = [data.employee_code, data.present_days].filter(Boolean);
+
+      const uniqueValues = new Set(values);
+      return uniqueValues.size === values.length;
+    },
+    {
+      message:
+        "Some fields have the same value. Please select different options.",
+      path: ["employee_code", "present_days"],
+    }
+  );
+
+export const ImportSingleEmployeeAttendanceByPresentsDataSchema = z.object({
+  employee_code: zNumberString.min(3),
+  present_days: z.preprocess((value) => {
+    const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
+    return Number.isNaN(parsed) ? undefined : parsed;
+  }, z.number()),
+});
+
+export const ImportEmployeeAttendanceByPresentsDataSchema = z.object({
+  data: z.array(ImportSingleEmployeeAttendanceByPresentsDataSchema),
 });
 
 export const employeeLetterTypesArray = [
@@ -1573,6 +1613,69 @@ export const ImportSingleLeavesDataSchema = z.object({
 
 export const ImportLeavesDataSchema = z.object({
   data: z.array(ImportSingleLeavesDataSchema),
+});
+
+export const ImportPayrollHeaderSchemaObject = z.object({
+  employee_code: z.string(),
+  amount: z.string(),
+});
+
+export const ImportPayrollHeaderSchema = ImportPayrollHeaderSchemaObject.refine(
+  (data) => {
+    const values = [data.employee_code, data.amount].filter(Boolean);
+
+    const uniqueValues = new Set(values);
+    return uniqueValues.size === values.length;
+  },
+  {
+    message:
+      "Some fields have the same value. Please select different options.",
+    path: ["employee_code", "amount"],
+  }
+);
+
+export const ImportSinglePayrollDataSchema = z.object({
+  employee_code: zNumberString.min(3),
+  amount: z.preprocess((value) => {
+    const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
+    return Number.isNaN(parsed) ? undefined : parsed;
+  }, z.number()),
+});
+
+export const ImportPayrollDataSchema = z.object({
+  data: z.array(ImportSinglePayrollDataSchema),
+});
+
+export const ImportSalaryPayrollHeaderSchemaObject = z.object({
+  employee_code: z.string(),
+  present_days: z.string(),
+});
+
+export const ImportSalaryPayrollHeaderSchema =
+  ImportSalaryPayrollHeaderSchemaObject.refine(
+    (data) => {
+      const values = [data.employee_code, data.present_days].filter(Boolean);
+
+      const uniqueValues = new Set(values);
+      return uniqueValues.size === values.length;
+    },
+    {
+      message:
+        "Some fields have the same value. Please select different options.",
+      path: ["employee_code", "present_days"],
+    }
+  );
+
+export const ImportSingleSalaryPayrollDataSchema = z.object({
+  employee_code: zNumberString.min(3),
+  present_days: z.preprocess((value) => {
+    const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
+    return Number.isNaN(parsed) ? undefined : parsed;
+  }, z.number()),
+});
+
+export const ImportSalaryPayrollDataSchema = z.object({
+  data: z.array(ImportSingleSalaryPayrollDataSchema),
 });
 
 export const EmployeeLoginSchema = z.object({

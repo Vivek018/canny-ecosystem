@@ -43,20 +43,19 @@ import type { EmployeeGuardianDatabaseInsert } from "@canny_ecosystem/supabase/t
 import { CreateEmployeeGuardianDetails } from "@/components/employees/form/create-employee-guardian-details";
 import { FormStepHeader } from "@/components/form/form-step-header";
 import {
-  getEmployeesByPositionAndProjectSiteId,
   getProjectsByCompanyId,
   getSitesByProjectId,
 } from "@canny_ecosystem/supabase/queries";
 import {
   CreateEmployeeProjectAssignment,
   PROJECT_PARAM,
-  PROJECT_SITE_PARAM,
 } from "@/components/employees/form/create-employee-project-assignment";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { clearCacheEntry } from "@/utils/cache";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { safeRedirect } from "@/utils/server/http.server";
+import { seedRequisitesForEmployeeCreation } from "@canny_ecosystem/supabase/seed";
 
 export const CREATE_EMPLOYEE = [
   "create-employee",
@@ -109,7 +108,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   let projectOptions: any = [];
   let projectSiteOptions: any = [];
-  let siteEmployeeOptions: any = [];
   if (step === 4) {
     const { data: projects } = await getProjectsByCompanyId({
       supabase,
@@ -135,21 +133,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
       }));
     }
 
-    const projectSiteParamId = urlSearchParams.get(PROJECT_SITE_PARAM);
 
-    if (projectSiteParamId?.length) {
-      const { data: siteEmployees } =
-        await getEmployeesByPositionAndProjectSiteId({
-          supabase,
-          position: "supervisor",
-          projectSiteId: projectSiteParamId,
-        });
-
-      siteEmployeeOptions = siteEmployees?.map((siteEmployee) => ({
-        label: siteEmployee?.employee_code,
-        value: siteEmployee?.id,
-      }));
-    }
+   
   }
 
   return json({
@@ -159,7 +144,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
     companyId,
     projectOptions,
     projectSiteOptions,
-    siteEmployeeOptions,
   });
 }
 
@@ -174,7 +158,7 @@ export async function action({
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await parseMultipartFormData(
     request,
-    createMemoryUploadHandler({ maxPartSize: SIZE_1MB }),
+    createMemoryUploadHandler({ maxPartSize: SIZE_1MB })
   );
   const actionType = formData.get("_action") as string;
   const submission = parseWithZod(formData, { schema: currentSchema });
@@ -188,23 +172,24 @@ export async function action({
             message: "Form validation failed",
             returnTo: `/create-employee?step=${step}`,
           },
-          { status: 400 },
+          { status: 400 }
         );
       }
 
       const employeeData = session.get(`${SESSION_KEY_PREFIX}1`);
       const employeeStatutoryDetailsData = session.get(
-        `${SESSION_KEY_PREFIX}2`,
+        `${SESSION_KEY_PREFIX}2`
       );
       const employeeBankDetailsData = session.get(`${SESSION_KEY_PREFIX}3`);
       const employeeProjectAssignmentData = session.get(
-        `${SESSION_KEY_PREFIX}4`,
+        `${SESSION_KEY_PREFIX}4`
       );
       const employeeAddressesData = session.get(`${SESSION_KEY_PREFIX}5`);
       const employeeGuardiansData =
         submission.value as EmployeeGuardianDatabaseInsert;
 
       const {
+        id,
         status,
         employeeError,
         employeeStatutoryDetailsError,
@@ -221,7 +206,9 @@ export async function action({
         employeeAddressesData,
         employeeGuardiansData,
       });
-
+      if (id) {
+        await seedRequisitesForEmployeeCreation({ employeeId: id });
+      }
       if (employeeError) {
         return json(
           {
@@ -229,7 +216,7 @@ export async function action({
             message: "Failed to create employee",
             returnTo: "/employees",
           },
-          { status: 500 },
+          { status: 500 }
         );
       }
 
@@ -246,7 +233,7 @@ export async function action({
             message: "Failed to save employee details",
             returnTo: DEFAULT_ROUTE,
           },
-          { status: 500 },
+          { status: 500 }
         );
       }
 
@@ -265,7 +252,7 @@ export async function action({
             headers: {
               "Set-Cookie": await commitSession(session),
             },
-          },
+          }
         );
       }
     } else if (
@@ -284,7 +271,7 @@ export async function action({
             message: "Form validation failed",
             returnTo: `/create-employee?step=${step}`,
           },
-          { status: 400 },
+          { status: 400 }
         );
       }
 
@@ -309,7 +296,7 @@ export async function action({
         message: `An unexpected error occurred${error}`,
         returnTo: "/employees",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 
@@ -324,7 +311,6 @@ export default function CreateEmployee() {
     companyId,
     projectOptions,
     projectSiteOptions,
-    siteEmployeeOptions,
   } = useLoaderData<typeof loader>();
   const [resetKey, setResetKey] = useState(Date.now());
 
@@ -353,8 +339,8 @@ export default function CreateEmployee() {
         toast({
           title: "Error",
           description:
-            actionData?.error ||
             actionData?.error?.message ||
+            actionData?.error ||
             actionData?.message ||
             "Failed to create employee",
           variant: "destructive",
@@ -417,7 +403,6 @@ export default function CreateEmployee() {
                   fields={fields as any}
                   projectOptions={projectOptions}
                   projectSiteOptions={projectSiteOptions}
-                  siteEmployeeOptions={siteEmployeeOptions}
                 />
               ) : null}
               {step === 5 ? (

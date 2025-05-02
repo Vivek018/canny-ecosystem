@@ -20,6 +20,7 @@ import type {
 } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
 import { useReimbursementStore } from "@/store/reimbursements";
+import { useSearchParams } from "@remix-run/react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -46,7 +47,7 @@ export function ReimbursementsTable<TData, TValue>({
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
     initialColumnVisibility ?? {}
   );
-
+  const [searchParams, setSearchParams] = useSearchParams();
   const table = useReactTable({
     data,
     columns,
@@ -106,7 +107,7 @@ export function ReimbursementsTable<TData, TValue>({
                           className={cn(
                             "px-3 md:px-4 py-4 md:table-cell",
                             cell.column.id === "actions" &&
-                            "sticky right-0 min-w-20 max-w-20 bg-card z-10"
+                              "sticky right-0 min-w-20 max-w-20 bg-card z-10"
                           )}
                         >
                           {flexRender(
@@ -140,6 +141,9 @@ export function ReimbursementsTable<TData, TValue>({
                           "mt-4",
                           !data?.length && noFilters && "hidden"
                         )}
+                        onClick={() => {
+                          setSearchParams();
+                        }}
                       >
                         Clear Filters
                       </Button>

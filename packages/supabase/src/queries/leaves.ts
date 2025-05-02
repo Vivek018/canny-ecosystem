@@ -72,7 +72,7 @@ export async function getLeavesByEmployeeId({
   };
 }) {
   const { from, to, sort, filters } = params;
-  const { date_start, date_end, leave_type, users } = filters ?? {};
+  const { date_start, date_end, leave_type, users, year } = filters ?? {};
 
   const columns = [
     "id",
@@ -115,6 +115,11 @@ export async function getLeavesByEmployeeId({
             date_start
           )},start_date.lte.${formatUTCDate(date_end)},end_date.is.null)`
       );
+    }
+    if (year) {
+      const startDate = `${year}-01-01`;
+      const endDate = `${year}-12-31`;
+      query.or(`and(start_date.lte.${endDate}, end_date.gte.${startDate})`);
     }
     if (leave_type) {
       query.eq("leave_type", leave_type.toLowerCase() as any);

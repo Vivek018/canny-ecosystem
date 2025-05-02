@@ -12,41 +12,19 @@ export const ImportedDataColumns: ColumnDef<ImportExitDataType>[] = [
     header: "Employee Code",
     cell: ({ row }) => {
       return (
-        <p className='truncate group-hover:text-primary'>
+        <p className="truncate group-hover:text-primary">
           {row.original.employee_code}
         </p>
       );
     },
   },
-  {
-    accessorKey: "employee_name",
-    header: "Employee Name",
-    cell: ({ row }) => {
-      return <p className='truncate '>{row.original.employee_name}</p>;
-    },
-  },
-  {
-    accessorKey: "project_name",
-    header: "Project Name",
-    cell: ({ row }) => {
-      return <p className='truncate '>{row.original?.project_name ?? "--"}</p>;
-    },
-  },
-  {
-    accessorKey: "project_site_name",
-    header: "Project Site Name",
-    cell: ({ row }) => {
-      return (
-        <p className='truncate '>{row.original?.project_site_name ?? "--"}</p>
-      );
-    },
-  },
+
   {
     accessorKey: "last_working_day",
     header: "Last working day",
     cell: ({ row }) => {
       return (
-        <p className='truncate '>{row.original?.last_working_day ?? "--"}</p>
+        <p className="truncate ">{row.original?.last_working_day ?? "--"}</p>
       );
     },
   },
@@ -54,7 +32,7 @@ export const ImportedDataColumns: ColumnDef<ImportExitDataType>[] = [
     accessorKey: "reason",
     header: "Reason",
     cell: ({ row }) => {
-      return <p className='truncate '>{row.original?.reason ?? "--"}</p>;
+      return <p className="truncate ">{row.original?.reason ?? "--"}</p>;
     },
   },
   {
@@ -62,7 +40,7 @@ export const ImportedDataColumns: ColumnDef<ImportExitDataType>[] = [
     header: "Final Settlement Date",
     cell: ({ row }) => {
       return (
-        <p className='truncate '>
+        <p className="truncate ">
           {row.original?.final_settlement_date ?? "--"}
         </p>
       );
@@ -73,7 +51,7 @@ export const ImportedDataColumns: ColumnDef<ImportExitDataType>[] = [
     header: "Organization Payable Days",
     cell: ({ row }) => {
       return (
-        <p className='truncate '>
+        <p className="truncate ">
           {row.original?.organization_payable_days ?? "--"}
         </p>
       );
@@ -84,7 +62,7 @@ export const ImportedDataColumns: ColumnDef<ImportExitDataType>[] = [
     header: "Employee Payable Days",
     cell: ({ row }) => {
       return (
-        <p className='truncate '>
+        <p className="truncate ">
           {row.original?.employee_payable_days ?? "--"}
         </p>
       );
@@ -94,7 +72,7 @@ export const ImportedDataColumns: ColumnDef<ImportExitDataType>[] = [
     accessorKey: "bonus",
     header: "Bonus",
     cell: ({ row }) => {
-      return <p className='truncate '>{row.original?.bonus ?? "--"}</p>;
+      return <p className="truncate ">{row.original?.bonus ?? "--"}</p>;
     },
   },
   {
@@ -102,7 +80,7 @@ export const ImportedDataColumns: ColumnDef<ImportExitDataType>[] = [
     header: "Leave Encashment",
     cell: ({ row }) => {
       return (
-        <p className='truncate '>{row.original?.leave_encashment ?? "--"}</p>
+        <p className="truncate ">{row.original?.leave_encashment ?? "--"}</p>
       );
     },
   },
@@ -110,28 +88,28 @@ export const ImportedDataColumns: ColumnDef<ImportExitDataType>[] = [
     accessorKey: "gratuity",
     header: "Gratuity",
     cell: ({ row }) => {
-      return <p className='truncate '>{row.original?.gratuity ?? "--"}</p>;
+      return <p className="truncate ">{row.original?.gratuity ?? "--"}</p>;
     },
   },
   {
     accessorKey: "deduction",
     header: "Deduction",
     cell: ({ row }) => {
-      return <p className='truncate '>{row.original?.deduction ?? "--"}</p>;
+      return <p className="truncate ">{row.original?.deduction ?? "--"}</p>;
     },
   },
   {
     accessorKey: "total",
     header: "Total",
     cell: ({ row }: { row: any }) => {
-      return <p className='truncate '>{row.original?.total ?? "--"}</p>;
+      return <p className="truncate ">{row.original?.total ?? "--"}</p>;
     },
   },
   {
     accessorKey: "note",
     header: "Note",
     cell: ({ row }) => {
-      return <p className='truncate '>{row.original?.note ?? "--"}</p>;
+      return <p className="truncate ">{row.original?.note ?? "--"}</p>;
     },
   },
   {
@@ -146,9 +124,9 @@ export const ImportedDataColumns: ColumnDef<ImportExitDataType>[] = [
           data={row.original}
           triggerChild={
             <DropdownMenuTrigger asChild>
-              <Button variant='ghost' className='h-8 w-8 p-0'>
-                <span className='sr-only'>Open menu</span>
-                <Icon name='dots-vertical' />
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <Icon name="dots-vertical" />
               </Button>
             </DropdownMenuTrigger>
           }

@@ -63,31 +63,36 @@ export default function AttendanceAnalytics() {
       attendance: Object.entries(entry)
         .filter(([key]) => key.match(/^\d{2} \w{3} \d{4}$/))
         .map(([date, status]) => {
-          const isPresent = status === "P";
-          const isWeeklyOff = status === "(WOF)";
-          const isLeave = status === "L";
+
+          const isPresent =
+            typeof status === "object" &&
+            status !== null &&
+            "present" in status &&
+            status.present === "P";
+          // const isWeeklyOff = status === "(WOF)";
+          // const isLeave = status === "L";
 
           return {
             date,
             no_of_hours: isPresent ? 8 : 0,
             present: isPresent,
-            holiday: isWeeklyOff || isLeave,
-            working_shift: "",
-            holiday_type: isWeeklyOff ? "weekly" : isLeave ? "paid" : "",
+            // holiday: isWeeklyOff || isLeave,
+            // working_shift: "",
+            // holiday_type: isWeeklyOff ? "weekly" : isLeave ? "paid" : "",
           };
         }),
     })
   );
 
   return (
-    <div className='w-full p-4 m-auto flex flex-col gap-4'>
-      <div className='grid grid-cols-3 gap-3'>
-        <div className='col-span-3'>
+    <div className="w-full p-4 m-auto flex flex-col gap-4">
+      <div className="grid grid-cols-3 gap-3">
+        <div className="col-span-3">
           <AttendanceTrend chartData={transformedData} />
         </div>
       </div>
 
-      <div className='grid grid-cols-3 gap-3'>
+      <div className="grid grid-cols-3 gap-3">
         <AttendanceByProjects chartData={transformedData} />
         <AttendanceByProjectSite
           chartData={transformedData}
@@ -97,7 +102,7 @@ export default function AttendanceAnalytics() {
         <AttendanceAbsentees chartData={transformedData} />
       </div>
 
-      <div className='col-span-1'>
+      <div className="col-span-1">
         <AttendanceBars chartData={transformedData} />
       </div>
     </div>

@@ -1,7 +1,7 @@
 import type { EmployeeReportDataType } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { formatDateTime } from "@canny_ecosystem/utils";
+import { formatDate, formatDateTime } from "@canny_ecosystem/utils";
 import type { VisibilityState } from "@tanstack/react-table";
 import Papa from "papaparse";
 import { paymentFieldsReportColumnIdArray } from "./table/data-table-header";
@@ -14,8 +14,8 @@ export function ExportBar({
 }: {
   rows: number;
   data: (EmployeeReportDataType & {
-    start_range: string;
-    end_range: string;
+    start_date: string;
+    end_date: string;
   })[];
   className: string;
   columnVisibility: VisibilityState;
@@ -24,8 +24,7 @@ export function ExportBar({
     const exportedData: {
       [key: (typeof paymentFieldsReportColumnIdArray)[number]]:
         | string
-        | number
-        | boolean;
+        | undefined;
     } = {};
 
     for (const key of paymentFieldsReportColumnIdArray) {
@@ -45,11 +44,13 @@ export function ExportBar({
         exportedData[key] =
           element?.employee_project_assignment?.project_sites?.name;
       } else if (key === "start_range") {
-        exportedData[key] = element?.start_range;
+        exportedData[key] = formatDate(element.start_date)?.slice(3);
       } else if (key === "end_range") {
-        exportedData[key] = element?.end_range ?? "";
+        exportedData[key] = formatDate(element.end_date)?.slice(3);
       } else {
-        exportedData[key] = element[key as keyof EmployeeReportDataType] as string | boolean | number;
+        exportedData[key] = element[
+          key as keyof EmployeeReportDataType
+        ] as string;
       }
     }
 

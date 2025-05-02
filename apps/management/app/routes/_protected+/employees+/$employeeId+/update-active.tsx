@@ -43,10 +43,9 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
-
     const { status, error } = await updateEmployee({
       supabase,
       data: submission.value,
@@ -88,7 +87,7 @@ export default function UpdateActive() {
       if (actionData?.status === "success") {
         clearCacheEntry(cacheKeyPrefix.employees);
         clearExactCacheEntry(
-          `${cacheKeyPrefix.employee_overview}${employeeId}`,
+          `${cacheKeyPrefix.employee_overview}${employeeId}`
         );
         toast({
           title: "Success",
@@ -99,8 +98,8 @@ export default function UpdateActive() {
         toast({
           title: "Error",
           description:
-            actionData?.error ||
             actionData?.error?.message ||
+            actionData?.error ||
             "Employee update failed",
           variant: "destructive",
         });

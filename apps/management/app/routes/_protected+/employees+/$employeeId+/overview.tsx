@@ -108,24 +108,31 @@ export default function EmployeeIndex() {
   if (error) {
     clearExactCacheEntry(`${cacheKeyPrefix.employee_overview}${employeeId}`);
     return (
-      <ErrorBoundary error={error} message='Failed to load employee details' />
+      <ErrorBoundary error={error} message="Failed to load employee details" />
     );
   }
 
   return (
-    <div className='w-full py-6 flex flex-col gap-8'>
+    <div className="w-full py-6 flex flex-col gap-8">
       <Suspense fallback={<LoadingSpinner />}>
         <Await resolve={employeePromise}>
           {(resolvedData) => {
             if (!resolvedData || !env) {
-              clearExactCacheEntry(`${cacheKeyPrefix.employee_overview}${employeeId}`);
-              return <ErrorBoundary message='Failed to load employee' />;
+              clearExactCacheEntry(
+                `${cacheKeyPrefix.employee_overview}${employeeId}`
+              );
+              return <ErrorBoundary message="Failed to load employee" />;
             }
             return (
               <>
                 <CommonWrapper
                   error={resolvedData.error}
-                  Component={<EmployeePageHeader employee={resolvedData.data!} env={env} />}
+                  Component={
+                    <EmployeePageHeader
+                      employee={resolvedData.data!}
+                      env={env}
+                    />
+                  }
                 />
                 <CommonWrapper
                   error={resolvedData.error}
@@ -147,7 +154,7 @@ export default function EmployeeIndex() {
                 `${cacheKeyPrefix.employee_overview}${employeeId}`
               );
               return (
-                <ErrorBoundary message='Failed to load employee statutory details' />
+                <ErrorBoundary message="Failed to load employee statutory details" />
               );
             }
             return (
@@ -172,7 +179,7 @@ export default function EmployeeIndex() {
                 `${cacheKeyPrefix.employee_overview}${employeeId}`
               );
               return (
-                <ErrorBoundary message='Failed to load employee bank details' />
+                <ErrorBoundary message="Failed to load employee bank details" />
               );
             }
             return (
@@ -195,7 +202,7 @@ export default function EmployeeIndex() {
                 `${cacheKeyPrefix.employee_overview}${employeeId}`
               );
               return (
-                <ErrorBoundary message='Failed to load employee addresses' />
+                <ErrorBoundary message="Failed to load employee addresses" />
               );
             }
             return (
@@ -220,7 +227,7 @@ export default function EmployeeIndex() {
                 `${cacheKeyPrefix.employee_overview}${employeeId}`
               );
               return (
-                <ErrorBoundary message='Failed to load employee guardians details' />
+                <ErrorBoundary message="Failed to load employee guardians details" />
               );
             }
             return (

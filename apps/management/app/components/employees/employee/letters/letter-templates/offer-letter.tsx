@@ -9,6 +9,7 @@ import { MarkdownRenderer } from "../markdown-renderer";
 import type { CompanyInfoDataType } from "@/routes/_protected+/employees+/$employeeId+/letters+/$letterId";
 import { LetterHeader } from "./letter-header";
 import type { EmployeeAddressDatabaseRow } from "@canny_ecosystem/supabase/types";
+import { LetterFooter } from "./letter-footer";
 
 export function OfferLetter({
   data,
@@ -23,14 +24,16 @@ export function OfferLetter({
   companyData: CompanyInfoDataType | null;
 }) {
   const replacements = {
-    employeeName: `${data?.employees.gender === "female" ? "Ms." : "Mr."} ${data?.employees.first_name} ${data?.employees.middle_name ?? ""} ${data?.employees?.last_name}`,
+    employeeName: `${data?.employees.gender === "female" ? "Ms." : "Mr."} ${
+      data?.employees.first_name
+    } ${data?.employees.middle_name ?? ""} ${data?.employees?.last_name}`,
     employeeGender: data?.employees.gender ?? "",
     employeeJoiningDate: new Date(
-      data?.employees.employee_project_assignment?.start_date ?? "",
+      data?.employees.employee_project_assignment?.start_date ?? ""
     ).toLocaleDateString("en-IN"),
 
     employeeLeavingDate: new Date(
-      data?.employees.employee_project_assignment?.end_date ?? "",
+      data?.employees.employee_project_assignment?.end_date ?? ""
     ).toLocaleDateString("en-IN"),
     employeePosition:
       data?.employees.employee_project_assignment?.position ?? "",
@@ -48,15 +51,13 @@ export function OfferLetter({
           <View fixed style={styles.header}>
             <LetterHeader />
           </View>
-        ) : <View fixed style={styles.indent} />}
+        ) : (
+          <View fixed style={styles.indent} />
+        )}
         <View style={styles.wrapper}>
           {/* Header Section */}
           <View style={styles.headerDate}>
             <Text>Date: {formatDate(data?.date ?? "")}</Text>
-          </View>
-
-          <View style={styles.title}>
-            <Text style={styles.underlineText}>{data?.subject}</Text>
           </View>
 
           {/* Recipient Details */}
@@ -94,7 +95,9 @@ export function OfferLetter({
                 </Text>
               </View>
             )}
-
+          <View style={styles.title}>
+            <Text style={styles.underlineText}>{data?.subject}</Text>
+          </View>
           {/* Main Content Section */}
           <View style={styles.section}>
             <MarkdownRenderer
@@ -130,7 +133,7 @@ export function OfferLetter({
         </View>
         {data?.include_letter_head && (
           <View style={styles.footer} fixed>
-            <LetterHeader />
+            <LetterFooter />
           </View>
         )}
       </Page>

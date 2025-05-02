@@ -1,3 +1,4 @@
+import { defaultYear } from "@canny_ecosystem/utils";
 import { HARD_QUERY_LIMIT } from "../constant";
 import type {
   PayrollDatabaseRow,
@@ -7,7 +8,19 @@ import type {
   EmployeeDatabaseRow,
   SalaryEntriesDatabaseRow,
 } from "../types";
+import type { DashboardFilters } from "./exits";
+import { months } from "@canny_ecosystem/utils/constant";
 
+export type ImportPayrollDataType = Pick<
+  PayrollEntriesDatabaseRow,
+  "employee_id" | "amount"
+> & {
+  employee_code: EmployeeDatabaseRow["employee_code"];
+};
+export type ImportSalaryPayrollDataType = {
+  employee_code: EmployeeDatabaseRow["employee_code"];
+  present_days: number;
+};
 
 export async function getPendingOrSubmittedPayrollsByCompanyId({
   supabase,
@@ -25,7 +38,7 @@ export async function getPendingOrSubmittedPayrollsByCompanyId({
     "total_net_amount",
     "commission",
     "company_id",
-    "created_at"
+    "created_at",
   ] as const;
 
   const { data, error } = await supabase
@@ -37,7 +50,8 @@ export async function getPendingOrSubmittedPayrollsByCompanyId({
     .limit(HARD_QUERY_LIMIT)
     .returns<InferredType<PayrollDatabaseRow, (typeof columns)[number]>[]>();
 
-  if (error) console.error("getPendingOrSubmittedPayrollsByCompanyId Error", error);
+  if (error)
+    console.error("getPendingOrSubmittedPayrollsByCompanyId Error", error);
 
   return { data, error };
 }
@@ -58,7 +72,7 @@ export async function getApprovedPayrollsByCompanyId({
     "total_net_amount",
     "commission",
     "company_id",
-    "created_at"
+    "created_at",
   ] as const;
 
   const { data, error } = await supabase
@@ -91,6 +105,7 @@ export async function getPayrollById({
     "total_net_amount",
     "commission",
     "company_id",
+    "created_at",
   ] as const;
 
   const { data, error } = await supabase
@@ -104,10 +119,33 @@ export async function getPayrollById({
   return { data, error };
 }
 
+export type PayrollEntriesWithEmployee = Omit<
+  PayrollEntriesDatabaseRow,
+  "created_at" | "updated_at"
+> & {
+  employees: Pick<
+    EmployeeDatabaseRow,
+    | "first_name"
+    | "middle_name"
+    | "last_name"
+    | "employee_code"
+    | "company_id"
+    | "id"
+  >;
+};
 
-export type PayrollEntriesWithEmployee = Omit<PayrollEntriesDatabaseRow, "created_at" | "updated_at"> & { employees: Pick<EmployeeDatabaseRow, "first_name" | "middle_name" | "last_name" | "employee_code" | "company_id" | "id"> }
-
-export type SalaryEntriesWithEmployee = Pick<EmployeeDatabaseRow, "first_name" | "middle_name" | "last_name" | "employee_code" | "company_id" | "id"> & { salary_entries: Omit<SalaryEntriesDatabaseRow, "created_at" | "updated_at">[] }
+export type SalaryEntriesWithEmployee = Pick<
+  EmployeeDatabaseRow,
+  | "first_name"
+  | "middle_name"
+  | "last_name"
+  | "employee_code"
+  | "company_id"
+  | "id"
+> & {
+  salary_entries: Omit<SalaryEntriesDatabaseRow, "created_at" | "updated_at">[];
+  leaves?: { start_date: string; end_date: string; status: string }[];
+};
 
 export async function getSalaryEntriesByPayrollId({
   supabase,
@@ -135,12 +173,21 @@ export async function getSalaryEntriesByPayrollId({
 
   const { data, error } = await supabase
     .from("employees")
-    .select(`id, company_id, first_name, middle_name, last_name, employee_code, salary_entries!inner(${columns.join(",")})`)
+    .select(
+      `id, company_id, first_name, middle_name, last_name, employee_code, salary_entries!inner(${columns.join(
+        ","
+      )})`
+    )
     .eq("salary_entries.payroll_id", payrollId)
-    .order("type, field_name", { ascending: true, referencedTable: "salary_entries" })
+    .order("type, field_name", {
+      ascending: true,
+      referencedTable: "salary_entries",
+    })
     .returns<SalaryEntriesWithEmployee[]>();
 
-  if (error) { console.error("getSalaryEntriesByPayrollId Error", error); }
+  if (error) {
+    console.error("getSalaryEntriesByPayrollId Error", error);
+  }
 
   return { data, error };
 }
@@ -173,7 +220,11 @@ export async function getSalaryEntriesByPayrollAndEmployeeId({
 
   const { data, error } = await supabase
     .from("employees")
-    .select(`id, company_id, first_name, middle_name, last_name, employee_code, salary_entries!inner(${columns.join(",")})`)
+    .select(
+      `id, company_id, first_name, middle_name, last_name, employee_code, salary_entries!inner(${columns.join(
+        ","
+      )})`
+    )
     .eq("salary_entries.payroll_id", payrollId)
     .eq("id", employeeId)
     .single<SalaryEntriesWithEmployee>();
@@ -213,7 +264,7 @@ export async function getSalaryEntryById({
     .from("salary_entries")
     .select(`${columns.join(",")}`)
     .eq("id", id)
-    .single<InferredType<SalaryEntriesDatabaseRow, typeof columns[number]>>();
+    .single<InferredType<SalaryEntriesDatabaseRow, (typeof columns)[number]>>();
 
   if (error) console.error("getSalaryEntryById Error", error);
 
@@ -234,12 +285,17 @@ export async function getPayrollEntriesByPayrollId({
     "exit_id",
     "payment_status",
     "amount",
-    "payroll_id"
+    "payroll_id",
+    "created_at",
   ] as const;
 
   const { data, error } = await supabase
     .from("payroll_entries")
-    .select(`${columns.join(",")}, employees!left(id,company_id,first_name, middle_name, last_name, employee_code)`)
+    .select(
+      `${columns.join(
+        ","
+      )}, employees!left(id,company_id,first_name, middle_name, last_name, employee_code)`
+    )
     .eq("payroll_id", payrollId)
     .order("created_at", { ascending: false })
     .returns<PayrollEntriesWithEmployee[]>();
@@ -248,7 +304,6 @@ export async function getPayrollEntriesByPayrollId({
 
   return { data, error };
 }
-
 
 export async function getPayrollEntryById({
   supabase,
@@ -269,11 +324,210 @@ export async function getPayrollEntryById({
 
   const { data, error } = await supabase
     .from("payroll_entries")
-    .select(`${columns.join(",")}, employees!left(id,company_id,first_name, middle_name, last_name, employee_code)`)
+    .select(
+      `${columns.join(
+        ","
+      )}, employees!left(id,company_id,first_name, middle_name, last_name, employee_code)`
+    )
     .eq("id", id)
     .single<PayrollEntriesWithEmployee>();
 
   if (error) console.error("getPayrollEntryById Error", error);
 
   return { data, error };
+}
+
+export async function getApprovedPayrollsAmountsByCompanyIdByMonths({
+  supabase,
+  companyId,
+  filters,
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+  filters?: DashboardFilters;
+}) {
+  const columns = ["payroll_type", "run_date", "total_net_amount"] as const;
+  const defMonth = new Date().getMonth();
+  const filterMonth = filters?.month && Number(months[filters.month]);
+  const filterYear = filters?.year && Number(filters.year);
+
+  //For Current Month
+  const startOfCurrentMonth = filterMonth
+    ? new Date(Date.UTC(Number(filterYear ?? defaultYear), filterMonth - 1, 1))
+    : new Date(Date.UTC(Number(filterYear ?? defaultYear), defMonth, 1));
+  const endOfCurrentMonth = filterMonth
+    ? new Date(Number(filterYear ?? defaultYear), filterMonth, 1)
+    : new Date(Number(filterYear ?? defaultYear), defMonth + 1, 1);
+
+  const { data: currentMonth, error: currentMonthError } = await supabase
+    .from("payroll")
+    .select(columns.join(","))
+    .eq("company_id", companyId)
+    .in("status", ["approved"])
+    .gte("run_date", startOfCurrentMonth.toISOString())
+    .lt("run_date", endOfCurrentMonth.toISOString())
+    .order("created_at", { ascending: false })
+    .returns<InferredType<PayrollDatabaseRow, (typeof columns)[number]>[]>();
+
+  if (currentMonthError)
+    console.error(
+      "getApprovedPayrollsByCompanyIdByMonths Error",
+      currentMonthError
+    );
+
+  //For Previous Month
+
+  const startOfPrevMonth = filterMonth
+    ? new Date(Date.UTC(Number(filterYear ?? defaultYear), filterMonth - 2, 1))
+    : new Date(Date.UTC(Number(filterYear ?? defaultYear), defMonth - 1, 1));
+  const endOfPrevMonth = filterMonth
+    ? new Date(Number(filterYear ?? defaultYear), filterMonth - 1, 1)
+    : new Date(Number(filterYear ?? defaultYear), defMonth, 1);
+
+  const { data: previousMonth, error: previousMonthError } = await supabase
+    .from("payroll")
+    .select(columns.join(","))
+    .eq("company_id", companyId)
+    .in("status", ["approved"])
+    .gte("run_date", startOfPrevMonth.toISOString())
+    .lt("run_date", endOfPrevMonth.toISOString())
+    .order("created_at", { ascending: false })
+    .returns<InferredType<PayrollDatabaseRow, (typeof columns)[number]>[]>();
+
+  if (previousMonthError)
+    console.error(
+      "getApprovedPayrollsByCompanyIdByMonths Error",
+      previousMonthError
+    );
+
+  return { currentMonth, currentMonthError, previousMonth, previousMonthError };
+}
+
+export async function getApprovedPayrollsByCompanyIdByYears({
+  supabase,
+  companyId,
+  filters,
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+  filters?: DashboardFilters;
+}) {
+  const columns = ["payroll_type", "run_date", "total_net_amount"] as const;
+  const defMonth = new Date().getMonth();
+  const filterMonth = filters?.month && Number(months[filters.month]);
+  const filterYear = filters?.year && Number(filters.year);
+
+  const startOfYear = filterMonth
+    ? new Date(Date.UTC(Number(filterYear ?? defaultYear) - 1, filterMonth, 1))
+    : new Date(
+        Date.UTC(Number(filterYear ?? defaultYear) - 1, defMonth + 1, 1)
+      );
+
+  const endOfYear = filterMonth
+    ? new Date(Number(filterYear ?? defaultYear), filterMonth, 1)
+    : new Date(Number(filterYear ?? defaultYear), defMonth + 1, 1);
+
+  const { data, error } = await supabase
+    .from("payroll")
+    .select(columns.join(","))
+    .eq("company_id", companyId)
+    .in("status", ["approved"])
+    .gte("run_date", startOfYear.toISOString())
+    .lt("run_date", endOfYear.toISOString())
+    .order("run_date", { ascending: true })
+    .returns<InferredType<PayrollDatabaseRow, (typeof columns)[number]>[]>();
+
+  if (error) {
+    console.error("getApprovedPayrollsByCompanyIdByYears Error", error);
+    return { data: null, error };
+  }
+
+  const groupedByMonthObj: Record<string, typeof data> = {};
+
+  // Build placeholder for last 12 months
+  const tempDate = new Date(startOfYear);
+  for (let i = 0; i < 12; i++) {
+    const month = tempDate.toLocaleString("default", { month: "short" });
+    const year = tempDate.getFullYear();
+    const key = `${month} ${year}`;
+    groupedByMonthObj[key] = [];
+    tempDate.setMonth(tempDate.getMonth() + 1);
+  }
+
+  // Group actual data into corresponding months
+  for (const item of data) {
+    const date = new Date(item.run_date ?? "");
+    const month = date.toLocaleString("default", { month: "short" });
+    const year = date.getFullYear();
+    const key = `${month} ${year}`;
+
+    if (groupedByMonthObj[key]) {
+      groupedByMonthObj[key].push(item);
+    }
+  }
+
+  const groupedByMonth = Object.entries(groupedByMonthObj).map(
+    ([month, data]) => ({
+      month,
+      data,
+    })
+  );
+
+  return { data: groupedByMonth, error: null };
+}
+
+export async function getSalaryEntriesByPayrollIdForSalaryRegister({
+  supabase,
+  payrollId,
+}: {
+  supabase: TypedSupabaseClient;
+  payrollId: string;
+}) {
+  const columns = [
+    "month",
+    "year",
+    "present_days",
+    "overtime_hours",
+    "field_name",
+    "type",
+    "amount",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("employees")
+    .select(
+      `id, company_id, first_name, middle_name, last_name, employee_code, salary_entries!inner(${columns.join(
+        ","
+      )}),employee_project_assignment!inner(position),employee_statutory_details!inner(aadhaar_number,pan_number,uan_number,pf_number,esic_number),leaves(start_date,end_date,leave_type)`
+    )
+    .eq("salary_entries.payroll_id", payrollId)
+    .order("type, field_name", {
+      ascending: true,
+      referencedTable: "salary_entries",
+    })
+    .returns<SalaryEntriesWithEmployee[]>();
+
+  if (error) {
+    console.error("getSalaryEntriesByPayrollId Error", error);
+  }
+
+  const filteredData = data?.map((employee) => {
+    const salaryEntry = employee.salary_entries[0];
+    const year = salaryEntry?.year;
+    const month = salaryEntry?.month;
+
+    const filteredLeaves = employee?.leaves?.filter((leave) => {
+      const leaveDate = new Date(leave.start_date);
+      return (
+        leaveDate.getFullYear() === year && leaveDate.getMonth() + 1 === month
+      );
+    });
+
+    return {
+      ...employee,
+      leaves: filteredLeaves,
+    };
+  });
+
+  return { data: filteredData, error: null };
 }
