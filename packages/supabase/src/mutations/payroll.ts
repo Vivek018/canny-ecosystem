@@ -30,8 +30,8 @@ export async function createSalaryPayroll({
 }: {
   supabase: TypedSupabaseClient;
   data: {
-    run_date: string;
-    status: "pending" | "approved" | "submitted";
+    run_date?: string;
+    status?: "pending" | "approved" | "submitted";
     type: "salary";
     salaryData: Omit<SalaryEntriesDatabaseInsert, "payroll_id">[];
     totalEmployees: number;
@@ -153,8 +153,8 @@ export async function createReimbursementPayroll({
 }: {
   supabase: TypedSupabaseClient;
   data: {
-    run_date: string;
-    status: "pending" | "approved" | "submitted";
+    run_date?: string;
+    status?: "pending" | "approved" | "submitted";
     type: "reimbursement";
     reimbursementData: Partial<ReimbursementDataType>[];
     totalEmployees: number;
@@ -276,8 +276,8 @@ export async function createExitPayroll({
 }: {
   supabase: TypedSupabaseClient;
   data: {
-    run_date: string;
-    status: "pending" | "approved" | "submitted";
+    run_date?: string;
+    status?: "pending" | "approved" | "submitted";
     type: "exit";
     exitData: Partial<ExitDataType>[];
     totalEmployees: number;
