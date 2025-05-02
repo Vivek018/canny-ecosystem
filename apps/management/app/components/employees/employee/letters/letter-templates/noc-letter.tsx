@@ -9,6 +9,7 @@ import { MarkdownRenderer } from "../markdown-renderer";
 import type { CompanyInfoDataType } from "@/routes/_protected+/employees+/$employeeId+/letters+/$letterId";
 import { LetterHeader } from "./letter-header";
 import type { EmployeeAddressDatabaseRow } from "@canny_ecosystem/supabase/types";
+import { LetterFooter } from "./letter-footer";
 
 export function NOCLetter({
   data,
@@ -124,7 +125,7 @@ export function NOCLetter({
         </View>
         {data?.include_letter_head && (
           <View style={styles.footer} fixed>
-            <LetterHeader />
+            <LetterFooter />
           </View>
         )}
       </Page>
