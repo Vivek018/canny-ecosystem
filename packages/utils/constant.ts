@@ -90,6 +90,7 @@ export const payoutMonths = [
   { value: 12, label: "December" },
 ];
 
+export const BONUS_PERCENTAGE = 0.0833;
 export const EMPLOYEE_EPF_PERCENTAGE = 0.12;
 export const EMPLOYER_EPF_PERCENTAGE = 0.12;
 export const EMPLOYER_EDLI_PERCENTAGE = 0.005;
