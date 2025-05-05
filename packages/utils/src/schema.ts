@@ -272,11 +272,11 @@ export const EmployeeSchema = z.object({
 
 export const EmployeeStatutorySchema = z.object({
   employee_id: z.string().optional(),
-  aadhaar_number: zNumber.min(12).max(12),
+  aadhaar_number: zNumber.min(12).max(12).optional(),
   pan_number: zNumberString.max(10).optional(),
-  uan_number: zNumberString.max(12),
-  pf_number: zNumberString.max(20),
-  esic_number: zNumberString.max(20),
+  uan_number: zNumberString.max(12).optional(),
+  pf_number: zNumberString.max(20).optional(),
+  esic_number: zNumberString.max(20).optional(),
   driving_license_number: zNumberString.max(20).optional(),
   driving_license_expiry: z.string().optional(),
   passport_number: zNumberString.max(20).optional(),
@@ -931,14 +931,14 @@ export const ImportEmployeeStatutoryHeaderSchema =
 
 export const ImportSingleEmployeeStatutoryDataSchema = z.object({
   employee_code: zNumberString.min(3),
-  aadhaar_number: zNumber.min(12).max(12),
+  aadhaar_number: zNumber.min(12).max(12).optional(),
   pan_number: z.preprocess(
     (value) => (value === "" ? undefined : value),
     z.string().max(10).optional()
   ),
-  uan_number: zNumberString.max(12),
-  pf_number: zNumberString.max(20),
-  esic_number: zNumberString.max(20),
+  uan_number: zNumberString.max(12).optional(),
+  pf_number: zNumberString.max(22).optional(),
+  esic_number: zNumberString.max(20).optional(),
   driving_license_number: z.preprocess(
     (value) => (value === "" ? undefined : value),
     z.string().max(20).optional()
@@ -1062,7 +1062,7 @@ export const ImportEmployeeAddressHeaderSchema =
 
 export const ImportSingleEmployeeAddressDataSchema = z.object({
   employee_code: zNumberString.min(3),
-  address_type: zString.min(3).max(20),
+  address_type: zString.min(3).max(20).optional(),
   is_primary: z.preprocess(
     (value) =>
       typeof value === "string" ? value.toLowerCase() === "true" : value,
@@ -1071,14 +1071,15 @@ export const ImportSingleEmployeeAddressDataSchema = z.object({
   address_line_1: z
     .string()
     .min(3)
-    .max(textMaxLength * 2),
+    .max(textMaxLength * 2)
+    .optional(),
   address_line_2: z
     .string()
     .max(textMaxLength * 2)
     .optional(),
-  state: zString,
-  city: zString.min(3),
-  pincode: zNumber.min(6).max(6),
+  state: zString.optional(),
+  city: zString.min(3).optional(),
+  pincode: zNumber.min(6).max(6).optional(),
   latitude: z.preprocess(
     (value) => (value === "" ? undefined : value),
     z.string().max(180).min(-180).optional()
