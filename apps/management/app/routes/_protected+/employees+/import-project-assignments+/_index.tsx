@@ -10,25 +10,45 @@ import {
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
-import type { ImportEmployeeAddressHeaderSchemaObject } from "@canny_ecosystem/utils";
-import type { ImportEmployeeAddressDataType } from "@canny_ecosystem/supabase/queries";
+import type {
+  ImportEmployeeDetailsHeaderSchemaObject,
+  ImportEmployeeProjectAssignmentsHeaderSchemaObject,
+} from "@canny_ecosystem/utils";
 import {
-  ImportEmployeeAddressHeaderSchema,
-  ImportEmployeeAddressDataSchema,
+  getEmployeeIdsByEmployeeCodes,
+  getEmployeeProjectAssignmentsConflicts,
+  getProjectNamesByCompanyId,
+  getSiteNamesByProjectName,
+  type ImportEmployeeDetailsDataType,
+  type ImportEmployeeProjectAssignmentsDataType,
+} from "@canny_ecosystem/supabase/queries";
+import {
+  ImportEmployeeDetailsHeaderSchema,
+  ImportEmployeeDetailsDataSchema,
   transformStringArrayIntoOptions,
   replaceUnderscore,
   pipe,
   replaceDash,
+  ImportEmployeeProjectAssignmentsHeaderSchema,
+  ImportEmployeeProjectAssignmentsDataSchema,
 } from "@canny_ecosystem/utils";
 import type { z } from "zod";
-
-import { EmployeeAddressImportData } from "@/components/employees/import-export/employee-address-import-data";
-
-import { useImportStoreForEmployeeAddress } from "@/store/import";
+import { getEmployeeDetailsConflicts } from "@canny_ecosystem/supabase/mutations";
+import { EmployeeDetailsImportData } from "@/components/employees/import-export/employee-details-import-data";
+import { useSupabase } from "@canny_ecosystem/supabase/client";
+import {
+  useImportStoreForEmployeeDetails,
+  useImportStoreForEmployeeProjectAssignments,
+} from "@/store/import";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { EmployeeProjectAssignmentsImportData } from "@/components/employees/import-export/employee-project-assignments-import-data";
+import { EmployeeProjectAssignmentDatabaseInsert } from "@canny_ecosystem/supabase/types";
 
 type FieldConfig = {
-  key: keyof z.infer<typeof ImportEmployeeAddressHeaderSchemaObject>;
+  key: keyof z.infer<typeof ImportEmployeeProjectAssignmentsHeaderSchemaObject>;
   required?: boolean;
 };
 
@@ -37,50 +57,64 @@ const FIELD_CONFIGS: FieldConfig[] = [
     key: "employee_code",
     required: true,
   },
+  { key: "assignment_type" },
   {
-    key: "address_type",
-    required: true,
+    key: "position"
   },
   {
-    key: "address_line_1",
+    key: "start_date"
   },
   {
-    key: "address_line_2",
-  },
-  { key: "city" },
-  {
-    key: "pincode",
+    key: "end_date",
   },
   {
-    key: "state",
-    required: true,
-  },
-  { key: "country" },
-  { key: "is_primary" },
-  {
-    key: "latitude",
+    key: "skill_level"
   },
   {
-    key: "longitude",
-    required: true,
+    key: "probation_period"
   },
+  { key: "probation_end_date" },
 ];
 
-export async function loader() {
+export async function loader({ request }: LoaderFunctionArgs) {
+  const { supabase } = getSupabaseWithHeaders({ request });
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
-
-  return json({ env });
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+  const { data } = await getProjectNamesByCompanyId({ companyId, supabase });
+  return json({ env, companyId, data });
 }
 
-export default function EmployeeAddressImportFieldMapping() {
-  const { env } = useLoaderData<typeof loader>();
+export default function EmployeeProjectAssignmentsImportFieldMapping() {
+  const { env, companyId, data } = useLoaderData<typeof loader>();
+  const { supabase } = useSupabase({ env });
 
-  const { setImportData } = useImportStoreForEmployeeAddress();
+  const projectNames = data?.map((project) => project.name) ?? [];
+  const [project, setProject] = useState("");
+  const [siteArray, setSiteArray] = useState<string[]>([]);
+  const [site, setSite] = useState<string>("");
+
+  const handleSites = async (projectName: string) => {
+    const { data: sites, error } = await getSiteNamesByProjectName({
+      projectName,
+      supabase,
+    });
+
+    setSiteArray(sites?.map((site) => site.name) ?? []);
+  };
+
+  useEffect(() => {
+    if (project) {
+      handleSites(project);
+    }
+  }, [project]);
+
+  const { setImportData } = useImportStoreForEmployeeProjectAssignments();
 
   const [loadNext, setLoadNext] = useState(false);
+  const [hasConflict, setHasConflict] = useState<number[]>([]);
 
   const location = useLocation();
   const [file] = useState(location.state?.file);
@@ -101,7 +135,10 @@ export default function EmployeeAddressImportFieldMapping() {
           setHeaderArray(headers);
         },
         error: (error) => {
-          console.error("Address Header parsing error:", error);
+          console.error(
+            "Employee Project Assignments Header parsing error:",
+            error
+          );
           setErrors((prev) => ({ ...prev, parsing: "Error parsing headers" }));
         },
       });
@@ -130,14 +167,15 @@ export default function EmployeeAddressImportFieldMapping() {
 
   const validateMapping = () => {
     try {
-      const mappingResult = ImportEmployeeAddressHeaderSchema.safeParse(
-        Object.fromEntries(
-          Object.entries(fieldMapping).map(([key, value]) => [
-            key,
-            value || undefined,
-          ])
-        )
-      );
+      const mappingResult =
+        ImportEmployeeProjectAssignmentsHeaderSchema.safeParse(
+          Object.fromEntries(
+            Object.entries(fieldMapping).map(([key, value]) => [
+              key,
+              value || undefined,
+            ])
+          )
+        );
 
       if (!mappingResult.success) {
         const formattedErrors = mappingResult.error.errors.map(
@@ -150,7 +188,7 @@ export default function EmployeeAddressImportFieldMapping() {
       setValidationErrors([]);
       return true;
     } catch (error) {
-      console.error("Address Validation error:", error);
+      console.error("Employee Project Assignments Validation error:", error);
       setValidationErrors(["An unexpected error occurred during validation"]);
       return false;
     }
@@ -158,7 +196,9 @@ export default function EmployeeAddressImportFieldMapping() {
 
   const validateImportData = (data: any[]) => {
     try {
-      const result = ImportEmployeeAddressDataSchema.safeParse({ data });
+      const result = ImportEmployeeProjectAssignmentsDataSchema.safeParse({
+        data,
+      });
       if (!result.success) {
         const formattedErrors = result.error.errors.map(
           (err) => `${err.path[2]}: ${err.message}`
@@ -168,7 +208,10 @@ export default function EmployeeAddressImportFieldMapping() {
       }
       return true;
     } catch (error) {
-      console.error("Address Data validation error:", error);
+      console.error(
+        "Employee Project Assignments Data validation error:",
+        error
+      );
       setValidationErrors([
         "An unexpected error occurred during data validation",
       ]);
@@ -204,8 +247,7 @@ export default function EmployeeAddressImportFieldMapping() {
         transformHeader: (header) => swappedFieldMapping[header] || header,
         complete: async (results) => {
           const allowedFields = FIELD_CONFIGS.map((field) => field.key);
-
-          const finalData = results.data
+          const finalData = results?.data
             .filter((entry) =>
               Object.values(entry!).some((value) => String(value).trim() !== "")
             )
@@ -220,23 +262,64 @@ export default function EmployeeAddressImportFieldMapping() {
                   )
                   .filter(([key]) =>
                     allowedFields.includes(
-                      key as keyof ImportEmployeeAddressDataType
+                      key as keyof ImportEmployeeProjectAssignmentsDataType
                     )
                   )
               );
-              return cleanEntry;
+              return { ...cleanEntry, site: site } as ImportEmployeeProjectAssignmentsDataType;
             });
 
           if (validateImportData(finalData)) {
+
             setImportData({
-              data: finalData as ImportEmployeeAddressDataType[],
+              data: finalData as ImportEmployeeProjectAssignmentsDataType[],
             });
 
+            const employeeCodes = finalData!.map(
+              (value) => value.employee_code
+            );
+            const { data: employees, error: idByCodeError } =
+              await getEmployeeIdsByEmployeeCodes({
+                supabase,
+                employeeCodes,
+              });
+
+            if (idByCodeError) {
+              throw idByCodeError;
+            }
+
+            const updatedData = finalData!.map((item: any) => {
+              const employeeId = employees?.find(
+                (e) => e.employee_code === item.employee_code
+              )?.id;
+
+              const { employee_code, ...rest } = item;
+              return {
+                ...rest,
+                ...(employeeId ? { employee_id: employeeId } : {}),
+              };
+            });
+
+            const { conflictingIndices, error } =
+              await getEmployeeProjectAssignmentsConflicts({
+                supabase,
+                importedData:
+                  updatedData as EmployeeProjectAssignmentDatabaseInsert[],
+              });
+
+            if (error) {
+              throw error;
+            }
+
+            setHasConflict(conflictingIndices);
             setLoadNext(true);
           }
         },
         error: (error) => {
-          console.error("Address Data parsing error:", error);
+          console.error(
+            "Employee Project Assignments Data parsing error:",
+            error
+          );
           setErrors((prev) => ({
             ...prev,
             parsing: "Error parsing file data",
@@ -249,7 +332,11 @@ export default function EmployeeAddressImportFieldMapping() {
   return (
     <section className="py-4 ">
       {loadNext ? (
-        <EmployeeAddressImportData env={env} />
+        <EmployeeProjectAssignmentsImportData
+          conflictingIndices={hasConflict}
+          env={env}
+          companyId={companyId}
+        />
       ) : (
         <Card className="m-4 px-40">
           <CardHeader>
@@ -278,6 +365,35 @@ export default function EmployeeAddressImportFieldMapping() {
             )}
 
             <div className="grid grid-cols-2 place-content-center justify-between gap-y-8 gap-x-10 mt-5">
+              <div className="w-full">
+                <div className=" pb-1">
+                  <label className="text-sm text-muted-foreground capitalize">
+                    Project <span className="text-primary">*</span>
+                  </label>
+                </div>
+                <Combobox
+                  options={transformStringArrayIntoOptions(projectNames)}
+                  value={project}
+                  onChange={(value: string) => setProject(value)}
+                  placeholder={`Select Project`}
+                  className="w-full"
+                />
+              </div>
+              <div className="w-full">
+                <div className="pb-1">
+                  <label className="text-sm text-muted-foreground capitalize">
+                    Site <span className="text-primary">*</span>
+                  </label>
+                </div>
+                <Combobox
+                  options={transformStringArrayIntoOptions(siteArray)}
+                  value={site}
+                  onChange={(value: string) => setSite(value)}
+                  placeholder={`Select Site`}
+                  className="w-full"
+                />
+              </div>
+
               {FIELD_CONFIGS.map((field) => (
                 <div key={field.key} className="flex flex-col">
                   <div className="flex flex-row gap-1 pb-1">

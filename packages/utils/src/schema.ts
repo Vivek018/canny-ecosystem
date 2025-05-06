@@ -287,8 +287,8 @@ export const accountTypeArray = ["savings", "current", "salary"] as const;
 
 export const EmployeeBankDetailsSchema = z.object({
   employee_id: z.string().optional(),
-  account_number: zNumber.min(10).max(20),
-  ifsc_code: zNumberString.min(3).max(11),
+  account_number: zNumber.min(9).max(20),
+  ifsc_code: zNumberString.min(3).max(15),
   account_holder_name: zString.min(3).optional(),
   account_type: z.enum(accountTypeArray).default("savings"),
   bank_name: zString.min(3),
@@ -790,7 +790,7 @@ export const ImportReimbursementDataSchema = z.object({
   data: z.array(ImportSingleReimbursementDataSchema),
 });
 
-export const duplicationTypeArray = ["overwrite", "skip"] as const;
+export const duplicationTypeArray = ["skip", "overwrite"] as const;
 
 export const ImportEmployeeDetailsHeaderSchemaObject = z.object({
   employee_code: z.string(),
@@ -995,8 +995,8 @@ export const ImportEmployeeBankDetailsHeaderSchema =
 
 export const ImportSingleEmployeeBankDetailsDataSchema = z.object({
   employee_code: zNumberString.min(3),
-  account_number: zNumber.min(10).max(20),
-  ifsc_code: zNumberString.min(3).max(11),
+  account_number: zNumber.min(9).max(20),
+  ifsc_code: zNumberString.min(3).max(15),
   account_holder_name: zString.min(3).optional(),
   account_type: z.enum(accountTypeArray).default("savings"),
   bank_name: zString.min(3),
@@ -1011,7 +1011,7 @@ export const ImportEmployeeAddressHeaderSchemaObject = z.object({
   employee_code: z.string(),
   address_type: z.string(),
   address_line_1: z.string(),
-  address_line_2: z.string(),
+  address_line_2: z.string().optional(),
   city: z.string(),
   pincode: z.string(),
   state: z.string(),
@@ -1176,6 +1176,74 @@ export const ImportSingleEmployeeGuardiansDataSchema = z.object({
 
 export const ImportEmployeeGuardiansDataSchema = z.object({
   data: z.array(ImportSingleEmployeeGuardiansDataSchema),
+});
+
+export const ImportEmployeeProjectAssignmentsHeaderSchemaObject = z.object({
+  employee_code: z.string(),
+  site: z.string().optional(),
+  position: z.string().optional(),
+  start_date: z.string().optional(),
+  end_date: z.string().optional(),
+  assignment_type: z.string().optional(),
+  skill_level: z.string().optional(),
+  probation_period: z.string().optional(),
+  probation_end_date: z.string().optional(),
+});
+
+export const ImportEmployeeProjectAssignmentsHeaderSchema =
+  ImportEmployeeProjectAssignmentsHeaderSchemaObject.refine(
+    (data) => {
+      const values = [
+        data.employee_code,
+        data.site,
+        data.assignment_type,
+        data.position,
+        data.start_date,
+        data.end_date,
+        data.skill_level,
+        data.probation_period,
+        data.probation_end_date,
+      ].filter(Boolean);
+
+      const uniqueValues = new Set(values);
+      return uniqueValues.size === values.length;
+    },
+    {
+      message:
+        "Some fields have the same value. Please select different options.",
+      path: [
+        "employee_code",
+        "assignment_type",
+        "position",
+        "skill_level",
+        "start_date",
+        "end_date",
+        "probation_period",
+        "probation_end_date",
+      ],
+    }
+  );
+
+export const ImportSingleEmployeeProjectAssignmentsDataSchema = z.object({
+  employee_code: zNumberString.min(3),
+  site: zString.min(3),
+  position: z.enum(positionArray).default("sampler"),
+  skill_level: z.enum(skillLevelArray).default("unskilled"),
+  assignment_type: z.enum(assignmentTypeArray).default("full_time"),
+  start_date: z.string().default(new Date().toISOString().split("T")[0]),
+  end_date: z.string().optional(),
+  probation_end_date: z.string().optional(),
+  probation_period: z
+    .preprocess(
+      (value) =>
+        typeof value === "string" ? value.toLowerCase() === "true" : value,
+      z.boolean().default(false)
+    )
+    .default(false),
+});
+
+export const ImportEmployeeProjectAssignmentsDataSchema = z.object({
+  data: z.array(ImportSingleEmployeeProjectAssignmentsDataSchema),
 });
 
 export const payrollPaymentStatusArray = [
