@@ -132,9 +132,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
         value: projectSite?.id,
       }));
     }
-
-
-   
   }
 
   return json({

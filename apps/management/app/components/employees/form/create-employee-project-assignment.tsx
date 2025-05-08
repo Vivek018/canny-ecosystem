@@ -36,7 +36,6 @@ type FieldsType = {
 };
 
 export const PROJECT_PARAM = "project";
-export const PROJECT_SITE_PARAM = "project-site";
 
 export const CreateEmployeeProjectAssignment = ({
   fields,
@@ -88,21 +87,11 @@ export const CreateEmployeeProjectAssignment = ({
             options={projectSiteOptions ?? []}
             inputProps={{
               ...getInputProps(fields.project_site_id, { type: "text" }),
-              defaultValue:
-                searchParams.get(PROJECT_SITE_PARAM) ??
-                String(fields.project_site_id.initialValue),
+              defaultValue: String(fields.project_site_id.initialValue),
             }}
             placeholder={"Select Project Site"}
             labelProps={{
               children: "Project Site",
-            }}
-            onChange={(projectSite) => {
-              if (projectSite?.length) {
-                searchParams.set(PROJECT_SITE_PARAM, projectSite);
-              } else {
-                searchParams.delete(PROJECT_SITE_PARAM);
-              }
-              setSearchParams(searchParams);
             }}
             errors={fields.project_site_id.errors}
           />

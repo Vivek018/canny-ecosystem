@@ -24,7 +24,7 @@ export function SalaryTableHeader({ table, loading, className }: Props) {
     "overtime_hours",
     "period",
     ...(salaryEntries?.map((salaryEntry) => {
-      return salaryEntry.template_component_id ?? salaryEntry.field_name;
+      return salaryEntry.field_name ?? salaryEntry.template_component_id;
     }) ?? []),
     "actions"
   ];
