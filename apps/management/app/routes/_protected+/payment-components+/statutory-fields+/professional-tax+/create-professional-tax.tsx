@@ -89,7 +89,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -118,7 +118,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -213,7 +213,7 @@ export default function CreateProfessionalTax({
                 inputProps={{
                   ...getInputProps(fields.pt_number, { type: "text" }),
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.pt_number.name,
+                    fields.pt_number.name
                   )}`,
                 }}
                 labelProps={{
@@ -225,13 +225,13 @@ export default function CreateProfessionalTax({
                 key={resetKey + 1}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  deductionCycleArray as unknown as string[],
+                  deductionCycleArray as unknown as string[]
                 )}
                 inputProps={{
                   ...getInputProps(fields.deduction_cycle, { type: "text" }),
                 }}
                 placeholder={`Select ${replaceUnderscore(
-                  fields.deduction_cycle.name,
+                  fields.deduction_cycle.name
                 )}`}
                 labelProps={{
                   children: replaceUnderscore(fields.deduction_cycle.name),
@@ -245,6 +245,10 @@ export default function CreateProfessionalTax({
                   ...getInputProps(fields.gross_salary_range, {
                     type: "hidden",
                   }),
+                  defaultValue: JSON.stringify(
+                    fields.gross_salary_range.initialValue ??
+                      fields.gross_salary_range.value
+                  ),
                 }}
                 fields={[
                   { key: "start", type: "number", placeholder: "Start Range" },

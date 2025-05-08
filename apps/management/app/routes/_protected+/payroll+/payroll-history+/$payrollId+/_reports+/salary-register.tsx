@@ -219,16 +219,11 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
             ]}
           >
             <Text>Employee Name</Text>
-            <View
-              style={{
-                flexDirection: "row",
-                gap: "15",
-              }}
-            >
-              <Text>Employee Code</Text>
-              <Text>UAN no.</Text>
-            </View>
-            <Text>Designation</Text>
+
+            <Text>Employee Code</Text>
+
+            <Text>Position</Text>
+            <Text>UAN no.</Text>
             <Text>PF No.</Text>
             <Text>ESI No.</Text>
           </View>
@@ -390,19 +385,14 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
                 {employee.employeeData?.middle_name}{" "}
                 {employee.employeeData?.last_name}
               </Text>
-              <View
-                style={{
-                  flexDirection: "row",
-                  gap: "30",
-                }}
-              >
-                <Text>{employee?.employeeData?.employee_code}</Text>
-                <Text>{employee?.employeeStatutoryDetails?.uan_number}</Text>
-              </View>
+
+              <Text>{employee?.employeeData?.employee_code}</Text>
+
               <Text style={{ textTransform: "capitalize" }}>
                 {replaceUnderscore(
                   employee?.employeeProjectAssignmentData?.position
                 )}
+                <Text>{employee?.employeeStatutoryDetails?.uan_number}</Text>
               </Text>
               <Text>{employee?.employeeStatutoryDetails?.pf_number}.</Text>
               <Text>{employee?.employeeStatutoryDetails?.esic_number}</Text>
@@ -668,16 +658,18 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
               ]}
             >
               <Text>
-                {Number(
-                  employee.earnings
-                    .reduce((sum, earning) => sum + earning.amount, 0)
-                    .toFixed(2)
-                ) -
+                {(
+                  Number(
+                    employee.earnings
+                      .reduce((sum, earning) => sum + earning.amount, 0)
+                      .toFixed(2)
+                  ) -
                   Number(
                     employee.deductions
                       .reduce((sum, earning) => sum + earning.amount, 0)
                       .toFixed(2)
-                  )}
+                  )
+                ).toFixed(2)}
               </Text>
             </View>
             <View style={[styles.headerCell, { flex: 1 }]} />

@@ -10,21 +10,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
-import type {
-  ImportEmployeeDetailsHeaderSchemaObject,
-  ImportEmployeeProjectAssignmentsHeaderSchemaObject,
-} from "@canny_ecosystem/utils";
+import type { ImportEmployeeProjectAssignmentsHeaderSchemaObject } from "@canny_ecosystem/utils";
 import {
   getEmployeeIdsByEmployeeCodes,
   getEmployeeProjectAssignmentsConflicts,
   getProjectNamesByCompanyId,
   getSiteNamesByProjectName,
-  type ImportEmployeeDetailsDataType,
   type ImportEmployeeProjectAssignmentsDataType,
 } from "@canny_ecosystem/supabase/queries";
 import {
-  ImportEmployeeDetailsHeaderSchema,
-  ImportEmployeeDetailsDataSchema,
   transformStringArrayIntoOptions,
   replaceUnderscore,
   pipe,
@@ -33,19 +27,15 @@ import {
   ImportEmployeeProjectAssignmentsDataSchema,
 } from "@canny_ecosystem/utils";
 import type { z } from "zod";
-import { getEmployeeDetailsConflicts } from "@canny_ecosystem/supabase/mutations";
-import { EmployeeDetailsImportData } from "@/components/employees/import-export/employee-details-import-data";
+
 import { useSupabase } from "@canny_ecosystem/supabase/client";
-import {
-  useImportStoreForEmployeeDetails,
-  useImportStoreForEmployeeProjectAssignments,
-} from "@/store/import";
+import { useImportStoreForEmployeeProjectAssignments } from "@/store/import";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { EmployeeProjectAssignmentsImportData } from "@/components/employees/import-export/employee-project-assignments-import-data";
-import { EmployeeProjectAssignmentDatabaseInsert } from "@canny_ecosystem/supabase/types";
+import type { EmployeeProjectAssignmentDatabaseInsert } from "@canny_ecosystem/supabase/types";
 
 type FieldConfig = {
   key: keyof z.infer<typeof ImportEmployeeProjectAssignmentsHeaderSchemaObject>;
@@ -59,19 +49,19 @@ const FIELD_CONFIGS: FieldConfig[] = [
   },
   { key: "assignment_type" },
   {
-    key: "position"
+    key: "position",
   },
   {
-    key: "start_date"
+    key: "start_date",
   },
   {
     key: "end_date",
   },
   {
-    key: "skill_level"
+    key: "skill_level",
   },
   {
-    key: "probation_period"
+    key: "probation_period",
   },
   { key: "probation_end_date" },
 ];
@@ -97,7 +87,7 @@ export default function EmployeeProjectAssignmentsImportFieldMapping() {
   const [site, setSite] = useState<string>("");
 
   const handleSites = async (projectName: string) => {
-    const { data: sites, error } = await getSiteNamesByProjectName({
+    const { data: sites } = await getSiteNamesByProjectName({
       projectName,
       supabase,
     });
@@ -266,11 +256,13 @@ export default function EmployeeProjectAssignmentsImportFieldMapping() {
                     )
                   )
               );
-              return { ...cleanEntry, site: site } as ImportEmployeeProjectAssignmentsDataType;
+              return {
+                ...cleanEntry,
+                site: site,
+              } as ImportEmployeeProjectAssignmentsDataType;
             });
 
           if (validateImportData(finalData)) {
-
             setImportData({
               data: finalData as ImportEmployeeProjectAssignmentsDataType[],
             });
@@ -375,7 +367,7 @@ export default function EmployeeProjectAssignmentsImportFieldMapping() {
                   options={transformStringArrayIntoOptions(projectNames)}
                   value={project}
                   onChange={(value: string) => setProject(value)}
-                  placeholder={`Select Project`}
+                  placeholder={"Select Project"}
                   className="w-full"
                 />
               </div>
@@ -389,7 +381,7 @@ export default function EmployeeProjectAssignmentsImportFieldMapping() {
                   options={transformStringArrayIntoOptions(siteArray)}
                   value={site}
                   onChange={(value: string) => setSite(value)}
-                  placeholder={`Select Site`}
+                  placeholder={"Select Site"}
                   className="w-full"
                 />
               </div>

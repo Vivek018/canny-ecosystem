@@ -23,12 +23,15 @@ export async function createProfessionalTax({
       return { status: 400, error: "Unauthorized User" };
     }
   }
+
+  const newData = {
+    ...data,
+    gross_salary_range: JSON.parse(data.gross_salary_range as any),
+  };
   
   const { error, status } = await supabase
-  .from("professional_tax")
-  .insert(data)
-  ;
-  
+    .from("professional_tax")
+    .insert(newData);
   if (error) {
     console.error("createProfessionalTax Error:", error);
   }
@@ -57,12 +60,14 @@ export async function updateProfessionalTax({
 
   const updateData = convertToNull(data);
 
+  const newData = {
+    ...updateData,
+    gross_salary_range: JSON.parse(updateData.gross_salary_range as any),
+  };
   const { error, status } = await supabase
     .from("professional_tax")
-    .update(updateData)
-    .eq("id", data.id!)
-    ;
-
+    .update(newData)
+    .eq("id", data.id!);
   if (error) {
     console.error("updateProfessionalTax Error:", error);
   }

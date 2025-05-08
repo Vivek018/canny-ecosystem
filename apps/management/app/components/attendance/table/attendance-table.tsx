@@ -14,7 +14,6 @@ import { AttendanceTableHeader } from "./attendance-table-header";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@canny_ecosystem/ui/button";
 import { useAttendanceStore } from "@/store/attendance";
-import type { AttendanceFilterType } from "@/routes/_protected+/dashboard";
 import { ExportBar } from "../export-bar";
 import type {
   DayType,
@@ -36,7 +35,7 @@ interface DataTableProps {
   hasNextPage: boolean;
   count: number;
   pageSize: number;
-  filters?: AttendanceFilterType;
+  filters?: any;
   companyId: string;
   env: SupabaseEnv;
   query?: string | null;
@@ -188,7 +187,7 @@ export function AttendanceTable({
       loadMoreEmployees();
     }
   }, [inView]);
-  
+
   const selectedRowsData = table
     .getSelectedRowModel()
     .rows?.map((row) => row.original);

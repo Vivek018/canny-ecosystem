@@ -52,6 +52,8 @@ export default function EmployeeAttendanceImportFieldMapping() {
   const [formatType, setFormatType] = useState<string>("normal");
   const [presentMap, setPresentMap] = useState<string>();
   const [absentMap, setAbsentMap] = useState<string>();
+  const [weeklyOffMap, setWeeklyOffMap] = useState<string>();
+
   const [dayShift, setDayShift] = useState<string>();
   const [noonShift, setNoonShift] = useState<string>();
   const [nightShift, setNightShift] = useState<string>();
@@ -73,9 +75,10 @@ export default function EmployeeAttendanceImportFieldMapping() {
   const validateImportData = (data: any[]) => {
     try {
       const result = ImportEmployeeAttendanceDataSchema.safeParse({ data });
+
       if (!result.success) {
         const formattedErrors = result.error.errors.map(
-          (err) => `${err.path[2]}: ${err.message}`,
+          (err) => `${err.path[2]}: ${err.message}`
         );
         setValidationErrors(formattedErrors);
         return false;
@@ -99,9 +102,7 @@ export default function EmployeeAttendanceImportFieldMapping() {
         complete: async (results) => {
           const cleanedData = results.data
             .filter((entry) =>
-              Object.values(entry!).some(
-                (value) => String(value).trim() !== "",
-              ),
+              Object.values(entry!).some((value) => String(value).trim() !== "")
             )
             .map((entry) => {
               const cleanEntry = Object.fromEntries(
@@ -109,8 +110,8 @@ export default function EmployeeAttendanceImportFieldMapping() {
                   ([key, value]) =>
                     key.trim() !== "" &&
                     value !== null &&
-                    String(value).trim() !== "",
-                ),
+                    String(value).trim() !== ""
+                )
               );
               return cleanEntry;
             });
@@ -143,7 +144,7 @@ export default function EmployeeAttendanceImportFieldMapping() {
 
               const date = `20${year}-${monthMap[month]}-${day.padStart(
                 2,
-                "0",
+                "0"
               )}`;
               const status = value?.toString().toUpperCase();
 
@@ -193,6 +194,13 @@ export default function EmployeeAttendanceImportFieldMapping() {
                 ) {
                   present = false;
                   noOfHours = 0;
+                } else if (
+                  status.toLowerCase() === `${weeklyOffMap?.toLowerCase()}`
+                ) {
+                  present = false;
+                  holiday = true;
+                  holidayType = "weekly";
+                  noOfHours = 0;
                 }
               }
               if (formatType === "custom(shift)") {
@@ -213,6 +221,13 @@ export default function EmployeeAttendanceImportFieldMapping() {
                   status.toLowerCase() === `${absentMap?.toLowerCase()}`
                 ) {
                   present = false;
+                  noOfHours = 0;
+                } else if (
+                  status.toLowerCase() === `${weeklyOffMap?.toLowerCase()}`
+                ) {
+                  present = false;
+                  holiday = true;
+                  holidayType = "weekly";
                   noOfHours = 0;
                 }
               }
@@ -250,7 +265,7 @@ export default function EmployeeAttendanceImportFieldMapping() {
             });
 
             const employeeCodes = transformedData!.map(
-              (value) => value.employee_code,
+              (value) => value.employee_code
             );
             const { data: employees, error: idByCodeError } =
               await getEmployeeIdsByEmployeeCodes({
@@ -264,7 +279,7 @@ export default function EmployeeAttendanceImportFieldMapping() {
 
             const updatedData = transformedData!.map((item: any) => {
               const employeeId = employees?.find(
-                (e) => e.employee_code === item.employee_code,
+                (e) => e.employee_code === item.employee_code
               )?.id;
 
               const { employee_code, ...rest } = item;
@@ -316,9 +331,9 @@ export default function EmployeeAttendanceImportFieldMapping() {
           </CardHeader>
           <CardContent>
             <Combobox
-              className={cn("w-80 h-10 mr-4")}
+              className={cn("w-80 h-10 mr-4 mb-5")}
               options={transformStringArrayIntoOptions(
-                formatTypeArray as unknown as string[],
+                formatTypeArray as unknown as string[]
               )}
               value={formatType}
               onChange={(value: string) => {
@@ -347,6 +362,14 @@ export default function EmployeeAttendanceImportFieldMapping() {
                     value: absentMap!,
                     onChange: (e) => setAbsentMap(e.target.value),
                     placeholder: "Enter for Absent",
+                  }}
+                />
+                <Field
+                  inputProps={{
+                    type: "text",
+                    value: weeklyOffMap!,
+                    onChange: (e) => setWeeklyOffMap(e.target.value),
+                    placeholder: "Enter for Weekly Off",
                   }}
                 />
               </div>
@@ -392,6 +415,14 @@ grid-cols-2 place-content-center justify-between gap-3"
                       value: absentMap!,
                       onChange: (e) => setAbsentMap(e.target.value),
                       placeholder: "Enter for Absent",
+                    }}
+                  />
+                  <Field
+                    inputProps={{
+                      type: "text",
+                      value: weeklyOffMap!,
+                      onChange: (e) => setWeeklyOffMap(e.target.value),
+                      placeholder: "Enter for Weekly Off",
                     }}
                   />
                 </div>

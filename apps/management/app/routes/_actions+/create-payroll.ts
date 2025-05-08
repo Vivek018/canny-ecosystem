@@ -218,9 +218,7 @@ export async function action({
               ).toFixed(3)
             );
           } else if (entry.field_name.toLowerCase().includes("pt")) {
-            for (const range of JSON.parse(
-              ptField?.gross_salary_range as string
-            )) {
+            for (const range of ptField?.gross_salary_range as any) {
               if (range.start <= grossValue && grossValue <= range.end) {
                 amount = range.value;
                 break;

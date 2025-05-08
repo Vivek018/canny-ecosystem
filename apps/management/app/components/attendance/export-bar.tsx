@@ -1,8 +1,6 @@
 import { Button } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import {
-  formatDateTime,
-} from "@canny_ecosystem/utils";
+import { formatDateTime } from "@canny_ecosystem/utils";
 import type { VisibilityState } from "@tanstack/react-table";
 import Papa from "papaparse";
 
@@ -17,15 +15,11 @@ export function ExportBar({
   className: string;
   columnVisibility: VisibilityState;
 }) {
-  
- 
-
   const allHeaders = new Set<string>();
   const dateHeaders = new Set<string>();
 
   for (const entry of data) {
     for (const key of Object.keys(entry)) {
-      
       if (columnVisibility[key] !== false) {
         allHeaders.add(key);
         if (
@@ -85,15 +79,17 @@ export function ExportBar({
             "project_site",
           ].includes(key)
         ) {
-          totalDays++;
-          if (employee[key] === "P") {
-            totalP++;
+          if (employee[key] !== "WOF") {
+            totalDays++;
+            if (employee[key] === "P") {
+              totalP++;
+            }
           }
         }
       }
     }
 
-    return totalDays > 0 ? (totalP / (totalDays / data.length)).toFixed(2) : 0;
+    return totalDays > 0 ? ((totalP / totalDays) * 100).toFixed(2) : 0;
   }
 
   const handleExport = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -115,8 +111,8 @@ export function ExportBar({
     document.body.removeChild(link);
   };
 
-  
-  
+  console.log(formattedData);
+
   return (
     <div
       className={cn(
@@ -129,9 +125,9 @@ export function ExportBar({
       </div>
       <div className="h-full flex justify-center items-center gap-2">
         <div className="h-full tracking-wide font-medium rounded-full flex justify-between items-center px-6 border dark:border-muted-foreground/30 ">
-          Avg Presents:{" "}
+          Avg Present Days:{" "}
           <span className="ml-1.5">
-            {calculateMonthlyAvgPresence(formattedData)}
+            {calculateMonthlyAvgPresence(formattedData)} %
           </span>
         </div>
         <Button
@@ -143,7 +139,6 @@ export function ExportBar({
           Export
         </Button>
       </div>
-      
     </div>
   );
 }
