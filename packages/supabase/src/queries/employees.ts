@@ -137,14 +137,11 @@ export async function getEmployeesByCompanyId({
     .from("employees")
     .select(
       `${columns.join(",")},
-        employee_project_assignment!employee_project_assignments_employee_id_fkey!${
-          hasProjectAssignmentFilter ? "inner" : "left"
-        }(
+        employee_project_assignment!employee_project_assignments_employee_id_fkey!${hasProjectAssignmentFilter ? "inner" : "left"
+      }(
         employee_id, assignment_type, skill_level, position, start_date, end_date,
-        project_sites!${
-          hasProjectAssignmentFilter ? "inner" : "left"
-        }(id, name, projects!${
-        hasProjectAssignmentFilter ? "inner" : "left"
+        project_sites!${hasProjectAssignmentFilter ? "inner" : "left"
+      }(id, name, projects!${hasProjectAssignmentFilter ? "inner" : "left"
       }(id, name))
       )`,
       { count: "exact" }
@@ -154,8 +151,6 @@ export async function getEmployeesByCompanyId({
   if (sort) {
     const [column, direction] = sort;
     query.order(column, { ascending: direction === "asc" });
-  } else {
-    query.order("created_at", { ascending: false });
   }
 
   if (searchQuery) {
@@ -925,12 +920,10 @@ export async function getEmployeesReportByCompanyId({
     .from("employees")
     .select(
       `${columns.join(",")},
-        employee_project_assignment!employee_project_assignments_employee_id_fkey!${
-          project ? "inner" : "left"
-        }(
+        employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
+      }(
         employee_id, assignment_type, skill_level, position, start_date, end_date,
-        project_sites!${project ? "inner" : "left"}(id, name, projects!${
-        project ? "inner" : "left"
+        project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
       }(id, name))
       )`,
       { count: "exact" }
@@ -945,8 +938,6 @@ export async function getEmployeesReportByCompanyId({
     } else {
       query.order(column, { ascending: direction === "asc" });
     }
-  } else {
-    query.order("created_at", { ascending: false });
   }
 
   if (searchQuery) {

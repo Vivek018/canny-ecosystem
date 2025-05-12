@@ -89,10 +89,8 @@ export async function getReimbursementsByCompanyId({
     .from("reimbursements")
     .select(
       `${columns.join(",")},
-          employees!inner(first_name, middle_name, last_name, employee_code, company_id, employee_project_assignment!employee_project_assignments_employee_id_fkey!${
-            project ? "inner" : "left"
-          }(project_sites!${project ? "inner" : "left"}(id, name, projects!${
-        project ? "inner" : "left"
+          employees!inner(first_name, middle_name, last_name, employee_code, company_id, employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
+      }(project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
       }(id, name)))),
           users!${users ? "inner" : "left"}(id,email)`,
       { count: "exact" }
@@ -102,8 +100,6 @@ export async function getReimbursementsByCompanyId({
   if (sort) {
     const [column, direction] = sort;
     query.order(column, { ascending: direction === "asc" });
-  } else {
-    query.order("created_at", { ascending: false });
   }
 
   if (searchQuery) {
@@ -142,7 +138,7 @@ export async function getReimbursementsByCompanyId({
     query.eq("status", status.toLowerCase());
   }
   if (is_deductible !== undefined && is_deductible !== null) {
-    query.eq("is_deductible", is_deductible);
+    query.eq("is_deductible", Boolean(is_deductible));
   }
   if (users) {
     query.eq("users.email", users);
@@ -259,8 +255,6 @@ export async function getReimbursementsByEmployeeId({
   if (sort) {
     const [column, direction] = sort;
     query.order(column, { ascending: direction === "asc" });
-  } else {
-    query.order("created_at", { ascending: false });
   }
 
   if (filters) {
@@ -280,7 +274,7 @@ export async function getReimbursementsByEmployeeId({
     }
 
     if (is_deductible !== undefined && is_deductible !== null) {
-      query.eq("is_deductible", is_deductible);
+      query.eq("is_deductible", Boolean(is_deductible));
     }
     if (users) {
       query.eq("users.email", users);

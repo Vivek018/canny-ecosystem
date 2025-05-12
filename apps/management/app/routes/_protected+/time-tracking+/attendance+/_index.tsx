@@ -208,7 +208,7 @@ export default function Attendance() {
           const employeeDetails = acc[empCode] || {
             employee_id: employee.id,
             employee_code: empCode,
-            employee_name: `${employee.first_name} ${employee.middle_name} ${employee.last_name}`,
+            employee_name: `${employee.first_name ?? ""} ${employee.middle_name ?? ""} ${employee.last_name ?? ""}`,
             project:
               employee.employee_project_assignment?.project_sites?.projects
                 ?.name || null,

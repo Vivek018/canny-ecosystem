@@ -64,11 +64,11 @@ export type AttendanceReportDataType = Pick<
     };
   };
 } & {
-    attendance: Pick<
-      EmployeeAttendanceDatabaseRow,
-      "id" | "employee_id" | "date" | "present"
-    >;
-  }[];
+  attendance: Pick<
+    EmployeeAttendanceDatabaseRow,
+    "id" | "employee_id" | "date" | "present"
+  >;
+}[];
 
 export async function getAttendanceByEmployeeId({
   supabase,
@@ -449,11 +449,9 @@ export async function getAttendanceByCompanyId({
     .select(
       `
       ${columns.join(",")},
-      employee_project_assignment!employee_project_assignments_employee_id_fkey!${
-        project ? "inner" : "left"
+      employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
       }(
-        project_sites!${project ? "inner" : "left"}(id, name, projects!${
-        project ? "inner" : "left"
+        project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
       }(id, name))),
       attendance(
         id,
@@ -478,8 +476,6 @@ export async function getAttendanceByCompanyId({
   if (sort) {
     const [column, direction] = sort;
     query.order(column, { ascending: direction === "asc" });
-  } else {
-    query.order("created_at", { ascending: false });
   }
 
   if (searchQuery) {
@@ -505,9 +501,8 @@ export async function getAttendanceByCompanyId({
   }
 
   if (project_site) {
-    query = query.filter(
+    query = query.eq(
       "employee_project_assignment.project_sites.name",
-      "eq",
       project_site
     );
   }
@@ -576,11 +571,9 @@ export async function getAttendanceReportByCompanyId({
     .select(
       `
       ${columns.join(",")},
-      employee_project_assignment!employee_project_assignments_employee_id_fkey!${
-        project ? "inner" : "left"
+      employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
       }(
-        project_sites!${project ? "inner" : "left"}(id, name, projects!${
-        project ? "inner" : "left"
+        project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
       }(id, name))),
       attendance(
         id,
@@ -603,8 +596,6 @@ export async function getAttendanceReportByCompanyId({
     } else {
       query.order(column, { ascending: direction === "asc" });
     }
-  } else {
-    query.order("created_at", { ascending: false });
   }
   if (searchQuery) {
     const searchQueryArray = searchQuery.split(" ");

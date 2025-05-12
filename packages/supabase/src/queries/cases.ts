@@ -118,8 +118,6 @@ export async function getCasesByCompanyId({
   if (sort) {
     const [column, direction] = sort;
     query.order(column, { ascending: direction === "asc" });
-  } else {
-    query.order("created_at", { ascending: false });
   }
 
   if (searchQuery) {
