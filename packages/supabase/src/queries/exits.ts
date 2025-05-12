@@ -121,6 +121,8 @@ export const getExitsByCompanyId = async ({
   if (sort) {
     const [column, direction] = sort;
     query.order(column, { ascending: direction === "asc" });
+  } else {
+    query.order("created_at", { ascending: false });
   }
 
   // Full-text search
