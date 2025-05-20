@@ -43,11 +43,11 @@ export const sideNavList = [
     link: "/payroll",
     icon: "table",
   },
-  {
-    name: "Payment Components",
-    link: "/payment-components",
-    icon: "input",
-  },
+  // {
+  //   name: "Payment Components",
+  //   link: "/payment-components",
+  //   icon: "input",
+  // },
   { name: "Group 3" },
   { name: "Approvals", link: "/approvals", icon: "check-circle" },
   { name: "Incidents", link: "/incidents", icon: "exclaimation-triangle" },
