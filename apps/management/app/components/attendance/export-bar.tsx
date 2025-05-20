@@ -111,8 +111,6 @@ export function ExportBar({
     document.body.removeChild(link);
   };
 
-  console.log(formattedData);
-
   return (
     <div
       className={cn(

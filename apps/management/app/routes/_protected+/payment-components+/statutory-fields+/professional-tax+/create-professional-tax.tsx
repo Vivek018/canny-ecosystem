@@ -128,6 +128,7 @@ export default function CreateProfessionalTax({
 }: {
   updateValues?: ProfessionalTaxDatabaseUpdate | null;
 }) {
+  
   const { companyId } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const PROFESSIONAL_TAX_TAG = updateValues

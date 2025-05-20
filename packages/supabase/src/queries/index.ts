@@ -25,3 +25,4 @@ export * from "./cases";
 export * from "./leaves";
 export * from "./holidays";
 export * from "./pay-sequence";
+export * from "./invoices";

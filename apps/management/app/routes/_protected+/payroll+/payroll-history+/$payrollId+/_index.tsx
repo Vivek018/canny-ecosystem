@@ -195,6 +195,7 @@ export default function HistoryPayrollId() {
                       data={data}
                       noButtons={true}
                       env={env as SupabaseEnv}
+                      fromWhere="payrollhistory"
                     />
                   );
                 }}
@@ -222,6 +223,7 @@ export default function HistoryPayrollId() {
                       data={data}
                       noButtons={true}
                       env={env as SupabaseEnv}
+                      fromWhere="payrollhistory"
                     />
                   );
                 }}

@@ -1267,7 +1267,7 @@ export const SalaryEntrySchema = z.object({
   is_overtime: z.boolean().default(false),
 });
 
-export const payrollTypesArray = ["reimbursement", "exit", "others"];
+export const payrollTypesArray = ["salary", "reimbursement", "exit", "others"];
 
 export const PayrollEntrySchema = z.object({
   id: z.string().optional(),
@@ -1749,4 +1749,38 @@ export const ImportSalaryPayrollDataSchema = z.object({
 
 export const EmployeeLoginSchema = z.object({
   employee_code: z.string().optional(),
+});
+
+export const invoiceReimbursementTypeArray = [
+  "expenses",
+  "advances",
+  "loan",
+  "rent",
+  "vehicle",
+  "vehicle_related",
+  "others",
+] as const;
+
+export const InvoiceSchema = z.object({
+  id: z.string().optional(),
+  company_id: z.string(),
+  invoice_number: z.string(),
+  date: z.string(),
+  subject: z.string(),
+  company_address_id: z.string(),
+  payroll_type: z.enum(["salary", "exit", "reimbursement"]),
+  invoice_type: z
+    .enum(["salary", "exit", ...invoiceReimbursementTypeArray])
+    .default("expenses")
+    .optional(),
+  payroll_data: z.any(),
+  payroll_id: z.string(),
+  include_charge: z.boolean().default(false),
+  include_cgst: z.boolean().default(false),
+  include_sgst: z.boolean().default(false),
+  include_igst: z.boolean().default(false),
+  include_proof: z.boolean().default(false),
+  proof: zFile.optional(),
+  is_paid: z.boolean().default(false),
+  include_header: z.boolean().default(false),
 });

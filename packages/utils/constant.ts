@@ -164,6 +164,7 @@ export const attribute = {
   holidays: "holidays",
   paySequence: "pay_sequence",
   companyDocuments: "company_documents",
+  invoice:"invoice",
 };
 
 export const months: { [key: string]: number } = {
