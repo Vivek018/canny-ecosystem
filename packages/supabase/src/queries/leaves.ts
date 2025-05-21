@@ -89,8 +89,8 @@ export async function getLeavesByEmployeeId({
     .select(
       `
         ${columns.join(
-          ","
-        )},employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!left(project_sites!left(id, name, projects!left(id, name)))),
+        ","
+      )},employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!left(project_sites!left(id, name, projects!left(id, name)))),
           users!${users ? "inner" : "left"}(id,email)
       
       `,
@@ -111,9 +111,9 @@ export async function getLeavesByEmployeeId({
         `and(start_date.lte.${formatUTCDate(
           date_end
         )},end_date.gte.${formatUTCDate(date_start)}),` +
-          `and(start_date.gte.${formatUTCDate(
-            date_start
-          )},start_date.lte.${formatUTCDate(date_end)},end_date.is.null)`
+        `and(start_date.gte.${formatUTCDate(
+          date_start
+        )},start_date.lte.${formatUTCDate(date_end)},end_date.is.null)`
       );
     }
     if (year) {
@@ -208,10 +208,8 @@ export async function getLeavesByCompanyId({
     .select(
       `
         ${columns.join(",")},
-        employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${
-          project ? "inner" : "left"
-        }(project_sites!${project ? "inner" : "left"}(id, name, projects!${
-        project ? "inner" : "left"
+        employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
+      }(project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
       }(id, name)))),
           users!${users ? "inner" : "left"}(id,email)
       `,
@@ -232,9 +230,9 @@ export async function getLeavesByCompanyId({
         `and(start_date.lte.${formatUTCDate(
           date_end
         )},end_date.gte.${formatUTCDate(date_start)}),` +
-          `and(start_date.gte.${formatUTCDate(
-            date_start
-          )},start_date.lte.${formatUTCDate(date_end)},end_date.is.null)`
+        `and(start_date.gte.${formatUTCDate(
+          date_start
+        )},start_date.lte.${formatUTCDate(date_end)},end_date.is.null)`
       );
     }
 

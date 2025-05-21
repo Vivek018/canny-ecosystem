@@ -1,6 +1,6 @@
 import type { TransformedAttendanceDataType } from "@/routes/_protected+/time-tracking+/attendance+/_index";
 import { useUser } from "@/utils/user";
-import { Button, buttonVariants } from "@canny_ecosystem/ui/button";
+import { Button } from "@canny_ecosystem/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +15,7 @@ import {
   attribute,
   modalSearchParamNames,
 } from "@canny_ecosystem/utils/constant";
-import { useSearchParams, useSubmit } from "@remix-run/react";
+import { useSearchParams } from "@remix-run/react";
 import { AttendanceRegister } from "./attendance-register";
 import type {
   CompanyDatabaseRow,
@@ -33,62 +33,63 @@ export function AttendanceMenu({
   companyAddress?: LocationDatabaseRow;
 }) {
   const { role } = useUser();
-  const submit = useSubmit();
+  // const submit = useSubmit();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  function extractAttendanceData(employees: { [key: string]: any }[]) {
-    return employees?.map(({ employee_id, ...rest }) => {
-      let present_days = 0;
-      let overtime_hours = 0;
-      let latestDate: Date | null = null;
+  /* Do it Later */
+  // function extractAttendanceData(employees: { [key: string]: any }[]) {
+  //   return employees?.map(({ employee_id, ...rest }) => {
+  //     let present_days = 0;
+  //     let overtime_hours = 0;
+  //     let latestDate: Date | null = null;
 
-      for (const [key, value] of Object.entries(rest)) {
-        if (typeof value === "object" && value !== null) {
-          if (value.present === "P") {
-            present_days++;
-            overtime_hours += value.hours - 8;
-          }
+  //     for (const [key, value] of Object.entries(rest)) {
+  //       if (typeof value === "object" && value !== null) {
+  //         if (value.present === "P") {
+  //           present_days++;
+  //           overtime_hours += value.hours - 8;
+  //         }
 
-          const [day, monthStr, yearStr] = key.split(" ");
-          const monthIndex = new Date(`${monthStr} 1, 2025`).getMonth();
-          const dateObj = new Date(
-            Number.parseInt(yearStr),
-            monthIndex,
-            Number.parseInt(day)
-          );
+  //         const [day, monthStr, yearStr] = key.split(" ");
+  //         const monthIndex = new Date(`${monthStr} 1, 2025`).getMonth();
+  //         const dateObj = new Date(
+  //           Number.parseInt(yearStr),
+  //           monthIndex,
+  //           Number.parseInt(day)
+  //         );
 
-          if (!latestDate || dateObj > latestDate) {
-            latestDate = dateObj;
-          }
-        }
-      }
+  //         if (!latestDate || dateObj > latestDate) {
+  //           latestDate = dateObj;
+  //         }
+  //       }
+  //     }
 
-      const month = latestDate
-        ? Number.parseInt(
-            latestDate.toLocaleString("en-US", { month: "2-digit" })
-          )
-        : null;
-      const year = latestDate ? latestDate.getFullYear() : null;
+  //     const month = latestDate
+  //       ? Number.parseInt(
+  //           latestDate.toLocaleString("en-US", { month: "2-digit" })
+  //         )
+  //       : null;
+  //     const year = latestDate ? latestDate.getFullYear() : null;
 
-      return { employee_id, present_days, overtime_hours, month, year };
-    });
-  }
+  //     return { employee_id, present_days, overtime_hours, month, year };
+  //   });
+  // }
 
-  const attendanceForPayroll = extractAttendanceData(selectedRows);
+  // const attendanceForPayroll = extractAttendanceData(selectedRows);
 
-  const handleCreatePayroll = () => {
-    submit(
-      {
-        type: "salary",
-        attendanceData: JSON.stringify(attendanceForPayroll),
-        failedRedirect: "/time-tracking/attendance",
-      },
-      {
-        method: "POST",
-        action: "/create-payroll",
-      }
-    );
-  };
+  // const handleCreatePayroll = () => {
+  //   submit(
+  //     {
+  //       type: "salary",
+  //       attendanceData: JSON.stringify(attendanceForPayroll),
+  //       failedRedirect: "/time-tracking/attendance",
+  //     },
+  //     {
+  //       method: "POST",
+  //       action: "/create-payroll",
+  //     }
+  //   );
+  // };
 
   return (
     <DropdownMenu>
@@ -104,7 +105,8 @@ export function AttendanceMenu({
       </DropdownMenuTrigger>
       <DropdownMenuContent sideOffset={10} align="end">
         <div className={cn("flex flex-col", !selectedRows?.length && "hidden")}>
-          <DropdownMenuItem
+          {/* Do it Later */}
+          {/* <DropdownMenuItem
             onClick={handleCreatePayroll}
             className={cn(
               buttonVariants({ variant: "muted" }),
@@ -115,14 +117,14 @@ export function AttendanceMenu({
           >
             <Icon name="plus-circled" />
             <span>Create Payroll</span>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator
+          </DropdownMenuItem> */}
+          {/* <DropdownMenuSeparator
             className={cn(
               !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
-                "hidden",
+              "hidden",
               !selectedRows.length && "hidden"
             )}
-          />
+          /> */}
           <div
             className={cn(
               "flex flex-col gap-1",
@@ -144,7 +146,7 @@ export function AttendanceMenu({
         <DropdownMenuSeparator
           className={cn(
             !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
-              "hidden",
+            "hidden",
             !selectedRows.length && "hidden"
           )}
         />
@@ -159,7 +161,7 @@ export function AttendanceMenu({
           className={cn(
             "space-x-2 flex items-center",
             !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
-              "hidden"
+            "hidden"
           )}
         >
           <Icon name="import" size="sm" className="mb-0.5" />
@@ -177,7 +179,7 @@ export function AttendanceMenu({
           className={cn(
             "space-x-2 flex items-center",
             !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
-              "hidden"
+            "hidden"
           )}
         >
           <Icon name="import" size="sm" className="mb-0.5" />

@@ -79,7 +79,7 @@ export function AttendanceTable({
         const employeeDetails = {
           employee_id: employee.id,
           employee_code: empCode,
-          employee_name: `${employee.first_name} ${employee.middle_name} ${employee.last_name}`,
+          employee_name: `${employee.first_name ?? ""} ${employee.middle_name ?? ""} ${employee.last_name ?? ""}`,
           project:
             employee.employee_project_assignment?.project_sites?.projects
               ?.name || null,
@@ -148,8 +148,7 @@ export function AttendanceTable({
           (prevData) =>
             [...prevData, ...transformedData] as TransformedAttendanceDataType[]
         );
-        setFrom(to);
-
+        setFrom(to + 1);
         setHasNextPage(count > to);
       } else {
         setHasNextPage(false);
