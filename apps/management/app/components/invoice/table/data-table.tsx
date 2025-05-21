@@ -12,21 +12,112 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { DataTableHeader } from "./data-table-header";
+import {
+  getInvoicesByCompanyId,
+  type InvoiceDataType,
+  type InvoiceFilters,
+} from "@canny_ecosystem/supabase/queries";
+import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
+import { useEffect, useState } from "react";
+import { useSupabase } from "@canny_ecosystem/supabase/client";
+import { useInView } from "react-intersection-observer";
+import { useInvoiceStore } from "@/store/invoices";
+import { Spinner } from "@canny_ecosystem/ui/spinner";
+import { Button } from "@canny_ecosystem/ui/button";
+import { useSearchParams } from "@remix-run/react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  count: number;
+  hasNextPage: boolean;
+  query?: string | null;
+  filters?: InvoiceFilters | null;
+  noFilters?: boolean;
+  pageSize: number;
+  companyId: string;
+  env: SupabaseEnv;
 }
 
 export function InvoiceTable<TData, TValue>({
   columns,
-  data,
+  data: initialData,
+  companyId,
+  count,
+  env,
+  hasNextPage: initialHasNextPage,
+  pageSize,
+  filters,
+  noFilters,
+  query,
 }: DataTableProps<TData, TValue>) {
+  const [data, setData] = useState(initialData);
+  const [from, setFrom] = useState(pageSize);
+  const [hasNextPage, setHasNextPage] = useState(initialHasNextPage);
+  const { supabase } = useSupabase({ env });
+  const [, setSearchParams] = useSearchParams();
+
+  const { ref, inView } = useInView();
+  const { rowSelection, setRowSelection, setSelectedRows } = useInvoiceStore();
+
+  const loadMoreInvoices = async () => {
+    const formattedFrom = from;
+    const to = formattedFrom + pageSize;
+
+    try {
+      const { data } = await getInvoicesByCompanyId({
+        supabase,
+        companyId,
+        params: {
+          from: from,
+          to: to,
+          filters,
+          searchQuery: query ?? undefined,
+        },
+      });
+      if (data) {
+        setData((prevData) => [...prevData, ...data] as TData[]);
+      }
+      setFrom(to + 1);
+      setHasNextPage(count > to);
+    } catch {
+      setHasNextPage(false);
+    }
+  };
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    onRowSelectionChange: setRowSelection,
+    state: {
+      rowSelection,
+    },
   });
+
+  useEffect(() => {
+    if (inView) {
+      loadMoreInvoices();
+    }
+  }, [inView]);
+
+  // const selectedRowsData = table
+  //   .getSelectedRowModel()
+  //   .rows?.map((row) => row.original);
+
+  useEffect(() => {
+    setData(initialData);
+    setFrom(pageSize);
+    setHasNextPage(initialHasNextPage);
+  }, [initialData]);
+
+  useEffect(() => {
+    const rowArray = [];
+    for (const row of table.getSelectedRowModel().rows) {
+      rowArray.push(row.original);
+    }
+    setSelectedRows(rowArray as unknown as InvoiceDataType[]);
+  }, [rowSelection]);
 
   const tableLength = table.getRowModel().rows?.length;
 
@@ -57,13 +148,13 @@ export function InvoiceTable<TData, TValue>({
                         <TableCell
                           key={cell.id}
                           className={cn(
-                            "px-3 md:px-4 py-2 hidden md:table-cell",
+                            "px-3 md:px-4 py-2",
+                            cell.column.id === "select" &&
+                              "hidden md:table-cell",
+                            cell.column.id === "select" &&
+                              "sticky left-0 min-w-12 max-w-12 bg-card z-10",
                             cell.column.id === "invoice_number" &&
-                              "sticky left-0 bg-card z-10",
-                            cell.column.id === "subject" &&
-                              "sticky left-48 bg-card z-10",
-                            cell.column.id === "actions" &&
-                              "sticky right-0 min-w-20 max-w-20 bg-card z-10"
+                              "sticky left-12 bg-card z-10"
                           )}
                         >
                           {flexRender(
@@ -76,12 +167,38 @@ export function InvoiceTable<TData, TValue>({
                   </TableRow>
                 ))
               ) : (
-                <TableRow className={cn(!tableLength && "border-none")}>
+                <TableRow
+                  className={cn("flex flex-col", !tableLength && "border-none")}
+                >
                   <TableCell
                     colSpan={columns.length}
-                    className="h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize"
+                    className={cn(
+                      "h-96 bg-background grid place-items-center text-center tracking-wide"
+                    )}
                   >
-                    No Invoice Found.
+                    <div className="flex flex-col items-center gap-1">
+                      <h2 className="text-xl">No Invoices found.</h2>
+                      <p
+                        className={cn(
+                          "text-muted-foreground",
+                          !data?.length && noFilters && "hidden"
+                        )}
+                      >
+                        Try another search, or adjusting the filters
+                      </p>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "mt-4",
+                          !data?.length && noFilters && "hidden"
+                        )}
+                        onClick={() => {
+                          setSearchParams();
+                        }}
+                      >
+                        Clear Filters
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               )}
@@ -89,6 +206,15 @@ export function InvoiceTable<TData, TValue>({
           </Table>
         </div>
       </div>
+
+      {hasNextPage && initialData?.length && (
+        <div className="flex items-center justify-center mt-6" ref={ref}>
+          <div className="flex items-center space-x-2 px-6 py-5">
+            <Spinner />
+            <span className="text-sm text-[#606060]">Loading more...</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

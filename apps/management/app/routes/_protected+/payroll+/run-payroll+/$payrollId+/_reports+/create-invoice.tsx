@@ -2,7 +2,7 @@ import { FormButtons } from "@/components/form/form-buttons";
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { addInvoiceWithProof } from "@canny_ecosystem/supabase/media";
+import { addOrUpdateInvoiceWithProof } from "@canny_ecosystem/supabase/media";
 import { createInvoice } from "@canny_ecosystem/supabase/mutations";
 import {
   getCannyCompanyIdByName,
@@ -160,7 +160,7 @@ export async function action({
     }
     if (submission.value.include_proof) {
       if (submission.value.proof) {
-        const { error, status } = await addInvoiceWithProof({
+        const { error, status } = await addOrUpdateInvoiceWithProof({
           invoiceData: submission.value as InvoiceDatabaseInsert,
           payrollId,
           proof: submission.value.proof as File,
@@ -296,6 +296,7 @@ export default function CreateInvoice({
         ? transformSalaryData(salaryData)
         : transformPayrollData(payrollData as any[], payroll?.payroll_type!),
       payroll_type: updateValues?.payroll_type ?? type,
+      proof: undefined,
       invoice_type:
         updateValues?.invoice_type ??
         (type === "exit" || type === "salary" ? type : "expenses"),
