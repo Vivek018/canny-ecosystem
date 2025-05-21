@@ -36,6 +36,7 @@ type FieldsType = {
 };
 
 export const PROJECT_PARAM = "project";
+export const PROJECT_SITE_PARAM = "project-site";
 
 export const CreateEmployeeProjectAssignment = ({
   fields,
