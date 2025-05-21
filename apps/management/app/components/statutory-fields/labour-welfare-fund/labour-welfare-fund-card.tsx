@@ -63,16 +63,16 @@ export function LabourWelfareFundCard({
         "w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start"
       )}
     >
-      <CardHeader className='flex flex-row space-y-0 items-center justify-between p-4'>
-        <CardTitle className='text-lg tracking-wide capitalize'>
+      <CardHeader className="flex flex-row space-y-0 items-center justify-between p-4">
+        <CardTitle className="text-lg tracking-wide capitalize">
           {replaceUnderscore(labourWelfareFund.state)}
         </CardTitle>
-        <div className='flex items-center gap-3'>
+        <div className="flex items-center gap-3">
           <TooltipProvider>
             <Tooltip delayDuration={100}>
               <TooltipTrigger asChild>
                 <Link
-                  prefetch='intent'
+                  prefetch="intent"
                   to={`${labourWelfareFund.id}/update-labour-welfare-fund`}
                   className={cn(
                     "p-2 rounded-md bg-secondary grid place-items-center",
@@ -82,7 +82,7 @@ export function LabourWelfareFundCard({
                     ) && "hidden"
                   )}
                 >
-                  <Icon name='edit' size='xs' />
+                  <Icon name="edit" size="xs" />
                 </Link>
               </TooltipTrigger>
               <TooltipContent>Edit</TooltipContent>
@@ -98,9 +98,9 @@ export function LabourWelfareFundCard({
                 ) && "hidden"
               )}
             >
-              <Icon name='dots-vertical' size='xs' />
+              <Icon name="dots-vertical" size="xs" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent sideOffset={10} align='end'>
+            <DropdownMenuContent sideOffset={10} align="end">
               <DropdownMenuGroup>
                 <DeleteLabourWelfareFund
                   labourWelfareFundId={labourWelfareFund.id}
@@ -110,23 +110,23 @@ export function LabourWelfareFundCard({
           </DropdownMenu>
         </div>
       </CardHeader>
-      <CardContent className='flex flex-col gap-4'>
+      <CardContent className="flex flex-col gap-4">
         <DetailItem
-          label='Employee Contribution'
+          label="Employee Contribution"
           value={labourWelfareFund.employee_contribution}
         />
         <DetailItem
-          label='Employer Contribution'
+          label="Employer Contribution"
           value={labourWelfareFund.employer_contribution}
         />
         <DetailItem
-          label='Deduction Cycle'
-          value={labourWelfareFund.deduction_cycle}
+          label="Deduction Cycle"
+          value={replaceUnderscore(labourWelfareFund.deduction_cycle)}
         />
       </CardContent>
       {labourWelfareFund.status && (
-        <CardFooter className='px-2.5 ml-auto bg-secondary text-foreground py-1.5 text-sm tracking-wide font-sem rounded-tl-md border-foreground flex gap-1 justify-center'>
-          <Icon name='dot-filled' size='xs' />
+        <CardFooter className="px-2.5 ml-auto bg-secondary text-foreground py-1.5 text-sm tracking-wide font-sem rounded-tl-md border-foreground flex gap-1 justify-center">
+          <Icon name="dot-filled" size="xs" />
           Active
         </CardFooter>
       )}

@@ -15,8 +15,8 @@ export function replaceUnderscore(str: string | null | undefined) {
 
 export const pipe =
   (...fns: any[]) =>
-    (val: any) =>
-      fns.reduce((prev, fn) => fn(prev), val);
+  (val: any) =>
+    fns.reduce((prev, fn) => fn(prev), val);
 
 export function getInitialValueFromZod<T extends z.ZodTypeAny>(
   schema: T
@@ -182,7 +182,9 @@ export function toCamelCase(str: string) {
     .join("");
 }
 
-export function getWorkingDaysInCurrentMonth({ working_days }: {
+export function getWorkingDaysInCurrentMonth({
+  working_days,
+}: {
   working_days: number[];
 }): number {
   const now = new Date();
@@ -206,7 +208,7 @@ export const searchInObject = (obj: any, searchString: string): any => {
   }
 
   return Object.values(obj).some((value) =>
-    searchInObject(value, searchString),
+    searchInObject(value, searchString)
   );
 };
 
@@ -218,23 +220,128 @@ export function extractKeys<T extends Record<string, any>, K extends string>(
   arr: T[],
   keys: K[]
 ): Partial<Record<K, any>>[] {
-  return arr.map(obj =>
+  return arr.map((obj) =>
     keys.reduce((acc, key) => {
-      acc[key] = key.split('.').reduce((o, k) => o?.[k], obj);
+      acc[key] = key.split(".").reduce((o, k) => o?.[k], obj);
       return acc;
     }, {} as Partial<Record<K, any>>)
   );
 }
 
-export function getMonthNameFromNumber(monthNumber: number, shortName = false): string {
+export function getMonthNameFromNumber(
+  monthNumber: number,
+  shortName = false
+): string {
   const monthNames = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
 
   if (monthNumber < 1 || monthNumber > 12) {
     throw new Error("Month number must be between 1 and 12");
   }
 
-  return shortName ? monthNames[monthNumber - 1].slice(0, 3) : monthNames[monthNumber - 1];
+  return shortName
+    ? monthNames[monthNumber - 1].slice(0, 3)
+    : monthNames[monthNumber - 1];
+}
+
+export function numberToWords(num: number): string {
+  if (num === 0) return "zero";
+
+  const ones = [
+    "",
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+  ];
+  const teens = [
+    "ten",
+    "eleven",
+    "twelve",
+    "thirteen",
+    "fourteen",
+    "fifteen",
+    "sixteen",
+    "seventeen",
+    "eighteen",
+    "nineteen",
+  ];
+  const tens = [
+    "",
+    "",
+    "twenty",
+    "thirty",
+    "forty",
+    "fifty",
+    "sixty",
+    "seventy",
+    "eighty",
+    "ninety",
+  ];
+
+  const units = [
+    { value: 10000000, str: "crore" },
+    { value: 100000, str: "lakh" },
+    { value: 1000, str: "thousand" },
+    { value: 100, str: "hundred" },
+  ];
+
+  function convert(n: number): string {
+    let words = "";
+
+    for (const unit of units) {
+      if (n >= unit.value) {
+        words += `${convert(Math.floor(n / unit.value))} ${unit.str} `;
+        n %= unit.value;
+      }
+    }
+
+    if (n >= 20) {
+      words += `${tens[Math.floor(n / 10)]} `;
+      n %= 10;
+    }
+
+    if (n >= 10 && n <= 19) {
+      words += `${teens[n - 10]} `;
+      return words.trim();
+    }
+
+    if (n > 0 && n < 10) {
+      words += `${ones[n]} `;
+    }
+
+    return words.trim();
+  }
+
+  // Split integer and decimal parts
+  const integerPart = Math.floor(num);
+  const decimalPart = Math.round((num - integerPart) * 100);
+
+  let words = convert(integerPart);
+
+  if (decimalPart > 0) {
+    words += " point";
+    for (const digit of decimalPart.toString().split("")) {
+      words += ` ${ones[Number.parseInt(digit)]}`;
+    }
+  }
+
+  return words.replace(/\s+/g, " ").trim();
 }

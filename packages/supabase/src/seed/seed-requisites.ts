@@ -26,7 +26,6 @@ import {
   createLabourWelfareFund,
   createLeaveEncashment,
   createPaymentField,
-  createPaySequence,
   createProfessionalTax,
   createStatutoryBonus,
 } from "../mutations";
@@ -251,20 +250,6 @@ export async function seedRequisitesForCompanyCreation({
       company_id: companyId!,
     })),
   });
-
-  await createPaySequence({
-    supabase,
-    data: {
-      name: "Default Pay Sequence",
-      overtime_multiplier: 1.5,
-      pay_day: faker.number.int({ min: 1, max: 30 }),
-      working_days: [0, 1, 2, 3, 4, 5, 6],
-      is_default: true,
-      company_id: companyId!,
-    },
-    bypassAuth: true,
-  });
-  
 }
 
 export async function seedRequisitesForEmployeeCreation({

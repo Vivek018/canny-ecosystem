@@ -14,7 +14,6 @@ import { AttendanceTableHeader } from "./attendance-table-header";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@canny_ecosystem/ui/button";
 import { useAttendanceStore } from "@/store/attendance";
-
 import { ExportBar } from "../export-bar";
 import type {
   DayType,
@@ -187,7 +186,7 @@ export function AttendanceTable({
       loadMoreEmployees();
     }
   }, [inView]);
-  
+
   const selectedRowsData = table
     .getSelectedRowModel()
     .rows?.map((row) => row.original);

@@ -5,6 +5,7 @@ import { ImportEmployeeAddressModal } from "@/components/employees/import-export
 import { ImportEmployeeBankDetailsModal } from "@/components/employees/import-export/import-modal-bank-details";
 import { ImportEmployeeDetailsModal } from "@/components/employees/import-export/import-modal-employee-details";
 import { ImportEmployeeGuardiansModal } from "@/components/employees/import-export/import-modal-guardians";
+import { ImportEmployeeProjectAssignmentModal } from "@/components/employees/import-export/import-modal-project-assignments";
 import { ImportEmployeeStatutoryModal } from "@/components/employees/import-export/import-modal-statutory";
 import { columns } from "@/components/employees/table/columns";
 import { DataTable } from "@/components/employees/table/data-table";
@@ -281,6 +282,7 @@ export default function EmployeesIndex() {
         <ImportEmployeeBankDetailsModal />
         <ImportEmployeeAddressModal />
         <ImportEmployeeGuardiansModal />
+        <ImportEmployeeProjectAssignmentModal />
         <Outlet />
       </Suspense>
     </section>

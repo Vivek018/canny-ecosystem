@@ -174,7 +174,7 @@ export default function RunPayrollId() {
               />
             );
           }
-          
+
           if (
             payrollData.payroll_type === "reimbursement" ||
             payrollData.payroll_type === "exit"
@@ -199,6 +199,7 @@ export default function RunPayrollId() {
                       payrollData={payrollData}
                       data={data}
                       env={env as SupabaseEnv}
+                      fromWhere="runpayroll"
                     />
                   );
                 }}
@@ -226,6 +227,7 @@ export default function RunPayrollId() {
                       payrollData={payrollData}
                       data={data}
                       env={env as SupabaseEnv}
+                      fromWhere="runpayroll"
                     />
                   );
                 }}

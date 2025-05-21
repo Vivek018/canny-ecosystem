@@ -23,12 +23,16 @@ export function PayrollActions({
   env,
   data,
   payrollData,
+  fromWhere,
+  status,
 }: {
   payrollData: Omit<PayrollDatabaseRow, "created_at" | "updated_at">;
   data: PayrollEntriesWithEmployee[];
   env: SupabaseEnv;
   payrollId: string;
   className?: string;
+  fromWhere: "runpayroll" | "payrollhistory";
+  status: string;
 }) {
   const navigate = useNavigate();
 
@@ -40,8 +44,35 @@ export function PayrollActions({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent sideOffset={10} align="end">
-        <div className="flex flex-col pl-1">
-          <Button variant={"ghost"} className="w-full p-0">
+        <div className="flex flex-col">
+          <div>
+            <Button
+              variant={"ghost"}
+              className={cn(
+                "px-2 w-full flex flex-row justify-start gap-2 ",
+                status !== "approved" ? "hidden" : ""
+              )}
+              onClick={() =>
+                fromWhere === "runpayroll"
+                  ? navigate(`/payroll/run-payroll/${payrollId}/create-invoice`)
+                  : navigate(
+                      `/payroll/payroll-history/${payrollId}/create-invoice`
+                    )
+              }
+            >
+              <Icon name="plus-circled" />
+              Create Invoice
+            </Button>
+          </div>
+          <DropdownMenuSeparator
+            className={cn(
+              "flex ",
+              fromWhere !== "payrollhistory" || status !== "approved"
+                ? "hidden"
+                : ""
+            )}
+          />
+          <Button variant={"ghost"} className="w-full px-2">
             <DownloadBankAdvice
               env={env}
               data={data}
@@ -52,7 +83,7 @@ export function PayrollActions({
           <Button
             variant={"ghost"}
             className={cn(
-              "hidden w-full p-0",
+              "hidden w-full px-2",
               payrollData.payroll_type === "salary" && "flex"
             )}
           >
@@ -62,21 +93,30 @@ export function PayrollActions({
           <Button
             variant={"ghost"}
             className={cn(
-              "hidden w-full p-0",
+              "hidden w-full px-2",
               payrollData.payroll_type === "salary" && "flex"
             )}
           >
             <DownloadEpfFormat env={env} data={data} />
           </Button>
-          <DropdownMenuSeparator />
+          <DropdownMenuSeparator
+            className={cn(
+              "hidden",
+              payrollData.payroll_type === "salary" && "flex"
+            )}
+          />
           <div>
             <Button
               variant={"ghost"}
-              className="p-0 pr-1 flex flex-row justify-start gap-2"
+              className="px-2 pr-1 flex flex-row justify-start gap-2"
               onClick={() =>
-                navigate(
-                  `/payroll/payroll-history/${payrollId}/salary-register`
-                )
+                fromWhere === "runpayroll"
+                  ? navigate(
+                      `/payroll/run-payroll/${payrollId}/salary-register`
+                    )
+                  : navigate(
+                      `/payroll/payroll-history/${payrollId}/salary-register`
+                    )
               }
             >
               <Icon name="import" />

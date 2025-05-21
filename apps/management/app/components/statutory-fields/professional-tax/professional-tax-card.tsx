@@ -67,9 +67,9 @@ export function ProfessionalTaxCard({
     "created_at" | "updated_at"
   >;
 }) {
-
   const { role } = useUser();
-  const grossSalaryRangeJson = professionalTax.gross_salary_range as ProfessionalTaxGrossSalaryRangeType;
+  const grossSalaryRangeJson =
+    professionalTax.gross_salary_range as ProfessionalTaxGrossSalaryRangeType;
 
   return (
     <Card
@@ -91,8 +91,8 @@ export function ProfessionalTaxCard({
                     "p-2 rounded-md bg-secondary grid place-items-center",
                     !hasPermission(
                       `${role}`,
-                      `${updateRole}:${attribute.statutoryFieldsPf}`,
-                    ) && "hidden",
+                      `${updateRole}:${attribute.statutoryFieldsPf}`
+                    ) && "hidden"
                   )}
                 >
                   <Icon name="edit" size="xs" />
@@ -107,8 +107,8 @@ export function ProfessionalTaxCard({
                 "p-2 py-2 rounded-md bg-secondary grid place-items-center",
                 !hasPermission(
                   `${role}`,
-                  `${deleteRole}:${attribute.statutoryFieldsPf}`,
-                ) && "hidden",
+                  `${deleteRole}:${attribute.statutoryFieldsPf}`
+                ) && "hidden"
               )}
             >
               <Icon name="dots-vertical" size="xs" />
@@ -125,7 +125,7 @@ export function ProfessionalTaxCard({
         <DetailItem label="PT Number" value={professionalTax.pt_number} />
         <DetailItem
           label="Deduction Cycle"
-          value={professionalTax.deduction_cycle}
+          value={replaceUnderscore(professionalTax.deduction_cycle)}
         />
         <div className="flex flex-row items-center gap-4 text-base">
           <h3 className="text-muted-foreground tracking-wide capitalize w-40 truncate">

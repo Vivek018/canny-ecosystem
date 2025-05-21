@@ -9,6 +9,7 @@ export const modalSearchParamNames = {
   import_employee_bank_details: "import-employee-bank-details",
   import_employee_address: "import-employee-address",
   import_employee_guardians: "import-employee-guardians",
+  import_project_assignments: "import-project-assignments",
   import_employee_attendance: "import-employee-attendance",
   import_employee_attendance_by_present_days:
     "import-employee-attendance-by-present-days",
@@ -163,6 +164,7 @@ export const attribute = {
   holidays: "holidays",
   paySequence: "pay_sequence",
   companyDocuments: "company_documents",
+  invoice:"invoice",
 };
 
 export const months: { [key: string]: number } = {

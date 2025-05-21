@@ -100,13 +100,13 @@ export const CreateEmployeeProjectAssignment = ({
           <SearchableSelectField
             className="capitalize"
             options={transformStringArrayIntoOptions(
-              assignmentTypeArray as unknown as string[],
+              assignmentTypeArray as unknown as string[]
             )}
             inputProps={{
               ...getInputProps(fields.assignment_type, { type: "text" }),
             }}
             placeholder={`Select ${replaceUnderscore(
-              fields.assignment_type.name,
+              fields.assignment_type.name
             )}`}
             labelProps={{
               children: replaceUnderscore(fields.assignment_type.name),
@@ -116,7 +116,7 @@ export const CreateEmployeeProjectAssignment = ({
           <SearchableSelectField
             className="capitalize"
             options={transformStringArrayIntoOptions(
-              positionArray as unknown as string[],
+              positionArray as unknown as string[]
             )}
             inputProps={{
               ...getInputProps(fields.position, { type: "text" }),
@@ -130,7 +130,7 @@ export const CreateEmployeeProjectAssignment = ({
           <SearchableSelectField
             className="capitalize"
             options={transformStringArrayIntoOptions(
-              skillLevelArray as unknown as string[],
+              skillLevelArray as unknown as string[]
             )}
             inputProps={{
               ...getInputProps(fields.skill_level, { type: "text" }),
@@ -149,7 +149,7 @@ export const CreateEmployeeProjectAssignment = ({
               placeholder: `Enter ${replaceUnderscore(fields.start_date.name)}`,
               max: getValidDateForInput(new Date().toISOString()),
               defaultValue: getValidDateForInput(
-                String(fields.start_date.initialValue),
+                String(fields.start_date.initialValue)
               ),
             }}
             labelProps={{
@@ -165,7 +165,7 @@ export const CreateEmployeeProjectAssignment = ({
               placeholder: `Enter ${replaceUnderscore(fields.end_date.name)}`,
               min: getValidDateForInput(String(fields.start_date.value)),
               defaultValue: getValidDateForInput(
-                String(fields.end_date.initialValue),
+                String(fields.end_date.initialValue)
               ),
             }}
             labelProps={{
@@ -189,10 +189,10 @@ export const CreateEmployeeProjectAssignment = ({
               type: "date",
             }),
             placeholder: `Enter ${replaceUnderscore(
-              fields.probation_end_date.name,
+              fields.probation_end_date.name
             )}`,
             defaultValue: getValidDateForInput(
-              String(fields.probation_end_date.initialValue),
+              String(fields.probation_end_date.initialValue)
             ),
           }}
           labelProps={{

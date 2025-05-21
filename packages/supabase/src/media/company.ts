@@ -208,7 +208,7 @@ export async function deleteCompanyDocument({
       supabase,
       documentName,
       companyId,
-    },
+    }
   );
   if (!data || error) return { status: 400, error };
 
@@ -229,7 +229,7 @@ export async function deleteCompanyDocument({
   if (deleteCompanyDocumentError)
     console.error(
       "deleteCompanyDocumentByCompanyId error",
-      deleteCompanyDocumentError,
+      deleteCompanyDocumentError
     );
   return { status, error: null };
 }

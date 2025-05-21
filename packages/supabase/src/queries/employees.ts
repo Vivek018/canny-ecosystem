@@ -1255,7 +1255,7 @@ export async function getActiveEmployeesByCompanyId({
     .select(
       `${columns.join(
         ","
-      )},employee_project_assignment!employee_project_assignments_employee_id_fkey!left(project_sites!left(id, name))`
+      )},employee_project_assignment!employee_project_assignments_employee_id_fkey!left(project_sites!left(id, name, projects!inner(id, name)))`
     )
     .eq("company_id", companyId)
     .in("is_active", [true]);

@@ -1,9 +1,27 @@
 import type {
+  EmployeeDatabaseRow,
+  EmployeeProjectAssignmentDatabaseInsert,
+  EmployeeProjectAssignmentDatabaseRow,
+  InferredType,
   ProjectDatabaseRow,
   SiteDatabaseRow,
   TypedSupabaseClient,
 } from "../types";
 import { HARD_QUERY_LIMIT, MID_QUERY_LIMIT } from "../constant";
+
+export type ImportEmployeeProjectAssignmentsDataType = Pick<
+  EmployeeProjectAssignmentDatabaseRow,
+  | "position"
+  | "assignment_type"
+  | "start_date"
+  | "end_date"
+  | "skill_level"
+  | "probation_period"
+  | "probation_end_date"
+> & {
+  employee_code: EmployeeDatabaseRow["employee_code"];
+  site: string;
+};
 
 // Projects
 export type ProjectsWithCompany = ProjectDatabaseRow & {
@@ -37,7 +55,7 @@ export async function getProjectsByCompanyId({
     .from("projects")
     .select(columns.join(","))
     .or(
-      `project_client_id.eq.${companyId},end_client_id.eq.${companyId},primary_contractor_id.eq.${companyId}`,
+      `project_client_id.eq.${companyId},end_client_id.eq.${companyId},primary_contractor_id.eq.${companyId}`
     )
     .limit(HARD_QUERY_LIMIT)
     .order("created_at", { ascending: false })
@@ -61,7 +79,7 @@ export async function getProjectNamesByCompanyId({
     .from("projects")
     .select("id, name")
     .or(
-      `project_client_id.eq.${companyId},end_client_id.eq.${companyId},primary_contractor_id.eq.${companyId}`,
+      `project_client_id.eq.${companyId},end_client_id.eq.${companyId},primary_contractor_id.eq.${companyId}`
     )
     .limit(HARD_QUERY_LIMIT)
     .order("created_at", { ascending: false })
@@ -110,7 +128,7 @@ export async function getProjectById({
     .select(columns.join(","))
     .eq("id", id)
     .or(
-      `project_client_id.eq.${companyId},end_client_id.eq.${companyId},primary_contractor_id.eq.${companyId}`,
+      `project_client_id.eq.${companyId},end_client_id.eq.${companyId},primary_contractor_id.eq.${companyId}`
     )
     .single<Omit<ProjectsWithCompany, "created_at" | "updated_at">>();
 
@@ -175,7 +193,7 @@ export async function getSiteNamesByProjectName({
   const { data, error } = await supabase
     .from("project_sites")
     .select(
-      "name, projects!inner(name, project_client_id, end_client_id, primary_contractor_id)",
+      "name, projects!inner(name, project_client_id, end_client_id, primary_contractor_id)"
     )
     .eq("projects.name", projectName)
     .limit(HARD_QUERY_LIMIT)
@@ -215,13 +233,13 @@ export async function getSitesByCompanyId({
         end_client_id,
         primary_contractor_id
       )`,
-      { count: "exact" },
+      { count: "exact" }
     )
     .or(
       `project_client_id.eq.${companyId},end_client_id.eq.${companyId},primary_contractor_id.eq.${companyId}`,
       {
         foreignTable: "projects",
-      },
+      }
     )
     .limit(MID_QUERY_LIMIT)
     .order("created_at", { ascending: false })
@@ -271,9 +289,182 @@ export async function getSiteById({
   return { data, error };
 }
 
+export async function getEmployeeProjectAssignmentsConflicts({
+  supabase,
+  importedData,
+}: {
+  supabase: TypedSupabaseClient;
+  importedData: EmployeeProjectAssignmentDatabaseInsert[];
+}) {
+  const employeeIds = [...new Set(importedData.map((emp) => emp.employee_id))];
 
+  const query = supabase
+    .from("employee_project_assignment")
+    .select(
+      `
+      employee_id
+    `
+    )
+    .or(
+      [`employee_id.in.(${employeeIds.map((id) => id).join(",")})`].join(",")
+    );
 
+  const { data: conflictingRecords, error } = await query;
 
+  if (error) {
+    console.error("Error fetching conflicts:", error);
+    return { conflictingIndices: [], error };
+  }
 
+  const conflictingIndices = importedData.reduce(
+    (indices: number[], record, index) => {
+      const hasConflict = conflictingRecords?.some(
+        (existing) => existing.employee_id === record.employee_id
+      );
 
+      if (hasConflict) {
+        indices.push(index);
+      }
+      return indices;
+    },
+    []
+  );
 
+  return { conflictingIndices, error: null };
+}
+
+export async function createEmployeeProjectAssignmentsFromImportedData({
+  supabase,
+  data,
+  import_type,
+}: {
+  supabase: TypedSupabaseClient;
+  data: EmployeeProjectAssignmentDatabaseInsert[];
+  import_type?: string;
+}) {
+  if (!data || data.length === 0) {
+    return { status: "No data provided", error: null };
+  }
+
+  const identifiers = data.map((entry) => ({
+    employee_id: entry.employee_id,
+  }));
+
+  const { data: existingRecords, error: existingError } = await supabase
+    .from("employee_project_assignment")
+    .select("employee_id")
+    .in(
+      "employee_id",
+      identifiers.map((entry) => entry.employee_id).filter(Boolean)
+    );
+  if (existingError) {
+    console.error("Error fetching existing records:", existingError);
+    return { status: "Error fetching existing records", error: existingError };
+  }
+
+  const normalize = (value: any) =>
+    String(value || "")
+      .trim()
+      .toLowerCase();
+
+  const existingSets = {
+    ids: new Set(existingRecords?.map((e) => normalize(e.employee_id)) || []),
+  };
+
+  if (import_type === "skip") {
+    const newData = data.filter((entry) => {
+      const hasConflict = existingSets.ids.has(normalize(entry.employee_id));
+
+      return !hasConflict;
+    });
+
+    if (newData.length === 0) {
+      return {
+        status: "No new data to insert after filtering duplicates",
+        error: null,
+      };
+    }
+
+    const BATCH_SIZE = 50;
+
+    for (let i = 0; i < newData.length; i += BATCH_SIZE) {
+      const batch = newData.slice(i, Math.min(i + BATCH_SIZE, newData.length));
+
+      const { error: insertError } = await supabase
+        .from("employee_project_assignment")
+        .insert(batch);
+      if (insertError) {
+        console.error("Error inserting batch:", insertError);
+      }
+    }
+
+    return {
+      status: "Successfully inserted new records",
+      error: null,
+    };
+  }
+
+  if (import_type === "overwrite") {
+    const results = await Promise.all(
+      data.map(async (record) => {
+        const existingRecord = existingRecords?.find(
+          (existing) =>
+            normalize(existing.employee_id) === normalize(record.employee_id)
+        );
+
+        if (existingRecord) {
+          const { error: updateError } = await supabase
+            .from("employee_project_assignment")
+            .update(record)
+            .eq("employee_id", existingRecord.employee_id);
+
+          return { type: "update", error: updateError };
+        }
+
+        const { error: insertError } = await supabase
+          .from("employee_project_assignment")
+          .insert(record);
+
+        return { type: "insert", error: insertError };
+      })
+    );
+
+    const errors = results.filter((r) => r.error);
+
+    if (errors.length > 0) {
+      console.error("Errors during processing:", errors);
+    }
+
+    return {
+      status: "Successfully processed updates and new insertions",
+      error: null,
+    };
+  }
+
+  return {
+    status: "Invalid import_type specified",
+    error: new Error("Invalid import_type"),
+  };
+}
+
+export async function getSiteIdsBySiteNames({
+  supabase,
+  siteNames,
+}: {
+  supabase: TypedSupabaseClient;
+  siteNames: string[];
+}) {
+  const columns = ["name", "id"] as const;
+
+  const { data, error } = await supabase
+    .from("project_sites")
+    .select(columns.join(","))
+    .in("name", siteNames)
+    .returns<InferredType<SiteDatabaseRow, (typeof columns)[number]>[]>();
+
+  if (error) {
+    console.error("getSiteIdsBySiteNames Error", error);
+  }
+
+  return { data, error };
+}
