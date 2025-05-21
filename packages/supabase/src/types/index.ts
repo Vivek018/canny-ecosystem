@@ -350,3 +350,11 @@ export type HolidaysDatabaseInsert =
   Database["public"]["Tables"]["holidays"]["Insert"];
 export type HolidaysDatabaseUpdate =
   Database["public"]["Tables"]["holidays"]["Update"];
+
+export type InvoiceDatabaseRow = Database["public"]["Tables"]["invoice"]["Row"];
+
+export type InvoiceDatabaseInsert =
+  Database["public"]["Tables"]["invoice"]["Insert"];
+
+export type InvoiceDatabaseUpdate =
+  Database["public"]["Tables"]["invoice"]["Update"];

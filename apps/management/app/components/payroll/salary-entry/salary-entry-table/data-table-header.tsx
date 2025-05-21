@@ -11,10 +11,9 @@ interface Props {
   className?: string;
 }
 
-
 export function SalaryTableHeader({ table, loading, className }: Props) {
-  const salaryEntries: SalaryEntriesDatabaseRow[] = table.getRowModel()?.rows[0]?.original?.salary_entries;
-
+  const salaryEntries: SalaryEntriesDatabaseRow[] =
+    table.getRowModel()?.rows[0]?.original?.salary_entries;
 
   // make sure the order is same as header order
   const salaryEntryColumnIdArray = [
@@ -24,9 +23,9 @@ export function SalaryTableHeader({ table, loading, className }: Props) {
     "overtime_hours",
     "period",
     ...(salaryEntries?.map((salaryEntry) => {
-      return salaryEntry.template_component_id ?? salaryEntry.field_name;
+      return salaryEntry.field_name ?? salaryEntry.template_component_id;
     }) ?? []),
-    "actions"
+    "actions",
   ];
 
   const [sortingOrder, setSortingOrder] = useState("");
@@ -68,12 +67,7 @@ export function SalaryTableHeader({ table, loading, className }: Props) {
     <TableHeader className={className}>
       <TableRow className="h-[45px] hover:bg-transparent">
         {salaryEntryColumnIdArray.map((id) => (
-          <TableHead
-            key={id}
-            className={cn(
-              "px-4 py-2",
-            )}
-          >
+          <TableHead key={id} className={cn("px-4 py-2")}>
             <Button
               className="p-0 hover:bg-transparent space-x-2 disabled:opacity-100"
               variant="ghost"
@@ -85,14 +79,14 @@ export function SalaryTableHeader({ table, loading, className }: Props) {
                 name="chevron-down"
                 className={cn(
                   "hidden",
-                  sortingId === id && sortingOrder === "desc" && "flex",
+                  sortingId === id && sortingOrder === "desc" && "flex"
                 )}
               />
               <Icon
                 name="chevron-up"
                 className={cn(
                   "hidden",
-                  sortingId === id && sortingOrder === "asc" && "flex",
+                  sortingId === id && sortingOrder === "asc" && "flex"
                 )}
               />
             </Button>

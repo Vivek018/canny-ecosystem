@@ -11,7 +11,9 @@ import { HARD_QUERY_LIMIT, SINGLE_QUERY_LIMIT } from "../constant";
 
 export async function getCompanies({
   supabase,
-}: { supabase: TypedSupabaseClient }) {
+}: {
+  supabase: TypedSupabaseClient;
+}) {
   const columns = ["id", "name", "logo"] as const;
 
   const { data, error } = await supabase
@@ -371,7 +373,10 @@ export async function getRelationshipTermsById({
 export async function getCompanyDocumentById({
   supabase,
   id,
-}: { supabase: TypedSupabaseClient; id: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+}) {
   const columns = ["name", "url"] as const;
 
   const { data, error } = await supabase
@@ -388,7 +393,10 @@ export async function getCompanyDocumentById({
 export async function getCompanyDocumentsByCompanyId({
   supabase,
   companyId,
-}: { supabase: TypedSupabaseClient; companyId: string }) {
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+}) {
   const columns = ["name", "url", "id"] as const;
 
   const { data, error } = await supabase
@@ -425,8 +433,68 @@ export async function getCompanyDocumentUrlByCompanyIdAndDocumentName({
   if (error)
     console.error(
       "getCompanyDocumentUrlByCompanyIdAndDocumentName Error",
-      error,
+      error
     );
+
+  return { data, error };
+}
+
+export async function getRelationshipsByParentAndChildCompanyId({
+  supabase,
+  parentCompanyId,
+  childCompanyId,
+}: {
+  supabase: TypedSupabaseClient;
+  parentCompanyId: string;
+  childCompanyId: string;
+}) {
+  const columns = [
+    "id",
+    "parent_company_id",
+    "child_company_id",
+    "relationship_type",
+    "start_date",
+    "end_date",
+    "terms",
+    "is_active",
+    "parent_company:companies!parent_company_id (id, name)",
+    "child_company:companies!child_company_id (id, name)",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("company_relationships")
+    .select(columns.join(","))
+    .or(
+      `parent_company_id.eq.${parentCompanyId},child_company_id.eq.${childCompanyId}`
+    )
+    .order("created_at", { ascending: false })
+    .single<RelationshipWithCompany>();
+
+  if (error) {
+    console.error("getRelationshipsByParentAndChildCompanyId Error", error);
+  }
+
+  return { data, error };
+}
+
+export async function getCannyCompanyIdByName({
+  supabase,
+  name,
+}: {
+  supabase: TypedSupabaseClient;
+  name: string;
+}) {
+  const columns = ["name", "id"] as const;
+
+  const { data, error } = await supabase
+    .from("companies")
+    .select(columns.join(","))
+    .eq("name", name)
+    .single<InferredType<CompanyDatabaseRow, (typeof columns)[number]>>();
+
+  if (error) {
+    console.error("getCannyCompanyIdByName Error", error);
+  }
 
   return { data, error };
 }

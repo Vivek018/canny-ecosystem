@@ -22,7 +22,7 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
-import { attribute, statesAndUTs } from "@canny_ecosystem/utils/constant";
+import { attribute } from "@canny_ecosystem/utils/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
 
 export const UPDATE_PROFESSIONAL_TAX = "update-professional-tax";
@@ -109,19 +109,10 @@ export async function action({
 
 export default function UpdateProfessionalTax() {
   const { professionalTaxData, error } = useLoaderData<typeof loader>();
+
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
-
-  const matchedState = statesAndUTs.find(
-    (state) =>
-      state.label.toLowerCase() === professionalTaxData?.state.toLowerCase()
-  );
-
-  if (matchedState && professionalTaxData) {
-    professionalTaxData.state = matchedState.value;
-  }
-
 
   useEffect(() => {
     if (!actionData) return;

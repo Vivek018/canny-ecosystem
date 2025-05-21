@@ -51,25 +51,18 @@ export async function action({
         "employee_id" | "present_days" | "overtime_hours" | "month" | "year"
       >[];
 
-      const salaryEntries: Omit<
+      const allSalaryEntries: Omit<
         SalaryEntriesDatabaseRow,
         "id" | "created_at" | "updated_at" | "payroll_id"
       >[] = [];
 
-      let epfField = null;
-      let esiField = null;
-      let ptField = null;
-      let lwfField = null;
-      let bonusField = null;
       const uniqueEmployeeIds = new Set<string>();
 
       for (const attendance of attendanceData) {
         const { employee_id, present_days, overtime_hours, month, year } =
           attendance;
 
-        if (!employee_id || !month || !year || !present_days) {
-          continue;
-        }
+        if (!employee_id || !month || !year || !present_days) continue;
 
         uniqueEmployeeIds.add(employee_id);
 
@@ -80,9 +73,7 @@ export async function action({
             companyId,
           });
 
-        if (!linkedPaymentTemplate?.template_id) {
-          continue;
-        }
+        if (!linkedPaymentTemplate?.template_id) continue;
 
         const { data: paymentTemplateComponents } =
           await getPaymentTemplateComponentsByTemplateId({
@@ -90,28 +81,24 @@ export async function action({
             templateId: linkedPaymentTemplate.template_id,
           });
 
-        if (!paymentTemplateComponents) {
-          continue;
-        }
+        if (!paymentTemplateComponents) continue;
+
+        const employeeSalaryEntries = [];
+
+        let epfField = null;
+        let esiField = null;
+        let ptField = null;
+        let lwfField = null;
+        let bonusField = null;
 
         for (const component of paymentTemplateComponents) {
           let amount = component.calculation_value ?? 0;
 
-          if (component.target_type === "epf") {
-            epfField = component.employee_provident_fund;
-          }
-          if (component.target_type === "esi") {
-            esiField = component.employee_state_insurance;
-          }
-          if (component.target_type === "pt") {
-            ptField = component.professional_tax;
-          }
-          if (component.target_type === "lwf") {
-            lwfField = component.labour_welfare_fund;
-          }
-          if (component.target_type === "bonus") {
-            bonusField = component.statutory_bonus;
-          }
+          if (component.target_type === "epf") epfField = component.employee_provident_fund;
+          if (component.target_type === "esi") esiField = component.employee_state_insurance;
+          if (component.target_type === "pt") ptField = component.professional_tax;
+          if (component.target_type === "lwf") lwfField = component.labour_welfare_fund;
+          if (component.target_type === "bonus") bonusField = component.statutory_bonus;
 
           if (
             component.target_type === "payment_field" &&
@@ -129,7 +116,7 @@ export async function action({
             });
           }
 
-          salaryEntries.push({
+          employeeSalaryEntries.push({
             month,
             year,
             present_days,
@@ -139,14 +126,11 @@ export async function action({
             field_name:
               component.target_type === "payment_field"
                 ? component.payment_fields?.name
-                : component.target_type.toUpperCase() ??
-                  component.component_type,
+                : component.target_type.toUpperCase() ?? component.component_type,
             type: component.component_type,
             is_pro_rata: component.payment_fields?.is_pro_rata ?? false,
-            consider_for_epf:
-              component.payment_fields?.consider_for_epf ?? false,
-            consider_for_esic:
-              component.payment_fields?.consider_for_esic ?? false,
+            consider_for_epf: component.payment_fields?.consider_for_epf ?? false,
+            consider_for_esic: component.payment_fields?.consider_for_esic ?? false,
             amount,
             is_overtime:
               component.target_type === "payment_field"
@@ -154,114 +138,87 @@ export async function action({
                 : false,
           });
         }
-      }
 
-      const totalEmployees = uniqueEmployeeIds.size ?? 0;
+        let grossValue = 0;
+        let basicValue = 0;
+        let valueForEPF = 0;
+        let valueForESIC = 0;
 
-      let grossValue = 0;
-      let basicValue = 0;
-      let valueForEPF = 0;
-      let valueForESIC = 0;
-
-      for (const entry of salaryEntries) {
-        if (entry.type === "earning") {
-          grossValue += entry.amount;
-        }
-        if (entry.field_name.toLowerCase() === "basic") {
-          basicValue = entry.amount;
-        }
-        if (entry.consider_for_epf) {
-          if (entry.type === "earning") {
-            valueForEPF += entry.amount;
-          } else if (entry.type === "deduction") {
-            valueForEPF -= entry.amount;
+        for (const entry of employeeSalaryEntries) {
+          if (entry.type === "earning") grossValue += entry.amount;
+          if (entry.field_name.toLowerCase() === "basic") basicValue = entry.amount;
+          if (entry.consider_for_epf) {
+            valueForEPF += entry.type === "earning" ? entry.amount : -entry.amount;
+          }
+          if (entry.consider_for_esic) {
+            valueForESIC += entry.type === "earning" ? entry.amount : -entry.amount;
           }
         }
-        if (entry.consider_for_esic) {
-          if (entry.type === "earning") {
-            valueForESIC += entry.amount;
-          } else if (entry.type === "deduction") {
-            valueForESIC -= entry.amount;
-          }
-        }
-      }
 
-      const salaryData = salaryEntries.map((entry) => {
-        if (
-          entry.type === "statutory_contribution" ||
-          entry.type === "earning" ||
-          entry.type === "bonus"
-        ) {
-          let amount = null;
-          if (entry.field_name.toLowerCase().includes("pf")) {
-            amount = Number.parseFloat(
-              (
-                getValueforEPF({
-                  epf: epfField!,
-                  values: {
-                    valueForEPF,
-                  },
-                }) *
-                (epfField?.employee_contribution ?? EMPLOYEE_EPF_PERCENTAGE)
-              ).toFixed(3)
-            );
-          } else if (entry.field_name.toLowerCase().includes("esi")) {
-            amount = Number.parseFloat(
-              (
-                getValueforESI({
-                  esi: esiField!,
-                  values: {
-                    valueForESIC,
-                  },
-                }) *
-                (esiField?.employee_contribution ?? ESI_EMPLOYEE_CONTRIBUTION)
-              ).toFixed(3)
-            );
-          } else if (entry.field_name.toLowerCase().includes("pt")) {
-            for (const range of JSON.parse(
-              ptField?.gross_salary_range as string
-            )) {
-              if (range.start <= grossValue && grossValue <= range.end) {
-                amount = range.value;
-                break;
-              }
-            }
-          } else if (entry.field_name.toLowerCase().includes("lwf")) {
-            if (lwfField?.deduction_cycle === "monthly") {
-              amount = lwfField?.employee_contribution ?? 0;
-            } else if (lwfField?.deduction_cycle === "yearly") {
-              amount = (lwfField?.employee_contribution ?? 0) / 12;
-            } else if (lwfField?.deduction_cycle === "half_yearly") {
-              amount = (lwfField?.employee_contribution ?? 0) / 6;
-            } else if (lwfField?.deduction_cycle === "quarterly") {
-              amount = (lwfField?.employee_contribution ?? 0) / 3;
-            }
-          } else if (
-            entry.field_name.toLowerCase() === "bonus" ||
-            entry.field_name.toLowerCase() === "statutory_bonus"
+        const calculatedEntries = employeeSalaryEntries.map((entry) => {
+          if (
+            entry.type === "statutory_contribution" ||
+            entry.type === "earning" ||
+            entry.type === "bonus"
           ) {
-            amount = Number.parseFloat(
-              (
-                ((bonusField?.percentage ?? BONUS_PERCENTAGE) * basicValue) /
-                100
-              ).toFixed(3)
-            );
+            let amount = null;
+            const field = entry.field_name.toLowerCase();
+            if (field.includes("pf")) {
+              amount = Number.parseFloat(
+                (
+                  getValueforEPF({ epf: epfField!, values: { valueForEPF } }) *
+                  (epfField?.employee_contribution ?? EMPLOYEE_EPF_PERCENTAGE)
+                ).toFixed(3)
+              );
+            } else if (field.includes("esi")) {
+              amount = Number.parseFloat(
+                (
+                  getValueforESI({ esi: esiField!, values: { valueForESIC } }) *
+                  (esiField?.employee_contribution ?? ESI_EMPLOYEE_CONTRIBUTION)
+                ).toFixed(3)
+              );
+            } else if (field.includes("pt")) {
+              for (const range of ptField?.gross_salary_range as any) {
+                if (grossValue >= range.start && grossValue <= range.end) {
+                  amount = range.value;
+                  break;
+                }
+              }
+            } else if (field.includes("lwf")) {
+              const contrib = lwfField?.employee_contribution ?? 0;
+              if (lwfField?.deduction_cycle === "monthly") amount = contrib;
+              else if (lwfField?.deduction_cycle === "yearly") amount = contrib / 12;
+              else if (lwfField?.deduction_cycle === "half_yearly") amount = contrib / 6;
+              else if (lwfField?.deduction_cycle === "quarterly") amount = contrib / 3;
+            } else if (field === "bonus" || field === "statutory_bonus") {
+              amount = Number.parseFloat(
+                (
+                  ((bonusField?.percentage ?? BONUS_PERCENTAGE) * basicValue) / 100
+                ).toFixed(3)
+              );
+            }
+            return { ...entry, amount: amount ?? entry.amount };
           }
-          return { ...entry, amount: amount ?? entry.amount };
-        }
-        return entry;
-      });
+          return entry;
+        });
 
-      let totalNetAmount = 0;
+        allSalaryEntries.push(...calculatedEntries);
+      }
 
-      totalNetAmount = calculateSalaryTotalNetAmount(salaryData);
+      const totalNetAmount = calculateSalaryTotalNetAmount(allSalaryEntries);
+
       const {
         status,
         error: salaryError,
         message,
       } = await createSalaryPayroll({
         supabase,
-        data: { type: "salary", salaryData, totalEmployees, totalNetAmount },
+        data: {
+          type: "salary",
+          salaryData: allSalaryEntries,
+          totalEmployees: uniqueEmployeeIds.size,
+          totalNetAmount,
+        },
         companyId: companyId ?? "",
       });
 
@@ -276,6 +233,7 @@ export async function action({
 
       error = salaryError;
     }
+
     if (type === "reimbursement") {
       const reimbursementData = JSON.parse(
         formData.get("reimbursementData") as string

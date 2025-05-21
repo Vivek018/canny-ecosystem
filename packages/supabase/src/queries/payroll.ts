@@ -531,3 +531,29 @@ export async function getSalaryEntriesByPayrollIdForSalaryRegister({
 
   return { data: filteredData, error: null };
 }
+
+export async function getPayrollEntriesByPayrollIdForPayrollRegister({
+  supabase,
+  payrollId,
+}: {
+  supabase: TypedSupabaseClient;
+  payrollId: string;
+}) {
+  const columns = ["payment_status", "amount"] as const;
+
+  const { data, error } = await supabase
+    .from("employees")
+    .select(
+      `id, company_id, first_name, middle_name, last_name, employee_code, payroll_entries!inner(${columns.join(
+        ","
+      )})`
+    )
+    .eq("payroll_entries.payroll_id", payrollId)
+    .returns<PayrollEntriesWithEmployee[]>();
+
+  if (error) {
+    console.error("getPayrollEntriesByPayrollId Error", error);
+  }
+
+  return { data, error: null };
+}

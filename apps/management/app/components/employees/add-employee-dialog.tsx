@@ -27,7 +27,7 @@ export function AddEmployeeDialog() {
         asChild
         className={cn(
           !hasPermission(role, `${createRole}:${attribute.employees}`) &&
-            "hidden",
+            "hidden"
         )}
       >
         <Button variant="outline" size="icon" className="h-10 w-10">
@@ -47,7 +47,7 @@ export function AddEmployeeDialog() {
           onClick={() => {
             searchParams.set(
               "step",
-              modalSearchParamNames.import_employee_details,
+              modalSearchParamNames.import_employee_details
             );
             setSearchParams(searchParams);
           }}
@@ -60,7 +60,7 @@ export function AddEmployeeDialog() {
           onClick={() => {
             searchParams.set(
               "step",
-              modalSearchParamNames.import_employee_statutory,
+              modalSearchParamNames.import_employee_statutory
             );
             setSearchParams(searchParams);
           }}
@@ -73,7 +73,7 @@ export function AddEmployeeDialog() {
           onClick={() => {
             searchParams.set(
               "step",
-              modalSearchParamNames.import_employee_bank_details,
+              modalSearchParamNames.import_employee_bank_details
             );
             setSearchParams(searchParams);
           }}
@@ -86,7 +86,7 @@ export function AddEmployeeDialog() {
           onClick={() => {
             searchParams.set(
               "step",
-              modalSearchParamNames.import_employee_address,
+              modalSearchParamNames.import_employee_address
             );
             setSearchParams(searchParams);
           }}
@@ -99,7 +99,7 @@ export function AddEmployeeDialog() {
           onClick={() => {
             searchParams.set(
               "step",
-              modalSearchParamNames.import_employee_guardians,
+              modalSearchParamNames.import_employee_guardians
             );
             setSearchParams(searchParams);
           }}
@@ -107,6 +107,19 @@ export function AddEmployeeDialog() {
         >
           <Icon name="import" size="sm" className="mb-0.5" />
           <span>Import Guardians</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            searchParams.set(
+              "step",
+              modalSearchParamNames.import_project_assignments
+            );
+            setSearchParams(searchParams);
+          }}
+          className="space-x-2 flex items-center"
+        >
+          <Icon name="import" size="sm" className="mb-0.5" />
+          <span>Import Project Assignments</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

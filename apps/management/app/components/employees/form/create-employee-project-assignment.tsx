@@ -36,7 +36,6 @@ type FieldsType = {
 };
 
 export const PROJECT_PARAM = "project";
-export const PROJECT_SITE_PARAM = "project-site";
 
 export const CreateEmployeeProjectAssignment = ({
   fields,
@@ -88,21 +87,11 @@ export const CreateEmployeeProjectAssignment = ({
             options={projectSiteOptions ?? []}
             inputProps={{
               ...getInputProps(fields.project_site_id, { type: "text" }),
-              defaultValue:
-                searchParams.get(PROJECT_SITE_PARAM) ??
-                String(fields.project_site_id.initialValue),
+              defaultValue: String(fields.project_site_id.initialValue),
             }}
             placeholder={"Select Project Site"}
             labelProps={{
               children: "Project Site",
-            }}
-            onChange={(projectSite) => {
-              if (projectSite?.length) {
-                searchParams.set(PROJECT_SITE_PARAM, projectSite);
-              } else {
-                searchParams.delete(PROJECT_SITE_PARAM);
-              }
-              setSearchParams(searchParams);
             }}
             errors={fields.project_site_id.errors}
           />
@@ -111,13 +100,13 @@ export const CreateEmployeeProjectAssignment = ({
           <SearchableSelectField
             className="capitalize"
             options={transformStringArrayIntoOptions(
-              assignmentTypeArray as unknown as string[],
+              assignmentTypeArray as unknown as string[]
             )}
             inputProps={{
               ...getInputProps(fields.assignment_type, { type: "text" }),
             }}
             placeholder={`Select ${replaceUnderscore(
-              fields.assignment_type.name,
+              fields.assignment_type.name
             )}`}
             labelProps={{
               children: replaceUnderscore(fields.assignment_type.name),
@@ -127,7 +116,7 @@ export const CreateEmployeeProjectAssignment = ({
           <SearchableSelectField
             className="capitalize"
             options={transformStringArrayIntoOptions(
-              positionArray as unknown as string[],
+              positionArray as unknown as string[]
             )}
             inputProps={{
               ...getInputProps(fields.position, { type: "text" }),
@@ -141,7 +130,7 @@ export const CreateEmployeeProjectAssignment = ({
           <SearchableSelectField
             className="capitalize"
             options={transformStringArrayIntoOptions(
-              skillLevelArray as unknown as string[],
+              skillLevelArray as unknown as string[]
             )}
             inputProps={{
               ...getInputProps(fields.skill_level, { type: "text" }),
@@ -160,7 +149,7 @@ export const CreateEmployeeProjectAssignment = ({
               placeholder: `Enter ${replaceUnderscore(fields.start_date.name)}`,
               max: getValidDateForInput(new Date().toISOString()),
               defaultValue: getValidDateForInput(
-                String(fields.start_date.initialValue),
+                String(fields.start_date.initialValue)
               ),
             }}
             labelProps={{
@@ -176,7 +165,7 @@ export const CreateEmployeeProjectAssignment = ({
               placeholder: `Enter ${replaceUnderscore(fields.end_date.name)}`,
               min: getValidDateForInput(String(fields.start_date.value)),
               defaultValue: getValidDateForInput(
-                String(fields.end_date.initialValue),
+                String(fields.end_date.initialValue)
               ),
             }}
             labelProps={{
@@ -200,10 +189,10 @@ export const CreateEmployeeProjectAssignment = ({
               type: "date",
             }),
             placeholder: `Enter ${replaceUnderscore(
-              fields.probation_end_date.name,
+              fields.probation_end_date.name
             )}`,
             defaultValue: getValidDateForInput(
-              String(fields.probation_end_date.initialValue),
+              String(fields.probation_end_date.initialValue)
             ),
           }}
           labelProps={{

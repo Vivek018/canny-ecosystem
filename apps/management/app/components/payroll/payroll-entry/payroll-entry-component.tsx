@@ -33,13 +33,14 @@ export function PayrollEntryComponent({
   payrollData,
   env,
   noButtons = false,
+  fromWhere,
 }: {
   data: PayrollEntriesWithEmployee[];
   payrollData: Omit<PayrollDatabaseRow, "created_at" | "updated_at">;
   noButtons?: boolean;
   env: SupabaseEnv;
+  fromWhere: "runpayroll" | "payrollhistory";
 }) {
-  
   const payrollCardDetails = [
     { title: "Payroll Type", value: "payroll_type" },
     { title: "Status", value: "status" },
@@ -182,6 +183,8 @@ export function PayrollEntryComponent({
           env={env}
           data={data}
           payrollData={payrollData}
+          fromWhere={fromWhere}
+          status={payrollData?.status}
         />
       </div>
       <PayrollEntryDataTable

@@ -57,7 +57,7 @@ export async function createSalaryPayroll({
   } = await supabase
     .from("payroll")
     .insert({
-      run_date: data.run_date ?? "",
+      run_date: data.run_date ?? null,
       status: data?.status ?? "pending",
       payroll_type: data.type ?? "salary",
       total_employees: data.totalEmployees,
@@ -180,7 +180,7 @@ export async function createReimbursementPayroll({
   } = await supabase
     .from("payroll")
     .insert({
-      run_date: data.run_date ?? "",
+      run_date: data.run_date ?? null,
       status: data?.status ?? "pending",
       payroll_type: data.type ?? "reimbursement",
       total_employees: data.totalEmployees,
@@ -301,7 +301,7 @@ export async function createExitPayroll({
   } = await supabase
     .from("payroll")
     .insert({
-      run_date: data.run_date ?? "",
+      run_date: data.run_date ?? null,
       status: data?.status ?? "pending",
       payroll_type: data.type ?? "exit",
       total_employees: data.totalEmployees,
