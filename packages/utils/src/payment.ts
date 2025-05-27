@@ -19,7 +19,7 @@ import {
 import { EMPLOYEE_EPF_PERCENTAGE } from "@canny_ecosystem/utils/constant";
 
 export function getSelectedPaymentComponentFromField<
-  T extends PaymentFieldDataType,
+  T extends PaymentFieldDataType
 >({
   field,
   monthlyCtc,
@@ -29,9 +29,9 @@ export function getSelectedPaymentComponentFromField<
   field: T | undefined | null;
   monthlyCtc: number;
   priortizedComponent?:
-  | Omit<PaymentTemplateComponentDatabaseRow, "created_at" | "updated_at">
-  | null
-  | undefined;
+    | Omit<PaymentTemplateComponentDatabaseRow, "created_at" | "updated_at">
+    | null
+    | undefined;
   existingComponent?: Omit<
     PaymentTemplateComponentDatabaseRow,
     "created_at" | "updated_at"
@@ -71,7 +71,7 @@ export function getSelectedPaymentComponentFromField<
 }
 
 export function getEPFComponentFromField<
-  T extends Omit<EmployeeProvidentFundDatabaseRow, "created_at" | "updated_at">,
+  T extends Omit<EmployeeProvidentFundDatabaseRow, "created_at" | "updated_at">
 >({
   field,
   value,
@@ -101,7 +101,7 @@ export function getEPFComponentFromField<
 }
 
 export function getESIComponentFromField<
-  T extends EmployeeStateInsuranceDataType,
+  T extends EmployeeStateInsuranceDataType
 >({
   field,
   value,
@@ -136,7 +136,7 @@ export function getPTComponentFromField<
     "gross_salary_range" | "created_at" | "updated_at"
   > & {
     gross_salary_range: any;
-  },
+  }
 >({
   field,
   value,
@@ -155,7 +155,10 @@ export function getPTComponentFromField<
 
   let calculationValue = 0;
 
-  const grossSalaryRange = typeof field.gross_salary_range === "string" ? JSON.parse(field.gross_salary_range) : field.gross_salary_range;
+  const grossSalaryRange =
+    typeof field.gross_salary_range === "string"
+      ? JSON.parse(field.gross_salary_range)
+      : field.gross_salary_range;
 
   for (const range of grossSalaryRange) {
     if (range.start <= value && value <= range.end) {
@@ -176,7 +179,7 @@ export function getPTComponentFromField<
 }
 
 export function getLWFComponentFromField<
-  T extends Omit<LabourWelfareFundDatabaseRow, "created_at" | "updated_at">,
+  T extends Omit<LabourWelfareFundDatabaseRow, "created_at" | "updated_at">
 >({
   field,
   existingComponent,
@@ -316,7 +319,9 @@ export function calculateProRataAmount({
   return Number.parseFloat((proRataAmount + overtimeAmount).toFixed(3));
 }
 
-export function calculateSalaryTotalNetAmount(salaryData: SalaryEntriesDatabaseUpdate[]): number {
+export function calculateSalaryTotalNetAmount(
+  salaryData: SalaryEntriesDatabaseUpdate[]
+): number {
   return salaryData.reduce((total, entry) => {
     if (entry.type === "earning" || entry.type === "bonus") {
       return total + (entry?.amount ?? 0);
@@ -324,6 +329,6 @@ export function calculateSalaryTotalNetAmount(salaryData: SalaryEntriesDatabaseU
     if (entry.type === "deduction" || entry.type === "statutory_contribution") {
       return total - (entry?.amount ?? 0);
     }
-    return total;
+    return Math.round(total);
   }, 0);
 }

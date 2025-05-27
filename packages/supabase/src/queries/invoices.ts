@@ -1,10 +1,12 @@
-import { formatUTCDate } from "@canny_ecosystem/utils";
+import { defaultYear, formatUTCDate } from "@canny_ecosystem/utils";
 import type {
   InferredType,
   InvoiceDatabaseRow,
   LocationDatabaseRow,
   TypedSupabaseClient,
 } from "../types";
+import type { DashboardFilters } from "./exits";
+import { months } from "@canny_ecosystem/utils/constant";
 
 export type InvoiceDataType = Pick<
   InvoiceDatabaseRow,
@@ -156,6 +158,7 @@ export async function getInvoicesByCompanyId({
     error,
   };
 }
+
 export async function getInvoiceById({
   supabase,
   id,
@@ -196,4 +199,73 @@ export async function getInvoiceById({
   }
 
   return { data, error };
+}
+
+export async function getInvoicesByCompanyIdForDashboard({
+  supabase,
+  companyId,
+  filters,
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+  filters?: DashboardFilters | null;
+}) {
+  const columns = ["is_paid", "date"] as const;
+  const defMonth = new Date().getMonth();
+  const filterMonth = filters?.month && Number(months[filters.month]);
+  const filterYear = filters?.year && Number(filters.year);
+
+  const startOfYear = filterMonth
+    ? new Date(Date.UTC(Number(filterYear ?? defaultYear) - 1, filterMonth, 1))
+    : new Date(
+        Date.UTC(Number(filterYear ?? defaultYear) - 1, defMonth + 1, 1)
+      );
+
+  const endOfYear = filterMonth
+    ? new Date(Number(filterYear ?? defaultYear), filterMonth, 1)
+    : new Date(Number(filterYear ?? defaultYear), defMonth + 1, 1);
+
+  const { data, error } = await supabase
+    .from("invoice")
+    .select(`${columns.join(",")}`)
+    .eq("company_id", companyId)
+    .gte("date", startOfYear.toISOString())
+    .lt("date", endOfYear.toISOString())
+    .order("date", { ascending: true })
+    .returns<InferredType<InvoiceDatabaseRow, (typeof columns)[number]>[]>();
+
+  if (error) {
+    console.error("getInvoiceDataByCompanyIdForDashboard Error", error);
+    return { data: null, error };
+  }
+  const groupedByMonthObj: Record<string, typeof data> = {};
+
+  const tempDate = new Date(startOfYear);
+  for (let i = 0; i < 12; i++) {
+    const month = tempDate.toLocaleString("default", { month: "short" });
+    const year = tempDate.getFullYear();
+    const key = `${month} ${year}`;
+    groupedByMonthObj[key] = [];
+    tempDate.setMonth(tempDate.getMonth() + 1);
+  }
+
+  for (const item of data) {
+    const date = new Date(item.date ?? "");
+    const month = date.toLocaleString("default", { month: "short" });
+    const year = date.getFullYear();
+    const key = `${month} ${year}`;
+
+    if (groupedByMonthObj[key]) {
+      groupedByMonthObj[key].push(item);
+    }
+  }
+
+  const groupedByMonth = Object.entries(groupedByMonthObj).map(
+    ([month, data]) => ({
+      month,
+      data,
+    })
+  );
+
+  return { data: groupedByMonth, error: null };
 }

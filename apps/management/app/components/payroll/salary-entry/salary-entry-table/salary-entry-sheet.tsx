@@ -61,7 +61,7 @@ export function SalaryEntrySheet({
 
             <div className="flex flex-col items-end justify-around">
               <h2 className="text-xl text-muted-foreground">Net Pay</h2>
-              <p className="font-bold">Rs {salaryEntry.amount}</p>
+              <p className="font-bold">Rs {salaryEntry?.amount}</p>
             </div>
           </SheetTitle>
         </SheetHeader>
@@ -71,7 +71,7 @@ export function SalaryEntrySheet({
               method="POST"
               {...getFormProps(form)}
               className="flex flex-col"
-              action={`/payroll/run-payroll/${salaryEntry.payroll_id}/${salaryEntry.id}/update-salary-entry`}
+              action={`/payroll/run-payroll/${salaryEntry?.payroll_id}/${salaryEntry?.id}/update-salary-entry`}
             >
               <input
                 {...getInputProps(fields.id, { type: "hidden" })}

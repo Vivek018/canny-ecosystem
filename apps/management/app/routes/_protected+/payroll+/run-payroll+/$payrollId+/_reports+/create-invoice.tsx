@@ -59,6 +59,7 @@ import { parseMultipartFormData } from "@remix-run/server-runtime/dist/formData"
 import { createMemoryUploadHandler } from "@remix-run/server-runtime/dist/upload/memoryUploadHandler";
 import { useEffect, useState } from "react";
 import { UPDATE_INVOICE_TAG } from "../../../invoices+/$invoiceId.update-invoice";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
 
 const ADD_INVOICE_TAG = "Create-Invoice";
 
@@ -251,22 +252,33 @@ export default function CreateInvoice({
   }
 
   function transformSalaryData(employees: any) {
-    const fieldTotals: Record<string, number> = {};
+    const fieldTotals: Record<string, { rawAmount: number; type: string }> = {};
 
     for (const emp of employees) {
       for (const entry of emp.salary_entries) {
         const field = entry.field_name;
         if (!fieldTotals[field]) {
-          fieldTotals[field] = 0;
+          fieldTotals[field] = { rawAmount: 0, type: entry.type };
         }
-        fieldTotals[field] += entry.amount;
+        fieldTotals[field].rawAmount += entry.amount;
       }
     }
+    const basicAmount = fieldTotals.BASIC?.rawAmount ?? 0;
+    return Object.entries(fieldTotals).map(([field, data]) => {
+      let amount = data.rawAmount;
 
-    return Object.entries(fieldTotals).map(([field, value]) => ({
-      field,
-      amount: Number(value.toFixed(2)),
-    }));
+      if (field === "PF" || field === "EPF") {
+        amount = (basicAmount * 13) / 100;
+      } else if (field === "ESIC" || field === "ESI") {
+        amount = (amount * 3.25) / 0.75;
+      }
+
+      return {
+        field,
+        amount: Number(amount.toFixed(2)),
+        type: data.type,
+      };
+    });
   }
 
   const actionData = useActionData<typeof action>();
@@ -551,6 +563,17 @@ export default function CreateInvoice({
                 ]}
                 errors={fields.payroll_data.errors}
               />
+              <p
+                className={cn(
+                  "text-muted-foreground hidden",
+                  (updateValues?.payroll_type ??
+                    payroll?.payroll_type === "salary") &&
+                    "flex"
+                )}
+              >
+                Note : As Esic values are not fixed and cant be calculated,
+                kindly edit manualy above
+              </p>
             </CardContent>
             <FormButtons
               form={form}

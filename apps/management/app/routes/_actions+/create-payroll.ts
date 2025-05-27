@@ -37,8 +37,8 @@ export async function action({
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-
     const formData = await request.formData();
+    const skipped = formData.get("skipped") as string;
     const type = formData.get("type") as string;
     const failedRedirect = formData.get("failedRedirect") as string;
     let error = null;
@@ -94,11 +94,16 @@ export async function action({
         for (const component of paymentTemplateComponents) {
           let amount = component.calculation_value ?? 0;
 
-          if (component.target_type === "epf") epfField = component.employee_provident_fund;
-          if (component.target_type === "esi") esiField = component.employee_state_insurance;
-          if (component.target_type === "pt") ptField = component.professional_tax;
-          if (component.target_type === "lwf") lwfField = component.labour_welfare_fund;
-          if (component.target_type === "bonus") bonusField = component.statutory_bonus;
+          if (component.target_type === "epf")
+            epfField = component.employee_provident_fund;
+          if (component.target_type === "esi")
+            esiField = component.employee_state_insurance;
+          if (component.target_type === "pt")
+            ptField = component.professional_tax;
+          if (component.target_type === "lwf")
+            lwfField = component.labour_welfare_fund;
+          if (component.target_type === "bonus")
+            bonusField = component.statutory_bonus;
 
           if (
             component.target_type === "payment_field" &&
@@ -126,11 +131,14 @@ export async function action({
             field_name:
               component.target_type === "payment_field"
                 ? component.payment_fields?.name
-                : component.target_type.toUpperCase() ?? component.component_type,
+                : component.target_type.toUpperCase() ??
+                  component.component_type,
             type: component.component_type,
             is_pro_rata: component.payment_fields?.is_pro_rata ?? false,
-            consider_for_epf: component.payment_fields?.consider_for_epf ?? false,
-            consider_for_esic: component.payment_fields?.consider_for_esic ?? false,
+            consider_for_epf:
+              component.payment_fields?.consider_for_epf ?? false,
+            consider_for_esic:
+              component.payment_fields?.consider_for_esic ?? false,
             amount,
             is_overtime:
               component.target_type === "payment_field"
@@ -146,12 +154,15 @@ export async function action({
 
         for (const entry of employeeSalaryEntries) {
           if (entry.type === "earning") grossValue += entry.amount;
-          if (entry.field_name.toLowerCase() === "basic") basicValue = entry.amount;
+          if (entry.field_name.toLowerCase() === "basic")
+            basicValue = entry.amount;
           if (entry.consider_for_epf) {
-            valueForEPF += entry.type === "earning" ? entry.amount : -entry.amount;
+            valueForEPF +=
+              entry.type === "earning" ? entry.amount : -entry.amount;
           }
           if (entry.consider_for_esic) {
-            valueForESIC += entry.type === "earning" ? entry.amount : -entry.amount;
+            valueForESIC +=
+              entry.type === "earning" ? entry.amount : -entry.amount;
           }
         }
 
@@ -187,13 +198,17 @@ export async function action({
             } else if (field.includes("lwf")) {
               const contrib = lwfField?.employee_contribution ?? 0;
               if (lwfField?.deduction_cycle === "monthly") amount = contrib;
-              else if (lwfField?.deduction_cycle === "yearly") amount = contrib / 12;
-              else if (lwfField?.deduction_cycle === "half_yearly") amount = contrib / 6;
-              else if (lwfField?.deduction_cycle === "quarterly") amount = contrib / 3;
+              else if (lwfField?.deduction_cycle === "yearly")
+                amount = contrib / 12;
+              else if (lwfField?.deduction_cycle === "half_yearly")
+                amount = contrib / 6;
+              else if (lwfField?.deduction_cycle === "quarterly")
+                amount = contrib / 3;
             } else if (field === "bonus" || field === "statutory_bonus") {
               amount = Number.parseFloat(
                 (
-                  ((bonusField?.percentage ?? BONUS_PERCENTAGE) * basicValue) / 100
+                  ((bonusField?.percentage ?? BONUS_PERCENTAGE) * basicValue) /
+                  100
                 ).toFixed(3)
               );
             }
@@ -352,6 +367,14 @@ export async function action({
       });
 
       if (isGoodStatus(status)) {
+        if (Number(skipped) > 0) {
+          return json({
+            status: "success",
+            message: `Salary Payroll Created  with ${skipped} skipped entries`,
+            failedRedirect,
+            error: null,
+          });
+        }
         return json({
           status: "success",
           message: message ?? "Import Salary Payroll Created Successfully",

@@ -444,7 +444,6 @@ export async function getApprovedPayrollsByCompanyIdByYears({
 
   const groupedByMonthObj: Record<string, typeof data> = {};
 
-  // Build placeholder for last 12 months
   const tempDate = new Date(startOfYear);
   for (let i = 0; i < 12; i++) {
     const month = tempDate.toLocaleString("default", { month: "short" });
@@ -454,7 +453,6 @@ export async function getApprovedPayrollsByCompanyIdByYears({
     tempDate.setMonth(tempDate.getMonth() + 1);
   }
 
-  // Group actual data into corresponding months
   for (const item of data) {
     const date = new Date(item.run_date ?? "");
     const month = date.toLocaleString("default", { month: "short" });

@@ -12,6 +12,7 @@ interface Props {
 
 // make sure the order is same as header order
 export const payrollEntryColumnIdArray = [
+  "sr_no",  
   "employee_code",
   "name",
   "amount",
