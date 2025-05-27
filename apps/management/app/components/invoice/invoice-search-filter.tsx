@@ -174,7 +174,7 @@ export function InvoiceSearchFilter({
           <Icon
             name={isSubmitting ? "update" : "search"}
             className={cn(
-              "absolute pointer-events-none left-3 top-[12.5px]",
+              "absolute pointer-events-none left-3 top-[15px]",
               isSubmitting && "animate-spin"
             )}
           />
@@ -189,6 +189,7 @@ export function InvoiceSearchFilter({
             autoCapitalize="none"
             autoCorrect="off"
             spellCheck="false"
+            placeholder="Search invoices"
           />
 
           <DropdownMenuTrigger disabled={disabled} asChild>

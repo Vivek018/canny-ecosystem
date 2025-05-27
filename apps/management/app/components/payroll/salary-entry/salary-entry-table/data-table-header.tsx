@@ -17,6 +17,7 @@ export function SalaryTableHeader({ table, loading, className }: Props) {
 
   // make sure the order is same as header order
   const salaryEntryColumnIdArray = [
+    "sr_no",
     "employee_code",
     "name",
     "present_days",
@@ -25,6 +26,7 @@ export function SalaryTableHeader({ table, loading, className }: Props) {
     ...(salaryEntries?.map((salaryEntry) => {
       return salaryEntry.field_name ?? salaryEntry.template_component_id;
     }) ?? []),
+    "net_amount",
     "actions",
   ];
 

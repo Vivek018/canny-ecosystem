@@ -137,11 +137,14 @@ export async function getEmployeesByCompanyId({
     .from("employees")
     .select(
       `${columns.join(",")},
-        employee_project_assignment!employee_project_assignments_employee_id_fkey!${hasProjectAssignmentFilter ? "inner" : "left"
-      }(
+        employee_project_assignment!employee_project_assignments_employee_id_fkey!${
+          hasProjectAssignmentFilter ? "inner" : "left"
+        }(
         employee_id, assignment_type, skill_level, position, start_date, end_date,
-        project_sites!${hasProjectAssignmentFilter ? "inner" : "left"
-      }(id, name, projects!${hasProjectAssignmentFilter ? "inner" : "left"
+        project_sites!${
+          hasProjectAssignmentFilter ? "inner" : "left"
+        }(id, name, projects!${
+        hasProjectAssignmentFilter ? "inner" : "left"
       }(id, name))
       )`,
       { count: "exact" }
@@ -328,6 +331,7 @@ export async function getEmployeesByPositionAndProjectSiteId({
     error,
   };
 }
+
 export async function getEmployeeIdsByEmployeeCodes({
   supabase,
   employeeCodes,
@@ -345,9 +349,78 @@ export async function getEmployeeIdsByEmployeeCodes({
 
   if (error) {
     console.error("getEmployeeIdsByEmployeeCodes Error", error);
+    return { data: [], missing: [], error };
   }
 
-  return { data, error };
+  const foundCodes = data.map((e) => e.employee_code);
+  const missing = employeeCodes.filter((code) => !foundCodes.includes(code));
+
+  return { data, missing, error };
+}
+
+export async function getEmployeeIdsByUanNumber({
+  supabase,
+  uan_number,
+}: {
+  supabase: TypedSupabaseClient;
+  uan_number: string[];
+}) {
+  const columns = ["uan_number", "employee_id"] as const;
+
+  const { data, error } = await supabase
+    .from("employee_statutory_details")
+    .select(columns.join(","))
+    .in("uan_number", uan_number)
+    .returns<
+      InferredType<
+        EmployeeStatutoryDetailsDatabaseRow,
+        (typeof columns)[number]
+      >[]
+    >();
+
+  if (error) {
+    console.error("getEmployeeIdsByUanNumber Error", error);
+    return { data: [], missing: [], error };
+  }
+
+  const foundCodes = data.map((e) => e.uan_number);
+  const missing = uan_number.filter(
+    (uan_number) => !foundCodes.includes(uan_number)
+  );
+
+  return { data, missing, error };
+}
+export async function getEmployeeIdsByEsicNumber({
+  supabase,
+  esic_number,
+}: {
+  supabase: TypedSupabaseClient;
+  esic_number: string[];
+}) {
+  const columns = ["esic_number", "employee_id"] as const;
+
+  const { data, error } = await supabase
+    .from("employee_statutory_details")
+    .select(columns.join(","))
+    .in("esic_number", esic_number)
+    .returns<
+      InferredType<
+        EmployeeStatutoryDetailsDatabaseRow,
+        (typeof columns)[number]
+      >[]
+    >();
+
+  if (error) {
+    console.error("getEmployeeIdsByesicNumber Error", error);
+    return { data: [], missing: [], error };
+  }
+
+  const foundCodes = data.map((e) => e.esic_number);
+  const missing = esic_number.filter(
+    (esic_number) => !foundCodes.includes(esic_number)
+  );
+
+  return { data, missing, error };
 }
 
 export async function getEmployeeById({
@@ -922,10 +995,12 @@ export async function getEmployeesReportByCompanyId({
     .from("employees")
     .select(
       `${columns.join(",")},
-        employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
-      }(
+        employee_project_assignment!employee_project_assignments_employee_id_fkey!${
+          project ? "inner" : "left"
+        }(
         employee_id, assignment_type, skill_level, position, start_date, end_date,
-        project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
+        project_sites!${project ? "inner" : "left"}(id, name, projects!${
+        project ? "inner" : "left"
       }(id, name))
       )`,
       { count: "exact" }

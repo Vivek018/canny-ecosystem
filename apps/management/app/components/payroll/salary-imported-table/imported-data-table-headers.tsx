@@ -18,7 +18,7 @@ export function ImportedDataTableHeader({
   loading,
   fieldConfigs,
 }: Props) {
-  const ImportPayrollDataArray: string[] = [];
+  const ImportPayrollDataArray: string[] = ["sr_no"];
 
   for (const { key } of fieldConfigs) {
     const lowerKey = key.toLowerCase();

@@ -202,51 +202,25 @@ const InvoicePDF = ({
     { label: "C.G.S.T @ 9%", border: false },
     { label: "S.G.S.T @ 9%", border: false },
     { label: "I.G.S.T @ 18%", border: false },
-    { label: "Grand Total", border: true },
+    { label: "Grand Total", border: true, bold: true },
   ];
-  const totalHraOthers =
+
+  const totalGross =
+    data?.invoiceDetails?.payroll_data
+      ?.filter((item) => item.type === "earning")
+      ?.reduce((sum, item) => sum + Number(item.amount), 0) ?? 0;
+
+  const beforeService =
+    totalGross +
     Number(
-      data?.invoiceDetails?.payroll_data?.find((item) => item.field === "HRA")
-        ?.amount ?? 0
-    ) +
-    Number(
-      data?.invoiceDetails?.payroll_data?.find((item) => item.field === "LTA")
-        ?.amount ?? 0
+      data?.invoiceDetails?.payroll_data?.find(
+        (item) => item.field === "PF" || item.field === "EPF"
+      )?.amount ?? 0
     ) +
     Number(
       data?.invoiceDetails?.payroll_data?.find(
-        (item) => item.field === "OTHERS"
-      )?.amount ?? 0
-    );
-  const totalGross =
-    Number(
-      data?.invoiceDetails?.payroll_data?.find((item) => item.field === "BASIC")
-        ?.amount ?? 0
-    ) + totalHraOthers;
-
-  const totalPf =
-    (Number(
-      data?.invoiceDetails?.payroll_data?.find((item) => item.field === "BASIC")
-        ?.amount ?? 0
-    ) *
-      13) /
-    100;
-
-  const totalEsic =
-    (Number(
-      data.invoiceDetails?.payroll_data?.find(
         (item) => item.field === "ESIC" || item.field === "ESI"
       )?.amount ?? 0
-    ) *
-      3.25) /
-    0.75;
-  const beforeService =
-    totalGross +
-    totalPf +
-    totalEsic +
-    Number(
-      data?.invoiceDetails?.payroll_data?.find((item) => item.field === "BONUS")
-        ?.amount ?? 0
     );
 
   const includedFields = terms.include_service_charge
@@ -443,9 +417,18 @@ const InvoicePDF = ({
               >
                 <Text style={{ fontFamily: "Helvetica" }}>
                   {field.field === "ESIC" || field.field === "ESI"
-                    ? totalEsic.toFixed(2)
+                    ? Number(
+                        data?.invoiceDetails?.payroll_data?.find(
+                          (item) =>
+                            item.field === "ESIC" || item.field === "ESI"
+                        )?.amount ?? 0
+                      )
                     : field.field === "PF" || field.field === "EPF"
-                    ? totalPf.toFixed(2)
+                    ? Number(
+                        data?.invoiceDetails?.payroll_data?.find(
+                          (item) => item.field === "PF" || item.field === "EPF"
+                        )?.amount ?? 0
+                      )
                     : field.amount}
                 </Text>
               </View>
@@ -523,7 +506,11 @@ const InvoicePDF = ({
                   padding: 4,
                 }}
               >
-                <Text style={{ fontFamily: "Helvetica" }}>
+                <Text
+                  style={{
+                    fontFamily: field.bold ? "Helvetica-Bold" : "Helvetica",
+                  }}
+                >
                   {calculatedValues[
                     field.label as keyof typeof calculatedValues
                   ]?.toFixed(2) || 0}
@@ -1004,16 +991,31 @@ const InvoicePDF = ({
                   )?.amount ?? 0
                 ).toFixed(2),
               },
-              { label: "HRA and Others", value: totalHraOthers.toFixed(2) },
-              { label: "P.F. (13%)", value: totalPf.toFixed(2) },
-              { label: "ESIC (3.25%)", value: totalEsic.toFixed(2) },
               {
-                label: "Bonus (8.33%)",
+                label: "HRA and Others",
+                value:
+                  totalGross -
+                  Number(
+                    data?.invoiceDetails?.payroll_data?.find(
+                      (item) => item.field === "BASIC"
+                    )?.amount ?? 0
+                  ),
+              },
+              {
+                label: "P.F. (13%)",
                 value: Number(
                   data?.invoiceDetails?.payroll_data?.find(
-                    (item) => item.field === "BONUS"
+                    (item) => item.field === "PF" || item.field === "EPF"
                   )?.amount ?? 0
-                ).toFixed(2),
+                ),
+              },
+              {
+                label: "ESIC (3.25%)",
+                value: Number(
+                  data?.invoiceDetails?.payroll_data?.find(
+                    (item) => item.field === "ESIC" || item.field === "ESI"
+                  )?.amount ?? 0
+                ),
               },
               {
                 label: `Service Charge (${
@@ -1026,12 +1028,13 @@ const InvoicePDF = ({
               { label: "Total C.T.C", value: total.toFixed(2) },
               {
                 label: "IGST (18%)",
-                value:
-                  igst !== undefined && !Number(igst)
-                    ? igst.toFixed(2)
-                    : (cgst + sgst).toFixed(2),
+                value: igst === 0 ? (cgst + sgst).toFixed(2) : igst.toFixed(2),
               },
-              { label: "Total Bill Amount", value: grand_total.toFixed(2) },
+              {
+                label: "Total Bill Amount",
+                value: grand_total.toFixed(2),
+                bold: true,
+              },
             ].map((item, index) => (
               <View
                 key={index.toString()}
@@ -1056,6 +1059,7 @@ const InvoicePDF = ({
                     width: 100,
                     textAlign: "left",
                     borderBottom: "0.1pt solid #000000",
+                    fontFamily: item.bold ? "Helvetica-Bold" : "Helvetica",
                   }}
                 >
                   {item.value}
@@ -1252,7 +1256,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const response = await fetch(invoiceData?.proof!);
     contentType = response.headers.get("Content-Type") || undefined;
   }
-  
+
   return {
     data: {
       employeeCompanyData,
@@ -1267,7 +1271,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export default function PreviewInvoice() {
-  const { data, payroll, companyRelations,contentType } = useLoaderData<typeof loader>();
+  const { data, payroll, companyRelations, contentType } =
+    useLoaderData<typeof loader>();
   const navigate = useNavigate();
   const { isDocument } = useIsDocument();
 
@@ -1577,7 +1582,6 @@ export default function PreviewInvoice() {
   const handleOpenChange = () => {
     navigate("/payroll/invoices");
   };
-
 
   return (
     <Dialog defaultOpen={true} onOpenChange={handleOpenChange}>

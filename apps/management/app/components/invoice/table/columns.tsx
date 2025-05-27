@@ -111,7 +111,7 @@ export const columns: ColumnDef<InvoiceDataType>[] = [
   {
     enableSorting: false,
     accessorKey: "is_paid",
-    header: "is_paid",
+    header: "Is Paid",
     cell: ({ row }) => {
       return (
         <p className="truncate">{row.original?.is_paid ? "True" : "False"}</p>

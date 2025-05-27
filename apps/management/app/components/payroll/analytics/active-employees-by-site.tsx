@@ -11,7 +11,7 @@ import {
   ChartContainer,
   ChartTooltip,
 } from "@canny_ecosystem/ui/chart";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 const chartConfig = {
   count: {
@@ -57,9 +57,10 @@ export function ActiveEmployeesBySite({ chartData }: { chartData: any[] }) {
 
   const finalData = groupByProjectAndSite(chartData);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const chartRef = useRef<HTMLDivElement>(null);
 
   return (
-    <Card className="flex flex-col">
+    <Card className="flex flex-col gap-20">
       <CardHeader className="items-center pb-0">
         <CardTitle>Employees by Project</CardTitle>
       </CardHeader>
@@ -67,6 +68,7 @@ export function ActiveEmployeesBySite({ chartData }: { chartData: any[] }) {
         <ChartContainer
           config={chartConfig}
           className="mx-auto aspect-square max-h-[250px] w-full pb-0 [&_.recharts-pie-label-text]:fill-foreground"
+          ref={chartRef}
         >
           <PieChart>
             <ChartTooltip
@@ -83,9 +85,7 @@ export function ActiveEmployeesBySite({ chartData }: { chartData: any[] }) {
                         <div className="flex items-center gap-2">
                           <div
                             className="w-3 h-3 rounded-sm"
-                            style={{
-                              backgroundColor: projectData.fill,
-                            }}
+                            style={{ backgroundColor: projectData.fill }}
                           />
                           <span>{site}</span>
                         </div>
@@ -95,7 +95,6 @@ export function ActiveEmployeesBySite({ chartData }: { chartData: any[] }) {
                   </div>
                 );
               }}
-              position={{ x: 535, y: 0 }}
               wrapperStyle={{ zIndex: 1000 }}
               cursor={false}
             />
