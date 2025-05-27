@@ -1,6 +1,10 @@
 import { useImportStoreForSalaryPayroll } from "@/store/import";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
-import { getEmployeeIdsByEmployeeCodes } from "@canny_ecosystem/supabase/queries";
+import {
+  getEmployeeIdsByEmployeeCodes,
+  getEmployeeIdsByEsicNumber,
+  getEmployeeIdsByUanNumber,
+} from "@canny_ecosystem/supabase/queries";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
@@ -37,29 +41,87 @@ export function SalaryPayrollImportData({
   }, [searchString, importData]);
 
   const handleFinalImport = async () => {
-    const employeeCodes = importData.data!.map((value) => value.employee_code);
-    const { data: employees, error: codeError } =
-      await getEmployeeIdsByEmployeeCodes({
-        supabase,
-        employeeCodes,
-      });
+    const importEntries = importData.data! as any[];
+
+    const employeeCodes = importEntries
+      .map((entry) => entry.employee_code)
+      .filter(Boolean);
+    const {
+      data: employeesByCode,
+      error: codeError,
+      missing: missingCodes,
+    } = await getEmployeeIdsByEmployeeCodes({ supabase, employeeCodes });
     if (codeError) throw codeError;
 
-    const updatedData = importData.data!.map((item: any) => {
-      const employeeId = employees?.find(
-        (e) => e.employee_code === item.employee_code
-      )?.id;
-      const { employee_code, ...rest } = item;
-      return {
-        ...rest,
-        ...(employeeId ? { employee_id: employeeId } : {}),
-      };
-    });
+    let unresolvedEntries = importEntries.filter((entry) =>
+      missingCodes.includes(entry.employee_code)
+    );
+
+    const uanNumbers = unresolvedEntries
+      .map((entry) => entry.uan_number)
+      .filter(Boolean);
+
+    const { data: employeesByUAN, error: uanError } =
+      await getEmployeeIdsByUanNumber({ supabase, uan_number: uanNumbers });
+    if (uanError) throw uanError;
+
+    const resolvedUANs = employeesByUAN.map((e) => e.uan_number);
+    unresolvedEntries = unresolvedEntries.filter(
+      (entry) => !resolvedUANs.includes(entry.uan_number)
+    );
+
+    const esicNumbers = unresolvedEntries
+      .map((entry) => entry.esic_number)
+      .filter(Boolean);
+
+    const { data: employeesByESIC, error: esicError } =
+      await getEmployeeIdsByEsicNumber({ supabase, esic_number: esicNumbers });
+    if (esicError) throw esicError;
+
+    const allEmployees = [
+      ...(employeesByCode?.map((e) => ({
+        matchKey: e.employee_code,
+        id: e.id,
+        type: "employee_code",
+      })) ?? []),
+      ...(employeesByUAN?.map((e) => ({
+        matchKey: e.uan_number,
+        id: e.employee_id,
+        type: "uan_number",
+      })) ?? []),
+      ...(employeesByESIC?.map((e) => ({
+        matchKey: e.esic_number,
+        id: e.employee_id,
+        type: "esic_number",
+      })) ?? []),
+    ];
+
+    const updatedData = importEntries
+      .map((item) => {
+        const matched = allEmployees.find(
+          (e) =>
+            (e.type === "employee_code" && e.matchKey === item.employee_code) ||
+            (e.type === "uan_number" && e.matchKey === item.uan_number) ||
+            (e.type === "esic_number" && e.matchKey === item.esic_number)
+        );
+
+        const { employee_code, uan_number, esic_number, ...rest } = item;
+        return {
+          ...rest,
+          ...(matched ? { employee_id: matched.id } : {}),
+        };
+      })
+      .filter((item) => item.employee_id);
+
 
     submit(
       {
         type: "salary-import",
         salaryImportData: JSON.stringify(updatedData),
+        skipped:
+          importData.data.length - updatedData.length > 0
+            ? importData.data.length - updatedData.length
+            : 0,
         failedRedirect: "/payroll",
       },
       {

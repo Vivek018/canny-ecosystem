@@ -41,7 +41,7 @@ import {
 import { payoutMonths } from "@canny_ecosystem/utils/constant";
 
 export type FieldConfig = {
-  key: keyof z.infer<typeof ImportSalaryPayrollHeaderSchemaObject>;
+  key: string;
   required?: boolean;
   type?: string;
 };
@@ -51,7 +51,14 @@ const FIELD_CONFIGS: FieldConfig[] = [
     key: "employee_code",
     required: true,
   },
-
+  {
+    key: "uan_number",
+    required: false,
+  },
+  {
+    key: "esic_number",
+    required: true,
+  },
   {
     key: "present_days",
     required: true,
@@ -76,8 +83,35 @@ export default function PayrollImportFieldMapping() {
   const [month, setMonth] = useState(defaultMonth + 2);
   const [year, setYear] = useState(defaultYear);
   const [open, setOpen] = useState(false);
-  const [fieldConfigs, setFieldConfigs] =
-    useState<FieldConfig[]>(FIELD_CONFIGS);
+  const [fieldConfigs, setFieldConfigs] = useState<FieldConfig[]>([
+    ...FIELD_CONFIGS,
+    {
+      key: "BASIC",
+      required: true,
+      type: "earning",
+    },
+    {
+      key: "HRA",
+      type: "earning",
+    },
+    {
+      key: "LTA",
+      type: "earning",
+    },
+    {
+      key: "PF",
+      type: "statutory_contribution",
+    },
+    {
+      key: "ESIC",
+      type: "statutory_contribution",
+    },
+    {
+      key: "PT",
+      type: "statutory_contribution",
+    },
+  ]);
+
   const [loadNext, setLoadNext] = useState(false);
   const location = useLocation();
   const [file] = useState(location.state?.file);
@@ -340,20 +374,35 @@ export default function PayrollImportFieldMapping() {
 
             <div className="grid grid-cols-2 place-content-center justify-between gap-y-8 gap-x-10 mt-5 mb-10">
               {fieldConfigs.map((field) => (
-                <div key={field.key} className="flex flex-col">
-                  <div className="flex flex-row gap-1 pb-1">
-                    <label className="text-sm text-muted-foreground capitalize">
-                      {replaceUnderscore(field.key)}
-                    </label>
-                    <sub
-                      className={cn(
-                        "hidden text-primary mt-1",
-                        field.required && "inline"
-                      )}
+                <div key={field.key} className="flex flex-col relative">
+                  <div className="flex flex-row justify-between items-center">
+                    <div className="flex gap-1">
+                      <label className="text-sm text-muted-foreground capitalize">
+                        {replaceUnderscore(field.key)}
+                      </label>
+                      <sub
+                        className={cn(
+                          "hidden text-primary mt-1",
+                          field.required && "inline"
+                        )}
+                      >
+                        *
+                      </sub>
+                    </div>
+                    <Button
+                      variant={"ghost"}
+                      onClick={() =>
+                        setFieldConfigs((prev) =>
+                          prev.filter((f) => f.key !== field.key)
+                        )
+                      }
+                      className="p-0 h-0 text-destructive text-xs font-extrabold"
+                      title="Remove field"
                     >
-                      *
-                    </sub>
+                      ✕
+                    </Button>
                   </div>
+
                   <Combobox
                     options={transformStringArrayIntoOptions(headerArray)}
                     value={
@@ -378,6 +427,7 @@ export default function PayrollImportFieldMapping() {
                     placeholder={`Select ${replaceUnderscore(field.key)}`}
                     className={errors[field.key] ? "border-red-500" : ""}
                   />
+
                   {errors[field.key] && (
                     <span className="text-red-500 text-sm mt-1">
                       {errors[field.key]}
@@ -386,7 +436,8 @@ export default function PayrollImportFieldMapping() {
                 </div>
               ))}
             </div>
-            <Dialog open={open}>
+
+            <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild className="mt-3">
                 <Button
                   variant={"primary-outline"}
@@ -432,6 +483,7 @@ export default function PayrollImportFieldMapping() {
                 <DialogFooter className="mt-2">
                   <DialogClose
                     className={buttonVariants({ variant: "secondary" })}
+                    onClick={() => setOpen(false)}
                   >
                     Cancel
                   </DialogClose>

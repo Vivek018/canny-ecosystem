@@ -785,25 +785,6 @@ export async function updateEmployeeProjectAssignment({
   return { status, error };
 }
 
-export async function updateEmployeeProjectAssignmentSupervisorId({
-  supabase,
-  employeeId,
-}: {
-  supabase: TypedSupabaseClient;
-  employeeId: string;
-}) {
-  const { error, status } = await supabase
-    .from("employee_project_assignment")
-    .update({ supervisor_id: employeeId })
-    .eq("employee_id", employeeId);
-
-  if (error) {
-    console.error("updateEmployeeProjectAssignmentPosition Error:", error);
-  }
-
-  return { status, error };
-}
-
 export async function getEmployeeDetailsConflicts({
   supabase,
   importedData,
