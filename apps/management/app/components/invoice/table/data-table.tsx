@@ -25,6 +25,7 @@ import { useInvoiceStore } from "@/store/invoices";
 import { Spinner } from "@canny_ecosystem/ui/spinner";
 import { Button } from "@canny_ecosystem/ui/button";
 import { useSearchParams } from "@remix-run/react";
+import { ExportBar } from "../export-bar";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -101,9 +102,9 @@ export function InvoiceTable<TData, TValue>({
     }
   }, [inView]);
 
-  // const selectedRowsData = table
-  //   .getSelectedRowModel()
-  //   .rows?.map((row) => row.original);
+  const selectedRowsData = table
+    .getSelectedRowModel()
+    .rows?.map((row) => row.original);
 
   useEffect(() => {
     setData(initialData);
@@ -215,6 +216,11 @@ export function InvoiceTable<TData, TValue>({
           </div>
         </div>
       )}
+      <ExportBar
+        className={cn(!table.getSelectedRowModel().rows.length && "hidden")}
+        rows={table.getSelectedRowModel().rows.length}
+        data={selectedRowsData as InvoiceDataType[]}
+      />
     </div>
   );
 }

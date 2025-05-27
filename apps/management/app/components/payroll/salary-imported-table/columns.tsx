@@ -6,17 +6,26 @@ import type { ColumnDef } from "@tanstack/react-table";
 
 import { ImportedSalaryPayrollOptionsDropdown } from "./imported-table-options";
 import type { FieldConfig } from "@/routes/_protected+/payroll+/run-payroll+/import-salary-payroll+/_index";
+import { replaceUnderscore } from "@canny_ecosystem/utils";
 
 export const ImportedDataColumns = (
   fieldConfigs: FieldConfig[]
 ): ColumnDef<ImportSalaryPayrollDataType>[] => [
+  {
+    accessorKey: "sr_no",
+    header: "Sr No.",
+    cell: ({ row }) => {
+      return <p className="truncate ">{row.index + 1}</p>;
+    },
+  },
   ...fieldConfigs.map((field) => ({
     accessorKey: field.key.toLowerCase(),
-    header: field.key,
+    header: replaceUnderscore(field.key),
     cell: ({ row }: { row: { original: ImportSalaryPayrollDataType } }) => {
-      const key = field.key.toLowerCase();
+      const key = field.key;
 
-      const value :any = row.original?.[key as keyof ImportSalaryPayrollDataType];
+      const value: any =
+        row.original?.[key as keyof ImportSalaryPayrollDataType];
       const displayColor =
         typeof value === "object"
           ? value?.type === "earning"

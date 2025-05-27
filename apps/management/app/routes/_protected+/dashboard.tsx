@@ -12,6 +12,8 @@ import {
   getApprovedPayrollsAmountsByCompanyIdByMonths,
   getApprovedPayrollsByCompanyIdByYears,
   getExitsByCompanyIdByMonths,
+  getInvoicesByCompanyIdForDashboard,
+  type InvoiceDataType,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { defer, type LoaderFunctionArgs } from "@remix-run/node";
@@ -22,7 +24,7 @@ import type {
   PayrollDatabaseRow,
 } from "@canny_ecosystem/supabase/types";
 import { ActiveEmployeesBySite } from "@/components/payroll/analytics/active-employees-by-site";
-import { AiDescription } from "@/components/dashboard/ai-description";
+import { InvoicePaidUnpaid } from "@/components/dashboard/paid-unpaid-invoices";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -86,6 +88,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
       });
     if (payrollDataByYearError) throw payrollDataByYearError;
 
+    const { data: invoiceData, error: invoiceDataError } =
+      await getInvoicesByCompanyIdForDashboard({
+        companyId,
+        supabase,
+        filters,
+      });
+    if (invoiceDataError) throw invoiceDataError;
+
     return defer({
       currentMonthExits,
       previousMonthExits,
@@ -95,6 +105,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       totalEmployees,
       activeEmployeesBySites,
       payrollDataByYears,
+      invoiceData,
       filters,
       error: null,
     });
@@ -108,6 +119,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       totalEmployees: null,
       activeEmployeesBySites: null,
       payrollDataByYears: null,
+      invoiceData: null,
       filters,
       error: error,
     });
@@ -134,6 +146,7 @@ export default function Dashboard() {
     totalEmployees,
     activeEmployeesBySites,
     payrollDataByYears,
+    invoiceData,
     filters,
     error,
   } = useLoaderData<typeof loader>();
@@ -165,13 +178,15 @@ export default function Dashboard() {
           previousExits={previousMonthExits as unknown as ExitsRow[]}
         />
         <PayrollTrend chartData={payrollDataByYears} />
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           <ActiveEmployeesBySite
             chartData={
               activeEmployeesBySites as unknown as EmployeeDatabaseRow[]
             }
           />
-          <AiDescription />
+          <InvoicePaidUnpaid
+            chartData={invoiceData as unknown as InvoiceDataType[]}
+          />
         </div>
       </div>
     </section>

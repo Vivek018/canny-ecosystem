@@ -37,6 +37,13 @@ export const salaryEntryColumns = ({
 
   return [
     {
+      accessorKey: "sr_no",
+      header: "Sr No.",
+      cell: ({ row }) => {
+        return <p className="truncate ">{row.index + 1}</p>;
+      },
+    },
+    {
       accessorKey: "employee_code",
       header: "Employee Code",
       cell: ({ row }) => {
@@ -125,6 +132,41 @@ export const salaryEntryColumns = ({
         );
       },
     })),
+    {
+      accessorKey: "net_amount",
+      header: "Net Amount",
+      cell: ({ row }) => {
+        function calculateNetAmount(
+          employees: SalaryEntriesWithEmployee
+        ): Record<string, number> {
+          let gross = 0;
+          let statutoryContributions = 0;
+          let deductions = 0;
+
+          for (const entry of employees.salary_entries) {
+            const amount = entry.amount ?? 0;
+            const fieldType = entry.type;
+            if (fieldType === "earning") {
+              gross += amount;
+            } else if (fieldType === "statutory_contribution") {
+              statutoryContributions += amount;
+            } else if (fieldType === "deduction") {
+              deductions += amount;
+            }
+          }
+
+          return {
+            total: gross - statutoryContributions - deductions,
+          };
+        }
+
+        return (
+          <p className="truncate">
+            {calculateNetAmount(row.original).total ?? "--"}
+          </p>
+        );
+      },
+    },
     {
       accessorKey: "actions",
       cell: ({ row }) => {
