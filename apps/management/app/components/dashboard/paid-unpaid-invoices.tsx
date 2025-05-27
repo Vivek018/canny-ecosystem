@@ -47,7 +47,7 @@ export function InvoicePaidUnpaid({ chartData }: { chartData: any }) {
   return (
     <Card className="col-span-2">
       <CardHeader>
-        <CardTitle className="text-center">Paid vs Unpaid Analysis</CardTitle>
+        <CardTitle className="text-center">Paid vs Unpaid Invoice</CardTitle>
       </CardHeader>
       <CardContent>
         <ChartContainer className="w-full h-[360px]" config={chartConfig}>
@@ -79,7 +79,7 @@ export function InvoicePaidUnpaid({ chartData }: { chartData: any }) {
       </CardContent>
       <CardFooter className=" flex flex-col items-start justify-center gap-2 text-sm">
         <div className="leading-none text-muted-foreground">
-          Showing Paid vs Unpaid Invoices for the selected year
+          Showing Paid vs Unpaid Invoices for the selected period
         </div>
       </CardFooter>
     </Card>
