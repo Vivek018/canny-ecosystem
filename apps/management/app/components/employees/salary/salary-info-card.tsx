@@ -2,7 +2,6 @@ import type { GroupedPayrollEntry } from "@/routes/_protected+/employees+/$emplo
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
@@ -77,19 +76,28 @@ export default function SalaryInfoCard({
           </DropdownMenu>
         </CardTitle>
       </CardHeader>
-
-      <div className="px-3 w-1/2 flex flex-col text-sm ">
-        <div className="flex justify-between">
-          <span>Presents:</span>
-          <span className="font-medium text-muted-foreground">
-            {salaryData?.present_days}
-          </span>
+      <div className="px-3 grid grid-cols-2 gap-6">
+        <div className=" flex flex-col text-sm ">
+          <div className="flex justify-between">
+            <span>Presents Days :</span>
+            <span className="font-medium text-muted-foreground">
+              {salaryData?.present_days}
+            </span>
+          </div>
+          <div className="flex justify-between">
+            <span>Overtime Hours :</span>
+            <span className="font-medium text-muted-foreground  ">
+              {salaryData?.overtime_hours}
+            </span>
+          </div>
         </div>
-        <div className="flex justify-between">
-          <span>Overtime Hours:</span>
-          <span className="font-medium text-muted-foreground  ">
-            {salaryData?.overtime_hours}
-          </span>
+        <div className="w-full flex items-center text-sm">
+          <div className="w-full flex justify-between ">
+            <span className="font-bold">Net Amount : </span>
+            <span className="font-medium text-muted-foreground">
+              ₹ {earningTotal - deductionTotal}
+            </span>
+          </div>
         </div>
       </div>
       <CardContent className="grid grid-cols-2 py-2 px-3 gap-6">
@@ -135,17 +143,6 @@ export default function SalaryInfoCard({
           </div>
         </div>
       </CardContent>
-
-      <hr />
-
-      <CardFooter className="pb-2 pt-1 px-3">
-        <div className="w-full flex items-center justify-evenly py-0.5 text-xs">
-          <span className="font-bold">Net Amount</span>
-          <span className="font-semibold">
-            ₹ {earningTotal - deductionTotal}
-          </span>
-        </div>
-      </CardFooter>
     </Card>
   );
 }
