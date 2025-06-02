@@ -42,7 +42,7 @@ export function seedCompanyLocations(): Omit<
 > {
   return {
     name: faker.string.alpha(10),
-    is_primary: [true, false][faker.number.int({ min: 0, max: 1 })],
+    is_primary: true,
     address_line_1: faker.location.streetAddress(),
     address_line_2: faker.location.streetAddress(),
     city: faker.location.city(),
@@ -63,9 +63,10 @@ export function seedCompanyRelationships(): Omit<
     end_date: faker.date.future().toISOString(),
     is_active: [true, false][faker.number.int({ min: 0, max: 1 })],
     terms: {
-      service_charge: faker.number.float({ min: 2, max: 10 }),
-      reimbursement_charge: faker.number.float({ min: 0, max: 10 }),
+      service_charge: faker.number.int({ min: 2, max: 10 }),
+      reimbursement_charge: faker.number.int({ min: 0, max: 10 }),
       credit_days: [0, 15, 45, 60][faker.number.int({ min: 0, max: 3 })],
+      include_service_charge: "basic, hra, lta",
     },
   };
 }

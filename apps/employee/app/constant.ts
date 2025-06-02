@@ -3,13 +3,12 @@ import type { NavList } from "@canny_ecosystem/types";
 export const DEFAULT_ROUTE = "/";
 
 export const CANNY_MANAGEMENT_SERVICES_COMPANY_ID =
-  "0638799b-6608-4326-8da0-8ac1fa38f0e7";
+  "3f01b65d-ba67-4d57-9e79-c5ad9d8695a3";
 
 export const CANNY_MANAGEMENT_SERVICES_NAME = "Canny Management Services";
 
 export const CANNY_MANAGEMENT_SERVICES_ADDRESS =
   "502-503, Girivar Glean, Under Odhav Overbrigde, Sardar Patel Ring Rd, nr. Palm Hotel, Odhav, Ahmedabad, Gujarat 382415";
-
 
 export const sideNavList = [
   { name: "Dashboard", link: "/dashboard", icon: "dashboard" },

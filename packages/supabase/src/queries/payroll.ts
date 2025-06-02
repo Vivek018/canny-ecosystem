@@ -555,3 +555,46 @@ export async function getPayrollEntriesByPayrollIdForPayrollRegister({
 
   return { data, error: null };
 }
+
+export async function getSalaryEntriesByEmployeeId({
+  supabase,
+  employeeId,
+  filters,
+}: {
+  supabase: TypedSupabaseClient;
+  employeeId: string;
+  filters: DashboardFilters;
+}) {
+  const filterYear = filters?.year ? Number(filters.year) : defaultYear;
+
+  const columns = [
+    "id",
+    "month",
+    "year",
+    "present_days",
+    "overtime_hours",
+    "employee_id",
+    "payroll_id",
+    "field_name",
+    "type",
+    "amount",
+    "is_pro_rata",
+    "consider_for_epf",
+    "consider_for_esic",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("salary_entries")
+    .select(columns.join(","))
+    .eq("employee_id", employeeId)
+    .eq("year", filterYear)
+    .gte("month", 1)
+    .lte("month", 12)
+    .returns<SalaryEntriesDatabaseRow[]>();
+
+  if (error) {
+    console.error("getSalaryEntriesByEmployeeId Error", error);
+  }
+
+  return { data, error };
+}
