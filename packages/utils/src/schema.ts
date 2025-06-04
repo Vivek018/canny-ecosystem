@@ -72,14 +72,14 @@ export const zFile = z
     (file) =>
       typeof file !== "string"
         ? [
-            ...ACCEPTED_IMAGE_TYPES,
-            "image/pdf",
-            "image/doc",
-            "image/docx",
-            "application/pdf",
-            "application/doc",
-            "application/docx",
-          ].includes(file?.type)
+          ...ACCEPTED_IMAGE_TYPES,
+          "image/pdf",
+          "image/doc",
+          "image/docx",
+          "application/pdf",
+          "application/doc",
+          "application/docx",
+        ].includes(file?.type)
         : true,
     "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .docx formats are supported."
   );
@@ -339,10 +339,28 @@ export const EmployeeGuardiansSchema = z.object({
 
 export const positionArray = [
   "supervisor",
+  "hr_manager",
+  "branch_manager",
+  "finance_manager",
+  "jr_accountant",
+  "office_assistant",
+  "fitter",
+  "assistant_fitter",
+  "store_department",
+  "peon",
+  "office_boy",
+  "operator",
+  "computer_operator",
   "sampler",
   "helper",
+  "house_keeper",
+  "back_office",
+  "clerk",
+  "surveyor",
+  "cook",
   "driver",
   "chemist",
+  "watchman",
   "field_operator",
   "technician",
   "inspector",
@@ -351,8 +369,15 @@ export const positionArray = [
   "electrician",
   "welder",
   "scaffolder",
+  "qac",
+  "lab_chemist",
+  "food_chemist",
+  "lab_assistant",
   "heavy_equipment_operator",
   "plumber",
+  "executive",
+  "business_development_executive",
+  "industry_&_environment",
   "unknown",
 ] as const;
 
@@ -413,6 +438,7 @@ export const employeeDocuments = [
   "pan_card",
   "passport",
   "uan_card",
+  "joining_form"
 ] as const;
 
 export const EmployeeDocumentsSchema = z.object({
