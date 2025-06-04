@@ -168,7 +168,7 @@ export default function AddDocument({
       open={true}
       onOpenChange={() => navigate(`/employees/${employeeId}/documents`)}
     >
-      <DialogContent>
+      <DialogContent className="top-[45%]">
         <DialogHeader>
           <DialogTitle>{updatedValues ? "Update" : "Add"} Document</DialogTitle>
         </DialogHeader>
@@ -176,7 +176,7 @@ export default function AddDocument({
           <Form
             method="POST"
             {...getFormProps(form)}
-            className="flex flex-col"
+            className="flex flex-col overflow-auto"
             encType="multipart/form-data"
           >
             <input
