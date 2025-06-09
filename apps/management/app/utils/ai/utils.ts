@@ -22,7 +22,7 @@ function isValidToolName<K extends PropertyKey, T extends object>(
 export async function processToolCalls<
   Tools extends ToolSet,
   ExecutableTools extends {
-    [Tool in keyof Tools as Tools[Tool] extends { execute: Function }
+    [Tool in keyof Tools as Tools[Tool] extends { execute: any }
     ? never
     : Tool]: Tools[Tool];
   },

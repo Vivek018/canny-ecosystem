@@ -17,10 +17,10 @@ const queryDatabase = tool({
       if (!env.HYPERDRIVE) {
         throw new Error("HYPERDRIVE is undefined");
       }
-      let hyperdriveConfig;
+      let hyperdriveConfig: any;
       try {
         hyperdriveConfig = JSON.parse(env.HYPERDRIVE);
-      } catch (e) {
+      } catch {
         throw new Error("Failed to parse HYPERDRIVE as JSON");
       }
       if (!hyperdriveConfig.connectionString) {

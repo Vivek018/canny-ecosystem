@@ -1,6 +1,5 @@
 import {
   type AgentNamespace,
-
   routeAgentRequest,
 } from "agents";
 import { AIChatAgent } from "agents/ai-chat-agent";
@@ -25,6 +24,7 @@ export class Chat extends AIChatAgent<Env> {
   getEnv() {
     return process.env;
   }
+  // biome-ignore lint/complexity/noBannedTypes: <explanation>
   async onChatMessage(onFinish: StreamTextOnFinishCallback<{}>) {
     return agentContext.run(this, async () => {
       const dataStreamResponse = createDataStreamResponse({
@@ -59,7 +59,7 @@ export class Chat extends AIChatAgent<Env> {
 }
 
 export default {
-  async fetch(request: Request, env: Env, ctx: any) {
+  async fetch(request: Request, env: Env) {
     if (!env.OPENAI_API_KEY) {
       console.error(
         "OPENAI_API_KEY is not set, don't forget to set it locally in .dev.vars, and use `wrangler secret bulk .dev.vars` to upload it to production"
