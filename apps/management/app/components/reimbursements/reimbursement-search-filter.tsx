@@ -225,7 +225,8 @@ export function ReimbursementSearchFilter({
               >
                 <Calendar
                   mode='range'
-                  initialFocus
+                  captionLayout="dropdown"
+
                   today={
                     filterParams.submitted_date_start
                       ? new Date(filterParams.submitted_date_start)

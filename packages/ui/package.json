@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "files": ["tailwind.config.ts", "postcss.config.js", "globals.css"],
+  "files": [
+    "tailwind.config.ts",
+    "postcss.config.js",
+    "globals.css"
+  ],
   "scripts": {
     "build:icons": "tsx ./src/other/build-icons.ts",
     "clean": "rm -rf .turbo node_modules",
@@ -24,7 +28,7 @@
     "@radix-ui/react-progress": "^1.1.0",
     "@radix-ui/react-scroll-area": "^1.1.0",
     "@radix-ui/react-select": "^2.1.1",
-    "@radix-ui/react-slot": "^1.1.0",
+    "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-toast": "^1.2.2",
     "@radix-ui/react-toggle": "^1.1.0",
     "@radix-ui/react-toggle-group": "^1.1.0",
@@ -34,7 +38,7 @@
     "cmdk": "^1.0.0",
     "date-fns": "^4.1.0",
     "execa": "^8.0.1",
-    "react-day-picker": "^9.5.1",
+    "react-day-picker": "^9.7.0",
     "recharts": "^2.15.0",
     "spin-delay": "^2.0.1",
     "tailwind-merge": "^1.11.0",

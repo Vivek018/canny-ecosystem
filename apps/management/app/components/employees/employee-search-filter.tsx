@@ -249,7 +249,7 @@ export function EmployeesSearchFilter({
               className={cn(
                 "absolute z-10 right-3 top-[6px] opacity-70",
                 !disabled &&
-                  "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
+                "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 hasValidFilters && "opacity-100",
                 isOpen && "opacity-100"
               )}
@@ -279,6 +279,7 @@ export function EmployeesSearchFilter({
               >
                 <Calendar
                   mode='range'
+                  captionLayout="dropdown"
                   today={
                     filterParams.dob_start
                       ? new Date(filterParams.dob_start)
@@ -582,6 +583,7 @@ export function EmployeesSearchFilter({
               >
                 <Calendar
                   mode='range'
+                  captionLayout="dropdown"
                   today={
                     filterParams.doj_start
                       ? new Date(filterParams.doj_start)
@@ -628,7 +630,8 @@ export function EmployeesSearchFilter({
               >
                 <Calendar
                   mode='range'
-                  initialFocus
+                  captionLayout="dropdown"
+
                   today={
                     filterParams.dol_start
                       ? new Date(filterParams.dol_start)
