@@ -125,7 +125,11 @@ export const DownloadEsiFormat = ({
         .filter((e: { field_name: string; amount: number }) =>
           earningsFields.includes(e.field_name)
         )
-        .reduce((sum: number, e: { amount: number }) => sum + e.amount, 0);
+        .reduce(
+          (sum: number, e: { amount: number }) => sum + e.amount.toFixed(2),
+          0
+        );
+
       const presentDays =
         emp.salary_entries.length > 0
           ? emp.salary_entries[0].present_days

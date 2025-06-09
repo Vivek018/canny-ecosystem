@@ -25,6 +25,7 @@ import type { z } from "zod";
 import { useImportStoreForPayroll } from "@/store/import";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { PayrollImportData } from "@/components/payroll/import-export/payroll-import-data";
+import { Input } from "@canny_ecosystem/ui/input";
 type FieldConfig = {
   key: keyof z.infer<typeof ImportPayrollHeaderSchemaObject>;
   required?: boolean;
@@ -54,7 +55,7 @@ export default function PayrollImportFieldMapping() {
   const { env } = useLoaderData<typeof loader>();
   const [payrollType, setPayrollType] = useState("");
   const { setImportData } = useImportStoreForPayroll();
-
+  const [title, setTitle] = useState("");
   const [loadNext, setLoadNext] = useState(false);
   const location = useLocation();
   const [file] = useState(location.state?.file);
@@ -132,10 +133,15 @@ export default function PayrollImportFieldMapping() {
 
   const validateImportData = (data: any[]) => {
     try {
-      const result = ImportPayrollDataSchema.safeParse({ data });
+      const result = ImportPayrollDataSchema.safeParse({
+        payrollType,
+        title,
+        data,
+      });
+
       if (!result.success) {
         const formattedErrors = result.error.errors.map(
-          (err) => `${err.path[2]}: ${err.message}`
+          (err) => `${err.path[0]}: ${err.message}`
         );
         setValidationErrors(formattedErrors);
         return false;
@@ -149,7 +155,6 @@ export default function PayrollImportFieldMapping() {
       return false;
     }
   };
-
   const handleMapping = (key: string, value: string) => {
     setFieldMapping((prev) => ({ ...prev, [key]: value }));
     if (errors[key]) {
@@ -200,6 +205,8 @@ export default function PayrollImportFieldMapping() {
 
           if (validateImportData(finalData)) {
             setImportData({
+              payrollType,
+              title,
               data: finalData as ImportPayrollDataType[],
             });
 
@@ -220,7 +227,7 @@ export default function PayrollImportFieldMapping() {
   return (
     <section className="py-4 ">
       {loadNext ? (
-        <PayrollImportData env={env} payrollType={payrollType} />
+        <PayrollImportData env={env} />
       ) : (
         <Card className="m-4 px-40">
           <CardHeader>
@@ -257,6 +264,12 @@ export default function PayrollImportFieldMapping() {
                 setPayrollType(value);
               }}
               placeholder={"Select Payroll Type"}
+            />
+
+            <Input
+              className=""
+              placeholder="Enter the title here"
+              onChange={(e) => setTitle(e.target.value)}
             />
             <div className="grid grid-cols-2 place-content-center justify-between gap-y-8 gap-x-10 mt-5">
               {FIELD_CONFIGS.map((field) => (

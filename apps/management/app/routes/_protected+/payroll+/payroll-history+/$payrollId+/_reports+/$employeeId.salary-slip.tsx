@@ -26,7 +26,11 @@ import {
   numberToWordsIndian,
   SALARY_SLIP_TITLE,
 } from "@/constant";
-import { formatDate, formatDateTime } from "@canny_ecosystem/utils";
+import {
+  formatDate,
+  formatDateTime,
+  replaceUnderscore,
+} from "@canny_ecosystem/utils";
 import type {
   CompanyDatabaseRow,
   EmployeeDatabaseRow,
@@ -212,8 +216,12 @@ type DataType = {
   companyData: CompanyDatabaseRow & LocationDatabaseRow;
   employee: {
     attendance: {
+      paid_days: number;
       overtime_hours: number;
       working_days: number;
+      paid_leaves: number;
+      casual_leaves: number;
+      absents: number;
     };
     employeeData: EmployeeDatabaseRow;
     employeeProjectAssignmentData: EmployeeProjectAssignmentDataType;
@@ -259,13 +267,17 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
         <View style={styles.employeeSection}>
           <View style={styles.employeeDetails}>
             <Text style={styles.employeeName}>
-              {`${data.employee?.employeeData?.first_name} ${data?.employee?.employeeData?.middle_name} ${data?.employee?.employeeData.last_name}`}{" "}
+              {`${data.employee?.employeeData?.first_name} ${
+                data?.employee?.employeeData?.middle_name ?? ""
+              } ${data?.employee?.employeeData.last_name}`}{" "}
               <Text style={styles.employeeId}>
                 (Employee Code: {data?.employee?.employeeData?.employee_code})
               </Text>
             </Text>
             <Text style={styles.department}>
-              {data?.employee?.employeeProjectAssignmentData?.position}
+              {replaceUnderscore(
+                data?.employee?.employeeProjectAssignmentData?.position
+              )}
             </Text>
             <Text style={styles.department}>
               Location: {data?.companyData?.city}
@@ -275,15 +287,39 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
             <Text style={styles.workingTitle}>WORKING DETAILS</Text>
 
             <View style={styles.workingRow}>
-              <Text style={styles.workingLabel}>Paid Days</Text>
+              <Text style={styles.workingLabel}>Working Days</Text>
               <Text style={styles.workingValue}>
                 {data?.employee?.attendance?.working_days}
+              </Text>
+            </View>
+            <View style={styles.workingRow}>
+              <Text style={styles.workingLabel}>Paid Days</Text>
+              <Text style={styles.workingValue}>
+                {data?.employee?.attendance?.paid_days}
+              </Text>
+            </View>
+            <View style={styles.workingRow}>
+              <Text style={styles.workingLabel}>Absents</Text>
+              <Text style={styles.workingValue}>
+                {data?.employee?.attendance?.absents}
               </Text>
             </View>
             <View style={styles.workingRow}>
               <Text style={styles.workingLabel}>Overtime Hours</Text>
               <Text style={styles.workingValue}>
                 {data?.employee?.attendance?.overtime_hours}
+              </Text>
+            </View>
+            <View style={styles.workingRow}>
+              <Text style={styles.workingLabel}>Casual Leaves</Text>
+              <Text style={styles.workingValue}>
+                {data?.employee?.attendance?.casual_leaves}
+              </Text>
+            </View>
+            <View style={styles.workingRow}>
+              <Text style={styles.workingLabel}>Paid Leaves</Text>
+              <Text style={styles.workingValue}>
+                {data?.employee?.attendance?.paid_leaves}
               </Text>
             </View>
           </View>
@@ -495,6 +531,71 @@ export default function SalarySlip() {
       amount: number;
       type: string;
     }
+    const targetYear = attendanceData.year;
+    const targetMonth = attendanceData.month;
+
+    const monthStart = new Date(targetYear, targetMonth - 1, 1);
+    const monthEnd = new Date(targetYear, targetMonth, 0);
+
+    const stripTime = (d: Date) =>
+      new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    interface LeaveEntry {
+      leave_type: string;
+      start_date: string;
+      end_date: string;
+    }
+
+    const casualLeaves: number =
+      data?.payrollData.leaves?.reduce((total: number, leave: LeaveEntry) => {
+        if (leave.leave_type === "casual_leave") {
+          const leaveStart: Date = stripTime(new Date(leave.start_date));
+          const leaveEnd: Date = stripTime(new Date(leave.end_date));
+
+          const overlapStart: Date =
+            leaveStart < monthStart ? stripTime(monthStart) : leaveStart;
+          const overlapEnd: Date =
+            leaveEnd > monthEnd ? stripTime(monthEnd) : leaveEnd;
+
+          if (overlapStart > overlapEnd) return total;
+
+          const timeDiff: number =
+            overlapEnd.getTime() - overlapStart.getTime();
+          const daysInMonth: number =
+            Math.floor(timeDiff / (1000 * 60 * 60 * 24)) + 1;
+
+          return total + daysInMonth;
+        }
+        return total;
+      }, 0) || 0;
+
+    interface Leave {
+      leave_type: string;
+      start_date: string;
+      end_date: string;
+    }
+
+    const paidLeaves: number =
+      data?.payrollData?.leaves?.reduce((total: number, leave: Leave) => {
+        if (leave.leave_type === "paid_leave") {
+          const leaveStart: Date = stripTime(new Date(leave.start_date));
+          const leaveEnd: Date = stripTime(new Date(leave.end_date));
+
+          const overlapStart: Date =
+            leaveStart < monthStart ? stripTime(monthStart) : leaveStart;
+          const overlapEnd: Date =
+            leaveEnd > monthEnd ? stripTime(monthEnd) : leaveEnd;
+
+          if (overlapStart > overlapEnd) return total;
+
+          const timeDiff: number =
+            overlapEnd.getTime() - overlapStart.getTime();
+          const daysInMonth: number =
+            Math.floor(timeDiff / (1000 * 60 * 60 * 24)) + 1;
+
+          return total + daysInMonth;
+        }
+        return total;
+      }, 0) || 0;
 
     const earnings: { name: string; amount: number }[] = salaryEntries
       .filter((entry: SalaryEntry) => entry.type === "earning")
@@ -524,8 +625,12 @@ export default function SalarySlip() {
         employeeProjectAssignmentData: projectAssignment,
         employeeStatutoryDetails: statutoryDetails,
         attendance: {
-          working_days: attendanceData?.present_days || 0,
+          working_days: 26,
+          paid_days: attendanceData?.present_days || 0,
           overtime_hours: attendanceData?.overtime_hours || 0,
+          paid_leaves: paidLeaves,
+          casual_leaves: casualLeaves,
+          absents: 26 - Number(attendanceData?.present_days) || 0,
         },
         earnings,
         deductions,

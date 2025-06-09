@@ -42,7 +42,7 @@ export function SalaryEntryComponent({
   fromWhere: "runpayroll" | "payrollhistory";
 }) {
   const payrollCardDetails = [
-    { title: "Payroll Type", value: "payroll_type" },
+    { title: "Title", value: "title" },
     { title: "Status", value: "status" },
     { title: "No of Employees", value: "total_employees" },
     { title: "Pay Day", value: "created_at" },
@@ -219,7 +219,7 @@ export function SalaryEntryComponent({
             <p className="mt-2">Net Amount : {totals.TOTAL.toString()}</p>
           </CardContent>
         </Card>
-        <div className="grid grid-cols-2 gap-1">
+        <div className="grid grid-cols-2 gap-2">
           {payrollCardDetails?.map((details, index) => (
             <Card
               key={index.toString()}
@@ -230,8 +230,13 @@ export function SalaryEntryComponent({
                   {details.title}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="py-0">
-                <p className="text-muted-foreground text-center">
+              <CardContent className="py-0  px-2 text-muted-foreground text-center">
+                <p
+                  className={cn(
+                    "text-wrap break-words whitespace-pre-wrap",
+                    details.title === "Title" && "text-sm"
+                  )}
+                >
                   {details.value === "created_at"
                     ? formatDate(
                         payrollData[details.value as keyof typeof payrollData]

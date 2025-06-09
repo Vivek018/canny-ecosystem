@@ -28,13 +28,13 @@ export function AttendanceActions({
   return (
     <div className="space-x-2 hidden md:flex">
       <ColumnVisibility disabled={isEmpty} />
-      <AttendanceEmailMenu
+      {/* <AttendanceEmailMenu
         selectedRows={selectedRows}
         companyName={companyName}
         companyAddress={companyAddress}
         emails={userEmails}
         columnVisibility={columnVisibility}
-      />
+      /> */}
       <Button
         variant="outline"
         size="icon"

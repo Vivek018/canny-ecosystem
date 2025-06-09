@@ -14,11 +14,11 @@ export function EmployeesActions({
   return (
     <div className="space-x-2 hidden md:flex">
       <ColumnVisibility disabled={isEmpty} />
-      <EmployeesEmailMenu
+      {/* <EmployeesEmailMenu
         emails={emails}
         selectedRows={selectedRows}
         columnVisibility={columnVisibility}
-      />
+      /> */}
       <AddEmployeeDialog />
     </div>
   );

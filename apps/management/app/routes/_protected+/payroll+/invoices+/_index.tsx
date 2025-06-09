@@ -169,7 +169,6 @@ export default function Invoices() {
               />
             );
           }}
-          
         </Await>
         <Outlet />
       </Suspense>

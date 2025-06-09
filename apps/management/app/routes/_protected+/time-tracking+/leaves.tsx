@@ -333,13 +333,13 @@ export default function LeavesIndex() {
           </div>
           <div className="space-x-2 hidden md:flex">
             <ColumnVisibility />
-            <LeavesEmailMenu
+            {/* <LeavesEmailMenu
               columnVisibility={columnVisibility}
               selectedRows={selectedRows}
               emails={userEmails as unknown as any}
               companyName={companyName as unknown as CompanyDatabaseRow}
               companyAddress={companyAddress as unknown as LocationDatabaseRow}
-            />
+            /> */}
             <Button
               variant="outline"
               size="icon"

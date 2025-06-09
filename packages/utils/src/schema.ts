@@ -1292,7 +1292,12 @@ export const SalaryEntrySchema = z.object({
   is_overtime: z.boolean().default(false),
 });
 
-export const payrollTypesArray = ["salary", "reimbursement", "exit", "others"];
+export const payrollTypesArray = [
+  "salary",
+  "reimbursement",
+  "exit",
+  "others",
+] as const;
 
 export const PayrollEntrySchema = z.object({
   id: z.string().optional(),
@@ -1737,6 +1742,8 @@ export const ImportSinglePayrollDataSchema = z.object({
 });
 
 export const ImportPayrollDataSchema = z.object({
+  payrollType: z.enum(payrollTypesArray),
+  title: z.string().min(3),
   data: z.array(ImportSinglePayrollDataSchema),
 });
 
@@ -1769,6 +1776,7 @@ export const ImportSingleSalaryPayrollDataSchema = z.object({
 });
 
 export const ImportSalaryPayrollDataSchema = z.object({
+  title: z.string().min(3),
   data: z.array(ImportSingleSalaryPayrollDataSchema),
 });
 

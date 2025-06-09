@@ -1,5 +1,4 @@
-import { defaultYear } from "@canny_ecosystem/utils";
-import { HARD_QUERY_LIMIT } from "../constant";
+import { defaultYear, formatUTCDate } from "@canny_ecosystem/utils";
 import type {
   PayrollDatabaseRow,
   InferredType,
@@ -11,12 +10,20 @@ import type {
 import type { DashboardFilters } from "./exits";
 import { months } from "@canny_ecosystem/utils/constant";
 
+export type PayrollFilters = {
+  date_start?: string | undefined | null;
+  date_end?: string | undefined | null;
+  payroll_type?: string | undefined | null;
+  status?: string | undefined | null;
+};
+
 export type ImportPayrollDataType = Pick<
   PayrollEntriesDatabaseRow,
   "employee_id" | "amount"
 > & {
   employee_code: EmployeeDatabaseRow["employee_code"];
 };
+
 export type ImportSalaryPayrollDataType = {
   employee_code: EmployeeDatabaseRow["employee_code"];
   present_days: number;
@@ -25,12 +32,22 @@ export type ImportSalaryPayrollDataType = {
 export async function getPendingOrSubmittedPayrollsByCompanyId({
   supabase,
   companyId,
+  params,
 }: {
   supabase: TypedSupabaseClient;
   companyId: string;
+  params: {
+    to: number;
+    from: number;
+    searchQuery?: string;
+    filters?: PayrollFilters | null;
+  };
 }) {
+  const { from, to, filters, searchQuery } = params;
+  const { date_start, date_end, payroll_type, status } = filters ?? {};
   const columns = [
     "id",
+    "title",
     "total_employees",
     "payroll_type",
     "status",
@@ -41,30 +58,57 @@ export async function getPendingOrSubmittedPayrollsByCompanyId({
     "created_at",
   ] as const;
 
-  const { data, error } = await supabase
+  const query = supabase
     .from("payroll")
     .select(columns.join(","))
     .eq("company_id", companyId)
-    .in("status", ["pending", "submitted"])
-    .order("created_at", { ascending: false })
-    .limit(HARD_QUERY_LIMIT)
-    .returns<InferredType<PayrollDatabaseRow, (typeof columns)[number]>[]>();
+    .in("status", ["pending", "submitted"]);
+
+  if (searchQuery) {
+    query.or(`title.ilike.*${searchQuery}*`);
+  }
+
+  const dateFilters = [{ field: "run_date", start: date_start, end: date_end }];
+  for (const { field, start, end } of dateFilters) {
+    if (start) query.gte(field, formatUTCDate(start));
+    if (end) query.lte(field, formatUTCDate(end));
+  }
+
+  if (payroll_type) {
+    query.eq("payroll_type", payroll_type);
+  }
+
+  if (status) {
+    query.eq("status", status);
+  }
+
+  const { data, count, error } = await query.range(from, to);
 
   if (error)
     console.error("getPendingOrSubmittedPayrollsByCompanyId Error", error);
 
-  return { data, error };
+  return { data, meta: { count: count }, error };
 }
 
 export async function getApprovedPayrollsByCompanyId({
   supabase,
   companyId,
+  params,
 }: {
   supabase: TypedSupabaseClient;
   companyId: string;
+  params: {
+    to: number;
+    from: number;
+    searchQuery?: string;
+    filters?: PayrollFilters | null;
+  };
 }) {
+  const { from, to, filters, searchQuery } = params;
+  const { date_start, date_end, payroll_type, status } = filters ?? {};
   const columns = [
     "id",
+    "title",
     "total_employees",
     "payroll_type",
     "status",
@@ -75,18 +119,34 @@ export async function getApprovedPayrollsByCompanyId({
     "created_at",
   ] as const;
 
-  const { data, error } = await supabase
+  const query = supabase
     .from("payroll")
     .select(columns.join(","))
     .eq("company_id", companyId)
-    .in("status", ["approved"])
-    .order("created_at", { ascending: false })
-    .limit(HARD_QUERY_LIMIT)
-    .returns<InferredType<PayrollDatabaseRow, (typeof columns)[number]>[]>();
+    .in("status", ["approved"]);
 
+  if (searchQuery) {
+    query.or(`title.ilike.*${searchQuery}*`);
+  }
+
+  const dateFilters = [{ field: "run_date", start: date_start, end: date_end }];
+  for (const { field, start, end } of dateFilters) {
+    if (start) query.gte(field, formatUTCDate(start));
+    if (end) query.lte(field, formatUTCDate(end));
+  }
+
+  if (payroll_type) {
+    query.eq("payroll_type", payroll_type);
+  }
+
+  if (status) {
+    query.eq("status", status);
+  }
+
+  const { data, count, error } = await query.range(from, to);
   if (error) console.error("getApprovedPayrollsByCompanyId Error", error);
 
-  return { data, error };
+  return { data, meta: { count: count }, error };
 }
 
 export async function getPayrollById({
@@ -98,6 +158,7 @@ export async function getPayrollById({
 }) {
   const columns = [
     "id",
+    "title",
     "total_employees",
     "payroll_type",
     "status",
@@ -223,7 +284,7 @@ export async function getSalaryEntriesByPayrollAndEmployeeId({
     .select(
       `id, company_id, first_name, middle_name, last_name, employee_code, salary_entries!inner(${columns.join(
         ","
-      )})`
+      )}),leaves(start_date,end_date,leave_type)`
     )
     .eq("salary_entries.payroll_id", payrollId)
     .eq("id", employeeId)
@@ -496,7 +557,7 @@ export async function getSalaryEntriesByPayrollIdForSalaryRegister({
     .select(
       `id, company_id, first_name, middle_name, last_name, employee_code, salary_entries!inner(${columns.join(
         ","
-      )}),employee_project_assignment!inner(position),employee_statutory_details!inner(aadhaar_number,pan_number,uan_number,pf_number,esic_number),leaves(start_date,end_date,leave_type)`
+      )}),employee_project_assignment!inner(position,start_date),employee_statutory_details!inner(aadhaar_number,pan_number,uan_number,pf_number,esic_number),leaves(start_date,end_date,leave_type),employee_bank_details(account_number,bank_name)`
     )
     .eq("salary_entries.payroll_id", payrollId)
     .order("type, field_name", {

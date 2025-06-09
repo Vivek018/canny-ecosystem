@@ -296,7 +296,7 @@ export const cacheKeyPrefix = {
   payroll_invoice: "payroll-invoice",
 };
 
-export const SALARY_SLIP_TITLE = "Salary Slip Form IV B [Rule 26(2)(b)]";
+export const SALARY_SLIP_TITLE = "Form IV B [Rule 26(2)(b)]";
 
 export function numberToWordsIndian(num: number) {
   const belowTwenty = [
