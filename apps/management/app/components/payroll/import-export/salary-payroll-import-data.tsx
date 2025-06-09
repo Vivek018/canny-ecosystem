@@ -29,6 +29,7 @@ export function SalaryPayrollImportData({
   const [searchString, setSearchString] = useState("");
   const [tableData, setTableData] = useState(importData.data);
 
+
   useEffect(() => {
     const filteredData = importData?.data.filter((item) =>
       Object.entries(item).some(
@@ -113,10 +114,10 @@ export function SalaryPayrollImportData({
       })
       .filter((item) => item.employee_id);
 
-
     submit(
       {
         type: "salary-import",
+        title: importData.title,
         salaryImportData: JSON.stringify(updatedData),
         skipped:
           importData.data.length - updatedData.length > 0

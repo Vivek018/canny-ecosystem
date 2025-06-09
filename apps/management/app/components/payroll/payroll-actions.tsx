@@ -108,6 +108,33 @@ export function PayrollActions({
           <div>
             <Button
               variant={"ghost"}
+              className={cn(
+                "hidden",
+                payrollData.payroll_type === "salary" &&
+                  status === "approved" &&
+                  "flex flex-row justify-start gap-2 px-2 pr-1  "
+              )}
+              onClick={() =>
+                fromWhere === "runpayroll"
+                  ? navigate(`/payroll/run-payroll/${payrollId}/salary-slips`)
+                  : navigate(
+                      `/payroll/payroll-history/${payrollId}/salary-slips`
+                    )
+              }
+            >
+              <Icon name="import" />
+              Download Bulk Salary Slips
+            </Button>
+          </div>
+          <DropdownMenuSeparator
+            className={cn(
+              "hidden",
+              payrollData.payroll_type === "salary" && status==="approved" && "flex"
+            )}
+          />
+          <div>
+            <Button
+              variant={"ghost"}
               className="px-2 pr-1 flex flex-row justify-start gap-2"
               onClick={() =>
                 fromWhere === "runpayroll"

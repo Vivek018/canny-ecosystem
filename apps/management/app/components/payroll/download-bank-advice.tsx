@@ -110,7 +110,7 @@ export const prepareBankAdviceWorkbook = async ({
       "182628991917",
       emp.account_number || null,
       emp.account_holder_name || null,
-      emp.amount || null,
+      Number(emp.amount).toFixed(2) || null,
       "Online",
       `${formatDate(date)}`.replaceAll(" ", "-"),
       emp.ifsc_code || null,

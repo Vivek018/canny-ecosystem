@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { months } from "../constant";
 
 export function isGoodStatus(status: number | string) {
   const statusString = status.toString();
@@ -345,3 +346,6 @@ export function numberToWords(num: number): string {
 
   return words.replace(/\s+/g, " ").trim();
 }
+export const getMonthName = (value: number): string | undefined => {
+  return Object.keys(months).find((key) => months[key] === value);
+};

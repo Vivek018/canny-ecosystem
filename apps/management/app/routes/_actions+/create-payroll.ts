@@ -38,6 +38,7 @@ export async function action({
     const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
     const formData = await request.formData();
+    const payrollTitle = formData.get("title") as string;
     const skipped = formData.get("skipped") as string;
     const type = formData.get("type") as string;
     const failedRedirect = formData.get("failedRedirect") as string;
@@ -229,6 +230,7 @@ export async function action({
       } = await createSalaryPayroll({
         supabase,
         data: {
+          title: payrollTitle,
           type: "salary",
           salaryData: allSalaryEntries,
           totalEmployees: uniqueEmployeeIds.size,
@@ -266,7 +268,13 @@ export async function action({
         message,
       } = await createReimbursementPayroll({
         supabase,
-        data: { type, reimbursementData, totalEmployees, totalNetAmount },
+        data: {
+          title: payrollTitle,
+          type,
+          reimbursementData,
+          totalEmployees,
+          totalNetAmount,
+        },
         companyId: companyId ?? "",
       });
 
@@ -298,7 +306,13 @@ export async function action({
         message,
       } = await createExitPayroll({
         supabase,
-        data: { type, exitData, totalEmployees, totalNetAmount },
+        data: {
+          title: payrollTitle,
+          type,
+          exitData,
+          totalEmployees,
+          totalNetAmount,
+        },
         companyId: companyId ?? "",
       });
 
@@ -358,6 +372,7 @@ export async function action({
       } = await createSalaryPayroll({
         supabase,
         data: {
+          title: payrollTitle,
           type: "salary",
           salaryData: transformedData,
           totalEmployees: salaryImportData.length,

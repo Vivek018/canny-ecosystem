@@ -264,6 +264,7 @@ export default function CreateInvoice({
       }
     }
     const basicAmount = fieldTotals.BASIC?.rawAmount ?? 0;
+    
     return Object.entries(fieldTotals).map(([field, data]) => {
       let amount = data.rawAmount;
 
