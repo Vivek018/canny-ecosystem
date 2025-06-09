@@ -65,7 +65,7 @@ export async function loader({
   if (
     !hasPermission(
       user?.role!,
-      `${createRole}:${attribute.settingRelationships}`,
+      `${createRole}:${attribute.settingRelationships}`
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -84,7 +84,7 @@ export async function loader({
         },
         {
           status: 500,
-        },
+        }
       );
     }
 
@@ -96,7 +96,7 @@ export async function loader({
           data: null,
           error: "No companies found",
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -118,7 +118,7 @@ export async function loader({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -137,7 +137,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -195,7 +195,13 @@ export default function CreateRelationship({
     defaultValue: {
       ...initialValues,
       parent_company_id: initialValues.parent_company_id ?? companyId,
-      terms: JSON.stringify(initialValues.terms),
+      terms:
+        JSON.stringify(initialValues.terms) ??
+        JSON.stringify({
+          service_charge: 5,
+          reimbursement_charge: 2,
+          include_service_charge: "basic, hra, lta",
+        }),
     },
   });
   const { toast } = useToast();
@@ -246,7 +252,7 @@ export default function CreateRelationship({
                   ...getInputProps(fields.relationship_type, { type: "text" }),
                   autoFocus: true,
                   placeholder: `Enter ${replaceUnderscore(
-                    fields.relationship_type.name,
+                    fields.relationship_type.name
                   )}`,
                   className: "capitalize",
                 }}
@@ -283,11 +289,11 @@ export default function CreateRelationship({
                   inputProps={{
                     ...getInputProps(fields.start_date, { type: "date" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.start_date.name,
+                      fields.start_date.name
                     )}`,
                     max: getValidDateForInput(new Date().toISOString()),
                     defaultValue: getValidDateForInput(
-                      fields.start_date.initialValue,
+                      fields.start_date.initialValue
                     ),
                   }}
                   labelProps={{
@@ -299,11 +305,11 @@ export default function CreateRelationship({
                   inputProps={{
                     ...getInputProps(fields.end_date, { type: "date" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.end_date.name,
+                      fields.end_date.name
                     )}`,
                     min: getValidDateForInput(fields.start_date.value),
                     defaultValue: getValidDateForInput(
-                      fields.end_date.initialValue,
+                      fields.end_date.initialValue
                     ),
                   }}
                   labelProps={{

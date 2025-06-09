@@ -30,6 +30,7 @@ export async function createSalaryPayroll({
 }: {
   supabase: TypedSupabaseClient;
   data: {
+    title: string;
     run_date?: string;
     status?: "pending" | "approved" | "submitted";
     type: "salary";
@@ -57,6 +58,7 @@ export async function createSalaryPayroll({
   } = await supabase
     .from("payroll")
     .insert({
+      title: data.title,
       run_date: data.run_date ?? null,
       status: data?.status ?? "pending",
       payroll_type: data.type ?? "salary",
@@ -154,6 +156,7 @@ export async function createReimbursementPayroll({
   supabase: TypedSupabaseClient;
   data: {
     run_date?: string;
+    title: string;
     status?: "pending" | "approved" | "submitted";
     type: "reimbursement";
     reimbursementData: Partial<ReimbursementDataType>[];
@@ -180,6 +183,7 @@ export async function createReimbursementPayroll({
   } = await supabase
     .from("payroll")
     .insert({
+      title: data.title,
       run_date: data.run_date ?? null,
       status: data?.status ?? "pending",
       payroll_type: data.type ?? "reimbursement",
@@ -277,6 +281,7 @@ export async function createExitPayroll({
   supabase: TypedSupabaseClient;
   data: {
     run_date?: string;
+    title: string;
     status?: "pending" | "approved" | "submitted";
     type: "exit";
     exitData: Partial<ExitDataType>[];
@@ -301,6 +306,7 @@ export async function createExitPayroll({
   } = await supabase
     .from("payroll")
     .insert({
+      title: data.title,
       run_date: data.run_date ?? null,
       status: data?.status ?? "pending",
       payroll_type: data.type ?? "exit",

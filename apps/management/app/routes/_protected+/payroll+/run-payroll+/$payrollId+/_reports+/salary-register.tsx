@@ -122,10 +122,14 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
         {/* Company Header */}
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
           <View style={{ flex: 1, marginRight: 10 }}>
-            <Text style={styles.companyName}>{data.companyData?.name}</Text>
-            <Text
-              style={styles.companyAddress}
-            >{`${data?.companyData?.address_line_1}, ${data?.companyData?.address_line_2}, ${data?.companyData?.city}, ${data?.companyData?.state}, ${data?.companyData?.pincode}`}</Text>
+            <Text style={styles.companyName}>{data?.companyData?.name}</Text>
+            <Text style={styles.companyAddress}>{`${
+              data?.companyData?.address_line_1
+            }, ${data?.companyData?.address_line_2 ?? ""}, ${
+              data?.companyData?.city
+            }, ${data?.companyData?.state}, ${
+              data?.companyData?.pincode
+            }`}</Text>
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.companyName}>
@@ -382,7 +386,7 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
             >
               <Text style={{ marginBottom: "8" }}>
                 {employee?.employeeData?.first_name}{" "}
-                {employee?.employeeData?.middle_name}{" "}
+                {employee?.employeeData?.middle_name ?? ""}{" "}
                 {employee?.employeeData?.last_name}
               </Text>
 
@@ -720,16 +724,16 @@ export default function SalaryRegister() {
   const { isDocument } = useIsDocument();
 
   function transformData(data: any) {
-    const company = data.employeeCompanyData;
-    const location = data.employeesCompanyLocationData;
+    const company = data?.employeeCompanyData;
+    const location = data?.employeesCompanyLocationData;
 
     const companyData = {
-      name: company.name,
-      address_line_1: location.address_line_1,
-      address_line_2: location.address_line_2,
-      city: location.city,
-      state: location.state,
-      pincode: location.pincode,
+      name: company?.name,
+      address_line_1: location?.address_line_1,
+      address_line_2: location?.address_line_2,
+      city: location?.city,
+      state: location?.state,
+      pincode: location?.pincode,
     };
 
     interface SalaryEntry {

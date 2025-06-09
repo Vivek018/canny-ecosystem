@@ -375,9 +375,7 @@ export async function updateRelationship({
   const { error, status } = await supabase
     .from("company_relationships")
     .update(updateData)
-    .eq("id", data.id!)
-    ;
-
+    .eq("id", data.id!);
   if (error) {
     console.error("updateRelationship Error", error);
   }

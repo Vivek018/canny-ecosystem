@@ -12,13 +12,7 @@ import { useState, useEffect } from "react";
 import { ImportedDataTable } from "../imported-table/imported-data-table";
 import { ImportedDataColumns } from "../imported-table/columns";
 
-export function PayrollImportData({
-  env,
-  payrollType,
-}: {
-  env: SupabaseEnv;
-  payrollType: string;
-}) {
+export function PayrollImportData({ env }: { env: SupabaseEnv }) {
   const submit = useSubmit();
   const { supabase } = useSupabase({ env });
   const { importData } = useImportStoreForPayroll();
@@ -26,9 +20,17 @@ export function PayrollImportData({
   const [searchString, setSearchString] = useState("");
   const [tableData, setTableData] = useState(importData.data);
 
-  const validateImportData = (data: any[]) => {
+  const validateImportData = (
+    payrollType: string,
+    title: string,
+    data: any[]
+  ) => {
     try {
-      const result = ImportPayrollDataSchema.safeParse({ data });
+      const result = ImportPayrollDataSchema.safeParse({
+        payrollType,
+        title,
+        data,
+      });
       if (!result.success) {
         console.error("Payroll Data validation error");
         return false;
@@ -52,7 +54,13 @@ export function PayrollImportData({
   }, [searchString, importData]);
 
   const handleFinalImport = async () => {
-    if (validateImportData(importData.data)) {
+    if (
+      validateImportData(
+        importData.payrollType,
+        importData.title,
+        importData.data
+      )
+    ) {
       const employeeCodes = importData.data!.map(
         (value) => value.employee_code
       );
@@ -62,10 +70,9 @@ export function PayrollImportData({
           supabase,
           employeeCodes,
         });
-      
 
       if (codeError) throw codeError;
-      if (payrollType === "reimbursement") {
+      if (importData.payrollType === "reimbursement") {
         const updatedData = importData.data!.map((item: any) => {
           const employeeId = employees?.find(
             (e) => e.employee_code === item.employee_code
@@ -93,6 +100,7 @@ export function PayrollImportData({
         submit(
           {
             type: "reimbursement",
+            title: importData.title,
             reimbursementData: JSON.stringify(reimbursementForPayroll),
             totalEmployees,
             totalNetAmount,
@@ -104,7 +112,7 @@ export function PayrollImportData({
           }
         );
       }
-      if (payrollType === "exit") {
+      if (importData.payrollType === "exit") {
         const updatedData = importData.data!.map((item: any) => {
           const employeeId = employees?.find(
             (e) => e.employee_code === item.employee_code
@@ -133,6 +141,7 @@ export function PayrollImportData({
         submit(
           {
             type: "exit",
+            title: importData.title,
             exitData: JSON.stringify(exitForPayroll),
             totalEmployees,
             totalNetAmount,

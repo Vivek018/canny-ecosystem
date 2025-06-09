@@ -50,13 +50,16 @@ export const prepareEpfFormat = async ({
     epf_wages: formatData?.amount > 15000 ? 15000 : formatData?.amount,
     eps_wages: formatData?.amount > 15000 ? 15000 : formatData?.amount,
     edli_wages: formatData?.amount > 15000 ? 15000 : formatData?.amount,
-    epf_contribution:
-      (formatData?.amount > 15000 ? 15000 : formatData?.amount) * 0.12,
-    eps_contribution:
-      (formatData?.amount > 15000 ? 15000 : formatData?.amount) * 0.0833,
-    diffEpf_Eps:
+    epf_contribution: Number(
+      (formatData?.amount > 15000 ? 15000 : formatData?.amount) * 0.12
+    ).toFixed(2),
+    eps_contribution: Number(
+      (formatData?.amount > 15000 ? 15000 : formatData?.amount) * 0.0833
+    ).toFixed(2),
+    diffEpf_Eps: Number(
       (formatData?.amount > 15000 ? 15000 : formatData?.amount) * 0.12 -
-      (formatData?.amount > 15000 ? 15000 : formatData?.amount) * 0.0833,
+        (formatData?.amount > 15000 ? 15000 : formatData?.amount) * 0.0833
+    ).toFixed(2),
     ncp_days: null,
     refund: null,
   }));

@@ -139,23 +139,41 @@ export const useImportStoreForLeaves = create<ImportStateForLeaves>()(
 );
 
 type ImportStateForPayroll = {
-  importData: { data: ImportPayrollDataType[] };
-  setImportData: (importData: { data: ImportPayrollDataType[] }) => void;
+  importData: {
+    payrollType: string;
+    title: string;
+    data: ImportPayrollDataType[];
+  };
+  setImportData: (importData: {
+    payrollType: string;
+    title: string;
+    data: ImportPayrollDataType[];
+  }) => void;
 };
 export const useImportStoreForPayroll = create<ImportStateForPayroll>()(
   (set) => ({
-    importData: { data: [] },
+    importData: { payrollType: "", title: "", data: [] },
     setImportData: (importData) => set({ importData }),
   })
 );
 
 type ImportStateForSalaryPayroll = {
-  importData: { data: ImportSalaryPayrollDataType[] };
-  setImportData: (importData: { data: ImportSalaryPayrollDataType[] }) => void;
+  importData: {
+    title: string;
+    data: ImportSalaryPayrollDataType[];
+  };
+  setImportData: (importData: {
+    title: string;
+    data: ImportSalaryPayrollDataType[];
+  }) => void;
 };
+
 export const useImportStoreForSalaryPayroll =
   create<ImportStateForSalaryPayroll>()((set) => ({
-    importData: { data: [] },
+    importData: {
+      title: "",
+      data: [],
+    },
     setImportData: (importData) => set({ importData }),
   }));
 
