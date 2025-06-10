@@ -53,7 +53,6 @@ export async function getPendingOrSubmittedPayrollsByCompanyId({
     "status",
     "run_date",
     "total_net_amount",
-    "commission",
     "company_id",
     "created_at",
   ] as const;
@@ -75,11 +74,11 @@ export async function getPendingOrSubmittedPayrollsByCompanyId({
   }
 
   if (payroll_type) {
-    query.eq("payroll_type", payroll_type);
+    query.eq("payroll_type", payroll_type as PayrollDatabaseRow["payroll_type"]);
   }
 
   if (status) {
-    query.eq("status", status);
+    query.eq("status", status as PayrollDatabaseRow["status"]);
   }
 
   const { data, count, error } = await query.range(from, to);
@@ -114,7 +113,6 @@ export async function getApprovedPayrollsByCompanyId({
     "status",
     "run_date",
     "total_net_amount",
-    "commission",
     "company_id",
     "created_at",
   ] as const;
@@ -136,11 +134,11 @@ export async function getApprovedPayrollsByCompanyId({
   }
 
   if (payroll_type) {
-    query.eq("payroll_type", payroll_type);
+    query.eq("payroll_type", payroll_type as PayrollDatabaseRow["payroll_type"]);
   }
 
   if (status) {
-    query.eq("status", status);
+    query.eq("status", status as PayrollDatabaseRow["status"]);
   }
 
   const { data, count, error } = await query.range(from, to);
@@ -164,7 +162,6 @@ export async function getPayrollById({
     "status",
     "run_date",
     "total_net_amount",
-    "commission",
     "company_id",
     "created_at",
   ] as const;
