@@ -344,6 +344,7 @@ export const positionArray = [
   "finance_manager",
   "jr_accountant",
   "office_assistant",
+  "office_attendant",
   "fitter",
   "assistant_fitter",
   "store_department",
