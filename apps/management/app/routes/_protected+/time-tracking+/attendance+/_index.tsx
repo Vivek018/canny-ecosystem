@@ -1,7 +1,6 @@
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
   LAZY_LOADING_LIMIT,
-  MAX_QUERY_LIMIT,
 } from "@canny_ecosystem/supabase/constant";
 import {
   getAttendanceByCompanyId,
@@ -101,13 +100,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
       range: searchParams.get("range") ?? undefined,
     };
 
-    const hasFilters = Object.values(filters).some((value) => value);
     const attendancePromise = getAttendanceByCompanyId({
       supabase,
       companyId,
       params: {
         from: 0,
-        to: hasFilters ? MAX_QUERY_LIMIT : pageSize - 1,
+        to: pageSize - 1,
         filters,
         searchQuery: filters.name,
         sort: searchParams.get("sort")?.split(":") as [string, "asc" | "desc"],
