@@ -160,7 +160,6 @@ export default function RunPayrollIndex() {
                               key={payroll.id}
                               value={
                                 payroll.id +
-                                payroll?.commission +
                                 payroll?.payroll_type +
                                 formatDate(payroll?.run_date) +
                                 payroll?.status +
