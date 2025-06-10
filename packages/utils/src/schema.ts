@@ -275,11 +275,11 @@ export const EmployeeStatutorySchema = z.object({
   aadhaar_number: zNumber.min(12).max(12).optional(),
   pan_number: zNumberString.max(10).optional(),
   uan_number: zNumberString.max(12).optional(),
-  pf_number: zNumberString.max(20).optional(),
-  esic_number: zNumberString.max(20).optional(),
-  driving_license_number: zNumberString.max(20).optional(),
+  pf_number: zNumberString.max(30).optional(),
+  esic_number: zNumberString.max(30).optional(),
+  driving_license_number: zNumberString.max(30).optional(),
   driving_license_expiry: z.string().optional(),
-  passport_number: zNumberString.max(20).optional(),
+  passport_number: zNumberString.max(30).optional(),
   passport_expiry: z.string().optional(),
 });
 
