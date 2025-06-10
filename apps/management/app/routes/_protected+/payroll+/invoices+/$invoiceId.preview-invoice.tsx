@@ -223,7 +223,7 @@ const InvoicePDF = ({
       )?.amount ?? 0
     );
 
-  const includedFields = terms.include_service_charge
+  const includedFields = terms?.include_service_charge
     ?.split(",")
     .map((f: string) => f.trim().toUpperCase());
 
@@ -1196,6 +1196,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   if (error) {
     throw new Error("Error fetching company ID");
   }
+
 
   let companyRelations = [] as any;
   if (cannyData?.id) {

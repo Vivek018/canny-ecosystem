@@ -3,13 +3,12 @@ import type { NavList } from "@canny_ecosystem/types";
 export const DEFAULT_ROUTE = "/";
 
 export const CANNY_MANAGEMENT_SERVICES_COMPANY_ID =
-  "0638799b-6608-4326-8da0-8ac1fa38f0e7";
+  "3f01b65d-ba67-4d57-9e79-c5ad9d8695a3";
 
 export const CANNY_MANAGEMENT_SERVICES_NAME = "Canny Management Services";
 
 export const CANNY_MANAGEMENT_SERVICES_ADDRESS =
   "502-503, Girivar Glean, Under Odhav Overbrigde, Sardar Patel Ring Rd, nr. Palm Hotel, Odhav, Ahmedabad, Gujarat 382415";
-
 
 export const sideNavList = [
   { name: "Dashboard", link: "/dashboard", icon: "dashboard" },
@@ -58,4 +57,104 @@ export const cacheKeyPrefix = {
   attendance: "attendance",
   attendanceReport: "attendance-report",
   employee_leaves: "employee-leaves",
+  employee_salary: "employee_salary",
 };
+
+
+export function numberToWordsIndian(num: number) {
+  const belowTwenty = [
+    "zero",
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+    "ten",
+    "eleven",
+    "twelve",
+    "thirteen",
+    "fourteen",
+    "fifteen",
+    "sixteen",
+    "seventeen",
+    "eighteen",
+    "nineteen",
+  ];
+  const tens = [
+    "",
+    "",
+    "twenty",
+    "thirty",
+    "forty",
+    "fifty",
+    "sixty",
+    "seventy",
+    "eighty",
+    "ninety",
+  ];
+  const units = [
+    "",
+    "thousand",
+    "lakh",
+    "crore",
+    "arab",
+    "kharab",
+    "neel",
+    "padma",
+  ];
+
+  function convertBelowThousand(n: number): string {
+    if (n === 0) return "";
+    if (n < 20) return belowTwenty[n];
+    if (n < 100)
+      return (
+        tens[Math.floor(n / 10)] + (n % 10 ? ` ${belowTwenty[n % 10]}` : "")
+      );
+    return `${belowTwenty[Math.floor(n / 100)]} hundred${
+      n % 100 ? ` ${convertBelowThousand(n % 100)}` : ""
+    }`;
+  }
+
+  function convertIntegerToWordsIndian(n: number) {
+    if (n === 0) return "zero";
+
+    const parts = [];
+    let i = 0;
+
+    while (n > 0) {
+      const remainder = n % (i === 0 ? 1000 : 100); // First group is 3 digits, subsequent groups are 2 digits
+      if (remainder > 0) {
+        const groupName = i > 0 ? units[i] : ""; // Add lakh, crore, etc.
+        parts.unshift(
+          convertBelowThousand(remainder) + (groupName ? ` ${groupName}` : "")
+        );
+      }
+      n = Math.floor(n / (i === 0 ? 1000 : 100)); // Reduce the number based on the group
+      i++;
+    }
+
+    return parts.join(" ");
+  }
+
+  function convertDecimalPart(decimalStr: string) {
+    return decimalStr
+      .split("")
+      .map((digit) => belowTwenty[Number.parseInt(digit, 10)])
+      .join(" ");
+  }
+
+  // Split integer and decimal parts
+  const [integerPart, decimalPart] = num.toString().split(".");
+  const integerWords = convertIntegerToWordsIndian(
+    Number.parseInt(integerPart, 10)
+  );
+  const decimalWords = decimalPart
+    ? `point ${convertDecimalPart(decimalPart)}`
+    : "";
+
+  return `${integerWords}${decimalPart ? ` ${decimalWords}` : ""}`;
+}

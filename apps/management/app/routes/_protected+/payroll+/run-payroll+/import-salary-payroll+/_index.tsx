@@ -39,6 +39,7 @@ import {
   DialogTrigger,
 } from "@canny_ecosystem/ui/dialog";
 import { payoutMonths } from "@canny_ecosystem/utils/constant";
+import { Input } from "@canny_ecosystem/ui/input";
 
 export type FieldConfig = {
   key: string;
@@ -57,7 +58,7 @@ const FIELD_CONFIGS: FieldConfig[] = [
   },
   {
     key: "esic_number",
-    required: true,
+    required: false,
   },
   {
     key: "present_days",
@@ -82,12 +83,12 @@ export default function PayrollImportFieldMapping() {
   const [addFieldValueType, setAddFieldValueType] = useState("");
   const [month, setMonth] = useState(defaultMonth + 2);
   const [year, setYear] = useState(defaultYear);
+  const [title, setTitle] = useState("");
   const [open, setOpen] = useState(false);
   const [fieldConfigs, setFieldConfigs] = useState<FieldConfig[]>([
     ...FIELD_CONFIGS,
     {
       key: "BASIC",
-      required: true,
       type: "earning",
     },
     {
@@ -198,11 +199,13 @@ export default function PayrollImportFieldMapping() {
 
   const validateImportData = (data: any[]) => {
     try {
-      const result = ImportSalaryPayrollDataSchema.safeParse({ data });
+      const result = ImportSalaryPayrollDataSchema.safeParse({ title, data });
+
       if (!result.success) {
         const formattedErrors = result.error.errors.map(
-          (err) => `${err.path[2]}: ${err.message}`
+          (err) => `${err.path[0]}: ${err.message}`
         );
+
         setValidationErrors(formattedErrors);
         return false;
       }
@@ -302,6 +305,7 @@ export default function PayrollImportFieldMapping() {
             });
 
             setImportData({
+              title,
               data: finalImport as ImportSalaryPayrollDataType[],
             });
 
@@ -371,7 +375,12 @@ export default function PayrollImportFieldMapping() {
                 </ul>
               </div>
             )}
-
+            <Input
+              className=""
+              placeholder="Enter the title here"
+              onChange={(e) => setTitle(e.target.value)}
+            />
+            
             <div className="grid grid-cols-2 place-content-center justify-between gap-y-8 gap-x-10 mt-5 mb-10">
               {fieldConfigs.map((field) => (
                 <div key={field.key} className="flex flex-col relative">

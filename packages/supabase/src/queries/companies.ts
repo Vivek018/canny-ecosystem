@@ -464,10 +464,8 @@ export async function getRelationshipsByParentAndChildCompanyId({
   const { data, error } = await supabase
     .from("company_relationships")
     .select(columns.join(","))
-    .or(
-      `parent_company_id.eq.${parentCompanyId},child_company_id.eq.${childCompanyId}`
-    )
-    .order("created_at", { ascending: false })
+    .eq('parent_company_id', parentCompanyId)
+    .eq('child_company_id', childCompanyId)
     .single<RelationshipWithCompany>();
 
   if (error) {

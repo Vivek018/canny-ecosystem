@@ -275,11 +275,11 @@ export const EmployeeStatutorySchema = z.object({
   aadhaar_number: zNumber.min(12).max(12).optional(),
   pan_number: zNumberString.max(10).optional(),
   uan_number: zNumberString.max(12).optional(),
-  pf_number: zNumberString.max(20).optional(),
-  esic_number: zNumberString.max(20).optional(),
-  driving_license_number: zNumberString.max(20).optional(),
+  pf_number: zNumberString.max(30).optional(),
+  esic_number: zNumberString.max(30).optional(),
+  driving_license_number: zNumberString.max(30).optional(),
   driving_license_expiry: z.string().optional(),
-  passport_number: zNumberString.max(20).optional(),
+  passport_number: zNumberString.max(30).optional(),
   passport_expiry: z.string().optional(),
 });
 
@@ -1293,7 +1293,12 @@ export const SalaryEntrySchema = z.object({
   is_overtime: z.boolean().default(false),
 });
 
-export const payrollTypesArray = ["salary", "reimbursement", "exit", "others"];
+export const payrollTypesArray = [
+  "salary",
+  "reimbursement",
+  "exit",
+  "others",
+] as const;
 
 export const PayrollEntrySchema = z.object({
   id: z.string().optional(),
@@ -1738,6 +1743,8 @@ export const ImportSinglePayrollDataSchema = z.object({
 });
 
 export const ImportPayrollDataSchema = z.object({
+  payrollType: z.enum(payrollTypesArray),
+  title: z.string().min(3),
   data: z.array(ImportSinglePayrollDataSchema),
 });
 
@@ -1770,6 +1777,7 @@ export const ImportSingleSalaryPayrollDataSchema = z.object({
 });
 
 export const ImportSalaryPayrollDataSchema = z.object({
+  title: z.string().min(3),
   data: z.array(ImportSingleSalaryPayrollDataSchema),
 });
 

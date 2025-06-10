@@ -122,10 +122,14 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
         {/* Company Header */}
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
           <View style={{ flex: 1, marginRight: 10 }}>
-            <Text style={styles.companyName}>{data.companyData?.name}</Text>
-            <Text
-              style={styles.companyAddress}
-            >{`${data?.companyData?.address_line_1}, ${data?.companyData?.address_line_2}, ${data?.companyData?.city}, ${data?.companyData?.state}, ${data?.companyData?.pincode}`}</Text>
+            <Text style={styles.companyName}>{data?.companyData?.name}</Text>
+            <Text style={styles.companyAddress}>{`${
+              data?.companyData?.address_line_1
+            }, ${data?.companyData?.address_line_2 ?? ""}, ${
+              data?.companyData?.city
+            }, ${data?.companyData?.state}, ${
+              data?.companyData?.pincode
+            }`}</Text>
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.companyName}>
@@ -339,6 +343,7 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
                 <Text style={{ fontSize: "7" }}>EPF</Text>
                 <Text style={{ fontSize: "7" }}>ESIC</Text>
                 <Text style={{ fontSize: "7" }}>PT</Text>
+                <Text style={{ fontSize: "7" }}>PF</Text>
                 <Text style={{ fontSize: "7" }}>LWF</Text>
                 <Text style={{ fontSize: "7" }}>Advances</Text>
               </View>
@@ -381,7 +386,7 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
             >
               <Text style={{ marginBottom: "8" }}>
                 {employee?.employeeData?.first_name}{" "}
-                {employee?.employeeData?.middle_name}{" "}
+                {employee?.employeeData?.middle_name ?? ""}{" "}
                 {employee?.employeeData?.last_name}
               </Text>
 
@@ -490,35 +495,35 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
                 {Number(
                   employee?.earnings
                     .find((e) => e?.name === "BASIC")
-                    ?.amount?.toFixed(2) ?? 0
+                    ?.amount?.toFixed(2) ?? 0.0
                 )}
               </Text>
               <Text>
                 {Number(
                   employee?.earnings
                     .find((e) => e?.name === "HRA")
-                    ?.amount?.toFixed(2) ?? 0
+                    ?.amount?.toFixed(2) ?? 0.0
                 )}
               </Text>
               <Text>
                 {Number(
                   employee?.earnings
                     .find((e) => e?.name === "LTA")
-                    ?.amount?.toFixed(2) ?? 0
+                    ?.amount?.toFixed(2) ?? 0.0
                 )}
               </Text>
               <Text>
                 {Number(
                   employee?.earnings
                     .find((e) => e.name === "Others")
-                    ?.amount?.toFixed(2) ?? 0
+                    ?.amount?.toFixed(2) ?? 0.0
                 )}
               </Text>
               <Text>
                 {Number(
                   employee?.earnings
                     .find((e) => e?.name === "BONUS")
-                    ?.amount?.toFixed(2) ?? 0
+                    ?.amount?.toFixed(2) ?? 0.0
                 )}
               </Text>
             </View>
@@ -539,7 +544,7 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
                 {Number(
                   employee?.earnings
                     .find((e) => e?.name === "BASIC")
-                    ?.amount?.toFixed(2) ?? 0
+                    ?.amount?.toFixed(2) ?? 0.0
                 )}
               </Text>
               <Text>0</Text>
@@ -564,8 +569,8 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
               >
                 {Number(
                   employee?.deductions
-                    .find((e) => e?.name === "EPF" || e?.name === "PF")
-                    ?.amount?.toFixed(2) ?? 0
+                    .find((e) => e?.name === "EPF" || "PF")
+                    ?.amount?.toFixed(2) ?? 0.0
                 )}
               </Text>
               <Text
@@ -575,8 +580,19 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
               >
                 {Number(
                   employee?.deductions
-                    .find((e) => e?.name === "ESI" || e?.name === "ESIC")
-                    ?.amount?.toFixed(2) ?? 0
+                    .find((e) => e?.name === "ESIC")
+                    ?.amount?.toFixed(2) ?? 0.0
+                )}
+              </Text>
+              <Text
+                style={{
+                  fontSize: "7",
+                }}
+              >
+                {Number(
+                  employee?.deductions
+                    .find((e) => e?.name === "PT")
+                    ?.amount?.toFixed(2) ?? 0.0
                 )}
               </Text>
               <Text
@@ -587,7 +603,7 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
                 {Number(
                   employee?.deductions
                     .find((e) => e?.name === "PF")
-                    ?.amount?.toFixed(2) ?? 0
+                    ?.amount?.toFixed(2) ?? 0.0
                 )}
               </Text>
               <Text
@@ -598,7 +614,7 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
                 {Number(
                   employee?.deductions
                     .find((e) => e?.name === "LWF")
-                    ?.amount?.toFixed(2) ?? 0
+                    ?.amount?.toFixed(2) ?? 0.0
                 )}
               </Text>
               <Text
@@ -609,7 +625,7 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
                 {Number(
                   employee?.deductions
                     .find((e) => e.name === "Advances")
-                    ?.amount?.toFixed(2) ?? 0
+                    ?.amount?.toFixed(2) ?? 0.0
                 )}
               </Text>
             </View>
@@ -708,16 +724,16 @@ export default function SalaryRegister() {
   const { isDocument } = useIsDocument();
 
   function transformData(data: any) {
-    const company = data.employeeCompanyData;
-    const location = data.employeesCompanyLocationData;
+    const company = data?.employeeCompanyData;
+    const location = data?.employeesCompanyLocationData;
 
     const companyData = {
-      name: company.name,
-      address_line_1: location.address_line_1,
-      address_line_2: location.address_line_2,
-      city: location.city,
-      state: location.state,
-      pincode: location.pincode,
+      name: company?.name,
+      address_line_1: location?.address_line_1,
+      address_line_2: location?.address_line_2,
+      city: location?.city,
+      state: location?.state,
+      pincode: location?.pincode,
     };
 
     interface SalaryEntry {

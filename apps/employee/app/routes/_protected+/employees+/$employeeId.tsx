@@ -1,10 +1,20 @@
 import { FooterTabs } from "@/components/footer-tabs";
-import { json, Link, Outlet, useLoaderData, useLocation, useParams } from "@remix-run/react";
+import {
+  json,
+  Link,
+  Outlet,
+  useLoaderData,
+  useLocation,
+  useParams,
+} from "@remix-run/react";
 import { SecondaryMenu } from "@canny_ecosystem/ui/secondary-menu";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import { getEmployeeIdFromCookie, getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import {
+  getEmployeeIdFromCookie,
+  getUserCookieOrFetchUser,
+} from "@/utils/server/user.server";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { safeRedirect } from "@/utils/server/http.server";
@@ -19,7 +29,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
-  return json({ user })
+  return json({ user });
 }
 
 export default function Employee() {
@@ -29,8 +39,14 @@ export default function Employee() {
 
   const items = [
     { label: "Overview", path: `/employees/${employeeId}/overview` },
-    { label: "Work Portfolio", path: `/employees/${employeeId}/work-portfolio` },
-    { label: "Reimbursements", path: `/employees/${employeeId}/reimbursements` },
+    {
+      label: "Work Portfolio",
+      path: `/employees/${employeeId}/work-portfolio`,
+    },
+    {
+      label: "Reimbursements",
+      path: `/employees/${employeeId}/reimbursements`,
+    },
     { label: "Letters", path: `/employees/${employeeId}/letters` },
     { label: "Attendance", path: `/employees/${employeeId}/attendance` },
     { label: "Payments", path: `/employees/${employeeId}/payments` },
@@ -38,22 +54,28 @@ export default function Employee() {
       label: "Leaves",
       path: `/employees/${employeeId}/leaves`,
     },
-  ]
+    {
+      label: "Salary",
+      path: `/employees/${employeeId}/salary`,
+    },
+  ];
 
   return (
     <section className="relative w-full">
       <div className="flex items-center gap-4 md:py-2.5 px-4 md:border-b border-t">
         <div className="hidden md:flex md:items-center md:gap-4">
-          {user && <Link
-            prefetch="intent"
-            to="/employees"
-            className={cn(
-              buttonVariants({ variant: "outline" }),
-              "bg-card w-9 h-9 px-0 rounded-full"
-            )}
-          >
-            <Icon name="chevron-left" size="sm" />
-          </Link>}
+          {user && (
+            <Link
+              prefetch="intent"
+              to="/employees"
+              className={cn(
+                buttonVariants({ variant: "outline" }),
+                "bg-card w-9 h-9 px-0 rounded-full"
+              )}
+            >
+              <Icon name="chevron-left" size="sm" />
+            </Link>
+          )}
           <SecondaryMenu
             items={items}
             pathname={pathname}
@@ -62,13 +84,11 @@ export default function Employee() {
           />
         </div>
 
-        <FooterTabs
-          items={items}
-          pathname={pathname}
-          Link={Link}
-        />
+        <FooterTabs items={items} pathname={pathname} Link={Link} />
       </div>
-      <div className="px-4 pb-20"><Outlet /></div>
+      <div className="px-4 pb-20">
+        <Outlet />
+      </div>
     </section>
   );
 }

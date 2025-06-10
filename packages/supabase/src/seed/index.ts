@@ -83,6 +83,7 @@ import {
   seedReimbursementPayroll,
   seedSalaryPayroll,
 } from "./payroll";
+import { CANNY_MANAGEMENT_SERVICES_COMPANY_ID } from "../../../../apps/management/app/constant";
 
 dotenv.config();
 
@@ -126,6 +127,7 @@ export async function seed(newCompanyId?: string) {
         data: {
           ...seedCompanyRelationships(),
           parent_company_id: companyId!,
+          child_company_id: CANNY_MANAGEMENT_SERVICES_COMPANY_ID,
         },
         bypassAuth: true,
       });

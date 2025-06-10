@@ -42,19 +42,12 @@ export function PayrollEntryComponent({
   fromWhere: "runpayroll" | "payrollhistory";
 }) {
   const payrollCardDetails = [
+    { title: "Title", value: "title" },
     { title: "Payroll Type", value: "payroll_type" },
     { title: "Status", value: "status" },
-    { title: "Payroll Cost", value: "cost" },
     { title: "Net Pay", value: "total_net_amount" },
     { title: "No of Employees", value: "total_employees" },
-    { title: "Pay Day", value: "created_at" },
   ];
-  const updatedPayrollCardDetails =
-    payrollData.payroll_type === "reimbursement" ||
-    payrollData.payroll_type === "exit" ||
-    payrollData.payroll_type === "salary"
-      ? payrollCardDetails.filter((_, index) => index !== 2)
-      : payrollCardDetails;
 
   const { role } = useUser();
   const { payrollId } = useParams();
@@ -103,15 +96,20 @@ export function PayrollEntryComponent({
           "h-24 mb-5 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4"
         )}
       >
-        {updatedPayrollCardDetails?.map((details, index) => (
+        {payrollCardDetails?.map((details, index) => (
           <Card key={index.toString()} className="flex flex-col justify-around">
             <CardHeader className="p-0">
               <CardTitle className="text-lg text-center">
                 {details.title}
               </CardTitle>
             </CardHeader>
-            <CardContent className="py-0">
-              <p className="text-muted-foreground text-center">
+            <CardContent className="py-0 px-2 text-muted-foreground text-center">
+              <p
+                className={cn(
+                  "text-wrap break-words whitespace-pre-wrap",
+                  details.title === "Title" && "text-sm"
+                )}
+              >
                 {details.value === "created_at"
                   ? formatDate(
                       payrollData[details.value as keyof typeof payrollData]

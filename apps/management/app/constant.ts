@@ -11,7 +11,7 @@ import {
 export const DEFAULT_ROUTE = "/";
 
 export const CANNY_MANAGEMENT_SERVICES_COMPANY_ID =
-  "0638799b-6608-4326-8da0-8ac1fa38f0e7";
+  "3f01b65d-ba67-4d57-9e79-c5ad9d8695a3";
 
 export const CANNY_MANAGEMENT_SERVICES_NAME = "Canny Management Services";
 
@@ -246,6 +246,7 @@ export const cacheKeyPrefix = {
   employee_reimbursements: "employee-reimbursements",
   employee_letters: "employee-letters",
   employee_payments: "employee_payments",
+  employee_salary: "employee_salary",
   payroll: "payroll",
   run_payroll: "run-payroll",
   run_payroll_id: "run-payroll-id",
@@ -295,7 +296,7 @@ export const cacheKeyPrefix = {
   payroll_invoice: "payroll-invoice",
 };
 
-export const SALARY_SLIP_TITLE = "Salary Slip Form IV B [Rule 26(2)(b)]";
+export const SALARY_SLIP_TITLE = "Form IV B [Rule 26(2)(b)]";
 
 export function numberToWordsIndian(num: number) {
   const belowTwenty = [
