@@ -1,4 +1,3 @@
-import { EmployeesActions } from "@/components/employees/employee-actions";
 import { EmployeesSearchFilter } from "@/components/employees/employee-search-filter";
 import { FilterList } from "@/components/employees/filter-list";
 import { ImportEmployeeAddressModal } from "@/components/employees/import-export/import-modal-address";
@@ -24,7 +23,6 @@ import {
   getEmployeesByCompanyId,
   getProjectNamesByCompanyId,
   getSiteNamesByProjectName,
-  getUsersEmail,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
@@ -104,7 +102,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
         projectName: filters.project,
       });
     }
-    const { data: userEmails } = await getUsersEmail({ companyId, supabase });
     return defer({
       employeesPromise: employeesPromise as any,
       projectPromise,
@@ -112,7 +109,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
       query,
       filters,
       companyId,
-      userEmails,
       env,
     });
   } catch (error) {
@@ -124,7 +120,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
       projectSitePromise: Promise.resolve({ data: [] }),
       query: "",
       filters: null,
-      userEmails: null,
       companyId: "",
       env,
     });
@@ -177,7 +172,6 @@ export default function EmployeesIndex() {
     filters,
     companyId,
     env,
-    userEmails,
   } = useLoaderData<typeof loader>();
 
   const filterList = { ...filters, name: query };
@@ -214,10 +208,10 @@ export default function EmployeesIndex() {
             </Await>
           </Suspense>
         </div>
-        <EmployeesActions
+        {/* <EmployeesActions
           isEmpty={!projectPromise}
-          emails={userEmails as unknown as any}
-        />
+          emails={}
+        /> */}
       </div>
       <Suspense fallback={<LoadingSpinner className="h-1/3" />}>
         <Await resolve={employeesPromise}>

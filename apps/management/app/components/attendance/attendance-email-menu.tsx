@@ -39,7 +39,7 @@ export default function AttendanceEmailMenu({
   emails: any[];
   columnVisibility: any;
 }) {
-  const userEmails = emails.map((item) => item.email);
+  const userEmails = emails.map((item) => item?.email);
 
   const { role } = useUser();
   const [to, setTo] = useState<string[]>();

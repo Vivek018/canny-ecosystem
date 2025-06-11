@@ -9,22 +9,19 @@ import type {
   CompanyDatabaseRow,
   LocationDatabaseRow,
 } from "@canny_ecosystem/supabase/types";
-import AttendanceEmailMenu from "./attendance-email-menu";
 
 export function AttendanceActions({
   isEmpty,
   companyName,
   companyAddress,
-  userEmails,
 }: {
   isEmpty?: boolean;
   companyName?: CompanyDatabaseRow;
   companyAddress?: LocationDatabaseRow;
-  userEmails: any[];
 }) {
   const navigate = useNavigate();
-  const { selectedRows, columnVisibility } = useAttendanceStore();
-  
+  const { selectedRows } = useAttendanceStore();
+
   return (
     <div className="space-x-2 hidden md:flex">
       <ColumnVisibility disabled={isEmpty} />
