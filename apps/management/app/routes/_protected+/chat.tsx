@@ -1,3 +1,4 @@
+import { Results } from "@/components/ai/result";
 import { cacheKeyPrefix } from "@/constant";
 import { generateQuery, runGeneratedSQLQuery } from "@/utils/ai/chat";
 import { clientCaching } from "@/utils/cache";
@@ -22,7 +23,7 @@ const suggestedPrompt = [
   "List all pending reimbursements that need approval",
   // "Generate ESI/PF contribution report for this quarter",
   "Which employees have incomplete document submissions?",
-  "List all projects and their employee count",
+  "List all projects sites with no of employees",
   "Payroll with highest amount in last 2 years",
   "Show me the top 5 employees with the highest salaries",
   "Show me employees with upcoming birthdays",
@@ -79,10 +80,12 @@ clientLoader.hydrate = true;
 export default function Chat() {
 
   const { data, error } = useLoaderData<typeof loader>();
+  const columns = data?.[0] ? Object.keys(data[0]) : [];
 
   const { toast } = useToast();
   const [prompt, setPrompt] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const [chartConfig, setChartConfig] = useState<null>(null);
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -98,6 +101,7 @@ export default function Chat() {
   const clearSearch = () => {
     searchParams.delete("prompt");
     setSearchParams(searchParams);
+    setChartConfig(null);
   }
 
   useEffect(() => {
@@ -131,6 +135,8 @@ export default function Chat() {
     searchParams.set("prompt", prompt);
     setSearchParams(searchParams);
   };
+
+  console.log(data, columns);
 
   return (
     <section className="w-full h-full p-4 flex flex-col items-center justify-start gap-4">
@@ -176,7 +182,7 @@ export default function Chat() {
             suggestedPrompt.map((prompt, index) => (
               <div
                 key={prompt + index.toString()}
-                className="w-max h-min text-sm tracking-wide cursor-pointer text-muted-foreground hover:text-foreground px-5 py-2.5 border dark:border-muted-foreground/40 rounded-md hover:bg-accent transition-colors"
+                className="w-max h-min text-sm tracking-wider cursor-pointer text-muted-foreground hover:text-foreground px-5 py-2.5 border dark:border-muted-foreground/40 rounded-md hover:bg-accent transition-colors"
                 tabIndex={0}
                 role="button"
                 onClick={() => {
@@ -199,7 +205,7 @@ export default function Chat() {
       <div className={cn("hidden", (searchPrompt && !data?.length) && "flex flex-col gap-4 w-full h-3/5 items-center justify-center")}>
         {isSubmitting ?
           <>
-            <p className="text-muted-foreground text-lg">Searching...</p>
+            <p className="text-muted-foreground text-lg">Creating Data For You...</p>
           </>
           :
           <>
@@ -210,6 +216,14 @@ export default function Chat() {
           </>
         }
       </div>
+      {/* Data Display */}
+      <Card className={cn("w-full h-full md:w-4/5 overflow-y-auto", (!data?.length) && "hidden")}>
+        <Results
+          results={data}
+          chartConfig={chartConfig}
+          columns={columns}
+        />
+      </Card>
     </section>
   )
 }
