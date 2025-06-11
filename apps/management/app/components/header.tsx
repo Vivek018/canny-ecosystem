@@ -18,7 +18,6 @@ export function Header({
       )}
     >
       <AssistantButton />
-
       <div className="flex gap-4 items-center no-drag">
         <CompanySwitch companies={companies} />
       </div>

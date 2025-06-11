@@ -1,3 +1,4 @@
+import { EmployeesActions } from "@/components/employees/employee-actions";
 import { EmployeesSearchFilter } from "@/components/employees/employee-search-filter";
 import { FilterList } from "@/components/employees/filter-list";
 import { ImportEmployeeAddressModal } from "@/components/employees/import-export/import-modal-address";
@@ -133,7 +134,6 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
     args
   );
 }
-
 clientLoader.hydrate = true;
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -208,10 +208,10 @@ export default function EmployeesIndex() {
             </Await>
           </Suspense>
         </div>
-        {/* <EmployeesActions
+        <EmployeesActions
           isEmpty={!projectPromise}
-          emails={}
-        /> */}
+          // emails={}
+        />
       </div>
       <Suspense fallback={<LoadingSpinner className="h-1/3" />}>
         <Await resolve={employeesPromise}>

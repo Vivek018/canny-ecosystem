@@ -153,6 +153,7 @@ export const cacheKeyPrefix = {
   index: "index",
   protected: "protected",
   dashboard: "dashboard",
+  chat: "chat",
   employees_main: "employees-main",
   employees: "employees",
   employee_overview: "employee-overview",
@@ -265,9 +266,8 @@ export function numberToWordsIndian(num: number) {
       return (
         tens[Math.floor(n / 10)] + (n % 10 ? ` ${belowTwenty[n % 10]}` : "")
       );
-    return `${belowTwenty[Math.floor(n / 100)]} hundred${
-      n % 100 ? ` ${convertBelowThousand(n % 100)}` : ""
-    }`;
+    return `${belowTwenty[Math.floor(n / 100)]} hundred${n % 100 ? ` ${convertBelowThousand(n % 100)}` : ""
+      }`;
   }
 
   function convertIntegerToWordsIndian(n: number) {
