@@ -11,8 +11,8 @@ import { columns } from "@/components/employees/table/columns";
 import { DataTable } from "@/components/employees/table/data-table";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { LoadingSpinner } from "@/components/loading-spinner";
-import { cacheKeyPrefix, VALID_FILTERS } from "@/constant";
-import { AIChat4o } from "@/utils/ai";
+import { cacheKeyPrefix } from "@/constant";
+import { generateEmployeeFilter } from "@/utils/ai/employee";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
@@ -27,7 +27,6 @@ import {
   getUsersEmail,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { extractJsonFromString } from "@canny_ecosystem/utils";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import {
   Await,
@@ -148,37 +147,11 @@ export async function action({ request }: ActionFunctionArgs) {
     const formData = await request.formData();
     const prompt = formData.get("prompt") as string;
 
-    const completion = await AIChat4o({
-      messages: [
-        {
-          role: "system",
-          content: `You are a filter extraction assistant. Convert user queries into a JSON object using the filters below.
-Current date: ${new Date().toISOString().split("T")[0]}
-### VALID FILTERS
-${VALID_FILTERS.map(
-  (filter) =>
-    `name: "${filter.name}", type: "${
-      filter.valueType
-    }", example: ${JSON.stringify(filter.example)}`
-).join(".")}`,
-        },
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-    });
-
-    const content = completion.choices[0]?.message?.content;
-    if (!content) throw new Error("No content received from OpenAI");
-
-    const validatedContent = extractJsonFromString(content);
+    const { object } = await generateEmployeeFilter({ input: prompt });
 
     const searchParams = new URLSearchParams();
-    for (const [key, value] of Object.entries(validatedContent)) {
+    for (const [key, value] of Object.entries(object)) {
       if (value !== null && value !== undefined && String(value)?.length) {
-        if (key === "end" && !validatedContent?.start)
-          searchParams.append("start", "1947-08-15");
         searchParams.append(key, value.toString());
       }
     }

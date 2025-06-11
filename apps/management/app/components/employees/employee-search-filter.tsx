@@ -36,8 +36,8 @@ import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
 
 const PLACEHOLDERS = [
   "Employees joined after Jan 2020 with a supervisor position",
-  "Active employees with a bachelor's degree at Project Site 'B'",
-  "Skilled employees left between 2022-2024 as a contractor",
+  "Active employees with a bachelor's degree",
+  "Skilled employees joined between 2022-2024",
   "Male employees born after 1990 working as Sampler",
   "Inactive employees in Project A who left before 2023",
   "Semi Skilled Employees born 1990-2000 in full time",

@@ -116,46 +116,6 @@ export const parseStringValue = (value: string) => {
   }
 };
 
-export function extractJsonFromString(str: string): any | null {
-  // Function to find the outermost matching braces
-  function findOutermostBraces(s: string): [number, number] | null {
-    const stack: string[] = [];
-    let start = -1;
-
-    for (let i = 0; i < s.length; i++) {
-      if (s[i] === "{") {
-        if (stack.length === 0) start = i;
-        stack.push("{");
-      } else if (s[i] === "}") {
-        if (stack.length === 0) return null; // Unmatched closing brace
-        stack.pop();
-        if (stack.length === 0) return [start, i];
-      }
-    }
-
-    return null; // No matching braces found
-  }
-
-  // Find the outermost braces
-  const bracesIndices = findOutermostBraces(str);
-
-  if (bracesIndices === null) {
-    console.warn("No valid JSON object found in the string");
-    return null;
-  }
-
-  const [start, end] = bracesIndices;
-  const jsonSubstring = str.substring(start, end + 1);
-
-  try {
-    // Attempt to parse the extracted substring
-    return JSON.parse(jsonSubstring);
-  } catch (error) {
-    console.error("Failed to parse extracted JSON:", error);
-    return null;
-  }
-}
-
 export function debounce<
   Callback extends (...args: Parameters<Callback>) => void
 >(fn: Callback, delay: number) {
