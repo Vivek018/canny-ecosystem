@@ -54,19 +54,9 @@ export const TABLE_SQL_SCHEMA = `-- WARNING: This schema is for context only and
   TABLE public.employee_project_assignment (
   employee_id,project_site_id,position,start_date,end_date,created_at,updated_at,assignment_type character varying DEFAULT 'full_time'::character varyin,skill_level,probation_period,probation_end_date,CONSTRAINT employee_project_assignment_pkey PRIMARY KEY (employee_id,CONSTRAINT employee_project_assignments_project_site_id_fkey FOREIGN,CONSTRAINT employee_project_assignments_employee_id_fkey FOREIGN KEY (employee_id) REFERENCES public.employees(id)
 );
-  TABLE public.employee_provident_fund (
-  id,company_id,epf_number,deduction_cycle,employee_contribution,employer_contribution,employee_restrict_value,restrict_employer_contribution,include_employer_edli_contribution,
-  include_admin_charges,created_at,updated_at,restrict_employee_contribution,
-  employer_restrict_value,include_employer_contribution,
-  is_default,edli_restrict_value,CONSTRAINT,CONSTRAINT employee_provident_fund_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id)
-);
   TABLE public.employee_skills (
   id,employee_id,skill_name,proficiency character varying NOT NULL DEFAULT 'beginner,
   years_of_experience,created_at,updated_at,CONSTRAINT,CONSTRAINT employee_skills_employee_id_fkey FOREIGN KEY (employee_id) REFERENCES public.employees(id)
-);
-  TABLE public.employee_state_insurance (
-  id,company_id,esi_number,deduction_cycle,employee_contribution double precision NOT NULL DEFAULT 0.0075 CHECK,employer_contribution double precision NOT NULL DEFAULT 0.0325 CHECK,include_employer_contribution,
-  created_at,updated_at,is_default,max_limit,CONSTRAINT,CONSTRAINT employee_state_insurance_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id)
 );
   TABLE public.employee_statutory_details (
   employee_id,aadhaar_number,pan_number,uan_number,pf_number,esic_number,driving_license_number,driving_license_expiry,passport_number,passport_expiry,created_at,updated_at,CONSTRAINT employee_statutory_details_pkey PRIMARY KEY (employee_id,
@@ -85,22 +75,11 @@ export const TABLE_SQL_SCHEMA = `-- WARNING: This schema is for context only and
   TABLE public.feedback (
   id,subject,category,severity,message,user_id,company_id,created_at,updated_at,CONSTRAINT,CONSTRAINT feedback_user_id_fkey FOREIGN KEY (user_id) REFERENCES public,CONSTRAINT feedback_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id)
 );
-  TABLE public.gratuity (
-  id,company_id,max_amount_limit,eligibility_years numeric DEFAULT 4.5 CHECK (eligibility_years >= 0,
-  present_day_per_year integer DEFAULT 240 CHECK (present_day_per_year,payment_days_per_year integer DEFAULT 15 CHECK (payment_days_per_year,max_multiply_limit integer DEFAULT 20 CHECK (max_multiply_limit > 0,
-  created_at,updated_at,is_default,CONSTRAINT,CONSTRAINT gratuity_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id)
-);
   TABLE public.holidays (
   id,company_id,name,is_mandatory,start_date,no_of_days,created_at,updated_at,CONSTRAINT,CONSTRAINT holidays_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id)
 );
   TABLE public.invoice (
   id,invoice_number,date,subject,company_address_id,payroll_data,payroll_id,include_charge,include_cgst,include_sgst,include_igst,include_proof,proof,is_paid,updated_at,created_at,payroll_type,company_id,include_header,invoice_type,CONSTRAINT,CONSTRAINT invoice_company_address_id_fkey FOREIGN KEY (company_address_id,CONSTRAINT invoice_payroll_id_fkey FOREIGN KEY (payroll_id) REFERENCES,CONSTRAINT invoice_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id)
-);
-  TABLE public.labour_welfare_fund (
-  id,company_id,state,employer_contribution,employee_contribution,status,created_at,updated_at,deduction_cycle,CONSTRAINT,CONSTRAINT labour_welfare_fund_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id)
-);
-  TABLE public.leave_encashment (
-  eligible_years,max_encashable_leaves,max_encashment_amount,encashment_multiplier,working_days_per_year,encashment_frequency,is_default,created_at,updated_at,company_id,id,CONSTRAINT,CONSTRAINT leave_encashment_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id)
 );
   TABLE public.leave_type (
   id,created_at,updated_at,company_id,leave_type,leaves_per_year,CONSTRAINT,CONSTRAINT leave_type_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id)
@@ -111,28 +90,11 @@ export const TABLE_SQL_SCHEMA = `-- WARNING: This schema is for context only and
   TABLE public.pay_sequence (
   working_days,pay_day,created_at,id,company_id,overtime_multiplier,name,is_default,CONSTRAINT,CONSTRAINT pay_sequence_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id)
 );
-  TABLE public.payment_fields (
-  id,name,payment_type USER-DEFINED NOT NULL CHECK (payment_type::text = AN(ARRAY, 'variable'::character varying,
-  calculation_type,amount,is_active,is_pro_rata,consider_for_epf,consider_for_esic,created_at,updated_at,company_id,is_overtime,CONSTRAINT,CONSTRAINT payment_fields_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id)
-);
-  TABLE public.payment_template_assignments (
-  id,template_id,assignment_type,employee_id,site_id,eligibility_option,position,skill_level,effective_from,effective_to,is_active,created_at,updated_at,name,CONSTRAINT,CONSTRAINT payment_template_assignments_site_id_fkey FOREIGN KEY (site_id,CONSTRAINT payment_template_assignments_template_id_fkey FOREIGN KEY,CONSTRAINT payment_template_assignments_employee_id_fkey FOREIGN KEY (employee_id) REFERENCES public.employees(id)
-);
-  TABLE public.payment_template_components (
-  id,template_id,target_type,payment_field_id,epf_id,esi_id,bonus_id,pt_id,lwf_id,component_type,calculation_value,display_order,created_at,updated_at,CONSTRAINT,CONSTRAINT payment_template_components_lwf_id_fkey FOREIGN KEY (lwf_id,CONSTRAINT payment_template_components_template_id_fkey FOREIGN KEY (template_id,CONSTRAINT payment_template_components_bonus_id_fkey FOREIGN KEY (bonus_id,CONSTRAINT payment_template_components_epf_id_fkey FOREIGN KEY (epf_id,CONSTRAINT payment_template_components_esi_id_fkey FOREIGN KEY (esi_id,CONSTRAINT payment_template_components_payment_field_id_fkey FOREIGN,CONSTRAINT payment_template_components_pt_id_fkey FOREIGN KEY (pt_id) REFERENCES public.professional_tax(id)
-);
-  TABLE public.payment_templates (
-  id,name,company_id,description,is_active,created_at,updated_at,is_default,monthly_ctc,state,CONSTRAINT,CONSTRAINT payment_templates_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id)
-);
   TABLE public.payroll (
   id,status,run_date,total_net_amount,total_employees,created_at,updated_at,payroll_type,company_id,title,CONSTRAINT,CONSTRAINT payroll_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id)
 );
   TABLE public.payroll_entries (
   id,employee_id,payroll_id,amount,payment_status,created_at,updated_at,reimbursement_id,exit_id,CONSTRAINT,CONSTRAINT payroll_entries_employee_id_fkey FOREIGN KEY (employee_id,CONSTRAINT payroll_entries_exit_id_fkey FOREIGN KEY (exit_id) REFERENCES,CONSTRAINT payroll_entries_reimbursement_id_fkey FOREIGN KEY (reimbursement_id,CONSTRAINT payroll_entries_payroll_id_fkey FOREIGN KEY (payroll_id) REFERENCES public.payroll(id)
-);
-  TABLE public.professional_tax (
-  id,company_id,pt_number,deduction_cycle character varying NOT NULL DEFAULT 'monthly,
-  state,created_at,updated_at,gross_salary_range,CONSTRAINT,CONSTRAINT professional_tax_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id)
 );
   TABLE public.project_sites (
   id,project_id,name,site_code,latitude,longitude,capacity,is_active,created_at,updated_at,company_location_id,address_line_1,address_line_2,city,state,pincode,CONSTRAINT,CONSTRAINT project_sites_company_address_id_fkey FOREIGN KEY (company_location_id,CONSTRAINT project_sites_project_id_fkey FOREIGN KEY (project_id) REFERENCES public.projects(id)
@@ -148,11 +110,7 @@ export const TABLE_SQL_SCHEMA = `-- WARNING: This schema is for context only and
   id,created_at,updated_at,month,year,present_days,overtime_hours,employee_id,template_component_id,payroll_id,field_name,type,is_pro_rata,amount,consider_for_epf,consider_for_esic,is_overtime,CONSTRAINT,CONSTRAINT salary_entries_payroll_id_fkey FOREIGN KEY (payroll_id) REFERENCES,CONSTRAINT salary_entries_employee_id_fkey FOREIGN KEY (employee_id,
   CONSTRAINT salary_entries_template_component_id_fkey FOREIGN KEY (template_component_id) REFERENCES public.payment_template_components(id)
 );
-  TABLE public.statutory_bonus (
-  id,company_id,percentage,payout_month,created_at,updated_at,is_default,payment_frequency USER-DEFINED DEFAULT 'yearly,
-  CONSTRAINT,CONSTRAINT statutory_bonus_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id)
-);
-  TABLE public.users (
+TABLE public.users (
   id,first_name,last_name,email,mobile_number,avatar,is_email_verified,is_mobile_verified,preferred_language character varying DEFAULT 'en'::character varyin,
   last_login,company_id,is_active,created_at,updated_at,role,site_id,CONSTRAINT,CONSTRAINT users_site_id_fkey FOREIGN KEY (site_id) REFERENCES public,CONSTRAINT users_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id)
 );`;

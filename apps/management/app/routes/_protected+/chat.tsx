@@ -11,7 +11,7 @@ import { Input } from "@canny_ecosystem/ui/input";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { type ClientLoaderFunctionArgs, defer, useLoaderData, useNavigation, useSearchParams } from "@remix-run/react";
+import { type ClientLoaderFunctionArgs, defer, useLoaderData, useNavigate, useNavigation, useSearchParams } from "@remix-run/react";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 
@@ -24,15 +24,16 @@ const suggestedPrompt = [
   // "Generate ESI/PF contribution report for this quarter",
   "Which employees have incomplete document submissions?",
   "List all projects sites with no of employees",
-  "Payroll with highest amount in last 2 years",
-  "Show me the top 5 employees with the highest salaries",
+  "Payroll's with net amount more than 7 lakhs in last 2 years",
+  "Show me the top 20 employees with the highest salaries last month",
   "Show me employees with upcoming birthdays",
   "Show me project sites with lowest attendance rates",
-  "List all pending contractor invoices",
-  "Probation end dates by employee",
-  "Employees with upcoming leave",
-  "Generate payroll summary for last 3 month",
   "Show me accident reports by severity level",
+  "Show me all ongoing cases",
+  "List all pending invoices",
+  "Probation end dates by employee",
+  "Employees with upcoming leaves",
+  "Generate payroll summary for last 3 month",
   "List approved invoices awaiting processing",
   // "Generate monthly attendance % per site",
   "List employees with work anniversaries this month",
@@ -55,11 +56,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     const { query, error } = await generateQuery({ input: prompt, companyId });
 
+    console.log("Query: ", query);
+
     if (query === undefined || error) {
       return defer({ data: null, error: error ?? "Error generating query" });
     }
 
     const { data, error: sqlError } = await runGeneratedSQLQuery(query);
+
+    console.log("Data: ", data);
 
     return defer({ data, error: sqlError ?? null });
   } catch (error) {
@@ -82,14 +87,16 @@ export default function Chat() {
   const { data, error } = useLoaderData<typeof loader>();
   const columns = data?.[0] ? Object.keys(data[0]) : [];
 
+  const [searchParams, setSearchParams] = useSearchParams();
+  const searchPrompt = searchParams.get("prompt")?.toString() ?? undefined;
+
   const { toast } = useToast();
-  const [prompt, setPrompt] = useState("");
+  const [prompt, setPrompt] = useState(searchPrompt);
   const inputRef = useRef<HTMLInputElement>(null);
   const [chartConfig, setChartConfig] = useState<null>(null);
 
-  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
-  const searchPrompt = searchParams.get("prompt") ?? null;
 
   const navigation = useNavigation();
   const isSubmitting =
@@ -100,6 +107,7 @@ export default function Chat() {
 
   const clearSearch = () => {
     searchParams.delete("prompt");
+    setPrompt("");
     setSearchParams(searchParams);
     setChartConfig(null);
   }
@@ -132,11 +140,11 @@ export default function Chat() {
   };
 
   const handleSubmit = () => {
-    searchParams.set("prompt", prompt);
-    setSearchParams(searchParams);
+    if (prompt) {
+      searchParams.set("prompt", prompt);
+      setSearchParams(searchParams);
+    }
   };
-
-  console.log(data, columns);
 
   return (
     <section className="w-full h-full p-4 flex flex-col items-center justify-start gap-4">
@@ -202,17 +210,22 @@ export default function Chat() {
         </CardContent>
       </Card>
       {/* If no data is there after prompt */}
-      <div className={cn("hidden", (searchPrompt && !data?.length) && "flex flex-col gap-4 w-full h-3/5 items-center justify-center")}>
+      <div className={cn("hidden", (searchPrompt && !data?.length) && "flex flex-col gap-4 w-full sm:w-4/5 md:w-3/5 h-3/5 text-center items-center justify-center")}>
         {isSubmitting ?
           <>
-            <p className="text-muted-foreground text-lg">Creating Data For You...</p>
+            <p className="text-muted-foreground text-xl">Creating Data For You......</p>
           </>
           :
           <>
-            <p className="text-muted-foreground text-lg">
-              No data found for your prompt. Please try a different question.
+            <p className="text-muted-foreground">
+              No data found for your prompt. Please try a different question. Since, this chat box is in early stages it might not work as expected. Try refreshing page or other prompts.
             </p>
-            <Button size="lg" variant={"secondary"} onClick={clearSearch}>Clear</Button>
+            <div className="flex flex-col md:flex-row gap-3 items-center justify-center">
+              <Button size="full" className="w-40" variant={"primary-outline"} onClick={() => {
+                navigate(0)
+              }}>Refresh</Button>
+              <Button size="full" className="w-40" variant={"secondary"} onClick={clearSearch}>Clear</Button>
+            </div>
           </>
         }
       </div>

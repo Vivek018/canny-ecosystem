@@ -1,5 +1,6 @@
 import { Tabs, TabsContent, TabsTrigger, TabsList } from "@canny_ecosystem/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@canny_ecosystem/ui/table";
+import { capitalizeFirstLetter, formatDate, pipe, replaceDash, replaceUnderscore } from "@canny_ecosystem/utils";
 
 
 export const Results = ({
@@ -58,36 +59,38 @@ export const Results = ({
             Chart
           </TabsTrigger>
         </TabsList>
-        <TabsContent value="table" className="flex-grow">
+        <TabsContent value="table" className="flex-grow mt-0">
           <div className="sm:min-h-[10px] relative">
-            <Table className="min-w-full divide-y divide-border">
-              <TableHeader className="bg-secondary sticky top-0 shadow-sm">
+            <Table className="min-w-max divide-y divide-border">
+              <TableHeader>
                 <TableRow>
                   {columns.map((column, index) => (
                     <TableHead
                       key={index.toString()}
-                      className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                      className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider w-max"
                     >
-                      {formatColumnTitle(column)}
+                      {pipe(formatColumnTitle, formatDate, replaceDash, replaceUnderscore, capitalizeFirstLetter)(column)}
                     </TableHead>
                   ))}
                 </TableRow>
               </TableHeader>
-              <TableBody className="bg-card divide-y divide-border">
+              <TableBody className="bg-card border-b-2">
                 {results.map((company, index) => (
-                  <TableRow key={index.toString()} className="hover:bg-muted">
-                    {columns.map((column, cellIndex) => (
-                      <TableCell
-                        key={cellIndex.toString()}
-                        className="px-6 py-4 whitespace-nowrap text-sm text-foreground"
-                      >
-                        {formatCellValue(
-                          column,
-                          company[column],
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
+                  <>
+                    <TableRow key={index.toString()}>
+                      {columns.map((column, cellIndex) => (
+                        <TableCell
+                          key={cellIndex.toString()}
+                          className="px-6 py-4 whitespace-nowrap text-sm text-foreground"
+                        >
+                          {pipe(formatDate, replaceDash, replaceUnderscore)(formatCellValue(
+                            column,
+                            company[column],
+                          ))}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  </>
                 ))}
               </TableBody>
             </Table>
