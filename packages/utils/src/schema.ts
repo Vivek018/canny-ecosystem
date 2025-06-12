@@ -372,6 +372,7 @@ export const positionArray = [
   "scaffolder",
   "qac",
   "lab_chemist",
+  "lab_attendant",
   "food_chemist",
   "lab_assistant",
   "heavy_equipment_operator",
