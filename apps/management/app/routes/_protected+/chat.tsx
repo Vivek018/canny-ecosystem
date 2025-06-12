@@ -1,6 +1,6 @@
 import { Results } from "@/components/ai/result";
 import { cacheKeyPrefix } from "@/constant";
-import { generateQuery, runGeneratedSQLQuery } from "@/utils/ai/chat";
+import { fetchAllSingleSQLQuery, generateQuery, runGeneratedSQLQuery } from "@/utils/ai/chat";
 import { clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -24,7 +24,7 @@ const suggestedPrompt = [
   // "Generate ESI/PF contribution report for this quarter",
   "Which employees have incomplete document submissions?",
   "List all projects sites with no of employees",
-  "Payroll's with net amount more than 7 lakhs in last 2 years",
+  "Payroll with amount more than 7 lakhs in last 2 years",
   "Show me the top 20 employees with the highest salaries last month",
   "Show me employees with upcoming birthdays",
   "Show me project sites with lowest attendance rates",
@@ -43,6 +43,7 @@ const suggestedPrompt = [
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {
+    const tablesData = JSON.stringify((await fetchAllSingleSQLQuery())?.data);
     const url = new URL(request.url);
     const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
@@ -54,7 +55,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       return defer({ data: [], error: null });
     }
 
-    const { query, error } = await generateQuery({ input: prompt, companyId });
+    const { query, error } = await generateQuery({ input: prompt, tablesData, companyId });
 
     console.log("Query: ", query);
 
@@ -62,7 +63,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       return defer({ data: null, error: error ?? "Error generating query" });
     }
 
-    const { data, error: sqlError } = await runGeneratedSQLQuery(query);
+    const { data, error: sqlError } = await runGeneratedSQLQuery({ input: prompt, originalQuery: query, tablesData, companyId });
 
     console.log("Data: ", data);
 
