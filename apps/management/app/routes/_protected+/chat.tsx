@@ -13,7 +13,7 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useTypingAnimation } from "@canny_ecosystem/utils/hooks/typing-animation";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { type ClientLoaderFunctionArgs, defer, useLoaderData, useNavigate, useNavigation, useSearchParams } from "@remix-run/react";
+import { type ClientLoaderFunctionArgs, defer, useLoaderData, useNavigate, useNavigation, useSearchParams, useSubmit } from "@remix-run/react";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 
@@ -33,7 +33,7 @@ const suggestedPrompt = [
   "Show me accident reports by severity level",
   "Show me all ongoing cases",
   "List all pending invoices",
-  "Probation end dates by employee",
+  "Employees with probation end dates",
   "Employees with upcoming leaves",
   "Generate payroll summary for last 3 month",
   "List approved invoices awaiting processing",
@@ -55,11 +55,11 @@ const placeholders = [
   "Crunching some serious numbers for this one",
   "Loading up the insights you’re looking for",
   "Compiling the response that matches your request",
-  "Pulling up the results — this won’t take long",
+  "Pulling up the results — this won’t take long!",
   "Finalizing everything for a smooth output",
   "Almost done — just adding the finishing touches",
   "One sec, wrapping things up neatly for you",
-  "Getting things ready — this’ll be worth it",
+  "Getting things ready — this’ll be worth it!",
   "Still with me? Your answer is coming together now",
   "Formatting the cleanest, clearest response possible",
   "Checking all the latest details before replying",
@@ -114,9 +114,15 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 }
 clientLoader.hydrate = true;
 
+
 export default function Chat() {
   const { data, config, error } = useLoaderData<typeof loader>();
-  const columns = data?.[0] ? Object.keys(data[0]) : [];
+
+  const [stateData, setStateData] = useState(data ?? []);
+  const [stateConfig, setStateConfig] = useState(config);
+
+  const columns = stateData?.[0] ? Object.keys(stateData[0]) : [];
+
 
   const animatedPlaceholder = useTypingAnimation(placeholders, false, {
     typingSpeed: 70,
@@ -133,17 +139,43 @@ export default function Chat() {
   const navigate = useNavigate();
 
   const navigation = useNavigation();
-  const isSubmitting =
-    navigation.state === "submitting" ||
-    (navigation.state === "loading" &&
-      navigation.location.pathname === "/chat" &&
-      navigation.location.search.length);
+  const [isSubmitting, setIsSubmitting] =
+    useState(false);
 
   const clearSearch = () => {
-    searchParams.delete("prompt");
+    setStateData([]);
+    setStateConfig(null);
     setPrompt("");
+    searchParams.delete("prompt");
     setSearchParams(searchParams);
   }
+
+  const refreshSearch = () => {
+    setStateData([]);
+    setStateConfig(null);
+    setIsSubmitting(true);
+    navigate(0);
+  }
+
+  useEffect(() => {
+    if (data?.length) {
+      setStateData(data);
+    }
+    if (config) {
+      setStateConfig(config);
+    }
+  }, [data, config])
+
+  useEffect(() => {
+    setIsSubmitting(
+      navigation.state === "submitting" ||
+      (
+        navigation.state === "loading" &&
+        navigation.location.pathname === "/chat" &&
+        !!navigation.location.search.length
+      )
+    );
+  }, [navigation.state]);
 
   useEffect(() => {
     if (error) {
@@ -173,16 +205,18 @@ export default function Chat() {
   };
 
   const handleSubmit = () => {
+    setIsSubmitting(true)
     if (prompt) {
       searchParams.set("prompt", prompt);
       setSearchParams(searchParams);
     }
+    setIsSubmitting(false);
   };
 
   return (
     <section className="w-full h-full p-4 flex flex-col items-center justify-start gap-4">
       {/* Input Chat Box */}
-      <div className='flex space-x-4 w-full md:w-4/5 items-center'>
+      <div className='flex space-x-3 w-full md:w-4/5 items-center'>
         <form
           className='relative w-full'
           onSubmit={(e) => {
@@ -194,7 +228,7 @@ export default function Chat() {
             name={isSubmitting ? "update" : "search"}
             size="md"
             className={cn(
-              "absolute pointer-events-none left-2 top-[14px] md:left-[10px] md:top-[18px]",
+              "absolute pointer-events-none left-2 top-[14px]",
               isSubmitting && "animate-spin"
             )}
           />
@@ -205,7 +239,7 @@ export default function Chat() {
             tabIndex={-1}
             ref={inputRef}
             placeholder="Start typing to ask a question or search across your company’s data"
-            className='pl-9 pb-[5px] text-[15px] w-full h-12 md:h-14 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70 bg-card'
+            className='pl-9 pb-[5px] text-[15px] w-full h-12 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70 bg-card tracking-wide'
             onChange={handleSearch}
             autoFocus={true}
             autoComplete='on'
@@ -214,6 +248,10 @@ export default function Chat() {
             spellCheck='false'
           />
         </form>
+        <div className={cn("h-full flex flex-row items-center justify-center gap-3", (!stateData?.length) && "hidden")}>
+          <Button className="h-full px-7" variant={"default"} onClick={refreshSearch}>Refresh</Button>
+          <Button className="h-full px-7" variant={"secondary"} onClick={clearSearch}>Clear</Button>
+        </div>
       </div>
       {/* Suggested Prompts */}
       <Card className={cn('w-full h-full md:w-4/5 items-start pb-3', searchPrompt && "hidden")}>
@@ -242,8 +280,8 @@ export default function Chat() {
           }
         </CardContent>
       </Card>
-      {/* If no data is there after prompt */}
-      <div className={cn("hidden", (searchPrompt && !data?.length) && "flex flex-col gap-4 w-full sm:w-3/5 md:w-1/2 h-3/5 text-center items-center justify-center")}>
+      {/* If no state data is there after prompt */}
+      <div className={cn("hidden", (searchPrompt && !stateData?.length) && "flex flex-col gap-4 w-full sm:w-3/5 md:w-1/2 h-3/5 text-center items-center justify-center")}>
         {isSubmitting ?
           <>
             <p className="text-muted-foreground/60 text-xl tracking-wider">{animatedPlaceholder}</p>
@@ -254,22 +292,20 @@ export default function Chat() {
               No data found in this prompt. Since, this chat box is in early stages it might not work as expected. Try refreshing page or other prompts.
             </p>
             <div className="flex flex-col md:flex-row gap-3 items-center justify-center mt-1">
-              <Button size="full" className="w-40" variant={"default"} onClick={() => {
-                navigate(0)
-              }}>Refresh</Button>
+              <Button size="full" className="w-40" variant={"default"} onClick={refreshSearch}>Refresh</Button>
               <Button size="full" className="w-40" variant={"secondary"} onClick={clearSearch}>Clear</Button>
             </div>
           </>
         }
       </div>
       {/* Data Display */}
-      <Card className={cn("w-full h-full md:w-4/5 overflow-y-auto", (!data?.length) && "hidden")}>
+      <Card className={cn("w-full h-full md:w-4/5 overflow-y-auto", (!stateData?.length) && "hidden")}>
         <Results
-          results={data ?? []}
-          chartConfig={config}
+          results={stateData}
+          chartConfig={stateConfig}
           columns={columns}
         />
       </Card>
-    </section>
+    </section >
   )
 }

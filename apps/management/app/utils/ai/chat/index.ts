@@ -94,7 +94,7 @@ Sample row from each table: ${tablesData}
 - Prefer child/detail tables when relevant (e.g., show assignment/site details with employee).
 - Always ensure all JOINs are schema-correct. Avoid missing joins.
 - When giving employee name in result always combine first_name and last_name into single field.
-- Do not select, give and use meta fields like created_at or updated_at.`      ,
+- Do not select, give and use meta fields like created_at, updated_at, id (not company_id/project_client_id or foreign relationship id).`      ,
       prompt: `Generate the query necessary to retrieve the data the user wants: ${input}`,
       schema: z.object({
         query: z.string(),
@@ -157,7 +157,7 @@ Schema:
 - Fix the query using schema and intent.
 - Respect foreign key paths and avoid expressions, aliases, subqueries, and CTEs.
 - When giving employee name in result always combine first_name and last_name into single field.
-- Do not select, give and use meta fields like created_at or updated_at.
+- Do not select, give and use meta fields like created_at, updated_at, id (not company_id/project_client_id or foreign relationship id).
 - End with LIMIT $${MID_QUERY_LIMIT}.
 
 Return only a corrected SQL SELECT query.`,

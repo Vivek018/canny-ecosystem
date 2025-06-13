@@ -9,9 +9,9 @@ export const configSchema = z
     description: z
       .string()
       .describe(
-        'Describe the chart. What is it showing? What is interesting about the way the data is displayed?',
+        'Describe the chart. What is it showing? What is interesting about the way the data is displayed? Give comprehensive details of 50 - 80 words.',
       ),
-    takeaway: z.string().describe('What is the main takeaway from the chart?'),
+    takeaway: z.string().describe('What is the main takeaway from the chart? Give comprehensive details of 50 - 80 words.'),
     type: z.enum(['bar', 'line', 'area', 'pie']).describe('Type of chart'),
     title: z.string(),
     xKey: z.string().describe('Key for x-axis or category'),

@@ -223,14 +223,14 @@ export function DynamicChart({
             },
             {} as Record<string, { label: string; color: string }>,
           )}
-          className="h-[320px] w-full"
+          className="h-[300px] w-full"
         >
           {renderChart()}
         </ChartContainer>
       )}
-      <div className="w-full">
-        <p className="mt-4 text-sm">{chartConfig.description}</p>
-        <p className="mt-4 text-sm">{chartConfig.takeaway}</p>
+      <div className="w-full py-6">
+        <p className="mt-4 text-foreground/80 tracking-wider">{chartConfig.description}</p>
+        <p className="mt-4 text-foreground/80 tracking-wider">{chartConfig.takeaway}</p>
       </div>
     </div>
   );
