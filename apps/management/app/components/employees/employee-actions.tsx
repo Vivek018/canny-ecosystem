@@ -8,7 +8,7 @@ export function EmployeesActions({
   emails,
 }: {
   isEmpty: boolean;
-  emails: any[];
+  emails?: any[];
 }) {
   const { columnVisibility, selectedRows } = useEmployeesStore();
   return (

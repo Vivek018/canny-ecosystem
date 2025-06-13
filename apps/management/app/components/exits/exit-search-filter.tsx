@@ -230,7 +230,8 @@ export function ExitsSearchFilter({
               >
                 <Calendar
                   mode='range'
-                  initialFocus
+                  captionLayout="dropdown"
+
                   today={
                     filterParams.last_working_day_start
                       ? new Date(filterParams.last_working_day_start)
@@ -308,7 +309,8 @@ export function ExitsSearchFilter({
               >
                 <Calendar
                   mode='range'
-                  initialFocus
+                  captionLayout="dropdown"
+
                   today={
                     filterParams.final_settlement_date_start
                       ? new Date(filterParams.final_settlement_date_start)

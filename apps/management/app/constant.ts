@@ -1,12 +1,4 @@
 import type { NavList } from "@canny_ecosystem/types";
-import {
-  assignmentTypeArray,
-  educationArray,
-  genderArray,
-  positionArray,
-  skillLevelArray,
-  statusArray,
-} from "@canny_ecosystem/utils";
 
 export const DEFAULT_ROUTE = "/";
 
@@ -118,84 +110,6 @@ export const navList = [
   },
 ] as NavList[];
 
-export const VALID_FILTERS = [
-  {
-    name: "name",
-    valueType: "string",
-    example: ["John Doe", "Synthentica", "EMP123"],
-  },
-  {
-    name: "dob_start",
-    valueType: "date",
-    example: "1990-01-01",
-  },
-  {
-    name: "dob_end",
-    valueType: "date",
-    example: "2000-12-31",
-  },
-  {
-    name: "gender",
-    valueType: genderArray,
-    example: "male",
-  },
-  {
-    name: "education",
-    valueType: educationArray,
-    example: "Bachelor's",
-  },
-  {
-    name: "status",
-    valueType: statusArray,
-    example: "active",
-  },
-  {
-    name: "project",
-    valueType: "string",
-    example: "Project A",
-  },
-  {
-    name: "project_site",
-    valueType: "string",
-    example: "Site B",
-  },
-  {
-    name: "assignment_type",
-    valueType: assignmentTypeArray,
-    example: "full-time",
-  },
-  {
-    name: "position",
-    valueType: positionArray,
-    example: "Software Engineer",
-  },
-  {
-    name: "skill_level",
-    valueType: skillLevelArray,
-    example: "senior",
-  },
-  {
-    name: "doj_start",
-    valueType: "date",
-    example: "2020-01-01",
-  },
-  {
-    name: "doj_end",
-    valueType: "date",
-    example: "2023-12-31",
-  },
-  {
-    name: "dol_start",
-    valueType: "date",
-    example: "2022-01-01",
-  },
-  {
-    name: "dol_end",
-    valueType: "date",
-    example: "2024-11-30",
-  },
-];
-
 export const statutorySideNavList = [
   {
     name: "EPF",
@@ -239,6 +153,7 @@ export const cacheKeyPrefix = {
   index: "index",
   protected: "protected",
   dashboard: "dashboard",
+  chat: "chat",
   employees_main: "employees-main",
   employees: "employees",
   employee_overview: "employee-overview",
@@ -351,9 +266,8 @@ export function numberToWordsIndian(num: number) {
       return (
         tens[Math.floor(n / 10)] + (n % 10 ? ` ${belowTwenty[n % 10]}` : "")
       );
-    return `${belowTwenty[Math.floor(n / 100)]} hundred${
-      n % 100 ? ` ${convertBelowThousand(n % 100)}` : ""
-    }`;
+    return `${belowTwenty[Math.floor(n / 100)]} hundred${n % 100 ? ` ${convertBelowThousand(n % 100)}` : ""
+      }`;
   }
 
   function convertIntegerToWordsIndian(n: number) {

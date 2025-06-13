@@ -40,7 +40,7 @@ export default function LeavesEmailMenu({
   emails: any[];
   columnVisibility: any;
 }) {
-  const userEmails = emails.map((item) => item.email);
+  const userEmails = emails.map((item) => item?.email);
 
   const [searchParams] = useSearchParams();
   const refYear = Number(searchParams.get("year"));

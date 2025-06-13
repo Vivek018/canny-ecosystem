@@ -63,7 +63,6 @@ import type {
   CompanyDatabaseRow,
   LocationDatabaseRow,
 } from "@canny_ecosystem/supabase/types";
-import LeavesEmailMenu from "@/components/leaves/leaves-email-menu";
 
 const pageSize = LAZY_LOADING_LIMIT;
 const isEmployeeRoute = false;
@@ -140,8 +139,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
         projectName: filters.project,
       });
 
-    const { data: userEmails } = await getUsersEmail({ companyId, supabase });
-
     return defer({
       leavesPromise: leavesPromise as any,
       projectPromise,
@@ -153,7 +150,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
       companyId,
       env,
       companyName,
-      userEmails,
       companyAddress,
     });
   } catch (error) {
@@ -169,7 +165,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
       filters: null,
       companyId: "",
       env,
-      userEmails: null,
       companyName: null,
       companyAddress: null,
     });
@@ -196,14 +191,13 @@ export default function LeavesIndex() {
     query,
     filters,
     companyId,
-    userEmails,
     env,
     companyName,
     companyAddress,
   } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
   const { role } = useUser();
-  const { selectedRows, columnVisibility } = useLeavesStore();
+  const { selectedRows } = useLeavesStore();
   const filterList = { ...filters, name: query };
   const noFilters = Object.values(filterList).every((value) => !value);
 

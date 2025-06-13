@@ -3,6 +3,7 @@ import {
   type ClientLoaderFunctionArgs,
   Outlet,
   useLoaderData,
+  useNavigate,
 } from "@remix-run/react";
 import { getSessionUser } from "@canny_ecosystem/supabase/cached-queries";
 import {
@@ -16,6 +17,7 @@ import { Header } from "@/components/header";
 import { clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { useHotkeys } from "react-hotkeys-hook";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { user: sessionUser } = await getSessionUser({ request });
@@ -51,6 +53,17 @@ clientLoader.hydrate = true;
 export default function ProtectedRoute() {
   const { companies, user } = useLoaderData<typeof loader>();
   const { theme } = useTheme();
+  const navigate = useNavigate();
+
+  useHotkeys(
+    ["meta+k", "ctrl+k"],
+    () => {
+      navigate("/chat");
+    },
+    {
+      enableOnFormTags: true,
+    }
+  );
 
   return (
     <>

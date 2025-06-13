@@ -188,7 +188,7 @@ export function CaseSearchFilter({ disabled }: { disabled?: boolean }) {
               className={cn(
                 "absolute z-10 right-3 top-[6px] opacity-70",
                 !disabled &&
-                  "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
+                "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 hasValidFilters && "opacity-100",
                 isOpen && "opacity-100"
               )}
@@ -219,7 +219,8 @@ export function CaseSearchFilter({ disabled }: { disabled?: boolean }) {
               >
                 <Calendar
                   mode='range'
-                  initialFocus
+                  captionLayout="dropdown"
+
                   today={
                     filterParams.date_start
                       ? new Date(filterParams.date_start)
@@ -266,7 +267,8 @@ export function CaseSearchFilter({ disabled }: { disabled?: boolean }) {
               >
                 <Calendar
                   mode='range'
-                  initialFocus
+                  captionLayout="dropdown"
+
                   today={
                     filterParams.incident_date_start
                       ? new Date(filterParams.incident_date_start)
@@ -313,7 +315,8 @@ export function CaseSearchFilter({ disabled }: { disabled?: boolean }) {
               >
                 <Calendar
                   mode='range'
-                  initialFocus
+                  captionLayout="dropdown"
+
                   today={
                     filterParams.resolution_date_start
                       ? new Date(filterParams.resolution_date_start)

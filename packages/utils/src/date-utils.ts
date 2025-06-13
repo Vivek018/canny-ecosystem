@@ -75,12 +75,29 @@ export function formatMonthYearDate(date: Date | string | number) {
 }
 
 export function formatDate(date: Date | string | number | null) {
-  if (!date || !String(date)?.length) {
-    return null;
+  if (!date || typeof date === "number") {
+    return date;
   }
 
-  return format(new Date(date), "dd MMM yyyy");
+  if (typeof date === "string") {
+    const trimmed = date.trim();
+    if (!trimmed.length) return date;
+
+    const parsedDate = new Date(trimmed);
+    if (Number.isNaN(parsedDate.getTime()) || !trimmed.match(/^\d{4}-\d{2}-\d{2}/)) {
+      return date;
+    }
+
+    return format(parsedDate, "dd MMM yyyy");
+  }
+
+  if (date instanceof Date && !Number.isNaN(date.getTime())) {
+    return format(date, "dd MMM yyyy");
+  }
+
+  return date;
 }
+
 
 export function formatDateTime(date: Date | string | number) {
   return format(new Date(date), "dd MMM yyyy, hh:mm a");
