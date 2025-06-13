@@ -44,6 +44,17 @@ export function CountCards({
     {} as Record<string, number>
   );
 
+  const salaryCalculation =
+    ((Number(currentResult.salary ?? 0) - Number(previousResult.salary ?? 0)) /
+      Number(previousResult.salary)) *
+    100;
+
+  const reimbursementCalculation =
+    ((Number(currentResult.reimbursement ?? 0) -
+      Number(previousResult.reimbursement ?? 0)) /
+      Number(previousResult.reimbursement)) *
+    100;
+
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <Card>
@@ -56,29 +67,17 @@ export function CountCards({
           <p
             className={cn(
               "text-xs text-muted-foreground flex",
-              (previousResult.salary
-                ? ((currentResult.salary - previousResult.salary) /
-                    previousResult.salary) *
-                  100
-                : 100) > 0
+              (previousResult.salary ? salaryCalculation : 100) > 0
                 ? "text-green"
                 : "text-destructive"
             )}
           >
             {previousResult.salary
-              ? (
-                  ((currentResult.salary ?? 0 - previousResult.salary ?? 0) /
-                    previousResult.salary) *
-                  100
-                ).toFixed(2)
+              ? Math.abs(salaryCalculation).toFixed(2)
               : currentResult.salary ?? 0}
             %
             <p className="text-xs text-muted-foreground ml-1">
-              {(previousResult.salary
-                ? ((currentResult.salary - previousResult.salary) /
-                    previousResult.salary) *
-                  100
-                : 100) > 0
+              {(previousResult.salary ? salaryCalculation : 100) > 0
                 ? "more"
                 : "less"}{" "}
               than last month
@@ -100,33 +99,19 @@ export function CountCards({
           <p
             className={cn(
               "text-xs text-muted-foreground flex",
-              (previousResult.reimbursement
-                ? ((currentResult.reimbursement -
-                    previousResult.reimbursement) /
-                    previousResult.reimbursement) *
-                  100
-                : 100) > 0
+              (previousResult.reimbursement ? reimbursementCalculation : 100) >
+                0
                 ? "text-green"
                 : "text-destructive"
             )}
           >
             {previousResult.reimbursement
-              ? (
-                  ((currentResult.reimbursement ??
-                    0 - previousResult.reimbursement ??
-                    0) /
-                    previousResult.reimbursement) *
-                  100
-                ).toFixed(2)
+              ? Math.abs(reimbursementCalculation).toFixed(2)
               : currentResult.reimbursement ?? 0}
             %
             <p className="text-xs text-muted-foreground ml-1">
-              {(previousResult.reimbursement
-                ? ((currentResult.reimbursement -
-                    previousResult.reimbursement) /
-                    previousResult.reimbursement) *
-                  100
-                : 100) > 0
+              {(previousResult.reimbursement ? reimbursementCalculation : 100) >
+              0
                 ? "more"
                 : "less"}{" "}
               than last month

@@ -490,10 +490,10 @@ export default function SalarySlip() {
 
   function transformData(data: any) {
     const fullName = {
-      first_name: data?.payrollData.first_name,
-      middle_name: data?.payrollData.middle_name,
-      last_name: data?.payrollData.last_name,
-      employee_code: data?.payrollData.employee_code,
+      first_name: data?.payrollData?.first_name,
+      middle_name: data?.payrollData?.middle_name,
+      last_name: data?.payrollData?.last_name,
+      employee_code: data?.payrollData?.employee_code,
     };
 
     const companyData = {
@@ -531,8 +531,8 @@ export default function SalarySlip() {
       amount: number;
       type: string;
     }
-    const targetYear = attendanceData.year;
-    const targetMonth = attendanceData.month;
+    const targetYear = attendanceData?.year;
+    const targetMonth = attendanceData?.month;
 
     const monthStart = new Date(targetYear, targetMonth - 1, 1);
     const monthEnd = new Date(targetYear, targetMonth, 0);
@@ -548,8 +548,8 @@ export default function SalarySlip() {
     const casualLeaves: number =
       data?.payrollData.leaves?.reduce((total: number, leave: LeaveEntry) => {
         if (leave.leave_type === "casual_leave") {
-          const leaveStart: Date = stripTime(new Date(leave.start_date));
-          const leaveEnd: Date = stripTime(new Date(leave.end_date));
+          const leaveStart: Date = stripTime(new Date(leave?.start_date));
+          const leaveEnd: Date = stripTime(new Date(leave?.end_date));
 
           const overlapStart: Date =
             leaveStart < monthStart ? stripTime(monthStart) : leaveStart;
@@ -577,8 +577,8 @@ export default function SalarySlip() {
     const paidLeaves: number =
       data?.payrollData?.leaves?.reduce((total: number, leave: Leave) => {
         if (leave.leave_type === "paid_leave") {
-          const leaveStart: Date = stripTime(new Date(leave.start_date));
-          const leaveEnd: Date = stripTime(new Date(leave.end_date));
+          const leaveStart: Date = stripTime(new Date(leave?.start_date));
+          const leaveEnd: Date = stripTime(new Date(leave?.end_date));
 
           const overlapStart: Date =
             leaveStart < monthStart ? stripTime(monthStart) : leaveStart;

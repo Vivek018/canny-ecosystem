@@ -234,7 +234,9 @@ const InvoicePDF = ({
   const service_charge =
     type === "salary"
       ? data.invoiceDetails.include_charge
-        ? (sum * terms.service_charge) / 100
+        ? includedFields?.includes("ALL")
+          ? (beforeService * terms.service_charge) / 100
+          : (sum * terms.service_charge) / 100
         : 0
       : data.invoiceDetails.include_charge
       ? (Number(
@@ -1197,7 +1199,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     throw new Error("Error fetching company ID");
   }
 
-
   let companyRelations = [] as any;
   if (cannyData?.id) {
     const { data } = await getRelationshipsByParentAndChildCompanyId({
@@ -1234,11 +1235,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     await getPrimaryLocationByCompanyId({ supabase, companyId });
 
   let payrollDataAndOthers = [] as any[];
+
   if (payroll?.payroll_type === "salary") {
     const { data } = await getSalaryEntriesByPayrollIdForSalaryRegister({
       supabase,
       payrollId: invoiceData?.payroll_id!,
     });
+
     payrollDataAndOthers = data || [];
   }
   if (
@@ -1274,6 +1277,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export default function PreviewInvoice() {
   const { data, payroll, companyRelations, contentType } =
     useLoaderData<typeof loader>();
+
   const navigate = useNavigate();
   const { isDocument } = useIsDocument();
 
@@ -1295,17 +1299,17 @@ export default function PreviewInvoice() {
       };
       const invoiceDetails = {
         invoice_number: invoice?.invoice_number,
-        date: invoice.date,
-        subject: invoice.subject,
-        payroll_data: invoice.payroll_data,
-        include_cgst: invoice.include_cgst,
-        include_sgst: invoice.include_sgst,
-        include_igst: invoice.include_igst,
-        include_charge: invoice.include_charge,
-        include_proof: invoice.include_proof,
-        include_header: invoice.include_header,
-        invoice_type: invoice.invoice_type,
-        proof: invoice.proof,
+        date: invoice?.date,
+        subject: invoice?.subject,
+        payroll_data: invoice?.payroll_data,
+        include_cgst: invoice?.include_cgst,
+        include_sgst: invoice?.include_sgst,
+        include_igst: invoice?.include_igst,
+        include_charge: invoice?.include_charge,
+        include_proof: invoice?.include_proof,
+        include_header: invoice?.include_header,
+        invoice_type: invoice?.invoice_type,
+        proof: invoice?.proof,
       };
 
       interface SalaryEntry {
@@ -1409,8 +1413,8 @@ export default function PreviewInvoice() {
             const casualLeaves =
               emp.leaves?.reduce((total, leave) => {
                 if (leave.leave_type === "casual_leave") {
-                  const leaveStart = stripTime(new Date(leave.start_date));
-                  const leaveEnd = stripTime(new Date(leave.end_date));
+                  const leaveStart = stripTime(new Date(leave?.start_date));
+                  const leaveEnd = stripTime(new Date(leave?.end_date));
 
                   const overlapStart =
                     leaveStart < monthStart
@@ -1434,8 +1438,8 @@ export default function PreviewInvoice() {
             const paidLeaves =
               emp.leaves?.reduce((total, leave) => {
                 if (leave.leave_type === "paid_leave") {
-                  const leaveStart = stripTime(new Date(leave.start_date));
-                  const leaveEnd = stripTime(new Date(leave.end_date));
+                  const leaveStart = stripTime(new Date(leave?.start_date));
+                  const leaveEnd = stripTime(new Date(leave?.end_date));
 
                   const overlapStart =
                     leaveStart < monthStart
@@ -1458,10 +1462,10 @@ export default function PreviewInvoice() {
 
             return {
               employeeData: {
-                first_name: emp.first_name,
-                middle_name: emp.middle_name,
-                last_name: emp.last_name,
-                employee_code: emp.employee_code,
+                first_name: emp?.first_name,
+                middle_name: emp?.middle_name,
+                last_name: emp?.last_name,
+                employee_code: emp?.employee_code,
               },
               employeeProjectAssignmentData: {
                 position: emp.employee_project_assignment?.position || "",
@@ -1476,10 +1480,10 @@ export default function PreviewInvoice() {
                 working_days: 26,
                 weekly_off: 5,
                 paid_holidays: 0,
-                paid_days: emp?.salary_entries[0].present_days,
+                paid_days: emp?.salary_entries[0]?.present_days,
                 paid_leaves: paidLeaves,
                 casual_leaves: casualLeaves,
-                absents: 26 - Number(emp?.salary_entries[0].present_days),
+                absents: 26 - Number(emp?.salary_entries[0]?.present_days),
               },
               earnings,
               deductions,
@@ -1518,17 +1522,17 @@ export default function PreviewInvoice() {
 
       const invoiceDetails = {
         invoice_number: invoice?.invoice_number,
-        date: invoice.date,
-        subject: invoice.subject,
-        payroll_data: invoice.payroll_data,
-        include_cgst: invoice.include_cgst,
-        include_sgst: invoice.include_sgst,
-        include_igst: invoice.include_igst,
-        include_charge: invoice.include_charge,
-        include_proof: invoice.include_proof,
-        include_header: invoice.include_header,
-        invoice_type: invoice.invoice_type,
-        proof: invoice.proof,
+        date: invoice?.date,
+        subject: invoice?.subject,
+        payroll_data: invoice?.payroll_data,
+        include_cgst: invoice?.include_cgst,
+        include_sgst: invoice?.include_sgst,
+        include_igst: invoice?.include_igst,
+        include_charge: invoice?.include_charge,
+        include_proof: invoice?.include_proof,
+        include_header: invoice?.include_header,
+        invoice_type: invoice?.invoice_type,
+        proof: invoice?.proof,
       };
 
       interface EmployeeData {
@@ -1553,10 +1557,10 @@ export default function PreviewInvoice() {
         for (const entry of emp.payroll_entries) {
           employeeData.push({
             employeeData: {
-              first_name: emp.first_name,
-              middle_name: emp.middle_name,
-              last_name: emp.last_name,
-              employee_code: emp.employee_code,
+              first_name: emp?.first_name,
+              middle_name: emp?.middle_name,
+              last_name: emp?.last_name,
+              employee_code: emp?.employee_code,
             },
             invoiceFields: [
               {

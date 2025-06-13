@@ -57,6 +57,11 @@ export const salaryEntryColumns = ({
     {
       accessorKey: "name",
       header: "Employee Name",
+      accessorFn: (row) =>
+        `${row.first_name ?? ""} ${row.middle_name ?? ""} ${
+          row.last_name ?? ""
+        }`,
+      sortingFn: "text",
       cell: ({ row }) => {
         return (
           <p className="truncate capitalize w-48">{`${
@@ -70,6 +75,8 @@ export const salaryEntryColumns = ({
     {
       accessorKey: "present_days",
       header: "P. Days",
+      accessorFn: (row) => row.salary_entries[0]?.present_days ?? 0,
+      sortingFn: "basic",
       cell: ({ row }) => {
         return (
           <p className="truncate">
@@ -105,6 +112,13 @@ export const salaryEntryColumns = ({
     ...uniqueFields.map((fieldName: string) => ({
       id: fieldName,
       accessorKey: fieldName,
+      accessorFn: (row: any) =>
+        row.salary_entries.find(
+          (entry: any) =>
+            entry.field_name.toLowerCase() === fieldName.toLowerCase()
+        )?.amount ?? 0,
+
+      sortingFns: "basic",
       header: fieldName,
       cell: ({ row }: { row: { original: SalaryEntriesWithEmployee } }) => {
         const valueObj = row.original.salary_entries.find(

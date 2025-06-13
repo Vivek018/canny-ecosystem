@@ -41,6 +41,7 @@ export function SalaryEntryComponent({
   env: SupabaseEnv;
   fromWhere: "runpayroll" | "payrollhistory";
 }) {
+  
   const payrollCardDetails = [
     { title: "Title", value: "title" },
     { title: "Status", value: "status" },

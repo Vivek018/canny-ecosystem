@@ -28,7 +28,6 @@ export function SalaryEntryDataTable<TData, TValue>({
   data,
 }: SalaryEntryTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
-
   const table = useReactTable({
     data: data,
     columns: columns,

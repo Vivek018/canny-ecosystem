@@ -15,6 +15,7 @@ export type PayrollFilters = {
   date_end?: string | undefined | null;
   payroll_type?: string | undefined | null;
   status?: string | undefined | null;
+  name?: string | undefined | null;
 };
 
 export type ImportPayrollDataType = Pick<
@@ -53,14 +54,13 @@ export async function getPendingOrSubmittedPayrollsByCompanyId({
     "status",
     "run_date",
     "total_net_amount",
-    "commission",
     "company_id",
     "created_at",
   ] as const;
 
   const query = supabase
     .from("payroll")
-    .select(columns.join(","))
+    .select(columns.join(","), { count: "exact" })
     .eq("company_id", companyId)
     .in("status", ["pending", "submitted"]);
 
@@ -114,19 +114,25 @@ export async function getApprovedPayrollsByCompanyId({
     "status",
     "run_date",
     "total_net_amount",
-    "commission",
     "company_id",
     "created_at",
   ] as const;
 
   const query = supabase
     .from("payroll")
-    .select(columns.join(","))
+    .select(columns.join(","), { count: "exact" })
     .eq("company_id", companyId)
     .in("status", ["approved"]);
 
   if (searchQuery) {
-    query.or(`title.ilike.*${searchQuery}*`);
+    const searchQueryArray = searchQuery.split(" ");
+    if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
+      for (const searchQueryElement of searchQueryArray) {
+        query.or(`title.ilike.*${searchQueryElement}*`);
+      }
+    } else {
+      query.or(`title.ilike.*${searchQuery}*`);
+    }
   }
 
   const dateFilters = [{ field: "run_date", start: date_start, end: date_end }];
@@ -145,7 +151,6 @@ export async function getApprovedPayrollsByCompanyId({
 
   const { data, count, error } = await query.range(from, to);
   if (error) console.error("getApprovedPayrollsByCompanyId Error", error);
-
   return { data, meta: { count: count }, error };
 }
 
@@ -164,7 +169,6 @@ export async function getPayrollById({
     "status",
     "run_date",
     "total_net_amount",
-    "commission",
     "company_id",
     "created_at",
   ] as const;

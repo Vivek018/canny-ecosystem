@@ -51,19 +51,19 @@ export function InvoicePaidUnpaid({
       <CardContent className="flex-1 pb-0 ">
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px] pb-0 [&_.recharts-pie-label-text]:fill-foreground"
+          className="mx-auto aspect-square max-h-[250px] pb-0 [&_.recharts-pie-label-text]:fill-foreground "
         >
           <PieChart>
             <ChartTooltip
               content={<ChartTooltipContent hideLabel />}
-              wrapperStyle={{ width: "60%" }}
+              wrapperStyle={{ width: "60%", height: "60%" }}
               cursor={false}
             />
             <Pie data={trendData} dataKey="count" nameKey="type" stroke="0" />
           </PieChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm">
+      <CardFooter className="flex-col items-start gap-1 text-sm">
         <div className="leading-none text-muted-foreground">
           Showing number of Paid vs Unpaid invoices
         </div>

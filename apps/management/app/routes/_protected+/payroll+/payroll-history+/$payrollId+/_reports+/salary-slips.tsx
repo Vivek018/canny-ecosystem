@@ -566,8 +566,8 @@ export default function SalarySlips() {
           const casualLeaves =
             emp.leaves?.reduce((total, leave) => {
               if (leave.leave_type === "casual_leave") {
-                const leaveStart = stripTime(new Date(leave.start_date));
-                const leaveEnd = stripTime(new Date(leave.end_date));
+                const leaveStart = stripTime(new Date(leave?.start_date));
+                const leaveEnd = stripTime(new Date(leave?.end_date));
 
                 const overlapStart =
                   leaveStart < monthStart ? stripTime(monthStart) : leaveStart;
@@ -588,8 +588,8 @@ export default function SalarySlips() {
           const paidLeaves =
             emp.leaves?.reduce((total, leave) => {
               if (leave.leave_type === "paid_leave") {
-                const leaveStart = stripTime(new Date(leave.start_date));
-                const leaveEnd = stripTime(new Date(leave.end_date));
+                const leaveStart = stripTime(new Date(leave?.start_date));
+                const leaveEnd = stripTime(new Date(leave?.end_date));
 
                 const overlapStart =
                   leaveStart < monthStart ? stripTime(monthStart) : leaveStart;
@@ -609,14 +609,14 @@ export default function SalarySlips() {
 
           return {
             employeeData: {
-              first_name: emp.first_name,
-              middle_name: emp.middle_name,
-              last_name: emp.last_name,
-              employee_code: emp.employee_code,
+              first_name: emp?.first_name,
+              middle_name: emp?.middle_name,
+              last_name: emp?.last_name,
+              employee_code: emp?.employee_code,
             },
             employeeProjectAssignmentData: {
-              position: emp.employee_project_assignment?.position || "",
-              department: emp.employee_project_assignment?.department || "",
+              position: emp?.employee_project_assignment?.position || "",
+              department: emp?.employee_project_assignment?.department || "",
               date_of_joining:
                 emp.employee_project_assignment?.start_date || "",
             },
@@ -629,14 +629,14 @@ export default function SalarySlips() {
               working_days: 26,
               weekly_off: 5,
               paid_holidays: 0,
-              paid_days: emp?.salary_entries[0].present_days,
+              paid_days: emp?.salary_entries[0]?.present_days,
               paid_leaves: paidLeaves,
               casual_leaves: casualLeaves,
-              absents: 26 - Number(emp?.salary_entries[0].present_days),
+              absents: 26 - Number(emp?.salary_entries[0]?.present_days),
             },
             bankDetails: {
-              bank: emp.employee_bank_details.bank_name,
-              account_number: emp.employee_bank_details.account_number,
+              bank: emp.employee_bank_details?.bank_name,
+              account_number: emp.employee_bank_details?.account_number,
             },
             earnings,
             deductions,

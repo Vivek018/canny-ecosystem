@@ -31,6 +31,9 @@ import {
 } from "@remix-run/react";
 import { Suspense, useEffect } from "react";
 
+
+
+
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const payrollId = params.payrollId;
   const env = {
@@ -191,7 +194,7 @@ export default function HistoryPayrollId() {
 
                   return (
                     <PayrollEntryComponent
-                      payrollData={payrollData}
+                      payrollData={payrollData as unknown as any}
                       data={data}
                       noButtons={true}
                       env={env as SupabaseEnv}
@@ -219,7 +222,7 @@ export default function HistoryPayrollId() {
                   }
                   return (
                     <SalaryEntryComponent
-                      payrollData={payrollData}
+                      payrollData={payrollData as any}
                       data={data}
                       noButtons={true}
                       env={env as SupabaseEnv}
