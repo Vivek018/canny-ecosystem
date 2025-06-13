@@ -65,7 +65,14 @@ export async function getPendingOrSubmittedPayrollsByCompanyId({
     .in("status", ["pending", "submitted"]);
 
   if (searchQuery) {
-    query.or(`title.ilike.*${searchQuery}*`);
+    const searchQueryArray = searchQuery.split(" ");
+    if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
+      for (const searchQueryElement of searchQueryArray) {
+        query.or(`title.ilike.*${searchQueryElement}*`);
+      }
+    } else {
+      query.or(`title.ilike.*${searchQuery}*`);
+    }
   }
 
   const dateFilters = [{ field: "run_date", start: date_start, end: date_end }];
@@ -75,7 +82,10 @@ export async function getPendingOrSubmittedPayrollsByCompanyId({
   }
 
   if (payroll_type) {
-    query.eq("payroll_type", payroll_type as PayrollDatabaseRow["payroll_type"]);
+    query.eq(
+      "payroll_type",
+      payroll_type as PayrollDatabaseRow["payroll_type"]
+    );
   }
 
   if (status) {
@@ -142,7 +152,10 @@ export async function getApprovedPayrollsByCompanyId({
   }
 
   if (payroll_type) {
-    query.eq("payroll_type", payroll_type as PayrollDatabaseRow["payroll_type"]);
+    query.eq(
+      "payroll_type",
+      payroll_type as PayrollDatabaseRow["payroll_type"]
+    );
   }
 
   if (status) {
