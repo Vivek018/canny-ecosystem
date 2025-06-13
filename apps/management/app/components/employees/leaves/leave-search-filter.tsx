@@ -223,6 +223,7 @@ export function LeavesSearchFilter({
               >
                 <Calendar
                   mode="range"
+                  captionLayout="dropdown"
                   today={
                     filterParams.date_start
                       ? new Date(filterParams.date_start)
