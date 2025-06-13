@@ -3,6 +3,7 @@ import { cacheKeyPrefix } from "@/constant";
 import { fetchAllSingleSQLQuery, generateQuery, runGeneratedSQLQuery } from "@/utils/ai/chat";
 import { clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Card, CardContent, CardHeader } from "@canny_ecosystem/ui/card";
@@ -25,8 +26,8 @@ const suggestedPrompt = [
   "Which employees have incomplete document submissions?",
   "List all projects sites with no of employees",
   "Payroll with amount more than 7 lakhs in last 2 years",
-  "Show me the top 20 employees with the highest salaries last month",
-  "Show me employees with upcoming birthdays",
+  "Show me the top 20 employees with the highest net salaries in April 2025",
+  "Show me employees with upcoming birthdays this month",
   "Show me project sites with lowest attendance rates",
   "Show me accident reports by severity level",
   "Show me all ongoing cases",
@@ -57,15 +58,16 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     const { query, error } = await generateQuery({ input: prompt, tablesData, companyId });
 
-    console.log("Query: ", query);
-
     if (query === undefined || error) {
       return defer({ data: null, error: error ?? "Error generating query" });
     }
 
-    const { data, error: sqlError } = await runGeneratedSQLQuery({ input: prompt, originalQuery: query, tablesData, companyId });
+    const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-    console.log("Data: ", data);
+    const disableCompanyFilter = user?.role === "master" || user?.role === "admin";
+
+    // use this disableCompanyFilter once chatgpt testing is done in place of false
+    const { data, error: sqlError } = await runGeneratedSQLQuery({ input: prompt, originalQuery: query, tablesData, companyId, disableCompanyFilter: false });
 
     return defer({ data, error: sqlError ?? null });
   } catch (error) {
@@ -219,10 +221,10 @@ export default function Chat() {
           :
           <>
             <p className="text-muted-foreground">
-              No data found for your prompt. Please try a different question. Since, this chat box is in early stages it might not work as expected. Try refreshing page or other prompts.
+              No data found for your prompt. Since, this chat box is in early stages it might not work as expected. Try refreshing page or other prompts.
             </p>
             <div className="flex flex-col md:flex-row gap-3 items-center justify-center">
-              <Button size="full" className="w-40" variant={"primary-outline"} onClick={() => {
+              <Button size="full" className="w-40" variant={"default"} onClick={() => {
                 navigate(0)
               }}>Refresh</Button>
               <Button size="full" className="w-40" variant={"secondary"} onClick={clearSearch}>Clear</Button>
@@ -233,7 +235,7 @@ export default function Chat() {
       {/* Data Display */}
       <Card className={cn("w-full h-full md:w-4/5 overflow-y-auto", (!data?.length) && "hidden")}>
         <Results
-          results={data}
+          results={data ?? []}
           chartConfig={chartConfig}
           columns={columns}
         />

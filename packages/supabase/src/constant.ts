@@ -32,7 +32,7 @@ SELECT 'employee_guardians', row_to_json(t) FROM (SELECT * FROM public.employee_
 UNION ALL
 SELECT 'employee_letter', row_to_json(t) FROM (SELECT * FROM public.employee_letter LIMIT 1) t
 UNION ALL
-SELECT 'employee_project_assignment', row_to_json(t) FROM (SELECT * FROM public.employee_project_assignment LIMIT 1) t
+SELECT 'employee_project_assignment', row_to_json(t) FROM (SELECT * FROM public.employee_project_assignment LIMIT 5) t
 UNION ALL
 SELECT 'employee_skills', row_to_json(t) FROM (SELECT * FROM public.employee_skills LIMIT 1) t
 UNION ALL
@@ -58,7 +58,7 @@ SELECT 'pay_sequence', row_to_json(t) FROM (SELECT * FROM public.pay_sequence LI
 UNION ALL
 SELECT 'payroll', row_to_json(t) FROM (SELECT * FROM public.payroll LIMIT 1) t
 UNION ALL
-SELECT 'payroll_entries', row_to_json(t) FROM (SELECT * FROM public.payroll_entries LIMIT 1) t
+SELECT 'payroll_entries', row_to_json(t) FROM (SELECT * FROM public.payroll_entries LIMIT 5) t
 UNION ALL
 SELECT 'project_sites', row_to_json(t) FROM (SELECT * FROM public.project_sites LIMIT 1) t
 UNION ALL
@@ -66,7 +66,7 @@ SELECT 'projects', row_to_json(t) FROM (SELECT * FROM public.projects LIMIT 1) t
 UNION ALL
 SELECT 'reimbursements', row_to_json(t) FROM (SELECT * FROM public.reimbursements LIMIT 1) t
 UNION ALL
-SELECT 'salary_entries', row_to_json(t) FROM (SELECT * FROM public.salary_entries LIMIT 1) t
+SELECT 'salary_entries', row_to_json(t) FROM (SELECT * FROM public.salary_entries LIMIT 15) t
 UNION ALL
 SELECT 'users', row_to_json(t) FROM (SELECT * FROM public.users LIMIT 1) t;
 `
