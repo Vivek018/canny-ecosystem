@@ -13,7 +13,7 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useTypingAnimation } from "@canny_ecosystem/utils/hooks/typing-animation";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { type ClientLoaderFunctionArgs, defer, useLoaderData, useNavigate, useNavigation, useSearchParams, useSubmit } from "@remix-run/react";
+import { type ClientLoaderFunctionArgs, defer, useLoaderData, useNavigate, useNavigation, useSearchParams } from "@remix-run/react";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 
