@@ -7,17 +7,23 @@ export function isGoodStatus(status: number | string) {
 }
 
 export function replaceDash(str: string | null | undefined) {
+  if (typeof str !== "string") {
+    return str;
+  }
   return str?.replaceAll("-", " ");
 }
 
 export function replaceUnderscore(str: string | null | undefined) {
+  if (typeof str !== "string") {
+    return str;
+  }
   return str?.replaceAll("_", " ");
 }
 
 export const pipe =
   (...fns: any[]) =>
-  (val: any) =>
-    fns.reduce((prev, fn) => fn(prev), val);
+    (val: any) =>
+      fns.reduce((prev, fn) => fn(prev), val);
 
 export function getInitialValueFromZod<T extends z.ZodTypeAny>(
   schema: T

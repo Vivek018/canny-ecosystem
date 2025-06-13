@@ -1,9 +1,9 @@
 import { Results } from "@/components/ai/result";
 import { cacheKeyPrefix } from "@/constant";
 import { fetchAllSingleSQLQuery, generateQuery, runGeneratedSQLQuery } from "@/utils/ai/chat";
+import { generateChartConfig } from "@/utils/ai/chat/chart";
 import { clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
-import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Card, CardContent, CardHeader } from "@canny_ecosystem/ui/card";
@@ -44,28 +44,27 @@ const suggestedPrompt = [
 ];
 
 const placeholders = [
-  "Thinking",
-  "Analyzing your request",
-  "Generating the best response",
-  "Fetching the data",
-  "Just a moment",
-  "Working on it",
-  "Looking into it",
-  "Digging through the data",
-  "Crunching some numbers",
-  "Loading insights",
-  "Compiling your response",
-  "Pulling up the results",
-  "Finalizing output",
-  "Almost there",
-  "One sec, wrapping it up",
-  "Getting things ready",
-  "Still with me? Generating your answer",
-  "Formatting the best response for you",
-  "Checking the latest details",
-  "Still cooking that answer"
+  "Thinking through your request, please hold on",
+  "Analyzing everything you just asked for",
+  "Generating the best possible response for you",
+  "Fetching all the relevant data from our systems",
+  "Just a moment while we prepare everything",
+  "Working on your request with full focus",
+  "Looking into the details to give you an accurate answer",
+  "Digging through the data to find what you need",
+  "Crunching some serious numbers for this one",
+  "Loading up the insights you’re looking for",
+  "Compiling the response that matches your request",
+  "Pulling up the results — this won’t take long",
+  "Finalizing everything for a smooth output",
+  "Almost done — just adding the finishing touches",
+  "One sec, wrapping things up neatly for you",
+  "Getting things ready — this’ll be worth it",
+  "Still with me? Your answer is coming together now",
+  "Formatting the cleanest, clearest response possible",
+  "Checking all the latest details before replying",
+  "Still cooking that answer — hang tight!"
 ];
-
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {
@@ -73,13 +72,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const url = new URL(request.url);
     const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-    const { user } = await getUserCookieOrFetchUser(request, supabase);
+    // const { user } = await getUserCookieOrFetchUser(request, supabase);
 
     const searchParams = new URLSearchParams(url.searchParams);
     let prompt = searchParams.get("prompt") ?? "";
 
     if (!prompt) {
-      return defer({ data: [], error: null });
+      return defer({ data: [], config: null, error: null });
     }
 
     // After testing everything uncomment the if statement below
@@ -91,17 +90,18 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const { query, error } = await generateQuery({ input: prompt, tablesData, companyId });
 
     if (query === undefined || error) {
-      return defer({ data: null, error: error ?? "Error generating query" });
+      return defer({ data: null, config: null, error: error ?? "Error generating query" });
     }
-
-
 
     const { data, error: sqlError } = await runGeneratedSQLQuery({ input: prompt, originalQuery: query, tablesData, companyId });
 
-    return defer({ data, error: sqlError ?? null });
+
+    const { config } = await generateChartConfig(data ?? [], prompt);
+
+    return defer({ data, config, error: sqlError ?? null });
   } catch (error) {
     console.error("Error in action function:", error);
-    return defer({ data: null, error: error });
+    return defer({ data: null, config: null, error: error });
   }
 }
 
@@ -115,8 +115,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 clientLoader.hydrate = true;
 
 export default function Chat() {
-
-  const { data, error } = useLoaderData<typeof loader>();
+  const { data, config, error } = useLoaderData<typeof loader>();
   const columns = data?.[0] ? Object.keys(data[0]) : [];
 
   const animatedPlaceholder = useTypingAnimation(placeholders, false, {
@@ -130,10 +129,8 @@ export default function Chat() {
   const { toast } = useToast();
   const [prompt, setPrompt] = useState(searchPrompt);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [chartConfig, setChartConfig] = useState<null>(null);
 
   const navigate = useNavigate();
-
 
   const navigation = useNavigation();
   const isSubmitting =
@@ -146,7 +143,6 @@ export default function Chat() {
     searchParams.delete("prompt");
     setPrompt("");
     setSearchParams(searchParams);
-    setChartConfig(null);
   }
 
   useEffect(() => {
@@ -270,7 +266,7 @@ export default function Chat() {
       <Card className={cn("w-full h-full md:w-4/5 overflow-y-auto", (!data?.length) && "hidden")}>
         <Results
           results={data ?? []}
-          chartConfig={chartConfig}
+          chartConfig={config}
           columns={columns}
         />
       </Card>

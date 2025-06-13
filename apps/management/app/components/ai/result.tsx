@@ -13,6 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@canny_ecosystem/ui/table";
+import { DynamicChart } from "@canny_ecosystem/ui/dynamic-charts";
 import {
   formatDate,
   pipe,
@@ -123,10 +124,10 @@ export const Results = ({
           </div>
         </TabsContent>
         <TabsContent value="charts" className="flex-grow overflow-auto">
-          <div className="mt-4">
-            {/* {chartConfig && results.length > 0 ? (
+          <div className="mt-4 px-4">
+            {chartConfig && results.length > 0 ? (
               <DynamicChart chartData={results} chartConfig={chartConfig} />
-            ) : null} */}
+            ) : <>F</>}
           </div>
         </TabsContent>
       </Tabs>
