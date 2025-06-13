@@ -14,7 +14,6 @@ import {
   TableRow,
 } from "@canny_ecosystem/ui/table";
 import {
-  capitalizeFirstLetter,
   formatDate,
   pipe,
   replaceDash,
@@ -63,43 +62,10 @@ export const Results = ({
     });
   }, [results, sortBy, sortDirection]);
 
-  const formatColumnTitle = (title: string) => {
-    return title
-      .split("_")
-      .map((word, index) =>
-        index === 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word,
-      )
-      .join(" ");
-  };
-
-  const formatCellValue = (column: string, value: any) => {
-    if (column.toLowerCase().includes("valuation")) {
-      const parsedValue = Number.parseFloat(value);
-      if (Number.isNaN(parsedValue)) {
-        return "";
-      }
-      const formattedValue = parsedValue.toFixed(2);
-      const trimmedValue = formattedValue.replace(/\.?0+$/, "");
-      return `$${trimmedValue}B`;
-    }
-    if (column.toLowerCase().includes("rate")) {
-      const parsedValue = Number.parseFloat(value);
-      if (Number.isNaN(parsedValue)) {
-        return "";
-      }
-      const percentage = (parsedValue * 100).toFixed(2);
-      return `${percentage}%`;
-    }
-    if (value instanceof Date) {
-      return value.toLocaleDateString();
-    }
-    return String(value);
-  };
-
   return (
     <div className="flex-grow flex flex-col overflow-hidden">
       <Tabs defaultValue="table" className="w-full flex-grow flex flex-col">
-        <TabsList className="grid w-full grid-cols-2 rounded-none">
+        <TabsList className="grid w-full grid-cols-2 rounded-none border-b">
           <TabsTrigger value="table">Table</TabsTrigger>
           <TabsTrigger
             value="charts"
@@ -122,11 +88,9 @@ export const Results = ({
                       onClick={() => handleSort(column)}
                     >
                       {pipe(
-                        formatColumnTitle,
                         formatDate,
                         replaceDash,
                         replaceUnderscore,
-                        capitalizeFirstLetter,
                       )(column)}
                       {sortBy === column ? (
                         <Icon name={sortDirection === "asc" ? "chevron-down" : "chevron-up"} size="xs" className="ml-1.5 -mt-1" />
@@ -149,7 +113,7 @@ export const Results = ({
                           formatDate,
                           replaceDash,
                           replaceUnderscore,
-                        )(formatCellValue(column, row[column]))}
+                        )(row[column])}
                       </TableCell>
                     ))}
                   </TableRow>
