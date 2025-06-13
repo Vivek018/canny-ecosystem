@@ -1,4 +1,3 @@
-import { openai } from "@ai-sdk/openai";
 import { z } from "@canny_ecosystem/utils";
 import { generateObject } from "ai";
 import {
@@ -9,6 +8,7 @@ import {
   skillLevelArray,
   statusArray,
 } from "@canny_ecosystem/utils";
+import { google } from "@ai-sdk/google";
 
 export const EmployeeFiltersSchema = z.object({
   name: z
@@ -57,7 +57,7 @@ export const generateEmployeeFilter = async (
 ) => {
   try {
     const result = await generateObject({
-      model: openai('gpt-4o-mini'),
+      model: google('gemini-2.0-flash-lite'),
       system: `You are a helpful assistant that generates filters for a given prompt.
       Current date is: ${new Date().toISOString().split("T")[0]}.
       Instructions:
