@@ -94,15 +94,7 @@ Sample row from each table: ${tablesData}
 - Prefer child/detail tables when relevant (e.g., show assignment/site details with employee).
 - Always ensure all JOINs are schema-correct. Avoid missing joins.
 - When giving employee name in result always combine first_name and last_name into single field.
-- Do not select, give and use meta fields like created_at or updated_at.
-
-=== EXAMPLES OF STRONG OUTPUT ===
-- Site-wise attendance: site name, project name, date, present count, absent count, etc.
-- employee working details / info: employee_code, first_name, last_name then all details from employee_project_assignment table.
-- payroll: title, total earnings, total deductions, net amount, etc.
-- Missing documents: employee name, document_type, file_url IS NULL.
-- Top absentees last month: employee name, mobile, site, total absents.
-- Approved reimbursements: employee, amount, status, approved_by, approved_at.`      ,
+- Do not select, give and use meta fields like created_at or updated_at.`      ,
       prompt: `Generate the query necessary to retrieve the data the user wants: ${input}`,
       schema: z.object({
         query: z.string(),
@@ -166,7 +158,6 @@ Schema:
 - Respect foreign key paths and avoid expressions, aliases, subqueries, and CTEs.
 - When giving employee name in result always combine first_name and last_name into single field.
 - Do not select, give and use meta fields like created_at or updated_at.
-- Always apply company_id.
 - End with LIMIT $${MID_QUERY_LIMIT}.
 
 Return only a corrected SQL SELECT query.`,
@@ -193,13 +184,11 @@ export const runGeneratedSQLQuery = async ({
   originalQuery,
   companyId,
   tablesData,
-  disableCompanyFilter = false,
 }: {
   input: string;
   originalQuery: string;
   companyId: string;
   tablesData: string;
-  disableCompanyFilter?: boolean;
 }) => {
   const client = new Client({
     connectionString: process.env.SUPABASE_DATABASE_URL,
@@ -237,56 +226,6 @@ export const runGeneratedSQLQuery = async ({
     return cleanedLines.join(' ').trim();
   };
 
-  const ensureCompanyFilter = (query: string): string => {
-    if (disableCompanyFilter || !companyId) return query;
-
-    try {
-      const tablesWithCompanyId = Object.entries(JSON.parse(tablesData))
-        .filter(([_, row]) => row && typeof row === "object" && "company_id" in row)
-        .map(([table]) => table);
-
-      const fromMatch = query.match(/from\s+([\w_]+)/i);
-      if (!fromMatch) return query;
-
-      const fromTable = fromMatch[1];
-      if (!tablesWithCompanyId.includes(fromTable)) return query;
-
-      const companyRegex = /company_id\s*=\s*'([^']+)'/i;
-      const existingMatch = query.match(companyRegex);
-
-      if (existingMatch) {
-        return query.replace(companyRegex, `company_id = '${companyId}'`);
-      }
-
-      const whereMatch = query.match(/\bwhere\b/i);
-      const companyFilter = `company_id = '${companyId}'`;
-
-      if (whereMatch) {
-        return query.replace(/(\bwhere\b\s*)/i, `$1${companyFilter} AND `);
-      }
-        const orderByMatch = query.match(/\border\s+by\b/i);
-        const limitMatch = query.match(/\blimit\b/i);
-        const groupByMatch = query.match(/\bgroup\s+by\b/i);
-        const havingMatch = query.match(/\bhaving\b/i);
-
-        let insertPosition = query.length;
-
-        for (const match of [orderByMatch, limitMatch, groupByMatch, havingMatch]) {
-          if (match && match.index !== undefined && match.index < insertPosition) {
-            insertPosition = match.index;
-          }
-        }
-
-        const beforeClause = query.substring(0, insertPosition).trim();
-        const afterClause = query.substring(insertPosition).trim();
-
-        return `${beforeClause} WHERE ${companyFilter} ${afterClause}`.trim();
-    } catch (error) {
-      console.error('Error parsing tablesData:', error);
-      return query;
-    }
-  };
-
   const cleanedQuery = cleanQuery(originalQuery);
 
   if (!isSafeQuery(cleanedQuery)) {
@@ -297,7 +236,7 @@ export const runGeneratedSQLQuery = async ({
   let finalData: any[] = [];
   let finalError: any = null;
 
-  const adjustedOriginalQuery = ensureCompanyFilter(cleanedQuery);
+  const adjustedOriginalQuery = cleanedQuery;
 
   try {
     const result = await client.query(adjustedOriginalQuery);
@@ -323,8 +262,7 @@ export const runGeneratedSQLQuery = async ({
 
       if (!nextRectify.query) break;
 
-      const cleanedRectifiedQuery = cleanQuery(nextRectify.query);
-      lastQuery = ensureCompanyFilter(cleanedRectifiedQuery);
+      lastQuery = cleanQuery(nextRectify.query);
       usedRectifiedQuery = true;
       attempts++;
       try {

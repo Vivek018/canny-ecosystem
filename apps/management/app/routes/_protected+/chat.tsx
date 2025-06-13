@@ -11,6 +11,7 @@ import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { useTypingAnimation } from "@canny_ecosystem/utils/hooks/typing-animation";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { type ClientLoaderFunctionArgs, defer, useLoaderData, useNavigate, useNavigation, useSearchParams } from "@remix-run/react";
 import { useEffect, useRef, useState } from "react";
@@ -38,9 +39,33 @@ const suggestedPrompt = [
   "List approved invoices awaiting processing",
   // "Generate monthly attendance % per site",
   "List employees with work anniversaries this month",
-  "Show me employees with the most overtime hours",
-  "List laborers most absent last month with contact numbers",
+  "Show me employees with the most overtime hours last month",
+  "List employees most absent last month with contact numbers",
 ];
+
+const placeholders = [
+  "Thinking",
+  "Analyzing your request",
+  "Generating the best response",
+  "Fetching the data",
+  "Just a moment",
+  "Working on it",
+  "Looking into it",
+  "Digging through the data",
+  "Crunching some numbers",
+  "Loading insights",
+  "Compiling your response",
+  "Pulling up the results",
+  "Finalizing output",
+  "Almost there",
+  "One sec, wrapping it up",
+  "Getting things ready",
+  "Still with me? Generating your answer",
+  "Formatting the best response for you",
+  "Checking the latest details",
+  "Still cooking that answer"
+];
+
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {
@@ -48,13 +73,20 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const url = new URL(request.url);
     const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+    const { user } = await getUserCookieOrFetchUser(request, supabase);
 
     const searchParams = new URLSearchParams(url.searchParams);
-    const prompt = searchParams.get("prompt") ?? "";
+    let prompt = searchParams.get("prompt") ?? "";
 
     if (!prompt) {
       return defer({ data: [], error: null });
     }
+
+    // After testing everything uncomment the if statement below
+
+    // if (user?.role !== "master" && user?.role !== "admin") {
+    prompt = `${prompt} where company is company_id=${companyId}`
+    // }
 
     const { query, error } = await generateQuery({ input: prompt, tablesData, companyId });
 
@@ -62,12 +94,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
       return defer({ data: null, error: error ?? "Error generating query" });
     }
 
-    const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-    const disableCompanyFilter = user?.role === "master" || user?.role === "admin";
 
-    // use this disableCompanyFilter once chatgpt testing is done in place of false
-    const { data, error: sqlError } = await runGeneratedSQLQuery({ input: prompt, originalQuery: query, tablesData, companyId, disableCompanyFilter: false });
+    const { data, error: sqlError } = await runGeneratedSQLQuery({ input: prompt, originalQuery: query, tablesData, companyId });
 
     return defer({ data, error: sqlError ?? null });
   } catch (error) {
@@ -89,6 +118,11 @@ export default function Chat() {
 
   const { data, error } = useLoaderData<typeof loader>();
   const columns = data?.[0] ? Object.keys(data[0]) : [];
+
+  const animatedPlaceholder = useTypingAnimation(placeholders, false, {
+    typingSpeed: 70,
+    pauseDuration: 1400,
+  });
 
   const [searchParams, setSearchParams] = useSearchParams();
   const searchPrompt = searchParams.get("prompt")?.toString() ?? undefined;
@@ -213,17 +247,17 @@ export default function Chat() {
         </CardContent>
       </Card>
       {/* If no data is there after prompt */}
-      <div className={cn("hidden", (searchPrompt && !data?.length) && "flex flex-col gap-4 w-full sm:w-4/5 md:w-3/5 h-3/5 text-center items-center justify-center")}>
+      <div className={cn("hidden", (searchPrompt && !data?.length) && "flex flex-col gap-4 w-full sm:w-3/5 md:w-1/2 h-3/5 text-center items-center justify-center")}>
         {isSubmitting ?
           <>
-            <p className="text-muted-foreground text-xl">Creating Data For You......</p>
+            <p className="text-muted-foreground/60 text-xl tracking-wider">{animatedPlaceholder}</p>
           </>
           :
           <>
-            <p className="text-muted-foreground">
-              No data found for your prompt. Since, this chat box is in early stages it might not work as expected. Try refreshing page or other prompts.
+            <p className="text-muted-foreground tracking-wider">
+              No data found in this prompt. Since, this chat box is in early stages it might not work as expected. Try refreshing page or other prompts.
             </p>
-            <div className="flex flex-col md:flex-row gap-3 items-center justify-center">
+            <div className="flex flex-col md:flex-row gap-3 items-center justify-center mt-1">
               <Button size="full" className="w-40" variant={"default"} onClick={() => {
                 navigate(0)
               }}>Refresh</Button>
