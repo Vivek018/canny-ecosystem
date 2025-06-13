@@ -34,8 +34,5 @@
   "engines": {
     "node": "22.14.0"
   },
-  "packageManager": "npm@10.8.3",
-  "dependencies": {
-    "@radix-ui/react-tabs": "^1.1.12"
-  }
+  "packageManager": "npm@10.8.3"
 }

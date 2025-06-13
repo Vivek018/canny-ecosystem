@@ -15,7 +15,6 @@ import {
   useLoaderData,
 } from "@remix-run/react";
 import { clientCaching } from "./utils/cache";
-
 import tailwindStyleSheetUrl from "@/styles/tailwind.css?url";
 import { getTheme } from "./utils/server/theme.server";
 import { useTheme } from "./utils/theme";
@@ -32,7 +31,6 @@ import {
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "./constant";
 import { Toaster } from "@canny_ecosystem/ui/toaster";
-import { ErrorBoundary } from "./components/error-boundary";
 import {
   getUserCookieOrFetchUser,
   setUserCookie,
@@ -142,13 +140,10 @@ function Document({
 
 function App() {
   const {
-    error,
     requestInfo: {
       userPrefs: { theme: initialTheme, user },
     },
   } = useLoaderData<typeof loader>();
-
-  if (error) return <ErrorBoundary error={error} />;
 
   const nonce = useNonce();
   const { theme } = useTheme();
