@@ -72,14 +72,14 @@ export const zFile = z
     (file) =>
       typeof file !== "string"
         ? [
-          ...ACCEPTED_IMAGE_TYPES,
-          "image/pdf",
-          "image/doc",
-          "image/docx",
-          "application/pdf",
-          "application/doc",
-          "application/docx",
-        ].includes(file?.type)
+            ...ACCEPTED_IMAGE_TYPES,
+            "image/pdf",
+            "image/doc",
+            "image/docx",
+            "application/pdf",
+            "application/doc",
+            "application/docx",
+          ].includes(file?.type)
         : true,
     "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .docx formats are supported."
   );
@@ -385,6 +385,7 @@ export const positionArray = [
   "business_development_executive",
   "industry_&_environment",
   "unknown",
+  "office_attendant",
 ] as const;
 
 export const assignmentTypeArray = [
@@ -444,7 +445,7 @@ export const employeeDocuments = [
   "pan_card",
   "passport",
   "uan_card",
-  "joining_form"
+  "joining_form",
 ] as const;
 
 export const EmployeeDocumentsSchema = z.object({

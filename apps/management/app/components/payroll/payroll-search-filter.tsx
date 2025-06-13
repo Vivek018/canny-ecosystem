@@ -13,25 +13,20 @@ import {
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
 import { formatISO } from "date-fns";
-import { useEffect, useRef, useState } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import {
-  type SubmitOptions,
   useNavigation,
   useSearchParams,
-  useSubmit,
 } from "@remix-run/react";
 import { Calendar } from "@canny_ecosystem/ui/calendar";
 import { payrollPaymentStatusArray } from "@canny_ecosystem/utils";
 import type { PayrollFilters } from "@canny_ecosystem/supabase/queries";
-import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
 
 export function PayrollSearchFilter({
   disabled,
-  from,
 }: {
   disabled?: boolean;
-  from: "run-payroll" | "payroll-history";
 }) {
   const [prompt, setPrompt] = useState("");
   const navigation = useNavigation();
@@ -51,14 +46,12 @@ export function PayrollSearchFilter({
     date_end: "",
     payroll_type: "",
     status: "",
+    name: "",
   };
 
   const [filterParams, setFilterParams] = useState(initialFilterParams);
 
-  const submit = useSubmit();
-  const debounceSubmit = useDebounce((target: any, options?: SubmitOptions) => {
-    submit(target, options);
-  }, 300);
+
 
   const deleteAllSearchParams = () => {
     for (const [key, _val] of Object.entries(filterParams)) {
@@ -130,23 +123,11 @@ export function PayrollSearchFilter({
     }
   };
 
-  const handleSubmit = () => {
-    if (prompt.split(" ").length > 1) {
-      debounceSubmit(
-        { prompt: prompt },
-        {
-          action:
-            from === "run-payroll"
-              ? "/payroll/run-payroll?index"
-              : "/payroll/payroll-history?index",
-          method: "POST",
-        }
-      );
-    } else {
-      if (prompt.length) {
-        searchParams.set("name", prompt);
-        setSearchParams(searchParams);
-      }
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (prompt.length) {
+      searchParams.set("name", prompt);
+      setSearchParams(searchParams);
     }
   };
 
@@ -162,7 +143,7 @@ export function PayrollSearchFilter({
           className="relative w-full md:w-auto"
           onSubmit={(e) => {
             e.preventDefault();
-            handleSubmit();
+            handleSubmit(e);
           }}
         >
           <Icon

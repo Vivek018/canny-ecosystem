@@ -235,7 +235,8 @@ export default function CreateInvoice({
   } = useLoaderData<typeof loader>();
 
   const relations = companyRelationsFromUpdate ?? companyRelations;
-  const type = payroll?.payroll_type;
+
+  const type = payroll?.payroll_type ?? updateValues?.payroll_type;
 
   function transformPayrollData(employees: any[], payrollType: string) {
     const total = employees.reduce(
@@ -264,6 +265,7 @@ export default function CreateInvoice({
       }
     }
     const basicAmount = fieldTotals.BASIC?.rawAmount ?? 0;
+
     return Object.entries(fieldTotals).map(([field, data]) => {
       let amount = data.rawAmount;
 

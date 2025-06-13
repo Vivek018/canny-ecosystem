@@ -86,7 +86,7 @@ export async function createSalaryPayroll({
   } = await createSalaryEntries({
     supabase,
     data: salaryPayrollEntries,
-    onConflict: "month, year, employee_id, template_component_id",
+    onConflict: "month, year, employee_id, field_name",
     bypassAuth,
   });
 

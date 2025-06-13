@@ -15,6 +15,7 @@ export type PayrollFilters = {
   date_end?: string | undefined | null;
   payroll_type?: string | undefined | null;
   status?: string | undefined | null;
+  name?: string | undefined | null;
 };
 
 export type ImportPayrollDataType = Pick<
@@ -59,12 +60,19 @@ export async function getPendingOrSubmittedPayrollsByCompanyId({
 
   const query = supabase
     .from("payroll")
-    .select(columns.join(","))
+    .select(columns.join(","), { count: "exact" })
     .eq("company_id", companyId)
     .in("status", ["pending", "submitted"]);
 
   if (searchQuery) {
-    query.or(`title.ilike.*${searchQuery}*`);
+    const searchQueryArray = searchQuery.split(" ");
+    if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
+      for (const searchQueryElement of searchQueryArray) {
+        query.or(`title.ilike.*${searchQueryElement}*`);
+      }
+    } else {
+      query.or(`title.ilike.*${searchQuery}*`);
+    }
   }
 
   const dateFilters = [{ field: "run_date", start: date_start, end: date_end }];
@@ -74,7 +82,10 @@ export async function getPendingOrSubmittedPayrollsByCompanyId({
   }
 
   if (payroll_type) {
-    query.eq("payroll_type", payroll_type as PayrollDatabaseRow["payroll_type"]);
+    query.eq(
+      "payroll_type",
+      payroll_type as PayrollDatabaseRow["payroll_type"]
+    );
   }
 
   if (status) {
@@ -119,12 +130,19 @@ export async function getApprovedPayrollsByCompanyId({
 
   const query = supabase
     .from("payroll")
-    .select(columns.join(","))
+    .select(columns.join(","), { count: "exact" })
     .eq("company_id", companyId)
     .in("status", ["approved"]);
 
   if (searchQuery) {
-    query.or(`title.ilike.*${searchQuery}*`);
+    const searchQueryArray = searchQuery.split(" ");
+    if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
+      for (const searchQueryElement of searchQueryArray) {
+        query.or(`title.ilike.*${searchQueryElement}*`);
+      }
+    } else {
+      query.or(`title.ilike.*${searchQuery}*`);
+    }
   }
 
   const dateFilters = [{ field: "run_date", start: date_start, end: date_end }];
@@ -134,7 +152,10 @@ export async function getApprovedPayrollsByCompanyId({
   }
 
   if (payroll_type) {
-    query.eq("payroll_type", payroll_type as PayrollDatabaseRow["payroll_type"]);
+    query.eq(
+      "payroll_type",
+      payroll_type as PayrollDatabaseRow["payroll_type"]
+    );
   }
 
   if (status) {
@@ -143,7 +164,6 @@ export async function getApprovedPayrollsByCompanyId({
 
   const { data, count, error } = await query.range(from, to);
   if (error) console.error("getApprovedPayrollsByCompanyId Error", error);
-
   return { data, meta: { count: count }, error };
 }
 

@@ -17,7 +17,7 @@ import {
   Outlet,
   useLoaderData,
 } from "@remix-run/react";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { PayrollCard } from "@/components/payroll/payroll-card";
 import {
@@ -31,22 +31,24 @@ import { formatDate } from "@canny_ecosystem/utils";
 import { ImportPayrollDialog } from "@/components/payroll/import-payroll-dialog";
 import { ImportPayrollModal } from "@/components/payroll/import-export/import-modal-payroll";
 import { ImportSalaryPayrollModal } from "@/components/payroll/import-export/import-modal-salary-payroll";
-import {
-  LAZY_LOADING_LIMIT,
-  MAX_QUERY_LIMIT,
-} from "@canny_ecosystem/supabase/constant";
 import { PayrollSearchFilter } from "@/components/payroll/payroll-search-filter";
 import { FilterList } from "@/components/payroll/filter-list";
 import type { PayrollDatabaseRow } from "@canny_ecosystem/supabase/types";
+import { useInView } from "react-intersection-observer";
+import { useSupabase } from "@canny_ecosystem/supabase/client";
+import { Spinner } from "@canny_ecosystem/ui/spinner";
 
-const pageSize = LAZY_LOADING_LIMIT;
+const pageSize = 15;
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  const env = {
+    SUPABASE_URL: process.env.SUPABASE_URL!,
+    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
+  };
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
     const url = new URL(request.url);
-    const page = 0;
     const searchParams = new URLSearchParams(url.searchParams);
     const query = searchParams.get("name") ?? null;
 
@@ -57,30 +59,29 @@ export async function loader({ request }: LoaderFunctionArgs) {
       status: searchParams.get("status") ?? null,
     };
 
-    const hasFilters =
-      filters &&
-      Object.values(filters).some(
-        (value) => value !== null && value !== undefined
-      );
-
     const payrollsPromise = getPendingOrSubmittedPayrollsByCompanyId({
       supabase,
       companyId: companyId ?? "",
       params: {
         from: 0,
-        to: hasFilters ? MAX_QUERY_LIMIT : page > 0 ? pageSize : pageSize - 1,
+        to: pageSize - 1,
         filters,
         searchQuery: query ?? undefined,
       },
     });
 
-    return defer({ payrollsPromise, query, filters });
+    return defer({ payrollsPromise, query, filters, env, companyId });
   } catch (error) {
     console.error("Run Payroll Error", error);
     return defer({
       payrollsPromise: Promise.resolve({ data: [], error: null }),
       query: "",
       filters: null,
+      env: {
+        SUPABASE_URL: process.env.SUPABASE_URL!,
+        SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
+      },
+      companyId: null,
     });
   }
 }
@@ -92,10 +93,12 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 clientLoader.hydrate = true;
 
 export default function RunPayrollIndex() {
-  const { payrollsPromise, filters, query } = useLoaderData<typeof loader>();
+  const { payrollsPromise, filters, query, companyId, env } =
+    useLoaderData<typeof loader>();
   const filterList = { ...filters, name: query };
   const noFilters = Object.values(filterList).every((value) => !value);
-
+  const { ref, inView } = useInView();
+  const { supabase } = useSupabase({ env });
   return (
     <section className="py-4 px-4">
       <div className="w-full flex flex-col items-end justify-between">
@@ -116,7 +119,6 @@ export default function RunPayrollIndex() {
                   <div className="w-1/2 flex gap-4">
                     <PayrollSearchFilter
                       disabled={!data?.length && noFilters}
-                      from={"run-payroll"}
                     />
                     <FilterList filterList={filterList as PayrollFilters} />
                   </div>
@@ -128,8 +130,12 @@ export default function RunPayrollIndex() {
         </Suspense>
         <Suspense fallback={<LoadingSpinner className="my-20" />}>
           <Await resolve={payrollsPromise}>
-            {({ data, error }) => {
+            {(result) => {
               clearCacheEntry(cacheKeyPrefix.run_payroll);
+
+              const innitial = result.data;
+              const meta = "meta" in result ? result.meta : undefined;
+              const error = result.error;
               if (error)
                 return (
                   <ErrorBoundary
@@ -139,52 +145,128 @@ export default function RunPayrollIndex() {
                 );
 
               const { isDocument } = useIsDocument();
+              const [hasNextPage, setHasNextPage] = useState(
+                Boolean(
+                  meta?.count && innitial?.length
+                    ? meta.count > innitial.length
+                    : false
+                )
+              );
+
+              const [data, setData] = useState(innitial);
+              const [from, setFrom] = useState(pageSize);
+              useEffect(() => {
+                setData(innitial);
+                setFrom(pageSize);
+                setHasNextPage(
+                  Boolean(
+                    meta?.count && innitial?.length
+                      ? meta.count > innitial.length
+                      : false
+                  )
+                );
+              }, [innitial]);
+
+              const loadMorePayrolls = async () => {
+                const formattedFrom = from;
+                const to = formattedFrom + pageSize - 1;
+
+                try {
+                  if (companyId) {
+                    const { data: moreData } =
+                      await getPendingOrSubmittedPayrollsByCompanyId({
+                        supabase,
+                        companyId,
+                        params: {
+                          from: formattedFrom,
+                          to,
+                          filters,
+                          searchQuery: query ?? undefined,
+                        },
+                      });
+
+                    if (moreData?.length) {
+                      setData((prevData: any) => [...prevData, ...moreData]);
+                      setFrom(to + 1);
+                      setHasNextPage(moreData.length === pageSize);
+                      length;
+                    } else {
+                      setHasNextPage(false);
+                    }
+                  }
+                } catch (error) {
+                  console.error("Error loading more payrolls", error);
+                  setHasNextPage(false);
+                }
+              };
+
+              useEffect(() => {
+                if (inView) {
+                  loadMorePayrolls();
+                }
+              }, [inView]);
 
               return (
-                <Command className="overflow-visible">
-                  <CommandEmpty
-                    className={cn(
-                      "w-full py-40 capitalize text-lg tracking-wide text-center",
-                      !isDocument && "hidden"
-                    )}
-                  >
-                    No payrolls found
-                  </CommandEmpty>
-                  <CommandList className="max-h-full py-6 overflow-x-visible overflow-y-visible">
-                    <CommandGroup className="p-0 overflow-visible">
-                      <div className="w-full grid gap-8 grid-cols-1">
-                        {data?.map((payroll: any) => {
-                          if (!payroll) return null;
-                          return (
-                            <CommandItem
-                              key={payroll.id}
-                              value={
-                                payroll.id +
-                                payroll?.payroll_type +
-                                formatDate(payroll?.run_date) +
-                                payroll?.status +
-                                payroll?.total_employees +
-                                payroll?.total_net_amount +
-                                formatDate(payroll?.created_at)
-                              }
-                              className="data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0"
-                            >
-                              <PayrollCard
-                                data={
-                                  payroll as unknown as Omit<
-                                    PayrollDatabaseRow,
-                                    "updated_at"
-                                  >
-                                }
+                <>
+                  <Command className="overflow-visible">
+                    <CommandEmpty
+                      className={cn(
+                        "w-full py-40 capitalize text-lg tracking-wide text-center",
+                        !isDocument && "hidden"
+                      )}
+                    >
+                      No payrolls found
+                    </CommandEmpty>
+                    <CommandList className="max-h-full py-6 overflow-x-visible overflow-y-visible">
+                      <CommandGroup className="p-0 overflow-visible">
+                        <div className="w-full grid gap-8 grid-cols-1">
+                          {data?.map((payroll: any) => {
+                            if (!payroll) return null;
+                            return (
+                              <CommandItem
                                 key={payroll.id}
-                              />
-                            </CommandItem>
-                          );
-                        })}
+                                value={
+                                  payroll.id +
+                                  payroll?.commission +
+                                  payroll?.payroll_type +
+                                  formatDate(payroll?.run_date) +
+                                  payroll?.status +
+                                  payroll?.total_employees +
+                                  payroll?.total_net_amount +
+                                  formatDate(payroll?.created_at)
+                                }
+                                className="data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0"
+                              >
+                                <PayrollCard
+                                  data={
+                                    payroll as unknown as Omit<
+                                      PayrollDatabaseRow,
+                                      "updated_at"
+                                    >
+                                  }
+                                  key={payroll.id}
+                                />
+                              </CommandItem>
+                            );
+                          })}
+                        </div>
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                  {hasNextPage && innitial?.length && (
+                    <div
+                      className="flex items-center justify-center mt-6 mx-auto"
+                      ref={ref}
+                    >
+                      <div className="flex items-center space-x-2 px-6 py-5">
+                        <Spinner />
+                        <span className="text-sm text-[#606060]">
+                          Loading more...
+                        </span>
                       </div>
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
+                    </div>
+                  )}
+                </>
               );
             }}
           </Await>

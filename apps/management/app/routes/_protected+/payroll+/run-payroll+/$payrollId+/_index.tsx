@@ -196,7 +196,7 @@ export default function RunPayrollId() {
 
                   return (
                     <PayrollEntryComponent
-                      payrollData={payrollData}
+                      payrollData={payrollData as any}
                       data={data}
                       env={env as SupabaseEnv}
                       fromWhere="runpayroll"
@@ -224,7 +224,7 @@ export default function RunPayrollId() {
 
                   return (
                     <SalaryEntryComponent
-                      payrollData={payrollData}
+                      payrollData={payrollData as any}
                       data={data}
                       env={env as SupabaseEnv}
                       fromWhere="runpayroll"
