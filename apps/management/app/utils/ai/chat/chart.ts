@@ -9,12 +9,12 @@ export const configSchema = z
     description: z
       .string()
       .describe(
-        'Describe the chart. What is it showing? What is interesting about the way the data is displayed? Give comprehensive details of 50 - 80 words.',
+        'Describe the chart. What is it showing? What is interesting about the way the data is displayed?',
       ),
-    takeaway: z.string().describe('What is the main takeaway from the chart? Give comprehensive details of 50 - 80 words.'),
+    takeaway: z.string().describe('What is the main takeaway from the chart? Give them something usual regarding the data which is meaningfull for them.'),
     type: z.enum(['bar', 'line', 'area', 'pie']).describe('Type of chart'),
     title: z.string(),
-    xKey: z.string().describe('Key for x-axis or category it should mostly be Human-readable fields (e.g., first_name, last_name, label, name, title, etc) but never - Identifiers, types, metadata or values like amount, value, date, month, year, status, type, month, year, created_at, etc.'),
+    xKey: z.string().describe('Key for x-axis or category it should mostly be a field you can use to group data'),
     yKeys: z
       .array(z.string())
       .describe(
@@ -59,21 +59,38 @@ export const generateChartConfig = async (
   try {
     const { object: config } = await generateObject({
       model: google('gemini-2.0-flash'),
-      system: `You are a data visualization and charting expert.
-  Your job is to take structured SQL data and generate the best chart configuration for visual representation.
-  The data has already been processed and is clean — no further data transformations or filtering are needed.
-  
-  Guidelines:
-  1. Generate a chart config based on the structure and meaning of the data.
-  2. Avoid guessing — rely only on the provided data and user query.
-  3. The output config must be immediately usable as a React chart config with the following structure:
-    {
-      type: string,
-      xKey: string,
-      yKeys: string[],
-      colors: Record<string, string>,
-      legend: boolean
-    }`,
+      system: `You are a data visualization expert.
+
+Your job is to generate the best chart configuration based on structured SQL result data and the user's query. The data is already clean — no further filtering is needed.
+
+== GOAL ==
+Output a React-ready chart config object that:
+- Clearly answers the user query.
+- Groups data meaningfully (e.g., by project_site, status, type, position, date).
+- Uses readable formatting (e.g., format dates as "dd-MM-yyyy").
+
+== RULES ==
+1. Choose appropriate chart type:  
+  - **Bar/Line** for trends or categories.  
+  - **Pie/Doughnut** for proportions.  
+  - **Table** for detailed data.
+
+2. X-axis should be categorical or time-based. Y-axis should be numeric.  
+  - If no numeric Y exists, count items per group.  
+  - Avoid raw IDs or technical fields on axes.
+  - DO not give same x axis and y axis values more than once. Group the ones who same ones and create data like that accordingly.
+
+3. Don’t guess fields. Only use what's present in the data and relevant to the query.
+
+== OUTPUT STRUCTURE ==
+{
+  type: string,                    // "bar", "line", "pie", etc.
+  xKey: string,                    // grouping field
+  yKeys: string[],                 // numeric or countable fields
+  colors: Record<string, string>, // yKey => color
+  legend: boolean
+}
+`,
       prompt: `Based on the following SQL result and the user's query, generate the most suitable chart config.
   
   User Query:
@@ -97,4 +114,3 @@ export const generateChartConfig = async (
     throw new Error('Failed to generate chart suggestion');
   }
 };
-  

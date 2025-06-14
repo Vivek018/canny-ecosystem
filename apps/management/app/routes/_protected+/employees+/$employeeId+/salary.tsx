@@ -135,7 +135,7 @@ export default function Salary() {
         </div>
       </div>
       <div className="flex-1 w-full grid gap-6 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-2 justify-start auto-rows-min">
-        {groupPayrollData(salaryEntries).map((salary, index) => (
+        {groupPayrollData(salaryEntries).reverse().map((salary, index) => (
           <SalaryInfoCard
             key={index.toString()}
             salaryData={salary as unknown as GroupedPayrollEntry}

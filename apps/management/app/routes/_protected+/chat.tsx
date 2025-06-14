@@ -20,7 +20,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 const suggestedPrompt = [
   "Show me employees with the highest attendance this month",
   "Show invoices due for payment this week",
-  "Employees joined in 2025",
+  "Employees started working in 2025",
   "Employees with missing bank details",
   "List all pending reimbursements that need approval",
   // "Generate ESI/PF contribution report for this quarter",
@@ -93,7 +93,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       return defer({ data: null, config: null, error: error ?? "Error generating query" });
     }
 
-    const { data, error: sqlError } = await runGeneratedSQLQuery({ originalQuery: query, input: prompt, companyId, tablesData });
+    const { data, error: sqlError } = await runGeneratedSQLQuery({ originalQuery: query });
 
 
     const { config } = await generateChartConfig(data ?? [], prompt);
@@ -262,12 +262,12 @@ export default function Chat() {
       {/* Suggested Prompts */}
       <Card className={cn('w-full h-full md:w-4/5 items-start pb-3', searchPrompt && "hidden")}>
         <CardHeader className="py-4 text-2xl font-bold capitalize tracking-wide">Try These Prompts:</CardHeader>
-        <CardContent className="w-full flex flex-wrap gap-x-6 gap-y-4 overflow-y-scroll">
+        <CardContent className="w-full flex flex-wrap gap-x-4 gap-y-4 overflow-y-scroll">
           {
             suggestedPrompt.map((prompt, index) => (
               <div
                 key={prompt + index.toString()}
-                className="w-max h-min text-sm tracking-wider cursor-pointer text-muted-foreground hover:text-foreground px-5 py-2.5 border dark:border-muted-foreground/40 rounded-md hover:bg-accent transition-colors"
+                className="w-max h-min text-sm tracking-wide cursor-pointer text-muted-foreground hover:text-foreground px-5 py-2.5 border dark:border-muted-foreground/40 rounded-md hover:bg-accent transition-colors"
                 tabIndex={0}
                 role="button"
                 onClick={() => {
