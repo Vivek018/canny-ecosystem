@@ -3,7 +3,7 @@ import { SalaryFilter } from "@/components/employees/salary/salary-filter";
 import SalaryInfoCard from "@/components/employees/salary/salary-info-card";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { cacheKeyPrefix } from "@/constant";
-import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
+import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import {
   type DashboardFilters,
   getSalaryEntriesByEmployeeId,
@@ -16,6 +16,7 @@ import {
   Outlet,
   useLoaderData,
 } from "@remix-run/react";
+import { useState } from "react";
 
 interface GroupedPayrollFields {
   [fieldName: string]: {
@@ -56,7 +57,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return defer({
       salaryEntries,
       filters,
-      error: null,
+      error,
     });
   } catch (error) {
     return defer({
@@ -82,7 +83,7 @@ export default function Salary() {
   const { error, salaryEntries, filters } = useLoaderData<typeof loader>();
 
   if (error) {
-    clearExactCacheEntry(`${cacheKeyPrefix.employee_salary}`);
+    clearCacheEntry(`${cacheKeyPrefix.employee_salary}`);
     return (
       <ErrorBoundary error={error} message="Failed to load employee details" />
     );
@@ -100,7 +101,7 @@ export default function Salary() {
       type: string;
     }
 
-    const grouped: { [id: string]: GroupedPayrollEntry } = {};
+    const [grouped] = useState<{ [id: string]: GroupedPayrollEntry }>({});
 
     for (const entry of data as SalaryEntry[]) {
       const id = entry.payroll_id;

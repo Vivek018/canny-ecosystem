@@ -1,116 +1,104 @@
-/* ...rest of the file... */
-
 import { google } from "@ai-sdk/google";
 import { z } from "@canny_ecosystem/utils";
 import { generateObject } from "ai";
 
 export const configSchema = z
   .object({
+    title: z.string().describe("Title of the chart"),
     description: z
       .string()
-      .describe(
-        'Describe the chart. What is it showing? What is interesting about the way the data is displayed?',
-      ),
-    takeaway: z.string().describe('What is the main takeaway from the chart? Give them something usual regarding the data which is meaningfull for them.'),
-    type: z.enum(['bar', 'line', 'area', 'pie']).describe('Type of chart'),
-    title: z.string(),
-    xKey: z.string().describe('Key for x-axis or category it should mostly be a field you can use to group data'),
+      .describe("What is this chart showing? Explain the value of this visualization. Give proper meaningful description of 40 - 60 words."),
+    takeaway: z
+      .string()
+      .describe("What is the most interesting insight or summary from the data? Give proper meaningful takeaway of 40 - 60 words."),
+    type: z.enum(["bar", "line", "area", "pie"]).describe("Type of chart"),
+    xKey: z
+      .string()
+      .describe("Field to group by for X-axis. Must be a category or date."),
     yKeys: z
       .array(z.string())
-      .describe(
-        'Key(s) for y-axis values it should mostly be Quantitative fields (e.g., amount, value)',
-      ),
+      .describe("Numeric or countable fields used for Y-axis"),
     multipleLines: z
       .boolean()
-      .describe(
-        'For line charts only: whether the chart is comparing groups of data.',
-      )
+      .describe("If line chart, is it comparing categories?")
       .optional(),
     measurementColumn: z
       .string()
-      .describe(
-        'For line charts only: key for quantitative y-axis column to measure against (eg. values, counts etc.)',
-      )
+      .describe("For line charts: y-axis metric like amount or count")
       .optional(),
     lineCategories: z
       .array(z.string())
-      .describe(
-        'For line charts only: Categories used to compare different lines or data series. Each category represents a distinct line in the chart.',
-      )
+      .describe("Categories for separate lines in line chart")
       .optional(),
     colors: z
-      .record(
-        z.string().describe('Any of the yKeys'),
-        z.string().describe('Color value in CSS format (e.g., hex, rgb, hsl)'),
-      )
-      .describe('Mapping of data keys to color values for chart elements')
+      .record(z.string(), z.string())
+      .describe("Color mapping for yKeys")
       .optional(),
-    legend: z.boolean().describe('Whether to show legend'),
+    legend: z.boolean().describe("Whether to show a legend"),
   })
-  .describe('Chart configuration object');
-
+  .describe("Chart configuration object");
 
 export const generateChartConfig = async (
   results: any[],
   userQuery: string,
 ) => {
-  'use server';
+  "use server";
 
   try {
     const { object: config } = await generateObject({
-      model: google('gemini-2.0-flash'),
+      model: google("gemini-2.0-flash"),
       system: `You are a data visualization expert.
 
-Your job is to generate the best chart configuration based on structured SQL result data and the user's query. The data is already clean — no further filtering is needed.
+Your task is to generate a valid React chart configuration using SQL data and a user query. The data is already cleaned—no further transformation or filtering is needed.
 
-== GOAL ==
-Output a React-ready chart config object that:
-- Clearly answers the user query.
-- Groups data meaningfully (e.g., by project_site, status, type, position, date).
-- Uses readable formatting (e.g., format dates as "dd-MM-yyyy").
+== DATA RULES ==
+1. Always group the data meaningfully by a categorical or date-based field for the X-axis.
+  - Examples: project_site, status, type, department, position, employee_name, or a formatted date.
+  - Do NOT use rows as-is for X values. Group them and aggregate Y values.
+2. Y-axis MUST show quantitative insight.
+  - If no numerical fields exist, count how many rows exist for each X group (Y = count).
+  - If multiple Y values exist (amounts, totals, etc.), include them all.
+  - Never return charts with empty or ungrouped Y data.
+3. Format any X-axis date fields as "dd-MM-yyyy".
 
-== RULES ==
-1. Choose appropriate chart type:  
-  - **Bar/Line** for trends or categories.  
-  - **Pie/Doughnut** for proportions.  
-  - **Table** for detailed data.
+== OUTPUT RULES ==
+1. Use only fields present in the given dataset.
+2. Never guess field meanings. Use schema logic only when obvious.
+3. Always produce the following chart config:
 
-2. X-axis should be categorical or time-based. Y-axis should be numeric.  
-  - If no numeric Y exists, count items per group.  
-  - Avoid raw IDs or technical fields on axes.
-  - DO not give same x axis and y axis values more than once. Group the ones who same ones and create data like that accordingly.
-
-3. Don’t guess fields. Only use what's present in the data and relevant to the query.
-
-== OUTPUT STRUCTURE ==
 {
-  type: string,                    // "bar", "line", "pie", etc.
-  xKey: string,                    // grouping field
-  yKeys: string[],                 // numeric or countable fields
-  colors: Record<string, string>, // yKey => color
-  legend: boolean
+  type: string,                     // "bar", "line", "pie", etc.
+  title: string,                   // title based on user query
+  xKey: string,                    // grouped dimension
+  yKeys: string[],                 // aggregated numeric/count fields
+  colors: Record<string, string>, // optional - yKey => color
+  legend: boolean,                // true if multiple Y series
+  description: string,            // what the chart shows
+  takeaway: string                // key insight about the data
 }
-`,
-      prompt: `Based on the following SQL result and the user's query, generate the most suitable chart config.
-  
-  User Query:
-  ${userQuery}
-  
-  Data:
-  ${JSON.stringify(results, null, 2)}`,
+
+If the query is unclear, choose the most reasonable insight and grouping for the given data.`,
+      prompt: `You are given cleaned SQL data and a user query. 
+Generate the best chart configuration for visualizing this data based on the rules provided.
+
+User Query:
+${userQuery}
+
+SQL Result:
+${JSON.stringify(results, null, 2)}
+
+Return a single valid chart config object only.`,
       schema: configSchema,
     });
 
-    // Apply your custom shadcn color theme
     const colors: Record<string, string> = {};
     config.yKeys.forEach((key: string, index: number) => {
       colors[key] = `hsl(var(--chart-${index + 1}))`;
     });
 
-    const updatedConfig = { ...config, colors };
-    return { config: updatedConfig };
+    return { config: { ...config, colors } };
   } catch (e) {
     console.error(e);
-    throw new Error('Failed to generate chart suggestion');
+    return { config: null }
   }
 };

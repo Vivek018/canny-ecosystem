@@ -98,6 +98,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     const { config } = await generateChartConfig(data ?? [], prompt);
 
+    console.log(config);
+
     return defer({ data, config, error: sqlError ?? null });
   } catch (error) {
     console.error("Error in action function:", error);
