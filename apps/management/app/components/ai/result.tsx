@@ -94,7 +94,7 @@ export const Results = ({
                         replaceUnderscore,
                       )(column)}
                       {sortBy === column ? (
-                        <Icon name={sortDirection === "asc" ? "chevron-down" : "chevron-up"} size="xs" className="ml-1.5 -mt-1" />
+                        <Icon name={sortDirection === "desc" ? "chevron-down" : "chevron-up"} size="xs" className="ml-1.5 -mt-1" />
                       ) : (
                         ""
                       )}
@@ -114,7 +114,7 @@ export const Results = ({
                           formatDate,
                           replaceDash,
                           replaceUnderscore,
-                        )(row[column])}
+                        )(row[column] !== null && String(row[column]))}
                       </TableCell>
                     ))}
                   </TableRow>

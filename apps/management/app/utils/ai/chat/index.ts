@@ -179,6 +179,7 @@ ${errorMessage || "None"}
     return { query: undefined, error: e };
   }
 };
+
 export const runGeneratedSQLQuery = async ({
   input,
   originalQuery,

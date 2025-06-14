@@ -20,7 +20,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 const suggestedPrompt = [
   "Show me employees with the highest attendance this month",
   "Show invoices due for payment this week",
-  "Employees joined this month",
+  "Employees joined in 2025",
   "Employees with missing bank details",
   "List all pending reimbursements that need approval",
   // "Generate ESI/PF contribution report for this quarter",
@@ -93,7 +93,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       return defer({ data: null, config: null, error: error ?? "Error generating query" });
     }
 
-    const { data, error: sqlError } = await runGeneratedSQLQuery({ input: prompt, originalQuery: query, tablesData, companyId });
+    const { data, error: sqlError } = await runGeneratedSQLQuery({ originalQuery: query, input: prompt, companyId, tablesData });
 
 
     const { config } = await generateChartConfig(data ?? [], prompt);
@@ -122,7 +122,6 @@ export default function Chat() {
   const [stateConfig, setStateConfig] = useState(config);
 
   const columns = stateData?.[0] ? Object.keys(stateData[0]) : [];
-
 
   const animatedPlaceholder = useTypingAnimation(placeholders, false, {
     typingSpeed: 70,
@@ -206,6 +205,10 @@ export default function Chat() {
 
   const handleSubmit = () => {
     setIsSubmitting(true)
+    if (prompt !== searchPrompt) {
+      setStateData([]);
+      setStateConfig(null);
+    }
     if (prompt) {
       searchParams.set("prompt", prompt);
       setSearchParams(searchParams);
@@ -218,38 +221,41 @@ export default function Chat() {
       {/* Input Chat Box */}
       <div className='flex space-x-3 w-full md:w-4/5 items-center'>
         <form
-          className='relative w-full'
+          className='relative w-full h-full flex flex-row gap-3 items-center justify-center'
           onSubmit={(e) => {
             e.preventDefault();
             handleSubmit();
           }}
         >
-          <Icon
-            name={isSubmitting ? "update" : "search"}
-            size="md"
-            className={cn(
-              "absolute pointer-events-none left-2 top-[14px]",
-              isSubmitting && "animate-spin"
-            )}
-          />
-          <Input
-            type="search"
-            name="prompt"
-            value={prompt}
-            tabIndex={-1}
-            ref={inputRef}
-            placeholder="Start typing to ask a question or search across your company’s data"
-            className='pl-9 pb-[5px] text-[15px] w-full h-12 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70 bg-card tracking-wide'
-            onChange={handleSearch}
-            autoFocus={true}
-            autoComplete='on'
-            autoCapitalize='none'
-            autoCorrect='off'
-            spellCheck='false'
-          />
+          <>
+            <Icon
+              name={isSubmitting ? "update" : "search"}
+              size="md"
+              className={cn(
+                "absolute pointer-events-none left-2 top-[14px]",
+                isSubmitting && "animate-spin"
+              )}
+            />
+            <Input
+              type="search"
+              name="prompt"
+              value={prompt}
+              tabIndex={-1}
+              ref={inputRef}
+              placeholder="Start typing to ask a question or search across your company’s data"
+              className='pl-9 pb-[5px] text-[15px] w-full h-12 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70 bg-card tracking-wide'
+              onChange={handleSearch}
+              autoFocus={true}
+              autoComplete='on'
+              autoCapitalize='none'
+              autoCorrect='off'
+              spellCheck='false'
+            />
+          </>
+          <Button type="submit" className={cn("h-full px-7", (stateData?.length && prompt?.length && (prompt === searchPrompt)) && "hidden")} disabled={!prompt || isSubmitting} variant={"default"} onClick={handleSubmit}>Submit</Button>
         </form>
         <div className={cn("h-full flex flex-row items-center justify-center gap-3", (!stateData?.length) && "hidden")}>
-          <Button className="h-full px-7" variant={"default"} onClick={refreshSearch}>Refresh</Button>
+          <Button className={cn("h-full px-7", prompt?.length && (prompt !== searchPrompt) && "hidden")} variant={"default"} onClick={refreshSearch}>Refresh</Button>
           <Button className="h-full px-7" variant={"secondary"} onClick={clearSearch}>Clear</Button>
         </div>
       </div>

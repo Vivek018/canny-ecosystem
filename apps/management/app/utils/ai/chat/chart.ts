@@ -14,11 +14,11 @@ export const configSchema = z
     takeaway: z.string().describe('What is the main takeaway from the chart? Give comprehensive details of 50 - 80 words.'),
     type: z.enum(['bar', 'line', 'area', 'pie']).describe('Type of chart'),
     title: z.string(),
-    xKey: z.string().describe('Key for x-axis or category'),
+    xKey: z.string().describe('Key for x-axis or category it should mostly be Human-readable fields (e.g., first_name, last_name, label, name, title, etc) but never - Identifiers, types, metadata or values like amount, value, date, month, year, status, type, month, year, created_at, etc.'),
     yKeys: z
       .array(z.string())
       .describe(
-        'Key(s) for y-axis values this is typically the quantitative column',
+        'Key(s) for y-axis values it should mostly be Quantitative fields (e.g., amount, value)',
       ),
     multipleLines: z
       .boolean()
@@ -58,22 +58,15 @@ export const generateChartConfig = async (
 
   try {
     const { object: config } = await generateObject({
-      model: google('gemini-2.0-flash-lite'),
+      model: google('gemini-2.0-flash'),
       system: `You are a data visualization and charting expert.
   Your job is to take structured SQL data and generate the best chart configuration for visual representation.
   The data has already been processed and is clean — no further data transformations or filtering are needed.
   
   Guidelines:
   1. Generate a chart config based on the structure and meaning of the data.
-  2. Your config must clearly map x and y axes:
-    - xKey should represent a meaningful dimension (e.g., name, month, date, status).
-    - yKeys should include one or more numeric or count-based fields.
-  3. Choose chart types that best match the shape of the data:
-    - Use "bar" or "line" for time-series or grouped values.
-    - Use "pie" or "doughnut" when comparing parts of a whole.
-    - Use "table" when the data is dense and doesn't suit charting well.
-  4. Avoid guessing — rely only on the provided data and user query.
-  5. The output config must be immediately usable as a React chart config with the following structure:
+  2. Avoid guessing — rely only on the provided data and user query.
+  3. The output config must be immediately usable as a React chart config with the following structure:
     {
       type: string,
       xKey: string,
