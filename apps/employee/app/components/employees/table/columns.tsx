@@ -152,8 +152,9 @@ export const columns = (): ColumnDef<EmployeeDataType>[] => [
     cell: ({ row }) => {
       return (
         <p className="w-max capitalize">
-          {row.original?.employee_project_assignment?.start_date &&
-            formatDate(row.original?.employee_project_assignment?.start_date)}
+          {row.original?.employee_project_assignment?.start_date
+            ? String(formatDate(row.original?.employee_project_assignment?.start_date))
+            : ""}
         </p>
       );
     },
@@ -165,8 +166,9 @@ export const columns = (): ColumnDef<EmployeeDataType>[] => [
     cell: ({ row }) => {
       return (
         <p className="w-max capitalize">
-          {row.original?.employee_project_assignment?.end_date &&
-            formatDate(row.original?.employee_project_assignment?.end_date)}
+          {row.original?.employee_project_assignment?.end_date
+            ? String(formatDate(row.original?.employee_project_assignment?.end_date))
+            : ""}
         </p>
       );
     },

@@ -9,55 +9,55 @@ import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
 
 export async function action({ request }: ActionFunctionArgs): Promise<Response> {
-    const { supabase } = getSupabaseWithHeaders({ request });
-    const formData = await request.formData();
-    const file = formData.get("file") as File;
-    const returnTo = formData.get("returnTo") as string;
+  const { supabase } = getSupabaseWithHeaders({ request });
+  const formData = await request.formData();
+  const file = formData.get("file") as File;
+  const returnTo = formData.get("returnTo") as string;
 
-    if (!file || !(file instanceof File)) {
-        return json({
-            status: "error",
-            message: "Invalid file object received",
-            returnTo
-        });
-    }
-    const { error } = await uploadAvatar({ supabase, avatar: file });
-    if (error) {
-        return json({
-            status: "error",
-            message: error.toString,
-            returnTo
-        });
-    }
+  if (!file || !(file instanceof File)) {
     return json({
-        status: "success",
-        message: "Avatar uploaded successfully",
-        returnTo
+      status: "error",
+      message: "Invalid file object received",
+      returnTo
     });
+  }
+  const { error } = await uploadAvatar({ supabase, avatar: file });
+  if (error) {
+    return json({
+      status: "error",
+      message: error.toString(),
+      returnTo
+    });
+  }
+  return json({
+    status: "success",
+    message: "Avatar uploaded successfully",
+    returnTo
+  });
 }
 
 export default function UploadAvatar() {
-    const actionData = useActionData<typeof action>();
-    const { toast } = useToast();
-    const navigate = useNavigate();
+  const actionData = useActionData<typeof action>();
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        if (actionData) {
-            if (actionData?.status === "success") {
-                toast({
-                    title: "Success",
-                    description: actionData?.message,
-                    variant: "success",
-                });
-                clearExactCacheEntry(cacheKeyPrefix.users);
-            } else {
-                toast({
-                    title: "Error",
-                    description: actionData?.message,
-                    variant: "destructive",
-                });
-            }
-            navigate(actionData?.returnTo);
-        }
-    }, [actionData]);
+  useEffect(() => {
+    if (actionData) {
+      if (actionData?.status === "success") {
+        toast({
+          title: "Success",
+          description: actionData?.message,
+          variant: "success",
+        });
+        clearExactCacheEntry(cacheKeyPrefix.users);
+      } else {
+        toast({
+          title: "Error",
+          description: actionData?.message,
+          variant: "destructive",
+        });
+      }
+      navigate(actionData?.returnTo);
+    }
+  }, [actionData]);
 }

@@ -54,19 +54,30 @@ export const Results = ({
       if (valA == null) return 1;
       if (valB == null) return -1;
 
-      const aStr = typeof valA === "string" ? valA.toLowerCase() : valA;
-      const bStr = typeof valB === "string" ? valB.toLowerCase() : valB;
+      const aNum = +valA;
+      const bNum = +valB;
+
+      const bothAreNumbers = !Number.isNaN(aNum) && !Number.isNaN(bNum);
+
+      if (bothAreNumbers) {
+        return sortDirection === "asc" ? aNum - bNum : bNum - aNum;
+      }
+
+      const aStr = String(valA).toLowerCase();
+      const bStr = String(valB).toLowerCase();
 
       if (aStr < bStr) return sortDirection === "asc" ? -1 : 1;
       if (aStr > bStr) return sortDirection === "asc" ? 1 : -1;
       return 0;
     });
   }, [results, sortBy, sortDirection]);
+  
+  
 
   return (
     <div className="flex-grow flex flex-col overflow-hidden">
       <Tabs defaultValue="table" className="w-full flex-grow flex flex-col">
-        <TabsList className="grid w-full grid-cols-2 rounded-none border-b">
+        <TabsList className="grid w-full grid-cols-2 rounded-none">
           <TabsTrigger value="table">Table</TabsTrigger>
           <TabsTrigger
             value="charts"
@@ -79,13 +90,13 @@ export const Results = ({
         </TabsList>
         <TabsContent value="table" className="flex-grow mt-0">
           <div className="sm:min-h-[10px] relative overflow-auto">
-            <Table className="min-w-max divide-y divide-border">
+            <Table className="min-w-max divide-y divide-border border border-b-0">
               <TableHeader>
                 <TableRow>
                   {columns.map((column, index) => (
                     <TableHead
                       key={index.toString()}
-                      className="px-6 pt-5 pb-4 text-left text-xs font-medium text-muted-foreground/80 uppercase tracking-wider w-max cursor-pointer"
+                      className="px-6 pt-5 pb-4 text-left text-xs font-medium text-muted-foreground/80 uppercase tracking-wider w-max cursor-pointer hover:text-foreground focus:text-foreground"
                       onClick={() => handleSort(column)}
                     >
                       {pipe(
@@ -114,7 +125,7 @@ export const Results = ({
                           formatDate,
                           replaceDash,
                           replaceUnderscore,
-                        )(row[column] !== null && String(row[column]))}
+                        )(row[column])}
                       </TableCell>
                     ))}
                   </TableRow>
@@ -127,7 +138,7 @@ export const Results = ({
           <div className="mt-4 px-4">
             {chartConfig && results.length > 0 ? (
               <DynamicChart chartData={results} chartConfig={chartConfig} />
-            ) : <>F</>}
+            ) : <></>}
           </div>
         </TabsContent>
       </Tabs>

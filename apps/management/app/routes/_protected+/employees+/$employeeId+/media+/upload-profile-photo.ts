@@ -31,7 +31,7 @@ export async function action({
   if (error) {
     return json({
       status: "error",
-      message: error.toString,
+      message: error.toString(),
       returnTo,
     });
   }

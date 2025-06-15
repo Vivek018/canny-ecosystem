@@ -58,7 +58,7 @@ export default function ProtectedRoute() {
   useHotkeys(
     ["meta+k", "ctrl+k"],
     () => {
-      navigate("/chat");
+      navigate("/chat/chatbox");
     },
     {
       enableOnFormTags: true,

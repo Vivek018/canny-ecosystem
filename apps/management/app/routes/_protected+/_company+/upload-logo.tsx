@@ -25,7 +25,7 @@ export async function action({ request }: ActionFunctionArgs): Promise<Response>
   if (error) {
     return json({
       status: "error",
-      message: error.toString,
+      message: error.toString(),
       returnTo
     });
   }

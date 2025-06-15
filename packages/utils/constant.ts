@@ -107,6 +107,7 @@ export const exitPaymentFields = [
 
 export const attribute = {
   dashboard: "dashboard",
+  chat: "chat",
   company: "company",
   employees: "employees",
   employee: "employee",
