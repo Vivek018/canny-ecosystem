@@ -20,6 +20,7 @@ export type IconName =
   | "dot-filled"
   | "dots-horizontal"
   | "dots-vertical"
+  | "download"
   | "edit"
   | "email"
   | "employee"

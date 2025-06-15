@@ -5,17 +5,22 @@ import { runGeneratedSQLQuery } from "@/utils/ai/chat";
 import { clearCacheEntry, clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { useUser } from "@/utils/user";
 import { deleteChatById } from "@canny_ecosystem/supabase/mutations";
 import { getChatById } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
+import { Button } from "@canny_ecosystem/ui/button";
 import { Card, CardHeader } from "@canny_ecosystem/ui/card";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
+import { Icon } from "@canny_ecosystem/ui/icon";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { deleteRole, hasPermission, isGoodStatus, readRole } from "@canny_ecosystem/utils";
+import { deleteRole, formatDateTime, hasPermission, isGoodStatus, readRole } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { type ActionFunctionArgs, defer, json, type LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useActionData, useLoaderData, useNavigate, useParams, type ClientLoaderFunctionArgs } from "@remix-run/react";
 import { useEffect } from "react";
+import Papa from "papaparse";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   try {
@@ -100,6 +105,7 @@ export default function Chatbox() {
   const actionData = useActionData<typeof action>();
 
   const { toast } = useToast();
+  const { role } = useUser();
   const { chatId } = useParams();
   const navigate = useNavigate();
 
@@ -138,14 +144,68 @@ export default function Chatbox() {
     }
   }, [error]);
 
+  const toBeExportedData = data?.map((element) => {
+    const exportedData: {
+      [key: (typeof columns)[number]]: string | number | boolean;
+    } = {};
+
+    for (const key of columns) {
+      exportedData[key] = element[key as keyof typeof columns] as
+        | string
+        | boolean
+        | number;
+
+    }
+
+    return exportedData;
+  });
+
+  const handleExport = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
+    const csv = Papa.unparse(toBeExportedData as any);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+
+    link.setAttribute("download", `Employees - ${formatDateTime(Date.now())}`);
+
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+  };
+
   return (
     <Card className={cn("w-full h-full overflow-auto", (!data?.length) && "hidden")}>
       <Form method="POST">
-        <CardHeader className="pt-2 pb-3 flex flex-row items-center justify-between">
-          <p className="w-5/6 tracking-wide">
+        <CardHeader className="py-2 flex flex-row items-center justify-between gap-4">
+          <p className="w-full truncate tracking-wide">
             {prompt}
           </p>
-          <DeleteChat chatId={chatId ?? ""} />
+          <div className="h-11 flex-1 flex flex-row gap-2 items-center justify-end pb-2">
+            <Button variant={"secondary"} onClick={handleExport}>
+              <Icon name="download" size="sm" />
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                className={cn(
+                  "h-9 px-3.5 rounded-sm bg-secondary text-secondary-foreground grid place-items-center",
+                  !hasPermission(
+                    `${role}`,
+                    `${deleteRole}:${attribute.chat}`,
+                  ) && "hidden",
+                )}
+              >
+                <Icon name="dots-vertical" size="sm" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent sideOffset={10} align="end">
+                <DropdownMenuGroup>
+                  <DeleteChat chatId={chatId ?? ""} />
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </CardHeader>
       </Form>
       <Results

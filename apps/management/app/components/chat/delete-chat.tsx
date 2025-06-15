@@ -12,7 +12,6 @@ import {
 } from "@canny_ecosystem/ui/alert-dialog";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { ErrorList } from "@canny_ecosystem/ui/forms";
-import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { deleteRole, hasPermission } from "@canny_ecosystem/utils";
@@ -56,12 +55,12 @@ export const DeleteChat = ({ chatId }: { chatId: string }) => {
     <AlertDialog>
       <AlertDialogTrigger
         className={cn(
-          buttonVariants({ variant: "destructive-outline"}),
+          buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "text-[13px] h-9 hidden",
           hasPermission(role, `${deleteRole}:${attribute.chat}`) && "flex",
         )}
       >
-        <Icon name="trash" size="sm" />
+        Delete Chat
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
