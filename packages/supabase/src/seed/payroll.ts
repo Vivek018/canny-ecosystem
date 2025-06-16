@@ -13,11 +13,7 @@ export function seedSalaryPayroll(employees: { id: string }[]) {
         type: ["PF", "ESIC", "PT", "LWF"].includes(field)
           ? "statutory_contribution"
           : "earning",
-        is_pro_rata: faker.datatype.boolean(),
-        consider_for_epf: faker.datatype.boolean(),
-        consider_for_esic: faker.datatype.boolean(),
         amount: faker.number.int({ min: 0, max: 100000 }),
-        is_overtime: faker.datatype.boolean(),
       })
     );
   });

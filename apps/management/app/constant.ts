@@ -26,22 +26,22 @@ export const sideNavList = [
   { name: "Employees", link: "/employees", icon: "employee" },
   { name: "Group 2" },
   {
-    name: "Time Tracking",
-    link: "/time-tracking",
-    icon: "lab-timer",
-  },
-  {
     name: "Payroll",
     link: "/payroll",
     icon: "table",
   },
-  // {
-  //   name: "Payment Components",
-  //   link: "/payment-components",
-  //   icon: "input",
-  // },
-  { name: "Group 3" },
   { name: "Approvals", link: "/approvals", icon: "check-circle" },
+  // {
+    //   name: "Payment Components",
+    //   link: "/payment-components",
+    //   icon: "input",
+    // },
+    { name: "Group 3" },
+    {
+      name: "Time Tracking",
+      link: "/time-tracking",
+      icon: "lab-timer",
+    },
   { name: "Incidents", link: "/incidents", icon: "exclaimation-triangle" },
   { name: "Reports", link: "/reports", icon: "report" },
   { name: "Group 5" },

@@ -1289,15 +1289,10 @@ export const payrollPaymentStatusArray = [
 export const SalaryEntrySchema = z.object({
   id: z.string().optional(),
   employee_id: z.string(),
-  template_component_id: z.string().optional(),
   payroll_id: z.string().optional(),
   field_name: z.string(),
   type: z.enum(componentTypeArray).default("earning"),
   amount: z.number(),
-  is_pro_rata: z.boolean().default(false),
-  consider_for_epf: z.boolean().default(false),
-  consider_for_esic: z.boolean().default(false),
-  is_overtime: z.boolean().default(false),
 });
 
 export const payrollTypesArray = [

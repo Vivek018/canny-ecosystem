@@ -4,7 +4,7 @@ import {
   getInputProps,
   useForm,
 } from "@conform-to/react";
-import { CheckboxField, Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
+import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import { Form } from "@remix-run/react";
 import {
   Sheet,
@@ -77,9 +77,6 @@ export function SalaryEntrySheet({
                 {...getInputProps(fields.id, { type: "hidden" })}
               />
               <input
-                {...getInputProps(fields.template_component_id, { type: "hidden" })}
-              />
-              <input
                 {...getInputProps(fields.employee_id, { type: "hidden" })}
               />
               <input {...getInputProps(fields.payroll_id, { type: "hidden" })} />
@@ -123,7 +120,7 @@ export function SalaryEntrySheet({
                 }}
                 errors={fields.type.errors}
               />
-              <div className='grid grid-cols-2 place-content-center justify-between gap-x-4'>
+              {/* <div className='grid grid-cols-2 place-content-center justify-between gap-x-4'>
                 <CheckboxField
                   buttonProps={getInputProps(fields.is_pro_rata, {
                     type: "checkbox",
@@ -161,7 +158,7 @@ export function SalaryEntrySheet({
                     children: "Consider for ESI Contribution",
                   }}
                 />
-              </div>
+              </div> */}
             </Form>
           </FormProvider>
         </div>

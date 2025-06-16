@@ -239,14 +239,10 @@ export async function getSalaryEntriesByPayrollId({
     "present_days",
     "overtime_hours",
     "employee_id",
-    "template_component_id",
     "payroll_id",
     "field_name",
     "type",
     "amount",
-    "is_pro_rata",
-    "consider_for_epf",
-    "consider_for_esic",
   ] as const;
 
   const { data, error } = await supabase
@@ -291,9 +287,6 @@ export async function getSalaryEntriesByPayrollAndEmployeeId({
     "field_name",
     "type",
     "amount",
-    "is_pro_rata",
-    "consider_for_epf",
-    "consider_for_esic",
   ] as const;
 
   const { data, error } = await supabase
@@ -328,14 +321,10 @@ export async function getSalaryEntryById({
     "present_days",
     "overtime_hours",
     "employee_id",
-    "template_component_id",
     "payroll_id",
     "field_name",
     "type",
     "amount",
-    "is_pro_rata",
-    "consider_for_epf",
-    "consider_for_esic",
   ] as const;
 
   const { data, error } = await supabase
@@ -656,9 +645,6 @@ export async function getSalaryEntriesByEmployeeId({
     "field_name",
     "type",
     "amount",
-    "is_pro_rata",
-    "consider_for_epf",
-    "consider_for_esic",
   ] as const;
 
   const { data, error } = await supabase

@@ -93,12 +93,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       return defer({ query: null, data: [], config: null, error: null, dataExistsInDb });
     }
 
-    // After testing everything uncomment the if statement below
-
-    let promptWithCompany = prompt;
-    // if (user?.role !== "master" && user?.role !== "admin") {
-    promptWithCompany = `${promptWithCompany} where company is company_id=${companyId}`
-    // }
+    const promptWithCompany =`${prompt} where company is company_id=${companyId}`
 
     if (prompt && user?.id) {
       const { data, status } = await getChatByPromptAndUserId({ supabase, userId: user?.id ?? "", prompt: prompt });
@@ -418,7 +413,7 @@ export default function Chatbox() {
               No data found in this prompt. Since, this chat box is in early stages it might not work as expected. Try refreshing page or other prompts.
             </p>
             <div className="flex flex-col md:flex-row gap-3 items-center justify-center mt-1">
-              <Button size="full" disabled={isSubmitting} className="px-5" variant={"primary-outline"} onClick={refreshSearch}>
+              <Button size="full" disabled={isSubmitting} className="px-5" variant={"default"} onClick={refreshSearch}>
                 <Icon name="update" size="sm" />
               </Button>
               <Button size="full" disabled={isSubmitting} className="px-5" variant={"muted"} onClick={clearSearch}>

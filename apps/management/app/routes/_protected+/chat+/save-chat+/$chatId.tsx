@@ -148,7 +148,6 @@ export default function Chatbox() {
     const exportedData: {
       [key: (typeof columns)[number]]: string | number | boolean;
     } = {};
-
     for (const key of columns) {
       exportedData[key] = element[key as keyof typeof columns] as
         | string
@@ -156,7 +155,6 @@ export default function Chatbox() {
         | number;
 
     }
-
     return exportedData;
   });
 
@@ -168,7 +166,7 @@ export default function Chatbox() {
     const url = URL.createObjectURL(blob);
     link.href = url;
 
-    link.setAttribute("download", `Employees - ${formatDateTime(Date.now())}`);
+    link.setAttribute("download", `${prompt} - ${formatDateTime(Date.now())}`);
 
     document.body.appendChild(link);
     link.click();

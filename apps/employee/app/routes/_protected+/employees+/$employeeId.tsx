@@ -44,20 +44,20 @@ export default function Employee() {
       path: `/employees/${employeeId}/work-portfolio`,
     },
     {
+      label: "Salary Slips",
+      path: `/employees/${employeeId}/salary`,
+    },
+    { label: "Attendance", path: `/employees/${employeeId}/attendance` },
+    {
       label: "Reimbursements",
       path: `/employees/${employeeId}/reimbursements`,
     },
     { label: "Letters", path: `/employees/${employeeId}/letters` },
-    { label: "Attendance", path: `/employees/${employeeId}/attendance` },
-    { label: "Payments", path: `/employees/${employeeId}/payments` },
     {
       label: "Leaves",
       path: `/employees/${employeeId}/leaves`,
     },
-    {
-      label: "Salary",
-      path: `/employees/${employeeId}/salary`,
-    },
+    { label: "Exit", path: `/employees/${employeeId}/payments` },
   ];
 
   return (

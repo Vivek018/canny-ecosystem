@@ -53,7 +53,7 @@ export default function SaveChat() {
         navLinkClassName="w-64"
       />
       <div className="flex-1 w-full h-full p-4 flex flex-col overflow-hidden">
-        <Outlet />
+        <Outlet context={{ dataLength: data?.length }} />
       </div>
     </section>
   )
