@@ -6,6 +6,7 @@ import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { useUser } from "@/utils/user";
 import { createChat } from "@canny_ecosystem/supabase/mutations";
 import { getChatByPromptAndUserId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -15,7 +16,7 @@ import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { hasPermission, isGoodStatus, readRole } from "@canny_ecosystem/utils";
+import { createRole, hasPermission, isGoodStatus, readRole } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { useTypingAnimation } from "@canny_ecosystem/utils/hooks/typing-animation";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
@@ -24,29 +25,29 @@ import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 
 const suggestedPrompt = [
-  "Show me employees with the highest attendance this month",
+  "Employees working for more than 5 years",
   "Show invoices due for payment this week",
-  "Employees started working in 2025",
+  "Employees started working after 2023",
+  "List all project sites with no of employee of age above 40",
   "Employees with missing bank details",
   "List all pending reimbursements that need approval",
   // "Generate ESI/PF contribution report for this quarter",
-  "Which employees have incomplete document submissions?",
+  // Add Reports of Gratuity and other Field Names.
   "List all projects sites with no of employees",
   "Payroll with amount more than 7 lakhs in last 2 years",
   "Show me the top 20 employees with the highest net salaries in April 2025",
   "Show me employees with upcoming birthdays this month",
   "Show me project sites with lowest attendance rates",
-  "Show me accident reports by severity level",
+  "Show me employees with the highest attendance this month",
   "Show me all ongoing cases",
   "List all pending invoices",
-  "Employees with probation end dates",
   "Employees with upcoming leaves",
   "Generate payroll summary for last 3 month",
   "List approved invoices awaiting processing",
   // "Generate monthly attendance % per site",
   "List employees with work anniversaries this month",
   "Show me employees with the most overtime hours last month",
-  "List employees most absent last month with contact numbers",
+  "List employees with lowest attendance last month with contact numbers",
 ];
 
 const placeholders = [
@@ -93,7 +94,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       return defer({ query: null, data: [], config: null, error: null, dataExistsInDb });
     }
 
-    const promptWithCompany =`${prompt} where company is company_id=${companyId}`
+    const promptWithCompany = `${prompt} where company is company_id=${companyId}`
 
     if (prompt && user?.id) {
       const { data, status } = await getChatByPromptAndUserId({ supabase, userId: user?.id ?? "", prompt: prompt });
@@ -132,8 +133,12 @@ clientLoader.hydrate = true;
 
 export async function action({ request }: ActionFunctionArgs) {
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
+    const { supabase, headers } = getSupabaseWithHeaders({ request });
     const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+    if (!hasPermission(user?.role!, `${createRole}:${attribute.chat}`)) {
+      return safeRedirect(DEFAULT_ROUTE, { headers });
+    }
 
     const formData = await request.formData();
     const prompt = formData.get("prompt")?.toString();
@@ -176,6 +181,8 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function Chatbox() {
   const { query, data, config, error, dataExistsInDb } = useLoaderData<typeof loader>();
+
+  const { role } = useUser();
 
   const actionData = useActionData<typeof action>();
 
@@ -364,7 +371,10 @@ export default function Chatbox() {
           <Button
             onClick={saveChat}
             variant="default"
-            className="h-full px-5"
+            className={cn("h-full px-5", !hasPermission(
+              `${role}`,
+              `${createRole}:${attribute.chat}`,
+            ) && "hidden")}
             disabled={isSubmitting || dataExistsInDb}
           >
             <Icon name={dataExistsInDb ? "bookmark-filled" : "bookmark"} size="sm" />

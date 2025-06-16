@@ -35,18 +35,31 @@ export const ROLES: { [key in (typeof userRoles)[number]]: readonly string[] } =
       ...attributeValues
         .filter((value) => value.includes(attribute.payroll))
         .flatMap((value) => [`${approveRole}:${value}`]),
+      ...attributeValues
+        .filter((value) => value.includes(attribute.chat))
+        .flatMap((value) => [`${deleteRole}:${value}`]),
     ],
 
-    operation_manager: attributeValues.flatMap((value) => [
-      `${createRole}:${value}`,
-      `${readRole}:${value}`,
-      `${updateRole}:${value}`,
-      `${emailRole}:${value}`,
-    ]),
+    operation_manager: [
+      ...attributeValues.flatMap((value) => [
+        `${createRole}:${value}`,
+        `${readRole}:${value}`,
+        `${updateRole}:${value}`,
+        `${emailRole}:${value}`,
+      ]),
+      ...attributeValues
+        .filter((value) => value.includes(attribute.chat))
+        .flatMap((value) => [`${deleteRole}:${value}`]),
+    ],
 
-    executive: attributeValues
-      .filter((value) => !value.includes(attribute.feedbackList))
-      .flatMap((value) => [`${readRole}:${value}`]),
+    executive: [
+      ...attributeValues
+        .filter((value) => !value.includes(attribute.feedbackList))
+        .flatMap((value) => [`${readRole}:${value}`]),
+      ...attributeValues
+        .filter((value) => value.includes(attribute.chat))
+        .flatMap((value) => [`${createRole}:${value}`, `${deleteRole}:${value}`]),
+    ],
 
     supervisor: [],
   } as const;

@@ -59,7 +59,6 @@ Your task is to generate a valid React chart configuration using SQL data and a 
   - If no numerical fields exist, count how many rows exist for each X group (Y = count).
   - If multiple Y values exist (amounts, totals, etc.), include them all.
   - Never return charts with empty or ungrouped Y data.
-3. Format any X-axis date fields as "dd-MM-yyyy".
 
 == OUTPUT RULES ==
 1. Use only fields present in the given dataset.
