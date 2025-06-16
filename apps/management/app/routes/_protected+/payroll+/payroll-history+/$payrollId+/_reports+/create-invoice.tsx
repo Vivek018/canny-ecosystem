@@ -35,6 +35,7 @@ import {
   invoiceReimbursementTypeArray,
   InvoiceSchema,
   isGoodStatus,
+  replaceDash,
   replaceUnderscore,
   SIZE_1MB,
   transformStringArrayIntoOptions,
@@ -355,10 +356,10 @@ export default function CreateInvoice({
           <Card>
             <CardHeader>
               <CardTitle className="capitalize">
-                {replaceUnderscore(INVOICE_TAG)}
+                {replaceDash(INVOICE_TAG)}
               </CardTitle>
               <CardDescription className="lowercase">
-                {`${replaceUnderscore(INVOICE_TAG)} by filling this form`}
+                {`${replaceDash(INVOICE_TAG)} by filling this form`}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -568,14 +569,13 @@ export default function CreateInvoice({
               />
               <p
                 className={cn(
-                  "text-muted-foreground hidden",
+                  "text-muted-foreground tracking-wide hidden",
                   (updateValues?.payroll_type ??
                     payroll?.payroll_type === "salary") &&
                     "flex"
                 )}
               >
-                Note : As Esic values are not fixed and cant be calculated,
-                kindly edit manualy above
+                Note : All default values are system generated, Please verify them manually before submitting.
               </p>
             </CardContent>
             <FormButtons

@@ -433,25 +433,10 @@ export const EmployeeWorkHistorySchema = z.object({
   end_date: z.string(),
 });
 
-export const employeeDocuments = [
-  "aadhaar_card",
-  "address_proof",
-  "bank_document",
-  "birth_certificate",
-  "cv",
-  "driving_license",
-  "guardian_document",
-  "marriage_certificate",
-  "pan_card",
-  "passport",
-  "uan_card",
-  "joining_form",
-] as const;
-
 export const EmployeeDocumentsSchema = z.object({
-  document_type: z.enum(employeeDocuments),
+  document_type: zNumberString,
   document_file: zFile,
-  existing_document_type: z.enum(employeeDocuments).optional(),
+  existing_document_type: zNumberString.optional(),
 });
 
 export const paymentTypeArray = ["fixed", "variable"] as const;

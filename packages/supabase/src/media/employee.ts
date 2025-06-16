@@ -10,7 +10,7 @@ import {
   deleteEmployeeDocumentByEmployeeId,
   updateEmployee,
 } from "../mutations";
-import { isGoodStatus, type employeeDocuments } from "@canny_ecosystem/utils";
+import { isGoodStatus } from "@canny_ecosystem/utils";
 import {
   getEmployeeById,
   getEmployeeDocumentUrlByEmployeeIdAndDocumentName,
@@ -114,7 +114,7 @@ export async function uploadEmployeeDocument({
   supabase: TypedSupabaseClient;
   file: File;
   employeeId: string;
-  documentType: (typeof employeeDocuments)[number];
+  documentType: string;
 }) {
   if (file instanceof File) {
     const filePath = `employees/${documentType}/${employeeId}${file.name}`;
@@ -174,8 +174,8 @@ export async function updateEmployeeDocument({
   supabase: TypedSupabaseClient;
   file: File;
   employeeId: string;
-  documentType: (typeof employeeDocuments)[number];
-  existingDocumentType: (typeof employeeDocuments)[number];
+  documentType: string;
+  existingDocumentType: string;
 }) {
   const { status } = await deleteEmployeeDocument({
     supabase,
@@ -203,7 +203,7 @@ export async function deleteEmployeeDocument({
 }: {
   supabase: TypedSupabaseClient;
   employeeId: string;
-  documentType: (typeof employeeDocuments)[number];
+  documentType: string;
 }) {
   const { data, error } =
     await getEmployeeDocumentUrlByEmployeeIdAndDocumentName({

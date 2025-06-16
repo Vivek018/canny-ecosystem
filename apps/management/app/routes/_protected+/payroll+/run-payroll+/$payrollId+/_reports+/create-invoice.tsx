@@ -35,6 +35,7 @@ import {
   invoiceReimbursementTypeArray,
   InvoiceSchema,
   isGoodStatus,
+  replaceDash,
   replaceUnderscore,
   SIZE_1MB,
   transformStringArrayIntoOptions,
@@ -291,7 +292,7 @@ export default function CreateInvoice({
   const initialValues = updateValues ?? getInitialValueFromZod(InvoiceSchema);
 
   const [form, fields] = useForm({
-    id: "invoice",
+    id: INVOICE_TAG,
     constraint: getZodConstraint(InvoiceSchema),
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: InvoiceSchema });
@@ -354,10 +355,10 @@ export default function CreateInvoice({
           <Card>
             <CardHeader>
               <CardTitle className="capitalize">
-                {replaceUnderscore(INVOICE_TAG)}
+                {replaceDash(INVOICE_TAG)}
               </CardTitle>
               <CardDescription className="lowercase">
-                {`${replaceUnderscore(INVOICE_TAG)} by filling this form`}
+                {`${replaceDash(INVOICE_TAG)} by filling this form`}
               </CardDescription>
             </CardHeader>
             <CardContent>

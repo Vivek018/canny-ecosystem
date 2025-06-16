@@ -1,13 +1,11 @@
 import {
   EmployeeDocumentsSchema,
   SIZE_1MB,
-  employeeDocuments,
   getInitialValueFromZod,
   isGoodStatus,
   replaceUnderscore,
-  transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
-import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
+import { Field } from "@canny_ecosystem/ui/forms";
 import {
   FormProvider,
   getFormProps,
@@ -22,7 +20,7 @@ import {
   useLoaderData,
   useNavigate,
 } from "@remix-run/react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
@@ -75,8 +73,7 @@ export async function action({
       supabase,
       file: submission.value.document_file as File,
       employeeId,
-      documentType: submission.value
-        .document_type as (typeof employeeDocuments)[number],
+      documentType: submission.value.document_type,
     });
 
     if (isGoodStatus(status)) {
@@ -123,7 +120,6 @@ export default function AddDocument({
   const initialValues =
     updatedValues ?? getInitialValueFromZod(EmployeeDocumentsSchema);
 
-  const [resetKey, setResetKey] = useState(Date.now());
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -137,7 +133,6 @@ export default function AddDocument({
     shouldRevalidate: "onInput",
     defaultValue: {
       ...initialValues,
-      existing_document_type: initialValues.document_type,
     },
   });
 
@@ -184,20 +179,14 @@ export default function AddDocument({
                 type: "hidden",
               })}
             />
-            <SearchableSelectField
-              key={resetKey}
-              className="capitalize"
-              options={transformStringArrayIntoOptions(
-                employeeDocuments as unknown as string[]
-              )}
+            <Field
               inputProps={{
-                ...getInputProps(fields.document_type, { type: "text" }),
-              }}
-              placeholder={`Select ${replaceUnderscore(
-                fields.document_type.name
-              )}`}
-              labelProps={{
-                children: replaceUnderscore(fields.document_type.name),
+                ...getInputProps(fields.document_type, {
+                  type: "text",
+                }),
+                placeholder: `Enter ${replaceUnderscore(
+                  fields.document_type.name,
+                )}`,
               }}
               errors={fields.document_type.errors}
             />
@@ -217,7 +206,6 @@ export default function AddDocument({
         </FormProvider>
         <FormButtons
           className="mr-[-24px] pb-0"
-          setResetKey={setResetKey}
           form={form}
           isSingle={true}
         />

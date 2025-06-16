@@ -52,6 +52,7 @@ export default function Employee() {
       label: "Reimbursements",
       path: `/employees/${employeeId}/reimbursements`,
     },
+    { label: "Documents", path: `/employees/${employeeId}/documents` },
     { label: "Letters", path: `/employees/${employeeId}/letters` },
     {
       label: "Leaves",

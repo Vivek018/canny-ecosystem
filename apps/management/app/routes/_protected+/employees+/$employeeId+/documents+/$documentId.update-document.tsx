@@ -1,7 +1,6 @@
 import {
   EmployeeDocumentsSchema,
   SIZE_1MB,
-  type employeeDocuments,
   isGoodStatus,
 } from "@canny_ecosystem/utils";
 import { useEffect } from "react";
@@ -62,9 +61,9 @@ export async function action({
       file: submission.value.document_file as File,
       employeeId,
       documentType: submission.value
-        .document_type as (typeof employeeDocuments)[number],
+        .document_type,
       existingDocumentType: submission.value
-        .existing_document_type as (typeof employeeDocuments)[number],
+        .existing_document_type ?? "",
     });
     if (isGoodStatus(status)) {
       return json({
