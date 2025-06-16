@@ -88,8 +88,8 @@ ${JSON.stringify(results, null, 2)}
 
 Return a single valid chart config object only.`,
       schema: configSchema,
+      temperature: 0.1,
     });
-
     const colors: Record<string, string> = {};
     config.yKeys.forEach((key: string, index: number) => {
       colors[key] = `hsl(var(--chart-${index + 1}))`;
