@@ -28,57 +28,59 @@ export const generateQuery = async ({ input, companyId, tablesData }: { input: s
   try {
     const result = await generateObject({
       model: google('gemini-2.0-flash'),
-      system: `You are an expert PostgreSQL query generator. Generate precise SELECT queries based on user requests.
+      system: `PostgreSQL query generator. Return only SELECT statements.
 
-      CONTEXT:
-      - Current Date: ${new Date().toISOString().split("T")[0]}
-      - Target Company ID: ${companyId}
-      - Available Tables: ${tablesData}
-      
-      CORE REQUIREMENTS:
-      1. OUTPUT: Only valid PostgreSQL SELECT statements
-      2. SECURITY: No INSERT/UPDATE/DELETE/DDL operations
-      3. FILTERING: Always filter by company_id = '${companyId}'
-      4. LIMITS: Always add LIMIT ${MID_QUERY_LIMIT}
-      
-      COMPANY ID FILTERING:
-      - Use company_id directly if column exists
-      - For projects: use project.project_client_id = '${companyId}'
-      - Follow foreign key relationships to filter by company
-      - Always include readable names (project_site name, project name, company name)
-      
-      QUERY BEST PRACTICES:
-      - Use direct comparisons: column = 'value', amount > 0, date >= '2024-01-01'
-      - Avoid unnecessary functions like DATE(), CAST() unless required
-      - Date filtering priority: day/month/year → date → created_at
-      - Employee names: combine first_name + ' ' + last_name AS full_name
-      
-      PAYROLL CALCULATIONS:
-      - Earnings: SUM amounts WHERE amount_type = 'earning'
-      - Deductions: SUM amounts WHERE amount_type IN ('deduction', 'statutory_contribution')
-      - Show gross, deductions, and net amounts separately
-      
-      RESULT STRUCTURE:
-      - Include rich, relevant data (avoid minimal 2-3 column results)
-      - Column priority: readable fields → quantitative → metadata
-      - Sort by: quantitative fields first, then by name
-      - Exclude meta fields: created_at, updated_at, id, etc. (except foreign keys)
-      - Use is_active/status filters when available
-      
-      JOINS & RELATIONSHIPS:
-      - Validate all table/column names against schema
-      - Ensure all JOINs are schema-correct
-      - Prefer detail tables for comprehensive results`,
+  CONTEXT: Date: ${new Date().toISOString().split("T")[0]} | Company: ${companyId} | Schema: ${tablesData}
 
-      prompt: `User Request: "${input}"
-      
-      Generate a PostgreSQL SELECT query that:
-      1. Retrieves the data requested by the user
-      2. Filters by company_id = '${companyId}'
-      3. Returns comprehensive, useful results
-      4. Follows all system requirements
-      
-      Query:`,
+REQUIREMENTS:
+• Output: SELECT only
+• Filter: Always company_id = '${companyId}' (or project.project_client_id for projects)
+• Limit: Add LIMIT ${MID_QUERY_LIMIT}
+• Security: No INSERT/UPDATE/DELETE/DDL
+
+STANDARDS:
+• Use direct simple comparisons for filtering in sql that can be understood by pg library.
+• Employee names: first_name || ' ' || last_name AS full_name
+• Date priority: day/month/year → date → created_at
+• Rich results: Include names, amounts, status (not just IDs)
+• Sort: quantitative first, then alphabetical
+• Exclude meta fields: created_at, updated_at, id, etc.
+
+COMPANY FILTERING:
+• Use company_id directly if available
+• Projects: Has instad of company_id, it has project_client_id.
+• Follow foreign keys to filter by company
+
+  EMPLOYEE DATA:
+• Basic employee details (from employees table)
+• Employee tables start with "employee_". Use these to build joins and enrich data.
+• employee_project_assignment: working details (project_site, position, start_date, end_date, probation_period, probation_end_date, ...check table sample data).
+• For work details: JOIN employees with employee_project_assignment
+    
+  PAYROLL SYSTEM:
+payroll (types: salary, reimbursement, exit, other)
+
+SALARY_ENTRIES:
+• Earnings: basic,hra,lta,conveyance,medical,special_allowance,overtime,shift_allowance (type='earning')
+• Bonus: performance_bonus,festival_bonus,annual_bonus,incentive (type='bonus')
+• Deductions: advance,loan_deduction,salary_deduction,fine,other_deduction (type='deduction')
+• Statutory: pf,esic,pt,lwf,tds,income_tax,professional_tax (type='statutory_contribution')
+
+Query patterns:
+"pf amount" → field_name='pf'+type='statutory_contribution'
+"basic salary" → field_name='basic'+type='earning'
+"statutory" → type='statutory_contribution'
+"deductions" → type IN ('deduction','statutory_contribution')
+"gross" → type IN ('earning','bonus')
+
+Calc: Gross=SUM(earning+bonus), Deductions=SUM(deduction+statutory), Net=Gross-Deductions
+Show: employee name, field_name, amount, type, month, year, present_days, overtime_hours
+
+REIMBURSEMENT: employee name, amount, status, is_deductible, submitted_date
+EXIT: employee name, net_pay, leave_encashment, gratuity, deduction, bonus, last_working_day, final_settlement_date, reason
+SUMMARY: title, total_net_amount, total_employees, payroll_type, status, run_date
+`,
+      prompt: `User Request: "${input}"`,
       temperature: 0.1,
       schema: z.object({
         query: z.string(),
@@ -87,7 +89,7 @@ export const generateQuery = async ({ input, companyId, tablesData }: { input: s
     return { query: result.object.query, error: null };
   } catch (e: any) {
     console.error("Error generating query: ", e);
-    return { query: undefined, error: e };
+    return { query: undefined, error: e.message };
   }
 };
 
