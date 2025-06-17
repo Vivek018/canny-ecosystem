@@ -2,6 +2,7 @@ import { Results } from "@/components/chat/result";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { fetchAllSingleSQLQuery, generateQuery, runGeneratedSQLQuery } from "@/utils/ai/chat";
 import { generateChartConfig } from "@/utils/ai/chat/chart";
+import { useSearchState } from "@/utils/ai/chat/hooks/search-state";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
@@ -18,17 +19,15 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { createRole, hasPermission, isGoodStatus, readRole } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
-import { useTypingAnimation } from "@canny_ecosystem/utils/hooks/typing-animation";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { type ClientLoaderFunctionArgs, defer, json, useActionData, useLoaderData, useNavigate, useNavigation, useSearchParams, useSubmit } from "@remix-run/react";
-import { useEffect, useRef, useState } from "react";
-import { useHotkeys } from "react-hotkeys-hook";
+import { type ClientLoaderFunctionArgs, defer, json, useActionData, useLoaderData } from "@remix-run/react";
+import { useEffect } from "react";
 
 const suggestedPrompt = [
   "Employees working for more than 5 years",
   "Show invoices due for payment this week",
   "Employees started working after 2023",
-  "List project sites with no of employee of age above 40",
+  "List project sites with no of employees of age above 50",
   "Employees with missing bank details",
   "List pending reimbursements that need approval",
   "Generate basic salary report for April 2025",
@@ -50,29 +49,6 @@ const suggestedPrompt = [
   // "Generate monthly % present days per site",
   "List employees with work anniversaries this month",
   "List employees with the most overtime hours last month",
-];
-
-const placeholders = [
-  "Thinking through your request, please hold on",
-  "Analyzing everything you just asked for",
-  "Generating the best possible response for you",
-  "Fetching all the relevant data from our systems",
-  "Just a moment while we prepare everything",
-  "Working on your request with full focus",
-  "Looking into the details to give you an accurate answer",
-  "Digging through the data to find what you need",
-  "Crunching some serious numbers for this one",
-  "Loading up the insights you’re looking for",
-  "Compiling the response that matches your request",
-  "Pulling up the results — this won’t take long!",
-  "Finalizing everything for a smooth output",
-  "Almost done — just adding the finishing touches",
-  "One sec, wrapping things up neatly for you",
-  "Getting things ready — this’ll be worth it!",
-  "Still with me? Your answer is coming together now",
-  "Formatting the cleanest, clearest response possible",
-  "Checking all the latest details before replying",
-  "Still cooking that answer — hang tight!"
 ];
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -183,50 +159,25 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function Chatbox() {
   const { query, data, config, error, dataExistsInDb } = useLoaderData<typeof loader>();
-
-  const { role } = useUser();
-
   const actionData = useActionData<typeof action>();
 
-  const [stateData, setStateData] = useState(data ?? []);
-  const [stateConfig, setStateConfig] = useState(config);
-
-  const columns = stateData?.[0] ? Object.keys(stateData[0]) : [];
-
-  const animatedPlaceholder = useTypingAnimation(placeholders, false, {
-    typingSpeed: 70,
-    pauseDuration: 1400,
-  });
-
-  const [searchParams, setSearchParams] = useSearchParams();
-  const searchPrompt = searchParams.get("prompt")?.toString() ?? undefined;
-
+  const { role } = useUser();
   const { toast } = useToast();
-  const [prompt, setPrompt] = useState(searchPrompt);
-  const inputRef = useRef<HTMLInputElement>(null);
 
-  const navigate = useNavigate();
-
-  const submit = useSubmit();
-
-  const navigation = useNavigation();
-  const [isSubmitting, setIsSubmitting] =
-    useState(false);
-
-  const clearSearch = () => {
-    setStateData([]);
-    setStateConfig(null);
-    setPrompt("");
-    searchParams.delete("prompt");
-    setSearchParams(searchParams);
-  }
-
-  const refreshSearch = () => {
-    setStateData([]);
-    setStateConfig(null);
-    setIsSubmitting(true);
-    navigate(0);
-  }
+  const { stateData,
+    stateConfig,
+    columns,
+    prompt,
+    setPrompt,
+    inputRef,
+    isSubmitting,
+    searchPrompt,
+    animatedPlaceholder,
+    handleSubmit,
+    handleSearch,
+    saveChat,
+    clearSearch,
+    refreshSearch } = useSearchState({ data, config, query });
 
   useEffect(() => {
     if (actionData) {
@@ -249,25 +200,6 @@ export default function Chatbox() {
     }
   }, [actionData]);
 
-  useEffect(() => {
-    if (data?.length) {
-      setStateData(data);
-    }
-    if (config) {
-      setStateConfig(config);
-    }
-  }, [data, config])
-
-  useEffect(() => {
-    setIsSubmitting(
-      navigation.state === "submitting" ||
-      (
-        navigation.state === "loading" &&
-        navigation.location.pathname === "/chat/chatbox" &&
-        !!navigation.location.search.length
-      )
-    );
-  }, [navigation.state]);
 
   useEffect(() => {
     if (error) {
@@ -281,53 +213,8 @@ export default function Chatbox() {
     }
   }, [error]);
 
-  useHotkeys(
-    "esc",
-    () => {
-      clearSearch();
-    },
-    {
-      enableOnFormTags: true,
-    }
-  );
-
-  const handleSearch = (evt: React.ChangeEvent<HTMLInputElement>) => {
-    const value = evt.target.value;
-    setPrompt(value);
-  };
-
-  const handleSubmit = () => {
-    setIsSubmitting(true)
-    if (prompt !== searchPrompt) {
-      setStateData([]);
-      setStateConfig(null);
-    }
-    if (prompt) {
-      searchParams.set("prompt", prompt);
-      setSearchParams(searchParams);
-    }
-    setIsSubmitting(false);
-  };
-
-  const saveChat = (e: any) => {
-    e.preventDefault();
-
-    setIsSubmitting(true);
-    const formData = new FormData();
-    formData.append("prompt", searchPrompt ?? "");
-    formData.append("query", query ?? "");
-    formData.append("config", stateConfig ? JSON.stringify(stateConfig) : "");
-
-    submit(formData, {
-      action: "/chat/chatbox",
-      method: "POST"
-    })
-
-    setIsSubmitting(false);
-  }
-
   return (
-    <section className="relative w-full h-full p-4 flex flex-col items-center justify-start gap-4">
+    <section className="relative w-full h-full flex flex-col items-center justify-start gap-4 p-4 overflow-hidden">
       {/* Input Chat Box */}
       <div className='flex space-x-3 w-full md:w-5/6 items-center'>
         <form
@@ -387,11 +274,16 @@ export default function Chatbox() {
         </div>
       </div>
       {/* Suggested Prompts */}
-      <Card className={cn('w-full h-full md:w-5/6 items-start pb-3', searchPrompt && "hidden")}>
-        <CardHeader className="py-4 text-2xl font-bold capitalize tracking-wide">Try These Prompts:</CardHeader>
-        <CardContent className="w-full flex flex-wrap gap-x-4 gap-y-4 overflow-y-scroll">
-          {
-            suggestedPrompt.map((prompt, index) => (
+      <Card className={cn(
+        "w-full h-full md:w-5/6 flex flex-col overflow-hidden",
+        searchPrompt && "hidden"
+      )}>
+        <CardHeader className="py-4 text-2xl font-bold capitalize tracking-wide">
+          Try These Prompts:
+        </CardHeader>
+        <div className="flex-1 overflow-auto">
+          <CardContent className="w-full flex flex-wrap gap-x-4 gap-y-4">
+            {suggestedPrompt.map((prompt, index) => (
               <div
                 key={prompt + index.toString()}
                 className="w-max h-min text-sm tracking-wide cursor-pointer text-muted-foreground hover:text-foreground px-5 py-2.5 border dark:border-muted-foreground/40 rounded-md hover:bg-accent transition-colors"
@@ -409,10 +301,12 @@ export default function Chatbox() {
               >
                 {prompt}
               </div>
-            ))
-          }
-        </CardContent>
+            ))}
+          </CardContent>
+        </div>
       </Card>
+
+
       {/* If no state data is there after prompt */}
       <div className={cn("hidden", (searchPrompt && !stateData?.length) && "flex flex-col gap-4 w-full sm:w-3/5 md:w-1/2 h-3/5 text-center items-center justify-center")}>
         {isSubmitting ?
@@ -436,12 +330,10 @@ export default function Chatbox() {
         }
       </div>
       {/* Data Display */}
-      <Card className={cn("w-full h-full mb-4 md:w-5/6 overflow-y-auto", (!stateData?.length) && "hidden")}>
-        <Results
-          results={stateData}
-          chartConfig={stateConfig}
-          columns={columns}
-        />
+      <Card className={cn("w-full h-full md:w-5/6 flex flex-col overflow-hidden", (!stateData?.length) && "hidden")}>
+        <div className="flex-1 overflow-auto">
+          <Results results={stateData} chartConfig={stateConfig} columns={columns} />
+        </div>
       </Card>
     </section>
   )

@@ -35,18 +35,18 @@ export default function PaymentComponents() {
       <div className="py-[18px] px-4 border-b">
         <SecondaryMenu
           items={[
-            {
-              label: "Payment Fields",
-              path: "/payment-components/payment-fields",
-            },
+            // {
+            //   label: "Payment Fields",
+            //   path: "/payment-components/payment-fields",
+            // },
             {
               label: "Statutory fields",
               path: "/payment-components/statutory-fields",
             },
-            {
-              label: "Payment Templates",
-              path: "/payment-components/payment-templates",
-            },
+            // {
+            //   label: "Payment Templates",
+            //   path: "/payment-components/payment-templates",
+            // },
           ]}
           pathname={pathname}
           Link={Link}

@@ -175,7 +175,7 @@ export default function Chatbox() {
   };
 
   return (
-    <Card className={cn("w-full h-full overflow-auto", (!data?.length) && "hidden")}>
+    <Card className={cn("w-full h-full flex flex-col overflow-hidden", (!data?.length) && "hidden")}>
       <Form method="POST">
         <CardHeader className="py-2 flex flex-row items-center justify-between gap-4">
           <p className="w-full truncate tracking-wide">
@@ -206,11 +206,13 @@ export default function Chatbox() {
           </div>
         </CardHeader>
       </Form>
-      <Results
-        results={data ?? []}
-        chartConfig={config}
-        columns={columns}
-      />
+      <div className="flex-1 overflow-auto">
+        <Results
+          results={data ?? []}
+          chartConfig={config}
+          columns={columns}
+        />
+      </div>
     </Card>
   );
 }

@@ -68,9 +68,9 @@ export default function ProtectedRoute() {
   return (
     <>
       <Sidebar className="flex-none" theme={theme ?? "system"} user={user} />
-      <div className="flex max-h-screen flex-grow flex-col overflow-scroll ml-20">
+      <div className="flex flex-grow flex-col ml-20 min-h-screen overflow-hidden">
         <Header className="px-4" companies={companies ?? []} />
-        <div className="h-full">
+        <div className="flex-1 min-h-0 overflow-scroll">
           <Outlet />
         </div>
       </div>
