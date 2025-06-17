@@ -31,7 +31,6 @@ import {
   Await,
   type ClientLoaderFunctionArgs,
   defer,
-  Outlet,
   redirect,
   useLoaderData,
 } from "@remix-run/react";
@@ -250,7 +249,6 @@ export default function EmployeesIndex() {
         <ImportEmployeeAddressModal />
         <ImportEmployeeGuardiansModal />
         <ImportEmployeeProjectAssignmentModal />
-        <Outlet />
       </Suspense>
     </section>
   );

@@ -40,7 +40,7 @@ export const salaryEntryColumns = ({
       accessorKey: "sr_no",
       header: "Sr No.",
       cell: ({ row }) => {
-        return <p className="truncate ">{row.index + 1}</p>;
+        return <p className="truncate">{row.index + 1}</p>;
       },
     },
     {
@@ -64,7 +64,7 @@ export const salaryEntryColumns = ({
       sortingFn: "text",
       cell: ({ row }) => {
         return (
-          <p className="truncate capitalize w-48">{`${
+          <p className="truncate capitalize w-52">{`${
             row.original?.first_name
           } ${row.original?.middle_name ?? ""} ${
             row.original?.last_name ?? ""

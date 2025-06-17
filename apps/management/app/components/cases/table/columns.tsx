@@ -33,7 +33,7 @@ export const columns: ColumnDef<CasesDatabaseRow>[] = [
     header: "title",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-28 text-primary">
+        <p className="truncate w-52 text-primary">
           {row.original?.title ?? "--"}
         </p>
       );

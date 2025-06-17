@@ -108,18 +108,6 @@ export async function getEmployeesByCompanyId({
     dol_end,
   } = filters ?? {};
 
-  const hasProjectAssignmentFilter = Object.values({
-    project: project,
-    project_site: project_site,
-    assignment_type: assignment_type,
-    position: position,
-    skill_level: skill_level,
-    doj_start: doj_start,
-    doj_end: doj_end,
-    dol_start: dol_start,
-    dol_end: dol_end,
-  }).some((value) => value);
-
   const columns = [
     "id",
     "employee_code",
@@ -138,13 +126,13 @@ export async function getEmployeesByCompanyId({
     .select(
       `${columns.join(",")},
         employee_project_assignment!employee_project_assignments_employee_id_fkey!${
-          hasProjectAssignmentFilter ? "inner" : "left"
+          project ? "inner" : "left"
         }(
         employee_id, assignment_type, skill_level, position, start_date, end_date,
         project_sites!${
-          hasProjectAssignmentFilter ? "inner" : "left"
+          project ? "inner" : "left"
         }(id, name, projects!${
-        hasProjectAssignmentFilter ? "inner" : "left"
+        project ? "inner" : "left"
       }(id, name))
       )`,
       { count: "exact" }

@@ -140,6 +140,7 @@ export const cacheKeyPrefix = {
   account: "account",
   feedback_list: "feedback-list",
   exits: "exits",
+  events: "events",
   incidents: "incidents",
   approvals: "approvals",
   time_tracking: "time-tracking",

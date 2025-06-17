@@ -1,4 +1,4 @@
-import { Results } from "@/components/chat/result";
+import { Results } from "@/components/ai/result";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { fetchAllSingleSQLQuery, generateQuery, runGeneratedSQLQuery } from "@/utils/ai/chat";
 import { generateChartConfig } from "@/utils/ai/chat/chart";

@@ -181,7 +181,7 @@ export const columns = ({
         return (
           <p className="w-max capitalize">
             {row.original?.employee_project_assignment?.start_date &&
-              formatDate(row.original?.employee_project_assignment?.start_date)}
+              formatDate(row.original?.employee_project_assignment?.start_date) as any}
           </p>
         );
       },
@@ -194,7 +194,7 @@ export const columns = ({
         return (
           <p className="w-max capitalize">
             {row.original?.employee_project_assignment?.end_date &&
-              formatDate(row.original?.employee_project_assignment?.end_date)}
+              formatDate(row.original?.employee_project_assignment?.end_date) as any}
           </p>
         );
       },
