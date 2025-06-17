@@ -1,11 +1,11 @@
 import { Button } from "@canny_ecosystem/ui/button";
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import { AccidentOptionsDropdown } from "./accidents-table-options";
+import { IncidentOptionsDropdown } from "./incidents-table-options";
 
 import type { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@canny_ecosystem/ui/checkbox";
-import type { AccidentsDatabaseType } from "@canny_ecosystem/supabase/queries";
+import type { IncidentsDatabaseType } from "@canny_ecosystem/supabase/queries";
 import {
   deleteRole,
   formatDate,
@@ -15,8 +15,9 @@ import {
 import { useUser } from "@/utils/user";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import Previewer from "@/utils/previewer";
 
-export const columns: ColumnDef<AccidentsDatabaseType>[] = [
+export const columns: ColumnDef<IncidentsDatabaseType>[] = [
   {
     id: "select",
     cell: ({ row }) => (
@@ -34,7 +35,7 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
     header: "Employee Code",
     cell: ({ row }) => {
       return (
-        <p className='truncate w-28'>
+        <p className="truncate w-28">
           {row.original?.employees?.employee_code ?? "--"}
         </p>
       );
@@ -46,7 +47,7 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
     header: "Employee Name",
     cell: ({ row }) => {
       return (
-        <p className='truncate w-48 group-hover:text-primary'>{`${
+        <p className="truncate w-48 group-hover:text-primary">{`${
           row.original.employees?.first_name
         } ${row.original.employees?.middle_name ?? ""} ${
           row.original.employees?.last_name ?? ""
@@ -60,7 +61,7 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
     header: "Project",
     cell: ({ row }) => {
       return (
-        <p className='truncate w-28'>
+        <p className="truncate w-28">
           {row.original?.employees?.employee_project_assignment?.project_sites
             .projects?.name ?? "--"}
         </p>
@@ -73,7 +74,7 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
     header: "Project Site",
     cell: ({ row }) => {
       return (
-        <p className='truncate w-28'>
+        <p className="truncate w-28">
           {row.original?.employees?.employee_project_assignment?.project_sites
             ?.name ?? "--"}
         </p>
@@ -84,7 +85,7 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
     accessorKey: "title",
     header: "Title",
     cell: ({ row }) => {
-      return <p className=' truncate'>{row.original?.title ?? "--"}</p>;
+      return <p className=" truncate">{row.original?.title ?? "--"}</p>;
     },
   },
   {
@@ -92,7 +93,13 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
     accessorKey: "description",
     header: "Description",
     cell: ({ row }) => {
-      return <p className='truncate '>{row.original?.description ?? "--"}</p>;
+
+      return (
+        <Previewer
+          label={"Description"}
+          description={row.original?.description ?? "--"}
+        />
+      );
     },
   },
   {
@@ -100,8 +107,8 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
     header: "Date",
     cell: ({ row }) => {
       return (
-        <p className='truncate '>
-          {formatDate(row.original?.date ?? "") ?? "--"}
+        <p className="truncate ">
+          {(formatDate(row.original?.date ?? "") ?? "--").toString()}
         </p>
       );
     },
@@ -111,7 +118,7 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
     header: "Location Type",
     cell: ({ row }) => {
       return (
-        <p className='truncate capitalize '>
+        <p className="truncate capitalize ">
           {row.original?.location_type ?? "--"}
         </p>
       );
@@ -123,7 +130,7 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
     header: "Location",
     cell: ({ row }) => {
       return (
-        <p className='truncate capitalize'>{row.original?.location ?? "--"}</p>
+        <p className="truncate capitalize">{row.original?.location ?? "--"}</p>
       );
     },
   },
@@ -132,7 +139,7 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
     accessorKey: "category",
     header: "Category",
     cell: ({ row }) => {
-      return <p className=' truncate'>{row.original?.category ?? "--"}</p>;
+      return <p className=" truncate">{row.original?.category ?? "--"}</p>;
     },
   },
   {
@@ -140,7 +147,7 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
     accessorKey: "severity",
     header: "Severity",
     cell: ({ row }) => {
-      return <p className='truncate '>{row.original?.severity ?? "--"}</p>;
+      return <p className="truncate ">{row.original?.severity ?? "--"}</p>;
     },
   },
   {
@@ -148,7 +155,7 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      return <p className='truncate '>{row.original?.status ?? "--"}</p>;
+      return <p className="truncate ">{row.original?.status ?? "--"}</p>;
     },
   },
   {
@@ -157,7 +164,23 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
     header: "Medical Diagnosis",
     cell: ({ row }) => {
       return (
-        <p className='truncate '>{row.original?.medical_diagnosis ?? "--"}</p>
+        <Previewer
+          label={"Medical Diagnosis"}
+          description={row.original?.medical_diagnosis ?? "--"}
+        />
+      );
+    },
+  },
+  {
+    enableSorting: false,
+    accessorKey: "action_taken",
+    header: "Action Taken",
+    cell: ({ row }) => {
+      return (
+        <Previewer
+          label={"Action Taken"}
+          description={row.original?.action_taken ?? "--"}
+        />
       );
     },
   },
@@ -170,24 +193,24 @@ export const columns: ColumnDef<AccidentsDatabaseType>[] = [
       const { role } = useUser();
 
       return (
-        <AccidentOptionsDropdown
+        <IncidentOptionsDropdown
           key={row?.original?.id}
-          accidentId={row?.original?.id}
+          incidentId={row?.original?.id}
           triggerChild={
             <DropdownMenuTrigger
               className={cn(
-                !hasPermission(role, `${updateRole}:${attribute.accidents}`) &&
+                !hasPermission(role, `${updateRole}:${attribute.incidents}`) &&
                   !hasPermission(
                     role,
-                    `${deleteRole}:${attribute.accidents}`
+                    `${deleteRole}:${attribute.incidents}`
                   ) &&
                   "hidden"
               )}
               asChild
             >
-              <Button variant='ghost' className='h-8 w-8 p-0'>
-                <span className='sr-only'>Open menu</span>
-                <Icon name='dots-vertical' />
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <Icon name="dots-vertical" />
               </Button>
             </DropdownMenuTrigger>
           }

@@ -63,7 +63,7 @@ export function CasesTable<TData, TValue>({
   const { rowSelection, setSelectedRows, setRowSelection, setColumns } =
     useCaseStore();
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    initialColumnVisibility ?? {},
+    initialColumnVisibility ?? {}
   );
   const loadMoreCases = async () => {
     const formattedFrom = from;
@@ -115,7 +115,7 @@ export function CasesTable<TData, TValue>({
       rowArray.push(row.original);
     }
     setSelectedRows(
-      rowArray as Omit<CasesDatabaseRow, "created_at" | "updated_at">[],
+      rowArray as Omit<CasesDatabaseRow, "created_at" | "updated_at">[]
     );
   }, [rowSelection]);
 
@@ -138,14 +138,14 @@ export function CasesTable<TData, TValue>({
   const tableLength = table.getRowModel().rows?.length;
 
   return (
-    <div className='relative mb-8'>
+    <div className="relative mb-8">
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
           !tableLength && "border-none"
         )}
       >
-        <div className='relative'>
+        <div className="relative">
           <Table>
             <CasesTableHeader
               table={table}
@@ -161,10 +161,10 @@ export function CasesTable<TData, TValue>({
                 <TableRow className={cn(!tableLength && "border-none")}>
                   <TableCell
                     colSpan={columns.length}
-                    className='h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize'
+                    className="h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize"
                   >
-                    <div className='flex flex-col items-center gap-1'>
-                      <h2 className='text-xl'>No Cases Found.</h2>
+                    <div className="flex flex-col items-center gap-1">
+                      <h2 className="text-xl">No Cases Found.</h2>
                       <p
                         className={cn(
                           "text-muted-foreground",
@@ -174,7 +174,7 @@ export function CasesTable<TData, TValue>({
                         Try another search, or adjusting the filters
                       </p>
                       <Button
-                        variant='outline'
+                        variant="outline"
                         className={cn(
                           "mt-4",
                           !data?.length && noFilters && "hidden"
@@ -194,10 +194,10 @@ export function CasesTable<TData, TValue>({
         </div>
       </div>
       {hasNextPage && (
-        <div className='flex items-center justify-center mt-6' ref={ref}>
-          <div className='flex items-center space-x-2 px-6 py-5'>
+        <div className="flex items-center justify-center mt-6" ref={ref}>
+          <div className="flex items-center space-x-2 px-6 py-5">
             <Spinner />
-            <span className='text-sm text-[#606060]'>Loading more...</span>
+            <span className="text-sm text-[#606060]">Loading more...</span>
           </div>
         </div>
       )}
@@ -210,7 +210,6 @@ export function CasesTable<TData, TValue>({
             "created_at" | "updated_at"
           >[]
         }
-        columnVisibility={columnVisibility}
       />
     </div>
   );

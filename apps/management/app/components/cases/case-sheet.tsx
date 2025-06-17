@@ -53,10 +53,10 @@ function KeyValueRow({
 }) {
   return (
     <div className={`mx-5 flex justify-between ${className}`}>
-      <h3 className='my-3 text-muted-foreground font-semibold capitalize'>
+      <h3 className="my-3 text-muted-foreground font-semibold capitalize">
         {label}
       </h3>
-      <p className='my-3 font-bold'>{value}</p>
+      <p className="my-3 font-bold">{value}</p>
     </div>
   );
 }
@@ -80,7 +80,7 @@ export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
       <TableRow
         key={row.id}
         data-state={row.getIsSelected() && "selected"}
-        className='relative cursor-pointer select-text'
+        className="relative cursor-pointer select-text"
       >
         {row.getVisibleCells().map((cell: any) => {
           if (cell.column.id === "select" || cell.column.id === "actions") {
@@ -114,24 +114,22 @@ export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
         })}
       </TableRow>
 
-      <SheetContent className='w-[600px]'>
-        <SheetHeader className='m-5'>
-          <SheetTitle className='text-3xl'>
-            {rowData?.title ?? "--"}
-          </SheetTitle>
-          <SheetDescription className='text-muted-foreground text-sm line-clamp-4'>
-            {rowData?.description ?? ""}
+      <SheetContent className="w-[600px] h-full overflow-y-auto">
+        <SheetHeader className="m-5">
+          <SheetTitle className="text-3xl">{rowData?.title ?? "--"}</SheetTitle>
+          <SheetDescription className="text-sm text-wrap break-words text-muted-foreground">
+            {rowData?.description ?? "--"}
           </SheetDescription>
         </SheetHeader>
 
         <hr />
         <KeyValueRow
-          label='Court Case Reference'
+          label="Court Case Reference"
           value={rowData?.court_case_reference ?? "--"}
         />
         <hr />
         <KeyValueRow
-          label='Status'
+          label="Status"
           value={
             <span
               className={cn(
@@ -146,18 +144,21 @@ export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
           }
         />
         <KeyValueRow
-          label='Case Type'
+          label="Case Type"
           value={rowData?.case_type ?? "--"}
-          className='capitalize'
+          className="capitalize"
         />
         <KeyValueRow
-          label='Location'
+          label="Location"
           value={rowData?.location ?? "--"}
-          className='capitalize'
+          className="capitalize"
         />
-        <KeyValueRow label='Date' value={formatDate(rowData?.date) ?? "--"} />
         <KeyValueRow
-          label='Resolution Date'
+          label="Date"
+          value={rowData?.date ? formatDate(rowData?.date!) : "--"}
+        />
+        <KeyValueRow
+          label="Resolution Date"
           value={
             rowData?.resolution_date
               ? formatDate(rowData?.resolution_date)
@@ -165,7 +166,7 @@ export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
           }
         />
         <KeyValueRow
-          label='Incident Date'
+          label="Incident Date"
           value={
             rowData?.incident_date ? formatDate(rowData?.incident_date) : "--"
           }
@@ -173,9 +174,9 @@ export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
 
         <hr />
         <KeyValueRow
-          label='Reported On'
+          label="Reported On"
           value={rowData?.reported_on ?? "--"}
-          className='capitalize'
+          className="capitalize"
         />
         {rowData?.reported_on !== "other" && (
           <KeyValueRow
@@ -199,9 +200,9 @@ export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
 
         <hr />
         <KeyValueRow
-          label='Reported By'
+          label="Reported By"
           value={rowData?.reported_by ?? "--"}
-          className='capitalize'
+          className="capitalize"
         />
         {rowData?.reported_by !== "other" && (
           <KeyValueRow
@@ -223,19 +224,19 @@ export function CaseSheet({ row, rowData }: { row: any; rowData: any }) {
           />
         )}
 
-        <hr className='my-3' />
-        <div className='flex justify-between mx-5'>
+        <hr className="my-3" />
+        <div className="flex justify-between mx-5">
           <div>
-            <h3 className='my-3 text-muted-foreground font-semibold'>
+            <h3 className="my-3 text-muted-foreground font-semibold">
               Amount Given (-)
             </h3>
-            <h3 className='my-3 text-muted-foreground font-semibold'>
+            <h3 className="my-3 text-muted-foreground font-semibold">
               Amount Received (+)
             </h3>
           </div>
-          <div className='text-end font-semibold'>
-            <p className='my-3'>Rs {rowData?.amount_given ?? "--"}</p>
-            <p className='my-3'>Rs {rowData?.amount_received ?? "--"}</p>
+          <div className="text-end font-semibold">
+            <p className="my-3">Rs {rowData?.amount_given ?? "--"}</p>
+            <p className="my-3">Rs {rowData?.amount_received ?? "--"}</p>
           </div>
         </div>
       </SheetContent>

@@ -41,7 +41,7 @@ export const DeleteCase = ({ id }: { id: string }) => {
         {},
         {
           method: "post",
-          action: `/incidents/cases/${id}/delete-case`,
+          action: `/events/cases/${id}/delete-case`,
           replace: true,
         },
       );

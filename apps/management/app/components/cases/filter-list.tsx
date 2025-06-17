@@ -102,7 +102,7 @@ export function FilterList({ filters }: Props) {
                   className="scale-0 group-hover:scale-100 transition-all w-0 group-hover:w-4"
                 />
                 <span className="capitalize">
-                  {renderFilter({ key, value: value ?? "" })}
+                  {renderFilter({ key, value: value})}
                 </span>
               </Button>
             </li>

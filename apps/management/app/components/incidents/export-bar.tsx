@@ -1,4 +1,4 @@
-import type { AccidentsDatabaseType } from "@canny_ecosystem/supabase/queries";
+import type { IncidentsDatabaseType } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { formatDateTime } from "@canny_ecosystem/utils";
@@ -10,7 +10,7 @@ export function ExportBar({
   className,
 }: {
   rows: number;
-  data: AccidentsDatabaseType[];
+  data: IncidentsDatabaseType[];
   className: string;
 }) {
   const pendingCount = data?.filter(
@@ -25,7 +25,7 @@ export function ExportBar({
     const url = URL.createObjectURL(blob);
     link.href = url;
 
-    link.setAttribute("download", `Accidents - ${formatDateTime(Date.now())}`);
+    link.setAttribute("download", `Incidents - ${formatDateTime(Date.now())}`);
 
     document.body.appendChild(link);
     link.click();

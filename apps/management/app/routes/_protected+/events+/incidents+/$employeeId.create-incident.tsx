@@ -15,11 +15,11 @@ import {
 } from "@conform-to/react";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import {
-  AccidentSchema,
+  IncidentSchema,
   getInitialValueFromZod,
   isGoodStatus,
   transformStringArrayIntoOptions,
-  categoryOfAccidentArray,
+  categoryOfIncidentArray,
   statusArray,
   replaceUnderscore,
   locationTypeArray,
@@ -42,24 +42,24 @@ import {
   SearchableSelectField,
   TextareaField,
 } from "@canny_ecosystem/ui/forms";
-import { createAccident } from "@canny_ecosystem/supabase/mutations";
+import { createIncident } from "@canny_ecosystem/supabase/mutations";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { clearCacheEntry } from "@/utils/cache";
-import type { AccidentsDatabaseUpdate } from "@canny_ecosystem/supabase/types";
-import { UPDATE_ACCIDENTS_TAG } from "./$accidentId.update-accidents";
+import type { IncidentsDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import { UPDATE_INCIDENTS_TAG } from "./$incidentId.update-incident";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { safeRedirect } from "@/utils/server/http.server";
 
-export const CREATE_ACCIDENTS_TAG = "Create-Accident";
+export const CREATE_INCIDENTS_TAG = "Create-Incident";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${createRole}:${attribute.accidents}`)) {
+  if (!hasPermission(user?.role!, `${createRole}:${attribute.incidents}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   const employeeId = params.employeeId;
@@ -73,7 +73,7 @@ export async function action({
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
     const formData = await request.formData();
-    const submission = parseWithZod(formData, { schema: AccidentSchema });
+    const submission = parseWithZod(formData, { schema: IncidentSchema });
 
     if (submission.status !== "success") {
       return json(
@@ -83,24 +83,24 @@ export async function action({
     }
     const data = submission.value;
 
-    const { status, error } = await createAccident({
+    const { status, error } = await createIncident({
       supabase,
-      data,
+      data: data,
     });
 
     if (isGoodStatus(status)) {
       return json({
         status: "success",
-        message: "Accident registered successfully",
+        message: "Incident registered successfully",
         error: null,
-        returnTo: "/incidents/accidents",
+        returnTo: "/events/incidents",
       });
     }
 
     return json(
       {
         status: "error",
-        message: "Failed to register accident",
+        message: "Failed to register incident",
         error,
         returnTo: DEFAULT_ROUTE,
       },
@@ -119,10 +119,10 @@ export async function action({
   }
 }
 
-export default function CreateAccident({
+export default function CreateIncident({
   updateValues,
 }: {
-  updateValues?: AccidentsDatabaseUpdate | null;
+  updateValues?: IncidentsDatabaseUpdate | null;
 }) {
   const { employeeId } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
@@ -135,7 +135,7 @@ export default function CreateAccident({
   useEffect(() => {
     if (actionData) {
       if (actionData.status === "success") {
-        clearCacheEntry(cacheKeyPrefix.accident);
+        clearCacheEntry(cacheKeyPrefix.incidents);
         toast({
           title: "Success",
           description: actionData?.message,
@@ -156,17 +156,17 @@ export default function CreateAccident({
     }
   }, [actionData]);
 
-  const ACCIDENT_TAG = updateValues
-    ? UPDATE_ACCIDENTS_TAG
-    : CREATE_ACCIDENTS_TAG;
+  const INCIDENT_TAG = updateValues
+    ? UPDATE_INCIDENTS_TAG
+    : CREATE_INCIDENTS_TAG;
 
-  const initialValues = updateValues ?? getInitialValueFromZod(AccidentSchema);
+  const initialValues = updateValues ?? getInitialValueFromZod(IncidentSchema);
 
   const [form, fields] = useForm({
-    id: ACCIDENT_TAG,
-    constraint: getZodConstraint(AccidentSchema),
+    id: INCIDENT_TAG,
+    constraint: getZodConstraint(IncidentSchema),
     onValidate({ formData }) {
-      return parseWithZod(formData, { schema: AccidentSchema });
+      return parseWithZod(formData, { schema: IncidentSchema });
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
@@ -183,10 +183,10 @@ export default function CreateAccident({
           <Card>
             <CardHeader>
               <CardTitle>
-                {updateValues ? "Update" : "Register"} Accident
+                {updateValues ? "Update" : "Register"} Incident
               </CardTitle>
               <CardDescription>
-                {updateValues ? "Update" : "Register"} the Accident here
+                {updateValues ? "Update" : "Register"} the Incident here
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -254,7 +254,7 @@ export default function CreateAccident({
                 key={resetKey + 1}
                 className="capitalize"
                 options={transformStringArrayIntoOptions(
-                  categoryOfAccidentArray as unknown as string[]
+                  categoryOfIncidentArray as unknown as string[]
                 )}
                 inputProps={{
                   ...getInputProps(fields.category, { type: "text" }),
@@ -301,14 +301,28 @@ export default function CreateAccident({
                 inputProps={{
                   ...getInputProps(fields.medical_diagnosis, { type: "text" }),
 
-                  placeholder: replaceUnderscore(
-                    `Enter ${fields.medical_diagnosis.name}`
-                  ),
+                  placeholder:
+                    replaceUnderscore(
+                      `Enter ${fields.medical_diagnosis.name}`
+                    ) ?? "",
                 }}
                 labelProps={{
                   children: replaceUnderscore(fields.medical_diagnosis.name),
                 }}
                 errors={fields.medical_diagnosis.errors}
+              />
+              <Field
+                inputProps={{
+                  ...getInputProps(fields.action_taken, { type: "text" }),
+
+                  placeholder:
+                    replaceUnderscore(`Enter ${fields.action_taken.name}`) ??
+                    "",
+                }}
+                labelProps={{
+                  children: replaceUnderscore(fields.action_taken.name),
+                }}
+                errors={fields.action_taken.errors}
               />
             </CardContent>
             <FormButtons

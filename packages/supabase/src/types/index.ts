@@ -318,12 +318,12 @@ export type LeaveEncashmentDatabaseInsert =
 
 export type LeaveEncashmentDatabaseUpdate =
   Database["public"]["Tables"]["leave_encashment"]["Update"];
-export type AccidentsDatabaseRow =
-  Database["public"]["Tables"]["accidents"]["Row"];
-export type AccidentsDatabaseInsert =
-  Database["public"]["Tables"]["accidents"]["Insert"];
-export type AccidentsDatabaseUpdate =
-  Database["public"]["Tables"]["accidents"]["Update"];
+export type IncidentsDatabaseRow =
+  Database["public"]["Tables"]["incidents"]["Row"];
+export type IncidentsDatabaseInsert =
+  Database["public"]["Tables"]["incidents"]["Insert"];
+export type IncidentsDatabaseUpdate =
+  Database["public"]["Tables"]["incidents"]["Update"];
 
 export type CasesDatabaseRow = Database["public"]["Tables"]["cases"]["Row"];
 export type CasesDatabaseInsert =
@@ -358,7 +358,5 @@ export type InvoiceDatabaseUpdate =
   Database["public"]["Tables"]["invoice"]["Update"];
 
 export type ChatDatabaseRow = Database["public"]["Tables"]["chat"]["Row"];
-export type ChatDatabaseInsert =
-  Database["public"]["Tables"]["chat"]["Insert"];
-export type ChatDatabaseUpdate =
-  Database["public"]["Tables"]["chat"]["Update"];
+export type ChatDatabaseInsert = Database["public"]["Tables"]["chat"]["Insert"];
+export type ChatDatabaseUpdate = Database["public"]["Tables"]["chat"]["Update"];

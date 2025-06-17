@@ -105,13 +105,15 @@ export async function getCasesByCompanyId({
   const query = supabase
     .from("cases")
     .select(
-      `${columns.join(",")}, reported_by_project:projects!cases_reported_by_project_id_fkey(id, name), reported_on_project:projects!cases_reported_on_project_id_fkey(id, name),
+      `${columns.join(
+        ","
+      )}, reported_by_project:projects!cases_reported_by_project_id_fkey(id, name), reported_on_project:projects!cases_reported_on_project_id_fkey(id, name),
        reported_by_employee:employees!cases_reported_by_employee_id_fkey(id, employee_code), reported_on_employee:employees!cases_reported_on_employee_id_fkey(id, employee_code),
        reported_by_site:project_sites!cases_reported_by_site_id_fkey(id, name, projects!project_sites_project_id_fkey(id)), reported_on_site:project_sites!cases_reported_on_site_id_fkey(id, name),
        reported_by_company:companies!cases_reported_by_company_id_fkey(id, name), reported_on_company:companies!cases_reported_on_company_id_fkey(id, name)`,
       {
         count: "exact",
-      },
+      }
     )
     .eq("company_id", companyId);
 
@@ -127,12 +129,12 @@ export async function getCasesByCompanyId({
     if (searchQueryArray?.length > 0 && searchQueryArray?.length <= 3) {
       for (const searchQueryElement of searchQueryArray) {
         query.or(
-          `title.ilike.*${searchQueryElement}*,description.ilike.*${searchQueryElement}*`,
+          `title.ilike.*${searchQueryElement}*,description.ilike.*${searchQueryElement}*`
         );
       }
     } else {
       query.or(
-        `title.ilike.*${searchQuery}*,description.ilike.*${searchQuery}*`,
+        `title.ilike.*${searchQuery}*,description.ilike.*${searchQuery}*`
       );
     }
   }
@@ -165,7 +167,10 @@ export async function getCasesByCompanyId({
     query.eq("status", status as CasesDatabaseRow["status"]);
   }
   if (location_type) {
-    query.eq("location_type", location_type as CasesDatabaseRow["location_type"]);
+    query.eq(
+      "location_type",
+      location_type as CasesDatabaseRow["location_type"]
+    );
   }
   if (reported_by) {
     query.eq("reported_by", reported_by as CasesDatabaseRow["reported_by"]);
@@ -227,6 +232,30 @@ export async function getCasesById({
   if (error) {
     console.error("getCasesById Error", error);
   }
+
+  return { data, error };
+}
+
+export async function getCasesDocumentUrlByCompanyIdAndCaseTitle({
+  supabase,
+  companyId,
+  caseTitle,
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+  caseTitle: string;
+}) {
+  const columns = ["document"] as const;
+
+  const { data, error } = await supabase
+    .from("cases")
+    .select(columns.join(","))
+    .eq("company_id", companyId)
+    .eq("title", caseTitle)
+    .maybeSingle<CasesDatabaseRow>();
+
+  if (error)
+    console.error("getCaseDocumentUrlByCompanyIdAndCaseTitle Error", error);
 
   return { data, error };
 }

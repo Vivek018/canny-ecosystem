@@ -574,8 +574,8 @@ export default function CreateInvoice({
                     "flex"
                 )}
               >
-                Note : As Esic values are not fixed and cant be calculated,
-                kindly edit manualy above
+                Note : All default values are system generated, Please verify
+                them manually before submitting.
               </p>
             </CardContent>
             <FormButtons

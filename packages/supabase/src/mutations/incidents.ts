@@ -1,17 +1,17 @@
 import { convertToNull } from "@canny_ecosystem/utils";
 import type {
-  AccidentsDatabaseInsert,
-  AccidentsDatabaseUpdate,
+  IncidentsDatabaseInsert,
+  IncidentsDatabaseUpdate,
   TypedSupabaseClient,
 } from "../types";
 
-export async function createAccident({
+export async function createIncident({
   supabase,
   data,
   bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
-  data: AccidentsDatabaseInsert[];
+  data: IncidentsDatabaseInsert;
   bypassAuth?: boolean;
 }) {
   if (!bypassAuth) {
@@ -25,23 +25,23 @@ export async function createAccident({
   }
 
   const { error, status } = await supabase
-    .from("accidents")
+    .from("incidents")
     .insert(data);
 
   if (error) {
-    console.error("createAccident error:", error);
+    console.error("createIncident error:", error);
   }
 
   return { status, error };
 }
 
-export async function updateAccidentById({
+export async function updateIncidentById({
   supabase,
   data,
   bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
-  data: AccidentsDatabaseUpdate;
+  data: IncidentsDatabaseUpdate;
   bypassAuth?: boolean;
 }) {
   if (!bypassAuth) {
@@ -57,19 +57,19 @@ export async function updateAccidentById({
   const updateData = convertToNull(data);
 
   const { error, status } = await supabase
-    .from("accidents")
+    .from("incidents")
     .update(updateData)
     .eq("id", data.id!)
     .single();
 
   if (error) {
-    console.error("updateAccidentById error:", error);
+    console.error("updateIncidentById error:", error);
   }
 
   return { error, status };
 }
 
-export async function deleteAccidentById({
+export async function deleteIncidentById({
   supabase,
   id,
 }: {
@@ -77,12 +77,12 @@ export async function deleteAccidentById({
   id: string;
 }) {
   const { error, status } = await supabase
-    .from("accidents")
+    .from("incidents")
     .delete()
     .eq("id", id);
 
   if (error) {
-    console.error("deleteAccidentById error:", error);
+    console.error("deleteIncidentById error:", error);
   }
 
   return { status, error };

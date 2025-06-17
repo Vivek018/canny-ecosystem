@@ -435,8 +435,7 @@ export const EmployeeWorkHistorySchema = z.object({
 
 export const EmployeeDocumentsSchema = z.object({
   document_type: zNumberString,
-  document_file: zFile,
-  existing_document_type: zNumberString.optional(),
+  url: zFile,
 });
 
 export const paymentTypeArray = ["fixed", "variable"] as const;
@@ -1543,27 +1542,46 @@ export const severityTypeArray = [
   "unknown",
 ] as const;
 
-export const categoryOfAccidentArray = [
+export const categoryOfIncidentArray = [
   "theft",
   "assault",
   "fall",
   "accident",
   "machinery",
+  "chemical_spill",
+  "fire_incident",
+  "electrical_hazard",
+  "gas_leak",
+  "equipment_misuse",
+  "verbal_abuse",
+  "physical_altercation",
+  "misconduct",
+  "harassment",
+  "intoxication_on_duty",
+  "negligence",
+  "slip_or_trip",
+  "vehicle_collision",
+  "object_fall",
+  "crushed_between_objects",
+  "no_safety_gear",
+  "violation_of_SOP",
+  "weather_related_injury",
   "others",
 ] as const;
 
-export const AccidentSchema = z.object({
+export const IncidentSchema = z.object({
   id: z.string().optional(),
   employee_id: z.string(),
   date: z.string().default(new Date().toISOString().split("T")[0]),
   title: zString.min(3).max(30),
   location_type: z.enum(locationTypeArray).default("onsite"),
   location: z.string().optional(),
-  category: z.enum(categoryOfAccidentArray).default("accident"),
+  category: z.enum(categoryOfIncidentArray).default("accident"),
   severity: z.enum(severityTypeArray).default("moderate"),
   status: z.enum(statusArray).default("active"),
   description: zTextArea.max(500),
   medical_diagnosis: z.string().optional(),
+  action_taken: z.string().optional(),
 });
 
 export const leaveTypeArray = [
@@ -1640,7 +1658,7 @@ export const CaseSchema = z.object({
   amount_received: z.number().optional(),
   court_case_reference: z.string().optional(),
   description: zTextArea.optional(),
-  document: z.string().url().optional(),
+  document: zFile.optional(),
   resolution_date: z.string().optional(),
   reported_on_employee_id: z.string().optional(),
   reported_on_project_id: z.string().optional(),

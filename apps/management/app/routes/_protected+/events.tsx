@@ -7,7 +7,12 @@ import { SecondaryMenu } from "@canny_ecosystem/ui/secondary-menu";
 import { hasPermission, readRole } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Outlet, useLocation, Link, type ClientLoaderFunctionArgs } from "@remix-run/react";
+import {
+  Outlet,
+  useLocation,
+  Link,
+  type ClientLoaderFunctionArgs,
+} from "@remix-run/react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
@@ -25,7 +30,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 
 clientLoader.hydrate = true;
 
-export default function Incidents() {
+export default function Events() {
   const { pathname } = useLocation();
   return (
     <section className="flex flex-col h-full">
@@ -33,12 +38,12 @@ export default function Incidents() {
         <SecondaryMenu
           items={[
             {
-              label: "Accidents",
-              path: "/incidents/accidents",
+              label: "Incidents",
+              path: "/events/incidents",
             },
             {
               label: "Cases",
-              path: "/incidents/cases",
+              path: "/events/cases",
             },
           ]}
           pathname={pathname}

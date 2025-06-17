@@ -34,7 +34,7 @@ export function CaseSearchFilter({ disabled }: { disabled?: boolean }) {
   const isSubmitting =
     navigation.state === "submitting" ||
     (navigation.state === "loading" &&
-      navigation.location.pathname === "/incidents/cases" &&
+      navigation.location.pathname === "/events/cases" &&
       navigation.location.search.length);
 
   const inputRef = useRef<HTMLInputElement>(null);

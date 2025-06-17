@@ -169,17 +169,15 @@ export async function updateEmployeeDocument({
   file,
   employeeId,
   documentType,
-  existingDocumentType,
 }: {
   supabase: TypedSupabaseClient;
   file: File;
   employeeId: string;
   documentType: string;
-  existingDocumentType: string;
 }) {
   const { status } = await deleteEmployeeDocument({
     supabase,
-    documentType: existingDocumentType,
+    documentType,
     employeeId,
   });
 
@@ -211,6 +209,7 @@ export async function deleteEmployeeDocument({
       documentType,
       employeeId,
     });
+
   if (!data || error) return { status: 400, error };
 
   const filePath = getFilePathFromUrl(data.url ?? "");
@@ -230,7 +229,7 @@ export async function deleteEmployeeDocument({
   if (deleteEmployeeDocumentError)
     console.error(
       "deleteEmployeeDocumentByEmployeeId error",
-      deleteEmployeeDocumentError,
+      deleteEmployeeDocumentError
     );
   return { status, error: null };
 }

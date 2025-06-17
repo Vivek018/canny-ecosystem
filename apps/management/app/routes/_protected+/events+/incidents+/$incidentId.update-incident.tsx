@@ -9,7 +9,7 @@ import {
 import { parseWithZod } from "@conform-to/zod";
 import { safeRedirect } from "@/utils/server/http.server";
 import {
-  AccidentSchema,
+  IncidentSchema,
   hasPermission,
   isGoodStatus,
   updateRole,
@@ -20,47 +20,47 @@ import { attribute } from "@canny_ecosystem/utils/constant";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { useEffect } from "react";
 import { clearCacheEntry } from "@/utils/cache";
-import RegisterAccident from "./$employeeId.create-accident";
-import { updateAccidentById } from "@canny_ecosystem/supabase/mutations";
-import { getAccidentsById } from "@canny_ecosystem/supabase/queries";
-import type { AccidentsDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import RegisterIncident from "./$employeeId.create-incident";
+import { updateIncidentById } from "@canny_ecosystem/supabase/mutations";
+import { getIncidentsById } from "@canny_ecosystem/supabase/queries";
+import type { IncidentsDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 
-export const UPDATE_ACCIDENTS_TAG = "Update-Accident";
+export const UPDATE_INCIDENTS_TAG = "Update-Incident";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const accidentId = params.accidentId;
+  const incidentId = params.incidentId;
   const { supabase, headers } = getSupabaseWithHeaders({ request });
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.accidents}`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.incidents}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
-  let accidentData = null;
+  let incidentData = null;
   let error = null;
 
-  if (accidentId) {
-    const { data, error: accidentError } = await getAccidentsById({
+  if (incidentId) {
+    const { data, error: incidentError } = await getIncidentsById({
       supabase,
-      accidentId,
+      incidentId,
     });
 
-    accidentData = data;
-    error = accidentError;
+    incidentData = data;
+    error = incidentError;
   }
 
-  return json({ data: accidentData as AccidentsDatabaseUpdate, error });
+  return json({ data: incidentData as IncidentsDatabaseUpdate, error });
 }
 
 export async function action({
   request,
   params,
 }: ActionFunctionArgs): Promise<Response> {
-  const accidentId = params.accidentId;
+  const incidentId = params.incidentId;
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
-  const submission = parseWithZod(formData, { schema: AccidentSchema });
+  const submission = parseWithZod(formData, { schema: IncidentSchema });
 
   if (submission.status !== "success") {
     return json(
@@ -68,9 +68,9 @@ export async function action({
       { status: submission.status === "error" ? 400 : 200 },
     );
   }
-  const data = { ...submission.value, id: submission.value.id ?? accidentId };
+  const data = { ...submission.value, id: submission.value.id ?? incidentId };
 
-  const { status, error } = await updateAccidentById({
+  const { status, error } = await updateIncidentById({
     supabase,
     data,
   });
@@ -78,19 +78,19 @@ export async function action({
   if (isGoodStatus(status)) {
     return json({
       status: "success",
-      message: "Employee accident updated successfully",
+      message: "Employee incident updated successfully",
       error: null,
     });
   }
 
   return json({
     status: "error",
-    message: "Employee accident update failed",
+    message: "Employee incident update failed",
     error,
   });
 }
 
-export default function UpdateAccidents() {
+export default function UpdateIncidents() {
   const { data, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const updatableData = data;
@@ -102,7 +102,7 @@ export default function UpdateAccidents() {
     if (error) {
       toast({
         title: "Error",
-        description: error?.message || "Failed to load accident data",
+        description: error?.message || "Failed to load incident data",
         variant: "destructive",
       });
     }
@@ -111,23 +111,23 @@ export default function UpdateAccidents() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(cacheKeyPrefix.accident);
+        clearCacheEntry(cacheKeyPrefix.incidents);
         toast({
           title: "Success",
-          description: actionData?.message || "Accident updated successfully",
+          description: actionData?.message || "Incident updated successfully",
           variant: "success",
         });
       } else {
         toast({
           title: "Error",
           description:
-            actionData?.error?.message || "Failed to update accident",
+            actionData?.error?.message || "Failed to update incident",
           variant: "destructive",
         });
       }
-      navigate("/incidents/accidents");
+      navigate("/events/incidents");
     }
   }, [actionData]);
 
-  return <RegisterAccident updateValues={updatableData} />;
+  return <RegisterIncident updateValues={updatableData} />;
 }

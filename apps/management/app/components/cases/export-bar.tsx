@@ -1,4 +1,4 @@
-import type { CasesDatabaseRow } from "@canny_ecosystem/supabase/types";
+
 import { Button } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { formatDateTime } from "@canny_ecosystem/utils";
@@ -10,10 +10,9 @@ export function ExportBar({
   className,
 }: {
   rows: number;
-  data: Omit<CasesDatabaseRow, "created_at" | "updated_at">[];
+  data: any[];
   className: string;
 }) {
-
   const toBeExportedData = data.map((element) => ({
     title: element?.title,
     description: element?.description,

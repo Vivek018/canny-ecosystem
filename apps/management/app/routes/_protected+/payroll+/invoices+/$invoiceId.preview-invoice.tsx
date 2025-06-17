@@ -301,7 +301,10 @@ const InvoicePDF = ({
           </Text>
           <Text style={{ fontFamily: "Helvetica-Bold" }}>Tax-Invoice</Text>
           <Text style={{ fontFamily: "Helvetica-Bold" }}>
-            Date : {formatDate(data?.invoiceDetails?.date)}
+            Date :{" "}
+            {data?.invoiceDetails?.date
+              ? String(formatDate(data?.invoiceDetails?.date))
+              : ""}
           </Text>
         </View>
 

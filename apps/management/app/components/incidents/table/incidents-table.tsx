@@ -12,19 +12,19 @@ import {
   useReactTable,
   type VisibilityState,
 } from "@tanstack/react-table";
-import { AccidentsTableHeader } from "./accidents-table-header";
+import { IncidentsTableHeader } from "./incidents-table-header";
 import { useInView } from "react-intersection-observer";
 import { useEffect, useState } from "react";
 import {
-  type AccidentFilters,
-  getAccidentsByCompanyId,
-  type AccidentsDatabaseType,
+  type IncidentFilters,
+  getIncidentsByCompanyId,
+  type IncidentsDatabaseType,
 } from "@canny_ecosystem/supabase/queries";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
 import { Spinner } from "@canny_ecosystem/ui/spinner";
 import { useSearchParams } from "@remix-run/react";
 import { Button } from "@canny_ecosystem/ui/button";
-import { useAccidentStore } from "@/store/accidents";
+import { useIncidentStore } from "@/store/incidents";
 import { ExportBar } from "../export-bar";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 
@@ -37,12 +37,12 @@ interface DataTableProps<TData, TValue> {
   companyId?: string;
   employeeId?: string;
   noFilters?: boolean;
-  filters?: AccidentFilters | null;
+  filters?: IncidentFilters | null;
   query?: string | null;
   initialColumnVisibility?: VisibilityState;
 }
 
-export function AccidentsTable<TData, TValue>({
+export function IncidentsTable<TData, TValue>({
   columns,
   data: initialData,
   hasNextPage: initialHasNextPage,
@@ -62,17 +62,17 @@ export function AccidentsTable<TData, TValue>({
 
   const { ref, inView } = useInView();
   const { rowSelection, setSelectedRows, setRowSelection, setColumns } =
-    useAccidentStore();
+    useIncidentStore();
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
     initialColumnVisibility ?? {}
   );
-  const loadMoreEmployees = async () => {
+  const loadMoreIncidents = async () => {
     const formattedFrom = from;
     const to = formattedFrom + pageSize;
     const sortParam = searchParams.get("sort");
     if (companyId) {
       try {
-        const { data, meta } = await getAccidentsByCompanyId({
+        const { data, meta } = await getIncidentsByCompanyId({
           supabase,
           companyId,
           params: {
@@ -115,7 +115,7 @@ export function AccidentsTable<TData, TValue>({
     for (const row of table.getSelectedRowModel().rows) {
       rowArray.push(row.original);
     }
-    setSelectedRows(rowArray as AccidentsDatabaseType[]);
+    setSelectedRows(rowArray as IncidentsDatabaseType[]);
   }, [rowSelection]);
 
   useEffect(() => {
@@ -124,7 +124,7 @@ export function AccidentsTable<TData, TValue>({
 
   useEffect(() => {
     if (inView) {
-      loadMoreEmployees();
+      loadMoreIncidents();
     }
   }, [inView]);
 
@@ -137,16 +137,16 @@ export function AccidentsTable<TData, TValue>({
   const tableLength = table.getRowModel().rows?.length;
 
   return (
-    <div className='relative mb-8'>
+    <div className="relative mb-8">
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
           !tableLength && "border-none"
         )}
       >
-        <div className='relative'>
+        <div className="relative">
           <Table>
-            <AccidentsTableHeader
+            <IncidentsTableHeader
               table={table}
               className={cn(!tableLength && "hidden")}
             />
@@ -156,7 +156,7 @@ export function AccidentsTable<TData, TValue>({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    className='relative cursor-default select-text'
+                    className="relative cursor-default select-text"
                   >
                     {row.getVisibleCells().map((cell) => {
                       return (
@@ -187,10 +187,10 @@ export function AccidentsTable<TData, TValue>({
                 <TableRow className={cn(!tableLength && "border-none")}>
                   <TableCell
                     colSpan={columns.length}
-                    className='h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize'
+                    className="h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize"
                   >
                     <div className="flex flex-col items-center gap-1">
-                      <h2 className="text-xl">No Accidents Found.</h2>
+                      <h2 className="text-xl">No Incidents Found.</h2>
                       <p
                         className={cn(
                           "text-muted-foreground",
@@ -200,7 +200,7 @@ export function AccidentsTable<TData, TValue>({
                         Try another search, or adjusting the filters
                       </p>
                       <Button
-                        variant='outline'
+                        variant="outline"
                         className={cn(
                           "mt-4",
                           !data?.length && noFilters && "hidden"
@@ -220,17 +220,17 @@ export function AccidentsTable<TData, TValue>({
         </div>
       </div>
       {hasNextPage && initialData?.length && (
-        <div className='flex items-center justify-center mt-6' ref={ref}>
-          <div className='flex items-center space-x-2 px-6 py-5'>
+        <div className="flex items-center justify-center mt-6" ref={ref}>
+          <div className="flex items-center space-x-2 px-6 py-5">
             <Spinner />
-            <span className='text-sm text-[#606060]'>Loading more...</span>
+            <span className="text-sm text-[#606060]">Loading more...</span>
           </div>
         </div>
       )}
       <ExportBar
         className={cn(!table.getSelectedRowModel().rows.length && "hidden")}
         rows={table.getSelectedRowModel().rows.length}
-        data={selectedRowsData as AccidentsDatabaseType[]}
+        data={selectedRowsData as IncidentsDatabaseType[]}
       />
     </div>
   );
