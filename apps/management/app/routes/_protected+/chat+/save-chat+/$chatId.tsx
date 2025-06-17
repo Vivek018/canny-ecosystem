@@ -1,5 +1,5 @@
-import { DeleteChat } from "@/components/ai/delete-chat";
-import { Results } from "@/components/ai/result";
+import { DeleteChat } from "@/components/chat/delete-chat";
+import { Results } from "@/components/chat/result";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { runGeneratedSQLQuery } from "@/utils/ai/chat";
 import { clearCacheEntry, clearExactCacheEntry, clientCaching } from "@/utils/cache";

@@ -18,6 +18,7 @@ import type {
 
 import {
   HARD_QUERY_LIMIT,
+  HARDEST_QUERY_LIMIT,
   MID_QUERY_LIMIT,
   SINGLE_QUERY_LIMIT,
 } from "../constant";
@@ -125,14 +126,11 @@ export async function getEmployeesByCompanyId({
     .from("employees")
     .select(
       `${columns.join(",")},
-        employee_project_assignment!employee_project_assignments_employee_id_fkey!${
-          project ? "inner" : "left"
-        }(
+        employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
+      }(
         employee_id, assignment_type, skill_level, position, start_date, end_date,
-        project_sites!${
-          project ? "inner" : "left"
-        }(id, name, projects!${
-        project ? "inner" : "left"
+        project_sites!${project ? "inner" : "left"
+      }(id, name, projects!${project ? "inner" : "left"
       }(id, name))
       )`,
       { count: "exact" }
@@ -983,12 +981,10 @@ export async function getEmployeesReportByCompanyId({
     .from("employees")
     .select(
       `${columns.join(",")},
-        employee_project_assignment!employee_project_assignments_employee_id_fkey!${
-          project ? "inner" : "left"
-        }(
+        employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
+      }(
         employee_id, assignment_type, skill_level, position, start_date, end_date,
-        project_sites!${project ? "inner" : "left"}(id, name, projects!${
-        project ? "inner" : "left"
+        project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
       }(id, name))
       )`,
       { count: "exact" }
@@ -1340,5 +1336,68 @@ export async function getActiveEmployeesByCompanyId({
     totalEmployeeError,
     activeEmployeeErrorBySites,
     activeEmployeesBySites,
+  };
+}
+
+export async function getAllEmployeeTablesData({
+  supabase,
+}: {
+  supabase: TypedSupabaseClient;
+}) {
+  const [
+    employees,
+    employeeBankDetails,
+    employeeStatutoryDetails,
+    employeeAddressesDetails,
+    employeeGuardiansDetails,
+    employeeWorkDetails,
+    employeeWorkHistoryDetails,
+    employeeSkillsDetails,
+    projectDetails,
+    projectSiteDetails,
+  ] = await Promise.all([
+    supabase.from("employees").select("*").limit(HARDEST_QUERY_LIMIT),
+    supabase.from("employee_bank_details").select("*").limit(HARDEST_QUERY_LIMIT),
+    supabase.from("employee_statutory_details").select("*").limit(HARDEST_QUERY_LIMIT),
+    supabase.from("employee_addresses").select("*").limit(HARDEST_QUERY_LIMIT),
+    supabase.from("employee_guardians").select("*").limit(HARDEST_QUERY_LIMIT),
+    supabase.from("employee_project_assignment").select("*").limit(HARDEST_QUERY_LIMIT),
+    supabase.from("employee_work_history").select("*").limit(HARDEST_QUERY_LIMIT),
+    supabase.from("employee_skills").select("*").limit(HARDEST_QUERY_LIMIT),
+    supabase.from("projects").select("*").limit(HARDEST_QUERY_LIMIT),
+    supabase.from("project_sites").select("*").limit(HARDEST_QUERY_LIMIT),
+  ]);
+
+  const error =
+    employees.error ||
+    employeeBankDetails.error
+    || employeeStatutoryDetails.error
+    || employeeAddressesDetails.error
+    || employeeGuardiansDetails.error
+    || employeeWorkDetails.error
+    || employeeWorkHistoryDetails.error
+    || employeeSkillsDetails.error
+    || projectDetails.error
+    || projectSiteDetails.error;
+
+  if (error) {
+    console.error("getAllEmployeeRelatedData Error:", error);
+  }
+
+  return {
+    // Make sure the names is same as table names.
+    data: {
+      employees: employees.data,
+      employee_bank_details: employeeBankDetails.data,
+      employee_statutory_details: employeeStatutoryDetails.data,
+      employee_addresses: employeeAddressesDetails.data,
+      employee_guardians: employeeGuardiansDetails.data,
+      employee_project_assignment: employeeWorkDetails.data,
+      employee_work_history: employeeWorkHistoryDetails.data,
+      employee_skills: employeeSkillsDetails.data,
+      projects: projectDetails.data,
+      project_sites: projectSiteDetails.data,
+    },
+    error,
   };
 }

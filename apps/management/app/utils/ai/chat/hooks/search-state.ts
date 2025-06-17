@@ -30,10 +30,12 @@ export function useSearchState({
   data,
   config,
   query,
+  returnTo
 }: {
   data: any[] | null;
   config: any;
   query: string | null;
+  returnTo: string
 }) {
   const [stateData, setStateData] = useState(data ?? []);
   const [stateConfig, setStateConfig] = useState(config);
@@ -71,7 +73,7 @@ export function useSearchState({
       navigation.state === "submitting" ||
       (
         navigation.state === "loading" &&
-        navigation.location.pathname === "/chat/chatbox" &&
+        navigation.location.pathname.includes("/chat/chatbox") &&
         !!navigation.location.search.length
       )
     );
@@ -103,6 +105,7 @@ export function useSearchState({
     formData.append("prompt", searchPrompt ?? "");
     formData.append("query", query ?? "");
     formData.append("config", stateConfig ? JSON.stringify(stateConfig) : "");
+    formData.append("returnTo", returnTo);
 
     submit(formData, {
       action: "/chat/chatbox",
@@ -144,9 +147,9 @@ export function useSearchState({
     columns,
     prompt,
     setPrompt,
+    searchPrompt,
     inputRef,
     isSubmitting,
-    searchPrompt,
     animatedPlaceholder,
     handleSubmit,
     handleSearch,

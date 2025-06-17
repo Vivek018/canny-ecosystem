@@ -91,6 +91,34 @@ export const statutorySideNavList = [
   },
 ];
 
+export const chatCategories = [
+  {
+    name: "Employee",
+    link: "/chat/chatbox/employee",
+    icon: "",
+  },
+  {
+    name: "Payment",
+    link: "/chat/chatbox/payment",
+    icon: "",
+  },
+  {
+    name: "Attendance",
+    link: "/chat/chatbox/attendance",
+    icon: "",
+  },
+  {
+    name: "Reports",
+    link: "/chat/chatbox/reports",
+    icon: "",
+  },
+  {
+    name: "Events",
+    link: "/chat/chatbox/events",
+    icon: "",
+  },
+];
+
 export const cacheKeyPrefix = {
   root: "root",
   index: "index",
