@@ -33,7 +33,7 @@ export const SecondarySidebar = ({
                 prefetch="intent"
                 className={({ isActive }: { isActive: boolean }) =>
                   cn(
-                    "flex cursor-pointer text-start text-sm justify-start w-44 px-3.5 rounded py-2.5 tracking-wide hover:bg-accent gap-3 transition-[width] overflow-hidden",
+                    "min-h-max flex cursor-pointer text-start text-sm justify-start w-44 px-3.5 rounded py-2.5 tracking-wide hover:bg-accent gap-3 transition-[width] overflow-hidden",
                     isActive
                       ? "bg-primary/15 text-primary hover:bg-primary/20"
                       : "",

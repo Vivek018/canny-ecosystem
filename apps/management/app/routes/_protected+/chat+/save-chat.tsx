@@ -46,13 +46,13 @@ export default function SaveChat() {
   const { data } = useLoaderData<typeof loader>();
 
   return (
-    <section className="flex w-full h-full">
+    <section className="flex h-full w-full">
       <SecondarySidebar
         items={data ?? []}
         className="flex-shrink-0"
         navLinkClassName="w-64"
       />
-      <div className="flex-1 w-full h-full p-4 flex flex-col overflow-hidden">
+      <div className="flex-1 w-full p-4 flex flex-col overflow-hidden">
         <Outlet context={{ dataLength: data?.length }} />
       </div>
     </section>
