@@ -18,7 +18,7 @@ export * from "./payroll";
 export * from "./employee-letter";
 export * from "./attendance";
 export * from "./leave-encashment";
-export * from "./accidents";
+export * from "./incidents";
 export * from "./cases";
 export * from "./leaves";
 export * from "./holidays";

@@ -59,14 +59,14 @@ export const EmployeeOptionsDropdown = ({
     );
   };
 
-  const handleAccident = () => {
+  const handleIncident = () => {
     submit(
       {
         id: employee.id,
       },
       {
         method: "POST",
-        action: `/incidents/accidents/${employee.id}/create-accident`,
+        action: `/events/incidents/${employee.id}/create-incident`,
       },
     );
   };
@@ -105,17 +105,17 @@ export const EmployeeOptionsDropdown = ({
           />
           <DropdownMenuItem
             className={cn(
-              !hasPermission(role, `${createRole}:${attribute.accidents}`) &&
+              !hasPermission(role, `${createRole}:${attribute.incidents}`) &&
                 "hidden",
             )}
-            onClick={handleAccident}
+            onClick={handleIncident}
           >
-            Report Accident
+            Report Incident
           </DropdownMenuItem>
           <DropdownMenuSeparator
             className={cn(
               "hidden",
-              hasPermission(role, `${deleteRole}:${attribute.accidents}`) &&
+              hasPermission(role, `${deleteRole}:${attribute.incidents}`) &&
                 "flex",
             )}
           />

@@ -30,7 +30,7 @@ export function AddCaseDialog() {
       </DropdownMenuTrigger>
       <DropdownMenuContent sideOffset={10} align="end">
         <DropdownMenuItem
-          onClick={() => navigate("/incidents/cases/create-case")}
+          onClick={() => navigate("/events/cases/create-case")}
           className={cn("space-x-2")}
         >
           <Icon name="plus-circled" size="sm" />

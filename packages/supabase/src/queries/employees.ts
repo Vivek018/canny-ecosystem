@@ -1,4 +1,4 @@
-import { type employeeDocuments, formatUTCDate } from "@canny_ecosystem/utils";
+import { formatUTCDate } from "@canny_ecosystem/utils";
 import type {
   EmployeeAddressDatabaseRow,
   EmployeeAttendanceDatabaseRow,
@@ -1136,7 +1136,7 @@ export async function getEmployeeDocumentUrlByEmployeeIdAndDocumentName({
 }: {
   supabase: TypedSupabaseClient;
   employeeId: string;
-  documentType: (typeof employeeDocuments)[number];
+  documentType: string;
 }) {
   const columns = ["url"] as const;
 

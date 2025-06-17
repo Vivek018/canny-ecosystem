@@ -14,6 +14,7 @@ type Props = {
 // make sure the order is same as header order
 export const CasesColumnIdArray = [
   "title",
+  "description",
   "date",
   "case_type",
   "status",
@@ -87,7 +88,7 @@ export function CasesTableHeader({ table, className, loading }: Props) {
                 key={id}
                 className={cn(
                   "px-4 py-2",
-                  id === "title" && "sticky left-12 bg-card z-10",
+                  id === "title" && "sticky left-12 bg-card z-10"
                 )}
               >
                 <Button
@@ -104,14 +105,14 @@ export function CasesTableHeader({ table, className, loading }: Props) {
                     name="chevron-up"
                     className={cn(
                       "hidden",
-                      id === column && value === "desc" && "flex",
+                      id === column && value === "desc" && "flex"
                     )}
                   />
                   <Icon
                     name="chevron-down"
                     className={cn(
                       "hidden",
-                      id === column && value === "asc" && "flex",
+                      id === column && value === "asc" && "flex"
                     )}
                   />
                 </Button>

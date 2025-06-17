@@ -232,7 +232,7 @@ export default function UpdateAttendance() {
                 className="w-full"
                 inputProps={{
                   ...getInputProps(fields.date, { type: "date" }),
-                  placeholder: replaceUnderscore(fields.date.name),
+                  placeholder: replaceUnderscore(fields.date.name)!,
                   readOnly: true,
                 }}
                 labelProps={{

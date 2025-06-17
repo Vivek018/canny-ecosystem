@@ -12,7 +12,7 @@ type Props = {
 };
 
 // make sure the order is same as header order
-export const AccidentsColumnIdArray = [
+export const IncidentsColumnIdArray = [
   "employee_code",
   "employee_name",
   "project",
@@ -26,9 +26,10 @@ export const AccidentsColumnIdArray = [
   "severity",
   "status",
   "medical_diagnosis",
+  "action_taken",
 ];
 
-export function AccidentsTableHeader({ table, className, loading }: Props) {
+export function IncidentsTableHeader({ table, className, loading }: Props) {
   const [searchParams, setSearchParams] = useSearchParams();
   const sortParam = searchParams.get("sort");
   const [column, value] = sortParam ? sortParam.split(":") : [];
@@ -81,7 +82,7 @@ export function AccidentsTableHeader({ table, className, loading }: Props) {
             }}
           />
         </TableHead>
-        {AccidentsColumnIdArray?.map((id) => {
+        {IncidentsColumnIdArray?.map((id) => {
           return (
             isVisible(id) && (
               <TableHead

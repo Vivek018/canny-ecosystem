@@ -32,7 +32,22 @@ export const columns: ColumnDef<CasesDatabaseRow>[] = [
     accessorKey: "title",
     header: "title",
     cell: ({ row }) => {
-      return <p className="truncate w-28 text-primary">{row.original?.title ?? "--"}</p>;
+      return (
+        <p className="truncate w-28 text-primary">
+          {row.original?.title ?? "--"}
+        </p>
+      );
+    },
+  },
+  {
+    accessorKey: "description",
+    header: "Description",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate w-52">
+          {row.original?.description ?? "--"}
+        </p>
+      );
     },
   },
   {
@@ -41,7 +56,7 @@ export const columns: ColumnDef<CasesDatabaseRow>[] = [
     cell: ({ row }) => {
       return (
         <p className="truncate">
-          {formatDate(row.original?.date ?? "") ?? "--"}
+          {(formatDate(row.original?.date) ?? "--").toString()}
         </p>
       );
     },
@@ -156,12 +171,14 @@ export const columns: ColumnDef<CasesDatabaseRow>[] = [
         <CaseOptionsDropdown
           key={row?.original?.id}
           caseId={row?.original?.id}
+          documentUrl={row?.original?.document as string}
+          caseTitle={row?.original?.title}
           triggerChild={
             <DropdownMenuTrigger
               className={cn(
                 !hasPermission(role, `${updateRole}:${attribute.cases}`) &&
                   !hasPermission(role, `${deleteRole}:${attribute.cases}`) &&
-                  "hidden",
+                  "hidden"
               )}
               asChild
             >

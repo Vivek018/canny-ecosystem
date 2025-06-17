@@ -14,6 +14,7 @@ import {
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import {
+  type ClientLoaderFunctionArgs,
   Form,
   json,
   useActionData,
@@ -22,7 +23,7 @@ import {
 } from "@remix-run/react";
 import { useEffect } from "react";
 import { cacheKeyPrefix } from "@/constant";
-import { clearExactCacheEntry } from "@/utils/cache";
+import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { FormButtons } from "@/components/form/form-buttons";
@@ -45,6 +46,12 @@ export async function loader({ params }: LoaderFunctionArgs) {
   const employeeId = params.employeeId;
   return { employeeId };
 }
+
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+  return clientCaching(`${cacheKeyPrefix.employee_documents}`, args);
+}
+
+clientLoader.hydrate = true;
 
 export async function action({
   request,
@@ -71,7 +78,7 @@ export async function action({
 
     const { status, error } = await uploadEmployeeDocument({
       supabase,
-      file: submission.value.document_file as File,
+      file: submission.value.url as File,
       employeeId,
       documentType: submission.value.document_type,
     });
@@ -133,15 +140,14 @@ export default function AddDocument({
     shouldRevalidate: "onInput",
     defaultValue: {
       ...initialValues,
+      url: undefined,
     },
   });
 
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearExactCacheEntry(
-          `${cacheKeyPrefix.employee_documents}${employeeId}`
-        );
+        clearExactCacheEntry(`${cacheKeyPrefix.employee_documents}`);
         toast({
           title: "Success",
           description: actionData.message,
@@ -174,41 +180,30 @@ export default function AddDocument({
             className="flex flex-col overflow-auto"
             encType="multipart/form-data"
           >
-            <input
-              {...getInputProps(fields.existing_document_type, {
-                type: "hidden",
-              })}
-            />
             <Field
               inputProps={{
                 ...getInputProps(fields.document_type, {
                   type: "text",
                 }),
                 placeholder: `Enter ${replaceUnderscore(
-                  fields.document_type.name,
+                  fields.document_type.name
                 )}`,
               }}
               errors={fields.document_type.errors}
             />
             <Field
               inputProps={{
-                ...getInputProps(fields.document_file, { type: "file" }),
-                placeholder: `Enter ${replaceUnderscore(
-                  fields.document_file.name
-                )}`,
+                ...getInputProps(fields.url, { type: "file" }),
+                placeholder: `Enter ${replaceUnderscore(fields.url.name)}`,
               }}
               labelProps={{
-                children: replaceUnderscore(fields.document_file.name),
+                children: replaceUnderscore(fields.url.name),
               }}
-              errors={fields.document_file.errors}
+              errors={fields.url.errors}
             />
           </Form>
         </FormProvider>
-        <FormButtons
-          className="mr-[-24px] pb-0"
-          form={form}
-          isSingle={true}
-        />
+        <FormButtons className="mr-[-24px] pb-0" form={form} isSingle={true} />
       </DialogContent>
     </Dialog>
   );

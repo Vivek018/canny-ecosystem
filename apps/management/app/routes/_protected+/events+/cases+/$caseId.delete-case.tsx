@@ -1,8 +1,11 @@
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clearCacheEntry } from "@/utils/cache";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
+import { deleteCaseDocument } from "@canny_ecosystem/supabase/media";
 import { deleteCasesById } from "@canny_ecosystem/supabase/mutations";
+import { getCasesById } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import {
@@ -21,6 +24,7 @@ export async function action({
 }: ActionFunctionArgs): Promise<Response> {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
   if (!hasPermission(user?.role!, `${deleteRole}:${attribute.cases}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -30,6 +34,18 @@ export async function action({
   try {
     const formData = await request.formData();
     const returnTo = formData.get("returnTo") as string;
+    let caseData = null;
+    if (caseId) {
+      ({ data: caseData } = await getCasesById({
+        supabase,
+        caseId,
+      }));
+    }
+    await deleteCaseDocument({
+      supabase,
+      companyId,
+      caseTitle: caseData?.title!,
+    });
     const { error, status } = await deleteCasesById({
       supabase,
       id: caseId ?? "",
@@ -51,7 +67,7 @@ export async function action({
         returnTo,
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json({
@@ -85,7 +101,7 @@ export default function DeleteCase() {
           variant: "destructive",
         });
       }
-      navigate(actionData?.returnTo ?? "/incidents/cases");
+      navigate(actionData?.returnTo ?? "/events/cases");
     }
   }, [actionData]);
 

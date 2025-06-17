@@ -58,12 +58,9 @@ export async function action({
 
     const { status, error } = await updateEmployeeDocument({
       supabase,
-      file: submission.value.document_file as File,
+      file: submission.value.url as File,
       employeeId,
-      documentType: submission.value
-        .document_type,
-      existingDocumentType: submission.value
-        .existing_document_type ?? "",
+      documentType: submission.value.document_type,
     });
     if (isGoodStatus(status)) {
       return json({
@@ -83,7 +80,6 @@ export async function action({
       { status: 500 }
     );
   } catch (error) {
-
     return json(
       {
         status: "error",
@@ -97,7 +93,7 @@ export async function action({
 }
 
 export default function UpdateDocument() {
-  const { employeeId, data } = useLoaderData<typeof loader>();
+  const {  data } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -105,9 +101,7 @@ export default function UpdateDocument() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearExactCacheEntry(
-          `${cacheKeyPrefix.employee_documents}${employeeId}`
-        );
+        clearExactCacheEntry(`${cacheKeyPrefix.employee_documents}`);
         toast({
           title: "Success",
           description: actionData.message,

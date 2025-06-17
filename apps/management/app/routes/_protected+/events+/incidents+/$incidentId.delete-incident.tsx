@@ -2,7 +2,7 @@ import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clearCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
-import { deleteAccidentById } from "@canny_ecosystem/supabase/mutations";
+import { deleteIncidentById } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import {
@@ -22,24 +22,24 @@ export async function action({
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${deleteRole}:${attribute.accidents}`)) {
+  if (!hasPermission(user?.role!, `${deleteRole}:${attribute.incidents}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
-  const accidentId = params.accidentId;
+  const incidentId = params.incidentId;
   try {
     const formData = await request.formData();
     const employeeId = formData.get("employeeId");
     const returnTo = formData.get("returnTo") as string;
-    const { error, status } = await deleteAccidentById({
+    const { error, status } = await deleteIncidentById({
       supabase,
-      id: accidentId ?? "",
+      id: incidentId ?? "",
     });
 
     if (isGoodStatus(status)) {
       return json({
         status: "success",
-        message: "Accident deleted successfully",
+        message: "Incident deleted successfully",
         employeeId,
         returnTo,
         error,
@@ -49,12 +49,12 @@ export async function action({
     return json(
       {
         status: "error",
-        message: "Failed to delete Accident",
+        message: "Failed to delete Incident",
         employeeId,
         returnTo,
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json({
@@ -67,7 +67,7 @@ export async function action({
   }
 }
 
-export default function DeleteAccident() {
+export default function DeleteIncident() {
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -75,10 +75,10 @@ export default function DeleteAccident() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(cacheKeyPrefix.accident);
+        clearCacheEntry(cacheKeyPrefix.incidents);
         toast({
           title: "Success",
-          description: actionData?.message || "Accident deleted",
+          description: actionData?.message || "Incident deleted",
           variant: "success",
         });
       } else {
@@ -87,11 +87,11 @@ export default function DeleteAccident() {
           description:
             actionData?.error ??
             actionData?.message ??
-            "Accident delete failed",
+            "Incident delete failed",
           variant: "destructive",
         });
       }
-      navigate(actionData?.returnTo ?? "/incidents/accidents");
+      navigate(actionData?.returnTo ?? "/events/incidents");
     }
   }, [actionData]);
 

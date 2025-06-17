@@ -1,7 +1,7 @@
 import { formatUTCDate } from "@canny_ecosystem/utils";
 import type {
   EmployeeDatabaseRow,
-  AccidentsDatabaseRow,
+  IncidentsDatabaseRow,
   TypedSupabaseClient,
   InferredType,
   EmployeeProjectAssignmentDatabaseRow,
@@ -9,20 +9,20 @@ import type {
   ProjectDatabaseRow,
 } from "../types";
 
-export type AccidentFilters = {
+export type IncidentFilters = {
   date_start?: string | undefined | null;
   date_end?: string | undefined | null;
-  status?: AccidentsDatabaseRow["status"];
-  location_type?: AccidentsDatabaseRow["location_type"];
-  category?: AccidentsDatabaseRow["category"];
-  severity?: AccidentsDatabaseRow["severity"];
+  status?: IncidentsDatabaseRow["status"];
+  location_type?: IncidentsDatabaseRow["location_type"];
+  category?: IncidentsDatabaseRow["category"];
+  severity?: IncidentsDatabaseRow["severity"];
   name?: string | undefined | null;
   project?: string | undefined | null;
   project_site?: string | undefined | null;
 };
 
-export type AccidentsDatabaseType = Pick<
-  AccidentsDatabaseRow,
+export type IncidentsDatabaseType = Pick<
+  IncidentsDatabaseRow,
   | "id"
   | "title"
   | "date"
@@ -33,6 +33,7 @@ export type AccidentsDatabaseType = Pick<
   | "status"
   | "description"
   | "medical_diagnosis"
+  | "action_taken"
 > & {
   employees: Pick<
     EmployeeDatabaseRow,
@@ -59,7 +60,7 @@ export type AccidentsDatabaseType = Pick<
   };
 };
 
-export async function getAccidentsByCompanyId({
+export async function getIncidentsByCompanyId({
   supabase,
   companyId,
   params,
@@ -71,7 +72,7 @@ export async function getAccidentsByCompanyId({
     to: number;
     sort?: [string, "asc" | "desc"];
     searchQuery?: string;
-    filters?: AccidentFilters | null;
+    filters?: IncidentFilters | null;
   };
 }) {
   const { from, to, sort, searchQuery, filters } = params;
@@ -98,19 +99,22 @@ export async function getAccidentsByCompanyId({
     "status",
     "description",
     "medical_diagnosis",
+    "action_taken",
   ] as const;
 
   const query = supabase
-    .from("accidents")
+    .from("incidents")
     .select(
       `${columns.join(
-        ",",
-      )},employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
-      }(project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
+        ","
+      )},employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${
+        project ? "inner" : "left"
+      }(project_sites!${project ? "inner" : "left"}(id, name, projects!${
+        project ? "inner" : "left"
       }(id, name))))`,
       {
         count: "exact",
-      },
+      }
     )
     .eq("employees.company_id", companyId);
 
@@ -129,7 +133,7 @@ export async function getAccidentsByCompanyId({
           `first_name.ilike.*${searchQueryElement}*,middle_name.ilike.*${searchQueryElement}*,last_name.ilike.*${searchQueryElement}*,employee_code.ilike.*${searchQueryElement}*`,
           {
             referencedTable: "employees",
-          },
+          }
         );
       }
     } else {
@@ -137,7 +141,7 @@ export async function getAccidentsByCompanyId({
         `first_name.ilike.*${searchQuery}*,middle_name.ilike.*${searchQuery}*,last_name.ilike.*${searchQuery}*,employee_code.ilike.*${searchQuery}*`,
         {
           referencedTable: "employees",
-        },
+        }
       );
     }
   }
@@ -168,29 +172,29 @@ export async function getAccidentsByCompanyId({
   if (project) {
     query.eq(
       "employees.employee_project_assignment.project_sites.projects.name",
-      project,
+      project
     );
   }
   if (project_site) {
     query.eq(
       "employees.employee_project_assignment.project_sites.name",
-      project_site,
+      project_site
     );
   }
 
   const { data, count, error } = await query.range(from, to);
   if (error) {
-    console.error("getAccidentsByCompanyId Error", error);
+    console.error("getIncidentsByCompanyId Error", error);
   }
   return { data, meta: { count: count }, error };
 }
 
-export async function getAccidentsById({
+export async function getIncidentsById({
   supabase,
-  accidentId,
+  incidentId,
 }: {
   supabase: TypedSupabaseClient;
-  accidentId: string;
+  incidentId: string;
 }) {
   const columns = [
     "id",
@@ -204,18 +208,19 @@ export async function getAccidentsById({
     "status",
     "description",
     "medical_diagnosis",
+    "action_taken",
   ] as const;
 
   const { data, error } = await supabase
-    .from("accidents")
+    .from("incidents")
     .select(`${columns.join(",")}`, {
       count: "exact",
     })
-    .eq("id", accidentId)
-    .single<InferredType<AccidentsDatabaseRow, (typeof columns)[number]>>();
+    .eq("id", incidentId)
+    .single<InferredType<IncidentsDatabaseRow, (typeof columns)[number]>>();
 
   if (error) {
-    console.error("getAccidentsById Error", error);
+    console.error("getIncidentsById Error", error);
   }
 
   return { data, error };

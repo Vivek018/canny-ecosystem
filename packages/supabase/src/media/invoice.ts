@@ -71,7 +71,7 @@ export async function addOrUpdateInvoiceWithProof({
         };
       }
 
-      return { insertStatus, error: null };
+      return { status: insertStatus, error: null };
     }
     if (route === "update") {
       const { status: updateStatus, error: updateError } =
@@ -92,7 +92,7 @@ export async function addOrUpdateInvoiceWithProof({
         };
       }
 
-      return { updateStatus, error: null };
+      return { status: updateStatus, error: null };
     }
   }
 

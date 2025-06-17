@@ -19,20 +19,20 @@ import { attribute, DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
-export const DeleteAccident = ({ id }: { id: string }) => {
+export const DeleteIncident = ({ id }: { id: string }) => {
   const { role } = useUser();
   const [isLoading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [inputError, setInputError] = useState<string[]>([]);
   const submit = useSubmit();
 
-  const handleCancleAccident = () => {
+  const handleCancleIncident = () => {
     setInputError([]);
     setInputValue("");
     setLoading(false);
   };
 
-  const handleDeleteAccident = (
+  const handleDeleteIncident = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (inputValue === DELETE_TEXT) {
@@ -41,7 +41,7 @@ export const DeleteAccident = ({ id }: { id: string }) => {
         {},
         {
           method: "post",
-          action: `/incidents/accidents/${id}/delete-accident`,
+          action: `/events/incidents/${id}/delete-incident`,
           replace: true,
         },
       );
@@ -57,17 +57,17 @@ export const DeleteAccident = ({ id }: { id: string }) => {
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "text-[13px] h-9 hidden",
-          hasPermission(role, `${deleteRole}:${attribute.accidents}`) && "flex",
+          hasPermission(role, `${deleteRole}:${attribute.incidents}`) && "flex",
         )}
       >
-        Delete Accident
+        Delete Incident
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
             This action cannot be undone. This will permanently delete your
-            Accident and remove it's data from our servers.
+            Incident and remove it's data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="py-4">
@@ -94,13 +94,13 @@ export const DeleteAccident = ({ id }: { id: string }) => {
           <ErrorList errors={inputError} />
         </div>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={handleCancleAccident}>
+          <AlertDialogCancel onClick={handleCancleIncident}>
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
             className={cn(buttonVariants({ variant: "destructive" }))}
-            onClick={handleDeleteAccident}
-            onSelect={handleDeleteAccident}
+            onClick={handleDeleteIncident}
+            onSelect={handleDeleteIncident}
           >
             {isLoading ? "Deleting..." : "Delete"}
           </AlertDialogAction>

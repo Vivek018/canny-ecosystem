@@ -28,6 +28,7 @@ import {
   reportedOnArray,
   caseStatusArray,
   reportedByArray,
+  SIZE_1MB,
 } from "@canny_ecosystem/utils";
 import {
   Card,
@@ -48,7 +49,10 @@ import { createCase } from "@canny_ecosystem/supabase/mutations";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { clearCacheEntry } from "@/utils/cache";
-import type { CasesDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import type {
+  CasesDatabaseInsert,
+  CasesDatabaseUpdate,
+} from "@canny_ecosystem/supabase/types";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { safeRedirect } from "@/utils/server/http.server";
@@ -62,6 +66,9 @@ import {
 } from "@canny_ecosystem/supabase/queries";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
+import { parseMultipartFormData } from "@remix-run/server-runtime/dist/formData";
+import { createMemoryUploadHandler } from "@remix-run/server-runtime/dist/upload/memoryUploadHandler";
+import { addOrUpdateCaseWithDocument } from "@canny_ecosystem/supabase/media";
 
 export const CREATE_CASES_TAG = "Create-Case";
 
@@ -205,15 +212,19 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export async function action({
   request,
 }: ActionFunctionArgs): Promise<Response> {
+  const { supabase } = getSupabaseWithHeaders({ request });
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
-    const formData = await request.formData();
+    const formData = await parseMultipartFormData(
+      request,
+      createMemoryUploadHandler({ maxPartSize: SIZE_1MB })
+    );
     const submission = parseWithZod(formData, { schema: CaseSchema });
 
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -255,9 +266,35 @@ export async function action({
       data.reported_on_site_id = undefined;
     }
 
+    if (submission.value.document) {
+      const { error, status } = await addOrUpdateCaseWithDocument({
+        caseData: submission.value as CasesDatabaseInsert,
+        companyId,
+        document: submission.value.document as File,
+        supabase,
+        route: "add",
+      });
+
+      if (isGoodStatus(status!)) {
+        return json({
+          status: "success",
+          message: "Case registered successfully",
+          error: null,
+          returnTo: "/events/cases",
+        });
+      }
+
+      return json({
+        status: "error",
+        message: "Error creating Case",
+        error,
+        returnTo: "/events/cases",
+      });
+    }
+
     const { status, error } = await createCase({
       supabase,
-      data,
+      data: data,
     });
 
     if (isGoodStatus(status)) {
@@ -265,7 +302,7 @@ export async function action({
         status: "success",
         message: "Case registered successfully",
         error: null,
-        returnTo: "/incidents/cases",
+        returnTo: "/events/cases",
       });
     }
 
@@ -276,7 +313,7 @@ export async function action({
         error,
         returnTo: DEFAULT_ROUTE,
       },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json(
@@ -286,7 +323,7 @@ export async function action({
         error,
         returnTo: DEFAULT_ROUTE,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -337,6 +374,7 @@ export default function CreateCase({
     defaultValue: {
       ...initialValues,
       company_id: companyId,
+      document: undefined,
     },
   });
 
@@ -370,19 +408,19 @@ export default function CreateCase({
     if (updateValues) {
       searchParams.set(
         "reported_by_project",
-        updateValues.reported_by_project_id ?? "",
+        updateValues.reported_by_project_id ?? ""
       );
       searchParams.set(
         "reported_by_site",
-        updateValues.reported_by_site_id ?? "",
+        updateValues.reported_by_site_id ?? ""
       );
       searchParams.set(
         "reported_on_project",
-        updateValues.reported_on_project_id ?? "",
+        updateValues.reported_on_project_id ?? ""
       );
       searchParams.set(
         "reported_on_site",
-        updateValues.reported_on_site_id ?? "",
+        updateValues.reported_on_site_id ?? ""
       );
     }
     setSearchParams(searchParams);
@@ -391,7 +429,12 @@ export default function CreateCase({
   return (
     <section className="flex flex-col w-full mx-auto lg:px-10 xl:px-14 2xl:px-40 py-4">
       <FormProvider context={form.context}>
-        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
+        <Form
+          method="POST"
+          encType="multipart/form-data"
+          {...getFormProps(form)}
+          className="flex flex-col"
+        >
           <Card>
             <CardHeader>
               <CardTitle>{updateValues ? "Update" : "Register"} Case</CardTitle>
@@ -419,7 +462,7 @@ export default function CreateCase({
                   key={resetKey + 1}
                   className="capitalize"
                   options={transformStringArrayIntoOptions(
-                    caseTypeArray as unknown as string[],
+                    caseTypeArray as unknown as string[]
                   )}
                   inputProps={{
                     ...getInputProps(fields.case_type, { type: "text" }),
@@ -456,7 +499,7 @@ export default function CreateCase({
                   key={resetKey}
                   className="capitalize"
                   options={transformStringArrayIntoOptions(
-                    caseLocationTypeArray as unknown as string[],
+                    caseLocationTypeArray as unknown as string[]
                   )}
                   inputProps={{
                     ...getInputProps(fields.location_type, { type: "text" }),
@@ -485,7 +528,7 @@ export default function CreateCase({
                   key={resetKey + 1}
                   className="capitalize col-span-2"
                   options={transformStringArrayIntoOptions(
-                    reportedByArray as unknown as string[],
+                    reportedByArray as unknown as string[]
                   )}
                   inputProps={{
                     ...getInputProps(fields.reported_by, { type: "text" }),
@@ -593,7 +636,7 @@ export default function CreateCase({
                   key={resetKey + 7}
                   className="capitalize col-span-2"
                   options={transformStringArrayIntoOptions(
-                    reportedOnArray as unknown as string[],
+                    reportedOnArray as unknown as string[]
                   )}
                   inputProps={{
                     ...getInputProps(fields.reported_on, { type: "text" }),
@@ -702,7 +745,7 @@ export default function CreateCase({
                   key={resetKey + 12}
                   className="capitalize"
                   options={transformStringArrayIntoOptions(
-                    caseStatusArray as unknown as string[],
+                    caseStatusArray as unknown as string[]
                   )}
                   inputProps={{
                     ...getInputProps(fields.status, { type: "text" }),
@@ -717,9 +760,8 @@ export default function CreateCase({
                   inputProps={{
                     ...getInputProps(fields.document, { type: "file" }),
 
-                    placeholder: replaceUnderscore(
-                      `Enter ${fields.document.name}`,
-                    ),
+                    placeholder:
+                      replaceUnderscore(`Enter ${fields.document.name}`) ?? "",
                   }}
                   labelProps={{
                     children: replaceUnderscore(fields.document.name),
@@ -732,9 +774,10 @@ export default function CreateCase({
                   ...getInputProps(fields.court_case_reference, {
                     type: "text",
                   }),
-                  placeholder: replaceUnderscore(
-                    `Enter ${fields.court_case_reference.name}`,
-                  ),
+                  placeholder:
+                    replaceUnderscore(
+                      `Enter ${fields.court_case_reference.name}`
+                    ) ?? "",
                   required: false,
                 }}
                 labelProps={{
@@ -747,7 +790,7 @@ export default function CreateCase({
                   inputProps={{
                     ...getInputProps(fields.amount_given, { type: "number" }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.amount_given.name,
+                      fields.amount_given.name
                     )}`,
                     required: false,
                   }}
@@ -762,7 +805,7 @@ export default function CreateCase({
                       type: "number",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.amount_received.name,
+                      fields.amount_received.name
                     )}`,
                     required: false,
                   }}

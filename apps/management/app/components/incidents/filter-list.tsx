@@ -1,11 +1,11 @@
-import type { AccidentFilters } from "@canny_ecosystem/supabase/queries";
+import type { IncidentFilters } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { formatDate, formatDateRange } from "@canny_ecosystem/utils";
 import { useSearchParams } from "@remix-run/react";
 
 type Props = {
-  filters: AccidentFilters | undefined | null;
+  filters: IncidentFilters | undefined | null;
 };
 
 export function FilterList({ filters }: Props) {

@@ -12,6 +12,7 @@ import {
   CaseSchema,
   hasPermission,
   isGoodStatus,
+  SIZE_1MB,
   updateRole,
 } from "@canny_ecosystem/utils";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
@@ -31,6 +32,10 @@ import {
 } from "@canny_ecosystem/supabase/queries";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import { parseMultipartFormData } from "@remix-run/server-runtime/dist/formData";
+import { createMemoryUploadHandler } from "@remix-run/server-runtime/dist/upload/memoryUploadHandler";
+import { addOrUpdateCaseWithDocument } from "@canny_ecosystem/supabase/media";
+import type { CasesDatabaseInsert } from "@canny_ecosystem/supabase/types";
 
 export const UPDATE_CASES_TAG = "Update-Case";
 
@@ -193,7 +198,13 @@ export async function action({
 }: ActionFunctionArgs): Promise<Response> {
   const caseId = params.caseId;
   const { supabase } = getSupabaseWithHeaders({ request });
-  const formData = await request.formData();
+
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+
+  const formData = await parseMultipartFormData(
+    request,
+    createMemoryUploadHandler({ maxPartSize: SIZE_1MB })
+  );
   const submission = parseWithZod(formData, { schema: CaseSchema });
 
   if (submission.status !== "success") {
@@ -241,6 +252,49 @@ export async function action({
     data.reported_on_project_id = undefined;
     data.reported_on_company_id = undefined;
     data.reported_on_site_id = undefined;
+  }
+
+  if (data.document) {
+    const { error } = await addOrUpdateCaseWithDocument({
+      caseData: submission.value as CasesDatabaseInsert,
+      companyId,
+      document: submission.value.document as File,
+      supabase,
+      route: "update",
+    });
+
+    if (!error) {
+      return json({
+        status: "success",
+        message: "Invoice updated successfully",
+        error: null,
+      });
+    }
+
+    const { status, error: updateError } = await updateCaseById({
+      supabase,
+      data: {
+        ...submission.value,
+      },
+    });
+    if (!updateError) {
+      return json(
+        {
+          status: "success",
+          message: "Invoice Updated",
+          error: null,
+        },
+        { status: 400 }
+      );
+    }
+    return json(
+      {
+        status: status,
+        message: "Invoice Updated Failed",
+        error: error,
+      },
+      { status: 400 }
+    );
   }
 
   const { status, error } = await updateCaseById({
@@ -298,7 +352,7 @@ export default function UpdateCases() {
           variant: "destructive",
         });
       }
-      navigate("/incidents/cases");
+      navigate("/events/cases");
     }
   }, [actionData]);
 
