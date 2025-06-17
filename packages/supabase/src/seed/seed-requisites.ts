@@ -169,7 +169,7 @@ export async function seedRequisitesForCompanyCreation({
   // await createStatutoryBonus({
   //   supabase,
   //   data: {
-  //     percentage: 0.08,
+  //     percentage: 0.083,
   //     payment_frequency: "monthly",
   //     is_default: true,
   //     company_id: companyId!,

@@ -31,82 +31,25 @@ export const sideNavList = [
     icon: "table",
   },
   { name: "Approvals", link: "/approvals", icon: "check-circle" },
-  // {
-    //   name: "Payment Components",
-    //   link: "/payment-components",
-    //   icon: "input",
-    // },
-    { name: "Group 3" },
-    {
-      name: "Time Tracking",
-      link: "/time-tracking",
-      icon: "lab-timer",
+  { name: "Group 3" },
+  {
+    name: "Time Tracking",
+    link: "/time-tracking",
+    icon: "lab-timer",
+  },
+  {
+      name: "Components",
+      link: "/payment-components",
+      icon: "input",
     },
   { name: "Events", link: "/events", icon: "exclaimation-triangle" },
-  { name: "Reports", link: "/reports", icon: "report" },
+  // { name: "Reports", link: "/reports", icon: "report" },
   { name: "Group 5" },
   { name: "Projects", link: "/projects", icon: "project" },
   {
     name: "Settings",
     link: "/settings",
     icon: "setting",
-  },
-] as NavList[];
-
-export const navList = [
-  ...sideNavList,
-  { name: "Analytics", link: "/analytics", icon: "chart" },
-
-  { name: "Users", link: "/users", icon: "avatar" },
-  {
-    name: "Profile",
-    link: "/profile",
-    icon: "person",
-  },
-  {
-    name: "Add Users",
-    link: "/users/upsert",
-    icon: "plus-circled",
-  },
-  {
-    name: "Add Employee",
-    link: "/employees/upsert",
-    icon: "plus-circled",
-  },
-  {
-    name: "Add Document",
-    link: "/documents/upsert",
-    icon: "plus-circled",
-  },
-  {
-    name: "Add Company",
-    link: "/companies/upsert",
-    icon: "plus-circled",
-  },
-  {
-    name: "Add Advance Payment",
-    link: "/advances/upsert",
-    icon: "plus-circled",
-  },
-  {
-    name: "Add Payment Field",
-    link: "/payment-components/payment-fields/upsert",
-    icon: "plus-circled",
-  },
-  {
-    name: "Add Project",
-    link: "/projects/upsert",
-    icon: "plus-circled",
-  },
-  {
-    name: "Add Project Location",
-    link: "/project_locations/upsert",
-    icon: "plus-circled",
-  },
-  {
-    name: "Add Vehicle",
-    link: "/vehicles/upsert",
-    icon: "plus-circled",
   },
 ] as NavList[];
 

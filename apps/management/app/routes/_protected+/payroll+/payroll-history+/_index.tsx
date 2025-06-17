@@ -211,7 +211,7 @@ export default function PayrollHistoryIndex() {
                     >
                       No payrolls found
                     </CommandEmpty>
-                    <CommandList className="max-h-full py-6 overflow-x-visible overflow-y-visible">
+                    <CommandList className="max-h-full py-4 overflow-x-visible overflow-y-visible">
                       <CommandGroup className="p-0 overflow-visible">
                         <div className="w-full grid gap-8 grid-cols-1">
                           {data?.map((payroll: any) => {
