@@ -2,7 +2,7 @@ import { DeleteChat } from "@/components/chat/delete-chat";
 import { Results } from "@/components/chat/result";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { runGeneratedSQLQuery } from "@/utils/ai/chat";
-import { clearCacheEntry, clearExactCacheEntry, clientCaching } from "@/utils/cache";
+import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { useUser } from "@/utils/user";
@@ -60,6 +60,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
+  const returnTo = "/chat/save-chat";
+
   if (!hasPermission(user?.role!, `${deleteRole}:${attribute.chat}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
@@ -75,6 +77,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         status: "success",
         message: "Chat deleted successfully",
         chatId,
+        returnTo,
         error,
       });
     }
@@ -84,6 +87,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         status: "error",
         message: "Failed to delete chat",
         chatId,
+        returnTo,
         error,
       },
       { status: 500 }
@@ -93,6 +97,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
       status: "error",
       message: "An unexpected error occurred",
       chatId,
+      returnTo,
       error,
     });
   }
@@ -112,8 +117,6 @@ export default function Chatbox() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(cacheKeyPrefix.chatbox)
-        clearExactCacheEntry(cacheKeyPrefix.save_chat)
         clearExactCacheEntry(cacheKeyPrefix.save_chat_id + chatId);
         toast({
           title: "Success",
@@ -128,7 +131,7 @@ export default function Chatbox() {
           variant: "destructive",
         });
       }
-      navigate("/chat/chatbox");
+      navigate(actionData.returnTo ?? "/chat/save-chat");
     }
   }, [actionData]);
 
@@ -190,7 +193,7 @@ export default function Chatbox() {
                 className={cn(
                   "h-9 px-3.5 rounded-sm bg-secondary text-secondary-foreground grid place-items-center",
                   !hasPermission(
-                    `${role}`,
+                    role,
                     `${deleteRole}:${attribute.chat}`,
                   ) && "hidden",
                 )}

@@ -59,6 +59,21 @@ export function useSearchState({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const clearSearch = () => {
+    setStateData([]);
+    setStateConfig(null);
+    setPrompt("");
+    searchParams.delete("prompt");
+    setSearchParams(searchParams);
+  };
+
+  const refreshSearch = () => {
+    setStateData([]);
+    setStateConfig(null);
+    setIsSubmitting(true);
+    navigate(0);
+  };
+
   useEffect(() => {
     if (data?.length) {
       setStateData(data);
@@ -78,6 +93,16 @@ export function useSearchState({
       )
     );
   }, [navigation.state]);
+
+  useHotkeys(
+    "esc",
+    () => {
+      clearSearch();
+    },
+    {
+      enableOnFormTags: true,
+    }
+  );
 
   const handleSearch = (evt: React.ChangeEvent<HTMLInputElement>) => {
     const value = evt.target.value;
@@ -112,34 +137,11 @@ export function useSearchState({
       method: "POST"
     })
 
-    setIsSubmitting(false);
-  }
-
-
-  useHotkeys(
-    "esc",
-    () => {
-      clearSearch();
-    },
-    {
-      enableOnFormTags: true,
-    }
-  );
-
-  const clearSearch = () => {
     setStateData([]);
     setStateConfig(null);
     setPrompt("");
-    searchParams.delete("prompt");
-    setSearchParams(searchParams);
-  };
-
-  const refreshSearch = () => {
-    setStateData([]);
-    setStateConfig(null);
-    setIsSubmitting(true);
-    navigate(0);
-  };
+    setIsSubmitting(false);
+  }
 
   return {
     stateData,

@@ -1,5 +1,4 @@
-import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
-import { clientCaching } from "@/utils/cache";
+import { DEFAULT_ROUTE } from "@/constant";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { getChatsByUserId } from "@canny_ecosystem/supabase/queries";
@@ -8,7 +7,7 @@ import { SecondarySidebar } from "@canny_ecosystem/ui/secondary-sidebar";
 import { hasPermission, readRole } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { defer, type LoaderFunctionArgs } from "@remix-run/node";
-import { Outlet, useLoaderData, type ClientLoaderFunctionArgs } from "@remix-run/react";
+import { Outlet, useLoaderData } from "@remix-run/react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {
@@ -33,14 +32,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return defer({ data: null, error: error });
   }
 }
-
-export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return clientCaching(
-    cacheKeyPrefix.save_chat,
-    args
-  );
-}
-clientLoader.hydrate = true;
 
 export default function SaveChat() {
   const { data } = useLoaderData<typeof loader>();

@@ -2,7 +2,7 @@ import { ChatboxComponent } from "@/components/chat/chatbox-component";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { generateQuery, runGeneratedSQLQuery } from "@/utils/ai/chat";
 import { generateChartConfig } from "@/utils/ai/chat/chart";
-import { clientCaching } from "@/utils/cache";
+import { clearCacheEntry, clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
@@ -18,19 +18,20 @@ import { useEffect } from "react";
 const suggestedPrompts = [
   "Employees who started working after 2020",
   "Show employees completing more than 5 years of service in the next 6 months",
-  "List employees whose work anniversaries are in the current month",
   "List employees with no address",
-  "List project sites with number of local and outstation employees based on employee vs site location",
+  "Employees missing emergency contact or guardian details",
+  "City wise breakdown of employees with total count",
   "Employees with incomplete statutory details",
   "List employees whose birthdays are coming up this month",
   "List project sites with gender distribution count individually",
   "Identify employees turning above 50 this calendar year",
-  "Employees with missing bank information",
-  "Employees missing emergency contact or guardian details",
-  "State-wise breakdown from of employees with total count",
+  "Employees who have not been assigned to any project since joining",
+  "List project sites with number of local and outstation employees based on employee vs site location",
   "Predict which employees are due for a promotion based on tenure and education",
-  "Employees with postgraduate degrees and more than 10 years of work experience",
-  "List all employees showing whether they are local or outstation based on their work location"
+  "Employees with missing bank information",
+  "Top 20 oldest employees",
+  "Employees with post-graduate degrees and more than 10 years of work experience",
+  "List all employees showing whether they are local or outstation based on their work location with their home city and work city"
 ];
 
 export const employeeSystemPrompt = `
@@ -102,13 +103,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
     }
 
     const url = new URL(request.url);
-
     const searchParams = new URLSearchParams(url.searchParams);
     const prompt = searchParams.get("prompt") ?? "";
     let dataExistsInDb = false;
 
     if (!prompt) {
-      return defer({ query: null, data: [], config: null, error: null, dataExistsInDb });
+      return defer({ prompt, query: null, data: [], config: null, error: null, dataExistsInDb });
     }
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
@@ -128,7 +128,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const { query, error } = await generateQuery({ input: promptWithCompany, tablesData, companyId, systemPrompt: employeeSystemPrompt });
 
     if (query === undefined || error) {
-      return defer({ query: null, data: null, config: null, error: error ?? "Error generating query", dataExistsInDb });
+      return defer({ prompt, query: null, data: null, config: null, error: error ?? "Error generating query", dataExistsInDb });
     }
 
     const { data, error: sqlError } = await runGeneratedSQLQuery({ originalQuery: query });
@@ -136,29 +136,33 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     const { config } = await generateChartConfig(data ?? [], prompt);
 
-    return defer({ query, data, config, error: sqlError ?? null, dataExistsInDb });
+    return defer({ prompt, query, data, config, error: sqlError ?? null, dataExistsInDb });
   } catch (error) {
     console.error("Error in action function:", error);
-    return defer({ query: null, data: null, config: null, error: error, dataExistsInDb: false });
+    return defer({ prompt: null, query: null, data: null, config: null, error: error, dataExistsInDb: false });
   }
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
+  const searchParams = new URLSearchParams(url.searchParams);
+  const prompt = searchParams.get("prompt") ?? "";
   return clientCaching(
-    `${cacheKeyPrefix.chatbox}${url.searchParams.toString()}`,
+    `${cacheKeyPrefix.chatbox_employee}${prompt}`,
     args
   );
 }
 clientLoader.hydrate = true;
 
 export default function EmployeeChat() {
-  const { query, data, config, error, dataExistsInDb } = useLoaderData<typeof loader>();
+  const { prompt, query, data, config, error, dataExistsInDb } = useLoaderData<typeof loader>();
 
   const { toast } = useToast();
 
   useEffect(() => {
     if (error) {
+      clearCacheEntry(cacheKeyPrefix.chatbox)
+      clearExactCacheEntry(cacheKeyPrefix.chatbox_employee + prompt)
       toast({
         title: "Error",
         description:
@@ -170,6 +174,13 @@ export default function EmployeeChat() {
   }, [error]);
 
   return (
-    <ChatboxComponent query={query} suggestedPrompts={suggestedPrompts} data={data} config={config} returnTo="/chat/chatbox/employee" dataExistsInDb={dataExistsInDb} />
+    <ChatboxComponent
+      query={query}
+      suggestedPrompts={suggestedPrompts}
+      data={data}
+      config={config}
+      returnTo={"/chat/chatbox/employee"}
+      dataExistsInDb={dataExistsInDb}
+    />
   )
 }

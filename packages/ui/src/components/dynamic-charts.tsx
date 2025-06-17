@@ -101,7 +101,7 @@ export function DynamicChart({
               tickFormatter={formatter}
               textAnchor="end"
             >
-              <Label value={xLabel} offset={-10} position="insideBottom" />
+              <Label value={xLabel} offset={-5} position="insideBottom" />
             </XAxis>
             <YAxis tickFormatter={formatter}>
               <Label value={yLabel} offset={-20} angle={-90} position="insideLeft" />
@@ -133,7 +133,7 @@ export function DynamicChart({
               textAnchor="end"
               height={70}
             >
-              <Label value={xLabel} offset={-10} position="insideBottom" />
+              <Label value={xLabel} offset={-5} position="insideBottom" />
             </XAxis>
             <YAxis>
               <Label value={yLabel} angle={-90} position="insideLeft" />

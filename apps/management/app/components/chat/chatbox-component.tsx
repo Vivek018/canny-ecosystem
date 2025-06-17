@@ -70,12 +70,23 @@ export function ChatboxComponent({
               spellCheck='false'
             />
           </>
-          <Button type="submit" className={cn("h-full px-5", (stateData?.length && prompt?.length && (prompt === searchPrompt)) && "hidden")} disabled={!prompt || isSubmitting} variant={"default"} onClick={handleSubmit}>
+          <Button
+            type="submit"
+            className={cn("h-full px-5", (stateData?.length && prompt?.length && (prompt === searchPrompt)) && "hidden")}
+            disabled={!prompt || isSubmitting}
+            variant={"default"}
+            onClick={handleSubmit}
+          >
             <Icon name="check" size="md" />
           </Button>
         </form>
         <div className={cn("h-full flex flex-row items-center justify-center gap-3", (!stateData?.length) && "hidden")}>
-          <Button className={cn("h-full px-5", prompt?.length && (prompt !== searchPrompt) && "hidden")} disabled={isSubmitting} variant={"default"} onClick={refreshSearch}>
+          <Button
+            className={cn("h-full px-5", prompt?.length && (prompt !== searchPrompt) && "hidden")}
+            disabled={isSubmitting}
+            variant={"default"}
+            onClick={refreshSearch}
+          >
             <Icon name="update" size="sm" />
           </Button>
           <Button
@@ -89,7 +100,12 @@ export function ChatboxComponent({
           >
             <Icon name={dataExistsInDb ? "bookmark-filled" : "bookmark"} size="sm" />
           </Button>
-          <Button className="h-full px-5" disabled={isSubmitting} variant={"muted"} onClick={clearSearch}>
+          <Button
+            className="h-full px-5"
+            disabled={isSubmitting}
+            variant={"muted"}
+            onClick={clearSearch}
+          >
             <Icon name="cross" size="sm" />
           </Button>
         </div>
@@ -99,15 +115,15 @@ export function ChatboxComponent({
         "w-full h-full flex flex-col overflow-hidden",
         searchPrompt && "hidden"
       )}>
-        <CardHeader className="py-3 text-2xl font-bold capitalize tracking-wide">
+        <CardHeader className="py-3.5 text-xl font-bold capitalize tracking-wider">
           Try These Prompts:
         </CardHeader>
         <div className="flex-1 overflow-auto">
-          <CardContent className="w-full flex flex-wrap gap-x-3 gap-y-3">
+          <CardContent className="w-full flex flex-wrap gap-x-5 gap-y-3">
             {suggestedPrompts?.map((prompt, index) => (
               <div
                 key={prompt + index.toString()}
-                className="w-max h-min text-sm tracking-wide cursor-pointer text-muted-foreground hover:text-foreground px-4 py-2.5 border dark:border-muted-foreground/40 rounded-md hover:bg-accent transition-colors"
+                className="w-max h-min text-sm tracking-wide cursor-pointer text-muted-foreground hover:text-foreground px-5 py-2.5 border dark:border-muted-foreground/40 rounded-md hover:bg-accent transition-colors"
                 tabIndex={0}
                 role="button"
                 onClick={() => {

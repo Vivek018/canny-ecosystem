@@ -1,5 +1,5 @@
 import { cacheKeyPrefix, chatCategories, DEFAULT_ROUTE } from "@/constant";
-import { clearCacheEntry } from "@/utils/cache";
+import { clearCacheEntry, clearExactCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { createChat } from "@canny_ecosystem/supabase/mutations";
@@ -41,6 +41,7 @@ export async function action({ request }: ActionFunctionArgs) {
         return json({
           status: "error",
           message: (error as any).message.toString(),
+          prompt,
           returnTo,
         });
       }
@@ -48,36 +49,36 @@ export async function action({ request }: ActionFunctionArgs) {
       return json({
         status: "success",
         message: "Chat Saved Successfully",
+        prompt,
         returnTo,
       });
     }
     return json({
       status: "error",
       message: "No user found",
+      prompt,
       returnTo,
     });
   } catch (error) {
     return json({
       status: "error",
       message: error,
+      prompt: "",
       returnTo: "/chat/chatbox",
     });
   }
 }
 
 export default function Chatbox() {
-
   const actionData = useActionData<typeof action>()
 
   const { toast } = useToast();
-
   const navigate = useNavigate();
 
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(cacheKeyPrefix.chatbox);
-        clearCacheEntry(cacheKeyPrefix.save_chat);
+        clearExactCacheEntry(cacheKeyPrefix.chatbox_employee + actionData?.prompt)
         toast({
           title: "Success",
           description: actionData?.message,

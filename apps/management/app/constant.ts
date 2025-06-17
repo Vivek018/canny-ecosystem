@@ -126,7 +126,7 @@ export const cacheKeyPrefix = {
   dashboard: "dashboard",
   chat: "chat",
   chatbox: "chatbox",
-  save_chat: "save-chat",
+  chatbox_employee: "chatbox-employee",
   save_chat_id: "save-chat-id",
   employees_main: "employees-main",
   employees: "employees",
