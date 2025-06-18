@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 type UseAnimateTextScrollOptions = {
   pauseDurationMs?: number;
@@ -23,7 +23,7 @@ export function useAnimateTextScroll(
     let animFrame: number;
     let timeout: NodeJS.Timeout;
 
-    const scrollDistance = content.scrollWidth - container.offsetWidth + 40;
+    let scrollDistance = 0;
 
     const scrollStep = () => {
       currentX -= scrollSpeed;
@@ -41,11 +41,15 @@ export function useAnimateTextScroll(
     };
 
     const handleStartScroll = () => {
-      if (content.scrollWidth > container.offsetWidth) {
-        cancelAnimationFrame(animFrame);
-        clearTimeout(timeout);
-        animFrame = requestAnimationFrame(scrollStep);
-      }
+      if (!container || !content) return;
+
+      scrollDistance = content.scrollWidth - container.offsetWidth;
+
+      if (scrollDistance <= 0) return;
+
+      cancelAnimationFrame(animFrame);
+      clearTimeout(timeout);
+      animFrame = requestAnimationFrame(scrollStep);
     };
 
     const handleStopScroll = () => {

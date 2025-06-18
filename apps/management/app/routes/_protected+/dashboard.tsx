@@ -172,9 +172,10 @@ export default function Dashboard() {
 
   return (
     <>
-      <div ref={containerRef} className={cn("overflow-hidden w-full border-b p-4 bg-primary/15", !notificationData?.text && "hidden")}>
-        <div ref={contentRef} className="text-primary whitespace-nowrap text-sm py-0.5">
+      <div ref={containerRef} className={cn("overflow-hidden w-full border-b bg-primary/15", !notificationData?.text && "hidden")}>
+        <div ref={contentRef} className="text-primary whitespace-nowrap p-4">
           {notificationData?.text}
+          <span aria-hidden className="inline-block w-[17px]" />
         </div>
       </div>
       <section className="w-full p-4 flex flex-col gap-4">
