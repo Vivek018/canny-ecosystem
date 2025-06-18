@@ -19,9 +19,10 @@ export function seedSalaryPayroll(employees: { id: string }[]) {
   });
 
   return {
+    title: faker.word.words(),
     run_date: faker.date.past().toISOString(),
-    status: ["pending", "approved"][faker.number.int({ min: 0, max: 1 })],
-    type: "salary",
+    status: ["pending", "approved"][faker.number.int({ min: 0, max: 1 })] as "pending" | "approved",
+    type: "salary" as const,
     salaryData,
     totalEmployees: employees.length,
     totalNetAmount: salaryData.reduce((sum, entry) => sum + entry.amount, 0),
@@ -35,9 +36,10 @@ export function seedExitPayroll(employees: { id: string }[]) {
   }));
 
   return {
+    title: faker.word.words(),
     run_date: faker.date.past().toISOString(),
-    status: ["pending", "approved"][faker.number.int({ min: 0, max: 1 })],
-    type: "exit",
+    status: ["pending", "approved"][faker.number.int({ min: 0, max: 1 })] as "pending" | "approved",
+    type: "exit" as const,
     exitData,
     totalEmployees: employees.length,
     totalNetAmount: exitData.reduce((sum, emp) => sum + emp.net_pay, 0),
@@ -50,9 +52,10 @@ export function seedReimbursementPayroll(employees: { id: string }[]) {
   }));
 
   return {
+    title: faker.word.words(),
     run_date: faker.date.past().toISOString(),
-    status: ["pending", "approved"][faker.number.int({ min: 0, max: 1 })],
-    type: "reimbursement",
+    status: ["pending", "approved"][faker.number.int({ min: 0, max: 1 })] as "pending" | "approved",
+    type: "reimbursement" as const,
     reimbursementData,
     totalEmployees: employees.length,
     totalNetAmount: reimbursementData.reduce((sum, emp) => sum + emp.amount, 0),

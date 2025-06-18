@@ -6,14 +6,12 @@ import {
   LAZY_LOADING_LIMIT,
   MAX_QUERY_LIMIT,
 } from "@canny_ecosystem/supabase/constant";
-
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import {
   Await,
   type ClientLoaderFunctionArgs,
   defer,
-  Outlet,
   useLoaderData,
 } from "@remix-run/react";
 import { Suspense } from "react";
@@ -41,13 +39,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
-  const { supabase, headers } = getSupabaseWithHeaders({ request });
-  const { user } = await getUserCookieOrFetchUser(request, supabase);
-
-  if (!hasPermission(user?.role!, `${readRole}:${attribute.incidents}`)) {
-    return safeRedirect(DEFAULT_ROUTE, { headers });
-  }
   try {
+    const { supabase, headers } = getSupabaseWithHeaders({ request });
+    const { user } = await getUserCookieOrFetchUser(request, supabase);
+
+    if (!hasPermission(user?.role!, `${readRole}:${attribute.incidents}`)) {
+      return safeRedirect(DEFAULT_ROUTE, { headers });
+    }
     const url = new URL(request.url);
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
     const page = 0;
@@ -159,29 +157,31 @@ export default function IncidentsIndex() {
               {(projectData) => (
                 <Await resolve={projectSitePromise}>
                   {(projectSiteData) => (
-                    <IncidentSearchFilter
-                      disabled={!projectData?.data?.length && noFilters}
-                      projectArray={
-                        projectData?.data?.length
-                          ? projectData?.data?.map((project) => project!.name)
-                          : []
-                      }
-                      projectSiteArray={
-                        projectSiteData?.data?.length
-                          ? projectSiteData?.data?.map((site) => site!.name)
-                          : []
-                      }
-                    />
+                    <>
+                      <IncidentSearchFilter
+                        disabled={!projectData?.data?.length && noFilters}
+                        projectArray={
+                          projectData?.data?.length
+                            ? projectData?.data?.map((project) => project!.name)
+                            : []
+                        }
+                        projectSiteArray={
+                          projectSiteData?.data?.length
+                            ? projectSiteData?.data?.map((site) => site!.name)
+                            : []
+                        }
+                      />
+                      <FilterList filters={filterList} />
+                    </>
                   )}
                 </Await>
               )}
             </Await>
           </Suspense>
-          <FilterList filters={filterList} />
         </div>
         <IncidentActions />
       </div>
-      <Suspense fallback={<LoadingSpinner className="mt-20" />}>
+      <Suspense fallback={<LoadingSpinner className="h-1/3" />}>
         <Await resolve={incidentPromise}>
           {({ data, meta, error }) => {
             if (error) {
@@ -200,6 +200,7 @@ export default function IncidentsIndex() {
               <IncidentsTable
                 data={data ?? []}
                 columns={columns}
+                count={meta?.count ?? 0}
                 query={query}
                 filters={filters}
                 noFilters={noFilters}
@@ -212,7 +213,6 @@ export default function IncidentsIndex() {
           }}
         </Await>
       </Suspense>
-      <Outlet />
     </section>
   );
 }

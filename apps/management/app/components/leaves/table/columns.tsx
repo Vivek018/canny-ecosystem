@@ -63,7 +63,7 @@ export const columns = (
         className={cn("group", isEmployeeRoute && "cursor-default")}
       >
         <p
-          className={cn("truncate w-28", !isEmployeeRoute && "text-primary/80")}
+          className={cn("truncate w-52", !isEmployeeRoute && "text-primary/80")}
         >{`${row.original?.employees?.first_name} ${
           row.original?.employees?.middle_name ?? ""
         } ${row.original?.employees?.last_name ?? ""}`}</p>
@@ -110,7 +110,7 @@ export const columns = (
     header: "Start Date",
     cell: ({ row }) => {
       return (
-        <p className='w-max'>{formatDate(row.original?.start_date) ?? "--"}</p>
+        <p className='w-max'>{formatDate(row.original?.start_date) as any ?? "--"}</p>
       );
     },
   },
@@ -119,7 +119,7 @@ export const columns = (
     header: "End Date",
     cell: ({ row }) => {
       return (
-        <p className='w-max'>{formatDate(row.original?.end_date) ?? "--"}</p>
+        <p className='w-max'>{formatDate(row.original?.end_date) as any ?? "--"}</p>
       );
     },
   },

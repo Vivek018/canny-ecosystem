@@ -32,6 +32,7 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   hasNextPage: boolean;
+  count: number;
   pageSize: number;
   env: SupabaseEnv;
   companyId?: string;
@@ -46,6 +47,7 @@ export function IncidentsTable<TData, TValue>({
   columns,
   data: initialData,
   hasNextPage: initialHasNextPage,
+  count,
   pageSize,
   env,
   companyId,
@@ -87,7 +89,7 @@ export function IncidentsTable<TData, TValue>({
           setData((prevData) => [...prevData, ...data] as TData[]);
         }
         setFrom(to + 1);
-        setHasNextPage(meta?.count! > to);
+        setHasNextPage((meta?.count ?? count) > to);
       } catch {
         setHasNextPage(false);
       }
@@ -165,13 +167,13 @@ export function IncidentsTable<TData, TValue>({
                           className={cn(
                             "px-3 md:px-4 py-4 hidden md:table-cell",
                             cell.column.id === "select" &&
-                              "sticky left-0 min-w-12 max-w-12 bg-card z-10",
+                            "sticky left-0 min-w-12 max-w-12 bg-card z-10",
                             cell.column.id === "employee_code" &&
-                              "sticky left-12 bg-card z-10",
+                            "sticky left-12 bg-card z-10",
                             cell.column.id === "employee_name" &&
-                              "sticky left-48 bg-card z-10",
+                            "sticky left-48 bg-card z-10",
                             cell.column.id === "actions" &&
-                              "sticky right-0 min-w-20 max-w-20 bg-card z-10"
+                            "sticky right-0 min-w-20 max-w-20 bg-card z-10"
                           )}
                         >
                           {flexRender(

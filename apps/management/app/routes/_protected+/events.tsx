@@ -18,14 +18,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${readRole}:${attribute.incidents}`)) {
+  if (!hasPermission(user?.role!, `${readRole}:${attribute.events}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   return {};
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return clientCaching(cacheKeyPrefix.incidents, args);
+  return clientCaching(cacheKeyPrefix.events, args);
 }
 
 clientLoader.hydrate = true;

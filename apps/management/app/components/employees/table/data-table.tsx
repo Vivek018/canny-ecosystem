@@ -77,7 +77,7 @@ export function DataTable<TData, TValue>({
     const sortParam = searchParams.get("sort");
 
     try {
-      const { data } = await getEmployeesByCompanyId({
+      const { data, meta } = await getEmployeesByCompanyId({
         supabase,
         companyId,
         params: {
@@ -92,7 +92,7 @@ export function DataTable<TData, TValue>({
         setData((prevData) => [...prevData, ...data] as TData[]);
       }
       setFrom(to + 1);
-      setHasNextPage(count > to);
+      setHasNextPage((meta?.count ?? count) > to);
     } catch {
       setHasNextPage(false);
     }
@@ -176,15 +176,15 @@ export function DataTable<TData, TValue>({
                               cell.column.id === "education" ||
                               cell.column.id === "gender" ||
                               cell.column.id === "is_active") &&
-                              "hidden md:table-cell",
+                            "hidden md:table-cell",
                             cell.column.id === "select" &&
-                              "sticky left-0 min-w-12 max-w-12 bg-card z-10",
+                            "sticky left-0 min-w-12 max-w-12 bg-card z-10",
                             cell.column.id === "employee_code" &&
-                              "sticky left-12 bg-card z-10",
+                            "sticky left-12 bg-card z-10",
                             cell.column.id === "full_name" &&
-                              "sticky left-48 bg-card z-10",
+                            "sticky left-48 bg-card z-10",
                             cell.column.id === "actions" &&
-                              "sticky right-0 min-w-20 max-w-20 bg-card z-10"
+                            "sticky right-0 min-w-20 max-w-20 bg-card z-10"
                           )}
                         >
                           {flexRender(

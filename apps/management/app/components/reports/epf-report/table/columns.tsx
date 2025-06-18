@@ -1,4 +1,4 @@
-import { formatDate, formatMonthYearDate } from "@canny_ecosystem/utils";
+import { formatMonthYearDate } from "@canny_ecosystem/utils";
 import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 
 import type { ColumnDef } from "@tanstack/react-table";
@@ -79,7 +79,7 @@ export const columns = (): ColumnDef<EPFReportType>[] => [
     header: "PF Account Number",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-28 capitalize">
+        <p className="truncate w-40 capitalize">
           {row.original?.pf_acc_number}
         </p>
       );
@@ -90,7 +90,7 @@ export const columns = (): ColumnDef<EPFReportType>[] => [
     accessorKey: "uan",
     header: "UAN",
     cell: ({ row }) => {
-      return <p className="truncate w-28 capitalize">{row.original?.uan}</p>;
+      return <p className="truncate w-40 capitalize">{row.original?.uan}</p>;
     },
   },
   {
@@ -99,7 +99,7 @@ export const columns = (): ColumnDef<EPFReportType>[] => [
     header: "PF Wage",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-28 capitalize">{row.original?.pf_wage}</p>
+        <p className="truncate w-40 capitalize">{row.original?.pf_wage}</p>
       );
     },
   },
@@ -109,7 +109,7 @@ export const columns = (): ColumnDef<EPFReportType>[] => [
     header: "Employee PF Amount",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-28 capitalize">
+        <p className="truncate w-40 capitalize">
           {row.original?.employee_pf_amount}
         </p>
       );
@@ -121,7 +121,7 @@ export const columns = (): ColumnDef<EPFReportType>[] => [
     header: "Employee VPF Amount",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-28 capitalize">
+        <p className="truncate w-40 capitalize">
           {row.original?.employee_vpf_amount}
         </p>
       );
@@ -133,7 +133,7 @@ export const columns = (): ColumnDef<EPFReportType>[] => [
     header: "Employer PF Amount",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-28 capitalize">
+        <p className="truncate w-40 capitalize">
           {row.original?.employer_pf_amount}
         </p>
       );
@@ -145,7 +145,7 @@ export const columns = (): ColumnDef<EPFReportType>[] => [
     header: "Employer EPS Amount",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-28 capitalize">
+        <p className="truncate w-40 capitalize">
           {row.original?.employer_eps_amount}
         </p>
       );
@@ -157,7 +157,7 @@ export const columns = (): ColumnDef<EPFReportType>[] => [
     header: "Employer EDLI",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-28 capitalize">
+        <p className="truncate w-40 capitalize">
           {row.original?.employer_edli_contribution}
         </p>
       );
@@ -169,7 +169,7 @@ export const columns = (): ColumnDef<EPFReportType>[] => [
     header: "Employer PF admin charges",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-28 capitalize">
+        <p className="truncate w-40 capitalize">
           {row.original?.employer_pf_admin_charges}
         </p>
       );
@@ -181,7 +181,7 @@ export const columns = (): ColumnDef<EPFReportType>[] => [
     header: "Total Contribution",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-28 capitalize">
+        <p className="truncate w-40 capitalize">
           {row.original?.total_contribution}
         </p>
       );
@@ -193,7 +193,7 @@ export const columns = (): ColumnDef<EPFReportType>[] => [
     header: "Project",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-28 capitalize">
+        <p className="truncate w-40 capitalize">
           {
             row.original?.employee_project_assignment?.project_sites?.projects
               ?.name
@@ -208,7 +208,7 @@ export const columns = (): ColumnDef<EPFReportType>[] => [
     header: "Project Site",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-28 capitalize">
+        <p className="truncate w-40 capitalize">
           {row.original?.employee_project_assignment?.project_sites?.name}
         </p>
       );
