@@ -53,6 +53,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
       invoice_type: searchParams.get("invoice_type") ?? null,
       service_charge: searchParams.get("service_charge") ?? null,
       paid: searchParams.get("paid") ?? null,
+      paid_date_start: searchParams.get("paid_date_start") ?? null,
+      paid_date_end: searchParams.get("paid_date_end") ?? null,
     };
 
     const hasFilters =

@@ -23,6 +23,7 @@ export type InvoiceDataType = Pick<
   | "include_sgst"
   | "include_igst"
   | "is_paid"
+  | "paid_date"
   | "company_id"
   | "id"
   | "include_proof"
@@ -63,6 +64,8 @@ export type InvoiceFilters = {
   invoice_type?: string | undefined | null;
   service_charge?: string | undefined | null;
   paid?: string | undefined | null;
+  paid_date_start?: string | undefined | null;
+  paid_date_end?: string | undefined | null;
 };
 
 export async function getInvoicesByCompanyId({
@@ -88,6 +91,8 @@ export async function getInvoicesByCompanyId({
     invoice_type,
     service_charge,
     paid,
+    paid_date_start,
+    paid_date_end,
   } = filters ?? {};
 
   const columns = [
@@ -105,6 +110,7 @@ export async function getInvoicesByCompanyId({
     "proof",
     "include_proof",
     "is_paid",
+    "paid_date",
     "payroll_type",
     "invoice_type",
     "company_id",
@@ -125,7 +131,14 @@ export async function getInvoicesByCompanyId({
       `invoice_number.ilike.*${searchQuery}*,subject.ilike.*${searchQuery}*`
     );
   }
-  const dateFilters = [{ field: "date", start: date_start, end: date_end }];
+  const dateFilters = [
+    { field: "date", start: date_start, end: date_end },
+    {
+      field: "paid_date",
+      start: paid_date_start,
+      end: paid_date_end,
+    },
+  ];
   for (const { field, start, end } of dateFilters) {
     if (start) query.gte(field, formatUTCDate(start));
     if (end) query.lte(field, formatUTCDate(end));
@@ -181,6 +194,7 @@ export async function getInvoiceById({
     "include_proof",
     "include_header",
     "is_paid",
+    "paid_date",
     "proof",
     "payroll_type",
     "invoice_type",

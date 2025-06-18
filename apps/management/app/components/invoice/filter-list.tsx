@@ -2,10 +2,7 @@ import type { InvoiceFilters } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import {
-  formatDate,
-  formatDateRange,
-} from "@canny_ecosystem/utils";
+import { formatDate, formatDateRange } from "@canny_ecosystem/utils";
 import { useSearchParams } from "@remix-run/react";
 
 export type InvoiceFilterList = InvoiceFilters & {
@@ -55,6 +52,20 @@ export function FilterList({ filterList }: Props) {
       case "name":
         return value;
 
+      case "paid_date_start": {
+        if (value && filterList?.paid_date_end) {
+          return formatDateRange(
+            new Date(value),
+            new Date(filterList.paid_date_end),
+            {
+              includeTime: false,
+            }
+          );
+        }
+
+        return value && formatDate(new Date(value));
+      }
+
       default:
         return null;
     }
@@ -64,7 +75,7 @@ export function FilterList({ filterList }: Props) {
     if (key === "date_start" && filterList?.date_end) {
       searchParams.delete("date_end");
     }
-    
+
     searchParams.delete(key);
     setSearchParams(searchParams);
   };

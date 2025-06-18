@@ -1,4 +1,4 @@
-import { replaceUnderscore } from "@canny_ecosystem/utils";
+import { formatDate, replaceUnderscore } from "@canny_ecosystem/utils";
 import { Button } from "@canny_ecosystem/ui/button";
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
@@ -115,6 +115,18 @@ export const columns: ColumnDef<InvoiceDataType>[] = [
     cell: ({ row }) => {
       return (
         <p className="truncate">{row.original?.is_paid ? "True" : "False"}</p>
+      );
+    },
+  },
+  {
+    enableSorting: false,
+    accessorKey: "paid_date",
+    header: "Paid Date",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate">
+          {(formatDate(row.original?.paid_date) ?? "--").toString()}
+        </p>
       );
     },
   },

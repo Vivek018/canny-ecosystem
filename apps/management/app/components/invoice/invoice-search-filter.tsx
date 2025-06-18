@@ -57,6 +57,8 @@ export function InvoiceSearchFilter({
     invoice_type: "",
     service_charge: "",
     paid: "",
+    paid_date_start: "",
+    paid_date_end: "",
   };
 
   const [filterParams, setFilterParams] = useState(initialFilterParams);
@@ -91,6 +93,8 @@ export function InvoiceSearchFilter({
     invoice_type: searchParams.get("invoice_type"),
     service_charge: searchParams.get("project"),
     paid: searchParams.get("paid"),
+    paid_date_start: searchParams.get("paid_date_start"),
+    paid_date_end: searchParams.get("paid_date_end"),
   };
 
   useEffect(() => {
@@ -416,6 +420,53 @@ export function InvoiceSearchFilter({
                     {name}
                   </DropdownMenuCheckboxItem>
                 ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+        </DropdownMenuGroup>
+
+        <DropdownMenuGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <span>Paid Date</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent
+                sideOffset={14}
+                alignOffset={-4}
+                className="p-0"
+              >
+                <Calendar
+                  mode="range"
+                  captionLayout="dropdown"
+                  today={
+                    filterParams.paid_date_start
+                      ? new Date(filterParams.paid_date_start)
+                      : new Date()
+                  }
+                  hidden={{ after: new Date() }}
+                  selected={{
+                    from: filterParams.paid_date_start
+                      ? new Date(filterParams.paid_date_start)
+                      : undefined,
+                    to: filterParams.paid_date_end
+                      ? new Date(filterParams.paid_date_end)
+                      : undefined,
+                  }}
+                  onSelect={(range) => {
+                    if (!range) return;
+
+                    const newRange = {
+                      paid_date_start: range.from
+                        ? formatISO(range.from, { representation: "date" })
+                        : String(filterParams.paid_date_start),
+                      paid_date_end: range.to
+                        ? formatISO(range.to, { representation: "date" })
+                        : "",
+                    };
+                    setFilterParams((prev) => ({ ...prev, ...newRange }));
+                  }}
+                />
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>

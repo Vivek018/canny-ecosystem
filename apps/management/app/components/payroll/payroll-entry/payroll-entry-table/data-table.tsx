@@ -15,18 +15,20 @@ import {
 import { PayrollTableHeader } from "./data-table-header";
 import { PayrollEntrySheet } from "./payroll-entry-sheet";
 import { useState } from "react";
-import type { PayrollEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
+import type { ReimbursementPayrollEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
 
 interface PayrollEntryTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   editable: boolean;
+  type: string;
 }
 
 export function PayrollEntryDataTable<TData, TValue>({
   columns,
   data,
   editable,
+  type,
 }: PayrollEntryTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
 
@@ -46,7 +48,7 @@ export function PayrollEntryDataTable<TData, TValue>({
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
-          !tableLength && "border-none",
+          !tableLength && "border-none"
         )}
       >
         <Table>
@@ -61,8 +63,9 @@ export function PayrollEntryDataTable<TData, TValue>({
                 return (
                   <PayrollEntrySheet
                     key={row.id}
+                    type={type}
                     row={row}
-                    rowData={rowData as PayrollEntriesWithEmployee}
+                    rowData={rowData as ReimbursementPayrollEntriesWithEmployee}
                     editable={editable}
                   />
                 );

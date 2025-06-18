@@ -5,7 +5,7 @@ import { Outlet, useNavigation, useParams, useSubmit } from "@remix-run/react";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useState, useEffect } from "react";
 import { PayrollActions } from "../payroll-actions";
-import type { PayrollEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
+import type { ReimbursementPayrollEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
 import type {
   PayrollDatabaseRow,
   SupabaseEnv,
@@ -35,12 +35,14 @@ export function PayrollEntryComponent({
   noButtons = false,
   fromWhere,
 }: {
-  data: PayrollEntriesWithEmployee[];
+  data: ReimbursementPayrollEntriesWithEmployee[];
   payrollData: Omit<PayrollDatabaseRow, "created_at" | "updated_at">;
   noButtons?: boolean;
   env: SupabaseEnv;
   fromWhere: "runpayroll" | "payrollhistory";
 }) {
+
+
   const payrollCardDetails = [
     { title: "Title", value: "title" },
     { title: "Payroll Type", value: "payroll_type" },
@@ -187,8 +189,12 @@ export function PayrollEntryComponent({
       </div>
       <PayrollEntryDataTable
         data={tableData}
-        columns={payrollEntryColumns}
+        columns={payrollEntryColumns(
+          payrollData.status,
+          payrollData.payroll_type
+        )}
         editable={payrollData?.status === "pending"}
+        type={payrollData.payroll_type}
       />
       <Outlet />
     </section>

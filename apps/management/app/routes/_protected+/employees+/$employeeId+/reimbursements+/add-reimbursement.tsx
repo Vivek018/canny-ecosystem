@@ -42,9 +42,7 @@ import { FormButtons } from "@/components/form/form-buttons";
 import { createReimbursementsFromData } from "@canny_ecosystem/supabase/mutations";
 import type { ReimbursementsUpdate } from "@canny_ecosystem/supabase/types";
 import { UPDATE_REIMBURSEMENTS_TAG } from "../../../approvals+/reimbursements+/$reimbursementId.update-reimbursements";
-import {
-  getUsersByCompanyId,
-} from "@canny_ecosystem/supabase/queries";
+import { getUsersByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { useEffect, useState } from "react";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
@@ -141,6 +139,7 @@ export default function AddReimbursements({
         clearCacheEntry(
           `${cacheKeyPrefix.employee_reimbursements}${employeeId}`
         );
+        clearCacheEntry(cacheKeyPrefix.reimbursements);
         toast({
           title: "Success",
           description: actionData?.message || "Employee bank details created",
@@ -180,15 +179,15 @@ export default function AddReimbursements({
   });
 
   return (
-    <section className='px-4 lg:px-10 xl:px-14 2xl:px-40 py-4'>
+    <section className="px-4 lg:px-10 xl:px-14 2xl:px-40 py-4">
       <FormProvider context={form.context}>
-        <Form method='POST' {...getFormProps(form)} className='flex flex-col'>
+        <Form method="POST" {...getFormProps(form)} className="flex flex-col">
           <Card>
             <CardHeader>
-              <CardTitle className='capitalize'>
+              <CardTitle className="capitalize">
                 {replaceUnderscore(REIMBURSEMENTS_TAG)}
               </CardTitle>
-              <CardDescription className='lowercase'>
+              <CardDescription className="lowercase">
                 {`${replaceUnderscore(
                   REIMBURSEMENTS_TAG
                 )} by filling this form`}
@@ -199,7 +198,7 @@ export default function AddReimbursements({
               <input
                 {...getInputProps(fields.employee_id, { type: "hidden" })}
               />
-              <div className='grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10'>
+              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.submitted_date, {
@@ -215,7 +214,7 @@ export default function AddReimbursements({
                 />
                 <SearchableSelectField
                   key={resetKey}
-                  className='w-full capitalize flex-1 '
+                  className="w-full capitalize flex-1 "
                   options={transformStringArrayIntoOptions(
                     reimbursementStatusArray as unknown as string[]
                   )}
@@ -231,7 +230,7 @@ export default function AddReimbursements({
                   errors={fields.status.errors}
                 />
               </div>
-              <div className='grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10'>
+              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.amount, {
@@ -255,7 +254,7 @@ export default function AddReimbursements({
                     }),
                     placeholder: "Select an authority that approved",
                   }}
-                  className='lowercase'
+                  className="lowercase"
                   options={userOptions ?? userOptionsFromUpdate}
                   labelProps={{
                     children: "Approved By",
@@ -265,7 +264,7 @@ export default function AddReimbursements({
               </div>
 
               <CheckboxField
-                className='mt-8'
+                className="mt-8"
                 buttonProps={getInputProps(fields.is_deductible, {
                   type: "checkbox",
                 })}

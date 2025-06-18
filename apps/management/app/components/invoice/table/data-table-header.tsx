@@ -22,6 +22,7 @@ export const invoiceColumnIdArray = [
   "invoice_type",
   "service_charge",
   "is_paid",
+  "paid_date"
 ];
 
 export function DataTableHeader({ table, className, loading }: Props) {
