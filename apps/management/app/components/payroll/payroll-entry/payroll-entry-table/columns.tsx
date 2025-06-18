@@ -1,4 +1,4 @@
-import type { PayrollEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
+import type { ReimbursementPayrollEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
 import type { ColumnDef } from "@tanstack/react-table";
 import { PayrollEntryDropdown } from "../payroll-entry-dropdown";
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
@@ -9,7 +9,10 @@ import { attribute } from "@canny_ecosystem/utils/constant";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 
-export const payrollEntryColumns: ColumnDef<PayrollEntriesWithEmployee>[] = [
+export const payrollEntryColumns = (
+  status: string,
+  type: string
+): ColumnDef<ReimbursementPayrollEntriesWithEmployee>[] => [
   {
     accessorKey: "sr_no",
     header: "Sr No.",
@@ -23,7 +26,7 @@ export const payrollEntryColumns: ColumnDef<PayrollEntriesWithEmployee>[] = [
     header: "Employee Code",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-28 text-primary">{`${
+        <p className="truncate w-28 ">{`${
           row.original?.employees?.employee_code ?? "--"
         }`}</p>
       );
@@ -35,7 +38,7 @@ export const payrollEntryColumns: ColumnDef<PayrollEntriesWithEmployee>[] = [
     header: "Employee Name",
     cell: ({ row }) => {
       return (
-        <p className="truncate capitalize w-48 text-primary">{`${
+        <p className="truncate capitalize w-48">{`${
           row.original?.employees?.first_name
         } ${row.original?.employees?.middle_name ?? ""} ${
           row.original?.employees?.last_name ?? ""
@@ -52,30 +55,22 @@ export const payrollEntryColumns: ColumnDef<PayrollEntriesWithEmployee>[] = [
       );
     },
   },
-  {
-    accessorKey: "payment_status",
-    header: "Status",
-    cell: ({ row }) => {
-      return (
-        <p className="truncate capitalize w-28">{`${
-          row.original?.payment_status ?? "--"
-        }`}</p>
-      );
-    },
-  },
+
   {
     accessorKey: "actions",
     cell: ({ row }) => {
       const { role } = useUser();
       return (
         <PayrollEntryDropdown
-          data={row.original}
+          data={row.original as any}
+          status={status}
+          type={type}
           triggerChild={
             <DropdownMenuTrigger
               asChild
               className={cn(
                 "hidden",
-                row.original.payment_status === "pending" && "flex",
+                status === "pending" && "flex",
                 !hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
                   !hasPermission(
                     role,

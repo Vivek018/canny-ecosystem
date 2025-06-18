@@ -149,7 +149,7 @@ export function PayrollSearchFilter({
           <Icon
             name={isSubmitting ? "update" : "search"}
             className={cn(
-              "absolute pointer-events-none left-3 top-[15px]",
+              "absolute pointer-events-none left-3 top-[12.5px]",
               isSubmitting && "animate-spin"
             )}
           />

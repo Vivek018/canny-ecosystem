@@ -3,7 +3,6 @@ import type {
   PayrollDatabaseRow,
   InferredType,
   TypedSupabaseClient,
-  PayrollEntriesDatabaseRow,
   EmployeeDatabaseRow,
   SalaryEntriesDatabaseRow,
 } from "../types";
@@ -16,13 +15,6 @@ export type PayrollFilters = {
   payroll_type?: string | undefined | null;
   status?: string | undefined | null;
   name?: string | undefined | null;
-};
-
-export type ImportPayrollDataType = Pick<
-  PayrollEntriesDatabaseRow,
-  "employee_id" | "amount"
-> & {
-  employee_code: EmployeeDatabaseRow["employee_code"];
 };
 
 export type ImportSalaryPayrollDataType = {
@@ -197,21 +189,6 @@ export async function getPayrollById({
   return { data, error };
 }
 
-export type PayrollEntriesWithEmployee = Omit<
-  PayrollEntriesDatabaseRow,
-  "created_at" | "updated_at"
-> & {
-  employees: Pick<
-    EmployeeDatabaseRow,
-    | "first_name"
-    | "middle_name"
-    | "last_name"
-    | "employee_code"
-    | "company_id"
-    | "id"
-  >;
-};
-
 export type SalaryEntriesWithEmployee = Pick<
   EmployeeDatabaseRow,
   | "first_name"
@@ -334,72 +311,6 @@ export async function getSalaryEntryById({
     .single<InferredType<SalaryEntriesDatabaseRow, (typeof columns)[number]>>();
 
   if (error) console.error("getSalaryEntryById Error", error);
-
-  return { data, error };
-}
-
-export async function getPayrollEntriesByPayrollId({
-  supabase,
-  payrollId,
-}: {
-  supabase: TypedSupabaseClient;
-  payrollId: string;
-}) {
-  const columns = [
-    "id",
-    "employee_id",
-    "reimbursement_id",
-    "exit_id",
-    "payment_status",
-    "amount",
-    "payroll_id",
-    "created_at",
-  ] as const;
-
-  const { data, error } = await supabase
-    .from("payroll_entries")
-    .select(
-      `${columns.join(
-        ","
-      )}, employees!left(id,company_id,first_name, middle_name, last_name, employee_code)`
-    )
-    .eq("payroll_id", payrollId)
-    .order("created_at", { ascending: false })
-    .returns<PayrollEntriesWithEmployee[]>();
-
-  if (error) console.error("getPayrollEntriesByPayrollId Error", error);
-
-  return { data, error };
-}
-
-export async function getPayrollEntryById({
-  supabase,
-  id,
-}: {
-  supabase: TypedSupabaseClient;
-  id: string;
-}) {
-  const columns = [
-    "id",
-    "employee_id",
-    "reimbursement_id",
-    "exit_id",
-    "payment_status",
-    "amount",
-    "payroll_id",
-  ] as const;
-
-  const { data, error } = await supabase
-    .from("payroll_entries")
-    .select(
-      `${columns.join(
-        ","
-      )}, employees!left(id,company_id,first_name, middle_name, last_name, employee_code)`
-    )
-    .eq("id", id)
-    .single<PayrollEntriesWithEmployee>();
-
-  if (error) console.error("getPayrollEntryById Error", error);
 
   return { data, error };
 }
@@ -597,31 +508,7 @@ export async function getSalaryEntriesByPayrollIdForSalaryRegister({
   return { data: filteredData, error: null };
 }
 
-export async function getPayrollEntriesByPayrollIdForPayrollRegister({
-  supabase,
-  payrollId,
-}: {
-  supabase: TypedSupabaseClient;
-  payrollId: string;
-}) {
-  const columns = ["payment_status", "amount"] as const;
 
-  const { data, error } = await supabase
-    .from("employees")
-    .select(
-      `id, company_id, first_name, middle_name, last_name, employee_code, payroll_entries!inner(${columns.join(
-        ","
-      )})`
-    )
-    .eq("payroll_entries.payroll_id", payrollId)
-    .returns<PayrollEntriesWithEmployee[]>();
-
-  if (error) {
-    console.error("getPayrollEntriesByPayrollId Error", error);
-  }
-
-  return { data, error: null };
-}
 
 export async function getSalaryEntriesByEmployeeId({
   supabase,

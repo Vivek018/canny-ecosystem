@@ -1289,11 +1289,9 @@ export const payrollTypesArray = [
 export const PayrollEntrySchema = z.object({
   id: z.string().optional(),
   amount: z.number(),
-  payment_status: z.enum(payrollPaymentStatusArray),
-  reimbursement_id: z.string().optional(),
-  exit_id: z.string().optional(),
   employee_id: z.string(),
   payroll_id: z.string(),
+  type: z.string(),
 });
 
 // Exits
@@ -1821,5 +1819,6 @@ export const InvoiceSchema = z.object({
   include_proof: z.boolean().default(false),
   proof: zFile.optional(),
   is_paid: z.boolean().default(false),
+  paid_date: z.string().optional(),
   include_header: z.boolean().default(false),
 });

@@ -255,7 +255,7 @@ export default function PayrollImportFieldMapping() {
               </div>
             )}
             <Combobox
-              className={cn("w-52 h-10")}
+              className={cn("w-52 h-10 mb-8")}
               options={transformStringArrayIntoOptions(
                 payrollTypesArray as unknown as string[]
               )}
@@ -267,7 +267,6 @@ export default function PayrollImportFieldMapping() {
             />
 
             <Input
-              className=""
               placeholder="Enter the title here"
               onChange={(e) => setTitle(e.target.value)}
             />

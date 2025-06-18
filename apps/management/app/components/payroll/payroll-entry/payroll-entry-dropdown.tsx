@@ -1,11 +1,22 @@
-import type { PayrollEntriesDatabaseRow } from "@canny_ecosystem/supabase/types";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@canny_ecosystem/ui/alert-dialog";
+import type { ReimbursementRow } from "@canny_ecosystem/supabase/types";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@canny_ecosystem/ui/alert-dialog";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuSeparator,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { replaceDash } from "@canny_ecosystem/utils";
@@ -14,29 +25,31 @@ import { useNavigate, useSubmit } from "@remix-run/react";
 export const PayrollEntryDropdown = ({
   data,
   triggerChild,
+  status,
+  type,
 }: {
-  data: Omit<PayrollEntriesDatabaseRow, "created_at" | "updated_at">;
+  status: string;
+  data: Omit<ReimbursementRow, "created_at" | "updated_at">;
   triggerChild: React.ReactElement;
+  type: string;
 }) => {
   const navigate = useNavigate();
 
   const handleClick = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    document: string,
+    document: string
   ) => {
     e.preventDefault();
     navigate(`${data?.payroll_id}/${data?.employee_id}/${document}`);
   };
 
-  const employeeDocuments = [
-    "salary-slip"
-  ];
+  const employeeDocuments = ["salary-slip"];
 
   return (
     <DropdownMenu>
       {triggerChild}
       <DropdownMenuContent align="end">
-        <DropdownMenuGroup className={cn(data.payment_status === "pending" && "hidden")}>
+        <DropdownMenuGroup className={cn(status === "pending" && "hidden")}>
           {employeeDocuments.map((document) => (
             <DropdownMenuItem
               key={document}
@@ -46,28 +59,43 @@ export const PayrollEntryDropdown = ({
             </DropdownMenuItem>
           ))}
         </DropdownMenuGroup>
+        <DropdownMenuSeparator
+          className={cn(status === "pending" && "hidden")}
+        />
         <DropdownMenuGroup>
-          <DeletePayrollEntry payrollId={data?.payroll_id} id={data?.id} />
+          <DeletePayrollEntry
+            payrollId={data?.payroll_id!}
+            id={data?.id}
+            type={type}
+          />
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   );
 };
 
-
-export const DeletePayrollEntry = ({ payrollId, id }: { payrollId: string, id: string }) => {
+export const DeletePayrollEntry = ({
+  payrollId,
+  id,
+  type,
+}: {
+  payrollId: string;
+  id: string;
+  type: string;
+}) => {
   const submit = useSubmit();
 
   const handleDelete = () => {
     submit(
       {
+        type: type,
         is_active: false,
         returnTo: `/payroll/run-payroll/${payrollId}`,
       },
       {
         method: "POST",
         action: `/payroll/run-payroll/${payrollId}/${id}/delete-payroll-entry`,
-      },
+      }
     );
   };
 
@@ -76,7 +104,7 @@ export const DeletePayrollEntry = ({ payrollId, id }: { payrollId: string, id: s
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
-          "text-[13px] h-9",
+          "text-[13px] h-9"
         )}
       >
         Delete Payroll Entry
@@ -90,10 +118,7 @@ export const DeletePayrollEntry = ({ payrollId, id }: { payrollId: string, id: s
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel
-          >
-            Cancel
-          </AlertDialogCancel>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
             className={cn(buttonVariants({ variant: "destructive" }))}
             onClick={handleDelete}
@@ -106,4 +131,3 @@ export const DeletePayrollEntry = ({ payrollId, id }: { payrollId: string, id: s
     </AlertDialog>
   );
 };
-

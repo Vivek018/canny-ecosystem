@@ -1,6 +1,9 @@
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
-import { updatePayrollEntry } from "@canny_ecosystem/supabase/mutations";
+import {
+  updateExitAndPayrollById,
+  updateReimbursementsAndPayrollById,
+} from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { isGoodStatus, PayrollEntrySchema } from "@canny_ecosystem/utils";
@@ -9,9 +12,7 @@ import { json, type ActionFunctionArgs } from "@remix-run/node";
 import { useActionData, useNavigate, useParams } from "@remix-run/react";
 import { useEffect } from "react";
 
-export async function action({
-  request,
-}: ActionFunctionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
     const formData = await request.formData();
@@ -22,14 +23,42 @@ export async function action({
 
     if (submission.status !== "success") {
       return json(
-        { status: "error", message: "Payroll Entry update failed", error: submission.error },
-        { status: 500 },
+        {
+          status: "error",
+          message: "Payroll Entry update failed",
+          error: submission.error,
+        },
+        { status: 500 }
       );
     }
 
-    const { status, error } = await updatePayrollEntry({
+    if (submission.value.type === "reimbursement") {
+      const { type, ...updatableData } = submission.value;
+      const { status, error } = await updateReimbursementsAndPayrollById({
+        supabase,
+        data: updatableData,
+        reimbursementId: updatableData.id!,
+        action: "update",
+      });
+
+      if (isGoodStatus(status)) {
+        return json({
+          status: "success",
+          message: "Payroll Entry updated successfully",
+          error: null,
+        });
+      }
+      return json(
+        { status: "error", message: "Payroll Entry update failed", error },
+        { status: 500 }
+      );
+    }
+    const { type, amount, ...rest } = submission.value;
+    const updatableData = { ...rest, net_pay: amount };
+    const { status, error } = await updateExitAndPayrollById({
       supabase,
-      data: submission.value,
+      data: updatableData,
+      action: "update",
     });
 
     if (isGoodStatus(status)) {
@@ -41,7 +70,7 @@ export async function action({
     }
     return json(
       { status: "error", message: "Payroll Entry update failed", error },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json(
@@ -51,11 +80,10 @@ export async function action({
         error,
         data: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
-
 
 export default function UpdatePayrollEntry() {
   const actionData = useActionData<typeof action>();
