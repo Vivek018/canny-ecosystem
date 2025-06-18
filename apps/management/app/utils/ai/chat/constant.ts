@@ -20,3 +20,6 @@ COMPANY FILTERING:
 • Projects: instead of company_id, it has project_client_id.
 • Follow foreign keys to filter by company
 `
+
+export const GEMINI_MAIN = "gemini-1.5-flash";
+export const GEMINI_LITE = "gemini-1.5-flash-lite";

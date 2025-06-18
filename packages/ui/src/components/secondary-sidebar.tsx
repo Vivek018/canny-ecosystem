@@ -3,11 +3,13 @@ import { NavLink, useLocation } from "@remix-run/react";
 export const SecondarySidebar = ({
   items,
   className,
-  navLinkClassName
+  navLinkClassName,
+  bottomItem,
 }: {
   items: { name: string; link: string }[];
   className?: string;
   navLinkClassName?: string;
+  bottomItem?: React.ReactNode,
 }) => {
   const { pathname } = useLocation();
 
@@ -21,10 +23,10 @@ export const SecondarySidebar = ({
     >
       <nav
         className={cn(
-          "no-scrollbar h-full overflow-x-hidden overflow-y-scroll flex flex-col px-4 gap-4 items-center",
+          "no-scrollbar h-full overflow-x-hidden overflow-y-scroll flex flex-col justify-between px-4 pb-4 gap-4 items-center",
         )}
       >
-        <ul className="h-full flex flex-col gap-1.5 items-start">
+        <ul className="h-full flex flex-col gap-1.5 items-start pb-4">
           {items?.map(({ name, link }) => {
             return (
               <NavLink
@@ -49,6 +51,7 @@ export const SecondarySidebar = ({
             );
           })}
         </ul>
+        {bottomItem}
       </nav>
     </aside>
   );

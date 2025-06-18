@@ -50,7 +50,7 @@ export const CompanySwitch = ({ companies }: {
           aria-expanded={open}
           disabled={!hasPermission(role, `${updateRole}:${attribute.company}`)}
           className={cn(
-            "bg-card truncate justify-between capitalize rounded pl-1.5 pr-3 w-[350px] py-1.5 h-full disabled:opacity-100",
+            "bg-card truncate justify-between capitalize rounded pl-1.5 pr-3 w-[350px] py-1 h-full disabled:opacity-100",
             !currentCompany && "text-muted-foreground",
           )}
         >

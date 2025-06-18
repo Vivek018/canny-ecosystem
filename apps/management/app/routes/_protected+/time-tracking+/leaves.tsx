@@ -22,6 +22,7 @@ import {
   Await,
   type ClientLoaderFunctionArgs,
   defer,
+  Link,
   Outlet,
   useLoaderData,
   useNavigate,
@@ -47,7 +48,7 @@ import { LoadingSpinner } from "@/components/loading-spinner";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { useLeavesStore } from "@/store/leaves";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { Button } from "@canny_ecosystem/ui/button";
+import { Button, buttonVariants } from "@canny_ecosystem/ui/button";
 import { LeavesMenu } from "@/components/leaves/leaves-menu";
 import { ImportLeavesModal } from "@/components/leaves/import-export/import-modal-leaves";
 import {
@@ -231,11 +232,11 @@ export default function LeavesIndex() {
                                 role,
                                 `${deleteRole}:${attribute.leaves}`
                               ) &&
-                                !hasPermission(
-                                  role,
-                                  `${updateRole}:${attribute.leaves}`
-                                ) &&
-                                "hidden"
+                              !hasPermission(
+                                role,
+                                `${updateRole}:${attribute.leaves}`
+                              ) &&
+                              "hidden"
                             )}
                           >
                             <Icon name="dots-vertical" size="xs" />
@@ -297,22 +298,22 @@ export default function LeavesIndex() {
                             projectArray={
                               projectData?.data?.length
                                 ? projectData?.data?.map(
-                                    (project) => project!.name
-                                  )
+                                  (project) => project!.name
+                                )
                                 : []
                             }
                             projectSiteArray={
                               projectSiteData?.data?.length
                                 ? projectSiteData?.data?.map(
-                                    (site) => site!.name
-                                  )
+                                  (site) => site!.name
+                                )
                                 : []
                             }
                             userEmails={
                               userEmailsData?.data?.length
                                 ? userEmailsData?.data?.map(
-                                    (user) => user!.email
-                                  )
+                                  (user) => user!.email
+                                )
                                 : []
                             }
                           />
@@ -325,31 +326,37 @@ export default function LeavesIndex() {
             </Suspense>
             <FilterList filters={filterList} />
           </div>
-          <div className="space-x-2 hidden md:flex">
-            <ColumnVisibility />
-            {/* <LeavesEmailMenu
+          <div className="gap-4 hidden md:flex">
+            <div className="flex gap-2 px-4 border-r border-muted-foreground/80">
+              <ColumnVisibility />
+              {/* <LeavesEmailMenu
               columnVisibility={columnVisibility}
               selectedRows={selectedRows}
               emails={userEmails as unknown as any}
               companyName={companyName as unknown as CompanyDatabaseRow}
               companyAddress={companyAddress as unknown as LocationDatabaseRow}
             /> */}
-            <Button
-              variant="outline"
-              size="icon"
-              className={cn(
-                "h-10 w-10 bg-muted/70 text-muted-foreground",
-                !selectedRows.length && "hidden"
-              )}
-              disabled={!selectedRows.length}
-              onClick={() => navigate("analytics")}
-            >
-              <Icon name="chart" className="h-[18px] w-[18px]" />
-            </Button>
-            <LeavesMenu
-              companyName={companyName as unknown as CompanyDatabaseRow}
-              companyAddress={companyAddress as unknown as LocationDatabaseRow}
-            />
+              <Button
+                variant="outline"
+                size="icon"
+                className={cn(
+                  "h-10 w-10 bg-muted/70 text-muted-foreground",
+                  !selectedRows.length && "hidden"
+                )}
+                disabled={!selectedRows.length}
+                onClick={() => navigate("analytics")}
+              >
+                <Icon name="chart" className="h-[18px] w-[18px]" />
+              </Button>
+              <LeavesMenu
+                companyName={companyName as unknown as CompanyDatabaseRow}
+                companyAddress={companyAddress as unknown as LocationDatabaseRow}
+              />
+            </div>
+            <Link to="/chat/chatbox/attendance" className={cn(buttonVariants({ variant: "gradiant" }), "flex items-center justify-center gap-2 h-10")}>
+              <Icon name="magic" size="xs" />
+              <p>AI Chat</p>
+            </Link>
           </div>
         </div>
         <Suspense fallback={<LoadingSpinner className="h-1/2 mt-20" />}>
@@ -386,6 +393,6 @@ export default function LeavesIndex() {
       </div>
       <ImportLeavesModal />
       <Outlet />
-    </section>
+    </section >
   );
 }

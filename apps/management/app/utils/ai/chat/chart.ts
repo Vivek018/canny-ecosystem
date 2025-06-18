@@ -1,6 +1,7 @@
 import { google } from "@ai-sdk/google";
 import { z } from "@canny_ecosystem/utils";
 import { generateObject } from "ai";
+import { GEMINI_MAIN } from "./constant";
 
 export const configSchema = z
   .object({
@@ -46,7 +47,7 @@ export const generateChartConfig = async (
 
   try {
     const { object: config } = await generateObject({
-      model: google("gemini-2.0-flash"),
+      model: google(GEMINI_MAIN),
       system: `You are a data visualization expert.
 
 Your task is to generate a valid React chart configuration using SQL data and a user query. The data is already cleaned—no further transformation or filtering is needed.

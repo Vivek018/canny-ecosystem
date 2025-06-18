@@ -2,12 +2,12 @@ import { Client } from 'pg';
 import { generateObject } from 'ai';
 import { google } from '@ai-sdk/google';
 import { z } from '@canny_ecosystem/utils';
-import { BASIC_SYSTEM_PROMPT } from './constant';
+import { BASIC_SYSTEM_PROMPT, GEMINI_MAIN } from './constant';
 
 export const generateQuery = async ({ input, companyId, tablesData, systemPrompt }: { input: string, companyId: string, tablesData: string, systemPrompt: string }) => {
   try {
     const result = await generateObject({
-      model: google('gemini-2.0-flash'),
+      model: google(GEMINI_MAIN),
       system: `You're a PostgreSQL Query Generator
 
       Company Id: ${companyId}

@@ -1,6 +1,6 @@
-import { Button } from "@canny_ecosystem/ui/button";
+import { Button, buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import { useNavigate } from "@remix-run/react";
+import { Link, useNavigate } from "@remix-run/react";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useInvoiceStore } from "@/store/invoices";
 
@@ -9,7 +9,8 @@ export function InvoiceActions() {
   const navigate = useNavigate();
 
   return (
-    <div className="space-x-2 hidden md:flex">
+    <div className="gap-4 hidden md:flex">
+      <div className="flex gap-2 px-4 border-r border-muted-foreground/80">
       <Button
         variant="outline"
         size="icon"
@@ -22,6 +23,11 @@ export function InvoiceActions() {
       >
         <Icon name="chart" className="h-[18px] w-[18px]" />
       </Button>
+      </div>
+      <Link to="/chat/chatbox/payment" className={cn(buttonVariants({ variant: "gradiant" }), "flex items-center justify-center gap-2 h-10")}>
+        <Icon name="magic" size="xs" />
+        <p>AI Chat</p>
+      </Link>
     </div>
   );
 }

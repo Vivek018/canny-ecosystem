@@ -9,6 +9,7 @@ import {
   statusArray,
 } from "@canny_ecosystem/utils";
 import { google } from "@ai-sdk/google";
+import { GEMINI_LITE } from "./chat/constant";
 
 export const EmployeeFiltersSchema = z.object({
   name: z
@@ -57,7 +58,7 @@ export const generateEmployeeFilter = async (
 ) => {
   try {
     const result = await generateObject({
-      model: google('gemini-2.0-flash-lite'),
+      model: google(GEMINI_LITE),
       system: `You are a helpful assistant that generates filters for a given prompt.
       Current date is: ${new Date().toISOString().split("T")[0]}.
       Instructions:
