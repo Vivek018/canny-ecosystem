@@ -178,7 +178,7 @@ export function InvoiceSearchFilter({
           <Icon
             name={isSubmitting ? "update" : "search"}
             className={cn(
-              "absolute pointer-events-none left-3 top-[15px]",
+              "absolute pointer-events-none left-3 top-[12.5px]",
               isSubmitting && "animate-spin"
             )}
           />
@@ -204,7 +204,7 @@ export function InvoiceSearchFilter({
               className={cn(
                 "absolute z-10 right-3 top-[6px] opacity-70",
                 !disabled &&
-                  "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
+                "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 hasValidFilters && "opacity-100",
                 isOpen && "opacity-100"
               )}
