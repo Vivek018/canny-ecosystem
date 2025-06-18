@@ -1,5 +1,5 @@
 import { cacheKeyPrefix, chatCategories, DEFAULT_ROUTE } from "@/constant";
-import { clearCacheEntry, clearExactCacheEntry } from "@/utils/cache";
+import { clearExactCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { createChat } from "@canny_ecosystem/supabase/mutations";

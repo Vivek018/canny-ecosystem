@@ -20,12 +20,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function StatutoryFields() {
   return (
-    <div className="flex h-full">
+    <div className="flex w-full flex-1 overflow-hidden">
       <SecondarySidebar
         items={statutorySideNavList}
         className="flex-shrink-0"
       />
-      <div className="h-full w-full">
+      <div className="flex flex-col flex-1 min-h-0 overflow-auto">
         <Outlet />
       </div>
     </div>
