@@ -13,6 +13,7 @@ import {
   getApprovedPayrollsByCompanyIdByYears,
   getExitsByCompanyIdByMonths,
   getInvoicesByCompanyIdForDashboard,
+  getNotificationByCompanyId,
   type InvoiceDataType,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -25,6 +26,8 @@ import type {
 } from "@canny_ecosystem/supabase/types";
 import { ActiveEmployeesBySite } from "@/components/payroll/analytics/active-employees-by-site";
 import { InvoicePaidUnpaid } from "@/components/dashboard/paid-unpaid-invoices";
+import { useAnimateTextScroll } from "@canny_ecosystem/ui/animate-text-scroll";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -41,12 +44,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
   try {
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
+    const { data: notificationData, error: notificationError } = await getNotificationByCompanyId({ supabase, companyId });
+
     const {
       currentMonthExits,
       currentMonthExitErrors,
       previousMonthExits,
       previousMonthExitErrors,
     } = await getExitsByCompanyIdByMonths({ companyId, supabase, filters });
+    if (notificationError) throw notificationError;
     if (currentMonthExitErrors) throw currentMonthExitErrors;
     if (previousMonthExitErrors) throw previousMonthExitErrors;
 
@@ -97,6 +103,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     if (invoiceDataError) throw invoiceDataError;
 
     return defer({
+      notificationData,
       currentMonthExits,
       previousMonthExits,
       currentPayrollData,
@@ -111,6 +118,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
   } catch (error) {
     return defer({
+      notificationData: null,
       currentMonthExits: null,
       previousMonthExits: null,
       currentPayrollData: null,
@@ -138,6 +146,7 @@ clientLoader.hydrate = true;
 
 export default function Dashboard() {
   const {
+    notificationData,
     currentMonthExits,
     previousMonthExits,
     currentPayrollData,
@@ -151,44 +160,56 @@ export default function Dashboard() {
     error,
   } = useLoaderData<typeof loader>();
 
+  const { containerRef, contentRef } = useAnimateTextScroll({
+    pauseDurationMs: 2000,
+    speed: 1.5,
+  });
+
   if (error) {
     clearCacheEntry(cacheKeyPrefix.dashboard);
     return <ErrorBoundary error={error} message="Failed to load data" />;
   }
 
   return (
-    <section className="w-full p-4 flex flex-col gap-4">
-      <div className="flex justify-end">
-        <div className="flex justify-between gap-3">
-          <FilterList filters={filters as unknown as DashboardFilters} />
-          <DashboardFilter />
+    <>
+      <div ref={containerRef} className={cn("overflow-hidden w-full border-b p-4 bg-primary/15", !notificationData?.text && "hidden")}>
+        <div ref={contentRef} className="text-primary whitespace-nowrap text-sm py-0.5">
+          {notificationData?.text}
         </div>
       </div>
-      <div className="w-full flex flex-col gap-4">
-        <CountCards
-          currentData={currentPayrollData as unknown as PayrollDatabaseRow[]}
-          previousData={previousPayrollData as unknown as PayrollDatabaseRow[]}
-          activeEmployeeCount={
-            activeEmployees as unknown as EmployeeDatabaseRow[]
-          }
-          totalEmployeeCount={
-            totalEmployees as unknown as EmployeeDatabaseRow[]
-          }
-          currentExits={currentMonthExits as unknown as ExitsRow[]}
-          previousExits={previousMonthExits as unknown as ExitsRow[]}
-        />
-        <PayrollTrend chartData={payrollDataByYears} />
-        <div className="grid grid-cols-3 gap-4">
-          <ActiveEmployeesBySite
-            chartData={
-              activeEmployeesBySites as unknown as EmployeeDatabaseRow[]
+      <section className="w-full p-4 flex flex-col gap-4">
+        <div className="flex justify-end">
+          <div className="flex justify-between gap-3">
+            <FilterList filters={filters as unknown as DashboardFilters} />
+            <DashboardFilter />
+          </div>
+        </div>
+        <div className="w-full flex flex-col gap-4">
+          <CountCards
+            currentData={currentPayrollData as unknown as PayrollDatabaseRow[]}
+            previousData={previousPayrollData as unknown as PayrollDatabaseRow[]}
+            activeEmployeeCount={
+              activeEmployees as unknown as EmployeeDatabaseRow[]
             }
+            totalEmployeeCount={
+              totalEmployees as unknown as EmployeeDatabaseRow[]
+            }
+            currentExits={currentMonthExits as unknown as ExitsRow[]}
+            previousExits={previousMonthExits as unknown as ExitsRow[]}
           />
-          <InvoicePaidUnpaid
-            chartData={invoiceData as unknown as InvoiceDataType[]}
-          />
+          <PayrollTrend chartData={payrollDataByYears} />
+          <div className="grid grid-cols-3 gap-4">
+            <ActiveEmployeesBySite
+              chartData={
+                activeEmployeesBySites as unknown as EmployeeDatabaseRow[]
+              }
+            />
+            <InvoicePaidUnpaid
+              chartData={invoiceData as unknown as InvoiceDataType[]}
+            />
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }

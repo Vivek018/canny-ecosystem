@@ -21,98 +21,98 @@ import type { DocumentsDatabaseRow } from "@canny_ecosystem/supabase/types";
 export const UPDATE_COMPANY_DOCUMENT = "update-company-document";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    const documentId = params.documentId ?? "";
-    const { supabase, headers } = getSupabaseWithHeaders({ request });
+  const documentId = params.documentId ?? "";
+  const { supabase, headers } = getSupabaseWithHeaders({ request });
 
-    const { user } = await getUserCookieOrFetchUser(request, supabase);
-    if (!hasPermission(user?.role!, `${updateRole}:${attribute.companyDocuments}`)) {
-        return safeRedirect(DEFAULT_ROUTE, { headers });
-    }
+  const { user } = await getUserCookieOrFetchUser(request, supabase);
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.companyDocuments}`)) {
+    return safeRedirect(DEFAULT_ROUTE, { headers });
+  }
 
-    const { data } = await getCompanyDocumentById({ supabase, id: documentId });
-    return { data };
+  const { data } = await getCompanyDocumentById({ supabase, id: documentId });
+  return { data };
 }
 
 export async function action({ request }: ActionFunctionArgs): Promise<Response> {
-    const { supabase } = getSupabaseWithHeaders({ request });
-    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+  const { supabase } = getSupabaseWithHeaders({ request });
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-    try {
-        const formData = await parseMultipartFormData(
-            request,
-            createMemoryUploadHandler({ maxPartSize: SIZE_1MB }),
-        );
-        const submission = parseWithZod(formData, { schema: CompanyDocumentsSchema });
+  try {
+    const formData = await parseMultipartFormData(
+      request,
+      createMemoryUploadHandler({ maxPartSize: SIZE_1MB }),
+    );
+    const submission = parseWithZod(formData, { schema: CompanyDocumentsSchema });
 
-        if (submission.status !== "success") {
-            return json(
-                { result: submission.reply() },
-                { status: submission.status === "error" ? 400 : 200 },
-            );
-        }
-
-        const { status, error } = await updateCompanyDocument({
-            supabase,
-            file: submission.value.document_file as File,
-            companyId,
-            documentName: submission.value.name,
-            existingDocumentName:submission.value.existing_document_name ?? ""
-        });
-        if (isGoodStatus(status)) {
-            return json({
-                status: "success",
-                message: "Document updated successfully",
-                error: null,
-                returnTo: "/settings/documents",
-            });
-        }
-        return json(
-            {
-                status: "error",
-                message: "Document update failed",
-                error,
-                returnTo: "/settings/documents",
-            },
-            { status: 500 },
-        );
-    } catch (error) {
-        return json(
-            {
-                status: "error",
-                message: "An unexpected error occurred",
-                error,
-                returnTo: "/settings/documents",
-            },
-            { status: 500 },
-        );
+    if (submission.status !== "success") {
+      return json(
+        { result: submission.reply() },
+        { status: submission.status === "error" ? 400 : 200 },
+      );
     }
+
+    const { status, error } = await updateCompanyDocument({
+      supabase,
+      file: submission.value.document_file as File,
+      companyId,
+      documentName: submission.value.name,
+      existingDocumentName: submission.value.existing_document_name ?? ""
+    });
+    if (isGoodStatus(status)) {
+      return json({
+        status: "success",
+        message: "Document updated successfully",
+        error: null,
+        returnTo: "/settings/documents",
+      });
+    }
+    return json(
+      {
+        status: "error",
+        message: "Document update failed",
+        error,
+        returnTo: "/settings/documents",
+      },
+      { status: 500 },
+    );
+  } catch (error) {
+    return json(
+      {
+        status: "error",
+        message: "An unexpected error occurred",
+        error,
+        returnTo: "/settings/documents",
+      },
+      { status: 500 },
+    );
+  }
 }
 
 export default function UpdateDocument() {
-    const { data } = useLoaderData<typeof loader>();
-    const actionData = useActionData<typeof action>();
-    const { toast } = useToast();
-    const navigate = useNavigate();
+  const { data } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        if (actionData) {
-            if (actionData?.status === "success") {
-                clearExactCacheEntry(`${cacheKeyPrefix.company_document}`);
-                toast({
-                    title: "Success",
-                    description: actionData.message,
-                    variant: "success",
-                });
-            } else {
-                toast({
-                    title: "Error",
-                    description: actionData.error,
-                    variant: "destructive",
-                });
-            }
-            navigate(actionData.returnTo);
-        }
-    }, [actionData]);
+  useEffect(() => {
+    if (actionData) {
+      if (actionData?.status === "success") {
+        clearExactCacheEntry(`${cacheKeyPrefix.company_document}`);
+        toast({
+          title: "Success",
+          description: actionData.message,
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: actionData.error,
+          variant: "destructive",
+        });
+      }
+      navigate(actionData.returnTo);
+    }
+  }, [actionData]);
 
-    return <AddDocument updatedValues={data as DocumentsDatabaseRow} />
+  return <AddDocument updatedValues={data as DocumentsDatabaseRow} />
 }

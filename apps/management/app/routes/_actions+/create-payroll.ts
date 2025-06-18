@@ -133,7 +133,7 @@ export async function action({
               component.target_type === "payment_field"
                 ? component.payment_fields?.name
                 : component.target_type.toUpperCase() ??
-                  component.component_type,
+                component.component_type,
             type: component.component_type,
             is_pro_rata: component.payment_fields?.is_pro_rata ?? false,
             consider_for_epf:

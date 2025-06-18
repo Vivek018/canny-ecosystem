@@ -105,7 +105,7 @@ export default function EmployeeIndex() {
   } = useLoaderData<typeof loader>();
 
   const { employeeId } = useParams();
-  
+
   if (error) {
     clearExactCacheEntry(`${cacheKeyPrefix.employee_overview}${employeeId}`);
     return (

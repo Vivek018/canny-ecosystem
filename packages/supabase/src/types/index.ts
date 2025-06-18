@@ -267,14 +267,6 @@ export type PayrollDatabaseInsert =
 export type PayrollDatabaseUpdate =
   Database["public"]["Tables"]["payroll"]["Update"];
 
-// Payroll Entries
-export type PayrollEntriesDatabaseRow =
-  Database["public"]["Tables"]["payroll_entries"]["Row"];
-export type PayrollEntriesDatabaseInsert =
-  Database["public"]["Tables"]["payroll_entries"]["Insert"];
-export type PayrollEntriesDatabaseUpdate =
-  Database["public"]["Tables"]["payroll_entries"]["Update"];
-
 // Salary Entries
 export type SalaryEntriesDatabaseRow =
   Database["public"]["Tables"]["salary_entries"]["Row"];
@@ -360,3 +352,7 @@ export type InvoiceDatabaseUpdate =
 export type ChatDatabaseRow = Database["public"]["Tables"]["chat"]["Row"];
 export type ChatDatabaseInsert = Database["public"]["Tables"]["chat"]["Insert"];
 export type ChatDatabaseUpdate = Database["public"]["Tables"]["chat"]["Update"];
+
+export type NotificationDatabaseRow = Database["public"]["Tables"]["notifications"]["Row"];
+export type NotificationDatabaseInsert = Database["public"]["Tables"]["notifications"]["Insert"];
+export type NotificationDatabaseUpdate = Database["public"]["Tables"]["notifications"]["Update"];

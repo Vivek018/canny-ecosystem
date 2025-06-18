@@ -29,7 +29,7 @@ export const CompanyLogo = ({
 
   const handleUpload = async (evt: React.ChangeEvent<HTMLInputElement>) => {
     const file = evt?.target?.files?.[0];
-    
+
     if (!file) {
       toast({
         title: "Error",

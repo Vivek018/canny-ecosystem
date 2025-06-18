@@ -13,7 +13,7 @@ export function Header({
   return (
     <header
       className={cn(
-        "w-full min-h-[72px] max-h-[72px] md:m-0 z-10 border-b flex justify-between items-center sticky md:static top-0 bg-background md:backdrop-filter md:backdrop-blur-none",
+        "w-full px-4 min-h-[72px] max-h-[72px] md:m-0 z-10 border-b flex justify-between items-center sticky md:static top-0 bg-background md:backdrop-filter md:backdrop-blur-none",
         className,
       )}
     >

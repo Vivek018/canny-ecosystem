@@ -293,7 +293,7 @@ export default function CreatePaymentField({
               />
 
               <CheckboxField
-              className="pt-2 pb-4"
+                className="pt-2 pb-4"
                 buttonProps={getInputProps(fields.is_active, {
                   type: "checkbox",
                 })}

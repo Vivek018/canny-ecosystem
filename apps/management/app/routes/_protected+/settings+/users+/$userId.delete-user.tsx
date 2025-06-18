@@ -66,7 +66,7 @@ export async function action({
     }
 
     // deleting avatar
-    await deleteAvatar({supabase});
+    await deleteAvatar({ supabase });
 
     // Handle current user deletion
     if (dbUser?.id === userId) {

@@ -93,7 +93,7 @@ export async function action({
 }
 
 export default function UpdateDocument() {
-  const {  data } = useLoaderData<typeof loader>();
+  const { data } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();

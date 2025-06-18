@@ -128,7 +128,7 @@ export default function CreateProfessionalTax({
 }: {
   updateValues?: ProfessionalTaxDatabaseUpdate | null;
 }) {
-  
+
   const { companyId } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const PROFESSIONAL_TAX_TAG = updateValues
@@ -248,7 +248,7 @@ export default function CreateProfessionalTax({
                   }),
                   defaultValue: JSON.stringify(
                     fields.gross_salary_range.initialValue ??
-                      fields.gross_salary_range.value
+                    fields.gross_salary_range.value
                   ),
                 }}
                 fields={[

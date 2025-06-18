@@ -54,9 +54,8 @@ export async function action({
     if (isGoodStatus(status)) {
       return json({
         status: "success",
-        message: `Employee marked as ${
-          submission.value.is_active ? "active" : "inactive"
-        }`,
+        message: `Employee marked as ${submission.value.is_active ? "active" : "inactive"
+          }`,
         returnTo,
         error: null,
       });

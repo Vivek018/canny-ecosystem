@@ -25,8 +25,8 @@ export function LWFWrapper({
   error,
 }: {
   data:
-    | Omit<LabourWelfareFundDatabaseRow, "created_at" | "updated_at">[]
-    | null;
+  | Omit<LabourWelfareFundDatabaseRow, "created_at" | "updated_at">[]
+  | null;
   error: Error | null | { message: string };
 }) {
   const { role } = useUser();

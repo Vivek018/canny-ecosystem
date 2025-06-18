@@ -107,7 +107,7 @@ export const CaseOptionsDropdown = ({
             className={cn(
               (!hasPermission(role, `${updateRole}:${attribute.cases}`) ||
                 !documentUrl) &&
-                "hidden"
+              "hidden"
             )}
             onClick={() => handleDownloadDocument(documentUrl, `${caseTitle}`)}
           >
@@ -118,7 +118,7 @@ export const CaseOptionsDropdown = ({
               "flex",
               (!hasPermission(role, `${updateRole}:${attribute.cases}`) ||
                 !documentUrl) &&
-                "hidden"
+              "hidden"
             )}
           />
           <DeleteCase id={caseId} />

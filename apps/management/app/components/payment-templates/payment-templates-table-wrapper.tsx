@@ -31,10 +31,10 @@ export function PaymentTemplatesTableWrapper({
     }
 
     const filteredData = data?.filter((item) =>
-          searchInObject(item, searchString),
-        );
-    
-        setTableData(filteredData ?? []);
+      searchInObject(item, searchString),
+    );
+
+    setTableData(filteredData ?? []);
   }, [searchString, data]);
 
   return <DataTable columns={columns} data={tableData ?? []} />;

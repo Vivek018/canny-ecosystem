@@ -93,6 +93,7 @@
     "./alert-dialog": "./src/components/alert-dialog.tsx",
     "./pagination": "./src/components/pagination.tsx",
     "./toaster": "./src/components/toaster.tsx",
+    "./animate-text-scroll": "./src/hooks/animate-text-scroll.ts",
     "./use-toast": "./src/hooks/use-toast.ts",
     "./sheet": "./src/components/sheet.tsx",
     "./scroll-area": "./src/components/scroll-area.tsx",

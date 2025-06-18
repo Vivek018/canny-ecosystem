@@ -126,7 +126,7 @@ export default function RunPayrollIndex() {
                     <FilterList filterList={filterList as PayrollFilters} />
                   </div>
                   <div className="gap-4 hidden md:flex">
-                    <div className="flex gap-2 px-4 border-r border-muted-foreground/80">
+                    <div className="flex gap-2 px-4 border-r border-dashed border-muted-foreground/80">
                       <ImportPayrollDialog />
                     </div>
                     <Link to="/chat/chatbox/payment" className={cn(buttonVariants({ variant: "gradiant" }), "flex items-center justify-center gap-2 h-10")}>

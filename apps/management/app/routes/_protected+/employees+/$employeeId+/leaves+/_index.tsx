@@ -71,8 +71,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         to: hasFilters
           ? MAX_QUERY_LIMIT
           : page > 0
-          ? LAZY_LOADING_LIMIT
-          : LAZY_LOADING_LIMIT - 1,
+            ? LAZY_LOADING_LIMIT
+            : LAZY_LOADING_LIMIT - 1,
         filters,
         searchQuery: query ?? undefined,
         sort: sortParam?.split(":") as [string, "asc" | "desc"],
@@ -106,8 +106,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
 
   return clientCaching(
-    `${cacheKeyPrefix.employee_leaves}${
-      args.params.employeeId
+    `${cacheKeyPrefix.employee_leaves}${args.params.employeeId
     }${url.searchParams.toString()}`,
     args
   );
@@ -208,8 +207,8 @@ export default function Leaves() {
                                     userEmails={
                                       usersData?.data
                                         ? usersData?.data?.map(
-                                            (user) => user!.email
-                                          )
+                                          (user) => user!.email
+                                        )
                                         : []
                                     }
                                   />
