@@ -1,8 +1,10 @@
+import { getPayrollById, getReimbursementsById } from "../queries";
 import type {
   ReimbursementInsert,
   ReimbursementsUpdate,
   TypedSupabaseClient,
 } from "../types";
+import { updatePayroll } from "./payroll";
 
 export async function createReimbursementsFromData({
   supabase,
@@ -11,11 +13,7 @@ export async function createReimbursementsFromData({
   supabase: TypedSupabaseClient;
   data: ReimbursementInsert[];
 }) {
-  const { error, status } = await supabase
-    .from("reimbursements")
-    .insert(data)
-    ;
-
+  const { error, status } = await supabase.from("reimbursements").insert(data);
   if (error) {
     console.error("createReimbursementsFromData Error:", error);
   }
@@ -84,9 +82,82 @@ export async function deleteReimbursementById({
   if (status < 200 || status >= 300) {
     console.error(
       "deleteReimbursementById Unexpected Supabase status:",
-      status,
+      status
     );
   }
 
   return { status, error: null };
+}
+
+export async function updateReimbursementsForPayrollCreation({
+  supabase,
+  data,
+}: {
+  supabase: TypedSupabaseClient;
+  data: { id: string; payroll_id: string }[];
+}) {
+  const results = await Promise.all(
+    data.map((item) => {
+      const { id, ...updateData } = item;
+      return supabase.from("reimbursements").update(updateData).eq("id", id!);
+    })
+  );
+
+  const errors = results.filter((res) => res.error);
+  const status = results.filter((res) => res.status);
+
+  return { status, errors };
+}
+
+export async function updateReimbursementsAndPayrollById({
+  reimbursementId,
+  supabase,
+  data: updatedData,
+  action,
+}: {
+  reimbursementId: string;
+  supabase: TypedSupabaseClient;
+  data: ReimbursementsUpdate;
+  action: string;
+}) {
+  const { data: entryData } = await getReimbursementsById({
+    supabase,
+    reimbursementId: reimbursementId ?? "",
+  });
+
+  const { data: payrollData } = await getPayrollById({
+    supabase,
+    payrollId: entryData?.payroll_id ?? "",
+  });
+
+  let totalNetAmount = payrollData?.total_net_amount!;
+  let totalEmployees = payrollData?.total_employees!;
+  if (action === "update") {
+    totalNetAmount -= entryData?.amount!;
+    totalNetAmount += updatedData?.amount!;
+  } else if (action === "delete") {
+    totalNetAmount -= entryData?.amount!;
+    totalEmployees -= 1;
+  }
+
+  await updatePayroll({
+    supabase,
+    data: {
+      id: payrollData?.id,
+      total_net_amount: totalNetAmount,
+      total_employees: totalEmployees,
+    },
+  });
+
+  const { error, status } = await supabase
+    .from("reimbursements")
+    .update(updatedData)
+    .eq("id", reimbursementId ?? "")
+    .single();
+
+  if (error) {
+    console.error("updateReimbursementsAndPayrollById Error:", error);
+  }
+
+  return { error, status };
 }

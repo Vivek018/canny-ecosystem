@@ -6,7 +6,27 @@ import type {
   TypedSupabaseClient,
 } from "../types";
 import { months } from "@canny_ecosystem/utils/constant";
+export type ImportExitPayrollDataType = Pick<
+  ExitsRow,
+  "employee_id" | "net_pay" | "id" | "payroll_id"
+> & {
+  employee_code: EmployeeDatabaseRow["employee_code"];
+};
 
+export type ExitsPayrollEntriesWithEmployee = Omit<
+  ImportExitPayrollDataType,
+  "created_at" | "updated_at"
+> & {
+  employees: Pick<
+    EmployeeDatabaseRow,
+    | "first_name"
+    | "middle_name"
+    | "last_name"
+    | "employee_code"
+    | "company_id"
+    | "id"
+  >;
+};
 export type DashboardFilters = {
   month?: string | undefined | null;
   year?: string | undefined | null;
@@ -110,8 +130,10 @@ export const getExitsByCompanyId = async ({
     .from("exits")
     .select(
       `${columns.join(",")},
-          employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
-      }(project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
+          employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${
+            project ? "inner" : "left"
+          }(project_sites!${project ? "inner" : "left"}(id, name, projects!${
+        project ? "inner" : "left"
       }(id, name))))`,
       { count: "exact" }
     )
@@ -210,6 +232,7 @@ export const getExitsById = async ({
     "deduction",
     "note",
     "net_pay",
+    "payroll_id",
   ] as const;
 
   const { data, error } = await supabase
@@ -346,3 +369,100 @@ export const getExitsByCompanyIdByMonths = async ({
     previousMonthExitErrors,
   };
 };
+
+export async function getExitsEntriesForPayrollByPayrollId({
+  supabase,
+  payrollId,
+}: {
+  supabase: TypedSupabaseClient;
+  payrollId: string;
+}) {
+  const columns = [
+    "id",
+    "employee_id",
+    "payroll_id",
+    "net_pay",
+    "created_at",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("exits")
+    .select(
+      `${columns.join(
+        ","
+      )}, employees!left(id,company_id,first_name, middle_name, last_name, employee_code)`
+    )
+    .eq("payroll_id", payrollId)
+    .order("created_at", { ascending: false })
+    .returns<ExitsPayrollEntriesWithEmployee[]>();
+
+  if (error) console.error("getExitsEntriesForPayrollByPayrollId Error", error);
+
+  const mappedData = data?.map(({ net_pay, ...rest }) => ({
+    ...rest,
+    amount: net_pay,
+  }));
+  return { data: mappedData, error };
+}
+
+export async function getExitsEntryForPayrollById({
+  supabase,
+  id,
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+}) {
+  const columns = ["id", "employee_id", "net_pay", "payroll_id"] as const;
+
+  const { data, error } = await supabase
+    .from("exits")
+    .select(
+      `${columns.join(
+        ","
+      )}, employees!left(id,company_id,first_name, middle_name, last_name, employee_code)`
+    )
+    .eq("id", id)
+    .single<ExitsPayrollEntriesWithEmployee>();
+
+  if (error) console.error("getExitsforPayrollEntryById Error", error);
+
+  const mapped = data
+    ? (({ net_pay, ...rest }) => ({
+        ...rest,
+        amount: net_pay,
+      }))(data)
+    : null;
+  return { data: mapped, error };
+}
+
+export async function getExitEntriesByPayrollIdForPayrollRegister({
+  supabase,
+  payrollId,
+}: {
+  supabase: TypedSupabaseClient;
+  payrollId: string;
+}) {
+  const columns = ["net_pay"] as const;
+
+  const { data, error } = await supabase
+    .from("employees")
+    .select(
+      `id, company_id, first_name, middle_name, last_name, employee_code, exits!inner(${columns.join(
+        ","
+      )})`
+    )
+    .eq("exits.payroll_id", payrollId)
+    .returns<ExitsPayrollEntriesWithEmployee[]>();
+
+  if (error) {
+    console.error("getPayrollEntriesByPayrollId Error", error);
+  }
+  const mapped = data?.map((emp: any) => ({
+    ...emp,
+    exits: emp.exits.map(({ net_pay }: { net_pay: number }) => ({
+      amount: net_pay,
+    })),
+  }));
+
+  return { data: mapped, error: null };
+}

@@ -6,9 +6,11 @@ import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { updatePayroll } from "@canny_ecosystem/supabase/mutations";
 import {
+  getExitsEntriesForPayrollByPayrollId,
   getPayrollById,
-  getPayrollEntriesByPayrollId,
+  getReimbursementEntriesForPayrollByPayrollId,
   getSalaryEntriesByPayrollId,
+  type ReimbursementPayrollEntriesWithEmployee,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type {
@@ -31,9 +33,6 @@ import {
 } from "@remix-run/react";
 import { Suspense, useEffect } from "react";
 
-
-
-
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const payrollId = params.payrollId;
   const env = {
@@ -50,15 +49,20 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       supabase,
       payrollId: payrollId ?? "",
     });
-    const payrollEntriesPromise = getPayrollEntriesByPayrollId({
+    const reimbursementEntriesPromise =
+      getReimbursementEntriesForPayrollByPayrollId({
+        supabase,
+        payrollId: payrollId ?? "",
+      });
+    const exitEntriesPromise = getExitsEntriesForPayrollByPayrollId({
       supabase,
       payrollId: payrollId ?? "",
     });
-
     return defer({
       payrollPromise,
       salaryEntriesPromise,
-      payrollEntriesPromise,
+      reimbursementEntriesPromise,
+      exitEntriesPromise,
       error: null,
       env,
     });
@@ -67,7 +71,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return defer({
       payrollPromise: Promise.resolve({ data: null, error: null }),
       salaryEntriesPromise: Promise.resolve({ data: null, error: null }),
-      payrollEntriesPromise: Promise.resolve({ data: null, error: null }),
+      reimbursementEntriesPromise: Promise.resolve({ data: null, error: null }),
+      exitEntriesPromise: Promise.resolve({
+        data: null,
+        error: null,
+      }),
+
       error,
       env: null,
     });
@@ -127,8 +136,13 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export default function HistoryPayrollId() {
-  const { payrollPromise, salaryEntriesPromise, payrollEntriesPromise, env } =
-    useLoaderData<typeof loader>();
+  const {
+    payrollPromise,
+    salaryEntriesPromise,
+    reimbursementEntriesPromise,
+    exitEntriesPromise,
+    env,
+  } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
   const revalidator = useRevalidator();
@@ -178,7 +192,13 @@ export default function HistoryPayrollId() {
             payrollData.payroll_type === "exit"
           ) {
             return (
-              <Await resolve={payrollEntriesPromise}>
+              <Await
+                resolve={
+                  payrollData.payroll_type === "reimbursement"
+                    ? reimbursementEntriesPromise
+                    : exitEntriesPromise
+                }
+              >
                 {({ data, error }) => {
                   if (error || !data) {
                     clearExactCacheEntry(
@@ -195,7 +215,9 @@ export default function HistoryPayrollId() {
                   return (
                     <PayrollEntryComponent
                       payrollData={payrollData as unknown as any}
-                      data={data}
+                      data={
+                        data as unknown as ReimbursementPayrollEntriesWithEmployee[]
+                      }
                       noButtons={true}
                       env={env as SupabaseEnv}
                       fromWhere="payrollhistory"

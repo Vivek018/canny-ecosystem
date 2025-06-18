@@ -6,12 +6,13 @@ import { addOrUpdateInvoiceWithProof } from "@canny_ecosystem/supabase/media";
 import { createInvoice } from "@canny_ecosystem/supabase/mutations";
 import {
   getCannyCompanyIdByName,
+  getExitsEntriesForPayrollByPayrollId,
   getLocationsForSelectByCompanyId,
   getPayrollById,
-  getPayrollEntriesByPayrollId,
+  getReimbursementEntriesForPayrollByPayrollId,
   getRelationshipsByParentAndChildCompanyId,
   getSalaryEntriesByPayrollId,
-  type PayrollEntriesWithEmployee,
+  type ReimbursementPayrollEntriesWithEmployee,
   type SalaryEntriesWithEmployee,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -95,7 +96,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     supabase,
   });
   let salaryData = [] as SalaryEntriesWithEmployee[] | null;
-  let payrollData = [] as PayrollEntriesWithEmployee[] | null;
+  let reimbursementData = [] as
+    | ReimbursementPayrollEntriesWithEmployee[]
+    | null;
+  let exitData = [] as ReimbursementPayrollEntriesWithEmployee[] | null;
   if (payroll?.payroll_type === "salary") {
     const { data } = await getSalaryEntriesByPayrollId({
       supabase,
@@ -107,21 +111,29 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     payroll?.payroll_type === "exit" ||
     payroll?.payroll_type === "reimbursement"
   ) {
-    const { data } = await getPayrollEntriesByPayrollId({
+    const { data: reimb } = await getReimbursementEntriesForPayrollByPayrollId({
       supabase,
       payrollId,
     });
-    payrollData = data;
+    reimbursementData = reimb;
+
+    const { data: exit } = await getExitsEntriesForPayrollByPayrollId({
+      supabase,
+      payrollId,
+    });
+    exitData = exit ?? null;
   }
 
   const companyLocationArray = companyLocations?.map((location) => ({
     label: location?.name,
     value: location?.id,
   }));
+
   return {
     payroll,
     salaryData,
-    payrollData,
+    payrollData:
+      payroll?.payroll_type === "reimbursement" ? reimbursementData : exitData,
     companyRelations,
     companyLocationArray,
     payrollId,
@@ -290,9 +302,8 @@ export default function CreateInvoice({
   const INVOICE_TAG = updateValues ? UPDATE_INVOICE_TAG : ADD_INVOICE_TAG;
 
   const initialValues = updateValues ?? getInitialValueFromZod(InvoiceSchema);
-
   const [form, fields] = useForm({
-    id: INVOICE_TAG,
+    id: "invoice",
     constraint: getZodConstraint(InvoiceSchema),
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: InvoiceSchema });
@@ -543,6 +554,18 @@ export default function CreateInvoice({
                     children: "Include header in Invoice?",
                   }}
                 />
+                <Field
+                  inputProps={{
+                    ...getInputProps(fields.paid_date, { type: "date" }),
+                    placeholder: `Enter ${replaceUnderscore(
+                      fields.paid_date.name
+                    )}`,
+                  }}
+                  labelProps={{
+                    children: replaceUnderscore(fields.paid_date.name),
+                  }}
+                  errors={fields.paid_date.errors}
+                />
               </div>
               <RangeField
                 key={resetKey}
@@ -568,7 +591,7 @@ export default function CreateInvoice({
               />
               <p
                 className={cn(
-                  "text-muted-foreground hidden",
+                  "text-muted-foreground tracking-wide hidden",
                   (updateValues?.payroll_type ??
                     payroll?.payroll_type === "salary") &&
                     "flex"

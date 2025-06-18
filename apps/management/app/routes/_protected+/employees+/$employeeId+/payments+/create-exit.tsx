@@ -156,6 +156,8 @@ export default function CreateExit({
     if (!actionData) return;
     if (actionData?.status === "success") {
       clearCacheEntry(cacheKeyPrefix.employee_payments);
+      clearCacheEntry(cacheKeyPrefix.exits);
+
       toast({
         title: "Success",
         description: actionData?.message,

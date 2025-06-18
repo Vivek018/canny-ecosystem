@@ -6,11 +6,12 @@ import {
   getCompanyById,
   getInvoiceById,
   getPayrollById,
-  getPayrollEntriesByPayrollIdForPayrollRegister,
+  getReimbursementEntriesByPayrollIdForPayrollRegister,
   getPrimaryLocationByCompanyId,
   getRelationshipsByParentAndChildCompanyId,
   getSalaryEntriesByPayrollIdForSalaryRegister,
   type EmployeeProjectAssignmentDataType,
+  getExitEntriesByPayrollIdForPayrollRegister,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type {
@@ -1251,11 +1252,17 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     payroll?.payroll_type === "reimbursement" ||
     payroll?.payroll_type === "exit"
   ) {
-    const { data } = await getPayrollEntriesByPayrollIdForPayrollRegister({
+    const { data: reimb } =
+      await getReimbursementEntriesByPayrollIdForPayrollRegister({
+        supabase,
+        payrollId: invoiceData?.payroll_id!,
+      });
+    const { data: exit } = await getExitEntriesByPayrollIdForPayrollRegister({
       supabase,
       payrollId: invoiceData?.payroll_id!,
     });
-    payrollDataAndOthers = data || [];
+    payrollDataAndOthers =
+      payroll?.payroll_type === "reimbursement" ? reimb ?? [] : exit ?? [];
   }
 
   let contentType: string | undefined = undefined;
@@ -1555,26 +1562,46 @@ export default function PreviewInvoice() {
       }
 
       const employeeData: TransformedEmployeeEntry[] = [];
-
-      for (const emp of data.payrollDataAndOthers) {
-        for (const entry of emp.payroll_entries) {
-          employeeData.push({
-            employeeData: {
-              first_name: emp?.first_name,
-              middle_name: emp?.middle_name,
-              last_name: emp?.last_name,
-              employee_code: emp?.employee_code,
-            },
-            invoiceFields: [
-              {
-                name: type.toUpperCase(),
-                amount: entry.amount,
+      if (payroll?.payroll_type === "reimbursement") {
+        for (const emp of data.payrollDataAndOthers) {
+          for (const entry of emp.reimbursements) {
+            employeeData.push({
+              employeeData: {
+                first_name: emp?.first_name,
+                middle_name: emp?.middle_name,
+                last_name: emp?.last_name,
+                employee_code: emp?.employee_code,
               },
-            ],
-          });
+              invoiceFields: [
+                {
+                  name: type.toUpperCase(),
+                  amount: entry.amount,
+                },
+              ],
+            });
+          }
         }
       }
-
+      if (payroll?.payroll_type === "exit") {
+        for (const emp of data.payrollDataAndOthers) {
+          for (const entry of emp.exits) {
+            employeeData.push({
+              employeeData: {
+                first_name: emp?.first_name,
+                middle_name: emp?.middle_name,
+                last_name: emp?.last_name,
+                employee_code: emp?.employee_code,
+              },
+              invoiceFields: [
+                {
+                  name: type.toUpperCase(),
+                  amount: entry.amount,
+                },
+              ],
+            });
+          }
+        }
+      }
       return {
         companyData,
         employeeData,

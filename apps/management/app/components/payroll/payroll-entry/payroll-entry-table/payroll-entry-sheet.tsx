@@ -4,7 +4,7 @@ import {
   getInputProps,
   useForm,
 } from "@conform-to/react";
-import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
+import { Field } from "@canny_ecosystem/ui/forms";
 import { Form } from "@remix-run/react";
 import {
   Sheet,
@@ -20,19 +20,25 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { flexRender } from "@tanstack/react-table";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { FormButtons } from "../../../form/form-buttons";
-import type { PayrollEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
-import { PayrollEntrySchema, payrollPaymentStatusArray, replaceUnderscore, transformStringArrayIntoOptions } from "@canny_ecosystem/utils";
-import { useState } from "react";
+import type { ReimbursementPayrollEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
+import {
+  PayrollEntrySchema,
+} from "@canny_ecosystem/utils";
 
 export function PayrollEntrySheet({
   row,
   rowData,
   editable,
-}: { row: any; rowData: PayrollEntriesWithEmployee; editable: boolean }) {
-  const name = `${rowData?.employees?.first_name} ${rowData?.employees?.middle_name ?? ""} ${rowData?.employees?.last_name ?? ""
-    }`;
-
-  const [resetKey, setResetKey] = useState(Date.now());
+  type,
+}: {
+  row: any;
+  rowData: ReimbursementPayrollEntriesWithEmployee;
+  editable: boolean;
+  type: string;
+}) {
+  const name = `${rowData?.employees?.first_name} ${
+    rowData?.employees?.middle_name ?? ""
+  } ${rowData?.employees?.last_name ?? ""}`;
 
   const [form, fields] = useForm({
     id: "UPDATE_PAYROLL_ENTRY",
@@ -42,8 +48,10 @@ export function PayrollEntrySheet({
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
-    defaultValue: rowData,
-
+    defaultValue: {
+      ...rowData,
+      type: type,
+    },
   });
 
   return (
@@ -51,7 +59,7 @@ export function PayrollEntrySheet({
       <TableRow
         key={row.id}
         data-state={row.getIsSelected() && "selected"}
-        className='relative cursor-pointer select-text'
+        className="relative cursor-pointer select-text"
       >
         {row.getVisibleCells().map((cell: any) => {
           if (cell.column.id === "actions") {
@@ -60,7 +68,7 @@ export function PayrollEntrySheet({
                 key={cell.id}
                 className={cn(
                   cell.column.id === "actions" &&
-                  "sticky right-0 min-w-20 max-w-20 bg-card z-10"
+                    "sticky right-0 min-w-20 max-w-20 bg-card z-10"
                 )}
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -70,9 +78,7 @@ export function PayrollEntrySheet({
           return (
             <SheetTrigger asChild key={cell.id}>
               <TableCell
-                className={cn(
-                  "px-3 md:px-4 py-4 hidden md:table-cell"
-                )}
+                className={cn("px-3 md:px-4 py-4 hidden md:table-cell")}
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </TableCell>
@@ -104,19 +110,16 @@ export function PayrollEntrySheet({
               className="flex flex-col"
               action={`/payroll/run-payroll/${rowData.payroll_id}/${rowData.id}/update-payroll-entry`}
             >
-              <input
-                {...getInputProps(fields.id, { type: "hidden" })}
-              />
-              <input
-                {...getInputProps(fields.reimbursement_id, { type: "hidden" })}
-              />
-              <input
-                {...getInputProps(fields.exit_id, { type: "hidden" })}
-              />
+              <input {...getInputProps(fields.type, { type: "hidden" })} />
+
+              <input {...getInputProps(fields.id, { type: "hidden" })} />
+
               <input
                 {...getInputProps(fields.employee_id, { type: "hidden" })}
               />
-              <input {...getInputProps(fields.payroll_id, { type: "hidden" })} />
+              <input
+                {...getInputProps(fields.payroll_id, { type: "hidden" })}
+              />
               <Field
                 inputProps={{
                   ...getInputProps(fields.amount, { type: "number" }),
@@ -130,20 +133,6 @@ export function PayrollEntrySheet({
                 }}
                 errors={fields.amount.errors}
               />
-              <SearchableSelectField
-                key={resetKey}
-                className="capitalize"
-                options={transformStringArrayIntoOptions(payrollPaymentStatusArray as unknown as string[])}
-                inputProps={{
-                  ...getInputProps(fields.payment_status, { type: "text" }),
-                  readOnly: !editable,
-                }}
-                placeholder={`Select ${replaceUnderscore(fields.payment_status.name)}`}
-                labelProps={{
-                  children: replaceUnderscore(fields.payment_status.name),
-                }}
-                errors={fields.payment_status.errors}
-              />
             </Form>
           </FormProvider>
         </div>
@@ -151,7 +140,6 @@ export function PayrollEntrySheet({
           <SheetClose asChild>
             <FormButtons
               form={form}
-              setResetKey={setResetKey}
               isSingle={true}
               className={cn(!editable && "hidden")}
             />

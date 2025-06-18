@@ -1,5 +1,7 @@
 import { convertToNull } from "@canny_ecosystem/utils";
 import type { ExitsInsert, ExitsUpdate, TypedSupabaseClient } from "../types";
+import { updatePayroll } from "./payroll";
+import { getExitsById, getPayrollById } from "../queries";
 
 export const createExit = async ({
   supabase,
@@ -20,11 +22,7 @@ export const createExit = async ({
     }
   }
 
-  const { error, status } = await supabase
-    .from("exits")
-    .insert(data)
-    ;
-
+  const { error, status } = await supabase.from("exits").insert(data);
   if (error) {
     console.error("createExit Error:", error);
   }
@@ -56,9 +54,7 @@ export const updateExit = async ({
   const { error, status } = await supabase
     .from("exits")
     .update(updateData)
-    .eq("id", data.id!)
-    ;
-
+    .eq("id", data.id!);
   if (error) {
     console.error("updateExit Error:", error);
   }
@@ -198,11 +194,7 @@ export async function createExitsFromImportedData({
     for (let i = 0; i < newData.length; i += BATCH_SIZE) {
       const batch = newData.slice(i, Math.min(i + BATCH_SIZE, newData.length));
 
-      const { error: insertError } = await supabase
-        .from("exits")
-        .insert(batch)
-        ;
-
+      const { error: insertError } = await supabase.from("exits").insert(batch);
       if (insertError) {
         console.error("Error inserting batch:", insertError);
       }
@@ -225,7 +217,7 @@ export async function createExitsFromImportedData({
           const { error: updateError } = await supabase
             .from("exits")
             .update(record)
-            .eq("employee_id", existingRecord.employee_id);
+            .eq("employee_id", existingRecord.employee_id!);
 
           return { type: "update", error: updateError };
         }
@@ -254,3 +246,82 @@ export async function createExitsFromImportedData({
     error: new Error("Invalid import_type"),
   };
 }
+
+export async function updateExitsForPayrollCreation({
+  supabase,
+  data,
+}: {
+  supabase: TypedSupabaseClient;
+  data: { id: string; payroll_id: string }[];
+}) {
+  const results = await Promise.all(
+    data.map((item) => {
+      const { id, ...updateData } = item;
+      return supabase.from("exits").update(updateData).eq("id", id!);
+    })
+  );
+
+  const errors = results.filter((res) => res.error);
+  const status = results.filter((res) => res.status);
+
+  return { status, errors };
+}
+
+export const updateExitAndPayrollById = async ({
+  supabase,
+  data,
+  bypassAuth = false,
+  action,
+}: {
+  supabase: TypedSupabaseClient;
+  data: ExitsUpdate;
+  bypassAuth?: boolean;
+  action: string;
+}) => {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user?.email) return { status: 400, error: "Unauthorized User" };
+  }
+
+  const updateData = convertToNull(data);
+
+  const { data: entryData } = await getExitsById({
+    supabase,
+    id: data.id ?? "",
+  });
+  const { data: payrollData } = await getPayrollById({
+    supabase,
+    payrollId: entryData?.payroll_id ?? "",
+  });
+
+  let totalNetAmount = payrollData?.total_net_amount!;
+  let totalEmployees = payrollData?.total_employees!;
+  if (action === "update") {
+    totalNetAmount -= entryData?.net_pay!;
+    totalNetAmount += updateData?.net_pay!;
+  } else if (action === "delete") {
+    totalNetAmount -= entryData?.net_pay!;
+    totalEmployees -= 1;
+  }
+
+  await updatePayroll({
+    supabase,
+    data: {
+      id: payrollData?.id,
+      total_net_amount: totalNetAmount,
+      total_employees: totalEmployees,
+    },
+  });
+
+  const { error, status } = await supabase
+    .from("exits")
+    .update(updateData)
+    .eq("id", data.id!);
+  if (error) {
+    console.error("updateExitAndPayroll Error:", error);
+  }
+
+  return { status, error };
+};
