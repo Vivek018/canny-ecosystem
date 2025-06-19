@@ -1359,7 +1359,7 @@ export async function getAllEmployeeTablesData({
     supabase.from("employee_statutory_details").select("*").limit(HARDEST_QUERY_LIMIT),
     supabase.from("employee_addresses").select("*").limit(HARDEST_QUERY_LIMIT),
     supabase.from("employee_guardians").select("*").limit(HARDEST_QUERY_LIMIT),
-    supabase.from("employee_project_assignment").select("*, project_sites!left(id, name, projects!left(id, name))").limit(HARDEST_QUERY_LIMIT),
+    supabase.from("employee_project_assignment").select("*, project_sites!left(*, projects!left(*))").limit(HARDEST_QUERY_LIMIT),
     supabase.from("employee_work_history").select("*").limit(HARDEST_QUERY_LIMIT),
     supabase.from("employee_skills").select("*").limit(HARDEST_QUERY_LIMIT),
   ]);

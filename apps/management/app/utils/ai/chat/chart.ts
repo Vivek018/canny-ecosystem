@@ -47,7 +47,7 @@ export const generateChartConfig = async (
 
   try {
     const { object: config } = await generateObject({
-      model: google(GEMINI_MAIN),
+      model: GEMINI_MAIN,
       system: `You are a data visualization expert.
 
 Your task is to generate a valid React chart configuration using SQL data and a user query. The data is already cleaned—no further transformation or filtering is needed.

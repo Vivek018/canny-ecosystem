@@ -17,7 +17,7 @@ import { useEffect } from "react";
 
 const suggestedPrompts = [
   "Employees who started working after 2020",
-  "Show employees completing more than 5 years of service in the next 6 months",
+  "Show employees completing more than 5 years of service in April 2025",
   "Top 20 oldest employees",
   "List employees with no address",
   "Employees with missing bank information",

@@ -1,5 +1,5 @@
 export const SINGLE_QUERY_LIMIT = 1;
-export const HARDEST_QUERY_LIMIT = 2;
+export const HARDEST_QUERY_LIMIT = 1;
 export const LAZY_LOADING_LIMIT = 40;
 export const HARD_QUERY_LIMIT = 100;
 export const MID_QUERY_LIMIT = 1000;

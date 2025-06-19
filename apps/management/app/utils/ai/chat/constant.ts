@@ -1,4 +1,5 @@
 import { MID_QUERY_LIMIT } from "@canny_ecosystem/supabase/constant";
+import { google } from '@ai-sdk/google';
 
 export const BASIC_SYSTEM_PROMPT = `REQUIREMENTS:
 • Output: SELECT only
@@ -15,6 +16,7 @@ STRICT CONSTRAINTS:
 • Use LEFT JOINs for data
 • Prefer readable values (names, labels) over raw IDs.
 • Apply filters like “is_primary = true” or “is_emergency_contact = true” to avoid duplicates.
+• When comparing string always compare irrespective of their letter case (ILike only).
 • Use COALESCE to handle missing/null fields where useful.
 • For geo queries: compare employee address city/state vs project site location.
 • Can join 2–3 levels deep (e.g., employees → employee_project_assignment → project_sites).
@@ -35,5 +37,5 @@ SUPPORTED INSIGHT TYPES:
 • Promotion prediction based on tenure + skills.
 `
 
-export const GEMINI_MAIN = "gemini-2.0-flash";
-export const GEMINI_LITE = "gemini-2.0-flash-lite";
+export const GEMINI_MAIN = google("gemini-2.0-flash");
+export const GEMINI_LITE = google("gemini-2.0-flash-lite");

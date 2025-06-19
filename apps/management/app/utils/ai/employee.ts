@@ -58,7 +58,7 @@ export const generateEmployeeFilter = async (
 ) => {
   try {
     const result = await generateObject({
-      model: google(GEMINI_LITE),
+      model: GEMINI_LITE,
       system: `You are a helpful assistant that generates filters for a given prompt.
       Current date is: ${new Date().toISOString().split("T")[0]}.
       Instructions:
