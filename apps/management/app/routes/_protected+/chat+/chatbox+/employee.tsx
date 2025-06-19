@@ -89,6 +89,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
     if (!hasPermission(user?.role!, `${readRole}:${attribute.chat}`)) {
       return safeRedirect(DEFAULT_ROUTE, { headers });
     }
+    
+    const { data: employeesData } = await getAllEmployeeTablesData({ supabase });
 
     const url = new URL(request.url);
     const searchParams = new URLSearchParams(url.searchParams);
@@ -99,9 +101,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
       return defer({ prompt, query: null, data: [], config: null, error: null, dataExistsInDb });
     }
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-
-    const { data: employeesData } = await getAllEmployeeTablesData({ supabase });
     const tablesData = JSON.stringify(employeesData);
+
 
     const promptWithCompany = `${prompt} where company is company_id=${companyId}`
 

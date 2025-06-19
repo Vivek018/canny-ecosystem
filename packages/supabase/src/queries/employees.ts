@@ -1353,19 +1353,15 @@ export async function getAllEmployeeTablesData({
     employeeWorkDetails,
     employeeWorkHistoryDetails,
     employeeSkillsDetails,
-    projectDetails,
-    projectSiteDetails,
   ] = await Promise.all([
     supabase.from("employees").select("*").limit(HARDEST_QUERY_LIMIT),
     supabase.from("employee_bank_details").select("*").limit(HARDEST_QUERY_LIMIT),
     supabase.from("employee_statutory_details").select("*").limit(HARDEST_QUERY_LIMIT),
     supabase.from("employee_addresses").select("*").limit(HARDEST_QUERY_LIMIT),
     supabase.from("employee_guardians").select("*").limit(HARDEST_QUERY_LIMIT),
-    supabase.from("employee_project_assignment").select("*").limit(HARDEST_QUERY_LIMIT),
+    supabase.from("employee_project_assignment").select("*, project_sites!left(id, name, projects!left(id, name))").limit(HARDEST_QUERY_LIMIT),
     supabase.from("employee_work_history").select("*").limit(HARDEST_QUERY_LIMIT),
     supabase.from("employee_skills").select("*").limit(HARDEST_QUERY_LIMIT),
-    supabase.from("projects").select("*").limit(HARDEST_QUERY_LIMIT),
-    supabase.from("project_sites").select("*").limit(HARDEST_QUERY_LIMIT),
   ]);
 
   const error =
@@ -1376,9 +1372,7 @@ export async function getAllEmployeeTablesData({
     || employeeGuardiansDetails.error
     || employeeWorkDetails.error
     || employeeWorkHistoryDetails.error
-    || employeeSkillsDetails.error
-    || projectDetails.error
-    || projectSiteDetails.error;
+    || employeeSkillsDetails.error;
 
   if (error) {
     console.error("getAllEmployeeRelatedData Error:", error);
@@ -1395,8 +1389,6 @@ export async function getAllEmployeeTablesData({
       employee_project_assignment: employeeWorkDetails.data,
       employee_work_history: employeeWorkHistoryDetails.data,
       employee_skills: employeeSkillsDetails.data,
-      projects: projectDetails.data,
-      project_sites: projectSiteDetails.data,
     },
     error,
   };

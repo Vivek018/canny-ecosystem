@@ -20,7 +20,8 @@ export const generateQuery = async ({ input, companyId, tablesData, systemPrompt
       Generate the SQL query based on the natural language request and provided sample data structure
 `,
       prompt: input,
-      temperature: 0.1,
+      temperature: 0,
+      topK: 5,
       schema: z.object({
         query: z.string(),
       }),
