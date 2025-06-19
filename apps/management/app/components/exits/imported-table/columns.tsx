@@ -47,27 +47,17 @@ export const ImportedDataColumns: ColumnDef<ImportExitDataType>[] = [
     },
   },
   {
-    accessorKey: "organization_payable_days",
-    header: "Organization Payable Days",
+    accessorKey: "payable_days",
+    header: "Payable Days",
     cell: ({ row }) => {
       return (
         <p className="truncate ">
-          {row.original?.organization_payable_days ?? "--"}
+          {row.original?.payable_days ?? "--"}
         </p>
       );
     },
   },
-  {
-    accessorKey: "employee_payable_days",
-    header: "Employee Payable Days",
-    cell: ({ row }) => {
-      return (
-        <p className="truncate ">
-          {row.original?.employee_payable_days ?? "--"}
-        </p>
-      );
-    },
-  },
+  
   {
     accessorKey: "bonus",
     header: "Bonus",
@@ -98,13 +88,7 @@ export const ImportedDataColumns: ColumnDef<ImportExitDataType>[] = [
       return <p className="truncate ">{row.original?.deduction ?? "--"}</p>;
     },
   },
-  {
-    accessorKey: "total",
-    header: "Total",
-    cell: ({ row }: { row: any }) => {
-      return <p className="truncate ">{row.original?.total ?? "--"}</p>;
-    },
-  },
+  
   {
     accessorKey: "note",
     header: "Note",

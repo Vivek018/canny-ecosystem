@@ -44,12 +44,20 @@ export function ExitMenu({
   const exitForPayroll = extractKeys(selectedRows, [
     "id",
     "employee_id",
-    "net_pay",
+    "gratuity",
+    "bonus",
+    "leave_encashment",
+    "deduction",
   ]);
 
   const totalEmployees = exitForPayroll?.length;
   const totalNetAmount = exitForPayroll?.reduce(
-    (sum, item) => sum + item?.net_pay,
+    (sum, item) =>
+      sum +
+      item?.bonus +
+      item?.gratuity +
+      item?.leave_encashment -
+      item?.deduction,
     0
   );
 

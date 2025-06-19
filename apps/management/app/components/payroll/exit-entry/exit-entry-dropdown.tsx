@@ -1,4 +1,4 @@
-import type { ReimbursementRow } from "@canny_ecosystem/supabase/types";
+import type { ExitsRow} from "@canny_ecosystem/supabase/types";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,14 +22,14 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { replaceDash } from "@canny_ecosystem/utils";
 import { useNavigate, useSubmit } from "@remix-run/react";
 
-export const PayrollEntryDropdown = ({
+export const ExitEntryDropdown = ({
   data,
   triggerChild,
   status,
   type,
 }: {
   status: string;
-  data: Omit<ReimbursementRow, "created_at" | "updated_at">;
+  data: Omit<ExitsRow, "created_at" | "updated_at">;
   triggerChild: React.ReactElement;
   type: string;
 }) => {

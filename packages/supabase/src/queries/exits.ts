@@ -8,7 +8,13 @@ import type {
 import { months } from "@canny_ecosystem/utils/constant";
 export type ImportExitPayrollDataType = Pick<
   ExitsRow,
-  "employee_id" | "net_pay" | "id" | "payroll_id"
+  | "employee_id"
+  | "gratuity"
+  | "bonus"
+  | "deduction"
+  | "leave_encashment"
+  | "id"
+  | "payroll_id"
 > & {
   employee_code: EmployeeDatabaseRow["employee_code"];
 };
@@ -43,7 +49,6 @@ export type ExitFilterType = {
 
 export type ImportExitDataType = Pick<
   ExitsRow,
-  | "employee_payable_days"
   | "bonus"
   | "deduction"
   | "final_settlement_date"
@@ -51,16 +56,14 @@ export type ImportExitDataType = Pick<
   | "last_working_day"
   | "leave_encashment"
   | "note"
-  | "organization_payable_days"
+  | "payable_days"
   | "reason"
-  | "net_pay"
 > & { employee_code: string };
 
 export type ExitDataType = Pick<
   ExitsRow,
   | "id"
   | "employee_id"
-  | "employee_payable_days"
   | "bonus"
   | "deduction"
   | "final_settlement_date"
@@ -69,9 +72,8 @@ export type ExitDataType = Pick<
   | "last_working_day"
   | "final_settlement_date"
   | "note"
-  | "organization_payable_days"
+  | "payable_days"
   | "reason"
-  | "net_pay"
 > & {
   employees: Pick<
     EmployeeDatabaseRow,
@@ -113,8 +115,7 @@ export const getExitsByCompanyId = async ({
   const columns = [
     "id",
     "employee_id",
-    "organization_payable_days",
-    "employee_payable_days",
+    "payable_days",
     "last_working_day",
     "final_settlement_date",
     "reason",
@@ -123,7 +124,6 @@ export const getExitsByCompanyId = async ({
     "gratuity",
     "deduction",
     "note",
-    "net_pay",
   ] as const;
 
   const query = supabase
@@ -221,8 +221,7 @@ export const getExitsById = async ({
   const columns = [
     "id",
     "employee_id",
-    "organization_payable_days",
-    "employee_payable_days",
+    "payable_days",
     "last_working_day",
     "final_settlement_date",
     "reason",
@@ -231,7 +230,6 @@ export const getExitsById = async ({
     "gratuity",
     "deduction",
     "note",
-    "net_pay",
     "payroll_id",
   ] as const;
 
@@ -256,8 +254,7 @@ export const getExitByEmployeeId = async ({
   const columns = [
     "id",
     "employee_id",
-    "organization_payable_days",
-    "employee_payable_days",
+    "payable_days",
     "last_working_day",
     "final_settlement_date",
     "reason",
@@ -266,7 +263,6 @@ export const getExitByEmployeeId = async ({
     "gratuity",
     "deduction",
     "bonus",
-    "net_pay",
   ] as const;
 
   const { data, error } = await supabase
@@ -283,9 +279,8 @@ export const getExitByEmployeeId = async ({
 export type RecentExitsType = Pick<
   ExitsRow,
   | "id"
-  | "net_pay"
   | "last_working_day"
-  | "employee_payable_days"
+  | "payable_days"
   | "final_settlement_date"
   | "bonus"
   | "leave_encashment"
@@ -381,7 +376,10 @@ export async function getExitsEntriesForPayrollByPayrollId({
     "id",
     "employee_id",
     "payroll_id",
-    "net_pay",
+    "gratuity",
+    "bonus",
+    "leave_encashment",
+    "deduction",
     "created_at",
   ] as const;
 
@@ -398,11 +396,7 @@ export async function getExitsEntriesForPayrollByPayrollId({
 
   if (error) console.error("getExitsEntriesForPayrollByPayrollId Error", error);
 
-  const mappedData = data?.map(({ net_pay, ...rest }) => ({
-    ...rest,
-    amount: net_pay,
-  }));
-  return { data: mappedData, error };
+  return { data, error };
 }
 
 export async function getExitsEntryForPayrollById({
@@ -412,7 +406,15 @@ export async function getExitsEntryForPayrollById({
   supabase: TypedSupabaseClient;
   id: string;
 }) {
-  const columns = ["id", "employee_id", "net_pay", "payroll_id"] as const;
+  const columns = [
+    "id",
+    "employee_id",
+    "gratuity",
+    "bonus",
+    "leave_encashment",
+    "deduction",
+    "payroll_id",
+  ] as const;
 
   const { data, error } = await supabase
     .from("exits")
@@ -426,13 +428,7 @@ export async function getExitsEntryForPayrollById({
 
   if (error) console.error("getExitsforPayrollEntryById Error", error);
 
-  const mapped = data
-    ? (({ net_pay, ...rest }) => ({
-        ...rest,
-        amount: net_pay,
-      }))(data)
-    : null;
-  return { data: mapped, error };
+  return { data, error };
 }
 
 export async function getExitEntriesByPayrollIdForPayrollRegister({
@@ -442,7 +438,12 @@ export async function getExitEntriesByPayrollIdForPayrollRegister({
   supabase: TypedSupabaseClient;
   payrollId: string;
 }) {
-  const columns = ["net_pay"] as const;
+  const columns = [
+    "gratuity",
+    "bonus",
+    "leave_encashment",
+    "deduction",
+  ] as const;
 
   const { data, error } = await supabase
     .from("employees")

@@ -114,27 +114,13 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     },
   },
   {
-    accessorKey: "organization_payable_days",
-    header: "Organization Payable Days",
+    accessorKey: "payable_days",
+    header: "Payable Days",
     cell: ({ row }) => {
-      return (
-        <p className="truncate">
-          {row.original?.organization_payable_days ?? "--"}
-        </p>
-      );
+      return <p className="truncate">{row.original?.payable_days ?? "--"}</p>;
     },
   },
-  {
-    accessorKey: "employee_payable_days",
-    header: "Employee Payable Days",
-    cell: ({ row }) => {
-      return (
-        <p className="truncate">
-          {row.original?.employee_payable_days ?? "--"}
-        </p>
-      );
-    },
-  },
+
   {
     accessorKey: "bonus",
     header: "Bonus",
@@ -175,10 +161,22 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
   },
   {
     accessorKey: "net_pay",
-    header: "Net Pay",
+    header: "Net Amount",
     cell: ({ row }) => {
+      function calculateNetAmount(employees: any): Record<string, number> {
+        return {
+          total:
+            employees.gratuity +
+            employees.bonus +
+            employees.leave_encashment -
+            employees.deduction,
+        };
+      }
+
       return (
-        <p className="capitalize truncate">{row.original?.net_pay ?? "--"}</p>
+        <p className="truncate">
+          {calculateNetAmount(row.original).total ?? "--"}
+        </p>
       );
     },
   },

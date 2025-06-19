@@ -49,13 +49,28 @@ export function ImportPayrollDialog() {
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => {
-            searchParams.set("step", modalSearchParamNames.import_payroll);
+            searchParams.set(
+              "step",
+              modalSearchParamNames.import_reimbursement_payroll
+            );
             setSearchParams(searchParams);
           }}
           className="space-x-2 flex items-center"
         >
           <Icon name="import" size="sm" className="mb-0.5" />
-          <span>Import Payroll</span>
+          <span>Import Reimbursement Payroll</span>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem
+          onClick={() => {
+            searchParams.set("step", modalSearchParamNames.import_exit_payroll);
+            setSearchParams(searchParams);
+          }}
+          className="space-x-2 flex items-center"
+        >
+          <Icon name="import" size="sm" className="mb-0.5" />
+          <span>Import Exit Payroll</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

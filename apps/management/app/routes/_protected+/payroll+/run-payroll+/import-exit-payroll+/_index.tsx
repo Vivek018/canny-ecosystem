@@ -1,9 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  json,
-  useLoaderData,
-  useLocation,
-} from "@remix-run/react";
+import { json, useLoaderData, useLocation } from "@remix-run/react";
 import Papa from "papaparse";
 import { Combobox } from "@canny_ecosystem/ui/combobox";
 import { Button } from "@canny_ecosystem/ui/button";
@@ -30,11 +26,14 @@ import {
 } from "@canny_ecosystem/utils";
 import type { z } from "zod";
 
-import { useImportStoreForExit } from "@/store/import";
+import {
+  useImportStoreForExitPayroll,
+} from "@/store/import";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { ExitImportData } from "@/components/exits/import-export/exit-import-data";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
 import { getExitsConflicts } from "@canny_ecosystem/supabase/mutations";
+import { Input } from "@canny_ecosystem/ui/input";
+import { ExitImportData } from "@/components/payroll/import-export/payroll-exit-import-data";
 
 type FieldConfig = {
   key: keyof z.infer<typeof ImportExitHeaderSchema>;
@@ -64,8 +63,10 @@ export async function loader() {
 
 export default function ExitFieldMapping() {
   const { env } = useLoaderData<typeof loader>();
+  const [title, setTitle] = useState("");
+
   const { supabase } = useSupabase({ env });
-  const { setImportData } = useImportStoreForExit();
+  const { setImportData } = useImportStoreForExitPayroll();
   const [loadNext, setLoadNext] = useState(false);
   const location = useLocation();
   const [hasConflict, setHasConflict] = useState<number[]>([]);
@@ -207,7 +208,7 @@ export default function ExitFieldMapping() {
             });
 
           if (validateImportData(finalData)) {
-            setImportData({ data: finalData as ImportExitDataType[] });
+            setImportData({ title, data: finalData as ImportExitDataType[] });
             const employeeCodes = finalData!.map(
               (value) => value.employee_code
             );
@@ -288,7 +289,10 @@ export default function ExitFieldMapping() {
                 </ul>
               </div>
             )}
-
+            <Input
+              placeholder="Enter the title here"
+              onChange={(e) => setTitle(e.target.value)}
+            />
             <div className="grid grid-cols-2 place-content-center justify-between gap-y-8 gap-x-10 mt-5">
               {FIELD_CONFIGS.map((field) => (
                 <div key={field.key} className="flex flex-col">

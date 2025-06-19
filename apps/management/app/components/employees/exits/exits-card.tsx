@@ -37,16 +37,11 @@ export const ExitsItem = ({ exitsData }: { exitsData: any }) => {
   return (
     <section className="w-full select-text cursor-auto h-full flex flex-col justify-start p-4">
       <ul className="grid grid-cols-3 gap-4">
-        <li>
-          <DetailItem
-            label="Organization Payable Days"
-            value={exitsData?.organization_payable_days}
-          />
-        </li>
+        
         <li>
           <DetailItem
             label="Employee Payable Days"
-            value={exitsData?.employee_payable_days}
+            value={exitsData?.payable_days}
           />
         </li>
         <li>
@@ -81,12 +76,6 @@ export const ExitsItem = ({ exitsData }: { exitsData: any }) => {
         </li>
         <li>
           <DetailItem label="Deduction" value={`₹${exitsData?.deduction}`} />
-        </li>
-        <li>
-          <DetailItem
-            label="Net Pay"
-            value={exitsData.net_pay ? `₹${exitsData?.net_pay}` : "-"}
-          />
         </li>
         <li>
           <DetailItem label="Note" value={exitsData?.note} />

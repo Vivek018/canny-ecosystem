@@ -13,23 +13,23 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { PayrollTableHeader } from "./data-table-header";
-import { PayrollEntrySheet } from "./payroll-entry-sheet";
+import { ReimbursementEntrySheet } from "./reimbursement-entry-sheet";
 import { useState } from "react";
 import type { ReimbursementPayrollEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
 
-interface PayrollEntryTableProps<TData, TValue> {
+interface ReimbursementEntryTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   editable: boolean;
   type: string;
 }
 
-export function PayrollEntryDataTable<TData, TValue>({
+export function ReimbursementEntryDataTable<TData, TValue>({
   columns,
   data,
   editable,
   type,
-}: PayrollEntryTableProps<TData, TValue>) {
+}: ReimbursementEntryTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
 
   const table = useReactTable({
@@ -61,7 +61,7 @@ export function PayrollEntryDataTable<TData, TValue>({
               table.getRowModel()?.rows?.map((row) => {
                 const rowData = row.original;
                 return (
-                  <PayrollEntrySheet
+                  <ReimbursementEntrySheet
                     key={row.id}
                     type={type}
                     row={row}
@@ -73,7 +73,7 @@ export function PayrollEntryDataTable<TData, TValue>({
             ) : (
               <TableRow className={cn(!tableLength && "border-none")}>
                 <TableCell className="h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize">
-                  No Payroll Entry Found
+                  No Reimbursement Entry Found
                 </TableCell>
               </TableRow>
             )}

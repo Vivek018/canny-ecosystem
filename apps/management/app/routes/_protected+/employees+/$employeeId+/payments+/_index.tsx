@@ -7,6 +7,7 @@ import {
   getExitByEmployeeId,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
+import type{ ExitsRow } from "@canny_ecosystem/supabase/types";
 import { defer, type LoaderFunctionArgs } from "@remix-run/node";
 import {
   Await,
@@ -121,7 +122,7 @@ export default function Payments() {
             }
             return (
               <ExitsCard
-                exitsData={resolvedData.data}
+                exitsData={resolvedData.data as unknown as ExitsRow}
                 employeeId={employeeId ?? ""}
               />
             );
