@@ -54,18 +54,20 @@ export default function EmployeeStateInsuranceIndex() {
   }
 
   return (
-    <Suspense fallback={<LoadingSpinner className="mt-40" />}>
-      <Await resolve={esiPromise}>
-        {(resolvedData) => {
-          if (!resolvedData) {
-            clearExactCacheEntry(cacheKeyPrefix.statutory_field_esi);
-            return <ErrorBoundary message="Failed to load ESI" />;
-          }
-          return (
-            <ESIWrapper data={resolvedData.data} error={resolvedData.error} />
-          );
-        }}
-      </Await>
-    </Suspense>
+    <div className="p-4 flex gap-3 place-content-center justify-between">
+      <Suspense fallback={<LoadingSpinner className="mt-30" />}>
+        <Await resolve={esiPromise}>
+          {(resolvedData) => {
+            if (!resolvedData) {
+              clearExactCacheEntry(cacheKeyPrefix.statutory_field_esi);
+              return <ErrorBoundary message="Failed to load ESI" />;
+            }
+            return (
+              <ESIWrapper data={resolvedData.data} error={resolvedData.error} />
+            );
+          }}
+        </Await>
+      </Suspense>
+    </div>
   );
 }

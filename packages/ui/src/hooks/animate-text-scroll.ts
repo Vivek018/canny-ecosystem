@@ -33,7 +33,6 @@ export function useAnimateTextScroll(
         clearTimeout(timeout);
         timeout = setTimeout(() => {
           currentX = 0;
-          content.style.transform = `translateX(0px)`;
         }, pauseDuration);
       } else {
         animFrame = requestAnimationFrame(scrollStep);

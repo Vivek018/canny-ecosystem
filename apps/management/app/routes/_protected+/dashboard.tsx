@@ -161,7 +161,7 @@ export default function Dashboard() {
   } = useLoaderData<typeof loader>();
 
   const { containerRef, contentRef } = useAnimateTextScroll({
-    pauseDurationMs: 2000,
+    pauseDurationMs: 5000,
     speed: 1.5,
   });
 

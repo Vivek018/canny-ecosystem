@@ -18,80 +18,68 @@ import { useEffect } from "react";
 const suggestedPrompts = [
   "Employees who started working after 2020",
   "Show employees completing more than 5 years of service in the next 6 months",
+  "Top 20 oldest employees",
   "List employees with no address",
+  "Employees with missing bank information",
   "Employees missing emergency contact or guardian details",
   "City wise breakdown of employees with total count",
-  "Employees with incomplete statutory details",
   "List employees whose birthdays are coming up this month",
   "List project sites with gender distribution count individually",
   "Identify employees turning above 50 this calendar year",
   "Employees who have not been assigned to any project since joining",
   "List project sites with number of local and outstation employees based on employee vs site location",
   "Predict which employees are due for a promotion based on tenure and education",
-  "Employees with missing bank information",
-  "Top 20 oldest employees",
-  "Employees with post-graduate degrees and more than 10 years of work experience",
+  "Employees with incomplete statutory details",
+  "Employees with graduate degrees and more than 10 years of work experience",
   "List all employees showing whether they are local or outstation based on their work location with their home city and work city"
 ];
 
 export const employeeSystemPrompt = `
-TABLES AND RELATIONSHIPS:
-1. employees:
-- Core table with profile info like employee_code, first_name, last_name, date_of_birth, gender, nationality, etc.
-- Use first_name || ' ' || last_name AS full_name in queries.
-- Use this table as the primary anchor when querying anything about employees.
-- company_id is available for filtering by company.
+DATA STRUCTURE & QUERY INSTRUCTIONS (for employee insights and analytics):
 
-2. employee_addresses:
-- Contains residential address info for each employee.
-- Use address_line_1, city, state, country, and pincode.
-- is_primary = true helps choose the main address when multiple exist.
-- Useful for geographic queries or comparing with project site locations (e.g., local vs non-local employees).
+ANCHOR TABLE:
+1. employees (core employee profile)
+- Start all queries from this table.
+- Key fields: employee_code, first_name, last_name, date_of_birth, gender, nationality, company_id.
+- Use "first_name || ' ' || last_name" as full_name.
+- Filter by company_id for company-specific queries.
 
-3. employee_bank_details:
-- Bank account info: bank_name, account_number, ifsc_code, branch_name, account_type.
-- Useful when showing employee financial details, but do not expose account numbers directly unless needed for admin view.
+CHILD TABLES & JOINING RULES:
+2. employee_addresses
+- Home address info: address_line_1, city, state, country, pincode.
+- Use "is_primary = true" to get the main address.
+- Compare address city/state with project site for local vs outstation queries.
 
-4. employee_statutory_details:
-- Statutory identifiers like aadhaar_number, pan_number, pf_number, uan_number.
-- Used for compliance, reporting, audits.
-- Join with employees via employee_id only when such legal information is required.
+3. employee_bank_details
+- Fields: bank_name, account_number, ifsc_code, branch_name, account_type.
+- Use only for financial views. Avoid showing account_number unless necessary.
 
-5. employee_guardians:
-- Emergency contact or guardian data.
-- Includes name, mobile_number, relationship, is_emergency_contact.
-- address_same_as_employee = true means they live at the same address.
-- Not always filled; use cautiously.
+4. employee_statutory_details
+- Fields: aadhaar_number, pan_number, pf_number, uan_number.
+- Used for compliance or statutory completeness checks.
 
-6. employee_project_assignment:
-- Captures all employee's work details - employee assignments to project sites.
-- Fields include: project_site_id, position, start_date, end_date, assignment_type (full_time, part_time), skill_level (skilled, unskilled), probation_period.
-- Crucial for determining who worked where, when, and in what role.
-- You can use this to analyze site-wise deployment, track probation status, or evaluate workforce distribution.
-- Use this to JOIN project-level data, or to calculate how many employees worked at a site, or are currently assigned (if end_date IS NULL).
+5. employee_guardians
+- Guardian or emergency contact info: name, mobile_number, relationship.
+- "is_emergency_contact = true" to find emergency contacts.
+- "address_same_as_employee = true" if they share the same home address.
 
-7. employeeWorkHistoryDetails  
-- Historical job records for each employee.  
-- Includes: previous position, company name, responsibilities, start_date, end_date.  
-- Use to show prior experience, build resume views, or calculate total experience.  
-- Queries: “Show all past positions for an employee”, “Show employees who worked at ‘XYZ Ltd.’ before joining”.  
-- Join via employee_id
+6. employee_project_assignment
+- Work deployment info: project_site_id, position, start_date, end_date, assignment_type, skill_level, probation_period.
+- Use to track:
+  • current assignment (end_date IS NULL),
+  • probationary status,
+  • workforce distribution,
+  • employees without project history.
 
-8. employeeSkillsDetails  
-- Skills and proficiency levels for each employee.  
-- Includes: skill_name, proficiency (e.g., beginner, intermediate), years_of_experience.  
-- Use in queries like “Find skilled electricians”, “Filter employees with 3+ years in welding”, etc.  
-- Join via employee_id
+7. employeeWorkHistoryDetails
+- Past jobs: position, company name, responsibilities, start_date, end_date.
+- Used to evaluate total experience or find previous employers.
 
-HOW TO USE:
-• Always begin from employees table.
-• Use joins with child tables (bank, address, work, statutory, etc.) when additional data is needed.
-• Join depth can go up to 2 to 3 levels comfortably. For example, employees → employee_project_assignment → project_sites.
-• Prefer readable data (e.g., names, dates, positions) over IDs.
-• If an employee has multiple rows in a child table (like multiple addresses), apply aggregation or filters (like is_primary = true).
-• Use COALESCE to handle nulls where useful (e.g., COALESCE(middle_name, '') for full name).
-• For geo-type queries (e.g., local vs non-local employees), compare employee city/state with project_site location.
+8. employeeSkillsDetails
+- Skill info: skill_name, proficiency (beginner, intermediate, advanced), years_of_experience.
+- Useful for skill-based filtering and workforce capability queries.
 `;
+
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {

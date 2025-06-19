@@ -57,21 +57,23 @@ export default function StatutoryBonusIndex() {
   }
 
   return (
-    <Suspense fallback={<LoadingSpinner className="mt-40" />}>
-      <Await resolve={statutoryBonusPromise}>
-        {(resolvedData) => {
-          if (!resolvedData) {
-            clearExactCacheEntry(cacheKeyPrefix.statutory_bonus);
-            return <ErrorBoundary message="Failed to load Statutory Bonus" />;
-          }
-          return (
-            <StatutoryBonusWrapper
-              data={resolvedData.data}
-              error={resolvedData.error}
-            />
-          );
-        }}
-      </Await>
-    </Suspense>
+    <div className="p-4 flex gap-3 place-content-center justify-between">
+      <Suspense fallback={<LoadingSpinner className="mt-30" />}>
+        <Await resolve={statutoryBonusPromise}>
+          {(resolvedData) => {
+            if (!resolvedData) {
+              clearExactCacheEntry(cacheKeyPrefix.statutory_bonus);
+              return <ErrorBoundary message="Failed to load Statutory Bonus" />;
+            }
+            return (
+              <StatutoryBonusWrapper
+                data={resolvedData.data}
+                error={resolvedData.error}
+              />
+            );
+          }}
+        </Await>
+      </Suspense>
+    </div>
   );
 }
