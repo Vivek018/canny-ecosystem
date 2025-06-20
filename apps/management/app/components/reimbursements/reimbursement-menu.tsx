@@ -45,10 +45,14 @@ export function ReimbursementMenu({
     "id",
     "employee_id",
     "amount",
+    "payroll_id",
   ]);
+  const notInPayroll = reimbursementForPayroll.filter(
+    (entry) => entry.payroll_id === null
+  );
 
-  const totalEmployees = reimbursementForPayroll?.length;
-  const totalNetAmount = reimbursementForPayroll?.reduce(
+  const totalEmployees = notInPayroll?.length;
+  const totalNetAmount = notInPayroll?.reduce(
     (sum, item) => sum + item?.amount,
     0
   );
@@ -58,7 +62,7 @@ export function ReimbursementMenu({
       {
         title: title,
         type: "reimbursement",
-        reimbursementData: JSON.stringify(reimbursementForPayroll),
+        reimbursementData: JSON.stringify(notInPayroll),
         totalEmployees,
         totalNetAmount,
         failedRedirect: "/approvals/reimbursements",

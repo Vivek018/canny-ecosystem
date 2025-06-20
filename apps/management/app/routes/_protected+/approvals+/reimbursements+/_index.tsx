@@ -67,11 +67,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
       name: query,
       project: searchParams.get("project") ?? undefined,
       project_site: searchParams.get("project_site") ?? undefined,
+      in_payroll: searchParams.get("in_payroll") ?? undefined,
+
     };
 
     const hasFilters =
       filters &&
-      Object.values(filters).some((value) => value !== null && value !== undefined);
+      Object.values(filters).some(
+        (value) => value !== null && value !== undefined
+      );
 
     const reimbursementsPromise = getReimbursementsByCompanyId({
       supabase,
@@ -126,7 +130,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
     `${cacheKeyPrefix.reimbursements}${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 
@@ -159,12 +163,12 @@ export default function ReimbursementsIndex() {
                     <Await resolve={userEmailsPromise}>
                       {(userEmailsData) => (
                         <ReimbursementSearchFilter
-                          disabled={!projectData?.data?.length && noFilters}
+                          
                           projectArray={
                             projectData?.data?.length
                               ? projectData?.data?.map(
-                                (project) => project!.name,
-                              )
+                                  (project) => project!.name
+                                )
                               : []
                           }
                           projectSiteArray={

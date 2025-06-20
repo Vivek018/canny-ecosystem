@@ -45,6 +45,7 @@ export type ExitFilterType = {
   reason?: string | undefined | null;
   project?: string | undefined | null;
   project_site?: string | undefined | null;
+  in_payroll?: string | undefined | null;
 } | null;
 
 export type ImportExitDataType = Pick<
@@ -110,6 +111,7 @@ export const getExitsByCompanyId = async ({
     reason,
     project,
     project_site,
+    in_payroll,
   } = filters ?? {};
 
   const columns = [
@@ -124,6 +126,7 @@ export const getExitsByCompanyId = async ({
     "gratuity",
     "deduction",
     "note",
+    "payroll_id",
   ] as const;
 
   const query = supabase
@@ -201,7 +204,13 @@ export const getExitsByCompanyId = async ({
       project_site
     );
   }
-
+  if (in_payroll !== undefined && in_payroll !== null) {
+    if (in_payroll === "true") {
+      query.not("payroll_id", "is", null);
+    } else {
+      query.is("payroll_id", null);
+    }
+  }
   const { data, count, error } = await query.range(from, to);
 
   if (error) {

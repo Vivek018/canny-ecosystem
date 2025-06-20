@@ -48,10 +48,15 @@ export function ExitMenu({
     "bonus",
     "leave_encashment",
     "deduction",
+    "payroll_id",
   ]);
+  
+  const notInPayroll = exitForPayroll.filter(
+    (entry) => entry.payroll_id === null
+  );
 
-  const totalEmployees = exitForPayroll?.length;
-  const totalNetAmount = exitForPayroll?.reduce(
+  const totalEmployees = notInPayroll?.length;
+  const totalNetAmount = notInPayroll?.reduce(
     (sum, item) =>
       sum +
       item?.bonus +
@@ -66,7 +71,7 @@ export function ExitMenu({
       {
         title: title,
         type: "exit",
-        exitData: JSON.stringify(exitForPayroll),
+        exitData: JSON.stringify(notInPayroll),
         totalEmployees,
         totalNetAmount,
         failedRedirect: "/approvals/exits",

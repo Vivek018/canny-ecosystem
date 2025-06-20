@@ -263,7 +263,14 @@ export async function action({
       const totalNetAmount = Number.parseFloat(
         formData.get("totalNetAmount") as string
       );
-
+      if (Number(reimbursementData.length) === 0) {
+        return json({
+          status: "error",
+          message: "Payroll not created as entry already in other payroll",
+          failedRedirect,
+          error: "Entries already in other payroll",
+        });
+      }
       const {
         status,
         error: reimbursementError,
@@ -308,6 +315,14 @@ export async function action({
         formData.get("totalNetAmount") as string
       );
 
+      if (Number(exitData.length) === 0) {
+        return json({
+          status: "error",
+          message: "Payroll not created as entry already in other payroll",
+          failedRedirect,
+          error: "Entries already in other payroll",
+        });
+      }
       const {
         status,
         error: exitError,

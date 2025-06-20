@@ -67,6 +67,8 @@ export function ReimbursementsTable<TData, TValue>({
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
     initialColumnVisibility ?? {}
   );
+
+
   const loadMoreEmployees = async () => {
     const formattedFrom = from;
     const to = formattedFrom + pageSize;
@@ -127,14 +129,15 @@ export function ReimbursementsTable<TData, TValue>({
       columnVisibility,
     },
   });
-
+  
   const selectedRowsData = table
-    .getSelectedRowModel()
-    .rows?.map((row) => row.original);
-
+  .getSelectedRowModel()
+  .rows?.map((row) => row.original);
+  
   useEffect(() => {
     const rowArray = [];
     for (const row of table.getSelectedRowModel().rows) {
+      
       rowArray.push(row.original);
     }
     setSelectedRows(rowArray as ReimbursementDataType[]);
