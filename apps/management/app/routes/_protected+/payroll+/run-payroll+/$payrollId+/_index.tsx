@@ -1,11 +1,14 @@
 import { ErrorBoundary } from "@/components/error-boundary";
 import { LoadingSpinner } from "@/components/loading-spinner";
-import { PayrollEntryComponent } from "@/components/payroll/payroll-entry/payroll-entry-component";
+import { ExitEntryComponent } from "@/components/payroll/exit-entry/exit-entry-component";
+
+import { ReimbursementEntryComponent } from "@/components/payroll/reimbursement-entry/reimbursement-entry-component";
 import { SalaryEntryComponent } from "@/components/payroll/salary-entry/salary-entry-component";
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { updatePayroll } from "@canny_ecosystem/supabase/mutations";
 import {
+  type ExitsPayrollEntriesWithEmployee,
   getExitsEntriesForPayrollByPayrollId,
   getPayrollById,
   getReimbursementEntriesForPayrollByPayrollId,
@@ -214,11 +217,20 @@ export default function RunPayrollId() {
                     );
                   }
 
-                  return (
-                    <PayrollEntryComponent
+                  return payrollData.payroll_type === "reimbursement" ? (
+                    <ReimbursementEntryComponent
                       payrollData={payrollData as any}
                       data={
                         data as unknown as ReimbursementPayrollEntriesWithEmployee[]
+                      }
+                      env={env as SupabaseEnv}
+                      fromWhere="runpayroll"
+                    />
+                  ) : (
+                    <ExitEntryComponent
+                      payrollData={payrollData as any}
+                      data={
+                        data as unknown as ExitsPayrollEntriesWithEmployee[]
                       }
                       env={env as SupabaseEnv}
                       fromWhere="runpayroll"

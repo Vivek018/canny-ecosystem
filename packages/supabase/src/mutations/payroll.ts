@@ -1,4 +1,5 @@
 import type {
+  ExitsInsert,
   PayrollDatabaseUpdate,
   SalaryEntriesDatabaseInsert,
   SalaryEntriesDatabaseUpdate,
@@ -16,8 +17,14 @@ import {
   convertToNull,
   isGoodStatus,
 } from "@canny_ecosystem/utils";
-import { updateReimbursementsForPayrollCreation } from "./reimbursements";
-import { updateExitsForPayrollCreation } from "./exits";
+import {
+  createReimbursementsFromImportedData,
+  updateReimbursementsForPayrollCreation,
+} from "./reimbursements";
+import {
+  createExitsFromImportedData,
+  updateExitsForPayrollCreation,
+} from "./exits";
 
 // Salary Payroll
 export async function createSalaryPayroll({
@@ -150,6 +157,7 @@ export async function createReimbursementPayroll({
   data,
   companyId,
   bypassAuth = false,
+  from,
 }: {
   supabase: TypedSupabaseClient;
   data: {
@@ -162,6 +170,7 @@ export async function createReimbursementPayroll({
     totalNetAmount: number;
   };
   companyId: string;
+  from?: string;
   bypassAuth?: boolean;
 }) {
   if (!bypassAuth) {
@@ -173,6 +182,7 @@ export async function createReimbursementPayroll({
       return { status: 400, error: "Unauthorized User" };
     }
   }
+  
 
   const {
     data: payrollData,
@@ -197,6 +207,24 @@ export async function createReimbursementPayroll({
     return { status: payrollStatus, error: payrollError };
   }
 
+  if (from === "import") {
+    const updatedData = data.reimbursementData.map((entry) => ({
+      ...entry,
+      payroll_id: payrollData.id,
+    }));
+
+    const { error, status } = await createReimbursementsFromImportedData({
+      data: updatedData,
+      supabase,
+    });
+
+    return {
+      status: payrollStatus ?? status,
+      error: payrollError ?? error,
+      message: null,
+    };
+  }
+
   const payrollEntriesData = data.reimbursementData.map(({ id }) => ({
     id: id!,
     payroll_id: payrollData?.id,
@@ -219,6 +247,7 @@ export async function createExitPayroll({
   supabase,
   data,
   companyId,
+  from,
   bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
@@ -231,6 +260,7 @@ export async function createExitPayroll({
     totalEmployees: number;
     totalNetAmount: number;
   };
+  from?: string;
   companyId: string;
   bypassAuth?: boolean;
 }) {
@@ -264,13 +294,32 @@ export async function createExitPayroll({
     console.error("createExitPayroll payroll error", payrollError);
     return { status: payrollStatus, error: payrollError };
   }
-  const payrollEntriesData = data.exitData.map(({ id }) => ({
+  if (from === "import") {
+    const updatedData = data.exitData.map((entry) => ({
+      ...entry,
+      payroll_id: payrollData.id,
+    }));
+
+    const { error, status } = await createExitsFromImportedData({
+      import_type: "skip",
+      data: updatedData as ExitsInsert[],
+      supabase,
+    });
+
+    return {
+      status: payrollStatus ?? status,
+      error: payrollError ?? error,
+      message: null,
+    };
+  }
+
+  const exitEntriesData = data.exitData.map(({ id }) => ({
     id: id!,
     payroll_id: payrollData?.id,
   }));
 
   const { errors, status } = await updateExitsForPayrollCreation({
-    data: payrollEntriesData,
+    data: exitEntriesData,
     supabase,
   });
   return {
@@ -466,8 +515,6 @@ export async function updateSalaryEntry({
 
     let totalNetAmount = payrollData?.total_net_amount!;
 
-
-    
     if (salaryEntryData?.type === "earning") {
       totalNetAmount -= salaryEntryData?.amount;
     } else if (
@@ -523,10 +570,7 @@ export async function updatePayroll({
 
   const updateData = convertToNull(data);
 
-  const {
-    error,
-    status,
-  } = await supabase
+  const { error, status } = await supabase
     .from("payroll")
     .update(updateData)
     .eq("id", data.id!)

@@ -633,8 +633,7 @@ export const reasonForExitArray = [
 export const ExitFormSchema = z.object({
   id: z.string().optional(),
   employee_id: z.string(),
-  organization_payable_days: z.number().default(0),
-  employee_payable_days: z.number().default(0),
+  payable_days: z.number().default(0),
   last_working_day: z.string(),
   final_settlement_date: z.string(),
   reason: z.enum(reasonForExitArray).default("other"),
@@ -643,7 +642,6 @@ export const ExitFormSchema = z.object({
   leave_encashment: z.number().default(0),
   gratuity: z.number().default(0),
   deduction: z.number().default(0),
-  net_pay: z.number().default(0),
 });
 
 // Payment Templates
@@ -1279,16 +1277,21 @@ export const SalaryEntrySchema = z.object({
   amount: z.number(),
 });
 
-export const payrollTypesArray = [
-  "salary",
-  "reimbursement",
-  "exit",
-  "others",
-] as const;
+export const payrollTypesArray = ["reimbursement", "exit", "others"] as const;
 
-export const PayrollEntrySchema = z.object({
+export const ReimbursementEntrySchema = z.object({
   id: z.string().optional(),
   amount: z.number(),
+  employee_id: z.string(),
+  payroll_id: z.string(),
+  type: z.string(),
+});
+export const ExitEntrySchema = z.object({
+  id: z.string().optional(),
+  gratuity: z.number(),
+  leave_encashment: z.number(),
+  bonus: z.number(),
+  deduction: z.number(),
   employee_id: z.string(),
   payroll_id: z.string(),
   type: z.string(),
@@ -1309,14 +1312,12 @@ export const ImportExitHeaderSchemaObject = z.object({
   last_working_day: z.string(),
   reason: z.string(),
   final_settlement_date: z.string(),
-  organization_payable_days: z.string(),
-  employee_payable_days: z.string(),
+  payable_days: z.string(),
   bonus: z.string(),
   leave_encashment: z.string(),
   gratuity: z.string(),
   deduction: z.string(),
   note: z.string(),
-  net_pay: z.string(),
 });
 
 export const ImportExitHeaderSchema = ImportExitHeaderSchemaObject.refine(
@@ -1326,14 +1327,12 @@ export const ImportExitHeaderSchema = ImportExitHeaderSchemaObject.refine(
       data.last_working_day,
       data.reason,
       data.final_settlement_date,
-      data.organization_payable_days,
-      data.employee_payable_days,
+      data.payable_days,
       data.bonus,
       data.leave_encashment,
       data.gratuity,
       data.deduction,
       data.note,
-      data.net_pay,
     ].filter(Boolean);
 
     const uniqueValues = new Set(values);
@@ -1347,14 +1346,12 @@ export const ImportExitHeaderSchema = ImportExitHeaderSchemaObject.refine(
       "last_working_day",
       "reason",
       "final_settlement_date",
-      "organization_payable_days",
-      "employee_payable_days",
+      "payable_days",
       "bonus",
       "leave_encashment",
       "gratuity",
       "deduction",
       "note",
-      "total",
     ],
   }
 );
@@ -1367,14 +1364,11 @@ export const ImportSingleExitDataSchema = z.object({
     (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
     z.number()
   ),
-  organization_payable_days: z.preprocess(
+  payable_days: z.preprocess(
     (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
     z.number()
   ),
-  employee_payable_days: z.preprocess(
-    (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
-    z.number()
-  ),
+
   bonus: z.preprocess(
     (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
     z.number()
@@ -1392,10 +1386,6 @@ export const ImportSingleExitDataSchema = z.object({
     z.number()
   ),
   note: z.string().optional(),
-  net_pay: z.preprocess(
-    (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
-    z.number()
-  ),
 });
 
 export const ImportExitDataSchema = z.object({
@@ -1718,26 +1708,27 @@ export const ImportLeavesDataSchema = z.object({
   data: z.array(ImportSingleLeavesDataSchema),
 });
 
-export const ImportPayrollHeaderSchemaObject = z.object({
+export const ImportReimbursementPayrollHeaderSchemaObject = z.object({
   employee_code: z.string(),
   amount: z.string(),
 });
 
-export const ImportPayrollHeaderSchema = ImportPayrollHeaderSchemaObject.refine(
-  (data) => {
-    const values = [data.employee_code, data.amount].filter(Boolean);
+export const ImportReimbursementPayrollHeaderSchema =
+  ImportReimbursementPayrollHeaderSchemaObject.refine(
+    (data) => {
+      const values = [data.employee_code, data.amount].filter(Boolean);
 
-    const uniqueValues = new Set(values);
-    return uniqueValues.size === values.length;
-  },
-  {
-    message:
-      "Some fields have the same value. Please select different options.",
-    path: ["employee_code", "amount"],
-  }
-);
+      const uniqueValues = new Set(values);
+      return uniqueValues.size === values.length;
+    },
+    {
+      message:
+        "Some fields have the same value. Please select different options.",
+      path: ["employee_code", "amount"],
+    }
+  );
 
-export const ImportSinglePayrollDataSchema = z.object({
+export const ImportSingleReimbursementPayrollDataSchema = z.object({
   employee_code: zNumberString.min(3),
   amount: z.preprocess((value) => {
     const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
@@ -1745,10 +1736,69 @@ export const ImportSinglePayrollDataSchema = z.object({
   }, z.number()),
 });
 
-export const ImportPayrollDataSchema = z.object({
-  payrollType: z.enum(payrollTypesArray),
+export const ImportReimbursementPayrollDataSchema = z.object({
   title: z.string().min(3),
-  data: z.array(ImportSinglePayrollDataSchema),
+  data: z.array(ImportSingleReimbursementPayrollDataSchema),
+});
+
+export const ImportExitPayrollHeaderSchemaObject = z.object({
+  employee_code: z.string(),
+  gratuity: z.string(),
+  bonus: z.string(),
+  leave_encashment: z.string(),
+  deduction: z.string(),
+});
+
+export const ImportExitPayrollHeaderSchema =
+  ImportExitPayrollHeaderSchemaObject.refine(
+    (data) => {
+      const values = [
+        data.employee_code,
+        data.gratuity,
+        data.bonus,
+        data.leave_encashment,
+        data.deduction,
+      ].filter(Boolean);
+
+      const uniqueValues = new Set(values);
+      return uniqueValues.size === values.length;
+    },
+    {
+      message:
+        "Some fields have the same value. Please select different options.",
+      path: [
+        "employee_code",
+        "gratuity",
+        "bonus",
+        "leave_encashment",
+        "deduction",
+      ],
+    }
+  );
+
+export const ImportSingleExitPayrollDataSchema = z.object({
+  employee_code: zNumberString.min(3),
+  gratuity: z.preprocess((value) => {
+    const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
+    return Number.isNaN(parsed) ? undefined : parsed;
+  }, z.number()),
+  bonus: z.preprocess((value) => {
+    const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
+    return Number.isNaN(parsed) ? undefined : parsed;
+  }, z.number()),
+  leave_encashment: z.preprocess((value) => {
+    const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
+    return Number.isNaN(parsed) ? undefined : parsed;
+  }, z.number()),
+  deduction: z.preprocess((value) => {
+    const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
+    return Number.isNaN(parsed) ? undefined : parsed;
+  }, z.number()),
+});
+
+export const ImportExitPayrollDataSchema = z.object({
+  title: z.string().min(3),
+  data: z.array(ImportSingleExitPayrollDataSchema),
 });
 
 export const ImportSalaryPayrollHeaderSchemaObject = z.object({

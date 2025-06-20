@@ -299,10 +299,20 @@ export const updateExitAndPayrollById = async ({
   let totalNetAmount = payrollData?.total_net_amount!;
   let totalEmployees = payrollData?.total_employees!;
   if (action === "update") {
-    totalNetAmount -= entryData?.net_pay!;
-    totalNetAmount += updateData?.net_pay!;
+    totalNetAmount -= entryData?.gratuity!;
+    totalNetAmount += updateData?.gratuity!;
+    totalNetAmount -= entryData?.bonus!;
+    totalNetAmount += updateData?.bonus!;
+    totalNetAmount -= entryData?.leave_encashment!;
+    totalNetAmount += updateData?.leave_encashment!;
+    totalNetAmount += entryData?.deduction!;
+    totalNetAmount -= updateData?.deduction!;
   } else if (action === "delete") {
-    totalNetAmount -= entryData?.net_pay!;
+    totalNetAmount -= entryData?.gratuity!;
+    totalNetAmount -= entryData?.bonus!;
+    totalNetAmount -= entryData?.leave_encashment!;
+    totalNetAmount += entryData?.deduction!;
+
     totalEmployees -= 1;
   }
 

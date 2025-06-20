@@ -68,6 +68,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
       reason: searchParams.get("reason") ?? undefined,
       project: searchParams.get("project") ?? undefined,
       project_site: searchParams.get("project_site") ?? undefined,
+      in_payroll: searchParams.get("in_payroll") ?? undefined,
+
     };
 
     const hasFilters =
@@ -185,7 +187,6 @@ export default function ExitsIndex() {
                     return (
                       <>
                         <ExitsSearchFilter
-                          disabled={!projectData?.data?.length && noFilters}
                           projectArray={projectArray}
                           projectSiteArray={projectSiteArray}
                         />

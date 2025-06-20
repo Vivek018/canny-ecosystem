@@ -8,7 +8,6 @@ import type {
   ImportEmployeeAttendanceDataType,
   ImportExitDataType,
   ImportLeavesDataType,
-  ImportPayrollDataType,
   ImportSalaryPayrollDataType,
   ImportEmployeeAttendanceByPresentsDataType,
   ImportEmployeeProjectAssignmentsDataType,
@@ -138,21 +137,35 @@ export const useImportStoreForLeaves = create<ImportStateForLeaves>()(
   })
 );
 
-type ImportStateForPayroll = {
+type ImportStateForReimbursementPayroll = {
   importData: {
-    payrollType: string;
     title: string;
-    data: ImportPayrollDataType[];
+    data: ImportReimbursementDataType[];
   };
   setImportData: (importData: {
-    payrollType: string;
     title: string;
-    data: ImportPayrollDataType[];
+    data: ImportReimbursementDataType[];
   }) => void;
 };
-export const useImportStoreForPayroll = create<ImportStateForPayroll>()(
+export const useImportStoreForReimbursementPayroll =
+  create<ImportStateForReimbursementPayroll>()((set) => ({
+    importData: { title: "", data: [] },
+    setImportData: (importData) => set({ importData }),
+  }));
+
+type ImportStateForExitPayroll = {
+  importData: {
+    title: string;
+    data: ImportExitDataType[];
+  };
+  setImportData: (importData: {
+    title: string;
+    data: ImportExitDataType[];
+  }) => void;
+};
+export const useImportStoreForExitPayroll = create<ImportStateForExitPayroll>()(
   (set) => ({
-    importData: { payrollType: "", title: "", data: [] },
+    importData: { title: "", data: [] },
     setImportData: (importData) => set({ importData }),
   })
 );

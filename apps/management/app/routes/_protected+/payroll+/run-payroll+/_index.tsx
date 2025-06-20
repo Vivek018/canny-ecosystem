@@ -30,8 +30,7 @@ import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
 import { formatDate } from "@canny_ecosystem/utils";
 import { ImportPayrollDialog } from "@/components/payroll/import-payroll-dialog";
-import { ImportPayrollModal } from "@/components/payroll/import-export/import-modal-payroll";
-import { ImportSalaryPayrollModal } from "@/components/payroll/import-export/import-modal-salary-payroll";
+import { ImportSalaryPayrollModal } from "@/components/payroll/import-export/import-salary-modal-payroll";
 import { PayrollSearchFilter } from "@/components/payroll/payroll-search-filter";
 import { FilterList } from "@/components/payroll/filter-list";
 import type { PayrollDatabaseRow } from "@canny_ecosystem/supabase/types";
@@ -40,6 +39,8 @@ import { useSupabase } from "@canny_ecosystem/supabase/client";
 import { Spinner } from "@canny_ecosystem/ui/spinner";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
+import { ImportReimbursementPayrollModal } from "@/components/payroll/import-export/import-reimbursement-modal-payroll";
+import { ImportExitPayrollModal } from "@/components/payroll/import-export/import-exit-modal-payroll";
 
 const pageSize = 15;
 
@@ -129,7 +130,13 @@ export default function RunPayrollIndex() {
                     <div className="flex gap-2 px-4 border-r border-dashed border-muted-foreground/80">
                       <ImportPayrollDialog />
                     </div>
-                    <Link to="/chat/chatbox/payment" className={cn(buttonVariants({ variant: "gradiant" }), "flex items-center justify-center gap-2 h-10")}>
+                    <Link
+                      to="/chat/chatbox/payment"
+                      className={cn(
+                        buttonVariants({ variant: "gradiant" }),
+                        "flex items-center justify-center gap-2 h-10"
+                      )}
+                    >
                       <Icon name="magic" size="xs" />
                       <p>AI Chat</p>
                     </Link>
@@ -284,8 +291,9 @@ export default function RunPayrollIndex() {
         </Suspense>
       </div>
 
-      <ImportPayrollModal />
       <ImportSalaryPayrollModal />
+      <ImportReimbursementPayrollModal />
+      <ImportExitPayrollModal />
       <Outlet />
     </section>
   );

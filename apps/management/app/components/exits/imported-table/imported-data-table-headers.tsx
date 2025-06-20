@@ -14,13 +14,11 @@ export const ImportExitDataArray = [
   "last_working_day",
   "reason",
   "final_settlement_date",
-  "organization_payable_days",
-  "employee_payable_days",
+  "payable_days",
   "bonus",
   "leave_encashment",
   "gratuity",
   "deduction",
-  "total",
   "note",
 ];
 

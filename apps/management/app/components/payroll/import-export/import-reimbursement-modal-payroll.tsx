@@ -14,7 +14,7 @@ import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
 import { useNavigate, useSearchParams } from "@remix-run/react";
 import { useState, useEffect } from "react";
 
-export const ImportPayrollModal = () => {
+export const ImportReimbursementPayrollModal = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [eligibleFileSize, setEligibleFileSize] = useState<boolean>(true);
   const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
@@ -24,7 +24,8 @@ export const ImportPayrollModal = () => {
   const MAX_FILE_SIZE_LIMIT = SIZE_1MB * 3;
 
   const isOpen =
-    searchParams.get("step") === modalSearchParamNames.import_payroll;
+    searchParams.get("step") ===
+    modalSearchParamNames.import_reimbursement_payroll;
 
   const onClose = () => {
     searchParams.delete("step");
@@ -51,7 +52,7 @@ export const ImportPayrollModal = () => {
 
   const handleFileSubmit = () => {
     if (eligibleFileSize && selectedFile) {
-      navigate("/payroll/run-payroll/import-payroll", {
+      navigate("/payroll/run-payroll/import-reimbursement-payroll", {
         state: { file: selectedFile },
       });
     }
@@ -66,7 +67,11 @@ export const ImportPayrollModal = () => {
   const demo: any[] | Papa.UnparseObject<any> = [
     {
       employee_code: null,
+      submitted_date: null,
+      status: null,
       amount: null,
+      is_deductible: null,
+      email: null,
     },
   ];
   const downloadDemoCsv = (
@@ -79,23 +84,21 @@ export const ImportPayrollModal = () => {
     const url = URL.createObjectURL(blob);
     link.href = url;
 
-    link.setAttribute(
-      "download",
-      "Payroll-Format"
-    );
+    link.setAttribute("download", "Reimbursment-Payroll-Format");
 
     document.body.appendChild(link);
     link.click();
 
     document.body.removeChild(link);
   };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogTitle>Choose the file to be imported</DialogTitle>
         <div className="flex justify-between">
           <DialogDescription className="text-muted-foreground">
-            Only .csv format is supported! 
+            Only .csv format is supported!
             <span
               className="text-primary cursor-pointer ml-2"
               onClick={downloadDemoCsv}

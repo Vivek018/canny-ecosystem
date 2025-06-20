@@ -38,6 +38,7 @@ export async function action({
     const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
     const formData = await request.formData();
+    const from = (await formData.get("from")) as string;
     const payrollTitle = formData.get("title") as string;
     const skipped = formData.get("skipped") as string;
     const type = formData.get("type") as string;
@@ -133,7 +134,7 @@ export async function action({
               component.target_type === "payment_field"
                 ? component.payment_fields?.name
                 : component.target_type.toUpperCase() ??
-                component.component_type,
+                  component.component_type,
             type: component.component_type,
             is_pro_rata: component.payment_fields?.is_pro_rata ?? false,
             consider_for_epf:
@@ -255,13 +256,21 @@ export async function action({
       const reimbursementData = JSON.parse(
         formData.get("reimbursementData") as string
       ) as Pick<ReimbursementDataType, "id" | "employee_id" | "amount">[];
+
       const totalEmployees = Number.parseInt(
         formData.get("totalEmployees") as string
       );
       const totalNetAmount = Number.parseFloat(
         formData.get("totalNetAmount") as string
       );
-
+      if (Number(reimbursementData.length) === 0) {
+        return json({
+          status: "error",
+          message: "Payroll not created as entry already in other payroll",
+          failedRedirect,
+          error: "Entries already in other payroll",
+        });
+      }
       const {
         status,
         error: reimbursementError,
@@ -275,6 +284,7 @@ export async function action({
           totalEmployees,
           totalNetAmount,
         },
+        from,
         companyId: companyId ?? "",
       });
 
@@ -291,7 +301,12 @@ export async function action({
     if (type === "exit") {
       const exitData = JSON.parse(formData.get("exitData") as string) as Pick<
         ExitDataType,
-        "id" | "employee_id" | "net_pay"
+        | "id"
+        | "employee_id"
+        | "bonus"
+        | "deduction"
+        | "gratuity"
+        | "leave_encashment"
       >[];
       const totalEmployees = Number.parseInt(
         formData.get("totalEmployees") as string
@@ -300,6 +315,14 @@ export async function action({
         formData.get("totalNetAmount") as string
       );
 
+      if (Number(exitData.length) === 0) {
+        return json({
+          status: "error",
+          message: "Payroll not created as entry already in other payroll",
+          failedRedirect,
+          error: "Entries already in other payroll",
+        });
+      }
       const {
         status,
         error: exitError,
@@ -313,6 +336,7 @@ export async function action({
           totalEmployees,
           totalNetAmount,
         },
+        from,
         companyId: companyId ?? "",
       });
 

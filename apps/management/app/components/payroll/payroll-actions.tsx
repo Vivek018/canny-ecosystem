@@ -13,9 +13,12 @@ import { Icon } from "@canny_ecosystem/ui/icon";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useNavigate } from "@remix-run/react";
 import { DownloadBankAdvice } from "./download-bank-advice";
-import type { PayrollEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
 import { DownloadEsiFormat } from "./download-esi-format";
 import { DownloadEpfFormat } from "./download-epf-format";
+import type {
+  ExitsPayrollEntriesWithEmployee,
+  ReimbursementPayrollEntriesWithEmployee,
+} from "@canny_ecosystem/supabase/queries";
 
 export function PayrollActions({
   payrollId,
@@ -27,7 +30,9 @@ export function PayrollActions({
   status,
 }: {
   payrollData: Omit<PayrollDatabaseRow, "created_at" | "updated_at">;
-  data: PayrollEntriesWithEmployee[];
+  data:
+    | ReimbursementPayrollEntriesWithEmployee[]
+    | ExitsPayrollEntriesWithEmployee[];
   env: SupabaseEnv;
   payrollId: string;
   className?: string;
@@ -79,7 +84,14 @@ export function PayrollActions({
               payrollData={payrollData}
             />
           </Button>
-          <DropdownMenuSeparator />
+          <DropdownMenuSeparator
+            className={cn(
+              "hidden",
+              payrollData.payroll_type === "salary" &&
+                status === "approved" &&
+                "flex"
+            )}
+          />
           <Button
             variant={"ghost"}
             className={cn(
@@ -129,13 +141,20 @@ export function PayrollActions({
           <DropdownMenuSeparator
             className={cn(
               "hidden",
-              payrollData.payroll_type === "salary" && status==="approved" && "flex"
+              payrollData.payroll_type === "salary" &&
+                status === "approved" &&
+                "flex"
             )}
           />
           <div>
             <Button
               variant={"ghost"}
-              className="px-2 pr-1 flex flex-row justify-start gap-2"
+              className={cn(
+                "hidden",
+                payrollData.payroll_type === "salary" &&
+                  status === "approved" &&
+                  "flex flex-row justify-start gap-2 px-2 pr-1  "
+              )}
               onClick={() =>
                 fromWhere === "runpayroll"
                   ? navigate(

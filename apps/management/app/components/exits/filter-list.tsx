@@ -34,6 +34,7 @@ export function FilterList({ filterList }: Props) {
           formatDate(new Date(value))
         );
       }
+      case "in_payroll":
 
       case "reason":
 

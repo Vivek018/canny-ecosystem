@@ -10,24 +10,27 @@ import {
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
-import type { ImportPayrollHeaderSchemaObject } from "@canny_ecosystem/utils";
-import type { ImportPayrollDataType } from "@canny_ecosystem/supabase/queries";
+import {
+  ImportReimbursementDataSchema,
+  ImportReimbursementHeaderSchema,
+} from "@canny_ecosystem/utils";
+import type { ImportReimbursementDataType } from "@canny_ecosystem/supabase/queries";
 import {
   transformStringArrayIntoOptions,
   replaceUnderscore,
   pipe,
   replaceDash,
-  ImportPayrollHeaderSchema,
-  ImportPayrollDataSchema,
-  payrollTypesArray,
 } from "@canny_ecosystem/utils";
 import type { z } from "zod";
-import { useImportStoreForPayroll } from "@/store/import";
+
+import { useImportStoreForReimbursementPayroll } from "@/store/import";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { PayrollImportData } from "@/components/payroll/import-export/payroll-import-data";
+
 import { Input } from "@canny_ecosystem/ui/input";
+import { ReimbursementImportData } from "@/components/payroll/import-export/payroll-reimbursement-import-data";
+
 type FieldConfig = {
-  key: keyof z.infer<typeof ImportPayrollHeaderSchemaObject>;
+  key: keyof z.infer<typeof ImportReimbursementHeaderSchema>;
   required?: boolean;
 };
 
@@ -37,8 +40,19 @@ const FIELD_CONFIGS: FieldConfig[] = [
     required: true,
   },
   {
+    key: "submitted_date",
+    required: true,
+  },
+  {
+    key: "status",
+  },
+  {
     key: "amount",
     required: true,
+  },
+  { key: "is_deductible" },
+  {
+    key: "email",
   },
 ];
 
@@ -47,16 +61,17 @@ export async function loader() {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
-
   return json({ env });
 }
 
-export default function PayrollImportFieldMapping() {
+export default function ReimbursementFieldMapping() {
   const { env } = useLoaderData<typeof loader>();
-  const [payrollType, setPayrollType] = useState("");
-  const { setImportData } = useImportStoreForPayroll();
   const [title, setTitle] = useState("");
+
+  const { setImportData } = useImportStoreForReimbursementPayroll();
+
   const [loadNext, setLoadNext] = useState(false);
+
   const location = useLocation();
   const [file] = useState(location.state?.file);
   const [headerArray, setHeaderArray] = useState<string[]>([]);
@@ -76,7 +91,7 @@ export default function PayrollImportFieldMapping() {
           setHeaderArray(headers);
         },
         error: (error) => {
-          console.error("Payroll Header parsing error:", error);
+          console.error("Reimbursement Header parsing error:", error);
           setErrors((prev) => ({ ...prev, parsing: "Error parsing headers" }));
         },
       });
@@ -105,7 +120,7 @@ export default function PayrollImportFieldMapping() {
 
   const validateMapping = () => {
     try {
-      const mappingResult = ImportPayrollHeaderSchema.safeParse(
+      const mappingResult = ImportReimbursementHeaderSchema.safeParse(
         Object.fromEntries(
           Object.entries(fieldMapping).map(([key, value]) => [
             key,
@@ -125,7 +140,7 @@ export default function PayrollImportFieldMapping() {
       setValidationErrors([]);
       return true;
     } catch (error) {
-      console.error("Payroll Validation error:", error);
+      console.error("Reimbursement Validation error:", error);
       setValidationErrors(["An unexpected error occurred during validation"]);
       return false;
     }
@@ -133,28 +148,24 @@ export default function PayrollImportFieldMapping() {
 
   const validateImportData = (data: any[]) => {
     try {
-      const result = ImportPayrollDataSchema.safeParse({
-        payrollType,
-        title,
-        data,
-      });
-
+      const result = ImportReimbursementDataSchema.safeParse({ data });
       if (!result.success) {
         const formattedErrors = result.error.errors.map(
-          (err) => `${err.path[0]}: ${err.message}`
+          (err) => `${err.path[2]}: ${err.message}`
         );
         setValidationErrors(formattedErrors);
         return false;
       }
       return true;
     } catch (error) {
-      console.error("Payroll Data validation error:", error);
+      console.error("Reimbursement Data validation error:", error);
       setValidationErrors([
         "An unexpected error occurred during data validation",
       ]);
       return false;
     }
   };
+
   const handleMapping = (key: string, value: string) => {
     setFieldMapping((prev) => ({ ...prev, [key]: value }));
     if (errors[key]) {
@@ -183,7 +194,8 @@ export default function PayrollImportFieldMapping() {
         transformHeader: (header) => swappedFieldMapping[header] || header,
         complete: async (results) => {
           const allowedFields = FIELD_CONFIGS.map((field) => field.key);
-          const finalData = results?.data
+
+          const finalData = results.data
             .filter((entry) =>
               Object.values(entry!).some((value) => String(value).trim() !== "")
             )
@@ -197,24 +209,27 @@ export default function PayrollImportFieldMapping() {
                       String(value).trim() !== ""
                   )
                   .filter(([key]) =>
-                    allowedFields.includes(key as unknown as any)
+                    allowedFields.includes(
+                      key as keyof ImportReimbursementDataType
+                    )
                   )
               );
+
               return cleanEntry;
             });
 
           if (validateImportData(finalData)) {
             setImportData({
-              payrollType,
               title,
-              data: finalData as ImportPayrollDataType[],
+              data: finalData as ImportReimbursementDataType[],
             });
 
             setLoadNext(true);
           }
         },
+
         error: (error) => {
-          console.error("Payroll Data parsing error:", error);
+          console.error("Reimbursement Data parsing error:", error);
           setErrors((prev) => ({
             ...prev,
             parsing: "Error parsing file data",
@@ -227,13 +242,13 @@ export default function PayrollImportFieldMapping() {
   return (
     <section className="py-4 ">
       {loadNext ? (
-        <PayrollImportData env={env} />
+        <ReimbursementImportData env={env} />
       ) : (
         <Card className="m-4 px-40">
           <CardHeader>
             <CardTitle>Map Fields</CardTitle>
             <CardDescription>
-              Map your fields with the Payroll fields
+              Map your fields with the Reimbursements fields
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -254,18 +269,6 @@ export default function PayrollImportFieldMapping() {
                 </ul>
               </div>
             )}
-            <Combobox
-              className={cn("w-52 h-10 mb-8")}
-              options={transformStringArrayIntoOptions(
-                payrollTypesArray as unknown as string[]
-              )}
-              value={payrollType}
-              onChange={(value: string) => {
-                setPayrollType(value);
-              }}
-              placeholder={"Select Payroll Type"}
-            />
-
             <Input
               placeholder="Enter the title here"
               onChange={(e) => setTitle(e.target.value)}

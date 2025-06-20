@@ -14,7 +14,7 @@ import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
 import { useNavigate, useSearchParams } from "@remix-run/react";
 import { useState, useEffect } from "react";
 
-export const ImportExitModal = () => {
+export const ImportExitPayrollModal = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [eligibleFileSize, setEligibleFileSize] = useState<boolean>(true);
   const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
@@ -24,7 +24,7 @@ export const ImportExitModal = () => {
   const MAX_FILE_SIZE_LIMIT = SIZE_1MB * 3;
 
   const isOpen =
-    searchParams.get("step") === modalSearchParamNames.import_exits;
+    searchParams.get("step") === modalSearchParamNames.import_exit_payroll;
 
   const onClose = () => {
     searchParams.delete("step");
@@ -51,7 +51,7 @@ export const ImportExitModal = () => {
 
   const handleFileSubmit = () => {
     if (eligibleFileSize && selectedFile) {
-      navigate("/approvals/exits/import-data", {
+      navigate("/payroll/run-payroll/import-exit-payroll", {
         state: { file: selectedFile },
       });
     }
@@ -87,7 +87,7 @@ export const ImportExitModal = () => {
     const url = URL.createObjectURL(blob);
     link.href = url;
 
-    link.setAttribute("download", "Exits-Format");
+    link.setAttribute("download", "Exit-Payroll-Format");
 
     document.body.appendChild(link);
     link.click();

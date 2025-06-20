@@ -73,15 +73,6 @@ export async function action({
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
     const formData = await request.formData();
-    formData.set(
-      "net_pay",
-      String(
-        Number(formData.get("bonus")) +
-        Number(formData.get("leave_encashment")) +
-        Number(formData.get("gratuity")) -
-        Number(formData.get("deduction"))
-      )
-    );
     const submission = parseWithZod(formData, { schema: ExitFormSchema });
 
     if (submission.status !== "success") {
@@ -195,42 +186,21 @@ export default function CreateExit({
               <input
                 {...getInputProps(fields.employee_id, { type: "hidden" })}
               />
-              <div className="flex gap-7">
-                <Field
-                  inputProps={{
-                    ...getInputProps(fields.organization_payable_days, {
-                      type: "number",
-                    }),
-                    className: "capitalize",
-                    placeholder: `Enter ${replaceUnderscore(
-                      fields.organization_payable_days.name
-                    )}`,
-                  }}
-                  labelProps={{
-                    children: replaceUnderscore(
-                      fields.organization_payable_days.name
-                    ),
-                  }}
-                  errors={fields.organization_payable_days.errors}
-                />
-                <Field
-                  inputProps={{
-                    ...getInputProps(fields.employee_payable_days, {
-                      type: "number",
-                    }),
-                    className: "capitalize",
-                    placeholder: `Enter ${replaceUnderscore(
-                      fields.employee_payable_days.name
-                    )}`,
-                  }}
-                  labelProps={{
-                    children: replaceUnderscore(
-                      fields.employee_payable_days.name
-                    ),
-                  }}
-                  errors={fields.employee_payable_days.errors}
-                />
-              </div>
+              <Field
+                inputProps={{
+                  ...getInputProps(fields.payable_days, {
+                    type: "number",
+                  }),
+                  className: "capitalize",
+                  placeholder: `Enter ${replaceUnderscore(
+                    fields.payable_days.name
+                  )}`,
+                }}
+                labelProps={{
+                  children: replaceUnderscore(fields.payable_days.name),
+                }}
+                errors={fields.payable_days.errors}
+              />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Field
                   inputProps={{

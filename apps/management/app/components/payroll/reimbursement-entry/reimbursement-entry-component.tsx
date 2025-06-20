@@ -19,8 +19,8 @@ import {
   updateRole,
 } from "@canny_ecosystem/utils";
 import { attribute } from "@canny_ecosystem/utils/constant";
-import { PayrollEntryDataTable } from "./payroll-entry-table/data-table";
-import { payrollEntryColumns } from "./payroll-entry-table/columns";
+import { ReimbursementEntryDataTable } from "./payroll-entry-table/data-table";
+import { reimbursementEntryColumns } from "./payroll-entry-table/columns";
 import {
   Card,
   CardContent,
@@ -28,7 +28,7 @@ import {
   CardTitle,
 } from "@canny_ecosystem/ui/card";
 
-export function PayrollEntryComponent({
+export function ReimbursementEntryComponent({
   data,
   payrollData,
   env,
@@ -187,9 +187,9 @@ export function PayrollEntryComponent({
           status={payrollData?.status}
         />
       </div>
-      <PayrollEntryDataTable
+      <ReimbursementEntryDataTable
         data={tableData}
-        columns={payrollEntryColumns(
+        columns={reimbursementEntryColumns(
           payrollData.status,
           payrollData.payroll_type
         )}

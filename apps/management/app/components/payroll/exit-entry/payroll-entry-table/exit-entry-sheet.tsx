@@ -20,19 +20,17 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { flexRender } from "@tanstack/react-table";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { FormButtons } from "../../../form/form-buttons";
-import type { ReimbursementPayrollEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
-import {
-  PayrollEntrySchema,
-} from "@canny_ecosystem/utils";
+import type { ExitsPayrollEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
+import { ExitEntrySchema } from "@canny_ecosystem/utils";
 
-export function PayrollEntrySheet({
+export function ExitEntrySheet({
   row,
   rowData,
   editable,
   type,
 }: {
   row: any;
-  rowData: ReimbursementPayrollEntriesWithEmployee;
+  rowData: ExitsPayrollEntriesWithEmployee;
   editable: boolean;
   type: string;
 }) {
@@ -42,9 +40,9 @@ export function PayrollEntrySheet({
 
   const [form, fields] = useForm({
     id: "UPDATE_PAYROLL_ENTRY",
-    constraint: getZodConstraint(PayrollEntrySchema),
+    constraint: getZodConstraint(ExitEntrySchema),
     onValidate({ formData }) {
-      return parseWithZod(formData, { schema: PayrollEntrySchema });
+      return parseWithZod(formData, { schema: ExitEntrySchema });
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
@@ -97,8 +95,14 @@ export function PayrollEntrySheet({
             </div>
 
             <div className="flex flex-col items-end justify-around">
-              <h2 className="text-xl text-muted-foreground">Net Pay</h2>
-              <p className="font-bold">Rs {rowData.amount}</p>
+              <h2 className="text-xl text-muted-foreground">Net pay</h2>
+              <p className="font-bold">
+                Rs{" "}
+                {Number(rowData?.gratuity) +
+                  Number(rowData?.bonus) +
+                  Number(rowData?.leave_encashment) -
+                  Number(rowData?.deduction)}
+              </p>
             </div>
           </SheetTitle>
         </SheetHeader>
@@ -108,7 +112,7 @@ export function PayrollEntrySheet({
               method="POST"
               {...getFormProps(form)}
               className="flex flex-col"
-              action={`/payroll/run-payroll/${rowData.payroll_id}/${rowData.id}/update-payroll-entry`}
+              action={`/payroll/run-payroll/${rowData.payroll_id}/${rowData.id}/update-exit-entry`}
             >
               <input {...getInputProps(fields.type, { type: "hidden" })} />
 
@@ -122,16 +126,55 @@ export function PayrollEntrySheet({
               />
               <Field
                 inputProps={{
-                  ...getInputProps(fields.amount, { type: "number" }),
+                  ...getInputProps(fields.gratuity, { type: "number" }),
                   autoFocus: true,
-                  placeholder: "Enter amount",
+                  placeholder: "Enter Gratuity",
                   className: "capitalize",
                   readOnly: !editable,
                 }}
                 labelProps={{
-                  children: "Amount",
+                  children: "Gratuity",
                 }}
-                errors={fields.amount.errors}
+                errors={fields.gratuity.errors}
+              />
+              <Field
+                inputProps={{
+                  ...getInputProps(fields.bonus, { type: "number" }),
+                  autoFocus: true,
+                  placeholder: "Enter Bonus",
+                  className: "capitalize",
+                  readOnly: !editable,
+                }}
+                labelProps={{
+                  children: "Bonus",
+                }}
+                errors={fields.bonus.errors}
+              />
+              <Field
+                inputProps={{
+                  ...getInputProps(fields.leave_encashment, { type: "number" }),
+                  autoFocus: true,
+                  placeholder: "Enter Encashment",
+                  className: "capitalize",
+                  readOnly: !editable,
+                }}
+                labelProps={{
+                  children: "Leave Encashment",
+                }}
+                errors={fields.leave_encashment.errors}
+              />
+              <Field
+                inputProps={{
+                  ...getInputProps(fields.deduction, { type: "number" }),
+                  autoFocus: true,
+                  placeholder: "Enter Deduction",
+                  className: "capitalize",
+                  readOnly: !editable,
+                }}
+                labelProps={{
+                  children: "Deduction",
+                }}
+                errors={fields.deduction.errors}
               />
             </Form>
           </FormProvider>

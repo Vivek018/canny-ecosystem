@@ -5,6 +5,7 @@ import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { addOrUpdateInvoiceWithProof } from "@canny_ecosystem/supabase/media";
 import { createInvoice } from "@canny_ecosystem/supabase/mutations";
 import {
+  type ExitsPayrollEntriesWithEmployee,
   getCannyCompanyIdByName,
   getExitsEntriesForPayrollByPayrollId,
   getLocationsForSelectByCompanyId,
@@ -99,7 +100,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   let reimbursementData = [] as
     | ReimbursementPayrollEntriesWithEmployee[]
     | null;
-  let exitData = [] as ReimbursementPayrollEntriesWithEmployee[] | null;
+  let exitData = [] as ExitsPayrollEntriesWithEmployee[] | null;
   if (payroll?.payroll_type === "salary") {
     const { data } = await getSalaryEntriesByPayrollId({
       supabase,
@@ -319,8 +320,8 @@ export default function CreateInvoice({
           ? JSON.parse(updateValues.payroll_data as string)
           : updateValues.payroll_data
         : payroll?.payroll_type === "salary"
-          ? transformSalaryData(salaryData)
-          : transformPayrollData(payrollData as any[], payroll?.payroll_type!),
+        ? transformSalaryData(salaryData)
+        : transformPayrollData(payrollData as any[], payroll?.payroll_type!),
       payroll_type: updateValues?.payroll_type ?? type,
       proof: undefined,
       invoice_type:
@@ -484,10 +485,11 @@ export default function CreateInvoice({
                     type: "checkbox",
                   })}
                   labelProps={{
-                    children: `Is Charge Included? (${type === "salary"
-                      ? `${relations?.terms?.service_charge}% of ${relations.terms?.include_service_charge}`
-                      : `${relations.terms?.reimbursement_charge}%`
-                      })`,
+                    children: `Is Charge Included? (${
+                      type === "salary"
+                        ? `${relations?.terms?.service_charge}% of ${relations.terms?.include_service_charge}`
+                        : `${relations.terms?.reimbursement_charge}%`
+                    })`,
                   }}
                 />
                 <CheckboxField
@@ -575,7 +577,7 @@ export default function CreateInvoice({
                   }),
                   defaultValue: JSON.stringify(
                     fields.payroll_data.initialValue ??
-                    fields.payroll_data.value
+                      fields.payroll_data.value
                   ),
                 }}
                 fields={[
@@ -593,7 +595,7 @@ export default function CreateInvoice({
                   "text-muted-foreground tracking-wide hidden",
                   (updateValues?.payroll_type ??
                     payroll?.payroll_type === "salary") &&
-                  "flex"
+                    "flex"
                 )}
               >
                 Note : All default values are system generated, Please verify

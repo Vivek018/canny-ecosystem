@@ -1,6 +1,6 @@
 import type { ReimbursementPayrollEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
 import type { ColumnDef } from "@tanstack/react-table";
-import { PayrollEntryDropdown } from "../payroll-entry-dropdown";
+import { ReimbursementEntryDropdown } from "../reimbursement-entry-dropdown";
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
 import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
@@ -9,7 +9,7 @@ import { attribute } from "@canny_ecosystem/utils/constant";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 
-export const payrollEntryColumns = (
+export const reimbursementEntryColumns = (
   status: string,
   type: string
 ): ColumnDef<ReimbursementPayrollEntriesWithEmployee>[] => [
@@ -61,7 +61,7 @@ export const payrollEntryColumns = (
     cell: ({ row }) => {
       const { role } = useUser();
       return (
-        <PayrollEntryDropdown
+        <ReimbursementEntryDropdown
           data={row.original as any}
           status={status}
           type={type}

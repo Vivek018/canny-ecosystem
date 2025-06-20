@@ -1,11 +1,14 @@
 import { ErrorBoundary } from "@/components/error-boundary";
 import { LoadingSpinner } from "@/components/loading-spinner";
-import { PayrollEntryComponent } from "@/components/payroll/payroll-entry/payroll-entry-component";
+import { ExitEntryComponent } from "@/components/payroll/exit-entry/exit-entry-component";
+import { ReimbursementEntryComponent } from "@/components/payroll/reimbursement-entry/reimbursement-entry-component";
+
 import { SalaryEntryComponent } from "@/components/payroll/salary-entry/salary-entry-component";
 import { cacheKeyPrefix } from "@/constant";
 import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { updatePayroll } from "@canny_ecosystem/supabase/mutations";
 import {
+  type ExitsPayrollEntriesWithEmployee,
   getExitsEntriesForPayrollByPayrollId,
   getPayrollById,
   getReimbursementEntriesForPayrollByPayrollId,
@@ -85,7 +88,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   return clientCaching(
-    `${cacheKeyPrefix.run_payroll_id}${args.params.payrollId}`,
+    `${cacheKeyPrefix.payroll_history_id}${args.params.payrollId}`,
     args
   );
 }
@@ -153,7 +156,9 @@ export default function HistoryPayrollId() {
     if (actionData) {
       if (actionData?.status === "success") {
         clearExactCacheEntry(cacheKeyPrefix.run_payroll);
-        clearExactCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
+        clearExactCacheEntry(
+          `${cacheKeyPrefix.payroll_history_id}${payrollId}`
+        );
         clearExactCacheEntry(cacheKeyPrefix.payroll_history);
         toast({
           title: "Success",
@@ -178,12 +183,12 @@ export default function HistoryPayrollId() {
         {({ data: payrollData, error: payrollError }) => {
           if (payrollError || !payrollData) {
             clearExactCacheEntry(
-              `${cacheKeyPrefix.run_payroll_id}${payrollId}`
+              `${cacheKeyPrefix.payroll_history_id}${payrollId}`
             );
             return (
               <ErrorBoundary
                 error={payrollError}
-                message="Failed to load Payroll Data in Run Payroll Id"
+                message="Failed to load Payroll Data in Payroll History Id"
               />
             );
           }
@@ -202,21 +207,31 @@ export default function HistoryPayrollId() {
                 {({ data, error }) => {
                   if (error || !data) {
                     clearExactCacheEntry(
-                      `${cacheKeyPrefix.run_payroll_id}${payrollId}`
+                      `${cacheKeyPrefix.payroll_history_id}${payrollId}`
                     );
                     return (
                       <ErrorBoundary
                         error={error}
-                        message="Failed to load Payroll Entries in Run Payroll"
+                        message="Failed to load Payroll Entries in Payroll History"
                       />
                     );
                   }
 
-                  return (
-                    <PayrollEntryComponent
-                      payrollData={payrollData as unknown as any}
+                  return payrollData.payroll_type === "reimbursement" ? (
+                    <ReimbursementEntryComponent
+                      payrollData={payrollData as any}
                       data={
                         data as unknown as ReimbursementPayrollEntriesWithEmployee[]
+                      }
+                      noButtons={true}
+                      env={env as SupabaseEnv}
+                      fromWhere="payrollhistory"
+                    />
+                  ) : (
+                    <ExitEntryComponent
+                      payrollData={payrollData as any}
+                      data={
+                        data as unknown as ExitsPayrollEntriesWithEmployee[]
                       }
                       noButtons={true}
                       env={env as SupabaseEnv}
@@ -233,12 +248,12 @@ export default function HistoryPayrollId() {
                 {({ data, error }) => {
                   if (error || !data) {
                     clearExactCacheEntry(
-                      `${cacheKeyPrefix.run_payroll_id}${payrollId}`
+                      `${cacheKeyPrefix.payroll_history_id}${payrollId}`
                     );
                     return (
                       <ErrorBoundary
                         error={error}
-                        message="Failed to load Salary Entries in Run Payroll"
+                        message="Failed to load Salary Entries in Payroll Histrory"
                       />
                     );
                   }

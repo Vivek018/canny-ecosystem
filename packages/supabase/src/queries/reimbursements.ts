@@ -26,6 +26,7 @@ export type ReimbursementDataType = Pick<
   | "amount"
   | "submitted_date"
   | "user_id"
+  | "payroll_id"
 > & {
   employees: Pick<
     EmployeeDatabaseRow,
@@ -96,6 +97,7 @@ export async function getReimbursementsByCompanyId({
     users,
     project,
     project_site,
+    in_payroll,
   } = filters ?? {};
 
   const columns = [
@@ -105,6 +107,7 @@ export async function getReimbursementsByCompanyId({
     "amount",
     "submitted_date",
     "employee_id",
+    "payroll_id",
   ] as const;
 
   const query = supabase
@@ -166,6 +169,7 @@ export async function getReimbursementsByCompanyId({
   if (is_deductible !== undefined && is_deductible !== null) {
     query.eq("is_deductible", Boolean(is_deductible));
   }
+
   if (users) {
     query.eq("users.email", users);
   }
@@ -183,6 +187,14 @@ export async function getReimbursementsByCompanyId({
   }
   if (users) {
     query.eq("users.email", users);
+  }
+
+  if (in_payroll !== undefined && in_payroll !== null) {
+    if (in_payroll === "true") {
+      query.not("payroll_id", "is", null);
+    } else {
+      query.is("payroll_id", null);
+    }
   }
 
   const { data, count, error } = await query.range(from, to);
@@ -233,6 +245,7 @@ export type ReimbursementFilters = {
   name?: string | undefined | null;
   project?: string | undefined | null;
   project_site?: string | undefined | null;
+  in_payroll?: string | undefined | null;
 };
 
 export async function getReimbursementsByEmployeeId({
