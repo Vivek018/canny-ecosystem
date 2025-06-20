@@ -71,11 +71,11 @@ CHILD TABLES & JOINING RULES:
   • workforce distribution,
   • employees without project history.
 
-7. employeeWorkHistoryDetails
+7. employee_work_history
 - Past jobs: position, company name, responsibilities, start_date, end_date.
 - Used to evaluate total experience or find previous employers.
 
-8. employeeSkillsDetails
+8. employee_skills
 - Skill info: skill_name, proficiency (beginner, intermediate, advanced), years_of_experience.
 - Useful for skill-based filtering and workforce capability queries.
 `;
