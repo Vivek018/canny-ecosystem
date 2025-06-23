@@ -40,6 +40,7 @@ export const zEmailSuffix = z
 
 export const SIZE_1KB = 1 * 1024; //1KB
 export const SIZE_1MB = 1 * SIZE_1KB * SIZE_1KB; // 1MB
+export const SIZE_10MB = 10 * SIZE_1MB; // 10MB
 
 const ACCEPTED_IMAGE_TYPES = [
   "image/jpeg",
@@ -65,7 +66,7 @@ export const zImage = z
 export const zFile = z
   .any()
   .refine(
-    (file) => (typeof file !== "string" ? file.size < SIZE_1MB : true),
+    (file) => (typeof file !== "string" ? file.size < SIZE_10MB : true),
     "File size must be less than 1MB"
   )
   .refine(
