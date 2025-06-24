@@ -154,7 +154,7 @@ export async function getApprovedPayrollsByCompanyId({
     query.eq("status", status as PayrollDatabaseRow["status"]);
   }
 
-  const { data, count, error } = await query.range(from, to);
+  const { data, count, error } = await query.range(from, to).order("created_at", { ascending: false });
   if (error) console.error("getApprovedPayrollsByCompanyId Error", error);
   return { data, meta: { count: count }, error };
 }
@@ -398,8 +398,8 @@ export async function getApprovedPayrollsByCompanyIdByYears({
   const startOfYear = filterMonth
     ? new Date(Date.UTC(Number(filterYear ?? defaultYear) - 1, filterMonth, 1))
     : new Date(
-        Date.UTC(Number(filterYear ?? defaultYear) - 1, defMonth + 1, 1)
-      );
+      Date.UTC(Number(filterYear ?? defaultYear) - 1, defMonth + 1, 1)
+    );
 
   const endOfYear = filterMonth
     ? new Date(Number(filterYear ?? defaultYear), filterMonth, 1)

@@ -67,7 +67,7 @@ export const zFile = z
   .any()
   .refine(
     (file) => (typeof file !== "string" ? file.size < SIZE_10MB : true),
-    "File size must be less than 1MB"
+    "File size must be less than 10MB"
   )
   .refine(
     (file) =>
