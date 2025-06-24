@@ -20,6 +20,7 @@ import {
   useActionData,
   useLoaderData,
   useNavigate,
+  useParams,
 } from "@remix-run/react";
 import type { EmployeeDocumentsDatabaseRow } from "@canny_ecosystem/supabase/types";
 
@@ -97,11 +98,12 @@ export default function UpdateDocument() {
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { employeeId } = useParams();
 
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearExactCacheEntry(`${cacheKeyPrefix.employee_documents}`);
+        clearExactCacheEntry(`${cacheKeyPrefix.employee_documents}${employeeId}`);
         toast({
           title: "Success",
           description: actionData.message,

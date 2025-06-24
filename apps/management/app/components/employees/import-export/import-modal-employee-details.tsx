@@ -132,7 +132,7 @@ export const ImportEmployeeDetailsModal = () => {
           </div>
         </div>
 
-        <Input type="file" accept=".csv" onChange={handleFileSelect} />
+        <Input type="file" onChange={handleFileSelect} />
 
         <p
           className={cn(
