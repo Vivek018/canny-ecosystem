@@ -1,4 +1,4 @@
-import { type employeeDocuments, isGoodStatus } from "@canny_ecosystem/utils";
+import { isGoodStatus } from "@canny_ecosystem/utils";
 import { json, useActionData, useNavigate, useParams } from "@remix-run/react";
 import { useEffect } from "react";
 import { cacheKeyPrefix } from "@/constant";
@@ -14,7 +14,7 @@ export async function action({
 }: ActionFunctionArgs): Promise<Response> {
   const employeeId = params.employeeId ?? "";
   const url = new URL(request.url);
-  const documentType = url.searchParams.get("documentType") as (typeof employeeDocuments)[number];
+  const documentType = url.searchParams.get("documentType") ?? "";
   const { supabase } = getSupabaseWithHeaders({ request });
 
   try {
