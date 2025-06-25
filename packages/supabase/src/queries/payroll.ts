@@ -19,7 +19,6 @@ export type PayrollFilters = {
 
 export type ImportSalaryPayrollDataType = {
   employee_code: EmployeeDatabaseRow["employee_code"];
-  present_days: number;
 };
 
 export async function getPendingOrSubmittedPayrollsByCompanyId({
@@ -198,7 +197,18 @@ export type SalaryEntriesWithEmployee = Pick<
   | "company_id"
   | "id"
 > & {
-  salary_entries: Omit<SalaryEntriesDatabaseRow, "created_at" | "updated_at">[];
+  salary_entries: (Omit<
+    SalaryEntriesDatabaseRow,
+    "created_at" | "updated_at"
+  > & {
+    monthly_attendance: {
+      id: string;
+      year: number;
+      month: number;
+      present_days: number;
+      overtime_hours: number;
+    };
+  })[];
   leaves?: { start_date: string; end_date: string; status: string }[];
 };
 
@@ -211,10 +221,7 @@ export async function getSalaryEntriesByPayrollId({
 }) {
   const columns = [
     "id",
-    "month",
-    "year",
-    "present_days",
-    "overtime_hours",
+    "monthly_attendance_id",
     "employee_id",
     "payroll_id",
     "field_name",
@@ -227,7 +234,7 @@ export async function getSalaryEntriesByPayrollId({
     .select(
       `id, company_id, first_name, middle_name, last_name, employee_code, salary_entries!inner(${columns.join(
         ","
-      )})`
+      )},monthly_attendance!inner(id, month, year, present_days, overtime_hours))`
     )
     .eq("salary_entries.payroll_id", payrollId)
     .order("type, field_name", {
@@ -254,10 +261,7 @@ export async function getSalaryEntriesByPayrollAndEmployeeId({
 }) {
   const columns = [
     "id",
-    "month",
-    "year",
-    "present_days",
-    "overtime_hours",
+    "monthly_attendance_id",
     "employee_id",
     "template_component_id",
     "payroll_id",
@@ -271,7 +275,7 @@ export async function getSalaryEntriesByPayrollAndEmployeeId({
     .select(
       `id, company_id, first_name, middle_name, last_name, employee_code, salary_entries!inner(${columns.join(
         ","
-      )}),leaves(start_date,end_date,leave_type)`
+      )},monthly_attendance!inner(id, month, year, present_days, overtime_hours)),leaves(start_date,end_date,leave_type)`
     )
     .eq("salary_entries.payroll_id", payrollId)
     .eq("id", employeeId)
@@ -293,15 +297,12 @@ export async function getSalaryEntryById({
 }) {
   const columns = [
     "id",
-    "month",
-    "year",
-    "present_days",
-    "overtime_hours",
     "employee_id",
     "payroll_id",
     "field_name",
     "type",
     "amount",
+    "monthly_attendance_id",
   ] as const;
 
   const { data, error } = await supabase
@@ -460,10 +461,7 @@ export async function getSalaryEntriesByPayrollIdForSalaryRegister({
   payrollId: string;
 }) {
   const columns = [
-    "month",
-    "year",
-    "present_days",
-    "overtime_hours",
+    "monthly_attendance_id",
     "field_name",
     "type",
     "amount",
@@ -474,7 +472,7 @@ export async function getSalaryEntriesByPayrollIdForSalaryRegister({
     .select(
       `id, company_id, first_name, middle_name, last_name, employee_code, salary_entries!inner(${columns.join(
         ","
-      )}),employee_project_assignment!inner(position,start_date),employee_statutory_details!inner(aadhaar_number,pan_number,uan_number,pf_number,esic_number),leaves(start_date,end_date,leave_type),employee_bank_details(account_number,bank_name)`
+      )},monthly_attendance!inner(id, month, year, present_days, overtime_hours)),employee_project_assignment!inner(position,start_date),employee_statutory_details!inner(aadhaar_number,pan_number,uan_number,pf_number,esic_number),leaves(start_date,end_date,leave_type),employee_bank_details(account_number,bank_name)`
     )
     .eq("salary_entries.payroll_id", payrollId)
     .order("type, field_name", {
@@ -489,8 +487,8 @@ export async function getSalaryEntriesByPayrollIdForSalaryRegister({
 
   const filteredData = data?.map((employee) => {
     const salaryEntry = employee.salary_entries[0];
-    const year = salaryEntry?.year;
-    const month = salaryEntry?.month;
+    const year = salaryEntry?.monthly_attendance.year;
+    const month = salaryEntry?.monthly_attendance.month;
 
     const filteredLeaves = employee?.leaves?.filter((leave) => {
       const leaveDate = new Date(leave.start_date);
@@ -508,8 +506,6 @@ export async function getSalaryEntriesByPayrollIdForSalaryRegister({
   return { data: filteredData, error: null };
 }
 
-
-
 export async function getSalaryEntriesByEmployeeId({
   supabase,
   employeeId,
@@ -523,10 +519,7 @@ export async function getSalaryEntriesByEmployeeId({
 
   const columns = [
     "id",
-    "month",
-    "year",
-    "present_days",
-    "overtime_hours",
+    "monthly_attendance_id",
     "employee_id",
     "payroll_id",
     "field_name",
@@ -536,11 +529,15 @@ export async function getSalaryEntriesByEmployeeId({
 
   const { data, error } = await supabase
     .from("salary_entries")
-    .select(columns.join(","))
+    .select(
+      `${columns.join(
+        ","
+      )},monthly_attendance!inner(id, month, year, present_days, overtime_hours)`
+    )
     .eq("employee_id", employeeId)
-    .eq("year", filterYear)
-    .gte("month", 1)
-    .lte("month", 12)
+    .eq("monthly_attendance.year", filterYear)
+    .gte("monthly_attendance.month", 1)
+    .lte("monthly_attendance.month", 12)
     .returns<SalaryEntriesDatabaseRow[]>();
 
   if (error) {

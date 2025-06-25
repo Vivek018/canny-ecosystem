@@ -88,6 +88,27 @@ export default function PayrollImportFieldMapping() {
   const [fieldConfigs, setFieldConfigs] = useState<FieldConfig[]>([
     ...FIELD_CONFIGS,
     {
+      key: "working_days",
+    },
+    {
+      key: "working_hours",
+    },
+    {
+      key: "overtime_hours",
+    },
+    {
+      key: "absent_days",
+    },
+    {
+      key: "paid_holidays",
+    },
+    {
+      key: "paid_leaves",
+    },
+    {
+      key: "casual_leaves",
+    },
+    {
       key: "BASIC",
       type: "earning",
     },
@@ -295,10 +316,6 @@ export default function PayrollImportFieldMapping() {
                   transformedRow[key] = row[key];
                 }
               }
-              transformedRow.overtime_hours =
-                Number(row.present_days) > 26
-                  ? (Number(row.present_days) - 26) * 8
-                  : 0;
               transformedRow.month = month;
               transformedRow.year = year;
               return transformedRow;
@@ -380,7 +397,7 @@ export default function PayrollImportFieldMapping() {
               placeholder="Enter the title here"
               onChange={(e) => setTitle(e.target.value)}
             />
-            
+
             <div className="grid grid-cols-2 place-content-center justify-between gap-y-8 gap-x-10 mt-5 mb-10">
               {fieldConfigs.map((field) => (
                 <div key={field.key} className="flex flex-col relative">

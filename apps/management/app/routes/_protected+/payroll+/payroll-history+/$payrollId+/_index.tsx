@@ -61,6 +61,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       supabase,
       payrollId: payrollId ?? "",
     });
+
     return defer({
       payrollPromise,
       salaryEntriesPromise,
@@ -257,6 +258,8 @@ export default function HistoryPayrollId() {
                       />
                     );
                   }
+
+                  
                   return (
                     <SalaryEntryComponent
                       payrollData={payrollData as any}

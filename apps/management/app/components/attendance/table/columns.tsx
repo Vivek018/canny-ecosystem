@@ -179,12 +179,17 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
             <DropdownMenuTrigger
               asChild
               className={cn(
-                !hasPermission(role, `${updateRole}:${attribute.attendance}`) &&
+                (!hasPermission(
+                  role,
+                  `${updateRole}:${attribute.attendance}`
+                ) &&
                   !hasPermission(
                     role,
                     `${deleteRole}:${attribute.attendance}`
-                  ) &&
-                  "hidden"
+                  )) ||
+                  !row.original?.monthly_attendance?.id
+                  ? "hidden"
+                  : "flex"
               )}
             >
               <Button variant="ghost" className="h-8 w-8 p-0">

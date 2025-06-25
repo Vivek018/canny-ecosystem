@@ -92,13 +92,16 @@ export default function Salary() {
     interface SalaryEntry {
       payroll_id: string;
       employee_id: string;
-      month: number;
-      year: number;
-      present_days: number;
-      overtime_hours: number;
       field_name: string;
       amount: number;
       type: string;
+      monthly_attendance: {
+        id: string;
+        month: number;
+        year: number;
+        present_days: number;
+        overtime_hours: number;
+      };
     }
 
     const [grouped] = useState<{ [id: string]: GroupedPayrollEntry }>({});
@@ -110,10 +113,10 @@ export default function Salary() {
         grouped[id] = {
           payroll_id: id,
           employee_id: entry.employee_id,
-          month: entry.month,
-          year: entry.year,
-          present_days: entry.present_days,
-          overtime_hours: entry.overtime_hours,
+          month: entry.monthly_attendance.month,
+          year: entry.monthly_attendance.year,
+          present_days: entry.monthly_attendance.present_days,
+          overtime_hours: entry.monthly_attendance.overtime_hours,
           fields: {},
         };
       }

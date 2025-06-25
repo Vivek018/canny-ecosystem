@@ -117,13 +117,11 @@ export default function AddNonEmployeeReimbursements({
 }) {
   const { companyId } = useLoaderData<typeof loader>();
 
-  console.log("hereuhywqasuixnian");
   const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
 
   const { toast } = useToast();
   const navigate = useNavigate();
-  console.log(actionData);
 
   useEffect(() => {
     if (actionData) {

@@ -91,7 +91,7 @@ export async function createSalaryPayroll({
   } = await createSalaryEntries({
     supabase,
     data: salaryPayrollEntries,
-    onConflict: "month, year, employee_id, field_name",
+    onConflict: "monthly_attendance_id, employee_id, field_name",
     bypassAuth,
   });
 
@@ -182,7 +182,6 @@ export async function createReimbursementPayroll({
       return { status: 400, error: "Unauthorized User" };
     }
   }
-  
 
   const {
     data: payrollData,

@@ -86,3 +86,54 @@ export async function deleteAttendanceById({
 
   return { status, error: null };
 }
+
+export async function createAttendanceByPayrollImportAndGiveID({
+  supabase,
+  month,
+  year,
+  employee_id,
+  insertData,
+}: {
+  supabase: TypedSupabaseClient;
+  year: number;
+  month: number;
+  employee_id: string;
+  insertData: EmployeeMonthlyAttendanceDatabaseInsert;
+}) {
+  const { data, error, status } = await supabase
+    .from("monthly_attendance")
+    .insert([
+      {
+        ...insertData,
+        employee_id,
+        month,
+        year,
+      },
+    ])
+    .select("id")
+    .single();
+
+  if (error) {
+    if (error.code === "23505") {
+      const { data: existingData, error: selectError } = await supabase
+        .from("monthly_attendance")
+        .select("id")
+        .eq("employee_id", employee_id)
+        .eq("month", month)
+        .eq("year", year)
+        .single();
+
+      if (selectError || !existingData) {
+        console.error("Error fetching existing attendance:", selectError);
+        return { data: null, error: selectError || new Error("Not found") };
+      }
+
+      return { data: existingData, error: null, status: 200 };
+    }
+
+    console.error("createAttendanceByPayrollImportAndGiveID Error:", error);
+    return { data: null, error, status };
+  }
+
+  return { data, error: null, status };
+}

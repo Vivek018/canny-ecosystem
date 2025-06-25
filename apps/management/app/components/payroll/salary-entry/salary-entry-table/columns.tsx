@@ -75,12 +75,14 @@ export const salaryEntryColumns = ({
     {
       accessorKey: "present_days",
       header: "P. Days",
-      accessorFn: (row) => row.salary_entries[0]?.present_days ?? 0,
+      accessorFn: (row) =>
+        row.salary_entries[0]?.monthly_attendance.present_days ?? 0,
       sortingFn: "basic",
       cell: ({ row }) => {
         return (
           <p className="truncate">
-            {row.original.salary_entries[0].present_days}
+            {row.original.salary_entries[0].monthly_attendance.present_days ??
+              0}
           </p>
         );
       },
@@ -91,7 +93,8 @@ export const salaryEntryColumns = ({
       cell: ({ row }) => {
         return (
           <p className="truncate">
-            {row.original.salary_entries[0].overtime_hours}
+            {row.original.salary_entries[0].monthly_attendance.overtime_hours ??
+              0}
           </p>
         );
       },
@@ -102,8 +105,11 @@ export const salaryEntryColumns = ({
       cell: ({ row }) => {
         return (
           <p className="truncate">
-            {getMonthNameFromNumber(row.original.salary_entries[0].month, true)}{" "}
-            {row.original.salary_entries[0].year}
+            {getMonthNameFromNumber(
+              row.original.salary_entries[0].monthly_attendance.month,
+              true
+            )}{" "}
+            {row.original.salary_entries[0].monthly_attendance.year}
           </p>
         );
       },
@@ -141,7 +147,7 @@ export const salaryEntryColumns = ({
             triggerChild={<p className={displayColor}>{displayValue}</p>}
             editable={editable}
             employee={row.original as unknown as EmployeeDatabaseRow}
-            salaryEntry={valueObj as SalaryEntriesDatabaseRow}
+            salaryEntry={valueObj as unknown as SalaryEntriesDatabaseRow}
           />
         );
       },

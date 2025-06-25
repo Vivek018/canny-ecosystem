@@ -47,7 +47,6 @@ export const UpdateImportedReimbursement = ({
       });
     }
   };
-  console.log("here");
 
   return (
     <AlertDialog>

@@ -29,7 +29,6 @@ export function SalaryPayrollImportData({
   const [searchString, setSearchString] = useState("");
   const [tableData, setTableData] = useState(importData.data);
 
-
   useEffect(() => {
     const filteredData = importData?.data.filter((item) =>
       Object.entries(item).some(
