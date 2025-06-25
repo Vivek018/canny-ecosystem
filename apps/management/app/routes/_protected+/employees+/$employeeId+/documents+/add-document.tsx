@@ -147,7 +147,7 @@ export default function AddDocument({
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearExactCacheEntry(`${cacheKeyPrefix.employee_documents}`);
+        clearExactCacheEntry(`${cacheKeyPrefix.employee_documents}${employeeId}`);
         toast({
           title: "Success",
           description: actionData.message,

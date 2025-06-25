@@ -40,6 +40,7 @@ export const zEmailSuffix = z
 
 export const SIZE_1KB = 1 * 1024; //1KB
 export const SIZE_1MB = 1 * SIZE_1KB * SIZE_1KB; // 1MB
+export const SIZE_10MB = 10 * SIZE_1MB; // 10MB
 
 const ACCEPTED_IMAGE_TYPES = [
   "image/jpeg",
@@ -65,8 +66,8 @@ export const zImage = z
 export const zFile = z
   .any()
   .refine(
-    (file) => (typeof file !== "string" ? file.size < SIZE_1MB : true),
-    "File size must be less than 1MB"
+    (file) => (typeof file !== "string" ? file.size < SIZE_10MB : true),
+    "File size must be less than 10MB"
   )
   .refine(
     (file) =>
@@ -343,11 +344,13 @@ export const positionArray = [
   "branch_manager",
   "finance_manager",
   "jr_accountant",
+  "office_clerk",
   "office_assistant",
   "office_attendant",
   "fitter",
   "assistant_fitter",
   "store_department",
+  "store_incharge",
   "peon",
   "office_boy",
   "operator",
@@ -364,6 +367,7 @@ export const positionArray = [
   "cook",
   "driver",
   "chemist",
+  "field_chemist",
   "watchman",
   "field_operator",
   "technician",
