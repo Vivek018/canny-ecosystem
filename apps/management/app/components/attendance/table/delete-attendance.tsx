@@ -19,14 +19,10 @@ import { attribute, DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
-export const DeleteReimbursement = ({
-  id,
-  employeeId,
-  isEmployeeRoute,
+export const DeleteAttendance = ({
+  attendanceId,
 }: {
-  id: string;
-  employeeId: string;
-  isEmployeeRoute: boolean;
+  attendanceId: string;
 }) => {
   const { role } = useUser();
   const [isLoading, setLoading] = useState(false);
@@ -34,27 +30,22 @@ export const DeleteReimbursement = ({
   const [inputError, setInputError] = useState<string[]>([]);
   const submit = useSubmit();
 
-  const handleCancleReimbursement = () => {
+  const handleCancelAttendance = () => {
     setInputError([]);
     setInputValue("");
     setLoading(false);
   };
 
-  const handleDeleteReimbursement = (
+  const handleDeleteAttendance = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     if (inputValue === DELETE_TEXT) {
       setLoading(true);
       submit(
-        {
-          employeeId,
-          returnTo: isEmployeeRoute
-            ? `/employees/${employeeId}/reimbursements`
-            : "/approvals/reimbursements",
-        },
+        {},
         {
           method: "post",
-          action: `/approvals/reimbursements/${id}/delete-reimbursement`,
+          action: `/time-tracking/attendance/${attendanceId}/delete-attendance`,
           replace: true,
         }
       );
@@ -70,18 +61,17 @@ export const DeleteReimbursement = ({
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "text-[13px] h-9 hidden",
-          hasPermission(role, `${deleteRole}:${attribute.reimbursements}`) &&
-            "flex"
+          hasPermission(role, `${deleteRole}:${attribute.attendance}`) && "flex"
         )}
       >
-        Delete Reimbursement
+        Delete Attendnace
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your User
-            and remove it's data from our servers.
+            This action cannot be undone. This will permanently delete your
+            attendance and remove it's data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="py-4">
@@ -92,7 +82,6 @@ export const DeleteReimbursement = ({
           </p>
           <Input
             type="text"
-            autoFocus
             value={inputValue}
             onChange={(e) => {
               setInputValue(e.target.value);
@@ -108,13 +97,13 @@ export const DeleteReimbursement = ({
           <ErrorList errors={inputError} />
         </div>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={handleCancleReimbursement}>
+          <AlertDialogCancel onClick={handleCancelAttendance}>
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
             className={cn(buttonVariants({ variant: "destructive" }))}
-            onClick={handleDeleteReimbursement}
-            onSelect={handleDeleteReimbursement}
+            onClick={handleDeleteAttendance}
+            onSelect={handleDeleteAttendance}
           >
             {isLoading ? "Deleting..." : "Delete"}
           </AlertDialogAction>

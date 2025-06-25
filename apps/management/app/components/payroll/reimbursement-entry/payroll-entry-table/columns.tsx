@@ -35,14 +35,16 @@ export const reimbursementEntryColumns = (
   {
     enableSorting: false,
     accessorKey: "name",
-    header: "Employee Name",
+    header: "Name",
     cell: ({ row }) => {
       return (
-        <p className="truncate capitalize w-48">{`${
-          row.original?.employees?.first_name
-        } ${row.original?.employees?.middle_name ?? ""} ${
-          row.original?.employees?.last_name ?? ""
-        }`}</p>
+        <p className="truncate capitalize w-48">
+          {row.original?.employees?.id
+            ? `${row.original?.employees?.first_name} ${
+                row.original?.employees?.middle_name ?? ""
+              } ${row.original?.employees?.last_name ?? ""}`
+            : `${row.original?.name}`}
+        </p>
       );
     },
   },

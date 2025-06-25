@@ -26,8 +26,10 @@ import { cacheKeyPrefix } from "@/constant";
 
 export function ReimbursementImportData({
   env,
+  companyId,
 }: {
   env: SupabaseEnv;
+  companyId: string;
 }) {
   const navigate = useNavigate();
   const { supabase } = useSupabase({ env });
@@ -56,8 +58,8 @@ export function ReimbursementImportData({
       Object.entries(item).some(
         ([key, value]) =>
           key !== "avatar" &&
-          String(value).toLowerCase().includes(searchString.toLowerCase()),
-      ),
+          String(value).toLowerCase().includes(searchString.toLowerCase())
+      )
     );
     setTableData(filteredData);
   }, [searchString, importData]);
@@ -66,7 +68,7 @@ export function ReimbursementImportData({
     if (validateImportData(importData.data)) {
       const userEmails = importData.data!.map((value) => value.email!);
       const employeeCodes = importData.data!.map(
-        (value) => value.employee_code,
+        (value) => value.employee_code
       );
 
       const { data: employees, error: codeError } =
@@ -85,7 +87,7 @@ export function ReimbursementImportData({
 
       const updatedData = importData.data!.map((item: any) => {
         const employeeId = employees?.find(
-          (e) => e.employee_code === item.employee_code,
+          (e) => e.employee_code === item.employee_code
         )?.id;
         const userId = users?.find((u) => u.email === item.email)?.id;
 
@@ -95,6 +97,7 @@ export function ReimbursementImportData({
           ...rest,
           ...(employeeId ? { employee_id: employeeId } : {}),
           ...(userId ? { user_id: userId } : {}),
+          company_id: companyId,
         };
       });
 
@@ -104,8 +107,9 @@ export function ReimbursementImportData({
       });
       if (error) console.error("Reimbursement", error);
       if (isGoodStatus(status)) {
-        clearCacheEntry(cacheKeyPrefix.reimbursements)
-        navigate("/approvals/reimbursements")};
+        clearCacheEntry(cacheKeyPrefix.reimbursements);
+        navigate("/approvals/reimbursements");
+      }
     }
   };
 

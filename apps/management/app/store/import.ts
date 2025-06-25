@@ -9,7 +9,6 @@ import type {
   ImportExitDataType,
   ImportLeavesDataType,
   ImportSalaryPayrollDataType,
-  ImportEmployeeAttendanceByPresentsDataType,
   ImportEmployeeProjectAssignmentsDataType,
 } from "@canny_ecosystem/supabase/queries";
 import { create } from "zustand";
@@ -190,15 +189,16 @@ export const useImportStoreForSalaryPayroll =
     setImportData: (importData) => set({ importData }),
   }));
 
-type ImportStateForEmployeeForAttendanceByPresents = {
-  importData: { data: ImportEmployeeAttendanceByPresentsDataType[] };
+type ImportStateForAttendance = {
+  importData: { data: ImportEmployeeAttendanceDataType[] };
   setImportData: (importData: {
-    data: ImportEmployeeAttendanceByPresentsDataType[];
+    data: ImportEmployeeAttendanceDataType[];
   }) => void;
 };
 
-export const useImportStoreForEmployeeAttendanceByPresents =
-  create<ImportStateForEmployeeForAttendanceByPresents>()((set) => ({
+export const useImportStoreForAttendance = create<ImportStateForAttendance>()(
+  (set) => ({
     importData: { data: [] },
     setImportData: (importData) => set({ importData }),
-  }));
+  })
+);

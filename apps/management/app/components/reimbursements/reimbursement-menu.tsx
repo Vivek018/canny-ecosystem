@@ -24,7 +24,7 @@ import {
   attribute,
   modalSearchParamNames,
 } from "@canny_ecosystem/utils/constant";
-import { useSearchParams, useSubmit } from "@remix-run/react";
+import { useNavigate, useSearchParams, useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
 export function ReimbursementMenu({
@@ -37,7 +37,7 @@ export function ReimbursementMenu({
   const { role } = useUser();
   const submit = useSubmit();
   const [searchParams, setSearchParams] = useSearchParams();
-
+  const navigate = useNavigate();
   const [enterTitle, setEnterTitle] = useState(false);
   const [title, setTitle] = useState("");
 
@@ -47,6 +47,7 @@ export function ReimbursementMenu({
     "amount",
     "payroll_id",
   ]);
+
   const notInPayroll = reimbursementForPayroll.filter(
     (entry) => entry.payroll_id === null
   );
@@ -134,6 +135,18 @@ export function ReimbursementMenu({
           <DropdownMenuSeparator
             className={cn("flex", !selectedRows.length && "hidden")}
           />
+          <DropdownMenuItem
+            onClick={() => {
+              navigate(
+                "/approvals/reimbursements/add-nonemployee-reimbursement"
+              );
+            }}
+            className="space-x-2 flex items-center"
+          >
+            <Icon name="plus-circled" size="sm" className="mb-0.5" />
+            <span>Add Non-Employee Reimbursement</span>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={() => {
               searchParams.set(

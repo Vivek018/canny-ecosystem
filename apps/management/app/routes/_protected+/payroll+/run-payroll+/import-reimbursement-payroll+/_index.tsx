@@ -28,6 +28,9 @@ import { cn } from "@canny_ecosystem/ui/utils/cn";
 
 import { Input } from "@canny_ecosystem/ui/input";
 import { ReimbursementImportData } from "@/components/payroll/import-export/payroll-reimbursement-import-data";
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
 type FieldConfig = {
   key: keyof z.infer<typeof ImportReimbursementHeaderSchema>;
@@ -56,16 +59,20 @@ const FIELD_CONFIGS: FieldConfig[] = [
   },
 ];
 
-export async function loader() {
+export async function loader({ request }: LoaderFunctionArgs) {
+  const { supabase } = getSupabaseWithHeaders({ request });
+
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
-  return json({ env });
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+
+  return json({ env, companyId });
 }
 
 export default function ReimbursementFieldMapping() {
-  const { env } = useLoaderData<typeof loader>();
+  const { env, companyId } = useLoaderData<typeof loader>();
   const [title, setTitle] = useState("");
 
   const { setImportData } = useImportStoreForReimbursementPayroll();
@@ -242,7 +249,7 @@ export default function ReimbursementFieldMapping() {
   return (
     <section className="py-4 ">
       {loadNext ? (
-        <ReimbursementImportData env={env} />
+        <ReimbursementImportData env={env} companyId={companyId} />
       ) : (
         <Card className="m-4 px-40">
           <CardHeader>

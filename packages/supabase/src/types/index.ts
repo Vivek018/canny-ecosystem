@@ -98,12 +98,12 @@ export type EmployeeDatabaseUpdate =
   Database["public"]["Tables"]["employees"]["Update"];
 
 // Employee Attendance
-export type EmployeeAttendanceDatabaseRow =
-  Database["public"]["Tables"]["attendance"]["Row"];
-export type EmployeeAttendanceDatabaseInsert =
-  Database["public"]["Tables"]["attendance"]["Insert"];
-export type EmployeeAttendanceDatabaseUpdate =
-  Database["public"]["Tables"]["attendance"]["Update"];
+export type EmployeeMonthlyAttendanceDatabaseRow =
+  Database["public"]["Tables"]["monthly_attendance"]["Row"];
+export type EmployeeMonthlyAttendanceDatabaseInsert =
+  Database["public"]["Tables"]["monthly_attendance"]["Insert"];
+export type EmployeeMonthlyAttendanceDatabaseUpdate =
+  Database["public"]["Tables"]["monthly_attendance"]["Update"];
 
 // Employee Statutory Details
 export type EmployeeStatutoryDetailsDatabaseRow =
@@ -353,6 +353,9 @@ export type ChatDatabaseRow = Database["public"]["Tables"]["chat"]["Row"];
 export type ChatDatabaseInsert = Database["public"]["Tables"]["chat"]["Insert"];
 export type ChatDatabaseUpdate = Database["public"]["Tables"]["chat"]["Update"];
 
-export type NotificationDatabaseRow = Database["public"]["Tables"]["notifications"]["Row"];
-export type NotificationDatabaseInsert = Database["public"]["Tables"]["notifications"]["Insert"];
-export type NotificationDatabaseUpdate = Database["public"]["Tables"]["notifications"]["Update"];
+export type NotificationDatabaseRow =
+  Database["public"]["Tables"]["notifications"]["Row"];
+export type NotificationDatabaseInsert =
+  Database["public"]["Tables"]["notifications"]["Insert"];
+export type NotificationDatabaseUpdate =
+  Database["public"]["Tables"]["notifications"]["Update"];

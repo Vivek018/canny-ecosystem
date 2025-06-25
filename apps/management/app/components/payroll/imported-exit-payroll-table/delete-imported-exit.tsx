@@ -1,6 +1,4 @@
-import {
-  useImportStoreForEmployeeAttendanceByPresents,
-} from "@/store/import";
+import { useImportStoreForExitPayroll } from "@/store/import";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,15 +13,16 @@ import {
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 
-export const DeleteImportedEmployeeAttendanceByPresents = ({
+export const DeleteImportedExit = ({
   indexToDelete,
 }: {
   indexToDelete: number;
 }) => {
-  const { importData, setImportData } = useImportStoreForEmployeeAttendanceByPresents();
+  const { importData, setImportData } = useImportStoreForExitPayroll();
 
   const handleDelete = () => {
     setImportData({
+      title: importData.title,
       data: importData.data?.filter((_, index) => index !== indexToDelete),
     });
   };
@@ -36,7 +35,7 @@ export const DeleteImportedEmployeeAttendanceByPresents = ({
           "text-[13px] h-9"
         )}
       >
-        Delete Payroll
+        Delete Exit
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

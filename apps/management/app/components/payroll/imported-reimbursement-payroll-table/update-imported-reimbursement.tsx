@@ -1,4 +1,4 @@
-import { useImportStoreForReimbursement } from "@/store/import";
+import { useImportStoreForReimbursementPayroll } from "@/store/import";
 import type { ImportReimbursementDataType } from "@canny_ecosystem/supabase/queries";
 import {
   AlertDialog,
@@ -29,7 +29,7 @@ export const UpdateImportedReimbursement = ({
   indexToUpdate: number;
   dataToUpdate: ImportReimbursementDataType;
 }) => {
-  const { importData, setImportData } = useImportStoreForReimbursement();
+  const { importData, setImportData } = useImportStoreForReimbursementPayroll();
   const [data, setData] = useState(dataToUpdate);
 
   const onChange = (key: keyof typeof dataToUpdate, value: string) => {
@@ -41,6 +41,7 @@ export const UpdateImportedReimbursement = ({
 
     if (parsedResult.success) {
       setImportData({
+        title: importData.title,
         data: importData.data?.map((item, index) =>
           index === indexToUpdate ? data : item
         ),

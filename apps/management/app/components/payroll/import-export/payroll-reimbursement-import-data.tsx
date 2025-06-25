@@ -12,10 +12,16 @@ import { ImportReimbursementDataSchema } from "@canny_ecosystem/utils";
 import { useSubmit } from "@remix-run/react";
 
 import { useState, useEffect } from "react";
-import { ImportedDataTable } from "@/components/reimbursements/imported-table/imported-data-table";
-import { ImportedDataColumns } from "@/components/reimbursements/imported-table/columns";
+import { ImportedDataTable } from "../imported-reimbursement-payroll-table/imported-data-table";
+import { ImportedDataColumns } from "../imported-reimbursement-payroll-table/columns";
 
-export function ReimbursementImportData({ env }: { env: SupabaseEnv }) {
+export function ReimbursementImportData({
+  env,
+  companyId,
+}: {
+  env: SupabaseEnv;
+  companyId: string;
+}) {
   const submit = useSubmit();
 
   const { supabase } = useSupabase({ env });
@@ -50,6 +56,7 @@ export function ReimbursementImportData({ env }: { env: SupabaseEnv }) {
     setTableData(filteredData);
   }, [searchString, importData]);
 
+
   const handleFinalImport = async () => {
     if (validateImportData(importData.data)) {
       const userEmails = importData.data!.map((value) => value.email!);
@@ -83,6 +90,7 @@ export function ReimbursementImportData({ env }: { env: SupabaseEnv }) {
           ...rest,
           ...(employeeId ? { employee_id: employeeId } : {}),
           ...(userId ? { user_id: userId } : {}),
+          company_id: companyId,
         };
       });
 

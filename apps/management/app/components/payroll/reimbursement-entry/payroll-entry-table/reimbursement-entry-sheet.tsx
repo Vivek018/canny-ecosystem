@@ -88,7 +88,9 @@ export function ReimbursementEntrySheet({
         <SheetHeader className="px-6 pt-4 pb-8 flex-shrink-0">
           <SheetTitle className="flex justify-between">
             <div>
-              <h1 className="text-primary text-3xl">{name}</h1>
+              <h1 className="text-primary text-3xl">
+                {rowData.employee_id ? name : rowData.name}
+              </h1>
               <h4 className="my-1 text-muted-foreground text-sm">
                 Employee Code: {rowData?.employees?.employee_code ?? "--"}
               </h4>

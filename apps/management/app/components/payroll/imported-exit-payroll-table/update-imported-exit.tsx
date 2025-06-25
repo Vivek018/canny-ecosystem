@@ -1,4 +1,4 @@
-import { useImportStoreForExit } from "@/store/import";
+import { useImportStoreForExitPayroll } from "@/store/import";
 import type { ImportExitDataType } from "@canny_ecosystem/supabase/queries";
 import {
   AlertDialog,
@@ -30,7 +30,7 @@ export const UpdateImportedExit = ({
   indexToUpdate: number;
   dataToUpdate: ImportExitDataType;
 }) => {
-  const { importData, setImportData } = useImportStoreForExit();
+  const { importData, setImportData } = useImportStoreForExitPayroll();
   const [data, setData] = useState(dataToUpdate);
 
   const onChange = (key: keyof typeof dataToUpdate, value: string) => {
@@ -42,6 +42,7 @@ export const UpdateImportedExit = ({
 
     if (parsedResult.success) {
       setImportData({
+        title: importData.title,
         data: importData.data?.map((item, index) =>
           index === indexToUpdate ? data : item
         ),

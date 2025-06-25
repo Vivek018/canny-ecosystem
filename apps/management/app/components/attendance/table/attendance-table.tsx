@@ -11,26 +11,24 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { AttendanceTableHeader } from "./attendance-table-header";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@canny_ecosystem/ui/button";
 import { useAttendanceStore } from "@/store/attendance";
 import { ExportBar } from "../export-bar";
-import type {
-  DayType,
-  TransformedAttendanceDataType,
-} from "@/routes/_protected+/time-tracking+/attendance+/_index";
+
 import { useSearchParams } from "@remix-run/react";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
 import { useInView } from "react-intersection-observer";
-import { getAttendanceByCompanyId } from "@canny_ecosystem/supabase/queries";
 import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { Spinner } from "@canny_ecosystem/ui/spinner";
-import { formatDate } from "@canny_ecosystem/utils";
+import {
+  getMonthlyAttendanceByCompanyId,
+  type AttendanceDataType,
+} from "@canny_ecosystem/supabase/queries";
 
 interface DataTableProps {
-  days: DayType[];
   columns: any;
-  data: TransformedAttendanceDataType[];
+  data: AttendanceDataType[];
   noFilters?: boolean;
   hasNextPage: boolean;
   count: number;
@@ -42,7 +40,6 @@ interface DataTableProps {
 }
 
 export function AttendanceTable({
-  days,
   columns,
   data: initialData,
   hasNextPage: initialHasNextPage,
@@ -64,73 +61,20 @@ export function AttendanceTable({
   } = useAttendanceStore();
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const [data, setData] =
-    useState<TransformedAttendanceDataType[]>(initialData);
+  const [data, setData] = useState<AttendanceDataType[]>(initialData);
   const [from, setFrom] = useState(pageSize);
   const [hasNextPage, setHasNextPage] = useState(initialHasNextPage);
   const { supabase } = useSupabase({ env });
 
   const { ref, inView } = useInView();
 
-  const transformAttendanceData = useMemo(() => {
-    return (data: any[]) => {
-      const groupedByEmployeeAndMonth = data.reduce((acc, employee) => {
-        const empCode = employee.employee_code;
-        const employeeDetails = {
-          employee_id: employee.id,
-          employee_code: empCode,
-          employee_name: `${employee.first_name ?? ""} ${employee.middle_name ?? ""} ${employee.last_name ?? ""}`,
-          project:
-            employee.employee_project_assignment?.project_sites?.projects
-              ?.name || null,
-          project_site:
-            employee.employee_project_assignment?.project_sites?.name || null,
-        };
-
-        if (!employee?.attendance?.length) {
-          acc[empCode] = acc[empCode] || employeeDetails;
-          return acc;
-        }
-
-        for (const record of employee?.attendance ?? []) {
-          const date = new Date(record.date);
-          const monthYear = `${date.getMonth()}-${date.getFullYear()}`;
-          const key = `${empCode}-${monthYear}`;
-
-          if (!acc[key]) {
-            acc[key] = { ...employeeDetails };
-          }
-
-          const fullDate = formatDate(date.toISOString().split("T")[0]);
-          acc[key][fullDate!] = record.present
-            ? "P"
-            : record.holiday
-            ? record.holiday_type === "weekly"
-              ? "(WOF)"
-              : record.holiday_type === "paid"
-              ? "L"
-              : "A"
-            : "A";
-        }
-
-        return acc;
-      }, {});
-
-      return Object.values(groupedByEmployeeAndMonth);
-    };
-  }, [days]);
-
   const loadMoreEmployees = async () => {
-    if (data.length >= count) {
-      setHasNextPage(false);
-      return;
-    }
     const formattedFrom = from;
     const to = formattedFrom + pageSize;
     const sortParam = searchParams.get("sort");
 
     try {
-      const { data: newData } = await getAttendanceByCompanyId({
+      const { data } = await getMonthlyAttendanceByCompanyId({
         supabase,
         companyId,
         params: {
@@ -142,17 +86,11 @@ export function AttendanceTable({
         },
       });
 
-      if (newData && newData.length > 0) {
-        const transformedData = transformAttendanceData(newData);
-        setData(
-          (prevData) =>
-            [...prevData, ...transformedData] as TransformedAttendanceDataType[]
-        );
-        setFrom(to + 1);
-        setHasNextPage(count > to);
-      } else {
-        setHasNextPage(false);
+      if (data) {
+        setData((prevData) => [...prevData, ...data] as AttendanceDataType[]);
       }
+      setFrom(to + 1);
+      setHasNextPage(count > to);
     } catch (error) {
       console.error("Error loading more employees:", error);
       setHasNextPage(false);
@@ -167,7 +105,7 @@ export function AttendanceTable({
 
   useEffect(() => {
     setColumns(table.getAllLeafColumns());
-  }, [columnVisibility, days]);
+  }, [columnVisibility]);
 
   const table = useReactTable({
     data,
@@ -196,7 +134,7 @@ export function AttendanceTable({
     for (const row of table.getSelectedRowModel().rows) {
       rowArray.push(row.original);
     }
-    setSelectedRows(rowArray as unknown as TransformedAttendanceDataType[]);
+    setSelectedRows(rowArray as unknown as AttendanceDataType[]);
   }, [rowSelection]);
 
   const tableLength = table.getRowModel().rows?.length;
@@ -213,7 +151,6 @@ export function AttendanceTable({
             <AttendanceTableHeader
               table={table}
               className={cn(!tableLength && "hidden")}
-              days={days}
             />
             <TableBody>
               {tableLength ? (
@@ -234,7 +171,9 @@ export function AttendanceTable({
                             cell.column.id === "employee_code" &&
                               "sticky left-12 bg-card z-10",
                             cell.column.id === "employee_name" &&
-                              "sticky left-48 bg-card z-10"
+                              "sticky left-48 bg-card z-10",
+                            cell.column.id === "actions" &&
+                              "sticky right-0 min-w-20 max-w-20 bg-card z-10"
                           )}
                         >
                           {flexRender(

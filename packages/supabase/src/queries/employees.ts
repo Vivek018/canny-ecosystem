@@ -1,11 +1,11 @@
 import { formatUTCDate } from "@canny_ecosystem/utils";
 import type {
   EmployeeAddressDatabaseRow,
-  EmployeeAttendanceDatabaseRow,
   EmployeeBankDetailsDatabaseRow,
   EmployeeDatabaseRow,
   EmployeeDocumentsDatabaseRow,
   EmployeeGuardianDatabaseRow,
+  EmployeeMonthlyAttendanceDatabaseRow,
   EmployeeProjectAssignmentDatabaseRow,
   EmployeeSkillDatabaseRow,
   EmployeeStatutoryDetailsDatabaseRow,
@@ -126,11 +126,12 @@ export async function getEmployeesByCompanyId({
     .from("employees")
     .select(
       `${columns.join(",")},
-        employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
-      }(
+        employee_project_assignment!employee_project_assignments_employee_id_fkey!${
+          project ? "inner" : "left"
+        }(
         employee_id, assignment_type, skill_level, position, start_date, end_date,
-        project_sites!${project ? "inner" : "left"
-      }(id, name, projects!${project ? "inner" : "left"
+        project_sites!${project ? "inner" : "left"}(id, name, projects!${
+        project ? "inner" : "left"
       }(id, name))
       )`,
       { count: "exact" }
@@ -981,10 +982,12 @@ export async function getEmployeesReportByCompanyId({
     .from("employees")
     .select(
       `${columns.join(",")},
-        employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
-      }(
+        employee_project_assignment!employee_project_assignments_employee_id_fkey!${
+          project ? "inner" : "left"
+        }(
         employee_id, assignment_type, skill_level, position, start_date, end_date,
-        project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
+        project_sites!${project ? "inner" : "left"}(id, name, projects!${
+        project ? "inner" : "left"
       }(id, name))
       )`,
       { count: "exact" }
@@ -1218,13 +1221,17 @@ export type ImportEmployeeGuardiansDataType = Pick<
 };
 
 export type ImportEmployeeAttendanceDataType = Pick<
-  EmployeeAttendanceDatabaseRow,
-  | "date"
-  | "no_of_hours"
-  | "present"
-  | "holiday"
-  | "working_shift"
-  | "holiday_type"
+  EmployeeMonthlyAttendanceDatabaseRow,
+  | "month"
+  | "year"
+  | "working_days"
+  | "present_days"
+  | "working_hours"
+  | "overtime_hours"
+  | "absent_days"
+  | "paid_holidays"
+  | "paid_leaves"
+  | "casual_leaves"
 > & {
   employee_code: EmployeeDatabaseRow["employee_code"];
 };
@@ -1357,12 +1364,24 @@ export async function getAllEmployeeTablesData({
     projectSiteDetails,
   ] = await Promise.all([
     supabase.from("employees").select("*").limit(HARDEST_QUERY_LIMIT),
-    supabase.from("employee_bank_details").select("*").limit(HARDEST_QUERY_LIMIT),
-    supabase.from("employee_statutory_details").select("*").limit(HARDEST_QUERY_LIMIT),
+    supabase
+      .from("employee_bank_details")
+      .select("*")
+      .limit(HARDEST_QUERY_LIMIT),
+    supabase
+      .from("employee_statutory_details")
+      .select("*")
+      .limit(HARDEST_QUERY_LIMIT),
     supabase.from("employee_addresses").select("*").limit(HARDEST_QUERY_LIMIT),
     supabase.from("employee_guardians").select("*").limit(HARDEST_QUERY_LIMIT),
-    supabase.from("employee_project_assignment").select("*").limit(HARDEST_QUERY_LIMIT),
-    supabase.from("employee_work_history").select("*").limit(HARDEST_QUERY_LIMIT),
+    supabase
+      .from("employee_project_assignment")
+      .select("*")
+      .limit(HARDEST_QUERY_LIMIT),
+    supabase
+      .from("employee_work_history")
+      .select("*")
+      .limit(HARDEST_QUERY_LIMIT),
     supabase.from("employee_skills").select("*").limit(HARDEST_QUERY_LIMIT),
     supabase.from("projects").select("*").limit(HARDEST_QUERY_LIMIT),
     supabase.from("project_sites").select("*").limit(HARDEST_QUERY_LIMIT),
@@ -1370,15 +1389,15 @@ export async function getAllEmployeeTablesData({
 
   const error =
     employees.error ||
-    employeeBankDetails.error
-    || employeeStatutoryDetails.error
-    || employeeAddressesDetails.error
-    || employeeGuardiansDetails.error
-    || employeeWorkDetails.error
-    || employeeWorkHistoryDetails.error
-    || employeeSkillsDetails.error
-    || projectDetails.error
-    || projectSiteDetails.error;
+    employeeBankDetails.error ||
+    employeeStatutoryDetails.error ||
+    employeeAddressesDetails.error ||
+    employeeGuardiansDetails.error ||
+    employeeWorkDetails.error ||
+    employeeWorkHistoryDetails.error ||
+    employeeSkillsDetails.error ||
+    projectDetails.error ||
+    projectSiteDetails.error;
 
   if (error) {
     console.error("getAllEmployeeRelatedData Error:", error);

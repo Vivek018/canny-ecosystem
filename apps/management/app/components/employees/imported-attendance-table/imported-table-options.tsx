@@ -6,10 +6,10 @@ import {
 } from "@canny_ecosystem/ui/dropdown-menu";
 
 import type { ImportEmployeeAttendanceDataType } from "@canny_ecosystem/supabase/queries";
-import { DeleteImportedEmployee } from "./delete-imported-employee-attendance";
-import { UpdateImportedEmployee } from "./update-imported-employee-attendance";
+import { DeleteImportedEmployeeAttendance } from "./delete-imported-attendance";
+import { UpdateImportedEmployeeAttendance } from "./update-imported-attendance";
 
-export const ImportedEmployeeOptionsDropdown = ({
+export const ImportedEmployeeAttendanceOptionsDropdown = ({
   index,
   data,
   triggerChild,
@@ -23,9 +23,12 @@ export const ImportedEmployeeOptionsDropdown = ({
       {triggerChild}
       <DropdownMenuContent sideOffset={10} align="end">
         <DropdownMenuGroup>
-          <UpdateImportedEmployee indexToUpdate={index} dataToUpdate={data} />
+          <UpdateImportedEmployeeAttendance
+            indexToUpdate={index}
+            dataToUpdate={data}
+          />
           <DropdownMenuSeparator />
-          <DeleteImportedEmployee indexToDelete={index} />
+          <DeleteImportedEmployeeAttendance indexToDelete={index} />
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>

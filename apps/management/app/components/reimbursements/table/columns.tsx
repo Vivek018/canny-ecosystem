@@ -38,7 +38,7 @@ export const columns = ({
     header: "Employee Code",
     cell: ({ row }) => {
       return (
-        <p className='truncate'>
+        <p className="truncate">
           {row.original?.employees?.employee_code ?? "--"}
         </p>
       );
@@ -47,14 +47,16 @@ export const columns = ({
   {
     enableSorting: false,
     accessorKey: "employee_name",
-    header: "Employee Name",
+    header: "Name",
     cell: ({ row }) => {
       return (
-        <p className='truncate w-48 group-hover:text-primary'>{`${
-          row.original.employees?.first_name
-        } ${row.original.employees?.middle_name ?? ""} ${
-          row.original.employees?.last_name ?? ""
-        }`}</p>
+        <p className="truncate w-48 group-hover:text-primary">
+          {row.original.employee_id
+            ? `${row.original.employees?.first_name} ${
+                row.original.employees?.middle_name ?? ""
+              } ${row.original.employees?.last_name ?? ""}`
+            : `${row.original.name}`}
+        </p>
       );
     },
   },
@@ -64,7 +66,7 @@ export const columns = ({
     header: "Project",
     cell: ({ row }) => {
       return (
-        <p className='truncate '>
+        <p className="truncate ">
           {
             row.original.employees?.employee_project_assignment?.project_sites
               ?.projects?.name
@@ -79,7 +81,7 @@ export const columns = ({
     header: "Project Site",
     cell: ({ row }) => {
       return (
-        <p className='truncate '>
+        <p className="truncate ">
           {
             row.original.employees?.employee_project_assignment?.project_sites
               ?.name
@@ -93,7 +95,7 @@ export const columns = ({
     header: "Submitted Date",
     cell: ({ row }) => {
       return (
-        <p className='truncate '>
+        <p className="truncate ">
           {formatDate(row.original?.submitted_date ?? "") ?? "--"}
         </p>
       );
@@ -104,7 +106,7 @@ export const columns = ({
     header: "Status",
     cell: ({ row }) => {
       return (
-        <p className='truncate capitalize '>
+        <p className="truncate capitalize ">
           {row.original?.status
             ? row.original.status.toLowerCase() === "pending"
               ? `${row.original.status}`
@@ -118,7 +120,7 @@ export const columns = ({
     accessorKey: "amount",
     header: "Amount",
     cell: ({ row }) => {
-      return <p className=' truncate'>{row.original?.amount ?? "--"}</p>;
+      return <p className=" truncate">{row.original?.amount ?? "--"}</p>;
     },
   },
   {
@@ -126,7 +128,7 @@ export const columns = ({
     header: "Is Deductible",
     cell: ({ row }) => {
       return (
-        <p className='truncate capitalize'>
+        <p className="truncate capitalize">
           {String(row.original?.is_deductible) ?? "--"}
         </p>
       );
@@ -137,7 +139,7 @@ export const columns = ({
     accessorKey: "email",
     header: "Approved By",
     cell: ({ row }) => {
-      return <p className=' truncate'>{row.original?.users?.email ?? "--"}</p>;
+      return <p className=" truncate">{row.original?.users?.email ?? "--"}</p>;
     },
   },
   {
@@ -151,7 +153,8 @@ export const columns = ({
         <ReimbursementOptionsDropdown
           key={row?.original?.id}
           reimbursementId={row?.original?.id}
-          employeeId={row.original?.employees?.id}
+          employeeId={row.original?.employee_id!}
+          name={row.original?.name}
           isEmployeeRoute={isEmployeeRoute}
           triggerChild={
             <DropdownMenuTrigger
@@ -168,9 +171,9 @@ export const columns = ({
               )}
               asChild
             >
-              <Button variant='ghost' className='h-8 w-8 p-0'>
-                <span className='sr-only'>Open menu</span>
-                <Icon name='dots-vertical' />
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <Icon name="dots-vertical" />
               </Button>
             </DropdownMenuTrigger>
           }

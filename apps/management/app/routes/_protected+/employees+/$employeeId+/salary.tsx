@@ -135,15 +135,22 @@ export default function Salary() {
           <SalaryFilter />
         </div>
       </div>
-      <div className="flex-1 w-full grid gap-6 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-2 justify-start auto-rows-min">
-        {groupPayrollData(salaryEntries).reverse().map((salary, index) => (
-          <SalaryInfoCard
-            key={index.toString()}
-            salaryData={salary as unknown as GroupedPayrollEntry}
-          />
-        ))}
-      </div>
-
+      {(salaryEntries?.length ?? 0) > 0 ? (
+        <div className="flex-1 w-full grid gap-6 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-2 justify-start auto-rows-min">
+          {groupPayrollData(salaryEntries ?? [])
+            .reverse()
+            .map((salary, index) => (
+              <SalaryInfoCard
+                key={index.toString()}
+                salaryData={salary as unknown as GroupedPayrollEntry}
+              />
+            ))}
+        </div>
+      ) : (
+        <div className="h-full w-full flex justify-center items-center text-xl">
+          No Salary Data Found
+        </div>
+      )}
       <Outlet />
     </section>
   );

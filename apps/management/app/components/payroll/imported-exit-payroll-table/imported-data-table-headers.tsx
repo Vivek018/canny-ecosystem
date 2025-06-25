@@ -9,14 +9,17 @@ type Props = {
 };
 
 // make sure the order is same as header order
-export const ImportEmployeeDataArray = [
+export const ImportExitDataArray = [
   "employee_code",
-  "date",
-  "no_of_hours",
-  "present",
-  "holiday",
-  "working_shift",
-  "holiday_type",
+  "last_working_day",
+  "reason",
+  "final_settlement_date",
+  "payable_days",
+  "bonus",
+  "leave_encashment",
+  "gratuity",
+  "deduction",
+  "note",
 ];
 
 export function ImportedDataTableHeader({ table, className, loading }: Props) {
@@ -29,7 +32,7 @@ export function ImportedDataTableHeader({ table, className, loading }: Props) {
   return (
     <TableHeader className={className}>
       <TableRow className="h-[45px] hover:bg-transparent">
-        {ImportEmployeeDataArray?.map((id) => {
+        {ImportExitDataArray?.map((id) => {
           return (
             <TableHead key={id} className={cn("px-4 py-2")}>
               <Button

@@ -49,7 +49,7 @@ export function ImportedDataTable<TData, TValue>({
             <TableBody>
               {tableLength ? (
                 table.getRowModel().rows.map((row, index) => {
-                  const isConflicting = conflictingIndex.includes(index);
+                  const isConflicting = conflictingIndex?.includes(index);
                   return (
                     <TableRow
                       key={row.id}
