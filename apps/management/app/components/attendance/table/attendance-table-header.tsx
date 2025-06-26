@@ -90,7 +90,7 @@ export function AttendanceTableHeader({ table, className, loading }: Props) {
                     className={cn(
                       "px-4 py-2",
                       id === "employee_code" && "sticky left-12 bg-card z-10",
-                      id === "full_name" && "sticky w-full left-48 bg-card z-10",
+                      id === "employee_name" && "sticky w-full left-48 bg-card z-10",
                     )}
                   >
                     <Button
