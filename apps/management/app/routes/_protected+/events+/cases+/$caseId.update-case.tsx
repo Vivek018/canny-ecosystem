@@ -234,6 +234,11 @@ export async function action({
     data.reported_by_project_id = undefined;
     data.reported_by_company_id = undefined;
     data.reported_by_site_id = undefined;
+  } else if (data.reported_by === "other" || data.reported_by === "canny") {
+    data.reported_by_project_id = undefined;
+    data.reported_by_company_id = undefined;
+    data.reported_by_site_id = undefined;
+    data.reported_by_employee_id = undefined;
   }
 
   if (data.reported_on === "company") {
@@ -252,6 +257,11 @@ export async function action({
     data.reported_on_project_id = undefined;
     data.reported_on_company_id = undefined;
     data.reported_on_site_id = undefined;
+  } else if (data.reported_on === "other" || data.reported_on === "canny") {
+    data.reported_on_project_id = undefined;
+    data.reported_on_company_id = undefined;
+    data.reported_on_site_id = undefined;
+    data.reported_on_employee_id = undefined;
   }
 
   if (data.document) {
