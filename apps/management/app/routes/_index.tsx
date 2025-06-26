@@ -7,8 +7,8 @@ import type { ClientLoaderFunctionArgs } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "Canny Payroll" },
-    { name: "description", content: "Welcome to Canny Payroll!" },
+    { title: "Canny Ecosystem" },
+    { name: "description", content: "Welcome to Canny Ecosystem!" },
   ];
 };
 
