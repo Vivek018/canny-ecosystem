@@ -11,30 +11,25 @@ import { safeRedirect } from "@/utils/server/http.server";
 import {
   hasPermission,
   isGoodStatus,
-  ReimbursementSchema,
+  NonEmployeeReimbursementSchema,
   updateRole,
 } from "@canny_ecosystem/utils";
 import { updateReimbursementsById } from "@canny_ecosystem/supabase/mutations";
-import {
-  getReimbursementsById,
-  getUsersByCompanyId,
-} from "@canny_ecosystem/supabase/queries";
+import { getReimbursementsById } from "@canny_ecosystem/supabase/queries";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { useEffect } from "react";
 import { clearCacheEntry } from "@/utils/cache";
-import AddReimbursements from "../../employees+/$employeeId+/reimbursements+/add-reimbursement";
-import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import AddNonEmployeeReimbursements from "./add-nonemployee-reimbursement";
 
-export const UPDATE_REIMBURSEMENTS_TAG = "Update_Reimbursement";
+export const UPDATE_NONEMPLOYEE_REIMBURSEMENTS_TAG =
+  "Update_Non-Employee_Reimbursement";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const reimbursementId = params.reimbursementId;
   const { supabase, headers } = getSupabaseWithHeaders({ request });
-
-  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
   if (
@@ -46,12 +41,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   let reimbursementData = null;
   let error = null;
 
-  const { data: userData, error: userError } = await getUsersByCompanyId({
-    supabase,
-    companyId,
-  });
-  if (userError || !userData) throw userError;
-
   if (reimbursementId) {
     const { data, error: reimbursementError } = await getReimbursementsById({
       supabase,
@@ -62,12 +51,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     error = reimbursementError;
   }
 
-  const userOptions = userData.map((userData) => ({
-    label: userData.email?.toLowerCase(),
-    value: userData.id,
-  }));
-
-  return json({ data: reimbursementData, userOptions, reimbursementId, error });
+  return json({ data: reimbursementData, error });
 }
 
 export async function action({
@@ -77,7 +61,9 @@ export async function action({
   const reimbursementId = params.reimbursementId;
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
-  const submission = parseWithZod(formData, { schema: ReimbursementSchema });
+  const submission = parseWithZod(formData, {
+    schema: NonEmployeeReimbursementSchema,
+  });
 
   if (submission.status !== "success") {
     return json(
@@ -95,21 +81,20 @@ export async function action({
   if (isGoodStatus(status)) {
     return json({
       status: "success",
-      message: "Reimbursement updated successfully",
+      message: "Non Employee Reimbursement updated successfully",
       error: null,
     });
   }
 
   return json({
     status: "error",
-    message: "Reimbursement update failed",
+    message: "Non Employee Reimbursement update failed",
     error,
   });
 }
 
 export default function UpdateReimbursements() {
-  const { data, userOptions, reimbursementId, error } =
-    useLoaderData<typeof loader>();
+  const { data, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const updatableData = data;
 
@@ -131,30 +116,25 @@ export default function UpdateReimbursements() {
       if (actionData?.status === "success") {
         clearCacheEntry(`${cacheKeyPrefix.reimbursements}`);
         clearCacheEntry(`${cacheKeyPrefix.employee_reimbursements}`);
-
         toast({
           title: "Success",
           description:
-            actionData?.message || "Reimbursement updated successfully",
+            actionData?.message ||
+            " Non Employee Reimbursement updated successfully",
           variant: "success",
         });
       } else {
         toast({
           title: "Error",
           description:
-            actionData?.error?.message || "Failed to update reimbursement",
+            actionData?.error?.message ??
+            "Non Employee Reimbursement update failed",
           variant: "destructive",
         });
       }
-      navigate(`/employees/${updatableData?.employee_id}/reimbursements`);
+      navigate("/approvals/reimbursements");
     }
   }, [actionData]);
 
-  return (
-    <AddReimbursements
-      updateValues={updatableData}
-      userOptionsFromUpdate={userOptions}
-      reimbursementId={reimbursementId}
-    />
-  );
+  return <AddNonEmployeeReimbursements updateValues={updatableData} />;
 }

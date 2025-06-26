@@ -29,19 +29,10 @@ export function AttendanceSearchFilter({
   disabled,
   projectArray,
   projectSiteArray,
-  paySequenceArray,
-  defaultPayDay,
-  setYear,
-  setMonth,
 }: {
-  lastDayOfMonth: number;
   disabled?: boolean;
   projectArray: string[];
   projectSiteArray: string[];
-  paySequenceArray: [name: string, pay_day?: number][];
-  defaultPayDay: number | null | undefined;
-  setMonth: (month: number) => void;
-  setYear: (year: number) => void;
 }) {
   const [prompt, setPrompt] = useState("");
   const navigation = useNavigation();
@@ -65,13 +56,6 @@ export function AttendanceSearchFilter({
   };
 
   const [filterParams, setFilterParams] = useState(initialFilterParams);
-
-  useEffect(() => {
-    if (defaultPayDay && !filterParams.range) {
-      searchParams.set("range", defaultPayDay.toString());
-      setSearchParams(searchParams);
-    }
-  }, []);
 
   const submit = useSubmit();
   const debounceSubmit = useDebounce((target: any, options?: SubmitOptions) => {
@@ -234,83 +218,6 @@ export function AttendanceSearchFilter({
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
-              <span>Range</span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent
-                sideOffset={14}
-                alignOffset={-4}
-                className="p-0"
-              >
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>
-                    <span className="mr-3">Pay Sequence</span>
-                  </DropdownMenuSubTrigger>
-                  <DropdownMenuPortal>
-                    <DropdownMenuSubContent
-                      sideOffset={14}
-                      alignOffset={-4}
-                      className="p-0"
-                    >
-                      {paySequenceArray?.map(([name, pay_day], index) => (
-                        <DropdownMenuCheckboxItem
-                          key={name + index.toString()}
-                          className="capitalize"
-                          checked={filterParams?.project === pay_day}
-                          onCheckedChange={() => {
-                            setFilterParams((prev) => ({
-                              ...prev,
-                              range: pay_day?.toString(),
-                            }));
-                          }}
-                        >
-                          {name}
-                        </DropdownMenuCheckboxItem>
-                      ))}
-                    </DropdownMenuSubContent>
-                  </DropdownMenuPortal>
-                </DropdownMenuSub>
-
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>
-                    <span className="mr-3">Custom</span>
-                  </DropdownMenuSubTrigger>
-                  <DropdownMenuPortal>
-                    <DropdownMenuSubContent
-                      sideOffset={14}
-                      alignOffset={-4}
-                      className="p-0"
-                    >
-                      {[
-                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-                        17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-                        31,
-                      ].map((day, index) => (
-                        <DropdownMenuCheckboxItem
-                          key={day.toString() + index.toString()}
-                          className="capitalize"
-                          checked={filterParams?.project === day.toString()}
-                          onCheckedChange={() => {
-                            setFilterParams((prev) => ({
-                              ...prev,
-                              range: day?.toString(),
-                            }));
-                          }}
-                        >
-                          {day}
-                        </DropdownMenuCheckboxItem>
-                      ))}
-                    </DropdownMenuSubContent>
-                  </DropdownMenuPortal>
-                </DropdownMenuSub>
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-        </DropdownMenuGroup>
-
-        <DropdownMenuGroup>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
               <span>Project</span>
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
@@ -395,7 +302,6 @@ export function AttendanceSearchFilter({
                     className="capitalize"
                     checked={filterParams?.year === name.toString()}
                     onCheckedChange={() => {
-                      setYear(Number(name));
                       setFilterParams((prev) => ({
                         ...prev,
                         year: name.toString(),
@@ -427,7 +333,6 @@ export function AttendanceSearchFilter({
                     className="capitalize"
                     checked={filterParams?.month === name.toString()}
                     onCheckedChange={() => {
-                      setMonth(Number(index));
                       setFilterParams((prev) => ({
                         ...prev,
                         month: name.toString(),

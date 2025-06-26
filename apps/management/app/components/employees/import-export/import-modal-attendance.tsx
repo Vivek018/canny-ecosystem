@@ -1,4 +1,5 @@
 import { Button } from "@canny_ecosystem/ui/button";
+import Papa from "papaparse";
 import {
   Dialog,
   DialogContent,
@@ -12,7 +13,7 @@ import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
 import { useNavigate, useSearchParams } from "@remix-run/react";
 import { useState, useEffect } from "react";
 
-export const ImportEmployeeAttendanceModal = () => {
+export const ImportAttendanceModal = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [eligibleFileSize, setEligibleFileSize] = useState<boolean>(true);
   const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
@@ -22,8 +23,7 @@ export const ImportEmployeeAttendanceModal = () => {
   const MAX_FILE_SIZE_LIMIT = SIZE_1MB * 3;
 
   const isOpen =
-    searchParams.get("step") ===
-    modalSearchParamNames.import_employee_attendance;
+    searchParams.get("step") === modalSearchParamNames.import_attendance;
 
   const onClose = () => {
     searchParams.delete("step");
@@ -62,13 +62,60 @@ export const ImportEmployeeAttendanceModal = () => {
     return `${(size / SIZE_1MB).toFixed(2)} MB`;
   };
 
+  const demo: any[] | Papa.UnparseObject<any> = [
+    {
+      employee_code: null,
+      working_days: null,
+      present_days: null,
+      working_hours: null,
+      overtime_hours: null,
+      absent_days: null,
+      paid_holidays: null,
+      paid_leaves: null,
+      casual_leaves: null,
+    },
+  ];
+  const downloadDemoCsv = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    const csv = Papa.unparse(demo);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+
+    link.setAttribute("download", "Attendancesc-Format");
+
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+  };
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogTitle>Choose the file to be imported</DialogTitle>
         <div className="flex justify-between">
           <DialogDescription className="text-muted-foreground">
-            Only .csv format is supported! <br />
+            Only .csv format is supported!
+            <span
+              className="text-primary cursor-pointer ml-2"
+              onClick={downloadDemoCsv}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  downloadDemoCsv(
+                    e as unknown as React.MouseEvent<
+                      HTMLButtonElement,
+                      MouseEvent
+                    >
+                  );
+                }
+              }}
+            >
+              download csv format
+            </span>
+            <br />
             Maximum upload size is 3MB!
           </DialogDescription>
           <Button
@@ -86,7 +133,7 @@ export const ImportEmployeeAttendanceModal = () => {
           className={cn(
             "text-sm",
             selectedFile ? "flex" : "hidden",
-            !eligibleFileSize ? "text-destructive" : "text-muted-foreground",
+            !eligibleFileSize ? "text-destructive" : "text-muted-foreground"
           )}
         >
           {!eligibleFileSize

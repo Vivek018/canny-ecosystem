@@ -92,13 +92,16 @@ export default function Salary() {
     interface SalaryEntry {
       payroll_id: string;
       employee_id: string;
-      month: number;
-      year: number;
-      present_days: number;
-      overtime_hours: number;
       field_name: string;
       amount: number;
       type: string;
+      monthly_attendance: {
+        id: string;
+        month: number;
+        year: number;
+        present_days: number;
+        overtime_hours: number;
+      };
     }
 
     const [grouped] = useState<{ [id: string]: GroupedPayrollEntry }>({});
@@ -110,10 +113,10 @@ export default function Salary() {
         grouped[id] = {
           payroll_id: id,
           employee_id: entry.employee_id,
-          month: entry.month,
-          year: entry.year,
-          present_days: entry.present_days,
-          overtime_hours: entry.overtime_hours,
+          month: entry.monthly_attendance.month,
+          year: entry.monthly_attendance.year,
+          present_days: entry.monthly_attendance.present_days,
+          overtime_hours: entry.monthly_attendance.overtime_hours,
           fields: {},
         };
       }
@@ -135,15 +138,22 @@ export default function Salary() {
           <SalaryFilter />
         </div>
       </div>
-      <div className="flex-1 w-full grid gap-6 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-2 justify-start auto-rows-min">
-        {groupPayrollData(salaryEntries).reverse().map((salary, index) => (
-          <SalaryInfoCard
-            key={index.toString()}
-            salaryData={salary as unknown as GroupedPayrollEntry}
-          />
-        ))}
-      </div>
-
+      {(salaryEntries?.length ?? 0) > 0 ? (
+        <div className="flex-1 w-full grid gap-6 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-2 justify-start auto-rows-min">
+          {groupPayrollData(salaryEntries ?? [])
+            .reverse()
+            .map((salary, index) => (
+              <SalaryInfoCard
+                key={index.toString()}
+                salaryData={salary as unknown as GroupedPayrollEntry}
+              />
+            ))}
+        </div>
+      ) : (
+        <div className="h-full w-full flex justify-center items-center text-xl">
+          No Salary Data Found
+        </div>
+      )}
       <Outlet />
     </section>
   );

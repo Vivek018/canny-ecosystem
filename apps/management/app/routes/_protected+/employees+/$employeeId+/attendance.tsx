@@ -1,10 +1,16 @@
-import { AttendanceComponent } from "@/components/employees/attendance/attendance-component";
+import AttendanceComponent from "@/components/employees/attendance/attendance-component";
+import { FilterList } from "@/components/employees/salary/filter-list";
+import { SalaryFilter } from "@/components/employees/salary/salary-filter";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { cacheKeyPrefix } from "@/constant";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";
-import { getAttendanceByEmployeeId } from "@canny_ecosystem/supabase/queries";
+import {
+  type DashboardFilters,
+  getAttendanceByEmployeeId,
+} from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
+import type { EmployeeMonthlyAttendanceDatabaseRow } from "@canny_ecosystem/supabase/types";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import {
   Await,
@@ -24,16 +30,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const { supabase } = getSupabaseWithHeaders({ request });
 
     const filters = {
-      month: searchParams.get("month") ?? undefined,
       year: searchParams.get("year") ?? undefined,
     };
 
     const attendancePromise = getAttendanceByEmployeeId({
       employeeId: employeeId,
       supabase,
-      params: {
-        filters,
-      },
+      filters,
     });
 
     return defer({
@@ -44,8 +47,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   } catch (error) {
     return defer({
       attendancePromise: null,
-      filters: null,
       error,
+      filters: {},
     });
   }
 }
@@ -63,7 +66,7 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 clientLoader.hydrate = true;
 
 export default function EmployeeAttendance() {
-  const { attendancePromise, filters, error } = useLoaderData<typeof loader>();
+  const { attendancePromise, error, filters } = useLoaderData<typeof loader>();
 
   const { employeeId } = useParams();
 
@@ -82,6 +85,7 @@ export default function EmployeeAttendance() {
         {({ data, error }) => {
           if (error) {
             clearCacheEntry(`${cacheKeyPrefix.attendance}${employeeId}`);
+
             return (
               <ErrorBoundary
                 error={error}
@@ -91,14 +95,36 @@ export default function EmployeeAttendance() {
           }
 
           return (
-            <>
-              <AttendanceComponent
-                attendanceData={data}
-                employeeId={employeeId}
-                filters={filters}
-              />
+            <section className="py-4 flex flex-col gap-4">
+              <div className="flex justify-end">
+                <div className="flex justify-between gap-3">
+                  <FilterList
+                    filters={filters as unknown as DashboardFilters}
+                  />
+                  <SalaryFilter />
+                </div>
+              </div>
+              {(data?.length ?? 0) > 0 ? (
+                <div className="flex-1 w-full grid gap-6 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-2 justify-start auto-rows-min">
+                  {data.map(
+                    (
+                      attendance: EmployeeMonthlyAttendanceDatabaseRow,
+                      index: number
+                    ) => (
+                      <AttendanceComponent
+                        key={index.toString()}
+                        attendanceData={attendance}
+                      />
+                    )
+                  )}
+                </div>
+              ) : (
+                <div className="h-full w-full flex justify-center items-center text-xl">
+                  No Attendance Data Found
+                </div>
+              )}
               <Outlet />
-            </>
+            </section>
           );
         }}
       </Await>

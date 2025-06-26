@@ -1,4 +1,3 @@
-import type { TransformedAttendanceDataType } from "@/routes/_protected+/time-tracking+/attendance+/_index";
 import { useUser } from "@/utils/user";
 import { Button } from "@canny_ecosystem/ui/button";
 import {
@@ -22,13 +21,14 @@ import type {
   LocationDatabaseRow,
 } from "@canny_ecosystem/supabase/types";
 import { AttendanceHourlyRegister } from "./attendance-hourly-register";
+import type { AttendanceDataType } from "@canny_ecosystem/supabase/queries";
 
 export function AttendanceMenu({
   selectedRows,
   companyName,
   companyAddress,
 }: {
-  selectedRows: TransformedAttendanceDataType[];
+  selectedRows: AttendanceDataType[];
   companyName?: CompanyDatabaseRow;
   companyAddress?: LocationDatabaseRow;
 }) {
@@ -146,44 +146,24 @@ export function AttendanceMenu({
         <DropdownMenuSeparator
           className={cn(
             !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
-            "hidden",
+              "hidden",
             !selectedRows.length && "hidden"
           )}
         />
+
         <DropdownMenuItem
           onClick={() => {
-            searchParams.set(
-              "step",
-              modalSearchParamNames.import_employee_attendance
-            );
+            searchParams.set("step", modalSearchParamNames.import_attendance);
             setSearchParams(searchParams);
           }}
           className={cn(
             "space-x-2 flex items-center",
             !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
-            "hidden"
+              "hidden"
           )}
         >
           <Icon name="import" size="sm" className="mb-0.5" />
           <span>Import Attendance</span>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onClick={() => {
-            searchParams.set(
-              "step",
-              modalSearchParamNames.import_employee_attendance_by_present_days
-            );
-            setSearchParams(searchParams);
-          }}
-          className={cn(
-            "space-x-2 flex items-center",
-            !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
-            "hidden"
-          )}
-        >
-          <Icon name="import" size="sm" className="mb-0.5" />
-          <span>Attendance Days Import</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

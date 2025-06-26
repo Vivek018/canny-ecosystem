@@ -1,4 +1,6 @@
-import { useImportStoreForEmployeeAttendance } from "@/store/import";
+import {
+  useImportStoreForEmployeeAttendance,
+} from "@/store/import";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,7 +15,7 @@ import {
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 
-export const DeleteImportedEmployee = ({
+export const DeleteImportedEmployeeAttendance = ({
   indexToDelete,
 }: {
   indexToDelete: number;
@@ -31,10 +33,10 @@ export const DeleteImportedEmployee = ({
       <AlertDialogTrigger
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
-          "text-[13px] h-9",
+          "text-[13px] h-9"
         )}
       >
-        Delete Employee
+        Delete Payroll
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

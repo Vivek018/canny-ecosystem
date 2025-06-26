@@ -5,17 +5,17 @@ import {
   DropdownMenuSeparator,
 } from "@canny_ecosystem/ui/dropdown-menu";
 
-import type { ImportEmployeeAttendanceByPresentsDataType } from "@canny_ecosystem/supabase/queries";
-import { DeleteImportedEmployeeAttendanceByPresents } from "./delete-imported-attendance-by-presents";
-import { UpdateImportedEmployeeAttendanceByPresents } from "./update-imported-attendance-by-presents";
+import { DeleteImportedReimbursement } from "./delete-imported-reimbursement";
+import type { ImportReimbursementDataType } from "@canny_ecosystem/supabase/queries";
+import { UpdateImportedReimbursement } from "./update-imported-reimbursement";
 
-export const ImportedEmployeeAttendanceByPresentsOptionsDropdown = ({
+export const ImportedReimbursementOptionsDropdown = ({
   index,
   data,
   triggerChild,
 }: {
   index: number;
-  data: ImportEmployeeAttendanceByPresentsDataType;
+  data: ImportReimbursementDataType;
   triggerChild: React.ReactElement;
 }) => {
   return (
@@ -23,12 +23,12 @@ export const ImportedEmployeeAttendanceByPresentsOptionsDropdown = ({
       {triggerChild}
       <DropdownMenuContent sideOffset={10} align="end">
         <DropdownMenuGroup>
-          <UpdateImportedEmployeeAttendanceByPresents
+          <UpdateImportedReimbursement
             indexToUpdate={index}
             dataToUpdate={data}
           />
           <DropdownMenuSeparator />
-          <DeleteImportedEmployeeAttendanceByPresents indexToDelete={index} />
+          <DeleteImportedReimbursement indexToDelete={index} />
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>

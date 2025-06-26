@@ -1,6 +1,8 @@
 import type { AttendanceFilters } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
+import { defaultMonth, defaultYear } from "@canny_ecosystem/utils";
+import { months } from "@canny_ecosystem/utils/constant";
 import { useSearchParams } from "@remix-run/react";
 
 type Props = {
@@ -9,7 +11,18 @@ type Props = {
 
 export function FilterList({ filters }: Props) {
   const [searchParams, setSearchParams] = useSearchParams();
+  const monthNames = Object.entries(months).reduce((acc, [name, num]) => {
+    acc[num] = name;
+    return acc;
+  }, {} as { [key: number]: string });
 
+  const defaultFilters =
+    filters?.month || filters?.year
+      ? filters
+      : {
+          month: monthNames[defaultMonth + 2],
+          year: defaultYear.toString(),
+        };
   const renderFilter = ({
     key,
     value,
@@ -20,7 +33,6 @@ export function FilterList({ filters }: Props) {
     if (!value) return null;
 
     switch (key) {
-      case "range":
       case "name":
       case "month":
       case "year":
@@ -41,8 +53,8 @@ export function FilterList({ filters }: Props) {
 
   return (
     <ul className="flex flex-0 space-x-2 w-full overflow-scroll no-scrollbar">
-      {filters &&
-        Object.entries(filters)
+      {defaultFilters &&
+        Object.entries(defaultFilters)
           .filter(([key, value]) => value != null && !key.endsWith("end"))
           .map(([key, value]) => (
             <li key={key}>

@@ -9,57 +9,61 @@ import {
 import { parseWithZod } from "@conform-to/zod";
 import { safeRedirect } from "@/utils/server/http.server";
 import {
+  AttendanceSchema,
   hasPermission,
   isGoodStatus,
-  PaySequenceSchema,
   updateRole,
 } from "@canny_ecosystem/utils";
-import { updatePaySequenceById } from "@canny_ecosystem/supabase/mutations";
-import { getPaySequenceById } from "@canny_ecosystem/supabase/queries";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { useEffect } from "react";
 import { clearCacheEntry } from "@/utils/cache";
-import AddPaySequence from "./add-pay-sequence";
+import { UpdateAttendance } from "@canny_ecosystem/supabase/mutations";
+import type { EmployeeMonthlyAttendanceDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import AddMonthlyAttendance from "./$employeeId.add-attendance";
+import { getAttendanceById } from "@canny_ecosystem/supabase/queries";
 
-export const UPDATE_PAYSEQUENCE_TAG = "Update_paysequence";
+export const UPDATE_ATTENDANCE_TAG = "Update-Attendance";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const paySequenceId = params.id;
+  const attendanceId = params.attendanceId;
   const { supabase, headers } = getSupabaseWithHeaders({ request });
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.paySequence}`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.attendance}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
-  let paySequenceData = null;
+  let attendanceData = null;
   let error = null;
 
-  if (paySequenceId) {
-    const { data, error: paySequenceError } = await getPaySequenceById({
+  if (attendanceId) {
+    const { data, error: attendanceError } = await getAttendanceById({
       supabase,
-      paySequenceId,
+      id: attendanceId,
     });
 
-    paySequenceData = data;
-    error = paySequenceError;
+    attendanceData = data;
+    error = attendanceError;
   }
 
-  return json({ data: paySequenceData, error });
+  return json({
+    data: attendanceData as EmployeeMonthlyAttendanceDatabaseUpdate,
+    error,
+  });
 }
 
 export async function action({
   request,
   params,
 }: ActionFunctionArgs): Promise<Response> {
-  const paySequenceId = params.id!;
+  const attendanceId = params.attendanceId;
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
-  const submission = parseWithZod(formData, { schema: PaySequenceSchema });
+  const submission = parseWithZod(formData, { schema: AttendanceSchema });
 
   if (submission.status !== "success") {
     return json(
@@ -67,32 +71,33 @@ export async function action({
       { status: submission.status === "error" ? 400 : 200 }
     );
   }
+  const data = { ...submission.value, id: submission.value.id ?? attendanceId };
 
-  const { status, error } = await updatePaySequenceById({
-    paySequenceId,
+  const { status, error } = await UpdateAttendance({
     supabase,
-    data: submission.value,
+    data,
   });
 
   if (isGoodStatus(status)) {
     return json({
       status: "success",
-      message: "Pay Sequence updated successfully",
+      message: "Employee attendance updated successfully",
       error: null,
     });
   }
 
   return json({
     status: "error",
-    message: "Pay Sequence update failed",
+    message: "Employee attendance update failed",
     error,
   });
 }
 
-export default function UpdatePaySequence() {
+export default function UpdateMonthlyAttendance() {
   const { data, error } = useLoaderData<typeof loader>();
-  const actionData = useActionData<typeof action>();
   const updatableData = data;
+
+  const actionData = useActionData<typeof action>();
 
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -101,7 +106,7 @@ export default function UpdatePaySequence() {
     if (error) {
       toast({
         title: "Error",
-        description: error?.message || "Failed to load pay sequence data",
+        description: error?.message || "Failed to load attendance data",
         variant: "destructive",
       });
     }
@@ -110,24 +115,29 @@ export default function UpdatePaySequence() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearCacheEntry(`${cacheKeyPrefix.pay_sequence}`);
+        clearCacheEntry(cacheKeyPrefix.attendance);
         toast({
           title: "Success",
-          description:
-            actionData?.message || "Pay Sequence updated successfully",
+          description: actionData?.message || "Attendance updated successfully",
           variant: "success",
         });
       } else {
         toast({
           title: "Error",
           description:
-            actionData?.error?.message || "Failed to update pay sequence",
+            actionData?.error?.message || "Failed to update attendance",
           variant: "destructive",
         });
       }
-      navigate("/time-tracking/pay-sequence");
+      navigate("/time-tracking/attendance");
     }
   }, [actionData]);
 
-  return <AddPaySequence updatableData={updatableData} />;
+  return (
+    <AddMonthlyAttendance
+      updateValues={
+        updatableData as unknown as EmployeeMonthlyAttendanceDatabaseUpdate
+      }
+    />
+  );
 }

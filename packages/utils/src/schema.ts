@@ -748,6 +748,17 @@ export const ReimbursementSchema = z.object({
   user_id: z.string().optional(),
   is_deductible: z.boolean().optional().default(false),
   employee_id: z.string(),
+  company_id: z.string(),
+});
+
+export const NonEmployeeReimbursementSchema = z.object({
+  id: z.string().optional(),
+  name: z.string().min(3),
+  submitted_date: z.string(),
+  status: z.enum(reimbursementStatusArray),
+  amount: z.number().min(1).max(100000000),
+  is_deductible: z.boolean().optional().default(false),
+  company_id: z.string(),
 });
 
 export const ImportReimbursementHeaderSchema = z
@@ -1286,7 +1297,7 @@ export const payrollTypesArray = ["reimbursement", "exit", "others"] as const;
 export const ReimbursementEntrySchema = z.object({
   id: z.string().optional(),
   amount: z.number(),
-  employee_id: z.string(),
+  employee_id: z.string().optional(),
   payroll_id: z.string(),
   type: z.string(),
 });
@@ -1404,59 +1415,47 @@ export const attendanceHolidayTypeArray = [
   "national",
 ] as const;
 
-export const AttendanceDataSchema = z.object({
-  type: z.enum(["add", "update"]),
-  date: z.string(),
-  no_of_hours: z.number().min(0).max(24).default(8),
+export const AttendanceSchema = z.object({
+  id: z.string().optional(),
   employee_id: z.string(),
-  present: z.boolean().default(false),
-  holiday: z.boolean().default(false),
-  working_shift: z.enum(attendanceWorkShiftArray).optional(),
-  holiday_type: z.enum(attendanceHolidayTypeArray).optional(),
+  present_days: z.number().min(0).max(31),
+  overtime_hours: z.number().default(0),
+  month: z.number().min(1).max(12),
+  year: z.number(),
+  working_days: z.number().min(0).max(31),
+  absent_days: z.number().min(0).max(31),
+  working_hours: z.number().default(0),
+  paid_holidays: z.number().min(0).max(31).optional(),
+  paid_leaves: z.number().min(0).max(31).optional(),
+  casual_leaves: z.number().min(0).max(31).optional(),
 });
 
-export const ImportSingleEmployeeAttendanceDataSchema = z.object({
-  employee_code: zNumberString.min(3),
-  date: z.string(),
-  no_of_hours: z.preprocess(
-    (value) => (typeof value === "string" ? Number.parseFloat(value) : value),
-    z.number().min(0).max(24).default(8)
-  ),
-  present: z.preprocess(
-    (value) =>
-      typeof value === "string" ? value.toLowerCase() === "true" : value,
-    z.boolean().default(false)
-  ),
-  holiday: z.preprocess(
-    (value) =>
-      typeof value === "string" ? value.toLowerCase() === "true" : value,
-    z.boolean().default(false)
-  ),
-  working_shift: z.preprocess(
-    (value) =>
-      value === "" || value === undefined || value === null ? undefined : value,
-    z.enum(attendanceWorkShiftArray).optional()
-  ),
-  holiday_type: z.preprocess(
-    (value) =>
-      value === "" || value === undefined || value === null ? undefined : value,
-    z.enum(attendanceHolidayTypeArray).optional()
-  ),
-});
-
-export const ImportEmployeeAttendanceDataSchema = z.object({
-  data: z.array(ImportSingleEmployeeAttendanceDataSchema),
-});
-
-export const ImportEmployeeAttendanceByPresentsHeaderSchemaObject = z.object({
+export const ImportEmployeeAttendanceHeaderSchemaObject = z.object({
   employee_code: z.string(),
+  working_days: z.string(),
   present_days: z.string(),
+  working_hours: z.string(),
+  overtime_hours: z.string(),
+  absent_days: z.string(),
+  paid_holidays: z.string(),
+  paid_leaves: z.string(),
+  casual_leaves: z.string(),
 });
 
-export const ImportEmployeeAttendanceByPresentsHeaderSchema =
-  ImportEmployeeAttendanceByPresentsHeaderSchemaObject.refine(
+export const ImportEmployeeAttendanceHeaderSchema =
+  ImportEmployeeAttendanceHeaderSchemaObject.refine(
     (data) => {
-      const values = [data.employee_code, data.present_days].filter(Boolean);
+      const values = [
+        data.employee_code,
+        data.working_days,
+        data.present_days,
+        data.working_hours,
+        data.overtime_hours,
+        data.absent_days,
+        data.paid_holidays,
+        data.paid_leaves,
+        data.casual_leaves,
+      ].filter(Boolean);
 
       const uniqueValues = new Set(values);
       return uniqueValues.size === values.length;
@@ -1464,20 +1463,73 @@ export const ImportEmployeeAttendanceByPresentsHeaderSchema =
     {
       message:
         "Some fields have the same value. Please select different options.",
-      path: ["employee_code", "present_days"],
+      path: [
+        "employee_code",
+        "present_days",
+        "working_days",
+        "working_hours",
+        "overtime_hours",
+        "absent_days",
+        "paid_holidays",
+        "paid_leaves",
+        "casual_leaves",
+      ],
     }
   );
 
-export const ImportSingleEmployeeAttendanceByPresentsDataSchema = z.object({
+export const ImportSingleEmployeeAttendanceDataSchema = z.object({
   employee_code: zNumberString.min(3),
+  working_days: z.preprocess((value) => {
+    const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
+    return Number.isNaN(parsed) ? undefined : parsed;
+  }, z.number()),
+  working_hours: z
+    .preprocess((value) => {
+      const parsed =
+        typeof value === "string" ? Number.parseFloat(value) : value;
+      return Number.isNaN(parsed) ? undefined : parsed;
+    }, z.number())
+    .optional(),
+  overtime_hours: z
+    .preprocess((value) => {
+      const parsed =
+        typeof value === "string" ? Number.parseFloat(value) : value;
+      return Number.isNaN(parsed) ? undefined : parsed;
+    }, z.number())
+    .optional(),
+  absent_days: z.preprocess((value) => {
+    const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
+    return Number.isNaN(parsed) ? undefined : parsed;
+  }, z.number()),
+  paid_holidays: z
+    .preprocess((value) => {
+      const parsed =
+        typeof value === "string" ? Number.parseFloat(value) : value;
+      return Number.isNaN(parsed) ? undefined : parsed;
+    }, z.number())
+    .optional(),
+  paid_leaves: z
+    .preprocess((value) => {
+      const parsed =
+        typeof value === "string" ? Number.parseFloat(value) : value;
+      return Number.isNaN(parsed) ? undefined : parsed;
+    }, z.number())
+    .optional(),
+  casual_leaves: z
+    .preprocess((value) => {
+      const parsed =
+        typeof value === "string" ? Number.parseFloat(value) : value;
+      return Number.isNaN(parsed) ? undefined : parsed;
+    }, z.number())
+    .optional(),
   present_days: z.preprocess((value) => {
     const parsed = typeof value === "string" ? Number.parseFloat(value) : value;
     return Number.isNaN(parsed) ? undefined : parsed;
   }, z.number()),
 });
 
-export const ImportEmployeeAttendanceByPresentsDataSchema = z.object({
-  data: z.array(ImportSingleEmployeeAttendanceByPresentsDataSchema),
+export const ImportEmployeeAttendanceDataSchema = z.object({
+  data: z.array(ImportSingleEmployeeAttendanceDataSchema),
 });
 
 export const employeeLetterTypesArray = [

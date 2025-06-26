@@ -12,7 +12,10 @@ import type {
 
 export type ImportReimbursementDataType = Pick<
   ReimbursementRow,
-  "amount" | "is_deductible" | "status" | "submitted_date"
+  | "amount"
+  | "is_deductible"
+  | "status"
+  | "submitted_date"
 > & { email: UserDatabaseRow["email"] } & {
   employee_code: EmployeeDatabaseRow["employee_code"];
 };
@@ -21,16 +24,18 @@ export type ReimbursementDataType = Pick<
   ReimbursementRow,
   | "id"
   | "employee_id"
+  | "name"
   | "is_deductible"
   | "status"
   | "amount"
   | "submitted_date"
   | "user_id"
   | "payroll_id"
+  | "company_id"
 > & {
   employees: Pick<
     EmployeeDatabaseRow,
-    "first_name" | "middle_name" | "last_name" | "employee_code" | "company_id"
+    "first_name" | "middle_name" | "last_name" | "employee_code"
   > & {
     employee_project_assignment: Pick<
       EmployeeProjectAssignmentDatabaseRow,
@@ -52,7 +57,7 @@ export type ReimbursementDataType = Pick<
 
 export type ImportReimbursementPayrollDataType = Pick<
   ReimbursementRow,
-  "employee_id" | "amount" | "id" | "payroll_id"
+  "employee_id" | "amount" | "id" | "payroll_id" | "company_id" | "name"
 > & {
   employee_code: EmployeeDatabaseRow["employee_code"];
 };
@@ -63,12 +68,7 @@ export type ReimbursementPayrollEntriesWithEmployee = Omit<
 > & {
   employees: Pick<
     EmployeeDatabaseRow,
-    | "first_name"
-    | "middle_name"
-    | "last_name"
-    | "employee_code"
-    | "company_id"
-    | "id"
+    "first_name" | "middle_name" | "last_name" | "employee_code" | "id"
   >;
 };
 
@@ -105,16 +105,18 @@ export async function getReimbursementsByCompanyId({
     "is_deductible",
     "status",
     "amount",
+    "name",
     "submitted_date",
     "employee_id",
     "payroll_id",
+    "company_id",
   ] as const;
 
   const query = supabase
     .from("reimbursements")
     .select(
       `${columns.join(",")},
-          employees!inner(first_name, middle_name, last_name, employee_code, company_id, employee_project_assignment!employee_project_assignments_employee_id_fkey!${
+          employees!left(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${
             project ? "inner" : "left"
           }(project_sites!${project ? "inner" : "left"}(id, name, projects!${
         project ? "inner" : "left"
@@ -122,7 +124,7 @@ export async function getReimbursementsByCompanyId({
           users!${users ? "inner" : "left"}(id,email)`,
       { count: "exact" }
     )
-    .eq("employees.company_id", companyId);
+    .eq("company_id", companyId);
 
   if (sort) {
     const [column, direction] = sort;
@@ -141,6 +143,9 @@ export async function getReimbursementsByCompanyId({
             referencedTable: "employees",
           }
         );
+        query.or(`name.ilike.*${searchQueryElement}*`, {
+          referencedTable: "reimbursement",
+        });
       }
     } else {
       query.or(
@@ -149,6 +154,9 @@ export async function getReimbursementsByCompanyId({
           referencedTable: "employees",
         }
       );
+      query.or(`name.ilike.*${searchQuery}*`, {
+        referencedTable: "reimbursement",
+      });
     }
   }
 
@@ -215,12 +223,14 @@ export async function getReimbursementsById({
   const columns = [
     "id",
     "employee_id",
+    "name",
     "is_deductible",
     "status",
     "amount",
     "submitted_date",
     "user_id",
     "payroll_id",
+    "company_id",
   ] as const;
 
   const { data, error } = await supabase
@@ -277,9 +287,11 @@ export async function getReimbursementsByEmployeeId({
     "id",
     "employee_id",
     "is_deductible",
+    "name",
     "status",
     "amount",
     "submitted_date",
+    "company_id",
   ] as const;
 
   const query = supabase
@@ -332,7 +344,7 @@ export async function getReimbursementsByEmployeeId({
 
 export type RecentReimbursementType = Pick<
   ReimbursementRow,
-  "id" | "amount" | "status" | "submitted_date"
+  "id" | "amount" | "status" | "submitted_date" | "company_id" | "name"
 > & {
   employees: Pick<
     EmployeeDatabaseRow,
@@ -350,9 +362,11 @@ export async function getReimbursementEntriesForPayrollByPayrollId({
   const columns = [
     "id",
     "employee_id",
+    "name",
     "amount",
     "payroll_id",
     "created_at",
+    "company_id",
   ] as const;
 
   const { data, error } = await supabase
@@ -360,7 +374,7 @@ export async function getReimbursementEntriesForPayrollByPayrollId({
     .select(
       `${columns.join(
         ","
-      )}, employees!left(id,company_id,first_name, middle_name, last_name, employee_code)`
+      )}, employees!left(id, first_name, middle_name, last_name, employee_code)`
     )
     .eq("payroll_id", payrollId)
     .order("created_at", { ascending: false })
@@ -379,14 +393,21 @@ export async function getReimbursementEntryForPayrollById({
   supabase: TypedSupabaseClient;
   id: string;
 }) {
-  const columns = ["id", "employee_id", "amount", "payroll_id"] as const;
+  const columns = [
+    "id",
+    "employee_id",
+    "name",
+    "amount",
+    "payroll_id",
+    "company_id",
+  ] as const;
 
   const { data, error } = await supabase
     .from("reimbursements")
     .select(
       `${columns.join(
         ","
-      )}, employees!left(id,company_id,first_name, middle_name, last_name, employee_code)`
+      )}, employees!left(id,first_name, middle_name, last_name, employee_code)`
     )
     .eq("id", id)
     .single<ReimbursementPayrollEntriesWithEmployee>();

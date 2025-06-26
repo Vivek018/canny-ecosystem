@@ -6,7 +6,7 @@ import {
   DropdownMenuSeparator,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import {  useSubmit } from "@remix-run/react";
+import { useSubmit } from "@remix-run/react";
 import { DeleteEmployee } from "./delete-employee";
 import {
   createRole,
@@ -41,7 +41,7 @@ export const EmployeeOptionsDropdown = ({
       {
         method: "POST",
         action: `/employees/${employee.id}/update-active`,
-      },
+      }
     );
   };
 
@@ -55,7 +55,7 @@ export const EmployeeOptionsDropdown = ({
       {
         method: "POST",
         action: `/employees/${employee.id}/update-active`,
-      },
+      }
     );
   };
 
@@ -67,7 +67,18 @@ export const EmployeeOptionsDropdown = ({
       {
         method: "POST",
         action: `/events/incidents/${employee.id}/create-incident`,
+      }
+    );
+  };
+  const handleAttendance = () => {
+    submit(
+      {
+        id: employee.id,
       },
+      {
+        method: "POST",
+        action: `/time-tracking/attendance/${employee.id}/add-attendance`,
+      }
     );
   };
 
@@ -80,7 +91,7 @@ export const EmployeeOptionsDropdown = ({
             className={cn(
               employee.is_active && "hidden",
               !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
-                "hidden",
+                "hidden"
             )}
             onClick={handleMarkAsActive}
           >
@@ -90,7 +101,7 @@ export const EmployeeOptionsDropdown = ({
             className={cn(
               !employee.is_active && "hidden",
               !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
-                "hidden",
+                "hidden"
             )}
             onClick={handleMarkAsInactive}
           >
@@ -100,23 +111,33 @@ export const EmployeeOptionsDropdown = ({
             className={cn(
               !hasPermission(role, `${updateRole}:${attribute.employees}`) &&
                 !hasPermission(role, `${deleteRole}:${attribute.employees}`) &&
-                "hidden",
+                "hidden"
             )}
           />
           <DropdownMenuItem
             className={cn(
               !hasPermission(role, `${createRole}:${attribute.incidents}`) &&
-                "hidden",
+                "hidden"
             )}
             onClick={handleIncident}
           >
             Report Incident
           </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            className={cn(
+              !hasPermission(role, `${createRole}:${attribute.incidents}`) &&
+                "hidden"
+            )}
+            onClick={handleAttendance}
+          >
+            Add Attendance
+          </DropdownMenuItem>
           <DropdownMenuSeparator
             className={cn(
               "hidden",
               hasPermission(role, `${deleteRole}:${attribute.incidents}`) &&
-                "flex",
+                "flex"
             )}
           />
           <DeleteEmployee employeeId={employee.id} />

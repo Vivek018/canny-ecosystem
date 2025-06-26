@@ -22,6 +22,7 @@ export default function SalaryInfoCard({
 }: {
   salaryData: GroupedPayrollEntry;
 }) {
+
   let earningTotal = 0;
   let deductionTotal = 0;
 

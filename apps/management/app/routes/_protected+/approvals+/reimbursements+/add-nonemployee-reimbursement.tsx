@@ -13,11 +13,11 @@ import {
   getInitialValueFromZod,
   hasPermission,
   isGoodStatus,
-  ReimbursementSchema,
   reimbursementStatusArray,
   replaceUnderscore,
   transformStringArrayIntoOptions,
   createRole,
+  NonEmployeeReimbursementSchema,
 } from "@canny_ecosystem/utils";
 
 import {
@@ -44,8 +44,6 @@ import type {
   ReimbursementInsert,
   ReimbursementsUpdate,
 } from "@canny_ecosystem/supabase/types";
-import { UPDATE_REIMBURSEMENTS_TAG } from "../../../approvals+/reimbursements+/$reimbursementId.update-reimbursements";
-import { getUsersByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { useEffect, useState } from "react";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
@@ -53,10 +51,12 @@ import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { clearCacheEntry } from "@/utils/cache";
+import { UPDATE_NONEMPLOYEE_REIMBURSEMENTS_TAG } from "./$reimbursementId.nonemployee-update-reimbursements";
 
-export const ADD_REIMBURSEMENTS_TAG = "Add_Reimbursement";
+export const ADD_NONEMPLOYEE_REIMBURSEMENTS_TAG =
+  "Add_Non-Employee_Reimbursement";
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
@@ -69,23 +69,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
-  const employeeId = params.employeeId;
 
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const { data: userData, error: userError } = await getUsersByCompanyId({
-    supabase,
-    companyId,
-  });
-  if (userError || !userData) {
-    throw userError;
-  }
 
-  const userOptions = userData.map((userData) => ({
-    label: userData.email?.toLowerCase() ?? "",
-    value: userData.id,
-  }));
-
-  return json({ userOptions, employeeId, companyId });
+  return json({ companyId });
 }
 
 export async function action({
@@ -93,7 +80,9 @@ export async function action({
 }: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await request.formData();
-  const submission = parseWithZod(formData, { schema: ReimbursementSchema });
+  const submission = parseWithZod(formData, {
+    schema: NonEmployeeReimbursementSchema,
+  });
 
   if (submission.status !== "success") {
     return json(
@@ -110,26 +99,24 @@ export async function action({
   if (isGoodStatus(status)) {
     return json({
       status: "success",
-      message: "Employee reimbursement create successfully",
+      message: "Non Employee reimbursement create successfully",
       error: null,
     });
   }
   return json({
     status: "error",
-    message: "Employee reimbursement create failed",
+    message: "Non Employee reimbursement create failed",
     error,
   });
 }
 
-export default function AddReimbursements({
+export default function AddNonEmployeeReimbursements({
   updateValues,
-  userOptionsFromUpdate,
 }: {
   updateValues?: ReimbursementsUpdate | null;
-  userOptionsFromUpdate?: any;
-  reimbursementId?: string;
 }) {
-  const { userOptions, employeeId, companyId } = useLoaderData<typeof loader>();
+  const { companyId } = useLoaderData<typeof loader>();
+
   const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
 
@@ -143,39 +130,39 @@ export default function AddReimbursements({
         clearCacheEntry(cacheKeyPrefix.reimbursements);
         toast({
           title: "Success",
-          description: actionData?.message || "Employee bank details created",
+          description:
+            actionData?.message || "Non Employee Reimbursement created",
           variant: "success",
         });
       } else {
         toast({
           title: "Error",
           description:
-            actionData?.error?.message || "Employee bank details create failed",
+            actionData?.error?.message ?? "Non Employee Reimbursement create failed",
           variant: "destructive",
         });
       }
-      navigate(`/employees/${employeeId}/reimbursements`);
+      navigate("/approvals/reimbursements");
     }
   }, [actionData]);
 
   const REIMBURSEMENTS_TAG = updateValues
-    ? UPDATE_REIMBURSEMENTS_TAG
-    : ADD_REIMBURSEMENTS_TAG;
+    ? UPDATE_NONEMPLOYEE_REIMBURSEMENTS_TAG
+    : ADD_NONEMPLOYEE_REIMBURSEMENTS_TAG;
 
   const initialValues =
-    updateValues ?? getInitialValueFromZod(ReimbursementSchema);
+    updateValues ?? getInitialValueFromZod(NonEmployeeReimbursementSchema);
 
   const [form, fields] = useForm({
     id: REIMBURSEMENTS_TAG,
-    constraint: getZodConstraint(ReimbursementSchema),
+    constraint: getZodConstraint(NonEmployeeReimbursementSchema),
     onValidate({ formData }) {
-      return parseWithZod(formData, { schema: ReimbursementSchema });
+      return parseWithZod(formData, { schema: NonEmployeeReimbursementSchema });
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
     defaultValue: {
       ...initialValues,
-      employee_id: initialValues.employee_id ?? employeeId,
       company_id: initialValues.company_id ?? companyId,
     },
   });
@@ -197,13 +184,41 @@ export default function AddReimbursements({
             </CardHeader>
             <CardContent>
               <input {...getInputProps(fields.id, { type: "hidden" })} />
-              <input
-                {...getInputProps(fields.employee_id, { type: "hidden" })}
-              />
+
               <input
                 {...getInputProps(fields.company_id, { type: "hidden" })}
               />
 
+              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10">
+                <Field
+                  inputProps={{
+                    ...getInputProps(fields.name, {
+                      type: "text",
+                    }),
+                    placeholder: `Enter ${replaceUnderscore(fields.name.name)}`,
+                    className: "",
+                  }}
+                  labelProps={{
+                    children: replaceUnderscore(fields.name.name),
+                  }}
+                  errors={fields.name.errors}
+                />
+                <Field
+                  inputProps={{
+                    ...getInputProps(fields.amount, {
+                      type: "number",
+                    }),
+                    placeholder: `Enter ${replaceUnderscore(
+                      fields.amount.name
+                    )}`,
+                    className: "",
+                  }}
+                  labelProps={{
+                    children: replaceUnderscore(fields.amount.name),
+                  }}
+                  errors={fields.amount.errors}
+                />
+              </div>
               <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10">
                 <Field
                   inputProps={{
@@ -234,38 +249,6 @@ export default function AddReimbursements({
                     children: "Status",
                   }}
                   errors={fields.status.errors}
-                />
-              </div>
-              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10">
-                <Field
-                  inputProps={{
-                    ...getInputProps(fields.amount, {
-                      type: "number",
-                    }),
-                    placeholder: `Enter ${replaceUnderscore(
-                      fields.amount.name
-                    )}`,
-                    className: "",
-                  }}
-                  labelProps={{
-                    children: replaceUnderscore(fields.amount.name),
-                  }}
-                  errors={fields.amount.errors}
-                />
-                <SearchableSelectField
-                  key={resetKey + 1}
-                  inputProps={{
-                    ...getInputProps(fields.user_id, {
-                      type: "text",
-                    }),
-                    placeholder: "Select an authority that approved",
-                  }}
-                  className="lowercase"
-                  options={userOptions ?? userOptionsFromUpdate}
-                  labelProps={{
-                    children: "Approved By",
-                  }}
-                  errors={fields.user_id.errors}
                 />
               </div>
 
