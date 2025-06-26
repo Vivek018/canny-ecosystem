@@ -12,7 +12,7 @@ import {
   CaseSchema,
   hasPermission,
   isGoodStatus,
-  SIZE_1MB,
+  SIZE_10MB,
   updateRole,
 } from "@canny_ecosystem/utils";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
@@ -203,7 +203,7 @@ export async function action({
 
   const formData = await parseMultipartFormData(
     request,
-    createMemoryUploadHandler({ maxPartSize: SIZE_1MB })
+    createMemoryUploadHandler({ maxPartSize: SIZE_10MB })
   );
   const submission = parseWithZod(formData, { schema: CaseSchema });
 

@@ -1,6 +1,6 @@
 import {
   EmployeeDocumentsSchema,
-  SIZE_1MB,
+  SIZE_10MB,
   getInitialValueFromZod,
   isGoodStatus,
   replaceUnderscore,
@@ -63,7 +63,7 @@ export async function action({
   try {
     const formData = await parseMultipartFormData(
       request,
-      createMemoryUploadHandler({ maxPartSize: SIZE_1MB })
+      createMemoryUploadHandler({ maxPartSize: SIZE_10MB })
     );
     const submission = parseWithZod(formData, {
       schema: EmployeeDocumentsSchema,

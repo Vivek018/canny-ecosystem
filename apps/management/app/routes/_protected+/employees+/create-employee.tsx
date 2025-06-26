@@ -8,7 +8,7 @@ import {
   EmployeeStatutorySchema,
   hasPermission,
   isGoodStatus,
-  SIZE_1MB,
+  SIZE_10MB,
 } from "@canny_ecosystem/utils";
 import { createEmployee } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -155,7 +155,7 @@ export async function action({
   const { supabase } = getSupabaseWithHeaders({ request });
   const formData = await parseMultipartFormData(
     request,
-    createMemoryUploadHandler({ maxPartSize: SIZE_1MB })
+    createMemoryUploadHandler({ maxPartSize: SIZE_10MB })
   );
   const actionType = formData.get("_action") as string;
   const submission = parseWithZod(formData, { schema: currentSchema });

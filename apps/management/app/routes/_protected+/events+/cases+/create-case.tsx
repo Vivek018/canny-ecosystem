@@ -28,7 +28,7 @@ import {
   reportedOnArray,
   caseStatusArray,
   reportedByArray,
-  SIZE_1MB,
+  SIZE_10MB,
 } from "@canny_ecosystem/utils";
 import {
   Card,
@@ -214,10 +214,11 @@ export async function action({
 }: ActionFunctionArgs): Promise<Response> {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+
   try {
     const formData = await parseMultipartFormData(
       request,
-      createMemoryUploadHandler({ maxPartSize: SIZE_1MB })
+      createMemoryUploadHandler({ maxPartSize: SIZE_10MB })
     );
     const submission = parseWithZod(formData, { schema: CaseSchema });
 
@@ -321,7 +322,7 @@ export async function action({
         status: "error",
         message: "An unexpected error occurred",
         error,
-        returnTo: DEFAULT_ROUTE,
+        returnTo: "/payroll",
       },
       { status: 500 }
     );

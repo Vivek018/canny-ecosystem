@@ -1,4 +1,4 @@
-import { CompanyDocumentsSchema, SIZE_1MB, getInitialValueFromZod, isGoodStatus, replaceUnderscore } from "@canny_ecosystem/utils";
+import { CompanyDocumentsSchema, SIZE_10MB,  getInitialValueFromZod, isGoodStatus, replaceUnderscore } from "@canny_ecosystem/utils";
 import { Field } from "@canny_ecosystem/ui/forms";
 import { FormProvider, getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
@@ -27,7 +27,7 @@ export async function action({ request }: ActionFunctionArgs): Promise<Response>
   try {
     const formData = await parseMultipartFormData(
       request,
-      createMemoryUploadHandler({ maxPartSize: SIZE_1MB }),
+      createMemoryUploadHandler({ maxPartSize: SIZE_10MB }),
     );
     const submission = parseWithZod(formData, { schema: CompanyDocumentsSchema });
 

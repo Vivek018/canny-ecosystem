@@ -1,4 +1,4 @@
-import { CompanyDocumentsSchema, SIZE_1MB, hasPermission, isGoodStatus, updateRole } from "@canny_ecosystem/utils";
+import { CompanyDocumentsSchema, SIZE_10MB, hasPermission, isGoodStatus, updateRole } from "@canny_ecosystem/utils";
 import { parseWithZod } from "@conform-to/zod";
 import { json, useActionData, useLoaderData, useNavigate } from "@remix-run/react";
 import { useEffect } from "react";
@@ -40,7 +40,7 @@ export async function action({ request }: ActionFunctionArgs): Promise<Response>
   try {
     const formData = await parseMultipartFormData(
       request,
-      createMemoryUploadHandler({ maxPartSize: SIZE_1MB }),
+      createMemoryUploadHandler({ maxPartSize: SIZE_10MB }),
     );
     const submission = parseWithZod(formData, { schema: CompanyDocumentsSchema });
 
