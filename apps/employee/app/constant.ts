@@ -1,4 +1,3 @@
-
 export const DEFAULT_ROUTE = "/";
 
 export const CANNY_MANAGEMENT_SERVICES_COMPANY_ID =
@@ -23,9 +22,9 @@ export const cacheKeyPrefix = {
   attendance: "attendance",
   attendanceReport: "attendance-report",
   employee_leaves: "employee-leaves",
-  employee_salary: "employee_salary",
+  employee_salary: "employee-salary",
+  employee_document: "employee-document",
 };
-
 
 export function numberToWordsIndian(num: number) {
   const belowTwenty = [
