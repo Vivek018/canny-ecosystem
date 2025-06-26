@@ -73,16 +73,19 @@ export const zFile = z
     (file) =>
       typeof file !== "string"
         ? [
-            ...ACCEPTED_IMAGE_TYPES,
-            "image/pdf",
-            "image/doc",
-            "image/docx",
-            "application/pdf",
-            "application/doc",
-            "application/docx",
-          ].includes(file?.type)
+          ...ACCEPTED_IMAGE_TYPES,
+          "image/pdf",
+          "image/doc",
+          "image/docx",
+          "application/pdf",
+          "application/doc",
+          "application/docx",
+          "application/zip",
+          "application/x-zip-compressed",
+          "multipart/x-zip"
+        ].includes(file?.type)
         : true,
-    "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .docx formats are supported."
+    "Only .jpg, .jpeg, .png .webp, .pdf, .doc, .docx, .zip formats are supported."
   );
 
 export const booleanArray = ["true", "false"] as const;
