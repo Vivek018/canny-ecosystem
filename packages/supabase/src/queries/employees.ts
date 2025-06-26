@@ -1132,7 +1132,7 @@ export async function getEmployeeDocumentUrlByEmployeeIdAndDocumentName({
     .select(columns.join(","))
     .eq("employee_id", employeeId)
     .eq("document_type", documentType)
-    .single<EmployeeDocumentsDatabaseRow>();
+    .maybeSingle<EmployeeDocumentsDatabaseRow>();
 
   if (error) {
     console.error(
