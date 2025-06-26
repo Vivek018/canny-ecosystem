@@ -448,6 +448,7 @@ export async function getExitEntriesByPayrollIdForPayrollRegister({
   payrollId: string;
 }) {
   const columns = [
+    "id",
     "gratuity",
     "bonus",
     "leave_encashment",
@@ -469,9 +470,16 @@ export async function getExitEntriesByPayrollIdForPayrollRegister({
   }
   const mapped = data?.map((emp: any) => ({
     ...emp,
-    exits: emp.exits.map(({ net_pay }: { net_pay: number }) => ({
-      amount: net_pay,
-    })),
+    exits: emp.exits.map(
+      ({
+        bonus = 0,
+        gratuity = 0,
+        leave_encashment = 0,
+        deduction = 0,
+      }: any) => ({
+        amount: bonus + gratuity + leave_encashment - deduction,
+      })
+    ),
   }));
 
   return { data: mapped, error: null };

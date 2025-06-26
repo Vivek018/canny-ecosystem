@@ -25,10 +25,10 @@ import type {
 import { Dialog, DialogContent } from "@canny_ecosystem/ui/dialog";
 import {
   formatDate,
+  getMonthNameFromNumber,
   numberToWords,
   replaceUnderscore,
 } from "@canny_ecosystem/utils";
-import { months } from "@canny_ecosystem/utils/constant";
 import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
 import {
   Document,
@@ -234,12 +234,12 @@ const InvoicePDF = ({
 
   const service_charge =
     type === "salary"
-      ? data.invoiceDetails.include_charge
+      ? data.invoiceDetails?.include_charge
         ? includedFields?.includes("ALL")
           ? (beforeService * terms.service_charge) / 100
           : (sum * terms.service_charge) / 100
         : 0
-      : data.invoiceDetails.include_charge
+      : data.invoiceDetails?.include_charge
       ? (Number(
           data?.invoiceDetails?.payroll_data.reduce(
             (sum, item) => sum + Number(item.amount),
@@ -256,21 +256,21 @@ const InvoicePDF = ({
       : Number(data?.invoiceDetails?.payroll_data[0].amount) + service_charge;
 
   const cgst =
-    data.invoiceDetails.include_cgst &&
-    data.invoiceDetails.include_sgst &&
-    !data.invoiceDetails.include_igst
+    data.invoiceDetails?.include_cgst &&
+    data.invoiceDetails?.include_sgst &&
+    !data.invoiceDetails?.include_igst
       ? (total * 9) / 100
       : 0;
   const sgst =
-    data.invoiceDetails.include_cgst &&
-    data.invoiceDetails.include_sgst &&
-    !data.invoiceDetails.include_igst
+    data.invoiceDetails?.include_cgst &&
+    data.invoiceDetails?.include_sgst &&
+    !data.invoiceDetails?.include_igst
       ? (total * 9) / 100
       : 0;
   const igst =
-    !data.invoiceDetails.include_cgst &&
-    !data.invoiceDetails.include_sgst &&
-    data.invoiceDetails.include_igst
+    !data.invoiceDetails?.include_cgst &&
+    !data.invoiceDetails?.include_sgst &&
+    data.invoiceDetails?.include_igst
       ? (total * 18) / 100
       : 0;
 
@@ -278,7 +278,7 @@ const InvoicePDF = ({
 
   const calculatedValues = {
     [`Service Charge @ ${
-      type === "salary" ? terms.service_charge : terms.reimbursement_charge
+      type === "salary" ? terms?.service_charge : terms?.reimbursement_charge
     }%`]: service_charge,
     Total: total,
     "C.G.S.T @ 9%": cgst,
@@ -290,7 +290,7 @@ const InvoicePDF = ({
   return (
     <Document title="fdgzdfgfsg" subject="uhydhsu" author="dassaas">
       <Page size="A4" style={styles.page}>
-        {data.invoiceDetails.include_header && (
+        {data.invoiceDetails?.include_header && (
           <View style={styles.header} fixed>
             <LetterHeader />
           </View>
@@ -315,7 +315,7 @@ const InvoicePDF = ({
             <Text>{data?.companyData?.address_line_1}</Text>
             <Text>{data?.companyData?.address_line_2}</Text>
             <Text>
-              {data?.companyData.city}-{data?.companyData.pincode},{" "}
+              {data?.companyData?.city}-{data?.companyData?.pincode},{" "}
               {data?.companyData?.state?.toUpperCase()}
             </Text>
             <Text>GSTIN : SE593484848</Text>
@@ -368,7 +368,7 @@ const InvoicePDF = ({
           </View>
         </View>
 
-        {data?.invoiceDetails?.payroll_data.map((field, index) => (
+        {data?.invoiceDetails?.payroll_data?.map((field, index) => (
           <View key={index.toString()} style={[styles.mainRows]}>
             {index === 0 ? (
               <View
@@ -476,7 +476,7 @@ const InvoicePDF = ({
           </View>
         </View>
 
-        {array.map((field, index) => (
+        {array?.map((field, index) => (
           <View key={index.toString()} style={[styles.mainRows]}>
             {index === 0 ? (
               <View
@@ -579,7 +579,7 @@ const InvoicePDF = ({
             </View>
           </View>
 
-          {data.invoiceDetails.include_header && <LetterFooter />}
+          {data.invoiceDetails?.include_header && <LetterFooter />}
         </View>
       </Page>
       {type === "salary" ? (
@@ -691,7 +691,7 @@ const InvoicePDF = ({
             </View>
           </View>
 
-          {data.employeeData.map((employee, index) => (
+          {data.employeeData?.map((employee, index) => (
             <View
               key={index.toString()}
               style={[styles.tableHeader, { borderTop: "1pt solid #000000" }]}
@@ -1041,7 +1041,7 @@ const InvoicePDF = ({
                 value: grand_total.toFixed(2),
                 bold: true,
               },
-            ].map((item, index) => (
+            ]?.map((item, index) => (
               <View
                 key={index.toString()}
                 style={{
@@ -1139,7 +1139,7 @@ const InvoicePDF = ({
             </View>
           </View>
 
-          {data.employeeData.map((employee, index) => (
+          {data.employeeData?.map((employee, index) => (
             <View
               key={index.toString()}
               style={[styles.tableHeader, { borderTop: "1pt solid #000000" }]}
@@ -1326,9 +1326,18 @@ export default function PreviewInvoice() {
         field_name: string;
         amount: number;
         type: "earning" | "statutory_contribution";
-        present_days: number;
-        month: number;
-        year: number;
+        monthly_attendance: {
+          working_days: number;
+          present_days: number;
+          month: number;
+          year: number;
+          working_hours: number;
+          absent_days: number;
+          overtime_hours: number;
+          paid_holidays: number;
+          paid_leaves: number;
+          casual_leaves: number;
+        };
       }
       interface Leaves {
         start_date: string;
@@ -1374,18 +1383,12 @@ export default function PreviewInvoice() {
         name: string;
         amount: number;
       }
-      function getMonthName(monthNumber: number) {
-        const entry = Object.entries(months).find(
-          ([, value]) => value === monthNumber
-        );
-        return entry ? entry[0] : undefined;
-      }
 
       const attendanceData =
         data?.payrollDataAndOthers[0].salary_entries[0] || {};
 
       const employeeData: TransformedEmployeeData[] =
-        data.payrollDataAndOthers.map(
+        data.payrollDataAndOthers?.map(
           (emp: {
             first_name: string;
             middle_name: string;
@@ -1411,64 +1414,6 @@ export default function PreviewInvoice() {
                 deductions.push(entryItem);
               }
             }
-            const targetYear = emp.salary_entries[0]?.year;
-            const targetMonth = emp.salary_entries[0]?.month;
-
-            const monthStart = new Date(targetYear, targetMonth - 1, 1);
-            const monthEnd = new Date(targetYear, targetMonth, 0);
-
-            const stripTime = (d: Date) =>
-              new Date(d.getFullYear(), d.getMonth(), d.getDate());
-
-            const casualLeaves =
-              emp.leaves?.reduce((total, leave) => {
-                if (leave.leave_type === "casual_leave") {
-                  const leaveStart = stripTime(new Date(leave?.start_date));
-                  const leaveEnd = stripTime(new Date(leave?.end_date));
-
-                  const overlapStart =
-                    leaveStart < monthStart
-                      ? stripTime(monthStart)
-                      : leaveStart;
-                  const overlapEnd =
-                    leaveEnd > monthEnd ? stripTime(monthEnd) : leaveEnd;
-
-                  if (overlapStart > overlapEnd) return total;
-
-                  const timeDiff =
-                    overlapEnd.getTime() - overlapStart.getTime();
-                  const daysInMonth =
-                    Math.floor(timeDiff / (1000 * 60 * 60 * 24)) + 1;
-
-                  return total + daysInMonth;
-                }
-                return total;
-              }, 0) || 0;
-
-            const paidLeaves =
-              emp.leaves?.reduce((total, leave) => {
-                if (leave.leave_type === "paid_leave") {
-                  const leaveStart = stripTime(new Date(leave?.start_date));
-                  const leaveEnd = stripTime(new Date(leave?.end_date));
-
-                  const overlapStart =
-                    leaveStart < monthStart
-                      ? stripTime(monthStart)
-                      : leaveStart;
-                  const overlapEnd =
-                    leaveEnd > monthEnd ? stripTime(monthEnd) : leaveEnd;
-
-                  if (overlapStart > overlapEnd) return total;
-
-                  const timeDiff =
-                    overlapEnd.getTime() - overlapStart.getTime();
-                  const daysInMonth =
-                    Math.floor(timeDiff / (1000 * 60 * 60 * 24)) + 1;
-
-                  return total + daysInMonth;
-                }
-                return total;
-              }, 0) || 0;
 
             return {
               employeeData: {
@@ -1487,13 +1432,19 @@ export default function PreviewInvoice() {
                 uan_number: emp.employee_statutory_details?.uan_number || "",
               },
               attendance: {
-                working_days: 26,
+                working_days:
+                  emp?.salary_entries[0]?.monthly_attendance.working_days ?? 0,
                 weekly_off: 5,
-                paid_holidays: 0,
-                paid_days: emp?.salary_entries[0]?.present_days,
-                paid_leaves: paidLeaves,
-                casual_leaves: casualLeaves,
-                absents: 26 - Number(emp?.salary_entries[0]?.present_days),
+                paid_holidays:
+                  emp?.salary_entries[0]?.monthly_attendance.paid_holidays ?? 0,
+                paid_days:
+                  emp?.salary_entries[0]?.monthly_attendance.present_days,
+                paid_leaves:
+                  emp?.salary_entries[0]?.monthly_attendance.paid_leaves ?? 0,
+                casual_leaves:
+                  emp?.salary_entries[0]?.monthly_attendance.casual_leaves ?? 0,
+                absents:
+                  emp?.salary_entries[0]?.monthly_attendance.absent_days ?? 0,
               },
               earnings,
               deductions,
@@ -1502,8 +1453,8 @@ export default function PreviewInvoice() {
         );
 
       return {
-        month: getMonthName(attendanceData?.month),
-        year: attendanceData?.year,
+        month: getMonthNameFromNumber(attendanceData?.monthly_attendance.month),
+        year: attendanceData?.monthly_attendance.year,
         companyData,
         employeeData,
         invoiceDetails,
@@ -1516,7 +1467,7 @@ export default function PreviewInvoice() {
     payroll?.payroll_type === "reimbursement" ||
     payroll?.payroll_type === "exit"
   ) {
-    function transformDataForPayroll(data: any, type: string) {
+    function transformReimbursementDataForPayroll(data: any, type: string) {
       const company = data.employeeCompanyData;
       const location = data.employeesCompanyLocationData;
       const invoice = data.invoiceData;
@@ -1609,7 +1560,10 @@ export default function PreviewInvoice() {
       };
     }
 
-    registerData = transformDataForPayroll(data, payroll?.payroll_type);
+    registerData = transformReimbursementDataForPayroll(
+      data,
+      payroll?.payroll_type
+    );
   }
 
   if (!isDocument) return <div>Loading...</div>;

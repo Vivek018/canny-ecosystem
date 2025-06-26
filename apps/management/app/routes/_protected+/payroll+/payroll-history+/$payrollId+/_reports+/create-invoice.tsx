@@ -108,23 +108,20 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     });
     salaryData = data;
   }
-  if (
-    payroll?.payroll_type === "exit" ||
-    payroll?.payroll_type === "reimbursement"
-  ) {
-    const { data: reimb } = await getReimbursementEntriesForPayrollByPayrollId({
-      supabase,
-      payrollId,
-    });
-    reimbursementData = reimb;
-
+  if (payroll?.payroll_type === "exit") {
     const { data: exit } = await getExitsEntriesForPayrollByPayrollId({
       supabase,
       payrollId,
     });
     exitData = exit ?? null;
   }
-
+  if (payroll?.payroll_type === "reimbursement") {
+    const { data: reimb } = await getReimbursementEntriesForPayrollByPayrollId({
+      supabase,
+      payrollId,
+    });
+    reimbursementData = reimb;
+  }
   const companyLocationArray = companyLocations?.map((location) => ({
     label: location?.name,
     value: location?.id,
@@ -253,17 +250,37 @@ export default function CreateInvoice({
   const type = payroll?.payroll_type ?? updateValues?.payroll_type;
 
   function transformPayrollData(employees: any[], payrollType: string) {
-    const total = employees.reduce(
-      (sum, entry) => sum + (entry.amount || 0),
-      0
-    );
+    if (payrollType === "reimbursement") {
+      const total = employees.reduce(
+        (sum, entry) => sum + (entry.amount || 0),
+        0
+      );
 
-    return [
-      {
-        field: payrollType.toUpperCase(),
-        amount: Number(total.toFixed(2)),
-      },
-    ];
+      return [
+        {
+          field: payrollType.toUpperCase(),
+          amount: Number(total.toFixed(2)),
+        },
+      ];
+    }
+
+    if (payrollType === "exit") {
+      const total = employees.reduce((sum, entry) => {
+        const bonus = entry.bonus || 0;
+        const gratuity = entry.gratuity || 0;
+        const leave = entry.leave_encashment || 0;
+        const deduction = entry.deduction || 0;
+
+        return sum + bonus + gratuity + leave - deduction;
+      }, 0);
+
+      return [
+        {
+          field: payrollType.toUpperCase(),
+          amount: Number(total.toFixed(2)),
+        },
+      ];
+    }
   }
 
   function transformSalaryData(employees: any) {

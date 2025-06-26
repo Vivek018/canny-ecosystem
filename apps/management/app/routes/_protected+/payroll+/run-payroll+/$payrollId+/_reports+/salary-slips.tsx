@@ -31,8 +31,11 @@ import type {
   LocationDatabaseRow,
   PayrollDatabaseRow,
 } from "@canny_ecosystem/supabase/types";
-import { months } from "@canny_ecosystem/utils/constant";
-import { formatDate, replaceUnderscore } from "@canny_ecosystem/utils";
+import {
+  formatDate,
+  getMonthNameFromNumber,
+  replaceUnderscore,
+} from "@canny_ecosystem/utils";
 
 // Define styles for PDF
 const styles = StyleSheet.create({
@@ -459,9 +462,18 @@ export default function SalarySlips() {
       field_name: string;
       amount: number;
       type: "earning" | "statutory_contribution";
-      present_days: number;
-      month: number;
-      year: number;
+      monthly_attendance: {
+        working_days: number;
+        present_days: number;
+        month: number;
+        year: number;
+        working_hours: number;
+        absent_days: number;
+        overtime_hours: number;
+        paid_holidays: number;
+        paid_leaves: number;
+        casual_leaves: number;
+      };
     }
     interface Leaves {
       start_date: string;
@@ -517,13 +529,6 @@ export default function SalarySlips() {
       bankDetails: BankDetails;
     }
 
-    function getMonthName(monthNumber: number) {
-      const entry = Object.entries(months).find(
-        ([, value]) => value === monthNumber
-      );
-      return entry ? entry[0] : undefined;
-    }
-
     const attendanceData =
       data?.payrollDataAndOthers[0].salary_entries[0] || {};
 
@@ -556,59 +561,6 @@ export default function SalarySlips() {
             }
           }
 
-          const targetYear = emp.salary_entries[0]?.year;
-          const targetMonth = emp.salary_entries[0]?.month;
-
-          const monthStart = new Date(targetYear, targetMonth - 1, 1);
-          const monthEnd = new Date(targetYear, targetMonth, 0);
-
-          const stripTime = (d: Date) =>
-            new Date(d.getFullYear(), d.getMonth(), d.getDate());
-
-          const casualLeaves =
-            emp.leaves?.reduce((total, leave) => {
-              if (leave.leave_type === "casual_leave") {
-                const leaveStart = stripTime(new Date(leave?.start_date));
-                const leaveEnd = stripTime(new Date(leave?.end_date));
-
-                const overlapStart =
-                  leaveStart < monthStart ? stripTime(monthStart) : leaveStart;
-                const overlapEnd =
-                  leaveEnd > monthEnd ? stripTime(monthEnd) : leaveEnd;
-
-                if (overlapStart > overlapEnd) return total;
-
-                const timeDiff = overlapEnd.getTime() - overlapStart.getTime();
-                const daysInMonth =
-                  Math.floor(timeDiff / (1000 * 60 * 60 * 24)) + 1;
-
-                return total + daysInMonth;
-              }
-              return total;
-            }, 0) || 0;
-
-          const paidLeaves =
-            emp.leaves?.reduce((total, leave) => {
-              if (leave.leave_type === "paid_leave") {
-                const leaveStart = stripTime(new Date(leave?.start_date));
-                const leaveEnd = stripTime(new Date(leave?.end_date));
-
-                const overlapStart =
-                  leaveStart < monthStart ? stripTime(monthStart) : leaveStart;
-                const overlapEnd =
-                  leaveEnd > monthEnd ? stripTime(monthEnd) : leaveEnd;
-
-                if (overlapStart > overlapEnd) return total;
-
-                const timeDiff = overlapEnd.getTime() - overlapStart.getTime();
-                const daysInMonth =
-                  Math.floor(timeDiff / (1000 * 60 * 60 * 24)) + 1;
-
-                return total + daysInMonth;
-              }
-              return total;
-            }, 0) || 0;
-
           return {
             employeeData: {
               first_name: emp?.first_name,
@@ -617,8 +569,8 @@ export default function SalarySlips() {
               employee_code: emp?.employee_code,
             },
             employeeProjectAssignmentData: {
-              position: emp.employee_project_assignment?.position || "",
-              department: emp.employee_project_assignment?.department || "",
+              position: emp?.employee_project_assignment?.position || "",
+              department: emp?.employee_project_assignment?.department || "",
               date_of_joining:
                 emp.employee_project_assignment?.start_date || "",
             },
@@ -628,13 +580,19 @@ export default function SalarySlips() {
               uan_number: emp.employee_statutory_details?.uan_number || "",
             },
             attendance: {
-              working_days: 26,
+              working_days:
+                emp?.salary_entries[0]?.monthly_attendance.working_days ?? 0,
               weekly_off: 5,
-              paid_holidays: 0,
-              paid_days: emp?.salary_entries[0]?.present_days,
-              paid_leaves: paidLeaves,
-              casual_leaves: casualLeaves,
-              absents: 26 - Number(emp?.salary_entries[0]?.present_days),
+              paid_holidays:
+                emp?.salary_entries[0]?.monthly_attendance.paid_holidays ?? 0,
+              paid_days:
+                emp?.salary_entries[0]?.monthly_attendance.present_days,
+              paid_leaves:
+                emp?.salary_entries[0]?.monthly_attendance.paid_leaves ?? 0,
+              casual_leaves:
+                emp?.salary_entries[0]?.monthly_attendance.casual_leaves ?? 0,
+              absents:
+                emp?.salary_entries[0]?.monthly_attendance.absent_days ?? 0,
             },
             bankDetails: {
               bank: emp.employee_bank_details?.bank_name,
@@ -647,8 +605,8 @@ export default function SalarySlips() {
       );
 
     return {
-      month: getMonthName(attendanceData?.month),
-      year: attendanceData?.year,
+      month: getMonthNameFromNumber(attendanceData?.monthly_attendance.month),
+      year: attendanceData?.monthly_attendance.year,
       companyData,
       employeeData,
     };
