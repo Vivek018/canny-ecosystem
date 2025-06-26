@@ -153,7 +153,9 @@ export async function getApprovedPayrollsByCompanyId({
     query.eq("status", status as PayrollDatabaseRow["status"]);
   }
 
-  const { data, count, error } = await query.range(from, to).order("created_at", { ascending: false });
+  const { data, count, error } = await query
+    .range(from, to)
+    .order("created_at", { ascending: false });
   if (error) console.error("getApprovedPayrollsByCompanyId Error", error);
   return { data, meta: { count: count }, error };
 }
@@ -263,7 +265,6 @@ export async function getSalaryEntriesByPayrollAndEmployeeId({
     "id",
     "monthly_attendance_id",
     "employee_id",
-    "template_component_id",
     "payroll_id",
     "field_name",
     "type",
@@ -275,7 +276,7 @@ export async function getSalaryEntriesByPayrollAndEmployeeId({
     .select(
       `id, company_id, first_name, middle_name, last_name, employee_code, salary_entries!inner(${columns.join(
         ","
-      )},monthly_attendance!inner(id, month, year, present_days, overtime_hours)),leaves(start_date,end_date,leave_type)`
+      )},monthly_attendance!inner(id, month, year, present_days, overtime_hours, working_days, working_hours, paid_holidays, paid_leaves, casual_leaves, absent_days))`
     )
     .eq("salary_entries.payroll_id", payrollId)
     .eq("id", employeeId)
@@ -399,8 +400,8 @@ export async function getApprovedPayrollsByCompanyIdByYears({
   const startOfYear = filterMonth
     ? new Date(Date.UTC(Number(filterYear ?? defaultYear) - 1, filterMonth, 1))
     : new Date(
-      Date.UTC(Number(filterYear ?? defaultYear) - 1, defMonth + 1, 1)
-    );
+        Date.UTC(Number(filterYear ?? defaultYear) - 1, defMonth + 1, 1)
+      );
 
   const endOfYear = filterMonth
     ? new Date(Number(filterYear ?? defaultYear), filterMonth, 1)
@@ -472,7 +473,7 @@ export async function getSalaryEntriesByPayrollIdForSalaryRegister({
     .select(
       `id, company_id, first_name, middle_name, last_name, employee_code, salary_entries!inner(${columns.join(
         ","
-      )},monthly_attendance!inner(id, month, year, present_days, overtime_hours)),employee_project_assignment!inner(position,start_date),employee_statutory_details!inner(aadhaar_number,pan_number,uan_number,pf_number,esic_number),leaves(start_date,end_date,leave_type),employee_bank_details(account_number,bank_name)`
+      )},monthly_attendance!inner(id, month, year, present_days, overtime_hours,working_days, working_hours, paid_holidays, paid_leaves, casual_leaves,absent_days)),employee_project_assignment!inner(position,start_date),employee_statutory_details!inner(aadhaar_number,pan_number,uan_number,pf_number,esic_number),employee_bank_details(account_number,bank_name)`
     )
     .eq("salary_entries.payroll_id", payrollId)
     .order("type, field_name", {

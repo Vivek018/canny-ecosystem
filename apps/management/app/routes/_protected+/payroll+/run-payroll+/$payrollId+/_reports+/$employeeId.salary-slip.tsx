@@ -29,6 +29,7 @@ import {
 import {
   formatDate,
   formatDateTime,
+  getMonthNameFromNumber,
   replaceUnderscore,
 } from "@canny_ecosystem/utils";
 import type {
@@ -38,7 +39,6 @@ import type {
   LocationDatabaseRow,
   PayrollDatabaseRow,
 } from "@canny_ecosystem/supabase/types";
-import { months } from "@canny_ecosystem/utils/constant";
 
 // Define styles for PDF
 const styles = StyleSheet.create({
@@ -516,13 +516,6 @@ export default function SalarySlip() {
       uan_number: data?.employeeStatutoryDetails?.uan_number || "",
     };
 
-    function getMonthName(monthNumber: number) {
-      const entry = Object.entries(months).find(
-        ([, value]) => value === monthNumber
-      );
-      return entry ? entry[0] : undefined;
-    }
-
     const attendanceData = data?.payrollData.salary_entries[0] || {};
     const salaryEntries = data?.payrollData.salary_entries || [];
 
@@ -531,71 +524,6 @@ export default function SalarySlip() {
       amount: number;
       type: string;
     }
-    const targetYear = attendanceData?.year;
-    const targetMonth = attendanceData?.month;
-
-    const monthStart = new Date(targetYear, targetMonth - 1, 1);
-    const monthEnd = new Date(targetYear, targetMonth, 0);
-
-    const stripTime = (d: Date) =>
-      new Date(d.getFullYear(), d.getMonth(), d.getDate());
-    interface LeaveEntry {
-      leave_type: string;
-      start_date: string;
-      end_date: string;
-    }
-
-    const casualLeaves: number =
-      data?.payrollData.leaves?.reduce((total: number, leave: LeaveEntry) => {
-        if (leave.leave_type === "casual_leave") {
-          const leaveStart: Date = stripTime(new Date(leave?.start_date));
-          const leaveEnd: Date = stripTime(new Date(leave?.end_date));
-
-          const overlapStart: Date =
-            leaveStart < monthStart ? stripTime(monthStart) : leaveStart;
-          const overlapEnd: Date =
-            leaveEnd > monthEnd ? stripTime(monthEnd) : leaveEnd;
-
-          if (overlapStart > overlapEnd) return total;
-
-          const timeDiff: number =
-            overlapEnd.getTime() - overlapStart.getTime();
-          const daysInMonth: number =
-            Math.floor(timeDiff / (1000 * 60 * 60 * 24)) + 1;
-
-          return total + daysInMonth;
-        }
-        return total;
-      }, 0) || 0;
-
-    interface Leave {
-      leave_type: string;
-      start_date: string;
-      end_date: string;
-    }
-
-    const paidLeaves: number =
-      data?.payrollData?.leaves?.reduce((total: number, leave: Leave) => {
-        if (leave.leave_type === "paid_leave") {
-          const leaveStart: Date = stripTime(new Date(leave?.start_date));
-          const leaveEnd: Date = stripTime(new Date(leave?.end_date));
-
-          const overlapStart: Date =
-            leaveStart < monthStart ? stripTime(monthStart) : leaveStart;
-          const overlapEnd: Date =
-            leaveEnd > monthEnd ? stripTime(monthEnd) : leaveEnd;
-
-          if (overlapStart > overlapEnd) return total;
-
-          const timeDiff: number =
-            overlapEnd.getTime() - overlapStart.getTime();
-          const daysInMonth: number =
-            Math.floor(timeDiff / (1000 * 60 * 60 * 24)) + 1;
-
-          return total + daysInMonth;
-        }
-        return total;
-      }, 0) || 0;
 
     const earnings: { name: string; amount: number }[] = salaryEntries
       .filter((entry: SalaryEntry) => entry.type === "earning")
@@ -617,20 +545,21 @@ export default function SalarySlip() {
       }));
 
     return {
-      month: getMonthName(attendanceData?.month),
-      year: attendanceData?.year,
+      month: getMonthNameFromNumber(attendanceData?.monthly_attendance.month),
+      year: attendanceData?.monthly_attendance.year,
       companyData,
       employee: {
         employeeData: fullName,
         employeeProjectAssignmentData: projectAssignment,
         employeeStatutoryDetails: statutoryDetails,
         attendance: {
-          working_days: 26,
-          paid_days: attendanceData?.present_days || 0,
-          overtime_hours: attendanceData?.overtime_hours || 0,
-          paid_leaves: paidLeaves,
-          casual_leaves: casualLeaves,
-          absents: 26 - Number(attendanceData?.present_days) || 0,
+          working_days: attendanceData?.monthly_attendance.working_days || 0,
+          paid_days: attendanceData?.monthly_attendance.present_days,
+          overtime_hours:
+            attendanceData?.monthly_attendance?.overtime_hours || 0,
+          paid_leaves: attendanceData?.monthly_attendance?.paid_leaves || 0,
+          casual_leaves: attendanceData?.monthly_attendance?.casual_leaves || 0,
+          absents: attendanceData?.monthly_attendance.absent_days || 0,
         },
         earnings,
         deductions,
