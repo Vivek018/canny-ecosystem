@@ -85,7 +85,7 @@ export const zFile = z
           "multipart/x-zip"
         ].includes(file?.type)
         : true,
-    "Only .jpg, .jpeg, .png .webp, .pdf, .doc, .docx, .zip formats are supported."
+    "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .zip formats are supported."
   );
 
 export const booleanArray = ["true", "false"] as const;
@@ -440,8 +440,10 @@ export const EmployeeWorkHistorySchema = z.object({
   end_date: z.string(),
 });
 
+export const employeeDocumentTypeArray = ["aadhaar_card", "pan_card", "address_proof", "bank_document", "birth_certificate", "bio_data", "canny_form", "clearance_form", "cv", "driving_license", "education_document", "election_card", "pan_card", "joining_form", "personal_data_form", "driving_license", "guardian_aadhaar_card", "guardian_bank_document"] as const;
+
 export const EmployeeDocumentsSchema = z.object({
-  document_type: zNumberString,
+  document_type: z.enum(employeeDocumentTypeArray),
   url: zFile,
 });
 
