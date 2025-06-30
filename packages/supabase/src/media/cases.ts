@@ -64,6 +64,10 @@ export async function addOrUpdateCaseWithDocument({
       });
 
       if (insertError) {
+        await supabase.storage
+          .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
+          .remove([filePath]);
+
         console.error("addCaseDocument Error", insertError);
         return {
           insertStatus,
@@ -92,7 +96,7 @@ export async function addOrUpdateCaseWithDocument({
         };
       }
 
-      return { status:updateStatus, error: null };
+      return { status: updateStatus, error: null };
     }
   }
 
@@ -113,6 +117,7 @@ export async function deleteCaseDocument({
     caseTitle,
     companyId,
   });
+
   if (!data || error) return { status: 400, error };
 
   const filePath = getFilePathFromUrl(data.document ?? "");

@@ -298,7 +298,7 @@ export async function action({
       return json({
         status: "error",
         message: "Error creating Case",
-        error,
+        error: error,
         returnTo: "/events/cases",
       });
     }
@@ -321,16 +321,16 @@ export async function action({
       {
         status: "error",
         message: "Failed to register case",
-        error,
+        error: error,
         returnTo: DEFAULT_ROUTE,
       },
       { status: 500 }
     );
-  } catch (error) {
+  } catch (error: any) {
     return json(
       {
         status: "error",
-        message: "An unexpected error occurred",
+        message: error.message ?? "An unexpected error occured",
         error,
         returnTo: DEFAULT_ROUTE,
       },
@@ -394,8 +394,7 @@ export default function CreateCase({
       if (actionData.status === "error") {
         toast({
           title: "Error",
-          description:
-            actionData?.error?.message ?? "An unexpected error occurred",
+          description: actionData?.message ?? "An unexpected error occurred",
           variant: "destructive",
         });
       } else if (actionData.status === "success") {

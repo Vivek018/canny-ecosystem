@@ -24,7 +24,11 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
-import { attribute } from "@canny_ecosystem/utils/constant";
+import {
+  attribute,
+  SUPABASE_BUCKET,
+  SUPABASE_MEDIA_URL_PREFIX,
+} from "@canny_ecosystem/utils/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
 import CreateInvoice, {
   CANNY_NAME,
@@ -112,6 +116,13 @@ export async function action({
 }: ActionFunctionArgs): Promise<Response> {
   const invoiceId = params.invoiceId;
   const { supabase } = getSupabaseWithHeaders({ request });
+  const { data: oldInvoiceData } = await getInvoiceById({
+    supabase,
+    id: invoiceId!,
+  });
+  const oldFilePath = `invoice/${oldInvoiceData!.payroll_id}/${
+    oldInvoiceData!.invoice_number
+  }`;
 
   try {
     const formData = await parseMultipartFormData(
@@ -129,14 +140,44 @@ export async function action({
 
     if (submission.value.include_proof) {
       if (submission.value.proof) {
-        const { error } = await addOrUpdateInvoiceWithProof({
-          invoiceData: submission.value as InvoiceDatabaseInsert,
-          payrollId: submission.value.payroll_id,
-          proof: submission.value.proof as File,
-          supabase,
-          route: "update",
-        });
+        if (
+          oldInvoiceData?.invoice_number !== submission.value.invoice_number
+        ) {
+          const { error } = await addOrUpdateInvoiceWithProof({
+            invoiceData: submission.value as InvoiceDatabaseInsert,
+            payrollId: submission.value.payroll_id,
+            proof: submission.value.proof as File,
+            supabase,
+            route: "update",
+          });
 
+          await supabase.storage
+            .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
+            .remove([oldFilePath]);
+
+          if (!error) {
+            return json({
+              status: "success",
+              message: "Invoice updated successfully",
+              error: null,
+            });
+          }
+          return json(
+            {
+              status: "error",
+              message: "Invoice Updated Failed",
+              error: error,
+            },
+            { status: 400 }
+          );
+        }
+
+        const { error } = await supabase.storage
+          .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
+          .upload(oldFilePath, submission.value.proof, {
+            contentType: submission.value.proof.type,
+            upsert: true,
+          });
         if (!error) {
           return json({
             status: "success",
@@ -144,13 +185,70 @@ export async function action({
             error: null,
           });
         }
+        return json(
+          {
+            status: "error",
+            message: "Invoice Updated Failed",
+            error: error,
+          },
+          { status: 400 }
+        );
+      }
 
+      if (
+        oldInvoiceData?.proof &&
+        oldInvoiceData?.invoice_number !== submission.value.invoice_number
+      ) {
+        const newFilePath = `invoice/${submission.value.payroll_id}/${
+          submission.value!.invoice_number
+        }`;
+
+        const { data: fileData, error: downloadError } = await supabase.storage
+          .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
+          .download(oldFilePath);
+
+        if (downloadError || !fileData) {
+          console.error("Failed to download the file to rename.");
+        }
+
+        const { data: urlData, error: uploadError } = await supabase.storage
+          .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
+          .upload(newFilePath, fileData!, {
+            contentType: fileData!.type,
+            cacheControl: "3600",
+          });
+
+        if (uploadError) {
+          console.error("Failed to upload the renamed file.");
+        }
+
+        await supabase.storage
+          .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
+          .remove([oldFilePath]);
+
+        const { error: invoiceError } = await updateInvoiceById({
+          supabase,
+          invoiceId: invoiceId!,
+          data: {
+            ...submission.value,
+            proof: `${SUPABASE_MEDIA_URL_PREFIX}${urlData!.fullPath}`,
+          },
+        });
+
+        if (!uploadError && !downloadError && !invoiceError) {
+          return json({
+            status: "success",
+            message: "Invoice updated successfully",
+            error: null,
+          });
+        }
         return json({
           status: "error",
-          message: "Error updating Invoice with proof",
-          error,
+          message: "Invoice update failed",
+          error: uploadError || downloadError || invoiceError,
         });
       }
+
       const { status, error } = await updateInvoiceById({
         supabase,
         invoiceId: invoiceId!,

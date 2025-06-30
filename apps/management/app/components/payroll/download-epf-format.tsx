@@ -13,7 +13,7 @@ import {
 } from "@canny_ecosystem/ui/alert-dialog";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { formatDateTime } from "@canny_ecosystem/utils";
+import { formatDateTime, roundToNearest } from "@canny_ecosystem/utils";
 import type {
   SupabaseEnv,
   TypedSupabaseClient,
@@ -50,18 +50,26 @@ export const prepareEpfFormat = async ({
     epf_wages: formatData?.amount > 15000 ? 15000 : formatData?.amount,
     eps_wages: formatData?.amount > 15000 ? 15000 : formatData?.amount,
     edli_wages: formatData?.amount > 15000 ? 15000 : formatData?.amount,
-    epf_contribution: Number(
-      (formatData?.amount > 15000 ? 15000 : formatData?.amount) * 0.12
-    ).toFixed(2),
-    eps_contribution: Number(
-      (formatData?.amount > 15000 ? 15000 : formatData?.amount) * 0.0833
-    ).toFixed(2),
-    diffEpf_Eps: Number(
-      (formatData?.amount > 15000 ? 15000 : formatData?.amount) * 0.12 -
-        (formatData?.amount > 15000 ? 15000 : formatData?.amount) * 0.0833
-    ).toFixed(2),
-    ncp_days: null,
-    refund: null,
+    epf_contribution: roundToNearest(
+      Number((formatData?.amount > 15000 ? 15000 : formatData?.amount) * 0.12)
+    ),
+    eps_contribution: roundToNearest(
+      Number((formatData?.amount > 15000 ? 15000 : formatData?.amount) * 0.0833)
+    ),
+    diffEpf_Eps:
+      roundToNearest(
+        Number(formatData?.amount > 15000 ? 15000 : formatData?.amount * 0.12)
+      ) -
+      roundToNearest(
+        Number(
+          (formatData?.amount > 15000 ? 15000 : formatData?.amount) * 0.0833
+        )
+      ),
+    ncp_days:
+      formatData.absentDays ??
+      Number(formatData.workingDays) - Number(formatData.presentDays) ??
+      0,
+    refund: 0,
   }));
 
   return await extractedData;
@@ -75,21 +83,19 @@ export const DownloadEpfFormat = ({
 }) => {
   const { supabase } = useSupabase({ env });
 
-  function transformSalaryData(data: any) {
-    const earningsFields = ["BASIC", "BONUS", "HRA", "Others"];
+  function transformSalaryData(data: any[]) {
     return data.map((emp: any) => {
       const earnings = emp.salary_entries
-        .filter((e: { field_name: string; amount: number }) =>
-          earningsFields.includes(e.field_name)
-        )
+        .filter((e: { type: string; amount: number }) => e.type === "earning")
         .reduce((sum: number, e: { amount: number }) => sum + e.amount, 0);
-      const presentDays =
-        emp.salary_entries.length > 0
-          ? emp.salary_entries[0].present_days
-          : null;
+
+      const firstAttendance = emp.salary_entries[0]?.monthly_attendance;
+
       return {
         amount: earnings,
-        presentDays: presentDays,
+        presentDays: firstAttendance?.present_days ?? null,
+        workingDays: firstAttendance?.working_days ?? null,
+        absentDays: firstAttendance?.absent_days ?? null,
         employee_id: emp.id,
         employees: {
           company_id: emp.company_id,
@@ -108,6 +114,7 @@ export const DownloadEpfFormat = ({
     e.preventDefault();
 
     const transformedData = transformSalaryData(data);
+
     const epfData = await prepareEpfFormat({ data: transformedData, supabase });
 
     const csv = Papa.unparse(epfData, { header: false }).replaceAll(",", "#~#");

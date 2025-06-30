@@ -229,7 +229,28 @@ export async function getMonthlyAttendanceByCompanyId({
 
   if (sort) {
     const [column, direction] = sort;
-    query.order(column, { ascending: direction === "asc" });
+
+    const monthlyAttendanceCols = [
+      "present_days",
+      "working_hours",
+      "overtime_hours",
+      "working_days",
+      "absent_days",
+      "paid_holidays",
+      "paid_leaves",
+      "casual_leaves",
+    ];
+
+    if (monthlyAttendanceCols.includes(column)) {
+      query.order(column, {
+        ascending: direction === "asc",
+        referencedTable: "monthly_attendance",
+      });
+    } else {
+      query.order(column, {
+        ascending: direction === "asc",
+      });
+    }
   } else {
     query.order("created_at", { ascending: false });
   }

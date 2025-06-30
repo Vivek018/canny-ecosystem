@@ -300,9 +300,9 @@ export default function CreateInvoice({
     return Object.entries(fieldTotals).map(([field, data]) => {
       let amount = data.rawAmount;
 
-      if (field === "PF" || field === "EPF") {
+      if (field.trim() === "PF" || field.trim() === "EPF") {
         amount = (basicAmount * 13) / 100;
-      } else if (field === "ESIC" || field === "ESI") {
+      } else if (field.trim() === "ESIC" || field.trim() === "ESI") {
         amount = (amount * 3.25) / 0.75;
       }
 

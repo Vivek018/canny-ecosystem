@@ -19,6 +19,7 @@ import type {
   EmployeeDatabaseRow,
   SalaryEntriesDatabaseRow,
 } from "@canny_ecosystem/supabase/types";
+import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 
 export const salaryEntryColumns = ({
   data,
@@ -35,84 +36,125 @@ export const salaryEntryColumns = ({
     )
   );
 
+  const calculateNetAmount = (employee: SalaryEntriesWithEmployee): number => {
+    let gross = 0;
+    let statutoryContributions = 0;
+    let deductions = 0;
+
+    for (const entry of employee.salary_entries) {
+      const amount = entry.amount ?? 0;
+      if (entry.type === "earning") gross += amount;
+      else if (entry.type === "statutory_contribution")
+        statutoryContributions += amount;
+      else if (entry.type === "deduction") deductions += amount;
+    }
+    return gross - statutoryContributions - deductions;
+  };
+
   return [
     {
+      id: "select",
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
+      id: "sr_no",
       accessorKey: "sr_no",
       header: "Sr No.",
-      cell: ({ row }) => {
-        return <p className="truncate">{row.index + 1}</p>;
-      },
+      sortingFn: (a, b) => a.index - b.index,
+      cell: ({ row }) => <p className="truncate w-12">{row.index + 1}</p>,
     },
     {
+      id: "employee_code",
       accessorKey: "employee_code",
       header: "Employee Code",
-      cell: ({ row }) => {
-        return (
-          <p className="truncate w-28">{`${
-            row.original?.employee_code ?? "--"
-          }`}</p>
-        );
-      },
+      sortingFn: (a, b) =>
+        String(a.getValue("employee_code") ?? "").localeCompare(
+          String(b.getValue("employee_code") ?? "")
+        ),
+      cell: ({ row }) => (
+        <p className="truncate w-28">{row.original?.employee_code ?? "--"}</p>
+      ),
     },
     {
+      id: "name",
       accessorKey: "name",
       header: "Employee Name",
       accessorFn: (row) =>
         `${row.first_name ?? ""} ${row.middle_name ?? ""} ${
           row.last_name ?? ""
         }`,
-      sortingFn: "text",
-      cell: ({ row }) => {
-        return (
-          <p className="truncate capitalize w-52">{`${
-            row.original?.first_name
-          } ${row.original?.middle_name ?? ""} ${
-            row.original?.last_name ?? ""
-          }`}</p>
-        );
-      },
+      sortingFn: (a, b) =>
+        String(a.getValue("name") ?? "").localeCompare(
+          String(b.getValue("name") ?? "")
+        ),
+      cell: ({ row }) => (
+        <p className="truncate capitalize w-52">{`${
+          row.original?.first_name ?? ""
+        } ${row.original?.middle_name ?? ""} ${
+          row.original?.last_name ?? ""
+        }`}</p>
+      ),
     },
     {
+      id: "present_days",
       accessorKey: "present_days",
       header: "P. Days",
       accessorFn: (row) =>
         row.salary_entries[0]?.monthly_attendance.present_days ?? 0,
-      sortingFn: "basic",
-      cell: ({ row }) => {
-        return (
-          <p className="truncate">
-            {row.original.salary_entries[0].monthly_attendance.present_days ??
-              0}
-          </p>
-        );
-      },
+      sortingFn: (a, b) =>
+        Number(a.getValue("present_days") ?? 0) -
+        Number(b.getValue("present_days") ?? 0),
+      cell: ({ row }) => (
+        <p className="truncate">
+          {row.original.salary_entries[0]?.monthly_attendance.present_days ?? 0}
+        </p>
+      ),
     },
     {
+      id: "overtime_hours",
       accessorKey: "overtime_hours",
       header: "OT Hours",
-      cell: ({ row }) => {
-        return (
-          <p className="truncate">
-            {row.original.salary_entries[0].monthly_attendance.overtime_hours ??
-              0}
-          </p>
-        );
-      },
+      accessorFn: (row) =>
+        row.salary_entries[0]?.monthly_attendance.overtime_hours ?? 0,
+      sortingFn: (a, b) =>
+        Number(a.getValue("overtime_hours") ?? 0) -
+        Number(b.getValue("overtime_hours") ?? 0),
+      cell: ({ row }) => (
+        <p className="truncate">
+          {row.original.salary_entries[0]?.monthly_attendance.overtime_hours ??
+            0}
+        </p>
+      ),
     },
     {
+      id: "period",
       accessorKey: "period",
       header: "Period",
-      cell: ({ row }) => {
-        return (
-          <p className="truncate">
-            {getMonthNameFromNumber(
-              row.original.salary_entries[0].monthly_attendance.month,
-              true
-            )}{" "}
-            {row.original.salary_entries[0].monthly_attendance.year}
-          </p>
-        );
-      },
+      accessorFn: (row) =>
+        `${getMonthNameFromNumber(
+          row.salary_entries[0]?.monthly_attendance?.month,
+          true
+        )} ${row.salary_entries[0]?.monthly_attendance?.year}`,
+      sortingFn: (a, b) =>
+        String(a.getValue("period") ?? "").localeCompare(
+          String(b.getValue("period") ?? "")
+        ),
+      cell: ({ row }) => (
+        <p className="truncate">
+          {getMonthNameFromNumber(
+            row.original.salary_entries[0]?.monthly_attendance?.month,
+            true
+          )}{" "}
+          {row.original.salary_entries[0]?.monthly_attendance?.year}
+        </p>
+      ),
     },
 
     ...uniqueFields.map((fieldName: string) => ({
@@ -123,8 +165,8 @@ export const salaryEntryColumns = ({
           (entry: any) =>
             entry.field_name.toLowerCase() === fieldName.toLowerCase()
         )?.amount ?? 0,
-
-      sortingFns: "basic",
+      sortingFn: (a: any, b: any) =>
+        (a.getValue(fieldName) ?? 0) - (b.getValue(fieldName) ?? 0),
       header: fieldName,
       cell: ({ row }: { row: { original: SalaryEntriesWithEmployee } }) => {
         const valueObj = row.original.salary_entries.find(
@@ -152,43 +194,22 @@ export const salaryEntryColumns = ({
         );
       },
     })),
+
     {
+      id: "net_amount",
       accessorKey: "net_amount",
       header: "Net Amount",
-      cell: ({ row }) => {
-        function calculateNetAmount(
-          employees: SalaryEntriesWithEmployee
-        ): Record<string, number> {
-          let gross = 0;
-          let statutoryContributions = 0;
-          let deductions = 0;
-
-          for (const entry of employees.salary_entries) {
-            const amount = entry.amount ?? 0;
-            const fieldType = entry.type;
-            if (fieldType === "earning") {
-              gross += amount;
-            } else if (fieldType === "statutory_contribution") {
-              statutoryContributions += amount;
-            } else if (fieldType === "deduction") {
-              deductions += amount;
-            }
-          }
-
-          return {
-            total: gross - statutoryContributions - deductions,
-          };
-        }
-
-        return (
-          <p className="truncate">
-            {calculateNetAmount(row.original).total ?? "--"}
-          </p>
-        );
-      },
+      sortingFn: (a, b) =>
+        calculateNetAmount(a.original) - calculateNetAmount(b.original),
+      cell: ({ row }) => (
+        <p className="truncate">{calculateNetAmount(row.original)}</p>
+      ),
     },
+
     {
+      id: "actions",
       accessorKey: "actions",
+      header: "",
       cell: ({ row }) => {
         const { role } = useUser();
         return (

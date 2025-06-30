@@ -64,6 +64,9 @@ export async function addOrUpdateInvoiceWithProof({
       });
 
       if (insertError) {
+        await supabase.storage
+          .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
+          .remove([filePath]);
         console.error("addInvoiceProof Error", insertError);
         return {
           insertStatus,

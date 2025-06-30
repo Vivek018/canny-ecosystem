@@ -73,17 +73,17 @@ export const zFile = z
     (file) =>
       typeof file !== "string"
         ? [
-          ...ACCEPTED_IMAGE_TYPES,
-          "image/pdf",
-          "image/doc",
-          "image/docx",
-          "application/pdf",
-          "application/doc",
-          "application/docx",
-          "application/zip",
-          "application/x-zip-compressed",
-          "multipart/x-zip"
-        ].includes(file?.type)
+            ...ACCEPTED_IMAGE_TYPES,
+            "image/pdf",
+            "image/doc",
+            "image/docx",
+            "application/pdf",
+            "application/doc",
+            "application/docx",
+            "application/zip",
+            "application/x-zip-compressed",
+            "multipart/x-zip",
+          ].includes(file?.type)
         : true,
     "Only .jpg, .jpeg, .png .webp, .pdf, .doc, .docx, .zip formats are supported."
   );
@@ -1912,7 +1912,11 @@ export const InvoiceSchema = z.object({
   company_id: z.string(),
   invoice_number: z.string(),
   date: z.string(),
-  subject: z.string(),
+  subject: z
+    .string()
+    .default(
+      "Providing Manpower on Labour contract basis at your _____ Office for Month of _________"
+    ),
   company_address_id: z.string(),
   payroll_type: z.enum(["salary", "exit", "reimbursement"]),
   invoice_type: z

@@ -13,7 +13,7 @@ import {
 } from "@canny_ecosystem/ui/alert-dialog";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { formatDateTime } from "@canny_ecosystem/utils";
+import { formatDateTime} from "@canny_ecosystem/utils";
 import type {
   SupabaseEnv,
   TypedSupabaseClient,
@@ -118,24 +118,17 @@ export const DownloadEsiFormat = ({
 }) => {
   const { supabase } = useSupabase({ env });
 
-  function transformSalaryData(data: any) {
-    const earningsFields = ["BASIC", "BONUS", "HRA", "Others"];
+  function transformSalaryData(data: any[]) {
     return data.map((emp: any) => {
       const earnings = emp.salary_entries
-        .filter((e: { field_name: string; amount: number }) =>
-          earningsFields.includes(e.field_name)
-        )
-        .reduce(
-          (sum: number, e: { amount: number }) => sum + e.amount.toFixed(2),
-          0
-        );
+        .filter((e: { type: string }) => e.type === "earning")
+        .reduce((sum: number, e: { amount: number }) => sum + e.amount, 0);
 
       const presentDays =
-        emp.salary_entries.length > 0
-          ? emp.salary_entries[0].present_days
-          : null;
+        emp.salary_entries[0]?.monthly_attendance?.present_days ?? null;
+
       return {
-        amount: earnings,
+        amount: Number(earnings),
         presentDays: presentDays,
         employee_id: emp.id,
         employees: {

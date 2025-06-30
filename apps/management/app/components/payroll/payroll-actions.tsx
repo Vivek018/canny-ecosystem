@@ -114,7 +114,9 @@ export function PayrollActions({
           <DropdownMenuSeparator
             className={cn(
               "hidden",
-              payrollData.payroll_type === "salary" && "flex"
+              payrollData.payroll_type === "salary" &&
+                status === "approved" &&
+                "flex"
             )}
           />
           <div>

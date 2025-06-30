@@ -16,7 +16,8 @@ import {
 import { useState } from "react";
 
 import { SalaryTableHeader } from "./data-table-header";
-
+import type { SalaryEntriesDatabaseRow } from "@canny_ecosystem/supabase/types";
+import { ExportBar } from "../../export-bar";
 
 interface SalaryEntryTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -28,6 +29,7 @@ export function SalaryEntryDataTable<TData, TValue>({
   data,
 }: SalaryEntryTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
+
   const table = useReactTable({
     data: data,
     columns: columns,
@@ -39,12 +41,16 @@ export function SalaryEntryDataTable<TData, TValue>({
 
   const tableLength = table.getRowModel().rows?.length;
 
+  const selectedRowsData = table
+    .getSelectedRowModel()
+    .rows?.map((row) => row.original);
+
   return (
     <div className="relative mb-8">
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
-          !tableLength && "border-none",
+          !tableLength && "border-none"
         )}
       >
         <Table>
@@ -65,7 +71,13 @@ export function SalaryEntryDataTable<TData, TValue>({
                       <TableCell
                         key={cell.id}
                         className={cn(
-                          "px-3 md:px-4 py-4 hidden md:table-cell"
+                          "px-3 md:px-4 py-4 hidden md:table-cell",
+                          cell.column.id === "select" &&
+                            "sticky left-0 min-w-12 max-w-12 bg-card z-10",
+                          cell.column.id === "sr_no" &&
+                            "sticky left-12 bg-card z-10",
+                          cell.column.id === "employee_code" &&
+                            "sticky left-32 bg-card z-10"
                         )}
                       >
                         {flexRender(
@@ -87,6 +99,11 @@ export function SalaryEntryDataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
+      <ExportBar
+        className={cn(!table.getSelectedRowModel().rows.length && "hidden")}
+        rows={table.getSelectedRowModel().rows.length}
+        data={selectedRowsData as SalaryEntriesDatabaseRow[]}
+      />
     </div>
   );
 }

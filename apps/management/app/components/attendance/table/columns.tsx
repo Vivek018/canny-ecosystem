@@ -57,6 +57,7 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     ),
   },
   {
+    enableSorting: false,
     accessorKey: "project_name",
     header: "Project",
     cell: ({ row }) => (
@@ -67,6 +68,7 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     ),
   },
   {
+    enableSorting: false,
     accessorKey: "project_site_name",
     header: "Project Site",
     cell: ({ row }) => (
@@ -76,6 +78,7 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     ),
   },
   {
+    enableSorting: false,
     accessorKey: "month",
     header: "Month",
     cell: ({ row }) => (
@@ -85,6 +88,8 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     ),
   },
   {
+    enableSorting: false,
+
     accessorKey: "year",
     header: "Year",
     cell: ({ row }) => (
