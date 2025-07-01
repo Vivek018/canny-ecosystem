@@ -397,7 +397,7 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                     a signature.
                   </Text>
                 </View>
-                <View>
+                <View style={{ marginVertical: 15 }}>
                   <View style={[styles.dashedLine]} />
                 </View>
               </View>

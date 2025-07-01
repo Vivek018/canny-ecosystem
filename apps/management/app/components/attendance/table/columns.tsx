@@ -40,8 +40,8 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     ),
   },
   {
-    enableSorting: false,
-    accessorKey: "employee_name",
+    // enableSorting: false,
+    accessorKey: "first_name",
     header: "Employee Name",
     cell: ({ row }) => (
       <Link

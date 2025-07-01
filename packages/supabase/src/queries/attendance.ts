@@ -224,36 +224,7 @@ export async function getMonthlyAttendanceByCompanyId({
 `,
       { count: "exact" }
     )
-
     .eq("company_id", companyId);
-
-  if (sort) {
-    const [column, direction] = sort;
-
-    const monthlyAttendanceCols = [
-      "present_days",
-      "working_hours",
-      "overtime_hours",
-      "working_days",
-      "absent_days",
-      "paid_holidays",
-      "paid_leaves",
-      "casual_leaves",
-    ];
-
-    if (monthlyAttendanceCols.includes(column)) {
-      query.order(column, {
-        ascending: direction === "asc",
-        referencedTable: "monthly_attendance",
-      });
-    } else {
-      query.order(column, {
-        ascending: direction === "asc",
-      });
-    }
-  } else {
-    query.order("created_at", { ascending: false });
-  }
 
   if (searchQuery) {
     const searchQueryArray = searchQuery.split(" ");
@@ -269,6 +240,7 @@ export async function getMonthlyAttendanceByCompanyId({
       );
     }
   }
+
   if (month || year) {
     if (month) {
       query = query.eq("monthly_attendance.month", Number(months[month]));
@@ -289,6 +261,7 @@ export async function getMonthlyAttendanceByCompanyId({
     query = query.eq("monthly_attendance.month", effectiveMonth);
     query = query.eq("monthly_attendance.year", effectiveYear);
   }
+
   if (project) {
     query = query.eq(
       "employee_project_assignment.project_sites.projects.name",
@@ -303,15 +276,78 @@ export async function getMonthlyAttendanceByCompanyId({
     );
   }
 
+  if (sort) {
+    const [column, direction] = sort;
+
+    const monthlyAttendanceCols = [
+      "present_days",
+      "working_hours",
+      "overtime_hours",
+      "working_days",
+      "absent_days",
+      "paid_holidays",
+      "paid_leaves",
+      "casual_leaves",
+    ];
+
+    const employeeCols = ["first_name", "employee_code"];
+
+    if (monthlyAttendanceCols.includes(column)) {
+      query = query.order(column, {
+        ascending: direction === "asc",
+        referencedTable: "monthly_attendance",
+        nullsFirst: false,
+      });
+    } else if (employeeCols.includes(column)) {
+      query = query.order(column, {
+        ascending: direction === "asc",
+      });
+    } else {
+      query = query.order(column, {
+        ascending: direction === "asc",
+      });
+    }
+  } else {
+    query = query.order("employee_code", { ascending: true });
+  }
+
   const { data, count, error } = await query.range(from, to);
 
   if (error) {
     console.error("getAttendanceByCompanyId Error", error);
   }
+
   const transformedData = data?.map((employee: any) => ({
     ...employee,
     monthly_attendance: employee.monthly_attendance?.[0] ?? null,
   }));
+
+  if (sort && transformedData) {
+    const [column, direction] = sort;
+    const monthlyAttendanceCols = [
+      "present_days",
+      "working_hours",
+      "overtime_hours",
+      "working_days",
+      "absent_days",
+      "paid_holidays",
+      "paid_leaves",
+      "casual_leaves",
+    ];
+
+    if (monthlyAttendanceCols.includes(column)) {
+      transformedData.sort((a, b) => {
+        const aValue = a.monthly_attendance?.[column] ?? 0;
+        const bValue = b.monthly_attendance?.[column] ?? 0;
+
+        if (direction === "asc") {
+          return aValue - bValue;
+        }
+        return bValue - aValue;
+      });
+    }
+  }
+
   return {
     data: transformedData,
     meta: { count: count },
