@@ -22,8 +22,8 @@ export function replaceUnderscore(str: string | null | undefined) {
 
 export const pipe =
   (...fns: any[]) =>
-    (val: any) =>
-      fns.reduce((prev, fn) => fn(prev), val);
+  (val: any) =>
+    fns.reduce((prev, fn) => fn(prev), val);
 
 export function getInitialValueFromZod<T extends z.ZodTypeAny>(
   schema: T
@@ -315,3 +315,7 @@ export function numberToWords(num: number): string {
 export const getMonthName = (value: number): string | undefined => {
   return Object.keys(months).find((key) => months[key] === value);
 };
+
+export function roundToNearest(num: number): number {
+  return Math.floor(num) + (num % 1 >= 0.5 ? 1 : 0);
+}

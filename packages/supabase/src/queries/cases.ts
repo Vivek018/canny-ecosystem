@@ -192,7 +192,7 @@ export async function getCasesById({
   caseId,
 }: {
   supabase: TypedSupabaseClient;
-  caseId: string;
+  caseId: string | undefined;
 }) {
   const columns = [
     "id",
@@ -226,7 +226,7 @@ export async function getCasesById({
     .select(`${columns.join(",")}`, {
       count: "exact",
     })
-    .eq("id", caseId)
+    .eq("id", caseId!)
     .single<InferredType<CasesDatabaseRow, (typeof columns)[number]>>();
 
   if (error) {

@@ -236,7 +236,7 @@ export async function getSalaryEntriesByPayrollId({
     .select(
       `id, company_id, first_name, middle_name, last_name, employee_code, salary_entries!inner(${columns.join(
         ","
-      )},monthly_attendance!inner(id, month, year, present_days, overtime_hours))`
+      )},monthly_attendance!inner(id, month, year, present_days, overtime_hours,working_days,absent_days))`
     )
     .eq("salary_entries.payroll_id", payrollId)
     .order("type, field_name", {

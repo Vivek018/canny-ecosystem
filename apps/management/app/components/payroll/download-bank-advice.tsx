@@ -13,7 +13,11 @@ import {
 } from "@canny_ecosystem/ui/alert-dialog";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { formatDate, formatDateTime } from "@canny_ecosystem/utils";
+import {
+  formatDate,
+  formatDateTime,
+  roundToNearest,
+} from "@canny_ecosystem/utils";
 import type {
   PayrollDatabaseRow,
   SupabaseEnv,
@@ -22,6 +26,7 @@ import type {
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { useSupabase } from "@canny_ecosystem/supabase/client";
 import { getEmployeeBankDetailsById } from "@canny_ecosystem/supabase/queries";
+import { CANNY_MANAGEMENT_SERVICES_ACCOUNT_NUMBER } from "@/constant";
 
 export const prepareBankAdviceWorkbook = async ({
   data,
@@ -77,6 +82,10 @@ export const prepareBankAdviceWorkbook = async ({
     "Add detail 5",
     "Remarks",
   ]);
+  function isIciciBankIfsc(ifsc: string | null | undefined): boolean {
+    if (!ifsc) return false;
+    return ifsc.toUpperCase().startsWith("ICIC");
+  }
 
   for (let col = 1; col <= 21; col++) {
     const cell = headerRow.getCell(col);
@@ -107,17 +116,17 @@ export const prepareBankAdviceWorkbook = async ({
   }
   for (const emp of extractedData) {
     const row = [
-      "182628991917",
+      CANNY_MANAGEMENT_SERVICES_ACCOUNT_NUMBER,
       emp.account_number || null,
       emp.account_holder_name || null,
-      Number(emp.amount).toFixed(2) || null,
-      "Online",
+      roundToNearest(Number(emp.amount)) || null,
+      isIciciBankIfsc(emp.ifsc_code) ? "I" : "N",
       `${formatDate(date)}`.replaceAll(" ", "-"),
       emp.ifsc_code || null,
       null,
       null,
       null,
-      "canny.canny@gmail.com",
+      "canny.cms@gmail.com",
       null,
       null,
       null,
@@ -152,22 +161,21 @@ export const DownloadBankAdvice = ({
 }) => {
   const { supabase } = useSupabase({ env });
 
-  function transformSalaryData(data: any) {
-    const earningsFields = ["BASIC", "BONUS", "HRA", "Others"];
-    const deductionsFields = ["EPF", "ESI", "LWF", "PT"];
+  function transformSalaryData(data: any[]) {
+    return data.map((emp) => {
+      let earnings = 0;
+      let deductions = 0;
 
-    return data.map((emp: any) => {
-      const earnings = emp.salary_entries
-        .filter((e: { field_name: string; amount: number }) =>
-          earningsFields.includes(e.field_name)
-        )
-        .reduce((sum: number, e: { amount: number }) => sum + e.amount, 0);
-
-      const deductions = emp.salary_entries
-        .filter((e: { field_name: string; amount: number }) =>
-          deductionsFields.includes(e.field_name)
-        )
-        .reduce((sum: number, e: { amount: number }) => sum + e.amount, 0);
+      for (const entry of emp.salary_entries) {
+        if (entry.type === "earning") {
+          earnings += entry.amount;
+        } else if (
+          entry.type === "deduction" ||
+          entry.type === "statutory_contribution"
+        ) {
+          deductions += entry.amount;
+        }
+      }
 
       return {
         amount: earnings - deductions,

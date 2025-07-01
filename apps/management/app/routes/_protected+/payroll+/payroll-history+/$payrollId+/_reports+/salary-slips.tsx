@@ -42,31 +42,31 @@ const styles = StyleSheet.create({
   page: {
     padding: "20 10",
     fontFamily: "Helvetica",
-    fontSize: 6,
+    fontSize: 8,
     backgroundColor: "#FFFFFF",
   },
   titleText: {
-    fontSize: 8,
+    fontSize: 10,
     fontFamily: "Helvetica-Bold",
     marginHorizontal: "auto",
     marginBottom: 5,
   },
   monthText: {
-    fontSize: 7,
+    fontSize: 10,
     color: "#444444",
   },
   companyName: {
-    fontSize: 7,
+    fontSize: 12,
     fontFamily: "Helvetica-Bold",
     marginBottom: 6,
   },
   companyAddress: {
-    fontSize: 7,
+    fontSize: 8,
     color: "#444444",
     marginBottom: 2,
   },
   form: {
-    fontSize: 6,
+    fontSize: 7,
     color: "#444444",
     marginTop: 2,
   },
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     right: 0,
     textAlign: "center",
     color: "#999999",
-    fontSize: 6,
+    fontSize: 8,
     fontStyle: "italic",
   },
   dashedLine: {
@@ -137,7 +137,7 @@ function chunkArray(array: any, size: number) {
 }
 
 const SalarySlipsPDF = ({ data }: { data: DataType }) => {
-  const employeeChunks = chunkArray(data.employeeData, 3);
+  const employeeChunks = chunkArray(data.employeeData, 2);
 
   return (
     <Document>
@@ -397,7 +397,7 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                     a signature.
                   </Text>
                 </View>
-                <View>
+                <View style={{ marginVertical: 15 }}>
                   <View style={[styles.dashedLine]} />
                 </View>
               </View>

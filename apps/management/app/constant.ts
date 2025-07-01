@@ -9,6 +9,18 @@ export const CANNY_MANAGEMENT_SERVICES_NAME = "Canny Management Services";
 
 export const CANNY_MANAGEMENT_SERVICES_ADDRESS =
   "502-503, Girivar Glean, Under Odhav Overbrigde, Sardar Patel Ring Rd, nr. Palm Hotel, Odhav, Ahmedabad, Gujarat 382415";
+  
+export const CANNY_MANAGEMENT_SERVICES_ACCOUNT_NUMBER = "093005001273";
+
+export const CANNY_MANAGEMENT_SERVICES_IFSC_CODE = "ICIC0000930";
+
+export const CANNY_MANAGEMENT_SERVICES_BRANCH_NAME = "Bapunagar Ahmedabad";
+
+export const CANNY_MANAGEMENT_SERVICES_HSN_CODE_NUMBER = "9985";
+
+export const CANNY_MANAGEMENT_SERVICES_PAN_NUMBER = "AADCC6596P";
+
+export const CANNY_MANAGEMENT_SERVICES_GSTIN = "24AADCC6596P1ZZ";
 
 export const workingDaysOptions = [
   { value: "0", label: "Sun" },
@@ -38,10 +50,10 @@ export const sideNavList = [
     icon: "lab-timer",
   },
   {
-      name: "Components",
-      link: "/payment-components",
-      icon: "input",
-    },
+    name: "Components",
+    link: "/payment-components",
+    icon: "input",
+  },
   { name: "Events", link: "/events", icon: "exclaimation-triangle" },
   // { name: "Reports", link: "/reports", icon: "report" },
   { name: "Group 5" },
@@ -240,8 +252,9 @@ export function numberToWordsIndian(num: number) {
       return (
         tens[Math.floor(n / 10)] + (n % 10 ? ` ${belowTwenty[n % 10]}` : "")
       );
-    return `${belowTwenty[Math.floor(n / 100)]} hundred${n % 100 ? ` ${convertBelowThousand(n % 100)}` : ""
-      }`;
+    return `${belowTwenty[Math.floor(n / 100)]} hundred${
+      n % 100 ? ` ${convertBelowThousand(n % 100)}` : ""
+    }`;
   }
 
   function convertIntegerToWordsIndian(n: number) {

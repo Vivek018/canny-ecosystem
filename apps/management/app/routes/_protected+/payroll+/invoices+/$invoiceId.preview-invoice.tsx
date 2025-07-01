@@ -28,6 +28,7 @@ import {
   getMonthNameFromNumber,
   numberToWords,
   replaceUnderscore,
+  roundToNearest,
 } from "@canny_ecosystem/utils";
 import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
 import {
@@ -44,7 +45,10 @@ import { useLoaderData, useNavigate } from "@remix-run/react";
 import { CANNY_NAME } from "../payroll-history+/$payrollId+/_reports+/create-invoice";
 import {
   CANNY_MANAGEMENT_SERVICES_ADDRESS,
+  CANNY_MANAGEMENT_SERVICES_GSTIN,
+  CANNY_MANAGEMENT_SERVICES_HSN_CODE_NUMBER,
   CANNY_MANAGEMENT_SERVICES_NAME,
+  CANNY_MANAGEMENT_SERVICES_PAN_NUMBER,
 } from "@/constant";
 
 const styles = StyleSheet.create({
@@ -212,16 +216,20 @@ const InvoicePDF = ({
       ?.reduce((sum, item) => sum + Number(item.amount), 0) ?? 0;
 
   const beforeService =
-    totalGross +
-    Number(
-      data?.invoiceDetails?.payroll_data?.find(
-        (item) => item.field === "PF" || item.field === "EPF"
-      )?.amount ?? 0
+    roundToNearest(totalGross) +
+    roundToNearest(
+      Number(
+        data?.invoiceDetails?.payroll_data?.find(
+          (item) => item.field.trim() === "PF" || item.field.trim() === "EPF"
+        )?.amount ?? 0
+      )
     ) +
-    Number(
-      data?.invoiceDetails?.payroll_data?.find(
-        (item) => item.field === "ESIC" || item.field === "ESI"
-      )?.amount ?? 0
+    roundToNearest(
+      Number(
+        data?.invoiceDetails?.payroll_data?.find(
+          (item) => item.field.trim() === "ESIC" || item.field.trim() === "ESI"
+        )?.amount ?? 0
+      )
     );
 
   const includedFields = terms?.include_service_charge
@@ -236,42 +244,46 @@ const InvoicePDF = ({
     type === "salary"
       ? data.invoiceDetails?.include_charge
         ? includedFields?.includes("ALL")
-          ? (beforeService * terms.service_charge) / 100
-          : (sum * terms.service_charge) / 100
+          ? roundToNearest((beforeService * terms.service_charge) / 100)
+          : roundToNearest((sum * terms.service_charge) / 100)
         : 0
       : data.invoiceDetails?.include_charge
-      ? (Number(
-          data?.invoiceDetails?.payroll_data.reduce(
-            (sum, item) => sum + Number(item.amount),
-            0
-          )
-        ) *
-          terms.reimbursement_charge) /
-        100
+      ? roundToNearest(
+          (Number(
+            data?.invoiceDetails?.payroll_data.reduce(
+              (sum, item) => sum + Number(item.amount),
+              0
+            )
+          ) *
+            terms.reimbursement_charge) /
+            100
+        )
       : 0;
 
   const total =
     type === "salary"
-      ? beforeService + service_charge
-      : Number(data?.invoiceDetails?.payroll_data[0].amount) + service_charge;
+      ? roundToNearest(beforeService) + roundToNearest(service_charge)
+      : roundToNearest(
+          Number(data?.invoiceDetails?.payroll_data[0].amount) + service_charge
+        );
 
   const cgst =
     data.invoiceDetails?.include_cgst &&
     data.invoiceDetails?.include_sgst &&
     !data.invoiceDetails?.include_igst
-      ? (total * 9) / 100
+      ? roundToNearest((total * 9) / 100)
       : 0;
   const sgst =
     data.invoiceDetails?.include_cgst &&
     data.invoiceDetails?.include_sgst &&
     !data.invoiceDetails?.include_igst
-      ? (total * 9) / 100
+      ? roundToNearest((total * 9) / 100)
       : 0;
   const igst =
     !data.invoiceDetails?.include_cgst &&
     !data.invoiceDetails?.include_sgst &&
     data.invoiceDetails?.include_igst
-      ? (total * 18) / 100
+      ? roundToNearest((total * 18) / 100)
       : 0;
 
   const grand_total = total + cgst + sgst + igst;
@@ -368,79 +380,68 @@ const InvoicePDF = ({
           </View>
         </View>
 
-        {data?.invoiceDetails?.payroll_data?.map((field, index) => (
-          <View key={index.toString()} style={[styles.mainRows]}>
-            {index === 0 ? (
-              <View
-                style={{
-                  flex: 5,
-                  textAlign: "left",
-                  padding: 4,
-                }}
-              >
-                <Text
-                  style={{
-                    fontFamily: "Helvetica",
-                  }}
+        <View style={{ flexDirection: "row" }}>
+          <View style={{ flex: 5, padding: 4 }}>
+            <Text style={{ fontFamily: "Helvetica" }}>
+              {data?.invoiceDetails?.subject}
+            </Text>
+          </View>
+
+          <View style={{ flex: 5.5, flexDirection: "row" }}>
+            <View style={{ flex: 2 }}>
+              {data?.invoiceDetails?.payroll_data?.map((field, index) => (
+                <View
+                  key={(index + 1).toString()}
+                  style={{ paddingVertical: 2, paddingHorizontal: 4 }}
                 >
-                  {data?.invoiceDetails?.subject}
-                </Text>
-              </View>
-            ) : (
-              <View
-                style={{
-                  flex: 5,
-                  textAlign: "left",
-                  padding: 4,
-                }}
-              />
-            )}
-            <View style={{ flex: 5.5, flexDirection: "row", gap: 20 }}>
-              <View
-                style={{
-                  flex: 2,
-                  textAlign: "left",
-                  padding: 4,
-                }}
-              >
-                <Text
-                  style={{
-                    fontFamily: "Helvetica",
-                    textTransform: "capitalize",
-                  }}
-                >
-                  {field.field === "REIMBURSEMENT"
-                    ? replaceUnderscore(data?.invoiceDetails?.invoice_type)
-                    : field.field}
-                </Text>
-              </View>
-              <View
-                style={{
-                  flex: 1,
-                  textAlign: "left",
-                  padding: 4,
-                }}
-              >
-                <Text style={{ fontFamily: "Helvetica" }}>
-                  {field.field === "ESIC" || field.field === "ESI"
-                    ? Number(
-                        data?.invoiceDetails?.payroll_data?.find(
-                          (item) =>
-                            item.field === "ESIC" || item.field === "ESI"
-                        )?.amount ?? 0
-                      )
-                    : field.field === "PF" || field.field === "EPF"
-                    ? Number(
-                        data?.invoiceDetails?.payroll_data?.find(
-                          (item) => item.field === "PF" || item.field === "EPF"
-                        )?.amount ?? 0
-                      )
-                    : field.amount}
-                </Text>
-              </View>
+                  <Text
+                    style={{
+                      fontFamily: "Helvetica",
+                      textTransform: "capitalize",
+                    }}
+                  >
+                    {field.field === "REIMBURSEMENT"
+                      ? replaceUnderscore(data?.invoiceDetails?.invoice_type)
+                      : field.field}
+                  </Text>
+                </View>
+              ))}
+            </View>
+
+            <View style={{ flex: 1 }}>
+              {data?.invoiceDetails?.payroll_data?.map((field, index) => {
+                let amount = field.amount;
+                const trimmed = field.field.trim();
+                if (trimmed === "ESIC" || trimmed === "ESI") {
+                  amount =
+                    data?.invoiceDetails?.payroll_data?.find(
+                      (item) =>
+                        item.field.trim() === "ESIC" ||
+                        item.field.trim() === "ESI"
+                    )?.amount ?? 0;
+                } else if (trimmed === "PF" || trimmed === "EPF") {
+                  amount =
+                    data?.invoiceDetails?.payroll_data?.find(
+                      (item) =>
+                        item.field.trim() === "PF" ||
+                        item.field.trim() === "EPF"
+                    )?.amount ?? 0;
+                }
+
+                return (
+                  <View
+                    key={(index + 2).toString()}
+                    style={{ paddingVertical: 2, paddingHorizontal: 6 }}
+                  >
+                    <Text style={{ fontFamily: "Helvetica" }}>
+                      {Number(amount)}
+                    </Text>
+                  </View>
+                );
+              })}
             </View>
           </View>
-        ))}
+        </View>
 
         <View
           style={[
@@ -500,16 +501,24 @@ const InvoicePDF = ({
                 style={{
                   flex: 2,
                   textAlign: "left",
-                  padding: 4,
+                  paddingHorizontal: 4,
+                  paddingVertical: 2,
                 }}
               >
-                <Text style={{ fontFamily: "Helvetica" }}>{field.label}</Text>
+                <Text
+                  style={{
+                    fontFamily: field.bold ? "Helvetica-Bold" : "Helvetica",
+                  }}
+                >
+                  {field.label}
+                </Text>
               </View>
               <View
                 style={{
                   flex: 1,
                   textAlign: "left",
-                  padding: 4,
+                  paddingLeft: 4,
+                  paddingVertical: 2,
                 }}
               >
                 <Text
@@ -519,7 +528,7 @@ const InvoicePDF = ({
                 >
                   {calculatedValues[
                     field.label as keyof typeof calculatedValues
-                  ]?.toFixed(2) || 0}
+                  ] || 0}
                 </Text>
               </View>
             </View>
@@ -528,10 +537,12 @@ const InvoicePDF = ({
 
         <View style={{ flexDirection: "row", marginTop: 10 }}>
           <View style={{ flex: 1, padding: 3, marginTop: -23 }}>
-            <Text>HSN CODE NO. : </Text>
-            <Text>PAN NO. : </Text>
-            <Text>GSTIN : </Text>
-            <Text>TOTAL GSTIN AMOUNT : </Text>
+            <Text>
+              HSN CODE NO. :- {CANNY_MANAGEMENT_SERVICES_HSN_CODE_NUMBER}
+            </Text>
+            <Text>PAN NO. :- {CANNY_MANAGEMENT_SERVICES_PAN_NUMBER}</Text>
+            <Text>GSTIN :- {CANNY_MANAGEMENT_SERVICES_GSTIN}</Text>
+            <Text>TOTAL GSTIN AMOUNT :- {(cgst + sgst).toFixed(0)}</Text>
           </View>
           <View
             style={{ flex: 1.1, borderTop: "1pt solid #000000", padding: 3 }}
@@ -995,7 +1006,7 @@ const InvoicePDF = ({
                   data?.invoiceDetails?.payroll_data?.find(
                     (item) => item.field === "BASIC"
                   )?.amount ?? 0
-                ).toFixed(2),
+                ),
               },
               {
                 label: "HRA and Others",
@@ -1029,16 +1040,16 @@ const InvoicePDF = ({
                     ? terms.service_charge
                     : terms.reimbursement_charge
                 }%)`,
-                value: service_charge.toFixed(2),
+                value: service_charge,
               },
-              { label: "Total C.T.C", value: total.toFixed(2) },
+              { label: "Total C.T.C", value: total },
               {
                 label: "IGST (18%)",
-                value: igst === 0 ? (cgst + sgst).toFixed(2) : igst.toFixed(2),
+                value: igst === 0 ? cgst + sgst : igst,
               },
               {
                 label: "Total Bill Amount",
-                value: grand_total.toFixed(2),
+                value: grand_total,
                 bold: true,
               },
             ]?.map((item, index) => (

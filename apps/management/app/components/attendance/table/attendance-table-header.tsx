@@ -16,16 +16,16 @@ export function AttendanceTableHeader({ table, className, loading }: Props) {
 
   const AttendanceColumnIdArray = [
     "employee_code",
-    "employee_name",
+    "first_name",
     "project_name",
     "project_site_name",
     "month",
     "year",
-    "working_days",
+    "working_days", 
     "present_days",
+    "absent_days",
     "working_hours",
     "overtime_hours",
-    "absent_days",
     "paid_holidays",
     "paid_leaves",
     "casual_leaves",
@@ -69,62 +69,62 @@ export function AttendanceTableHeader({ table, className, loading }: Props) {
 
   return (
     <TableHeader className={className}>
-          <TableRow className="h-[45px] hover:bg-transparent">
-            <TableHead className="hidden md:table-cell px-3 md:px-4 py-2 sticky left-0 min-w-12 max-w-12 bg-card z-10">
-              <Checkbox
-                checked={
-                  table?.getIsAllPageRowsSelected() ||
-                  (table?.getIsSomePageRowsSelected() && "indeterminate")
-                }
-                onCheckedChange={(value) =>
-                  table.toggleAllPageRowsSelected(!!value)
-                }
-              />
-            </TableHead>
-    
-            {AttendanceColumnIdArray?.map((id) => {
-              return (
-                isVisible(id) && (
-                  <TableHead
-                    key={id}
+      <TableRow className="h-[45px] hover:bg-transparent">
+        <TableHead className="hidden md:table-cell px-3 md:px-4 py-2 sticky left-0 min-w-12 max-w-12 bg-card z-10">
+          <Checkbox
+            checked={
+              table?.getIsAllPageRowsSelected() ||
+              (table?.getIsSomePageRowsSelected() && "indeterminate")
+            }
+            onCheckedChange={(value) =>
+              table.toggleAllPageRowsSelected(!!value)
+            }
+          />
+        </TableHead>
+
+        {AttendanceColumnIdArray?.map((id) => {
+          return (
+            isVisible(id) && (
+              <TableHead
+                key={id}
+                className={cn(
+                  "px-4 py-2",
+                  id === "employee_code" && "sticky left-12 bg-card z-10",
+                  id === "employee_name" && "sticky w-full left-48 bg-card z-10"
+                )}
+              >
+                <Button
+                  className="p-0 hover:bg-transparent space-x-2 disabled:opacity-100"
+                  variant="ghost"
+                  disabled={!isEnableSorting(id)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    createSortQuery(id);
+                  }}
+                >
+                  <span className="capitalize">{columnName(id)}</span>
+
+                  <Icon
+                    name="chevron-up"
                     className={cn(
-                      "px-4 py-2",
-                      id === "employee_code" && "sticky left-12 bg-card z-10",
-                      id === "employee_name" && "sticky w-full left-48 bg-card z-10",
+                      "hidden",
+                      id === column && value === "desc" && "flex"
                     )}
-                  >
-                    <Button
-                      className="p-0 hover:bg-transparent space-x-2 disabled:opacity-100"
-                      variant="ghost"
-                      disabled={!isEnableSorting(id)}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        createSortQuery(id);
-                      }}
-                    >
-                      <span className="capitalize">{columnName(id)}</span>
-    
-                      <Icon
-                        name="chevron-up"
-                        className={cn(
-                          "hidden",
-                          id === column && value === "desc" && "flex",
-                        )}
-                      />
-                      <Icon
-                        name="chevron-down"
-                        className={cn(
-                          "hidden",
-                          id === column && value === "asc" && "flex",
-                        )}
-                      />
-                    </Button>
-                  </TableHead>
-                )
-              );
-            })}
-            <TableHead className="sticky right-0 min-w-20 max-w-20 bg-card z-10" />
-          </TableRow>
-        </TableHeader>
+                  />
+                  <Icon
+                    name="chevron-down"
+                    className={cn(
+                      "hidden",
+                      id === column && value === "asc" && "flex"
+                    )}
+                  />
+                </Button>
+              </TableHead>
+            )
+          );
+        })}
+        <TableHead className="sticky right-0 min-w-20 max-w-20 bg-card z-10" />
+      </TableRow>
+    </TableHeader>
   );
 }

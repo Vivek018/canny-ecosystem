@@ -17,7 +17,11 @@ import {
 } from "@canny_ecosystem/utils";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
-import { attribute } from "@canny_ecosystem/utils/constant";
+import {
+  attribute,
+  SUPABASE_BUCKET,
+  SUPABASE_MEDIA_URL_PREFIX,
+} from "@canny_ecosystem/utils/constant";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { useEffect } from "react";
 import { clearExactCacheEntry } from "@/utils/cache";
@@ -198,8 +202,13 @@ export async function action({
 }: ActionFunctionArgs): Promise<Response> {
   const caseId = params.caseId;
   const { supabase } = getSupabaseWithHeaders({ request });
-
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+
+  const { data: oldCaseData } = await getCasesById({
+    supabase,
+    caseId,
+  });
+  const oldFilePath = `cases/${companyId}/${oldCaseData!.title}`;
 
   const formData = await parseMultipartFormData(
     request,
@@ -265,46 +274,105 @@ export async function action({
   }
 
   if (data.document) {
-    const { error } = await addOrUpdateCaseWithDocument({
-      caseData: submission.value as CasesDatabaseInsert,
-      companyId,
-      document: submission.value.document as File,
-      supabase,
-      route: "update",
-    });
-
-    if (!error) {
-      return json({
-        status: "success",
-        message: "Invoice updated successfully",
-        error: null,
+    if (oldCaseData?.title !== data.title) {
+      const { error } = await addOrUpdateCaseWithDocument({
+        caseData: submission.value as CasesDatabaseInsert,
+        companyId,
+        document: submission.value.document as File,
+        supabase,
+        route: "update",
       });
-    }
 
-    const { status, error: updateError } = await updateCaseById({
-      supabase,
-      data: {
-        ...submission.value,
-      },
-    });
-    if (!updateError) {
+      await supabase.storage
+        .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
+        .remove([oldFilePath]);
+
+      if (!error) {
+        return json({
+          status: "success",
+          message: "Case updated successfully",
+          error: null,
+        });
+      }
       return json(
         {
-          status: "success",
-          message: "Invoice Updated",
-          error: null,
+          status: "error",
+          message: "Case Updated Failed",
+          error: error,
         },
         { status: 400 }
       );
     }
+
+    const { error } = await supabase.storage
+      .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
+      .upload(oldFilePath, data.document, {
+        contentType: data.document.type,
+        upsert: true,
+      });
+    if (!error) {
+      return json({
+        status: "success",
+        message: "Case updated successfully",
+        error: null,
+      });
+    }
     return json(
       {
-        status: status,
-        message: "Invoice Updated Failed",
+        status: "error",
+        message: "Case Updated Failed",
         error: error,
       },
       { status: 400 }
     );
+  }
+
+  if (oldCaseData?.document && oldCaseData?.title !== data.title) {
+    const newFilePath = `cases/${companyId}/${data!.title}`;
+
+    const { data: fileData, error: downloadError } = await supabase.storage
+      .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
+      .download(oldFilePath);
+
+    if (downloadError || !fileData) {
+      console.error("Failed to download the file to rename.");
+    }
+
+    const { data: urlData, error: uploadError } = await supabase.storage
+      .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
+      .upload(newFilePath, fileData!, {
+        contentType: fileData!.type,
+        cacheControl: "3600",
+      });
+
+    if (uploadError) {
+      console.error("Failed to upload the renamed file.");
+    }
+
+    await supabase.storage
+      .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
+      .remove([oldFilePath]);
+
+    const { error: caseError } = await updateCaseById({
+      supabase,
+      data: {
+        ...data,
+        document: `${SUPABASE_MEDIA_URL_PREFIX}${urlData!.fullPath}`,
+      },
+    });
+
+    if (!uploadError && !downloadError && !caseError) {
+      return json({
+        status: "success",
+        message: "Case updated successfully",
+        error: null,
+      });
+    }
+    return json({
+      status: "error",
+      message: "Case update failed",
+      error: uploadError || downloadError || caseError,
+    });
   }
 
   const { status, error } = await updateCaseById({

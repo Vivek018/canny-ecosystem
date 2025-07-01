@@ -221,7 +221,7 @@ export default function CreateRelationship({
       toast({
         title: "Error",
         description:
-          actionData.error?.message || "Relationship creation failed",
+          actionData.message || "Relationship creation failed",
         variant: "destructive",
       });
     }
