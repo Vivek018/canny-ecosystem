@@ -4,14 +4,13 @@ import { defer, type LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import {
   Await,
-  type ClientLoaderFunctionArgs,
   Link,
   Outlet,
   useLoaderData,
   useParams,
 } from "@remix-run/react";
 import { Suspense, useEffect } from "react";
-import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
+import { clearExactCacheEntry } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
@@ -55,20 +54,20 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 }
 
-// caching
-export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return await clientCaching(
-    `${cacheKeyPrefix.employee_documents}${args.params.employeeId}`,
-    args
-  );
-}
-clientLoader.hydrate = true;
+// Not working for now on adding document
 
-// document page
+// export async function clientLoader(args: ClientLoaderFunctionArgs) {
+//   return await clientCaching(
+//     `${cacheKeyPrefix.employee_documents}${args.params.employeeId}`,
+//     args
+//   );
+// }
+// clientLoader.hydrate = true;
+
 export default function Documents() {
-  const { role } = useUser();
   const { documentsPromise, employeeId, error } =
     useLoaderData<typeof loader>();
+  const { role } = useUser();
   const { isDocument } = useIsDocument();
 
   if (error) {
@@ -159,18 +158,18 @@ export function DocumentsWrapper({
   return (
     <CommandGroup className="w-full px-0">
       <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 px-0">
-        {data.map((document) => {
+        {data?.map((document) => {
           return (
             <CommandItem
-              key={document.document_type}
-              value={document.document_type + document.url}
+              key={document?.document_type}
+              value={document?.document_type + document?.url}
               className="data-[selected=true]:bg-inherit data-[selected=true]:text-foreground px-0 py-0"
             >
               <DocumentCard
                 documentData={{
-                  name: document.document_type,
-                  url: document.url,
-                  documentId: document.id,
+                  name: document?.document_type,
+                  url: document?.url,
+                  documentId: document?.id,
                 }}
               />
             </CommandItem>

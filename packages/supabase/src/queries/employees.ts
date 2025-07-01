@@ -109,6 +109,16 @@ export async function getEmployeesByCompanyId({
     dol_end,
   } = filters ?? {};
 
+  const foreignFilters = project
+    || project_site
+    || assignment_type
+    || position
+    || skill_level
+    || doj_start
+    || doj_end
+    || dol_start
+    || dol_end;
+
   const columns = [
     "id",
     "employee_code",
@@ -126,12 +136,10 @@ export async function getEmployeesByCompanyId({
     .from("employees")
     .select(
       `${columns.join(",")},
-        employee_project_assignment!employee_project_assignments_employee_id_fkey!${
-          project ? "inner" : "left"
-        }(
+        employee_project_assignment!employee_project_assignments_employee_id_fkey!${foreignFilters ? "inner" : "left"
+      }(
         employee_id, assignment_type, skill_level, position, start_date, end_date,
-        project_sites!${project ? "inner" : "left"}(id, name, projects!${
-        project ? "inner" : "left"
+        project_sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${foreignFilters ? "inner" : "left"
       }(id, name))
       )`,
       { count: "exact" }
@@ -982,12 +990,10 @@ export async function getEmployeesReportByCompanyId({
     .from("employees")
     .select(
       `${columns.join(",")},
-        employee_project_assignment!employee_project_assignments_employee_id_fkey!${
-          project ? "inner" : "left"
-        }(
+        employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
+      }(
         employee_id, assignment_type, skill_level, position, start_date, end_date,
-        project_sites!${project ? "inner" : "left"}(id, name, projects!${
-        project ? "inner" : "left"
+        project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
       }(id, name))
       )`,
       { count: "exact" }

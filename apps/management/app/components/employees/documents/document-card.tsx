@@ -97,7 +97,6 @@ export default function DocumentCard({
       </div>
 
       <div className="px-4 py-3 flex justify-between items-center border-t">
-        {/* Card Title */}
         <CardTitle
           className="text-sm tracking-wide hover:text-primary truncate"
           onClick={() => window.open(documentData.url, "_blank")}
@@ -105,7 +104,6 @@ export default function DocumentCard({
           {replaceUnderscore(documentData.name)}
         </CardTitle>
 
-        {/* Dropdown Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger className="p-1 rounded-full hover:bg-secondary grid place-items-center">
             <Icon name="dots-vertical" size="xs" />

@@ -1,11 +1,13 @@
 import {
   EmployeeDocumentsSchema,
   SIZE_10MB,
+  employeeDocumentTypeArray,
   getInitialValueFromZod,
   isGoodStatus,
   replaceUnderscore,
+  transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
-import { Field } from "@canny_ecosystem/ui/forms";
+import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import {
   FormProvider,
   getFormProps,
@@ -14,44 +16,27 @@ import {
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import {
-  type ClientLoaderFunctionArgs,
   Form,
   json,
   useActionData,
-  useLoaderData,
   useNavigate,
+  useParams,
 } from "@remix-run/react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { cacheKeyPrefix } from "@/constant";
-import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { clearExactCacheEntry } from "@/utils/cache";
+import type { ActionFunctionArgs } from "@remix-run/node";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { FormButtons } from "@/components/form/form-buttons";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { uploadEmployeeDocument } from "@canny_ecosystem/supabase/media";
 import { parseMultipartFormData } from "@remix-run/server-runtime/dist/formData";
 import { createMemoryUploadHandler } from "@remix-run/server-runtime/dist/upload/memoryUploadHandler";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@canny_ecosystem/ui/dialog";
 import { UPDATE_EMPLOYEE_DOCUMENT } from "./$documentId.update-document";
 import type { EmployeeDocumentsDatabaseRow } from "@canny_ecosystem/supabase/types";
+import { Icon } from "@canny_ecosystem/ui/icon";
 
 export const CREATE_EMPLOYEE_DOCUMENT = "create-employee-document";
-
-export async function loader({ params }: LoaderFunctionArgs) {
-  const employeeId = params.employeeId;
-  return { employeeId };
-}
-
-export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return clientCaching(`${cacheKeyPrefix.employee_documents}`, args);
-}
-
-clientLoader.hydrate = true;
 
 export async function action({
   request,
@@ -118,12 +103,12 @@ export default function AddDocument({
 }: {
   updatedValues: EmployeeDocumentsDatabaseRow;
 }) {
-  const { employeeId } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const EMPLOYEE_DOCUMENT_TAG = updatedValues
     ? UPDATE_EMPLOYEE_DOCUMENT
     : CREATE_EMPLOYEE_DOCUMENT;
 
+  const { employeeId } = useParams();
   const initialValues =
     updatedValues ?? getInitialValueFromZod(EmployeeDocumentsSchema);
 
@@ -144,6 +129,30 @@ export default function AddDocument({
     },
   });
 
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleOutsideClick(event: MouseEvent) {
+      const target = event.target as HTMLElement;
+
+      if (dialogRef.current?.contains(target)) return;
+
+      if (
+        target.closest("[cmdk-root]") ||
+        target.closest("[role='listbox']") ||
+        target.closest(".popover-content")
+      ) {
+        return;
+      }
+
+      navigate(`/employees/${employeeId}/documents`);
+    }
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
+
+
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
@@ -160,34 +169,45 @@ export default function AddDocument({
           variant: "destructive",
         });
       }
-      navigate(actionData.returnTo);
+      navigate(actionData.returnTo, { replace: true });
     }
   }, [actionData]);
 
   return (
-    <Dialog
-      open={true}
-      onOpenChange={() => navigate(`/employees/${employeeId}/documents`)}
-    >
-      <DialogContent className="top-[45%]">
-        <DialogHeader>
-          <DialogTitle>{updatedValues ? "Update" : "Add"} Document</DialogTitle>
-        </DialogHeader>
+    <div className="fixed inset-0 z-50 bg-black/80">
+      <div
+        ref={dialogRef}
+        className="fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg sm:rounded-lg"
+      >
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-lg font-semibold">
+            {updatedValues ? "Update" : "Add"} Document
+          </h1>
+          <button
+            type="button"
+            onClick={() => navigate(`/employees/${employeeId}/documents`)}
+          >
+            <Icon name="cross" size="sm" />
+          </button>
+        </div>
         <FormProvider context={form.context}>
           <Form
             method="POST"
             {...getFormProps(form)}
-            className="flex flex-col overflow-auto"
+            className="flex flex-col space-y-4"
             encType="multipart/form-data"
           >
-            <Field
+            <SearchableSelectField
+              className="capitalize"
+              options={transformStringArrayIntoOptions(
+                employeeDocumentTypeArray as unknown as string[]
+              )}
               inputProps={{
-                ...getInputProps(fields.document_type, {
-                  type: "text",
-                }),
-                placeholder: `Enter ${replaceUnderscore(
-                  fields.document_type.name
-                )}`,
+                ...getInputProps(fields.document_type, { type: "text" }),
+              }}
+              placeholder={`Select ${replaceUnderscore(fields.document_type.name)}`}
+              labelProps={{
+                children: replaceUnderscore(fields.document_type.name),
               }}
               errors={fields.document_type.errors}
             />
@@ -201,10 +221,11 @@ export default function AddDocument({
               }}
               errors={fields.url.errors}
             />
+            <FormButtons className="self-end -mr-6 pb-0" form={form} isSingle={true} />
           </Form>
         </FormProvider>
-        <FormButtons className="mr-[-24px] pb-0" form={form} isSingle={true} />
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 }
+
