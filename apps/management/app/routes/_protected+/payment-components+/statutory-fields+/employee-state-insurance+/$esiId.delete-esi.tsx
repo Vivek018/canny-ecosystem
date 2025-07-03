@@ -75,14 +75,14 @@ export default function DeleteEmployeeStateInsurance() {
       clearExactCacheEntry(cacheKeyPrefix.statutory_field_esi);
       toast({
         title: "Success",
-        description: actionData.message || "Employee State Insurance deleted",
+        description: actionData.message ?? "Employee State Insurance deleted",
         type: "success",
       });
     } else {
       toast({
         title: "Error",
         description:
-          actionData?.error?.message ||
+          actionData?.error ||
           "Employee State Insurance delete failed",
         type: "error",
       });

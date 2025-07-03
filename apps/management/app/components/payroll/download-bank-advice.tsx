@@ -126,7 +126,7 @@ export const prepareBankAdviceWorkbook = async ({
       null,
       null,
       null,
-      "canny.cms@gmail.com",
+      "cannycms@gmail.com",
       null,
       null,
       null,

@@ -287,9 +287,11 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                         { flex: 2, textTransform: "capitalize" },
                       ]}
                     >
-                      {formatDate(
-                        emp.employeeProjectAssignmentData.date_of_joining
-                      )}
+                      <>
+                        {formatDate(
+                          emp.employeeProjectAssignmentData.date_of_joining
+                        )}
+                      </>
                     </Text>
                     <Text style={[styles.cell, { flex: 1 }]}>A/c No.</Text>
                     <Text style={[styles.cell, { flex: 2 }]}>
@@ -397,7 +399,7 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                     a signature.
                   </Text>
                 </View>
-                <View style={{ marginVertical: 15 }}>
+                <View style={{ marginVertical: 7 }}>
                   <View style={[styles.dashedLine]} />
                 </View>
               </View>

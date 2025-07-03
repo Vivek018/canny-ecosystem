@@ -36,6 +36,7 @@ import type {
   LocationDatabaseRow,
 } from "@canny_ecosystem/supabase/types";
 import { ImportAttendanceModal } from "@/components/employees/import-export/import-modal-attendance";
+import { generateAttendanceFilter } from "@/utils/ai/attendance";
 
 const pageSize = LAZY_LOADING_LIMIT;
 
@@ -131,13 +132,30 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 clientLoader.hydrate = true;
 
 export async function action({ request }: ActionFunctionArgs) {
-  const url = new URL(request.url);
-  const formData = await request.formData();
-  const prompt = formData.get("prompt") as string | null;
-  const searchParams = new URLSearchParams();
-  if (prompt?.trim()) searchParams.append("name", prompt.trim());
-  url.search = searchParams.toString();
-  return redirect(url.toString());
+  try {
+    const url = new URL(request.url);
+    const formData = await request.formData();
+    const prompt = formData.get("prompt") as string;
+
+    const { object } = await generateAttendanceFilter({ input: prompt });
+
+    const searchParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(object)) {
+      if (value !== null && value !== undefined && String(value)?.length) {
+        searchParams.append(key, value.toString());
+      }
+    }
+
+    url.search = searchParams.toString();
+
+    return redirect(url.toString());
+  } catch (error) {
+    console.error("Attendance Error in action function:", error);
+
+    const fallbackUrl = new URL(request.url);
+    fallbackUrl.search = "";
+    return redirect(fallbackUrl.toString());
+  }
 }
 
 export default function Attendance() {

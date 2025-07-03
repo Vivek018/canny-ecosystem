@@ -357,13 +357,13 @@ export default function CreateInvoice({
       clearExactCacheEntry(cacheKeyPrefix.payroll_invoice);
       toast({
         title: "Success",
-        description: actionData.message || "Invoice created",
+        description: actionData.message ?? "Invoice created",
         variant: "success",
       });
     } else {
       toast({
         title: "Error",
-        description: actionData.message || "Invoice create failed",
+        description: actionData.error ?? "Invoice create failed",
         variant: "destructive",
       });
     }

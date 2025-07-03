@@ -39,7 +39,11 @@ export async function action({
   params,
 }: ActionFunctionArgs): Promise<Response> {
   const employeeId = params.employeeId ?? "";
+  const documentId = params.documentId ?? "";
+
   const { supabase } = getSupabaseWithHeaders({ request });
+
+  const { data } = await getEmployeeDocumentById({ supabase, id: documentId });
 
   try {
     const formData = await parseMultipartFormData(
@@ -62,6 +66,7 @@ export async function action({
       file: submission.value.url as File,
       employeeId,
       documentType: submission.value.document_type,
+      oldDocumentType: data?.document_type!,
     });
     if (isGoodStatus(status)) {
       return json({
@@ -103,7 +108,9 @@ export default function UpdateDocument() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearExactCacheEntry(`${cacheKeyPrefix.employee_documents}${employeeId}`);
+        clearExactCacheEntry(
+          `${cacheKeyPrefix.employee_documents}${employeeId}`
+        );
         toast({
           title: "Success",
           description: actionData.message,

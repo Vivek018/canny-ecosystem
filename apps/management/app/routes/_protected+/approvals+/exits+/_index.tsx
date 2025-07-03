@@ -7,6 +7,7 @@ import { ExitPaymentColumns } from "@/components/exits/table/columns";
 import { ExitPaymentTable } from "@/components/exits/table/data-table";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
+import { generateExitFilter } from "@/utils/ai/exit";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { safeRedirect } from "@/utils/server/http.server";
@@ -131,19 +132,32 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 }
 clientLoader.hydrate = true;
 
+
 export async function action({ request }: ActionFunctionArgs) {
-  const url = new URL(request.url);
-  const formData = await request.formData();
+  try {
+    const url = new URL(request.url);
+    const formData = await request.formData();
+    const prompt = formData.get("prompt") as string;
 
-  const prompt = formData.get("prompt") as string | null;
+    const { object } = await generateExitFilter({ input: prompt });
 
-  const searchParams = new URLSearchParams();
-  if (prompt && prompt.trim().length > 0)
-    searchParams.append("name", prompt.trim());
+    const searchParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(object)) {
+      if (value !== null && value !== undefined && String(value)?.length) {
+        searchParams.append(key, value.toString());
+      }
+    }
 
-  url.search = searchParams.toString();
+    url.search = searchParams.toString();
 
-  return redirect(url.toString());
+    return redirect(url.toString());
+  } catch (error) {
+    console.error("Exits Error in action function:", error);
+
+    const fallbackUrl = new URL(request.url);
+    fallbackUrl.search = "";
+    return redirect(fallbackUrl.toString());
+  }
 }
 
 export default function ExitsIndex() {

@@ -17,12 +17,13 @@ import {
   getUsersEmail,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import {
   Await,
   type ClientLoaderFunctionArgs,
   defer,
   Outlet,
+  redirect,
   useLoaderData,
 } from "@remix-run/react";
 import { Suspense } from "react";
@@ -34,6 +35,7 @@ import { safeRedirect } from "@/utils/server/http.server";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { LoadingSpinner } from "@/components/loading-spinner";
+import { generateReimbursementFilter } from "@/utils/ai/reimbursement";
 
 const pageSize = LAZY_LOADING_LIMIT;
 
@@ -68,7 +70,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
       project: searchParams.get("project") ?? undefined,
       project_site: searchParams.get("project_site") ?? undefined,
       in_payroll: searchParams.get("in_payroll") ?? undefined,
-
     };
 
     const hasFilters =
@@ -136,6 +137,32 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 
 clientLoader.hydrate = true;
 
+export async function action({ request }: ActionFunctionArgs) {
+  try {
+    const url = new URL(request.url);
+    const formData = await request.formData();
+    const prompt = formData.get("prompt") as string;
+
+    const { object } = await generateReimbursementFilter({ input: prompt });
+
+    const searchParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(object)) {
+      if (value !== null && value !== undefined && String(value)?.length) {
+        searchParams.append(key, value.toString());
+      }
+    }
+
+    url.search = searchParams.toString();
+
+    return redirect(url.toString());
+  } catch (error) {
+    console.error("Reimbursement Error in action function:", error);
+
+    const fallbackUrl = new URL(request.url);
+    fallbackUrl.search = "";
+    return redirect(fallbackUrl.toString());
+  }
+}
 export default function ReimbursementsIndex() {
   const {
     reimbursementsPromise,
@@ -163,7 +190,6 @@ export default function ReimbursementsIndex() {
                     <Await resolve={userEmailsPromise}>
                       {(userEmailsData) => (
                         <ReimbursementSearchFilter
-                          
                           projectArray={
                             projectData?.data?.length
                               ? projectData?.data?.map(

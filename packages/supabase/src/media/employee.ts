@@ -151,6 +151,10 @@ export async function uploadEmployeeDocument({
     });
 
     if (insertError) {
+      await supabase.storage
+        .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
+        .remove([filePath]);
+
       console.error("uploadEmployeeDocument Error", insertError);
       return {
         status,
@@ -169,15 +173,17 @@ export async function updateEmployeeDocument({
   file,
   employeeId,
   documentType,
+  oldDocumentType,
 }: {
   supabase: TypedSupabaseClient;
   file: File;
   employeeId: string;
   documentType: string;
+  oldDocumentType: string;
 }) {
   const { status } = await deleteEmployeeDocument({
     supabase,
-    documentType,
+    documentType: oldDocumentType,
     employeeId,
   });
 
@@ -209,7 +215,6 @@ export async function deleteEmployeeDocument({
       documentType,
       employeeId,
     });
-
   if (!data || error) return { status: 400, error };
 
   const filePath = getFilePathFromUrl(data.url ?? "");

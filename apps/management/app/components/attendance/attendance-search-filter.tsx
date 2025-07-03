@@ -24,6 +24,24 @@ import type { AttendanceFilters } from "@canny_ecosystem/supabase/queries";
 import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
 import { months } from "@canny_ecosystem/utils/constant";
 import { defaultYear, getYears } from "@canny_ecosystem/utils";
+import { useTypingAnimation } from "@canny_ecosystem/utils/hooks/typing-animation";
+
+export const PLACEHOLDERS = [
+  "Attendance records for March 2024 at Site 'ABC'",
+  "Attendance of employees for Project 'ABC' in 2023",
+  "Monthly attendance for Site 'XYZ' in January",
+  "Year 2022 attendance across all sites",
+  "Attendance in June 2020 for Project 'XYZ'",
+  "Project 'Delta' site-wise attendance in July 2021",
+  "Employees attendance for December 2023 at Site 'ABC'",
+  "Attendance of EMP123 in April 2022",
+  "Project 'Beta' attendance for the year 2021",
+  "Attendance data for Site 'ABC' in August 2020",
+  "Employees who worked at Site 'ABC' in October 2019",
+  "Annual attendance report for Project 'XYZ' in 2020",
+  "Attendance in November 2022 for Site 'XYZ'",
+  "March 2021 attendance of employees in payroll",
+];
 
 export function AttendanceSearchFilter({
   disabled,
@@ -44,7 +62,11 @@ export function AttendanceSearchFilter({
 
   const inputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
-
+  const [isFocused, setIsFocused] = useState(false);
+  const animatedPlaceholder = useTypingAnimation(PLACEHOLDERS, isFocused, {
+    typingSpeed: 40,
+    pauseDuration: 4000,
+  });
   const [searchParams, setSearchParams] = useSearchParams();
 
   const initialFilterParams: AttendanceFilters = {
@@ -52,7 +74,6 @@ export function AttendanceSearchFilter({
     year: "",
     project: "",
     project_site: "",
-    range: "",
   };
 
   const [filterParams, setFilterParams] = useState(initialFilterParams);
@@ -84,7 +105,6 @@ export function AttendanceSearchFilter({
     year: searchParams.get("year"),
     project: searchParams.get("project"),
     project_site: searchParams.get("project_site"),
-    range: searchParams.get("range"),
   };
 
   useEffect(() => {
@@ -178,12 +198,14 @@ export function AttendanceSearchFilter({
             placeholder={
               disabled
                 ? "No Attendance Data to Search And Filter"
-                : "Search Attendance"
+                : animatedPlaceholder
             }
             disabled={disabled}
             className="pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70"
             value={prompt}
             onChange={handleSearch}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
             autoComplete="on"
             autoCapitalize="none"
             autoCorrect="off"

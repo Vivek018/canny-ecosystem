@@ -29,6 +29,24 @@ import {
 } from "@canny_ecosystem/utils";
 import type { ExitFilterType } from "@canny_ecosystem/supabase/queries";
 import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
+import { useTypingAnimation } from "@canny_ecosystem/utils/hooks/typing-animation";
+
+export const PLACEHOLDERS = [
+  "Employees who left before 2020 due to resignation",
+  "Exits with final settlement after Jan 2023",
+  "Employees exited from Project 'XYZ' at Site 'ABC'",
+  "Resigned employees not included in payroll",
+  "Terminated employees whose last working day was in 2022",
+  "Employees who exited Site 'ABC' with settlements before 2024",
+  "Exits from Project 'XYZ' with final settlement after June 2021",
+  "Employees who left between 2019-2021 and were in payroll",
+  "Voluntary exits from Site 'XYZ' before 2018",
+  "Exits due to retirement with working day end before 2015",
+  "Employees whose final settlement is still pending after 2023",
+  "Non-payroll exits due to personal reasons",
+  "Employees exited in 2020 from Project 'XYZ'",
+  "Last working day between 2021 and 2022 for Site 'ABC'",
+];
 
 export function ExitsSearchFilter({
   disabled,
@@ -41,6 +59,11 @@ export function ExitsSearchFilter({
 }) {
   const [prompt, setPrompt] = useState("");
   const navigation = useNavigation();
+  const [isFocused, setIsFocused] = useState(false);
+  const animatedPlaceholder = useTypingAnimation(PLACEHOLDERS, isFocused, {
+    typingSpeed: 40,
+    pauseDuration: 4000,
+  });
   const isSubmitting =
     navigation.state === "submitting" ||
     (navigation.state === "loading" &&
@@ -146,18 +169,19 @@ export function ExitsSearchFilter({
   };
 
   const handleSubmit = () => {
-    debounceSubmit(
-      { prompt: prompt },
-      {
-        action: "/approvals/exits?index",
-        method: "POST",
+    if (prompt.split(" ").length > 1) {
+      debounceSubmit(
+        { prompt: prompt },
+        {
+          action: "/approvals/exits?index",
+          method: "POST",
+        }
+      );
+    } else {
+      if (prompt.length) {
+        searchParams.set("name", prompt);
+        setSearchParams(searchParams);
       }
-    );
-    // if (prompt.split(" ").length > 1) {
-    // } else {
-    if (prompt.length) {
-      searchParams.set("name", prompt);
-      setSearchParams(searchParams);
     }
   };
 
@@ -187,12 +211,16 @@ export function ExitsSearchFilter({
             tabIndex={-1}
             ref={inputRef}
             placeholder={
-              disabled ? "No Exits Data to Search And Filter" : "Search Exits"
+              disabled
+                ? "No Exits Data to Search And Filter"
+                : animatedPlaceholder
             }
             disabled={disabled}
             className="pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70"
             value={prompt}
             onChange={handleSearch}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
             autoComplete="on"
             autoCapitalize="none"
             autoCorrect="off"

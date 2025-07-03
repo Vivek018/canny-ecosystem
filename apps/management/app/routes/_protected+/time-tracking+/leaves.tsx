@@ -17,13 +17,14 @@ import {
   type LeavesFilters,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import {
   Await,
   type ClientLoaderFunctionArgs,
   defer,
   Link,
   Outlet,
+  redirect,
   useLoaderData,
   useNavigate,
 } from "@remix-run/react";
@@ -64,9 +65,12 @@ import type {
   CompanyDatabaseRow,
   LocationDatabaseRow,
 } from "@canny_ecosystem/supabase/types";
+import { generateLeavesFilter } from "@/utils/ai/leave";
 
 const pageSize = LAZY_LOADING_LIMIT;
 const isEmployeeRoute = false;
+
+
 export async function loader({ request }: LoaderFunctionArgs) {
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,
@@ -182,6 +186,32 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 
 clientLoader.hydrate = true;
 
+export async function action({ request }: ActionFunctionArgs) {
+  try {
+    const url = new URL(request.url);
+    const formData = await request.formData();
+    const prompt = formData.get("prompt") as string;
+
+    const { object } = await generateLeavesFilter({ input: prompt });
+
+    const searchParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(object)) {
+      if (value !== null && value !== undefined && String(value)?.length) {
+        searchParams.append(key, value.toString());
+      }
+    }
+
+    url.search = searchParams.toString();
+
+    return redirect(url.toString());
+  } catch (error) {
+    console.error("Leaves Error in action function:", error);
+
+    const fallbackUrl = new URL(request.url);
+    fallbackUrl.search = "";
+    return redirect(fallbackUrl.toString());
+  }
+}
 export default function LeavesIndex() {
   const {
     leavesPromise,
@@ -396,3 +426,4 @@ export default function LeavesIndex() {
     </section >
   );
 }
+

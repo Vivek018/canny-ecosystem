@@ -13,23 +13,50 @@ import {
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
 import { formatISO } from "date-fns";
-import { type FormEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import {
+  type SubmitOptions,
   useNavigation,
   useSearchParams,
+  useSubmit,
 } from "@remix-run/react";
 import { Calendar } from "@canny_ecosystem/ui/calendar";
 import { payrollPaymentStatusArray } from "@canny_ecosystem/utils";
 import type { PayrollFilters } from "@canny_ecosystem/supabase/queries";
+import { useTypingAnimation } from "@canny_ecosystem/utils/hooks/typing-animation";
+import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
+
+export const PLACEHOLDERS = [
+  "Approved payrolls processed between Jan and May 2024",
+  "Salary-type payrolls created before 2020",
+  "Payrolls with pending status for Contract employees",
+  "Payroll records from Project 'XYZ' created in 2023",
+  "Payrolls generated between 2018 and 2020 with 'ABC' type",
+  "Rejected payrolls for employees from Site 'ABC'",
+  "Payrolls with status Approved for salary type",
+  "Payrolls created before 2015 still in processing",
+  "Freelancer payrolls submitted in January 2024",
+  "Payroll records for Project Site 'ABC' during 2021",
+  "All payrolls from Site 'ABC' with 'Part-time' type",
+  "Approved payrolls for year 2023 with salary type",
+  "Payrolls with pending payment for Site 'XYZ'",
+];
 
 export function PayrollSearchFilter({
   disabled,
+  from,
 }: {
   disabled?: boolean;
+  from: "run-payroll" | "payroll-history";
 }) {
   const [prompt, setPrompt] = useState("");
   const navigation = useNavigation();
+  const [isFocused, setIsFocused] = useState(false);
+  const animatedPlaceholder = useTypingAnimation(PLACEHOLDERS, isFocused, {
+    typingSpeed: 40,
+    pauseDuration: 4000,
+  });
   const isSubmitting =
     navigation.state === "submitting" ||
     (navigation.state === "loading" &&
@@ -51,7 +78,10 @@ export function PayrollSearchFilter({
 
   const [filterParams, setFilterParams] = useState(initialFilterParams);
 
-
+  const submit = useSubmit();
+  const debounceSubmit = useDebounce((target: any, options?: SubmitOptions) => {
+    submit(target, options);
+  }, 300);
 
   const deleteAllSearchParams = () => {
     for (const [key, _val] of Object.entries(filterParams)) {
@@ -123,11 +153,23 @@ export function PayrollSearchFilter({
     }
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (prompt.length) {
-      searchParams.set("name", prompt);
-      setSearchParams(searchParams);
+  const handleSubmit = () => {
+    if (prompt.split(" ").length > 1) {
+      debounceSubmit(
+        { prompt: prompt },
+        {
+          action:
+            from === "payroll-history"
+              ? "/payroll/payroll-history?index"
+              : "/payroll/run-payroll?index",
+          method: "POST",
+        }
+      );
+    } else {
+      if (prompt.length) {
+        searchParams.set("name", prompt);
+        setSearchParams(searchParams);
+      }
     }
   };
 
@@ -143,7 +185,7 @@ export function PayrollSearchFilter({
           className="relative w-full md:w-auto"
           onSubmit={(e) => {
             e.preventDefault();
-            handleSubmit(e);
+            handleSubmit();
           }}
         >
           <Icon
@@ -160,11 +202,15 @@ export function PayrollSearchFilter({
             className="pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70"
             value={prompt}
             onChange={handleSearch}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
             autoComplete="on"
             autoCapitalize="none"
             autoCorrect="off"
             spellCheck="false"
-            placeholder="Search Payroll"
+            placeholder={
+              disabled ? "No Payroll to Search And Filter" : animatedPlaceholder
+            }
           />
 
           <DropdownMenuTrigger disabled={disabled} asChild>

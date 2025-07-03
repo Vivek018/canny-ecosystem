@@ -9,13 +9,14 @@ import {
 } from "@canny_ecosystem/ui/command";
 import { useIsDocument } from "@canny_ecosystem/utils/hooks/is-document";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import {
   Await,
   type ClientLoaderFunctionArgs,
   defer,
   Link,
   Outlet,
+  redirect,
   useLoaderData,
 } from "@remix-run/react";
 import { Suspense, useEffect, useState } from "react";
@@ -41,6 +42,7 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { ImportReimbursementPayrollModal } from "@/components/payroll/import-export/import-reimbursement-modal-payroll";
 import { ImportExitPayrollModal } from "@/components/payroll/import-export/import-exit-modal-payroll";
+import { generatePayrollFilter } from "@/utils/ai/payroll";
 
 const pageSize = 15;
 
@@ -96,6 +98,35 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 
 clientLoader.hydrate = true;
 
+
+export async function action({ request }: ActionFunctionArgs) {
+  try {
+    const url = new URL(request.url);
+    const formData = await request.formData();
+    const prompt = formData.get("prompt") as string;
+
+    const { object } = await generatePayrollFilter({ input: prompt });
+
+    const searchParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(object)) {
+      if (value !== null && value !== undefined && String(value)?.length) {
+        searchParams.append(key, value.toString());
+      }
+    }
+
+    url.search = searchParams.toString();
+
+    return redirect(url.toString());
+  } catch (error) {
+    console.error("Payroll Error in action function:", error);
+
+    const fallbackUrl = new URL(request.url);
+    fallbackUrl.search = "";
+    return redirect(fallbackUrl.toString());
+  }
+}
+
+
 export default function RunPayrollIndex() {
   const { payrollsPromise, filters, query, companyId, env } =
     useLoaderData<typeof loader>();
@@ -123,6 +154,7 @@ export default function RunPayrollIndex() {
                   <div className="w-1/2 flex gap-4">
                     <PayrollSearchFilter
                       disabled={!data?.length && noFilters}
+                      from="run-payroll"
                     />
                     <FilterList filterList={filterList as PayrollFilters} />
                   </div>
