@@ -6,6 +6,7 @@ import { columns } from "@/components/invoice/table/columns";
 import { InvoiceTable } from "@/components/invoice/table/data-table";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { cacheKeyPrefix } from "@/constant";
+import { generateInvoiceFilter } from "@/utils/ai/invoice";
 import { clearCacheEntry, clientCaching } from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
@@ -19,13 +20,14 @@ import {
   type InvoiceFilters,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import {
   Await,
   type ClientLoaderFunctionArgs,
   defer,
   json,
   Outlet,
+  redirect,
   useLoaderData,
 } from "@remix-run/react";
 import { Suspense } from "react";
@@ -109,6 +111,34 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   );
 }
 clientLoader.hydrate = true;
+
+
+export async function action({ request }: ActionFunctionArgs) {
+  try {
+    const url = new URL(request.url);
+    const formData = await request.formData();
+    const prompt = formData.get("prompt") as string;
+
+    const { object } = await generateInvoiceFilter({ input: prompt });
+
+    const searchParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(object)) {
+      if (value !== null && value !== undefined && String(value)?.length) {
+        searchParams.append(key, value.toString());
+      }
+    }
+
+    url.search = searchParams.toString();
+
+    return redirect(url.toString());
+  } catch (error) {
+    console.error("Invoice Error in action function:", error);
+
+    const fallbackUrl = new URL(request.url);
+    fallbackUrl.search = "";
+    return redirect(fallbackUrl.toString());
+  }
+}
 
 export default function Invoices() {
   const { invoicePromise, env, filters, query, companyId, locationPromise } =

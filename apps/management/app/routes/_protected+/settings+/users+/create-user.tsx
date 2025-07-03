@@ -221,7 +221,7 @@ export default function CreateUser({
     } else {
       toast({
         title: "Error",
-        description: actionData.message || "User creation failed",
+        description: actionData.error ?? "User creation failed",
         variant: "destructive",
       });
     }

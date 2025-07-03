@@ -13,9 +13,14 @@ import {
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
 import { formatISO } from "date-fns";
-import { type FormEvent, useEffect, useRef, useState } from "react";
+import {  useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { useNavigation, useSearchParams } from "@remix-run/react";
+import {
+ type SubmitOptions,
+  useNavigation,
+  useSearchParams,
+  useSubmit,
+} from "@remix-run/react";
 import { Calendar } from "@canny_ecosystem/ui/calendar";
 import {
   defaultYear,
@@ -25,6 +30,27 @@ import {
 } from "@canny_ecosystem/utils";
 
 import type { LeavesFilters } from "@canny_ecosystem/supabase/queries";
+import { useTypingAnimation } from "@canny_ecosystem/utils/hooks/typing-animation";
+import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
+
+
+export const PLACEHOLDERS = [
+  "Sick leaves taken in 2023 for Project 'ABC'",
+  "Leaves approved by Manager Priya between Jan-Mar 2022",
+  "Casual leaves taken in 2020 at Site 'XYZ'",
+  "Maternity leaves recorded in 2021 for Project Site 'ABC'",
+  "Leaves from EMP456 in December 2023",
+  "Unapproved leaves for Project 'ABC' in year 2022",
+  "Leave records from Site 'ABC' for year 2020",
+  "Paid leave entries for employees in 2019",
+  "Leaves taken in February 2024 across all sites",
+  "Leave records from Project 'XYZ' in year 2021",
+  "Annual leaves approved by ABC in 2020",
+  "Leaves from Site 'ABC' for the year 2023",
+  "Emergency leaves taken by employees in March 2022",
+  "Leaves from EMP1001 in year 2021 for Site 'XYZ'",
+];
+
 
 export function LeavesSearchFilter({
   disabled,
@@ -43,6 +69,11 @@ export function LeavesSearchFilter({
 }) {
   const [prompt, setPrompt] = useState("");
   const navigation = useNavigation();
+  const [isFocused, setIsFocused] = useState(false);
+  const animatedPlaceholder = useTypingAnimation(PLACEHOLDERS, isFocused, {
+    typingSpeed: 40,
+    pauseDuration: 4000,
+  });
   const isSubmitting =
     navigation.state === "submitting" ||
     (navigation.state === "loading" &&
@@ -67,6 +98,10 @@ export function LeavesSearchFilter({
 
   const [filterParams, setFilterParams] = useState(initialFilterParams);
 
+  const submit = useSubmit();
+  const debounceSubmit = useDebounce((target: any, options?: SubmitOptions) => {
+    submit(target, options);
+  }, 300);
   const deleteAllSearchParams = () => {
     for (const [key, _val] of Object.entries(filterParams)) {
       searchParams.delete(key);
@@ -139,11 +174,20 @@ export function LeavesSearchFilter({
     }
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (prompt.length) {
-      searchParams.set("name", prompt);
-      setSearchParams(searchParams);
+  const handleSubmit = () => {
+    if (prompt.split(" ").length > 1) {
+      debounceSubmit(
+        { prompt: prompt },
+        {
+          action: "/time-tracking/leaves",
+          method: "POST",
+        }
+      );
+    } else {
+      if (prompt.length) {
+        searchParams.set("name", prompt);
+        setSearchParams(searchParams);
+      }
     }
   };
 
@@ -159,7 +203,7 @@ export function LeavesSearchFilter({
           className="relative w-full md:w-auto"
           onSubmit={(e) => {
             e.preventDefault();
-            handleSubmit(e);
+            handleSubmit();
           }}
         >
           <Icon
@@ -173,12 +217,16 @@ export function LeavesSearchFilter({
             tabIndex={-1}
             ref={inputRef}
             placeholder={
-              disabled ? "No Leaves Data to Search And Filter" : "Search Leaves"
+              disabled
+                ? "No Leaves Data to Search And Filter"
+                : animatedPlaceholder
             }
             disabled={disabled}
             className="pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70"
             value={prompt}
             onChange={handleSearch}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
             autoComplete="on"
             autoCapitalize="none"
             autoCorrect="off"

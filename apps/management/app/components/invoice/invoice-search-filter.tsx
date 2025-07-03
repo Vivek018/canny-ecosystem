@@ -29,6 +29,24 @@ import {
 } from "@canny_ecosystem/utils";
 import type { InvoiceFilters } from "@canny_ecosystem/supabase/queries";
 import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
+import { useTypingAnimation } from "@canny_ecosystem/utils/hooks/typing-animation";
+
+export const PLACEHOLDERS = [
+  "Paid invoices created between Jan and Mar 2024",
+  "Unpaid invoices with service charge included",
+  "Salary-type invoices for employees at 'ABC' location",
+  "Invoices raised before 2020 for exit settlements",
+  "Invoices paid after April 2023 for Project Site 'ABC'",
+  "Reimbursement invoices pending from 2022",
+  "Invoices without service charges created in 2021",
+  "Invoices from payroll type 'XYZ' paid in 2023",
+  "Unpaid invoices for employees in 'XYZ' location",
+  "Exit-type invoices with paid date after June 2024",
+  "Invoices created between 2018 and 2019 with salary type",
+  "Service-charge included invoices created in 2020",
+  "Reimbursement invoices created at Site 'ABC' before 2022",
+  "Paid salary invoices from Company Location 'ABC'",
+];
 
 export function InvoiceSearchFilter({
   disabled,
@@ -39,6 +57,11 @@ export function InvoiceSearchFilter({
 }) {
   const [prompt, setPrompt] = useState("");
   const navigation = useNavigation();
+  const [isFocused, setIsFocused] = useState(false);
+  const animatedPlaceholder = useTypingAnimation(PLACEHOLDERS, isFocused, {
+    typingSpeed: 40,
+    pauseDuration: 4000,
+  });
   const isSubmitting =
     navigation.state === "submitting" ||
     (navigation.state === "loading" &&
@@ -189,11 +212,15 @@ export function InvoiceSearchFilter({
             className="pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70"
             value={prompt}
             onChange={handleSearch}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
             autoComplete="on"
             autoCapitalize="none"
             autoCorrect="off"
             spellCheck="false"
-            placeholder="Search invoices"
+            placeholder={
+              disabled ? "No Invoice to Search And Filter" : animatedPlaceholder
+            }
           />
 
           <DropdownMenuTrigger disabled={disabled} asChild>
@@ -204,7 +231,7 @@ export function InvoiceSearchFilter({
               className={cn(
                 "absolute z-10 right-3 top-[6px] opacity-70",
                 !disabled &&
-                "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
+                  "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 hasValidFilters && "opacity-100",
                 isOpen && "opacity-100"
               )}

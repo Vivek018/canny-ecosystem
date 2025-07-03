@@ -161,14 +161,14 @@ export default function CreateProfessionalTax({
       clearExactCacheEntry(cacheKeyPrefix.professional_tax);
       toast({
         title: "Success",
-        description: actionData.message || "Professional Tax created",
+        description: actionData.message ?? "Professional Tax created",
         variant: "success",
       });
     } else {
       toast({
         title: "Error",
         description:
-          actionData.message || "Professional Tax create failed",
+          actionData.error ?? "Professional Tax create failed",
         variant: "destructive",
       });
     }

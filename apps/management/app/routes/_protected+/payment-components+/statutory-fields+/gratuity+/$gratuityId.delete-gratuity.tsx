@@ -26,7 +26,7 @@ export async function action({
   if (
     !hasPermission(
       user?.role!,
-      `${deleteRole}:${attribute.statutoryFieldsGraduity}`,
+      `${deleteRole}:${attribute.statutoryFieldsGraduity}`
     )
   ) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
@@ -60,7 +60,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -76,15 +76,15 @@ export default function DeleteGratuity() {
       clearExactCacheEntry(cacheKeyPrefix.gratuity);
       toast({
         title: "Success",
-        description: actionData.message || "Gratuity deleted",
+        description: actionData.message ?? "Gratuity deleted",
         type: "success",
       });
     } else {
       toast({
         title: "Error",
         description:
-          actionData?.error ||
-          actionData?.error?.message ||
+          actionData?.error ??
+          actionData?.error?.message ??
           "Gratuity delete failed",
         type: "error",
       });

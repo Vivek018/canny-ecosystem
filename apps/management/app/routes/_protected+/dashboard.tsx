@@ -18,7 +18,11 @@ import {
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { defer, type LoaderFunctionArgs } from "@remix-run/node";
-import { type ClientLoaderFunctionArgs, useLoaderData } from "@remix-run/react";
+import {
+  Await,
+  type ClientLoaderFunctionArgs,
+  useLoaderData,
+} from "@remix-run/react";
 import type {
   EmployeeDatabaseRow,
   ExitsRow,
@@ -27,7 +31,8 @@ import type {
 import { ActiveEmployeesBySite } from "@/components/payroll/analytics/active-employees-by-site";
 import { InvoicePaidUnpaid } from "@/components/dashboard/paid-unpaid-invoices";
 import { useAnimateTextScroll } from "@canny_ecosystem/ui/animate-text-scroll";
-import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { Suspense } from "react";
+import { LoadingSpinner } from "@/components/loading-spinner";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -44,90 +49,75 @@ export async function loader({ request }: LoaderFunctionArgs) {
   try {
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-    const { data: notificationData, error: notificationError } = await getNotificationByCompanyId({ supabase, companyId });
-
-    const {
-      currentMonthExits,
-      currentMonthExitErrors,
-      previousMonthExits,
-      previousMonthExitErrors,
-    } = await getExitsByCompanyIdByMonths({ companyId, supabase, filters });
-    if (notificationError) throw notificationError;
-    if (currentMonthExitErrors) throw currentMonthExitErrors;
-    if (previousMonthExitErrors) throw previousMonthExitErrors;
-
-    const {
-      activeEmployeeError,
-      activeEmployees,
-      totalEmployeeError,
-      totalEmployees,
-      activeEmployeesBySites,
-      activeEmployeeErrorBySites,
-    } = await getActiveEmployeesByCompanyId({
+    const notificationPromise = getNotificationByCompanyId({
       supabase,
       companyId,
     });
 
-    if (activeEmployeeError) throw activeEmployeeError;
-    if (totalEmployeeError) throw totalEmployeeError;
-    if (activeEmployeeErrorBySites) throw activeEmployeeErrorBySites;
+    const exitsPromise = getExitsByCompanyIdByMonths({
+      companyId,
+      supabase,
+      filters,
+    });
 
-    const {
-      currentMonth: currentPayrollData,
-      currentMonthError: currentPayrollError,
-      previousMonth: previousPayrollData,
-      previousMonthError: previousPayrollError,
-    } = await getApprovedPayrollsAmountsByCompanyIdByMonths({
+    const employeesPromise = getActiveEmployeesByCompanyId({
+      supabase,
+      companyId,
+    });
+
+    const payrollPromise = getApprovedPayrollsAmountsByCompanyIdByMonths({
       supabase,
       companyId,
       filters,
     });
 
-    if (currentPayrollError) throw currentPayrollError;
-    if (previousPayrollError) throw previousPayrollError;
+    const payrollByYearsPromise = getApprovedPayrollsByCompanyIdByYears({
+      companyId,
+      supabase,
+      filters,
+    });
 
-    const { data: payrollDataByYears, error: payrollDataByYearError } =
-      await getApprovedPayrollsByCompanyIdByYears({
-        companyId,
-        supabase,
-        filters,
-      });
-    if (payrollDataByYearError) throw payrollDataByYearError;
-
-    const { data: invoiceData, error: invoiceDataError } =
-      await getInvoicesByCompanyIdForDashboard({
-        companyId,
-        supabase,
-        filters,
-      });
-    if (invoiceDataError) throw invoiceDataError;
+    const invoicePromise = getInvoicesByCompanyIdForDashboard({
+      companyId,
+      supabase,
+      filters,
+    });
 
     return defer({
-      notificationData,
-      currentMonthExits,
-      previousMonthExits,
-      currentPayrollData,
-      previousPayrollData,
-      activeEmployees,
-      totalEmployees,
-      activeEmployeesBySites,
-      payrollDataByYears,
-      invoiceData,
+      notificationPromise,
+      exitsPromise,
+      employeesPromise,
+      payrollPromise,
+      payrollByYearsPromise,
+      invoicePromise,
       filters,
       error: null,
     });
   } catch (error) {
     return defer({
-      notificationData: null,
-      currentMonthExits: null,
-      previousMonthExits: null,
-      currentPayrollData: null,
-      previousPayrollData: null,
-      activeEmployees: null,
-      totalEmployees: null,
-      activeEmployeesBySites: null,
-      payrollDataByYears: null,
-      invoiceData: null,
+      notificationPromise: Promise.resolve({ data: null, error }),
+      exitsPromise: Promise.resolve({
+        currentMonthExits: null,
+        currentMonthExitErrors: null,
+        previousMonthExits: null,
+        previousMonthExitErrors: null,
+      }),
+      employeesPromise: Promise.resolve({
+        activeEmployeeError: null,
+        activeEmployees: null,
+        totalEmployeeError: null,
+        totalEmployees: null,
+        activeEmployeesBySites: null,
+        activeEmployeeErrorBySites: null,
+      }),
+      payrollPromise: Promise.resolve({
+        currentMonth: null,
+        currentMonthError: null,
+        previousMonth: null,
+        previousMonthError: null,
+      }),
+      payrollByYearsPromise: Promise.resolve({ data: null, error }),
+      invoicePromise: Promise.resolve({ data: null, error }),
       filters,
       error: error,
     });
@@ -135,9 +125,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  const url = new URL(args.request.url);
   return clientCaching(
-    `${cacheKeyPrefix.dashboard}${url.searchParams.toString()}`,
+    `${cacheKeyPrefix.dashboard}`,
     args
   );
 }
@@ -146,16 +135,12 @@ clientLoader.hydrate = true;
 
 export default function Dashboard() {
   const {
-    notificationData,
-    currentMonthExits,
-    previousMonthExits,
-    currentPayrollData,
-    previousPayrollData,
-    activeEmployees,
-    totalEmployees,
-    activeEmployeesBySites,
-    payrollDataByYears,
-    invoiceData,
+    notificationPromise,
+    exitsPromise,
+    employeesPromise,
+    payrollPromise,
+    payrollByYearsPromise,
+    invoicePromise,
     filters,
     error,
   } = useLoaderData<typeof loader>();
@@ -172,12 +157,37 @@ export default function Dashboard() {
 
   return (
     <>
-      <div ref={containerRef} className={cn("overflow-hidden w-full border-b bg-primary/15", !notificationData?.text && "hidden")}>
-        <div ref={contentRef} className="text-primary whitespace-nowrap p-4">
-          {notificationData?.text}
-          <span aria-hidden className="inline-block w-[17px]" />
-        </div>
-      </div>
+      <Suspense fallback={null}>
+        <Await resolve={notificationPromise}>
+          {({ data: notificationData, error: notificationError }) => {
+            if (notificationError) {
+              clearCacheEntry(cacheKeyPrefix.dashboard);
+              return (
+                <ErrorBoundary
+                  error={notificationError}
+                  message="Failed to load Notification"
+                />
+              );
+            }
+
+            return (
+              <div
+                ref={containerRef}
+                className="overflow-hidden w-full border-b bg-primary/15"
+              >
+                <div
+                  ref={contentRef}
+                  className="text-primary whitespace-nowrap p-4"
+                >
+                  {notificationData?.text}
+                  <span aria-hidden className="inline-block w-[17px]" />
+                </div>
+              </div>
+            );
+          }}
+        </Await>
+      </Suspense>
+
       <section className="w-full p-4 flex flex-col gap-4">
         <div className="flex justify-end">
           <div className="flex justify-between gap-3">
@@ -185,29 +195,140 @@ export default function Dashboard() {
             <DashboardFilter />
           </div>
         </div>
+
         <div className="w-full flex flex-col gap-4">
-          <CountCards
-            currentData={currentPayrollData as unknown as PayrollDatabaseRow[]}
-            previousData={previousPayrollData as unknown as PayrollDatabaseRow[]}
-            activeEmployeeCount={
-              activeEmployees as unknown as EmployeeDatabaseRow[]
-            }
-            totalEmployeeCount={
-              totalEmployees as unknown as EmployeeDatabaseRow[]
-            }
-            currentExits={currentMonthExits as unknown as ExitsRow[]}
-            previousExits={previousMonthExits as unknown as ExitsRow[]}
-          />
-          <PayrollTrend chartData={payrollDataByYears} />
+          <Suspense fallback={<LoadingSpinner className="h-32" />}>
+            <Await
+              resolve={Promise.all([
+                payrollPromise,
+                employeesPromise,
+                exitsPromise,
+              ])}
+            >
+              {([payrollData, employeesData, exitsData]) => {
+                if (payrollData.currentMonthError) {
+                  clearCacheEntry(cacheKeyPrefix.dashboard);
+                  return (
+                    <ErrorBoundary
+                      error={payrollData.currentMonthError}
+                      message="Failed to load payroll data"
+                    />
+                  );
+                }
+
+                if (employeesData.activeEmployeeError) {
+                  clearCacheEntry(cacheKeyPrefix.dashboard);
+                  return (
+                    <ErrorBoundary
+                      error={employeesData.activeEmployeeError}
+                      message="Failed to load employee data"
+                    />
+                  );
+                }
+
+                if (exitsData.currentMonthExitErrors) {
+                  clearCacheEntry(cacheKeyPrefix.dashboard);
+                  return (
+                    <ErrorBoundary
+                      error={exitsData.currentMonthExitErrors}
+                      message="Failed to load exits data"
+                    />
+                  );
+                }
+
+                return (
+                  <CountCards
+                    currentData={
+                      payrollData.currentMonth as unknown as PayrollDatabaseRow[]
+                    }
+                    previousData={
+                      payrollData.previousMonth as unknown as PayrollDatabaseRow[]
+                    }
+                    activeEmployeeCount={
+                      employeesData.activeEmployees as unknown as EmployeeDatabaseRow[]
+                    }
+                    totalEmployeeCount={
+                      employeesData.totalEmployees as unknown as EmployeeDatabaseRow[]
+                    }
+                    currentExits={
+                      exitsData.currentMonthExits as unknown as ExitsRow[]
+                    }
+                    previousExits={
+                      exitsData.previousMonthExits as unknown as ExitsRow[]
+                    }
+                  />
+                );
+              }}
+            </Await>
+          </Suspense>
+
+          <Suspense fallback={<LoadingSpinner className="h-64" />}>
+            <Await resolve={payrollByYearsPromise}>
+              {({
+                data: payrollDataByYears,
+                error: payrollDataByYearError,
+              }) => {
+                if (payrollDataByYearError) {
+                  clearCacheEntry(cacheKeyPrefix.dashboard);
+                  return (
+                    <ErrorBoundary
+                      error={payrollDataByYearError}
+                      message="Failed to load payroll trend data"
+                    />
+                  );
+                }
+
+                return <PayrollTrend chartData={payrollDataByYears} />;
+              }}
+            </Await>
+          </Suspense>
+
           <div className="grid grid-cols-3 gap-4">
-            <ActiveEmployeesBySite
-              chartData={
-                activeEmployeesBySites as unknown as EmployeeDatabaseRow[]
-              }
-            />
-            <InvoicePaidUnpaid
-              chartData={invoiceData as unknown as InvoiceDataType[]}
-            />
+            <Suspense fallback={<LoadingSpinner className="h-64" />}>
+              <Await resolve={employeesPromise}>
+                {({ activeEmployeesBySites, activeEmployeeErrorBySites }) => {
+                  if (activeEmployeeErrorBySites) {
+                    clearCacheEntry(cacheKeyPrefix.dashboard);
+                    return (
+                      <ErrorBoundary
+                        error={activeEmployeeErrorBySites}
+                        message="Failed to load employees by site data"
+                      />
+                    );
+                  }
+
+                  return (
+                    <ActiveEmployeesBySite
+                      chartData={
+                        activeEmployeesBySites as unknown as EmployeeDatabaseRow[]
+                      }
+                    />
+                  );
+                }}
+              </Await>
+            </Suspense>
+
+            <Suspense fallback={<LoadingSpinner className="h-64" />}>
+              <Await resolve={invoicePromise}>
+                {({ data: invoiceData, error: invoiceDataError }) => {
+                  if (invoiceDataError) {
+                    clearCacheEntry(cacheKeyPrefix.dashboard);
+                    return (
+                      <ErrorBoundary
+                        error={invoiceDataError}
+                        message="Failed to load invoice data"
+                      />
+                    );
+                  }
+
+                  return (
+                    <InvoicePaidUnpaid
+                      chartData={invoiceData as unknown as InvoiceDataType[]}
+                    />
+                  );
+                }}
+              </Await>
+            </Suspense>
           </div>
         </div>
       </section>

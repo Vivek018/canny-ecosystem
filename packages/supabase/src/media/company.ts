@@ -148,6 +148,9 @@ export async function uploadCompanyDocument({
     });
 
     if (insertError) {
+      await supabase.storage
+        .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
+        .remove([filePath]);
       console.error("addCompanyDocument Error", insertError);
       return {
         status,

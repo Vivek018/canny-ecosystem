@@ -13,9 +13,14 @@ import {
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
 import { formatISO } from "date-fns";
-import { type FormEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { useNavigation, useSearchParams } from "@remix-run/react";
+import {
+  type SubmitOptions,
+  useNavigation,
+  useSearchParams,
+  useSubmit,
+} from "@remix-run/react";
 import { Calendar } from "@canny_ecosystem/ui/calendar";
 import {
   booleanArray,
@@ -24,6 +29,25 @@ import {
 } from "@canny_ecosystem/utils";
 
 import type { ReimbursementFilters } from "@canny_ecosystem/supabase/queries";
+import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
+import { useTypingAnimation } from "@canny_ecosystem/utils/hooks/typing-animation";
+
+export const PLACEHOLDERS = [
+  "Reimbursements submitted after Jan 2022 for Project 'ABC'",
+  "Pending reimbursements approved by Manager John",
+  "Non-payroll reimbursements submitted in 2023",
+  "Approved reimbursements for Site 'ABC' under Project 'XYZ'",
+  "Reimbursements marked as deductible for Loan recovery",
+  "Reimbursements submitted before 2020 and still pending",
+  "In-payroll reimbursements approved by User",
+  "Rejected reimbursements for Project 'XYZ' by User",
+  "Deductible reimbursements submitted between 2021 and 2024",
+  "Reimbursements for Site 'ABC' not linked to Payroll",
+  "Approved reimbursements submitted by EMP2045 in 2022",
+  "Reimbursements submitted before 2019 for Project Site 'XYZ'",
+  "Pending reimbursements from employees not in Payroll",
+  "Deductible reimbursements approved by Finance Head",
+];
 
 export function ReimbursementSearchFilter({
   disabled,
@@ -40,6 +64,18 @@ export function ReimbursementSearchFilter({
 }) {
   const [prompt, setPrompt] = useState("");
   const navigation = useNavigation();
+  const submit = useSubmit();
+  const [isFocused, setIsFocused] = useState(false);
+
+  const debounceSubmit = useDebounce((target: any, options?: SubmitOptions) => {
+    submit(target, options);
+  }, 300);
+
+  const animatedPlaceholder = useTypingAnimation(PLACEHOLDERS, isFocused, {
+    typingSpeed: 40,
+    pauseDuration: 4000,
+  });
+
   const isSubmitting =
     navigation.state === "submitting" ||
     (navigation.state === "loading" &&
@@ -141,11 +177,20 @@ export function ReimbursementSearchFilter({
     }
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (prompt.length) {
-      searchParams.set("name", prompt);
-      setSearchParams(searchParams);
+  const handleSubmit = () => {
+    if (prompt.split(" ").length > 1) {
+      debounceSubmit(
+        { prompt: prompt },
+        {
+          action: "/approvals/reimbursements?index",
+          method: "POST",
+        }
+      );
+    } else {
+      if (prompt.length) {
+        searchParams.set("name", prompt);
+        setSearchParams(searchParams);
+      }
     }
   };
 
@@ -161,7 +206,7 @@ export function ReimbursementSearchFilter({
           className="relative w-full md:w-auto"
           onSubmit={(e) => {
             e.preventDefault();
-            handleSubmit(e);
+            handleSubmit();
           }}
         >
           <Icon
@@ -177,12 +222,14 @@ export function ReimbursementSearchFilter({
             placeholder={
               disabled
                 ? "No Reimbursement Data to Search And Filter"
-                : "Search Reimbursements"
+                : animatedPlaceholder
             }
             disabled={disabled}
             className="pl-9 w-full h-10 md:w-[480px] pr-8 focus-visible:ring-0 placeholder:opacity-50 placeholder:focus-visible:opacity-70"
             value={prompt}
             onChange={handleSearch}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
             autoComplete="on"
             autoCapitalize="none"
             autoCorrect="off"
