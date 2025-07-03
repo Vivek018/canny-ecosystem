@@ -12,7 +12,7 @@ export const ReimbursementFiltersSchema = z.object({
     .string()
     .optional()
     .describe(
-      "Full name, employee code or any identifier. Example: John Doe or EMP123"
+      "Full name, employee code or reimbursement name. Example: John Doe or EMP123 or Bonus"
     ),
   submitted_date_start: z
     .string()

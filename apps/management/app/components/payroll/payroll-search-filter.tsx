@@ -29,7 +29,7 @@ import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
 
 export const PLACEHOLDERS = [
   "Approved payrolls processed between Jan and May 2024",
-  "Salary-type payrolls created before 2020",
+  "Salary type payrolls created before 2020",
   "Payrolls with pending status for Contract employees",
   "Payroll records from Project 'XYZ' created in 2023",
   "Payrolls generated between 2018 and 2020 with 'ABC' type",

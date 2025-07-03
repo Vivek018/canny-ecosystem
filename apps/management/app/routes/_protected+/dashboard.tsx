@@ -33,6 +33,7 @@ import { InvoicePaidUnpaid } from "@/components/dashboard/paid-unpaid-invoices";
 import { useAnimateTextScroll } from "@canny_ecosystem/ui/animate-text-scroll";
 import { Suspense } from "react";
 import { LoadingSpinner } from "@/components/loading-spinner";
+import { cn } from "@canny_ecosystem/ui/utils/cn";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
@@ -45,9 +46,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
     month: searchParams.get("month") ?? undefined,
     year: searchParams.get("year") ?? undefined,
   };
-
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   try {
-    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
     const notificationPromise = getNotificationByCompanyId({
       supabase,
@@ -84,6 +84,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
 
     return defer({
+      companyId,
       notificationPromise,
       exitsPromise,
       employeesPromise,
@@ -95,6 +96,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
   } catch (error) {
     return defer({
+      companyId,
       notificationPromise: Promise.resolve({ data: null, error }),
       exitsPromise: Promise.resolve({
         currentMonthExits: null,
@@ -125,8 +127,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
+  const url = new URL(args.request.url);
   return clientCaching(
-    `${cacheKeyPrefix.dashboard}`,
+    `${cacheKeyPrefix.dashboard}${url.searchParams.toString()}`,
     args
   );
 }
@@ -135,6 +138,7 @@ clientLoader.hydrate = true;
 
 export default function Dashboard() {
   const {
+    companyId,
     notificationPromise,
     exitsPromise,
     employeesPromise,
@@ -156,7 +160,7 @@ export default function Dashboard() {
   }
 
   return (
-    <>
+    <div key={companyId}>
       <Suspense fallback={null}>
         <Await resolve={notificationPromise}>
           {({ data: notificationData, error: notificationError }) => {
@@ -173,7 +177,7 @@ export default function Dashboard() {
             return (
               <div
                 ref={containerRef}
-                className="overflow-hidden w-full border-b bg-primary/15"
+                className={cn("overflow-hidden w-full border-b bg-primary/15", !notificationData?.text && "hidden")}
               >
                 <div
                   ref={contentRef}
@@ -332,6 +336,6 @@ export default function Dashboard() {
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
 }
