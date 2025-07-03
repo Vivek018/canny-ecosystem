@@ -48,7 +48,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
   };
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
   try {
-
     const notificationPromise = getNotificationByCompanyId({
       supabase,
       companyId,
@@ -149,11 +148,6 @@ export default function Dashboard() {
     error,
   } = useLoaderData<typeof loader>();
 
-  const { containerRef, contentRef } = useAnimateTextScroll({
-    pauseDurationMs: 2000,
-    speed: 1.5,
-  });
-
   if (error) {
     clearCacheEntry(cacheKeyPrefix.dashboard);
     return <ErrorBoundary error={error} message="Failed to load data" />;
@@ -174,10 +168,18 @@ export default function Dashboard() {
               );
             }
 
+            const { containerRef, contentRef } = useAnimateTextScroll({
+              pauseDurationMs: 2000,
+              speed: 1.5,
+            });
+
             return (
               <div
                 ref={containerRef}
-                className={cn("overflow-hidden w-full border-b bg-primary/15", !notificationData?.text && "hidden")}
+                className={cn(
+                  "overflow-hidden w-full border-b bg-primary/15",
+                  !notificationData?.text && "hidden"
+                )}
               >
                 <div
                   ref={contentRef}

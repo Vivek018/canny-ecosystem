@@ -33,7 +33,7 @@ export function useAnimateTextScroll(
         clearTimeout(timeout);
         timeout = setTimeout(() => {
           currentX = 0;
-          content.style.transform = `translateX(0px)`;
+          content.style.transform = "translateX(0px)";
         }, pauseDuration);
       } else {
         animFrame = requestAnimationFrame(scrollStep);
@@ -56,7 +56,7 @@ export function useAnimateTextScroll(
       cancelAnimationFrame(animFrame);
       clearTimeout(timeout);
       currentX = 0;
-      content.style.transform = `translateX(0px)`;
+      content.style.transform = "translateX(0px)";
     };
 
     container.addEventListener("mouseenter", handleStartScroll);
