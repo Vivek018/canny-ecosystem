@@ -41,7 +41,6 @@ export function SalaryEntryComponent({
   env: SupabaseEnv;
   fromWhere: "runpayroll" | "payrollhistory";
 }) {
-
   const payrollCardDetails = [
     { title: "Title", value: "title" },
     { title: "Status", value: "status" },
@@ -238,11 +237,13 @@ export function SalaryEntryComponent({
                     details.title === "Title" && "text-sm"
                   )}
                 >
-                  {details.value === "created_at"
-                    ? formatDate(
-                        payrollData[details.value as keyof typeof payrollData]
-                      )
-                    : payrollData[details.value as keyof typeof payrollData]}
+                  <>
+                    {details.value === "created_at"
+                      ? formatDate(
+                          payrollData[details.value as keyof typeof payrollData]
+                        )
+                      : payrollData[details.value as keyof typeof payrollData]}
+                  </>
                 </p>
               </CardContent>
             </Card>

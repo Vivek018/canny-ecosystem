@@ -171,6 +171,99 @@ export function PayrollActions({
               Download Salary Register
             </Button>
           </div>
+          {/* <DropdownMenuSeparator
+            className={cn(
+              "hidden",
+              payrollData.payroll_type === "salary" &&
+                status === "approved" &&
+                "flex"
+            )}
+          />
+          <div>
+            <Button
+              variant={"ghost"}
+              className={cn(
+                "hidden",
+                payrollData.payroll_type === "salary" &&
+                  status === "approved" &&
+                  "flex flex-row justify-start gap-2 px-2 pr-1  "
+              )}
+              onClick={() =>
+                fromWhere === "runpayroll"
+                  ? navigate(
+                      `/payroll/run-payroll/${payrollId}/salary-register`
+                    )
+                  : navigate(
+                      `/payroll/payroll-history/${payrollId}/salary-register`
+                    )
+              }
+            >
+              <Icon name="import" />
+              Download Salary Register
+            </Button>
+          </div>
+          <DropdownMenuSeparator
+            className={cn(
+              "hidden",
+              payrollData.payroll_type === "salary" &&
+                status === "approved" &&
+                "flex"
+            )}
+          />
+          <div>
+            <Button
+              variant={"ghost"}
+              className={cn(
+                "hidden",
+                payrollData.payroll_type === "salary" &&
+                  status === "approved" &&
+                  "flex flex-row justify-start gap-2 px-2 pr-1  "
+              )}
+              onClick={() =>
+                fromWhere === "runpayroll"
+                  ? navigate(
+                      `/payroll/run-payroll/${payrollId}/salary-register`
+                    )
+                  : navigate(
+                      `/payroll/payroll-history/${payrollId}/salary-register`
+                    )
+              }
+            >
+              <Icon name="import" />
+              Download Salary Register
+            </Button>
+          </div> */}
+          <DropdownMenuSeparator
+            className={cn(
+              "hidden",
+              payrollData.payroll_type === "salary" &&
+                status === "approved" &&
+                "flex"
+            )}
+          />
+          <div>
+            <Button
+              variant={"ghost"}
+              className={cn(
+                "hidden",
+                payrollData.payroll_type === "salary" &&
+                  status === "approved" &&
+                  "flex flex-row justify-start gap-2 px-2 pr-1  "
+              )}
+              onClick={() =>
+                fromWhere === "runpayroll"
+                  ? navigate(
+                      `/payroll/run-payroll/${payrollId}/overtime-register`
+                    )
+                  : navigate(
+                      `/payroll/payroll-history/${payrollId}/overtime-register`
+                    )
+              }
+            >
+              <Icon name="import" />
+              Download Overtime Register
+            </Button>
+          </div>
         </div>
       </DropdownMenuContent>
     </DropdownMenu>

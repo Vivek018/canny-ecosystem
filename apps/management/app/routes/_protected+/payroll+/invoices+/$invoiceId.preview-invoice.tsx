@@ -196,6 +196,41 @@ const InvoicePDF = ({
   terms: any;
   proofType: string;
 }) => {
+  const allEarningFields = Array.from(
+    new Set(
+      data.employeeData.flatMap(
+        (emp) => emp?.earnings?.map((e) => e.name) ?? []
+      )
+    )
+  );
+  const allDeductionFields = Array.from(
+    new Set(
+      data.employeeData.flatMap(
+        (emp) => emp?.deductions?.map((e) => e.name) ?? []
+      )
+    )
+  );
+  const earningTotals: Record<string, number> = {};
+  const deductionTotals: Record<string, number> = {};
+
+  for (const emp of data.employeeData) {
+    if (emp?.earnings) {
+      for (const e of emp.earnings) {
+        const key = e.name;
+        const amount = Number(e.amount ?? 0);
+        earningTotals[key] = (earningTotals[key] || 0) + amount;
+      }
+    }
+
+    if (emp?.deductions) {
+      for (const d of emp.deductions) {
+        const key = d.name;
+        const amount = Number(d.amount ?? 0);
+        deductionTotals[key] = (deductionTotals[key] || 0) + amount;
+      }
+    }
+  }
+
   const array = [
     {
       label: `Service Charge @ ${
@@ -640,16 +675,16 @@ const InvoicePDF = ({
               { borderTop: "1pt solid #000000", marginTop: "22" },
             ]}
           >
-            <View style={[styles.headerCell, { flex: 0.1 }]}>
-              <Text>Sr. No.</Text>
+            <View style={[styles.headerCell, { flex: 0.13 }]}>
+              <Text>Sr.no.</Text>
             </View>
-            <View style={[styles.headerCell, { flex: 0.6 }]}>
+            <View style={[styles.headerCell, { flex: 0.5 }]}>
               <Text>EMP. CODE</Text>
             </View>
             <View style={[styles.headerCell, { flex: 0.5 }]}>
               <Text>ESIC No.</Text>
             </View>
-            <View style={[styles.headerCell, { flex: 0.6 }]}>
+            <View style={[styles.headerCell, { flex: 0.53 }]}>
               <Text>UAN NO.</Text>
             </View>
             <View style={[styles.headerCell, { flex: 0.7 }]}>
@@ -664,37 +699,29 @@ const InvoicePDF = ({
             <View style={[styles.headerCell, { flex: 0.2 }]}>
               <Text>Present Days</Text>
             </View>
-            <View style={[styles.headerCell, { flex: 0.3 }]}>
-              <Text>BASIC</Text>
-            </View>
-            <View style={[styles.headerCell, { flex: 0.3 }]}>
-              <Text>HRA</Text>
-            </View>
-            <View style={[styles.headerCell, { flex: 0.3 }]}>
-              <Text>LTA</Text>
-            </View>
-            <View style={[styles.headerCell, { flex: 0.3 }]}>
-              <Text>Others</Text>
-            </View>
+            {data.employeeData?.[0]?.earnings.map((earningField, index) => (
+              <View
+                key={index.toString()}
+                style={[styles.headerCell, { flex: 0.3 }]}
+              >
+                <Text>{earningField.name}</Text>
+              </View>
+            ))}
             <View style={[styles.headerCell, { flex: 0.3 }]}>
               <Text>GROSS</Text>
             </View>
-            <View style={[styles.headerCell, { flex: 0.4 }]}>
-              <Text>P.F. (12%)</Text>
-            </View>
-            <View style={[styles.headerCell, { flex: 0.3 }]}>
-              <Text>ESIC (0.75%)</Text>
-            </View>
-            <View style={[styles.headerCell, { flex: 0.2 }]}>
-              <Text>P.Tax</Text>
-            </View>
-            <View style={[styles.headerCell, { flex: 0.4 }]}>
+            {data.employeeData?.[0]?.deductions.map((deductionField, index) => (
+              <View
+                key={index.toString()}
+                style={[styles.headerCell, { flex: 0.3 }]}
+              >
+                <Text>{deductionField.name}</Text>
+              </View>
+            ))}
+            <View style={[styles.headerCell, { flex: 0.22 }]}>
               <Text>Total Ded.</Text>
             </View>
-            <View style={[styles.headerCell, { flex: 0.4 }]}>
-              <Text>Bonus (8.33%)</Text>
-            </View>
-            <View style={[styles.headerCell, { flex: 0.4 }]}>
+            <View style={[styles.headerCell, { flex: 0.35 }]}>
               <Text>Net Pay</Text>
             </View>
             <View style={[styles.headerCell, { flex: 0.15 }]}>
@@ -707,66 +734,51 @@ const InvoicePDF = ({
               key={index.toString()}
               style={[styles.tableHeader, { borderTop: "1pt solid #000000" }]}
             >
-              <View style={[styles.headerCell, { flex: 0.1 }]}>
+              <View style={[styles.headerCell, { flex: 0.13 }]}>
                 <Text>{index + 1}</Text>
               </View>
-              <View style={[styles.headerCell, { flex: 0.6 }]}>
+              <View style={[styles.headerCell, { flex: 0.5 }]}>
                 <Text>{employee?.employeeData?.employee_code}</Text>
               </View>
               <View style={[styles.headerCell, { flex: 0.5 }]}>
                 <Text>{employee?.employeeStatutoryDetails?.esic_number}</Text>
               </View>
-              <View style={[styles.headerCell, { flex: 0.6 }]}>
+              <View style={[styles.headerCell, { flex: 0.53 }]}>
                 <Text>{employee?.employeeStatutoryDetails?.uan_number}</Text>
               </View>
               <View style={[styles.headerCell, { flex: 0.7 }]}>
                 <Text>
                   {employee?.employeeData?.first_name}{" "}
-                  {employee?.employeeData?.middle_name}{" "}
                   {employee?.employeeData?.last_name}
                 </Text>
               </View>
               <View style={[styles.headerCell, { flex: 0.4 }]}>
-                <Text>{}</Text>
+                <Text>{data.invoiceDetails.company_address_id}</Text>
               </View>
-              <View style={[styles.headerCell, { flex: 0.4 }]}>
-                <Text>{employee.employeeProjectAssignmentData?.position}</Text>
+              <View
+                style={[
+                  styles.headerCell,
+                  { flex: 0.4, textTransform: "capitalize" },
+                ]}
+              >
+                <Text>
+                  {replaceUnderscore(
+                    employee.employeeProjectAssignmentData?.position
+                  )}
+                </Text>
               </View>
               <View style={[styles.headerCell, { flex: 0.2 }]}>
                 <Text>{employee?.attendance?.paid_days}</Text>
               </View>
-              <View style={[styles.headerCell, { flex: 0.3 }]}>
-                <Text>
-                  {Number(
-                    employee?.earnings?.find((item) => item.name === "BASIC")
-                      ?.amount ?? 0
-                  ) || 0}
-                </Text>
-              </View>
-              <View style={[styles.headerCell, { flex: 0.3 }]}>
-                <Text>
-                  {Number(
-                    employee?.earnings?.find((item) => item.name === "HRA")
-                      ?.amount ?? 0
-                  ) || 0}
-                </Text>
-              </View>
-              <View style={[styles.headerCell, { flex: 0.3 }]}>
-                <Text>
-                  {Number(
-                    employee?.earnings?.find((item) => item.name === "LTA")
-                      ?.amount ?? 0
-                  ) || 0}
-                </Text>
-              </View>
-              <View style={[styles.headerCell, { flex: 0.3 }]}>
-                <Text>
-                  {Number(
-                    employee?.earnings?.find((item) => item.name === "Others")
-                      ?.amount ?? 0
-                  ) || 0}
-                </Text>
-              </View>
+              {employee?.earnings.map((earningField, index) => (
+                <View
+                  key={index.toString()}
+                  style={[styles.headerCell, { flex: 0.3 }]}
+                >
+                  <Text>{earningField.amount}</Text>
+                </View>
+              ))}
+
               <View style={[styles.headerCell, { flex: 0.3 }]}>
                 <Text>
                   {Number(
@@ -776,65 +788,43 @@ const InvoicePDF = ({
                   )}
                 </Text>
               </View>
-              <View style={[styles.headerCell, { flex: 0.4 }]}>
-                <Text>
-                  {Number(
-                    employee?.deductions?.find(
-                      (item) => item.name === "EPF" || item.name === "PF"
-                    )?.amount ?? 0
-                  ).toFixed(2) || 0}
-                </Text>
-              </View>
-              <View style={[styles.headerCell, { flex: 0.3 }]}>
-                <Text>
-                  {Number(
-                    employee?.deductions?.find(
-                      (item) => item.name === "ESI" || item.name === "ESIC"
-                    )?.amount ?? 0
-                  ).toFixed(2) || 0}
-                </Text>
-              </View>
-              <View style={[styles.headerCell, { flex: 0.2 }]}>
-                <Text>
-                  {Number(
-                    employee?.deductions?.find((item) => item.name === "PT")
-                      ?.amount ?? 0
-                  ) || 0}
-                </Text>
-              </View>
+              {employee?.deductions.map((deductionField, index) => (
+                <View
+                  key={index.toString()}
+                  style={[styles.headerCell, { flex: 0.3 }]}
+                >
+                  <Text>{deductionField.amount}</Text>
+                </View>
+              ))}
 
-              <View style={[styles.headerCell, { flex: 0.4 }]}>
+              <View style={[styles.headerCell, { flex: 0.22 }]}>
                 <Text>
-                  {Number(
-                    employee?.deductions.reduce(
-                      (sum, earning) => sum + earning?.amount,
-                      0
-                    )
-                  ).toFixed(2)}
-                </Text>
-              </View>
-              <View style={[styles.headerCell, { flex: 0.4 }]}>
-                <Text>
-                  {Number(
-                    employee?.deductions?.find((item) => item.name === "BONUS")
-                      ?.amount ?? 0
-                  ).toFixed(2) || 0}
-                </Text>
-              </View>
-              <View style={[styles.headerCell, { flex: 0.4 }]}>
-                <Text>
-                  {(
+                  {roundToNearest(
                     Number(
-                      employee?.earnings
-                        .reduce((sum, earning) => sum + earning?.amount, 0)
-                        ?.toFixed(2)
+                      employee?.deductions.reduce(
+                        (sum, deduction) => sum + deduction?.amount,
+                        0
+                      )
+                    )
+                  )}
+                </Text>
+              </View>
+              <View style={[styles.headerCell, { flex: 0.35 }]}>
+                <Text>
+                  {roundToNearest(
+                    Number(
+                      employee?.earnings.reduce(
+                        (sum, earning) => sum + earning?.amount,
+                        0
+                      )
                     ) -
-                    Number(
-                      employee?.deductions
-                        .reduce((sum, earning) => sum + earning?.amount, 0)
-                        ?.toFixed(2)
-                    )
-                  )?.toFixed(2)}
+                      Number(
+                        employee?.deductions.reduce(
+                          (sum, deduction) => sum + deduction?.amount,
+                          0
+                        )
+                      )
+                  )}
                 </Text>
               </View>
               <View style={[styles.headerCell, { flex: 0.15 }]} />
@@ -846,50 +836,23 @@ const InvoicePDF = ({
               { borderTop: "1pt solid #000000", marginTop: 8 },
             ]}
           >
-            <View style={[styles.headerCell, { flex: 0.1 }]} />
-            <View style={[styles.headerCell, { flex: 0.6 }]} />
+            <View style={[styles.headerCell, { flex: 0.13 }]} />
             <View style={[styles.headerCell, { flex: 0.5 }]} />
-            <View style={[styles.headerCell, { flex: 0.6 }]} />
+            <View style={[styles.headerCell, { flex: 0.5 }]} />
+            <View style={[styles.headerCell, { flex: 0.53 }]} />
             <View style={[styles.headerCell, { flex: 0.7 }]} />
             <View style={[styles.headerCell, { flex: 0.4 }]} />
             <View style={[styles.headerCell, { flex: 0.4 }]} />
             <View style={[styles.headerCell, { flex: 0.2 }]} />
-            <View style={[styles.headerCell, { flex: 0.3 }]}>
-              <Text>
-                {Number(
-                  data?.invoiceDetails?.payroll_data?.find(
-                    (item) => item.field === "BASIC"
-                  )?.amount ?? 0
-                ) || 0}
-              </Text>
-            </View>
-            <View style={[styles.headerCell, { flex: 0.3 }]}>
-              <Text>
-                {Number(
-                  data?.invoiceDetails?.payroll_data?.find(
-                    (item) => item.field === "HRA"
-                  )?.amount ?? 0
-                ) || 0}
-              </Text>
-            </View>
-            <View style={[styles.headerCell, { flex: 0.3 }]}>
-              <Text>
-                {Number(
-                  data?.invoiceDetails?.payroll_data?.find(
-                    (item) => item.field === "LTA"
-                  )?.amount ?? 0
-                ) || 0}
-              </Text>
-            </View>
-            <View style={[styles.headerCell, { flex: 0.3 }]}>
-              <Text>
-                {Number(
-                  data?.invoiceDetails?.payroll_data?.find(
-                    (item) => item.field === "Others"
-                  )?.amount ?? 0
-                ) || 0}
-              </Text>
-            </View>
+            {allEarningFields.map((field, index) => (
+              <View
+                key={index.toString()}
+                style={[styles.headerCell, { flex: 0.3 }]}
+              >
+                <Text>{earningTotals[field] ?? 0}</Text>
+              </View>
+            ))}
+
             <View style={[styles.headerCell, { flex: 0.3 }]}>
               <Text>
                 {Number(
@@ -903,91 +866,60 @@ const InvoicePDF = ({
                 )}
               </Text>
             </View>
-            <View style={[styles.headerCell, { flex: 0.4 }]}>
-              <Text>
-                {Number(
-                  data?.invoiceDetails?.payroll_data?.find(
-                    (item) => item.field === "EPF" || item.field === "PF"
-                  )?.amount ?? 0
-                ).toFixed(2) || 0}
-              </Text>
-            </View>
-            <View style={[styles.headerCell, { flex: 0.3 }]}>
-              <Text>
-                {Number(
-                  data?.invoiceDetails?.payroll_data?.find(
-                    (item) => item.field === "ESI" || item.field === "ESIC"
-                  )?.amount ?? 0
-                ).toFixed(2) || 0}
-              </Text>
-            </View>
-            <View style={[styles.headerCell, { flex: 0.2 }]}>
-              <Text>
-                {Number(
-                  data?.invoiceDetails?.payroll_data?.find(
-                    (item) => item.field === "PT"
-                  )?.amount ?? 0
-                ) || 0}
-              </Text>
-            </View>
+            {allDeductionFields.map((field, index) => (
+              <View
+                key={index.toString()}
+                style={[styles.headerCell, { flex: 0.3 }]}
+              >
+                <Text>{deductionTotals[field] ?? 0}</Text>
+              </View>
+            ))}
 
-            <View style={[styles.headerCell, { flex: 0.4 }]}>
+            <View style={[styles.headerCell, { flex: 0.22 }]}>
               <Text>
-                {Number(
-                  data.employeeData
-                    .reduce((sum, emp) => {
+                {roundToNearest(
+                  Number(
+                    data.employeeData.reduce((sum, emp) => {
                       const deductionSum = emp?.deductions?.reduce(
                         (acc, d) => acc + Number(d?.amount ?? 0),
                         0
                       );
                       return sum + deductionSum;
                     }, 0)
-                    .toFixed(2)
+                  )
                 )}
               </Text>
             </View>
-            <View style={[styles.headerCell, { flex: 0.4 }]}>
+
+            <View style={[styles.headerCell, { flex: 0.35 }]}>
               <Text>
-                {Number(
-                  data?.invoiceDetails?.payroll_data?.find(
-                    (item) => item.field === "BONUS"
-                  )?.amount ?? 0
-                ).toFixed(2) || 0}
-              </Text>
-            </View>
-            <View style={[styles.headerCell, { flex: 0.4 }]}>
-              <Text>
-                {Number(
-                  data.employeeData.reduce((sum, emp) => {
-                    const earningSum = emp?.earnings?.reduce(
-                      (acc, d) => acc + Number(d?.amount ?? 0),
-                      0
-                    );
-                    return sum + earningSum;
-                  }, 0)
-                ) +
+                {roundToNearest(
                   Number(
-                    data?.invoiceDetails?.payroll_data?.find(
-                      (item) => item.field === "BONUS"
-                    )?.amount ?? 0
+                    data.employeeData.reduce((sum, emp) => {
+                      const earningSum = emp?.earnings?.reduce(
+                        (acc, d) => acc + Number(d?.amount ?? 0),
+                        0
+                      );
+                      return sum + earningSum;
+                    }, 0)
                   ) -
-                  Number(
-                    data.employeeData
-                      .reduce((sum, emp) => {
+                    Number(
+                      data.employeeData.reduce((sum, emp) => {
                         const deductionSum = emp?.deductions?.reduce(
                           (acc, d) => acc + Number(d?.amount ?? 0),
                           0
                         );
                         return sum + deductionSum;
                       }, 0)
-                      .toFixed(2)
-                  )}
+                    )
+                )}
               </Text>
             </View>
             <View style={[styles.headerCell, { flex: 0.15 }]} />
           </View>
 
           <View
+            wrap={false}
             style={{
               fontSize: 9,
               width: 250,
@@ -1230,6 +1162,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     ({ data: invoiceData, error: invoiceError } = await getInvoiceById({
       supabase,
       id: invoiceId,
+      from: "preview",
     }));
   }
   if (invoiceError) {
@@ -1322,6 +1255,7 @@ export default function PreviewInvoice() {
         invoice_number: invoice?.invoice_number,
         date: invoice?.date,
         subject: invoice?.subject,
+        company_address_id: invoice?.company_address_id,
         payroll_data: invoice?.payroll_data,
         include_cgst: invoice?.include_cgst,
         include_sgst: invoice?.include_sgst,
@@ -1496,6 +1430,7 @@ export default function PreviewInvoice() {
         invoice_number: invoice?.invoice_number,
         date: invoice?.date,
         subject: invoice?.subject,
+        company_address_id: invoice?.company_address_id,
         payroll_data: invoice?.payroll_data,
         include_cgst: invoice?.include_cgst,
         include_sgst: invoice?.include_sgst,
@@ -1582,6 +1517,7 @@ export default function PreviewInvoice() {
   const handleOpenChange = () => {
     navigate("/payroll/invoices");
   };
+
 
   return (
     <Dialog defaultOpen={true} onOpenChange={handleOpenChange}>
