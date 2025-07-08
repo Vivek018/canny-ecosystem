@@ -529,7 +529,7 @@ export default function PayrollImportFieldMapping() {
                       setOpen(false);
                     }}
                   >
-                    Send
+                    Set
                   </Button>
                 </DialogFooter>
               </DialogContent>

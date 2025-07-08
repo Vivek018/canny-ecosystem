@@ -367,6 +367,7 @@ export async function getReimbursementEntriesForPayrollByPayrollId({
     "payroll_id",
     "created_at",
     "company_id",
+    "is_deductible",
   ] as const;
 
   const { data, error } = await supabase

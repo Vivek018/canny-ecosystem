@@ -22,6 +22,7 @@ import {
   Await,
   type ClientLoaderFunctionArgs,
   useLoaderData,
+  useSearchParams,
 } from "@remix-run/react";
 import type {
   EmployeeDatabaseRow,
@@ -153,8 +154,14 @@ export default function Dashboard() {
     return <ErrorBoundary error={error} message="Failed to load data" />;
   }
 
+  const [searchParams] = useSearchParams();
+  const key =
+    (searchParams.get("month") ?? "") +
+    (searchParams.get("year") ?? "") +
+    companyId;
+
   return (
-    <div key={companyId}>
+    <div key={key}>
       <Suspense fallback={null}>
         <Await resolve={notificationPromise}>
           {({ data: notificationData, error: notificationError }) => {

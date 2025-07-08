@@ -17,7 +17,7 @@ export default function Project() {
           to={`/projects/${projectId}/sites`}
           className={cn(
             buttonVariants({ variant: "outline" }),
-            "bg-card w-9 h-9 px-0 rounded-full",
+            "bg-card w-9 h-9 px-0 rounded-full"
           )}
         >
           <Icon name="chevron-left" size="sm" />
@@ -25,8 +25,18 @@ export default function Project() {
 
         <SecondaryMenu
           items={[
-            { label: "Overview", path: `/projects/${projectId}/${siteId}/overview` },
-            { label: "Link Templates", path: `/projects/${projectId}/${siteId}/link-templates` },
+            {
+              label: "Overview",
+              path: `/projects/${projectId}/${siteId}/overview`,
+            },
+            {
+              label: "Link Templates",
+              path: `/projects/${projectId}/${siteId}/link-templates`,
+            },
+            {
+              label: "Groups",
+              path: `/projects/${projectId}/${siteId}/groups`,
+            },
           ]}
           className="pt-0 pb-0"
           pathname={pathname}

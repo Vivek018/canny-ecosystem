@@ -195,6 +195,7 @@ export const cacheKeyPrefix = {
   company_document: "company-document",
   attendance_report: "attendance-report",
   payroll_invoice: "payroll-invoice",
+  groups: "groups",
 };
 
 export const SALARY_SLIP_TITLE = "Form IV B [Rule 26(2)(b)]";

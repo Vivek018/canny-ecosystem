@@ -359,3 +359,9 @@ export type NotificationDatabaseInsert =
   Database["public"]["Tables"]["notifications"]["Insert"];
 export type NotificationDatabaseUpdate =
   Database["public"]["Tables"]["notifications"]["Update"];
+
+export type GroupDatabaseRow = Database["public"]["Tables"]["groups"]["Row"];
+export type GroupDatabaseInsert =
+  Database["public"]["Tables"]["groups"]["Insert"];
+export type GroupDatabaseUpdate =
+  Database["public"]["Tables"]["groups"]["Update"];

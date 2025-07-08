@@ -1,4 +1,4 @@
-import { Button } from "@canny_ecosystem/ui/button";
+import { Button, buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
 import { Outlet, useNavigation, useParams, useSubmit } from "@remix-run/react";
@@ -27,6 +27,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@canny_ecosystem/ui/alert-dialog";
+import { Label } from "@canny_ecosystem/ui/label";
 
 export function SalaryEntryComponent({
   data,
@@ -41,13 +53,13 @@ export function SalaryEntryComponent({
   env: SupabaseEnv;
   fromWhere: "runpayroll" | "payrollhistory";
 }) {
+  const [title, setTitle] = useState(payrollData?.title);
+  const [rundate, setRundate] = useState(payrollData?.run_date);
+
   const payrollCardDetails = [
-    { title: "Title", value: "title" },
     { title: "Status", value: "status" },
     { title: "No of Employees", value: "total_employees" },
-    { title: "Pay Day", value: "created_at" },
   ];
-
   const { role } = useUser();
   const { payrollId } = useParams();
   const submit = useSubmit();
@@ -138,6 +150,23 @@ export function SalaryEntryComponent({
   );
   const deductiveCount = deductiveEntries.length;
 
+  const handleUpdatePayroll = () => {
+    submit(
+      {
+        payrollId: payrollId ?? payrollData?.id,
+        payrollData: JSON.stringify({ title: title, run_date: rundate }),
+        failedRedirect:
+          fromWhere === "runpayroll"
+            ? `/payroll/run-payroll/${payrollId}`
+            : `/payroll/payroll-history/${payrollId}`,
+      },
+      {
+        method: "POST",
+        action: "/payroll/run-payroll/update-payroll",
+      }
+    );
+  };
+
   return (
     <section className="p-4">
       <div className={cn("mb-5 grid grid-cols-2 gap-4")}>
@@ -219,35 +248,101 @@ export function SalaryEntryComponent({
             <p className="mt-2">Net Amount : {totals.TOTAL.toString()}</p>
           </CardContent>
         </Card>
-        <div className="grid grid-cols-2 gap-2">
-          {payrollCardDetails?.map((details, index) => (
-            <Card
-              key={index.toString()}
-              className="flex flex-col justify-around"
-            >
-              <CardHeader className="p-0">
-                <CardTitle className="text-lg text-center">
-                  {details.title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="py-0  px-2 text-muted-foreground text-center">
-                <p
-                  className={cn(
-                    "text-wrap break-words whitespace-pre-wrap",
-                    details.title === "Title" && "text-sm"
-                  )}
-                >
-                  <>
-                    {details.value === "created_at"
-                      ? formatDate(
-                          payrollData[details.value as keyof typeof payrollData]
-                        )
-                      : payrollData[details.value as keyof typeof payrollData]}
-                  </>
-                </p>
+        <div className="flex flex-col gap-2">
+          <div className="relative h-full">
+            <Card className="h-full flex flex-col justify-between px-4 py-3">
+              <div className="absolute top-2 right-2 z-10">
+                <AlertDialog>
+                  <AlertDialogTrigger
+                    className={cn("bg-secondary rounded-md py-0 px-1")}
+                  >
+                    <Icon className="text-sm" name="dots-vertical" />
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Update Payroll</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Update the payroll here
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-sm font-medium">Title</Label>
+                        <Input
+                          type="text"
+                          placeholder="Enter the Title"
+                          value={title}
+                          onChange={(e) => setTitle(e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-sm font-medium">Run Date</Label>
+                        <Input
+                          type="date"
+                          value={rundate!}
+                          placeholder="Enter the Date"
+                          onChange={(e) => setRundate(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    <AlertDialogFooter className="pt-2">
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        className={cn(buttonVariants({ variant: "default" }))}
+                        onClick={handleUpdatePayroll}
+                        onSelect={handleUpdatePayroll}
+                      >
+                        Submit
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+              <CardContent className="h-full p-0">
+                <div className="h-full grid grid-cols-2 gap-4">
+                  <div className="flex flex-col justify-around items-center">
+                    <span className="">Title</span>
+                    <span className="text-base font-medium text-muted-foreground break-words">
+                      {payrollData?.title}
+                    </span>
+                  </div>
+                  <div className="flex flex-col justify-around items-center">
+                    <span className="">Run Date</span>
+                    <span className="text-base font-medium text-muted-foreground break-words">
+                      {formatDate(payrollData?.run_date)?.toString() ?? ""}
+                    </span>
+                  </div>
+                </div>
               </CardContent>
             </Card>
-          ))}
+          </div>
+
+          <div className="h-full grid grid-cols-2 gap-2">
+            {payrollCardDetails?.map((details, index) => (
+              <Card
+                key={index.toString()}
+                className="flex flex-col justify-around pb-1"
+              >
+                <CardHeader className="p-0">
+                  <CardTitle className="text-lg text-center">
+                    {details.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="py-0  px-2 text-muted-foreground text-center">
+                  <p
+                    className={cn(
+                      "text-wrap break-words whitespace-pre-wrap",
+                      details.title === "Title" && "text-sm"
+                    )}
+                  >
+                    <>
+                      {payrollData[details.value as keyof typeof payrollData]}
+                    </>
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       </div>
       <div className="w-full flex items-center justify-between gap-4 pb-4">

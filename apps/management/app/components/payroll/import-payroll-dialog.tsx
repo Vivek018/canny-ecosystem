@@ -14,12 +14,12 @@ import {
   attribute,
   modalSearchParamNames,
 } from "@canny_ecosystem/utils/constant";
-import { useSearchParams } from "@remix-run/react";
+import { useNavigate, useSearchParams } from "@remix-run/react";
 
 export function ImportPayrollDialog() {
   const { role } = useUser();
   const [searchParams, setSearchParams] = useSearchParams();
-
+  const navigate = useNavigate();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -33,6 +33,14 @@ export function ImportPayrollDialog() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent sideOffset={10} align="end">
+        <DropdownMenuItem
+          onClick={() => navigate("/payroll/run-payroll/create-payroll")}
+          className="space-x-2"
+        >
+          <Icon name="plus-circled" size="sm" />
+          <span>Create Payroll</span>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => {
             searchParams.set(

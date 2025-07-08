@@ -63,6 +63,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       payrollId: payrollId ?? "",
     });
 
+
+    // const {}= await get
     return defer({
       payrollPromise,
       salaryEntriesPromise,

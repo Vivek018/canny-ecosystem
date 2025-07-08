@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { defaultMonth, defaultYear } from "./date-utils";
 
 export { z };
 
@@ -440,7 +441,26 @@ export const EmployeeWorkHistorySchema = z.object({
   end_date: z.string(),
 });
 
-export const employeeDocumentTypeArray = ["aadhaar_card", "pan_card", "address_proof", "bank_document", "birth_certificate", "bio_data", "canny_form", "clearance_form", "cv", "driving_license", "education_document", "election_card", "pan_card", "joining_form", "personal_data_form", "driving_license", "guardian_aadhaar_card", "guardian_bank_document"] as const;
+export const employeeDocumentTypeArray = [
+  "aadhaar_card",
+  "pan_card",
+  "address_proof",
+  "bank_document",
+  "birth_certificate",
+  "bio_data",
+  "canny_form",
+  "clearance_form",
+  "cv",
+  "driving_license",
+  "education_document",
+  "election_card",
+  "pan_card",
+  "joining_form",
+  "personal_data_form",
+  "driving_license",
+  "guardian_aadhaar_card",
+  "guardian_bank_document",
+] as const;
 
 export const EmployeeDocumentsSchema = z.object({
   document_type: z.enum(employeeDocumentTypeArray),
@@ -1280,12 +1300,27 @@ export const ImportSingleEmployeeProjectAssignmentsDataSchema = z.object({
 export const ImportEmployeeProjectAssignmentsDataSchema = z.object({
   data: z.array(ImportSingleEmployeeProjectAssignmentsDataSchema),
 });
-
 export const payrollPaymentStatusArray = [
   "pending",
   "submitted",
   "approved",
 ] as const;
+export const payrollTypesArray = ["salary", "reimbursement", "exit"] as const;
+
+export const PayrollSchema = z.object({
+  id: z.string().optional(),
+  title: z.string(),
+  status: z.enum(payrollPaymentStatusArray).default("pending"),
+  payroll_type: z.enum(payrollTypesArray),
+  run_date: z.string().default(new Date().toISOString().split("T")[0]),
+  total_net_amount: z.number().default(0),
+  company_id: z.string(),
+  total_employees: z.number().default(0),
+  project_id: z.string().optional(),
+  site_id: z.string().optional(),
+  month: z.number().min(1).max(12).default(defaultMonth),
+  year: z.number().default(defaultYear),
+});
 
 // Payroll
 export const SalaryEntrySchema = z.object({
@@ -1296,8 +1331,6 @@ export const SalaryEntrySchema = z.object({
   type: z.enum(componentTypeArray).default("earning"),
   amount: z.number(),
 });
-
-export const payrollTypesArray = ["reimbursement", "exit", "others"] as const;
 
 export const ReimbursementEntrySchema = z.object({
   id: z.string().optional(),
@@ -1936,4 +1969,10 @@ export const InvoiceSchema = z.object({
   is_paid: z.boolean().default(false),
   paid_date: z.string().optional(),
   include_header: z.boolean().default(false),
+});
+
+export const GroupsSchema = z.object({
+  id: z.string().uuid().optional(),
+  name: z.string().min(3),
+  site_id: z.string(),
 });

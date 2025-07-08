@@ -1,5 +1,7 @@
 import { convertToNull } from "@canny_ecosystem/utils";
 import type {
+  GroupDatabaseInsert,
+  GroupDatabaseUpdate,
   ProjectDatabaseInsert,
   ProjectDatabaseUpdate,
   SiteDatabaseInsert,
@@ -63,9 +65,7 @@ export async function updateProject({
   const { error, status } = await supabase
     .from("projects")
     .update(updateData)
-    .eq("id", data.id!)
-    ;
-
+    .eq("id", data.id!);
   if (error) {
     console.error("updateProject Error:", error);
   }
@@ -159,9 +159,7 @@ export async function updateSite({
   const { error, status } = await supabase
     .from("project_sites")
     .update(data)
-    .eq("id", data.id!)
-    ;
-
+    .eq("id", data.id!);
   if (error) {
     console.error("updateSite Error:", error);
   }
@@ -200,4 +198,94 @@ export async function deleteSite({
   return { status, error };
 }
 
+export async function createGroup({
+  supabase,
+  data,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  data: GroupDatabaseInsert;
+  bypassAuth?: boolean;
+}) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
+  const { error, status } = await supabase
+    .from("groups")
+    .insert(data)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("createGroup Error:", error);
+  }
+
+  return { status, error };
+}
+
+export async function updateGroupById({
+  supabase,
+  data,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  data: GroupDatabaseUpdate;
+  bypassAuth?: boolean;
+}) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
+  const updateData = convertToNull(data);
+
+  const { error, status } = await supabase
+    .from("groups")
+    .update(updateData)
+    .eq("id", data.id!);
+  if (error) {
+    console.error("updateGroup Error:", error);
+  }
+
+  return { status, error };
+}
+
+export async function deleteGroup({
+  supabase,
+  id,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+  bypassAuth?: boolean;
+}) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
+  const { error, status } = await supabase.from("groups").delete().eq("id", id);
+
+  if (error) {
+    console.error("deleteGroup Error:", error);
+  }
+
+  return { status, error };
+}

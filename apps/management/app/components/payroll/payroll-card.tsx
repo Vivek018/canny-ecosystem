@@ -1,5 +1,5 @@
 import type { PayrollDatabaseRow } from "@canny_ecosystem/supabase/types";
-import { formatDate } from "@canny_ecosystem/utils";
+import { formatDate, getMonthName } from "@canny_ecosystem/utils";
 import { Card, CardContent } from "@canny_ecosystem/ui/card";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { Link } from "@remix-run/react";
@@ -17,7 +17,7 @@ export function PayrollCard({
     <Card className="w-full select-text cursor-auto dark:border-[1.5px] flex flex-col justify-between">
       <CardContent className="h-full flex flex-row gap-0.5 justify-center items-center p-6">
         <div className="flex items-center flex-1 gap-10 justify-start">
-          <div className="w-1/4 text-md tracking-wide flex-col justify-center items-center text-center">
+          <div className="w-1/6 text-md tracking-wide flex-col justify-center items-center text-center">
             <h2>Title</h2>
             <p className="p-2 w-auto font-bold text-sm rounded-md">
               {data?.title}
@@ -56,10 +56,22 @@ export function PayrollCard({
               ₹{data.total_net_amount}
             </p>
           </div>
-          <div className="text-md tracking-wide flex-col justify-center items-center text-center">
-            <h2>Created Date</h2>
+          <div className="text-md text-bolder tracking-wide flex-col justify-center items-center text-center">
+            <h2>Month</h2>
             <p className="p-2 w-auto font-bold text-md rounded-md">
-              {formatDate(data.created_at ?? "-")}
+              {getMonthName(data.month!)}
+            </p>
+          </div>
+          <div className="text-md text-bolder tracking-wide flex-col justify-center items-center text-center">
+            <h2>Year</h2>
+            <p className="p-2 w-auto font-bold text-md rounded-md">
+              {data.year}
+            </p>
+          </div>
+          <div className="text-md tracking-wide flex-col justify-center items-center text-center">
+            <h2>Run Date</h2>
+            <p className="p-2 w-auto font-bold text-md rounded-md">
+              <> {formatDate(data.run_date ?? "-")}</>
             </p>
           </div>
         </div>

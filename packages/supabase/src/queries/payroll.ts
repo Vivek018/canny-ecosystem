@@ -45,6 +45,8 @@ export async function getPendingOrSubmittedPayrollsByCompanyId({
     "status",
     "run_date",
     "total_net_amount",
+    "month",
+    "year",
     "company_id",
     "created_at",
   ] as const;
@@ -115,6 +117,8 @@ export async function getApprovedPayrollsByCompanyId({
     "status",
     "run_date",
     "total_net_amount",
+    "month",
+    "year",
     "company_id",
     "created_at",
   ] as const;

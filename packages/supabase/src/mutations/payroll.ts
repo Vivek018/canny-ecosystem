@@ -1,5 +1,6 @@
 import type {
   ExitsInsert,
+  PayrollDatabaseInsert,
   PayrollDatabaseUpdate,
   SalaryEntriesDatabaseInsert,
   SalaryEntriesDatabaseUpdate,
@@ -581,4 +582,43 @@ export async function updatePayroll({
   }
 
   return { status, error };
+}
+
+//////////////////////////////////////////////////////////////////
+
+export async function createPayroll({
+  supabase,
+  data,
+}: {
+  supabase: TypedSupabaseClient;
+  data: PayrollDatabaseInsert;
+}) {
+  const { error, status } = await supabase.from("payroll").insert(data);
+  if (error) {
+    console.error("createPayroll Error:", error);
+  }
+
+  return { status, error };
+}
+
+export async function updatePayrollById({
+  payrollId,
+  supabase,
+  data,
+}: {
+  payrollId: string;
+  supabase: TypedSupabaseClient;
+  data: PayrollDatabaseUpdate;
+}) {
+  const { error, status } = await supabase
+    .from("payroll")
+    .update(data)
+    .eq("id", payrollId ?? "")
+    .single();
+
+  if (error) {
+    console.error("updatePayrollById Error:", error);
+  }
+
+  return { error, status };
 }
