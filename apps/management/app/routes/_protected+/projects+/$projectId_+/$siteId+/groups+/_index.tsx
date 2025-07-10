@@ -41,7 +41,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   try {
     const siteId = params.siteId;
-    console.log(siteId);
 
     if (!siteId) {
       throw new Response("Site ID is required", { status: 400 });
@@ -82,7 +81,6 @@ export default function Groups() {
       <Suspense fallback={<LoadingSpinner className="h-1/3" />}>
         <Await resolve={groupPromise}>
           {({ data, error }) => {
-            console.log(data);
 
             if (error) {
               clearExactCacheEntry(cacheKeyPrefix.groups);

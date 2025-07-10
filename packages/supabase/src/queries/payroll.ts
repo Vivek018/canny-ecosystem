@@ -178,8 +178,14 @@ export async function getPayrollById({
     "payroll_type",
     "status",
     "run_date",
+    "project_id",
+    "month",
+    "project_site_id",
+    "year",
     "total_net_amount",
     "company_id",
+    "project_id",
+    "project_site_id",
     "created_at",
   ] as const;
 
@@ -221,10 +227,17 @@ export type SalaryEntriesWithEmployee = Pick<
 export async function getSalaryEntriesByPayrollId({
   supabase,
   payrollId,
+  params,
 }: {
   supabase: TypedSupabaseClient;
   payrollId: string;
+  params: {
+    site?: string[] | null;
+    group?: string[] | null;
+  };
 }) {
+  const { site, group } = params;
+
   const columns = [
     "id",
     "monthly_attendance_id",
@@ -233,9 +246,11 @@ export async function getSalaryEntriesByPayrollId({
     "field_name",
     "type",
     "amount",
+    "site_id",
+    "group_id",
   ] as const;
 
-  const { data, error } = await supabase
+  const query = supabase
     .from("employees")
     .select(
       `id, company_id, first_name, middle_name, last_name, employee_code, salary_entries!inner(${columns.join(
@@ -246,14 +261,21 @@ export async function getSalaryEntriesByPayrollId({
     .order("type, field_name", {
       ascending: true,
       referencedTable: "salary_entries",
-    })
-    .returns<SalaryEntriesWithEmployee[]>();
+    });
 
-  if (error) {
-    console.error("getSalaryEntriesByPayrollId Error", error);
+  if (site?.length) {
+    query.in("salary_entries.site_id", site);
   }
 
-  return { data, error };
+  if (group?.length) {
+    query.in("salary_entries.group_id", group);
+  }
+
+  const { data, count, error } = await query;
+
+  if (error) console.error("getSalaryEntriesByPayrollId Error", error);
+
+  return { data, meta: { count: count }, error };
 }
 
 export async function getSalaryEntriesByPayrollAndEmployeeId({
@@ -470,6 +492,8 @@ export async function getSalaryEntriesByPayrollIdForSalaryRegister({
     "field_name",
     "type",
     "amount",
+    "site_id",
+    "group_id",
   ] as const;
 
   const { data, error } = await supabase
@@ -477,7 +501,7 @@ export async function getSalaryEntriesByPayrollIdForSalaryRegister({
     .select(
       `id, company_id, first_name, middle_name, last_name, employee_code, salary_entries!inner(${columns.join(
         ","
-      )},monthly_attendance!inner(id, month, year, present_days, overtime_hours,working_days, working_hours, paid_holidays, paid_leaves, casual_leaves,absent_days)),employee_project_assignment!inner(position,start_date),employee_statutory_details!inner(aadhaar_number,pan_number,uan_number,pf_number,esic_number),employee_bank_details(account_number,bank_name)`
+      )},monthly_attendance!inner(id, month, year, present_days, overtime_hours,working_days, working_hours, paid_holidays, paid_leaves, casual_leaves,absent_days)),employee_project_assignment!inner(position,start_date),employee_statutory_details!left(aadhaar_number,pan_number,uan_number,pf_number,esic_number),employee_bank_details(account_number,bank_name)`
     )
     .eq("salary_entries.payroll_id", payrollId)
     .order("type, field_name", {
@@ -489,26 +513,9 @@ export async function getSalaryEntriesByPayrollIdForSalaryRegister({
   if (error) {
     console.error("getSalaryEntriesByPayrollId Error", error);
   }
+  console.log(data);
 
-  const filteredData = data?.map((employee) => {
-    const salaryEntry = employee.salary_entries[0];
-    const year = salaryEntry?.monthly_attendance.year;
-    const month = salaryEntry?.monthly_attendance.month;
-
-    const filteredLeaves = employee?.leaves?.filter((leave) => {
-      const leaveDate = new Date(leave.start_date);
-      return (
-        leaveDate.getFullYear() === year && leaveDate.getMonth() + 1 === month
-      );
-    });
-
-    return {
-      ...employee,
-      leaves: filteredLeaves,
-    };
-  });
-
-  return { data: filteredData, error: null };
+  return { data, error: null };
 }
 
 export async function getSalaryEntriesByEmployeeId({

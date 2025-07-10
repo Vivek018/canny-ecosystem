@@ -50,7 +50,7 @@ import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { clearCacheEntry } from "@/utils/cache";
 import { Combobox } from "@canny_ecosystem/ui/combobox";
 import { Label } from "@canny_ecosystem/ui/label";
-import { createPayroll} from "@canny_ecosystem/supabase/mutations";
+import { createPayroll } from "@canny_ecosystem/supabase/mutations";
 
 export const LINK_PARAM = "linkWith";
 
@@ -123,7 +123,7 @@ export async function action({
   return json({
     status: "error",
     message: "Payroll create failed",
-    error
+    error,
   });
 }
 
@@ -312,14 +312,16 @@ export default function CreatePayroll() {
                     className="capitalize"
                     options={allSiteOptions ?? []}
                     inputProps={{
-                      ...getInputProps(fields.site_id, { type: "text" }),
-                      defaultValue: String(fields.site_id.initialValue),
+                      ...getInputProps(fields.project_site_id, {
+                        type: "text",
+                      }),
+                      defaultValue: String(fields.project_site_id.initialValue),
                     }}
                     placeholder={"Select Site"}
                     labelProps={{
                       children: "Site",
                     }}
-                    errors={fields.site_id.errors}
+                    errors={fields.project_site_id.errors}
                   />
                 )}
               </div>

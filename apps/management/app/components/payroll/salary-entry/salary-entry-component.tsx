@@ -1,13 +1,20 @@
 import { Button, buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
-import { Outlet, useNavigation, useParams, useSubmit } from "@remix-run/react";
+import {
+  Outlet,
+  useNavigation,
+  useParams,
+  useSearchParams,
+  useSubmit,
+} from "@remix-run/react";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import React, { useState, useEffect } from "react";
 import { useUser } from "@/utils/user";
 import {
   approveRole,
   formatDate,
+  getMonthName,
   hasPermission,
   searchInObject,
   updateRole,
@@ -39,6 +46,9 @@ import {
   AlertDialogTrigger,
 } from "@canny_ecosystem/ui/alert-dialog";
 import { Label } from "@canny_ecosystem/ui/label";
+import { ImportGroupPayrollDialog } from "../import-grouped-payroll-dialog";
+import { useSalaryEntriesStore } from "@/store/salary-entries";
+import { MultiSelectCombobox } from "@canny_ecosystem/ui/multi-select-combobox";
 
 export function SalaryEntryComponent({
   data,
@@ -46,18 +56,25 @@ export function SalaryEntryComponent({
   noButtons = false,
   env,
   fromWhere,
+  groupOptions,
+  siteOptions,
 }: {
   data: SalaryEntriesWithEmployee[];
   payrollData: Omit<PayrollDatabaseRow, "created_at" | "updated_at">;
   noButtons?: boolean;
   env: SupabaseEnv;
   fromWhere: "runpayroll" | "payrollhistory";
+  siteOptions: any[];
+  groupOptions: any[];
 }) {
+  const { selectedRows } = useSalaryEntriesStore();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [title, setTitle] = useState(payrollData?.title);
   const [rundate, setRundate] = useState(payrollData?.run_date);
 
   const payrollCardDetails = [
     { title: "Status", value: "status" },
+    { title: `${getMonthName(payrollData.month!)}`, value: "year" },
     { title: "No of Employees", value: "total_employees" },
   ];
   const { role } = useUser();
@@ -68,15 +85,70 @@ export function SalaryEntryComponent({
   const disable =
     navigation.state === "submitting" || navigation.state === "loading";
 
+  const [site, setSite] = useState<string[]>(
+    () => searchParams.get("site")?.split(",") ?? []
+  );
+  const [group, setGroup] = useState<string[]>(
+    () => searchParams.get("group")?.split(",") ?? []
+  );
+
+  const handleFieldChange = (newSelectedFields: string[]) => {
+    payrollData.project_id
+      ? setSite(newSelectedFields)
+      : setGroup(newSelectedFields);
+  };
+
+  const handleRenderSelectedItem = (values: string[]): string => {
+    if (values.length === 0) return "";
+
+    if (values.length <= 3) {
+      return payrollData.project_id
+        ? siteOptions
+            .filter((option) => values.includes(String(option.value)))
+            .map((option) => option.label)
+            .join(", ")
+        : groupOptions
+            .filter((option) => values.includes(String(option.value)))
+            .map((option) => option.label)
+            .join(", ");
+    }
+
+    return `${values.length} selected`;
+  };
+
+  useEffect(() => {
+    const newParams = new URLSearchParams(searchParams);
+
+    if (payrollData.project_id) {
+      if (site.length) {
+        newParams.set("site", site.join(","));
+      } else {
+        newParams.delete("site");
+      }
+    }
+
+    if (payrollData.project_site_id) {
+      if (group.length) {
+        newParams.set("group", group.join(","));
+      } else {
+        newParams.delete("group");
+      }
+    }
+
+    setSearchParams(newParams);
+  }, [site, group]);
+
   const [searchString, setSearchString] = useState("");
-  const [tableData, setTableData] = useState(data);
+  const [tableData, setTableData] = useState(
+    selectedRows.length ? selectedRows : data
+  );
 
   useEffect(() => {
     const filteredData = data?.filter((item) =>
       searchInObject(item, searchString)
     );
 
-    setTableData(filteredData);
+    setTableData(filteredData as any);
   }, [searchString, data]);
 
   const updateStatusPayroll = (
@@ -101,7 +173,7 @@ export function SalaryEntryComponent({
   };
 
   function calculateFieldTotalsWithNetPay(
-    employees: SalaryEntriesWithEmployee[]
+    employees: any
   ): Record<string, { amount: number; type: string } | number> {
     const fieldTotals: Record<string, { amount: number; type: string }> = {};
     let gross = 0;
@@ -137,7 +209,9 @@ export function SalaryEntryComponent({
     };
   }
 
-  const totals = calculateFieldTotalsWithNetPay(data);
+  const totals = calculateFieldTotalsWithNetPay(
+    selectedRows.length ? selectedRows : data
+  );
 
   const earningEntries = Object.entries(totals).filter(
     ([, value]: any) => value.type === "earning"
@@ -317,7 +391,7 @@ export function SalaryEntryComponent({
             </Card>
           </div>
 
-          <div className="h-full grid grid-cols-2 gap-2">
+          <div className="h-full grid grid-cols-3 gap-2">
             {payrollCardDetails?.map((details, index) => (
               <Card
                 key={index.toString()}
@@ -346,6 +420,40 @@ export function SalaryEntryComponent({
         </div>
       </div>
       <div className="w-full flex items-center justify-between gap-4 pb-4">
+        <div className="w-1/4">
+          <MultiSelectCombobox
+            label="Groups"
+            options={payrollData?.project_id ? siteOptions : groupOptions}
+            value={payrollData?.project_id ? site : group}
+            onChange={handleFieldChange}
+            renderItem={(option) =>
+              payrollData?.project_id ? (
+                <div
+                  role="option"
+                  aria-selected={site.includes(String(option.value))}
+                >
+                  {option.label}
+                </div>
+              ) : (
+                <div
+                  role="option"
+                  aria-selected={group.includes(String(option.value))}
+                >
+                  {option.label}
+                </div>
+              )
+            }
+            renderSelectedItem={handleRenderSelectedItem}
+            aria-label="Filter by payment field"
+            aria-required="false"
+            aria-multiselectable="true"
+            aria-describedby="payment-field-description"
+          />
+          <span id="payment-field-description" className="sr-only">
+            Select one or more payment fields. Shows individual payment fields
+            names when 3 or fewer are selected.
+          </span>
+        </div>
         <div className="relative w-full">
           <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
             <Icon name="magnifying-glass" size="sm" className="text-gray-400" />
@@ -400,10 +508,17 @@ export function SalaryEntryComponent({
             Approve
           </Button>
         </div>
+        <div>
+          <ImportGroupPayrollDialog />
+        </div>
         <PayrollActions
-          className={cn(payrollData?.status === "pending" && "hidden")}
+          className={cn(
+            payrollData?.status === "pending" || !selectedRows.length
+              ? "hidden"
+              : ""
+          )}
           payrollId={payrollId ?? payrollData?.id}
-          data={data as unknown as any}
+          data={selectedRows.length ? selectedRows : (data as unknown as any)}
           env={env as SupabaseEnv}
           payrollData={payrollData}
           fromWhere={fromWhere}
@@ -412,11 +527,12 @@ export function SalaryEntryComponent({
       </div>
 
       <SalaryEntryDataTable
-        data={tableData}
+        data={tableData as any}
         columns={salaryEntryColumns({
           data,
           editable: payrollData?.status === "pending",
         })}
+        totalNet={totals.TOTAL as number}
       />
       <Outlet />
     </section>

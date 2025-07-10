@@ -1317,7 +1317,7 @@ export const PayrollSchema = z.object({
   company_id: z.string(),
   total_employees: z.number().default(0),
   project_id: z.string().optional(),
-  site_id: z.string().optional(),
+  project_site_id: z.string().optional(),
   month: z.number().min(1).max(12).default(defaultMonth),
   year: z.number().default(defaultYear),
 });

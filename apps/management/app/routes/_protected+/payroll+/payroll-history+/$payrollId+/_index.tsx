@@ -5,14 +5,20 @@ import { ReimbursementEntryComponent } from "@/components/payroll/reimbursement-
 
 import { SalaryEntryComponent } from "@/components/payroll/salary-entry/salary-entry-component";
 import { cacheKeyPrefix } from "@/constant";
-import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
+import {
+  clearCacheEntry,
+  clearExactCacheEntry,
+  clientCaching,
+} from "@/utils/cache";
 import { updatePayroll } from "@canny_ecosystem/supabase/mutations";
 import {
   type ExitsPayrollEntriesWithEmployee,
   getExitsEntriesForPayrollByPayrollId,
+  getGroupsBySiteId,
   getPayrollById,
   getReimbursementEntriesForPayrollByPayrollId,
   getSalaryEntriesByPayrollId,
+  getSitesByProjectId,
   type ReimbursementPayrollEntriesWithEmployee,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -44,13 +50,27 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   };
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
-    const payrollPromise = getPayrollById({
+
+    const url = new URL(request.url);
+    const searchParams = new URLSearchParams(url.searchParams);
+    const site = searchParams.get("site")?.split(",") ?? [];
+    const group = searchParams.get("group")?.split(",") ?? [];
+
+    const { data: payrollData, error } = await getPayrollById({
       supabase,
       payrollId: payrollId ?? "",
     });
+    if (error || !payrollData) {
+      clearExactCacheEntry(`${cacheKeyPrefix.payroll_history_id}${payrollId}`);
+    }
+
     const salaryEntriesPromise = getSalaryEntriesByPayrollId({
       supabase,
       payrollId: payrollId ?? "",
+      params: {
+        site,
+        group,
+      },
     });
     const reimbursementEntriesPromise =
       getReimbursementEntriesForPayrollByPayrollId({
@@ -62,10 +82,36 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       payrollId: payrollId ?? "",
     });
 
+    let groupOptions: any = [];
+    let siteOptions: any = [];
+
+    if (payrollData?.project_id) {
+      const { data: allSites } = await getSitesByProjectId({
+        projectId: payrollData?.project_id,
+        supabase,
+      });
+      siteOptions = allSites?.map((sites) => ({
+        label: sites?.name,
+        value: sites?.id,
+      }));
+    }
+    if (payrollData?.project_site_id) {
+      const { data: allGroups } = await getGroupsBySiteId({
+        siteId: payrollData?.project_site_id,
+        supabase,
+      });
+      groupOptions = allGroups?.map((sites) => ({
+        label: sites?.name,
+        value: sites?.id,
+      }));
+    }
+
     return defer({
-      payrollPromise,
+      payrollData,
       salaryEntriesPromise,
       reimbursementEntriesPromise,
+      groupOptions,
+      siteOptions,
       exitEntriesPromise,
       error: null,
       env,
@@ -73,9 +119,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   } catch (error) {
     console.error("Payroll Id Index Error", error);
     return defer({
-      payrollPromise: Promise.resolve({ data: null, error: null }),
+      payrollData: null,
+
       salaryEntriesPromise: Promise.resolve({ data: null, error: null }),
       reimbursementEntriesPromise: Promise.resolve({ data: null, error: null }),
+      groupOptions: [],
+      siteOptions: [],
       exitEntriesPromise: Promise.resolve({
         data: null,
         error: null,
@@ -88,8 +137,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
+  const url = new URL(args.request.url);
   return clientCaching(
-    `${cacheKeyPrefix.payroll_history_id}${args.params.payrollId}`,
+    `${cacheKeyPrefix.payroll_history_id}${
+      args.params.payrollId
+    }${url.searchParams.toString()}`,
     args
   );
 }
@@ -141,10 +193,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
 export default function HistoryPayrollId() {
   const {
-    payrollPromise,
+    payrollData,
     salaryEntriesPromise,
     reimbursementEntriesPromise,
     exitEntriesPromise,
+    groupOptions,
+    siteOptions,
     env,
   } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
@@ -178,103 +232,89 @@ export default function HistoryPayrollId() {
     }
   }, [actionData]);
 
+  if (!payrollData) {
+    clearCacheEntry(`${cacheKeyPrefix.payroll_history_id}${payrollId}`);
+    return (
+      <ErrorBoundary
+        error={null}
+        message="Failed to load Payroll Data in Payroll History Id"
+      />
+    );
+  }
   return (
     <Suspense fallback={<LoadingSpinner className="my-20" />}>
-      <Await resolve={payrollPromise}>
-        {({ data: payrollData, error: payrollError }) => {
-          if (payrollError || !payrollData) {
-            clearExactCacheEntry(
-              `${cacheKeyPrefix.payroll_history_id}${payrollId}`
-            );
-            return (
-              <ErrorBoundary
-                error={payrollError}
-                message="Failed to load Payroll Data in Payroll History Id"
+      {payrollData.payroll_type === "reimbursement" ||
+      payrollData.payroll_type === "exit" ? (
+        <Await
+          resolve={
+            payrollData.payroll_type === "reimbursement"
+              ? reimbursementEntriesPromise
+              : exitEntriesPromise
+          }
+        >
+          {({ data, error }) => {
+            if (error || !data) {
+              clearExactCacheEntry(
+                `${cacheKeyPrefix.payroll_history_id}${payrollId}`
+              );
+              return (
+                <ErrorBoundary
+                  error={error}
+                  message="Failed to load Payroll Entries in Payroll History"
+                />
+              );
+            }
+
+            return payrollData.payroll_type === "reimbursement" ? (
+              <ReimbursementEntryComponent
+                payrollData={payrollData as any}
+                data={
+                  data as unknown as ReimbursementPayrollEntriesWithEmployee[]
+                }
+                noButtons={true}
+                env={env as SupabaseEnv}
+                fromWhere="payrollhistory"
+              />
+            ) : (
+              <ExitEntryComponent
+                payrollData={payrollData as any}
+                data={data as unknown as ExitsPayrollEntriesWithEmployee[]}
+                noButtons={true}
+                env={env as SupabaseEnv}
+                fromWhere="payrollhistory"
               />
             );
-          }
-          if (
-            payrollData.payroll_type === "reimbursement" ||
-            payrollData.payroll_type === "exit"
-          ) {
-            return (
-              <Await
-                resolve={
-                  payrollData.payroll_type === "reimbursement"
-                    ? reimbursementEntriesPromise
-                    : exitEntriesPromise
-                }
-              >
-                {({ data, error }) => {
-                  if (error || !data) {
-                    clearExactCacheEntry(
-                      `${cacheKeyPrefix.payroll_history_id}${payrollId}`
-                    );
-                    return (
-                      <ErrorBoundary
-                        error={error}
-                        message="Failed to load Payroll Entries in Payroll History"
-                      />
-                    );
-                  }
+          }}
+        </Await>
+      ) : payrollData.payroll_type === "salary" ? (
+        <Await resolve={salaryEntriesPromise}>
+          {({ data, error }) => {
+            if (error || !data) {
+              clearExactCacheEntry(
+                `${cacheKeyPrefix.payroll_history_id}${payrollId}`
+              );
+              return (
+                <ErrorBoundary
+                  error={error}
+                  message="Failed to load Salary Entries in Payroll Histrory"
+                />
+              );
+            }
 
-                  return payrollData.payroll_type === "reimbursement" ? (
-                    <ReimbursementEntryComponent
-                      payrollData={payrollData as any}
-                      data={
-                        data as unknown as ReimbursementPayrollEntriesWithEmployee[]
-                      }
-                      noButtons={true}
-                      env={env as SupabaseEnv}
-                      fromWhere="payrollhistory"
-                    />
-                  ) : (
-                    <ExitEntryComponent
-                      payrollData={payrollData as any}
-                      data={
-                        data as unknown as ExitsPayrollEntriesWithEmployee[]
-                      }
-                      noButtons={true}
-                      env={env as SupabaseEnv}
-                      fromWhere="payrollhistory"
-                    />
-                  );
-                }}
-              </Await>
-            );
-          }
-          if (payrollData.payroll_type === "salary") {
             return (
-              <Await resolve={salaryEntriesPromise}>
-                {({ data, error }) => {
-                  if (error || !data) {
-                    clearExactCacheEntry(
-                      `${cacheKeyPrefix.payroll_history_id}${payrollId}`
-                    );
-                    return (
-                      <ErrorBoundary
-                        error={error}
-                        message="Failed to load Salary Entries in Payroll Histrory"
-                      />
-                    );
-                  }
-
-                  
-                  return (
-                    <SalaryEntryComponent
-                      payrollData={payrollData as any}
-                      data={data}
-                      noButtons={true}
-                      env={env as SupabaseEnv}
-                      fromWhere="payrollhistory"
-                    />
-                  );
-                }}
-              </Await>
+              <SalaryEntryComponent
+                payrollData={payrollData as any}
+                data={data as any}
+                noButtons={true}
+                env={env as SupabaseEnv}
+                fromWhere="payrollhistory"
+                groupOptions={groupOptions}
+                siteOptions={siteOptions}
+              />
             );
-          }
-        }}
-      </Await>
+          }}
+        </Await>
+      ) : null}
     </Suspense>
   );
 }

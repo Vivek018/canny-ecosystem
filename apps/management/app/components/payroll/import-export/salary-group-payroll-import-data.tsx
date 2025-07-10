@@ -15,10 +15,12 @@ import { ImportedDataTable } from "../salary-imported-table/imported-data-table"
 import { ImportedDataColumns } from "../salary-imported-table/columns";
 import type { FieldConfig } from "@/routes/_protected+/payroll+/run-payroll+/import-salary-payroll+/_index";
 
-export function SalaryPayrollImportData({
+export function SalaryGroupPayrollImportData({
   env,
   fieldConfigs,
+  payrollId,
 }: {
+  payrollId: string;
   env: SupabaseEnv;
   fieldConfigs: FieldConfig[];
 }) {
@@ -112,16 +114,18 @@ export function SalaryPayrollImportData({
         };
       })
       .filter((item) => item.employee_id);
+
     submit(
       {
         type: "salary-import",
-        title: importData.title!,
+        different: "grouped",
+        payrollId: payrollId,
         salaryImportData: JSON.stringify(updatedData),
         skipped:
           importData.data.length - updatedData.length > 0
             ? importData.data.length - updatedData.length
             : 0,
-        failedRedirect: "/payroll",
+        failedRedirect: `/payroll/run-payroll/${payrollId}`,
       },
       {
         method: "POST",

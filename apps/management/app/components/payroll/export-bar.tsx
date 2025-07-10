@@ -8,10 +8,12 @@ export function ExportBar({
   rows,
   data,
   className,
+  totalNet,
 }: {
   rows: number;
   data: SalaryEntriesDatabaseRow[];
   className: string;
+  totalNet: number;
 }) {
   function transformEmployeeData(employee: any) {
     const {
@@ -80,6 +82,9 @@ export function ExportBar({
     >
       <div className="ml-2 flex items-center space-x-1 rounded-md">
         <p className="font-semibold">{rows} Employee Selected</p>
+      </div>
+      <div className="h-full tracking-wide font-medium rounded-full flex justify-between items-center px-6 border dark:border-muted-foreground/30 ">
+        Net Amount: <span className="ml-1.5">{totalNet}</span>
       </div>
       <div className="h-full flex justify-center items-center gap-2">
         <Button

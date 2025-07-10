@@ -6,10 +6,12 @@ import {
   createExitPayroll,
   createReimbursementPayroll,
   createSalaryPayroll,
+  createSalaryPayrollByGroup,
 } from "@canny_ecosystem/supabase/mutations";
-import type {
-  ExitDataType,
-  ReimbursementDataType,
+import {
+  getPayrollById,
+  type ExitDataType,
+  type ReimbursementDataType,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { EmployeeMonthlyAttendanceDatabaseInsert } from "@canny_ecosystem/supabase/types";
@@ -30,10 +32,12 @@ export async function action({
     const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
     const formData = await request.formData();
-    const from = (await formData.get("from")) as string;
+    const from = formData.get("from") as string;
     const payrollTitle = formData.get("title") as string;
     const skipped = formData.get("skipped") as string;
     const type = formData.get("type") as string;
+    const different = formData.get("different") as string;
+
     const failedRedirect = formData.get("failedRedirect") as string;
     let error = null;
 
@@ -347,48 +351,10 @@ export async function action({
         formData.get("salaryImportData") as string
       );
 
-      // const transformedData: any[] = salaryImportData.flatMap((entry: any) => {
-      //   const { month, year, present_days, employee_id, ...rest } = entry;
-
-      //   const attendanceFieldKeys = [
-      //     "overtime_hours",
-      //     "working_days",
-      //     "absent_days",
-      //     "working_hours",
-      //     "paid_holidays",
-      //     "paid_leaves",
-      //     "casual_leaves",
-      //   ];
-
-      //   const attendance: Record<string, any> = {};
-      //   const components: Record<string, any> = {};
-
-      //   for (const key in rest) {
-      //     if (attendanceFieldKeys.includes(key)) {
-      //       attendance[key] = rest[key];
-      //     } else {
-      //       components[key] = rest[key];
-      //     }
-      //   }
-
-      //   return Object.entries(components)
-      //     .filter(
-      //       ([, value]) =>
-      //         typeof value === "object" && value !== null && "amount" in value
-      //     )
-      //     .map(([key, value]: [string, any]) => ({
-      //       monthly_attendance_id: "something",
-      //       employee_id,
-      //       field_name: key.toUpperCase(),
-      //       type: value.type,
-      //       amount: value.amount,
-      //     }));
-      // });
-
       const transformedData: any[] = [];
 
       for (const entry of salaryImportData) {
-        const { month, year, employee_id, ...rest } = entry;
+        const { month, year, employee_id, site_id, group_id, ...rest } = entry;
 
         const attendanceFieldKeys = [
           "working_days",
@@ -445,6 +411,8 @@ export async function action({
             field_name: key.toUpperCase(),
             type: value.type,
             amount: value.amount,
+            site_id,
+            group_id,
           }));
 
         transformedData.push(...componentEntries);
@@ -453,6 +421,50 @@ export async function action({
       let totalNetAmount = 0;
 
       totalNetAmount = calculateSalaryTotalNetAmount(transformedData);
+
+      if (different === "grouped") {
+        const payrollId = formData.get("payrollId") as string;
+
+        const { data } = await getPayrollById({ payrollId, supabase });
+
+        const {
+          status,
+          error: salaryError,
+          message,
+        } = await createSalaryPayrollByGroup({
+          supabase,
+          data: {
+            payrollId,
+            salaryData: transformedData,
+            oldTotalEmployees: data?.total_employees ?? 0,
+            totalEmployees:
+              Number(salaryImportData.length) + Number(data?.total_employees),
+            oldTotalNetAmount: data?.total_net_amount ?? 0,
+            totalNetAmount:
+              Number(totalNetAmount) + Number(data?.total_net_amount),
+          },
+        });
+
+        if (isGoodStatus(status)) {
+          if (Number(skipped) > 0) {
+            return json({
+              status: "success",
+              message: `Salary Payroll Created  with ${skipped} skipped entries`,
+              failedRedirect,
+              error: null,
+            });
+          }
+          return json({
+            status: "success",
+            message: message ?? "Import Salary Payroll Created Successfully",
+            failedRedirect,
+            error: null,
+          });
+        }
+
+        error = salaryError;
+      }
+
       const {
         status,
         error: salaryError,
@@ -465,6 +477,9 @@ export async function action({
           salaryData: transformedData,
           totalEmployees: salaryImportData.length,
           totalNetAmount,
+          month: Number(salaryImportData[0].month),
+          year: Number(salaryImportData[0].year),
+          run_date: salaryImportData[0].run_date,
         },
         companyId: companyId ?? "",
       });
