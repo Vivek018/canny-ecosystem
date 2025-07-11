@@ -36,6 +36,7 @@ import {
   getMonthNameFromNumber,
   replaceUnderscore,
 } from "@canny_ecosystem/utils";
+import { useSalaryEntriesStore } from "@/store/salary-entries";
 
 // Define styles for PDF
 const styles = StyleSheet.create({
@@ -441,7 +442,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export default function SalarySlips() {
   const { data, payrollId } = useLoaderData<typeof loader>();
+  const { selectedRows } = useSalaryEntriesStore();
 
+  const updatedData = {
+    ...data,
+    payrollDataAndOthers: data?.payrollDataAndOthers?.filter((emp1) =>
+      selectedRows.some((emp2) => emp2.id === emp1.id)
+    ),
+  };
   const navigate = useNavigate();
   const { isDocument } = useIsDocument();
 
@@ -612,7 +620,7 @@ export default function SalarySlips() {
     };
   }
 
-  const slipData = transformData(data);
+  const slipData = transformData(updatedData);
 
   if (!isDocument) return <div>Loading...</div>;
 

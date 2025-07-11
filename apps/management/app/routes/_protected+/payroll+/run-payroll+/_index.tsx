@@ -98,7 +98,6 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
 
 clientLoader.hydrate = true;
 
-
 export async function action({ request }: ActionFunctionArgs) {
   try {
     const url = new URL(request.url);
@@ -125,7 +124,6 @@ export async function action({ request }: ActionFunctionArgs) {
     return redirect(fallbackUrl.toString());
   }
 }
-
 
 export default function RunPayrollIndex() {
   const { payrollsPromise, filters, query, companyId, env } =

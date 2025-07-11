@@ -312,9 +312,11 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>Date of Joining</Text>
             <Text style={styles.infoValue}>
-              {formatDate(
-                data?.employee?.employeeProjectAssignmentData?.start_date
-              )}
+              <>
+                {formatDate(
+                  data?.employee?.employeeProjectAssignmentData?.start_date
+                )}
+              </>
             </Text>
           </View>
         </View>
@@ -448,7 +450,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export default function SalarySlip() {
-  const { data,  employeeId } = useLoaderData<typeof loader>();
+  const { data, employeeId } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
   const { isDocument } = useIsDocument();
 

@@ -18,7 +18,7 @@ export const modalSearchParamNames = {
   import_leaves: "import-leaves",
   import_reimbursement_payroll: "import-reimbursement-payroll",
   import_exit_payroll: "import-exit-payroll",
-
+  import_group_salary_payroll: "import-group-salary-payroll",
   import_salary_payroll: "import-salary-payroll",
 };
 
@@ -166,6 +166,7 @@ export const attribute = {
   paySequence: "pay_sequence",
   companyDocuments: "company_documents",
   invoice: "invoice",
+  groups: "groups",
 };
 
 export const months: { [key: string]: number } = {

@@ -2,6 +2,7 @@ import type {
   EmployeeDatabaseRow,
   EmployeeProjectAssignmentDatabaseInsert,
   EmployeeProjectAssignmentDatabaseRow,
+  GroupDatabaseRow,
   InferredType,
   ProjectDatabaseRow,
   SiteDatabaseRow,
@@ -207,7 +208,7 @@ export async function getSiteNamesByProjectName({
   return { data, error };
 }
 
-export type SitesWithProjects = Pick<SiteDatabaseRow, "id"> & {
+export type SitesWithProjects = Pick<SiteDatabaseRow, "id" | "name"> & {
   projects: Pick<
     ProjectDatabaseRow,
     | "id"
@@ -228,7 +229,7 @@ export async function getSitesByCompanyId({
   const { data, error } = await supabase
     .from("project_sites")
     .select(
-      `id,  projects!inner(
+      `id,name,  projects!inner(
         project_client_id,
         end_client_id,
         primary_contractor_id
@@ -464,6 +465,53 @@ export async function getSiteIdsBySiteNames({
 
   if (error) {
     console.error("getSiteIdsBySiteNames Error", error);
+  }
+
+  return { data, error };
+}
+
+export async function getGroupsBySiteId({
+  supabase,
+  siteId,
+}: {
+  supabase: TypedSupabaseClient;
+  siteId: string;
+}) {
+
+  const columns = ["id", "name", "site_id", "created_at"] as const;
+
+  const { data, error } = await supabase
+    .from("groups")
+    .select(columns.join(","))
+    .eq("site_id", siteId)
+    .returns<InferredType<GroupDatabaseRow, (typeof columns)[number]>[]>();
+
+
+  if (error) {
+    console.error("getGroupsBySiteId Error", error);
+  }
+
+  return { data, error };
+}
+
+export async function getGroupById({
+  supabase,
+  id,
+}: {
+  supabase: TypedSupabaseClient;
+  id: string;
+}) {
+  const columns = ["id", "name", "site_id"] as const;
+
+  const { data, error } = await supabase
+    .from("groups")
+    .select(columns.join(","))
+    .eq("id", id)
+    .single<GroupDatabaseRow>();
+
+
+  if (error) {
+    console.error("getGroupsBySiteId Error", error);
   }
 
   return { data, error };

@@ -33,6 +33,7 @@ import {
   getMonthNameFromNumber,
   replaceUnderscore,
 } from "@canny_ecosystem/utils";
+import { useSalaryEntriesStore } from "@/store/salary-entries";
 
 // Define styles for PDF
 const styles = StyleSheet.create({
@@ -171,7 +172,7 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
                 },
               ]}
             >
-              {`For  ${data.month} ${data.year}`}
+              {`For  ${data?.month} ${data?.year}`}
             </Text>
           </View>
           <View
@@ -721,6 +722,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export default function SalaryRegister() {
   const { data, payrollId } = useLoaderData<typeof loader>();
+  const { selectedRows } = useSalaryEntriesStore();
+
+  const updatedData = {
+    ...data,
+    payrollDataAndOthers: data?.payrollDataAndOthers?.filter((emp1) =>
+      selectedRows.some((emp2) => emp2.id === emp1.id)
+    ),
+  };
 
   const navigate = useNavigate();
   const { isDocument } = useIsDocument();
@@ -804,7 +813,7 @@ export default function SalaryRegister() {
     }
 
     const attendanceData =
-      data?.payrollDataAndOthers[0].salary_entries[0] || {};
+      data?.payrollDataAndOthers[0]?.salary_entries[0] || {};
 
     const employeeData: TransformedEmployeeData[] =
       data.payrollDataAndOthers.map(
@@ -872,14 +881,14 @@ export default function SalaryRegister() {
       );
 
     return {
-      month: getMonthNameFromNumber(attendanceData?.monthly_attendance.month),
-      year: attendanceData?.monthly_attendance.year,
+      month: getMonthNameFromNumber(attendanceData?.monthly_attendance?.month),
+      year: attendanceData?.monthly_attendance?.year,
       companyData,
       employeeData,
     };
   }
 
-  const slipData = transformData(data);
+  const slipData = transformData(updatedData);
 
   if (!isDocument) return <div>Loading...</div>;
 

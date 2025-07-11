@@ -1,13 +1,20 @@
-import { Button } from "@canny_ecosystem/ui/button";
+import { Button, buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
-import { Outlet, useNavigation, useParams, useSubmit } from "@remix-run/react";
+import {
+  Outlet,
+  useNavigation,
+  useParams,
+  useSearchParams,
+  useSubmit,
+} from "@remix-run/react";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import React, { useState, useEffect } from "react";
 import { useUser } from "@/utils/user";
 import {
   approveRole,
   formatDate,
+  getMonthName,
   hasPermission,
   searchInObject,
   updateRole,
@@ -27,6 +34,21 @@ import {
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@canny_ecosystem/ui/alert-dialog";
+import { Label } from "@canny_ecosystem/ui/label";
+import { ImportGroupPayrollDialog } from "../import-grouped-payroll-dialog";
+import { useSalaryEntriesStore } from "@/store/salary-entries";
+import { MultiSelectCombobox } from "@canny_ecosystem/ui/multi-select-combobox";
 
 export function SalaryEntryComponent({
   data,
@@ -34,21 +56,27 @@ export function SalaryEntryComponent({
   noButtons = false,
   env,
   fromWhere,
+  groupOptions,
+  siteOptions,
 }: {
   data: SalaryEntriesWithEmployee[];
   payrollData: Omit<PayrollDatabaseRow, "created_at" | "updated_at">;
   noButtons?: boolean;
   env: SupabaseEnv;
   fromWhere: "runpayroll" | "payrollhistory";
+  siteOptions: any[];
+  groupOptions: any[];
 }) {
+  const { selectedRows } = useSalaryEntriesStore();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [title, setTitle] = useState(payrollData?.title);
+  const [rundate, setRundate] = useState(payrollData?.run_date);
 
   const payrollCardDetails = [
-    { title: "Title", value: "title" },
     { title: "Status", value: "status" },
+    { title: `${getMonthName(payrollData.month!)}`, value: "year" },
     { title: "No of Employees", value: "total_employees" },
-    { title: "Pay Day", value: "created_at" },
   ];
-
   const { role } = useUser();
   const { payrollId } = useParams();
   const submit = useSubmit();
@@ -57,15 +85,72 @@ export function SalaryEntryComponent({
   const disable =
     navigation.state === "submitting" || navigation.state === "loading";
 
+  const [site, setSite] = useState<string[]>(
+    () =>
+      searchParams.get("site")?.split(",") ?? []
+  );
+  const [group, setGroup] = useState<string[]>(
+    () =>
+      searchParams.get("group")?.split(",") ?? []
+  );
+
+  const handleFieldChange = (newSelectedFields: string[]) => {
+    payrollData.project_id
+      ? setSite(newSelectedFields)
+      : setGroup(newSelectedFields);
+  };
+
+  const handleRenderSelectedItem = (values: string[]): string => {
+    if (values.length === 0) return "";
+
+    if (values.length <= 3) {
+      return payrollData.project_id
+        ? siteOptions
+            .filter((option) => values.includes(String(option.value)))
+            .map((option) => option.label)
+            .join(", ")
+        : groupOptions
+            .filter((option) => values.includes(String(option.value)))
+            .map((option) => option.label)
+            .join(", ");
+    }
+
+    return `${values.length} selected`;
+  };
+
+  useEffect(() => {
+    const newParams = new URLSearchParams(searchParams);
+
+    if (payrollData.project_id) {
+      if (site.length) {
+        newParams.set("site", site.join(","));
+      } else {
+        newParams.delete("site");
+      }
+    }
+
+    if (payrollData.project_site_id) {
+      if (group.length) {
+        newParams.set("group", group.join(","));
+      } else {
+        newParams.delete("group");
+      }
+    }
+
+    setSearchParams(newParams);
+  }, [site, group]);
+
   const [searchString, setSearchString] = useState("");
-  const [tableData, setTableData] = useState(data);
+  const [tableData, setTableData] = useState(
+    selectedRows.length ? selectedRows : data
+  );
 
   useEffect(() => {
     const filteredData = data?.filter((item) =>
       searchInObject(item, searchString)
     );
 
-    setTableData(filteredData);
+    setTableData(filteredData as any);
   }, [searchString, data]);
 
   const updateStatusPayroll = (
@@ -90,7 +175,7 @@ export function SalaryEntryComponent({
   };
 
   function calculateFieldTotalsWithNetPay(
-    employees: SalaryEntriesWithEmployee[]
+    employees: any
   ): Record<string, { amount: number; type: string } | number> {
     const fieldTotals: Record<string, { amount: number; type: string }> = {};
     let gross = 0;
@@ -126,7 +211,9 @@ export function SalaryEntryComponent({
     };
   }
 
-  const totals = calculateFieldTotalsWithNetPay(data);
+  const totals = calculateFieldTotalsWithNetPay(
+    selectedRows.length ? selectedRows : data
+  );
 
   const earningEntries = Object.entries(totals).filter(
     ([, value]: any) => value.type === "earning"
@@ -139,15 +226,41 @@ export function SalaryEntryComponent({
   );
   const deductiveCount = deductiveEntries.length;
 
+  const handleUpdatePayroll = () => {
+    submit(
+      {
+        payrollId: payrollId ?? payrollData?.id,
+        payrollData: JSON.stringify({ title: title, run_date: rundate }),
+        failedRedirect:
+          fromWhere === "runpayroll"
+            ? `/payroll/run-payroll/${payrollId}`
+            : `/payroll/payroll-history/${payrollId}`,
+      },
+      {
+        method: "POST",
+        action: "/payroll/run-payroll/update-payroll",
+      }
+    );
+  };
+
   return (
     <section className="p-4">
       <div className={cn("mb-5 grid grid-cols-2 gap-4")}>
-        <Card className="flex flex-col justify-around px-4 py-2">
+        <Card
+          className={cn(
+            "flex flex-col justify-around px-4 py-2",
+            selectedRows.length && "bg-muted"
+          )}
+        >
           <CardContent className="p-0 text-center">
             <div className="grid grid-cols-2 gap-x-4 text-sm">
               <div className="text-center text-lg">
                 Earnings
-                <hr />
+                <hr
+                  className={cn(
+                    selectedRows.length && "border-muted-foreground"
+                  )}
+                />
                 <div className="grid grid-cols-2 gap-x-4 text-sm text-left py-2">
                   {[
                     ...Object.entries(totals)
@@ -174,14 +287,22 @@ export function SalaryEntryComponent({
                       )),
                   ]}
                 </div>
-                <hr />
+                <hr
+                  className={cn(
+                    selectedRows.length && "border-muted-foreground"
+                  )}
+                />
                 <p className="text-sm py-1">
                   Gross : {totals.GROSS.toString()}
                 </p>
               </div>
               <div className="text-center text-lg">
                 Deductions
-                <hr />
+                <hr
+                  className={cn(
+                    selectedRows.length && "border-muted-foreground"
+                  )}
+                />
                 <div className="grid grid-cols-2 gap-x-4 text-sm text-left py-2">
                   {[
                     Object.entries(totals).map(
@@ -210,46 +331,154 @@ export function SalaryEntryComponent({
                       )),
                   ]}
                 </div>
-                <hr />
+                <hr
+                  className={cn(
+                    selectedRows.length && "border-muted-foreground"
+                  )}
+                />
                 <p className="text-sm py-1">
                   Deduction : {totals.DEDUCTION.toString()}
                 </p>
               </div>
             </div>
-            <hr />
+            <hr
+              className={cn(selectedRows.length && "border-muted-foreground")}
+            />
             <p className="mt-2">Net Amount : {totals.TOTAL.toString()}</p>
           </CardContent>
         </Card>
-        <div className="grid grid-cols-2 gap-2">
-          {payrollCardDetails?.map((details, index) => (
-            <Card
-              key={index.toString()}
-              className="flex flex-col justify-around"
-            >
-              <CardHeader className="p-0">
-                <CardTitle className="text-lg text-center">
-                  {details.title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="py-0  px-2 text-muted-foreground text-center">
-                <p
-                  className={cn(
-                    "text-wrap break-words whitespace-pre-wrap",
-                    details.title === "Title" && "text-sm"
-                  )}
-                >
-                  {details.value === "created_at"
-                    ? formatDate(
-                        payrollData[details.value as keyof typeof payrollData]
-                      )
-                    : payrollData[details.value as keyof typeof payrollData]}
-                </p>
+        <div className="flex flex-col gap-2">
+          <div className="relative h-full">
+            <Card className="h-full flex flex-col justify-between px-4 py-3">
+              <div className="absolute top-2 right-2 z-10">
+                <AlertDialog>
+                  <AlertDialogTrigger
+                    className={cn(" bg-secondary rounded-md px-1 pb-1")}
+                  >
+                    <Icon className="text-md" name="edit" />
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Update Payroll</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Update the payroll here
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-sm font-medium">Title</Label>
+                        <Input
+                          type="text"
+                          placeholder="Enter the Title"
+                          value={title}
+                          onChange={(e) => setTitle(e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-sm font-medium">Run Date</Label>
+                        <Input
+                          type="date"
+                          value={rundate!}
+                          placeholder="Enter the Date"
+                          onChange={(e) => setRundate(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    <AlertDialogFooter className="pt-2">
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        className={cn(buttonVariants({ variant: "default" }))}
+                        onClick={handleUpdatePayroll}
+                        onSelect={handleUpdatePayroll}
+                      >
+                        Submit
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+              <CardContent className="h-full p-0">
+                <div className="h-full grid grid-cols-2 gap-4">
+                  <div className="flex flex-col justify-around items-center">
+                    <span className="">Title</span>
+                    <span className="text-base font-medium text-muted-foreground break-words">
+                      {payrollData?.title}
+                    </span>
+                  </div>
+                  <div className="flex flex-col justify-around items-center">
+                    <span className="">Run Date</span>
+                    <span className="text-base font-medium text-muted-foreground break-words">
+                      {formatDate(payrollData?.run_date)?.toString() ?? ""}
+                    </span>
+                  </div>
+                </div>
               </CardContent>
             </Card>
-          ))}
+          </div>
+
+          <div className="h-full grid grid-cols-3 gap-2">
+            {payrollCardDetails?.map((details, index) => (
+              <Card
+                key={index.toString()}
+                className="flex flex-col justify-around pb-1"
+              >
+                <CardHeader className="p-0">
+                  <CardTitle className="text-lg text-center">
+                    {details.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="py-0  px-2 text-muted-foreground text-center">
+                  <p
+                    className={cn(
+                      "text-wrap break-words whitespace-pre-wrap",
+                      details.title === "Title" && "text-sm"
+                    )}
+                  >
+                    <>
+                      {payrollData[details.value as keyof typeof payrollData]}
+                    </>
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       </div>
       <div className="w-full flex items-center justify-between gap-4 pb-4">
+        <div className="w-1/3">
+          <MultiSelectCombobox
+            label="Groups"
+            options={payrollData?.project_id ? siteOptions : groupOptions}
+            value={payrollData?.project_id ? site : group}
+            onChange={handleFieldChange}
+            renderItem={(option) =>
+              payrollData?.project_id ? (
+                <div
+                  role="option"
+                  aria-selected={site.includes(String(option.value))}
+                >
+                  {option.label}
+                </div>
+              ) : (
+                <div
+                  role="option"
+                  aria-selected={group.includes(String(option.value))}
+                >
+                  {option.label}
+                </div>
+              )
+            }
+            renderSelectedItem={handleRenderSelectedItem}
+            aria-label="Filter by payment field"
+            aria-required="false"
+            aria-multiselectable="true"
+            aria-describedby="payment-field-description"
+          />
+          <span id="payment-field-description" className="sr-only">
+            Select one or more payment fields. Shows individual payment fields
+            names when 3 or fewer are selected.
+          </span>
+        </div>
         <div className="relative w-full">
           <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
             <Icon name="magnifying-glass" size="sm" className="text-gray-400" />
@@ -304,10 +533,17 @@ export function SalaryEntryComponent({
             Approve
           </Button>
         </div>
+        <div className={cn(fromWhere === "payrollhistory" && "hidden")}>
+          <ImportGroupPayrollDialog />
+        </div>
         <PayrollActions
-          className={cn(payrollData?.status === "pending" && "hidden")}
+          className={cn(
+            payrollData?.status === "pending" || !selectedRows.length
+              ? "hidden"
+              : ""
+          )}
           payrollId={payrollId ?? payrollData?.id}
-          data={data as unknown as any}
+          data={selectedRows.length ? selectedRows : (data as unknown as any)}
           env={env as SupabaseEnv}
           payrollData={payrollData}
           fromWhere={fromWhere}
@@ -316,11 +552,12 @@ export function SalaryEntryComponent({
       </div>
 
       <SalaryEntryDataTable
-        data={tableData}
+        data={tableData as any}
         columns={salaryEntryColumns({
           data,
           editable: payrollData?.status === "pending",
         })}
+        totalNet={totals.TOTAL as number}
       />
       <Outlet />
     </section>

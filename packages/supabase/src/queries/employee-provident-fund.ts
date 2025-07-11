@@ -121,3 +121,35 @@ export const getEmployeeProvidentFundByCompanyId = async ({
 
   return { data, error };
 };
+
+export const getEmployeeProvidentFundForEpfChallanByCompanyId = async ({
+  supabase,
+  companyId,
+}: {
+  supabase: TypedSupabaseClient;
+  companyId: string;
+}) => {
+  const columns = [
+    "id",
+    "company_id",
+    "restrict_employee_contribution",
+    "is_default",
+  ] as const;
+
+  const { data, error } = await supabase
+    .from("employee_provident_fund")
+    .select(columns.join(","))
+    .eq("company_id", companyId)
+    .eq("is_default", true)
+    .limit(SINGLE_QUERY_LIMIT)
+    .order("created_at", { ascending: false })
+    .maybeSingle<
+      InferredType<EmployeeProvidentFundDatabaseRow, (typeof columns)[number]>
+    >();
+
+  if (error) {
+    console.error("getEmployeeProvidentFundByCompanyId Error", error);
+  }
+
+  return { data, error };
+};

@@ -7,6 +7,7 @@ import type {
 } from "../types";
 import type { DashboardFilters } from "./exits";
 import { months } from "@canny_ecosystem/utils/constant";
+import { getLocationById } from "./companies";
 
 export type InvoiceDataType = Pick<
   InvoiceDatabaseRow,
@@ -175,9 +176,11 @@ export async function getInvoicesByCompanyId({
 export async function getInvoiceById({
   supabase,
   id,
+  from,
 }: {
   supabase: TypedSupabaseClient;
   id: string;
+  from?: "preview";
 }) {
   const columns = [
     "id",
@@ -212,7 +215,24 @@ export async function getInvoiceById({
     console.error("getInvoiceByCompanyId Error", error);
   }
 
-  return { data, error };
+  let dataForPreview: Partial<InvoiceDatabaseRow> = {};
+  if (from === "preview") {
+    const { data: companyAddressData, error: companyAddressError } =
+      await getLocationById({
+        id: data?.company_address_id!,
+        supabase,
+      });
+    if (companyAddressError) {
+      console.error("getInvoiceByCompanyId Error", error);
+    }
+    
+    dataForPreview = {
+      ...data,
+      company_address_id: companyAddressData!.city,
+    };
+  }
+
+  return { data: from === "preview" ? dataForPreview : data, error };
 }
 
 export async function getInvoicesByCompanyIdForDashboard({

@@ -13,7 +13,7 @@ import {
 } from "@canny_ecosystem/ui/alert-dialog";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { formatDateTime} from "@canny_ecosystem/utils";
+import { formatDateTime, roundToNearest } from "@canny_ecosystem/utils";
 import type {
   SupabaseEnv,
   TypedSupabaseClient,
@@ -41,13 +41,13 @@ export const prepareEsiFormatWorkbook = async ({
   }));
 
   const extractedData = updatedData.map((formatData) => ({
-    wages: formatData?.amount,
+    wages: roundToNearest(formatData?.amount),
     ip_number: formatData?.statutoryDetails?.esic_number || null,
     ip_name:
       `${formatData?.employees?.first_name} ${
         formatData?.employees?.middle_name || ""
       } ${formatData?.employees?.last_name}` || null,
-    days: formatData?.presentDays || 0,
+    days: roundToNearest(formatData?.presentDays) || 0,
     code: null,
     last_day: null,
   }));

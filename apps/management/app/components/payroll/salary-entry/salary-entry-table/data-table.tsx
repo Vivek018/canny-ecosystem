@@ -13,31 +13,44 @@ import {
   type SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { SalaryTableHeader } from "./data-table-header";
 import type { SalaryEntriesDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { ExportBar } from "../../export-bar";
+import { useSalaryEntriesStore } from "@/store/salary-entries";
 
 interface SalaryEntryTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  totalNet: number;
 }
 
 export function SalaryEntryDataTable<TData, TValue>({
   columns,
   data,
+  totalNet,
 }: SalaryEntryTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
-
+  const { rowSelection, setSelectedRows, setRowSelection } =
+    useSalaryEntriesStore();
   const table = useReactTable({
     data: data,
     columns: columns,
     getCoreRowModel: getCoreRowModel(),
+    onRowSelectionChange: setRowSelection,
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
-    state: { sorting },
+    state: { sorting, rowSelection },
   });
+
+  useEffect(() => {
+    const rowArray = [];
+    for (const row of table.getSelectedRowModel().rows) {
+      rowArray.push(row.original);
+    }
+    setSelectedRows(rowArray as SalaryEntriesDatabaseRow[]);
+  }, [rowSelection]);
 
   const tableLength = table.getRowModel().rows?.length;
 
@@ -100,6 +113,7 @@ export function SalaryEntryDataTable<TData, TValue>({
         </Table>
       </div>
       <ExportBar
+        totalNet={totalNet}
         className={cn(!table.getSelectedRowModel().rows.length && "hidden")}
         rows={table.getSelectedRowModel().rows.length}
         data={selectedRowsData as SalaryEntriesDatabaseRow[]}

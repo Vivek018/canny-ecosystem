@@ -12,7 +12,7 @@ import {
   TooltipTrigger,
 } from "@canny_ecosystem/ui/tooltip";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { Link } from "@remix-run/react";
+import { Link, useNavigate } from "@remix-run/react";
 import { DeleteSite } from "./delete-site";
 import {
   Card,
@@ -37,7 +37,7 @@ export function SiteCard({
   site: Omit<SitesWithLocation, "created_at" | "updated_at">;
 }) {
   const { role } = useUser();
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   return (
     <Card
@@ -49,11 +49,11 @@ export function SiteCard({
           <CardTitle
             className={cn(
               "text-lg tracking-wide",
-              // "hover:cursor-pointer hover:text-primary",
+              "hover:cursor-pointer hover:text-primary",
             )}
-            // onClick={() =>
-            //   navigate(`/projects/${site.project_id}/${site.id}/overview`)
-            // }
+            onClick={() =>
+              navigate(`/projects/${site.project_id}/${site.id}/overview`)
+            }
           >
             {site.name}
           </CardTitle>

@@ -143,14 +143,14 @@ export default function AddReimbursements({
         clearCacheEntry(cacheKeyPrefix.reimbursements);
         toast({
           title: "Success",
-          description: actionData?.message || "Employee bank details created",
+          description: actionData?.message || "Reimbursement created",
           variant: "success",
         });
       } else {
         toast({
           title: "Error",
           description:
-            actionData?.error?.message || "Employee bank details create failed",
+            actionData?.message || "Reimbursement create failed",
           variant: "destructive",
         });
       }

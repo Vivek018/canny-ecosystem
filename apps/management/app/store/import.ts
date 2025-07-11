@@ -171,11 +171,11 @@ export const useImportStoreForExitPayroll = create<ImportStateForExitPayroll>()(
 
 type ImportStateForSalaryPayroll = {
   importData: {
-    title: string;
+    title?: string;
     data: ImportSalaryPayrollDataType[];
   };
   setImportData: (importData: {
-    title: string;
+    title?: string;
     data: ImportSalaryPayrollDataType[];
   }) => void;
 };

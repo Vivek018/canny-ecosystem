@@ -118,7 +118,7 @@ type DataType = {
   }[];
 };
 
-const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
+const OvertimeRegisterPDF = ({ data }: { data: DataType }) => {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -161,7 +161,7 @@ const SalaryRegisterPDF = ({ data }: { data: DataType }) => {
                 },
               ]}
             >
-              Salary Register
+              Overtime Register
             </Text>
             <Text
               style={[
@@ -720,7 +720,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   };
 }
 
-export default function SalaryRegister() {
+export default function OvertimeRegister() {
   const { data, payrollId } = useLoaderData<typeof loader>();
   const { selectedRows } = useSalaryEntriesStore();
 
@@ -902,7 +902,7 @@ export default function SalaryRegister() {
         disableIcon={true}
       >
         <PDFViewer width="100%" height="100%">
-          <SalaryRegisterPDF data={slipData as unknown as DataType} />
+          <OvertimeRegisterPDF data={slipData as unknown as DataType} />
         </PDFViewer>
       </DialogContent>
     </Dialog>

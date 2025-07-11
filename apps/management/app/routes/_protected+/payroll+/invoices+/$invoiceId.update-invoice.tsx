@@ -172,12 +172,18 @@ export async function action({
           );
         }
 
-        const { error } = await supabase.storage
+        await supabase.storage
           .from(SUPABASE_BUCKET.CANNY_ECOSYSTEM)
-          .upload(oldFilePath, submission.value.proof, {
-            contentType: submission.value.proof.type,
-            upsert: true,
-          });
+          .remove([oldFilePath]);
+
+        const { error } = await addOrUpdateInvoiceWithProof({
+          invoiceData: submission.value as InvoiceDatabaseInsert,
+          payrollId: submission.value.payroll_id,
+          proof: submission.value.proof as File,
+          supabase,
+          route: "update",
+        });
+
         if (!error) {
           return json({
             status: "success",
@@ -281,6 +287,7 @@ export async function action({
       payrollId: submission.value.payroll_id,
       documentName: submission.value.invoice_number,
     });
+
     const { error: invoiceError } = await updateInvoiceById({
       supabase,
       invoiceId: invoiceId!,

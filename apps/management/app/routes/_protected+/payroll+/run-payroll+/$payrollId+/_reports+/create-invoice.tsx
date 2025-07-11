@@ -14,7 +14,6 @@ import {
   getRelationshipsByParentAndChildCompanyId,
   getSalaryEntriesByPayrollId,
   type ReimbursementPayrollEntriesWithEmployee,
-  type SalaryEntriesWithEmployee,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { InvoiceDatabaseInsert } from "@canny_ecosystem/supabase/types";
@@ -63,6 +62,7 @@ import { createMemoryUploadHandler } from "@remix-run/server-runtime/dist/upload
 import { useEffect, useState } from "react";
 import { UPDATE_INVOICE_TAG } from "../../../invoices+/$invoiceId.update-invoice";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { useSalaryEntriesStore } from "@/store/salary-entries";
 
 const ADD_INVOICE_TAG = "Create-Invoice";
 
@@ -72,7 +72,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const payrollId = params.payrollId as string;
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-
+  const url = new URL(request.url);
+  const searchParams = new URLSearchParams(url.searchParams);
+  const site = searchParams.get("site") ?? null;
+  const group = searchParams.get("group") ?? null;
   const { data: cannyData, error } = await getCannyCompanyIdByName({
     name: CANNY_NAME,
     supabase,
@@ -96,7 +99,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     companyId,
     supabase,
   });
-  let salaryData = [] as SalaryEntriesWithEmployee[] | null;
+  let salaryData = [] as any;
   let reimbursementData = [] as
     | ReimbursementPayrollEntriesWithEmployee[]
     | null;
@@ -105,6 +108,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const { data } = await getSalaryEntriesByPayrollId({
       supabase,
       payrollId,
+      params: { group, site },
     });
     salaryData = data;
   }
@@ -246,6 +250,8 @@ export default function CreateInvoice({
     companyRelations,
   } = useLoaderData<typeof loader>();
 
+  const { selectedRows } = useSalaryEntriesStore();
+
   const relations = companyRelationsFromUpdate ?? companyRelations;
 
   const type = payroll?.payroll_type ?? updateValues?.payroll_type;
@@ -338,7 +344,7 @@ export default function CreateInvoice({
           ? JSON.parse(updateValues.payroll_data as string)
           : updateValues.payroll_data
         : payroll?.payroll_type === "salary"
-        ? transformSalaryData(salaryData)
+        ? transformSalaryData(selectedRows.length ? selectedRows : salaryData)
         : transformPayrollData(payrollData as any[], payroll?.payroll_type!),
       payroll_type: updateValues?.payroll_type ?? type,
       proof: undefined,

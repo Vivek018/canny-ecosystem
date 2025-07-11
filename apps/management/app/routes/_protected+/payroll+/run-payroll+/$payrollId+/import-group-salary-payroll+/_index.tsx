@@ -11,7 +11,12 @@ import {
   CardTitle,
 } from "@canny_ecosystem/ui/card";
 import type { ImportSalaryPayrollHeaderSchemaObject } from "@canny_ecosystem/utils";
-import type { ImportSalaryPayrollDataType } from "@canny_ecosystem/supabase/queries";
+import {
+  getGroupsBySiteId,
+  getPayrollById,
+  getSitesByProjectId,
+  type ImportSalaryPayrollDataType,
+} from "@canny_ecosystem/supabase/queries";
 import {
   transformStringArrayIntoOptions,
   replaceUnderscore,
@@ -26,7 +31,6 @@ import {
 import type { z } from "zod";
 import { useImportStoreForSalaryPayroll } from "@/store/import";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { SalaryPayrollImportData } from "@/components/payroll/import-export/salary-payroll-import-data";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import {
   Dialog,
@@ -38,9 +42,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@canny_ecosystem/ui/dialog";
-import { payoutMonths } from "@canny_ecosystem/utils/constant";
-import { Input } from "@canny_ecosystem/ui/input";
 import { Label } from "@canny_ecosystem/ui/label";
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
+import { SalaryGroupPayrollImportData } from "@/components/payroll/import-export/salary-group-payroll-import-data";
+import { payoutMonths } from "@canny_ecosystem/utils/constant";
 
 export type FieldConfig = {
   key: string;
@@ -67,26 +73,55 @@ const FIELD_CONFIGS: FieldConfig[] = [
   },
 ];
 
-export async function loader() {
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  const payrollId = params.payrollId!;
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
+  const { supabase } = getSupabaseWithHeaders({ request });
 
-  return json({ env });
+  const { data } = await getPayrollById({ payrollId, supabase });
+
+  let groupOptions: any = [];
+  let siteOptions: any = [];
+
+  if (data?.project_id) {
+    const { data: allSites } = await getSitesByProjectId({
+      projectId: data?.project_id,
+      supabase,
+    });
+    siteOptions = allSites?.map((sites) => ({
+      label: sites?.name,
+      value: sites?.id,
+    }));
+  }
+  if (data?.project_site_id) {
+    const { data: allGroups } = await getGroupsBySiteId({
+      siteId: data?.project_site_id,
+      supabase,
+    });
+    groupOptions = allGroups?.map((sites) => ({
+      label: sites?.name,
+      value: sites?.id,
+    }));
+  }
+
+  return json({ payrollId, env, groupOptions, siteOptions, payrollInfo: data });
 }
 
 export default function PayrollImportFieldMapping() {
-  const today = new Date();
-  const { env } = useLoaderData<typeof loader>();
+  const { payrollId, env, groupOptions, siteOptions, payrollInfo } =
+    useLoaderData<typeof loader>();
   const { setImportData } = useImportStoreForSalaryPayroll();
+  const [site, setSite] = useState("");
+  const [group, setGroup] = useState("");
+  const [month, setMonth] = useState(defaultMonth + 2);
+  const [year, setYear] = useState(defaultYear);
+
   const [addField, setAddField] = useState("");
   const [addFieldValue, setAddFieldValue] = useState("");
   const [addFieldValueType, setAddFieldValueType] = useState("");
-  const [month, setMonth] = useState(defaultMonth + 2);
-  const [year, setYear] = useState(defaultYear);
-  const [title, setTitle] = useState("");
-  const [runDate, setRunDate] = useState(today.toISOString().split("T")[0]);
   const [open, setOpen] = useState(false);
   const [fieldConfigs, setFieldConfigs] = useState<FieldConfig[]>([
     ...FIELD_CONFIGS,
@@ -223,7 +258,10 @@ export default function PayrollImportFieldMapping() {
 
   const validateImportData = (data: any[]) => {
     try {
-      const result = ImportSalaryPayrollDataSchema.safeParse({ title, data });
+      const result = ImportSalaryPayrollDataSchema.safeParse({
+        title: "aaa",
+        data,
+      });
 
       if (!result.success) {
         const formattedErrors = result.error.errors.map(
@@ -319,14 +357,16 @@ export default function PayrollImportFieldMapping() {
                   transformedRow[key] = row[key];
                 }
               }
+              transformedRow.group_id = payrollInfo?.project_site_id
+                ? group
+                : null;
+              transformedRow.site_id = payrollInfo?.project_id ? site : null;
               transformedRow.month = month;
               transformedRow.year = year;
-              transformedRow.run_date = runDate;
               return transformedRow;
             });
 
             setImportData({
-              title,
               data: finalImport as ImportSalaryPayrollDataType[],
             });
 
@@ -347,7 +387,11 @@ export default function PayrollImportFieldMapping() {
   return (
     <section className="py-4 ">
       {loadNext ? (
-        <SalaryPayrollImportData env={env} fieldConfigs={fieldConfigs} />
+        <SalaryGroupPayrollImportData
+          env={env}
+          fieldConfigs={fieldConfigs}
+          payrollId={payrollId}
+        />
       ) : (
         <Card className="m-4 px-40">
           <CardHeader>
@@ -374,15 +418,6 @@ export default function PayrollImportFieldMapping() {
                 </ul>
               </div>
             )}
-            <div className="mb-6">
-              <Label className="text-sm font-medium">Run Date</Label>
-              <Input
-                type="date"
-                placeholder="Enter the Run Date"
-                value={runDate}
-                onChange={(e) => setRunDate(e.target.value)}
-              />
-            </div>
             <div className="grid grid-cols-2 gap-8 mb-4">
               <div className="flex  flex-col gap-1">
                 <Label className="text-sm font-medium">Month</Label>
@@ -413,15 +448,23 @@ export default function PayrollImportFieldMapping() {
                 />
               </div>
             </div>
-
             <div className="mb-8 flex flex-col gap-1">
-              <Label className="text-sm font-medium">Title</Label>
-              <Input
-                className=""
-                placeholder="Enter the title here"
-                onChange={(e) => setTitle(e.target.value)}
+              <Label className="text-sm font-medium">Group Selection</Label>
+              <Combobox
+                options={payrollInfo?.project_id ? siteOptions : groupOptions}
+                placeholder="Select Group or Site"
+                value={payrollInfo?.project_id ? site : group}
+                onChange={(value: string) => {
+                  if (payrollInfo?.project_id) {
+                    setSite(value);
+                  }
+                  if (payrollInfo?.project_site_id) {
+                    setGroup(value);
+                  }
+                }}
               />
             </div>
+
             <div className="grid grid-cols-2 place-content-center justify-between gap-y-8 gap-x-10 mt-5 mb-10">
               {fieldConfigs.map((field) => (
                 <div key={field.key} className="flex flex-col relative">

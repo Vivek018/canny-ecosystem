@@ -1,4 +1,4 @@
-import ExcelJS from "exceljs";
+import * as XLSX from "xlsx";
 import saveAs from "file-saver";
 import {
   AlertDialog,
@@ -31,11 +31,11 @@ import { CANNY_MANAGEMENT_SERVICES_ACCOUNT_NUMBER } from "@/constant";
 export const prepareBankAdviceWorkbook = async ({
   data,
   supabase,
-  payrollType,
+  payrollData,
 }: {
   data: any[];
   supabase: TypedSupabaseClient;
-  payrollType: string;
+  payrollData: Omit<PayrollDatabaseRow, "created_at" | "updated_at">;
 }) => {
   const date = new Date();
   const bankDetailsResults = await Promise.all(
@@ -43,6 +43,10 @@ export const prepareBankAdviceWorkbook = async ({
       getEmployeeBankDetailsById({ id: employee_id, supabase })
     )
   );
+  const dateToBeSent = formatDate(date)
+    ?.toString()!
+    .replace(/([A-Za-z]{3})/, (match) => match.toUpperCase())
+    .replaceAll(" ", "-");
 
   const updatedData = data.map((entry, index) => ({
     ...entry,
@@ -51,15 +55,17 @@ export const prepareBankAdviceWorkbook = async ({
 
   const extractedData = updatedData.map(({ amount, bankDetails }) => ({
     amount,
-    account_holder_name: bankDetails?.account_holder_name || null,
-    account_number: bankDetails?.account_number || null,
-    ifsc_code: bankDetails?.ifsc_code || null,
+    account_holder_name: bankDetails?.account_holder_name || "",
+    account_number: bankDetails?.account_number || "",
+    ifsc_code: bankDetails?.ifsc_code || "",
   }));
 
-  const workbook = new ExcelJS.Workbook();
-  const worksheet = workbook.addWorksheet("Bank Advice");
+  function isIciciBankIfsc(ifsc: string | null | undefined): boolean {
+    if (!ifsc) return false;
+    return ifsc.toUpperCase().startsWith("ICIC");
+  }
 
-  const headerRow = worksheet.addRow([
+  const headers = [
     "Debit A/c Number",
     "Beneficiary A/c Number",
     "Beneficiary Name",
@@ -81,73 +87,80 @@ export const prepareBankAdviceWorkbook = async ({
     "Add detail 4",
     "Add detail 5",
     "Remarks",
-  ]);
-  function isIciciBankIfsc(ifsc: string | null | undefined): boolean {
-    if (!ifsc) return false;
-    return ifsc.toUpperCase().startsWith("ICIC");
-  }
-
-  for (let col = 1; col <= 21; col++) {
-    const cell = headerRow.getCell(col);
-    cell.fill = {
-      type: "pattern",
-      pattern: "solid",
-      fgColor: { argb: "FF999999" },
-    };
-    cell.font = { bold: true };
-    cell.alignment = {
-      horizontal: "center",
-      vertical: "middle",
-      wrapText: true,
-    };
-    cell.border = {
-      bottom: { style: "thin", color: { argb: "FF000000" } },
-      left: { style: "thin", color: { argb: "FF000000" } },
-      right: { style: "thin", color: { argb: "FF000000" } },
-    };
-  }
-  const columnWidths = [
-    20, 20, 30, 15, 20, 20, 25, 15, 15, 15, 35, 15, 15, 15, 15, 15, 15, 15, 15,
-    15, 40,
   ];
 
-  for (let col = 0; col < columnWidths.length; col++) {
-    worksheet.getColumn(col + 1).width = columnWidths[col];
-  }
+  const dataRows = [headers];
+
   for (const emp of extractedData) {
-    const row = [
+    dataRows.push([
       CANNY_MANAGEMENT_SERVICES_ACCOUNT_NUMBER,
-      emp.account_number || null,
-      emp.account_holder_name || null,
-      roundToNearest(Number(emp.amount)) || null,
+      emp.account_number,
+      emp.account_holder_name,
+      roundToNearest(Number(emp.amount)).toFixed(2),
       isIciciBankIfsc(emp.ifsc_code) ? "I" : "N",
-      `${formatDate(date)}`.replaceAll(" ", "-"),
-      emp.ifsc_code || null,
-      null,
-      null,
-      null,
+      dateToBeSent,
+      emp.ifsc_code,
+      "",
+      "",
+      "",
       "cannycms@gmail.com",
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      `${payrollType.charAt(0).toUpperCase() + payrollType.slice(1)} payment`,
-    ];
-    const newRow = worksheet.addRow(row);
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      data[0]?.is_deductible
+        ? payrollData.title.trim().toLowerCase().includes("advance")
+          ? "Advance payment"
+          : "Loan payment"
+        : `${
+            payrollData.payroll_type.charAt(0).toUpperCase() +
+            payrollData.payroll_type.slice(1)
+          } payment`,
+    ]);
+  }
 
-    for (let i = 4; i < newRow.cellCount - 1; i++) {
-      const cell = newRow.getCell(i + 1);
+  const worksheet = XLSX.utils.aoa_to_sheet(dataRows);
 
-      cell.alignment = { horizontal: "center" };
+  const columnWidths = [
+    20, 20, 40, 15, 20, 20, 25, 15, 15, 15, 35, 15, 15, 15, 15, 15, 15, 15, 15,
+    15, 40,
+  ].map((w) => ({ wch: w }));
+  worksheet["!cols"] = columnWidths;
+
+  for (let col = 0; col < headers.length; col++) {
+    const cellAddress = XLSX.utils.encode_cell({ c: col, r: 0 });
+    const cell = worksheet[cellAddress];
+    if (cell) {
+      cell.s = {
+        fill: {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FF999999" },
+        },
+        font: { bold: true },
+        alignment: { horizontal: "center", vertical: "middle", wrapText: true },
+        border: {
+          bottom: { style: "thin", color: { argb: "FF000000" } },
+          left: { style: "thin", color: { argb: "FF000000" } },
+          right: { style: "thin", color: { argb: "FF000000" } },
+        },
+      };
     }
   }
 
-  return await workbook.xlsx.writeBuffer();
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Bank Advice");
+  const buffer = XLSX.write(workbook, {
+    bookType: "xls",
+    type: "array",
+    cellStyles: true,
+  });
+  return new Blob([buffer], { type: "application/vnd.ms-excel" });
 };
 
 export const DownloadBankAdvice = ({
@@ -165,18 +178,14 @@ export const DownloadBankAdvice = ({
     return data.map((emp) => {
       let earnings = 0;
       let deductions = 0;
-
       for (const entry of emp.salary_entries) {
-        if (entry.type === "earning") {
-          earnings += entry.amount;
-        } else if (
+        if (entry.type === "earning") earnings += entry.amount;
+        else if (
           entry.type === "deduction" ||
           entry.type === "statutory_contribution"
-        ) {
+        )
           deductions += entry.amount;
-        }
       }
-
       return {
         amount: earnings - deductions,
         employee_id: emp.id,
@@ -193,22 +202,16 @@ export const DownloadBankAdvice = ({
 
   const generateBankAdviceExcel = async (selectedRows: any[]) => {
     if (!selectedRows.length) return;
-
-    const workbook = await prepareBankAdviceWorkbook({
+    const blob = await prepareBankAdviceWorkbook({
       data:
         payrollData.payroll_type === "salary"
           ? transformSalaryData(data)
           : data,
       supabase,
-      payrollType: payrollData.payroll_type,
+      payrollData,
     });
-    if (!workbook) return;
-    saveAs(
-      new Blob([workbook], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      }),
-      `Bank-Advice ${formatDateTime(Date.now())}.xlsx`
-    );
+    if (!blob) return;
+    saveAs(blob, `Bank-Advice ${formatDateTime(Date.now())}.xls`);
   };
 
   return (
@@ -226,7 +229,6 @@ export const DownloadBankAdvice = ({
             Create the advice for bank
           </AlertDialogDescription>
         </AlertDialogHeader>
-
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
