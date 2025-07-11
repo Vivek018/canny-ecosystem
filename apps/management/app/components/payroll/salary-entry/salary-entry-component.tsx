@@ -49,6 +49,9 @@ import { Label } from "@canny_ecosystem/ui/label";
 import { ImportGroupPayrollDialog } from "../import-grouped-payroll-dialog";
 import { useSalaryEntriesStore } from "@/store/salary-entries";
 import { MultiSelectCombobox } from "@canny_ecosystem/ui/multi-select-combobox";
+import { clearCacheEntry } from "@/utils/cache";
+import { cacheKeyPrefix } from "@/constant";
+import { LoadingSpinner } from "@/components/loading-spinner";
 
 export function SalaryEntryComponent({
   data,
@@ -94,6 +97,13 @@ export function SalaryEntryComponent({
       searchParams.get("group")?.split(",") ?? []
   );
 
+  let redirectUrl = `/payroll/run-payroll/${payrollId}`;
+  if (site.length) {
+    redirectUrl += `?site=${searchParams.getAll("site").join(",")}`
+  } else if (group.length) {
+    redirectUrl += `?group=${searchParams.getAll("group").join(",")}`;
+  }
+
   const handleFieldChange = (newSelectedFields: string[]) => {
     payrollData.project_id
       ? setSite(newSelectedFields)
@@ -106,13 +116,13 @@ export function SalaryEntryComponent({
     if (values.length <= 3) {
       return payrollData.project_id
         ? siteOptions
-            .filter((option) => values.includes(String(option.value)))
-            .map((option) => option.label)
-            .join(", ")
+          .filter((option) => values.includes(String(option.value)))
+          .map((option) => option.label)
+          .join(", ")
         : groupOptions
-            .filter((option) => values.includes(String(option.value)))
-            .map((option) => option.label)
-            .join(", ");
+          .filter((option) => values.includes(String(option.value)))
+          .map((option) => option.label)
+          .join(", ");
     }
 
     return `${values.length} selected`;
@@ -158,6 +168,9 @@ export function SalaryEntryComponent({
     status: PayrollDatabaseRow["status"]
   ) => {
     e.preventDefault();
+    clearCacheEntry(
+      `${cacheKeyPrefix.run_payroll_id}${payrollId}`
+    );
     submit(
       {
         data: JSON.stringify({
@@ -166,6 +179,7 @@ export function SalaryEntryComponent({
           total_employees: payrollData?.total_employees,
           total_net_amount: payrollData?.total_net_amount,
         }),
+        redirectUrl: redirectUrl,
       },
       {
         method: "POST",
@@ -227,14 +241,14 @@ export function SalaryEntryComponent({
   const deductiveCount = deductiveEntries.length;
 
   const handleUpdatePayroll = () => {
+    clearCacheEntry(
+      `${cacheKeyPrefix.run_payroll_id}${payrollId}`
+    );
     submit(
       {
         payrollId: payrollId ?? payrollData?.id,
         payrollData: JSON.stringify({ title: title, run_date: rundate }),
-        failedRedirect:
-          fromWhere === "runpayroll"
-            ? `/payroll/run-payroll/${payrollId}`
-            : `/payroll/payroll-history/${payrollId}`,
+        failedRedirect: redirectUrl,
       },
       {
         method: "POST",
@@ -258,7 +272,7 @@ export function SalaryEntryComponent({
                 Earnings
                 <hr
                   className={cn(
-                    selectedRows.length && "border-muted-foreground"
+                    selectedRows.length && "border-muted-foreground/30"
                   )}
                 />
                 <div className="grid grid-cols-2 gap-x-4 text-sm text-left py-2">
@@ -289,7 +303,7 @@ export function SalaryEntryComponent({
                 </div>
                 <hr
                   className={cn(
-                    selectedRows.length && "border-muted-foreground"
+                    selectedRows.length && "border-muted-foreground/30"
                   )}
                 />
                 <p className="text-sm py-1">
@@ -300,7 +314,7 @@ export function SalaryEntryComponent({
                 Deductions
                 <hr
                   className={cn(
-                    selectedRows.length && "border-muted-foreground"
+                    selectedRows.length && "border-muted-foreground/30"
                   )}
                 />
                 <div className="grid grid-cols-2 gap-x-4 text-sm text-left py-2">
@@ -333,7 +347,7 @@ export function SalaryEntryComponent({
                 </div>
                 <hr
                   className={cn(
-                    selectedRows.length && "border-muted-foreground"
+                    selectedRows.length && "border-muted-foreground/30"
                   )}
                 />
                 <p className="text-sm py-1">
@@ -342,7 +356,7 @@ export function SalaryEntryComponent({
               </div>
             </div>
             <hr
-              className={cn(selectedRows.length && "border-muted-foreground")}
+              className={cn(selectedRows.length && "border-muted-foreground/30")}
             />
             <p className="mt-2">Net Amount : {totals.TOTAL.toString()}</p>
           </CardContent>
@@ -353,9 +367,9 @@ export function SalaryEntryComponent({
               <div className="absolute top-2 right-2 z-10">
                 <AlertDialog>
                   <AlertDialogTrigger
-                    className={cn(" bg-secondary rounded-md px-1 pb-1")}
+                    className={cn("bg-secondary rounded-md px-1.5 pb-0.5")}
                   >
-                    <Icon className="text-md" name="edit" />
+                    <Icon name="edit" size="xs" />
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
@@ -444,7 +458,7 @@ export function SalaryEntryComponent({
           </div>
         </div>
       </div>
-      <div className="w-full flex items-center justify-between gap-4 pb-4">
+      <div className="w-full flex items-center justify-between gap-3 pb-4">
         <div className="w-1/3">
           <MultiSelectCombobox
             label="Groups"
@@ -500,8 +514,8 @@ export function SalaryEntryComponent({
               "hidden h-10",
               (payrollData.status === "pending" ||
                 payrollData.status === "approved") &&
-                hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
-                "flex"
+              hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
+              "flex"
             )}
             disabled={disable}
           >
@@ -513,8 +527,8 @@ export function SalaryEntryComponent({
             className={cn(
               "hidden h-10",
               payrollData.status === "submitted" &&
-                hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
-                "flex"
+              hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
+              "flex"
             )}
             disabled={disable}
           >
@@ -525,8 +539,8 @@ export function SalaryEntryComponent({
             className={cn(
               "hidden h-10",
               payrollData.status === "submitted" &&
-                hasPermission(role, `${approveRole}:${attribute.payroll}`) &&
-                "flex"
+              hasPermission(role, `${approveRole}:${attribute.payroll}`) &&
+              "flex"
             )}
             disabled={disable}
           >
@@ -551,14 +565,14 @@ export function SalaryEntryComponent({
         />
       </div>
 
-      <SalaryEntryDataTable
+      {disable ? <LoadingSpinner className="my-20" /> : <SalaryEntryDataTable
         data={tableData as any}
         columns={salaryEntryColumns({
           data,
           editable: payrollData?.status === "pending",
         })}
         totalNet={totals.TOTAL as number}
-      />
+      />}
       <Outlet />
     </section>
   );

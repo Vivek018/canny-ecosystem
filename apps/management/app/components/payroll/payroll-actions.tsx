@@ -44,7 +44,7 @@ export function PayrollActions({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" className={cn("h-10, bg-muted", className)}>
+        <Button variant="outline" size="icon" className={cn("h-10 px-2 bg-muted", className)}>
           <Icon name="dots-vertical" className="h-[18px] w-[18px]" />
         </Button>
       </DropdownMenuTrigger>

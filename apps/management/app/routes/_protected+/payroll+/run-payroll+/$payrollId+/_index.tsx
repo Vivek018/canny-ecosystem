@@ -39,6 +39,7 @@ import {
   redirect,
   useActionData,
   useLoaderData,
+  useNavigate,
   useParams,
   useRevalidator,
 } from "@remix-run/react";
@@ -54,13 +55,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
 
-    const { data: payrollData, error } = await getPayrollById({
+    const { data: payrollData } = await getPayrollById({
       supabase,
       payrollId: payrollId ?? "",
     });
-    if (error || !payrollData) {
-      clearExactCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
-    }
 
     let groupOptions: any = [];
     let siteOptions: any = [];
@@ -161,8 +159,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
-    `${cacheKeyPrefix.run_payroll_id}${
-      args.params.payrollId
+    `${cacheKeyPrefix.run_payroll_id}${args.params.payrollId
     }${url.searchParams.toString()}`,
     args
   );
@@ -176,6 +173,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     const formData = await request.formData();
     const payrollId = params.payrollId;
     const parsedData = JSON.parse(formData.get("data") as string);
+    const redirectUrl = (formData.get("redirectUrl") as string) ?? `/payroll/run-payroll/${payrollId}`;
 
     const data = {
       id: (parsedData.id ?? payrollId) as PayrollDatabaseRow["id"],
@@ -195,11 +193,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
       return json({
         status: "success",
         message: "Payroll updated successfully",
+        redirectUrl,
         error: null,
       });
     }
     return json(
-      { status: "error", message: "Payroll update failed", error },
+      { status: "error", message: "Payroll update failed", redirectUrl, error },
       { status: 500 }
     );
   } catch (error) {
@@ -208,6 +207,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
       {
         status: "error",
         message: "An unexpected error occurred",
+        redirectUrl: `/payroll/run-payroll/${params.payrollId}`,
         error,
         data: null,
       },
@@ -228,6 +228,7 @@ export default function RunPayrollId() {
   } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
+  const navigate = useNavigate();
   const revalidator = useRevalidator();
   const { payrollId } = useParams();
   const { toast } = useToast();
@@ -236,7 +237,7 @@ export default function RunPayrollId() {
     if (actionData) {
       if (actionData?.status === "success") {
         clearExactCacheEntry(cacheKeyPrefix.run_payroll);
-        clearExactCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
+        clearCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
         clearExactCacheEntry(cacheKeyPrefix.payroll_history);
         toast({
           title: "Success",
@@ -252,6 +253,7 @@ export default function RunPayrollId() {
         });
       }
       revalidator.revalidate();
+      navigate(actionData.redirectUrl, { replace: true });
     }
   }, [actionData]);
 
@@ -269,7 +271,7 @@ export default function RunPayrollId() {
     <>
       <Suspense fallback={<LoadingSpinner className="my-20" />}>
         {payrollData?.payroll_type === "reimbursement" ||
-        payrollData?.payroll_type === "exit" ? (
+          payrollData?.payroll_type === "exit" ? (
           <Await
             resolve={
               payrollData?.payroll_type === "reimbursement"
@@ -279,7 +281,7 @@ export default function RunPayrollId() {
           >
             {({ data, error }) => {
               if (error || !data) {
-                clearExactCacheEntry(
+                clearCacheEntry(
                   `${cacheKeyPrefix.run_payroll_id}${payrollId}`
                 );
                 return (
