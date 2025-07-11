@@ -1,5 +1,5 @@
 import { cacheKeyPrefix } from "@/constant";
-import { clearExactCacheEntry } from "@/utils/cache";
+import { clearCacheEntry, clearExactCacheEntry } from "@/utils/cache";
 import { deleteSalaryEntriesFromPayrollAndEmployeeId } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
@@ -58,7 +58,7 @@ export default function DeleteSalaryEntry() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearExactCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
+        clearCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
         clearExactCacheEntry(cacheKeyPrefix.run_payroll);
         toast({
           title: "Success",

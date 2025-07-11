@@ -36,6 +36,7 @@ import {
   type ClientLoaderFunctionArgs,
   defer,
   json,
+  redirect,
   useActionData,
   useLoaderData,
   useParams,
@@ -53,11 +54,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
 
-    const url = new URL(request.url);
-    const searchParams = new URLSearchParams(url.searchParams);
-    const site = searchParams.get("site")?.split(",") ?? [];
-    const group = searchParams.get("group")?.split(",") ?? [];
-
     const { data: payrollData, error } = await getPayrollById({
       supabase,
       payrollId: payrollId ?? "",
@@ -65,24 +61,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     if (error || !payrollData) {
       clearExactCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
     }
-
-    const salaryEntriesPromise = getSalaryEntriesByPayrollId({
-      supabase,
-      payrollId: payrollId ?? "",
-      params: {
-        site,
-        group,
-      },
-    });
-    const reimbursementEntriesPromise =
-      getReimbursementEntriesForPayrollByPayrollId({
-        supabase,
-        payrollId: payrollId ?? "",
-      });
-    const exitEntriesPromise = getExitsEntriesForPayrollByPayrollId({
-      supabase,
-      payrollId: payrollId ?? "",
-    });
 
     let groupOptions: any = [];
     let siteOptions: any = [];
@@ -108,7 +86,53 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       }));
     }
 
-    // const {}= await get
+    const url = new URL(request.url);
+    const searchParams = new URLSearchParams(url.searchParams);
+    let site = searchParams.get("site")?.split(",") ?? [];
+    let group = searchParams.get("group")?.split(",") ?? [];
+
+    let shouldRedirect = false;
+    if (
+      site.length === 0 &&
+      payrollData?.project_id &&
+      siteOptions.length > 0
+    ) {
+      site = [siteOptions[0].value];
+      searchParams.set("site", site.join(","));
+      shouldRedirect = true;
+    }
+
+    if (
+      group.length === 0 &&
+      payrollData?.project_site_id &&
+      groupOptions.length > 0
+    ) {
+      group = [groupOptions[0].value];
+      searchParams.set("group", group.join(","));
+      shouldRedirect = true;
+    }
+    if (shouldRedirect) {
+      return redirect(`${url.pathname}?${searchParams.toString()}`);
+    }
+
+    const salaryEntriesPromise = getSalaryEntriesByPayrollId({
+      supabase,
+      payrollId: payrollId ?? "",
+      params: {
+        site,
+        group,
+      },
+    });
+    const reimbursementEntriesPromise =
+      getReimbursementEntriesForPayrollByPayrollId({
+        supabase,
+        payrollId: payrollId ?? "",
+      });
+    const exitEntriesPromise = getExitsEntriesForPayrollByPayrollId({
+      supabase,
+      payrollId: payrollId ?? "",
+    });
+
     return defer({
       payrollData,
       salaryEntriesPromise,

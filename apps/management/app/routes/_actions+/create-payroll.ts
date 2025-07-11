@@ -1,5 +1,5 @@
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
-import { clearExactCacheEntry } from "@/utils/cache";
+import { clearCacheEntry} from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
   createAttendanceByPayrollImportAndGiveID,
@@ -444,8 +444,8 @@ export async function action({
               Number(totalNetAmount) + Number(data?.total_net_amount),
           },
         });
-
         if (isGoodStatus(status)) {
+          console.log("===>", failedRedirect);
           if (Number(skipped) > 0) {
             return json({
               status: "success",
@@ -532,13 +532,14 @@ export default function CreatePayroll() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearExactCacheEntry(cacheKeyPrefix.run_payroll);
+        clearCacheEntry(cacheKeyPrefix.run_payroll);
+        clearCacheEntry(cacheKeyPrefix.run_payroll_id);
         toast({
           title: "Success",
           description: actionData?.message || "Payroll Created",
           variant: "success",
         });
-        navigate("/payroll/run-payroll");
+        navigate(actionData?.failedRedirect ?? "payroll/run-payroll");
       } else {
         toast({
           title: "Error",

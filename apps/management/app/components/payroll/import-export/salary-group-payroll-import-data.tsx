@@ -9,7 +9,7 @@ import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
-import { useSubmit } from "@remix-run/react";
+import {useSubmit } from "@remix-run/react";
 import { useState, useEffect } from "react";
 import { ImportedDataTable } from "../salary-imported-table/imported-data-table";
 import { ImportedDataColumns } from "../salary-imported-table/columns";
@@ -25,6 +25,7 @@ export function SalaryGroupPayrollImportData({
   fieldConfigs: FieldConfig[];
 }) {
   const submit = useSubmit();
+
   const { supabase } = useSupabase({ env });
   const { importData } = useImportStoreForSalaryPayroll();
 
@@ -125,7 +126,9 @@ export function SalaryGroupPayrollImportData({
           importData.data.length - updatedData.length > 0
             ? importData.data.length - updatedData.length
             : 0,
-        failedRedirect: `/payroll/run-payroll/${payrollId}`,
+        failedRedirect: updatedData[0].group_id
+          ? `/payroll/run-payroll/${payrollId}?group=${updatedData[0]?.group_id}`
+          : `/payroll/run-payroll/${payrollId}?site=${updatedData[0]?.site_id}`,
       },
       {
         method: "POST",

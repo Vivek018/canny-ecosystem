@@ -86,10 +86,12 @@ export function SalaryEntryComponent({
     navigation.state === "submitting" || navigation.state === "loading";
 
   const [site, setSite] = useState<string[]>(
-    () => searchParams.get("site")?.split(",") ?? []
+    () =>
+      searchParams.get("site")?.split(",") ?? []
   );
   const [group, setGroup] = useState<string[]>(
-    () => searchParams.get("group")?.split(",") ?? []
+    () =>
+      searchParams.get("group")?.split(",") ?? []
   );
 
   const handleFieldChange = (newSelectedFields: string[]) => {
@@ -244,12 +246,21 @@ export function SalaryEntryComponent({
   return (
     <section className="p-4">
       <div className={cn("mb-5 grid grid-cols-2 gap-4")}>
-        <Card className="flex flex-col justify-around px-4 py-2">
+        <Card
+          className={cn(
+            "flex flex-col justify-around px-4 py-2",
+            selectedRows.length && "bg-muted"
+          )}
+        >
           <CardContent className="p-0 text-center">
             <div className="grid grid-cols-2 gap-x-4 text-sm">
               <div className="text-center text-lg">
                 Earnings
-                <hr />
+                <hr
+                  className={cn(
+                    selectedRows.length && "border-muted-foreground"
+                  )}
+                />
                 <div className="grid grid-cols-2 gap-x-4 text-sm text-left py-2">
                   {[
                     ...Object.entries(totals)
@@ -276,14 +287,22 @@ export function SalaryEntryComponent({
                       )),
                   ]}
                 </div>
-                <hr />
+                <hr
+                  className={cn(
+                    selectedRows.length && "border-muted-foreground"
+                  )}
+                />
                 <p className="text-sm py-1">
                   Gross : {totals.GROSS.toString()}
                 </p>
               </div>
               <div className="text-center text-lg">
                 Deductions
-                <hr />
+                <hr
+                  className={cn(
+                    selectedRows.length && "border-muted-foreground"
+                  )}
+                />
                 <div className="grid grid-cols-2 gap-x-4 text-sm text-left py-2">
                   {[
                     Object.entries(totals).map(
@@ -312,13 +331,19 @@ export function SalaryEntryComponent({
                       )),
                   ]}
                 </div>
-                <hr />
+                <hr
+                  className={cn(
+                    selectedRows.length && "border-muted-foreground"
+                  )}
+                />
                 <p className="text-sm py-1">
                   Deduction : {totals.DEDUCTION.toString()}
                 </p>
               </div>
             </div>
-            <hr />
+            <hr
+              className={cn(selectedRows.length && "border-muted-foreground")}
+            />
             <p className="mt-2">Net Amount : {totals.TOTAL.toString()}</p>
           </CardContent>
         </Card>
@@ -328,9 +353,9 @@ export function SalaryEntryComponent({
               <div className="absolute top-2 right-2 z-10">
                 <AlertDialog>
                   <AlertDialogTrigger
-                    className={cn("bg-secondary rounded-md py-0 px-1")}
+                    className={cn(" bg-secondary rounded-md px-1 pb-1")}
                   >
-                    <Icon className="text-sm" name="dots-vertical" />
+                    <Icon className="text-md" name="edit" />
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
@@ -420,7 +445,7 @@ export function SalaryEntryComponent({
         </div>
       </div>
       <div className="w-full flex items-center justify-between gap-4 pb-4">
-        <div className="w-1/4">
+        <div className="w-1/3">
           <MultiSelectCombobox
             label="Groups"
             options={payrollData?.project_id ? siteOptions : groupOptions}
@@ -508,7 +533,7 @@ export function SalaryEntryComponent({
             Approve
           </Button>
         </div>
-        <div>
+        <div className={cn(fromWhere === "payrollhistory" && "hidden")}>
           <ImportGroupPayrollDialog />
         </div>
         <PayrollActions

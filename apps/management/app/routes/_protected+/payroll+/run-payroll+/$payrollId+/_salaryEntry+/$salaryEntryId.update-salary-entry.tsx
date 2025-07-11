@@ -1,5 +1,5 @@
 import { cacheKeyPrefix } from "@/constant";
-import { clearExactCacheEntry } from "@/utils/cache";
+import { clearCacheEntry, clearExactCacheEntry } from "@/utils/cache";
 import { updateSalaryEntry } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
@@ -9,9 +9,7 @@ import { json, type ActionFunctionArgs } from "@remix-run/node";
 import { useActionData, useNavigate, useParams } from "@remix-run/react";
 import { useEffect } from "react";
 
-export async function action({
-  request,
-}: ActionFunctionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
     const formData = await request.formData();
@@ -22,8 +20,12 @@ export async function action({
 
     if (submission.status !== "success") {
       return json(
-        { status: "error", message: "Salary Entry update failed", error: submission.error },
-        { status: 500 },
+        {
+          status: "error",
+          message: "Salary Entry update failed",
+          error: submission.error,
+        },
+        { status: 500 }
       );
     }
 
@@ -41,7 +43,7 @@ export async function action({
     }
     return json(
       { status: "error", message: "Salary Entry update failed", error },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json(
@@ -51,11 +53,10 @@ export async function action({
         error,
         data: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
-
 
 export default function UpdateSalaryEntry() {
   const actionData = useActionData<typeof action>();
@@ -66,7 +67,7 @@ export default function UpdateSalaryEntry() {
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearExactCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
+        clearCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
         clearExactCacheEntry(cacheKeyPrefix.run_payroll);
         toast({
           title: "Success",
