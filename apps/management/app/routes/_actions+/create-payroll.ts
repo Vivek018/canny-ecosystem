@@ -445,7 +445,6 @@ export async function action({
           },
         });
         if (isGoodStatus(status)) {
-          console.log("===>", failedRedirect);
           if (Number(skipped) > 0) {
             return json({
               status: "success",

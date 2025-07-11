@@ -513,7 +513,6 @@ export async function getSalaryEntriesByPayrollIdForSalaryRegister({
   if (error) {
     console.error("getSalaryEntriesByPayrollId Error", error);
   }
-  console.log(data);
 
   return { data, error: null };
 }
