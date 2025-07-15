@@ -51,8 +51,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       date_start: searchParams.get("date_start") ?? null,
       date_end: searchParams.get("date_end") ?? null,
       company_location: searchParams.get("company_location") ?? null,
-      payroll_type: searchParams.get("payroll_type") ?? null,
-      invoice_type: searchParams.get("invoice_type") ?? null,
+      type: searchParams.get("type") ?? null,
       service_charge: searchParams.get("service_charge") ?? null,
       paid: searchParams.get("paid") ?? null,
       paid_date_start: searchParams.get("paid_date_start") ?? null,
@@ -111,7 +110,6 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   );
 }
 clientLoader.hydrate = true;
-
 
 export async function action({ request }: ActionFunctionArgs) {
   try {

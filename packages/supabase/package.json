@@ -9,7 +9,7 @@
     "format": "biome format --write .",
     "typecheck": "tsc --noEmit",
     "seed": "tsx src/seed/index.ts",
-    "db:generate": "supabase gen types --lang=typescript --project-id oghojvhpbxanipiuxwbu --schema public > src/types/db.ts"
+    "db:generate": "set USERPROFILE=%USERPROFILE% && set HOME=%USERPROFILE% && supabase gen types --lang=typescript --project-id oghojvhpbxanipiuxwbu --schema public > src/types/db.ts"
   },
   "dependencies": {
     "@canny_ecosystem/utils": "*",

@@ -70,7 +70,6 @@ export const ImportReimbursementPayrollModal = () => {
       submitted_date: null,
       status: null,
       amount: null,
-      is_deductible: null,
       email: null,
     },
   ];

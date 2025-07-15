@@ -12,7 +12,7 @@ import {
 } from "@canny_ecosystem/ui/alert-dialog";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Combobox } from "@canny_ecosystem/ui/combobox";
-import { CheckboxField, Field } from "@canny_ecosystem/ui/forms";
+import { Field } from "@canny_ecosystem/ui/forms";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import {
   getValidDateForInput,
@@ -101,23 +101,6 @@ export const UpdateImportedReimbursement = ({
                 value: data.email ?? "",
                 onChange: (e) => onChange("email", e.target.value),
                 placeholder: "Approval's Email",
-              }}
-            />
-          </div>
-
-          <div>
-            <CheckboxField
-              buttonProps={{
-                form: "",
-                type: "button",
-                name: "is_deductible",
-                checked: data.is_deductible ?? false,
-                onCheckedChange: (state) => {
-                  onChange("is_deductible", String(state));
-                },
-              }}
-              labelProps={{
-                children: "Is Deductible?",
               }}
             />
           </div>

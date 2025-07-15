@@ -95,7 +95,7 @@ export async function action({
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
@@ -113,7 +113,7 @@ export async function action({
 
     return json(
       { status: "error", message: "Location creation failed", error },
-      { status: 500 },
+      { status: 500 }
     );
   } catch (error) {
     return json(
@@ -122,7 +122,7 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -223,7 +223,8 @@ export default function CreateLocation({
               <Field
                 inputProps={{
                   ...getInputProps(fields.address_line_1, { type: "text" }),
-                  placeholder: replaceUnderscore(fields.address_line_1.name),
+                  placeholder:
+                    replaceUnderscore(fields.address_line_1.name) ?? "",
                   className: "placeholder:capitalize",
                 }}
                 labelProps={{
@@ -235,7 +236,8 @@ export default function CreateLocation({
                 className="-mt-4"
                 inputProps={{
                   ...getInputProps(fields.address_line_2, { type: "text" }),
-                  placeholder: replaceUnderscore(fields.address_line_2.name),
+                  placeholder:
+                    replaceUnderscore(fields.address_line_2.name) ?? "",
                   className: "placeholder:capitalize",
                 }}
                 errors={fields.address_line_2.errors}
@@ -270,13 +272,39 @@ export default function CreateLocation({
                     ...getInputProps(fields.pincode, { type: "text" }),
                     className: "capitalize",
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.pincode.name,
+                      fields.pincode.name
                     )}`,
                   }}
                   labelProps={{
                     children: replaceUnderscore(fields.pincode.name),
                   }}
                   errors={fields.pincode.errors}
+                />
+              </div>
+              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+                <Field
+                  inputProps={{
+                    ...getInputProps(fields.pan_number, { type: "text" }),
+                    className: "capitalize",
+                    placeholder: `Enter ${replaceUnderscore(fields.pan_number.name)}`,
+                  }}
+                  labelProps={{
+                    children: replaceUnderscore(fields.pan_number.name),
+                  }}
+                  errors={fields.pan_number.errors}
+                />
+                <Field
+                  inputProps={{
+                    ...getInputProps(fields.gst_number, { type: "text" }),
+                    className: "capitalize",
+                    placeholder: `Enter ${replaceUnderscore(
+                      fields.gst_number.name
+                    )}`,
+                  }}
+                  labelProps={{
+                    children: replaceUnderscore(fields.gst_number.name),
+                  }}
+                  errors={fields.gst_number.errors}
                 />
               </div>
               <div className="grid grid-cols-2 place-content-center justify-between gap-6">
@@ -296,7 +324,7 @@ export default function CreateLocation({
                     ...getInputProps(fields.longitude, { type: "number" }),
                     className: "capitalize",
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.longitude.name,
+                      fields.longitude.name
                     )}`,
                   }}
                   labelProps={{

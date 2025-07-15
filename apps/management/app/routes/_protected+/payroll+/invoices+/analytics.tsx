@@ -14,7 +14,7 @@ import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { CANNY_NAME } from "../payroll-history+/$payrollId+/_reports+/create-invoice";
 import { InvoicePaidUnpaid } from "@/components/invoice/analytics/paid-unpaid-invoice";
 import { InvoicesByLocations } from "@/components/invoice/analytics/invoices-by-locations";
-import { InvoicesByReimbursementType } from "@/components/invoice/analytics/invoice-by-reimbursement-type";
+import { InvoicesByType } from "@/components/invoice/analytics/invoice-by-type";
 
 const getDataSource = (
   selectedRows: InvoiceDataType[],
@@ -85,7 +85,7 @@ export default function InvoicesAnalytics() {
           chartData={dataSource}
           companyRelations={companyRelations}
         />
-        <InvoicesByReimbursementType
+        <InvoicesByType
           chartData={dataSource}
           companyRelations={companyRelations}
         />

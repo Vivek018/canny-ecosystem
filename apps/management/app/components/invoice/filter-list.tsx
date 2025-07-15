@@ -37,11 +37,9 @@ export function FilterList({ filterList }: Props) {
       case "company_location":
         return value;
 
-      case "payroll_type":
+      case "type":
         return value;
 
-      case "invoice_type":
-        return value;
 
       case "service_charge":
         return value;

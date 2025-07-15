@@ -69,14 +69,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
       reason: searchParams.get("reason") ?? undefined,
       project: searchParams.get("project") ?? undefined,
       project_site: searchParams.get("project_site") ?? undefined,
-      in_payroll: searchParams.get("in_payroll") ?? undefined,
-
+      in_invoice: searchParams.get("in_invoice") ?? undefined,
     };
 
     const hasFilters =
       filters &&
       Object.values(filters).some(
-        (value) => value !== null && value !== undefined,
+        (value) => value !== null && value !== undefined
       );
 
     const exitsPromise = getExitsByCompanyId({
@@ -127,11 +126,10 @@ export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
     `${cacheKeyPrefix.exits}${url.searchParams.toString()}`,
-    args,
+    args
   );
 }
 clientLoader.hydrate = true;
-
 
 export async function action({ request }: ActionFunctionArgs) {
   try {
@@ -214,7 +212,7 @@ export default function ExitsIndex() {
           </Suspense>
         </div>
         <div className="flex-shrink-0">
-          <ExitActions isEmpty={!exitsPromise} />
+          <ExitActions isEmpty={!exitsPromise} env={env} />
         </div>
       </div>
 
@@ -237,7 +235,7 @@ export default function ExitsIndex() {
             }
             const hasNextPage = Boolean(
               exitsData?.meta?.count &&
-              exitsData.meta.count > LAZY_LOADING_LIMIT,
+                exitsData.meta.count > LAZY_LOADING_LIMIT
             );
 
             return (

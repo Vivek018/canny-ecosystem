@@ -28,12 +28,16 @@ export async function createInvoice({
     payroll_data: JSON.parse(data.payroll_data as any),
   };
 
-  const { error, status } = await supabase.from("invoice").insert(newData);
+  const {
+    data: returnedData,
+    error,
+    status,
+  } = await supabase.from("invoice").insert(newData).select().single();
   if (error) {
     console.error("createInvoice Error:", error);
   }
 
-  return { status, error };
+  return { data: returnedData, status, error };
 }
 
 export async function updateInvoiceById({

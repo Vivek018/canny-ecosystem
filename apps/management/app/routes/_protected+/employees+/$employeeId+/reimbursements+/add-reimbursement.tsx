@@ -18,6 +18,7 @@ import {
   replaceUnderscore,
   transformStringArrayIntoOptions,
   createRole,
+  reimbursementTypeArray,
 } from "@canny_ecosystem/utils";
 
 import {
@@ -33,11 +34,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
-import {
-  CheckboxField,
-  Field,
-  SearchableSelectField,
-} from "@canny_ecosystem/ui/forms";
+import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import { FormButtons } from "@/components/form/form-buttons";
 import { createReimbursementsFromData } from "@canny_ecosystem/supabase/mutations";
 import type {
@@ -149,8 +146,7 @@ export default function AddReimbursements({
       } else {
         toast({
           title: "Error",
-          description:
-            actionData?.message || "Reimbursement create failed",
+          description: actionData?.message || "Reimbursement create failed",
           variant: "destructive",
         });
       }
@@ -269,15 +265,36 @@ export default function AddReimbursements({
                 />
               </div>
 
-              <CheckboxField
-                className="mt-8"
-                buttonProps={getInputProps(fields.is_deductible, {
-                  type: "checkbox",
-                })}
-                labelProps={{
-                  children: "Is Deductible?",
-                }}
-              />
+              <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10">
+                <SearchableSelectField
+                  key={resetKey + 1}
+                  inputProps={{
+                    ...getInputProps(fields.type, {
+                      type: "text",
+                    }),
+                    placeholder: "Select Reimbursement Type",
+                  }}
+                  options={transformStringArrayIntoOptions(
+                    reimbursementTypeArray as unknown as string[]
+                  )}
+                  labelProps={{
+                    children: "Type",
+                  }}
+                  errors={fields.type.errors}
+                />
+                <Field
+                  inputProps={{
+                    ...getInputProps(fields.note, {
+                      type: "text",
+                    }),
+                    placeholder: `Enter ${replaceUnderscore(fields.note.name)}`,
+                  }}
+                  labelProps={{
+                    children: replaceUnderscore(fields.note.name),
+                  }}
+                  errors={fields.note.errors}
+                />
+              </div>
             </CardContent>
 
             <FormButtons

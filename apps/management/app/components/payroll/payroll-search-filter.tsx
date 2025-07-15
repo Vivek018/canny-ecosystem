@@ -71,7 +71,6 @@ export function PayrollSearchFilter({
   const initialFilterParams: PayrollFilters = {
     date_start: "",
     date_end: "",
-    payroll_type: "",
     status: "",
     name: "",
   };
@@ -103,7 +102,6 @@ export function PayrollSearchFilter({
   const searchParamsList: PayrollFilters = {
     date_start: searchParams.get("date_start"),
     date_end: searchParams.get("date_end"),
-    payroll_type: searchParams.get("payroll_type"),
     status: searchParams.get("status"),
   };
 
@@ -280,37 +278,6 @@ export function PayrollSearchFilter({
                     setFilterParams((prev) => ({ ...prev, ...newRange }));
                   }}
                 />
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-        </DropdownMenuGroup>
-
-        <DropdownMenuGroup>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-              <span>Payroll Type</span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent
-                sideOffset={14}
-                alignOffset={-4}
-                className="p-0"
-              >
-                {["salary", "exit", "reimbursement"].map((name, index) => (
-                  <DropdownMenuCheckboxItem
-                    key={name + index.toString()}
-                    className="capitalize"
-                    checked={filterParams?.payroll_type === name}
-                    onCheckedChange={() => {
-                      setFilterParams((prev) => ({
-                        ...prev,
-                        payroll_type: name,
-                      }));
-                    }}
-                  >
-                    {name}
-                  </DropdownMenuCheckboxItem>
-                ))}
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>

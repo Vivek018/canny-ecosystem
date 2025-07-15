@@ -22,11 +22,7 @@ import {
   useSubmit,
 } from "@remix-run/react";
 import { Calendar } from "@canny_ecosystem/ui/calendar";
-import {
-  booleanArray,
-  invoiceReimbursementTypeArray,
-  replaceUnderscore,
-} from "@canny_ecosystem/utils";
+import { booleanArray, replaceUnderscore } from "@canny_ecosystem/utils";
 import type { InvoiceFilters } from "@canny_ecosystem/supabase/queries";
 import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
 import { useTypingAnimation } from "@canny_ecosystem/utils/hooks/typing-animation";
@@ -76,8 +72,7 @@ export function InvoiceSearchFilter({
     date_start: "",
     date_end: "",
     company_location: "",
-    payroll_type: "",
-    invoice_type: "",
+    type: "",
     service_charge: "",
     paid: "",
     paid_date_start: "",
@@ -112,8 +107,7 @@ export function InvoiceSearchFilter({
     date_start: searchParams.get("date_start"),
     date_end: searchParams.get("date_end"),
     company_location: searchParams.get("company_location"),
-    payroll_type: searchParams.get("payroll_type"),
-    invoice_type: searchParams.get("invoice_type"),
+    type: searchParams.get("type"),
     service_charge: searchParams.get("project"),
     paid: searchParams.get("paid"),
     paid_date_start: searchParams.get("paid_date_start"),
@@ -329,7 +323,7 @@ export function InvoiceSearchFilter({
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
-              <span>Payroll Type</span>
+              <span>Type</span>
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent
@@ -341,50 +335,17 @@ export function InvoiceSearchFilter({
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
                     className="capitalize"
-                    checked={filterParams?.payroll_type === name}
+                    checked={filterParams?.type === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
                         ...prev,
-                        payroll_type: name,
+                        type: name,
                       }));
                     }}
                   >
                     {name}
                   </DropdownMenuCheckboxItem>
                 ))}
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-        </DropdownMenuGroup>
-
-        <DropdownMenuGroup>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-              <span>Invoice Type</span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent
-                sideOffset={14}
-                alignOffset={-4}
-                className="p-0"
-              >
-                {["salary", "exit", ...invoiceReimbursementTypeArray].map(
-                  (name, index) => (
-                    <DropdownMenuCheckboxItem
-                      key={name + index.toString()}
-                      className="capitalize"
-                      checked={filterParams?.invoice_type === name}
-                      onCheckedChange={() => {
-                        setFilterParams((prev) => ({
-                          ...prev,
-                          invoice_type: name,
-                        }));
-                      }}
-                    >
-                      {name}
-                    </DropdownMenuCheckboxItem>
-                  )
-                )}
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>

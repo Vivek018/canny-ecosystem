@@ -55,7 +55,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const filters: PayrollFilters = {
       date_start: searchParams.get("date_start") ?? null,
       date_end: searchParams.get("date_end") ?? null,
-      payroll_type: searchParams.get("payroll_type") ?? null,
       status: searchParams.get("status") ?? null,
     };
 

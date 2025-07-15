@@ -41,7 +41,6 @@ export async function action({
 
     const { error: proofError } = await deleteInvoiceProof({
       supabase,
-      payrollId: invoiceData?.payroll_id!,
       documentName: invoiceData?.invoice_number!,
     });
     const { status, error } = await deleteInvoiceById({

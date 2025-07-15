@@ -40,8 +40,6 @@ import { useSupabase } from "@canny_ecosystem/supabase/client";
 import { Spinner } from "@canny_ecosystem/ui/spinner";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import { ImportReimbursementPayrollModal } from "@/components/payroll/import-export/import-reimbursement-modal-payroll";
-import { ImportExitPayrollModal } from "@/components/payroll/import-export/import-exit-modal-payroll";
 import { generatePayrollFilter } from "@/utils/ai/payroll";
 
 const pageSize = 15;
@@ -61,7 +59,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const filters: PayrollFilters = {
       date_start: searchParams.get("date_start") ?? null,
       date_end: searchParams.get("date_end") ?? null,
-      payroll_type: searchParams.get("payroll_type") ?? null,
       status: searchParams.get("status") ?? null,
     };
 
@@ -322,8 +319,6 @@ export default function RunPayrollIndex() {
       </div>
 
       <ImportSalaryPayrollModal />
-      <ImportReimbursementPayrollModal />
-      <ImportExitPayrollModal />
       <Outlet />
     </section>
   );

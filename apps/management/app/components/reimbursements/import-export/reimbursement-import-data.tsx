@@ -100,6 +100,7 @@ export function ReimbursementImportData({
           company_id: companyId,
         };
       });
+      console.log(updatedData);
 
       const { error, status } = await createReimbursementsFromImportedData({
         data: updatedData as ReimbursementInsert[],

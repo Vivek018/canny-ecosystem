@@ -83,13 +83,13 @@ export function InvoicesByLocations({
           ? (sum * companyRelations.service_charge) / 100
           : 0
         : invoice.include_charge
-        ? (invoice.payroll_data.reduce(
-            (sum: number, item: PayrollDataItem) => sum + Number(item.amount),
-            0
-          ) *
-            companyRelations.reimbursement_charge) /
-          100
-        : 0;
+          ? (invoice.payroll_data.reduce(
+              (sum: number, item: PayrollDataItem) => sum + Number(item.amount),
+              0
+            ) *
+              companyRelations.reimbursement_charge) /
+            100
+          : 0;
 
     const total: number =
       type === "salary"
@@ -116,7 +116,7 @@ export function InvoicesByLocations({
     return {
       location: invoice?.company_locations?.name,
       amount: Number(grand_total.toFixed(2)),
-      fill: `hsl(var(--chart-${index + 1}))`, 
+      fill: `hsl(var(--chart-${index + 1}))`,
     };
   });
 
@@ -133,7 +133,7 @@ export function InvoicesByLocations({
           <PieChart>
             <ChartTooltip
               content={<ChartTooltipContent hideLabel />}
-              wrapperStyle={{ width: "60%" }}
+              wrapperStyle={{ width: "85%" }}
               cursor={false}
             />
             <Pie

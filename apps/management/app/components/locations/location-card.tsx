@@ -32,6 +32,14 @@ import {
 } from "@canny_ecosystem/utils";
 import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@canny_ecosystem/ui/dialog";
+import { Label } from "@canny_ecosystem/ui/label";
+import { useState } from "react";
 
 export function LocationCard({
   location,
@@ -39,6 +47,7 @@ export function LocationCard({
   location: Omit<LocationDatabaseRow, "created_at" | "updated_at">;
 }) {
   const { role } = useUser();
+  const [open, setOpen] = useState(false);
   return (
     <Card
       key={location.id}
@@ -57,8 +66,8 @@ export function LocationCard({
                     "p-2 rounded-md bg-secondary grid place-items-center ",
                     !hasPermission(
                       `${role}`,
-                      `${updateRole}:${attribute.settingLocations}`,
-                    ) && "hidden",
+                      `${updateRole}:${attribute.settingLocations}`
+                    ) && "hidden"
                   )}
                 >
                   <Icon name="edit" size="xs" />
@@ -75,9 +84,9 @@ export function LocationCard({
                   !location.longitude &&
                   !hasPermission(
                     `${role}`,
-                    `${deleteRole}:${attribute.settingLocations}`,
+                    `${deleteRole}:${attribute.settingLocations}`
                   ) &&
-                  "hidden",
+                  "hidden"
               )}
             >
               <Icon name="dots-vertical" size="xs" />
@@ -87,7 +96,7 @@ export function LocationCard({
                 <DropdownMenuItem
                   className={cn(
                     "py-2 text-[13px]",
-                    !location.latitude && "hidden",
+                    !location.latitude && "hidden"
                   )}
                   onClick={() => {
                     navigator.clipboard.writeText(String(location.latitude));
@@ -98,7 +107,7 @@ export function LocationCard({
                 <DropdownMenuItem
                   className={cn(
                     "py-2 text-[13px]",
-                    !location.longitude && "hidden",
+                    !location.longitude && "hidden"
                   )}
                   onClick={() => {
                     navigator.clipboard.writeText(String(location.longitude));
@@ -108,17 +117,47 @@ export function LocationCard({
                 </DropdownMenuItem>
                 <DropdownMenuSeparator
                   className={cn(
-                    !location.latitude && !location.longitude && "hidden",
+                    !location.latitude && !location.longitude && "hidden"
+                  )}
+                />
+                <DropdownMenuItem
+                  className="py-2 text-[13px]"
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    setOpen(true);
+                  }}
+                >
+                  View Location Details
+                </DropdownMenuItem>
+                <DropdownMenuSeparator
+                  className={cn(
                     !hasPermission(
                       `${role}`,
-                      `${deleteRole}:${attribute.settingLocations}`,
-                    ) && "hidden",
+                      `${deleteRole}:${attribute.settingLocations}`
+                    ) && "hidden"
                   )}
                 />
                 <DeleteLocation locationId={location.id} />
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogContent className="max-w-max pl-5 pr-40">
+              <DialogHeader className="mb-4">
+                <DialogTitle>Location Details</DialogTitle>
+              </DialogHeader>
+              <div className="flex flex-col gap-6">
+                <div className="flex items-center gap-2">
+                  <Label className="font-bold">Pan Number :</Label>
+                  <p className="text-base">{location?.pan_number}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Label className="font-bold">Gst Number :</Label>
+                  <p className="text-base">{location?.gst_number}</p>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </CardHeader>
       <CardContent className="flex flex-col gap-0.5 px-4">
@@ -136,7 +175,7 @@ export function LocationCard({
       <CardFooter
         className={cn(
           "px-2.5 ml-auto bg-secondary text-foreground py-1.5 text-sm tracking-wide font-sem rounded-tl-md border-foreground flex gap-1 justify-center mt-auto",
-          !location.is_primary && "opacity-0",
+          !location.is_primary && "opacity-0"
         )}
       >
         <Icon name="dot-filled" size="xs" />

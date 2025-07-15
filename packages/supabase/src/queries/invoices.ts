@@ -16,8 +16,7 @@ export type InvoiceDataType = Pick<
   | "subject"
   | "company_address_id"
   | "payroll_data"
-  | "payroll_type"
-  | "invoice_type"
+  | "type"
   | "payroll_id"
   | "include_charge"
   | "include_cgst"
@@ -35,11 +34,9 @@ export type InvoiceDataType = Pick<
 
 export async function getInvoiceProofUrlByPayrollIdAndDocumentName({
   supabase,
-  payrollId,
   documentName,
 }: {
   supabase: TypedSupabaseClient;
-  payrollId: string;
   documentName: string;
 }) {
   const columns = ["proof"] as const;
@@ -47,7 +44,6 @@ export async function getInvoiceProofUrlByPayrollIdAndDocumentName({
   const { data, error } = await supabase
     .from("invoice")
     .select(columns.join(","))
-    .eq("payroll_id", payrollId)
     .eq("invoice_number", documentName)
     .maybeSingle<InvoiceDatabaseRow>();
 
@@ -61,8 +57,7 @@ export type InvoiceFilters = {
   date_start?: string | undefined | null;
   date_end?: string | undefined | null;
   company_location?: string | undefined | null;
-  payroll_type?: string | undefined | null;
-  invoice_type?: string | undefined | null;
+  type?: string | undefined | null;
   service_charge?: string | undefined | null;
   paid?: string | undefined | null;
   paid_date_start?: string | undefined | null;
@@ -88,8 +83,7 @@ export async function getInvoicesByCompanyId({
     date_start,
     date_end,
     company_location,
-    payroll_type,
-    invoice_type,
+    type,
     service_charge,
     paid,
     paid_date_start,
@@ -112,8 +106,7 @@ export async function getInvoicesByCompanyId({
     "include_proof",
     "is_paid",
     "paid_date",
-    "payroll_type",
-    "invoice_type",
+    "type",
     "company_id",
     "created_at",
   ] as const;
@@ -148,17 +141,15 @@ export async function getInvoicesByCompanyId({
   if (company_location) {
     query.eq("company_locations.name", company_location);
   }
-  if (invoice_type) {
-    query.eq("invoice_type", invoice_type);
+  if (type) {
+    query.eq("type", type);
   }
-  if (payroll_type) {
-    query.eq("payroll_type", payroll_type);
-  }
+
   if (service_charge) {
-    query.eq("include_charge", service_charge);
+    query.eq("include_charge", Boolean(service_charge));
   }
   if (paid) {
-    query.eq("is_paid", paid);
+    query.eq("is_paid", Boolean(paid));
   }
   const { data, count, error } = await query.range(from, to);
 
@@ -199,8 +190,7 @@ export async function getInvoiceById({
     "is_paid",
     "paid_date",
     "proof",
-    "payroll_type",
-    "invoice_type",
+    "type",
     "created_at",
     "company_id",
   ] as const;
@@ -225,7 +215,7 @@ export async function getInvoiceById({
     if (companyAddressError) {
       console.error("getInvoiceByCompanyId Error", error);
     }
-    
+
     dataForPreview = {
       ...data,
       company_address_id: companyAddressData!.city,

@@ -64,12 +64,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
         searchParams.get("submitted_date_start") ?? undefined,
       submitted_date_end: searchParams.get("submitted_date_end") ?? undefined,
       status: searchParams.get("status") ?? undefined,
-      is_deductible: searchParams.get("is_deductible") ?? undefined,
+      type: searchParams.get("type") ?? undefined,
       users: searchParams.get("users") ?? undefined,
       name: query,
       project: searchParams.get("project") ?? undefined,
       project_site: searchParams.get("project_site") ?? undefined,
-      in_payroll: searchParams.get("in_payroll") ?? undefined,
+      in_invoice: searchParams.get("in_invoice") ?? undefined,
     };
 
     const hasFilters =
@@ -217,7 +217,7 @@ export default function ReimbursementsIndex() {
           </Suspense>
           <FilterList filters={filterList} />
         </div>
-        <ReimbursementActions isEmpty={!projectPromise} />
+        <ReimbursementActions isEmpty={!projectPromise} env={env} />
       </div>
       <Suspense fallback={<LoadingSpinner className="h-1/3" />}>
         <Await resolve={reimbursementsPromise}>

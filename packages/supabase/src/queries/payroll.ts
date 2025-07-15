@@ -12,7 +12,6 @@ import { months } from "@canny_ecosystem/utils/constant";
 export type PayrollFilters = {
   date_start?: string | undefined | null;
   date_end?: string | undefined | null;
-  payroll_type?: string | undefined | null;
   status?: string | undefined | null;
   name?: string | undefined | null;
 };
@@ -36,7 +35,7 @@ export async function getPendingOrSubmittedPayrollsByCompanyId({
   };
 }) {
   const { from, to, filters, searchQuery } = params;
-  const { date_start, date_end, payroll_type, status } = filters ?? {};
+  const { date_start, date_end,status } = filters ?? {};
   const columns = [
     "id",
     "title",
@@ -74,12 +73,7 @@ export async function getPendingOrSubmittedPayrollsByCompanyId({
     if (end) query.lte(field, formatUTCDate(end));
   }
 
-  if (payroll_type) {
-    query.eq(
-      "payroll_type",
-      payroll_type as PayrollDatabaseRow["payroll_type"]
-    );
-  }
+  
 
   if (status) {
     query.eq("status", status as PayrollDatabaseRow["status"]);
@@ -108,7 +102,7 @@ export async function getApprovedPayrollsByCompanyId({
   };
 }) {
   const { from, to, filters, searchQuery } = params;
-  const { date_start, date_end, payroll_type, status } = filters ?? {};
+  const { date_start, date_end,  status } = filters ?? {};
   const columns = [
     "id",
     "title",
@@ -146,12 +140,7 @@ export async function getApprovedPayrollsByCompanyId({
     if (end) query.lte(field, formatUTCDate(end));
   }
 
-  if (payroll_type) {
-    query.eq(
-      "payroll_type",
-      payroll_type as PayrollDatabaseRow["payroll_type"]
-    );
-  }
+ 
 
   if (status) {
     query.eq("status", status as PayrollDatabaseRow["status"]);

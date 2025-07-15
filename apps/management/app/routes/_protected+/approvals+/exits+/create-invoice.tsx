@@ -7,9 +7,7 @@ import { createInvoice } from "@canny_ecosystem/supabase/mutations";
 import {
   getCannyCompanyIdByName,
   getLocationsForSelectByCompanyId,
-  getPayrollById,
   getRelationshipsByParentAndChildCompanyId,
-  getSalaryEntriesByPayrollId,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { InvoiceDatabaseInsert } from "@canny_ecosystem/supabase/types";
@@ -55,21 +53,16 @@ import {
 import { parseMultipartFormData } from "@remix-run/server-runtime/dist/formData";
 import { createMemoryUploadHandler } from "@remix-run/server-runtime/dist/upload/memoryUploadHandler";
 import { useEffect, useState } from "react";
-import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { useSalaryEntriesStore } from "@/store/salary-entries";
+import { useExitsStore } from "@/store/exits";
 
 const ADD_INVOICE_TAG = "Create-Invoice";
 
 export const CANNY_NAME = "Canny Management Services";
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
-  const payrollId = params.payrollId as string;
+export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const url = new URL(request.url);
-  const searchParams = new URLSearchParams(url.searchParams);
-  const site = searchParams.get("site") ?? null;
-  const group = searchParams.get("group") ?? null;
+
   const { data: cannyData, error } = await getCannyCompanyIdByName({
     name: CANNY_NAME,
     supabase,
@@ -88,18 +81,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     companyRelations = (data ?? []) as unknown as any;
   }
 
-  const { data: payroll } = await getPayrollById({ payrollId, supabase });
   const { data: companyLocations } = await getLocationsForSelectByCompanyId({
     companyId,
     supabase,
-  });
-  const { data: salaryData } = await getSalaryEntriesByPayrollId({
-    supabase,
-    payrollId,
-    params: {
-      group: group ? [group] : null,
-      site: site ? [site] : null,
-    },
   });
 
   const companyLocationArray = companyLocations?.map((location) => ({
@@ -108,11 +92,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }));
 
   return {
-    payroll,
-    salaryData,
     companyRelations,
     companyLocationArray,
-    payrollId,
     companyId,
   };
 }
@@ -135,6 +116,9 @@ export async function action({
       request,
       createMemoryUploadHandler({ maxPartSize: SIZE_10MB })
     );
+
+    const selectedRowData = formData.get("selected_rows") as string;
+    const selectedExitData = JSON.parse(selectedRowData || "[]");
 
     const submission = parseWithZod(formData, {
       schema: InvoiceSchema,
@@ -171,11 +155,39 @@ export async function action({
       }
     }
 
-    const { status, error } = await createInvoice({
+    const { data, status, error } = await createInvoice({
       supabase,
       data: submission.value,
     });
+    if (data?.id) {
+      const updatedExit = (selectedExitData as Array<{ id: string }>).map(
+        ({ id }: { id: string }) => ({
+          id: id!,
+          invoice_id: data.id!,
+        })
+      );
 
+      for (const entry of updatedExit) {
+        const { id, invoice_id } = entry;
+        const { error } = await supabase
+          .from("exits")
+          .update({ invoice_id })
+          .eq("id", id);
+
+        if (error) {
+          return json({
+            status: "error",
+            message: "Error udating Exit",
+            error,
+          });
+        }
+      }
+      return json({
+        status: "success",
+        message: "Invoice created successfully",
+        error: null,
+      });
+    }
     if (isGoodStatus(status)) {
       return json({
         status: "success",
@@ -210,47 +222,28 @@ export default function CreateInvoice({
   locationArrayFromUpdate: any[];
   companyRelationsFromUpdate: any;
 }) {
-  const {
-    companyId,
-    salaryData,
-    payrollId,
-    companyLocationArray,
-    companyRelations,
-  } = useLoaderData<typeof loader>();
-
-  const { selectedRows } = useSalaryEntriesStore();
+  const { selectedRows } = useExitsStore();
+  const { companyId, companyLocationArray, companyRelations } =
+    useLoaderData<typeof loader>();
 
   const relations = companyRelationsFromUpdate ?? companyRelations;
 
-  function transformSalaryData(employees: any) {
-    const fieldTotals: Record<string, { rawAmount: number; type: string }> = {};
+  function transformPayrollData(employees: any[]) {
+    const total = employees.reduce((sum, entry) => {
+      const bonus = entry.bonus || 0;
+      const gratuity = entry.gratuity || 0;
+      const leave = entry.leave_encashment || 0;
+      const deduction = entry.deduction || 0;
 
-    for (const emp of employees) {
-      for (const entry of emp.salary_entries) {
-        const field = entry.field_name;
-        if (!fieldTotals[field]) {
-          fieldTotals[field] = { rawAmount: 0, type: entry.type };
-        }
-        fieldTotals[field].rawAmount += entry.amount;
-      }
-    }
-    const basicAmount = fieldTotals.BASIC?.rawAmount ?? 0;
+      return sum + bonus + gratuity + leave - deduction;
+    }, 0);
 
-    return Object.entries(fieldTotals).map(([field, data]) => {
-      let amount = data.rawAmount;
-
-      if (field.trim() === "PF" || field.trim() === "EPF") {
-        amount = (basicAmount * 13) / 100;
-      } else if (field.trim() === "ESIC" || field.trim() === "ESI") {
-        amount = (amount * 3.25) / 0.75;
-      }
-
-      return {
-        field,
-        amount: Number(amount.toFixed(2)),
-        type: data.type,
-      };
-    });
+    return [
+      {
+        field: "EXIT",
+        amount: Number(total.toFixed(2)),
+      },
+    ];
   }
 
   const actionData = useActionData<typeof action>();
@@ -259,6 +252,7 @@ export default function CreateInvoice({
   const INVOICE_TAG = updateValues ? "Update-Invoice" : ADD_INVOICE_TAG;
 
   const initialValues = updateValues ?? getInitialValueFromZod(InvoiceSchema);
+
   const [form, fields] = useForm({
     id: "invoice",
     constraint: getZodConstraint(InvoiceSchema),
@@ -269,14 +263,13 @@ export default function CreateInvoice({
     shouldRevalidate: "onInput",
     defaultValue: {
       ...initialValues,
-      payroll_id: initialValues.payroll_id ?? payrollId,
       company_id: initialValues.company_id ?? companyId,
       payroll_data: updateValues
         ? typeof updateValues?.payroll_data === "string"
           ? JSON.parse(updateValues.payroll_data as string)
           : updateValues.payroll_data
-        : transformSalaryData(selectedRows.length ? selectedRows : salaryData),
-      type: updateValues?.type ?? "salary",
+        : transformPayrollData(selectedRows as any[]),
+      type: updateValues?.type ?? "exit",
       proof: undefined,
     },
   });
@@ -325,6 +318,12 @@ export default function CreateInvoice({
               </CardDescription>
             </CardHeader>
             <CardContent>
+              <input
+                type="hidden"
+                name="selected_rows"
+                value={JSON.stringify(selectedRows)}
+              />
+
               <input {...getInputProps(fields.id, { type: "hidden" })} />
               <input
                 {...getInputProps(fields.company_id, { type: "hidden" })}
@@ -416,7 +415,7 @@ export default function CreateInvoice({
                     type: "checkbox",
                   })}
                   labelProps={{
-                    children: `Is Charge Included? (${`${relations?.terms?.service_charge}% of ${relations.terms?.include_service_charge}`})`,
+                    children: `Is Charge Included? (${`${relations.terms?.reimbursement_charge}%`})`,
                   }}
                 />
                 <CheckboxField
@@ -517,10 +516,6 @@ export default function CreateInvoice({
                 ]}
                 errors={fields.payroll_data.errors}
               />
-              <p className={cn("text-muted-foreground tracking-wide hidden")}>
-                Note : All default values are system generated, Please verify
-                them manually before submitting.
-              </p>
             </CardContent>
             <FormButtons
               form={form}

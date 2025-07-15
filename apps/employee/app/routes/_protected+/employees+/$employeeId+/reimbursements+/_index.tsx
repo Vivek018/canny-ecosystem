@@ -49,7 +49,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         searchParams.get("submitted_date_start") ?? undefined,
       submitted_date_end: searchParams.get("submitted_date_end") ?? undefined,
       status: searchParams.get("status") ?? undefined,
-      is_deductible: searchParams.get("is_deductible") ?? undefined,
       users: searchParams.get("users") ?? undefined,
       name: query,
     };

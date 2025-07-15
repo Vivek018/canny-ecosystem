@@ -1,6 +1,5 @@
 import type {
   CompanyDatabaseRow,
-  CompanyRegistrationDetailsRow,
   DocumentsDatabaseRow,
   InferredType,
   LocationDatabaseRow,
@@ -87,6 +86,7 @@ export async function getCompanyById({
     "logo",
     "company_size",
     "company_type",
+    "registration_number",
   ] as const;
 
   const { data, error } = await supabase
@@ -97,40 +97,6 @@ export async function getCompanyById({
 
   if (error) {
     console.error("getCompanyById Error", error);
-  }
-
-  return { data, error };
-}
-
-// Company Registration Details
-export async function getCompanyRegistrationDetailsByCompanyId({
-  supabase,
-  companyId,
-}: {
-  supabase: TypedSupabaseClient;
-  companyId: string;
-}) {
-  const columns = [
-    "company_id",
-    "gst_number",
-    "registration_number",
-    "pan_number",
-    "pf_number",
-    "esic_number",
-    "pt_number",
-    "lwf_number",
-  ] as const;
-
-  const { data, error } = await supabase
-    .from("company_registration_details")
-    .select(columns.join(","))
-    .eq("company_id", companyId)
-    .single<
-      InferredType<CompanyRegistrationDetailsRow, (typeof columns)[number]>
-    >();
-
-  if (error) {
-    console.error("getCompanyRegistrationDetailsByCompanyId Error", error);
   }
 
   return { data, error };
@@ -179,6 +145,8 @@ export async function getLocationsByCompanyId({
     "pincode",
     "latitude",
     "longitude",
+    "pan_number",
+    "gst_number",
     "is_primary",
   ] as const;
 
@@ -215,6 +183,8 @@ export async function getLocationById({
     "pincode",
     "latitude",
     "longitude",
+    "pan_number",
+    "gst_number",
     "is_primary",
   ] as const;
 
@@ -249,6 +219,8 @@ export async function getPrimaryLocationByCompanyId({
     "pincode",
     "latitude",
     "longitude",
+    "gst_number",
+    "pan_number",
     "is_primary",
   ] as const;
 
@@ -464,8 +436,8 @@ export async function getRelationshipsByParentAndChildCompanyId({
   const { data, error } = await supabase
     .from("company_relationships")
     .select(columns.join(","))
-    .eq('parent_company_id', parentCompanyId)
-    .eq('child_company_id', childCompanyId)
+    .eq("parent_company_id", parentCompanyId)
+    .eq("child_company_id", childCompanyId)
     .single<RelationshipWithCompany>();
 
   if (error) {

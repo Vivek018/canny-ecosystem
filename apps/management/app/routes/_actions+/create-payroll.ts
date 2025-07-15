@@ -3,15 +3,11 @@ import { clearCacheEntry} from "@/utils/cache";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
   createAttendanceByPayrollImportAndGiveID,
-  createExitPayroll,
-  createReimbursementPayroll,
   createSalaryPayroll,
   createSalaryPayrollByGroup,
 } from "@canny_ecosystem/supabase/mutations";
 import {
   getPayrollById,
-  type ExitDataType,
-  type ReimbursementDataType,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { EmployeeMonthlyAttendanceDatabaseInsert } from "@canny_ecosystem/supabase/types";
@@ -32,7 +28,6 @@ export async function action({
     const { supabase } = getSupabaseWithHeaders({ request });
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
     const formData = await request.formData();
-    const from = formData.get("from") as string;
     const payrollTitle = formData.get("title") as string;
     const skipped = formData.get("skipped") as string;
     const type = formData.get("type") as string;
@@ -248,104 +243,7 @@ export async function action({
     //   error = salaryError;
     // }
 
-    if (type === "reimbursement") {
-      const reimbursementData = JSON.parse(
-        formData.get("reimbursementData") as string
-      ) as Pick<ReimbursementDataType, "id" | "employee_id" | "amount">[];
 
-      const totalEmployees = Number.parseInt(
-        formData.get("totalEmployees") as string
-      );
-      const totalNetAmount = Number.parseFloat(
-        formData.get("totalNetAmount") as string
-      );
-      if (Number(reimbursementData.length) === 0) {
-        return json({
-          status: "error",
-          message: "Payroll not created as entry already in other payroll",
-          failedRedirect,
-          error: "Entries already in other payroll",
-        });
-      }
-      const {
-        status,
-        error: reimbursementError,
-        message,
-      } = await createReimbursementPayroll({
-        supabase,
-        data: {
-          title: payrollTitle,
-          type,
-          reimbursementData,
-          totalEmployees,
-          totalNetAmount,
-        },
-        from,
-        companyId: companyId ?? "",
-      });
-
-      if (isGoodStatus(status)) {
-        return json({
-          status: "success",
-          message: message ?? "Reimbursement Payroll Created Successfully",
-          failedRedirect,
-          error: null,
-        });
-      }
-      error = reimbursementError;
-    }
-    if (type === "exit") {
-      const exitData = JSON.parse(formData.get("exitData") as string) as Pick<
-        ExitDataType,
-        | "id"
-        | "employee_id"
-        | "bonus"
-        | "deduction"
-        | "gratuity"
-        | "leave_encashment"
-      >[];
-      const totalEmployees = Number.parseInt(
-        formData.get("totalEmployees") as string
-      );
-      const totalNetAmount = Number.parseFloat(
-        formData.get("totalNetAmount") as string
-      );
-
-      if (Number(exitData.length) === 0) {
-        return json({
-          status: "error",
-          message: "Payroll not created as entry already in other payroll",
-          failedRedirect,
-          error: "Entries already in other payroll",
-        });
-      }
-      const {
-        status,
-        error: exitError,
-        message,
-      } = await createExitPayroll({
-        supabase,
-        data: {
-          title: payrollTitle,
-          type,
-          exitData,
-          totalEmployees,
-          totalNetAmount,
-        },
-        from,
-        companyId: companyId ?? "",
-      });
-
-      if (isGoodStatus(status)) {
-        return json({
-          status: "success",
-          message: message ?? "Exit Payroll Created Successfully",
-          failedRedirect,
-          error: null,
-        });
-      }
-      error = exitError;
-    }
     if (type === "salary-import") {
       const salaryImportData = JSON.parse(
         formData.get("salaryImportData") as string

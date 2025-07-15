@@ -34,7 +34,6 @@ export function FilterList({ filters }: Props) {
 
       case "name":
       case "status":
-      case "is_deductible":
       case "users":
       case "project":
       case "project_site":

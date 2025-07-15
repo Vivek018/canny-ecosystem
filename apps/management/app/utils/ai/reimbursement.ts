@@ -1,6 +1,7 @@
 import {
   booleanArray,
   reimbursementStatusArray,
+  reimbursementTypeArray,
   z,
 } from "@canny_ecosystem/utils";
 import { generateObject } from "ai";
@@ -26,15 +27,15 @@ export const ReimbursementFiltersSchema = z.object({
     .describe(
       "Submitted Date of Reimbursement end range in YYYY-MM-DD format. Example: 2000-12-31"
     ),
-  id_deductible: z
-    .enum(booleanArray)
-    .optional()
-    .describe("Reimbursement giving or loan taken."),
   users: z.string().optional().describe("Authority giving the approval."),
   status: z
     .enum(reimbursementStatusArray)
     .optional()
     .describe("Reimbursement status."),
+  type: z
+    .enum(reimbursementTypeArray)
+    .optional()
+    .describe("Reimbursement type."),
   project: z
     .string()
     .optional()
@@ -43,10 +44,10 @@ export const ReimbursementFiltersSchema = z.object({
     .string()
     .optional()
     .describe("Name of the site under the project."),
-  in_payroll: z
+  in_invoice: z
     .enum(booleanArray)
     .optional()
-    .describe("Is the reimbursement in any Payroll."),
+    .describe("Is the reimbursement in any Invoice."),
 });
 
 export const generateReimbursementFilter = async ({

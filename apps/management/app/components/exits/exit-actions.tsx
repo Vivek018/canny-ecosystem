@@ -4,9 +4,10 @@ import { Icon } from "@canny_ecosystem/ui/icon";
 import { Link, useNavigate } from "@remix-run/react";
 import { ColumnVisibility } from "./column-visibility";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
+import { ExitAddOption } from "./exit-add-option";
 import { ExitMenu } from "./exit-menu";
 
-export function ExitActions({ isEmpty }: { isEmpty: boolean }) {
+export function ExitActions({ isEmpty, env }: { isEmpty: boolean; env: any }) {
   const { selectedRows } = useExitsStore();
   const navigate = useNavigate();
 
@@ -14,6 +15,7 @@ export function ExitActions({ isEmpty }: { isEmpty: boolean }) {
     <div className="gap-4 hidden md:flex">
       <div className="flex gap-2 px-4 border-r border-dashed border-muted-foreground/80">
         <ColumnVisibility disabled={isEmpty} />
+        <ExitAddOption />
         <Button
           variant="outline"
           size="icon"
@@ -29,11 +31,20 @@ export function ExitActions({ isEmpty }: { isEmpty: boolean }) {
         <ExitMenu
           selectedRows={selectedRows}
           className={
-            selectedRows?.length ? "bg-muted/70 text-muted-foreground" : undefined
+            selectedRows?.length
+              ? "bg-muted/70 text-muted-foreground"
+              : "hidden"
           }
+          env={env}
         />
       </div>
-      <Link to="/chat/chatbox/payment" className={cn(buttonVariants({ variant: "gradiant" }), "flex items-center justify-center gap-2 h-10")}>
+      <Link
+        to="/chat/chatbox/payment"
+        className={cn(
+          buttonVariants({ variant: "gradiant" }),
+          "flex items-center justify-center gap-2 h-10"
+        )}
+      >
         <Icon name="magic" size="xs" />
         <p>AI Chat</p>
       </Link>

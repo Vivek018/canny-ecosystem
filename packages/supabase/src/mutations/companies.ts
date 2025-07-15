@@ -1,10 +1,7 @@
 import { convertToNull } from "@canny_ecosystem/utils";
-import { getCompanyRegistrationDetailsByCompanyId } from "../queries";
 import type {
   CompanyDatabaseInsert,
   CompanyDatabaseUpdate,
-  CompanyRegistrationDetailsInsert,
-  CompanyRegistrationDetailsUpdate,
   LocationDatabaseInsert,
   LocationDatabaseUpdate,
   RelationshipDatabaseInsert,
@@ -15,15 +12,10 @@ import type {
 export async function createCompany({
   supabase,
   companyData,
-  companyRegistrationDetails,
   bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
   companyData: CompanyDatabaseInsert;
-  companyRegistrationDetails?: Omit<
-    CompanyRegistrationDetailsInsert,
-    "company_id"
-  >;
   bypassAuth?: boolean;
 }) {
   if (!bypassAuth) {
@@ -36,7 +28,7 @@ export async function createCompany({
     }
   }
 
-  const { error, status, data } = await supabase
+  const { error, status } = await supabase
     .from("companies")
     .insert(companyData)
     .select("id")
@@ -46,33 +38,13 @@ export async function createCompany({
     console.error("createCompany error:", error);
     return {
       status,
-      companyError: error,
-      registrationDetailsError: null,
-      id: null,
-    };
-  }
-
-  if (data?.id) {
-    const { error: registrationDetailsError } =
-      await createCompanyRegistrationDetails({
-        supabase,
-        data: { ...companyRegistrationDetails, company_id: data.id },
-        bypassAuth,
-      });
-
-    return {
-      status,
-      companyError: null,
-      registrationDetailsError,
-      id: data?.id,
+      error,
     };
   }
 
   return {
     status,
-    companyError: null,
-    registrationDetailsError: null,
-    id: data?.id,
+    error: null,
   };
 }
 
@@ -135,86 +107,6 @@ export async function deleteCompany({
 
   if (error) {
     console.error("deleteCompany error:", error);
-  }
-
-  return { status, error };
-}
-
-export async function createCompanyRegistrationDetails({
-  supabase,
-  data,
-  bypassAuth = false,
-}: {
-  supabase: TypedSupabaseClient;
-  data: CompanyRegistrationDetailsInsert;
-  bypassAuth?: boolean;
-}) {
-  if (!bypassAuth) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user?.email) {
-      return { status: 400, error: "Unauthorized User" };
-    }
-  }
-
-  const { error, status } = await supabase
-    .from("company_registration_details")
-    .insert(data);
-
-  if (error) {
-    console.error("createCompanyRegistrationDetails error:", error);
-  }
-
-  return { status, error };
-}
-
-export async function updateOrCreateCompanyRegistrationDetails({
-  supabase,
-  data,
-  bypassAuth = false,
-}: {
-  supabase: TypedSupabaseClient;
-  data: CompanyRegistrationDetailsUpdate;
-  bypassAuth?: boolean;
-}) {
-  if (!bypassAuth) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user?.email) {
-      return { status: 400, error: "Unauthorized User" };
-    }
-  }
-
-  if (!data.company_id) {
-    return { status: 400, error: "Company ID is required" };
-  }
-
-  const { data: dataExist } = await getCompanyRegistrationDetailsByCompanyId({
-    supabase,
-    companyId: data?.company_id,
-  });
-
-  if (!dataExist) {
-    return await createCompanyRegistrationDetails({
-      supabase,
-      data: { ...data, company_id: data?.company_id },
-      bypassAuth,
-    });
-  }
-
-  const updateData = convertToNull(data);
-
-  const { error, status } = await supabase
-    .from("company_registration_details")
-    .update(updateData)
-    .eq("company_id", data.company_id!);
-
-  if (error) {
-    console.error("updateOrCreateCompanyRegistrationDetails Error", error);
   }
 
   return { status, error };

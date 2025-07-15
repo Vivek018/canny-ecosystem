@@ -4,9 +4,16 @@ import { Link, useNavigate } from "@remix-run/react";
 import { ColumnVisibility } from "./column-visibility";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useReimbursementStore } from "@/store/reimbursements";
+import { ReimbursementAdd } from "./reimbursement-add-option";
 import { ReimbursementMenu } from "./reimbursement-menu";
 
-export function ReimbursementActions({ isEmpty }: { isEmpty: boolean }) {
+export function ReimbursementActions({
+  isEmpty,
+  env,
+}: {
+  isEmpty: boolean;
+  env: any;
+}) {
   const { selectedRows } = useReimbursementStore();
   const navigate = useNavigate();
 
@@ -14,6 +21,7 @@ export function ReimbursementActions({ isEmpty }: { isEmpty: boolean }) {
     <div className="gap-4 hidden md:flex">
       <div className="flex gap-2 px-4 border-r border-dashed border-muted-foreground/80">
         <ColumnVisibility disabled={isEmpty} />
+        <ReimbursementAdd />
         <Button
           variant="outline"
           size="icon"
@@ -27,13 +35,22 @@ export function ReimbursementActions({ isEmpty }: { isEmpty: boolean }) {
           <Icon name="chart" className="h-[18px] w-[18px]" />
         </Button>
         <ReimbursementMenu
+          env={env}
           selectedRows={selectedRows}
           className={
-            selectedRows?.length ? "bg-muted/70 text-muted-foreground" : undefined
+            selectedRows?.length
+              ? "bg-muted/70 text-muted-foreground"
+              : "hidden"
           }
         />
       </div>
-      <Link to="/chat/chatbox/payment" className={cn(buttonVariants({ variant: "gradiant" }), "flex items-center justify-center gap-2 h-10")}>
+      <Link
+        to="/chat/chatbox/payment"
+        className={cn(
+          buttonVariants({ variant: "gradiant" }),
+          "flex items-center justify-center gap-2 h-10"
+        )}
+      >
         <Icon name="magic" size="xs" />
         <p>AI Chat</p>
       </Link>

@@ -18,11 +18,10 @@ export const invoiceColumnIdArray = [
   "subject",
   "date",
   "location",
-  "payroll_type",
-  "invoice_type",
+  "type",
   "service_charge",
   "is_paid",
-  "paid_date"
+  "paid_date",
 ];
 
 export function DataTableHeader({ table, className, loading }: Props) {

@@ -1,5 +1,4 @@
 import { Button } from "@canny_ecosystem/ui/button";
-import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { TableHead, TableHeader, TableRow } from "@canny_ecosystem/ui/table";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
@@ -20,7 +19,7 @@ export const ReimbursementsColumnIdArray = [
   "submitted_date",
   "status",
   "amount",
-  "is_deductible",
+  "type",
   "email",
 ];
 

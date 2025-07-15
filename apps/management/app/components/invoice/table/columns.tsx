@@ -74,24 +74,12 @@ export const columns: ColumnDef<InvoiceDataType>[] = [
   },
   {
     enableSorting: false,
-    accessorKey: "payroll_type",
-    header: "Payroll Type",
+    accessorKey: "type",
+    header: "Type",
     cell: ({ row }) => {
       return (
         <p className="truncate capitalize">
-          {replaceUnderscore(row.original?.payroll_type ?? "--")}
-        </p>
-      );
-    },
-  },
-  {
-    enableSorting: false,
-    accessorKey: "invoice_type",
-    header: "Invoice Type",
-    cell: ({ row }) => {
-      return (
-        <p className="truncate capitalize">
-          {replaceUnderscore(row.original?.invoice_type ?? "--")}
+          {replaceUnderscore(row.original?.type ?? "--")}
         </p>
       );
     },

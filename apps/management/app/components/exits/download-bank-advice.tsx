@@ -50,12 +50,18 @@ export const prepareBankAdviceWorkbook = async ({
     bankDetails: bankDetailsResults[index]?.data || null,
   }));
 
-  const extractedData = updatedData.map(({ amount, bankDetails }) => ({
-    amount,
-    account_holder_name: bankDetails?.account_holder_name || "",
-    account_number: bankDetails?.account_number || "",
-    ifsc_code: bankDetails?.ifsc_code || "",
-  }));
+  const extractedData = updatedData.map(
+    ({ leave_encashment, bonus, gratuity, deduction, bankDetails }) => ({
+      amount:
+        Number(leave_encashment) +
+        Number(bonus) +
+        Number(gratuity) -
+        Number(deduction),
+      account_holder_name: bankDetails?.account_holder_name || "",
+      account_number: bankDetails?.account_number || "",
+      ifsc_code: bankDetails?.ifsc_code || "",
+    })
+  );
 
   function isIciciBankIfsc(ifsc: string | null | undefined): boolean {
     if (!ifsc) return false;
@@ -110,7 +116,7 @@ export const prepareBankAdviceWorkbook = async ({
       "",
       "",
       "",
-      "Salary Payment",
+      "Exit Payment",
     ]);
   }
 
@@ -162,36 +168,10 @@ export const DownloadBankAdvice = ({
 }) => {
   const { supabase } = useSupabase({ env });
 
-  function transformSalaryData(data: any[]) {
-    return data.map((emp) => {
-      let earnings = 0;
-      let deductions = 0;
-      for (const entry of emp.salary_entries) {
-        if (entry.type === "earning") earnings += entry.amount;
-        else if (
-          entry.type === "deduction" ||
-          entry.type === "statutory_contribution"
-        )
-          deductions += entry.amount;
-      }
-      return {
-        amount: earnings - deductions,
-        employee_id: emp.id,
-        employees: {
-          company_id: emp.company_id,
-          employee_code: emp.employee_code,
-          first_name: emp.first_name,
-          middle_name: emp.middle_name,
-          last_name: emp.last_name,
-        },
-      };
-    });
-  }
-
   const generateBankAdviceExcel = async (selectedRows: any[]) => {
     if (!selectedRows.length) return;
     const blob = await prepareBankAdviceWorkbook({
-      data: transformSalaryData(data),
+      data,
       supabase,
     });
     if (!blob) return;

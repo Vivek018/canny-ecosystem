@@ -43,7 +43,6 @@ import {
   deleteInvoiceProof,
 } from "@canny_ecosystem/supabase/media";
 
-export const UPDATE_INVOICE_TAG = "Update-Invoice";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const invoiceId = params.invoiceId;
@@ -145,7 +144,6 @@ export async function action({
         ) {
           const { error } = await addOrUpdateInvoiceWithProof({
             invoiceData: submission.value as InvoiceDatabaseInsert,
-            payrollId: submission.value.payroll_id,
             proof: submission.value.proof as File,
             supabase,
             route: "update",
@@ -178,7 +176,6 @@ export async function action({
 
         const { error } = await addOrUpdateInvoiceWithProof({
           invoiceData: submission.value as InvoiceDatabaseInsert,
-          payrollId: submission.value.payroll_id,
           proof: submission.value.proof as File,
           supabase,
           route: "update",
@@ -284,7 +281,6 @@ export async function action({
 
     const { error: proofError } = await deleteInvoiceProof({
       supabase,
-      payrollId: submission.value.payroll_id,
       documentName: submission.value.invoice_number,
     });
 

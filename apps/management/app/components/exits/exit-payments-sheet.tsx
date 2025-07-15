@@ -33,7 +33,6 @@ export function ExitPaymentsSheet({
       >
         {row.getVisibleCells().map((cell: any) => {
           if (cell.column.id === "select" || cell.column.id === "actions") {
-
             return (
               <TableCell
                 key={cell.id}
@@ -90,6 +89,7 @@ export function ExitPaymentsSheet({
                     } ${rowData.employees.last_name}`
                   : "--"}
               </h1>
+              <p className="mt-2 pr-5 text-sm">{rowData.note}</p>
             </div>
 
             <div className="flex flex-col items-end justify-around">

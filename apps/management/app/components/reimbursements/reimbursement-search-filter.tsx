@@ -25,6 +25,7 @@ import { Calendar } from "@canny_ecosystem/ui/calendar";
 import {
   booleanArray,
   reimbursementStatusArray,
+  reimbursementTypeArray,
   replaceUnderscore,
 } from "@canny_ecosystem/utils";
 
@@ -94,12 +95,12 @@ export function ReimbursementSearchFilter({
     submitted_date_start: "",
     submitted_date_end: "",
     status: "",
-    is_deductible: "",
+    type: "",
     users: "",
     name: "",
     project: "",
     project_site: "",
-    in_payroll: "",
+    in_invoice: "",
   };
 
   const [filterParams, setFilterParams] = useState(initialFilterParams);
@@ -124,11 +125,11 @@ export function ReimbursementSearchFilter({
     submitted_date_start: searchParams.get("submitted_date_start"),
     submitted_date_end: searchParams.get("submitted_date_end"),
     status: searchParams.get("status"),
-    is_deductible: searchParams.get("is_deductible"),
+    type: searchParams.get("type"),
     users: searchParams.get("users"),
     project: searchParams.get("project"),
     project_site: searchParams.get("project_site"),
-    in_payroll: searchParams.get("in_payroll"),
+    in_invoice: searchParams.get("in_invoice"),
   };
 
   useEffect(() => {
@@ -342,7 +343,7 @@ export function ReimbursementSearchFilter({
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
-              <span>Is Deductible</span>
+              <span>Type</span>
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent
@@ -350,15 +351,15 @@ export function ReimbursementSearchFilter({
                 alignOffset={-4}
                 className="p-0"
               >
-                {booleanArray.map((name, index) => (
+                {reimbursementTypeArray.map((name, index) => (
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
                     className="capitalize"
-                    checked={filterParams?.is_deductible === name}
+                    checked={filterParams?.type === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
                         ...prev,
-                        is_deductible: name,
+                        type: name,
                       }));
                     }}
                   >
@@ -473,7 +474,7 @@ export function ReimbursementSearchFilter({
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
-              <span>Is In Payroll</span>
+              <span>Is In Invoice</span>
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent
@@ -485,11 +486,11 @@ export function ReimbursementSearchFilter({
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
                     className="capitalize"
-                    checked={filterParams?.in_payroll === name}
+                    checked={filterParams?.in_invoice === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
                         ...prev,
-                        in_payroll: name,
+                        in_invoice: name,
                       }));
                     }}
                   >
