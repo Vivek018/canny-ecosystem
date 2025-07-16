@@ -68,7 +68,6 @@ export function ReimbursementsTable<TData, TValue>({
     initialColumnVisibility ?? {}
   );
 
-
   const loadMoreEmployees = async () => {
     const formattedFrom = from;
     const to = formattedFrom + pageSize;
@@ -94,8 +93,7 @@ export function ReimbursementsTable<TData, TValue>({
       } catch {
         setHasNextPage(false);
       }
-    }
-    else if (employeeId) {
+    } else if (employeeId) {
       try {
         const { data, meta } = await getReimbursementsByEmployeeId({
           supabase,
@@ -129,15 +127,14 @@ export function ReimbursementsTable<TData, TValue>({
       columnVisibility,
     },
   });
-  
+
   const selectedRowsData = table
-  .getSelectedRowModel()
-  .rows?.map((row) => row.original);
-  
+    .getSelectedRowModel()
+    .rows?.map((row) => row.original);
+
   useEffect(() => {
     const rowArray = [];
     for (const row of table.getSelectedRowModel().rows) {
-      
       rowArray.push(row.original);
     }
     setSelectedRows(rowArray as ReimbursementDataType[]);

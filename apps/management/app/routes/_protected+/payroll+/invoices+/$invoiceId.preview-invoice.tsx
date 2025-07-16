@@ -11,6 +11,7 @@ import {
   getSalaryEntriesByPayrollIdForSalaryRegister,
   type EmployeeProjectAssignmentDataType,
   getExitEntriesByPayrollIdForInvoicePreview,
+  getLocationById,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type {
@@ -189,11 +190,13 @@ const InvoicePDF = ({
   terms,
   type,
   proofType,
+  location,
 }: {
   type: string;
   data: DataTypeForRegister;
   terms: any;
   proofType: string;
+  location: LocationDatabaseRow;
 }) => {
   const allEarningFields = Array.from(
     new Set(
@@ -364,7 +367,7 @@ const InvoicePDF = ({
               {data?.companyData?.city}-{data?.companyData?.pincode},{" "}
               {data?.companyData?.state?.toUpperCase()}
             </Text>
-            <Text>GSTIN : SE593484848</Text>
+            <Text>GSTIN : {location?.gst_number}</Text>
           </View>
         </View>
 
@@ -574,7 +577,10 @@ const InvoicePDF = ({
             </Text>
             <Text>PAN NO. :- {CANNY_MANAGEMENT_SERVICES_PAN_NUMBER}</Text>
             <Text>GSTIN :- {CANNY_MANAGEMENT_SERVICES_GSTIN}</Text>
-            <Text>TOTAL GSTIN AMOUNT :- {(cgst + sgst).toFixed(0)}</Text>
+            <Text>
+              TOTAL GSTIN AMOUNT :-{" "}
+              {igst === 0 ? (cgst + sgst).toFixed(0) : igst.toFixed(0)}
+            </Text>
           </View>
           <View
             style={{ flex: 1.1, borderTop: "1pt solid #000000", padding: 3 }}
@@ -750,7 +756,7 @@ const InvoicePDF = ({
                 </Text>
               </View>
               <View style={[styles.headerCell, { flex: 0.4 }]}>
-                <Text>{data.invoiceDetails.company_address_id}</Text>
+                <Text>{location.city}</Text>
               </View>
               <View
                 style={[
@@ -1159,7 +1165,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     ({ data: invoiceData, error: invoiceError } = await getInvoiceById({
       supabase,
       id: invoiceId,
-      from: "preview",
     }));
   }
   if (invoiceError) {
@@ -1173,6 +1178,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   const { data: employeesCompanyLocationData } =
     await getPrimaryLocationByCompanyId({ supabase, companyId });
+
+  const { data: locationData } = await getLocationById({
+    id: invoiceData?.company_address_id!,
+    supabase,
+  });
 
   let payrollDataAndOthers = [] as any[];
 
@@ -1190,10 +1200,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         supabase,
         invoiceId: invoiceData?.id!,
       });
-    const { data: exit }: { data: any } = await getExitEntriesByPayrollIdForInvoicePreview({
-      supabase,
-      invoiceId: invoiceData?.id!,
-    });
+    const { data: exit }: { data: any } =
+      await getExitEntriesByPayrollIdForInvoicePreview({
+        supabase,
+        invoiceId: invoiceData?.id!,
+      });
     payrollDataAndOthers =
       invoiceData?.type === "reimbursement" ? (reimb ?? []) : (exit ?? []);
   }
@@ -1212,13 +1223,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       payrollDataAndOthers,
       invoiceData,
     },
+    locationData,
     companyRelations: companyRelations?.terms,
     contentType,
   };
 }
 
 export default function PreviewInvoice() {
-  const { data, companyRelations, contentType } =
+  const { data, companyRelations, locationData, contentType } =
     useLoaderData<typeof loader>();
   const navigate = useNavigate();
   const { isDocument } = useIsDocument();
@@ -1517,6 +1529,7 @@ export default function PreviewInvoice() {
           <InvoicePDF
             data={registerData as unknown as DataTypeForRegister}
             terms={companyRelations}
+            location={locationData as unknown as LocationDatabaseRow}
             type={data?.invoiceData?.type!}
             proofType={contentType as string}
           />

@@ -169,7 +169,7 @@ export default function Invoices() {
             </Await>
           </Suspense>
         </div>
-        <InvoiceActions />
+        <InvoiceActions isEmpty={!invoicePromise} />
       </div>
       <Suspense fallback={<LoadingSpinner />}>
         <Await resolve={invoicePromise}>

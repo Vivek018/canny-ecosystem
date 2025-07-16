@@ -69,7 +69,6 @@ export const ImportReimbursementModal = () => {
       submitted_date: null,
       status: null,
       amount: null,
-      email: null,
     },
   ];
   const downloadDemoCsv = (

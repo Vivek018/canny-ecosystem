@@ -1281,13 +1281,11 @@ export const payrollPaymentStatusArray = [
   "submitted",
   "approved",
 ] as const;
-export const payrollTypesArray = ["salary"] as const;
 
 export const PayrollSchema = z.object({
   id: z.string().optional(),
   title: z.string(),
   status: z.enum(payrollPaymentStatusArray).default("pending"),
-  payroll_type: z.enum(payrollTypesArray),
   run_date: z.string().default(new Date().toISOString().split("T")[0]),
   total_net_amount: z.number().default(0),
   company_id: z.string(),

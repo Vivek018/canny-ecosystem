@@ -60,7 +60,6 @@ export async function createSalaryPayroll({
       year: data.year,
       run_date: data.run_date ?? null,
       status: data?.status ?? "pending",
-      payroll_type: data.type ?? "salary",
       total_employees: data.totalEmployees,
       total_net_amount: data.totalNetAmount,
       company_id: companyId,

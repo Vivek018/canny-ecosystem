@@ -36,18 +36,16 @@ import { useTypingAnimation } from "@canny_ecosystem/utils/hooks/typing-animatio
 export const PLACEHOLDERS = [
   "Reimbursements submitted after Jan 2022 for Project 'ABC'",
   "Pending reimbursements approved by Manager John",
-  "Non-payroll reimbursements submitted in 2023",
+  "Non-Invoice reimbursements submitted in 2023",
   "Approved reimbursements for Site 'ABC' under Project 'XYZ'",
-  "Reimbursements marked as deductible for Loan recovery",
+  "Reimbursements for Loan type",
   "Reimbursements submitted before 2020 and still pending",
-  "In-payroll reimbursements approved by User",
+  "In-Invoice reimbursements approved by User",
   "Rejected reimbursements for Project 'XYZ' by User",
-  "Deductible reimbursements submitted between 2021 and 2024",
-  "Reimbursements for Site 'ABC' not linked to Payroll",
+  "Reimbursements for Site 'ABC' not linked to Invoice",
   "Approved reimbursements submitted by EMP2045 in 2022",
   "Reimbursements submitted before 2019 for Project Site 'XYZ'",
-  "Pending reimbursements from employees not in Payroll",
-  "Deductible reimbursements approved by Finance Head",
+  "Pending reimbursements from employees not in Invoice",
 ];
 
 export function ReimbursementSearchFilter({

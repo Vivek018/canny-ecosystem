@@ -1,6 +1,5 @@
 import {
   booleanArray,
-  payrollTypesArray,
   z,
 } from "@canny_ecosystem/utils";
 import { generateObject } from "ai";
@@ -44,7 +43,7 @@ export const InvoiceFiltersSchema = z.object({
     .optional()
     .describe("Is the service charge included in invoice."),
   type: z
-    .enum([...payrollTypesArray, "reimbursement", "exit"])
+    .enum(["salary", "reimbursement", "exit"])
     .optional()
     .describe("Types of payroll."),
   company_location: z

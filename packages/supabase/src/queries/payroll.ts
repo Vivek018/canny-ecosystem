@@ -1,4 +1,7 @@
-import { defaultYear, formatUTCDate } from "@canny_ecosystem/utils";
+import {
+  defaultYear,
+  formatUTCDate,
+} from "@canny_ecosystem/utils";
 import type {
   PayrollDatabaseRow,
   InferredType,
@@ -14,6 +17,8 @@ export type PayrollFilters = {
   date_end?: string | undefined | null;
   status?: string | undefined | null;
   name?: string | undefined | null;
+  month?: string | undefined | null;
+  year?: string | undefined | null;
 };
 
 export type ImportSalaryPayrollDataType = {
@@ -35,12 +40,11 @@ export async function getPendingOrSubmittedPayrollsByCompanyId({
   };
 }) {
   const { from, to, filters, searchQuery } = params;
-  const { date_start, date_end,status } = filters ?? {};
+  const { date_start, date_end, status, month, year } = filters ?? {};
   const columns = [
     "id",
     "title",
     "total_employees",
-    "payroll_type",
     "status",
     "run_date",
     "total_net_amount",
@@ -50,7 +54,7 @@ export async function getPendingOrSubmittedPayrollsByCompanyId({
     "created_at",
   ] as const;
 
-  const query = supabase
+  let query = supabase
     .from("payroll")
     .select(columns.join(","), { count: "exact" })
     .eq("company_id", companyId)
@@ -73,7 +77,17 @@ export async function getPendingOrSubmittedPayrollsByCompanyId({
     if (end) query.lte(field, formatUTCDate(end));
   }
 
-  
+  if (month) {
+    query = query.eq("month", Number(months[month]));
+    query = query.eq("year", defaultYear);
+  }
+  if (year) {
+    query = query.eq("year", Number(year));
+  }
+  if (month && year) {
+    query = query.eq("month", Number(months[month]));
+    query = query.eq("year", Number(year));
+  }
 
   if (status) {
     query.eq("status", status as PayrollDatabaseRow["status"]);
@@ -102,12 +116,11 @@ export async function getApprovedPayrollsByCompanyId({
   };
 }) {
   const { from, to, filters, searchQuery } = params;
-  const { date_start, date_end,  status } = filters ?? {};
+  const { date_start, date_end, status, month, year } = filters ?? {};
   const columns = [
     "id",
     "title",
     "total_employees",
-    "payroll_type",
     "status",
     "run_date",
     "total_net_amount",
@@ -117,7 +130,7 @@ export async function getApprovedPayrollsByCompanyId({
     "created_at",
   ] as const;
 
-  const query = supabase
+  let query = supabase
     .from("payroll")
     .select(columns.join(","), { count: "exact" })
     .eq("company_id", companyId)
@@ -139,8 +152,17 @@ export async function getApprovedPayrollsByCompanyId({
     if (start) query.gte(field, formatUTCDate(start));
     if (end) query.lte(field, formatUTCDate(end));
   }
-
- 
+  if (month) {
+    query = query.eq("month", Number(months[month]));
+    query = query.eq("year", defaultYear);
+  }
+  if (year) {
+    query = query.eq("year", Number(year));
+  }
+  if (month && year) {
+    query = query.eq("month", Number(months[month]));
+    query = query.eq("year", Number(year));
+  }
 
   if (status) {
     query.eq("status", status as PayrollDatabaseRow["status"]);
@@ -164,7 +186,6 @@ export async function getPayrollById({
     "id",
     "title",
     "total_employees",
-    "payroll_type",
     "status",
     "run_date",
     "project_id",
@@ -341,7 +362,7 @@ export async function getApprovedPayrollsAmountsByCompanyIdByMonths({
   companyId: string;
   filters?: DashboardFilters;
 }) {
-  const columns = ["payroll_type", "run_date", "total_net_amount"] as const;
+  const columns = ["run_date", "total_net_amount"] as const;
   const defMonth = new Date().getMonth();
   const filterMonth = filters?.month && Number(months[filters.month]);
   const filterYear = filters?.year && Number(filters.year);
@@ -407,7 +428,7 @@ export async function getApprovedPayrollsByCompanyIdByYears({
   companyId: string;
   filters?: DashboardFilters;
 }) {
-  const columns = ["payroll_type", "run_date", "total_net_amount"] as const;
+  const columns = ["run_date", "total_net_amount"] as const;
   const defMonth = new Date().getMonth();
   const filterMonth = filters?.month && Number(months[filters.month]);
   const filterYear = filters?.year && Number(filters.year);

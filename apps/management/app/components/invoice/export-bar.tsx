@@ -2,39 +2,49 @@ import type { InvoiceDataType } from "@canny_ecosystem/supabase/queries";
 import { Button } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { formatDateTime } from "@canny_ecosystem/utils";
+import type { VisibilityState } from "@tanstack/react-table";
 import Papa from "papaparse";
+import { invoiceColumnIdArray } from "./table/data-table-header";
 
 export function ExportBar({
   rows,
   data,
   className,
+  columnVisibility,
 }: {
   rows: number;
   data: InvoiceDataType[];
   className: string;
+  columnVisibility: VisibilityState;
 }) {
   const paidCount = (data: InvoiceDataType[]): number =>
     data.filter((invoice) => invoice.is_paid === true).length;
 
-  const finalExportData = data.map((invoice) => {
-    return {
-      invoice_number: invoice?.invoice_number,
-      date: invoice?.date,
-      subject: invoice?.subject,
-      company_location: invoice?.company_locations?.name,
-      include_charge: invoice?.include_charge,
-      include_cgst: invoice?.include_cgst,
-      include_sgst: invoice?.include_sgst,
-      include_igst: invoice?.include_igst,
-      include_proof: invoice?.include_proof,
-      is_paid: invoice?.is_paid,
-      type: invoice?.invoice_type,
-    };
+  const toBeExportedData = data.map((element) => {
+    const exportedData: {
+      [key: (typeof invoiceColumnIdArray)[number]]: string | number | boolean;
+    } = {};
+
+    for (const key of invoiceColumnIdArray) {
+      if (columnVisibility[key] === false) {
+        continue;
+      }
+      if (key === "location") {
+        exportedData[key] = element?.company_locations.name;
+      } else {
+        exportedData[key] = element?.[key as keyof InvoiceDataType] as
+          | string
+          | boolean
+          | number;
+      }
+    }
+
+    return exportedData;
   });
 
   const handleExport = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-    const csv = Papa.unparse(finalExportData);
+    const csv = Papa.unparse(toBeExportedData);
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);

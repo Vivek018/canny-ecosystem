@@ -15,7 +15,10 @@ import {
   ImportReimbursementHeaderSchema,
   reimbursementTypeArray,
 } from "@canny_ecosystem/utils";
-import type { ImportReimbursementDataType } from "@canny_ecosystem/supabase/queries";
+import {
+  getUsersByCompanyId,
+  type ImportReimbursementDataType,
+} from "@canny_ecosystem/supabase/queries";
 import {
   transformStringArrayIntoOptions,
   replaceUnderscore,
@@ -55,9 +58,6 @@ const FIELD_CONFIGS: FieldConfig[] = [
     key: "amount",
     required: true,
   },
-  {
-    key: "email",
-  },
 ];
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -68,12 +68,23 @@ export async function loader({ request }: LoaderFunctionArgs) {
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+  const { data: userData, error: userError } = await getUsersByCompanyId({
+    supabase,
+    companyId,
+  });
+  if (userError || !userData) {
+    throw userError;
+  }
 
-  return json({ env, companyId });
+  const userOptions = userData.map((userData) => ({
+    label: userData.email?.toLowerCase() ?? "",
+    value: userData.id,
+  }));
+  return json({ env, companyId, userOptions });
 }
 
 export default function ReimbursementFieldMapping() {
-  const { env, companyId } = useLoaderData<typeof loader>();
+  const { env, companyId, userOptions } = useLoaderData<typeof loader>();
 
   const { setImportData } = useImportStoreForReimbursement();
 
@@ -81,6 +92,8 @@ export default function ReimbursementFieldMapping() {
 
   const [type, setType] = useState("");
   const [note, setNote] = useState("");
+  const [approver, setApprover] = useState("");
+
   const location = useLocation();
   const [file] = useState(location.state?.file);
   const [headerArray, setHeaderArray] = useState<string[]>([]);
@@ -231,6 +244,7 @@ export default function ReimbursementFieldMapping() {
                 ...cleanEntry,
                 note: note,
                 type: type,
+                user_id: approver,
               };
             });
 
@@ -286,7 +300,7 @@ export default function ReimbursementFieldMapping() {
             )}
             <div className="grid grid-cols-2 gap-8 mb-4">
               <div className="flex  flex-col gap-1">
-                <Label className="text-sm font-medium">Month</Label>
+                <Label className="text-sm font-medium">Type</Label>
 
                 <Combobox
                   options={transformStringArrayIntoOptions(
@@ -300,7 +314,7 @@ export default function ReimbursementFieldMapping() {
                 />
               </div>
 
-              <div className="mb-8 flex flex-col gap-1">
+              <div className=" flex flex-col gap-1">
                 <Label className="text-sm font-medium">Note</Label>
                 <Input
                   className=""
@@ -308,6 +322,17 @@ export default function ReimbursementFieldMapping() {
                   onChange={(e) => setNote(e.target.value)}
                 />
               </div>
+            </div>
+            <div className="mb-10 flex flex-col gap-1">
+              <Label className="text-sm font-medium">Approver</Label>
+              <Combobox
+                options={userOptions}
+                placeholder="Select User"
+                value={approver}
+                onChange={(value: string) => {
+                  setApprover(value);
+                }}
+              />
             </div>
             <div className="grid grid-cols-2 place-content-center justify-between gap-y-8 gap-x-10 mt-5">
               {FIELD_CONFIGS.map((field) => (

@@ -1,5 +1,4 @@
 import type {
-  PayrollDatabaseRow,
   SupabaseEnv,
 } from "@canny_ecosystem/supabase/types";
 import { Button } from "@canny_ecosystem/ui/button";
@@ -21,11 +20,9 @@ export function PayrollActions({
   className,
   env,
   data,
-  payrollData,
   fromWhere,
   status,
 }: {
-  payrollData: Omit<PayrollDatabaseRow, "created_at" | "updated_at">;
   data: any[];
   env: SupabaseEnv;
   payrollId: string;
@@ -76,52 +73,33 @@ export function PayrollActions({
             )}
           />
           <Button variant={"ghost"} className="w-full px-2">
-            <DownloadBankAdvice
-              env={env}
-              data={data}
-            />
+            <DownloadBankAdvice env={env} data={data} />
           </Button>
           <DropdownMenuSeparator
-            className={cn(
-              "hidden",
-              payrollData.payroll_type === "salary" &&
-                status === "approved" &&
-                "flex"
-            )}
+            className={cn("hidden", status === "approved" && "flex")}
           />
-          <Button
-            variant={"ghost"}
-            className={cn(
-              "hidden w-full px-2",
-              payrollData.payroll_type === "salary" && "flex"
-            )}
-          >
+          <Button variant={"ghost"} className={cn("w-full px-2")}>
             <DownloadEsiFormat env={env} data={data} />
           </Button>
 
           <Button
             variant={"ghost"}
             className={cn(
-              "hidden w-full px-2",
-              payrollData.payroll_type === "salary" && "flex"
+              " w-full px-2",
             )}
           >
             <DownloadEpfFormat env={env} data={data} />
           </Button>
 
           <DropdownMenuSeparator
-            className={cn(
-              "hidden",
-                status === "approved" &&
-                "flex"
-            )}
+            className={cn("hidden", status === "approved" && "flex")}
           />
           <div>
             <Button
               variant={"ghost"}
               className={cn(
                 "hidden",
-                  status === "approved" &&
+                status === "approved" &&
                   "flex flex-row justify-start gap-2 px-2 pr-1  "
               )}
               onClick={() =>
@@ -137,18 +115,14 @@ export function PayrollActions({
             </Button>
           </div>
           <DropdownMenuSeparator
-            className={cn(
-              "hidden",
-                status === "approved" &&
-                "flex"
-            )}
+            className={cn("hidden", status === "approved" && "flex")}
           />
           <div>
             <Button
               variant={"ghost"}
               className={cn(
                 "hidden",
-                  status === "approved" &&
+                status === "approved" &&
                   "flex flex-row justify-start gap-2 px-2 pr-1  "
               )}
               onClick={() =>
@@ -224,18 +198,14 @@ export function PayrollActions({
             </Button>
           </div> */}
           <DropdownMenuSeparator
-            className={cn(
-              "hidden",
-                status === "approved" &&
-                "flex"
-            )}
+            className={cn("hidden", status === "approved" && "flex")}
           />
           <div>
             <Button
               variant={"ghost"}
               className={cn(
                 "hidden",
-                  status === "approved" &&
+                status === "approved" &&
                   "flex flex-row justify-start gap-2 px-2 pr-1  "
               )}
               onClick={() =>

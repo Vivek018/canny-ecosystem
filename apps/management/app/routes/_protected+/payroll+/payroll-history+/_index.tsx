@@ -56,6 +56,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
       date_start: searchParams.get("date_start") ?? null,
       date_end: searchParams.get("date_end") ?? null,
       status: searchParams.get("status") ?? null,
+      month: searchParams.get("month") ?? null,
+      year: searchParams.get("year") ?? null,
     };
 
     const payrollsPromise = getApprovedPayrollsByCompanyId({
@@ -251,7 +253,6 @@ export default function PayrollHistoryIndex() {
                                 value={
                                   payroll.id +
                                   payroll?.commission +
-                                  payroll?.payroll_type +
                                   formatDate(payroll?.run_date) +
                                   payroll?.status +
                                   payroll?.total_employees +

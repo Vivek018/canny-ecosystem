@@ -29,7 +29,7 @@ export function CountCards({
 }) {
   const currentResult = currentData.reduce(
     (acc: Record<string, number>, item) => {
-      const type = item.payroll_type;
+      const type = "salary";
       acc[type] = (acc[type] || 0) + (item?.total_net_amount ?? 0);
       return acc;
     },
@@ -37,7 +37,7 @@ export function CountCards({
   );
   const previousResult = previousData.reduce(
     (acc: Record<string, number>, item) => {
-      const type = item.payroll_type;
+      const type = "salary";
       acc[type] = (acc[type] || 0) + (item?.total_net_amount ?? 0);
       return acc;
     },
@@ -74,7 +74,7 @@ export function CountCards({
           >
             {previousResult.salary
               ? Math.abs(salaryCalculation).toFixed(2)
-              : currentResult.salary ?? 0}
+              : (currentResult.salary ?? 0)}
             %
             <p className="text-xs text-muted-foreground ml-1">
               {(previousResult.salary ? salaryCalculation : 100) > 0
@@ -107,7 +107,7 @@ export function CountCards({
           >
             {previousResult.reimbursement
               ? Math.abs(reimbursementCalculation).toFixed(2)
-              : currentResult.reimbursement ?? 0}
+              : (currentResult.reimbursement ?? 0)}
             %
             <p className="text-xs text-muted-foreground ml-1">
               {(previousResult.reimbursement ? reimbursementCalculation : 100) >
