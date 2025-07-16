@@ -38,7 +38,7 @@ export const sideNavList = [
   { name: "Employees", link: "/employees", icon: "employee" },
   { name: "Group 2" },
   {
-    name: "Payroll",
+    name: "Payment",
     link: "/payroll",
     icon: "table",
   },
