@@ -1919,7 +1919,6 @@ export const InvoiceSchema = z.object({
   company_address_id: z.string(),
   type: z.enum(["salary", "exit", "reimbursement"]),
   payroll_data: z.any(),
-  payroll_id: z.string().optional(),
   include_charge: z.boolean().default(false),
   include_cgst: z.boolean().default(false),
   include_sgst: z.boolean().default(false),

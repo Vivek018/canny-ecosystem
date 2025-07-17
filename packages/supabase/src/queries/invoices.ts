@@ -16,7 +16,6 @@ export type InvoiceDataType = Pick<
   | "company_address_id"
   | "payroll_data"
   | "type"
-  | "payroll_id"
   | "include_charge"
   | "include_cgst"
   | "include_sgst"
@@ -95,7 +94,6 @@ export async function getInvoicesByCompanyId({
     "invoice_number",
     "date",
     "company_address_id",
-    "payroll_id",
     "payroll_data",
     "include_charge",
     "include_cgst",
@@ -117,7 +115,8 @@ export async function getInvoicesByCompanyId({
         company_location ? "inner" : "left"
       }(id,name)`
     )
-    .eq("company_id", companyId);
+    .eq("company_id", companyId)
+    .order("created_at", { ascending: false });
 
   if (searchQuery) {
     query.or(
@@ -176,7 +175,6 @@ export async function getInvoiceById({
     "invoice_number",
     "date",
     "company_address_id",
-    "payroll_id",
     "payroll_data",
     "include_charge",
     "include_cgst",

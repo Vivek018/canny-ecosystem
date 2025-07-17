@@ -19,6 +19,7 @@ import { SalaryTableHeader } from "./data-table-header";
 import type { SalaryEntriesDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { ExportBar } from "../../export-bar";
 import { useSalaryEntriesStore } from "@/store/salary-entries";
+import { roundToNearest } from "@canny_ecosystem/utils";
 
 interface SalaryEntryTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -87,10 +88,9 @@ export function SalaryEntryDataTable<TData, TValue>({
                           "px-3 md:px-4 py-4 hidden md:table-cell",
                           cell.column.id === "select" &&
                             "sticky left-0 min-w-12 max-w-12 bg-card z-10",
-                          cell.column.id === "sr_no" &&
-                            "sticky left-12 bg-card z-10",
+                          cell.column.id === "sr_no" && "sticky left-12 bg-card z-10",
                           cell.column.id === "employee_code" &&
-                            "sticky left-32 bg-card z-10"
+                            "sticky left-32 z-10 bg-card"
                         )}
                       >
                         {flexRender(
@@ -113,7 +113,7 @@ export function SalaryEntryDataTable<TData, TValue>({
         </Table>
       </div>
       <ExportBar
-        totalNet={totalNet}
+        totalNet={roundToNearest(totalNet)}
         className={cn(!table.getSelectedRowModel().rows.length && "hidden")}
         rows={table.getSelectedRowModel().rows.length}
         data={selectedRowsData as SalaryEntriesDatabaseRow[]}

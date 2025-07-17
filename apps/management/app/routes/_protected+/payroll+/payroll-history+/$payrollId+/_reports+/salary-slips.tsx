@@ -35,6 +35,7 @@ import {
   formatDate,
   getMonthNameFromNumber,
   replaceUnderscore,
+  roundToNearest,
 } from "@canny_ecosystem/utils";
 import { useSalaryEntriesStore } from "@/store/salary-entries";
 
@@ -347,13 +348,13 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                   <View style={[styles.row, { backgroundColor: "#d0ebff" }]}>
                     <Text style={[styles.cell, { flex: 1 }]}>Gross Income</Text>
                     <Text style={[styles.cell, { flex: 1 }]}>
-                      {earningsTotal.toFixed(2)}
+                      {roundToNearest(earningsTotal)}
                     </Text>
                     <Text style={[styles.cell, { flex: 1 }]}>
                       Total Deductions
                     </Text>
                     <Text style={[styles.cell, { flex: 1 }]}>
-                      {deductionTotal.toFixed(2)}
+                      {roundToNearest(deductionTotal)}
                     </Text>
                   </View>
                   <View
@@ -378,7 +379,7 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                           },
                         ]}
                       >
-                        {numberToWordsIndian(Number(netAmount.toFixed(2)))}
+                        {numberToWordsIndian(roundToNearest(Number(netAmount)))}
                       </Text>
                     </View>
                     <View
@@ -390,7 +391,7 @@ const SalarySlipsPDF = ({ data }: { data: DataType }) => {
                     >
                       <Text style={[styles.cell, { flex: 2 }]}>Net Amount</Text>
                       <Text style={[styles.cell, { flex: 2 }]}>
-                        Rs. {netAmount.toFixed(2)}
+                        Rs. {roundToNearest(netAmount)}
                       </Text>
                     </View>
                   </View>

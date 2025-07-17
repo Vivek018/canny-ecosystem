@@ -323,9 +323,6 @@ export default function CreateInvoiceFromRiembursement({
               <input
                 {...getInputProps(fields.company_id, { type: "hidden" })}
               />
-              <input
-                {...getInputProps(fields.payroll_id, { type: "hidden" })}
-              />
 
               <div className="grid grid-cols-2 gap-4">
                 <Field

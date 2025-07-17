@@ -1,7 +1,4 @@
-import {
-  defaultYear,
-  formatUTCDate,
-} from "@canny_ecosystem/utils";
+import { defaultYear, formatUTCDate } from "@canny_ecosystem/utils";
 import type {
   PayrollDatabaseRow,
   InferredType,
@@ -258,6 +255,7 @@ export async function getSalaryEntriesByPayrollId({
     "amount",
     "site_id",
     "group_id",
+    "invoice_id",
   ] as const;
 
   const query = supabase

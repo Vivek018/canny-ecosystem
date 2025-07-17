@@ -150,7 +150,9 @@ export function CountCards({
                 : "text-destructive"
             )}
           >
-            {currentExits.length - previousExits.length}
+            {currentExits.length - previousExits.length > 0
+              ? currentExits.length - previousExits.length
+              : previousExits.length - currentExits.length}
             <p className="text-xs text-muted-foreground ml-1">
               {currentExits.length - previousExits.length > 0 ? "more" : "less"}{" "}
               than last month

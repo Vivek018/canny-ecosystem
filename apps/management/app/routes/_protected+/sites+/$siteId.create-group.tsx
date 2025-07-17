@@ -168,7 +168,7 @@ export default function CreateGroup({
         variant: "destructive",
       });
     }
-    navigate("/", { replace: true });
+    navigate(-1, { replace: true });
   }, [actionData]);
 
   return (

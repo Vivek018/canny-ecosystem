@@ -4,6 +4,7 @@ import {
   deleteRole,
   getMonthNameFromNumber,
   hasPermission,
+  roundToNearest,
   updateRole,
 } from "@canny_ecosystem/utils";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
@@ -68,7 +69,15 @@ export const salaryEntryColumns = ({
       accessorKey: "sr_no",
       header: "Sr No.",
       sortingFn: (a, b) => a.index - b.index,
-      cell: ({ row }) => <p className="truncate w-12">{row.index + 1}</p>,
+      cell: ({ row }) => (
+        <p
+          className={cn(
+            "truncate w-12"
+          )}
+        >
+          {row.index + 1}
+        </p>
+      ),
     },
     {
       id: "employee_code",
@@ -178,8 +187,8 @@ export const salaryEntryColumns = ({
           valueObj?.type === "earning"
             ? "text-green"
             : valueObj?.type
-            ? "text-destructive"
-            : "";
+              ? "text-destructive"
+              : "";
 
         const displayValue =
           valueObj?.amount !== undefined ? valueObj.amount : "--";
@@ -202,7 +211,9 @@ export const salaryEntryColumns = ({
       sortingFn: (a, b) =>
         calculateNetAmount(a.original) - calculateNetAmount(b.original),
       cell: ({ row }) => (
-        <p className="truncate">{calculateNetAmount(row.original)}</p>
+        <p className="truncate">
+          {roundToNearest(calculateNetAmount(row.original))}
+        </p>
       ),
     },
 

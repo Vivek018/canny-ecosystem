@@ -7,9 +7,7 @@ import { createInvoice } from "@canny_ecosystem/supabase/mutations";
 import {
   getCannyCompanyIdByName,
   getLocationsForSelectByCompanyId,
-  getPayrollById,
   getRelationshipsByParentAndChildCompanyId,
-  getSalaryEntriesByPayrollId,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { InvoiceDatabaseInsert } from "@canny_ecosystem/supabase/types";
@@ -33,6 +31,7 @@ import {
   isGoodStatus,
   replaceDash,
   replaceUnderscore,
+  roundToNearest,
   SIZE_10MB,
   transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
@@ -62,14 +61,9 @@ const ADD_INVOICE_TAG = "Create-Invoice";
 
 export const CANNY_NAME = "Canny Management Services";
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
-  const payrollId = params.payrollId as string;
+export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const url = new URL(request.url);
-  const searchParams = new URLSearchParams(url.searchParams);
-  const site = searchParams.get("site") ?? null;
-  const group = searchParams.get("group") ?? null;
   const { data: cannyData, error } = await getCannyCompanyIdByName({
     name: CANNY_NAME,
     supabase,
@@ -88,18 +82,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     companyRelations = (data ?? []) as unknown as any;
   }
 
-  const { data: payroll } = await getPayrollById({ payrollId, supabase });
   const { data: companyLocations } = await getLocationsForSelectByCompanyId({
     companyId,
     supabase,
-  });
-  const { data: salaryData } = await getSalaryEntriesByPayrollId({
-    supabase,
-    payrollId,
-    params: {
-      group: group ? [group] : null,
-      site: site ? [site] : null,
-    },
   });
 
   const companyLocationArray = companyLocations?.map((location) => ({
@@ -108,11 +93,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }));
 
   return {
-    payroll,
-    salaryData,
     companyRelations,
     companyLocationArray,
-    payrollId,
     companyId,
   };
 }
@@ -135,7 +117,8 @@ export async function action({
       request,
       createMemoryUploadHandler({ maxPartSize: SIZE_10MB })
     );
-
+    const selectedRowData = formData.get("selected_rows") as string;
+    const selectedSalaryEntriesData = JSON.parse(selectedRowData || "[]");
     const submission = parseWithZod(formData, {
       schema: InvoiceSchema,
     });
@@ -171,11 +154,44 @@ export async function action({
       }
     }
 
-    const { status, error } = await createInvoice({
+    const { data, status, error } = await createInvoice({
       supabase,
       data: submission.value,
     });
 
+    if (data?.id) {
+      const updatedSalaryEntries = (
+        selectedSalaryEntriesData as Array<any>
+      ).flatMap((employee) =>
+        employee.salary_entries.map((entry: { id: string }) => ({
+          id: entry.id,
+          invoice_id: data.id!,
+        }))
+      );
+
+      console.log("Updated Salary Entries===>", updatedSalaryEntries);
+
+      for (const entry of updatedSalaryEntries) {
+        const { id, invoice_id } = entry;
+        const { error } = await supabase
+          .from("salary_entries")
+          .update({ invoice_id })
+          .eq("id", id);
+
+        if (error) {
+          return json({
+            status: "error",
+            message: "Error udating Salary Entry",
+            error,
+          });
+        }
+      }
+      return json({
+        status: "success",
+        message: "Invoice created successfully",
+        error: null,
+      });
+    }
     if (isGoodStatus(status)) {
       return json({
         status: "success",
@@ -210,13 +226,8 @@ export default function CreateInvoice({
   locationArrayFromUpdate: any[];
   companyRelationsFromUpdate: any;
 }) {
-  const {
-    companyId,
-    salaryData,
-    payrollId,
-    companyLocationArray,
-    companyRelations,
-  } = useLoaderData<typeof loader>();
+  const { companyId, companyLocationArray, companyRelations } =
+    useLoaderData<typeof loader>();
 
   const { selectedRows } = useSalaryEntriesStore();
 
@@ -247,7 +258,7 @@ export default function CreateInvoice({
 
       return {
         field,
-        amount: Number(amount.toFixed(2)),
+        amount: roundToNearest(Number(amount)),
         type: data.type,
       };
     });
@@ -269,13 +280,12 @@ export default function CreateInvoice({
     shouldRevalidate: "onInput",
     defaultValue: {
       ...initialValues,
-      payroll_id: initialValues.payroll_id ?? payrollId,
       company_id: initialValues.company_id ?? companyId,
       payroll_data: updateValues
         ? typeof updateValues?.payroll_data === "string"
           ? JSON.parse(updateValues.payroll_data as string)
           : updateValues.payroll_data
-        : transformSalaryData(selectedRows.length ? selectedRows : salaryData),
+        : transformSalaryData(selectedRows),
       type: updateValues?.type ?? "salary",
       proof: undefined,
     },
@@ -325,12 +335,14 @@ export default function CreateInvoice({
               </CardDescription>
             </CardHeader>
             <CardContent>
+              <input
+                type="hidden"
+                name="selected_rows"
+                value={JSON.stringify(selectedRows)}
+              />
               <input {...getInputProps(fields.id, { type: "hidden" })} />
               <input
                 {...getInputProps(fields.company_id, { type: "hidden" })}
-              />
-              <input
-                {...getInputProps(fields.payroll_id, { type: "hidden" })}
               />
 
               <div className="grid grid-cols-2 gap-4">
