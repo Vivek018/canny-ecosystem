@@ -34,8 +34,8 @@ export default function Project() {
               path: `/projects/${projectId}/${siteId}/link-templates`,
             },
             {
-              label: "Groups",
-              path: `/projects/${projectId}/${siteId}/groups`,
+              label: "Departments",
+              path: `/projects/${projectId}/${siteId}/departments`,
             },
           ]}
           className="pt-0 pb-0"

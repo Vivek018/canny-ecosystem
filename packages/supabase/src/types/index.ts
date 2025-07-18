@@ -352,8 +352,23 @@ export type NotificationDatabaseInsert =
 export type NotificationDatabaseUpdate =
   Database["public"]["Tables"]["notifications"]["Update"];
 
-export type GroupDatabaseRow = Database["public"]["Tables"]["groups"]["Row"];
-export type GroupDatabaseInsert =
-  Database["public"]["Tables"]["groups"]["Insert"];
-export type GroupDatabaseUpdate =
-  Database["public"]["Tables"]["groups"]["Update"];
+export type DepartmentsDatabaseRow =
+  Database["public"]["Tables"]["departments"]["Row"];
+export type DepartmentsDatabaseInsert =
+  Database["public"]["Tables"]["departments"]["Insert"];
+export type DepartmentsDatabaseUpdate =
+  Database["public"]["Tables"]["departments"]["Update"];
+
+export type SalaryFieldValuesDatabaseRow =
+  Database["public"]["Tables"]["salary_field_values"]["Row"];
+export type SalaryFieldValuesDatabaseInsert =
+  Database["public"]["Tables"]["salary_field_values"]["Insert"];
+export type SalaryFieldValuesDatabaseUpdate =
+  Database["public"]["Tables"]["salary_field_values"]["Update"];
+
+export type PayrollFieldsDatabaseRow =
+  Database["public"]["Tables"]["payroll_fields"]["Row"];
+export type PayrollFieldsDatabaseInsert =
+  Database["public"]["Tables"]["payroll_fields"]["Insert"];
+export type PayrollFieldsDatabaseUpdate =
+  Database["public"]["Tables"]["payroll_fields"]["Update"];

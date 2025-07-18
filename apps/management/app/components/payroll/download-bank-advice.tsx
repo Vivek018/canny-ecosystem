@@ -169,8 +169,7 @@ export const DownloadBankAdvice = ({
       for (const entry of emp.salary_entries) {
         if (entry.type === "earning") earnings += entry.amount;
         else if (
-          entry.type === "deduction" ||
-          entry.type === "statutory_contribution"
+          entry.type === "deduction" 
         )
           deductions += entry.amount;
       }

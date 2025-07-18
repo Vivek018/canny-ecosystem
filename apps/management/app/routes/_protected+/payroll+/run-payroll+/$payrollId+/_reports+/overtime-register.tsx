@@ -749,7 +749,7 @@ export default function OvertimeRegister() {
     interface SalaryEntry {
       field_name: string;
       amount: number;
-      type: "earning" | "statutory_contribution";
+      type: "earning" | "deduction";
       monthly_attendance: {
         working_days: number;
         present_days: number;
@@ -837,7 +837,7 @@ export default function OvertimeRegister() {
 
             if (entry.type === "earning") {
               earnings.push(entryItem);
-            } else if (entry.type === "statutory_contribution") {
+            } else if (entry.type === "deduction") {
               deductions.push(entryItem);
             }
           }

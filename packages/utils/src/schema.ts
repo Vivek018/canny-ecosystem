@@ -682,11 +682,7 @@ export const statutoryFieldsArray = [
   "lwf",
 ] as const;
 
-export const componentTypeArray = [
-  "earning",
-  "deduction",
-  "statutory_contribution",
-] as const;
+export const componentTypeArray = ["earning", "deduction"] as const;
 
 export const PaymentTemplateComponentsSchema = z.object({
   id: z.string().uuid().optional(),
@@ -1298,10 +1294,10 @@ export const PayrollSchema = z.object({
 
 // Payroll
 export const SalaryEntrySchema = z.object({
-  id: z.string().optional(),
-  employee_id: z.string(),
-  payroll_id: z.string().optional(),
-  field_name: z.string(),
+  salaryFieldValues_id: z.string(),
+  payrollFields_id: z.string(),
+  payroll_id: z.string(),
+  name: z.string(),
   type: z.enum(componentTypeArray).default("earning"),
   amount: z.number(),
 });
@@ -1930,7 +1926,7 @@ export const InvoiceSchema = z.object({
   include_header: z.boolean().default(false),
 });
 
-export const GroupsSchema = z.object({
+export const DepartmentsSchema = z.object({
   id: z.string().uuid().optional(),
   name: z.string().min(3),
   site_id: z.string(),

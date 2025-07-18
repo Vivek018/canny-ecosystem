@@ -9,7 +9,7 @@ export const CANNY_MANAGEMENT_SERVICES_NAME = "Canny Management Services";
 
 export const CANNY_MANAGEMENT_SERVICES_ADDRESS =
   "502-503, Girivar Glean, Under Odhav Overbrigde, Sardar Patel Ring Rd, nr. Palm Hotel, Odhav, Ahmedabad, Gujarat 382415";
-  
+
 export const CANNY_MANAGEMENT_SERVICES_ACCOUNT_NUMBER = "093005001273";
 
 export const CANNY_MANAGEMENT_SERVICES_IFSC_CODE = "ICIC0000930";
@@ -195,7 +195,7 @@ export const cacheKeyPrefix = {
   company_document: "company-document",
   attendance_report: "attendance-report",
   payroll_invoice: "payroll-invoice",
-  groups: "groups",
+  departments: "departments",
 };
 
 export const SALARY_SLIP_TITLE = "Form IV B [Rule 26(2)(b)]";

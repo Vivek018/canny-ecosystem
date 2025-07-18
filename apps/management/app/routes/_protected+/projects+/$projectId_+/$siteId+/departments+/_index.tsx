@@ -28,15 +28,15 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { useUser } from "@/utils/user";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
-import { getGroupsBySiteId } from "@canny_ecosystem/supabase/queries";
-import { GroupsDataTable } from "@/components/sites/groups/table/data-table";
-import { columns } from "@/components/sites/groups/table/columns";
+import { getDepartmentsBySiteId } from "@canny_ecosystem/supabase/queries";
+import { DepartmentsDataTable } from "@/components/sites/departments/table/data-table";
+import { columns } from "@/components/sites/departments/table/columns";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${readRole}:${attribute.groups}`))
+  if (!hasPermission(user?.role!, `${readRole}:${attribute.departments}`))
     return safeRedirect(DEFAULT_ROUTE, { headers });
 
   try {
@@ -46,58 +46,60 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       throw new Response("Site ID is required", { status: 400 });
     }
 
-    const groupPromise = getGroupsBySiteId({
+    const departmentPromise = getDepartmentsBySiteId({
       supabase,
       siteId,
     });
 
     return defer({
-      groupPromise: groupPromise as any,
+      departmentPromise: departmentPromise as any,
       siteId,
     });
   } catch (error) {
-    console.error("Group Error in loader function:", error);
+    console.error("Department Error in loader function:", error);
 
     return defer({
-      groupPromise: Promise.resolve({ data: [] }),
+      departmentPromise: Promise.resolve({ data: [] }),
       siteId: "",
     });
   }
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return clientCaching(`${cacheKeyPrefix.groups}`, args);
+  return clientCaching(`${cacheKeyPrefix.departments}`, args);
 }
 
 clientLoader.hydrate = true;
 
-export default function Groups() {
+export default function Departments() {
   const { role } = useUser();
 
-  const { groupPromise, siteId } = useLoaderData<typeof loader>();
+  const { departmentPromise, siteId } = useLoaderData<typeof loader>();
 
   return (
     <>
       <Suspense fallback={<LoadingSpinner className="h-1/3" />}>
-        <Await resolve={groupPromise}>
+        <Await resolve={departmentPromise}>
           {({ data, error }) => {
-
             if (error) {
-              clearExactCacheEntry(cacheKeyPrefix.groups);
+              clearExactCacheEntry(cacheKeyPrefix.departments);
               return (
-                <ErrorBoundary error={error} message="Failed to load groups" />
+                <ErrorBoundary
+                  error={error}
+                  message="Failed to load departments"
+                />
               );
             }
             const [tableData, setTableData] = useState(data);
             const [searchString, setSearchString] = useState("");
 
             useEffect(() => {
-              interface GroupItem {
+              interface DepartmentItem {
                 [key: string]: any;
               }
 
-              const filteredData: GroupItem[] = data?.filter(
-                (item: GroupItem) => searchInObject(item, searchString)
+              const filteredData: DepartmentItem[] = data?.filter(
+                (item: DepartmentItem) => searchInObject(item, searchString)
               );
               setTableData(filteredData);
             }, [searchString, data]);
@@ -115,29 +117,29 @@ export default function Groups() {
                         />
                       </div>
                       <Input
-                        placeholder="Search Groups"
+                        placeholder="Search Department"
                         value={searchString}
                         onChange={(e) => setSearchString(e.target.value)}
                         className="pl-8 h-10 w-full focus-visible:ring-0 shadow-none"
                       />
                     </div>
                     <Link
-                      to={`/sites/${siteId}/create-group`}
+                      to={`/sites/${siteId}/create-department`}
                       className={cn(
                         buttonVariants({ variant: "primary-outline" }),
                         "flex items-center gap-1",
                         !hasPermission(
                           role,
-                          `${createRole}:${attribute.groups}`
+                          `${createRole}:${attribute.departments}`
                         ) && "hidden"
                       )}
                     >
                       <span>Add</span>
-                      <span className="hidden md:flex justify-end">Group</span>
+                      <span className="hidden md:flex justify-end">Department</span>
                     </Link>
                   </div>
                 </div>
-                <GroupsDataTable data={tableData} columns={columns} />
+                <DepartmentsDataTable data={tableData} columns={columns} />
               </section>
             );
           }}

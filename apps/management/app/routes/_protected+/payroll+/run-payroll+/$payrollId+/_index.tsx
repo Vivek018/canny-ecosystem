@@ -1,6 +1,6 @@
 import { ErrorBoundary } from "@/components/error-boundary";
 import { LoadingSpinner } from "@/components/loading-spinner";
-import { ImportGroupSalaryPayrollModal } from "@/components/payroll/import-export/import-group-salary-modal-payroll";
+import { ImportDepartmentSalaryPayrollModal } from "@/components/payroll/import-export/import-department-salary-modal-payroll";
 
 import { SalaryEntryComponent } from "@/components/payroll/salary-entry/salary-entry-component";
 import { cacheKeyPrefix } from "@/constant";
@@ -11,7 +11,7 @@ import {
 } from "@/utils/cache";
 import { updatePayroll } from "@canny_ecosystem/supabase/mutations";
 import {
-  getGroupsBySiteId,
+  getDepartmentsBySiteId,
   getPayrollById,
   getSalaryEntriesByPayrollId,
   getSitesByProjectId,
@@ -54,7 +54,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       payrollId: payrollId ?? "",
     });
 
-    let groupOptions: any = [];
+    let departmentOptions: any = [];
     let siteOptions: any = [];
 
     if (payrollData?.project_id) {
@@ -68,11 +68,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       }));
     }
     if (payrollData?.project_site_id) {
-      const { data: allGroups } = await getGroupsBySiteId({
+      const { data: allDepartments } = await getDepartmentsBySiteId({
         siteId: payrollData?.project_site_id,
         supabase,
       });
-      groupOptions = allGroups?.map((sites) => ({
+      departmentOptions = allDepartments?.map((sites) => ({
         label: sites?.name,
         value: sites?.id,
       }));
@@ -81,7 +81,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const url = new URL(request.url);
     const searchParams = new URLSearchParams(url.searchParams);
     let site = searchParams.get("site")?.split(",") ?? [];
-    let group = searchParams.get("group")?.split(",") ?? [];
+    let department = searchParams.get("department")?.split(",") ?? [];
 
     let shouldRedirect = false;
     if (
@@ -95,12 +95,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     if (
-      group.length === 0 &&
+      department.length === 0 &&
       payrollData?.project_site_id &&
-      groupOptions.length > 0
+      departmentOptions.length > 0
     ) {
-      group = [groupOptions[0].value];
-      searchParams.set("group", group.join(","));
+      department = [departmentOptions[0].value];
+      searchParams.set("department", department.join(","));
       shouldRedirect = true;
     }
     if (shouldRedirect) {
@@ -112,15 +112,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       payrollId: payrollId ?? "",
       params: {
         site,
-        group,
+        department,
       },
     });
-   
 
     return defer({
       payrollData,
       salaryEntriesPromise,
-      groupOptions,
+      departmentOptions,
       siteOptions,
       error: null,
       env,
@@ -130,7 +129,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return defer({
       payrollData: null,
       salaryEntriesPromise: Promise.resolve({ data: null, error: null }),
-      groupOptions: [],
+      departmentOptions: [],
       siteOptions: [],
       error,
       env: null,
@@ -205,7 +204,7 @@ export default function RunPayrollId() {
   const {
     payrollData,
     salaryEntriesPromise,
-    groupOptions,
+    departmentOptions,
     siteOptions,
     env,
   } = useLoaderData<typeof loader>();
@@ -272,13 +271,13 @@ export default function RunPayrollId() {
                 env={env as SupabaseEnv}
                 fromWhere="runpayroll"
                 siteOptions={siteOptions}
-                groupOptions={groupOptions}
+                departmentOptions={departmentOptions}
               />
             );
           }}
         </Await>
       </Suspense>
-      <ImportGroupSalaryPayrollModal />
+      <ImportDepartmentSalaryPayrollModal />
     </>
   );
 }

@@ -1,6 +1,7 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
 import {
+  calculateNetAmountAfterEntryCreated,
   deleteRole,
   getMonthNameFromNumber,
   hasPermission,
@@ -14,44 +15,18 @@ import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 
 import { SalaryEntryDropdown } from "../salary-entry-dropdown";
-import type { SalaryEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
 import { SalaryEntrySheet } from "./salary-entry-sheet";
-import type {
-  EmployeeDatabaseRow,
-  SalaryEntriesDatabaseRow,
-} from "@canny_ecosystem/supabase/types";
 import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 
 export const salaryEntryColumns = ({
   data,
   editable = false,
+  uniqueFields,
 }: {
   data: any;
   editable?: boolean;
-}): ColumnDef<SalaryEntriesWithEmployee>[] => {
-  const uniqueFields: string[] = Array.from(
-    new Set(
-      data.flatMap((emp: any) =>
-        emp.salary_entries.map((entry: any) => entry.field_name)
-      )
-    )
-  );
-
-  const calculateNetAmount = (employee: SalaryEntriesWithEmployee): number => {
-    let gross = 0;
-    let statutoryContributions = 0;
-    let deductions = 0;
-
-    for (const entry of employee.salary_entries) {
-      const amount = entry.amount ?? 0;
-      if (entry.type === "earning") gross += amount;
-      else if (entry.type === "statutory_contribution")
-        statutoryContributions += amount;
-      else if (entry.type === "deduction") deductions += amount;
-    }
-    return gross - statutoryContributions - deductions;
-  };
-
+  uniqueFields: string[];
+}): ColumnDef<any>[] => {
   return [
     {
       id: "select",
@@ -69,15 +44,7 @@ export const salaryEntryColumns = ({
       accessorKey: "sr_no",
       header: "Sr No.",
       sortingFn: (a, b) => a.index - b.index,
-      cell: ({ row }) => (
-        <p
-          className={cn(
-            "truncate w-12"
-          )}
-        >
-          {row.index + 1}
-        </p>
-      ),
+      cell: ({ row }) => <p className={cn("truncate w-12")}>{row.index + 1}</p>,
     },
     {
       id: "employee_code",
@@ -88,7 +55,9 @@ export const salaryEntryColumns = ({
           String(b.getValue("employee_code") ?? "")
         ),
       cell: ({ row }) => (
-        <p className="truncate w-28">{row.original?.employee_code ?? "--"}</p>
+        <p className="truncate w-28">
+          {row.original?.employee.employee_code ?? "--"}
+        </p>
       ),
     },
     {
@@ -96,8 +65,8 @@ export const salaryEntryColumns = ({
       accessorKey: "name",
       header: "Employee Name",
       accessorFn: (row) =>
-        `${row.first_name ?? ""} ${row.middle_name ?? ""} ${
-          row.last_name ?? ""
+        `${row.employee.first_name ?? ""} ${row.employee.middle_name ?? ""} ${
+          row.employee.last_name ?? ""
         }`,
       sortingFn: (a, b) =>
         String(a.getValue("name") ?? "").localeCompare(
@@ -105,9 +74,9 @@ export const salaryEntryColumns = ({
         ),
       cell: ({ row }) => (
         <p className="truncate capitalize w-52">{`${
-          row.original?.first_name ?? ""
-        } ${row.original?.middle_name ?? ""} ${
-          row.original?.last_name ?? ""
+          row.original?.employee.first_name ?? ""
+        } ${row.original?.employee.middle_name ?? ""} ${
+          row.original?.employee.last_name ?? ""
         }`}</p>
       ),
     },
@@ -115,31 +84,24 @@ export const salaryEntryColumns = ({
       id: "present_days",
       accessorKey: "present_days",
       header: "P. Days",
-      accessorFn: (row) =>
-        row.salary_entries[0]?.monthly_attendance.present_days ?? 0,
+      accessorFn: (row) => row.present_days ?? 0,
       sortingFn: (a, b) =>
         Number(a.getValue("present_days") ?? 0) -
         Number(b.getValue("present_days") ?? 0),
       cell: ({ row }) => (
-        <p className="truncate">
-          {row.original.salary_entries[0]?.monthly_attendance.present_days ?? 0}
-        </p>
+        <p className="truncate">{row.original.present_days ?? "--"}</p>
       ),
     },
     {
       id: "overtime_hours",
       accessorKey: "overtime_hours",
       header: "OT Hours",
-      accessorFn: (row) =>
-        row.salary_entries[0]?.monthly_attendance.overtime_hours ?? 0,
+      accessorFn: (row) => row.overtime_hours ?? 0,
       sortingFn: (a, b) =>
         Number(a.getValue("overtime_hours") ?? 0) -
         Number(b.getValue("overtime_hours") ?? 0),
       cell: ({ row }) => (
-        <p className="truncate">
-          {row.original.salary_entries[0]?.monthly_attendance.overtime_hours ??
-            0}
-        </p>
+        <p className="truncate">{row.original.overtime_hours ?? 0}</p>
       ),
     },
     {
@@ -147,21 +109,14 @@ export const salaryEntryColumns = ({
       accessorKey: "period",
       header: "Period",
       accessorFn: (row) =>
-        `${getMonthNameFromNumber(
-          row.salary_entries[0]?.monthly_attendance?.month,
-          true
-        )} ${row.salary_entries[0]?.monthly_attendance?.year}`,
+        `${getMonthNameFromNumber(row.month, true)} ${row.year}`,
       sortingFn: (a, b) =>
         String(a.getValue("period") ?? "").localeCompare(
           String(b.getValue("period") ?? "")
         ),
       cell: ({ row }) => (
         <p className="truncate">
-          {getMonthNameFromNumber(
-            row.original.salary_entries[0]?.monthly_attendance?.month,
-            true
-          )}{" "}
-          {row.original.salary_entries[0]?.monthly_attendance?.year}
+          {getMonthNameFromNumber(row.original.month, true)} {row.original.year}
         </p>
       ),
     },
@@ -170,23 +125,23 @@ export const salaryEntryColumns = ({
       id: fieldName,
       accessorKey: fieldName,
       accessorFn: (row: any) =>
-        row.salary_entries.find(
+        row.salary_entries.salary_field_values.find(
           (entry: any) =>
-            entry.field_name.toLowerCase() === fieldName.toLowerCase()
+            entry.payroll_fields.name.toLowerCase() === fieldName.toLowerCase()
         )?.amount ?? 0,
       sortingFn: (a: any, b: any) =>
         (a.getValue(fieldName) ?? 0) - (b.getValue(fieldName) ?? 0),
       header: fieldName,
-      cell: ({ row }: { row: { original: SalaryEntriesWithEmployee } }) => {
-        const valueObj = row.original.salary_entries.find(
+      cell: ({ row }: { row: { original: (typeof data)[0] } }) => {
+        const valueObj = row.original.salary_entries.salary_field_values.find(
           (entry: any) =>
-            entry.field_name.toLowerCase() === fieldName.toLowerCase()
+            entry.payroll_fields.name.toLowerCase() === fieldName.toLowerCase()
         );
 
         const displayColor =
-          valueObj?.type === "earning"
+          valueObj?.payroll_fields?.type === "earning"
             ? "text-green"
-            : valueObj?.type
+            : valueObj?.payroll_fields?.type === "deduction"
               ? "text-destructive"
               : "";
 
@@ -197,8 +152,9 @@ export const salaryEntryColumns = ({
           <SalaryEntrySheet
             triggerChild={<p className={displayColor}>{displayValue}</p>}
             editable={editable}
-            employee={row.original as unknown as EmployeeDatabaseRow}
-            salaryEntry={valueObj as unknown as SalaryEntriesDatabaseRow}
+            employee={row.original.employee}
+            salaryEntry={valueObj}
+            payrollId={row.original.salary_entries.payroll_id}
           />
         );
       },
@@ -209,10 +165,11 @@ export const salaryEntryColumns = ({
       accessorKey: "net_amount",
       header: "Net Amount",
       sortingFn: (a, b) =>
-        calculateNetAmount(a.original) - calculateNetAmount(b.original),
+        calculateNetAmountAfterEntryCreated(a.original) -
+        calculateNetAmountAfterEntryCreated(b.original),
       cell: ({ row }) => (
         <p className="truncate">
-          {roundToNearest(calculateNetAmount(row.original))}
+          {roundToNearest(calculateNetAmountAfterEntryCreated(row.original))}
         </p>
       ),
     },

@@ -5,14 +5,14 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@canny_ecosystem/ui/dropdown-menu";
-import { DeleteGroup } from "./delete-group";
+import { DeleteDepartment } from "./delete-department";
 import { useNavigate } from "@remix-run/react";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
-export const GroupOptionsDropdown = ({
+export const DepartmentOptionsDropdown = ({
   id,
   triggerChild,
 }: {
@@ -24,7 +24,7 @@ export const GroupOptionsDropdown = ({
   const navigate = useNavigate();
 
   const handleEdit = () => {
-    navigate(`/sites/${id}/update-group`);
+    navigate(`/sites/${id}/update-department`);
   };
 
   return (
@@ -35,19 +35,21 @@ export const GroupOptionsDropdown = ({
           <DropdownMenuItem
             className={cn(
               "hidden",
-              hasPermission(role, `${updateRole}:${attribute.groups}`) && "flex"
+              hasPermission(role, `${updateRole}:${attribute.departments}`) &&
+                "flex"
             )}
             onClick={handleEdit}
           >
-            Edit Group Data
+            Edit Department Data
           </DropdownMenuItem>
           <DropdownMenuSeparator
             className={cn(
               "hidden",
-              hasPermission(role, `${deleteRole}:${attribute.groups}`) && "flex"
+              hasPermission(role, `${deleteRole}:${attribute.departments}`) &&
+                "flex"
             )}
           />
-          <DeleteGroup id={id} role={role} />
+          <DeleteDepartment id={id} role={role} />
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
