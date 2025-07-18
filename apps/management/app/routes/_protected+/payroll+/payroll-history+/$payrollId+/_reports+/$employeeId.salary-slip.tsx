@@ -543,7 +543,7 @@ export default function SalarySlip() {
     }
 
     const deductions: DeductionEntry[] = salaryEntries
-      .filter((entry: SalaryEntry) => entry.type === "statutory_contribution")
+      .filter((entry: SalaryEntry) => entry.type === "deduction")
       .map((entry: SalaryEntry) => ({
         name: entry.field_name,
         amount: entry.amount,

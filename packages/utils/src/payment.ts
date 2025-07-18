@@ -8,7 +8,6 @@ import type {
   LabourWelfareFundDatabaseRow,
   PaymentTemplateComponentDatabaseRow,
   ProfessionalTaxDatabaseRow,
-  SalaryEntriesDatabaseUpdate,
 } from "@canny_ecosystem/supabase/types";
 import {
   componentTypeArray,
@@ -19,7 +18,7 @@ import {
 import { EMPLOYEE_EPF_PERCENTAGE } from "@canny_ecosystem/utils/constant";
 
 export function getSelectedPaymentComponentFromField<
-  T extends PaymentFieldDataType
+  T extends PaymentFieldDataType,
 >({
   field,
   monthlyCtc,
@@ -71,7 +70,7 @@ export function getSelectedPaymentComponentFromField<
 }
 
 export function getEPFComponentFromField<
-  T extends Omit<EmployeeProvidentFundDatabaseRow, "created_at" | "updated_at">
+  T extends Omit<EmployeeProvidentFundDatabaseRow, "created_at" | "updated_at">,
 >({
   field,
   value,
@@ -94,14 +93,14 @@ export function getEPFComponentFromField<
     template_id: existingComponent?.template_id,
     epf_id: field.id ?? existingComponent?.epf_id,
     target_type: "epf",
-    component_type: "statutory_contribution",
+    component_type: "deduction",
     calculation_value:
       calculationValue?.toFixed(3) ?? existingComponent?.calculation_value,
   };
 }
 
 export function getESIComponentFromField<
-  T extends EmployeeStateInsuranceDataType
+  T extends EmployeeStateInsuranceDataType,
 >({
   field,
   value,
@@ -124,7 +123,7 @@ export function getESIComponentFromField<
     template_id: existingComponent?.template_id,
     esi_id: field.id ?? existingComponent?.esi_id,
     target_type: "esi",
-    component_type: "statutory_contribution",
+    component_type: "deduction",
     calculation_value:
       calculationValue?.toFixed(3) ?? existingComponent?.calculation_value,
   };
@@ -136,7 +135,7 @@ export function getPTComponentFromField<
     "gross_salary_range" | "created_at" | "updated_at"
   > & {
     gross_salary_range: any;
-  }
+  },
 >({
   field,
   value,
@@ -172,14 +171,14 @@ export function getPTComponentFromField<
     template_id: existingComponent?.template_id,
     pt_id: field.id ?? existingComponent?.pt_id,
     target_type: "pt",
-    component_type: "statutory_contribution",
+    component_type: "deduction",
     calculation_value:
       calculationValue?.toFixed(3) || existingComponent?.calculation_value,
   };
 }
 
 export function getLWFComponentFromField<
-  T extends Omit<LabourWelfareFundDatabaseRow, "created_at" | "updated_at">
+  T extends Omit<LabourWelfareFundDatabaseRow, "created_at" | "updated_at">,
 >({
   field,
   existingComponent,
@@ -209,7 +208,7 @@ export function getLWFComponentFromField<
     template_id: existingComponent?.template_id,
     lwf_id: field.id ?? existingComponent?.lwf_id,
     target_type: "lwf",
-    component_type: "statutory_contribution",
+    component_type: "deduction",
     calculation_value:
       calculationValue?.toFixed(3) || existingComponent?.calculation_value,
   };
@@ -320,15 +319,44 @@ export function calculateProRataAmount({
 }
 
 export function calculateSalaryTotalNetAmount(
-  salaryData: SalaryEntriesDatabaseUpdate[]
+  salaryDataArray: Record<string, any>[]
 ): number {
-  return salaryData.reduce((total, entry) => {
-    if (entry.type === "earning" || entry.type === "bonus") {
-      return total + (entry?.amount ?? 0);
+  let totalNetPay = 0;
+
+  for (const employeeData of salaryDataArray) {
+    for (const value of Object.values(employeeData)) {
+      if (
+        value &&
+        typeof value === "object" &&
+        "amount" in value &&
+        "type" in value
+      ) {
+        const amount = Number(value.amount) || 0;
+        if (value.type === "earning") {
+          totalNetPay += amount;
+        } else if (value.type === "deduction") {
+          totalNetPay -= amount;
+        }
+      }
     }
-    if (entry.type === "deduction" || entry.type === "statutory_contribution") {
-      return total - (entry?.amount ?? 0);
-    }
-    return Math.round(total);
-  }, 0);
+  }
+
+  return totalNetPay;
 }
+
+
+
+export const calculateNetAmountAfterEntryCreated = (employee: any): number => {
+    let gross = 0;
+    let deductions = 0;
+
+    for (const entry of employee.salary_entries.salary_field_values) {
+      const amount = entry.amount ?? 0;
+      const type = entry.payroll_fields?.type;
+
+      if (type === "earning") gross += amount;
+      else if (type === "deduction") deductions += amount;
+    }
+
+    return gross - deductions;
+  };

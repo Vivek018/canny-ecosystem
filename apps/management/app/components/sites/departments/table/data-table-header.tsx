@@ -9,10 +9,7 @@ type Props = {
 };
 
 // make sure the order is same as header order
-export const groupDataArray = [
-  "name",
-  "created_at",
-];
+export const departmentDataArray = ["name", "created_at"];
 
 export function DataTableHeader({ table, className, loading }: Props) {
   const columnName = (id: string) =>
@@ -24,7 +21,7 @@ export function DataTableHeader({ table, className, loading }: Props) {
   return (
     <TableHeader className={className}>
       <TableRow className="h-[45px] hover:bg-transparent">
-        {groupDataArray?.map((id) => {
+        {departmentDataArray?.map((id) => {
           return (
             <TableHead key={id} className={cn("px-4 py-2")}>
               <Button

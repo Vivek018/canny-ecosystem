@@ -1,9 +1,9 @@
 import {
   hasPermission,
   isGoodStatus,
-  GroupsSchema,
   replaceUnderscore,
   createRole,
+  DepartmentsSchema,
 } from "@canny_ecosystem/utils";
 import { Field } from "@canny_ecosystem/ui/forms";
 import { getInitialValueFromZod, replaceDash } from "@canny_ecosystem/utils";
@@ -40,11 +40,11 @@ import { safeRedirect } from "@/utils/server/http.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
-import type { GroupDatabaseUpdate } from "@canny_ecosystem/supabase/types";
-import { createGroup } from "@canny_ecosystem/supabase/mutations";
-import { UPDATE_GROUP_TAG } from "./$groupId.update-group";
+import type { DepartmentsDatabaseUpdate } from "@canny_ecosystem/supabase/types";
+import { createDepartment } from "@canny_ecosystem/supabase/mutations";
+import { UPDATE_DEPARTMENT_TAG } from "./$departmentId.update-department";
 
-export const CREATE_GROUP_TAG = "create-group";
+export const CREATE_DEPARTMENT_TAG = "create-department";
 
 export async function loader({
   request,
@@ -53,7 +53,7 @@ export async function loader({
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${createRole}:${attribute.groups}`)) {
+  if (!hasPermission(user?.role!, `${createRole}:${attribute.departments}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
@@ -62,7 +62,7 @@ export async function loader({
 
     return json({
       status: "success",
-      message: "Group form loaded",
+      message: "Department form loaded",
       siteId,
       error: null,
     });
@@ -86,7 +86,7 @@ export async function action({
     const formData = await request.formData();
 
     const submission = parseWithZod(formData, {
-      schema: GroupsSchema,
+      schema: DepartmentsSchema,
     });
 
     if (submission.status !== "success") {
@@ -96,7 +96,7 @@ export async function action({
       );
     }
 
-    const { status, error } = await createGroup({
+    const { status, error } = await createDepartment({
       supabase,
       data: submission.value,
     });
@@ -104,13 +104,13 @@ export async function action({
     if (isGoodStatus(status))
       return json({
         status: "success",
-        message: "Group created successfully",
+        message: "Department created successfully",
         error: null,
       });
 
     return json({
       status: "error",
-      message: "Failed to create group",
+      message: "Failed to create department",
       error,
     });
   } catch (error) {
@@ -122,23 +122,26 @@ export async function action({
   }
 }
 
-export default function CreateGroup({
+export default function CreateDepartment({
   updateValues,
 }: {
-  updateValues?: GroupDatabaseUpdate | null;
+  updateValues?: DepartmentsDatabaseUpdate | null;
 }) {
   const { siteId } = useLoaderData<typeof loader>();
 
   const actionData = useActionData<typeof action>();
-  const GROUP_TAG = updateValues ? UPDATE_GROUP_TAG : CREATE_GROUP_TAG;
+  const DEPARTMENT_TAG = updateValues
+    ? UPDATE_DEPARTMENT_TAG
+    : CREATE_DEPARTMENT_TAG;
 
-  const initialValues = updateValues ?? getInitialValueFromZod(GroupsSchema);
+  const initialValues =
+    updateValues ?? getInitialValueFromZod(DepartmentsSchema);
 
   const [form, fields] = useForm({
-    id: GROUP_TAG,
-    constraint: getZodConstraint(GroupsSchema),
+    id: DEPARTMENT_TAG,
+    constraint: getZodConstraint(DepartmentsSchema),
     onValidate({ formData }) {
-      return parseWithZod(formData, { schema: GroupsSchema });
+      return parseWithZod(formData, { schema: DepartmentsSchema });
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
@@ -155,7 +158,7 @@ export default function CreateGroup({
     if (!actionData) return;
 
     if (actionData?.status === "success") {
-      clearExactCacheEntry(cacheKeyPrefix.groups);
+      clearExactCacheEntry(cacheKeyPrefix.departments);
       toast({
         title: "Success",
         description: actionData?.message,
@@ -164,7 +167,7 @@ export default function CreateGroup({
     } else {
       toast({
         title: "Error",
-        description: actionData.error ?? "Groups creation failed",
+        description: actionData.error ?? "Departments creation failed",
         variant: "destructive",
       });
     }
@@ -178,10 +181,10 @@ export default function CreateGroup({
           <Card>
             <CardHeader>
               <CardTitle className="text-3xl capitalize">
-                {replaceDash(GROUP_TAG)}
+                {replaceDash(DEPARTMENT_TAG)}
               </CardTitle>
               <CardDescription>
-                {GROUP_TAG.split("-")[0]} group for the site
+                {DEPARTMENT_TAG.split("-")[0]} department for the site
               </CardDescription>
             </CardHeader>
             <CardContent>

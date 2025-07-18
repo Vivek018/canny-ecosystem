@@ -295,16 +295,6 @@ export const bringDefaultLetterContent = (
     );
   }
 
-  if (data?.statutory_contribution) {
-    for (const [key, value] of Object.entries(data.statutory_contribution)) {
-      const amount = value as number;
-      salaryTablemarkdownLines.push(
-        `| ${key.toUpperCase()}                       | ${amount.toLocaleString()}/-           |`
-      );
-      totalDeductions += amount;
-    }
-  }
-
   if (data?.deduction) {
     for (const [key, value] of Object.entries(data.deduction)) {
       const amount = value as number;

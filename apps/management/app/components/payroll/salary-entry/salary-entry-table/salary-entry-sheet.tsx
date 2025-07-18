@@ -18,20 +18,44 @@ import {
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { FormButtons } from "../../../form/form-buttons";
-import { componentTypeArray, replaceUnderscore, SalaryEntrySchema, transformStringArrayIntoOptions } from "@canny_ecosystem/utils";
+import {
+  componentTypeArray,
+  replaceUnderscore,
+  SalaryEntrySchema,
+  transformStringArrayIntoOptions,
+} from "@canny_ecosystem/utils";
 import { useState } from "react";
-import type { EmployeeDatabaseRow, SalaryEntriesDatabaseRow } from "@canny_ecosystem/supabase/types";
+import type { EmployeeDatabaseRow } from "@canny_ecosystem/supabase/types";
 
 export function SalaryEntrySheet({
   triggerChild,
   salaryEntry,
   employee,
   editable,
-}: { triggerChild: React.ReactNode, salaryEntry: Omit<SalaryEntriesDatabaseRow, "created_at" | "updated_at">; employee: EmployeeDatabaseRow, editable: boolean }) {
-  const name = `${employee?.first_name} ${employee?.middle_name ?? ""} ${employee?.last_name ?? ""
-    }`;
+  payrollId,
+}: {
+  triggerChild: React.ReactNode;
+  salaryEntry: any;
+  employee: EmployeeDatabaseRow;
+  editable: boolean;
+  payrollId: string;
+}) {
+  const name = `${employee?.first_name} ${employee?.middle_name ?? ""} ${
+    employee?.last_name ?? ""
+  }`;
 
   const [resetKey, setResetKey] = useState(Date.now());
+  const typeOptions = transformStringArrayIntoOptions(
+    componentTypeArray as unknown as string[]
+  );
+
+  const formattedDefaultValue = {
+    amount: salaryEntry?.amount,
+    name: salaryEntry?.payroll_fields?.name,
+    type:
+      typeOptions.find((opt) => opt.value === salaryEntry?.payroll_fields?.type)
+        ?.value ?? "",
+  };
 
   const [form, fields] = useForm({
     id: "UPDATE_SALARY_ENTRY",
@@ -41,7 +65,12 @@ export function SalaryEntrySheet({
     },
     shouldValidate: "onInput",
     shouldRevalidate: "onInput",
-    defaultValue: salaryEntry,
+    defaultValue: {
+      ...formattedDefaultValue,
+      salaryFieldValues_id: salaryEntry.id,
+      payrollFields_id: salaryEntry.payroll_fields.id,
+      payroll_id: payrollId,
+    },
   });
 
   return (
@@ -71,19 +100,23 @@ export function SalaryEntrySheet({
               method="POST"
               {...getFormProps(form)}
               className="flex flex-col"
-              action={`/payroll/run-payroll/${salaryEntry?.payroll_id}/${salaryEntry?.id}/update-salary-entry`}
+              action={`/payroll/run-payroll/${payrollId}/${salaryEntry?.id}/update-salary-entry`}
             >
               <input
-                {...getInputProps(fields.id, { type: "hidden" })}
+                {...getInputProps(fields.salaryFieldValues_id, {
+                  type: "hidden",
+                })}
               />
               <input
-                {...getInputProps(fields.employee_id, { type: "hidden" })}
+                {...getInputProps(fields.payrollFields_id, { type: "hidden" })}
               />
-              <input {...getInputProps(fields.payroll_id, { type: "hidden" })} />
+              <input
+                {...getInputProps(fields.payroll_id, { type: "hidden" })}
+              />
 
               <Field
                 inputProps={{
-                  ...getInputProps(fields.field_name, { type: "text" }),
+                  ...getInputProps(fields.name, { type: "text" }),
                   placeholder: "Enter field name",
                   className: "capitalize",
                   readOnly: true,
@@ -91,7 +124,7 @@ export function SalaryEntrySheet({
                 labelProps={{
                   children: "Field Name",
                 }}
-                errors={fields.field_name.errors}
+                errors={fields.name.errors}
               />
               <Field
                 inputProps={{
@@ -109,7 +142,9 @@ export function SalaryEntrySheet({
               <SearchableSelectField
                 key={resetKey + 1}
                 className="capitalize"
-                options={transformStringArrayIntoOptions(componentTypeArray as unknown as string[])}
+                options={transformStringArrayIntoOptions(
+                  componentTypeArray as unknown as string[]
+                )}
                 inputProps={{
                   ...getInputProps(fields.type, { type: "text" }),
                   readOnly: !editable,
@@ -120,45 +155,6 @@ export function SalaryEntrySheet({
                 }}
                 errors={fields.type.errors}
               />
-              {/* <div className='grid grid-cols-2 place-content-center justify-between gap-x-4'>
-                <CheckboxField
-                  buttonProps={getInputProps(fields.is_pro_rata, {
-                    type: "checkbox",
-                    readOnly: !editable,
-                  })}
-                  labelProps={{
-                    children: "Calculate on pro-rata basis",
-                  }}
-                />
-
-                <CheckboxField
-                  buttonProps={getInputProps(fields.is_overtime, {
-                    type: "checkbox",
-                    
-                  })}
-                  labelProps={{
-                    children: "Calculate on overtime basis",
-                  }}
-                />
-
-                <CheckboxField
-                  buttonProps={getInputProps(fields.consider_for_epf, {
-                    type: "checkbox",
-                  })}
-                  labelProps={{
-                    children: "Consider for EPF Contribution",
-                  }}
-                />
-
-                <CheckboxField
-                  buttonProps={getInputProps(fields.consider_for_esic, {
-                    type: "checkbox",
-                  })}
-                  labelProps={{
-                    children: "Consider for ESI Contribution",
-                  }}
-                />
-              </div> */}
             </Form>
           </FormProvider>
         </div>
@@ -176,3 +172,43 @@ export function SalaryEntrySheet({
     </Sheet>
   );
 }
+
+// {/* <div className='grid grid-cols-2 place-content-center justify-between gap-x-4'>
+//   <CheckboxField
+//     buttonProps={getInputProps(fields.is_pro_rata, {
+//       type: "checkbox",
+//       readOnly: !editable,
+//     })}
+//     labelProps={{
+//       children: "Calculate on pro-rata basis",
+//     }}
+//   />
+
+//   <CheckboxField
+//     buttonProps={getInputProps(fields.is_overtime, {
+//       type: "checkbox",
+
+//     })}
+//     labelProps={{
+//       children: "Calculate on overtime basis",
+//     }}
+//   />
+
+//   <CheckboxField
+//     buttonProps={getInputProps(fields.consider_for_epf, {
+//       type: "checkbox",
+//     })}
+//     labelProps={{
+//       children: "Consider for EPF Contribution",
+//     }}
+//   />
+
+//   <CheckboxField
+//     buttonProps={getInputProps(fields.consider_for_esic, {
+//       type: "checkbox",
+//     })}
+//     labelProps={{
+//       children: "Consider for ESI Contribution",
+//     }}
+//   />
+// </div> */}

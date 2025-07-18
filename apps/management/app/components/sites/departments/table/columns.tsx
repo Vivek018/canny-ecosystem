@@ -5,22 +5,22 @@ import {
   updateRole,
 } from "@canny_ecosystem/utils";
 import type { ColumnDef } from "@tanstack/react-table";
-import { GroupOptionsDropdown } from "./group-options-dropdown";
+import { DepartmentOptionsDropdown } from "./department-options-dropdown";
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import type { GroupDatabaseRow } from "@canny_ecosystem/supabase/types";
+import type { DepartmentsDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
 
-export type GroupsType = {
+export type DepartmentsType = {
   id: string;
   name: string;
-  created_at: GroupDatabaseRow["created_at"] | string;
+  created_at: DepartmentsDatabaseRow["created_at"] | string;
 };
 
-export const columns: ColumnDef<GroupsType>[] = [
+export const columns: ColumnDef<DepartmentsType>[] = [
   {
     accessorKey: "name",
     header: "Name",
@@ -47,7 +47,7 @@ export const columns: ColumnDef<GroupsType>[] = [
     cell: ({ row }) => {
       const { role } = useUser();
       return (
-        <GroupOptionsDropdown
+        <DepartmentOptionsDropdown
           key={row.original.id}
           id={row.original.id}
           triggerChild={
@@ -56,8 +56,14 @@ export const columns: ColumnDef<GroupsType>[] = [
                 variant="ghost"
                 className={cn(
                   "h-8 w-8 p-0",
-                  !hasPermission(role, `${updateRole}:${attribute.groups}`) &&
-                    !hasPermission(role, `${deleteRole}:${attribute.groups}`) &&
+                  !hasPermission(
+                    role,
+                    `${updateRole}:${attribute.departments}`
+                  ) &&
+                    !hasPermission(
+                      role,
+                      `${deleteRole}:${attribute.departments}`
+                    ) &&
                     "hidden"
                 )}
               >

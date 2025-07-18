@@ -112,6 +112,7 @@ export function SalaryPayrollImportData({
         };
       })
       .filter((item) => item.employee_id);
+
     submit(
       {
         type: "salary-import",

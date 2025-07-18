@@ -2,11 +2,11 @@ import type {
   EmployeeDatabaseRow,
   EmployeeProjectAssignmentDatabaseInsert,
   EmployeeProjectAssignmentDatabaseRow,
-  GroupDatabaseRow,
   InferredType,
   ProjectDatabaseRow,
   SiteDatabaseRow,
   TypedSupabaseClient,
+  DepartmentsDatabaseRow,
 } from "../types";
 import { HARD_QUERY_LIMIT, MID_QUERY_LIMIT } from "../constant";
 
@@ -470,31 +470,31 @@ export async function getSiteIdsBySiteNames({
   return { data, error };
 }
 
-export async function getGroupsBySiteId({
+export async function getDepartmentsBySiteId({
   supabase,
   siteId,
 }: {
   supabase: TypedSupabaseClient;
   siteId: string;
 }) {
-
   const columns = ["id", "name", "site_id", "created_at"] as const;
 
   const { data, error } = await supabase
-    .from("groups")
+    .from("departments")
     .select(columns.join(","))
     .eq("site_id", siteId)
-    .returns<InferredType<GroupDatabaseRow, (typeof columns)[number]>[]>();
-
+    .returns<
+      InferredType<DepartmentsDatabaseRow, (typeof columns)[number]>[]
+    >();
 
   if (error) {
-    console.error("getGroupsBySiteId Error", error);
+    console.error("getDepartmentsBySiteId Error", error);
   }
 
   return { data, error };
 }
 
-export async function getGroupById({
+export async function getDepartmentById({
   supabase,
   id,
 }: {
@@ -504,14 +504,13 @@ export async function getGroupById({
   const columns = ["id", "name", "site_id"] as const;
 
   const { data, error } = await supabase
-    .from("groups")
+    .from("departments")
     .select(columns.join(","))
     .eq("id", id)
-    .single<GroupDatabaseRow>();
-
+    .single<DepartmentsDatabaseRow>();
 
   if (error) {
-    console.error("getGroupsBySiteId Error", error);
+    console.error("getDepartmentById Error", error);
   }
 
   return { data, error };

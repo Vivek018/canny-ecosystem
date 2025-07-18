@@ -166,7 +166,7 @@ export const attribute = {
   paySequence: "pay_sequence",
   companyDocuments: "company_documents",
   invoice: "invoice",
-  groups: "groups",
+  departments: "departments",
 };
 
 export const months: { [key: string]: number } = {

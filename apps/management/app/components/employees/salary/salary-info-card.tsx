@@ -31,7 +31,6 @@ export default function SalaryInfoCard({
     if (item.type === "earning") {
       earningTotal += item.amount;
     } else if (
-      item.type === "statutory_contribution" ||
       item.type === "deduction"
     ) {
       deductionTotal += item.amount;
@@ -128,7 +127,6 @@ export default function SalaryInfoCard({
           {Object.entries(salaryData?.fields)
             .filter(
               ([, value]) =>
-                value.type === "statutory_contribution" ||
                 value.type === "deduction"
             )
             .map(([key, value]) => (

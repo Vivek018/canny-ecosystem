@@ -60,7 +60,7 @@ export function SalaryEntryComponent({
   noButtons = false,
   env,
   fromWhere,
-  groupOptions,
+  departmentOptions,
   siteOptions,
 }: {
   data: SalaryEntriesWithEmployee[];
@@ -69,7 +69,7 @@ export function SalaryEntryComponent({
   env: SupabaseEnv;
   fromWhere: "runpayroll" | "payrollhistory";
   siteOptions: any[];
-  groupOptions: any[];
+  departmentOptions: any[];
 }) {
   const { selectedRows } = useSalaryEntriesStore();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -118,7 +118,7 @@ export function SalaryEntryComponent({
             .filter((option) => values.includes(String(option.value)))
             .map((option) => option.label)
             .join(", ")
-        : groupOptions
+        : departmentOptions
             .filter((option) => values.includes(String(option.value)))
             .map((option) => option.label)
             .join(", ");
@@ -190,24 +190,23 @@ export function SalaryEntryComponent({
   ): Record<string, { amount: number; type: string } | number> {
     const fieldTotals: Record<string, { amount: number; type: string }> = {};
     let gross = 0;
-    let statutoryContributions = 0;
     let deductions = 0;
 
     for (const employee of employees) {
-      for (const entry of employee.salary_entries) {
+      const fieldValues = employee.salary_entries?.salary_field_values ?? [];
+
+      for (const entry of fieldValues) {
         const amount = entry.amount ?? 0;
-        const fieldName = entry.field_name;
-        const fieldType = entry.type;
+        const fieldName = entry.payroll_fields.name;
+        const fieldType = entry.payroll_fields.type;
 
         if (!fieldTotals[fieldName]) {
-          fieldTotals[fieldName] = { amount: 0, type: fieldType! };
+          fieldTotals[fieldName] = { amount: 0, type: fieldType };
         }
         fieldTotals[fieldName].amount += amount;
 
         if (fieldType === "earning") {
           gross += amount;
-        } else if (fieldType === "statutory_contribution") {
-          statutoryContributions += amount;
         } else if (fieldType === "deduction") {
           deductions += amount;
         }
@@ -217,8 +216,8 @@ export function SalaryEntryComponent({
     return {
       ...fieldTotals,
       GROSS: gross,
-      DEDUCTION: statutoryContributions + deductions,
-      TOTAL: gross - statutoryContributions - deductions,
+      DEDUCTION: deductions,
+      TOTAL: gross - deductions,
     };
   }
 
@@ -232,8 +231,7 @@ export function SalaryEntryComponent({
   const earningCount = earningEntries.length;
 
   const deductiveEntries = Object.entries(totals).filter(
-    ([, value]: any) =>
-      value.type === "deduction" || value.type === "statutory_contribution"
+    ([, value]: any) => value.type === "deduction"
   );
   const deductiveCount = deductiveEntries.length;
 
@@ -316,8 +314,7 @@ export function SalaryEntryComponent({
                   {[
                     Object.entries(totals).map(
                       ([key, value]: any) =>
-                        (value.type === "deduction" ||
-                          value.type === "statutory_contribution") && (
+                        value.type === "deduction" && (
                           <React.Fragment key={key}>
                             <p>{key}</p>
                             <p className=" text-muted-foreground">
@@ -460,8 +457,8 @@ export function SalaryEntryComponent({
       <div className="w-full flex items-center justify-between gap-3 pb-4">
         <div className="w-1/3">
           <MultiSelectCombobox
-            label="Groups"
-            options={payrollData?.project_id ? siteOptions : groupOptions}
+            label="Departments"
+            options={payrollData?.project_id ? siteOptions : departmentOptions}
             value={payrollData?.project_id ? site : group}
             onChange={handleFieldChange}
             renderItem={(option) =>
