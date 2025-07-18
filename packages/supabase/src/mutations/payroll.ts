@@ -181,7 +181,7 @@ export async function createSalaryPayroll({
   };
 }
 
-export async function createSalaryPayrollByGroup({
+export async function createSalaryPayrollByDepartment({
   supabase,
   data,
   bypassAuth = false,

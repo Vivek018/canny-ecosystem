@@ -4,7 +4,7 @@ import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import {
   createAttendanceByPayrollImportAndGiveID,
   createSalaryPayroll,
-  createSalaryPayrollByGroup,
+  createSalaryPayrollByDepartment,
 } from "@canny_ecosystem/supabase/mutations";
 import { getPayrollById } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
@@ -125,7 +125,7 @@ export async function action({
 
       totalNetAmount = calculateSalaryTotalNetAmount(salaryImportData) ?? 69;
 
-      if (different === "grouped") {
+      if (different === "different") {
         const payrollId = formData.get("payrollId") as string;
 
         const { data } = await getPayrollById({ payrollId, supabase });
@@ -134,11 +134,11 @@ export async function action({
           status,
           error: salaryError,
           message,
-        } = await createSalaryPayrollByGroup({
+        } = await createSalaryPayrollByDepartment({
           supabase,
           data: {
             payrollId,
-            salaryData: transformedData,
+            salaryData: [],
             oldTotalEmployees: data?.total_employees ?? 0,
             totalEmployees:
               Number(salaryImportData.length) + Number(data?.total_employees),
@@ -464,5 +464,3 @@ export default function CreatePayroll() {
 
   return null;
 }
-
-

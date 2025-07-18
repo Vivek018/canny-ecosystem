@@ -90,6 +90,7 @@ export async function action({ request }: ActionFunctionArgs) {
         supabase,
         payrollId,
       });
+
       return json({
         status: "success",
         message: "Salary Entry updated successfully",
@@ -122,7 +123,6 @@ export default function UpdateSalaryEntry() {
   const { payrollId } = useParams();
   const { toast } = useToast();
   const navigate = useNavigate();
-console.log(payrollId);
 
   useEffect(() => {
     if (actionData) {

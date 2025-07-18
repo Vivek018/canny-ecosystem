@@ -80,7 +80,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const url = new URL(request.url);
     const searchParams = new URLSearchParams(url.searchParams);
     let site = searchParams.get("site")?.split(",") ?? [];
-    let group = searchParams.get("group")?.split(",") ?? [];
+    let department = searchParams.get("department")?.split(",") ?? [];
     let shouldRedirect = false;
     if (
       site.length === 0 &&
@@ -93,12 +93,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     if (
-      group.length === 0 &&
+      department.length === 0 &&
       payrollData?.project_site_id &&
       departmentOptions.length > 0
     ) {
-      group = [departmentOptions[0].value];
-      searchParams.set("group", group.join(","));
+      department = [departmentOptions[0].value];
+      searchParams.set("department", department.join(","));
       shouldRedirect = true;
     }
     if (shouldRedirect) {
@@ -109,7 +109,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       payrollId: payrollId ?? "",
       params: {
         site,
-        group,
+        department,
       },
     });
 

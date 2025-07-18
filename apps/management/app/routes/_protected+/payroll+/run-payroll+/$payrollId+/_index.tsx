@@ -1,6 +1,6 @@
 import { ErrorBoundary } from "@/components/error-boundary";
 import { LoadingSpinner } from "@/components/loading-spinner";
-import { ImportGroupSalaryPayrollModal } from "@/components/payroll/import-export/import-group-salary-modal-payroll";
+import { ImportDepartmentSalaryPayrollModal } from "@/components/payroll/import-export/import-department-salary-modal-payroll";
 
 import { SalaryEntryComponent } from "@/components/payroll/salary-entry/salary-entry-component";
 import { cacheKeyPrefix } from "@/constant";
@@ -81,7 +81,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const url = new URL(request.url);
     const searchParams = new URLSearchParams(url.searchParams);
     let site = searchParams.get("site")?.split(",") ?? [];
-    let group = searchParams.get("group")?.split(",") ?? [];
+    let department = searchParams.get("department")?.split(",") ?? [];
 
     let shouldRedirect = false;
     if (
@@ -95,12 +95,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     if (
-      group.length === 0 &&
+      department.length === 0 &&
       payrollData?.project_site_id &&
       departmentOptions.length > 0
     ) {
-      group = [departmentOptions[0].value];
-      searchParams.set("group", group.join(","));
+      department = [departmentOptions[0].value];
+      searchParams.set("department", department.join(","));
       shouldRedirect = true;
     }
     if (shouldRedirect) {
@@ -112,7 +112,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       payrollId: payrollId ?? "",
       params: {
         site,
-        group,
+        department,
       },
     });
 
@@ -277,7 +277,7 @@ export default function RunPayrollId() {
           }}
         </Await>
       </Suspense>
-      <ImportGroupSalaryPayrollModal />
+      <ImportDepartmentSalaryPayrollModal />
     </>
   );
 }

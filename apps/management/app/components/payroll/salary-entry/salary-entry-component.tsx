@@ -47,7 +47,7 @@ import {
   AlertDialogTrigger,
 } from "@canny_ecosystem/ui/alert-dialog";
 import { Label } from "@canny_ecosystem/ui/label";
-import { ImportGroupPayrollDialog } from "../import-grouped-payroll-dialog";
+import { ImportDepartmentPayrollDialog } from "../import-department-payroll-dialog";
 import { useSalaryEntriesStore } from "@/store/salary-entries";
 import { MultiSelectCombobox } from "@canny_ecosystem/ui/multi-select-combobox";
 import { clearCacheEntry } from "@/utils/cache";
@@ -92,21 +92,21 @@ export function SalaryEntryComponent({
   const [site, setSite] = useState<string[]>(
     () => searchParams.get("site")?.split(",") ?? []
   );
-  const [group, setGroup] = useState<string[]>(
-    () => searchParams.get("group")?.split(",") ?? []
+  const [department, setDepartment] = useState<string[]>(
+    () => searchParams.get("department")?.split(",") ?? []
   );
 
   let redirectUrl = `/payroll/run-payroll/${payrollId}`;
   if (site.length) {
     redirectUrl += `?site=${searchParams.getAll("site").join(",")}`;
-  } else if (group.length) {
-    redirectUrl += `?group=${searchParams.getAll("group").join(",")}`;
+  } else if (department.length) {
+    redirectUrl += `?department=${searchParams.getAll("department").join(",")}`;
   }
 
   const handleFieldChange = (newSelectedFields: string[]) => {
     payrollData.project_id
       ? setSite(newSelectedFields)
-      : setGroup(newSelectedFields);
+      : setDepartment(newSelectedFields);
   };
 
   const handleRenderSelectedItem = (values: string[]): string => {
@@ -139,15 +139,15 @@ export function SalaryEntryComponent({
     }
 
     if (payrollData.project_site_id) {
-      if (group.length) {
-        newParams.set("group", group.join(","));
+      if (department.length) {
+        newParams.set("department", department.join(","));
       } else {
-        newParams.delete("group");
+        newParams.delete("department");
       }
     }
 
     setSearchParams(newParams);
-  }, [site, group]);
+  }, [site, department]);
 
   const [searchString, setSearchString] = useState("");
   const [tableData, setTableData] = useState(
@@ -459,7 +459,7 @@ export function SalaryEntryComponent({
           <MultiSelectCombobox
             label="Departments"
             options={payrollData?.project_id ? siteOptions : departmentOptions}
-            value={payrollData?.project_id ? site : group}
+            value={payrollData?.project_id ? site : department}
             onChange={handleFieldChange}
             renderItem={(option) =>
               payrollData?.project_id ? (
@@ -472,7 +472,7 @@ export function SalaryEntryComponent({
               ) : (
                 <div
                   role="option"
-                  aria-selected={group.includes(String(option.value))}
+                  aria-selected={department.includes(String(option.value))}
                 >
                   {option.label}
                 </div>
@@ -544,7 +544,7 @@ export function SalaryEntryComponent({
           </Button>
         </div>
         <div className={cn(fromWhere === "payrollhistory" && "hidden")}>
-          <ImportGroupPayrollDialog />
+          <ImportDepartmentPayrollDialog />
         </div>
         <PayrollActions
           className={cn(

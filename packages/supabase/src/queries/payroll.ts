@@ -241,10 +241,10 @@ export const getSalaryEntriesByPayrollId = async ({
   payrollId: string;
   params: {
     site?: string[];
-    group?: string[];
+    department?: string[];
   };
 }) => {
-  const { group, site } = params;
+  const { department, site } = params;
   const query = supabase
     .from("monthly_attendance")
     .select(
@@ -285,8 +285,8 @@ export const getSalaryEntriesByPayrollId = async ({
     query.in("salary_entries.site_id", site);
   }
 
-  if (group?.length) {
-    query.in("salary_entries.department_id", group);
+  if (department?.length) {
+    query.in("salary_entries.department_id", department);
   }
 
   const { data, count, error } = await query;

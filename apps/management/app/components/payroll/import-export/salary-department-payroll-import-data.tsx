@@ -119,7 +119,7 @@ export function SalaryDepartmentPayrollImportData({
     submit(
       {
         type: "salary-import",
-        different: "grouped",
+        different: "different",
         payrollId: payrollId,
         salaryImportData: JSON.stringify(updatedData),
         skipped:
@@ -127,7 +127,7 @@ export function SalaryDepartmentPayrollImportData({
             ? importData.data.length - updatedData.length
             : 0,
         failedRedirect: updatedData[0].deaprtment_id
-          ? `/payroll/run-payroll/${payrollId}?group=${updatedData[0]?.group_id}`
+          ? `/payroll/run-payroll/${payrollId}?department=${updatedData[0]?.department_id}`
           : `/payroll/run-payroll/${payrollId}?site=${updatedData[0]?.site_id}`,
       },
       {

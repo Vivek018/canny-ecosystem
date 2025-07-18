@@ -119,7 +119,7 @@ export function SalaryEntrySheet({
                   ...getInputProps(fields.name, { type: "text" }),
                   placeholder: "Enter field name",
                   className: "capitalize",
-                  readOnly: true,
+                  readOnly: !editable,
                 }}
                 labelProps={{
                   children: "Field Name",
