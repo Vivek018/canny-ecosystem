@@ -1,8 +1,13 @@
 import type {
   PayrollDatabaseInsert,
   PayrollDatabaseUpdate,
+  PayrollFieldsDatabaseInsert,
+  PayrollFieldsDatabaseRow,
+  PayrollFieldsDatabaseUpdate,
   SalaryEntriesDatabaseInsert,
   SalaryEntriesDatabaseUpdate,
+  SalaryFieldValuesDatabaseInsert,
+  SalaryFieldValuesDatabaseUpdate,
   TypedSupabaseClient,
 } from "../types";
 import {
@@ -11,7 +16,7 @@ import {
   getSalaryEntryById,
 } from "../queries";
 import {
-  calculateSalaryTotalNetAmount,
+  calculateNetAmountAfterEntryCreated,
   convertToNull,
   isGoodStatus,
 } from "@canny_ecosystem/utils";
@@ -27,13 +32,15 @@ export async function createSalaryPayroll({
   data: {
     title: string;
     run_date?: string;
+    rawData: any[];
     status?: "pending" | "approved" | "submitted";
     type: "salary";
-    salaryData: Omit<SalaryEntriesDatabaseInsert, "payroll_id">[];
+    salaryEntryData: Omit<SalaryEntriesDatabaseInsert, "payroll_id">[];
     totalEmployees: number;
     totalNetAmount: number;
     month: number;
     year: number;
+    payrollFieldsData: PayrollFieldsDatabaseRow[];
   };
   companyId: string;
   bypassAuth?: boolean;
@@ -72,7 +79,27 @@ export async function createSalaryPayroll({
     return { status: payrollStatus, error: payrollError };
   }
 
-  const salaryPayrollEntries = data.salaryData?.map((value) => ({
+  const finalPayrollFields = data.payrollFieldsData?.map((value) => ({
+    ...value,
+    payroll_id: payrollData.id,
+  }));
+
+  const {
+    data: payrollFieldsData,
+    status: payrollFieldsStatus,
+    error: payrollFieldsError,
+  } = await createPayrollFields({
+    supabase,
+    data: finalPayrollFields as unknown as PayrollFieldsDatabaseInsert[],
+    onConflict: "name, payroll_id",
+  });
+
+  if (!payrollFieldsData || payrollFieldsError) {
+    console.error("createPayrollFields payroll error", payrollFieldsError);
+    return { status: payrollFieldsStatus, error: payrollFieldsError };
+  }
+
+  const salaryPayrollEntries = data.salaryEntryData?.map((value) => ({
     ...value,
     payroll_id: payrollData.id,
   }));
@@ -84,67 +111,77 @@ export async function createSalaryPayroll({
   } = await createSalaryEntries({
     supabase,
     data: salaryPayrollEntries,
-    onConflict: "monthly_attendance_id, employee_id, field_name",
+    onConflict: "monthly_attendance_id",
     bypassAuth,
   });
 
-  if (isGoodStatus(salaryEntriesStatus)) {
-    const uniqueEmployeeIds = new Set(
-      salaryEntriesData?.map((entry) => entry?.employee_id)
-    );
-    const salaryEntriesEmployeeLength = uniqueEmployeeIds.size;
+  if (!salaryEntriesData || salaryEntriesError) {
+    console.error("createPayrollFields payroll error", salaryEntriesError);
+    return { status: salaryEntriesStatus, error: salaryEntriesError };
+  }
 
-    const salaryEntriesNetAmount = calculateSalaryTotalNetAmount(
-      salaryEntriesData!
+  const finalPayrollFieldEntries = [];
+
+  const payrollFieldMap: { [key: string]: (typeof payrollFieldsData)[0] } = {};
+
+  for (const field of payrollFieldsData) {
+    const normalizedName = field.name.trim().toUpperCase();
+    payrollFieldMap[normalizedName] = field;
+  }
+
+  for (const record of data.rawData) {
+    const employeeId = record.employee_id;
+
+    const salaryEntry = salaryEntriesData!.find(
+      (entry) => entry.monthly_attendance?.employee_id === employeeId
     );
 
-    if (salaryEntriesEmployeeLength === 0 || salaryEntriesNetAmount === 0) {
-      const { status, error } = await deletePayroll({
-        supabase,
-        id: payrollData?.id ?? "",
-        bypassAuth,
-      });
-      if (isGoodStatus(status)) {
-        return {
-          status,
-          message:
-            "Deleted Salary Payroll Cause No Unique Employees in Payroll Or Amount existed",
-          error,
-        };
-      }
-    } else if (
-      data?.totalEmployees !== salaryEntriesEmployeeLength ||
-      data?.totalNetAmount !== salaryEntriesNetAmount
-    ) {
-      const { status, error } = await updatePayroll({
-        supabase,
-        data: {
-          id: payrollData?.id,
-          total_employees: salaryEntriesEmployeeLength,
-          total_net_amount: salaryEntriesNetAmount,
-        },
-        bypassAuth,
-      });
-      if (isGoodStatus(status)) {
-        return {
-          status,
-          message: `Skipped ${
-            data?.totalEmployees - (salaryEntriesEmployeeLength ?? 0)
-          } Employees cause they already exist in other payroll`,
-          error,
-        };
+    if (!salaryEntry) continue;
+
+    for (const [key, value] of Object.entries(record)) {
+      const normalizedKey = key.trim().toUpperCase();
+      const matchedField = payrollFieldMap[normalizedKey];
+
+      if (
+        matchedField &&
+        value &&
+        typeof value === "object" &&
+        value !== null &&
+        "amount" in value &&
+        typeof (value as { amount?: unknown }).amount === "number"
+      ) {
+        finalPayrollFieldEntries.push({
+          payroll_field_id: matchedField.id,
+          amount: (value as { amount: number }).amount,
+          salary_entry_id: salaryEntry.id,
+        });
       }
     }
   }
 
+  const { status: salaryFieldEntriesStatus, error: salaryFieldEntriesError } =
+    await createSalaryFieldValues({
+      supabase,
+      data: finalPayrollFieldEntries,
+      bypassAuth,
+    });
+
+  if (isGoodStatus(salaryFieldEntriesStatus)) {
+    return {
+      status: "success",
+      message: "Payroll created successfully",
+      error: null,
+    };
+  }
+
   return {
-    status: payrollStatus ?? salaryEntriesStatus,
-    error: payrollError ?? salaryEntriesError,
+    status: payrollStatus ?? salaryEntriesStatus ?? salaryFieldEntriesStatus,
+    error: payrollError ?? salaryEntriesError ?? salaryFieldEntriesError,
     message: null,
   };
 }
 
-export async function createSalaryPayrollByGroup({
+export async function createSalaryPayrollByDepartment({
   supabase,
   data,
   bypassAuth = false,
@@ -202,53 +239,53 @@ export async function createSalaryPayrollByGroup({
   } = await createSalaryEntries({
     supabase,
     data: salaryPayrollEntries,
-    onConflict: "monthly_attendance_id, employee_id, field_name",
+    onConflict: "monthly_attendance_id",
     bypassAuth,
   });
 
-  if (isGoodStatus(salaryEntriesStatus)) {
-    const uniqueEmployeeIds = new Set(
-      salaryEntriesData?.map((entry) => entry?.employee_id)
-    );
-    const salaryEntriesEmployeeLength = uniqueEmployeeIds.size;
+  // if (isGoodStatus(salaryEntriesStatus)) {
+  //   const uniqueEmployeeIds = new Set(
+  //     salaryEntriesData?.map((entry) => entry?.employee_id)
+  //   );
+  //   const salaryEntriesEmployeeLength = uniqueEmployeeIds.size;
 
-    const salaryEntriesNetAmount = calculateSalaryTotalNetAmount(
-      salaryEntriesData!
-    );
-    if (salaryEntriesEmployeeLength === 0 || salaryEntriesNetAmount === 0) {
-      return {
-        status: "error",
-        message: "No Unique Employees in Payroll Or Amount existed",
-        error: "No entries created as no unique employee",
-      };
-    }
-    if (
-      data?.totalEmployees !== salaryEntriesEmployeeLength ||
-      data?.totalNetAmount !== salaryEntriesNetAmount
-    ) {
-      const { status, error } = await updatePayroll({
-        supabase,
-        data: {
-          id: data?.payrollId,
-          total_employees:
-            Number(data.oldTotalEmployees) + salaryEntriesEmployeeLength,
-          total_net_amount:
-            Number(data.oldTotalNetAmount) + salaryEntriesNetAmount,
-        },
-        bypassAuth,
-      });
-      if (isGoodStatus(status)) {
-        return {
-          status,
-          message: `Skipped ${
-            Number(data?.totalEmployees - data.oldTotalEmployees) -
-            (salaryEntriesEmployeeLength ?? 0)
-          } Employees cause they already exist in other payroll`,
-          error,
-        };
-      }
-    }
-  }
+  //   const salaryEntriesNetAmount = calculateSalaryTotalNetAmount(
+  //     salaryEntriesData!
+  //   );
+  //   if (salaryEntriesEmployeeLength === 0 || salaryEntriesNetAmount === 0) {
+  //     return {
+  //       status: "error",
+  //       message: "No Unique Employees in Payroll Or Amount existed",
+  //       error: "No entries created as no unique employee",
+  //     };
+  //   }
+  //   if (
+  //     data?.totalEmployees !== salaryEntriesEmployeeLength ||
+  //     data?.totalNetAmount !== salaryEntriesNetAmount
+  //   ) {
+  //     const { status, error } = await updatePayroll({
+  //       supabase,
+  //       data: {
+  //         id: data?.payrollId,
+  //         total_employees:
+  //           Number(data.oldTotalEmployees) + salaryEntriesEmployeeLength,
+  //         total_net_amount:
+  //           Number(data.oldTotalNetAmount) + salaryEntriesNetAmount,
+  //       },
+  //       bypassAuth,
+  //     });
+  //     if (isGoodStatus(status)) {
+  //       return {
+  //         status,
+  //         message: `Skipped ${
+  //           Number(data?.totalEmployees - data.oldTotalEmployees) -
+  //           (salaryEntriesEmployeeLength ?? 0)
+  //         } Employees cause they already exist in other payroll`,
+  //         error,
+  //       };
+  //     }
+  //   }
+  // }
 
   return {
     status: payrollStatus ?? salaryEntriesStatus,
@@ -256,10 +293,6 @@ export async function createSalaryPayrollByGroup({
     message: null,
   };
 }
-
-
-
-
 
 export async function deletePayroll({
   supabase,
@@ -323,7 +356,7 @@ export async function createSalaryEntries({
       ignoreDuplicates: true,
       onConflict,
     })
-    .select("id, amount, type, employee_id");
+    .select("id, monthly_attendance(employee_id)");
 
   if (error) {
     console.error("createSalaryEntries Error", error);
@@ -364,10 +397,7 @@ export async function deleteSalaryEntriesFromPayrollAndEmployeeId({
     const { error, status } = await supabase
       .from("salary_entries")
       .delete()
-      .in(
-        "id",
-        salaryEntriesData.salary_entries.map((entry) => entry.id)
-      );
+      .in("id", [salaryEntriesData.salary_entries.id]);
 
     if (isGoodStatus(status)) {
       const { data: payrollData } = await getPayrollById({
@@ -375,9 +405,8 @@ export async function deleteSalaryEntriesFromPayrollAndEmployeeId({
         payrollId,
       });
 
-      const totalNetAmountReduction = calculateSalaryTotalNetAmount(
-        salaryEntriesData.salary_entries
-      );
+      const totalNetAmountReduction =
+        calculateNetAmountAfterEntryCreated(salaryEntriesData);
 
       await updatePayroll({
         supabase,
@@ -449,19 +478,13 @@ export async function updateSalaryEntry({
 
     if (salaryEntryData?.type === "earning") {
       totalNetAmount -= salaryEntryData?.amount;
-    } else if (
-      salaryEntryData?.type === "deduction" ||
-      salaryEntryData?.type === "statutory_contribution"
-    ) {
+    } else if (salaryEntryData?.type === "deduction") {
       totalNetAmount += salaryEntryData?.amount;
     }
 
     if (updateData?.type === "earning") {
       totalNetAmount += updateData?.amount!;
-    } else if (
-      updateData?.type === "deduction" ||
-      updateData?.type === "statutory_contribution"
-    ) {
+    } else if (updateData?.type === "deduction") {
       totalNetAmount -= updateData?.amount!;
     }
 
@@ -551,6 +574,138 @@ export async function updatePayrollById({
   if (error) {
     console.error("updatePayrollById Error:", error);
   }
+
+  return { error, status };
+}
+
+export async function createPayrollFields({
+  supabase,
+  data,
+  onConflict,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  data: PayrollFieldsDatabaseInsert[];
+  onConflict?: string;
+  bypassAuth?: boolean;
+}) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
+  const {
+    data: payrollFieldData,
+    status,
+    error,
+  } = await supabase
+    .from("payroll_fields")
+    .upsert(data, {
+      ignoreDuplicates: true,
+      onConflict,
+    })
+    .select("id, name");
+
+  if (error) {
+    console.error("createPayrollFields Error", error);
+  }
+
+  return { data: payrollFieldData, status, error };
+}
+
+export async function createSalaryFieldValues({
+  supabase,
+  data,
+  bypassAuth = false,
+}: {
+  supabase: TypedSupabaseClient;
+  data: SalaryFieldValuesDatabaseInsert[];
+  bypassAuth?: boolean;
+}) {
+  if (!bypassAuth) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { status: 400, error: "Unauthorized User" };
+    }
+  }
+
+  const { status, error } = await supabase
+    .from("salary_field_values")
+    .upsert(data);
+
+  if (error) {
+    console.error("createSalaryFieldValues Error", error);
+  }
+
+  return { status, error };
+}
+
+export async function updateSalaryFieldValuesById({
+  supabase,
+  data,
+}: {
+  supabase: TypedSupabaseClient;
+  data: SalaryFieldValuesDatabaseUpdate;
+}) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.email) {
+    return {
+      status: 400,
+      error: "No email found",
+    };
+  }
+
+  const updateData = convertToNull(data);
+
+  const { error, status } = await supabase
+    .from("salary_field_values")
+    .update(updateData)
+    .eq("id", data.id ?? "")
+    .single();
+
+  if (error) console.error("updateSalaryFieldValuesById Error:", error);
+
+  return { error, status };
+}
+
+export async function updatePayrollFieldsById({
+  supabase,
+  data,
+}: {
+  supabase: TypedSupabaseClient;
+  data: PayrollFieldsDatabaseUpdate;
+}) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.email) {
+    return {
+      status: 400,
+      error: "No email found",
+    };
+  }
+
+  const updateData = convertToNull(data);
+
+  const { error, status } = await supabase
+    .from("payroll_fields")
+    .update(updateData)
+    .eq("id", data.id ?? "")
+    .single();
+
+  if (error) console.error("updatePayrollFieldsById Error:", error);
 
   return { error, status };
 }

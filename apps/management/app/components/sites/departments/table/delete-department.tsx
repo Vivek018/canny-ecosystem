@@ -19,7 +19,7 @@ import { attribute, DELETE_TEXT } from "@canny_ecosystem/utils/constant";
 import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
-export const DeleteGroup = ({
+export const DeleteDepartment = ({
   id,
   role,
 }: {
@@ -31,13 +31,13 @@ export const DeleteGroup = ({
   const [inputError, setInputError] = useState<string[]>([]);
   const submit = useSubmit();
 
-  const handleCancelGroup = () => {
+  const handleCancelDepartment = () => {
     setInputError([]);
     setInputValue("");
     setLoading(false);
   };
 
-  const handleDeleteGroup = (
+  const handleDeleteDepartment = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     if (inputValue === DELETE_TEXT) {
@@ -46,7 +46,7 @@ export const DeleteGroup = ({
         {},
         {
           method: "post",
-          action: `/sites/${id}/delete-group`,
+          action: `/sites/${id}/delete-department`,
           replace: true,
         }
       );
@@ -62,17 +62,17 @@ export const DeleteGroup = ({
         className={cn(
           buttonVariants({ variant: "destructive-ghost", size: "full" }),
           "hidden text-[13px] h-9",
-          hasPermission(role, `${deleteRole}:${attribute.groups}`) && "flex"
+          hasPermission(role, `${deleteRole}:${attribute.departments}`) && "flex"
         )}
       >
-        Delete Group
+        Delete Department
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
             This action cannot be undone. This will permanently delete your
-            Group and remove it's data from our servers.
+            Department and remove it's data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="py-4">
@@ -99,13 +99,13 @@ export const DeleteGroup = ({
           <ErrorList errors={inputError} />
         </div>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={handleCancelGroup}>
+          <AlertDialogCancel onClick={handleCancelDepartment}>
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
             className={cn(buttonVariants({ variant: "destructive" }))}
-            onClick={handleDeleteGroup}
-            onSelect={handleDeleteGroup}
+            onClick={handleDeleteDepartment}
+            onSelect={handleDeleteDepartment}
           >
             {isLoading ? "Deleting..." : "Delete"}
           </AlertDialogAction>

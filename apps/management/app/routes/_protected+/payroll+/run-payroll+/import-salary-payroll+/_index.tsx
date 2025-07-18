@@ -125,15 +125,15 @@ export default function PayrollImportFieldMapping() {
     },
     {
       key: "PF",
-      type: "statutory_contribution",
+      type: "deduction",
     },
     {
       key: "ESIC",
-      type: "statutory_contribution",
+      type: "deduction",
     },
     {
       key: "PT",
-      type: "statutory_contribution",
+      type: "deduction",
     },
   ]);
 

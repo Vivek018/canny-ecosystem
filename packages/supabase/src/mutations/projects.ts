@@ -1,7 +1,7 @@
 import { convertToNull } from "@canny_ecosystem/utils";
 import type {
-  GroupDatabaseInsert,
-  GroupDatabaseUpdate,
+  DepartmentsDatabaseInsert,
+  DepartmentsDatabaseUpdate,
   ProjectDatabaseInsert,
   ProjectDatabaseUpdate,
   SiteDatabaseInsert,
@@ -198,13 +198,13 @@ export async function deleteSite({
   return { status, error };
 }
 
-export async function createGroup({
+export async function createDepartment({
   supabase,
   data,
   bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
-  data: GroupDatabaseInsert;
+  data: DepartmentsDatabaseInsert;
   bypassAuth?: boolean;
 }) {
   if (!bypassAuth) {
@@ -218,25 +218,25 @@ export async function createGroup({
   }
 
   const { error, status } = await supabase
-    .from("groups")
+    .from("departments")
     .insert(data)
     .select()
     .single();
 
   if (error) {
-    console.error("createGroup Error:", error);
+    console.error("createDepartment Error:", error);
   }
 
   return { status, error };
 }
 
-export async function updateGroupById({
+export async function updateDepartmentById({
   supabase,
   data,
   bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
-  data: GroupDatabaseUpdate;
+  data: DepartmentsDatabaseUpdate;
   bypassAuth?: boolean;
 }) {
   if (!bypassAuth) {
@@ -252,17 +252,17 @@ export async function updateGroupById({
   const updateData = convertToNull(data);
 
   const { error, status } = await supabase
-    .from("groups")
+    .from("departments")
     .update(updateData)
     .eq("id", data.id!);
   if (error) {
-    console.error("updateGroup Error:", error);
+    console.error("updateDepartment Error:", error);
   }
 
   return { status, error };
 }
 
-export async function deleteGroup({
+export async function deleteDepartment({
   supabase,
   id,
   bypassAuth = false,
@@ -281,10 +281,10 @@ export async function deleteGroup({
     }
   }
 
-  const { error, status } = await supabase.from("groups").delete().eq("id", id);
+  const { error, status } = await supabase.from("departments").delete().eq("id", id);
 
   if (error) {
-    console.error("deleteGroup Error:", error);
+    console.error("deleteDepartment Error:", error);
   }
 
   return { status, error };

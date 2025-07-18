@@ -1,4 +1,4 @@
-import type { SalaryEntriesWithEmployee } from "@canny_ecosystem/supabase/queries";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,13 +26,13 @@ export const SalaryEntryDropdown = ({
   data,
   triggerChild,
 }: {
-  data: SalaryEntriesWithEmployee;
+  data: any;
   triggerChild: React.ReactElement;
 }) => {
   const navigate = useNavigate();
 
-  const payrollId = data?.salary_entries[0].payroll_id;
-  const employeeId = data?.id;
+  const payrollId = data?.salary_entries.payroll_id;
+  const employeeId = data?.employee.id;
 
   const handleClick = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,

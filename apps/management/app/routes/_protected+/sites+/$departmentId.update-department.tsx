@@ -11,7 +11,7 @@ import {
   hasPermission,
   isGoodStatus,
   updateRole,
-  GroupsSchema,
+  DepartmentsSchema,
 } from "@canny_ecosystem/utils";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { useEffect } from "react";
@@ -21,25 +21,25 @@ import { safeRedirect } from "@/utils/server/http.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
-import CreateGroup from "./$siteId.create-group";
-import { getGroupById } from "@canny_ecosystem/supabase/queries";
-import { updateGroupById } from "@canny_ecosystem/supabase/mutations";
+import CreateDepartment from "./$siteId.create-department";
+import { getDepartmentById } from "@canny_ecosystem/supabase/queries";
+import { updateDepartmentById } from "@canny_ecosystem/supabase/mutations";
 
-export const UPDATE_GROUP_TAG = "update-group";
+export const UPDATE_DEPARTMENT_TAG = "update-department";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const groupId = params.groupId;
+  const departmentId = params.departmentId;
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.groups}`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.departments}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
   try {
-    if (groupId) {
-      const { data, error } = await getGroupById({
+    if (departmentId) {
+      const { data, error } = await getDepartmentById({
         supabase,
-        id: groupId,
+        id: departmentId,
       });
 
       if (error) throw error;
@@ -72,7 +72,7 @@ export async function action({
     const formData = await request.formData();
 
     const submission = parseWithZod(formData, {
-      schema: GroupsSchema,
+      schema: DepartmentsSchema,
     });
 
     if (submission.status !== "success") {
@@ -82,7 +82,7 @@ export async function action({
       );
     }
 
-    const { status, error } = await updateGroupById({
+    const { status, error } = await updateDepartmentById({
       supabase,
       data: submission.value,
     });
@@ -90,20 +90,20 @@ export async function action({
     if (isGoodStatus(status))
       return json({
         status: "success",
-        message: "Group updated successfully",
+        message: "Department updated successfully",
         error: null,
       });
 
     return json({
       status: "error",
-      message: "Failed to update group",
+      message: "Failed to update department",
       error,
     });
   } catch (error) {
     return json(
       {
         status: "error",
-        message: "Failed to update group",
+        message: "Failed to update department",
         error,
       },
       { status: 500 }
@@ -111,7 +111,7 @@ export async function action({
   }
 }
 
-export default function UpdateGroup() {
+export default function UpdateDepartment() {
   const { data, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
@@ -120,7 +120,7 @@ export default function UpdateGroup() {
   useEffect(() => {
     if (!actionData) return;
     if (actionData?.status === "success") {
-      clearExactCacheEntry(cacheKeyPrefix.groups);
+      clearExactCacheEntry(cacheKeyPrefix.departments);
       toast({
         title: "Success",
         description: actionData?.message,
@@ -132,7 +132,7 @@ export default function UpdateGroup() {
         description:
           actionData?.error ||
           actionData?.error?.message ||
-          "Group update failed",
+          "Department update failed",
         variant: "destructive",
       });
     }
@@ -143,7 +143,7 @@ export default function UpdateGroup() {
   }, [actionData]);
 
   if (error)
-    return <ErrorBoundary error={error} message="Failed to load group" />;
+    return <ErrorBoundary error={error} message="Failed to load department" />;
 
-  return <CreateGroup updateValues={data} />;
+  return <CreateDepartment updateValues={data} />;
 }

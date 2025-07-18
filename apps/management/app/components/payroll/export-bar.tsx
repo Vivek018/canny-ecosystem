@@ -1,4 +1,3 @@
-import type { SalaryEntriesDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { Button } from "@canny_ecosystem/ui/button";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { formatDateTime } from "@canny_ecosystem/utils";
@@ -11,30 +10,26 @@ export function ExportBar({
   totalNet,
 }: {
   rows: number;
-  data: SalaryEntriesDatabaseRow[];
+  data: any[];
   className: string;
   totalNet: number;
 }) {
   function transformEmployeeData(employee: any) {
-    const {
-      employee_code,
-      first_name,
-      middle_name,
-      last_name,
-      salary_entries,
-    } = employee;
+    const { month, year, present_days, overtime_hours } = employee;
 
+    const emp = employee?.employee || {};
+    const { employee_code, first_name, middle_name, last_name } = emp;
     const employee_name = [first_name, middle_name, last_name]
       .filter(Boolean)
       .join(" ");
 
-    const attendance = salary_entries[0]?.monthly_attendance || {};
-    const { month, year, present_days, overtime_hours } = attendance;
-
     const salaryFields: Record<string, number> = {};
-    for (const entry of salary_entries) {
-      if (entry.field_name) {
-        salaryFields[entry.field_name.trim()] = entry.amount;
+    for (const entry of employee.salary_entries?.salary_field_values ?? []) {
+      const fieldName = entry?.payroll_fields?.name?.trim();
+      const amount = entry?.amount ?? 0;
+
+      if (fieldName) {
+        salaryFields[fieldName] = amount;
       }
     }
 

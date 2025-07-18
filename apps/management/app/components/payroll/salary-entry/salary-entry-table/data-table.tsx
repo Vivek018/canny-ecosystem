@@ -25,12 +25,14 @@ interface SalaryEntryTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   totalNet: number;
+  uniqueFields: string[];
 }
 
 export function SalaryEntryDataTable<TData, TValue>({
   columns,
   data,
   totalNet,
+  uniqueFields,
 }: SalaryEntryTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const { rowSelection, setSelectedRows, setRowSelection } =
@@ -71,6 +73,7 @@ export function SalaryEntryDataTable<TData, TValue>({
           <SalaryTableHeader
             table={table}
             className={cn(!tableLength && "hidden")}
+            uniqueFields={uniqueFields}
           />
           <TableBody>
             {tableLength ? (
@@ -88,9 +91,12 @@ export function SalaryEntryDataTable<TData, TValue>({
                           "px-3 md:px-4 py-4 hidden md:table-cell",
                           cell.column.id === "select" &&
                             "sticky left-0 min-w-12 max-w-12 bg-card z-10",
-                          cell.column.id === "sr_no" && "sticky left-12 bg-card z-10",
+                          cell.column.id === "sr_no" &&
+                            "sticky left-12 bg-card z-10",
                           cell.column.id === "employee_code" &&
-                            "sticky left-32 z-10 bg-card"
+                            "sticky left-32 z-10 bg-card",
+                          cell.column.id === "actions" &&
+                            "sticky right-0 min-w-20 max-w-20 bg-card z-10"
                         )}
                       >
                         {flexRender(

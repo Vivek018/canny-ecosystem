@@ -14,7 +14,7 @@ import { modalSearchParamNames } from "@canny_ecosystem/utils/constant";
 import { useNavigate, useParams, useSearchParams } from "@remix-run/react";
 import { useState, useEffect } from "react";
 
-export const ImportGroupSalaryPayrollModal = () => {
+export const ImportDepartmentSalaryPayrollModal = () => {
   const { payrollId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const [eligibleFileSize, setEligibleFileSize] = useState<boolean>(true);
@@ -26,7 +26,7 @@ export const ImportGroupSalaryPayrollModal = () => {
 
   const isOpen =
     searchParams.get("step") ===
-    modalSearchParamNames.import_group_salary_payroll;
+    modalSearchParamNames.import_department_salary_payroll;
 
   const onClose = () => {
     searchParams.delete("step");
@@ -54,7 +54,7 @@ export const ImportGroupSalaryPayrollModal = () => {
   const handleFileSubmit = () => {
     if (eligibleFileSize && selectedFile) {
       navigate(
-        `/payroll/run-payroll/${payrollId}/import-group-salary-payroll`,
+        `/payroll/run-payroll/${payrollId}/import-department-salary-payroll`,
         {
           state: { file: selectedFile },
         }

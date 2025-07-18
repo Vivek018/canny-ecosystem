@@ -11,7 +11,7 @@ export function seedSalaryPayroll(employees: { id: string }[]) {
         employee_id: emp.id,
         field_name: field,
         type: ["PF", "ESIC", "PT", "LWF"].includes(field)
-          ? "statutory_contribution"
+          ? "deduction"
           : "earning",
         amount: faker.number.int({ min: 0, max: 100000 }),
       })

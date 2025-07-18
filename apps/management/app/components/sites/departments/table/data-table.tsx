@@ -13,15 +13,15 @@ import {
 } from "@tanstack/react-table";
 import { DataTableHeader } from "./data-table-header";
 
-interface GroupDataTableProps<TData, TValue> {
+interface DepartmentDataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 
-export function GroupsDataTable<TData, TValue>({
+export function DepartmentsDataTable<TData, TValue>({
   columns,
   data,
-}: GroupDataTableProps<TData, TValue>) {
+}: DepartmentDataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
@@ -35,7 +35,7 @@ export function GroupsDataTable<TData, TValue>({
       <div
         className={cn(
           "relative border overflow-x-auto rounded",
-          !tableLength && "border-none",
+          !tableLength && "border-none"
         )}
       >
         <div className="relative">
@@ -58,12 +58,12 @@ export function GroupsDataTable<TData, TValue>({
                           className={cn(
                             "h-[60px] px-3 md:px-4 py-2 hidden md:table-cell",
                             cell.column.id === "actions" &&
-                              "sticky right-0 min-w-20 max-w-20 bg-card z-10",
+                              "sticky right-0 min-w-20 max-w-20 bg-card z-10"
                           )}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext(),
+                            cell.getContext()
                           )}
                         </TableCell>
                       );
@@ -76,7 +76,7 @@ export function GroupsDataTable<TData, TValue>({
                     colSpan={columns.length}
                     className="h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize"
                   >
-                    No Group Found
+                    No Department Found
                   </TableCell>
                 </TableRow>
               )}

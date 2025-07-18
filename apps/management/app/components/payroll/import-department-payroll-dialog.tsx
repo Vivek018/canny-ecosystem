@@ -15,7 +15,7 @@ import {
 } from "@canny_ecosystem/utils/constant";
 import { useSearchParams } from "@remix-run/react";
 
-export function ImportGroupPayrollDialog() {
+export function ImportDepartmentPayrollDialog() {
   const { role } = useUser();
   const [searchParams, setSearchParams] = useSearchParams();
   return (
@@ -35,14 +35,14 @@ export function ImportGroupPayrollDialog() {
           onClick={() => {
             searchParams.set(
               "step",
-              modalSearchParamNames.import_group_salary_payroll
+              modalSearchParamNames.import_department_salary_payroll
             );
             setSearchParams(searchParams);
           }}
           className="space-x-2 flex items-center"
         >
           <Icon name="import" size="sm" className="mb-0.5" />
-          <span>Import Group Salary Payroll</span>
+          <span>Import Department Salary Payroll</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

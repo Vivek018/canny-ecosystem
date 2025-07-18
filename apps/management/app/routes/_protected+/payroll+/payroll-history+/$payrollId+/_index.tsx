@@ -10,7 +10,7 @@ import {
 } from "@/utils/cache";
 import { updatePayroll } from "@canny_ecosystem/supabase/mutations";
 import {
-  getGroupsBySiteId,
+  getDepartmentsBySiteId,
   getPayrollById,
   getSalaryEntriesByPayrollId,
   getSitesByProjectId,
@@ -53,7 +53,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     if (error || !payrollData) {
       clearExactCacheEntry(`${cacheKeyPrefix.payroll_history_id}${payrollId}`);
     }
-    let groupOptions: any = [];
+    let departmentOptions: any = [];
     let siteOptions: any = [];
 
     if (payrollData?.project_id) {
@@ -67,11 +67,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       }));
     }
     if (payrollData?.project_site_id) {
-      const { data: allGroups } = await getGroupsBySiteId({
+      const { data: allDepartments } = await getDepartmentsBySiteId({
         siteId: payrollData?.project_site_id,
         supabase,
       });
-      groupOptions = allGroups?.map((sites) => ({
+      departmentOptions = allDepartments?.map((sites) => ({
         label: sites?.name,
         value: sites?.id,
       }));
@@ -80,7 +80,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const url = new URL(request.url);
     const searchParams = new URLSearchParams(url.searchParams);
     let site = searchParams.get("site")?.split(",") ?? [];
-    let group = searchParams.get("group")?.split(",") ?? [];
+    let department = searchParams.get("department")?.split(",") ?? [];
     let shouldRedirect = false;
     if (
       site.length === 0 &&
@@ -93,12 +93,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     if (
-      group.length === 0 &&
+      department.length === 0 &&
       payrollData?.project_site_id &&
-      groupOptions.length > 0
+      departmentOptions.length > 0
     ) {
-      group = [groupOptions[0].value];
-      searchParams.set("group", group.join(","));
+      department = [departmentOptions[0].value];
+      searchParams.set("department", department.join(","));
       shouldRedirect = true;
     }
     if (shouldRedirect) {
@@ -109,14 +109,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       payrollId: payrollId ?? "",
       params: {
         site,
-        group,
+        department,
       },
     });
 
     return defer({
       payrollData,
       salaryEntriesPromise,
-      groupOptions,
+      departmentOptions,
       siteOptions,
       error: null,
       env,
@@ -127,7 +127,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       payrollData: null,
 
       salaryEntriesPromise: Promise.resolve({ data: null, error: null }),
-      groupOptions: [],
+      departmentOptions: [],
       siteOptions: [],
 
       error,
@@ -192,8 +192,13 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export default function HistoryPayrollId() {
-  const { payrollData, salaryEntriesPromise, groupOptions, siteOptions, env } =
-    useLoaderData<typeof loader>();
+  const {
+    payrollData,
+    salaryEntriesPromise,
+    departmentOptions,
+    siteOptions,
+    env,
+  } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
   const revalidator = useRevalidator();
@@ -257,7 +262,7 @@ export default function HistoryPayrollId() {
               noButtons={true}
               env={env as SupabaseEnv}
               fromWhere="payrollhistory"
-              groupOptions={groupOptions}
+              departmentOptions={departmentOptions}
               siteOptions={siteOptions}
             />
           );

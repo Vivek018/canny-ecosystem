@@ -2,7 +2,7 @@ import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
-import { deleteGroup } from "@canny_ecosystem/supabase/mutations";
+import { deleteDepartment } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import {
@@ -20,20 +20,20 @@ export async function action({
   params,
 }: ActionFunctionArgs): Promise<Response> {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
-  const groupId = params.groupId;
+  const departmentId = params.departmentId;
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${deleteRole}:${attribute.groups}`)) {
+  if (!hasPermission(user?.role!, `${deleteRole}:${attribute.departments}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
-  if (!groupId) {
+  if (!departmentId) {
     return json(
       {
         status: "error",
-        message: "Group ID is required",
-        error: "No group ID provided",
+        message: "Department ID is required",
+        error: "No department ID provided",
         redirectUrl: "/",
       },
       { status: 400 }
@@ -41,13 +41,13 @@ export async function action({
   }
 
   try {
-    const { error, status } = await deleteGroup({ supabase, id: groupId });
+    const { error, status } = await deleteDepartment({ supabase, id: departmentId });
 
     if (!isGoodStatus(status)) {
       return json(
         {
           status: "error",
-          message: "Failed to delete group",
+          message: "Failed to delete department",
           error,
           redirectUrl: "/",
         },
@@ -57,7 +57,7 @@ export async function action({
 
     return json({
       status: "success",
-      message: "Group deleted successfully",
+      message: "Department deleted successfully",
       error: null,
       redirectUrl: "/",
     });
@@ -74,7 +74,7 @@ export async function action({
   }
 }
 
-export default function DeleteGroup() {
+export default function DeleteDepartment() {
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -83,7 +83,7 @@ export default function DeleteGroup() {
     if (!actionData) return;
 
     if (actionData?.status === "success") {
-      clearExactCacheEntry(cacheKeyPrefix.groups);
+      clearExactCacheEntry(cacheKeyPrefix.departments);
       toast({
         title: "Success",
         description: actionData?.message,
@@ -95,7 +95,7 @@ export default function DeleteGroup() {
         description:
           actionData?.error ||
           actionData?.error?.message ||
-          "Group deletion failed",
+          "Department deletion failed",
         variant: "destructive",
       });
     }

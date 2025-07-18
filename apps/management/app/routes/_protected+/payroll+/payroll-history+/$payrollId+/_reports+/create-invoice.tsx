@@ -169,7 +169,6 @@ export async function action({
         }))
       );
 
-      console.log("Updated Salary Entries===>", updatedSalaryEntries);
 
       for (const entry of updatedSalaryEntries) {
         const { id, invoice_id } = entry;

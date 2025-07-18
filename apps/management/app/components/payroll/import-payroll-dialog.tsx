@@ -52,7 +52,7 @@ export function ImportPayrollDialog() {
           className="space-x-2 flex items-center"
         >
           <Icon name="import" size="sm" className="mb-0.5" />
-          <span>Import Salary Payroll</span>
+          <span>Import Payroll</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -12,7 +12,7 @@ import {
 } from "@canny_ecosystem/ui/card";
 import type { ImportSalaryPayrollHeaderSchemaObject } from "@canny_ecosystem/utils";
 import {
-  getGroupsBySiteId,
+  getDepartmentsBySiteId,
   getPayrollById,
   getSitesByProjectId,
   type ImportSalaryPayrollDataType,
@@ -45,7 +45,7 @@ import {
 import { Label } from "@canny_ecosystem/ui/label";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { SalaryGroupPayrollImportData } from "@/components/payroll/import-export/salary-group-payroll-import-data";
+import { SalaryDepartmentPayrollImportData } from "@/components/payroll/import-export/salary-department-payroll-import-data";
 import { payoutMonths } from "@canny_ecosystem/utils/constant";
 
 export type FieldConfig = {
@@ -83,7 +83,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   const { data } = await getPayrollById({ payrollId, supabase });
 
-  let groupOptions: any = [];
+  let departmentOptions: any = [];
   let siteOptions: any = [];
 
   if (data?.project_id) {
@@ -97,25 +97,31 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }));
   }
   if (data?.project_site_id) {
-    const { data: allGroups } = await getGroupsBySiteId({
+    const { data: alldepartments } = await getDepartmentsBySiteId({
       siteId: data?.project_site_id,
       supabase,
     });
-    groupOptions = allGroups?.map((sites) => ({
+    departmentOptions = alldepartments?.map((sites) => ({
       label: sites?.name,
       value: sites?.id,
     }));
   }
 
-  return json({ payrollId, env, groupOptions, siteOptions, payrollInfo: data });
+  return json({
+    payrollId,
+    env,
+    departmentOptions,
+    siteOptions,
+    payrollInfo: data,
+  });
 }
 
 export default function PayrollImportFieldMapping() {
-  const { payrollId, env, groupOptions, siteOptions, payrollInfo } =
+  const { payrollId, env, departmentOptions, siteOptions, payrollInfo } =
     useLoaderData<typeof loader>();
   const { setImportData } = useImportStoreForSalaryPayroll();
   const [site, setSite] = useState("");
-  const [group, setGroup] = useState("");
+  const [department, setDepartment] = useState("");
   const [month, setMonth] = useState(defaultMonth + 2);
   const [year, setYear] = useState(defaultYear);
 
@@ -160,15 +166,15 @@ export default function PayrollImportFieldMapping() {
     },
     {
       key: "PF",
-      type: "statutory_contribution",
+      type: "deduction",
     },
     {
       key: "ESIC",
-      type: "statutory_contribution",
+      type: "deduction",
     },
     {
       key: "PT",
-      type: "statutory_contribution",
+      type: "deduction",
     },
   ]);
 
@@ -200,19 +206,22 @@ export default function PayrollImportFieldMapping() {
 
   useEffect(() => {
     if (headerArray.length > 0) {
-      const initialMapping = fieldConfigs.reduce((mapping, field) => {
-        const matchedHeader = headerArray.find(
-          (value) =>
-            pipe(replaceUnderscore, replaceDash)(value?.toLowerCase()) ===
-            pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase())
-        );
+      const initialMapping = fieldConfigs.reduce(
+        (mapping, field) => {
+          const matchedHeader = headerArray.find(
+            (value) =>
+              pipe(replaceUnderscore, replaceDash)(value?.toLowerCase()) ===
+              pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase())
+          );
 
-        if (matchedHeader) {
-          mapping[field.key] = matchedHeader;
-        }
+          if (matchedHeader) {
+            mapping[field.key] = matchedHeader;
+          }
 
-        return mapping;
-      }, {} as Record<string, string>);
+          return mapping;
+        },
+        {} as Record<string, string>
+      );
 
       setFieldMapping(initialMapping);
     }
@@ -357,8 +366,8 @@ export default function PayrollImportFieldMapping() {
                   transformedRow[key] = row[key];
                 }
               }
-              transformedRow.group_id = payrollInfo?.project_site_id
-                ? group
+              transformedRow.department_id = payrollInfo?.project_site_id
+                ? department
                 : null;
               transformedRow.site_id = payrollInfo?.project_id ? site : null;
               transformedRow.month = month;
@@ -387,7 +396,7 @@ export default function PayrollImportFieldMapping() {
   return (
     <section className="py-4 ">
       {loadNext ? (
-        <SalaryGroupPayrollImportData
+        <SalaryDepartmentPayrollImportData
           env={env}
           fieldConfigs={fieldConfigs}
           payrollId={payrollId}
@@ -449,17 +458,19 @@ export default function PayrollImportFieldMapping() {
               </div>
             </div>
             <div className="mb-8 flex flex-col gap-1">
-              <Label className="text-sm font-medium">Group Selection</Label>
+              <Label className="text-sm font-medium">Department Selection</Label>
               <Combobox
-                options={payrollInfo?.project_id ? siteOptions : groupOptions}
-                placeholder="Select Group or Site"
-                value={payrollInfo?.project_id ? site : group}
+                options={
+                  payrollInfo?.project_id ? siteOptions : departmentOptions
+                }
+                placeholder="Select Department or Site"
+                value={payrollInfo?.project_id ? site : department}
                 onChange={(value: string) => {
                   if (payrollInfo?.project_id) {
                     setSite(value);
                   }
                   if (payrollInfo?.project_site_id) {
-                    setGroup(value);
+                    setDepartment(value);
                   }
                 }}
               />

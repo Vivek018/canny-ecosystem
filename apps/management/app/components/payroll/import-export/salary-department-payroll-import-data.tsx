@@ -9,13 +9,13 @@ import type { SupabaseEnv } from "@canny_ecosystem/supabase/types";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
-import {useSubmit } from "@remix-run/react";
+import { useSubmit } from "@remix-run/react";
 import { useState, useEffect } from "react";
 import { ImportedDataTable } from "../salary-imported-table/imported-data-table";
 import { ImportedDataColumns } from "../salary-imported-table/columns";
 import type { FieldConfig } from "@/routes/_protected+/payroll+/run-payroll+/import-salary-payroll+/_index";
 
-export function SalaryGroupPayrollImportData({
+export function SalaryDepartmentPayrollImportData({
   env,
   fieldConfigs,
   payrollId,
@@ -119,15 +119,15 @@ export function SalaryGroupPayrollImportData({
     submit(
       {
         type: "salary-import",
-        different: "grouped",
+        different: "different",
         payrollId: payrollId,
         salaryImportData: JSON.stringify(updatedData),
         skipped:
           importData.data.length - updatedData.length > 0
             ? importData.data.length - updatedData.length
             : 0,
-        failedRedirect: updatedData[0].group_id
-          ? `/payroll/run-payroll/${payrollId}?group=${updatedData[0]?.group_id}`
+        failedRedirect: updatedData[0].deaprtment_id
+          ? `/payroll/run-payroll/${payrollId}?department=${updatedData[0]?.department_id}`
           : `/payroll/run-payroll/${payrollId}?site=${updatedData[0]?.site_id}`,
       },
       {
