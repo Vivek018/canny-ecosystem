@@ -18,7 +18,6 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { useNavigation, useSearchParams } from "@remix-run/react";
 import { Calendar } from "@canny_ecosystem/ui/calendar";
 import {
-  booleanArray,
   reimbursementStatusArray,
   replaceUnderscore,
 } from "@canny_ecosystem/utils";
@@ -58,7 +57,6 @@ export function ReimbursementSearchFilter({
     submitted_date_start: "",
     submitted_date_end: "",
     status: "",
-    is_deductible: "",
     users: "",
     name: "",
     project: "",
@@ -87,7 +85,6 @@ export function ReimbursementSearchFilter({
     submitted_date_start: searchParams.get("submitted_date_start"),
     submitted_date_end: searchParams.get("submitted_date_end"),
     status: searchParams.get("status"),
-    is_deductible: searchParams.get("is_deductible"),
     users: searchParams.get("users"),
     project: searchParams.get("project"),
     project_site: searchParams.get("project_site"),
@@ -290,36 +287,6 @@ export function ReimbursementSearchFilter({
           </DropdownMenuSub>
         </DropdownMenuGroup>
 
-        <DropdownMenuGroup>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-              <span>Is Deductible</span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent
-                sideOffset={14}
-                alignOffset={-4}
-                className='p-0'
-              >
-                {booleanArray.map((name, index) => (
-                  <DropdownMenuCheckboxItem
-                    key={name + index.toString()}
-                    className='capitalize'
-                    checked={filterParams?.is_deductible === name}
-                    onCheckedChange={() => {
-                      setFilterParams((prev) => ({
-                        ...prev,
-                        is_deductible: name,
-                      }));
-                    }}
-                  >
-                    {name}
-                  </DropdownMenuCheckboxItem>
-                ))}
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-        </DropdownMenuGroup>
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>

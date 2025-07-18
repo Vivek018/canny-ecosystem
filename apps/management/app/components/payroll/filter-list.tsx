@@ -34,13 +34,14 @@ export function FilterList({ filterList }: Props) {
       case "date_end":
         return !filterList?.date_start && value && formatDate(new Date(value));
 
-      case "payroll_type":
-        return value;
-
       case "status":
         return value;
 
       case "name":
+        return value;
+      case "month":
+        return value;
+      case "year":
         return value;
 
       default:

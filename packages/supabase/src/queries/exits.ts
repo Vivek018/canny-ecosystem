@@ -14,7 +14,7 @@ export type ImportExitPayrollDataType = Pick<
   | "deduction"
   | "leave_encashment"
   | "id"
-  | "payroll_id"
+  | "invoice_id"
 > & {
   employee_code: EmployeeDatabaseRow["employee_code"];
 };
@@ -45,7 +45,7 @@ export type ExitFilterType = {
   reason?: string | undefined | null;
   project?: string | undefined | null;
   project_site?: string | undefined | null;
-  in_payroll?: string | undefined | null;
+  in_invoice?: string | undefined | null;
 } | null;
 
 export type ImportExitDataType = Pick<
@@ -111,7 +111,7 @@ export const getExitsByCompanyId = async ({
     reason,
     project,
     project_site,
-    in_payroll,
+    in_invoice,
   } = filters ?? {};
 
   const columns = [
@@ -126,7 +126,7 @@ export const getExitsByCompanyId = async ({
     "gratuity",
     "deduction",
     "note",
-    "payroll_id",
+    "invoice_id",
   ] as const;
 
   const query = supabase
@@ -136,8 +136,8 @@ export const getExitsByCompanyId = async ({
           employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${
             project ? "inner" : "left"
           }(project_sites!${project ? "inner" : "left"}(id, name, projects!${
-        project ? "inner" : "left"
-      }(id, name))))`,
+            project ? "inner" : "left"
+          }(id, name))))`,
       { count: "exact" }
     )
     .eq("employees.company_id", companyId);
@@ -204,11 +204,11 @@ export const getExitsByCompanyId = async ({
       project_site
     );
   }
-  if (in_payroll !== undefined && in_payroll !== null) {
-    if (in_payroll === "true") {
-      query.not("payroll_id", "is", null);
+  if (in_invoice !== undefined && in_invoice !== null) {
+    if (in_invoice === "true") {
+      query.not("invoice_id", "is", null);
     } else {
-      query.is("payroll_id", null);
+      query.is("invoice_id", null);
     }
   }
   const { data, count, error } = await query.range(from, to);
@@ -239,7 +239,7 @@ export const getExitsById = async ({
     "gratuity",
     "deduction",
     "note",
-    "payroll_id",
+    "invoice_id",
   ] as const;
 
   const { data, error } = await supabase
@@ -384,7 +384,7 @@ export async function getExitsEntriesForPayrollByPayrollId({
   const columns = [
     "id",
     "employee_id",
-    "payroll_id",
+    "invoice_id",
     "gratuity",
     "bonus",
     "leave_encashment",
@@ -399,7 +399,7 @@ export async function getExitsEntriesForPayrollByPayrollId({
         ","
       )}, employees!left(id,company_id,first_name, middle_name, last_name, employee_code)`
     )
-    .eq("payroll_id", payrollId)
+    .eq("invoice_id", payrollId)
     .order("created_at", { ascending: false })
     .returns<ExitsPayrollEntriesWithEmployee[]>();
 
@@ -422,7 +422,7 @@ export async function getExitsEntryForPayrollById({
     "bonus",
     "leave_encashment",
     "deduction",
-    "payroll_id",
+    "invoice_id",
   ] as const;
 
   const { data, error } = await supabase
@@ -440,12 +440,12 @@ export async function getExitsEntryForPayrollById({
   return { data, error };
 }
 
-export async function getExitEntriesByPayrollIdForPayrollRegister({
+export async function getExitEntriesByPayrollIdForInvoicePreview({
   supabase,
-  payrollId,
+  invoiceId,
 }: {
   supabase: TypedSupabaseClient;
-  payrollId: string;
+  invoiceId: string;
 }) {
   const columns = [
     "id",
@@ -453,6 +453,7 @@ export async function getExitEntriesByPayrollIdForPayrollRegister({
     "bonus",
     "leave_encashment",
     "deduction",
+    "invoice_id",
   ] as const;
 
   const { data, error } = await supabase
@@ -462,7 +463,7 @@ export async function getExitEntriesByPayrollIdForPayrollRegister({
         ","
       )})`
     )
-    .eq("exits.payroll_id", payrollId)
+    .eq("exits.invoice_id", invoiceId)
     .returns<ExitsPayrollEntriesWithEmployee[]>();
 
   if (error) {

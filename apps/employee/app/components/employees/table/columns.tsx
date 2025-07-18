@@ -68,7 +68,7 @@ export const columns = (): ColumnDef<EmployeeDataType>[] => [
     },
   },
   {
-    accessorKey: "status",
+    accessorKey: "is_active",
     header: "Status",
     cell: ({ row }) => {
       return (

@@ -19,49 +19,65 @@ const chartConfig = {
   amount: {
     label: "Total Amount",
   },
-  deductible: {
-    label: "Deductible",
+  loan: {
+    label: "Loan",
     color: "hsl(var(--chart-1))",
   },
-  nonDeductible: {
-    label: "Non Deductible",
+  advances: {
+    label: "Advances",
     color: "hsl(var(--chart-2))",
+  },
+  expenses: {
+    label: "Expenses",
+    color: "hsl(var(--chart-3))",
+  },
+  rent: {
+    label: "Rent",
+    color: "hsl(var(--chart-4))",
+  },
+  vehicle: {
+    label: "Vehicle",
+    color: "hsl(var(--chart-5))",
+  },
+  vehicle_related: {
+    label: "Vehicle Related",
+    color: "hsl(var(--chart-6))",
+  },
+  others: {
+    label: "Others",
+    color: "hsl(var(--chart-7))",
   },
 } satisfies ChartConfig;
 
-export function ReimbursementByDeductible({
+export function ReimbursementByType({
   chartData,
-}: { chartData: ReimbursementDataType[] }) {
-  const totalDeductibleData = Object.values(
+}: {
+  chartData: ReimbursementDataType[];
+}) {
+  const totalTypeData = Object.values(
     chartData.reduce(
-      (
-        acc: Record<
-          string,
-          { type: "deductible" | "nonDeductible"; amount: number }
-        >,
-        row,
-      ) => {
-        const type = row.is_deductible ? "deductible" : "nonDeductible";
+      (acc: Record<string, { type: string; amount: number }>, row) => {
+        const type = row.type!;
         if (!acc[type]) {
           acc[type] = { type, amount: 0 };
         }
         acc[type].amount += row.amount ?? 0;
         return acc;
       },
-      {},
-    ),
+      {}
+    )
   );
 
-  const transformedChartData = totalDeductibleData.map((data, i) => ({
+  const transformedChartData = totalTypeData.map((data, i) => ({
     ...data,
-    type: data.type === "deductible" ? "Deductible" : "Non Deductible",
+    type: data.type,
     fill: `hsl(var(--chart-${i + 1}))`,
   }));
 
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
-        <CardTitle>Reimbursement by Deductible</CardTitle>
+        <CardTitle>Reimbursement by Type</CardTitle>
         <CardDescription>Over the period</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
@@ -86,7 +102,7 @@ export function ReimbursementByDeductible({
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="leading-none text-muted-foreground">
-          Showing deductible and non-deductible ratio.
+          Showing reimbursements by types.
         </div>
       </CardFooter>
     </Card>

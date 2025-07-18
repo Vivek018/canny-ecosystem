@@ -19,7 +19,7 @@ export const employeeColumnIdArray = [
   "date_of_birth",
   "education",
   "gender",
-  "status",
+  "is_active",
   "project_name",
   "project_site_name",
   "assignment_type",

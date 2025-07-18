@@ -98,7 +98,7 @@ export const columns = ({
     },
   },
   {
-    accessorKey: "status",
+    accessorKey: "is_active",
     header: "Status",
     cell: ({ row }) => {
       return (

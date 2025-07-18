@@ -22,24 +22,28 @@ import {
   useSubmit,
 } from "@remix-run/react";
 import { Calendar } from "@canny_ecosystem/ui/calendar";
-import { payrollPaymentStatusArray } from "@canny_ecosystem/utils";
+import {
+  defaultYear,
+  getYears,
+  payrollPaymentStatusArray,
+} from "@canny_ecosystem/utils";
 import type { PayrollFilters } from "@canny_ecosystem/supabase/queries";
 import { useTypingAnimation } from "@canny_ecosystem/utils/hooks/typing-animation";
 import { useDebounce } from "@canny_ecosystem/utils/hooks/debounce";
+import { months } from "@canny_ecosystem/utils/constant";
 
 export const PLACEHOLDERS = [
-  "Approved payrolls processed between Jan and May 2024",
+  "Approved payrolls between Jan and May 2024",
   "Salary type payrolls created before 2020",
-  "Payrolls with pending status for Contract employees",
+  "Payrolls with pending status",
   "Payroll records from Project 'XYZ' created in 2023",
-  "Payrolls generated between 2018 and 2020 with 'ABC' type",
-  "Rejected payrolls for employees from Site 'ABC'",
-  "Payrolls with status Approved for salary type",
-  "Payrolls created before 2015 still in processing",
-  "Freelancer payrolls submitted in January 2024",
+  "Payrolls generated between 2018 and 2020",
+  "Pending payrolls for employees from Site 'ABC'",
+  "Payrolls created before 2015 still pending",
+  "Payrolls submitted of month January",
   "Payroll records for Project Site 'ABC' during 2021",
   "All payrolls from Site 'ABC' with 'Part-time' type",
-  "Approved payrolls for year 2023 with salary type",
+  "Approved payrolls for year 2023",
   "Payrolls with pending payment for Site 'XYZ'",
 ];
 
@@ -71,9 +75,10 @@ export function PayrollSearchFilter({
   const initialFilterParams: PayrollFilters = {
     date_start: "",
     date_end: "",
-    payroll_type: "",
     status: "",
     name: "",
+    month: "",
+    year: "",
   };
 
   const [filterParams, setFilterParams] = useState(initialFilterParams);
@@ -103,8 +108,9 @@ export function PayrollSearchFilter({
   const searchParamsList: PayrollFilters = {
     date_start: searchParams.get("date_start"),
     date_end: searchParams.get("date_end"),
-    payroll_type: searchParams.get("payroll_type"),
     status: searchParams.get("status"),
+    month: searchParams.get("month"),
+    year: searchParams.get("year"),
   };
 
   useEffect(() => {
@@ -288,37 +294,6 @@ export function PayrollSearchFilter({
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
-              <span>Payroll Type</span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent
-                sideOffset={14}
-                alignOffset={-4}
-                className="p-0"
-              >
-                {["salary", "exit", "reimbursement"].map((name, index) => (
-                  <DropdownMenuCheckboxItem
-                    key={name + index.toString()}
-                    className="capitalize"
-                    checked={filterParams?.payroll_type === name}
-                    onCheckedChange={() => {
-                      setFilterParams((prev) => ({
-                        ...prev,
-                        payroll_type: name,
-                      }));
-                    }}
-                  >
-                    {name}
-                  </DropdownMenuCheckboxItem>
-                ))}
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-        </DropdownMenuGroup>
-
-        <DropdownMenuGroup>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
               <span>Status</span>
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
@@ -336,6 +311,68 @@ export function PayrollSearchFilter({
                       setFilterParams((prev) => ({
                         ...prev,
                         status: name,
+                      }));
+                    }}
+                  >
+                    {name}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+        </DropdownMenuGroup>
+
+        <DropdownMenuGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <span>Year</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent
+                sideOffset={14}
+                alignOffset={-4}
+                className="p-0"
+              >
+                {getYears(25, defaultYear).map((name, index) => (
+                  <DropdownMenuCheckboxItem
+                    key={name + index.toString()}
+                    className="capitalize"
+                    checked={filterParams?.year === name.toString()}
+                    onCheckedChange={() => {
+                      setFilterParams((prev) => ({
+                        ...prev,
+                        year: name.toString(),
+                      }));
+                    }}
+                  >
+                    {name}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+        </DropdownMenuGroup>
+
+        <DropdownMenuGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <span>Month</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent
+                sideOffset={14}
+                alignOffset={-4}
+                className="p-0"
+              >
+                {Object.keys(months).map((name, index) => (
+                  <DropdownMenuCheckboxItem
+                    key={name + index.toString()}
+                    className="capitalize"
+                    checked={filterParams?.month === name.toString()}
+                    onCheckedChange={() => {
+                      setFilterParams((prev) => ({
+                        ...prev,
+                        month: name.toString(),
                       }));
                     }}
                   >

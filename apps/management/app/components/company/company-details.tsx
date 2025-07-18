@@ -144,6 +144,19 @@ export const CompanyDetails = ({
                 errors={fields.company_size.errors}
               />
             </div>
+            <Field
+              inputProps={{
+                ...getInputProps(fields.registration_number, { type: "text" }),
+                placeholder: `Enter ${replaceUnderscore(
+                  fields.registration_number.name
+                )}`,
+                readOnly: !hasPermission(
+                  role,
+                  `${updateRole}:${attribute.settingGeneral}`
+                ),
+              }}
+              errors={fields.registration_number.errors}
+            />
           </CardContent>
 
           <CardFooter

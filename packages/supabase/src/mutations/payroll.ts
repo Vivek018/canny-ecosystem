@@ -1,5 +1,4 @@
 import type {
-  ExitsInsert,
   PayrollDatabaseInsert,
   PayrollDatabaseUpdate,
   SalaryEntriesDatabaseInsert,
@@ -10,22 +9,12 @@ import {
   getPayrollById,
   getSalaryEntriesByPayrollAndEmployeeId,
   getSalaryEntryById,
-  type ExitDataType,
-  type ReimbursementDataType,
 } from "../queries";
 import {
   calculateSalaryTotalNetAmount,
   convertToNull,
   isGoodStatus,
 } from "@canny_ecosystem/utils";
-import {
-  createReimbursementsFromImportedData,
-  updateReimbursementsForPayrollCreation,
-} from "./reimbursements";
-import {
-  createExitsFromImportedData,
-  updateExitsForPayrollCreation,
-} from "./exits";
 
 // Salary Payroll
 export async function createSalaryPayroll({
@@ -71,7 +60,6 @@ export async function createSalaryPayroll({
       year: data.year,
       run_date: data.run_date ?? null,
       status: data?.status ?? "pending",
-      payroll_type: data.type ?? "salary",
       total_employees: data.totalEmployees,
       total_net_amount: data.totalNetAmount,
       company_id: companyId,
@@ -269,182 +257,9 @@ export async function createSalaryPayrollByGroup({
   };
 }
 
-// Reimbrusement Payroll
-export async function createReimbursementPayroll({
-  supabase,
-  data,
-  companyId,
-  bypassAuth = false,
-  from,
-}: {
-  supabase: TypedSupabaseClient;
-  data: {
-    run_date?: string;
-    title: string;
-    status?: "pending" | "approved" | "submitted";
-    type: "reimbursement";
-    reimbursementData: Partial<ReimbursementDataType>[];
-    totalEmployees: number;
-    totalNetAmount: number;
-  };
-  companyId: string;
-  from?: string;
-  bypassAuth?: boolean;
-}) {
-  if (!bypassAuth) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
 
-    if (!user?.email) {
-      return { status: 400, error: "Unauthorized User" };
-    }
-  }
 
-  const {
-    data: payrollData,
-    status: payrollStatus,
-    error: payrollError,
-  } = await supabase
-    .from("payroll")
-    .insert({
-      title: data.title,
-      run_date: data.run_date ?? null,
-      status: data?.status ?? "pending",
-      payroll_type: data.type ?? "reimbursement",
-      total_employees: data.totalEmployees,
-      total_net_amount: data.totalNetAmount,
-      company_id: companyId,
-    })
-    .select("id")
-    .single();
 
-  if (!payrollData?.id || payrollError) {
-    console.error("createReimbursmentPayroll payroll error", payrollError);
-    return { status: payrollStatus, error: payrollError };
-  }
-
-  if (from === "import") {
-    const updatedData = data.reimbursementData.map((entry) => ({
-      ...entry,
-      payroll_id: payrollData.id,
-    }));
-
-    const { error, status } = await createReimbursementsFromImportedData({
-      data: updatedData,
-      supabase,
-    });
-
-    return {
-      status: payrollStatus ?? status,
-      error: payrollError ?? error,
-      message: null,
-    };
-  }
-
-  const payrollEntriesData = data.reimbursementData.map(({ id }) => ({
-    id: id!,
-    payroll_id: payrollData?.id,
-  }));
-
-  const { errors, status } = await updateReimbursementsForPayrollCreation({
-    data: payrollEntriesData,
-    supabase,
-  });
-
-  return {
-    status: payrollStatus ?? status,
-    error: payrollError ?? errors,
-    message: null,
-  };
-}
-
-// Exit Payroll
-export async function createExitPayroll({
-  supabase,
-  data,
-  companyId,
-  from,
-  bypassAuth = false,
-}: {
-  supabase: TypedSupabaseClient;
-  data: {
-    run_date?: string;
-    title: string;
-    status?: "pending" | "approved" | "submitted";
-    type: "exit";
-    exitData: Partial<ExitDataType>[];
-    totalEmployees: number;
-    totalNetAmount: number;
-  };
-  from?: string;
-  companyId: string;
-  bypassAuth?: boolean;
-}) {
-  if (!bypassAuth) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user?.email) return { status: 400, error: "Unauthorized User" };
-  }
-
-  const {
-    data: payrollData,
-    status: payrollStatus,
-    error: payrollError,
-  } = await supabase
-    .from("payroll")
-    .insert({
-      title: data.title,
-      run_date: data.run_date ?? null,
-      status: data?.status ?? "pending",
-      payroll_type: data.type ?? "exit",
-      total_employees: data.totalEmployees,
-      total_net_amount: data.totalNetAmount,
-      company_id: companyId,
-    })
-    .select("id")
-    .single();
-
-  if (!payrollData?.id || payrollError) {
-    console.error("createExitPayroll payroll error", payrollError);
-    return { status: payrollStatus, error: payrollError };
-  }
-  if (from === "import") {
-    const updatedData = data.exitData.map((entry) => ({
-      ...entry,
-      payroll_id: payrollData.id,
-    }));
-
-    const { error, status } = await createExitsFromImportedData({
-      import_type: "skip",
-      data: updatedData as ExitsInsert[],
-      supabase,
-    });
-
-    return {
-      status: payrollStatus ?? status,
-      error: payrollError ?? error,
-      message: null,
-    };
-  }
-
-  const exitEntriesData = data.exitData.map(({ id }) => ({
-    id: id!,
-    payroll_id: payrollData?.id,
-  }));
-
-  const { errors, status } = await updateExitsForPayrollCreation({
-    data: exitEntriesData,
-    supabase,
-  });
-  return {
-    status: payrollStatus ?? status,
-    error: payrollError ?? errors,
-    message: null,
-  };
-}
 
 export async function deletePayroll({
   supabase,

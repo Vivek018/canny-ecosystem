@@ -15,7 +15,6 @@ export const ImportReimbursementDataArray = [
   "amount",
   "email",
   "status",
-  "is_deductible",
 ];
 
 export function ImportedDataTableHeader({ table, className, loading }: Props) {

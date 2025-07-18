@@ -40,8 +40,6 @@ import { useSupabase } from "@canny_ecosystem/supabase/client";
 import { Spinner } from "@canny_ecosystem/ui/spinner";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import { ImportReimbursementPayrollModal } from "@/components/payroll/import-export/import-reimbursement-modal-payroll";
-import { ImportExitPayrollModal } from "@/components/payroll/import-export/import-exit-modal-payroll";
 import { generatePayrollFilter } from "@/utils/ai/payroll";
 
 const pageSize = 15;
@@ -61,8 +59,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const filters: PayrollFilters = {
       date_start: searchParams.get("date_start") ?? null,
       date_end: searchParams.get("date_end") ?? null,
-      payroll_type: searchParams.get("payroll_type") ?? null,
       status: searchParams.get("status") ?? null,
+      month: searchParams.get("month") ?? null,
+      year: searchParams.get("year") ?? null,
     };
 
     const payrollsPromise = getPendingOrSubmittedPayrollsByCompanyId({
@@ -276,7 +275,6 @@ export default function RunPayrollIndex() {
                                 value={
                                   payroll.id +
                                   payroll?.commission +
-                                  payroll?.payroll_type +
                                   formatDate(payroll?.run_date) +
                                   payroll?.status +
                                   payroll?.total_employees +
@@ -322,8 +320,6 @@ export default function RunPayrollIndex() {
       </div>
 
       <ImportSalaryPayrollModal />
-      <ImportReimbursementPayrollModal />
-      <ImportExitPayrollModal />
       <Outlet />
     </section>
   );

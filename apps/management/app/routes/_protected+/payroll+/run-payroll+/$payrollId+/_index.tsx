@@ -1,9 +1,7 @@
 import { ErrorBoundary } from "@/components/error-boundary";
 import { LoadingSpinner } from "@/components/loading-spinner";
-import { ExitEntryComponent } from "@/components/payroll/exit-entry/exit-entry-component";
 import { ImportGroupSalaryPayrollModal } from "@/components/payroll/import-export/import-group-salary-modal-payroll";
 
-import { ReimbursementEntryComponent } from "@/components/payroll/reimbursement-entry/reimbursement-entry-component";
 import { SalaryEntryComponent } from "@/components/payroll/salary-entry/salary-entry-component";
 import { cacheKeyPrefix } from "@/constant";
 import {
@@ -13,14 +11,10 @@ import {
 } from "@/utils/cache";
 import { updatePayroll } from "@canny_ecosystem/supabase/mutations";
 import {
-  type ExitsPayrollEntriesWithEmployee,
-  getExitsEntriesForPayrollByPayrollId,
   getGroupsBySiteId,
   getPayrollById,
-  getReimbursementEntriesForPayrollByPayrollId,
   getSalaryEntriesByPayrollId,
   getSitesByProjectId,
-  type ReimbursementPayrollEntriesWithEmployee,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type {
@@ -121,21 +115,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         group,
       },
     });
-    const reimbursementEntriesPromise =
-      getReimbursementEntriesForPayrollByPayrollId({
-        supabase,
-        payrollId: payrollId ?? "",
-      });
-    const exitEntriesPromise = getExitsEntriesForPayrollByPayrollId({
-      supabase,
-      payrollId: payrollId ?? "",
-    });
+   
 
     return defer({
       payrollData,
       salaryEntriesPromise,
-      reimbursementEntriesPromise,
-      exitEntriesPromise,
       groupOptions,
       siteOptions,
       error: null,
@@ -146,8 +130,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return defer({
       payrollData: null,
       salaryEntriesPromise: Promise.resolve({ data: null, error: null }),
-      reimbursementEntriesPromise: Promise.resolve({ data: null, error: null }),
-      exitEntriesPromise: Promise.resolve({ data: null, error: null }),
       groupOptions: [],
       siteOptions: [],
       error,
@@ -159,7 +141,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
-    `${cacheKeyPrefix.run_payroll_id}${args.params.payrollId
+    `${cacheKeyPrefix.run_payroll_id}${
+      args.params.payrollId
     }${url.searchParams.toString()}`,
     args
   );
@@ -173,7 +156,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
     const formData = await request.formData();
     const payrollId = params.payrollId;
     const parsedData = JSON.parse(formData.get("data") as string);
-    const redirectUrl = (formData.get("redirectUrl") as string) ?? `/payroll/run-payroll/${payrollId}`;
+    const redirectUrl =
+      (formData.get("redirectUrl") as string) ??
+      `/payroll/run-payroll/${payrollId}`;
 
     const data = {
       id: (parsedData.id ?? payrollId) as PayrollDatabaseRow["id"],
@@ -220,8 +205,6 @@ export default function RunPayrollId() {
   const {
     payrollData,
     salaryEntriesPromise,
-    reimbursementEntriesPromise,
-    exitEntriesPromise,
     groupOptions,
     siteOptions,
     env,
@@ -270,73 +253,30 @@ export default function RunPayrollId() {
   return (
     <>
       <Suspense fallback={<LoadingSpinner className="my-20" />}>
-        {payrollData?.payroll_type === "reimbursement" ||
-          payrollData?.payroll_type === "exit" ? (
-          <Await
-            resolve={
-              payrollData?.payroll_type === "reimbursement"
-                ? reimbursementEntriesPromise
-                : exitEntriesPromise
-            }
-          >
-            {({ data, error }) => {
-              if (error || !data) {
-                clearCacheEntry(
-                  `${cacheKeyPrefix.run_payroll_id}${payrollId}`
-                );
-                return (
-                  <ErrorBoundary
-                    error={error}
-                    message="Failed to load Payroll Entries in Run Payroll"
-                  />
-                );
-              }
-
-              return payrollData?.payroll_type === "reimbursement" ? (
-                <ReimbursementEntryComponent
-                  payrollData={payrollData as any}
-                  data={
-                    data as unknown as ReimbursementPayrollEntriesWithEmployee[]
-                  }
-                  env={env as SupabaseEnv}
-                  fromWhere="runpayroll"
-                />
-              ) : (
-                <ExitEntryComponent
-                  payrollData={payrollData as any}
-                  data={data as unknown as ExitsPayrollEntriesWithEmployee[]}
-                  env={env as SupabaseEnv}
-                  fromWhere="runpayroll"
-                />
-              );
-            }}
-          </Await>
-        ) : payrollData?.payroll_type === "salary" ? (
-          <Await resolve={salaryEntriesPromise}>
-            {({ data, error }) => {
-              if (error || !data) {
-                clearCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
-                return (
-                  <ErrorBoundary
-                    error={error}
-                    message="Failed to load Salary Entries in Run Payroll"
-                  />
-                );
-              }
-
+        <Await resolve={salaryEntriesPromise}>
+          {({ data, error }) => {
+            if (error || !data) {
+              clearCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
               return (
-                <SalaryEntryComponent
-                  payrollData={payrollData as any}
-                  data={data as any}
-                  env={env as SupabaseEnv}
-                  fromWhere="runpayroll"
-                  siteOptions={siteOptions}
-                  groupOptions={groupOptions}
+                <ErrorBoundary
+                  error={error}
+                  message="Failed to load Salary Entries in Run Payroll"
                 />
               );
-            }}
-          </Await>
-        ) : null}
+            }
+
+            return (
+              <SalaryEntryComponent
+                payrollData={payrollData as any}
+                data={data as any}
+                env={env as SupabaseEnv}
+                fromWhere="runpayroll"
+                siteOptions={siteOptions}
+                groupOptions={groupOptions}
+              />
+            );
+          }}
+        </Await>
       </Suspense>
       <ImportGroupSalaryPayrollModal />
     </>

@@ -16,6 +16,7 @@ import {
   formatDate,
   getMonthName,
   hasPermission,
+  roundToNearest,
   searchInObject,
   updateRole,
 } from "@canny_ecosystem/utils";
@@ -89,17 +90,15 @@ export function SalaryEntryComponent({
     navigation.state === "submitting" || navigation.state === "loading";
 
   const [site, setSite] = useState<string[]>(
-    () =>
-      searchParams.get("site")?.split(",") ?? []
+    () => searchParams.get("site")?.split(",") ?? []
   );
   const [group, setGroup] = useState<string[]>(
-    () =>
-      searchParams.get("group")?.split(",") ?? []
+    () => searchParams.get("group")?.split(",") ?? []
   );
 
   let redirectUrl = `/payroll/run-payroll/${payrollId}`;
   if (site.length) {
-    redirectUrl += `?site=${searchParams.getAll("site").join(",")}`
+    redirectUrl += `?site=${searchParams.getAll("site").join(",")}`;
   } else if (group.length) {
     redirectUrl += `?group=${searchParams.getAll("group").join(",")}`;
   }
@@ -116,13 +115,13 @@ export function SalaryEntryComponent({
     if (values.length <= 3) {
       return payrollData.project_id
         ? siteOptions
-          .filter((option) => values.includes(String(option.value)))
-          .map((option) => option.label)
-          .join(", ")
+            .filter((option) => values.includes(String(option.value)))
+            .map((option) => option.label)
+            .join(", ")
         : groupOptions
-          .filter((option) => values.includes(String(option.value)))
-          .map((option) => option.label)
-          .join(", ");
+            .filter((option) => values.includes(String(option.value)))
+            .map((option) => option.label)
+            .join(", ");
     }
 
     return `${values.length} selected`;
@@ -168,9 +167,7 @@ export function SalaryEntryComponent({
     status: PayrollDatabaseRow["status"]
   ) => {
     e.preventDefault();
-    clearCacheEntry(
-      `${cacheKeyPrefix.run_payroll_id}${payrollId}`
-    );
+    clearCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
     submit(
       {
         data: JSON.stringify({
@@ -241,9 +238,7 @@ export function SalaryEntryComponent({
   const deductiveCount = deductiveEntries.length;
 
   const handleUpdatePayroll = () => {
-    clearCacheEntry(
-      `${cacheKeyPrefix.run_payroll_id}${payrollId}`
-    );
+    clearCacheEntry(`${cacheKeyPrefix.run_payroll_id}${payrollId}`);
     submit(
       {
         payrollId: payrollId ?? payrollData?.id,
@@ -283,7 +278,7 @@ export function SalaryEntryComponent({
                         <React.Fragment key={key}>
                           <p>{key}</p>
                           <p className="text-muted-foreground">
-                            {value?.amount?.toString() || "0"}
+                            {roundToNearest(value?.amount) || "0"}
                           </p>
                         </React.Fragment>
                       )),
@@ -307,7 +302,7 @@ export function SalaryEntryComponent({
                   )}
                 />
                 <p className="text-sm py-1">
-                  Gross : {totals.GROSS.toString()}
+                  Gross : {roundToNearest(Number(totals.GROSS))}
                 </p>
               </div>
               <div className="text-center text-lg">
@@ -326,7 +321,7 @@ export function SalaryEntryComponent({
                           <React.Fragment key={key}>
                             <p>{key}</p>
                             <p className=" text-muted-foreground">
-                              {value?.amount?.toString() || "0"}
+                              {roundToNearest(value?.amount) || "0"}
                             </p>
                           </React.Fragment>
                         )
@@ -351,14 +346,18 @@ export function SalaryEntryComponent({
                   )}
                 />
                 <p className="text-sm py-1">
-                  Deduction : {totals.DEDUCTION.toString()}
+                  Deduction : {roundToNearest(Number(totals.DEDUCTION))}
                 </p>
               </div>
             </div>
             <hr
-              className={cn(selectedRows.length && "border-muted-foreground/30")}
+              className={cn(
+                selectedRows.length && "border-muted-foreground/30"
+              )}
             />
-            <p className="mt-2">Net Amount : {totals.TOTAL.toString()}</p>
+            <p className="mt-2">
+              Net Amount : {roundToNearest(Number(totals.TOTAL))}
+            </p>
           </CardContent>
         </Card>
         <div className="flex flex-col gap-2">
@@ -514,8 +513,8 @@ export function SalaryEntryComponent({
               "hidden h-10",
               (payrollData.status === "pending" ||
                 payrollData.status === "approved") &&
-              hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
-              "flex"
+                hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
+                "flex"
             )}
             disabled={disable}
           >
@@ -527,8 +526,8 @@ export function SalaryEntryComponent({
             className={cn(
               "hidden h-10",
               payrollData.status === "submitted" &&
-              hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
-              "flex"
+                hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
+                "flex"
             )}
             disabled={disable}
           >
@@ -539,8 +538,8 @@ export function SalaryEntryComponent({
             className={cn(
               "hidden h-10",
               payrollData.status === "submitted" &&
-              hasPermission(role, `${approveRole}:${attribute.payroll}`) &&
-              "flex"
+                hasPermission(role, `${approveRole}:${attribute.payroll}`) &&
+                "flex"
             )}
             disabled={disable}
           >
@@ -559,20 +558,23 @@ export function SalaryEntryComponent({
           payrollId={payrollId ?? payrollData?.id}
           data={selectedRows.length ? selectedRows : (data as unknown as any)}
           env={env as SupabaseEnv}
-          payrollData={payrollData}
           fromWhere={fromWhere}
           status={payrollData?.status}
         />
       </div>
 
-      {disable ? <LoadingSpinner className="my-20" /> : <SalaryEntryDataTable
-        data={tableData as any}
-        columns={salaryEntryColumns({
-          data,
-          editable: payrollData?.status === "pending",
-        })}
-        totalNet={totals.TOTAL as number}
-      />}
+      {disable ? (
+        <LoadingSpinner className="my-20" />
+      ) : (
+        <SalaryEntryDataTable
+          data={tableData as any}
+          columns={salaryEntryColumns({
+            data,
+            editable: payrollData?.status === "pending",
+          })}
+          totalNet={totals.TOTAL as number}
+        />
+      )}
       <Outlet />
     </section>
   );

@@ -1,5 +1,4 @@
 import type {
-  PayrollDatabaseRow,
   SupabaseEnv,
 } from "@canny_ecosystem/supabase/types";
 import { Button } from "@canny_ecosystem/ui/button";
@@ -15,24 +14,16 @@ import { useNavigate } from "@remix-run/react";
 import { DownloadBankAdvice } from "./download-bank-advice";
 import { DownloadEsiFormat } from "./download-esi-format";
 import { DownloadEpfFormat } from "./download-epf-format";
-import type {
-  ExitsPayrollEntriesWithEmployee,
-  ReimbursementPayrollEntriesWithEmployee,
-} from "@canny_ecosystem/supabase/queries";
 
 export function PayrollActions({
   payrollId,
   className,
   env,
   data,
-  payrollData,
   fromWhere,
   status,
 }: {
-  payrollData: Omit<PayrollDatabaseRow, "created_at" | "updated_at">;
-  data:
-    | ReimbursementPayrollEntriesWithEmployee[]
-    | ExitsPayrollEntriesWithEmployee[];
+  data: any[];
   env: SupabaseEnv;
   payrollId: string;
   className?: string;
@@ -44,7 +35,11 @@ export function PayrollActions({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" className={cn("h-10 px-2 bg-muted", className)}>
+        <Button
+          variant="outline"
+          size="icon"
+          className={cn("h-10 px-2 bg-muted", className)}
+        >
           <Icon name="dots-vertical" className="h-[18px] w-[18px]" />
         </Button>
       </DropdownMenuTrigger>
@@ -78,55 +73,33 @@ export function PayrollActions({
             )}
           />
           <Button variant={"ghost"} className="w-full px-2">
-            <DownloadBankAdvice
-              env={env}
-              data={data}
-              payrollData={payrollData}
-            />
+            <DownloadBankAdvice env={env} data={data} />
           </Button>
           <DropdownMenuSeparator
-            className={cn(
-              "hidden",
-              payrollData.payroll_type === "salary" &&
-                status === "approved" &&
-                "flex"
-            )}
+            className={cn("hidden", status === "approved" && "flex")}
           />
-          <Button
-            variant={"ghost"}
-            className={cn(
-              "hidden w-full px-2",
-              payrollData.payroll_type === "salary" && "flex"
-            )}
-          >
+          <Button variant={"ghost"} className={cn("w-full px-2")}>
             <DownloadEsiFormat env={env} data={data} />
           </Button>
 
           <Button
             variant={"ghost"}
             className={cn(
-              "hidden w-full px-2",
-              payrollData.payroll_type === "salary" && "flex"
+              " w-full px-2",
             )}
           >
             <DownloadEpfFormat env={env} data={data} />
           </Button>
-          
+
           <DropdownMenuSeparator
-            className={cn(
-              "hidden",
-              payrollData.payroll_type === "salary" &&
-                status === "approved" &&
-                "flex"
-            )}
+            className={cn("hidden", status === "approved" && "flex")}
           />
           <div>
             <Button
               variant={"ghost"}
               className={cn(
                 "hidden",
-                payrollData.payroll_type === "salary" &&
-                  status === "approved" &&
+                status === "approved" &&
                   "flex flex-row justify-start gap-2 px-2 pr-1  "
               )}
               onClick={() =>
@@ -142,20 +115,14 @@ export function PayrollActions({
             </Button>
           </div>
           <DropdownMenuSeparator
-            className={cn(
-              "hidden",
-              payrollData.payroll_type === "salary" &&
-                status === "approved" &&
-                "flex"
-            )}
+            className={cn("hidden", status === "approved" && "flex")}
           />
           <div>
             <Button
               variant={"ghost"}
               className={cn(
                 "hidden",
-                payrollData.payroll_type === "salary" &&
-                  status === "approved" &&
+                status === "approved" &&
                   "flex flex-row justify-start gap-2 px-2 pr-1  "
               )}
               onClick={() =>
@@ -175,7 +142,6 @@ export function PayrollActions({
           {/* <DropdownMenuSeparator
             className={cn(
               "hidden",
-              payrollData.payroll_type === "salary" &&
                 status === "approved" &&
                 "flex"
             )}
@@ -185,7 +151,6 @@ export function PayrollActions({
               variant={"ghost"}
               className={cn(
                 "hidden",
-                payrollData.payroll_type === "salary" &&
                   status === "approved" &&
                   "flex flex-row justify-start gap-2 px-2 pr-1  "
               )}
@@ -206,7 +171,6 @@ export function PayrollActions({
           <DropdownMenuSeparator
             className={cn(
               "hidden",
-              payrollData.payroll_type === "salary" &&
                 status === "approved" &&
                 "flex"
             )}
@@ -216,7 +180,6 @@ export function PayrollActions({
               variant={"ghost"}
               className={cn(
                 "hidden",
-                payrollData.payroll_type === "salary" &&
                   status === "approved" &&
                   "flex flex-row justify-start gap-2 px-2 pr-1  "
               )}
@@ -235,20 +198,14 @@ export function PayrollActions({
             </Button>
           </div> */}
           <DropdownMenuSeparator
-            className={cn(
-              "hidden",
-              payrollData.payroll_type === "salary" &&
-                status === "approved" &&
-                "flex"
-            )}
+            className={cn("hidden", status === "approved" && "flex")}
           />
           <div>
             <Button
               variant={"ghost"}
               className={cn(
                 "hidden",
-                payrollData.payroll_type === "salary" &&
-                  status === "approved" &&
+                status === "approved" &&
                   "flex flex-row justify-start gap-2 px-2 pr-1  "
               )}
               onClick={() =>

@@ -1,11 +1,13 @@
 import {
+  defaultYear,
+  getYears,
   payrollPaymentStatusArray,
-  payrollTypesArray,
   z,
 } from "@canny_ecosystem/utils";
 import { generateObject } from "ai";
 import { google } from "@ai-sdk/google";
 import { GEMINI_LITE } from "./chat/constant";
+import { months } from "@canny_ecosystem/utils/constant";
 
 export const PayrollFiltersSchema = z.object({
   name: z
@@ -26,14 +28,18 @@ export const PayrollFiltersSchema = z.object({
     .describe(
       "Date of Payroll end range in YYYY-MM-DD format. Example: 2000-12-31"
     ),
-  payroll_type: z
-    .enum([...payrollTypesArray, "salary"])
-    .optional()
-    .describe("Types of payroll."),
   status: z
     .enum(payrollPaymentStatusArray)
     .optional()
     .describe("Status of payroll."),
+  month: z
+    .enum(Object.keys(months) as [string, ...string[]])
+    .optional()
+    .describe("Months in a year."),
+  year: z
+    .enum(getYears(25, defaultYear).map(String) as [string, ...string[]])
+    .optional()
+    .describe("Years."),
 });
 
 export const generatePayrollFilter = async ({

@@ -100,7 +100,7 @@ export default function DeleteGroup() {
       });
     }
 
-    navigate(actionData.redirectUrl, { replace: true });
+    navigate(-1, { replace: true });
   }, [actionData]);
 
   return null;

@@ -30,10 +30,10 @@ export function FilterList({ filters }: Props) {
           );
         }
         return formatDate(new Date(value));
-
+        
       case "name":
       case "status":
-      case "is_deductible":
+      case "type":
       case "users":
       case "project":
       case "project_site":

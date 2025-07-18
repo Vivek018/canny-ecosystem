@@ -10,11 +10,13 @@ import {
   deleteRole,
   formatDate,
   hasPermission,
+  replaceUnderscore,
   updateRole,
 } from "@canny_ecosystem/utils";
 import { useUser } from "@/utils/user";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import Previewer from "@/utils/previewer";
 
 export const columns = ({
   isEmployeeRoute = false,
@@ -51,11 +53,9 @@ export const columns = ({
     cell: ({ row }) => {
       return (
         <p className="truncate w-48 group-hover:text-primary">
-          {row.original.employee_id
-            ? `${row.original.employees?.first_name} ${
-                row.original.employees?.middle_name ?? ""
-              } ${row.original.employees?.last_name ?? ""}`
-            : `${row.original.name}`}
+          {`${row.original.employees?.first_name} ${
+            row.original.employees?.middle_name ?? ""
+          } ${row.original.employees?.last_name ?? ""}`}
         </p>
       );
     },
@@ -96,7 +96,18 @@ export const columns = ({
     cell: ({ row }) => {
       return (
         <p className="truncate ">
-          {formatDate(row.original?.submitted_date ?? "") ?? "--"}
+          <> {formatDate(row.original?.submitted_date ?? "") ?? "--"}</>
+        </p>
+      );
+    },
+  },
+  {
+    accessorKey: "type",
+    header: "Type",
+    cell: ({ row }) => {
+      return (
+        <p className="truncate capitalize ">
+          {replaceUnderscore(row.original.type) ?? "--"}
         </p>
       );
     },
@@ -124,13 +135,11 @@ export const columns = ({
     },
   },
   {
-    accessorKey: "is_deductible",
-    header: "Is Deductible",
+    accessorKey: "note",
+    header: "Note",
     cell: ({ row }) => {
       return (
-        <p className="truncate capitalize">
-          {String(row.original?.is_deductible) ?? "--"}
-        </p>
+        <Previewer label={"Note"} description={row.original?.note ?? "--"} />
       );
     },
   },
@@ -154,7 +163,6 @@ export const columns = ({
           key={row?.original?.id}
           reimbursementId={row?.original?.id}
           employeeId={row.original?.employee_id!}
-          name={row.original?.name}
           isEmployeeRoute={isEmployeeRoute}
           triggerChild={
             <DropdownMenuTrigger

@@ -58,17 +58,7 @@ export const ImportedDataColumns: ColumnDef<ImportReimbursementDataType>[] = [
       );
     },
   },
-  {
-    accessorKey: "is_deductible",
-    header: "Is Deductible",
-    cell: ({ row }) => {
-      return (
-        <p className="truncate capitalize">
-          {row.original?.is_deductible ?? "--"}
-        </p>
-      );
-    },
-  },
+ 
 
   {
     id: "actions",

@@ -146,7 +146,7 @@ export default function UpdateReimbursements() {
           variant: "destructive",
         });
       }
-      navigate(`/employees/${updatableData?.employee_id}/reimbursements`);
+      navigate("/approvals/reimbursements");
     }
   }, [actionData]);
 

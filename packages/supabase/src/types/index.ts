@@ -33,14 +33,6 @@ export type CompanyDatabaseInsert =
 export type CompanyDatabaseUpdate =
   Database["public"]["Tables"]["companies"]["Update"];
 
-// Company Registration Details
-export type CompanyRegistrationDetailsRow =
-  Database["public"]["Tables"]["company_registration_details"]["Row"];
-export type CompanyRegistrationDetailsInsert =
-  Database["public"]["Tables"]["company_registration_details"]["Insert"];
-export type CompanyRegistrationDetailsUpdate =
-  Database["public"]["Tables"]["company_registration_details"]["Update"];
-
 // Company Locations
 export type LocationDatabaseRow =
   Database["public"]["Tables"]["company_locations"]["Row"];

@@ -12,10 +12,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@canny_ecosystem/ui/chart";
-import {
-  invoiceReimbursementTypeArray,
-  replaceUnderscore,
-} from "@canny_ecosystem/utils";
+import { replaceUnderscore } from "@canny_ecosystem/utils";
 import { Bar, BarChart, CartesianGrid, LabelList, XAxis } from "recharts";
 
 const chartConfig = {
@@ -25,7 +22,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function InvoicesByReimbursementType({
+export function InvoicesByType({
   chartData,
   companyRelations,
 }: {
@@ -33,7 +30,7 @@ export function InvoicesByReimbursementType({
   companyRelations: any;
 }) {
   const partialData = (chartData as any[]).map((invoice) => {
-    const type = invoice.invoice_type;
+    const type = invoice.type;
 
     const totalGross: number =
       invoice.payroll_data
@@ -70,13 +67,13 @@ export function InvoicesByReimbursementType({
           ? (sum * companyRelations.service_charge) / 100
           : 0
         : invoice.include_charge
-        ? (invoice.payroll_data.reduce(
-            (sum: number, item: any) => sum + Number(item.amount),
-            0
-          ) *
-            companyRelations.reimbursement_charge) /
-          100
-        : 0;
+          ? (invoice.payroll_data.reduce(
+              (sum: number, item: any) => sum + Number(item.amount),
+              0
+            ) *
+              companyRelations.reimbursement_charge) /
+            100
+          : 0;
 
     const total: number =
       type === "salary"
@@ -101,12 +98,12 @@ export function InvoicesByReimbursementType({
     const grand_total: number = total + cgst + sgst + igst;
 
     return {
-      type: invoice.invoice_type,
+      type: invoice.type,
       amount: grand_total,
     };
   });
 
-  const trendData = invoiceReimbursementTypeArray.map((type) => {
+  const trendData = ["salary", "reimbursement", "exit"].map((type) => {
     const totalAmount = partialData
       .filter((item) => item.type === type)
       .reduce((sum, item) => sum + item.amount, 0);
@@ -117,11 +114,9 @@ export function InvoicesByReimbursementType({
   return (
     <Card className="flex-1 flex flex-col">
       <CardHeader>
-        <CardTitle className="text-center">
-          Invoices Amount by Reimbursement Type
-        </CardTitle>
+        <CardTitle className="text-center">Invoices Amount by Type</CardTitle>
       </CardHeader>
-      <CardContent >
+      <CardContent>
         <ChartContainer className="w-full h-64" config={chartConfig}>
           <BarChart
             accessibilityLayer

@@ -1,17 +1,17 @@
 import { faker } from "@faker-js/faker";
 import type {
-  AccidentsDatabaseInsert,
   CasesDatabaseInsert,
   CasesDatabaseRow,
   EmployeeAddressDatabaseInsert,
-  EmployeeAttendanceDatabaseInsert,
   EmployeeBankDetailsDatabaseInsert,
   EmployeeDatabaseInsert,
   EmployeeGuardianDatabaseInsert,
+  EmployeeMonthlyAttendanceDatabaseInsert,
   EmployeeProjectAssignmentDatabaseInsert,
   EmployeeSkillDatabaseInsert,
   EmployeeStatutoryDetailsDatabaseInsert,
   EmployeeWorkHistoryDatabaseInsert,
+  IncidentsDatabaseInsert,
   LeavesDatabaseInsert,
 } from "../types";
 import {
@@ -20,7 +20,7 @@ import {
   caseLocationTypeArray,
   caseStatusArray,
   caseTypeArray,
-  categoryOfAccidentArray,
+  categoryOfIncidentArray,
   genderArray,
   locationTypeArray,
   positionArray,
@@ -129,7 +129,7 @@ export function seedEmployeeProjectAssignmentDetails(): Omit<
   return {
     assignment_type:
       assignmentTypeArray[
-      Math.floor(Math.random() * assignmentTypeArray.length)
+        Math.floor(Math.random() * assignmentTypeArray.length)
       ],
     position: positionArray[Math.floor(Math.random() * positionArray.length)],
     skill_level:
@@ -166,7 +166,9 @@ export function seedEmployeeSkills(): Omit<
   };
 }
 
-export function seedEmployeeAttendance(employeeId: string): EmployeeAttendanceDatabaseInsert[] {
+export function seedEmployeeAttendance(
+  employeeId: string
+): EmployeeMonthlyAttendanceDatabaseInsert[] {
   const today = new Date();
   const oneYearAgo = new Date();
   oneYearAgo.setFullYear(today.getFullYear() - 1);
@@ -176,7 +178,7 @@ export function seedEmployeeAttendance(employeeId: string): EmployeeAttendanceDa
     dates.push(new Date(d));
   }
 
-  const employeeAttendances = dates.map(date => ({
+  const employeeAttendances = dates.map((date) => ({
     employee_id: employeeId,
     date: date.toISOString(),
     holiday: faker.datatype.boolean(),
@@ -193,7 +195,10 @@ export function seedEmployeeLeaves(employeeId: string): LeavesDatabaseInsert[] {
   const employeeLeaves = [];
 
   for (let i = 0; i < numLeaves; i++) {
-    const startDate = faker.date.between({ from: new Date(year, 0, 1), to: new Date(year, 11, 27) }); // Ensuring space for max leave days
+    const startDate = faker.date.between({
+      from: new Date(year, 0, 1),
+      to: new Date(year, 11, 27),
+    }); // Ensuring space for max leave days
     const endDate = new Date(startDate);
     endDate.setDate(startDate.getDate() + faker.number.int({ min: 1, max: 4 })); // Ensuring 1 to 4 days gap
 
@@ -204,7 +209,15 @@ export function seedEmployeeLeaves(employeeId: string): LeavesDatabaseInsert[] {
       start_date: startDate.toISOString(),
       end_date: endDate.toISOString(),
       reason: faker.lorem.words(5),
-      leave_type: (["sick_leave", "casual_leave", "paid_leave", "unpaid_leave", "paternity_leave"] as const)[faker.number.int({ min: 0, max: 4 })],
+      leave_type: (
+        [
+          "sick_leave",
+          "casual_leave",
+          "paid_leave",
+          "unpaid_leave",
+          "paternity_leave",
+        ] as const
+      )[faker.number.int({ min: 0, max: 4 })],
     });
   }
 
@@ -214,16 +227,20 @@ export function seedEmployeeLeaves(employeeId: string): LeavesDatabaseInsert[] {
 export function seedEmployeeReimbursements(employeeId: string) {
   const employeeReimbursements = [];
 
-  for (let i = 0; i < (Math.random() < 0.85 ? 0 : faker.number.int({ min: 1, max: 3 })); i++) {
+  for (
+    let i = 0;
+    i < (Math.random() < 0.85 ? 0 : faker.number.int({ min: 1, max: 3 }));
+    i++
+  ) {
     employeeReimbursements.push({
       employee_id: employeeId,
-      is_deductible: [true, false][faker.number.int({ min: 0, max: 1 })],
       amount: faker.number.int({ min: 1000, max: 5000 }),
-      status: ["approved", "pending", "rejected"][faker.number.int({ min: 0, max: 2 })],
+      status: ["approved", "pending", "rejected"][
+        faker.number.int({ min: 0, max: 2 })
+      ],
       submitted_date: faker.date.past().toISOString(),
     });
   }
-
 
   return employeeReimbursements;
 }
@@ -231,13 +248,15 @@ export function seedEmployeeReimbursements(employeeId: string) {
 export function seedEmployeeExits(employeeId: string) {
   const employeeExits = [];
 
-  for (let i = 0; i < (Math.random() < 0.90 ? 0 : 1); i++) {
+  for (let i = 0; i < (Math.random() < 0.9 ? 0 : 1); i++) {
     employeeExits.push({
       employee_payable_days: faker.number.int({ min: 1, max: 30 }),
       organization_payable_days: faker.number.int({ min: 1000, max: 5000 }),
       final_settlement_date: faker.date.past().toISOString(),
       last_working_day: faker.date.past().toISOString(),
-      reason: ["Resignation", "Termination", "Retirement"][faker.number.int({ min: 0, max: 2 })],
+      reason: ["Resignation", "Termination", "Retirement"][
+        faker.number.int({ min: 0, max: 2 })
+      ],
       bonus: faker.number.int({ min: 1000, max: 5000 }),
       gratuity: faker.number.int({ min: 1000, max: 5000 }),
       deduction: faker.number.int({ min: 1000, max: 5000 }),
@@ -252,20 +271,23 @@ export function seedEmployeeExits(employeeId: string) {
 }
 
 export function seedEmployeeAccidents(employeeId: string) {
-  const employeeAccidents: AccidentsDatabaseInsert[] = [];
+  const employeeAccidents: IncidentsDatabaseInsert[] = [];
 
   for (let i = 0; i < faker.number.int({ min: 0, max: 2 }); i++) {
     employeeAccidents.push({
       employee_id: employeeId,
-      category: categoryOfAccidentArray[
-        faker.number.int({ min: 0, max: categoryOfAccidentArray.length - 1 })],
+      category:
+        categoryOfIncidentArray[
+          faker.number.int({ min: 0, max: categoryOfIncidentArray.length - 1 })
+        ],
       date: faker.date.past().toISOString(),
       description: faker.lorem.words(5),
       location: faker.location.streetAddress(),
       location_type: locationTypeArray[faker.number.int({ min: 0, max: 1 })],
       medical_diagnosis: faker.lorem.words(5),
       severity: severityTypeArray[faker.number.int({ min: 0, max: 1 })],
-      status: statusArray[faker.number.int({ min: 0, max: statusArray.length - 1 })],
+      status:
+        statusArray[faker.number.int({ min: 0, max: statusArray.length - 1 })],
       title: faker.lorem.words(5),
     });
   }
@@ -281,14 +303,21 @@ export function seedEmployeeCases(caseData: Partial<CasesDatabaseRow>) {
       title: faker.lorem.sentence(),
       amount_given: faker.number.int({ min: 1000, max: 5000 }),
       amount_received: faker.number.int({ min: 1000, max: 5000 }),
-      case_type: caseTypeArray[faker.number.int({ min: 0, max: caseTypeArray.length - 1 })],
-      status: caseStatusArray[faker.number.int({ min: 0, max: caseStatusArray.length - 1 })],
+      case_type:
+        caseTypeArray[
+          faker.number.int({ min: 0, max: caseTypeArray.length - 1 })
+        ],
+      status:
+        caseStatusArray[
+          faker.number.int({ min: 0, max: caseStatusArray.length - 1 })
+        ],
       court_case_reference: faker.string.alphanumeric(10),
       date: faker.date.past().toISOString(),
       incident_date: faker.date.past().toISOString(),
       description: faker.lorem.paragraph(),
       location: faker.location.streetAddress(),
-      location_type: caseLocationTypeArray[faker.number.int({ min: 0, max: 1 })],
+      location_type:
+        caseLocationTypeArray[faker.number.int({ min: 0, max: 1 })],
       resolution_date: faker.date.future().toISOString(),
       ...caseData,
     });

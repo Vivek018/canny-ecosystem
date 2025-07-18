@@ -23,7 +23,7 @@ export const ExitFiltersSchema = z.object({
       "Last Working day end range in YYYY-MM-DD format. Example: 2000-12-31"
     ),
   reason: z.enum(exitReasonArray).optional().describe("Reason of leaving."),
-  in_payroll: z.enum(booleanArray).optional().describe("Is in any Payroll."),
+  in_invoice: z.enum(booleanArray).optional().describe("Is in any Invoice."),
   project: z
     .string()
     .optional()

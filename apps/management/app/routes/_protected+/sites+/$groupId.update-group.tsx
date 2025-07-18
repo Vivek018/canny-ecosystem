@@ -137,7 +137,7 @@ export default function UpdateGroup() {
       });
     }
 
-    navigate("/", {
+    navigate(-1, {
       replace: true,
     });
   }, [actionData]);

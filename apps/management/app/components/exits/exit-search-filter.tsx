@@ -35,15 +35,15 @@ export const PLACEHOLDERS = [
   "Employees who left before 2020 due to resignation",
   "Exits with final settlement after Jan 2023",
   "Employees exited from Project 'XYZ' at Site 'ABC'",
-  "Resigned employees not included in payroll",
+  "Resigned employees not included in invoice",
   "Terminated employees whose last working day was in 2022",
   "Employees who exited Site 'ABC' with settlements before 2024",
   "Exits from Project 'XYZ' with final settlement after June 2021",
-  "Employees who left between 2019-2021 and were in payroll",
+  "Employees who left between 2019-2021 and were in invoice",
   "Voluntary exits from Site 'XYZ' before 2018",
   "Exits due to retirement with working day end before 2015",
   "Employees whose final settlement is still pending after 2023",
-  "Non-payroll exits due to personal reasons",
+  "Non-invoice exits due to personal reasons",
   "Employees exited in 2020 from Project 'XYZ'",
   "Last working day between 2021 and 2022 for Site 'ABC'",
 ];
@@ -82,7 +82,7 @@ export function ExitsSearchFilter({
     reason: "",
     project: "",
     project_site: "",
-    in_payroll: "",
+    in_invoice: "",
   };
 
   const [filterParams, setFilterParams] = useState(initialFilterParams);
@@ -118,7 +118,7 @@ export function ExitsSearchFilter({
     final_settlement_date_end: searchParams.get("final_settlement_date_end"),
     reason: searchParams.get("reason"),
     project: searchParams.get("project"),
-    in_payroll: searchParams.get("in_payroll"),
+    in_invoice: searchParams.get("in_invoice"),
     project_site: searchParams.get("project_site"),
   };
 
@@ -451,7 +451,7 @@ export function ExitsSearchFilter({
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
-              <span>Is In Payroll</span>
+              <span>Is In Invoice</span>
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent
@@ -463,11 +463,11 @@ export function ExitsSearchFilter({
                   <DropdownMenuCheckboxItem
                     key={name + index.toString()}
                     className="capitalize"
-                    checked={filterParams?.in_payroll === name}
+                    checked={filterParams?.in_invoice === name}
                     onCheckedChange={() => {
                       setFilterParams((prev) => ({
                         ...prev,
-                        in_payroll: name,
+                        in_invoice: name,
                       }));
                     }}
                   >

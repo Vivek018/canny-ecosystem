@@ -10,6 +10,7 @@ import {
   flexRender,
   getCoreRowModel,
   useReactTable,
+  type VisibilityState,
 } from "@tanstack/react-table";
 import { DataTableHeader } from "./data-table-header";
 import {
@@ -38,6 +39,7 @@ interface DataTableProps<TData, TValue> {
   pageSize: number;
   companyId: string;
   env: SupabaseEnv;
+  initialColumnVisibility?: VisibilityState;
 }
 
 export function InvoiceTable<TData, TValue>({
@@ -50,6 +52,7 @@ export function InvoiceTable<TData, TValue>({
   pageSize,
   filters,
   noFilters,
+  initialColumnVisibility,
   query,
 }: DataTableProps<TData, TValue>) {
   const [data, setData] = useState(initialData);
@@ -59,8 +62,11 @@ export function InvoiceTable<TData, TValue>({
   const [, setSearchParams] = useSearchParams();
 
   const { ref, inView } = useInView();
-  const { rowSelection, setRowSelection, setSelectedRows } = useInvoiceStore();
-
+  const { rowSelection, setRowSelection, setSelectedRows, setColumns } =
+    useInvoiceStore();
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+    initialColumnVisibility ?? {}
+  );
   const loadMoreInvoices = async () => {
     const formattedFrom = from;
     const to = formattedFrom + pageSize;
@@ -90,9 +96,11 @@ export function InvoiceTable<TData, TValue>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     state: {
       rowSelection,
+      columnVisibility,
     },
   });
 
@@ -101,6 +109,10 @@ export function InvoiceTable<TData, TValue>({
       loadMoreInvoices();
     }
   }, [inView]);
+
+  useEffect(() => {
+    setColumns(table.getAllLeafColumns());
+  }, [columnVisibility]);
 
   const selectedRowsData = table
     .getSelectedRowModel()
@@ -157,7 +169,7 @@ export function InvoiceTable<TData, TValue>({
                             cell.column.id === "invoice_number" &&
                               "sticky left-12 bg-card z-10",
                             cell.column.id === "actions" &&
-                            "sticky right-0 min-w-20 max-w-20 bg-card z-10"
+                              "sticky right-0 min-w-20 max-w-20 bg-card z-10"
                           )}
                         >
                           {flexRender(
@@ -222,6 +234,7 @@ export function InvoiceTable<TData, TValue>({
         className={cn(!table.getSelectedRowModel().rows.length && "hidden")}
         rows={table.getSelectedRowModel().rows.length}
         data={selectedRowsData as InvoiceDataType[]}
+        columnVisibility={columnVisibility}
       />
     </div>
   );

@@ -16,7 +16,7 @@ export default function Previewer({
 }) {
   return (
     <Dialog>
-      <DialogTrigger className="truncate text-left w-52">
+      <DialogTrigger className="truncate text-left w-52 text-muted-foreground">
         {description}
       </DialogTrigger>
       <DialogContent>

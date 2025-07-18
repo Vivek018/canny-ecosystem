@@ -13,8 +13,12 @@ import {
 import {
   ImportReimbursementDataSchema,
   ImportReimbursementHeaderSchema,
+  reimbursementTypeArray,
 } from "@canny_ecosystem/utils";
-import type { ImportReimbursementDataType } from "@canny_ecosystem/supabase/queries";
+import {
+  getUsersByCompanyId,
+  type ImportReimbursementDataType,
+} from "@canny_ecosystem/supabase/queries";
 import {
   transformStringArrayIntoOptions,
   replaceUnderscore,
@@ -29,6 +33,8 @@ import { ReimbursementImportData } from "@/components/reimbursements/import-expo
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { LoaderFunctionArgs } from "@remix-run/node";
+import { Label } from "@canny_ecosystem/ui/label";
+import { Input } from "@canny_ecosystem/ui/input";
 
 type FieldConfig = {
   key: keyof z.infer<typeof ImportReimbursementHeaderSchema>;
@@ -46,14 +52,11 @@ const FIELD_CONFIGS: FieldConfig[] = [
   },
   {
     key: "status",
+    required: true,
   },
   {
     key: "amount",
     required: true,
-  },
-  { key: "is_deductible" },
-  {
-    key: "email",
   },
 ];
 
@@ -65,16 +68,31 @@ export async function loader({ request }: LoaderFunctionArgs) {
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
   };
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+  const { data: userData, error: userError } = await getUsersByCompanyId({
+    supabase,
+    companyId,
+  });
+  if (userError || !userData) {
+    throw userError;
+  }
 
-  return json({ env, companyId });
+  const userOptions = userData.map((userData) => ({
+    label: userData.email?.toLowerCase() ?? "",
+    value: userData.id,
+  }));
+  return json({ env, companyId, userOptions });
 }
 
 export default function ReimbursementFieldMapping() {
-  const { env, companyId } = useLoaderData<typeof loader>();
+  const { env, companyId, userOptions } = useLoaderData<typeof loader>();
 
   const { setImportData } = useImportStoreForReimbursement();
 
   const [loadNext, setLoadNext] = useState(false);
+
+  const [type, setType] = useState("");
+  const [note, setNote] = useState("");
+  const [approver, setApprover] = useState("");
 
   const location = useLocation();
   const [file] = useState(location.state?.file);
@@ -104,19 +122,22 @@ export default function ReimbursementFieldMapping() {
 
   useEffect(() => {
     if (headerArray.length > 0) {
-      const initialMapping = FIELD_CONFIGS.reduce((mapping, field) => {
-        const matchedHeader = headerArray.find(
-          (value) =>
-            pipe(replaceUnderscore, replaceDash)(value?.toLowerCase()) ===
-            pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase())
-        );
+      const initialMapping = FIELD_CONFIGS.reduce(
+        (mapping, field) => {
+          const matchedHeader = headerArray.find(
+            (value) =>
+              pipe(replaceUnderscore, replaceDash)(value?.toLowerCase()) ===
+              pipe(replaceUnderscore, replaceDash)(field.key?.toLowerCase())
+          );
 
-        if (matchedHeader) {
-          mapping[field.key] = matchedHeader;
-        }
+          if (matchedHeader) {
+            mapping[field.key] = matchedHeader;
+          }
 
-        return mapping;
-      }, {} as Record<string, string>);
+          return mapping;
+        },
+        {} as Record<string, string>
+      );
 
       setFieldMapping(initialMapping);
     }
@@ -219,12 +240,17 @@ export default function ReimbursementFieldMapping() {
                   )
               );
 
-              return cleanEntry;
+              return {
+                ...cleanEntry,
+                note: note,
+                type: type,
+                user_id: approver,
+              };
             });
 
           if (validateImportData(finalData)) {
             setImportData({
-              data: finalData as ImportReimbursementDataType[],
+              data: finalData as any[],
             });
 
             setLoadNext(true);
@@ -272,7 +298,42 @@ export default function ReimbursementFieldMapping() {
                 </ul>
               </div>
             )}
+            <div className="grid grid-cols-2 gap-8 mb-4">
+              <div className="flex  flex-col gap-1">
+                <Label className="text-sm font-medium">Type</Label>
 
+                <Combobox
+                  options={transformStringArrayIntoOptions(
+                    Array.from(reimbursementTypeArray)
+                  )}
+                  placeholder="Select Type"
+                  value={type}
+                  onChange={(value: string) => {
+                    setType(value);
+                  }}
+                />
+              </div>
+
+              <div className=" flex flex-col gap-1">
+                <Label className="text-sm font-medium">Note</Label>
+                <Input
+                  className=""
+                  placeholder="Enter the title here"
+                  onChange={(e) => setNote(e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="mb-10 flex flex-col gap-1">
+              <Label className="text-sm font-medium">Approver</Label>
+              <Combobox
+                options={userOptions}
+                placeholder="Select User"
+                value={approver}
+                onChange={(value: string) => {
+                  setApprover(value);
+                }}
+              />
+            </div>
             <div className="grid grid-cols-2 place-content-center justify-between gap-y-8 gap-x-10 mt-5">
               {FIELD_CONFIGS.map((field) => (
                 <div key={field.key} className="flex flex-col">

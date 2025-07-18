@@ -18,7 +18,6 @@ import {
   replaceUnderscore,
   transformStringArrayIntoOptions,
   createRole,
-  payrollTypesArray,
   defaultYear,
 } from "@canny_ecosystem/utils";
 
@@ -249,24 +248,6 @@ export default function CreatePayroll() {
                 />
               </div>
               <div className="grid grid-cols-2 place-content-center justify-between gap-x-8 mt-10">
-                <SearchableSelectField
-                  key={resetKey}
-                  className="w-full capitalize flex-1 "
-                  options={transformStringArrayIntoOptions(
-                    payrollTypesArray as unknown as string[]
-                  )}
-                  inputProps={{
-                    ...getInputProps(fields.payroll_type, { type: "text" }),
-                  }}
-                  placeholder={`Select ${replaceUnderscore(
-                    fields.payroll_type.name
-                  )}`}
-                  labelProps={{
-                    children: "Payroll Type",
-                  }}
-                  errors={fields.payroll_type.errors}
-                />
-
                 <div className="w-full flex flex-col gap-1.5">
                   <div className="flex">
                     <Label>Link With</Label>

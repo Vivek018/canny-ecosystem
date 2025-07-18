@@ -6,7 +6,8 @@ import { useReimbursementStore } from "@/store/reimbursements";
 import type { ReimbursementDataType } from "@canny_ecosystem/supabase/queries";
 import { useLocalStorage } from "@canny_ecosystem/utils/hooks/local-storage";
 import { useEffect } from "react";
-import { ReimbursementByDeductible } from "@/components/reimbursements/analytics/reimbursement-by-deductible";
+import { ReimbursementByType } from "@/components/reimbursements/analytics/reimbursement-by-type";
+
 
 const getDataSource = (
   selectedRows: ReimbursementDataType[],
@@ -42,7 +43,7 @@ export default function ReimbursementAnalytics() {
       </div>
 
       <div className="grid grid-cols-3 gap-3">
-        <ReimbursementByDeductible chartData={dataSource} />
+        <ReimbursementByType chartData={dataSource} />
         <ReimbursementByTime chartData={dataSource} />
         <ReimbursementPerEmployer chartData={dataSource} />
       </div>

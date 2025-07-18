@@ -31,6 +31,7 @@ import {
   formatDateTime,
   getMonthNameFromNumber,
   replaceUnderscore,
+  roundToNearest,
 } from "@canny_ecosystem/utils";
 import type {
   CompanyDatabaseRow,
@@ -373,10 +374,12 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
             <View style={styles.totalRow}>
               <Text>Gross Pay</Text>
               <Text>
-                {Number(
-                  data?.employee?.earnings
-                    ?.reduce((sum, earning) => sum + earning.amount, 0)
-                    .toFixed(2)
+                {roundToNearest(
+                  Number(
+                    data?.employee?.earnings
+                      ?.reduce((sum, earning) => sum + earning.amount, 0)
+                      .toFixed(2)
+                  )
                 )}
               </Text>
             </View>
@@ -398,10 +401,12 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
             <View style={styles.totalRow}>
               <Text>Total Deductions</Text>
               <Text>
-                {Number(
-                  data?.employee?.deductions
-                    ?.reduce((sum, deduction) => sum + deduction.amount, 0)
-                    .toFixed(2)
+                {roundToNearest(
+                  Number(
+                    data?.employee?.deductions
+                      ?.reduce((sum, deduction) => sum + deduction.amount, 0)
+                      .toFixed(2)
+                  )
                 )}
               </Text>
             </View>
@@ -410,30 +415,34 @@ const SalarySlipPDF = ({ data }: { data: DataType }) => {
 
         {/* Net Payable */}
         <View style={styles.netPayable}>
-          <Text style={styles.netPayableAmount}>{`Net Payable: Rs ${
+          <Text
+            style={styles.netPayableAmount}
+          >{`Net Payable: Rs ${roundToNearest(
             Number(
               data?.employee?.earnings
                 ?.reduce((sum, earning) => sum + earning.amount, 0)
                 .toFixed(2)
             ) -
-            Number(
-              data?.employee?.deductions
-                ?.reduce((sum, deduction) => sum + deduction.amount, 0)
-                .toFixed(2)
-            )
-          }`}</Text>
+              Number(
+                data?.employee?.deductions
+                  ?.reduce((sum, deduction) => sum + deduction.amount, 0)
+                  .toFixed(2)
+              )
+          )}`}</Text>
           <Text style={styles.netPayableWords}>
             {numberToWordsIndian(
-              Number(
-                data?.employee?.earnings
-                  ?.reduce((sum, earning) => sum + earning.amount, 0)
-                  .toFixed(2)
-              ) -
+              roundToNearest(
                 Number(
-                  data?.employee?.deductions
-                    ?.reduce((sum, deduction) => sum + deduction.amount, 0)
+                  data?.employee?.earnings
+                    ?.reduce((sum, earning) => sum + earning.amount, 0)
                     .toFixed(2)
-                )
+                ) -
+                  Number(
+                    data?.employee?.deductions
+                      ?.reduce((sum, deduction) => sum + deduction.amount, 0)
+                      .toFixed(2)
+                  )
+              )
             )}
           </Text>
         </View>

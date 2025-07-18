@@ -241,27 +241,13 @@ export async function getMonthlyAttendanceByCompanyId({
     }
   }
 
-  if (month || year) {
-    if (month) {
-      query = query.eq("monthly_attendance.month", Number(months[month]));
-      query = query.eq("monthly_attendance.year", Number(defaultYear));
-    }
-    if (year) {
-      query = query.eq("monthly_attendance.month", Number(defaultMonth));
-      query = query.eq("monthly_attendance.year", Number(year));
-    }
-    if (month && year) {
-      query = query.eq("monthly_attendance.month", Number(months[month]));
-      query = query.eq("monthly_attendance.year", Number(year));
-    }
-  } else {
-    const effectiveMonth = month ? Number(months[month]) : defaultMonth;
-    const effectiveYear = year ? Number(year) : defaultYear;
+  const effectiveMonth = month ? Number(months[month]) : defaultMonth;
+  const effectiveYear = year ? Number(year) : defaultYear;
 
-    query = query.eq("monthly_attendance.month", effectiveMonth);
-    query = query.eq("monthly_attendance.year", effectiveYear);
-  }
+  query = query.eq("monthly_attendance.month", effectiveMonth);
+  query = query.eq("monthly_attendance.year", effectiveYear);
 
+  
   if (project) {
     query = query.eq(
       "employee_project_assignment.project_sites.projects.name",
@@ -409,8 +395,8 @@ export async function getAttendanceReportByCompanyId({
         project ? "inner" : "left"
       }(
         project_sites!${project ? "inner" : "left"}(id, name, projects!${
-        project ? "inner" : "left"
-      }(id, name))),
+          project ? "inner" : "left"
+        }(id, name))),
       attendance(
         id,
         date,
@@ -487,10 +473,13 @@ export async function getAttendanceReportByCompanyId({
     return { data: null, error };
   }
 
-  const monthNames = Object.entries(months).reduce((acc, [name, num]) => {
-    acc[num] = name;
-    return acc;
-  }, {} as { [key: number]: string });
+  const monthNames = Object.entries(months).reduce(
+    (acc, [name, num]) => {
+      acc[num] = name;
+      return acc;
+    },
+    {} as { [key: number]: string }
+  );
 
   const processedData = data?.map((employee) => {
     const { attendance, ...employeeInfo } = employee;

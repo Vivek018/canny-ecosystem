@@ -12,10 +12,7 @@ import type {
 
 export type ImportReimbursementDataType = Pick<
   ReimbursementRow,
-  | "amount"
-  | "is_deductible"
-  | "status"
-  | "submitted_date"
+  "amount" | "status" | "submitted_date"
 > & { email: UserDatabaseRow["email"] } & {
   employee_code: EmployeeDatabaseRow["employee_code"];
 };
@@ -24,13 +21,13 @@ export type ReimbursementDataType = Pick<
   ReimbursementRow,
   | "id"
   | "employee_id"
-  | "name"
-  | "is_deductible"
+  | "note"
   | "status"
+  | "type"
   | "amount"
   | "submitted_date"
   | "user_id"
-  | "payroll_id"
+  | "invoice_id"
   | "company_id"
 > & {
   employees: Pick<
@@ -57,7 +54,13 @@ export type ReimbursementDataType = Pick<
 
 export type ImportReimbursementPayrollDataType = Pick<
   ReimbursementRow,
-  "employee_id" | "amount" | "id" | "payroll_id" | "company_id" | "name"
+  | "employee_id"
+  | "amount"
+  | "id"
+  | "invoice_id"
+  | "company_id"
+  | "type"
+  | "note"
 > & {
   employee_code: EmployeeDatabaseRow["employee_code"];
 };
@@ -93,22 +96,22 @@ export async function getReimbursementsByCompanyId({
     submitted_date_start,
     submitted_date_end,
     status,
-    is_deductible,
     users,
+    type,
     project,
     project_site,
-    in_payroll,
+    in_invoice,
   } = filters ?? {};
 
   const columns = [
     "id",
-    "is_deductible",
     "status",
     "amount",
-    "name",
+    "note",
+    "type",
     "submitted_date",
     "employee_id",
-    "payroll_id",
+    "invoice_id",
     "company_id",
   ] as const;
 
@@ -119,8 +122,8 @@ export async function getReimbursementsByCompanyId({
           employees!left(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${
             project ? "inner" : "left"
           }(project_sites!${project ? "inner" : "left"}(id, name, projects!${
-        project ? "inner" : "left"
-      }(id, name)))),
+            project ? "inner" : "left"
+          }(id, name)))),
           users!${users ? "inner" : "left"}(id,email)`,
       { count: "exact" }
     )
@@ -174,12 +177,12 @@ export async function getReimbursementsByCompanyId({
   if (status) {
     query.eq("status", status.toLowerCase());
   }
-  if (is_deductible !== undefined && is_deductible !== null) {
-    query.eq("is_deductible", Boolean(is_deductible));
-  }
 
   if (users) {
     query.eq("users.email", users);
+  }
+  if (type) {
+    query.eq("type", type);
   }
   if (project) {
     query.eq(
@@ -193,15 +196,12 @@ export async function getReimbursementsByCompanyId({
       project_site
     );
   }
-  if (users) {
-    query.eq("users.email", users);
-  }
 
-  if (in_payroll !== undefined && in_payroll !== null) {
-    if (in_payroll === "true") {
-      query.not("payroll_id", "is", null);
+  if (in_invoice !== undefined && in_invoice !== null) {
+    if (in_invoice === "true") {
+      query.not("invoice_id", "is", null);
     } else {
-      query.is("payroll_id", null);
+      query.is("invoice_id", null);
     }
   }
 
@@ -223,13 +223,13 @@ export async function getReimbursementsById({
   const columns = [
     "id",
     "employee_id",
-    "name",
-    "is_deductible",
+    "note",
     "status",
     "amount",
+    "type",
     "submitted_date",
     "user_id",
-    "payroll_id",
+    "invoice_id",
     "company_id",
   ] as const;
 
@@ -250,12 +250,12 @@ export type ReimbursementFilters = {
   submitted_date_start?: string | undefined | null;
   submitted_date_end?: string | undefined | null;
   status?: string | undefined | null;
-  is_deductible?: string | undefined | null;
   users?: string | undefined | null;
-  name?: string | undefined | null;
   project?: string | undefined | null;
+  name?: string | undefined | null;
   project_site?: string | undefined | null;
-  in_payroll?: string | undefined | null;
+  type?: string | undefined | null;
+  in_invoice?: string | undefined | null;
 };
 
 export async function getReimbursementsByEmployeeId({
@@ -275,20 +275,15 @@ export async function getReimbursementsByEmployeeId({
 }) {
   const { from, to, sort, filters } = params;
 
-  const {
-    submitted_date_start,
-    submitted_date_end,
-    status,
-    is_deductible,
-    users,
-  } = filters ?? {};
+  const { submitted_date_start, submitted_date_end, status, users, type } =
+    filters ?? {};
 
   const columns = [
     "id",
     "employee_id",
-    "is_deductible",
-    "name",
+    "note",
     "status",
+    "type",
     "amount",
     "submitted_date",
     "company_id",
@@ -326,9 +321,8 @@ export async function getReimbursementsByEmployeeId({
     if (status) {
       query.eq("status", status.toLowerCase());
     }
-
-    if (is_deductible !== undefined && is_deductible !== null) {
-      query.eq("is_deductible", Boolean(is_deductible));
+    if (type) {
+      query.eq("type", type);
     }
     if (users) {
       query.eq("users.email", users);
@@ -344,7 +338,7 @@ export async function getReimbursementsByEmployeeId({
 
 export type RecentReimbursementType = Pick<
   ReimbursementRow,
-  "id" | "amount" | "status" | "submitted_date" | "company_id" | "name"
+  "id" | "amount" | "status" | "submitted_date" | "company_id" | "note" | "type"
 > & {
   employees: Pick<
     EmployeeDatabaseRow,
@@ -362,12 +356,12 @@ export async function getReimbursementEntriesForPayrollByPayrollId({
   const columns = [
     "id",
     "employee_id",
-    "name",
+    "note",
     "amount",
-    "payroll_id",
+    "type",
+    "invoice_id",
     "created_at",
     "company_id",
-    "is_deductible",
   ] as const;
 
   const { data, error } = await supabase
@@ -397,9 +391,10 @@ export async function getReimbursementEntryForPayrollById({
   const columns = [
     "id",
     "employee_id",
-    "name",
+    "note",
+    "type",
     "amount",
-    "payroll_id",
+    "invoice_id",
     "company_id",
   ] as const;
 
@@ -418,12 +413,12 @@ export async function getReimbursementEntryForPayrollById({
   return { data, error };
 }
 
-export async function getReimbursementEntriesByPayrollIdForPayrollRegister({
+export async function getReimbursementEntriesByInvoiceIdForInvoicePreview({
   supabase,
-  payrollId,
+  invoiceId,
 }: {
   supabase: TypedSupabaseClient;
-  payrollId: string;
+  invoiceId: string;
 }) {
   const columns = ["amount"] as const;
 
@@ -434,7 +429,7 @@ export async function getReimbursementEntriesByPayrollIdForPayrollRegister({
         ","
       )})`
     )
-    .eq("reimbursements.payroll_id", payrollId)
+    .eq("reimbursements.invoice_id", invoiceId)
     .returns<ReimbursementPayrollEntriesWithEmployee[]>();
 
   if (error) {

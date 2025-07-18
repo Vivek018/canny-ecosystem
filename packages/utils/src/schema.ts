@@ -123,18 +123,7 @@ export const CompanyDetailsSchema = z.object({
   email_suffix: zEmailSuffix.max(32).optional(),
   company_type: z.enum(company_type).optional(),
   company_size: z.enum(company_size).optional(),
-});
-
-// Company Registration Details
-export const CompanyRegistrationDetailsSchema = z.object({
-  company_id: z.string().optional(),
-  registration_number: zNumberString.max(15).optional(),
-  gst_number: zNumberString.max(15).optional(),
-  pan_number: zNumberString.max(10).optional(),
-  pf_number: zNumberString.max(20).optional(),
-  esic_number: zNumberString.max(20).optional(),
-  pt_number: zNumberString.max(20).optional(),
-  lwf_number: zNumberString.max(20).optional(),
+  registration_number: z.string().optional(),
 });
 
 // Company Locations
@@ -155,6 +144,8 @@ export const LocationSchema = z.object({
   pincode: zNumber.min(6).max(6),
   latitude: z.number().min(-90).max(90).optional(),
   longitude: z.number().min(-180).max(180).optional(),
+  pan_number: z.string().optional(),
+  gst_number: z.string().optional(),
   company_id: z.string().optional(),
 });
 
@@ -765,25 +756,26 @@ export const SiteLinkSchema = z.object({
 
 export const reimbursementStatusArray = ["approved", "pending"] as const;
 
+export const reimbursementTypeArray = [
+  "expenses",
+  "advances",
+  "loan",
+  "rent",
+  "vehicle",
+  "vehicle_related",
+  "others",
+] as const;
+
 export const ReimbursementSchema = z.object({
   id: z.string().optional(),
   submitted_date: z.string(),
   status: z.enum(reimbursementStatusArray),
   amount: z.number().min(1).max(100000000),
   user_id: z.string().optional(),
-  is_deductible: z.boolean().optional().default(false),
   employee_id: z.string(),
   company_id: z.string(),
-});
-
-export const NonEmployeeReimbursementSchema = z.object({
-  id: z.string().optional(),
-  name: z.string().min(3),
-  submitted_date: z.string(),
-  status: z.enum(reimbursementStatusArray),
-  amount: z.number().min(1).max(100000000),
-  is_deductible: z.boolean().optional().default(false),
-  company_id: z.string(),
+  type: z.enum(reimbursementTypeArray),
+  note: z.string().optional(),
 });
 
 export const ImportReimbursementHeaderSchema = z
@@ -792,7 +784,6 @@ export const ImportReimbursementHeaderSchema = z
     employee_code: z.string(),
     amount: z.string(),
     email: z.string().optional(),
-    is_deductible: z.string().optional(),
     status: z.string(),
   })
   .refine(
@@ -802,7 +793,6 @@ export const ImportReimbursementHeaderSchema = z
         data.employee_code,
         data.amount,
         data.email,
-        data.is_deductible,
         data.status,
       ].filter(Boolean);
 
@@ -812,14 +802,7 @@ export const ImportReimbursementHeaderSchema = z
     {
       message:
         "Some fields have the same value. Please select different options.",
-      path: [
-        "employee_code",
-        "amount",
-        "submitted_date",
-        "email",
-        "is_deductible",
-        "status",
-      ],
+      path: ["employee_code", "amount", "submitted_date", "email", "status"],
     }
   );
 
@@ -831,13 +814,6 @@ export const ImportSingleReimbursementDataSchema = z.object({
     z.number()
   ),
   email: zEmail.optional(),
-  is_deductible: z
-    .preprocess(
-      (value) =>
-        typeof value === "string" ? value.toLowerCase() === "true" : value,
-      z.boolean().default(false)
-    )
-    .default(false),
   status: z.enum(reimbursementStatusArray),
 });
 
@@ -1305,13 +1281,11 @@ export const payrollPaymentStatusArray = [
   "submitted",
   "approved",
 ] as const;
-export const payrollTypesArray = ["salary", "reimbursement", "exit"] as const;
 
 export const PayrollSchema = z.object({
   id: z.string().optional(),
   title: z.string(),
   status: z.enum(payrollPaymentStatusArray).default("pending"),
-  payroll_type: z.enum(payrollTypesArray),
   run_date: z.string().default(new Date().toISOString().split("T")[0]),
   total_net_amount: z.number().default(0),
   company_id: z.string(),
@@ -1932,16 +1906,6 @@ export const EmployeeLoginSchema = z.object({
   employee_code: z.string().optional(),
 });
 
-export const invoiceReimbursementTypeArray = [
-  "expenses",
-  "advances",
-  "loan",
-  "rent",
-  "vehicle",
-  "vehicle_related",
-  "others",
-] as const;
-
 export const InvoiceSchema = z.object({
   id: z.string().optional(),
   company_id: z.string(),
@@ -1953,13 +1917,8 @@ export const InvoiceSchema = z.object({
       "Providing Manpower on Labour contract basis at your _____ Office for Month of _________"
     ),
   company_address_id: z.string(),
-  payroll_type: z.enum(["salary", "exit", "reimbursement"]),
-  invoice_type: z
-    .enum(["salary", "exit", ...invoiceReimbursementTypeArray])
-    .default("expenses")
-    .optional(),
+  type: z.enum(["salary", "exit", "reimbursement"]),
   payroll_data: z.any(),
-  payroll_id: z.string(),
   include_charge: z.boolean().default(false),
   include_cgst: z.boolean().default(false),
   include_sgst: z.boolean().default(false),

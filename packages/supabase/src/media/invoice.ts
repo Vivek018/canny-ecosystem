@@ -10,30 +10,26 @@ import type { InvoiceDatabaseInsert, TypedSupabaseClient } from "../types";
 export async function addOrUpdateInvoiceWithProof({
   supabase,
   proof,
-  payrollId,
   invoiceData,
   route,
 }: {
   supabase: TypedSupabaseClient;
   proof: File;
-  payrollId: string;
   invoiceData: InvoiceDatabaseInsert;
   route?: "add" | "update";
 }) {
   if (proof instanceof File) {
-    const filePath = `invoice/${payrollId}/${invoiceData.invoice_number}`;
+    const filePath = `invoice/${invoiceData.invoice_number}`;
 
     const { data: existingData } =
       await getInvoiceProofUrlByPayrollIdAndDocumentName({
         supabase,
-        payrollId,
         documentName: invoiceData.invoice_number!,
       });
 
     if (existingData?.proof) {
       await deleteInvoiceProof({
         supabase,
-        payrollId: payrollId,
         documentName: invoiceData.invoice_number!,
       });
     }
@@ -104,17 +100,14 @@ export async function addOrUpdateInvoiceWithProof({
 
 export async function deleteInvoiceProof({
   supabase,
-  payrollId,
   documentName,
 }: {
   supabase: TypedSupabaseClient;
-  payrollId: string;
   documentName: string;
 }) {
   const { data, error } = await getInvoiceProofUrlByPayrollIdAndDocumentName({
     supabase,
     documentName,
-    payrollId,
   });
   if (!data || error) return { status: 400, error };
 

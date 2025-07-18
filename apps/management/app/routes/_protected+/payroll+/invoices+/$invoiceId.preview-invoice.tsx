@@ -5,13 +5,13 @@ import {
   getCannyCompanyIdByName,
   getCompanyById,
   getInvoiceById,
-  getPayrollById,
-  getReimbursementEntriesByPayrollIdForPayrollRegister,
+  getReimbursementEntriesByInvoiceIdForInvoicePreview,
   getPrimaryLocationByCompanyId,
   getRelationshipsByParentAndChildCompanyId,
   getSalaryEntriesByPayrollIdForSalaryRegister,
   type EmployeeProjectAssignmentDataType,
-  getExitEntriesByPayrollIdForPayrollRegister,
+  getExitEntriesByPayrollIdForInvoicePreview,
+  getLocationById,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type {
@@ -190,11 +190,13 @@ const InvoicePDF = ({
   terms,
   type,
   proofType,
+  location,
 }: {
   type: string;
   data: DataTypeForRegister;
   terms: any;
   proofType: string;
+  location: LocationDatabaseRow;
 }) => {
   const allEarningFields = Array.from(
     new Set(
@@ -283,17 +285,17 @@ const InvoicePDF = ({
           : roundToNearest((sum * terms.service_charge) / 100)
         : 0
       : data.invoiceDetails?.include_charge
-      ? roundToNearest(
-          (Number(
-            data?.invoiceDetails?.payroll_data.reduce(
-              (sum, item) => sum + Number(item.amount),
-              0
-            )
-          ) *
-            terms.reimbursement_charge) /
-            100
-        )
-      : 0;
+        ? roundToNearest(
+            (Number(
+              data?.invoiceDetails?.payroll_data.reduce(
+                (sum, item) => sum + Number(item.amount),
+                0
+              )
+            ) *
+              terms.reimbursement_charge) /
+              100
+          )
+        : 0;
 
   const total =
     type === "salary"
@@ -365,7 +367,7 @@ const InvoicePDF = ({
               {data?.companyData?.city}-{data?.companyData?.pincode},{" "}
               {data?.companyData?.state?.toUpperCase()}
             </Text>
-            <Text>GSTIN : SE593484848</Text>
+            <Text>GSTIN : {location?.gst_number}</Text>
           </View>
         </View>
 
@@ -435,9 +437,7 @@ const InvoicePDF = ({
                       textTransform: "capitalize",
                     }}
                   >
-                    {field.field === "REIMBURSEMENT"
-                      ? replaceUnderscore(data?.invoiceDetails?.invoice_type)
-                      : field.field}
+                    {field.field}
                   </Text>
                 </View>
               ))}
@@ -577,7 +577,10 @@ const InvoicePDF = ({
             </Text>
             <Text>PAN NO. :- {CANNY_MANAGEMENT_SERVICES_PAN_NUMBER}</Text>
             <Text>GSTIN :- {CANNY_MANAGEMENT_SERVICES_GSTIN}</Text>
-            <Text>TOTAL GSTIN AMOUNT :- {(cgst + sgst).toFixed(0)}</Text>
+            <Text>
+              TOTAL GSTIN AMOUNT :-{" "}
+              {igst === 0 ? (cgst + sgst).toFixed(0) : igst.toFixed(0)}
+            </Text>
           </View>
           <View
             style={{ flex: 1.1, borderTop: "1pt solid #000000", padding: 3 }}
@@ -753,7 +756,7 @@ const InvoicePDF = ({
                 </Text>
               </View>
               <View style={[styles.headerCell, { flex: 0.4 }]}>
-                <Text>{data.invoiceDetails.company_address_id}</Text>
+                <Text>{location.city}</Text>
               </View>
               <View
                 style={[
@@ -1162,17 +1165,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     ({ data: invoiceData, error: invoiceError } = await getInvoiceById({
       supabase,
       id: invoiceId,
-      from: "preview",
     }));
   }
   if (invoiceError) {
     console.error(invoiceError);
   }
-
-  const { data: payroll } = await getPayrollById({
-    payrollId: invoiceData?.payroll_id!,
-    supabase,
-  });
 
   const { data: employeeCompanyData } = await getCompanyById({
     supabase,
@@ -1182,9 +1179,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const { data: employeesCompanyLocationData } =
     await getPrimaryLocationByCompanyId({ supabase, companyId });
 
+  const { data: locationData } = await getLocationById({
+    id: invoiceData?.company_address_id!,
+    supabase,
+  });
+
   let payrollDataAndOthers = [] as any[];
 
-  if (payroll?.payroll_type === "salary") {
+  if (invoiceData?.type === "salary") {
     const { data } = await getSalaryEntriesByPayrollIdForSalaryRegister({
       supabase,
       payrollId: invoiceData?.payroll_id!,
@@ -1192,24 +1194,23 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     payrollDataAndOthers = data || [];
   }
-  if (
-    payroll?.payroll_type === "reimbursement" ||
-    payroll?.payroll_type === "exit"
-  ) {
+  if (invoiceData?.type === "reimbursement" || invoiceData?.type === "exit") {
     const { data: reimb } =
-      await getReimbursementEntriesByPayrollIdForPayrollRegister({
+      await getReimbursementEntriesByInvoiceIdForInvoicePreview({
         supabase,
-        payrollId: invoiceData?.payroll_id!,
+        invoiceId: invoiceData?.id!,
       });
-    const { data: exit } = await getExitEntriesByPayrollIdForPayrollRegister({
-      supabase,
-      payrollId: invoiceData?.payroll_id!,
-    });
+    const { data: exit }: { data: any } =
+      await getExitEntriesByPayrollIdForInvoicePreview({
+        supabase,
+        invoiceId: invoiceData?.id!,
+      });
     payrollDataAndOthers =
-      payroll?.payroll_type === "reimbursement" ? reimb ?? [] : exit ?? [];
+      invoiceData?.type === "reimbursement" ? (reimb ?? []) : (exit ?? []);
   }
 
   let contentType: string | undefined = undefined;
+
   if (invoiceData?.proof) {
     const response = await fetch(invoiceData?.proof!);
     contentType = response.headers.get("Content-Type") || undefined;
@@ -1222,22 +1223,21 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       payrollDataAndOthers,
       invoiceData,
     },
-    payroll,
+    locationData,
     companyRelations: companyRelations?.terms,
     contentType,
   };
 }
 
 export default function PreviewInvoice() {
-  const { data, payroll, companyRelations, contentType } =
+  const { data, companyRelations, locationData, contentType } =
     useLoaderData<typeof loader>();
-
   const navigate = useNavigate();
   const { isDocument } = useIsDocument();
 
   let registerData = [] as any;
 
-  if (payroll?.payroll_type === "salary") {
+  if (data?.invoiceData?.type === "salary") {
     function transformDataForSalary(data: any) {
       const company = data.employeeCompanyData;
       const location = data.employeesCompanyLocationData;
@@ -1408,9 +1408,10 @@ export default function PreviewInvoice() {
 
     registerData = transformDataForSalary(data);
   }
+
   if (
-    payroll?.payroll_type === "reimbursement" ||
-    payroll?.payroll_type === "exit"
+    data?.invoiceData?.type === "reimbursement" ||
+    data?.invoiceData?.type === "exit"
   ) {
     function transformReimbursementDataForPayroll(data: any, type: string) {
       const company = data.employeeCompanyData;
@@ -1438,7 +1439,7 @@ export default function PreviewInvoice() {
         include_charge: invoice?.include_charge,
         include_proof: invoice?.include_proof,
         include_header: invoice?.include_header,
-        invoice_type: invoice?.invoice_type,
+        type: invoice?.type,
         proof: invoice?.proof,
       };
 
@@ -1459,7 +1460,7 @@ export default function PreviewInvoice() {
       }
 
       const employeeData: TransformedEmployeeEntry[] = [];
-      if (payroll?.payroll_type === "reimbursement") {
+      if (type === "reimbursement") {
         for (const emp of data.payrollDataAndOthers) {
           for (const entry of emp.reimbursements) {
             employeeData.push({
@@ -1479,7 +1480,7 @@ export default function PreviewInvoice() {
           }
         }
       }
-      if (payroll?.payroll_type === "exit") {
+      if (type === "exit") {
         for (const emp of data.payrollDataAndOthers) {
           for (const entry of emp.exits) {
             employeeData.push({
@@ -1508,7 +1509,7 @@ export default function PreviewInvoice() {
 
     registerData = transformReimbursementDataForPayroll(
       data,
-      payroll?.payroll_type
+      data?.invoiceData?.type
     );
   }
 
@@ -1517,7 +1518,6 @@ export default function PreviewInvoice() {
   const handleOpenChange = () => {
     navigate("/payroll/invoices");
   };
-
 
   return (
     <Dialog defaultOpen={true} onOpenChange={handleOpenChange}>
@@ -1529,7 +1529,8 @@ export default function PreviewInvoice() {
           <InvoicePDF
             data={registerData as unknown as DataTypeForRegister}
             terms={companyRelations}
-            type={payroll?.payroll_type!}
+            location={locationData as unknown as LocationDatabaseRow}
+            type={data?.invoiceData?.type!}
             proofType={contentType as string}
           />
         </PDFViewer>

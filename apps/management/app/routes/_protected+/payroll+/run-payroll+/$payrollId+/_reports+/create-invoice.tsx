@@ -5,15 +5,9 @@ import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { addOrUpdateInvoiceWithProof } from "@canny_ecosystem/supabase/media";
 import { createInvoice } from "@canny_ecosystem/supabase/mutations";
 import {
-  type ExitsPayrollEntriesWithEmployee,
   getCannyCompanyIdByName,
-  getExitsEntriesForPayrollByPayrollId,
   getLocationsForSelectByCompanyId,
-  getPayrollById,
-  getReimbursementEntriesForPayrollByPayrollId,
   getRelationshipsByParentAndChildCompanyId,
-  getSalaryEntriesByPayrollId,
-  type ReimbursementPayrollEntriesWithEmployee,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { InvoiceDatabaseInsert } from "@canny_ecosystem/supabase/types";
@@ -33,11 +27,11 @@ import {
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import {
   getInitialValueFromZod,
-  invoiceReimbursementTypeArray,
   InvoiceSchema,
   isGoodStatus,
   replaceDash,
   replaceUnderscore,
+  roundToNearest,
   SIZE_10MB,
   transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
@@ -60,7 +54,6 @@ import {
 import { parseMultipartFormData } from "@remix-run/server-runtime/dist/formData";
 import { createMemoryUploadHandler } from "@remix-run/server-runtime/dist/upload/memoryUploadHandler";
 import { useEffect, useState } from "react";
-import { UPDATE_INVOICE_TAG } from "../../../invoices+/$invoiceId.update-invoice";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useSalaryEntriesStore } from "@/store/salary-entries";
 
@@ -68,14 +61,9 @@ const ADD_INVOICE_TAG = "Create-Invoice";
 
 export const CANNY_NAME = "Canny Management Services";
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
-  const payrollId = params.payrollId as string;
+export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = getSupabaseWithHeaders({ request });
   const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-  const url = new URL(request.url);
-  const searchParams = new URLSearchParams(url.searchParams);
-  const site = searchParams.get("site") ?? null;
-  const group = searchParams.get("group") ?? null;
   const { data: cannyData, error } = await getCannyCompanyIdByName({
     name: CANNY_NAME,
     supabase,
@@ -94,38 +82,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     companyRelations = (data ?? []) as unknown as any;
   }
 
-  const { data: payroll } = await getPayrollById({ payrollId, supabase });
   const { data: companyLocations } = await getLocationsForSelectByCompanyId({
     companyId,
     supabase,
   });
-  let salaryData = [] as any;
-  let reimbursementData = [] as
-    | ReimbursementPayrollEntriesWithEmployee[]
-    | null;
-  let exitData = [] as ExitsPayrollEntriesWithEmployee[] | null;
-  if (payroll?.payroll_type === "salary") {
-    const { data } = await getSalaryEntriesByPayrollId({
-      supabase,
-      payrollId,
-      params: { group, site },
-    });
-    salaryData = data;
-  }
-  if (payroll?.payroll_type === "exit") {
-    const { data: exit } = await getExitsEntriesForPayrollByPayrollId({
-      supabase,
-      payrollId,
-    });
-    exitData = exit ?? null;
-  }
-  if (payroll?.payroll_type === "reimbursement") {
-    const { data: reimb } = await getReimbursementEntriesForPayrollByPayrollId({
-      supabase,
-      payrollId,
-    });
-    reimbursementData = reimb;
-  }
 
   const companyLocationArray = companyLocations?.map((location) => ({
     label: location?.name,
@@ -133,13 +93,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }));
 
   return {
-    payroll,
-    salaryData,
-    payrollData:
-      payroll?.payroll_type === "reimbursement" ? reimbursementData : exitData,
     companyRelations,
     companyLocationArray,
-    payrollId,
     companyId,
   };
 }
@@ -155,16 +110,15 @@ clientLoader.hydrate = true;
 
 export async function action({
   request,
-  params,
 }: ActionFunctionArgs): Promise<Response> {
-  const payrollId = params.payrollId as string;
   const { supabase } = getSupabaseWithHeaders({ request });
   try {
     const formData = await parseMultipartFormData(
       request,
       createMemoryUploadHandler({ maxPartSize: SIZE_10MB })
     );
-
+    const selectedRowData = formData.get("selected_rows") as string;
+    const selectedSalaryEntriesData = JSON.parse(selectedRowData || "[]");
     const submission = parseWithZod(formData, {
       schema: InvoiceSchema,
     });
@@ -179,7 +133,6 @@ export async function action({
       if (submission.value.proof) {
         const { error, status } = await addOrUpdateInvoiceWithProof({
           invoiceData: submission.value as InvoiceDatabaseInsert,
-          payrollId,
           proof: submission.value.proof as File,
           supabase,
           route: "add",
@@ -201,10 +154,40 @@ export async function action({
       }
     }
 
-    const { status, error } = await createInvoice({
+    const { data, status, error } = await createInvoice({
       supabase,
       data: submission.value,
     });
+
+    if (data?.id) {
+      const updatedSalaryEntries = (
+        selectedSalaryEntriesData as Array<{ id: string }>
+      ).map(({ id }: { id: string }) => ({
+        id: id!,
+        invoice_id: data.id!,
+      }));
+
+      for (const entry of updatedSalaryEntries) {
+        const { id, invoice_id } = entry;
+        const { error } = await supabase
+          .from("salary_entries")
+          .update({ invoice_id })
+          .eq("id", id);
+
+        if (error) {
+          return json({
+            status: "error",
+            message: "Error udating Salary Entries",
+            error,
+          });
+        }
+      }
+      return json({
+        status: "success",
+        message: "Invoice created successfully",
+        error: null,
+      });
+    }
 
     if (isGoodStatus(status)) {
       return json({
@@ -240,55 +223,12 @@ export default function CreateInvoice({
   locationArrayFromUpdate: any[];
   companyRelationsFromUpdate: any;
 }) {
-  const {
-    companyId,
-    payroll,
-    payrollData,
-    salaryData,
-    payrollId,
-    companyLocationArray,
-    companyRelations,
-  } = useLoaderData<typeof loader>();
+  const { companyId, companyLocationArray, companyRelations } =
+    useLoaderData<typeof loader>();
 
   const { selectedRows } = useSalaryEntriesStore();
 
   const relations = companyRelationsFromUpdate ?? companyRelations;
-
-  const type = payroll?.payroll_type ?? updateValues?.payroll_type;
-
-  function transformPayrollData(employees: any[], payrollType: string) {
-    if (payrollType === "reimbursement") {
-      const total = employees.reduce(
-        (sum, entry) => sum + (entry.amount || 0),
-        0
-      );
-
-      return [
-        {
-          field: payrollType.toUpperCase(),
-          amount: Number(total.toFixed(2)),
-        },
-      ];
-    }
-
-    if (payrollType === "exit") {
-      const total = employees.reduce((sum, entry) => {
-        const bonus = entry.bonus || 0;
-        const gratuity = entry.gratuity || 0;
-        const leave = entry.leave_encashment || 0;
-        const deduction = entry.deduction || 0;
-
-        return sum + bonus + gratuity + leave - deduction;
-      }, 0);
-
-      return [
-        {
-          field: payrollType.toUpperCase(),
-          amount: Number(total.toFixed(2)),
-        },
-      ];
-    }
-  }
 
   function transformSalaryData(employees: any) {
     const fieldTotals: Record<string, { rawAmount: number; type: string }> = {};
@@ -315,7 +255,7 @@ export default function CreateInvoice({
 
       return {
         field,
-        amount: Number(amount.toFixed(2)),
+        amount: roundToNearest(Number(amount)),
         type: data.type,
       };
     });
@@ -324,7 +264,7 @@ export default function CreateInvoice({
   const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
 
-  const INVOICE_TAG = updateValues ? UPDATE_INVOICE_TAG : ADD_INVOICE_TAG;
+  const INVOICE_TAG = updateValues ? "Update-Invoice" : ADD_INVOICE_TAG;
 
   const initialValues = updateValues ?? getInitialValueFromZod(InvoiceSchema);
   const [form, fields] = useForm({
@@ -337,20 +277,14 @@ export default function CreateInvoice({
     shouldRevalidate: "onInput",
     defaultValue: {
       ...initialValues,
-      payroll_id: initialValues.payroll_id ?? payrollId,
       company_id: initialValues.company_id ?? companyId,
       payroll_data: updateValues
         ? typeof updateValues?.payroll_data === "string"
           ? JSON.parse(updateValues.payroll_data as string)
           : updateValues.payroll_data
-        : payroll?.payroll_type === "salary"
-        ? transformSalaryData(selectedRows.length ? selectedRows : salaryData)
-        : transformPayrollData(payrollData as any[], payroll?.payroll_type!),
-      payroll_type: updateValues?.payroll_type ?? type,
+        : transformSalaryData(selectedRows),
+      type: updateValues?.type ?? "salary",
       proof: undefined,
-      invoice_type:
-        updateValues?.invoice_type ??
-        (type === "exit" || type === "salary" ? type : "expenses"),
     },
   });
 
@@ -398,12 +332,14 @@ export default function CreateInvoice({
               </CardDescription>
             </CardHeader>
             <CardContent>
+              <input
+                type="hidden"
+                name="selected_rows"
+                value={JSON.stringify(selectedRows)}
+              />
               <input {...getInputProps(fields.id, { type: "hidden" })} />
               <input
                 {...getInputProps(fields.company_id, { type: "hidden" })}
-              />
-              <input
-                {...getInputProps(fields.payroll_id, { type: "hidden" })}
               />
 
               <div className="grid grid-cols-2 gap-4">
@@ -470,36 +406,16 @@ export default function CreateInvoice({
                     "reimbursement",
                   ])}
                   inputProps={{
-                    ...getInputProps(fields.payroll_type, {
+                    ...getInputProps(fields.type, {
                       type: "text",
                     }),
-                    defaultValue: String(fields.payroll_type.initialValue),
+                    defaultValue: String(fields.type.initialValue),
                   }}
-                  placeholder={"Select Payroll Type"}
+                  placeholder={"Select Type"}
                   labelProps={{
-                    children: "Payroll Type",
+                    children: "Type",
                   }}
-                  errors={fields.payroll_type.errors}
-                />
-
-                <SearchableSelectField
-                  className="capitalize"
-                  options={transformStringArrayIntoOptions([
-                    "salary",
-                    "exit",
-                    ...invoiceReimbursementTypeArray,
-                  ])}
-                  inputProps={{
-                    ...getInputProps(fields.invoice_type, {
-                      type: "text",
-                    }),
-                    defaultValue: String(fields.invoice_type.initialValue),
-                  }}
-                  placeholder={"Select Invoice Type"}
-                  labelProps={{
-                    children: "Invoice Type",
-                  }}
-                  errors={fields.invoice_type.errors}
+                  errors={fields.type.errors}
                 />
               </div>
 
@@ -509,11 +425,7 @@ export default function CreateInvoice({
                     type: "checkbox",
                   })}
                   labelProps={{
-                    children: `Is Charge Included? (${
-                      type === "salary"
-                        ? `${relations?.terms?.service_charge}% of ${relations.terms?.include_service_charge}`
-                        : `${relations.terms?.reimbursement_charge}%`
-                    })`,
+                    children: `Is Charge Included? (${`${relations?.terms?.service_charge}% of ${relations.terms?.include_service_charge}`})`,
                   }}
                 />
                 <CheckboxField
@@ -614,14 +526,7 @@ export default function CreateInvoice({
                 ]}
                 errors={fields.payroll_data.errors}
               />
-              <p
-                className={cn(
-                  "text-muted-foreground tracking-wide hidden",
-                  (updateValues?.payroll_type ??
-                    payroll?.payroll_type === "salary") &&
-                    "flex"
-                )}
-              >
+              <p className={cn("text-muted-foreground tracking-wide hidden")}>
                 Note : All default values are system generated, Please verify
                 them manually before submitting.
               </p>
