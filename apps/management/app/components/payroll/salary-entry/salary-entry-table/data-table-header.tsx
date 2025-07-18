@@ -9,11 +9,15 @@ interface Props {
   table?: any;
   loading?: boolean;
   className?: string;
+  uniqueFields: string[];
 }
 
-export function SalaryTableHeader({ table, loading, className }: Props) {
-  const salaryEntries = table.getRowModel()?.rows[0]?.original?.salary_entries;
-
+export function SalaryTableHeader({
+  table,
+  loading,
+  className,
+  uniqueFields,
+}: Props) {
   const salaryEntryColumnIdArray = [
     "sr_no",
     "employee_code",
@@ -21,9 +25,7 @@ export function SalaryTableHeader({ table, loading, className }: Props) {
     "present_days",
     "overtime_hours",
     "period",
-    ...(salaryEntries?.salary_field_values?.map(
-      (val: any) => val.payroll_fields.name
-    ) ?? []),
+    ...uniqueFields.map((field) => field),
     "net_amount",
     "actions",
   ];

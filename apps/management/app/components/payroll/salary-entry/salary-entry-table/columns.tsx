@@ -21,20 +21,12 @@ import { Checkbox } from "@canny_ecosystem/ui/checkbox";
 export const salaryEntryColumns = ({
   data,
   editable = false,
+  uniqueFields,
 }: {
   data: any;
   editable?: boolean;
+  uniqueFields: string[];
 }): ColumnDef<any>[] => {
-  const uniqueFields: string[] = Array.from(
-    new Set(
-      data.flatMap((emp: any) =>
-        emp.salary_entries.salary_field_values.map(
-          (entry: any) => entry.payroll_fields.name
-        )
-      )
-    )
-  );
-
   return [
     {
       id: "select",

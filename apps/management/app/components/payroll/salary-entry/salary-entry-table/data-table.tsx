@@ -25,12 +25,14 @@ interface SalaryEntryTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   totalNet: number;
+  uniqueFields: string[];
 }
 
 export function SalaryEntryDataTable<TData, TValue>({
   columns,
   data,
   totalNet,
+  uniqueFields,
 }: SalaryEntryTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const { rowSelection, setSelectedRows, setRowSelection } =
@@ -71,6 +73,7 @@ export function SalaryEntryDataTable<TData, TValue>({
           <SalaryTableHeader
             table={table}
             className={cn(!tableLength && "hidden")}
+            uniqueFields={uniqueFields}
           />
           <TableBody>
             {tableLength ? (

@@ -250,6 +250,26 @@ export function SalaryEntryComponent({
     );
   };
 
+  const fieldMap = new Map<string, string>();
+
+  for (const emp of tableData as any[]) {
+    for (const entry of emp.salary_entries.salary_field_values as any[]) {
+      const name = entry.payroll_fields.name;
+      const type = entry.payroll_fields.type;
+      if (!fieldMap.has(name)) {
+        fieldMap.set(name, type);
+      }
+    }
+  }
+
+  const uniqueFields: string[] = Array.from(fieldMap.entries())
+    .sort((a, b) => {
+      if (a[1] === "earning" && b[1] === "deduction") return -1;
+      if (a[1] === "deduction" && b[1] === "earning") return 1;
+      return 0;
+    })
+    .map(([name]) => name);
+
   return (
     <section className="p-4">
       <div className={cn("mb-5 grid grid-cols-2 gap-4")}>
@@ -566,10 +586,12 @@ export function SalaryEntryComponent({
         <SalaryEntryDataTable
           data={tableData as any}
           columns={salaryEntryColumns({
+            uniqueFields,
             data,
             editable: payrollData?.status === "pending",
           })}
           totalNet={totals.TOTAL as number}
+          uniqueFields={uniqueFields}
         />
       )}
       <Outlet />
