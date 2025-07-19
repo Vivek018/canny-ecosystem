@@ -107,7 +107,7 @@ export const SiteDetailsCard = ({
                 "bg-card",
                 !hasPermission(
                   role,
-                  `${updateRole}:${attribute.projectSite}`
+                  `${updateRole}:${attribute.site}`
                 ) && "hidden"
               )}
             >

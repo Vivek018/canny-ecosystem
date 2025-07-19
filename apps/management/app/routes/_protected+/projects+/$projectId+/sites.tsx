@@ -100,7 +100,7 @@ export default function Sites() {
                         "flex items-center gap-1",
                         !hasPermission(
                           role,
-                          `${createRole}:${attribute.projectSites}`,
+                          `${createRole}:${attribute.sites}`,
                         ) && "hidden",
                       )}
                     >

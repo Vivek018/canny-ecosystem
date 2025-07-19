@@ -32,7 +32,7 @@ export const PLACEHOLDERS = [
   "Unpaid invoices with service charge included",
   "Salary-type invoices for employees at 'ABC' location",
   "Invoices raised before 2020 for exit settlements",
-  "Invoices paid after April 2023 for Project Site 'ABC'",
+  "Invoices paid after April 2023 for Site 'ABC'",
   "Reimbursement invoices pending from 2022",
   "Invoices without service charges created in 2021",
   "Invoices from payroll type 'XYZ' paid in 2023",
@@ -225,7 +225,7 @@ export function InvoiceSearchFilter({
               className={cn(
                 "absolute z-10 right-3 top-[6px] opacity-70",
                 !disabled &&
-                  "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
+                "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 hasValidFilters && "opacity-100",
                 isOpen && "opacity-100"
               )}

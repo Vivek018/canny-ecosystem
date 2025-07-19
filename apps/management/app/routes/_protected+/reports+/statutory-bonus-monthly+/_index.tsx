@@ -35,7 +35,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     start_year: searchParams.get("start_year") ?? undefined,
     end_year: searchParams.get("end_year") ?? undefined,
     project: searchParams.get("project") ?? undefined,
-    project_site: searchParams.get("project_site") ?? undefined,
+    site: searchParams.get("site") ?? undefined,
   };
 
   const hasFilters =
@@ -69,13 +69,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
     companyId,
   });
 
-  let projectSiteData = null;
+  let siteData = null;
   if (filters.project) {
     const { data } = await getSiteNamesByProjectName({
       supabase,
       projectName: filters.project,
     });
-    projectSiteData = data;
+    siteData = data;
   }
 
   const env = {
@@ -100,7 +100,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     hasNextPage,
     companyId,
     projectArray: projectData?.map((project) => project.name) ?? [],
-    projectSiteArray: projectSiteData?.map((site) => site.name) ?? [],
+    siteArray: siteData?.map((site) => site.name) ?? [],
     env,
   });
 }
@@ -132,7 +132,7 @@ export default function StatutoryBonusReport() {
     hasNextPage,
     companyId,
     projectArray,
-    projectSiteArray,
+    siteArray,
     env,
   } = useLoaderData<typeof loader>();
 
@@ -146,7 +146,7 @@ export default function StatutoryBonusReport() {
           <SBReportSearchFilter
             disabled={!data?.length && noFilters}
             projectArray={projectArray}
-            projectSiteArray={projectSiteArray}
+            siteArray={siteArray}
           />
           <FilterList filterList={filterList} />
         </div>

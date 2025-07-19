@@ -72,19 +72,19 @@ export async function loader({
       value: project?.id,
     }));
 
-    let projectSiteOptions: any = [];
+    let siteOptions: any = [];
 
     const projectParamId = urlSearchParams.get(PROJECT_PARAM);
 
     if (projectParamId?.length) {
-      const { data: projectSites } = await getSitesByProjectId({
+      const { data: sites } = await getSitesByProjectId({
         supabase,
         projectId: projectParamId,
       });
 
-      projectSiteOptions = projectSites?.map((projectSite) => ({
-        label: projectSite?.name,
-        value: projectSite?.id,
+      siteOptions = sites?.map((site) => ({
+        label: site?.name,
+        value: site?.id,
       }));
     }
 
@@ -92,7 +92,7 @@ export async function loader({
       status: "success",
       employeeId,
       projectOptions,
-      projectSiteOptions,
+      siteOptions,
     });
   } catch (error) {
     return json({
@@ -157,7 +157,7 @@ export default function CreateEmployeeProjectAssignmentRoute() {
   const {
     employeeId,
     projectOptions,
-    projectSiteOptions,
+    siteOptions,
     status,
     error,
   } = useLoaderData<typeof loader>();
@@ -227,7 +227,7 @@ export default function CreateEmployeeProjectAssignmentRoute() {
               key={resetKey}
               fields={fields as any}
               projectOptions={projectOptions}
-              projectSiteOptions={projectSiteOptions}
+              siteOptions={siteOptions}
             />
             <FormButtons
               form={form}

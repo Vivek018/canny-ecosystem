@@ -5,14 +5,13 @@ import { useAttendanceStore } from "@/store/attendance";
 import { AttendanceTrend } from "@/components/attendance/analytics/attendance-trend";
 import { AttendanceBars } from "@/components/attendance/analytics/attendance-bar";
 import type { TransformedAttendanceDataType } from "./_index";
-
 import { AttendanceAbsentees } from "@/components/attendance/analytics/attendance-absents";
 import { AttendanceByProjects } from "@/components/attendance/analytics/attendance-project";
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { useLoaderData } from "@remix-run/react";
-import { AttendanceByProjectSite } from "@/components/attendance/analytics/attendance-project-site";
+import { AttendanceBySite } from "@/components/attendance/analytics/attendance-site";
 
 const getDataSource = (
   selectedRows: TransformedAttendanceDataType[],
@@ -59,7 +58,7 @@ export default function AttendanceAnalytics() {
       employee_code: entry.employee_code,
       employee_name: entry.employee_name,
       project: entry.project,
-      project_site: entry.project_site,
+      site: entry.site,
       attendance: Object.entries(entry)
         .filter(([key]) => key.match(/^\d{2} \w{3} \d{4}$/))
         .map(([date, status]) => {
@@ -94,7 +93,7 @@ export default function AttendanceAnalytics() {
 
       <div className="grid grid-cols-3 gap-3">
         <AttendanceByProjects chartData={transformedData} />
-        <AttendanceByProjectSite
+        <AttendanceBySite
           chartData={transformedData}
           projectArray={projectArray}
         />

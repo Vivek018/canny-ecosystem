@@ -68,7 +68,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       users: searchParams.get("users") ?? undefined,
       name: query,
       project: searchParams.get("project") ?? undefined,
-      project_site: searchParams.get("project_site") ?? undefined,
+      site: searchParams.get("site") ?? undefined,
       in_invoice: searchParams.get("in_invoice") ?? undefined,
     };
 
@@ -94,9 +94,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     const userEmailsPromise = getUsersEmail({ supabase, companyId });
 
-    let projectSitePromise = null;
+    let sitePromise = null;
     if (filters.project)
-      projectSitePromise = getSiteNamesByProjectName({
+      sitePromise = getSiteNamesByProjectName({
         supabase,
         projectName: filters.project,
       });
@@ -104,7 +104,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return defer({
       reimbursementsPromise: reimbursementsPromise as any,
       projectPromise,
-      projectSitePromise,
+      sitePromise,
       userEmailsPromise,
       query,
       filters,
@@ -117,7 +117,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return defer({
       reimbursementsPromise: Promise.resolve({ data: [] }),
       projectPromise: Promise.resolve({ data: [] }),
-      projectSitePromise: Promise.resolve({ data: [] }),
+      sitePromise: Promise.resolve({ data: [] }),
       userEmailsPromise: Promise.resolve({ data: [] }),
       query: "",
       filters: null,
@@ -167,7 +167,7 @@ export default function ReimbursementsIndex() {
   const {
     reimbursementsPromise,
     projectPromise,
-    projectSitePromise,
+    sitePromise,
     userEmailsPromise,
     query,
     filters,
@@ -185,21 +185,21 @@ export default function ReimbursementsIndex() {
           <Suspense fallback={<LoadingSpinner className="ml-14" />}>
             <Await resolve={projectPromise}>
               {(projectData) => (
-                <Await resolve={projectSitePromise}>
-                  {(projectSiteData) => (
+                <Await resolve={sitePromise}>
+                  {(siteData) => (
                     <Await resolve={userEmailsPromise}>
                       {(userEmailsData) => (
                         <ReimbursementSearchFilter
                           projectArray={
                             projectData?.data?.length
                               ? projectData?.data?.map(
-                                  (project) => project!.name
-                                )
+                                (project) => project!.name
+                              )
                               : []
                           }
-                          projectSiteArray={
-                            projectSiteData?.data?.length
-                              ? projectSiteData?.data?.map((site) => site!.name)
+                          siteArray={
+                            siteData?.data?.length
+                              ? siteData?.data?.map((site) => site!.name)
                               : []
                           }
                           userEmails={

@@ -115,13 +115,13 @@ export function SalaryEntryComponent({
     if (values.length <= 3) {
       return payrollData.project_id
         ? siteOptions
-            .filter((option) => values.includes(String(option.value)))
-            .map((option) => option.label)
-            .join(", ")
+          .filter((option) => values.includes(String(option.value)))
+          .map((option) => option.label)
+          .join(", ")
         : departmentOptions
-            .filter((option) => values.includes(String(option.value)))
-            .map((option) => option.label)
-            .join(", ");
+          .filter((option) => values.includes(String(option.value)))
+          .map((option) => option.label)
+          .join(", ");
     }
 
     return `${values.length} selected`;
@@ -138,7 +138,7 @@ export function SalaryEntryComponent({
       }
     }
 
-    if (payrollData.project_site_id) {
+    if (payrollData.site_id) {
       if (department.length) {
         newParams.set("department", department.join(","));
       } else {
@@ -530,8 +530,8 @@ export function SalaryEntryComponent({
               "hidden h-10",
               (payrollData.status === "pending" ||
                 payrollData.status === "approved") &&
-                hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
-                "flex"
+              hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
+              "flex"
             )}
             disabled={disable}
           >
@@ -543,8 +543,8 @@ export function SalaryEntryComponent({
             className={cn(
               "hidden h-10",
               payrollData.status === "submitted" &&
-                hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
-                "flex"
+              hasPermission(role, `${updateRole}:${attribute.payroll}`) &&
+              "flex"
             )}
             disabled={disable}
           >
@@ -555,8 +555,8 @@ export function SalaryEntryComponent({
             className={cn(
               "hidden h-10",
               payrollData.status === "submitted" &&
-                hasPermission(role, `${approveRole}:${attribute.payroll}`) &&
-                "flex"
+              hasPermission(role, `${approveRole}:${attribute.payroll}`) &&
+              "flex"
             )}
             disabled={disable}
           >

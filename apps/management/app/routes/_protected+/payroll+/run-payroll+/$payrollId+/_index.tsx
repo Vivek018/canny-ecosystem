@@ -67,9 +67,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         value: sites?.id,
       }));
     }
-    if (payrollData?.project_site_id) {
+    if (payrollData?.site_id) {
       const { data: allDepartments } = await getDepartmentsBySiteId({
-        siteId: payrollData?.project_site_id,
+        siteId: payrollData?.site_id,
         supabase,
       });
       departmentOptions = allDepartments?.map((sites) => ({
@@ -96,7 +96,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     if (
       department.length === 0 &&
-      payrollData?.project_site_id &&
+      payrollData?.site_id &&
       departmentOptions.length > 0
     ) {
       department = [departmentOptions[0].value];
@@ -140,8 +140,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
-    `${cacheKeyPrefix.run_payroll_id}${
-      args.params.payrollId
+    `${cacheKeyPrefix.run_payroll_id}${args.params.payrollId
     }${url.searchParams.toString()}`,
     args
   );

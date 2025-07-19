@@ -107,7 +107,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   }
 
   let projectOptions: any = [];
-  let projectSiteOptions: any = [];
+  let siteOptions: any = [];
   if (step === 4) {
     const { data: projects } = await getProjectsByCompanyId({
       supabase,
@@ -122,14 +122,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const projectParamId = urlSearchParams.get(PROJECT_PARAM);
 
     if (projectParamId?.length) {
-      const { data: projectSites } = await getSitesByProjectId({
+      const { data: sites } = await getSitesByProjectId({
         supabase,
         projectId: projectParamId,
       });
 
-      projectSiteOptions = projectSites?.map((projectSite) => ({
-        label: projectSite?.name,
-        value: projectSite?.id,
+      siteOptions = sites?.map((site) => ({
+        label: site?.name,
+        value: site?.id,
       }));
     }
   }
@@ -140,7 +140,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     stepData,
     companyId,
     projectOptions,
-    projectSiteOptions,
+    siteOptions,
   });
 }
 
@@ -307,7 +307,7 @@ export default function CreateEmployee() {
     stepData,
     companyId,
     projectOptions,
-    projectSiteOptions,
+    siteOptions,
   } = useLoaderData<typeof loader>();
   const [resetKey, setResetKey] = useState(Date.now());
 
@@ -399,7 +399,7 @@ export default function CreateEmployee() {
                   key={resetKey + 3}
                   fields={fields as any}
                   projectOptions={projectOptions}
-                  projectSiteOptions={projectSiteOptions}
+                  siteOptions={siteOptions}
                 />
               ) : null}
               {step === 5 ? (

@@ -25,14 +25,14 @@ export function LeavesSearchFilter({
   disabled,
   employeeId,
   projectArray,
-  projectSiteArray,
+  siteArray,
   userEmails,
   isEmployeeRoute,
 }: {
   disabled?: boolean;
   employeeId?: string | undefined;
   projectArray?: string[];
-  projectSiteArray?: string[];
+  siteArray?: string[];
   userEmails: (string | null | undefined)[];
   isEmployeeRoute: boolean;
 }) {
@@ -55,7 +55,7 @@ export function LeavesSearchFilter({
     leave_type: "",
     name: "",
     project: "",
-    project_site: "",
+    site: "",
     users: "",
   };
 
@@ -82,7 +82,7 @@ export function LeavesSearchFilter({
     date_end: searchParams.get("date_end"),
     leave_type: searchParams.get("leave_type"),
     project: searchParams.get("project"),
-    project_site: searchParams.get("project_site"),
+    site: searchParams.get("site"),
     users: searchParams.get("users"),
   };
 
@@ -314,7 +314,7 @@ export function LeavesSearchFilter({
         <DropdownMenuGroup className={cn(isEmployeeRoute && "hidden")}>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
-              <span>Project Site</span>
+              <span>Site</span>
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent
@@ -330,15 +330,15 @@ export function LeavesSearchFilter({
                     Select Project First
                   </DropdownMenuCheckboxItem>
                 ) : (
-                  projectSiteArray?.map((name, index) => (
+                  siteArray?.map((name, index) => (
                     <DropdownMenuCheckboxItem
                       key={name + index.toString()}
                       className='capitalize'
-                      checked={filterParams?.project_site === name}
+                      checked={filterParams?.site === name}
                       onCheckedChange={() => {
                         setFilterParams((prev) => ({
                           ...prev,
-                          project_site: name,
+                          site: name,
                         }));
                       }}
                     >

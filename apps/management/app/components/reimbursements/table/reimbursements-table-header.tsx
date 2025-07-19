@@ -16,7 +16,7 @@ export const ReimbursementsColumnIdArray = [
   "employee_code",
   "employee_name",
   "project_name",
-  "project_site_name",
+  "site_name",
   "submitted_date",
   "type",
   "status",

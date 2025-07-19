@@ -47,11 +47,9 @@ export const columns: ColumnDef<IncidentsDatabaseType>[] = [
     header: "Employee Name",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-48 group-hover:text-primary">{`${
-          row.original.employees?.first_name
-        } ${row.original.employees?.middle_name ?? ""} ${
-          row.original.employees?.last_name ?? ""
-        }`}</p>
+        <p className="truncate w-48 group-hover:text-primary">{`${row.original.employees?.first_name
+          } ${row.original.employees?.middle_name ?? ""} ${row.original.employees?.last_name ?? ""
+          }`}</p>
       );
     },
   },
@@ -62,7 +60,7 @@ export const columns: ColumnDef<IncidentsDatabaseType>[] = [
     cell: ({ row }) => {
       return (
         <p className="truncate w-28">
-          {row.original?.employees?.employee_project_assignment?.project_sites
+          {row.original?.employees?.employee_project_assignment?.sites
             .projects?.name ?? "--"}
         </p>
       );
@@ -70,12 +68,12 @@ export const columns: ColumnDef<IncidentsDatabaseType>[] = [
   },
   {
     enableSorting: false,
-    accessorKey: "project_site",
-    header: "Project Site",
+    accessorKey: "site",
+    header: "Site",
     cell: ({ row }) => {
       return (
         <p className="truncate w-28">
-          {row.original?.employees?.employee_project_assignment?.project_sites
+          {row.original?.employees?.employee_project_assignment?.sites
             ?.name ?? "--"}
         </p>
       );
@@ -200,11 +198,11 @@ export const columns: ColumnDef<IncidentsDatabaseType>[] = [
             <DropdownMenuTrigger
               className={cn(
                 !hasPermission(role, `${updateRole}:${attribute.incidents}`) &&
-                  !hasPermission(
-                    role,
-                    `${deleteRole}:${attribute.incidents}`
-                  ) &&
-                  "hidden"
+                !hasPermission(
+                  role,
+                  `${deleteRole}:${attribute.incidents}`
+                ) &&
+                "hidden"
               )}
               asChild
             >

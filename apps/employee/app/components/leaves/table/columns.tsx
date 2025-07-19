@@ -54,7 +54,7 @@ export const columns = (
       header: "Project",
       cell: ({ row }) => {
         return (
-          row.original?.employees?.employee_project_assignment?.project_sites
+          row.original?.employees?.employee_project_assignment?.sites
             ?.projects?.name ?? "--"
         );
       },
@@ -62,11 +62,11 @@ export const columns = (
     {
       enableSorting: false,
 
-      accessorKey: "project_site",
-      header: "Project Site",
+      accessorKey: "site",
+      header: "Site",
       cell: ({ row }) => {
         return (
-          row.original?.employees?.employee_project_assignment?.project_sites
+          row.original?.employees?.employee_project_assignment?.sites
             ?.name ?? "--"
         );
       },

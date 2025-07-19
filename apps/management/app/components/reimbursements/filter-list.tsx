@@ -30,13 +30,13 @@ export function FilterList({ filters }: Props) {
           );
         }
         return formatDate(new Date(value));
-        
+
       case "name":
       case "status":
       case "type":
       case "users":
       case "project":
-      case "project_site":
+      case "site":
       case "in_payroll":
         return value;
       default:

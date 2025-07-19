@@ -42,10 +42,10 @@ export function ExportBar({
         exportedData.employee_name = employee_name;
       else if (key === "project")
         exportedData.project_name =
-          element.employees?.employee_project_assignment?.project_sites?.projects?.name;
-      else if (key === "project_site")
-        exportedData.project_site_name =
-          element.employees?.employee_project_assignment?.project_sites?.name;
+          element.employees?.employee_project_assignment?.sites?.projects?.name;
+      else if (key === "site")
+        exportedData.site_name =
+          element.employees?.employee_project_assignment?.sites?.name;
       else exportedData[key] = element[key];
     }
 

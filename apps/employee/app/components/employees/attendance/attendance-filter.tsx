@@ -21,7 +21,7 @@ export type AttendanceFilterType = {
   year?: string | undefined | null;
   month?: string | undefined | null;
   project?: string | undefined | null;
-  project_site?: string | undefined | null;
+  site?: string | undefined | null;
 };
 
 export const AttendanceFilter = ({

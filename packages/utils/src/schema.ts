@@ -74,17 +74,17 @@ export const zFile = z
     (file) =>
       typeof file !== "string"
         ? [
-            ...ACCEPTED_IMAGE_TYPES,
-            "image/pdf",
-            "image/doc",
-            "image/docx",
-            "application/pdf",
-            "application/doc",
-            "application/docx",
-            "application/zip",
-            "application/x-zip-compressed",
-            "multipart/x-zip",
-          ].includes(file?.type)
+          ...ACCEPTED_IMAGE_TYPES,
+          "image/pdf",
+          "image/doc",
+          "image/docx",
+          "application/pdf",
+          "application/doc",
+          "application/docx",
+          "application/zip",
+          "application/x-zip-compressed",
+          "multipart/x-zip",
+        ].includes(file?.type)
         : true,
     "Only .jpg, .jpeg, .png .webp, .pdf, .doc and .zip formats are supported."
   );
@@ -202,7 +202,7 @@ export const ProjectSchema = z.object({
   environmental_considerations: zTextArea.optional(),
 });
 
-// Project Sites
+// Sites
 export const SiteSchema = z.object({
   id: z.string().optional(),
   name: zString.min(3).max(50),
@@ -402,7 +402,7 @@ export const skillLevelArray = [
 
 export const EmployeeProjectAssignmentSchema = z.object({
   employee_id: z.string().optional(),
-  project_site_id: z.string(),
+  site_id: z.string(),
   position: z.enum(positionArray).default("sampler"),
   skill_level: z.enum(skillLevelArray).default("unskilled"),
   assignment_type: z.enum(assignmentTypeArray).default("full_time"),
@@ -1287,7 +1287,7 @@ export const PayrollSchema = z.object({
   company_id: z.string(),
   total_employees: z.number().default(0),
   project_id: z.string().optional(),
-  project_site_id: z.string().optional(),
+  site_id: z.string().optional(),
   month: z.number().min(1).max(12).default(defaultMonth),
   year: z.number().default(defaultYear),
 });

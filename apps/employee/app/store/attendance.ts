@@ -7,7 +7,7 @@ export type TransformedAttendanceDataType = {
   employee_code: string;
   employee_name: string;
   project: string | null;
-  project_site: string | null;
+  site: string | null;
 };
 
 interface AttendanceState {

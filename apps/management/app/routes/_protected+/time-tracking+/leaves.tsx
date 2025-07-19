@@ -97,7 +97,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       leave_type: searchParams.get("leave_type") ?? undefined,
       name: query,
       project: searchParams.get("project") ?? undefined,
-      project_site: searchParams.get("project_site") ?? undefined,
+      site: searchParams.get("site") ?? undefined,
       users: searchParams.get("users") ?? undefined,
       year: searchParams.get("year") ?? undefined,
     };
@@ -137,9 +137,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const userEmailsPromise = getUsersEmail({ supabase, companyId });
     const projectPromise = getProjectNamesByCompanyId({ supabase, companyId });
 
-    let projectSitePromise = null;
+    let sitePromise = null;
     if (filters.project)
-      projectSitePromise = getSiteNamesByProjectName({
+      sitePromise = getSiteNamesByProjectName({
         supabase,
         projectName: filters.project,
       });
@@ -147,7 +147,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return defer({
       leavesPromise: leavesPromise as any,
       projectPromise,
-      projectSitePromise,
+      sitePromise,
       leaveTypePromise,
       userEmailsPromise,
       query,
@@ -164,7 +164,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       leavesPromise: Promise.resolve({ data: [] }),
       projectPromise: Promise.resolve({ data: [] }),
       leaveTypePromise: Promise.resolve({ data: [], error: null }),
-      projectSitePromise: Promise.resolve({ data: [] }),
+      sitePromise: Promise.resolve({ data: [] }),
       userEmailsPromise: Promise.resolve({ data: [] }),
       query: "",
       filters: null,
@@ -217,7 +217,7 @@ export default function LeavesIndex() {
     leavesPromise,
     projectPromise,
     leaveTypePromise,
-    projectSitePromise,
+    sitePromise,
     userEmailsPromise,
     query,
     filters,
@@ -318,8 +318,8 @@ export default function LeavesIndex() {
             <Suspense fallback={<LoadingSpinner className="w-1/2" />}>
               <Await resolve={projectPromise}>
                 {(projectData) => (
-                  <Await resolve={projectSitePromise}>
-                    {(projectSiteData) => (
+                  <Await resolve={sitePromise}>
+                    {(siteData) => (
                       <Await resolve={userEmailsPromise}>
                         {(userEmailsData) => (
                           <LeavesSearchFilter
@@ -332,9 +332,9 @@ export default function LeavesIndex() {
                                 )
                                 : []
                             }
-                            projectSiteArray={
-                              projectSiteData?.data?.length
-                                ? projectSiteData?.data?.map(
+                            siteArray={
+                              siteData?.data?.length
+                                ? siteData?.data?.map(
                                   (site) => site!.name
                                 )
                                 : []

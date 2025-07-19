@@ -18,7 +18,7 @@ export type IncidentFilters = {
   severity?: IncidentsDatabaseRow["severity"];
   name?: string | undefined | null;
   project?: string | undefined | null;
-  project_site?: string | undefined | null;
+  site?: string | undefined | null;
 };
 
 export type IncidentsDatabaseType = Pick<
@@ -48,7 +48,7 @@ export type IncidentsDatabaseType = Pick<
       EmployeeProjectAssignmentDatabaseRow,
       "employee_id"
     > & {
-      project_sites: {
+      sites: {
         id: SiteDatabaseRow["id"];
         name: SiteDatabaseRow["name"];
         projects: {
@@ -85,7 +85,7 @@ export async function getIncidentsByCompanyId({
     category,
     severity,
     project,
-    project_site,
+    site,
   } = filters ?? {};
 
   const columns = [
@@ -107,10 +107,8 @@ export async function getIncidentsByCompanyId({
     .select(
       `${columns.join(
         ","
-      )},employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${
-        project ? "inner" : "left"
-      }(project_sites!${project ? "inner" : "left"}(id, name, projects!${
-        project ? "inner" : "left"
+      )},employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
+      }(sites!${site ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
       }(id, name))))`,
       {
         count: "exact",
@@ -171,14 +169,14 @@ export async function getIncidentsByCompanyId({
   }
   if (project) {
     query.eq(
-      "employees.employee_project_assignment.project_sites.projects.name",
+      "employees.employee_project_assignment.sites.projects.name",
       project
     );
   }
-  if (project_site) {
+  if (site) {
     query.eq(
-      "employees.employee_project_assignment.project_sites.name",
-      project_site
+      "employees.employee_project_assignment.sites.name",
+      site
     );
   }
 

@@ -44,7 +44,7 @@ export type ExitFilterType = {
   final_settlement_date_end?: string | undefined | null;
   reason?: string | undefined | null;
   project?: string | undefined | null;
-  project_site?: string | undefined | null;
+  site?: string | undefined | null;
   in_invoice?: string | undefined | null;
 } | null;
 
@@ -81,7 +81,7 @@ export type ExitDataType = Pick<
     "first_name" | "middle_name" | "last_name" | "employee_code"
   > & {
     employee_project_assignment: {
-      project_sites: { name: string; projects: { name: string } };
+      sites: { name: string; projects: { name: string } };
     };
   };
 };
@@ -110,7 +110,7 @@ export const getExitsByCompanyId = async ({
     final_settlement_date_end,
     reason,
     project,
-    project_site,
+    site,
     in_invoice,
   } = filters ?? {};
 
@@ -133,11 +133,9 @@ export const getExitsByCompanyId = async ({
     .from("exits")
     .select(
       `${columns.join(",")},
-          employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${
-            project ? "inner" : "left"
-          }(project_sites!${project ? "inner" : "left"}(id, name, projects!${
-            project ? "inner" : "left"
-          }(id, name))))`,
+          employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
+      }(sites!${site ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
+      }(id, name))))`,
       { count: "exact" }
     )
     .eq("employees.company_id", companyId);
@@ -194,14 +192,14 @@ export const getExitsByCompanyId = async ({
 
   if (project) {
     query.eq(
-      "employees.employee_project_assignment.project_sites.projects.name",
+      "employees.employee_project_assignment.sites.projects.name",
       project
     );
   }
-  if (project_site) {
+  if (site) {
     query.eq(
-      "employees.employee_project_assignment.project_sites.name",
-      project_site
+      "employees.employee_project_assignment.sites.name",
+      site
     );
   }
   if (in_invoice !== undefined && in_invoice !== null) {

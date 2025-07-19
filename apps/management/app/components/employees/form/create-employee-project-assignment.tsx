@@ -36,18 +36,18 @@ type FieldsType = {
 };
 
 export const PROJECT_PARAM = "project";
-export const PROJECT_SITE_PARAM = "project-site";
+export const SITE_PARAM = "site";
 
 export const CreateEmployeeProjectAssignment = ({
   fields,
   isUpdate = false,
   projectOptions,
-  projectSiteOptions,
+  siteOptions,
 }: {
   fields: FieldsType;
   isUpdate?: boolean;
   projectOptions: ComboboxSelectOption[] | undefined;
-  projectSiteOptions: ComboboxSelectOption[] | undefined;
+  siteOptions: ComboboxSelectOption[] | undefined;
 }) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -85,16 +85,16 @@ export const CreateEmployeeProjectAssignment = ({
           </div>
           <SearchableSelectField
             className="capitalize"
-            options={projectSiteOptions ?? []}
+            options={siteOptions ?? []}
             inputProps={{
-              ...getInputProps(fields.project_site_id, { type: "text" }),
-              defaultValue: String(fields.project_site_id.initialValue),
+              ...getInputProps(fields.site_id, { type: "text" }),
+              defaultValue: String(fields.site_id.initialValue),
             }}
-            placeholder={"Select Project Site"}
+            placeholder={"Select Site"}
             labelProps={{
-              children: "Project Site",
+              children: "Site",
             }}
-            errors={fields.project_site_id.errors}
+            errors={fields.site_id.errors}
           />
         </div>
         <div className="grid grid-cols-3 place-content-center justify-between gap-6">

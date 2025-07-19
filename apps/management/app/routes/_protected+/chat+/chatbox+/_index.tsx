@@ -12,7 +12,7 @@ const categoryList = [
   {
     title: "Attendance",
     description:
-      "Review attendance trends such as monthly presence, top absentees, most consistent employees, and project site reliability rankings.",
+      "Review attendance trends such as monthly presence, top absentees, most consistent employees, and site reliability rankings.",
   },
   {
     title: "Reports",

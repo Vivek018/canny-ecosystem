@@ -55,19 +55,19 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       value: project?.id,
     }));
 
-    let projectSiteOptions: any = [];
+    let siteOptions: any = [];
 
     const projectParamId = urlSearchParams.get(PROJECT_PARAM);
 
     if (projectParamId?.length) {
-      const { data: projectSites } = await getSitesByProjectId({
+      const { data: sites } = await getSitesByProjectId({
         supabase,
         projectId: projectParamId,
       });
 
-      projectSiteOptions = projectSites?.map((projectSite) => ({
-        label: projectSite?.name,
-        value: projectSite?.id,
+      siteOptions = sites?.map((site) => ({
+        label: site?.name,
+        value: site?.id,
       }));
     }
     let userData = null;
@@ -84,7 +84,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       return json({
         userData,
         projectOptions,
-        projectSiteOptions,
+        siteOptions,
         error: null,
       });
     }
@@ -96,7 +96,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         error,
         userData: null,
         projectOptions: null,
-        projectSiteOptions: null,
+        siteOptions: null,
       },
       { status: 500 }
     );
@@ -151,7 +151,7 @@ export async function action({
 }
 
 export default function UpdateUser() {
-  const { userData, error, projectOptions, projectSiteOptions } =
+  const { userData, error, projectOptions, siteOptions } =
     useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
@@ -189,7 +189,7 @@ export default function UpdateUser() {
     <CreateUser
       updateValues={userData}
       projectOptions={projectOptions as unknown as any}
-      projectSiteOptions={projectSiteOptions as unknown as any}
+      siteOptions={siteOptions as unknown as any}
     />
   );
 }

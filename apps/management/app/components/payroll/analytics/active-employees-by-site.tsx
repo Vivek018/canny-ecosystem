@@ -24,23 +24,23 @@ const chartConfig = {
 
 export function ActiveEmployeesBySite({ chartData }: { chartData: any[] }) {
   function groupByProjectAndSite(chartData: any[]) {
-    const projectSiteCounts: Record<string, Record<string, number>> = {};
+    const siteCounts: Record<string, Record<string, number>> = {};
 
     for (const item of chartData) {
       const project =
-        item.employee_project_assignment?.project_sites?.projects?.name;
-      const site = item.employee_project_assignment?.project_sites?.name;
+        item.employee_project_assignment?.sites?.projects?.name;
+      const site = item.employee_project_assignment?.sites?.name;
 
       if (project && site) {
-        if (!projectSiteCounts[project]) {
-          projectSiteCounts[project] = {};
+        if (!siteCounts[project]) {
+          siteCounts[project] = {};
         }
-        projectSiteCounts[project][site] =
-          (projectSiteCounts[project][site] || 0) + 1;
+        siteCounts[project][site] =
+          (siteCounts[project][site] || 0) + 1;
       }
     }
 
-    const finalData = Object.entries(projectSiteCounts).map(
+    const finalData = Object.entries(siteCounts).map(
       ([project, sites], index) => {
         const totalCount = Object.values(sites).reduce((a, b) => a + b, 0);
         return {

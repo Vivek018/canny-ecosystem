@@ -58,7 +58,7 @@ export default function AttendanceEmailMenu({
             "employee_code",
             "employee_name",
             "project",
-            "project_site",
+            "site",
           ].includes(key)
         ) {
           dateHeaders.add(key);
@@ -79,11 +79,11 @@ export default function AttendanceEmailMenu({
       employee_code,
       employee_name,
       project,
-      project_site,
+      site,
       ...attendance
     } = entry;
 
-    const fixedFields = { employee_code, employee_name, project, project_site };
+    const fixedFields = { employee_code, employee_name, project, site };
 
     const formattedEntry: Record<string, string> = { ...fixedFields };
 
@@ -154,7 +154,7 @@ export default function AttendanceEmailMenu({
     <div
       className={cn(
         !hasPermission(role, `${emailRole}:${attribute.attendance}`) &&
-          "hidden",
+        "hidden",
         !selectedRows.length && "hidden"
       )}
     >

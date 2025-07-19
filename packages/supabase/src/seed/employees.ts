@@ -124,12 +124,12 @@ export function seedEmployeeGuardianDetails(): Omit<
 
 export function seedEmployeeProjectAssignmentDetails(): Omit<
   EmployeeProjectAssignmentDatabaseInsert,
-  "employee_id" | "project_site_id" | "supervisor_id"
+  "employee_id" | "site_id" | "supervisor_id"
 > {
   return {
     assignment_type:
       assignmentTypeArray[
-        Math.floor(Math.random() * assignmentTypeArray.length)
+      Math.floor(Math.random() * assignmentTypeArray.length)
       ],
     position: positionArray[Math.floor(Math.random() * positionArray.length)],
     skill_level:
@@ -278,7 +278,7 @@ export function seedEmployeeAccidents(employeeId: string) {
       employee_id: employeeId,
       category:
         categoryOfIncidentArray[
-          faker.number.int({ min: 0, max: categoryOfIncidentArray.length - 1 })
+        faker.number.int({ min: 0, max: categoryOfIncidentArray.length - 1 })
         ],
       date: faker.date.past().toISOString(),
       description: faker.lorem.words(5),
@@ -305,11 +305,11 @@ export function seedEmployeeCases(caseData: Partial<CasesDatabaseRow>) {
       amount_received: faker.number.int({ min: 1000, max: 5000 }),
       case_type:
         caseTypeArray[
-          faker.number.int({ min: 0, max: caseTypeArray.length - 1 })
+        faker.number.int({ min: 0, max: caseTypeArray.length - 1 })
         ],
       status:
         caseStatusArray[
-          faker.number.int({ min: 0, max: caseStatusArray.length - 1 })
+        faker.number.int({ min: 0, max: caseStatusArray.length - 1 })
         ],
       court_case_reference: faker.string.alphanumeric(10),
       date: faker.date.past().toISOString(),

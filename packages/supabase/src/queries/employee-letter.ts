@@ -107,7 +107,7 @@ export type EmployeeWithLetterDataType = Omit<
       | "start_date"
       | "end_date"
     > & {
-      project_sites: Pick<SiteDatabaseRow, "id" | "name">;
+      sites: Pick<SiteDatabaseRow, "id" | "name">;
     };
   };
 };
@@ -139,7 +139,7 @@ export async function getEmployeeLetterWithEmployeeById({
     .select(
       `${columns.join(",")}, employees(first_name, middle_name, last_name, gender, personal_email, employee_project_assignment!employee_project_assignments_employee_id_fkey!left(
         employee_id, assignment_type, skill_level, position, start_date, end_date,
-        project_sites!left(id, name)
+        sites, name)
       ))`,
     )
     .eq("id", id)

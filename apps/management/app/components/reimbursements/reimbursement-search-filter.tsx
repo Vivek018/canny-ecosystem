@@ -44,7 +44,7 @@ export const PLACEHOLDERS = [
   "Rejected reimbursements for Project 'XYZ' by User",
   "Reimbursements for Site 'ABC' not linked to Invoice",
   "Approved reimbursements submitted by EMP2045 in 2022",
-  "Reimbursements submitted before 2019 for Project Site 'XYZ'",
+  "Reimbursements submitted before 2019 for Site 'XYZ'",
   "Pending reimbursements from employees not in Invoice",
 ];
 
@@ -53,13 +53,13 @@ export function ReimbursementSearchFilter({
   userEmails,
   employeeId,
   projectArray,
-  projectSiteArray,
+  siteArray,
 }: {
   disabled?: boolean;
   userEmails?: (string | null | undefined)[];
   employeeId?: string | undefined;
   projectArray?: string[];
-  projectSiteArray?: string[];
+  siteArray?: string[];
 }) {
   const [prompt, setPrompt] = useState("");
   const navigation = useNavigation();
@@ -79,9 +79,9 @@ export function ReimbursementSearchFilter({
     navigation.state === "submitting" ||
     (navigation.state === "loading" &&
       navigation.location.pathname ===
-        (employeeId
-          ? `/employees/${employeeId}/reimbursements`
-          : "/approvals/reimbursements") &&
+      (employeeId
+        ? `/employees/${employeeId}/reimbursements`
+        : "/approvals/reimbursements") &&
       navigation.location.search.length);
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -97,7 +97,7 @@ export function ReimbursementSearchFilter({
     users: "",
     name: "",
     project: "",
-    project_site: "",
+    site: "",
     in_invoice: "",
   };
 
@@ -126,7 +126,7 @@ export function ReimbursementSearchFilter({
     type: searchParams.get("type"),
     users: searchParams.get("users"),
     project: searchParams.get("project"),
-    project_site: searchParams.get("project_site"),
+    site: searchParams.get("site"),
     in_invoice: searchParams.get("in_invoice"),
   };
 
@@ -243,7 +243,7 @@ export function ReimbursementSearchFilter({
               className={cn(
                 "absolute z-10 right-3 top-[6px] opacity-70",
                 !disabled &&
-                  "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
+                "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 hasValidFilters && "opacity-100",
                 isOpen && "opacity-100"
               )}
@@ -433,7 +433,7 @@ export function ReimbursementSearchFilter({
         <DropdownMenuGroup className={cn(!projectArray?.length && "hidden")}>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
-              <span>Project Site</span>
+              <span>Site</span>
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent
@@ -449,15 +449,15 @@ export function ReimbursementSearchFilter({
                     Select Project First
                   </DropdownMenuCheckboxItem>
                 ) : (
-                  projectSiteArray?.map((name, index) => (
+                  siteArray?.map((name, index) => (
                     <DropdownMenuCheckboxItem
                       key={name + index.toString()}
                       className="capitalize"
-                      checked={filterParams?.project_site === name}
+                      checked={filterParams?.site === name}
                       onCheckedChange={() => {
                         setFilterParams((prev) => ({
                           ...prev,
-                          project_site: name,
+                          site: name,
                         }));
                       }}
                     >

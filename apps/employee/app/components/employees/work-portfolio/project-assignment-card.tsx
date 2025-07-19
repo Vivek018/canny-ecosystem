@@ -42,11 +42,11 @@ export const EmployeeProjectAssignmentCard = ({
         <div className="grid grid-cols-1 max-sm:grid-cols-2 lg:grid-cols-3 gap-5">
           <DetailItem
             label="Project Name"
-            value={projectAssignment.project_sites?.projects?.name}
+            value={projectAssignment.sites?.projects?.name}
           />
           <DetailItem
             label="Site Name"
-            value={projectAssignment?.project_sites?.name}
+            value={projectAssignment?.sites?.name}
           />
           <DetailItem
             label="Assignment Type"

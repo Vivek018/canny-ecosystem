@@ -52,7 +52,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       start_year: searchParams.get("start_year") ?? undefined,
       end_year: searchParams.get("end_year") ?? undefined,
       project: searchParams.get("project") ?? undefined,
-      project_site: searchParams.get("project_site") ?? undefined,
+      site: searchParams.get("site") ?? undefined,
     };
 
     const hasFilters =
@@ -78,9 +78,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
       companyId,
     });
 
-    let projectSitePromise = null;
+    let sitePromise = null;
     if (filters.project) {
-      projectSitePromise = getSiteNamesByProjectName({
+      sitePromise = getSiteNamesByProjectName({
         supabase,
         projectName: filters.project,
       });
@@ -88,7 +88,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     return defer({
       projectPromise,
-      projectSitePromise,
+      sitePromise,
       attendanceReportPromise: attendanceReportPromise as any,
       filters,
       query,
@@ -101,7 +101,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return defer({
       attendanceReportPromise: Promise.resolve({ data: [] }),
       projectPromise: Promise.resolve({ data: [] }),
-      projectSitePromise: Promise.resolve({ data: [] }),
+      sitePromise: Promise.resolve({ data: [] }),
       query: "",
       filters: null,
       companyId: "",
@@ -141,7 +141,7 @@ export default function AttendanceReport() {
   const {
     attendanceReportPromise,
     projectPromise,
-    projectSitePromise,
+    sitePromise,
     query,
     filters,
     companyId,
@@ -158,8 +158,8 @@ export default function AttendanceReport() {
           <Suspense fallback={<LoadingSpinner className="mt-20" />}>
             <Await resolve={projectPromise}>
               {(projectData) => (
-                <Await resolve={projectSitePromise}>
-                  {(projectSiteData) => (
+                <Await resolve={sitePromise}>
+                  {(siteData) => (
                     <AttendanceReportSearchFilter
                       disabled={!projectData?.data?.length && noFilters}
                       projectArray={
@@ -167,9 +167,9 @@ export default function AttendanceReport() {
                           ? projectData?.data?.map((project) => project!.name)
                           : []
                       }
-                      projectSiteArray={
-                        projectSiteData?.data?.length
-                          ? projectSiteData?.data?.map((site) => site!.name)
+                      siteArray={
+                        siteData?.data?.length
+                          ? siteData?.data?.map((site) => site!.name)
                           : []
                       }
                     />
@@ -236,17 +236,17 @@ export default function AttendanceReport() {
             const monthYearsRange =
               filters?.start_year && filters?.end_year
                 ? getMonthYearRange(
-                    filters.start_month,
-                    Number(filters.start_year),
-                    filters.end_month,
-                    Number(filters.end_year),
-                  )
+                  filters.start_month,
+                  Number(filters.start_year),
+                  filters.end_month,
+                  Number(filters.end_year),
+                )
                 : getMonthYearRange(
-                    "January",
-                    Number(currentYear),
-                    "December",
-                    Number(currentYear),
-                  );
+                  "January",
+                  Number(currentYear),
+                  "December",
+                  Number(currentYear),
+                );
 
             const hasNextPage = Boolean(meta?.count > data?.length);
 

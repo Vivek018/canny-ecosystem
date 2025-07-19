@@ -86,7 +86,7 @@ export const columns = (): ColumnDef<EmployeeDataType>[] => [
       return (
         <p className="truncate w-28 capitalize">
           {
-            row.original?.employee_project_assignment?.project_sites?.projects
+            row.original?.employee_project_assignment?.sites?.projects
               ?.name
           }
         </p>
@@ -95,12 +95,12 @@ export const columns = (): ColumnDef<EmployeeDataType>[] => [
   },
   {
     enableSorting: false,
-    accessorKey: "project_site_name",
-    header: "Project Site",
+    accessorKey: "site_name",
+    header: "Site",
     cell: ({ row }) => {
       return (
         <p className="truncate w-28 capitalize">
-          {row.original?.employee_project_assignment?.project_sites?.name}
+          {row.original?.employee_project_assignment?.sites?.name}
         </p>
       );
     },

@@ -30,7 +30,7 @@ export const EmployeeFiltersSchema = z.object({
   project: z
     .string().optional()
     .describe("Project name assigned to the individual."),
-  project_site: z
+  site: z
     .string().optional()
     .describe("Name of the site under the project."),
   assignment_type: z.enum(assignmentTypeArray).optional()

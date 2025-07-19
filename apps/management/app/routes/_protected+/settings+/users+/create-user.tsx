@@ -57,7 +57,7 @@ import { Label } from "@canny_ecosystem/ui/label";
 import { Combobox } from "@canny_ecosystem/ui/combobox";
 import {
   PROJECT_PARAM,
-  PROJECT_SITE_PARAM,
+  SITE_PARAM,
 } from "@/components/employees/form/create-employee-project-assignment";
 import {
   getProjectsByCompanyId,
@@ -90,19 +90,19 @@ export async function loader({
       value: project?.id,
     }));
 
-    let projectSiteOptions: any = [];
+    let siteOptions: any = [];
 
     const projectParamId = urlSearchParams.get(PROJECT_PARAM);
 
     if (projectParamId?.length) {
-      const { data: projectSites } = await getSitesByProjectId({
+      const { data: sites } = await getSitesByProjectId({
         supabase,
         projectId: projectParamId,
       });
 
-      projectSiteOptions = projectSites?.map((projectSite) => ({
-        label: projectSite?.name,
-        value: projectSite?.id,
+      siteOptions = sites?.map((site) => ({
+        label: site?.name,
+        value: site?.id,
       }));
     }
 
@@ -111,7 +111,7 @@ export async function loader({
       message: "User form loaded",
       companyId,
       projectOptions,
-      projectSiteOptions,
+      siteOptions,
       error: null,
     });
   } catch (error) {
@@ -173,13 +173,13 @@ export async function action({
 export default function CreateUser({
   updateValues,
   projectOptions: updateProjectOptions,
-  projectSiteOptions: updateProjectSiteOptions,
+  siteOptions: updateSiteOptions,
 }: {
-  projectSiteOptions: [];
+  siteOptions: [];
   projectOptions: [] | undefined | null;
   updateValues?: UserDatabaseUpdate | null;
 }) {
-  const { companyId, projectOptions, projectSiteOptions } =
+  const { companyId, projectOptions, siteOptions } =
     useLoaderData<typeof loader>();
 
   const actionData = useActionData<typeof action>();
@@ -348,25 +348,25 @@ export default function CreateUser({
                   <SearchableSelectField
                     className="capitalize"
                     options={
-                      projectSiteOptions ?? updateProjectSiteOptions ?? []
+                      siteOptions ?? updateSiteOptions ?? []
                     }
                     inputProps={{
                       ...getInputProps(fields.site_id, {
                         type: "text",
                       }),
                       defaultValue:
-                        searchParams.get(PROJECT_SITE_PARAM) ??
+                        searchParams.get(SITE_PARAM) ??
                         String(fields.site_id.initialValue),
                     }}
-                    placeholder={"Select Project Site"}
+                    placeholder={"Select Site"}
                     labelProps={{
-                      children: "Project Site",
+                      children: "Site",
                     }}
-                    onChange={(projectSite) => {
-                      if (projectSite?.length) {
-                        searchParams.set(PROJECT_SITE_PARAM, projectSite);
+                    onChange={(site) => {
+                      if (site?.length) {
+                        searchParams.set(SITE_PARAM, site);
                       } else {
-                        searchParams.delete(PROJECT_SITE_PARAM);
+                        searchParams.delete(SITE_PARAM);
                       }
                       setSearchParams(searchParams);
                     }}

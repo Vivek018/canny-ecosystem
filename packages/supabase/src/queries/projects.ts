@@ -140,7 +140,7 @@ export async function getProjectById({
   return { data, error };
 }
 
-// ProjectSites
+// Sites
 export type SitesWithLocation = SiteDatabaseRow & {
   company_location: { id: string; name: string };
 };
@@ -170,7 +170,7 @@ export async function getSitesByProjectId({
   ] as const;
 
   const { data, error } = await supabase
-    .from("project_sites")
+    .from("sites")
     .select(columns.join(","))
     .eq("project_id", projectId)
     .limit(HARD_QUERY_LIMIT)
@@ -192,7 +192,7 @@ export async function getSiteNamesByProjectName({
   projectName: string;
 }) {
   const { data, error } = await supabase
-    .from("project_sites")
+    .from("sites")
     .select(
       "name, projects!inner(name, project_client_id, end_client_id, primary_contractor_id)"
     )
@@ -227,9 +227,8 @@ export async function getSitesByCompanyId({
   companyId: string;
 }) {
   const { data, error } = await supabase
-    .from("project_sites")
-    .select(
-      `id,name,  projects!inner(
+    .from("sites").select(
+      `id,name,projects!inner(
         project_client_id,
         end_client_id,
         primary_contractor_id
@@ -278,8 +277,7 @@ export async function getSiteById({
   ] as const;
 
   const { data, error } = await supabase
-    .from("project_sites")
-    .select(columns.join(","))
+    .from("sites").select(columns.join(","))
     .eq("id", id)
     .single<Omit<SitesWithLocation, "created_at" | "updated_at">>();
 
@@ -458,8 +456,7 @@ export async function getSiteIdsBySiteNames({
   const columns = ["name", "id"] as const;
 
   const { data, error } = await supabase
-    .from("project_sites")
-    .select(columns.join(","))
+    .from("sites").select(columns.join(","))
     .in("name", siteNames)
     .returns<InferredType<SiteDatabaseRow, (typeof columns)[number]>[]>();
 

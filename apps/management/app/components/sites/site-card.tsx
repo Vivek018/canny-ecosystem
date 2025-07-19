@@ -72,7 +72,7 @@ export function SiteCard({
                     "p-2 rounded-md bg-secondary grid place-items-center",
                     !hasPermission(
                       role,
-                      `${updateRole}:${attribute.projectSites}`,
+                      `${updateRole}:${attribute.sites}`,
                     ) && "hidden",
                   )}
                 >
@@ -88,7 +88,7 @@ export function SiteCard({
                 "p-2 py-2 rounded-md bg-secondary grid place-items-center",
                 !hasPermission(
                   `${role}`,
-                  `${deleteRole}:${attribute.projectSites}`,
+                  `${deleteRole}:${attribute.sites}`,
                 ) && "hidden",
               )}
             >
@@ -104,9 +104,8 @@ export function SiteCard({
       </CardHeader>
       <CardContent className="flex flex-col gap-0.5 px-4">
         <address className="not-italic line-clamp-3">
-          {`${site.address_line_1} ${
-            site.address_line_2 ? site.address_line_2 : ""
-          }`}
+          {`${site.address_line_1} ${site.address_line_2 ? site.address_line_2 : ""
+            }`}
         </address>
         <div className="flex items-center capitalize gap-2">
           <p>{`${site.city},`}</p>

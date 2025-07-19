@@ -60,7 +60,7 @@ import { UPDATE_CASES_TAG } from "./$caseId.update-case";
 import { useCompanyId } from "@/utils/company";
 import {
   getCompanies,
-  getEmployeeIdentityByProjectSiteId,
+  getEmployeeIdentityBySiteId,
   getProjectsByCompanyId,
   getSitesByProjectId,
 } from "@canny_ecosystem/supabase/queries";
@@ -142,16 +142,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     if (reportedBySiteId && reportedBy === "employee") {
-      ({ data: reportedByEmployee } = await getEmployeeIdentityByProjectSiteId({
+      ({ data: reportedByEmployee } = await getEmployeeIdentityBySiteId({
         supabase,
-        projectSiteId: reportedBySiteId,
+        siteId: reportedBySiteId,
       }));
     }
 
     if (reportedOnSiteId && reportedOn === "employee") {
-      ({ data: reportedOnEmployee } = await getEmployeeIdentityByProjectSiteId({
+      ({ data: reportedOnEmployee } = await getEmployeeIdentityBySiteId({
         supabase,
-        projectSiteId: reportedOnSiteId,
+        siteId: reportedOnSiteId,
       }));
     }
 
@@ -606,13 +606,13 @@ export default function CreateCase({
                       searchParams.get("reported_by_site") ??
                       String(fields.reported_by_site_id.initialValue),
                   }}
-                  placeholder={"Select Project Site"}
+                  placeholder={"Select Site"}
                   labelProps={{
-                    children: "R/B Project Site",
+                    children: "R/B Site",
                   }}
-                  onChange={(projectSite) => {
-                    if (projectSite?.length) {
-                      searchParams.set("reported_by_site", projectSite);
+                  onChange={(site) => {
+                    if (site?.length) {
+                      searchParams.set("reported_by_site", site);
                     } else {
                       searchParams.delete("reported_by_site");
                     }
@@ -714,13 +714,13 @@ export default function CreateCase({
                       searchParams.get("reported_on_site") ??
                       String(fields.reported_on_site_id.initialValue),
                   }}
-                  placeholder={"Select Project Site"}
+                  placeholder={"Select Site"}
                   labelProps={{
-                    children: "R/O Project Site",
+                    children: "R/O Site",
                   }}
-                  onChange={(projectSite) => {
-                    if (projectSite?.length) {
-                      searchParams.set("reported_on_site", projectSite);
+                  onChange={(site) => {
+                    if (site?.length) {
+                      searchParams.set("reported_on_site", site);
                     } else {
                       searchParams.delete("reported_on_site");
                     }

@@ -21,11 +21,9 @@ export const columns = (): ColumnDef<ReimbursementDataType>[] => [
     header: "Employee Name",
     cell: ({ row }) => {
       return (
-        <p className="truncate w-48 group-hover:text-primary">{`${
-          row.original.employees?.first_name
-        } ${row.original.employees?.middle_name ?? ""} ${
-          row.original.employees?.last_name ?? ""
-        }`}</p>
+        <p className="truncate w-48 group-hover:text-primary">{`${row.original.employees?.first_name
+          } ${row.original.employees?.middle_name ?? ""} ${row.original.employees?.last_name ?? ""
+          }`}</p>
       );
     },
   },
@@ -37,7 +35,7 @@ export const columns = (): ColumnDef<ReimbursementDataType>[] => [
       return (
         <p className="truncate ">
           {
-            row.original.employees?.employee_project_assignment?.project_sites
+            row.original.employees?.employee_project_assignment?.sites
               ?.projects?.name
           }
         </p>
@@ -46,13 +44,13 @@ export const columns = (): ColumnDef<ReimbursementDataType>[] => [
   },
   {
     enableSorting: false,
-    accessorKey: "project_site_name",
-    header: "Project Site",
+    accessorKey: "site_name",
+    header: "Site",
     cell: ({ row }) => {
       return (
         <p className="truncate ">
           {
-            row.original.employees?.employee_project_assignment?.project_sites
+            row.original.employees?.employee_project_assignment?.sites
               ?.name
           }
         </p>

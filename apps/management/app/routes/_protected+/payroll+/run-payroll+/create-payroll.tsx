@@ -293,16 +293,16 @@ export default function CreatePayroll() {
                     className="capitalize"
                     options={allSiteOptions ?? []}
                     inputProps={{
-                      ...getInputProps(fields.project_site_id, {
+                      ...getInputProps(fields.site_id, {
                         type: "text",
                       }),
-                      defaultValue: String(fields.project_site_id.initialValue),
+                      defaultValue: String(fields.site_id.initialValue),
                     }}
                     placeholder={"Select Site"}
                     labelProps={{
                       children: "Site",
                     }}
-                    errors={fields.project_site_id.errors}
+                    errors={fields.site_id.errors}
                   />
                 )}
               </div>

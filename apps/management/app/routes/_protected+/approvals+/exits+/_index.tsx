@@ -68,7 +68,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         searchParams.get("final_settlement_date_end") ?? undefined,
       reason: searchParams.get("reason") ?? undefined,
       project: searchParams.get("project") ?? undefined,
-      project_site: searchParams.get("project_site") ?? undefined,
+      site: searchParams.get("site") ?? undefined,
       in_invoice: searchParams.get("in_invoice") ?? undefined,
     };
 
@@ -92,9 +92,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     const projectPromise = getProjectNamesByCompanyId({ supabase, companyId });
 
-    let projectSitePromise = null;
+    let sitePromise = null;
     if (filters.project)
-      projectSitePromise = getSiteNamesByProjectName({
+      sitePromise = getSiteNamesByProjectName({
         supabase,
         projectName: filters.project,
       });
@@ -104,7 +104,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       query,
       filters,
       projectPromise,
-      projectSitePromise,
+      sitePromise,
       env,
       error: null,
     });
@@ -114,7 +114,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       query: null,
       filters: null,
       projectPromise: null,
-      projectSitePromise: null,
+      sitePromise: null,
       env,
       error,
     });
@@ -165,7 +165,7 @@ export default function ExitsIndex() {
     filters,
     env,
     projectPromise,
-    projectSitePromise,
+    sitePromise,
   } = useLoaderData<typeof loader>();
 
   const noFilters = filters
@@ -180,27 +180,27 @@ export default function ExitsIndex() {
           <Suspense fallback={<LoadingSpinner className="ml-10" />}>
             <Await resolve={projectPromise}>
               {(projectData) => (
-                <Await resolve={projectSitePromise}>
-                  {(projectSiteData) => {
-                    if (projectSiteData?.error) {
+                <Await resolve={sitePromise}>
+                  {(siteData) => {
+                    if (siteData?.error) {
                       clearCacheEntry(cacheKeyPrefix.exits);
                       return (
                         <ErrorBoundary
-                          error={projectSiteData?.error}
+                          error={siteData?.error}
                           message="Failed to load Exits"
                         />
                       );
                     }
                     const projectArray =
                       projectData?.data?.map((project) => project.name) ?? [];
-                    const projectSiteArray =
-                      projectSiteData?.data?.map((site) => site.name) ?? [];
+                    const siteArray =
+                      siteData?.data?.map((site) => site.name) ?? [];
 
                     return (
                       <>
                         <ExitsSearchFilter
                           projectArray={projectArray}
-                          projectSiteArray={projectSiteArray}
+                          siteArray={siteArray}
                         />
                         <FilterList filterList={filterList} />
                       </>
@@ -235,7 +235,7 @@ export default function ExitsIndex() {
             }
             const hasNextPage = Boolean(
               exitsData?.meta?.count &&
-                exitsData.meta.count > LAZY_LOADING_LIMIT
+              exitsData.meta.count > LAZY_LOADING_LIMIT
             );
 
             return (

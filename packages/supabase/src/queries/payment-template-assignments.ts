@@ -37,7 +37,7 @@ export async function getLinkedPaymentTemplateIdByEmployeeId({
 
     const { data: sitePaymentTemplateAssignment, error: sitePaymentError } = await getPaymentTemplateAssignmentBySiteAndPositionOrSkillType({
       supabase,
-      site_id: employeeProjectAssignment?.project_site_id!,
+      site_id: employeeProjectAssignment?.site_id!,
       position: employeeProjectAssignment?.position!,
       skill_level: employeeProjectAssignment?.skill_level!,
     });

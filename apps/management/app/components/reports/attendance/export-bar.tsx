@@ -41,13 +41,13 @@ export function ExportBar({
 
       if (columnVisibility.project !== false) {
         exportedData.project =
-          element.employee_project_assignment?.project_sites?.projects?.name ||
+          element.employee_project_assignment?.sites?.projects?.name ||
           null;
       }
 
-      if (columnVisibility.project_site !== false) {
-        exportedData.project_site =
-          element.employee_project_assignment?.project_sites?.name || null;
+      if (columnVisibility.site !== false) {
+        exportedData.site =
+          element.employee_project_assignment?.sites?.name || null;
       }
 
       if (element.attendance) {
@@ -74,7 +74,7 @@ export function ExportBar({
           key === "employee_code" ||
           key === "employee_name" ||
           key === "project" ||
-          key === "project_site" ||
+          key === "site" ||
           key === "start_range" ||
           key === "end_range" ||
           (element.attendance && key in element.attendance)

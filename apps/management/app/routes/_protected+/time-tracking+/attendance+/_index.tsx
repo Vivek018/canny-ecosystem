@@ -41,6 +41,7 @@ import { generateAttendanceFilter } from "@/utils/ai/attendance";
 const pageSize = LAZY_LOADING_LIMIT;
 
 export type DayType = { day: number; fullDate: string };
+export type TransformedAttendanceDataType = any;
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const env = {
@@ -72,7 +73,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       year: searchParams.get("year") ?? undefined,
       name: searchParams.get("name") ?? undefined,
       project: searchParams.get("project") ?? undefined,
-      project_site: searchParams.get("project_site") ?? undefined,
+      site: searchParams.get("site") ?? undefined,
     };
 
     const attendancePromise = getMonthlyAttendanceByCompanyId({
@@ -89,13 +90,16 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     const projectPromise = getProjectNamesByCompanyId({ supabase, companyId });
 
-    const projectSitePromise = filters.project
-      ? getSiteNamesByProjectName({ supabase, projectName: filters.project })
-      : null;
+    let sitePromise = null;
+    if (filters.project) {
+      sitePromise = filters.project
+        ? getSiteNamesByProjectName({ supabase, projectName: filters.project })
+        : null;
+    }
 
     return defer({
       projectPromise,
-      projectSitePromise,
+      sitePromise,
       attendancePromise: attendancePromise as any,
       filters,
       companyName,
@@ -109,7 +113,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return defer({
       attendancePromise: Promise.resolve({ data: [] }),
       projectPromise: Promise.resolve({ data: [] }),
-      projectSitePromise: Promise.resolve({ data: [] }),
+      sitePromise: Promise.resolve({ data: [] }),
       defaultPayDay: null,
       query: "",
       filters: null,
@@ -162,7 +166,7 @@ export default function Attendance() {
   const {
     attendancePromise,
     projectPromise,
-    projectSitePromise,
+    sitePromise,
     query,
     filters,
     companyId,
@@ -180,15 +184,15 @@ export default function Attendance() {
           <Suspense fallback={<LoadingSpinner className="mt-20" />}>
             <Await resolve={projectPromise}>
               {(projectData) => (
-                <Await resolve={projectSitePromise}>
-                  {(projectSiteData) => (
+                <Await resolve={sitePromise}>
+                  {(siteData) => (
                     <AttendanceSearchFilter
                       disabled={!projectData?.data?.length && noFilters}
                       projectArray={
                         projectData?.data?.map((project) => project!.name) || []
                       }
-                      projectSiteArray={
-                        projectSiteData?.data?.map((site) => site!.name) || []
+                      siteArray={
+                        siteData?.data?.map((site) => site!.name) || []
                       }
                     />
                   )}

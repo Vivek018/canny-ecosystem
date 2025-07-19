@@ -41,7 +41,7 @@ export const PLACEHOLDERS = [
   "Pending payrolls for employees from Site 'ABC'",
   "Payrolls created before 2015 still pending",
   "Payrolls submitted of month January",
-  "Payroll records for Project Site 'ABC' during 2021",
+  "Payroll records for Site 'ABC' during 2021",
   "All payrolls from Site 'ABC' with 'Part-time' type",
   "Approved payrolls for year 2023",
   "Payrolls with pending payment for Site 'XYZ'",
@@ -227,7 +227,7 @@ export function PayrollSearchFilter({
               className={cn(
                 "absolute z-10 right-3 top-[6px] opacity-70",
                 !disabled &&
-                  "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
+                "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 hasValidFilters && "opacity-100",
                 isOpen && "opacity-100"
               )}

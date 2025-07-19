@@ -23,7 +23,7 @@ export type AttendanceDataType = Pick<
     EmployeeProjectAssignmentDatabaseRow,
     "employee_id"
   > & {
-    project_sites: {
+    sites: {
       id: SiteDatabaseRow["id"];
       name: SiteDatabaseRow["name"];
       projects: {
@@ -58,7 +58,7 @@ export type AttendanceReportDataType = Pick<
     EmployeeProjectAssignmentDatabaseRow,
     "employee_id"
   > & {
-    project_sites: {
+    sites: {
       id: SiteDatabaseRow["id"];
       name: SiteDatabaseRow["name"];
       projects: {
@@ -68,11 +68,11 @@ export type AttendanceReportDataType = Pick<
     };
   };
 } & {
-    attendance: Pick<
-      EmployeeMonthlyAttendanceDatabaseRow,
-      "id" | "employee_id" | "working_days" | "present_days"
-    >;
-  }[];
+  attendance: Pick<
+    EmployeeMonthlyAttendanceDatabaseRow,
+    "id" | "employee_id" | "working_days" | "present_days"
+  >;
+}[];
 
 export async function getAttendanceById({
   supabase,
@@ -160,7 +160,7 @@ export type AttendanceFilters = {
   month?: string | undefined | null;
   year?: string | undefined | null;
   project?: string | undefined | null;
-  project_site?: string | undefined | null;
+  site?: string | undefined | null;
 };
 
 export async function getMonthlyAttendanceByCompanyId({
@@ -182,7 +182,7 @@ export async function getMonthlyAttendanceByCompanyId({
   const defaultMonth = today.getMonth() + 1;
   const defaultYear = today.getFullYear();
   const { from, to, sort, searchQuery, filters } = params;
-  const { month, year, project, project_site } = filters ?? {};
+  const { month, year, project, site } = filters ?? {};
 
   const columns = [
     "id",
@@ -198,10 +198,9 @@ export async function getMonthlyAttendanceByCompanyId({
     .select(
       `
   ${columns.join(",")},
-  employee_project_assignment!employee_project_assignments_employee_id_fkey!${
-    project ? "inner" : "left"
-  }(
-    project_sites!${project ? "inner" : "left"}(
+  employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
+      }(
+    sites!${project ? "inner" : "left"}(
       id,
       name,
       projects!${project ? "inner" : "left"}(id, name)
@@ -247,18 +246,18 @@ export async function getMonthlyAttendanceByCompanyId({
   query = query.eq("monthly_attendance.month", effectiveMonth);
   query = query.eq("monthly_attendance.year", effectiveYear);
 
-  
+
   if (project) {
     query = query.eq(
-      "employee_project_assignment.project_sites.projects.name",
+      "employee_project_assignment.sites.projects.name",
       project
     );
   }
 
-  if (project_site) {
+  if (site) {
     query = query.eq(
-      "employee_project_assignment.project_sites.name",
-      project_site
+      "employee_project_assignment.sites.name",
+      site
     );
   }
 
@@ -347,7 +346,7 @@ export type AttendanceReportFilters = {
   start_year?: string | undefined | null;
   end_year?: string | undefined | null;
   project?: string | undefined | null;
-  project_site?: string | undefined | null;
+  site?: string | undefined | null;
 };
 
 export async function getAttendanceReportByCompanyId({
@@ -371,7 +370,7 @@ export async function getAttendanceReportByCompanyId({
   const { sort, from, to, filters, searchQuery } = params;
   const {
     project,
-    project_site,
+    site,
     start_year,
     start_month,
     end_year,
@@ -391,12 +390,10 @@ export async function getAttendanceReportByCompanyId({
     .select(
       `
       ${columns.join(",")},
-      employee_project_assignment!employee_project_assignments_employee_id_fkey!${
-        project ? "inner" : "left"
+      employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
       }(
-        project_sites!${project ? "inner" : "left"}(id, name, projects!${
-          project ? "inner" : "left"
-        }(id, name))),
+        sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
+      }(id, name))),
       attendance(
         id,
         date,
@@ -457,12 +454,12 @@ export async function getAttendanceReportByCompanyId({
   }
   if (project) {
     query.eq(
-      "employee_project_assignment.project_sites.projects.name",
+      "employee_project_assignment.sites.projects.name",
       project
     );
   }
-  if (project_site) {
-    query.eq("employee_project_assignment.project_sites.name", project_site);
+  if (site) {
+    query.eq("employee_project_assignment.sites.name", site);
   }
 
   const { data, count, error } = await query

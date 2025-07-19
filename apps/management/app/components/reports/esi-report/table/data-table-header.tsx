@@ -21,7 +21,7 @@ export const esiReportColumnIdArray = [
   "employer_contribution",
   "total_contribution",
   "project",
-  "project_site",
+  "site",
   "start_range",
   "end_range",
 ];
@@ -89,7 +89,7 @@ export function DataTableHeader({ table, loading, className }: Props) {
                   "px-4 py-2",
                   id === "employee_code" && "sticky left-12 bg-card z-10",
                   id === "employee_name" &&
-                    "sticky w-full left-48 bg-card z-10",
+                  "sticky w-full left-48 bg-card z-10",
                 )}
               >
                 <Button

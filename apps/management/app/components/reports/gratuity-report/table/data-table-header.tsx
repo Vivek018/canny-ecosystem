@@ -23,7 +23,7 @@ export const gratuityReportColumnIdArray = [
   "employee_eligible_date",
   "is_eligible_for_gratuity",
   "project",
-  "project_site",
+  "site",
   "date_of_joining",
   "date_of_leaving",
 ];
@@ -91,7 +91,7 @@ export function DataTableHeader({ table, loading, className }: Props) {
                   "px-4 py-2",
                   id === "employee_code" && "sticky left-12 bg-card z-10",
                   id === "employee_name" &&
-                    "sticky w-full left-48 bg-card z-10",
+                  "sticky w-full left-48 bg-card z-10",
                 )}
               >
                 <Button

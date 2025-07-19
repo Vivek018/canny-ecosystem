@@ -36,7 +36,7 @@ export function FilterList({ filters }: Props) {
       case "status":
       case "users":
       case "project":
-      case "project_site":
+      case "site":
         return value;
       default:
         return null;

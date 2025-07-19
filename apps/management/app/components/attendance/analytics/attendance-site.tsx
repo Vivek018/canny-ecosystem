@@ -22,12 +22,12 @@ const chartConfig = {
     color: "hsl(var(--chart-5))",
   },
   project: {
-    label: "Project Site",
+    label: "Site",
     color: "hsl(var(--chart-5))",
   },
 } satisfies { [key: string]: { label: string; color?: string } };
 
-export function AttendanceByProjectSite({
+export function AttendanceBySite({
   chartData,
   projectArray,
 }: {
@@ -48,7 +48,7 @@ export function AttendanceByProjectSite({
         );
 
         return {
-          projectSite: row.project_site,
+          site: row.site,
           presents: totalPresents,
         };
       })
@@ -60,11 +60,11 @@ export function AttendanceByProjectSite({
     <Card className="flex flex-col">
       <div className="flex justify-between p-2 relative items-start">
         <CardHeader className="flex-1 flex flex-col items-center pt-3">
-          <CardTitle>Project Site Attendance</CardTitle>
+          <CardTitle>Site Attendance</CardTitle>
           <CardDescription>
             {project
-              ? `Attendance by project site for ${project}`
-              : "Select project to see attendance by project sites"}
+              ? `Attendance by site for ${project}`
+              : "Select project to see attendance by sites"}
           </CardDescription>
         </CardHeader>
         <AttendanceProjectFilter
@@ -96,7 +96,7 @@ export function AttendanceByProjectSite({
               >
                 <LabelList
                   position="insideStart"
-                  dataKey="projectSite"
+                  dataKey="site"
                   className="fill-white capitalize mix-blend-luminosity"
                   fontSize={10}
                 />

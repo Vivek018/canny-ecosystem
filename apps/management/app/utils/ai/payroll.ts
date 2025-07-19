@@ -14,7 +14,7 @@ export const PayrollFiltersSchema = z.object({
     .string()
     .optional()
     .describe(
-      "Title of the payroll which will usually be combination of name of company, project, project site, month and year. Example: 'COTECNA CG ODISHA MINERAL MARCH 2025'. "
+      "Title of the payroll which will usually be combination of name of company, project, site, month and year. Example: 'COTECNA CG ODISHA MINERAL MARCH 2025'. "
     ),
   date_start: z
     .string()

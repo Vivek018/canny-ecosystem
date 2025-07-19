@@ -104,7 +104,7 @@ export async function deleteProject({
   return { status, error };
 }
 
-// Project Sites
+// Sites
 export async function createSite({
   supabase,
   data,
@@ -127,14 +127,14 @@ export async function createSite({
   const {
     error,
     status,
-    data: projectSiteData,
-  } = await supabase.from("project_sites").insert(data).select().single();
+    data: siteData,
+  } = await supabase.from("sites").insert(data).select().single();
 
   if (error) {
     console.error("createSite Error:", error);
   }
 
-  return { data: projectSiteData, status, error };
+  return { data: siteData, status, error };
 }
 
 export async function updateSite({
@@ -157,8 +157,7 @@ export async function updateSite({
   }
 
   const { error, status } = await supabase
-    .from("project_sites")
-    .update(data)
+    .from("sites").update(data)
     .eq("id", data.id!);
   if (error) {
     console.error("updateSite Error:", error);
@@ -187,8 +186,7 @@ export async function deleteSite({
   }
 
   const { error, status } = await supabase
-    .from("project_sites")
-    .delete()
+    .from("sites").delete()
     .eq("id", id);
 
   if (error) {

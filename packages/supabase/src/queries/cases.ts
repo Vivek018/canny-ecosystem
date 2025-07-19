@@ -109,7 +109,7 @@ export async function getCasesByCompanyId({
         ","
       )}, reported_by_project:projects!cases_reported_by_project_id_fkey(id, name), reported_on_project:projects!cases_reported_on_project_id_fkey(id, name),
        reported_by_employee:employees!cases_reported_by_employee_id_fkey(id, employee_code), reported_on_employee:employees!cases_reported_on_employee_id_fkey(id, employee_code),
-       reported_by_site:project_sites!cases_reported_by_site_id_fkey(id, name, projects!project_sites_project_id_fkey(id)), reported_on_site:project_sites!cases_reported_on_site_id_fkey(id, name),
+       reported_by_site:sites!cases_reported_by_site_id_fkey(id, name, projects!sites_project_id_fkey(id)), reported_on_site:sites!cases_reported_on_site_id_fkey(id, name),
        reported_by_company:companies!cases_reported_by_company_id_fkey(id, name), reported_on_company:companies!cases_reported_on_company_id_fkey(id, name)`,
       {
         count: "exact",

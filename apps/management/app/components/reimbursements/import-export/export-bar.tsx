@@ -24,9 +24,9 @@ export function ExportBar({
   const toBeExportedData = data.map((element) => {
     const exportedData: {
       [key: (typeof ReimbursementsColumnIdArray)[number]]:
-        | string
-        | number
-        | boolean;
+      | string
+      | number
+      | boolean;
     } = {};
 
     for (const key of ReimbursementsColumnIdArray) {
@@ -43,10 +43,10 @@ export function ExportBar({
         exportedData[key] = element?.users?.email ?? "";
       } else if (key === "project_name") {
         exportedData[key] =
-          element?.employees?.employee_project_assignment?.project_sites?.projects?.name;
-      } else if (key === "project_site_name") {
+          element?.employees?.employee_project_assignment?.sites?.projects?.name;
+      } else if (key === "site_name") {
         exportedData[key] =
-          element?.employees?.employee_project_assignment?.project_sites?.name;
+          element?.employees?.employee_project_assignment?.sites?.name;
       } else {
         exportedData[key] = element?.[
           key as keyof ReimbursementDataType

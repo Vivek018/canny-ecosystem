@@ -38,7 +38,7 @@ export function OfferLetter({
     compantAddress: companyData?.locationData?.address_line_1 ?? "",
     companyCity: companyData?.locationData?.city ?? "",
     siteName:
-      data?.employees.employee_project_assignment?.project_sites.name ?? "",
+      data?.employees.employee_project_assignment?.sites.name ?? "",
   };
 
   return (

@@ -14,12 +14,12 @@ export function FilterList({ filters }: { filters: DashboardFilters }) {
   }, {} as { [key: number]: string });
 
   const defaultFilters =
-    filters?.month || filters?.year
+    Object.keys(filters!).length
       ? filters
       : {
-          month: monthNames[defaultMonth + 2],
-          year: defaultYear.toString(),
-        };
+        month: monthNames[defaultMonth + 2],
+        year: defaultYear.toString(),
+      };
 
   const renderFilter = ({
     key,

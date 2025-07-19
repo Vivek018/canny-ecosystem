@@ -55,9 +55,9 @@ export const prepareLeavesWorkbook = async ({
       employee_project_assignment,
     } = employees;
     const project =
-      employee_project_assignment?.project_sites?.projects?.name || null;
-    const project_site =
-      employee_project_assignment?.project_sites?.name || null;
+      employee_project_assignment?.sites?.projects?.name || null;
+    const site =
+      employee_project_assignment?.sites?.name || null;
 
     if (!acc[employee_code]) {
       const monthsArray = Object.entries(months)
@@ -68,7 +68,7 @@ export const prepareLeavesWorkbook = async ({
         employee_code,
         employee_name: `${first_name} ${last_name}`,
         project,
-        project_site,
+        site,
         ...Object.fromEntries(
           monthsArray.map((month) => [
             month,
@@ -138,9 +138,8 @@ export const prepareLeavesWorkbook = async ({
   };
 
   worksheet.mergeCells("F1:BH4");
-  worksheet.getCell("F1").value = `Leaves Register for ${
-    refYear ? refYear : new Date().getFullYear()
-  }`;
+  worksheet.getCell("F1").value = `Leaves Register for ${refYear ? refYear : new Date().getFullYear()
+    }`;
   worksheet.getCell("F1").font = { bold: true, size: 20 };
   worksheet.getCell("F1").alignment = {
     horizontal: "center",
@@ -171,7 +170,7 @@ export const prepareLeavesWorkbook = async ({
     "Employee Code",
     "Employee Name",
     "Project",
-    "Project Site",
+    "Site",
   ];
   const leaveTypes = [
     "Casual Leave",
@@ -218,7 +217,7 @@ export const prepareLeavesWorkbook = async ({
       emp.employee_code || "N/A",
       emp.employee_name || "N/A",
       emp.project || "N/A",
-      emp.project_site || "N/A",
+      emp.site || "N/A",
     ];
 
     let totalLeaves = 0;

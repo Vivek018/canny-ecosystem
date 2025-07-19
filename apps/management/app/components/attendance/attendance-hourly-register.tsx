@@ -121,7 +121,7 @@ export const createAttendanceHourlyWorkbook = async ({
     "Employee Name",
     "Employee Code",
     "Project",
-    "Project Site",
+    "Site",
     ...sortedDates,
     "Total Hours",
   ]);
@@ -133,7 +133,7 @@ export const createAttendanceHourlyWorkbook = async ({
       emp.employee_name || "N/A",
       emp.employee_code || "N/A",
       emp.project || "N/A",
-      emp.project_site || "N/A",
+      emp.site || "N/A",
       ...sortedDates.map((date) => (emp[date as "attendance"] as any)?.hours || 0),
       emp.total_hours || 0,
     ];

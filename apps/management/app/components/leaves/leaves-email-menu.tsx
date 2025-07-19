@@ -68,10 +68,10 @@ export default function LeavesEmailMenu({
         exportedData[key] = element?.users?.email ?? "";
       } else if (key === "project") {
         exportedData[key] =
-          element?.employees?.employee_project_assignment?.project_sites?.projects?.name;
-      } else if (key === "project_site") {
+          element?.employees?.employee_project_assignment?.sites?.projects?.name;
+      } else if (key === "site") {
         exportedData[key] =
-          element?.employees?.employee_project_assignment?.project_sites?.name;
+          element?.employees?.employee_project_assignment?.sites?.name;
       } else {
         exportedData[key] = element?.[key as keyof LeavesDataType] as
           | string

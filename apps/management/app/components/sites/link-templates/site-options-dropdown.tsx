@@ -38,8 +38,8 @@ export const SiteOptionsDropdown = ({
             onClick={handleEdit}
             className={cn(
               "hidden",
-              hasPermission(role, `${updateRole}:${attribute.projectSite}`) &&
-                "flex"
+              hasPermission(role, `${updateRole}:${attribute.site}`) &&
+              "flex"
             )}
           >
             Edit Link Assignment
@@ -47,8 +47,8 @@ export const SiteOptionsDropdown = ({
           <DropdownMenuSeparator
             className={cn(
               "hidden",
-              hasPermission(role, `${deleteRole}:${attribute.projectSite}`) &&
-                "flex"
+              hasPermission(role, `${deleteRole}:${attribute.site}`) &&
+              "flex"
             )}
           />
           <DeleteSitePaymentTemplateAssignment

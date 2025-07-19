@@ -17,7 +17,7 @@ export type PaymentFieldsReportType = {
   employee_project_assignment: {
     start_date: string;
     end_date: string;
-    project_sites: {
+    sites: {
       name: string;
       projects: { name: string };
     };
@@ -64,11 +64,9 @@ export const columns = (): ColumnDef<PaymentFieldsReportType>[] => [
           prefetch="intent"
           className="group"
         >
-          <p className="truncate text-primary/80 w-48 group-hover:text-primary">{`${
-            row.original?.first_name
-          } ${row.original?.middle_name ?? ""} ${
-            row.original?.last_name ?? ""
-          }`}</p>
+          <p className="truncate text-primary/80 w-48 group-hover:text-primary">{`${row.original?.first_name
+            } ${row.original?.middle_name ?? ""} ${row.original?.last_name ?? ""
+            }`}</p>
         </Link>
       );
     },
@@ -99,7 +97,7 @@ export const columns = (): ColumnDef<PaymentFieldsReportType>[] => [
       return (
         <p className="truncate w-28 capitalize">
           {
-            row.original?.employee_project_assignment?.project_sites?.projects
+            row.original?.employee_project_assignment?.sites?.projects
               ?.name
           }
         </p>
@@ -108,12 +106,12 @@ export const columns = (): ColumnDef<PaymentFieldsReportType>[] => [
   },
   {
     enableSorting: false,
-    accessorKey: "project_site",
-    header: "Project Site",
+    accessorKey: "site",
+    header: "Site",
     cell: ({ row }) => {
       return (
         <p className="truncate w-28 capitalize">
-          {row.original?.employee_project_assignment?.project_sites?.name}
+          {row.original?.employee_project_assignment?.sites?.name}
         </p>
       );
     },

@@ -20,7 +20,7 @@ export function FilterList({ filterList }: Props) {
       case "project":
         return value;
 
-      case "project_site":
+      case "site":
         return value;
 
       case "doj_start": {

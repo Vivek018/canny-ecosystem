@@ -46,11 +46,11 @@ export const PLACEHOLDERS = [
 export function AttendanceSearchFilter({
   disabled,
   projectArray,
-  projectSiteArray,
+  siteArray,
 }: {
   disabled?: boolean;
   projectArray: string[];
-  projectSiteArray: string[];
+  siteArray: string[];
 }) {
   const [prompt, setPrompt] = useState("");
   const navigation = useNavigation();
@@ -73,7 +73,7 @@ export function AttendanceSearchFilter({
     month: "",
     year: "",
     project: "",
-    project_site: "",
+    site: "",
   };
 
   const [filterParams, setFilterParams] = useState(initialFilterParams);
@@ -104,7 +104,7 @@ export function AttendanceSearchFilter({
     month: searchParams.get("month"),
     year: searchParams.get("year"),
     project: searchParams.get("project"),
-    project_site: searchParams.get("project_site"),
+    site: searchParams.get("site"),
   };
 
   useEffect(() => {
@@ -220,7 +220,7 @@ export function AttendanceSearchFilter({
               className={cn(
                 "absolute z-10 right-3 top-[6px] opacity-70",
                 !disabled &&
-                  "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
+                "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 hasValidFilters && "opacity-100",
                 isOpen && "opacity-100"
               )}
@@ -271,7 +271,7 @@ export function AttendanceSearchFilter({
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
-              <span>Project Site</span>
+              <span>Site</span>
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent
@@ -287,15 +287,15 @@ export function AttendanceSearchFilter({
                     Select Project First
                   </DropdownMenuCheckboxItem>
                 ) : (
-                  projectSiteArray?.map((name, index) => (
+                  siteArray?.map((name, index) => (
                     <DropdownMenuCheckboxItem
                       key={name + index.toString()}
                       className="capitalize"
-                      checked={filterParams?.project_site === name}
+                      checked={filterParams?.site === name}
                       onCheckedChange={() => {
                         setFilterParams((prev) => ({
                           ...prev,
-                          project_site: name,
+                          site: name,
                         }));
                       }}
                     >

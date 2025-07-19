@@ -48,9 +48,8 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     cell: ({ row }) => {
       return (
         <p className="truncate text-primary/80 w-48 cursor-pointer">
-          {`${row.original?.employees?.first_name} ${
-            row.original?.employees?.middle_name ?? ""
-          }
+          {`${row.original?.employees?.first_name} ${row.original?.employees?.middle_name ?? ""
+            }
           ${row.original?.employees?.last_name ?? ""}`}
         </p>
       );
@@ -63,7 +62,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     cell: ({ row }) => {
       return (
         <p className="truncate capitalize">
-          {row.original?.employees?.employee_project_assignment?.project_sites
+          {row.original?.employees?.employee_project_assignment?.sites
             ?.projects?.name ?? "--"}
         </p>
       );
@@ -71,12 +70,12 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
   },
   {
     enableSorting: false,
-    accessorKey: "project_site",
-    header: "Project Site",
+    accessorKey: "site",
+    header: "Site",
     cell: ({ row }) => {
       return (
         <p className="truncate capitalize">
-          {row.original?.employees?.employee_project_assignment?.project_sites
+          {row.original?.employees?.employee_project_assignment?.sites
             ?.name ?? "--"}
         </p>
       );
@@ -87,9 +86,8 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     header: "Last Working Day ",
     cell: ({ row }) => {
       return (
-        <p className="truncate capitalize">{`${
-          formatDate(row.original?.last_working_day) ?? "--"
-        }`}</p>
+        <p className="truncate capitalize">{`${formatDate(row.original?.last_working_day) ?? "--"
+          }`}</p>
       );
     },
   },
@@ -205,8 +203,8 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
               asChild
               className={cn(
                 !hasPermission(role, `${updateRole}:${attribute.exits}`) &&
-                  !hasPermission(role, `${deleteRole}:${attribute.exits}`) &&
-                  "hidden"
+                !hasPermission(role, `${deleteRole}:${attribute.exits}`) &&
+                "hidden"
               )}
             >
               <Button variant="ghost" className="h-8 w-8 p-0">

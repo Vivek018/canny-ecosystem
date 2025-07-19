@@ -16,7 +16,7 @@ export const IncidentsColumnIdArray = [
   "employee_code",
   "employee_name",
   "project",
-  "project_site",
+  "site",
   "title",
   "description",
   "date",

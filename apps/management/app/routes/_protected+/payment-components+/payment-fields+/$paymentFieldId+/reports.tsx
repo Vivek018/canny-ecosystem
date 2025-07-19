@@ -36,7 +36,7 @@ export type PaymentFieldReportFilters = {
   start_year: string | undefined;
   end_year: string | undefined;
   project: string | undefined;
-  project_site: string | undefined;
+  site: string | undefined;
 };
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
@@ -62,7 +62,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       start_year: searchParams.get("start_year") ?? undefined,
       end_year: searchParams.get("end_year") ?? undefined,
       project: searchParams.get("project") ?? undefined,
-      project_site: searchParams.get("project_site") ?? undefined,
+      site: searchParams.get("site") ?? undefined,
     };
 
     const hasFilters =
@@ -85,9 +85,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     const paymentFieldPromise = paymentFieldId
       ? getPaymentFieldById({
-          supabase,
-          id: paymentFieldId,
-        })
+        supabase,
+        id: paymentFieldId,
+      })
       : Promise.resolve({ data: null, error: null });
 
     const projectPromise = getProjectNamesByCompanyId({
@@ -95,18 +95,18 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       companyId,
     });
 
-    const projectSitePromise = filters.project
+    const sitePromise = filters.project
       ? getSiteNamesByProjectName({
-          supabase,
-          projectName: filters.project,
-        })
+        supabase,
+        projectName: filters.project,
+      })
       : Promise.resolve({ data: null });
 
     return defer({
       reportPromise: reportPromise as any,
       paymentFieldPromise,
       projectPromise,
-      projectSitePromise,
+      sitePromise,
       query,
       filters,
       companyId,
@@ -118,7 +118,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       reportPromise: Promise.resolve({ data: [], meta: { count: 0 } }),
       paymentFieldPromise: Promise.resolve({ data: null, error: null }),
       projectPromise: Promise.resolve({ data: [] }),
-      projectSitePromise: Promise.resolve({ data: [] }),
+      sitePromise: Promise.resolve({ data: [] }),
       query: "",
       filters: null,
       companyId: "",
@@ -130,8 +130,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
   const url = new URL(args.request.url);
   return clientCaching(
-    `${cacheKeyPrefix.payment_field_report}${
-      args.params.paymentFieldId
+    `${cacheKeyPrefix.payment_field_report}${args.params.paymentFieldId
     }${url.searchParams.toString()}`,
     args,
   );
@@ -164,7 +163,7 @@ export default function PaymentFieldsReport() {
     reportPromise,
     paymentFieldPromise,
     projectPromise,
-    projectSitePromise,
+    sitePromise,
     query,
     filters,
     companyId,
@@ -182,15 +181,15 @@ export default function PaymentFieldsReport() {
           <Suspense fallback={<LoadingSpinner />}>
             <Await resolve={projectPromise}>
               {(projectData) => (
-                <Await resolve={projectSitePromise}>
-                  {(projectSiteData) => (
+                <Await resolve={sitePromise}>
+                  {(siteData) => (
                     <PaymentFieldsReportSearchFilter
                       disabled={!projectData?.data?.length && noFilters}
                       projectArray={
                         projectData?.data?.map((project) => project!.name) ?? []
                       }
-                      projectSiteArray={
-                        projectSiteData?.data?.map((site) => site!.name) ?? []
+                      siteArray={
+                        siteData?.data?.map((site) => site!.name) ?? []
                       }
                     />
                   )}

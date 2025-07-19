@@ -15,7 +15,7 @@ export const LeavesColumnIdArray = [
   "employee_code",
   "employee_name",
   "project",
-  "project_site",
+  "site",
   "leave_type",
   "start_date",
   "end_date",

@@ -23,7 +23,7 @@ export function DataTableHeader({
     "employee_code",
     "employee_name",
     "project",
-    "project_site",
+    "site",
     ...monthYearsRange.map((monthYear: { toString: () => string }) =>
       monthYear.toString()
     ),

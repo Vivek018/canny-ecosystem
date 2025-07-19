@@ -36,7 +36,7 @@ export function FilterList({ filters }: Props) {
       case "name":
       case "leave_type":
       case "project":
-      case "project_site":
+      case "site":
       case "users":
       case "year":
         return value;

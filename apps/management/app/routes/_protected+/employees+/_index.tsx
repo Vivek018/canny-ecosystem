@@ -62,7 +62,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       gender: searchParams.get("gender") ?? null,
       status: searchParams.get("status") ?? null,
       project: searchParams.get("project") ?? null,
-      project_site: searchParams.get("project_site") ?? null,
+      site: searchParams.get("site") ?? null,
       assignment_type: searchParams.get("assignment_type") ?? null,
       position: searchParams.get("position") ?? null,
       skill_level: searchParams.get("skill_level") ?? null,
@@ -95,9 +95,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
       companyId,
     });
 
-    let projectSitePromise = null;
+    let sitePromise = null;
     if (filters.project) {
-      projectSitePromise = getSiteNamesByProjectName({
+      sitePromise = getSiteNamesByProjectName({
         supabase,
         projectName: filters.project,
       });
@@ -105,7 +105,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return defer({
       employeesPromise: employeesPromise as any,
       projectPromise,
-      projectSitePromise,
+      sitePromise,
       query,
       filters,
       companyId,
@@ -117,7 +117,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return defer({
       employeesPromise: Promise.resolve({ data: [] }),
       projectPromise: Promise.resolve({ data: [] }),
-      projectSitePromise: Promise.resolve({ data: [] }),
+      sitePromise: Promise.resolve({ data: [] }),
       query: "",
       filters: null,
       companyId: "",
@@ -166,7 +166,7 @@ export default function EmployeesIndex() {
   const {
     employeesPromise,
     projectPromise,
-    projectSitePromise,
+    sitePromise,
     query,
     filters,
     companyId,
@@ -183,8 +183,8 @@ export default function EmployeesIndex() {
           <Suspense fallback={<LoadingSpinner />}>
             <Await resolve={projectPromise}>
               {(projectData) => (
-                <Await resolve={projectSitePromise}>
-                  {(projectSiteData) => (
+                <Await resolve={sitePromise}>
+                  {(siteData) => (
                     <>
                       <EmployeesSearchFilter
                         disabled={!projectData?.data?.length && noFilters}
@@ -193,9 +193,9 @@ export default function EmployeesIndex() {
                             ? projectData?.data?.map((project) => project!.name)
                             : []
                         }
-                        projectSiteArray={
-                          projectSiteData?.data?.length
-                            ? projectSiteData?.data?.map((site) => site!.name)
+                        siteArray={
+                          siteData?.data?.length
+                            ? siteData?.data?.map((site) => site!.name)
                             : []
                         }
                       />
@@ -209,7 +209,7 @@ export default function EmployeesIndex() {
         </div>
         <EmployeesActions
           isEmpty={!projectPromise}
-          // emails={}
+        // emails={}
         />
       </div>
       <Suspense fallback={<LoadingSpinner className="h-1/3" />}>

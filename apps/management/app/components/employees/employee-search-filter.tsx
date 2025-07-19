@@ -48,17 +48,17 @@ const PLACEHOLDERS = [
   "Employees joined before 2018 in Sampler role",
   "Employees born before 1995 who worked at Site 'B'",
   "Employees joined in 2019 in supervisor role",
-  "Full-time employees at Project Site 'B'",
+  "Full-time employees at Site 'B'",
 ];
 
 export function EmployeesSearchFilter({
   disabled,
   projectArray,
-  projectSiteArray,
+  siteArray,
 }: {
   disabled?: boolean;
   projectArray: string[];
-  projectSiteArray: string[];
+  siteArray: string[];
 }) {
   const [prompt, setPrompt] = useState("");
   const navigation = useNavigation();
@@ -80,7 +80,7 @@ export function EmployeesSearchFilter({
     gender: "",
     status: "",
     project: "",
-    project_site: "",
+    site: "",
     assignment_type: "",
     position: "",
     skill_level: "",
@@ -126,7 +126,7 @@ export function EmployeesSearchFilter({
     gender: searchParams.get("gender"),
     status: searchParams.get("status"),
     project: searchParams.get("project"),
-    project_site: searchParams.get("project_site"),
+    site: searchParams.get("site"),
     assignment_type: searchParams.get("assignment_type"),
     position: searchParams.get("position"),
     skill_level: searchParams.get("skill_level"),
@@ -440,7 +440,7 @@ export function EmployeesSearchFilter({
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
-              <span>Project Site</span>
+              <span>Site</span>
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent
@@ -456,15 +456,15 @@ export function EmployeesSearchFilter({
                     Select Project First
                   </DropdownMenuCheckboxItem>
                 ) : (
-                  projectSiteArray?.map((name, index) => (
+                  siteArray?.map((name, index) => (
                     <DropdownMenuCheckboxItem
                       key={name + index.toString()}
                       className='capitalize'
-                      checked={filterParams?.project_site === name}
+                      checked={filterParams?.site === name}
                       onCheckedChange={() => {
                         setFilterParams((prev) => ({
                           ...prev,
-                          project_site: name,
+                          site: name,
                         }));
                       }}
                     >

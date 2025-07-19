@@ -1,4 +1,4 @@
-import { convertToNull, type employeeDocuments } from "@canny_ecosystem/utils";
+import { convertToNull, type employeeDocumentTypeArray } from "@canny_ecosystem/utils";
 import type {
   EmployeeAddressDatabaseInsert,
   EmployeeAddressDatabaseUpdate,
@@ -1635,7 +1635,7 @@ export async function addEmployeeDocument({
 }: {
   supabase: TypedSupabaseClient;
   employee_id: string;
-  document_type: (typeof employeeDocuments)[number];
+  document_type: (typeof employeeDocumentTypeArray)[number];
   url: string;
 }) {
   const dataToBeInserted = convertToNull({ employee_id, document_type, url });
@@ -1653,7 +1653,7 @@ export async function deleteEmployeeDocumentByEmployeeId({
 }: {
   supabase: TypedSupabaseClient;
   employeeId: string;
-  documentType: (typeof employeeDocuments)[number];
+  documentType: (typeof employeeDocumentTypeArray)[number];
 }) {
   const { error, status } = await supabase
     .from("employee_documents")

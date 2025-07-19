@@ -16,7 +16,7 @@ export const ExitPaymentColumnIdArray = [
   "employee_code",
   "employee_name",
   "project",
-  "project_site",
+  "site",
   "last_working_day",
   "reason",
   "final_settlement_date",

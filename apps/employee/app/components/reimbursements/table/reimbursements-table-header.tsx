@@ -15,7 +15,7 @@ export const ReimbursementsColumnIdArray = [
   "employee_code",
   "employee_name",
   "project_name",
-  "project_site_name",
+  "site_name",
   "submitted_date",
   "status",
   "amount",
@@ -69,7 +69,7 @@ export function ReimbursementsTableHeader({
   return (
     <TableHeader className={className}>
       <TableRow className='h-[45px] hover:bg-transparent'>
-        
+
         {ReimbursementsColumnIdArray?.map((id) => {
           return (
             isVisible(id) && (

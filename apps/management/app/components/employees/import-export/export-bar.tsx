@@ -49,10 +49,10 @@ export function ExportBar({
         exportedData[key] = element?.is_active ? "Active" : "Inactive";
       } else if (key === "project_name") {
         exportedData[key] =
-          element?.employee_project_assignment?.project_sites.projects.name;
-      } else if (key === "project_site_name") {
+          element?.employee_project_assignment?.sites.projects.name;
+      } else if (key === "site_name") {
         exportedData[key] =
-          element?.employee_project_assignment?.project_sites?.name;
+          element?.employee_project_assignment?.sites?.name;
       } else if (key === "assignment_type") {
         exportedData[key] =
           element?.employee_project_assignment?.assignment_type ?? "";

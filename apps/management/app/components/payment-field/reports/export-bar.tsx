@@ -23,8 +23,8 @@ export function ExportBar({
   const toBeExportedData = data.map((element) => {
     const exportedData: {
       [key: (typeof paymentFieldsReportColumnIdArray)[number]]:
-        | string
-        | undefined;
+      | string
+      | undefined;
     } = {};
 
     for (const key of paymentFieldsReportColumnIdArray) {
@@ -39,10 +39,10 @@ export function ExportBar({
         ] = `${element?.first_name} ${element?.middle_name} ${element?.last_name}`;
       } else if (key === "project") {
         exportedData[key] =
-          element?.employee_project_assignment?.project_sites?.projects?.name;
-      } else if (key === "project_site") {
+          element?.employee_project_assignment?.sites?.projects?.name;
+      } else if (key === "site") {
         exportedData[key] =
-          element?.employee_project_assignment?.project_sites?.name;
+          element?.employee_project_assignment?.sites?.name;
       } else if (key === "start_range") {
         exportedData[key] = formatDate(element.start_date)?.slice(3);
       } else if (key === "end_range") {

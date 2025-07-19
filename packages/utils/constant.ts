@@ -141,8 +141,8 @@ export const attribute = {
   paymentTemplates: "payment_templates",
   projects: "projects",
   project: "project",
-  projectSites: "project_sites",
-  projectSite: "project_site",
+  sites: "sites",
+  site: "site",
   settingGeneral: "setting_general",
   settingLocations: "setting_locations",
   settingRelationships: "setting_relationships",
@@ -333,8 +333,8 @@ export function getFilePathFromUrl(url: string) {
     `${SUPABASE_MEDIA_URL_PREFIX}${SUPABASE_BUCKET.CANNY_ECOSYSTEM}/`
   )
     ? url.slice(
-        `${SUPABASE_MEDIA_URL_PREFIX}${SUPABASE_BUCKET.CANNY_ECOSYSTEM}/`.length
-      )
+      `${SUPABASE_MEDIA_URL_PREFIX}${SUPABASE_BUCKET.CANNY_ECOSYSTEM}/`.length
+    )
     : url;
 }
 

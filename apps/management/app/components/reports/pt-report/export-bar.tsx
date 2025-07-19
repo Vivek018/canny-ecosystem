@@ -38,10 +38,10 @@ export function ExportBar({
         ] = `${element?.first_name} ${element?.middle_name} ${element?.last_name}`;
       } else if (key === "project") {
         exportedData[key] =
-          element?.employee_project_assignment?.project_sites?.projects?.name;
-      } else if (key === "project_site") {
+          element?.employee_project_assignment?.sites?.projects?.name;
+      } else if (key === "site") {
         exportedData[key] =
-          element?.employee_project_assignment?.project_sites?.name;
+          element?.employee_project_assignment?.sites?.name;
       } else if (key === "start_range") {
         exportedData[key] = element?.start_range;
       } else if (key === "end_range") {

@@ -36,7 +36,7 @@ import {
   seedCompanyRegistrationDetails,
   seedCompanyRelationships,
 } from "./companies";
-import { seedProject, seedProjectSite } from "./projects";
+import { seedProject, seedSite } from "./projects";
 import {
   seedEmployeeAccidents,
   seedEmployeeAddresses,
@@ -56,7 +56,7 @@ import {
 import {
   getEmployeeProjectAssignmentByEmployeeId,
   getEmployeesByCompanyId,
-  getEmployeesByProjectSiteId,
+  getEmployeesBySiteId,
 } from "../queries";
 import {
   DEFAULT_APPOINTMENT_LETTER,
@@ -144,7 +144,7 @@ export async function seed(newCompanyId?: string) {
           const { data } = await createSite({
             supabase,
             data: {
-              ...seedProjectSite(),
+              ...seedSite(),
               project_id: projectId!,
             },
             bypassAuth: true,
@@ -159,7 +159,7 @@ export async function seed(newCompanyId?: string) {
                 employeeStatutoryDetailsData: seedEmployeeStatutoryDetails(),
                 employeeBankDetailsData: seedEmployeeBankDetails(),
                 employeeProjectAssignmentData: {
-                  project_site_id: data?.id,
+                  site_id: data?.id,
                   ...seedEmployeeProjectAssignmentDetails(),
                 },
                 employeeAddressesData: seedEmployeeAddresses(),
@@ -225,17 +225,17 @@ export async function seed(newCompanyId?: string) {
                 const caseData: Partial<CasesDatabaseRow> = {};
                 const reportedBy =
                   reportedByArray[
-                    faker.number.int({
-                      min: 0,
-                      max: reportedByArray.length - 1,
-                    })
+                  faker.number.int({
+                    min: 0,
+                    max: reportedByArray.length - 1,
+                  })
                   ];
                 const reportedOn =
                   reportedOnArray[
-                    faker.number.int({
-                      min: 0,
-                      max: reportedOnArray.length - 1,
-                    })
+                  faker.number.int({
+                    min: 0,
+                    max: reportedOnArray.length - 1,
+                  })
                   ];
                 caseData.reported_by = reportedBy;
                 caseData.reported_on = reportedOn;
@@ -250,7 +250,7 @@ export async function seed(newCompanyId?: string) {
                       employeeId: employeeData.id,
                     });
                   caseData.reported_by_project_id =
-                    assignmentData?.project_sites.projects?.id!;
+                    assignmentData?.sites.projects?.id!;
                 } else if (reportedBy === "site") {
                   const { data: assignmentData } =
                     await getEmployeeProjectAssignmentByEmployeeId({
@@ -258,7 +258,7 @@ export async function seed(newCompanyId?: string) {
                       employeeId: employeeData.id,
                     });
                   caseData.reported_by_site_id =
-                    assignmentData?.project_sites?.id!;
+                    assignmentData?.sites
                 }
                 // Reported On
                 let employeeId = null;
@@ -278,7 +278,7 @@ export async function seed(newCompanyId?: string) {
                       employeeId: employeeId!,
                     });
                   caseData.reported_on_project_id =
-                    assignmentData?.project_sites.projects?.id!;
+                    assignmentData?.sites
                 } else if (reportedOn === "site") {
                   const { data: assignmentData } =
                     await getEmployeeProjectAssignmentByEmployeeId({
@@ -286,7 +286,7 @@ export async function seed(newCompanyId?: string) {
                       employeeId: employeeId,
                     });
                   caseData.reported_on_site_id =
-                    assignmentData?.project_sites?.id!;
+                    assignmentData?.sites
                 }
                 await createCase({
                   supabase,
@@ -306,16 +306,16 @@ export async function seed(newCompanyId?: string) {
                     letterType === "appointment_letter"
                       ? DEFAULT_APPOINTMENT_LETTER
                       : letterType === "experience_letter"
-                      ? DEFAULT_EXPERIENCE_LETTER
-                      : letterType === "noc_letter"
-                      ? DEFAULT_NOC_LETTER
-                      : letterType === "offer_letter"
-                      ? DEFAULT_OFFER_LETTER
-                      : letterType === "relieving_letter"
-                      ? DEFAULT_RELIEVING_LETTER
-                      : letterType === "termination_letter"
-                      ? DEFAULT_TERMINATION_LETTER
-                      : faker.lorem.paragraph(5);
+                        ? DEFAULT_EXPERIENCE_LETTER
+                        : letterType === "noc_letter"
+                          ? DEFAULT_NOC_LETTER
+                          : letterType === "offer_letter"
+                            ? DEFAULT_OFFER_LETTER
+                            : letterType === "relieving_letter"
+                              ? DEFAULT_RELIEVING_LETTER
+                              : letterType === "termination_letter"
+                                ? DEFAULT_TERMINATION_LETTER
+                                : faker.lorem.paragraph(5);
                   const letterData: Omit<
                     EmployeeLetterDatabaseInsert,
                     "created_at" | "updated_at"
@@ -353,9 +353,9 @@ export async function seed(newCompanyId?: string) {
               }
             }
 
-            const { data: employees } = await getEmployeesByProjectSiteId({
+            const { data: employees } = await getEmployeesBySiteId({
               supabase,
-              projectSiteId: data.id,
+              siteId: data.id,
             });
             if (employees && employees.length > 0) {
               for (let i = 0; i < 1; i++) {

@@ -26,9 +26,9 @@ export function ExportBar({
   const toBeExportedData = data.map((element) => {
     const exportedData: {
       [key: (typeof gratuityReportColumnIdArray)[number]]:
-        | string
-        | number
-        | boolean;
+      | string
+      | number
+      | boolean;
     } = {};
 
     for (const key of gratuityReportColumnIdArray) {
@@ -45,10 +45,10 @@ export function ExportBar({
         exportedData[key] = element?.employee_eligible_date;
       } else if (key === "project") {
         exportedData[key] =
-          element?.employee_project_assignment?.project_sites?.projects?.name;
-      } else if (key === "project_site") {
+          element?.employee_project_assignment?.sites?.projects?.name;
+      } else if (key === "site") {
         exportedData[key] =
-          element?.employee_project_assignment?.project_sites?.name;
+          element?.employee_project_assignment?.sites?.name;
       } else if (key === "date_of_joining") {
         exportedData[key] = element?.employee_project_assignment?.start_date!;
       } else if (key === "date_of_leaving") {

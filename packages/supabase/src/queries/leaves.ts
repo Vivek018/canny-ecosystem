@@ -31,7 +31,7 @@ export type LeavesDataType = Pick<
       EmployeeProjectAssignmentDatabaseRow,
       "employee_id"
     > & {
-      project_sites: {
+      sites: {
         id: SiteDatabaseRow["id"];
         name: SiteDatabaseRow["name"];
         projects: {
@@ -51,7 +51,7 @@ export type LeavesFilters = {
   leave_type?: string | undefined | null;
   name?: string | undefined | null;
   project?: string | undefined | null;
-  project_site?: string | undefined | null;
+  site?: string | undefined | null;
   users?: string | undefined | null;
   year?: string | undefined | null;
 };
@@ -90,7 +90,7 @@ export async function getLeavesByEmployeeId({
       `
         ${columns.join(
         ","
-      )},employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!left(project_sites!left(id, name, projects!left(id, name)))),
+      )},employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!left(sites, name, projects!left(id, name)))),
           users!${users ? "inner" : "left"}(id,email)
       
       `,
@@ -189,7 +189,7 @@ export async function getLeavesByCompanyId({
     date_end,
     leave_type,
     project,
-    project_site,
+    site,
     users,
     year,
   } = filters ?? {};
@@ -209,7 +209,7 @@ export async function getLeavesByCompanyId({
       `
         ${columns.join(",")},
         employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
-      }(project_sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
+      }(sites!${site ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
       }(id, name)))),
           users!${users ? "inner" : "left"}(id,email)
       `,
@@ -241,7 +241,7 @@ export async function getLeavesByCompanyId({
     }
     if (project) {
       query.eq(
-        "employees.employee_project_assignment.project_sites.projects.name",
+        "employees.employee_project_assignment.sites.projects.name",
         project
       );
     }
@@ -250,10 +250,10 @@ export async function getLeavesByCompanyId({
       const endDate = `${year}-12-31`;
       query.or(`and(start_date.lte.${endDate}, end_date.gte.${startDate})`);
     }
-    if (project_site) {
+    if (site) {
       query.eq(
-        "employees.employee_project_assignment.project_sites.name",
-        project_site
+        "employees.employee_project_assignment.sites",
+        site
       );
     }
     if (users) {

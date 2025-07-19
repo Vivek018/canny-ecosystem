@@ -188,12 +188,12 @@ export async function getPayrollById({
     "run_date",
     "project_id",
     "month",
-    "project_site_id",
+    "site_id",
     "year",
     "total_net_amount",
     "company_id",
     "project_id",
-    "project_site_id",
+    "site_id",
     "created_at",
   ] as const;
 
@@ -456,8 +456,8 @@ export async function getApprovedPayrollsByCompanyIdByYears({
   const startOfYear = filterMonth
     ? new Date(Date.UTC(Number(filterYear ?? defaultYear) - 1, filterMonth, 1))
     : new Date(
-        Date.UTC(Number(filterYear ?? defaultYear) - 1, defMonth + 1, 1)
-      );
+      Date.UTC(Number(filterYear ?? defaultYear) - 1, defMonth + 1, 1)
+    );
 
   const endOfYear = filterMonth
     ? new Date(Number(filterYear ?? defaultYear), filterMonth, 1)

@@ -54,7 +54,7 @@ Your task is to generate a valid React chart configuration using SQL data and a 
 
 == DATA RULES ==
 1. Always group the data meaningfully by a categorical or date-based field for the X-axis.
-  - Examples: project_site, status, type, department, position, employee_name, or a formatted date.
+  - Examples: site, status, type, department, position, employee_name, or a formatted date.
   - Do NOT use rows as-is for X values. Group them and aggregate Y values.
 2. Y-axis MUST show quantitative insight.
   - If no numerical fields exist, count how many rows exist for each X group (Y = count).

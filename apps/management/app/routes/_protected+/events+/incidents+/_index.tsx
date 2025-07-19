@@ -69,7 +69,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         undefined) as IncidentFilters["severity"],
 
       project: searchParams.get("project") ?? undefined,
-      project_site: searchParams.get("project_site") ?? undefined,
+      site: searchParams.get("site") ?? undefined,
     };
 
     const hasFilters =
@@ -92,9 +92,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     const projectPromise = getProjectNamesByCompanyId({ supabase, companyId });
 
-    let projectSitePromise = null;
+    let sitePromise = null;
     if (filters.project)
-      projectSitePromise = getSiteNamesByProjectName({
+      sitePromise = getSiteNamesByProjectName({
         supabase,
         projectName: filters.project,
       });
@@ -102,7 +102,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return defer({
       incidentPromise: incidentPromise as any,
       projectPromise,
-      projectSitePromise,
+      sitePromise,
       query,
       filters,
       companyId,
@@ -114,7 +114,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return defer({
       incidentPromise: Promise.resolve({ data: [] }),
       projectPromise: Promise.resolve({ data: [] }),
-      projectSitePromise: Promise.resolve({ data: [] }),
+      sitePromise: Promise.resolve({ data: [] }),
       query: "",
       filters: null,
       companyId: "",
@@ -142,7 +142,7 @@ export default function IncidentsIndex() {
     companyId,
     env,
     projectPromise,
-    projectSitePromise,
+    sitePromise,
   } = useLoaderData<typeof loader>();
 
   const filterList = { ...filters, name: query };
@@ -155,8 +155,8 @@ export default function IncidentsIndex() {
           <Suspense fallback={<LoadingSpinner className="w-1/2" />}>
             <Await resolve={projectPromise}>
               {(projectData) => (
-                <Await resolve={projectSitePromise}>
-                  {(projectSiteData) => (
+                <Await resolve={sitePromise}>
+                  {(siteData) => (
                     <>
                       <IncidentSearchFilter
                         disabled={!projectData?.data?.length && noFilters}
@@ -165,9 +165,9 @@ export default function IncidentsIndex() {
                             ? projectData?.data?.map((project) => project!.name)
                             : []
                         }
-                        projectSiteArray={
-                          projectSiteData?.data?.length
-                            ? projectSiteData?.data?.map((site) => site!.name)
+                        siteArray={
+                          siteData?.data?.length
+                            ? siteData?.data?.map((site) => site!.name)
                             : []
                         }
                       />

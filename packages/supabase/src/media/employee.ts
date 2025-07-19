@@ -146,7 +146,7 @@ export async function uploadEmployeeDocument({
     const { status, error: insertError } = await addEmployeeDocument({
       supabase,
       employee_id: employeeId,
-      document_type: documentType,
+      document_type: documentType as any,
       url: `${SUPABASE_MEDIA_URL_PREFIX}${data.fullPath}`,
     });
 
@@ -227,7 +227,7 @@ export async function deleteEmployeeDocument({
   const { error: deleteEmployeeDocumentError, status } =
     await deleteEmployeeDocumentByEmployeeId({
       supabase,
-      documentType,
+      documentType: documentType as any,
       employeeId,
     });
 

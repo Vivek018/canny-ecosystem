@@ -23,10 +23,10 @@ const suggestedPrompts = [
   "City wise breakdown of employees with total count",
   "Employees with incomplete statutory details",
   "List employees whose birthdays are coming up this month",
-  "List project sites with gender distribution count individually",
+  "List sites with gender distribution count individually",
   "Identify employees turning above 50 this calendar year",
   "Employees who have not been assigned to any project since joining",
-  "List project sites with number of local and outstation employees based on employee vs site location",
+  "List sites with number of local and outstation employees based on employee vs site location",
   "Predict which employees are due for a promotion based on tenure and education",
   "Employees with missing bank information",
   "Top 20 oldest employees",
@@ -46,7 +46,7 @@ TABLES AND RELATIONSHIPS:
 - Contains residential address info for each employee.
 - Use address_line_1, city, state, country, and pincode.
 - is_primary = true helps choose the main address when multiple exist.
-- Useful for geographic queries or comparing with project site locations (e.g., local vs non-local employees).
+- Useful for geographic queries or comparing with site locations (e.g., local vs non-local employees).
 
 3. employee_bank_details:
 - Bank account info: bank_name, account_number, ifsc_code, branch_name, account_type.
@@ -64,8 +64,8 @@ TABLES AND RELATIONSHIPS:
 - Not always filled; use cautiously.
 
 6. employee_project_assignment:
-- Captures all employee's work details - employee assignments to project sites.
-- Fields include: project_site_id, position, start_date, end_date, assignment_type (full_time, part_time), skill_level (skilled, unskilled), probation_period.
+- Captures all employee's work details - employee assignments to sites.
+- Fields include: site_id, position, start_date, end_date, assignment_type (full_time, part_time), skill_level (skilled, unskilled), probation_period.
 - Crucial for determining who worked where, when, and in what role.
 - You can use this to analyze site-wise deployment, track probation status, or evaluate workforce distribution.
 - Use this to JOIN project-level data, or to calculate how many employees worked at a site, or are currently assigned (if end_date IS NULL).
@@ -86,11 +86,11 @@ TABLES AND RELATIONSHIPS:
 HOW TO USE:
 • Always begin from employees table.
 • Use joins with child tables (bank, address, work, statutory, etc.) when additional data is needed.
-• Join depth can go up to 2 to 3 levels comfortably. For example, employees → employee_project_assignment → project_sites.
+• Join depth can go up to 2 to 3 levels comfortably. For example, employees → employee_project_assignment → sites.
 • Prefer readable data (e.g., names, dates, positions) over IDs.
 • If an employee has multiple rows in a child table (like multiple addresses), apply aggregation or filters (like is_primary = true).
 • Use COALESCE to handle nulls where useful (e.g., COALESCE(middle_name, '') for full name).
-• For geo-type queries (e.g., local vs non-local employees), compare employee city/state with project_site location.
+• For geo-type queries (e.g., local vs non-local employees), compare employee city/state with site location.
 `;
 
 export async function loader({ request }: LoaderFunctionArgs) {

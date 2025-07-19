@@ -62,18 +62,18 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     header: "Project",
     cell: ({ row }) => (
       <p className="truncate">
-        {row.original?.employee_project_assignment?.project_sites.projects
+        {row.original?.employee_project_assignment?.sites.projects
           .name ?? "--"}
       </p>
     ),
   },
   {
     enableSorting: false,
-    accessorKey: "project_site_name",
-    header: "Project Site",
+    accessorKey: "site_name",
+    header: "Site",
     cell: ({ row }) => (
       <p className="truncate">
-        {row.original?.employee_project_assignment?.project_sites.name ?? "--"}
+        {row.original?.employee_project_assignment?.sites.name ?? "--"}
       </p>
     ),
   },

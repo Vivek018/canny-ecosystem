@@ -96,9 +96,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       value: sites?.id,
     }));
   }
-  if (data?.project_site_id) {
+  if (data?.site_id) {
     const { data: alldepartments } = await getDepartmentsBySiteId({
-      siteId: data?.project_site_id,
+      siteId: data?.site_id,
       supabase,
     });
     departmentOptions = alldepartments?.map((sites) => ({
@@ -366,7 +366,7 @@ export default function PayrollImportFieldMapping() {
                   transformedRow[key] = row[key];
                 }
               }
-              transformedRow.department_id = payrollInfo?.project_site_id
+              transformedRow.department_id = payrollInfo?.site_id
                 ? department
                 : null;
               transformedRow.site_id = payrollInfo?.project_id ? site : null;
@@ -469,7 +469,7 @@ export default function PayrollImportFieldMapping() {
                   if (payrollInfo?.project_id) {
                     setSite(value);
                   }
-                  if (payrollInfo?.project_site_id) {
+                  if (payrollInfo?.site_id) {
                     setDepartment(value);
                   }
                 }}

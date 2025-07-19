@@ -17,12 +17,12 @@ export function FilterList({ filters }: Props) {
   }, {} as { [key: number]: string });
 
   const defaultFilters =
-    filters?.month || filters?.year
+    Object.keys(filters!).length
       ? filters
       : {
-          month: monthNames[defaultMonth + 1],
-          year: defaultYear.toString(),
-        };
+        month: monthNames[defaultMonth + 1],
+        year: defaultYear.toString(),
+      };
 
   const renderFilter = ({
     key,

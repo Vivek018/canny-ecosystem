@@ -7,7 +7,7 @@ import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getEmployeeIdFromCookie } from "@/utils/server/user.server";
 import { getSessionUser } from "@canny_ecosystem/supabase/cached-queries";
-import { getEmployeesByProjectSiteId, getUserByEmail } from "@canny_ecosystem/supabase/queries";
+import { getEmployeesBySiteId, getUserByEmail } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
@@ -33,9 +33,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     if (!userProfile?.site_id) throw new Error("No site id found");
 
-    const employeesPromise = getEmployeesByProjectSiteId({
+    const employeesPromise = getEmployeesBySiteId({
       supabase,
-      projectSiteId: userProfile?.site_id || "",
+      siteId: userProfile?.site_id || "",
     });
 
     return defer({

@@ -58,9 +58,8 @@ export const columns = (
             className="group"
           >
             <p className="truncate text-primary/80 w-40 group-hover:text-primary">
-              {`${row.original?.first_name} ${
-                row.original?.middle_name ?? ""
-              } ${row.original?.last_name ?? ""}`}
+              {`${row.original?.first_name} ${row.original?.middle_name ?? ""
+                } ${row.original?.last_name ?? ""}`}
             </p>
           </Link>
         ),
@@ -72,7 +71,7 @@ export const columns = (
         cell: ({ row }) => (
           <p className="truncate capitalize">
             {
-              row.original?.employee_project_assignment?.project_sites?.projects
+              row.original?.employee_project_assignment?.sites?.projects
                 ?.name
             }
           </p>
@@ -80,11 +79,11 @@ export const columns = (
       },
       {
         enableSorting: false,
-        accessorKey: "project_site",
-        header: "Project Site",
+        accessorKey: "site",
+        header: "Site",
         cell: ({ row }) => (
           <p className="truncate capitalize">
-            {row.original?.employee_project_assignment?.project_sites?.name}
+            {row.original?.employee_project_assignment?.sites?.name}
           </p>
         ),
       },

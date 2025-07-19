@@ -57,7 +57,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         error,
         data: null,
         projectOptions: null,
-        projectSiteOptions: null,
+        siteOptions: null,
       },
       { status: 500 }
     );

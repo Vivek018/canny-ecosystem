@@ -35,7 +35,7 @@ export function FilterList({ filters }: Props) {
       case "category":
       case "severity":
       case "project":
-      case "project_site":
+      case "site":
         return value;
       default:
         return null;

@@ -23,7 +23,7 @@ export const AttendanceFiltersSchema = z.object({
     .string()
     .optional()
     .describe("Project name assigned to the individual."),
-  project_site: z
+  site: z
     .string()
     .optional()
     .describe("Name of the site under the project."),

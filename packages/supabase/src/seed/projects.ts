@@ -22,7 +22,7 @@ export function seedProject(): Omit<
   };
 }
 
-export function seedProjectSite(): Omit<
+export function seedSite(): Omit<
   SiteDatabaseInsert,
   "project_id" | "company_location_id"
 > {

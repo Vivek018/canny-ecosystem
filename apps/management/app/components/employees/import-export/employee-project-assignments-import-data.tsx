@@ -107,7 +107,7 @@ export function EmployeeProjectAssignmentsImportData({
         return {
           ...rest,
           ...(employeeId ? { employee_id: employeeId } : {}),
-          ...(siteId ? { project_site_id: siteId } : {}),
+          ...(siteId ? { site_id: siteId } : {}),
         };
       });
 

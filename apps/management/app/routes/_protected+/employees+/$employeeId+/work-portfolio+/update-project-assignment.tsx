@@ -90,19 +90,19 @@ export async function loader({
       value: project?.id,
     }));
 
-    let projectSiteOptions: any = [];
+    let siteOptions: any = [];
 
     const projectParamId = urlSearchParams.get(PROJECT_PARAM);
 
     if (projectParamId?.length) {
-      const { data: projectSites } = await getSitesByProjectId({
+      const { data: sites } = await getSitesByProjectId({
         supabase,
         projectId: projectParamId,
       });
 
-      projectSiteOptions = projectSites?.map((projectSite) => ({
-        label: projectSite?.name,
-        value: projectSite?.id,
+      siteOptions = sites?.map((site) => ({
+        label: site?.name,
+        value: site?.id,
       }));
     }
 
@@ -111,7 +111,7 @@ export async function loader({
       message: "Employee project assignment found",
       data: projectAssignmentData?.data,
       projectOptions,
-      projectSiteOptions,
+      siteOptions,
     });
   } catch (error) {
     return json({
@@ -167,7 +167,7 @@ export async function action({
 }
 
 export default function UpdateEmployeeProjectAssignment() {
-  const { data, projectOptions, projectSiteOptions, status, error } =
+  const { data, projectOptions, siteOptions, status, error } =
     useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
@@ -235,7 +235,7 @@ export default function UpdateEmployeeProjectAssignment() {
               fields={fields as any}
               isUpdate={true}
               projectOptions={projectOptions}
-              projectSiteOptions={projectSiteOptions}
+              siteOptions={siteOptions}
             />
             <FormButtons
               form={form}

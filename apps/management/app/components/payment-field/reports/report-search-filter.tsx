@@ -28,11 +28,11 @@ import { getYears } from "@canny_ecosystem/utils";
 export function PaymentFieldsReportSearchFilter({
   disabled,
   projectArray,
-  projectSiteArray,
+  siteArray,
 }: {
   disabled?: boolean;
   projectArray: string[] | null;
-  projectSiteArray: string[] | null;
+  siteArray: string[] | null;
 }) {
   const [prompt, setPrompt] = useState("");
   const navigation = useNavigation();
@@ -40,7 +40,7 @@ export function PaymentFieldsReportSearchFilter({
     navigation.state === "submitting" ||
     (navigation.state === "loading" &&
       navigation.location.pathname ===
-        "/payment-components/payment-fields/reports" &&
+      "/payment-components/payment-fields/reports" &&
       navigation.location.search.length);
   const inputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -49,7 +49,7 @@ export function PaymentFieldsReportSearchFilter({
 
   const initialFilterParams: EPFReportFilters = {
     project: "",
-    project_site: "",
+    site: "",
     start_month: "",
     start_year: "",
     end_year: "",
@@ -82,14 +82,14 @@ export function PaymentFieldsReportSearchFilter({
 
   const searchParamsList: {
     project: string | null;
-    project_site: string | null;
+    site: string | null;
     start_month: string | null;
     start_year: string | null;
     end_month: string | null;
     end_year: string | null;
   } = {
     project: searchParams.get("project"),
-    project_site: searchParams.get("project_site"),
+    site: searchParams.get("site"),
     start_month: searchParams.get("start_month"),
     start_year: searchParams.get("start_year"),
     end_month: searchParams.get("end_month"),
@@ -205,7 +205,7 @@ export function PaymentFieldsReportSearchFilter({
               className={cn(
                 "absolute z-10 right-3 top-[6px] opacity-70",
                 !disabled &&
-                  "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
+                "transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:opacity-100",
                 hasValidFilters && "opacity-100",
                 isOpen && "opacity-100"
               )}
@@ -384,7 +384,7 @@ export function PaymentFieldsReportSearchFilter({
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
-              <span>Project Site</span>
+              <span>Site</span>
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent
@@ -400,15 +400,15 @@ export function PaymentFieldsReportSearchFilter({
                     Select Project First
                   </DropdownMenuCheckboxItem>
                 ) : (
-                  projectSiteArray?.map((name, index) => (
+                  siteArray?.map((name, index) => (
                     <DropdownMenuCheckboxItem
                       key={name + index.toString()}
                       className="capitalize"
-                      checked={filterParams?.project_site === name}
+                      checked={filterParams?.site === name}
                       onCheckedChange={() => {
                         setFilterParams((prev) => ({
                           ...prev,
-                          project_site: name,
+                          site: name,
                         }));
                       }}
                     >

@@ -28,7 +28,7 @@ export function ExportBar({
             "employee_code",
             "employee_name",
             "project",
-            "project_site",
+            "site",
           ].includes(key)
         ) {
           dateHeaders.add(key);
@@ -49,11 +49,11 @@ export function ExportBar({
       employee_code,
       employee_name,
       project,
-      project_site,
+      site,
       ...attendance
     } = entry;
 
-    const fixedFields = { employee_code, employee_name, project, project_site };
+    const fixedFields = { employee_code, employee_name, project, site };
 
     const formattedEntry: Record<string, string> = { ...fixedFields };
 
@@ -76,7 +76,7 @@ export function ExportBar({
             "employee_code",
             "employee_name",
             "project",
-            "project_site",
+            "site",
           ].includes(key)
         ) {
           if (employee[key] !== "WOF") {
