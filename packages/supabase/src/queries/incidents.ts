@@ -88,6 +88,8 @@ export async function getIncidentsByCompanyId({
     site,
   } = filters ?? {};
 
+  const foreignFilters = project || site;
+
   const columns = [
     "id",
     "date",
@@ -107,8 +109,8 @@ export async function getIncidentsByCompanyId({
     .select(
       `${columns.join(
         ","
-      )},employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
-      }(sites!${site ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
+      )},employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${foreignFilters ? "inner" : "left"
+      }(sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${foreignFilters ? "inner" : "left"
       }(id, name))))`,
       {
         count: "exact",

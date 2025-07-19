@@ -193,6 +193,7 @@ export async function getLeavesByCompanyId({
     users,
     year,
   } = filters ?? {};
+  const foreignFilters = project || site;
 
   const columns = [
     "id",
@@ -208,8 +209,8 @@ export async function getLeavesByCompanyId({
     .select(
       `
         ${columns.join(",")},
-        employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
-      }(sites!${site ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
+        employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${foreignFilters ? "inner" : "left"
+      }(sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${foreignFilters ? "inner" : "left"
       }(id, name)))),
           users!${users ? "inner" : "left"}(id,email)
       `,
@@ -252,7 +253,7 @@ export async function getLeavesByCompanyId({
     }
     if (site) {
       query.eq(
-        "employees.employee_project_assignment.sites",
+        "employees.employee_project_assignment.sites.name",
         site
       );
     }

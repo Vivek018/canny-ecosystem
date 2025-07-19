@@ -62,8 +62,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     cell: ({ row }) => {
       return (
         <p className="truncate capitalize">
-          {row.original?.employees?.employee_project_assignment?.sites
-            ?.projects?.name ?? "--"}
+          {row.original?.employees?.employee_project_assignment?.sites?.projects?.name ?? "--"}
         </p>
       );
     },
@@ -75,8 +74,7 @@ export const ExitPaymentColumns: ColumnDef<ExitsRow & ExitDataType>[] = [
     cell: ({ row }) => {
       return (
         <p className="truncate capitalize">
-          {row.original?.employees?.employee_project_assignment?.sites
-            ?.name ?? "--"}
+          {row.original?.employees?.employee_project_assignment?.sites?.name ?? "--"}
         </p>
       );
     },

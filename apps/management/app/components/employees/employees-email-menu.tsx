@@ -64,7 +64,7 @@ export default function EmployeesEmailMenu({
         exportedData[key] = element?.is_active ? "Active" : "Inactive";
       } else if (key === "project_name") {
         exportedData[key] =
-          element?.employee_project_assignment?.sites.projects.name;
+          element?.employee_project_assignment?.sites?.projects.name;
       } else if (key === "site_name") {
         exportedData[key] =
           element?.employee_project_assignment?.sites?.name;

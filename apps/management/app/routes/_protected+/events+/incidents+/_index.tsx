@@ -93,10 +93,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const projectPromise = getProjectNamesByCompanyId({ supabase, companyId });
 
     let sitePromise = null;
-    if (filters.project)
+    if (filters?.project)
       sitePromise = getSiteNamesByProjectName({
         supabase,
-        projectName: filters.project,
+        projectName: filters?.project,
       });
 
     return defer({

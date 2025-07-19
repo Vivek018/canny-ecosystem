@@ -62,7 +62,7 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     header: "Project",
     cell: ({ row }) => (
       <p className="truncate">
-        {row.original?.employee_project_assignment?.sites.projects
+        {row.original?.employee_project_assignment?.sites?.projects
           .name ?? "--"}
       </p>
     ),

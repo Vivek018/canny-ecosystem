@@ -60,8 +60,7 @@ export const columns: ColumnDef<IncidentsDatabaseType>[] = [
     cell: ({ row }) => {
       return (
         <p className="truncate w-28">
-          {row.original?.employees?.employee_project_assignment?.sites
-            .projects?.name ?? "--"}
+          {row.original?.employees?.employee_project_assignment?.sites?.projects?.name ?? "--"}
         </p>
       );
     },
@@ -73,8 +72,7 @@ export const columns: ColumnDef<IncidentsDatabaseType>[] = [
     cell: ({ row }) => {
       return (
         <p className="truncate w-28">
-          {row.original?.employees?.employee_project_assignment?.sites
-            ?.name ?? "--"}
+          {row.original?.employees?.employee_project_assignment?.sites?.name ?? "--"}
         </p>
       );
     },

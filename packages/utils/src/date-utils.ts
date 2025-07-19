@@ -74,7 +74,7 @@ export function formatMonthYearDate(date: Date | string | number) {
   return format(new Date(date), "MMM yyyy");
 }
 
-export function formatDate(date: Date | string | number | null) {
+export function formatDate(date: Date | string | number | null): any {
   if (!date || typeof date === "number") {
     return date;
   }

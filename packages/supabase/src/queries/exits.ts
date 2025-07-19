@@ -113,6 +113,7 @@ export const getExitsByCompanyId = async ({
     site,
     in_invoice,
   } = filters ?? {};
+  const foreignFilters = project || site;
 
   const columns = [
     "id",
@@ -133,8 +134,8 @@ export const getExitsByCompanyId = async ({
     .from("exits")
     .select(
       `${columns.join(",")},
-          employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
-      }(sites!${site ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
+          employees!inner(first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!${foreignFilters ? "inner" : "left"
+      }(sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${foreignFilters ? "inner" : "left"
       }(id, name))))`,
       { count: "exact" }
     )

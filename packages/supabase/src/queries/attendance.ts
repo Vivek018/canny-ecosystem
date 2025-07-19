@@ -183,6 +183,7 @@ export async function getMonthlyAttendanceByCompanyId({
   const defaultYear = today.getFullYear();
   const { from, to, sort, searchQuery, filters } = params;
   const { month, year, project, site } = filters ?? {};
+  const foreignFilters = project || site;
 
   const columns = [
     "id",
@@ -198,12 +199,12 @@ export async function getMonthlyAttendanceByCompanyId({
     .select(
       `
   ${columns.join(",")},
-  employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
+  employee_project_assignment!employee_project_assignments_employee_id_fkey!${foreignFilters ? "inner" : "left"
       }(
-    sites!${project ? "inner" : "left"}(
+    sites!${foreignFilters ? "inner" : "left"}(
       id,
       name,
-      projects!${project ? "inner" : "left"}(id, name)
+      projects!${foreignFilters ? "inner" : "left"}(id, name)
     )
   ),
   monthly_attendance:monthly_attendance!left(
@@ -376,6 +377,7 @@ export async function getAttendanceReportByCompanyId({
     end_year,
     end_month,
   } = filters ?? {};
+  const foreignFilters = project || site;
 
   const columns = [
     "id",
@@ -390,9 +392,9 @@ export async function getAttendanceReportByCompanyId({
     .select(
       `
       ${columns.join(",")},
-      employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
+      employee_project_assignment!employee_project_assignments_employee_id_fkey!${foreignFilters ? "inner" : "left"
       }(
-        sites!${project ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
+        sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${foreignFilters ? "inner" : "left"
       }(id, name))),
       attendance(
         id,

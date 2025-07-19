@@ -275,7 +275,7 @@ export async function getEmployeesBySiteId({
       `${columns.join(
         ","
       )}, employee_project_assignment!employee_project_assignments_employee_id_fkey!inner(employee_id, assignment_type, skill_level, position, start_date, end_date,
-        sitesd, name, projects!inner(id, name)))`
+        site_id, name, projects!inner(id, name)))`
     )
     .eq("employee_project_assignment.site_id", siteId)
     .order("created_at", { ascending: false })
@@ -978,6 +978,7 @@ export async function getEmployeesReportByCompanyId({
     end_year,
     end_month,
   } = filters ?? {};
+  const foreignFilters = project || site;
 
   const columns = [
     "id",
@@ -991,10 +992,9 @@ export async function getEmployeesReportByCompanyId({
     .from("employees")
     .select(
       `${columns.join(",")},
-        employee_project_assignment!employee_project_assignments_employee_id_fkey!${project ? "inner" : "left"
-      }(
-        employee_id, assignment_type, skill_level, position, start_date, end_date,
-        sites ? "inner" : "left"}(id, name, projects!${project ? "inner" : "left"
+        employee_project_assignment!employee_project_assignments_employee_id_fkey!${foreignFilters ? "inner" : "left"
+      }(employee_id, assignment_type, skill_level, position, start_date, end_date,
+        sites!${foreignFilters ? "inner" : "left"}(id, name, projects!${foreignFilters ? "inner" : "left"
       }(id, name))
       )`,
       { count: "exact" }

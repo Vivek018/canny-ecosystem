@@ -54,8 +54,7 @@ export const columns = (
       header: "Project",
       cell: ({ row }) => {
         return (
-          row.original?.employees?.employee_project_assignment?.sites
-            ?.projects?.name ?? "--"
+          row.original?.employees?.employee_project_assignment?.sites?.projects?.name ?? "--"
         );
       },
     },
@@ -66,8 +65,7 @@ export const columns = (
       header: "Site",
       cell: ({ row }) => {
         return (
-          row.original?.employees?.employee_project_assignment?.sites
-            ?.name ?? "--"
+          row.original?.employees?.employee_project_assignment?.sites?.name ?? "--"
         );
       },
     },
