@@ -1,17 +1,12 @@
-import { convertToNull } from "@canny_ecosystem/utils";
-import type {
-  ProjectDatabaseInsert,
-  ProjectDatabaseUpdate,
-  TypedSupabaseClient,
-} from "../types";
+import type { SiteDatabaseInsert, SiteDatabaseUpdate, TypedSupabaseClient } from "../types";
 
-export async function createProject({
+export async function createSite({
   supabase,
   data,
   bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
-  data: ProjectDatabaseInsert;
+  data: SiteDatabaseInsert;
   bypassAuth?: boolean;
 }) {
   if (!bypassAuth) {
@@ -27,23 +22,23 @@ export async function createProject({
   const {
     error,
     status,
-    data: projectData,
-  } = await supabase.from("projects").insert(data).select().single();
+    data: siteData,
+  } = await supabase.from("sites").insert(data).select().single();
 
   if (error) {
-    console.error("createProject Error:", error);
+    console.error("createSite Error:", error);
   }
 
-  return { status, error, id: projectData?.id };
+  return { data: siteData, status, error };
 }
 
-export async function updateProject({
+export async function updateSite({
   supabase,
   data,
   bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
-  data: ProjectDatabaseUpdate;
+  data: SiteDatabaseUpdate;
   bypassAuth?: boolean;
 }) {
   if (!bypassAuth) {
@@ -56,20 +51,17 @@ export async function updateProject({
     }
   }
 
-  const updateData = convertToNull(data);
-
   const { error, status } = await supabase
-    .from("projects")
-    .update(updateData)
+    .from("sites").update(data)
     .eq("id", data.id!);
   if (error) {
-    console.error("updateProject Error:", error);
+    console.error("updateSite Error:", error);
   }
 
   return { status, error };
 }
 
-export async function deleteProject({
+export async function deleteSite({
   supabase,
   id,
   bypassAuth = false,
@@ -89,12 +81,11 @@ export async function deleteProject({
   }
 
   const { error, status } = await supabase
-    .from("projects")
-    .delete()
+    .from("sites").delete()
     .eq("id", id);
 
   if (error) {
-    console.error("deleteProject Error:", error);
+    console.error("deleteSite Error:", error);
   }
 
   return { status, error };

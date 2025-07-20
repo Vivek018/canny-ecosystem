@@ -17,8 +17,7 @@ import {
 } from "@canny_ecosystem/utils";
 import {
   getEmployeeProjectAssignmentByEmployeeId,
-  getProjectsByCompanyId,
-  getSitesByProjectId,
+  getSiteNamesByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import { updateEmployeeProjectAssignment } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
@@ -27,7 +26,6 @@ import { FormProvider, getFormProps, useForm } from "@conform-to/react";
 import { Card } from "@canny_ecosystem/ui/card";
 import {
   CreateEmployeeProjectAssignment,
-  PROJECT_PARAM,
 } from "@/components/employees/form/create-employee-project-assignment";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
@@ -43,7 +41,7 @@ export const UPDATE_EMPLOYEE_PROJECT_ASSIGNMENT =
 export async function loader({
   request,
   params,
-}: LoaderFunctionArgs): Promise<Response> {
+}: LoaderFunctionArgs) {
   const employeeId = params.employeeId;
   const { supabase, headers } = getSupabaseWithHeaders({ request });
 
@@ -51,7 +49,7 @@ export async function loader({
 
   if (
     !hasPermission(
-      `${user?.role!}`,
+      user?.role!,
       `${updateRole}:${attribute.employeeProjectAssignment}`
     )
   ) {
@@ -59,9 +57,6 @@ export async function loader({
   }
 
   try {
-    const url = new URL(request.url);
-    const urlSearchParams = new URLSearchParams(url.searchParams);
-
     let projectAssignmentData = null;
 
     if (employeeId) {
@@ -75,48 +70,37 @@ export async function loader({
       return json({
         status: "error",
         message: "Failed to get employee project assignment",
+        data: null,
+        siteOptions: null,
         error: projectAssignmentData.error,
       });
     }
 
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-    const { data: projects } = await getProjectsByCompanyId({
+
+    const { data: sites } = await getSiteNamesByCompanyId({
       supabase,
       companyId,
     });
 
-    const projectOptions = projects?.map((project) => ({
-      label: project?.name,
-      value: project?.id,
+    const siteOptions = sites?.map((site) => ({
+      label: site?.name,
+      value: site?.id,
     }));
-
-    let siteOptions: any = [];
-
-    const projectParamId = urlSearchParams.get(PROJECT_PARAM);
-
-    if (projectParamId?.length) {
-      const { data: sites } = await getSitesByProjectId({
-        supabase,
-        projectId: projectParamId,
-      });
-
-      siteOptions = sites?.map((site) => ({
-        label: site?.name,
-        value: site?.id,
-      }));
-    }
 
     return json({
       status: "success",
       message: "Employee project assignment found",
       data: projectAssignmentData?.data,
-      projectOptions,
       siteOptions,
+      error: null,
     });
   } catch (error) {
     return json({
       status: "error",
       message: "An unexpected error occurred",
+      data: null,
+      siteOptions: null,
       error,
     });
   }
@@ -167,7 +151,7 @@ export async function action({
 }
 
 export default function UpdateEmployeeProjectAssignment() {
-  const { data, projectOptions, siteOptions, status, error } =
+  const { data, siteOptions, status, error } =
     useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const [resetKey, setResetKey] = useState(Date.now());
@@ -191,7 +175,7 @@ export default function UpdateEmployeeProjectAssignment() {
     if (status === "error") {
       toast({
         title: "Error",
-        description: error?.message || "Failed to load",
+        description: (error as any)?.message || "Failed to load",
         variant: "destructive",
       });
     }
@@ -234,7 +218,6 @@ export default function UpdateEmployeeProjectAssignment() {
               key={resetKey}
               fields={fields as any}
               isUpdate={true}
-              projectOptions={projectOptions}
               siteOptions={siteOptions}
             />
             <FormButtons

@@ -45,8 +45,6 @@ import { createProject } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import type { ProjectDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { UPDATE_PROJECT } from "./$projectId+/update-project";
-import { getCompanies } from "@canny_ecosystem/supabase/queries";
-import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 import { useEffect, useState } from "react";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
@@ -69,24 +67,16 @@ export async function loader({ request }: LoaderFunctionArgs) {
   }
   try {
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-    const { data, error } = await getCompanies({ supabase });
-
-    if (error) throw error;
 
     return json({
       error: null,
       companyId,
-      companyOptions:
-        data
-          ?.filter((company) => company.id !== companyId)
-          .map((company) => ({ label: company.name, value: company.id })) || [],
     });
   } catch (error) {
     return json(
       {
         error,
         companyId: null,
-        companyOptions: null,
       },
       { status: 500 }
     );
@@ -141,12 +131,10 @@ export async function action({
 
 export default function CreateProject({
   updateValues,
-  companyOptionsFromUpdate,
 }: {
   updateValues?: ProjectDatabaseUpdate | null;
-  companyOptionsFromUpdate?: ComboboxSelectOption[] | null;
 }) {
-  const { companyId, companyOptions, error } = useLoaderData<typeof loader>();
+  const { companyId, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const PROJECT_TAG = updateValues ? UPDATE_PROJECT : CREATE_PROJECT;
 
@@ -163,7 +151,7 @@ export default function CreateProject({
     shouldRevalidate: "onInput",
     defaultValue: {
       ...initialValues,
-      project_client_id: initialValues.project_client_id ?? companyId,
+      company_id: initialValues.company_id ?? companyId,
     },
   });
 
@@ -189,7 +177,7 @@ export default function CreateProject({
           variant: "destructive",
         });
       }
-      navigate("/projects", { replace: true });
+      navigate("/modules/projects", { replace: true });
     }
   }, [actionData]);
 
@@ -220,7 +208,7 @@ export default function CreateProject({
             <CardContent>
               <input {...getInputProps(fields.id, { type: "hidden" })} />
               <input
-                {...getInputProps(fields.project_client_id, {
+                {...getInputProps(fields.company_id, {
                   type: "hidden",
                 })}
               />
@@ -287,37 +275,6 @@ export default function CreateProject({
                 labelProps={{ children: fields.description.name }}
                 errors={fields.description.errors}
               />
-
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
-                <SearchableSelectField
-                  key={resetKey + 1}
-                  inputProps={{
-                    ...getInputProps(fields.primary_contractor_id, {
-                      type: "text",
-                    }),
-                    placeholder: "Select Primary Contractor",
-                  }}
-                  options={companyOptionsFromUpdate ?? companyOptions}
-                  labelProps={{
-                    children: "Primary Contactor",
-                  }}
-                  errors={fields.primary_contractor_id.errors}
-                />
-                <SearchableSelectField
-                  key={resetKey + 2}
-                  inputProps={{
-                    ...getInputProps(fields.end_client_id, {
-                      type: "text",
-                    }),
-                    placeholder: "Select End Client",
-                  }}
-                  options={companyOptionsFromUpdate ?? companyOptions}
-                  labelProps={{
-                    children: "End Client",
-                  }}
-                  errors={fields.end_client_id.errors}
-                />
-              </div>
               <div className="grid grid-cols-2 place-content-center justify-between gap-6">
                 <Field
                   inputProps={{
@@ -337,75 +294,23 @@ export default function CreateProject({
                 />
                 <Field
                   inputProps={{
-                    ...getInputProps(fields.estimated_end_date, {
+                    ...getInputProps(fields.end_date, {
                       type: "date",
                     }),
                     placeholder: `Enter ${replaceUnderscore(
-                      fields.estimated_end_date.name
+                      fields.end_date.name
                     )}`,
                     min: getValidDateForInput(fields.start_date.value),
                     defaultValue: getValidDateForInput(
-                      fields.estimated_end_date.initialValue
+                      fields.end_date.initialValue
                     ),
                   }}
                   labelProps={{
-                    children: replaceUnderscore(fields.estimated_end_date.name),
+                    children: replaceUnderscore(fields.end_date.name),
                   }}
-                  errors={fields.estimated_end_date.errors}
+                  errors={fields.end_date.errors}
                 />
               </div>
-              <TextareaField
-                textareaProps={{
-                  ...getTextareaProps(fields.risk_assessment),
-                  placeholder: `Enter ${replaceUnderscore(
-                    fields.risk_assessment.name
-                  )}`,
-                }}
-                labelProps={{
-                  children: replaceUnderscore(fields.risk_assessment.name),
-                }}
-                errors={fields.risk_assessment.errors}
-              />
-              <TextareaField
-                textareaProps={{
-                  ...getTextareaProps(fields.quality_standards),
-                  placeholder: `Enter ${replaceUnderscore(
-                    fields.quality_standards.name
-                  )}`,
-                }}
-                labelProps={{
-                  children: replaceUnderscore(fields.quality_standards.name),
-                }}
-                errors={fields.quality_standards.errors}
-              />
-              <TextareaField
-                textareaProps={{
-                  ...getTextareaProps(fields.health_safety_requirements),
-                  placeholder: `Enter ${replaceUnderscore(
-                    fields.health_safety_requirements.name
-                  )}`,
-                }}
-                labelProps={{
-                  children: replaceUnderscore(
-                    fields.health_safety_requirements.name
-                  ),
-                }}
-                errors={fields.health_safety_requirements.errors}
-              />
-              <TextareaField
-                textareaProps={{
-                  ...getTextareaProps(fields.environmental_considerations),
-                  placeholder: `Enter ${replaceUnderscore(
-                    fields.environmental_considerations.name
-                  )}`,
-                }}
-                labelProps={{
-                  children: replaceUnderscore(
-                    fields.environmental_considerations.name
-                  ),
-                }}
-                errors={fields.environmental_considerations.errors}
-              />
             </CardContent>
             <FormButtons
               form={form}

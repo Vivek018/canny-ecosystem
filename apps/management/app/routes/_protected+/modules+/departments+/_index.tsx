@@ -9,7 +9,6 @@ import {
   type ClientLoaderFunctionArgs,
   defer,
   Link,
-  Outlet,
   useLoaderData,
 } from "@remix-run/react";
 import { Suspense, useEffect, useState } from "react";
@@ -28,32 +27,29 @@ import { buttonVariants } from "@canny_ecosystem/ui/button";
 import { useUser } from "@/utils/user";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { Input } from "@canny_ecosystem/ui/input";
-import { getDepartmentsBySiteId } from "@canny_ecosystem/supabase/queries";
+import { getDepartmentsByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { DepartmentsDataTable } from "@/components/sites/departments/table/data-table";
 import { columns } from "@/components/sites/departments/table/columns";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
   if (!hasPermission(user?.role!, `${readRole}:${attribute.departments}`))
     return safeRedirect(DEFAULT_ROUTE, { headers });
 
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+
   try {
-    const siteId = params.siteId;
 
-    if (!siteId) {
-      throw new Response("Site ID is required", { status: 400 });
-    }
-
-    const departmentPromise = getDepartmentsBySiteId({
+    const departmentPromise = getDepartmentsByCompanyId({
       supabase,
-      siteId,
+      companyId,
     });
 
     return defer({
       departmentPromise: departmentPromise as any,
-      siteId,
     });
   } catch (error) {
     console.error("Department Error in loader function:", error);
@@ -66,15 +62,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return clientCaching(`${cacheKeyPrefix.departments}`, args);
+  return clientCaching(cacheKeyPrefix.departments, args);
 }
 
 clientLoader.hydrate = true;
 
 export default function Departments() {
   const { role } = useUser();
-
-  const { departmentPromise, siteId } = useLoaderData<typeof loader>();
+  const { departmentPromise } = useLoaderData<typeof loader>();
 
   return (
     <>
@@ -124,7 +119,7 @@ export default function Departments() {
                       />
                     </div>
                     <Link
-                      to={`/sites/${siteId}/create-department`}
+                      to={"create-department"}
                       className={cn(
                         buttonVariants({ variant: "primary-outline" }),
                         "flex items-center gap-1",
@@ -145,7 +140,6 @@ export default function Departments() {
           }}
         </Await>
       </Suspense>
-      <Outlet />
     </>
   );
 }

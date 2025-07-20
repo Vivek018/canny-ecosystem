@@ -9,7 +9,7 @@ type Props = {
 };
 
 // make sure the order is same as header order
-export const departmentDataArray = ["name", "created_at"];
+export const departmentDataArray = ["name", "site", "created_at"];
 
 export function DataTableHeader({ table, className, loading }: Props) {
   const columnName = (id: string) =>

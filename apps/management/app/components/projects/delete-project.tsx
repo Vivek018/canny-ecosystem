@@ -41,7 +41,7 @@ export const DeleteProject = ({ projectId }: { projectId: string }) => {
         {},
         {
           method: "post",
-          action: `/projects/${projectId}/delete-project`,
+          action: `${projectId}/delete-project`,
           replace: true,
         },
       );

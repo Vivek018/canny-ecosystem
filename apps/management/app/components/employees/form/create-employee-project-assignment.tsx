@@ -5,9 +5,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
-import {
-  Combobox,
-  type ComboboxSelectOption,
+import type {
+  ComboboxSelectOption,
 } from "@canny_ecosystem/ui/combobox";
 import {
   assignmentTypeArray,
@@ -19,8 +18,6 @@ import {
   type EmployeeProjectAssignmentSchema,
 } from "@canny_ecosystem/utils";
 import { getInputProps, type FieldMetadata } from "@conform-to/react";
-import { Label } from "@canny_ecosystem/ui/label";
-import { useSearchParams } from "@remix-run/react";
 import {
   CheckboxField,
   Field,
@@ -35,22 +32,17 @@ type FieldsType = {
   >;
 };
 
-export const PROJECT_PARAM = "project";
 export const SITE_PARAM = "site";
 
 export const CreateEmployeeProjectAssignment = ({
   fields,
   isUpdate = false,
-  projectOptions,
   siteOptions,
 }: {
   fields: FieldsType;
   isUpdate?: boolean;
-  projectOptions: ComboboxSelectOption[] | undefined;
-  siteOptions: ComboboxSelectOption[] | undefined;
+  siteOptions: ComboboxSelectOption[] | null | undefined;
 }) => {
-  const [searchParams, setSearchParams] = useSearchParams();
-
   return (
     <Fragment>
       <CardHeader>
@@ -63,40 +55,19 @@ export const CreateEmployeeProjectAssignment = ({
       </CardHeader>
       <CardContent>
         <input {...getInputProps(fields.employee_id, { type: "hidden" })} />
-        <div className="grid grid-cols-2 place-content-center justify-between gap-6">
-          <div className="w-full flex flex-col gap-1.5">
-            <div className="flex">
-              <Label>Projects</Label>
-              <sub className="text-primary">*</sub>
-            </div>
-            <Combobox
-              options={projectOptions ?? []}
-              value={searchParams.get(PROJECT_PARAM) ?? ""}
-              onChange={(project) => {
-                if (project?.length) {
-                  searchParams.set(PROJECT_PARAM, project);
-                } else {
-                  searchParams.delete(PROJECT_PARAM);
-                }
-                setSearchParams(searchParams);
-              }}
-              placeholder={"Select Projects"}
-            />
-          </div>
-          <SearchableSelectField
-            className="capitalize"
-            options={siteOptions ?? []}
-            inputProps={{
-              ...getInputProps(fields.site_id, { type: "text" }),
-              defaultValue: String(fields.site_id.initialValue),
-            }}
-            placeholder={"Select Site"}
-            labelProps={{
-              children: "Site",
-            }}
-            errors={fields.site_id.errors}
-          />
-        </div>
+        <SearchableSelectField
+          className="capitalize"
+          options={siteOptions ?? []}
+          inputProps={{
+            ...getInputProps(fields.site_id, { type: "text" }),
+            defaultValue: String(fields.site_id.initialValue),
+          }}
+          placeholder={"Select Site"}
+          labelProps={{
+            children: "Site",
+          }}
+          errors={fields.site_id.errors}
+        />
         <div className="grid grid-cols-3 place-content-center justify-between gap-6">
           <SearchableSelectField
             className="capitalize"

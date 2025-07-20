@@ -1,9 +1,11 @@
-import { getSitesByProjectId } from "@canny_ecosystem/supabase/queries";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import { getProjectsByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { buttonVariants } from "@canny_ecosystem/ui/button";
 import {
   Command,
   CommandEmpty,
+  CommandGroup,
   CommandInput,
   CommandList,
 } from "@canny_ecosystem/ui/command";
@@ -14,14 +16,14 @@ import {
   Await,
   type ClientLoaderFunctionArgs,
   defer,
+  json,
   Link,
   Outlet,
   useLoaderData,
 } from "@remix-run/react";
-import { json } from "@remix-run/react";
 import { Suspense } from "react";
-import { SitesWrapper } from "@/components/sites/sites-wrapper";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { ProjectsWrapper } from "@/components/projects/projects-wrapper";
 import { hasPermission, createRole } from "@canny_ecosystem/utils";
 import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
@@ -29,30 +31,30 @@ import { clearExactCacheEntry, clientCaching } from "@/utils/cache";
 import { cacheKeyPrefix } from "@/constant";
 import { LoadingSpinner } from "@/components/loading-spinner";
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
-  const projectId = params.projectId;
+export async function loader({ request }: LoaderFunctionArgs) {
+  const { supabase } = getSupabaseWithHeaders({ request });
 
   try {
-    const { supabase } = getSupabaseWithHeaders({ request });
+    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-    if (!projectId) throw new Error("No projectId provided");
-
-    const sitesPromise = getSitesByProjectId({
+    const projectsPromise = getProjectsByCompanyId({
       supabase,
-      projectId,
+      companyId,
     });
 
     return defer({
+      status: "success",
+      message: "Projects found",
       error: null,
-      sitesPromise,
-      projectId,
+      projectsPromise,
     });
   } catch (error) {
     return json(
       {
+        status: "error",
+        message: "Failed to load projects",
         error,
-        projectId,
-        sitesPromise: null,
+        projectsPromise: null,
       },
       { status: 500 },
     );
@@ -60,52 +62,54 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-  return clientCaching(`${cacheKeyPrefix.sites}${args.params.projectId}`, args);
+  return clientCaching(cacheKeyPrefix.projects, args);
 }
 
 clientLoader.hydrate = true;
 
-export default function Sites() {
+export default function ProjectsIndex() {
   const { role } = useUser();
-  const { sitesPromise, projectId, error } = useLoaderData<typeof loader>();
+  const { projectsPromise, error } = useLoaderData<typeof loader>();
   const { isDocument } = useIsDocument();
 
   if (error) {
-    clearExactCacheEntry(`${cacheKeyPrefix.sites}${projectId}`);
-    return <ErrorBoundary error={error} message="Failed to load sites" />;
+    clearExactCacheEntry(cacheKeyPrefix.projects);
+    return <ErrorBoundary error={error} message="Failed to load projects" />;
   }
 
   return (
-    <section className="pb-4">
+    <section className="py-4 px-4">
       <div className="w-full flex items-end justify-between">
-        <Suspense fallback={<LoadingSpinner className="h-1/2 mt-20" />}>
-          <Await resolve={sitesPromise}>
+        <Suspense fallback={<LoadingSpinner className="mt-40" />}>
+          <Await resolve={projectsPromise}>
             {(resolvedData) => {
               if (!resolvedData) {
-                clearExactCacheEntry(`${cacheKeyPrefix.sites}${projectId}`);
-                return <ErrorBoundary message="Failed to load sites" />;
+                clearExactCacheEntry(cacheKeyPrefix.projects);
+                return <ErrorBoundary message="Failed to load projects" />;
               }
               return (
                 <Command className="overflow-visible">
-                  <div className="w-full md:w-3/4 lg:w-1/2 2xl:w-1/3 py-4 flex items-center gap-4">
+                  <div className="w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4">
                     <CommandInput
                       divClassName="border border-input rounded-md h-10 flex-1"
-                      placeholder="Search Sites"
+                      placeholder="Search Projects"
                       autoFocus={true}
                     />
                     <Link
-                      to={`/projects/${projectId}/sites/create-site`}
+                      to="create-project"
                       className={cn(
                         buttonVariants({ variant: "primary-outline" }),
                         "flex items-center gap-1",
                         !hasPermission(
                           role,
-                          `${createRole}:${attribute.sites}`,
+                          `${createRole}:${attribute.projects}`,
                         ) && "hidden",
                       )}
                     >
                       <span>Add</span>
-                      <span className="hidden md:flex justify-end">Site</span>
+                      <span className="hidden md:flex justify-end">
+                        Project
+                      </span>
                     </Link>
                   </div>
                   <CommandEmpty
@@ -114,13 +118,15 @@ export default function Sites() {
                       !isDocument && "hidden",
                     )}
                   >
-                    No site found.
+                    No project found.
                   </CommandEmpty>
-                  <CommandList className="max-h-full py-2 overflow-x-visible overflow-y-visible">
-                    <SitesWrapper
-                      data={resolvedData.data}
-                      error={resolvedData.error}
-                    />
+                  <CommandList className="max-h-full py-6 overflow-x-visible overflow-y-visible">
+                    <CommandGroup className="p-0 overflow-visible">
+                      <ProjectsWrapper
+                        data={resolvedData.data}
+                        error={resolvedData.error}
+                      />
+                    </CommandGroup>
                   </CommandList>
                 </Command>
               );

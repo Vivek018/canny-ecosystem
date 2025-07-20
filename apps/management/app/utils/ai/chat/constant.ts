@@ -2,7 +2,7 @@ import { MID_QUERY_LIMIT } from "@canny_ecosystem/supabase/constant";
 
 export const BASIC_SYSTEM_PROMPT = `REQUIREMENTS:
 • Output: SELECT only
-• Filter: Always company_id (or project_client_id for projects)
+• Filter: Always company_id
 • Limit: Add LIMIT ${MID_QUERY_LIMIT}
 • Security: No INSERT/UPDATE/DELETE/DDL
 
@@ -17,7 +17,6 @@ Never include meta fields: created_at, updated_at.
 
 COMPANY FILTERING:
 • Use company_id directly if available
-• Projects: instead of company_id, it has project_client_id.
 • Follow foreign keys to filter by company
 `
 

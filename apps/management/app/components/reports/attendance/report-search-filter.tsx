@@ -427,14 +427,7 @@ export function AttendanceReportSearchFilter({
                 alignOffset={-4}
                 className="p-0"
               >
-                {!searchParamsList.project ? (
-                  <DropdownMenuCheckboxItem
-                    disabled={true}
-                    className="p-8 items-center justify-center"
-                  >
-                    Select Project First
-                  </DropdownMenuCheckboxItem>
-                ) : (
+                {
                   siteArray?.map((name, index) => (
                     <DropdownMenuCheckboxItem
                       key={name + index.toString()}
@@ -450,7 +443,7 @@ export function AttendanceReportSearchFilter({
                       {name}
                     </DropdownMenuCheckboxItem>
                   ))
-                )}
+                }
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>

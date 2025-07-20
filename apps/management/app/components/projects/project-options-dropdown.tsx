@@ -16,16 +16,13 @@ import {
 } from "@canny_ecosystem/utils";
 import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import type { ProjectDatabaseRow } from "@canny_ecosystem/supabase/types";
 
 export const ProjectOptionsDropdown = ({
   project,
   triggerChild,
 }: {
-  project: {
-    id: string;
-    actual_end_date: string | null;
-    returnTo?: string;
-  };
+  project: Omit<ProjectDatabaseRow, "created_at" | "updated_at">;
   triggerChild: React.ReactElement;
 }) => {
   const submit = useSubmit();
@@ -34,13 +31,13 @@ export const ProjectOptionsDropdown = ({
     submit(
       {
         id: project.id,
-        actual_end_date: getValidDateForInput(new Date())!,
+        end_date: getValidDateForInput(new Date())!,
         status: "completed",
-        returnTo: project.returnTo ?? "/projects",
+        returnTo: "/modules/projects",
       },
       {
         method: "POST",
-        action: `/projects/${project.id}/update-completed`,
+        action: `${project.id}/update-completed`,
       },
     );
   };
@@ -51,11 +48,11 @@ export const ProjectOptionsDropdown = ({
         id: project.id,
         actual_end_date: null,
         status: "active",
-        returnTo: project.returnTo ?? "/projects",
+        returnTo: "/modules/",
       },
       {
         method: "POST",
-        action: `/projects/${project.id}/update-completed`,
+        action: `${project.id}/update-completed`,
       },
     );
   };
@@ -67,7 +64,7 @@ export const ProjectOptionsDropdown = ({
         <DropdownMenuGroup>
           <DropdownMenuItem
             className={cn(
-              project.actual_end_date && "hidden",
+              project.status === "completed" && "hidden",
               !hasPermission(role, `${updateRole}:${attribute.projects}`) &&
                 "hidden",
             )}
@@ -77,7 +74,7 @@ export const ProjectOptionsDropdown = ({
           </DropdownMenuItem>
           <DropdownMenuItem
             className={cn(
-              !project.actual_end_date && "hidden",
+              project.status === "active" && "hidden",
               !hasPermission(role, `${updateRole}:${attribute.projects}`) &&
                 "hidden",
             )}

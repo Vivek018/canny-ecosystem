@@ -9,18 +9,13 @@ import { DepartmentOptionsDropdown } from "./department-options-dropdown";
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
 import { Button } from "@canny_ecosystem/ui/button";
 import { Icon } from "@canny_ecosystem/ui/icon";
-import type { DepartmentsDatabaseRow } from "@canny_ecosystem/supabase/types";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import type { DepartmentWithSite } from "@canny_ecosystem/supabase/queries";
 
-export type DepartmentsType = {
-  id: string;
-  name: string;
-  created_at: DepartmentsDatabaseRow["created_at"] | string;
-};
 
-export const columns: ColumnDef<DepartmentsType>[] = [
+export const columns: ColumnDef<DepartmentWithSite>[] = [
   {
     accessorKey: "name",
     header: "Name",
@@ -29,8 +24,15 @@ export const columns: ColumnDef<DepartmentsType>[] = [
     },
   },
   {
+    accessorKey: "site",
+    header: "Site",
+    cell: ({ row }) => {
+      return <p className="truncate w-28">{`${row.original?.site?.name}`}</p>;
+    },
+  },
+  {
     accessorKey: "created_at",
-    header: "created_at",
+    header: "Created At",
     cell: ({ row }) => {
       return (
         <p className="truncate w-28">

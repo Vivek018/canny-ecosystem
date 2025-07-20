@@ -38,7 +38,7 @@ import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import { FormButtons } from "@/components/form/form-buttons";
 import {
   getProjectsByCompanyId,
-  getSitesByCompanyId,
+  getSiteNamesByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import { useEffect, useState } from "react";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
@@ -83,7 +83,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     }));
   }
   if (link?.length && link === "site") {
-    const { data: allSites } = await getSitesByCompanyId({
+    const { data: allSites } = await getSiteNamesByCompanyId({
       companyId,
       supabase,
     });

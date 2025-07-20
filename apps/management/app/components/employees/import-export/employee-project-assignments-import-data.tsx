@@ -13,7 +13,6 @@ import { Input } from "@canny_ecosystem/ui/input";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import {
   duplicationTypeArray,
-  ImportEmployeeDetailsDataSchema,
   ImportEmployeeProjectAssignmentsDataSchema,
   transformStringArrayIntoOptions,
 } from "@canny_ecosystem/utils";
@@ -23,16 +22,15 @@ import { useState, useEffect } from "react";
 import { ImportedDataColumns } from "../imported-employee-project-assignments-table/columns";
 import { ImportedDataTable } from "../imported-employee-project-assignments-table/imported-data-table";
 import {
-  createEmployeeProjectAssignmentsFromImportedData,
   getEmployeeIdsByEmployeeCodes,
   getEmployeeProjectAssignmentsConflicts,
   getSiteIdsBySiteNames,
 } from "@canny_ecosystem/supabase/queries";
+import { createEmployeeProjectAssignmentsFromImportedData } from "@canny_ecosystem/supabase/mutations";
 
 export function EmployeeProjectAssignmentsImportData({
   env,
   conflictingIndices,
-  companyId,
 }: {
   env: SupabaseEnv;
   conflictingIndices: number[];

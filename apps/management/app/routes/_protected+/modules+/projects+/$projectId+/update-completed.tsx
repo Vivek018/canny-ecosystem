@@ -19,7 +19,7 @@ import { useEffect } from "react";
 
 const UpdateCompletedSchema = z.object({
   id: z.string(),
-  actual_end_date: z.any(),
+  end_date: z.any(),
   status: z.enum(["completed", "active"]),
 });
 
@@ -73,7 +73,7 @@ export async function action({
       {
         status: "error",
         message: "An unexpected error occurred",
-        returnTo: "/projects",
+        returnTo: "/modules/projects",
         error,
       },
       { status: 500 }
@@ -108,7 +108,7 @@ export default function UpdateCompleted() {
           variant: "destructive",
         });
       }
-      navigate(actionData?.returnTo ?? "/projects", {
+      navigate(actionData?.returnTo ?? "/modules/projects", {
         replace: true,
       });
     }

@@ -1626,6 +1626,120 @@ export async function createEmployeeGuardiansFromImportedData({
   };
 }
 
+export async function createEmployeeProjectAssignmentsFromImportedData({
+  supabase,
+  data,
+  import_type,
+}: {
+  supabase: TypedSupabaseClient;
+  data: EmployeeProjectAssignmentDatabaseInsert[];
+  import_type?: string;
+}) {
+  if (!data || data.length === 0) {
+    return { status: "No data provided", error: null };
+  }
+
+  const identifiers = data.map((entry) => ({
+    employee_id: entry.employee_id,
+  }));
+
+  const { data: existingRecords, error: existingError } = await supabase
+    .from("employee_project_assignment")
+    .select("employee_id")
+    .in(
+      "employee_id",
+      identifiers.map((entry) => entry.employee_id).filter(Boolean)
+    );
+  if (existingError) {
+    console.error("Error fetching existing records:", existingError);
+    return { status: "Error fetching existing records", error: existingError };
+  }
+
+  const normalize = (value: any) =>
+    String(value || "")
+      .trim()
+      .toLowerCase();
+
+  const existingSets = {
+    ids: new Set(existingRecords?.map((e) => normalize(e.employee_id)) || []),
+  };
+
+  if (import_type === "skip") {
+    const newData = data.filter((entry) => {
+      const hasConflict = existingSets.ids.has(normalize(entry.employee_id));
+
+      return !hasConflict;
+    });
+
+    if (newData.length === 0) {
+      return {
+        status: "No new data to insert after filtering duplicates",
+        error: null,
+      };
+    }
+
+    const BATCH_SIZE = 50;
+
+    for (let i = 0; i < newData.length; i += BATCH_SIZE) {
+      const batch = newData.slice(i, Math.min(i + BATCH_SIZE, newData.length));
+
+      const { error: insertError } = await supabase
+        .from("employee_project_assignment")
+        .insert(batch);
+      if (insertError) {
+        console.error("Error inserting batch:", insertError);
+      }
+    }
+
+    return {
+      status: "Successfully inserted new records",
+      error: null,
+    };
+  }
+
+  if (import_type === "overwrite") {
+    const results = await Promise.all(
+      data.map(async (record) => {
+        const existingRecord = existingRecords?.find(
+          (existing) =>
+            normalize(existing.employee_id) === normalize(record.employee_id)
+        );
+
+        if (existingRecord) {
+          const { error: updateError } = await supabase
+            .from("employee_project_assignment")
+            .update(record)
+            .eq("employee_id", existingRecord.employee_id);
+
+          return { type: "update", error: updateError };
+        }
+
+        const { error: insertError } = await supabase
+          .from("employee_project_assignment")
+          .insert(record);
+
+        return { type: "insert", error: insertError };
+      })
+    );
+
+    const errors = results.filter((r) => r.error);
+
+    if (errors.length > 0) {
+      console.error("Errors during processing:", errors);
+    }
+
+    return {
+      status: "Successfully processed updates and new insertions",
+      error: null,
+    };
+  }
+
+  return {
+    status: "Invalid import_type specified",
+    error: new Error("Invalid import_type"),
+  };
+}
+
 // employee documents
 export async function addEmployeeDocument({
   supabase,

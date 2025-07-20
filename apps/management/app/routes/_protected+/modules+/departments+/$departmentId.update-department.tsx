@@ -21,9 +21,10 @@ import { safeRedirect } from "@/utils/server/http.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
-import CreateDepartment from "./$siteId.create-department";
-import { getDepartmentById } from "@canny_ecosystem/supabase/queries";
+import CreateDepartment from "./create-department";
+import { getDepartmentById, getSiteNamesByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { updateDepartmentById } from "@canny_ecosystem/supabase/mutations";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 
 export const UPDATE_DEPARTMENT_TAG = "update-department";
 
@@ -35,6 +36,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   if (!hasPermission(user?.role!, `${updateRole}:${attribute.departments}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
+
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+
   try {
     if (departmentId) {
       const { data, error } = await getDepartmentById({
@@ -42,10 +46,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         id: departmentId,
       });
 
-      if (error) throw error;
+      const { data: siteNamesData, error: siteNamesError } = await getSiteNamesByCompanyId({ supabase, companyId });
+
+      if (error ?? siteNamesError) throw error ?? siteNamesError;
 
       return json({
         data,
+        siteOptions: siteNamesData?.map((site) => ({ label: site.name, value: site.id })),
         error: null,
       });
     }
@@ -54,10 +61,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   } catch (error) {
     return json(
       {
-        error,
         data: null,
-        projectOptions: null,
         siteOptions: null,
+        error,
       },
       { status: 500 }
     );
@@ -90,7 +96,7 @@ export async function action({
     if (isGoodStatus(status))
       return json({
         status: "success",
-        message: "Department updated successfully",
+        message: "Department Updated successfully",
         error: null,
       });
 
@@ -112,7 +118,7 @@ export async function action({
 }
 
 export default function UpdateDepartment() {
-  const { data, error } = useLoaderData<typeof loader>();
+  const { data, siteOptions, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -137,7 +143,7 @@ export default function UpdateDepartment() {
       });
     }
 
-    navigate(-1, {
+    navigate("/modules/departments", {
       replace: true,
     });
   }, [actionData]);
@@ -145,5 +151,5 @@ export default function UpdateDepartment() {
   if (error)
     return <ErrorBoundary error={error} message="Failed to load department" />;
 
-  return <CreateDepartment updateValues={data} />;
+  return <CreateDepartment siteFromUpdate={siteOptions} updateValues={data} />;
 }

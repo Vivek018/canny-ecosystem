@@ -190,16 +190,10 @@ export const ProjectSchema = z.object({
   project_code: zNumberString.min(3).max(20),
   project_type: zNumberString.min(3).max(50),
   description: zTextArea.optional(),
-  project_client_id: z.string(),
-  end_client_id: z.string().optional(),
-  primary_contractor_id: z.string().optional(),
+  company_id: z.string(),
   start_date: z.string().default(new Date().toISOString().split("T")[0]),
-  estimated_end_date: z.string().optional(),
+  end_date: z.string().optional(),
   status: z.enum(statusArray).default("active"),
-  risk_assessment: zTextArea.optional(),
-  quality_standards: zTextArea.optional(),
-  health_safety_requirements: zTextArea.optional(),
-  environmental_considerations: zTextArea.optional(),
 });
 
 // Sites
@@ -222,7 +216,9 @@ export const SiteSchema = z.object({
   pincode: zNumber.min(6).max(6),
   latitude: z.number().min(-90).max(90).optional(),
   longitude: z.number().min(-180).max(180).optional(),
-  project_id: z.string(),
+  capacity: z.number().optional(),
+  project_id: z.string().optional(),
+  company_id: z.string(),
 });
 
 // Pay Sequence
@@ -1929,5 +1925,6 @@ export const InvoiceSchema = z.object({
 export const DepartmentsSchema = z.object({
   id: z.string().uuid().optional(),
   name: z.string().min(3),
-  site_id: z.string(),
+  site_id: z.string().optional(),
+  company_id: z.string()
 });

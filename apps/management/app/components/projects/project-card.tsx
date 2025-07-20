@@ -7,148 +7,54 @@ import {
   TooltipTrigger,
 } from "@canny_ecosystem/ui/tooltip";
 import { Link } from "@remix-run/react";
-import { Card, CardContent, CardTitle } from "@canny_ecosystem/ui/card";
-import type { ProjectsWithCompany } from "@canny_ecosystem/supabase/queries";
-import { Avatar, AvatarFallback, AvatarImage } from "@canny_ecosystem/ui/avatar";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@canny_ecosystem/ui/card";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { Progress } from "@canny_ecosystem/ui/progress";
 import {
-  deleteRole,
-  getAutoTimeDifference,
+  formatDate,
   hasPermission,
+  replaceUnderscore,
   updateRole,
 } from "@canny_ecosystem/utils";
 import { ProjectOptionsDropdown } from "./project-options-dropdown";
 import { useUser } from "@/utils/user";
 import { attribute } from "@canny_ecosystem/utils/constant";
+import type { ProjectDatabaseRow } from "@canny_ecosystem/supabase/types";
 
 export function ProjectCard({
   project,
 }: {
-  project: Omit<ProjectsWithCompany, "created_at" | "updated_at">;
+  project: Omit<ProjectDatabaseRow, "created_at" | "updated_at">;
 }) {
   const { role } = useUser();
-  const companies = [
-    project?.project_client,
-    project?.primary_contractor,
-    project?.end_client,
-  ];
 
   return (
     <Card
       key={project.id}
       className="w-full select-text cursor-auto dark:border-[1.5px] h-full flex flex-col justify-start"
     >
-      <CardContent className="flex flex-row gap-0.5 justify-between items-center p-4">
-        <div className="flex items-center flex-1 gap-10 justify-between pr-12">
-          <CardTitle className="text-xl tracking-wide">
-            <Link
-              prefetch="intent"
-              to={`${project?.id}`}
-              className="truncate max-w-96 font-bold text-wrap line-clamp-2 hover:text-primary"
-            >
-              {project.name}
-            </Link>
-            <div className="flex items-center gap-1.5">
-              <p className="text-[11px] bg-muted-foreground w-max text-muted px-1.5 mt-1.5 rounded-md">
-                {project.status}
-              </p>
-              <p className="text-[11px] bg-muted w-max text-muted-foreground px-1.5 mt-1.5 rounded-md">
-                {project.project_type}
-              </p>
-            </div>
+      <CardHeader className="flex flex-row space-y-0 items-start justify-between p-4">
+        <div className="flex flex-col items-start gap-1">
+          <CardTitle className="text-lg tracking-wide gap-1">
+            {replaceUnderscore(project.name ?? "")}
           </CardTitle>
-          <div className="flex flex-col items-center gap-1">
-            <TooltipProvider>
-              <div className="flex items-center">
-                {companies?.map((company, index) =>
-                  company?.id ? (
-                    <Tooltip key={company?.id} delayDuration={100}>
-                      <TooltipTrigger asChild>
-                        <Avatar
-                          className={cn(
-                            "w-12 h-12 border border-muted-foreground/30 shadow-sm hover:z-40",
-                            index !== 0 && "-ml-[18px]",
-                          )}
-                        >
-                          {company?.logo && (
-                            <AvatarImage src={company?.logo} alt={company?.name} />
-                          )}
-                          <AvatarFallback>
-                            <span className="tracking-widest text-sm">
-                              {company?.name.charAt(0)}
-                            </span>
-                          </AvatarFallback>
-                        </Avatar>
-                      </TooltipTrigger>
-                      <TooltipContent>{company?.name}</TooltipContent>
-                    </Tooltip>
-                  ) : null,
-                )}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Companies Involved
-              </p>
-            </TooltipProvider>
-          </div>
-          <div
-            className={cn("flex flex-col", project.actual_end_date && "hidden")}
-          >
-            <Progress
-              value={
-                (getAutoTimeDifference(project.start_date, new Date())! /
-                  getAutoTimeDifference(
-                    project.start_date,
-                    project.estimated_end_date,
-                  )!) *
-                100
-              }
-              className="w-80"
-            />
-            <p
-              className={cn(
-                "text-xs text-muted-foreground ml-auto mt-1",
-                getAutoTimeDifference(new Date(), project.estimated_end_date)! <
-                  0 && "hidden",
-              )}
-            >
-              {getAutoTimeDifference(new Date(), project.estimated_end_date)}{" "}
-              days remaining
-            </p>
-          </div>
-          <div
-            className={cn(
-              "flex flex-col",
-              !project.actual_end_date && "hidden",
-            )}
-          >
-            <Progress value={100} className="w-80" />
-            <p
-              className={cn(
-                "text-xs text-muted-foreground ml-auto mt-1",
-                !project.actual_end_date && "hidden",
-              )}
-            >
-              Took{" "}
-              {getAutoTimeDifference(
-                project.start_date,
-                project.actual_end_date,
-              )}{" "}
-              days
-            </p>
+          <div className="flex gap-1.5">
+            <div className="text-[10px] font-light px-1.5 bg-muted text-muted-foreground rounded-sm">{project.project_code}</div>
+            <div className="text-[10px] font-light px-1.5 bg-muted-foreground text-muted rounded-sm">{project.project_type}</div>
+            <div className="text-[10px] font-light px-1.5 bg-muted text-muted-foreground rounded-sm">{project.status}</div>
           </div>
         </div>
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex items-center gap-3">
           <TooltipProvider>
             <Tooltip delayDuration={100}>
               <TooltipTrigger asChild>
                 <Link
-                  to={`/projects/${project.id}/update-project`}
+                  prefetch="intent"
+                  to={`${project.id}/update-project`}
                   className={cn(
-                    "p-2 rounded-md bg-secondary grid place-items-center border-foreground ",
+                    "p-2 rounded-md bg-secondary grid place-items-center",
                     !hasPermission(
                       role,
-                      `${deleteRole}:${attribute.projects}`,
+                      `${updateRole}:${attribute.projects}`,
                     ) && "hidden",
                   )}
                 >
@@ -158,29 +64,42 @@ export function ProjectCard({
               <TooltipContent>Edit</TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          <ProjectOptionsDropdown
-            project={{
-              id: project.id,
-              actual_end_date: project.actual_end_date,
-            }}
-            triggerChild={
-              <DropdownMenuTrigger
-                className={cn(
-                  "p-2 py-2 rounded-md bg-secondary grid place-items-center border-foreground",
-                  !hasPermission(role, `${deleteRole}:${attribute.projects}`) &&
-                    !hasPermission(
-                      role,
-                      `${updateRole}:${attribute.projects}`,
-                    ) &&
-                    "hidden",
-                )}
-              >
-                <Icon name="dots-vertical" size="xs" />
-              </DropdownMenuTrigger>
-            }
-          />
+          <ProjectOptionsDropdown project={project} triggerChild={
+            <DropdownMenuTrigger className="p-2 py-2 rounded-md bg-secondary grid place-items-center">
+              <Icon name="dots-vertical" size="xs" />
+            </DropdownMenuTrigger>
+          } />
+        </div>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-0.5 px-4">
+        <div className="line-clamp-3">
+        {project.description}
         </div>
       </CardContent>
+      <CardFooter
+        className={cn(
+          "mx-4 mb-1.5 mt-auto p-0 py-1.5 text-foreground text-xs flex gap-1 justify-between font-semibold",
+        )}
+      >
+        <p
+          className={cn(
+            "text-green bg-green/25 rounded-md p-1 flex items-center gap-1 capitalize",
+            !formatDate(project.start_date) && "hidden",
+          )}
+        >
+          <Icon name="clock" size="xs" className="scale-x-[-1]" />
+          {formatDate(project.start_date)}
+        </p>
+        <p
+          className={cn(
+            "text-destructive bg-destructive/25 rounded-md flex items-center gap-1 p-1 capitalize",
+            !formatDate(project.end_date) && "hidden",
+          )}
+        >
+          <Icon name="clock" size="xs" />
+          {formatDate(project.end_date)}
+        </p>
+      </CardFooter>
     </Card>
   );
 }

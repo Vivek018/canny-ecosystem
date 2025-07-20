@@ -53,16 +53,13 @@ import {
   transformStringArrayIntoOptions,
   userRoles,
 } from "@canny_ecosystem/utils";
-import { Label } from "@canny_ecosystem/ui/label";
-import { Combobox } from "@canny_ecosystem/ui/combobox";
 import {
-  PROJECT_PARAM,
   SITE_PARAM,
 } from "@/components/employees/form/create-employee-project-assignment";
 import {
-  getProjectsByCompanyId,
-  getSitesByProjectId,
+  getSiteNamesByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
+import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 
 export const CREATE_USER_TAG = "create-user";
 
@@ -70,47 +67,29 @@ export async function loader({
   request,
 }: LoaderFunctionArgs): Promise<Response> {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
-  const url = new URL(request.url);
-  const urlSearchParams = new URLSearchParams(url.searchParams);
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
   if (!hasPermission(user?.role!, `${createRole}:${attribute.settingUsers}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+
   try {
-    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-    const { data: projects } = await getProjectsByCompanyId({
+    const { data: sites } = await getSiteNamesByCompanyId({
       supabase,
       companyId,
     });
 
-    const projectOptions = projects?.map((project) => ({
-      label: project?.name,
-      value: project?.id,
+    const siteOptions = sites?.map((site) => ({
+      label: site?.name,
+      value: site?.id,
     }));
-
-    let siteOptions: any = [];
-
-    const projectParamId = urlSearchParams.get(PROJECT_PARAM);
-
-    if (projectParamId?.length) {
-      const { data: sites } = await getSitesByProjectId({
-        supabase,
-        projectId: projectParamId,
-      });
-
-      siteOptions = sites?.map((site) => ({
-        label: site?.name,
-        value: site?.id,
-      }));
-    }
 
     return json({
       status: "success",
       message: "User form loaded",
       companyId,
-      projectOptions,
       siteOptions,
       error: null,
     });
@@ -119,6 +98,8 @@ export async function loader({
       {
         status: "error",
         message: "An unexpected error occurred",
+        companyId,
+        siteOptions: null,
         error,
       },
       { status: 500 }
@@ -172,14 +153,12 @@ export async function action({
 
 export default function CreateUser({
   updateValues,
-  projectOptions: updateProjectOptions,
   siteOptions: updateSiteOptions,
 }: {
-  siteOptions: [];
-  projectOptions: [] | undefined | null;
+  siteOptions: ComboboxSelectOption[] | null | undefined;
   updateValues?: UserDatabaseUpdate | null;
 }) {
-  const { companyId, projectOptions, siteOptions } =
+  const { companyId, siteOptions } =
     useLoaderData<typeof loader>();
 
   const actionData = useActionData<typeof action>();
@@ -325,54 +304,33 @@ export default function CreateUser({
               />
 
               {supervisor === "supervisor" && (
-                <div className="grid grid-cols-2 place-content-center justify-between gap-x-8">
-                  <div>
-                    <div className="flex mb-1.5">
-                      <Label>Projects</Label>
-                    </div>
-                    <Combobox
-                      options={projectOptions ?? updateProjectOptions ?? []}
-                      value={searchParams.get(PROJECT_PARAM) ?? ""}
-                      className="w-full"
-                      onChange={(project) => {
-                        if (project?.length) {
-                          searchParams.set(PROJECT_PARAM, project);
-                        } else {
-                          searchParams.delete(PROJECT_PARAM);
-                        }
-                        setSearchParams(searchParams);
-                      }}
-                      placeholder={"Select Projects"}
-                    />
-                  </div>
-                  <SearchableSelectField
-                    className="capitalize"
-                    options={
-                      siteOptions ?? updateSiteOptions ?? []
+                <SearchableSelectField
+                  className="capitalize"
+                  options={
+                    siteOptions ?? updateSiteOptions ?? []
+                  }
+                  inputProps={{
+                    ...getInputProps(fields.site_id, {
+                      type: "text",
+                    }),
+                    defaultValue:
+                      searchParams.get(SITE_PARAM) ??
+                      String(fields.site_id.initialValue),
+                  }}
+                  placeholder={"Select Site"}
+                  labelProps={{
+                    children: "Site",
+                  }}
+                  onChange={(site) => {
+                    if (site?.length) {
+                      searchParams.set(SITE_PARAM, site);
+                    } else {
+                      searchParams.delete(SITE_PARAM);
                     }
-                    inputProps={{
-                      ...getInputProps(fields.site_id, {
-                        type: "text",
-                      }),
-                      defaultValue:
-                        searchParams.get(SITE_PARAM) ??
-                        String(fields.site_id.initialValue),
-                    }}
-                    placeholder={"Select Site"}
-                    labelProps={{
-                      children: "Site",
-                    }}
-                    onChange={(site) => {
-                      if (site?.length) {
-                        searchParams.set(SITE_PARAM, site);
-                      } else {
-                        searchParams.delete(SITE_PARAM);
-                      }
-                      setSearchParams(searchParams);
-                    }}
-                    errors={fields.site_id.errors}
-                  />
-                </div>
+                    setSearchParams(searchParams);
+                  }}
+                  errors={fields.site_id.errors}
+                />
               )}
 
               <CheckboxField

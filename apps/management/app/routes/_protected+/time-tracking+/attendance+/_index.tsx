@@ -5,7 +5,7 @@ import {
   getCompanyNameByCompanyId,
   getPrimaryLocationByCompanyId,
   getProjectNamesByCompanyId,
-  getSiteNamesByProjectName,
+  getSiteNamesByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
@@ -90,12 +90,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     const projectPromise = getProjectNamesByCompanyId({ supabase, companyId });
 
-    let sitePromise = null;
-    if (filters.project) {
-      sitePromise = filters.project
-        ? getSiteNamesByProjectName({ supabase, projectName: filters.project })
-        : null;
-    }
+    const sitePromise = getSiteNamesByCompanyId({ supabase, companyId });
+
 
     return defer({
       projectPromise,

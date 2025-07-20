@@ -43,12 +43,10 @@ import type { EmployeeGuardianDatabaseInsert } from "@canny_ecosystem/supabase/t
 import { CreateEmployeeGuardianDetails } from "@/components/employees/form/create-employee-guardian-details";
 import { FormStepHeader } from "@/components/form/form-step-header";
 import {
-  getProjectsByCompanyId,
-  getSitesByProjectId,
+  getSiteNamesByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import {
   CreateEmployeeProjectAssignment,
-  PROJECT_PARAM,
 } from "@/components/employees/form/create-employee-project-assignment";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { clearCacheEntry } from "@/utils/cache";
@@ -90,7 +88,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
-  const urlSearchParams = new URLSearchParams(url.searchParams);
   const step = Number.parseInt(url.searchParams.get(STEP) || "1");
   const totalSteps = schemas.length;
 
@@ -106,32 +103,17 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return redirect(url.toString(), { status: 302 });
   }
 
-  let projectOptions: any = [];
   let siteOptions: any = [];
   if (step === 4) {
-    const { data: projects } = await getProjectsByCompanyId({
+    const { data: sites } = await getSiteNamesByCompanyId({
       supabase,
       companyId,
     });
 
-    projectOptions = projects?.map((project) => ({
-      label: project?.name,
-      value: project?.id,
+    siteOptions = sites?.map((site) => ({
+      label: site?.name,
+      value: site?.id,
     }));
-
-    const projectParamId = urlSearchParams.get(PROJECT_PARAM);
-
-    if (projectParamId?.length) {
-      const { data: sites } = await getSitesByProjectId({
-        supabase,
-        projectId: projectParamId,
-      });
-
-      siteOptions = sites?.map((site) => ({
-        label: site?.name,
-        value: site?.id,
-      }));
-    }
   }
 
   return json({
@@ -139,7 +121,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
     totalSteps,
     stepData,
     companyId,
-    projectOptions,
     siteOptions,
   });
 }
@@ -306,7 +287,6 @@ export default function CreateEmployee() {
     totalSteps,
     stepData,
     companyId,
-    projectOptions,
     siteOptions,
   } = useLoaderData<typeof loader>();
   const [resetKey, setResetKey] = useState(Date.now());
@@ -398,7 +378,6 @@ export default function CreateEmployee() {
                 <CreateEmployeeProjectAssignment
                   key={resetKey + 3}
                   fields={fields as any}
-                  projectOptions={projectOptions}
                   siteOptions={siteOptions}
                 />
               ) : null}

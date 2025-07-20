@@ -1,7 +1,6 @@
 import { faker } from "@faker-js/faker";
 import type {
   CompanyDatabaseInsert,
-  CompanyRegistrationDetailsInsert,
   LocationDatabaseInsert,
   RelationshipDatabaseInsert,
 } from "../types";
@@ -18,21 +17,6 @@ export function seedCompany(): CompanyDatabaseInsert {
       faker.number.int({ min: 0, max: 2 })
     ],
     is_active: [true, false][faker.number.int({ min: 0, max: 1 })],
-  };
-}
-
-export function seedCompanyRegistrationDetails(): Omit<
-  CompanyRegistrationDetailsInsert,
-  "company_id"
-> {
-  return {
-    registration_number: faker.string.alphanumeric(10),
-    gst_number: faker.string.alphanumeric(15),
-    pan_number: faker.string.alphanumeric(10),
-    pf_number: faker.string.alphanumeric(10),
-    esic_number: faker.string.alphanumeric(10),
-    lwf_number: faker.string.alphanumeric(10),
-    pt_number: faker.string.alphanumeric(10),
   };
 }
 

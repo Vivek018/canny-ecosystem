@@ -5,7 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@canny_ecosystem/ui/dropdown-menu";
-import { DeleteDepartment } from "./delete-department";
+import { DeleteDepartment } from "../delete-department";
 import { useNavigate } from "@remix-run/react";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
@@ -24,7 +24,7 @@ export const DepartmentOptionsDropdown = ({
   const navigate = useNavigate();
 
   const handleEdit = () => {
-    navigate(`/sites/${id}/update-department`);
+    navigate(`${id}/update-department`);
   };
 
   return (
@@ -40,7 +40,7 @@ export const DepartmentOptionsDropdown = ({
             )}
             onClick={handleEdit}
           >
-            Edit Department Data
+            Edit Department
           </DropdownMenuItem>
           <DropdownMenuSeparator
             className={cn(

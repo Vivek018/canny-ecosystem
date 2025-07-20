@@ -33,7 +33,6 @@ import {
 import {
   seedCompany,
   seedCompanyLocations,
-  seedCompanyRegistrationDetails,
   seedCompanyRelationships,
 } from "./companies";
 import { seedProject, seedSite } from "./projects";
@@ -105,7 +104,6 @@ export async function seed(newCompanyId?: string) {
       const { id } = await createCompany({
         supabase,
         companyData: seedCompany(),
-        companyRegistrationDetails: seedCompanyRegistrationDetails(),
         bypassAuth: true,
       });
 
@@ -136,7 +134,7 @@ export async function seed(newCompanyId?: string) {
       for (let index = 0; index < 1; index++) {
         const { id: projectId } = await createProject({
           supabase,
-          data: { ...seedProject(), project_client_id: companyId! },
+          data: { ...seedProject(), company_id: companyId! },
           bypassAuth: true,
         });
 

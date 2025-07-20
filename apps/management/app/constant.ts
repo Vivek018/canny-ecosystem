@@ -57,7 +57,7 @@ export const sideNavList = [
   { name: "Events", link: "/events", icon: "exclaimation-triangle" },
   // { name: "Reports", link: "/reports", icon: "report" },
   { name: "Group 5" },
-  { name: "Projects", link: "/projects", icon: "project" },
+  { name: "Modules", link: "/modules", icon: "project" },
   {
     name: "Settings",
     link: "/settings",
@@ -166,9 +166,11 @@ export const cacheKeyPrefix = {
   gratuity: "gratuity",
   leave_encashment: "leave-encashment",
   payment_templates: "payment-templates",
-  projects_main: "projects_main",
+  modules: "modules",
+  projects_main: "projects-main",
   projects: "projects",
   project_overview: "project-overview",
+  sites_main: "sites-main",
   sites: "sites",
   site_overview: "site-overview",
   site_link_templates: "site-link-templates",
@@ -195,6 +197,7 @@ export const cacheKeyPrefix = {
   company_document: "company-document",
   attendance_report: "attendance-report",
   payroll_invoice: "payroll-invoice",
+  departments_main: "departments_main",
   departments: "departments",
 };
 

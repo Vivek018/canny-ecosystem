@@ -16,8 +16,7 @@ import {
   isGoodStatus,
 } from "@canny_ecosystem/utils";
 import {
-  getProjectsByCompanyId,
-  getSitesByProjectId,
+  getSiteNamesByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import { createEmployeeProjectAssignment } from "@canny_ecosystem/supabase/mutations";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
@@ -26,7 +25,6 @@ import { FormProvider, getFormProps, useForm } from "@conform-to/react";
 import { Card } from "@canny_ecosystem/ui/card";
 import {
   CreateEmployeeProjectAssignment,
-  PROJECT_PARAM,
 } from "@/components/employees/form/create-employee-project-assignment";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
@@ -42,7 +40,7 @@ export const ADD_EMPLOYEE_PROJECT_ASSIGNMENT =
 export async function loader({
   request,
   params,
-}: LoaderFunctionArgs): Promise<Response> {
+}: LoaderFunctionArgs) {
   const employeeId = params.employeeId;
   const { supabase, headers } = getSupabaseWithHeaders({ request });
 
@@ -57,47 +55,31 @@ export async function loader({
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
-  try {
-    const url = new URL(request.url);
-    const urlSearchParams = new URLSearchParams(url.searchParams);
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
-    const { data: projects } = await getProjectsByCompanyId({
+  try {
+    const { data: sites } = await getSiteNamesByCompanyId({
       supabase,
       companyId,
     });
 
-    const projectOptions = projects?.map((project) => ({
-      label: project?.name,
-      value: project?.id,
+    const siteOptions = sites?.map((site) => ({
+      label: site?.name,
+      value: site?.id,
     }));
-
-    let siteOptions: any = [];
-
-    const projectParamId = urlSearchParams.get(PROJECT_PARAM);
-
-    if (projectParamId?.length) {
-      const { data: sites } = await getSitesByProjectId({
-        supabase,
-        projectId: projectParamId,
-      });
-
-      siteOptions = sites?.map((site) => ({
-        label: site?.name,
-        value: site?.id,
-      }));
-    }
 
     return json({
       status: "success",
       employeeId,
-      projectOptions,
       siteOptions,
+      message: "Employee Project Assignment Form Loaded",
+      error: null,
     });
   } catch (error) {
     return json({
       status: "error",
       employeeId,
+      siteOptions: null,
       message: "An unexpected error occurred",
       error,
     });
@@ -156,7 +138,6 @@ export async function action({
 export default function CreateEmployeeProjectAssignmentRoute() {
   const {
     employeeId,
-    projectOptions,
     siteOptions,
     status,
     error,
@@ -184,7 +165,7 @@ export default function CreateEmployeeProjectAssignmentRoute() {
     if (status === "error") {
       toast({
         title: "Error",
-        description: error?.message || "Failed to load",
+        description: (error as any)?.message || "Failed to load",
         variant: "destructive",
       });
     }
@@ -226,7 +207,6 @@ export default function CreateEmployeeProjectAssignmentRoute() {
             <CreateEmployeeProjectAssignment
               key={resetKey}
               fields={fields as any}
-              projectOptions={projectOptions}
               siteOptions={siteOptions}
             />
             <FormButtons

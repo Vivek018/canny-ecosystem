@@ -448,29 +448,21 @@ export function EmployeesSearchFilter({
                 alignOffset={-4}
                 className='p-0'
               >
-                {!searchParamsList.project ? (
+                {siteArray?.map((name, index) => (
                   <DropdownMenuCheckboxItem
-                    disabled={true}
-                    className='p-8 items-center justify-center'
+                    key={name + index.toString()}
+                    className='capitalize'
+                    checked={filterParams?.site === name}
+                    onCheckedChange={() => {
+                      setFilterParams((prev) => ({
+                        ...prev,
+                        site: name,
+                      }));
+                    }}
                   >
-                    Select Project First
+                    {name}
                   </DropdownMenuCheckboxItem>
-                ) : (
-                  siteArray?.map((name, index) => (
-                    <DropdownMenuCheckboxItem
-                      key={name + index.toString()}
-                      className='capitalize'
-                      checked={filterParams?.site === name}
-                      onCheckedChange={() => {
-                        setFilterParams((prev) => ({
-                          ...prev,
-                          site: name,
-                        }));
-                      }}
-                    >
-                      {name}
-                    </DropdownMenuCheckboxItem>
-                  ))
+                )
                 )}
               </DropdownMenuSubContent>
             </DropdownMenuPortal>

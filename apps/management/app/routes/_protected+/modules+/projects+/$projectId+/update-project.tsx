@@ -1,24 +1,25 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import CreateSite from "./create-site";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
+import {
+  getCompanies,
+  getProjectById,
+} from "@canny_ecosystem/supabase/queries";
 import {
   json,
   useActionData,
   useLoaderData,
   useNavigate,
+  useParams,
 } from "@remix-run/react";
 import { parseWithZod } from "@conform-to/zod";
+import { updateProject } from "@canny_ecosystem/supabase/mutations";
 import {
   hasPermission,
   isGoodStatus,
-  SiteSchema,
+  ProjectSchema,
   updateRole,
 } from "@canny_ecosystem/utils";
-import {
-  getLocationsForSelectByCompanyId,
-  getSiteById,
-} from "@canny_ecosystem/supabase/queries";
-import { updateSite } from "@canny_ecosystem/supabase/mutations";
+import CreateProject from "../create-project";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { useEffect } from "react";
@@ -29,92 +30,79 @@ import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
 
-export const UPDATE_SITE = "update-site";
+export const UPDATE_PROJECT = "update-project";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const siteId = params.siteId;
   const projectId = params.projectId;
   const { supabase, headers } = getSupabaseWithHeaders({ request });
-
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${updateRole}:${attribute.site}`)) {
+  if (!hasPermission(user?.role!, `${updateRole}:${attribute.projects}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
   try {
-    if (!projectId) throw new Error("No projectId provided");
-
     const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-    const { data: locationOptionsData, error: locationOptionsError } =
-      await getLocationsForSelectByCompanyId({
+    let projectData = null;
+    let projectError = null;
+
+    if (projectId) {
+      ({ data: projectData, error: projectError } = await getProjectById({
         supabase,
-        companyId,
-      });
-
-    if (locationOptionsError) throw locationOptionsError;
-
-    let siteData = null;
-    let siteError = null;
-
-    if (siteId) {
-      ({ data: siteData, error: siteError } = await getSiteById({
-        supabase,
-        id: siteId,
+        id: projectId,
       }));
 
-      if (siteError) throw siteError;
-
-      return json({
-        error: null,
-        siteData,
-        locationOptions: locationOptionsData?.map((location) => ({
-          label: location.name,
-          value: location.id,
-        })),
-        projectId,
-        siteId,
-      });
+      if (projectError) throw projectError;
+    } else {
+      throw new Error("Project ID not provided");
     }
 
-    throw new Error("Site ID not provided");
+    const { data, error } = await getCompanies({ supabase });
+
+    if (error) throw error;
+
+    return json({
+      projectData,
+      companyOptions:
+        data
+          ?.filter((company) => company.id !== companyId)
+          .map((company) => ({ label: company.name, value: company.id })) || [],
+      companyId,
+      error: null,
+    });
   } catch (error) {
     return json(
       {
         error,
-        siteData: null,
-        locationOptions: null,
-        projectId,
-        siteId,
+        companyId: null,
+        projectData: null,
+        companyOptions: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
 
 export async function action({
   request,
-  params,
 }: ActionFunctionArgs): Promise<Response> {
-  const projectId = params.projectId;
-
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
     const formData = await request.formData();
 
     const submission = parseWithZod(formData, {
-      schema: SiteSchema,
+      schema: ProjectSchema,
     });
 
     if (submission.status !== "success") {
       return json(
         { result: submission.reply() },
-        { status: submission.status === "error" ? 400 : 200 },
+        { status: submission.status === "error" ? 400 : 200 }
       );
     }
 
-    const { status, error } = await updateSite({
+    const { status, error } = await updateProject({
       supabase,
       data: submission.value,
     });
@@ -122,61 +110,68 @@ export async function action({
     if (isGoodStatus(status)) {
       return json({
         status: "success",
-        message: "Site updated",
+        message: "Project updated successfully",
         error: null,
-        projectId,
       });
     }
-    return json({
-      status: "error",
-      message: "Site update failed",
-      error,
-      projectId,
-    });
+    return json(
+      { status: "error", message: "Project update failed", error },
+      { status: 500 }
+    );
   } catch (error) {
     return json(
       {
         status: "error",
-        message: "Failed to update site",
+        message: "An unexpected error occurred",
         error,
+        data: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
 
-export default function UpdateSite() {
-  const { siteData, error, projectId, siteId } = useLoaderData<typeof loader>();
+export default function UpdateProject() {
+  const { projectData, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
+  const { projectId } = useParams();
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearExactCacheEntry(`${cacheKeyPrefix.sites}${projectId}`);
-        clearExactCacheEntry(`${cacheKeyPrefix.site_overview}${siteId}`);
+        clearExactCacheEntry(cacheKeyPrefix.projects);
+        clearExactCacheEntry(`${cacheKeyPrefix.project_overview}${projectId}`);
         toast({
           title: "Success",
-          description: actionData?.message || "Site updated",
+          description: actionData?.message || "Project updated",
           variant: "success",
         });
       } else {
         toast({
           title: "Error",
-          description: actionData?.error.message || "Site update failed",
+          description:
+            actionData?.error?.message ||
+            actionData?.error ||
+            actionData?.message ||
+            "Project update failed",
           variant: "destructive",
         });
       }
-      navigate(`/projects/${projectId}/sites`, {
+      navigate("/modules/projects", {
         replace: true,
       });
     }
   }, [actionData]);
 
   if (error)
-    return <ErrorBoundary error={error} message="Failed to load site" />;
+    return <ErrorBoundary error={error} message="Failed to load project" />;
 
-  return <CreateSite updateValues={siteData} />;
+  return (
+    <CreateProject
+      updateValues={projectData}
+    />
+  );
 }

@@ -6,6 +6,7 @@ import type {
   EmployeeDocumentsDatabaseRow,
   EmployeeGuardianDatabaseRow,
   EmployeeMonthlyAttendanceDatabaseRow,
+  EmployeeProjectAssignmentDatabaseInsert,
   EmployeeProjectAssignmentDatabaseRow,
   EmployeeSkillDatabaseRow,
   EmployeeStatutoryDetailsDatabaseRow,
@@ -1423,4 +1424,48 @@ export async function getAllEmployeeTablesData({
     },
     error,
   };
+}
+
+export async function getEmployeeProjectAssignmentsConflicts({
+  supabase,
+  importedData,
+}: {
+  supabase: TypedSupabaseClient;
+  importedData: EmployeeProjectAssignmentDatabaseInsert[];
+}) {
+  const employeeIds = [...new Set(importedData.map((emp) => emp.employee_id))];
+
+  const query = supabase
+    .from("employee_project_assignment")
+    .select(
+      `
+      employee_id
+    `
+    )
+    .or(
+      [`employee_id.in.(${employeeIds.map((id) => id).join(",")})`].join(",")
+    );
+
+  const { data: conflictingRecords, error } = await query;
+
+  if (error) {
+    console.error("Error fetching conflicts:", error);
+    return { conflictingIndices: [], error };
+  }
+
+  const conflictingIndices = importedData.reduce(
+    (indices: number[], record, index) => {
+      const hasConflict = conflictingRecords?.some(
+        (existing) => existing.employee_id === record.employee_id
+      );
+
+      if (hasConflict) {
+        indices.push(index);
+      }
+      return indices;
+    },
+    []
+  );
+
+  return { conflictingIndices, error: null };
 }

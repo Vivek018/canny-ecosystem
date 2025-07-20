@@ -2,7 +2,7 @@ import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
 import { safeRedirect } from "@/utils/server/http.server";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
-import { deleteSite } from "@canny_ecosystem/supabase/mutations";
+import { deleteProject } from "@canny_ecosystem/supabase/mutations";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import {
@@ -15,42 +15,35 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { json, useActionData, useNavigate, useParams } from "@remix-run/react";
 import { useEffect } from "react";
 
-export async function action({
-  request,
-  params,
-}: ActionFunctionArgs): Promise<Response> {
+export async function action({ request, params }: ActionFunctionArgs): Promise<Response> {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
-
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
-  if (!hasPermission(user?.role!, `${deleteRole}:${attribute.sites}`)) {
+  if (!hasPermission(user?.role!, `${deleteRole}:${attribute.projects}`)) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
+  const projectId = params.projectId;
+
   try {
     const { supabase } = getSupabaseWithHeaders({ request });
-    const siteId = params.siteId;
-    const projectId = params.projectId;
 
-    const { status, error } = await deleteSite({
+    const { status, error } = await deleteProject({
       supabase,
-      id: siteId ?? "",
+      id: projectId ?? "",
     });
 
     if (isGoodStatus(status)) {
       return json({
         status: "success",
-        message: "Site deleted",
+        message: "Project deleted",
         error: null,
-        projectId,
       });
     }
 
-    return json({
-      status: "error",
-      message: "Failed to delete site",
-      error,
-      projectId,
-    });
+    return json(
+      { status: "error", message: "Failed to delete project", error },
+      { status: 500 },
+    );
   } catch (error) {
     return json(
       {
@@ -58,23 +51,22 @@ export async function action({
         message: "An unexpected error occurred",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
-export default function DeleteSite() {
+export default function DeleteProject() {
   const actionData = useActionData<typeof action>();
-
-  const { projectId, siteId } = useParams();
+  const { projectId } = useParams();
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearExactCacheEntry(`${cacheKeyPrefix.sites}${projectId}`);
-        clearExactCacheEntry(`${cacheKeyPrefix.site_overview}${siteId}`);
+        clearExactCacheEntry(cacheKeyPrefix.projects);
+        clearExactCacheEntry(`${cacheKeyPrefix.project_overview}${projectId}`);
         toast({
           title: "Success",
           description: actionData?.message,
@@ -83,13 +75,13 @@ export default function DeleteSite() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.error,
+          description: actionData?.error || actionData?.error?.message,
           variant: "destructive",
         });
       }
-
-      navigate(`/projects/${actionData?.projectId}/sites`, { replace: true });
+      navigate("/modules/projects", { replace: true });
     }
   }, [actionData]);
+
   return null;
 }

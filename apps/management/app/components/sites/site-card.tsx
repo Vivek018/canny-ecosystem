@@ -12,7 +12,7 @@ import {
   TooltipTrigger,
 } from "@canny_ecosystem/ui/tooltip";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { Link, useNavigate } from "@remix-run/react";
+import { Link } from "@remix-run/react";
 import { DeleteSite } from "./delete-site";
 import {
   Card,
@@ -37,7 +37,6 @@ export function SiteCard({
   site: Omit<SitesWithLocation, "created_at" | "updated_at">;
 }) {
   const { role } = useUser();
-  const navigate = useNavigate();
 
   return (
     <Card
@@ -49,11 +48,7 @@ export function SiteCard({
           <CardTitle
             className={cn(
               "text-lg tracking-wide",
-              "hover:cursor-pointer hover:text-primary",
             )}
-            onClick={() =>
-              navigate(`/projects/${site.project_id}/${site.id}/overview`)
-            }
           >
             {site.name}
           </CardTitle>
@@ -67,7 +62,7 @@ export function SiteCard({
               <TooltipTrigger asChild>
                 <Link
                   prefetch="intent"
-                  to={`/projects/${site.project_id}/sites/${site.id}/update-site`}
+                  to={`${site.id}/update-site`}
                   className={cn(
                     "p-2 rounded-md bg-secondary grid place-items-center",
                     !hasPermission(
@@ -87,7 +82,7 @@ export function SiteCard({
               className={cn(
                 "p-2 py-2 rounded-md bg-secondary grid place-items-center",
                 !hasPermission(
-                  `${role}`,
+                  role,
                   `${deleteRole}:${attribute.sites}`,
                 ) && "hidden",
               )}
@@ -96,7 +91,7 @@ export function SiteCard({
             </DropdownMenuTrigger>
             <DropdownMenuContent sideOffset={10} align="end">
               <DropdownMenuGroup>
-                <DeleteSite projectId={site.project_id} siteId={site.id} />
+                <DeleteSite siteId={site.id} />
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>

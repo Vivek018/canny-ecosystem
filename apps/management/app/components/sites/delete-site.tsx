@@ -20,10 +20,8 @@ import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
 export const DeleteSite = ({
-  projectId,
   siteId,
 }: {
-  projectId: string;
   siteId: string;
 }) => {
   const { role } = useUser();
@@ -47,7 +45,7 @@ export const DeleteSite = ({
         {},
         {
           method: "post",
-          action: `/projects/${projectId}/sites/${siteId}/delete-site`,
+          action: `${siteId}/delete-site`,
           replace: true,
         },
       );

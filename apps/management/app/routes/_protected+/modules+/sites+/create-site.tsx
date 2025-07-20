@@ -40,8 +40,8 @@ import {
 import { createSite } from "@canny_ecosystem/supabase/mutations";
 import type { SiteDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { attribute, statesAndUTs } from "@canny_ecosystem/utils/constant";
-import { UPDATE_SITE } from "./$siteId.update-site";
-import { getLocationsForSelectByCompanyId } from "@canny_ecosystem/supabase/queries";
+import { UPDATE_SITE } from "./$siteId+/update-site";
+import { getLocationsForSelectByCompanyId, getProjectsByCompanyId } from "@canny_ecosystem/supabase/queries";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
@@ -50,11 +50,11 @@ import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
 import { safeRedirect } from "@/utils/server/http.server";
 import { cacheKeyPrefix, DEFAULT_ROUTE } from "@/constant";
 import { clearExactCacheEntry } from "@/utils/cache";
+import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 
 export const CREATE_SITE = "create-site";
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
-  const projectId = params.projectId;
+export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
 
   const { user } = await getUserCookieOrFetchUser(request, supabase);
@@ -63,31 +63,37 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
-  try {
-    if (!projectId) throw new Error("No projectId provided");
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
 
-    const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+  try {
     const { data, error } = await getLocationsForSelectByCompanyId({
       supabase,
       companyId,
     });
 
-    if (error) throw error;
+    const { data: projectsData, error: projectsError } = await getProjectsByCompanyId({ supabase, companyId });
+
+    if (error ?? projectsError) throw error ?? projectsError;
 
     return json({
       error: null,
-      projectId,
+      companyId,
       locationOptions: data?.map((location) => ({
-        label: location.name,
-        value: location.id,
+        label: location?.name,
+        value: location?.id,
+      })),
+      projectOptions: projectsData?.map((project) => ({
+        label: project?.name,
+        value: project?.id,
       })),
     });
   } catch (error) {
     return json(
       {
         error,
-        projectId,
+        companyId,
         locationOptions: null,
+        projectOptions: null,
       },
       { status: 500 },
     );
@@ -96,13 +102,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export async function action({
   request,
-  params,
 }: ActionFunctionArgs): Promise<Response> {
-  const projectId = params.projectId;
-
   try {
-    if (!projectId) throw new Error("No projectId provided");
-
     const { supabase } = getSupabaseWithHeaders({ request });
     const formData = await request.formData();
 
@@ -127,7 +128,7 @@ export async function action({
         status: "success",
         message: "Site created successfully",
         error: null,
-        returnTo: `/projects/${projectId}/sites`,
+        returnTo: "/modules/sites",
       });
     }
     return json(
@@ -135,7 +136,7 @@ export async function action({
         status: "error",
         message: "Site creation failed",
         error,
-        returnTo: `/projects/${projectId}/sites`,
+        returnTo: "/modules/sites",
       },
       { status: 500 },
     );
@@ -145,7 +146,7 @@ export async function action({
         status: "error",
         message: "An unexpected error occurred",
         error,
-        returnTo: `/projects/${projectId}/sites`,
+        returnTo: "/modules/sites",
       },
       { status: 500 },
     );
@@ -153,11 +154,15 @@ export async function action({
 }
 
 export default function CreateSite({
+  locationFromUpdate,
+  projectFromUpdate,
   updateValues,
 }: {
+  locationFromUpdate: ComboboxSelectOption[] | undefined | null;
+  projectFromUpdate: ComboboxSelectOption[] | undefined | null;
   updateValues?: SiteDatabaseUpdate | null;
 }) {
-  const { projectId, locationOptions, error } = useLoaderData<typeof loader>();
+  const { companyId, locationOptions, projectOptions, error } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const SITE_TAG = updateValues ? UPDATE_SITE : CREATE_SITE;
 
@@ -174,7 +179,7 @@ export default function CreateSite({
     shouldRevalidate: "onInput",
     defaultValue: {
       ...initialValues,
-      project_id: initialValues.project_id ?? projectId,
+      company_id: initialValues.company_id ?? companyId,
     },
   });
   const { toast } = useToast();
@@ -183,7 +188,7 @@ export default function CreateSite({
   useEffect(() => {
     if (actionData) {
       if (actionData?.status === "success") {
-        clearExactCacheEntry(`${cacheKeyPrefix.sites}${projectId}`);
+        clearExactCacheEntry(cacheKeyPrefix.sites);
         toast({
           title: "Success",
           description: actionData?.message,
@@ -196,7 +201,7 @@ export default function CreateSite({
           variant: "destructive",
         });
       }
-      navigate(actionData.returnTo);
+      navigate(actionData.returnTo ?? "/modules/sites");
     }
   }, [actionData]);
 
@@ -213,14 +218,14 @@ export default function CreateSite({
                 {replaceDash(SITE_TAG)}
               </CardTitle>
               <CardDescription>
-                {SITE_TAG.split("-")[0]} site of a project that will be central
+                {SITE_TAG.split("-")[0]} site of a company that will be central
                 in all of canny apps
               </CardDescription>
             </CardHeader>
             <CardContent>
               <input {...getInputProps(fields.id, { type: "hidden" })} />
               <input
-                {...getInputProps(fields.project_id, { type: "hidden" })}
+                {...getInputProps(fields.company_id, { type: "hidden" })}
               />
               <Field
                 inputProps={{
@@ -234,7 +239,7 @@ export default function CreateSite({
                 }}
                 errors={fields.name.errors}
               />
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+              <div className="grid grid-cols-3 place-content-center justify-between gap-6">
                 <Field
                   inputProps={{
                     ...getInputProps(fields.site_code, { type: "text" }),
@@ -251,7 +256,22 @@ export default function CreateSite({
                 <SearchableSelectField
                   key={resetKey}
                   className="capitalize"
-                  options={locationOptions ?? []}
+                  options={((updateValues ? projectFromUpdate : projectOptions)) ?? []}
+                  inputProps={{
+                    ...getInputProps(fields.project_id, {
+                      type: "text",
+                    }),
+                  }}
+                  placeholder={"Select Project"}
+                  labelProps={{
+                    children: "Project",
+                  }}
+                  errors={fields.project_id.errors}
+                />
+                <SearchableSelectField
+                  key={resetKey + 1}
+                  className="capitalize"
+                  options={(updateValues ? locationFromUpdate : locationOptions) ?? []}
                   inputProps={{
                     ...getInputProps(fields.company_location_id, {
                       type: "text",
@@ -276,7 +296,7 @@ export default function CreateSite({
               <Field
                 inputProps={{
                   ...getInputProps(fields.address_line_1, { type: "text" }),
-                  placeholder: replaceUnderscore(fields.address_line_1.name),
+                  placeholder: replaceUnderscore(fields.address_line_1.name)!,
                   className: "placeholder:capitalize",
                 }}
                 labelProps={{
@@ -288,7 +308,7 @@ export default function CreateSite({
                 className="-mt-4"
                 inputProps={{
                   ...getInputProps(fields.address_line_2, { type: "text" }),
-                  placeholder: replaceUnderscore(fields.address_line_2.name),
+                  placeholder: replaceUnderscore(fields.address_line_2.name)!,
                   className: "placeholder:capitalize",
                 }}
                 errors={fields.address_line_2.errors}
@@ -306,7 +326,7 @@ export default function CreateSite({
                   errors={fields.city.errors}
                 />
                 <SearchableSelectField
-                  key={resetKey}
+                  key={resetKey + 2}
                   className="capitalize"
                   options={statesAndUTs}
                   inputProps={{
@@ -332,7 +352,19 @@ export default function CreateSite({
                   errors={fields.pincode.errors}
                 />
               </div>
-              <div className="grid grid-cols-2 place-content-center justify-between gap-6">
+              <div className="grid grid-cols-3 place-content-center justify-between gap-6">
+                <Field
+                  inputProps={{
+                    ...getInputProps(fields.capacity, { type: "number" }),
+                    className: "capitalize",
+                    placeholder: `Enter ${fields.capacity.name}`,
+                  }}
+                  labelProps={{
+                    className: 'capitalize',
+                    children: `Employee ${fields.capacity.name}`,
+                  }}
+                  errors={fields.capacity.errors}
+                />
                 <Field
                   inputProps={{
                     ...getInputProps(fields.latitude, { type: "number" }),

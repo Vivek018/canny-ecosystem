@@ -1,17 +1,14 @@
 import { convertToNull } from "@canny_ecosystem/utils";
-import type {
-  ProjectDatabaseInsert,
-  ProjectDatabaseUpdate,
-  TypedSupabaseClient,
-} from "../types";
+import type { DepartmentsDatabaseInsert, DepartmentsDatabaseUpdate, TypedSupabaseClient } from "../types";
 
-export async function createProject({
+
+export async function createDepartment({
   supabase,
   data,
   bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
-  data: ProjectDatabaseInsert;
+  data: DepartmentsDatabaseInsert;
   bypassAuth?: boolean;
 }) {
   if (!bypassAuth) {
@@ -24,26 +21,26 @@ export async function createProject({
     }
   }
 
-  const {
-    error,
-    status,
-    data: projectData,
-  } = await supabase.from("projects").insert(data).select().single();
+  const { error, status } = await supabase
+    .from("departments")
+    .insert(data)
+    .select()
+    .single();
 
   if (error) {
-    console.error("createProject Error:", error);
+    console.error("createDepartment Error:", error);
   }
 
-  return { status, error, id: projectData?.id };
+  return { status, error };
 }
 
-export async function updateProject({
+export async function updateDepartmentById({
   supabase,
   data,
   bypassAuth = false,
 }: {
   supabase: TypedSupabaseClient;
-  data: ProjectDatabaseUpdate;
+  data: DepartmentsDatabaseUpdate;
   bypassAuth?: boolean;
 }) {
   if (!bypassAuth) {
@@ -59,17 +56,17 @@ export async function updateProject({
   const updateData = convertToNull(data);
 
   const { error, status } = await supabase
-    .from("projects")
+    .from("departments")
     .update(updateData)
     .eq("id", data.id!);
   if (error) {
-    console.error("updateProject Error:", error);
+    console.error("updateDepartment Error:", error);
   }
 
   return { status, error };
 }
 
-export async function deleteProject({
+export async function deleteDepartment({
   supabase,
   id,
   bypassAuth = false,
@@ -88,13 +85,10 @@ export async function deleteProject({
     }
   }
 
-  const { error, status } = await supabase
-    .from("projects")
-    .delete()
-    .eq("id", id);
+  const { error, status } = await supabase.from("departments").delete().eq("id", id);
 
   if (error) {
-    console.error("deleteProject Error:", error);
+    console.error("deleteDepartment Error:", error);
   }
 
   return { status, error };

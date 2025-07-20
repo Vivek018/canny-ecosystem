@@ -3,7 +3,7 @@ import type { ProjectDatabaseInsert, SiteDatabaseInsert } from "../types";
 
 export function seedProject(): Omit<
   ProjectDatabaseInsert,
-  "project_client_id" | "end_client_id" | "primary_contractor_id"
+  "company_id"
 > {
   return {
     name: faker.string.alphanumeric(10),
@@ -12,13 +12,9 @@ export function seedProject(): Omit<
     status: ["active", "pending", "cancelled", "completed"][
       faker.number.int({ min: 0, max: 3 })
     ],
-    start_date: faker.date.past().toISOString(),
-    estimated_end_date: faker.date.future().toISOString(),
     description: faker.lorem.paragraph(5),
-    environmental_considerations: faker.lorem.paragraph(5),
-    quality_standards: faker.lorem.paragraph(5),
-    health_safety_requirements: faker.lorem.paragraph(5),
-    risk_assessment: faker.lorem.paragraph(5),
+    start_date: faker.date.past().toISOString(),
+    end_date: faker.date.future().toISOString(),
   };
 }
 

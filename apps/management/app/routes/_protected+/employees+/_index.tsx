@@ -23,7 +23,7 @@ import {
   type EmployeeFilters,
   getEmployeesByCompanyId,
   getProjectNamesByCompanyId,
-  getSiteNamesByProjectName,
+  getSiteNamesByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
@@ -95,13 +95,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
       companyId,
     });
 
-    let sitePromise = null;
-    if (filters.project) {
-      sitePromise = getSiteNamesByProjectName({
-        supabase,
-        projectName: filters.project,
-      });
-    }
+    const sitePromise = getSiteNamesByCompanyId({
+      supabase,
+      companyId,
+    });
+
     return defer({
       employeesPromise: employeesPromise as any,
       projectPromise,

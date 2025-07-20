@@ -5,7 +5,7 @@ import {
   createRole,
   DepartmentsSchema,
 } from "@canny_ecosystem/utils";
-import { Field } from "@canny_ecosystem/ui/forms";
+import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import { getInitialValueFromZod, replaceDash } from "@canny_ecosystem/utils";
 import {
   FormProvider,
@@ -21,7 +21,7 @@ import {
   useLoaderData,
   useNavigate,
 } from "@remix-run/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 
@@ -43,13 +43,15 @@ import { clearExactCacheEntry } from "@/utils/cache";
 import type { DepartmentsDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { createDepartment } from "@canny_ecosystem/supabase/mutations";
 import { UPDATE_DEPARTMENT_TAG } from "./$departmentId.update-department";
+import { getSiteNamesByCompanyId } from "@canny_ecosystem/supabase/queries";
+import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
+import type { ComboboxSelectOption } from "@canny_ecosystem/ui/combobox";
 
 export const CREATE_DEPARTMENT_TAG = "create-department";
 
 export async function loader({
   request,
-  params,
-}: LoaderFunctionArgs): Promise<Response> {
+}: LoaderFunctionArgs) {
   const { supabase, headers } = getSupabaseWithHeaders({ request });
   const { user } = await getUserCookieOrFetchUser(request, supabase);
 
@@ -57,20 +59,23 @@ export async function loader({
     return safeRedirect(DEFAULT_ROUTE, { headers });
   }
 
+  const { companyId } = await getCompanyIdOrFirstCompany(request, supabase);
+
   try {
-    const siteId = params.siteId;
+    const { data, error } = await getSiteNamesByCompanyId({ supabase, companyId });
+
+    if (error) throw error;
 
     return json({
-      status: "success",
-      message: "Department form loaded",
-      siteId,
+      siteOptions: data?.map((site) => ({ label: site.name, value: site.id })),
+      companyId,
       error: null,
     });
   } catch (error) {
     return json(
       {
-        status: "error",
-        message: "An unexpected error occurred",
+        siteOptions: null,
+        companyId,
         error,
       },
       { status: 500 }
@@ -124,10 +129,13 @@ export async function action({
 
 export default function CreateDepartment({
   updateValues,
+  siteFromUpdate
 }: {
   updateValues?: DepartmentsDatabaseUpdate | null;
+  siteFromUpdate: ComboboxSelectOption[] | null | undefined;
 }) {
-  const { siteId } = useLoaderData<typeof loader>();
+  const { siteOptions, companyId } = useLoaderData<typeof loader>();
+  const [resetKey, setResetKey] = useState(Date.now());
 
   const actionData = useActionData<typeof action>();
   const DEPARTMENT_TAG = updateValues
@@ -147,7 +155,7 @@ export default function CreateDepartment({
     shouldRevalidate: "onInput",
     defaultValue: {
       ...initialValues,
-      site_id: initialValues.site_id ?? siteId,
+      company_id: initialValues.company_id ?? companyId,
     },
   });
 
@@ -167,11 +175,11 @@ export default function CreateDepartment({
     } else {
       toast({
         title: "Error",
-        description: actionData.error ?? "Departments creation failed",
+        description: actionData.error ?? "Departments Creation failed",
         variant: "destructive",
       });
     }
-    navigate(-1, { replace: true });
+    navigate("/modules/departments", { replace: true });
   }, [actionData]);
 
   return (
@@ -189,8 +197,7 @@ export default function CreateDepartment({
             </CardHeader>
             <CardContent>
               <input {...getInputProps(fields.id, { type: "hidden" })} />
-              <input {...getInputProps(fields.site_id, { type: "hidden" })} />
-
+              <input {...getInputProps(fields.company_id, { type: "hidden" })} />
               <Field
                 inputProps={{
                   ...getInputProps(fields.name, { type: "text" }),
@@ -203,8 +210,23 @@ export default function CreateDepartment({
                 }}
                 errors={fields.name.errors}
               />
+              <SearchableSelectField
+                key={resetKey}
+                className="capitalize"
+                options={((updateValues ? siteFromUpdate : siteOptions)) ?? []}
+                inputProps={{
+                  ...getInputProps(fields.site_id, {
+                    type: "text",
+                  }),
+                }}
+                placeholder={"Select Site"}
+                labelProps={{
+                  children: "Site",
+                }}
+                errors={fields.site_id.errors}
+              />
             </CardContent>
-            <FormButtons form={form} isSingle={true} />
+            <FormButtons setResetKey={setResetKey} form={form} isSingle={true} />
           </Card>
         </Form>
       </FormProvider>

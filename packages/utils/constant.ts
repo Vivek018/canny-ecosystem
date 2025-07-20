@@ -139,6 +139,7 @@ export const attribute = {
   statutoryFieldsGraduity: "statutory_fields_graduity",
   statutoryFieldsLeaveEncashment: "statutory_fields_leave_encashment",
   paymentTemplates: "payment_templates",
+  modules: "modules",
   projects: "projects",
   project: "project",
   sites: "sites",

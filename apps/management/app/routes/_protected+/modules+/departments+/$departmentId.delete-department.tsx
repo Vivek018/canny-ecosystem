@@ -34,7 +34,7 @@ export async function action({
         status: "error",
         message: "Department ID is required",
         error: "No department ID provided",
-        redirectUrl: "/",
+        redirectUrl: "/modules/departments",
       },
       { status: 400 }
     );
@@ -49,7 +49,7 @@ export async function action({
           status: "error",
           message: "Failed to delete department",
           error,
-          redirectUrl: "/",
+          redirectUrl: "/modules/departments",
         },
         { status: 500 }
       );
@@ -59,7 +59,7 @@ export async function action({
       status: "success",
       message: "Department deleted successfully",
       error: null,
-      redirectUrl: "/",
+      redirectUrl: "/modules/departments",
     });
   } catch (error) {
     return json(
@@ -67,7 +67,7 @@ export async function action({
         status: "error",
         message: "An unexpected error occurred",
         error,
-        redirectUrl: "/",
+        redirectUrl: "/modules/departments",
       },
       { status: 500 }
     );
@@ -100,7 +100,7 @@ export default function DeleteDepartment() {
       });
     }
 
-    navigate(-1, { replace: true });
+    navigate(actionData?.redirectUrl ?? "/modules/departments", { replace: true });
   }, [actionData]);
 
   return null;

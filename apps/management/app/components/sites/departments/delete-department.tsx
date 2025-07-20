@@ -46,7 +46,7 @@ export const DeleteDepartment = ({
         {},
         {
           method: "post",
-          action: `/sites/${id}/delete-department`,
+          action: `${id}/delete-department`,
           replace: true,
         }
       );
@@ -72,7 +72,7 @@ export const DeleteDepartment = ({
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
             This action cannot be undone. This will permanently delete your
-            Department and remove it's data from our servers.
+            department and remove it's data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="py-4">

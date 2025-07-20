@@ -76,7 +76,7 @@ export function DepartmentsDataTable<TData, TValue>({
                     colSpan={columns.length}
                     className="h-80 bg-background grid place-items-center text-center tracking-wide text-xl capitalize"
                   >
-                    No Department Found
+                    No Department Found.
                   </TableCell>
                 </TableRow>
               )}
