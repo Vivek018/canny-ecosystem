@@ -1,4 +1,3 @@
-
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,9 +24,11 @@ import { useNavigate, useSubmit } from "@remix-run/react";
 export const SalaryEntryDropdown = ({
   data,
   triggerChild,
+  editable = false,
 }: {
   data: any;
   triggerChild: React.ReactElement;
+  editable: boolean;
 }) => {
   const navigate = useNavigate();
 
@@ -58,8 +59,8 @@ export const SalaryEntryDropdown = ({
             </DropdownMenuItem>
           ))}
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
+        <DropdownMenuSeparator className={cn(!editable && "hidden")} />
+        <DropdownMenuGroup className={cn(!editable && "hidden")}>
           <DeleteSalaryEntry payrollId={payrollId} employeeId={employeeId} />
         </DropdownMenuGroup>
       </DropdownMenuContent>

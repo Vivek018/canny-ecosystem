@@ -38,12 +38,12 @@ export default function Modules() {
         <SecondaryMenu
           items={[
             {
-              label: "Projects",
-              path: "/modules/projects",
-            },
-            {
               label: "Sites",
               path: "/modules/sites",
+            },
+            {
+              label: "Projects",
+              path: "/modules/projects",
             },
             {
               label: "Departments",

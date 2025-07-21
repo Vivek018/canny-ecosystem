@@ -183,6 +183,7 @@ export const salaryEntryColumns = ({
         return (
           <SalaryEntryDropdown
             data={row.original}
+            editable={editable}
             triggerChild={
               <DropdownMenuTrigger
                 asChild
