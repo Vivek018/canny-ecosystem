@@ -118,7 +118,7 @@ export default function Login() {
     if (error) {
       toast({
         title: "Error",
-        description: error ?? "Failed to load employee details",
+        description: JSON.stringify(error) ?? "Failed to load employee details",
         variant: "destructive",
       })
     }

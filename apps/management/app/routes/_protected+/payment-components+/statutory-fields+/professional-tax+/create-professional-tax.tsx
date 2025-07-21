@@ -168,7 +168,7 @@ export default function CreateProfessionalTax({
       toast({
         title: "Error",
         description:
-          actionData.error ?? "Professional Tax create failed",
+          actionData.error?.message ?? "Professional Tax create failed",
         variant: "destructive",
       });
     }

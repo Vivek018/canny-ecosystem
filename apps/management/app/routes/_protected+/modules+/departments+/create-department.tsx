@@ -175,7 +175,7 @@ export default function CreateDepartment({
     } else {
       toast({
         title: "Error",
-        description: actionData.error ?? "Departments Creation failed",
+        description: actionData.error?.message ?? "Departments Creation failed",
         variant: "destructive",
       });
     }

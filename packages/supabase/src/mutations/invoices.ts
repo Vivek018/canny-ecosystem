@@ -33,6 +33,7 @@ export async function createInvoice({
     error,
     status,
   } = await supabase.from("invoice").insert(newData).select().single();
+  
   if (error) {
     console.error("createInvoice Error:", error);
   }
