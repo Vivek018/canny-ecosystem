@@ -32,7 +32,7 @@ import {
   getCompanies,
   getEmployeeIdentityBySiteId,
   getProjectsByCompanyId,
-  getSitesByProjectId,
+  getSiteNamesByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { getCompanyIdOrFirstCompany } from "@/utils/server/company.server";
@@ -72,8 +72,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     const reportedBy = urlSearchParams.get("reported_by");
     const reportedOn = urlSearchParams.get("reported_on");
-    const reportedByProject = urlSearchParams.get("reported_by_project");
-    const reportedOnProject = urlSearchParams.get("reported_on_project");
     const reportedBySiteId = urlSearchParams.get("reported_by_site");
     const reportedOnSiteId = urlSearchParams.get("reported_on_site");
 
@@ -105,22 +103,22 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     const needsReportedBySite =
-      (reportedBy === "site" || reportedBy === "employee") && reportedByProject;
+      (reportedBy === "site" || reportedBy === "employee");
 
     if (needsReportedBySite) {
-      ({ data: reportedBySite } = await getSitesByProjectId({
+      ({ data: reportedBySite } = await getSiteNamesByCompanyId({
         supabase,
-        projectId: reportedByProject ?? "",
+        companyId,
       }));
     }
 
     const needsReportedOnSite =
-      (reportedOn === "site" || reportedOn === "employee") && reportedOnProject;
+      (reportedOn === "site" || reportedOn === "employee");
 
     if (needsReportedOnSite) {
-      ({ data: reportedOnSite } = await getSitesByProjectId({
+      ({ data: reportedOnSite } = await getSiteNamesByCompanyId({
         supabase,
-        projectId: reportedOnProject ?? "",
+        companyId,
       }));
     }
 
