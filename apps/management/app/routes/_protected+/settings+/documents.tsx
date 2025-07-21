@@ -71,7 +71,7 @@ export default function Documents() {
   }
 
   return (
-    <section className='w-full px-0'>
+    <section className='w-full py-4 px-0'>
       <div className='w-full mb-6'>
         <Suspense fallback={<LoadingSpinner />}>
           <Await resolve={documentsPromise}>
@@ -81,7 +81,7 @@ export default function Documents() {
                 return <ErrorBoundary message='Failed to fetch documents' />;
               }
               return <Command className='overflow-visible w-full'>
-                <div className='w-full md:w-3/4 lg:w-1/2 2xl:w-1/3 py-4 flex items-center gap-4'>
+                <div className='w-full lg:w-3/5 2xl:w-1/3 flex items-center gap-4'>
                   <CommandInput
                     divClassName='border border-input rounded-md h-10 flex-1'
                     placeholder='Search Documents'

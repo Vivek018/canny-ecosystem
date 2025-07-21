@@ -22,7 +22,6 @@ import {
   Await,
   type ClientLoaderFunctionArgs,
   defer,
-  Link,
   Outlet,
   redirect,
   useLoaderData,
@@ -49,7 +48,7 @@ import { LoadingSpinner } from "@/components/loading-spinner";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { useLeavesStore } from "@/store/leaves";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
-import { Button, buttonVariants } from "@canny_ecosystem/ui/button";
+import { Button } from "@canny_ecosystem/ui/button";
 import { LeavesMenu } from "@/components/leaves/leaves-menu";
 import { ImportLeavesModal } from "@/components/leaves/import-export/import-modal-leaves";
 import {
@@ -355,7 +354,7 @@ export default function LeavesIndex() {
             <FilterList filters={filterList} />
           </div>
           <div className="gap-4 hidden md:flex">
-            <div className="flex gap-2 px-4 border-r border-dashed border-muted-foreground/80">
+            <div className="flex gap-2">
               <ColumnVisibility />
               {/* <LeavesEmailMenu
               columnVisibility={columnVisibility}
@@ -381,10 +380,6 @@ export default function LeavesIndex() {
                 companyAddress={companyAddress as unknown as LocationDatabaseRow}
               />
             </div>
-            <Link to="/chat/chatbox/attendance" className={cn(buttonVariants({ variant: "gradiant" }), "flex items-center justify-center gap-2 h-10")}>
-              <Icon name="magic" size="xs" />
-              <p>AI Chat</p>
-            </Link>
           </div>
         </div>
         <Suspense fallback={<LoadingSpinner className="h-1/2 mt-20" />}>

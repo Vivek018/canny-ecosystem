@@ -215,7 +215,7 @@ export default function ReimbursementsIndex() {
           </Suspense>
           <FilterList filters={filterList} />
         </div>
-        <ReimbursementActions isEmpty={!projectPromise} env={env} />
+        <ReimbursementActions isEmpty={!reimbursementsPromise} env={env} />
       </div>
       <Suspense fallback={<LoadingSpinner className="h-1/3" />}>
         <Await resolve={reimbursementsPromise}>

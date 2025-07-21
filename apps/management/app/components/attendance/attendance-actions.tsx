@@ -1,6 +1,6 @@
 import { AttendanceMenu } from "./attendance-menu";
-import { Button, buttonVariants } from "@canny_ecosystem/ui/button";
-import { Link, useNavigate } from "@remix-run/react";
+import { Button } from "@canny_ecosystem/ui/button";
+import { useNavigate } from "@remix-run/react";
 import { Icon } from "@canny_ecosystem/ui/icon";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { useAttendanceStore } from "@/store/attendance";
@@ -24,7 +24,7 @@ export function AttendanceActions({
 
   return (
     <div className="gap-4 hidden md:flex">
-      <div className="flex gap-2 px-4 border-r border-dashed border-muted-foreground/80">
+      <div className="flex gap-2">
       <ColumnVisibility disabled={isEmpty} />
       {/* <AttendanceEmailMenu
         selectedRows={selectedRows}
@@ -51,10 +51,6 @@ export function AttendanceActions({
         companyAddress={companyAddress}
       />
       </div>
-      <Link to="/chat/chatbox/attendance" className={cn(buttonVariants({ variant: "gradiant" }), "flex items-center justify-center gap-2 h-10")}>
-        <Icon name="magic" size="xs" />
-        <p>AI Chat</p>
-      </Link>
     </div>
   );
 }
