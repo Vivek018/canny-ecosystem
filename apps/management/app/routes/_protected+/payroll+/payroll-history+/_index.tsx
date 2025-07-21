@@ -240,7 +240,7 @@ export default function PayrollHistoryIndex() {
                         !isDocument && "hidden"
                       )}
                     >
-                      No payrolls found
+                      No payrolls found.
                     </CommandEmpty>
                     <CommandList className="max-h-full py-4 overflow-x-visible overflow-y-visible">
                       <CommandGroup className="p-0 overflow-visible">

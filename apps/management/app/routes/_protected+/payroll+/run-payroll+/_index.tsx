@@ -262,7 +262,7 @@ export default function RunPayrollIndex() {
                         !isDocument && "hidden"
                       )}
                     >
-                      No payrolls found
+                      No payrolls found.
                     </CommandEmpty>
                     <CommandList className="max-h-full py-6 overflow-x-visible overflow-y-visible">
                       <CommandGroup className="p-0 overflow-visible">

@@ -24,7 +24,7 @@ import {
   type IncidentFilters,
   getIncidentsByCompanyId,
   getProjectNamesByCompanyId,
-  getSiteNamesByProjectName,
+  getSiteNamesByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import { columns } from "@/components/incidents/table/columns";
 import { FilterList } from "@/components/incidents/filter-list";
@@ -92,12 +92,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     const projectPromise = getProjectNamesByCompanyId({ supabase, companyId });
 
-    let sitePromise = null;
-    if (filters?.project)
-      sitePromise = getSiteNamesByProjectName({
-        supabase,
-        projectName: filters?.project,
-      });
+    const sitePromise = getSiteNamesByCompanyId({
+      supabase,
+      companyId,
+    });
 
     return defer({
       incidentPromise: incidentPromise as any,

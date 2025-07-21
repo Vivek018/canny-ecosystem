@@ -88,7 +88,7 @@ export function ImportedDataTable<TData, TValue>({
                     colSpan={columns.length}
                     className="h-80 grid place-items-center text-center tracking-wide text-xl capitalize"
                   >
-                    No Payroll Found
+                    No Payroll Found.
                   </TableCell>
                 </TableRow>
               )}

@@ -34,7 +34,7 @@ function getRedirectUrl(type: string, data: any, keyPrefix: string): string {
     case "employee":
       return `/employees/${entity?.id}/overview`;
     case "site":
-      return `/modules/sites/${entity?.id}`;
+      return "/modules/sites";
     case "project":
       return "/modules/projects";
     default:
