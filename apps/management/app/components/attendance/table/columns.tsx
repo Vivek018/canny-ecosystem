@@ -5,7 +5,7 @@ import { Link } from "@remix-run/react";
 import type { AttendanceDataType } from "@canny_ecosystem/supabase/queries";
 import { useUser } from "@/utils/user";
 import { DropdownMenuTrigger } from "@canny_ecosystem/ui/dropdown-menu";
-import { deleteRole, hasPermission, updateRole } from "@canny_ecosystem/utils";
+import { deleteRole, getMonthName, hasPermission, updateRole } from "@canny_ecosystem/utils";
 import { cn } from "@canny_ecosystem/ui/utils/cn";
 import { attribute } from "@canny_ecosystem/utils/constant";
 import { Icon } from "@canny_ecosystem/ui/icon";
@@ -83,7 +83,7 @@ export const attendanceColumns: ColumnDef<AttendanceDataType>[] = [
     header: "Month",
     cell: ({ row }) => (
       <p className="truncate">
-        {row.original?.monthly_attendance?.month ?? "--"}
+        {getMonthName(row.original?.monthly_attendance?.month) ?? "--"}
       </p>
     ),
   },

@@ -67,7 +67,11 @@ export async function loader({
     if (error) throw error;
 
     return json({
-      siteOptions: data?.map((site) => ({ label: site.name, value: site.id })),
+      siteOptions: data?.map((site) => ({
+        label: site.name,
+        pseudoLabel: site?.projects?.name,
+        value: site.id
+      })),
       companyId,
       error: null,
     });

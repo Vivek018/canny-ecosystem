@@ -1405,12 +1405,13 @@ export const attendanceHolidayTypeArray = [
 export const AttendanceSchema = z.object({
   id: z.string().optional(),
   employee_id: z.string(),
-  present_days: z.number().min(0).max(31),
-  overtime_hours: z.number().default(0),
   month: z.number().min(1).max(12),
   year: z.number(),
-  working_days: z.number().min(0).max(31),
-  absent_days: z.number().min(0).max(31),
+  working_days: z.number().min(0).max(31).default(26),
+  present_days: z.number().min(0).max(31).default(26),
+  overtime_hours: z.number().default(0),
+  absent_days: z.number().min(0).max(31).optional
+  (),
   working_hours: z.number().default(0),
   paid_holidays: z.number().min(0).max(31).optional(),
   paid_leaves: z.number().min(0).max(31).optional(),

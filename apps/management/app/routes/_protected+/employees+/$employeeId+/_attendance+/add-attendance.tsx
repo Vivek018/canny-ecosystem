@@ -20,6 +20,9 @@ import {
   hasPermission,
   AttendanceSchema,
   replaceUnderscore,
+  transformStringArrayIntoOptions,
+  getYears,
+  defaultYear,
 } from "@canny_ecosystem/utils";
 import {
   Card,
@@ -28,19 +31,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@canny_ecosystem/ui/card";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
-import { Field } from "@canny_ecosystem/ui/forms";
+import { Field, SearchableSelectField } from "@canny_ecosystem/ui/forms";
 import { FormButtons } from "@/components/form/form-buttons";
 import { useToast } from "@canny_ecosystem/ui/use-toast";
 import { clearCacheEntry } from "@/utils/cache";
 import type { EmployeeMonthlyAttendanceDatabaseUpdate } from "@canny_ecosystem/supabase/types";
 import { getUserCookieOrFetchUser } from "@/utils/server/user.server";
-import { attribute } from "@canny_ecosystem/utils/constant";
+import { attribute, payoutMonths } from "@canny_ecosystem/utils/constant";
 import { safeRedirect } from "@/utils/server/http.server";
 import { AddAttendance } from "@canny_ecosystem/supabase/mutations";
-import { UPDATE_ATTENDANCE_TAG } from "./$attendanceId.update-attendance";
+import { UPDATE_ATTENDANCE_TAG } from "../../../time-tracking+/attendance+/$attendanceId.update-attendance";
 
 export const CREATE_ATTENDANCE_TAG = "Create-Attendance";
 
@@ -116,6 +119,7 @@ export default function AddMonthlyAttendance({
 }) {
   const { employeeId } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
+  const [resetKey, setResetKey] = useState(Date.now());
 
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -186,24 +190,29 @@ export default function AddMonthlyAttendance({
                 {...getInputProps(fields.employee_id, { type: "hidden" })}
               />
               <div className="grid grid-cols-2 place-content-center justify-between gap-6">
-                <Field
+                <SearchableSelectField
+                  key={resetKey}
                   inputProps={{
-                    ...getInputProps(fields.month, { type: "number" }),
-                    placeholder: `Enter ${fields.month.name}`,
+                    ...getInputProps(fields.month, { type: "text" }),
+                    placeholder: "Select Month",
                   }}
+                  options={payoutMonths}
                   labelProps={{
-                    children: fields.month.name,
+                    children: "Month",
                   }}
                   errors={fields.month.errors}
                 />
-                <Field
+                <SearchableSelectField
+                  key={resetKey + 1}
                   inputProps={{
-                    ...getInputProps(fields.year, { type: "number" }),
-                    placeholder: `Enter ${fields.year.name}`,
-                    className: "capitalize",
+                    ...getInputProps(fields.year, { type: "text" }),
+                    placeholder: "Select Year",
                   }}
+                  options={transformStringArrayIntoOptions(
+                    getYears(25, defaultYear) as unknown as string[]
+                  )}
                   labelProps={{
-                    children: fields.year.name,
+                    children: "Year",
                   }}
                   errors={fields.year.errors}
                 />
@@ -318,7 +327,11 @@ export default function AddMonthlyAttendance({
                 />
               </div>
             </CardContent>
-            <FormButtons form={form} isSingle={true} />
+            <FormButtons
+              form={form}
+              setResetKey={setResetKey}
+              isSingle={true}
+            />
           </Card>
         </Form>
       </FormProvider>

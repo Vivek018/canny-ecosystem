@@ -14,7 +14,7 @@ import {
   attribute,
   modalSearchParamNames,
 } from "@canny_ecosystem/utils/constant";
-import { useSearchParams } from "@remix-run/react";
+import { useNavigate, useSearchParams } from "@remix-run/react";
 import { AttendanceRegister } from "./attendance-register";
 import type {
   CompanyDatabaseRow,
@@ -35,6 +35,8 @@ export function AttendanceMenu({
   const { role } = useUser();
   // const submit = useSubmit();
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+
 
   /* Do it Later */
   // function extractAttendanceData(employees: { [key: string]: any }[]) {
@@ -146,11 +148,23 @@ export function AttendanceMenu({
         <DropdownMenuSeparator
           className={cn(
             !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
-              "hidden",
+            "hidden",
             !selectedRows.length && "hidden"
           )}
         />
-
+        <DropdownMenuItem
+          onClick={() => { navigate("create-bulk-attendance") }}
+          className={cn(!hasPermission(role, `${createRole}:${attribute.attendance}`) &&
+            "hidden", "space-x-2 flex items-center")}
+        >
+          <Icon name="plus-circled" size="sm" />
+          <span>Add Attendance</span>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator className={cn(
+          "space-x-2 flex items-center",
+          !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
+          "hidden"
+        )} />
         <DropdownMenuItem
           onClick={() => {
             searchParams.set("step", modalSearchParamNames.import_attendance);
@@ -159,7 +173,7 @@ export function AttendanceMenu({
           className={cn(
             "space-x-2 flex items-center",
             !hasPermission(role, `${createRole}:${attribute.attendance}`) &&
-              "hidden"
+            "hidden"
           )}
         >
           <Icon name="import" size="sm" className="mb-0.5" />

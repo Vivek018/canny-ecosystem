@@ -4,6 +4,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@canny_ecosystem/ui/dropdown-menu";
 import { Icon } from "@canny_ecosystem/ui/icon";
@@ -13,11 +14,12 @@ import {
   attribute,
   modalSearchParamNames,
 } from "@canny_ecosystem/utils/constant";
-import { useSearchParams } from "@remix-run/react";
+import { useNavigate, useSearchParams } from "@remix-run/react";
 
 export function ReimbursementAdd() {
   const { role } = useUser();
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   return (
     <>
@@ -26,7 +28,7 @@ export function ReimbursementAdd() {
           asChild
           className={cn(
             !hasPermission(role, `${createRole}:${attribute.reimbursements}`) &&
-              "hidden"
+            "hidden"
           )}
         >
           <Button variant="outline" size="icon" className="h-10 w-[2.5rem]">
@@ -34,6 +36,14 @@ export function ReimbursementAdd() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent sideOffset={10} align="end">
+          <DropdownMenuItem
+            onClick={() => { navigate("create-bulk-reimbursement") }}
+            className="space-x-2 flex items-center"
+          >
+            <Icon name="plus-circled" size="sm" />
+            <span>Add Reimbursement</span>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={() => {
               searchParams.set(

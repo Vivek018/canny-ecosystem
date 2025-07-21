@@ -50,9 +50,9 @@ export function getInitialValueFromZod<T extends z.ZodTypeAny>(
 export function transformStringArrayIntoOptions(
   arr: string[]
 ): { value: string; label: string }[] {
-  return arr.map((str) => ({
-    value: str,
-    label: str,
+  return arr?.map((str) => ({
+    value: String(str),
+    label: String(str),
   }));
 }
 

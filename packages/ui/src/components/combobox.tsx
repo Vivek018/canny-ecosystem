@@ -16,12 +16,14 @@ import { replaceUnderscore } from "@canny_ecosystem/utils";
 export interface ComboboxSelectOption {
   value: string | number;
   label: string;
+  pseudoLabel?: string;
 }
 
 interface ComboboxProps {
   options: ComboboxSelectOption[] | null | null[];
   value: string | number;
   onChange: (value: string) => void;
+  onInput?: (value: string) => void,
   placeholder?: string;
   className?: string;
   disabled?: boolean;
@@ -31,6 +33,7 @@ export function Combobox({
   options,
   value,
   onChange,
+  onInput,
   placeholder = "Select an option...",
   className,
   disabled,
@@ -66,7 +69,7 @@ export function Combobox({
       </PopoverTrigger>
       <PopoverContent align='start' className='p-0'>
         <Command>
-          <CommandInput placeholder='Search options...' />
+          <CommandInput placeholder='Search options...' onValueChange={(value) => onInput?.(value)} />
           <CommandEmpty className='w-full py-6 text-center'>
             No option found.
           </CommandEmpty>
@@ -75,7 +78,7 @@ export function Combobox({
               {options?.map((option) => (
                 <CommandItem
                   key={option?.value}
-                  value={String((option?.value ?? "") + (option?.label ?? ""))}
+                  value={String((option?.value ?? "") + (option?.label ?? "") + (option?.pseudoLabel ?? ""))}
                   onSelect={() => {
                     onChange(
                       String(option?.value) === String(value)
@@ -84,7 +87,7 @@ export function Combobox({
                     );
                     setOpen(false);
                   }}
-                  className='max-w-96'
+                  className='max-w-96 flex flex-row'
                 >
                   <Icon
                     name='check'
@@ -96,7 +99,8 @@ export function Combobox({
                         : "opacity-0"
                     )}
                   />
-                  <p className='truncate'>{replaceUnderscore(option?.label)}</p>
+                  <p className='truncate w-max flex-1'>{replaceUnderscore(option?.label)}</p>
+                  <p className={cn("text-muted-foreground ml-6 w-28 truncate", !option?.pseudoLabel && "hidden")}>{option?.pseudoLabel}</p>
                 </CommandItem>
               ))}
             </CommandGroup>

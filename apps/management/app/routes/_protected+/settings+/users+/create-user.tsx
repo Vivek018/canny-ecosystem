@@ -83,6 +83,7 @@ export async function loader({
 
     const siteOptions = sites?.map((site) => ({
       label: site?.name,
+      pseudoLabel: site?.projects?.name,
       value: site?.id,
     }));
 

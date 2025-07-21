@@ -37,7 +37,7 @@ export const AttendanceOptionsDropdown = ({
             )}
             onClick={handleUpdate}
           >
-            Update
+            Update Attendance
           </DropdownMenuItem>
 
           <DropdownMenuSeparator

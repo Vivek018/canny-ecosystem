@@ -175,11 +175,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     const reportedBySiteOptions = reportedBySite?.map((item) => ({
       label: item?.name,
+      pseudoLabel: item?.projects?.name,
       value: item?.id,
     }));
 
     const reportedOnSiteOptions = reportedOnSite?.map((item) => ({
       label: item?.name,
+      pseudoLabel: item?.projects?.name,
       value: item?.id,
     }));
 
