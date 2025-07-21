@@ -20,7 +20,7 @@ import {
   type ExitFilterType,
   getExitsByCompanyId,
   getProjectNamesByCompanyId,
-  getSiteNamesByProjectName,
+  getSiteNamesByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import { hasPermission, readRole } from "@canny_ecosystem/utils";
@@ -92,12 +92,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     const projectPromise = getProjectNamesByCompanyId({ supabase, companyId });
 
-    let sitePromise = null;
-    if (filters.project)
-      sitePromise = getSiteNamesByProjectName({
-        supabase,
-        projectName: filters.project,
-      });
+    const sitePromise = getSiteNamesByCompanyId({
+      supabase,
+      companyId,
+    });
 
     return defer({
       exitsPromise: exitsPromise as any,

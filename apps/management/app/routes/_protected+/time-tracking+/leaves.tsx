@@ -12,7 +12,7 @@ import {
   getLeaveTypeByCompanyId,
   getPrimaryLocationByCompanyId,
   getProjectNamesByCompanyId,
-  getSiteNamesByProjectName,
+  getSiteNamesByCompanyId,
   getUsersEmail,
   type LeavesFilters,
 } from "@canny_ecosystem/supabase/queries";
@@ -137,12 +137,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const userEmailsPromise = getUsersEmail({ supabase, companyId });
     const projectPromise = getProjectNamesByCompanyId({ supabase, companyId });
 
-    let sitePromise = null;
-    if (filters.project)
-      sitePromise = getSiteNamesByProjectName({
-        supabase,
-        projectName: filters.project,
-      });
+    const sitePromise = getSiteNamesByCompanyId({
+      supabase,
+      companyId,
+    });
 
     return defer({
       leavesPromise: leavesPromise as any,

@@ -13,8 +13,8 @@ import {
   type ReimbursementFilters,
   getReimbursementsByCompanyId,
   getProjectNamesByCompanyId,
-  getSiteNamesByProjectName,
   getUsersEmail,
+  getSiteNamesByCompanyId,
 } from "@canny_ecosystem/supabase/queries";
 import { getSupabaseWithHeaders } from "@canny_ecosystem/supabase/server";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
@@ -94,12 +94,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     const userEmailsPromise = getUsersEmail({ supabase, companyId });
 
-    let sitePromise = null;
-    if (filters.project)
-      sitePromise = getSiteNamesByProjectName({
-        supabase,
-        projectName: filters.project,
-      });
+    const sitePromise = getSiteNamesByCompanyId({
+      supabase,
+      companyId,
+    });
 
     return defer({
       reimbursementsPromise: reimbursementsPromise as any,
