@@ -90,7 +90,7 @@ export async function getLeavesByEmployeeId({
       `
         ${columns.join(
         ","
-      )},employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!left(sites, name, projects!left(id, name)))),
+      )},employees!inner(id,company_id,first_name, middle_name, last_name, employee_code, employee_project_assignment!employee_project_assignments_employee_id_fkey!left(sites!left(id, name, projects!left(id, name)))),
           users!${users ? "inner" : "left"}(id,email)
       
       `,
