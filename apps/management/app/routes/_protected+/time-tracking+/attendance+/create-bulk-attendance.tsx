@@ -178,7 +178,8 @@ export default function AddBulkAttendances() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.message || "Attendance Create Failed",
+          description:
+            actionData?.error?.message ?? actionData?.message ?? "Attendance Create Failed",
           variant: "destructive",
         });
       }

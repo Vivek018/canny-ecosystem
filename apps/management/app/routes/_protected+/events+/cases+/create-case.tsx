@@ -394,7 +394,8 @@ export default function CreateCase({
       if (actionData.status === "error") {
         toast({
           title: "Error",
-          description: actionData?.message ?? "An unexpected error occurred",
+          description:
+            actionData?.error?.message ?? actionData?.message ?? "An unexpected error occurred",
           variant: "destructive",
         });
       } else if (actionData.status === "success") {

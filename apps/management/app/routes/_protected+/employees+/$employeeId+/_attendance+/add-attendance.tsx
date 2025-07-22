@@ -138,10 +138,7 @@ export default function AddMonthlyAttendance({
         toast({
           title: "Error",
           description:
-            (actionData?.error?.message ===
-              'duplicate key value violates unique constraint "unique_employee_month_year"' &&
-              "Attendance already exists") ||
-            actionData?.error ||
+            actionData?.error?.message ??
             actionData?.message,
           variant: "destructive",
         });

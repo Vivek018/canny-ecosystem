@@ -134,8 +134,7 @@ export default function UpdateReimbursements() {
 
         toast({
           title: "Success",
-          description:
-            actionData?.message || "Reimbursement updated successfully",
+          description: actionData?.message || "Reimbursement updated successfully",
           variant: "success",
         });
       } else {

@@ -146,7 +146,8 @@ export default function AddReimbursements({
       } else {
         toast({
           title: "Error",
-          description: actionData?.message || "Reimbursement create failed",
+          description:
+            actionData?.error?.message ?? actionData?.message ?? "Reimbursement create failed",
           variant: "destructive",
         });
       }

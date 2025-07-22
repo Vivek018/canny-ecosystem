@@ -184,7 +184,8 @@ export default function AddBulkReimbursements() {
       } else {
         toast({
           title: "Error",
-          description: actionData?.message || "Reimbursement Create Failed",
+          description:
+            actionData?.error?.message ?? actionData?.message ?? "Reimbursement Create Failed",
           variant: "destructive",
         });
       }
